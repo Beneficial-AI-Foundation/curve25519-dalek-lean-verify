@@ -16,6 +16,5 @@ This function packs the element into a compact representation.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open scalar.backend.serial.u64.scalar
 
 -- Specification theorem to be written here

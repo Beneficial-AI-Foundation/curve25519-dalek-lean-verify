@@ -16,6 +16,5 @@ This function multiplies the point by the cofactor.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open edwards
 
 -- Specification theorem to be written here

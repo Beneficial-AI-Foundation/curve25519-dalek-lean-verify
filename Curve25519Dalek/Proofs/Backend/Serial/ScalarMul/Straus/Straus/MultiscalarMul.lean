@@ -16,6 +16,5 @@ This function performs multi-scalar multiplication.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open backend.serial.scalar_mul.straus
 
 -- Specification theorem to be written here

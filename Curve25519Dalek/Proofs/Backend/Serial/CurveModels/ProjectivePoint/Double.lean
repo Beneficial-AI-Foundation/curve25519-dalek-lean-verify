@@ -16,6 +16,5 @@ This function doubles the point.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open backend.serial.curve_models
 
 -- Specification theorem to be written here

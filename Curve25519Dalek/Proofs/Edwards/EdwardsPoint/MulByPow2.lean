@@ -16,6 +16,5 @@ This function multiplies by a power of 2.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open edwards
 
 -- Specification theorem to be written here
