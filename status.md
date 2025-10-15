@@ -67,7 +67,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `clamp_integer` | [scalar.rs:L1386-L1391](curve25519-dalek/src/scalar.rs#L1386-L1391) | [Scalar/ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `read_le_u64_into` | [scalar.rs:L1349-L1364](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ☐ |  |
 | `as_bytes` | [scalar.rs:L705-L708](curve25519-dalek/src/scalar.rs#L705-L708) | - | ☐ | ☐ |  |
-| `ct_eq` | [scalar.rs:L300-L304](curve25519-dalek/src/scalar.rs#L300-L304) | - | ☐ | ☐ |  |
+| `ct_eq` | [scalar.rs:L300-L304](curve25519-dalek/src/scalar.rs#L300-L304) | [Scalar/Scalar/CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | Draft Written (markus-dablander) |
 | `from_bytes_mod_order` | [scalar.rs:L236-L246](curve25519-dalek/src/scalar.rs#L236-L246) | - | ☐ | ☐ |  |
 | `from_bytes_mod_order_wide` | [scalar.rs:L249-L252](curve25519-dalek/src/scalar.rs#L249-L252) | - | ☐ | ☐ |  |
 | `from_canonical_bytes` | [scalar.rs:L260-L265](curve25519-dalek/src/scalar.rs#L260-L265) | - | ☐ | ☐ |  |
@@ -84,10 +84,10 @@ This document tracks the progress of formally verifying functions from the curve
 
 - **Total Functions**: 73
 - **Extracted**: 5 / 73 (6%)
-- **Draft Spec**: 0 / 73 (0%)
+- **Draft Spec**: 1 / 73 (1%)
 - **Specified**: 0 / 73 (0%)
 - **Verified**: 5 / 73 (6%)
-- **Pending**: 68 / 73 (93%)
+- **Pending**: 67 / 73 (91%)
 
 ---
 

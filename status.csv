@@ -60,7 +60,7 @@ curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve2551
 curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs:L1386-L1391,Curve25519Dalek/Proofs/Scalar/ClampInteger.lean,extracted,verified,Verified (oliver-butterley),,,
 curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs:L1349-L1364,,,,,,,
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs:L705-L708,,,,,,,
-curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs:L300-L304,,,,,,,
+curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs:L300-L304,Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean,,draft spec,Draft Written (markus-dablander),,,
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs:L236-L246,,,,,,,
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs:L249-L252,,,,,,,
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs:L260-L265,,,,,,,
