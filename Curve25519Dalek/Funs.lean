@@ -83,6 +83,183 @@ def backend.serial.u64.field.FieldElement51.reduce
   let limbs10 ← Array.update limbs9 4#usize i24
   ok limbs10
 
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 374:4-456:5 -/
+def backend.serial.u64.field.FieldElement51.to_bytes
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result (Array U8 32#usize)
+  :=
+  do
+  let fe ← backend.serial.u64.field.FieldElement51.reduce self
+  let i ← Array.index_usize fe 0#usize
+  let i1 ← i + 19#u64
+  let q ← i1 >>> 51#i32
+  let i2 ← Array.index_usize fe 1#usize
+  let i3 ← i2 + q
+  let q1 ← i3 >>> 51#i32
+  let i4 ← Array.index_usize fe 2#usize
+  let i5 ← i4 + q1
+  let q2 ← i5 >>> 51#i32
+  let i6 ← Array.index_usize fe 3#usize
+  let i7 ← i6 + q2
+  let q3 ← i7 >>> 51#i32
+  let i8 ← Array.index_usize fe 4#usize
+  let i9 ← i8 + q3
+  let q4 ← i9 >>> 51#i32
+  let i10 ← 19#u64 * q4
+  let i11 ← i + i10
+  let limbs ← Array.update fe 0#usize i11
+  let i12 ← 1#u64 <<< 51#i32
+  let low_51_bit_mask ← i12 - 1#u64
+  let i13 ← Array.index_usize limbs 0#usize
+  let i14 ← i13 >>> 51#i32
+  let i15 ← Array.index_usize limbs 1#usize
+  let i16 ← i15 + i14
+  let limbs1 ← Array.update limbs 1#usize i16
+  let i17 ← Array.index_usize limbs1 0#usize
+  let i18 ← (↑(i17 &&& low_51_bit_mask) : Result U64)
+  let limbs2 ← Array.update limbs1 0#usize i18
+  let i19 ← Array.index_usize limbs2 1#usize
+  let i20 ← i19 >>> 51#i32
+  let i21 ← Array.index_usize limbs2 2#usize
+  let i22 ← i21 + i20
+  let limbs3 ← Array.update limbs2 2#usize i22
+  let i23 ← Array.index_usize limbs3 1#usize
+  let i24 ← (↑(i23 &&& low_51_bit_mask) : Result U64)
+  let limbs4 ← Array.update limbs3 1#usize i24
+  let i25 ← Array.index_usize limbs4 2#usize
+  let i26 ← i25 >>> 51#i32
+  let i27 ← Array.index_usize limbs4 3#usize
+  let i28 ← i27 + i26
+  let limbs5 ← Array.update limbs4 3#usize i28
+  let i29 ← Array.index_usize limbs5 2#usize
+  let i30 ← (↑(i29 &&& low_51_bit_mask) : Result U64)
+  let limbs6 ← Array.update limbs5 2#usize i30
+  let i31 ← Array.index_usize limbs6 3#usize
+  let i32 ← i31 >>> 51#i32
+  let i33 ← Array.index_usize limbs6 4#usize
+  let i34 ← i33 + i32
+  let limbs7 ← Array.update limbs6 4#usize i34
+  let i35 ← Array.index_usize limbs7 3#usize
+  let i36 ← (↑(i35 &&& low_51_bit_mask) : Result U64)
+  let limbs8 ← Array.update limbs7 3#usize i36
+  let i37 ← Array.index_usize limbs8 4#usize
+  let i38 ← (↑(i37 &&& low_51_bit_mask) : Result U64)
+  let limbs9 ← Array.update limbs8 4#usize i38
+  let s := Array.repeat 32#usize 0#u8
+  let i39 ← Array.index_usize limbs9 0#usize
+  let i40 ← (↑(UScalar.cast .U8 i39) : Result U8)
+  let s1 ← Array.update s 0#usize i40
+  let i41 ← i39 >>> 8#i32
+  let i42 ← (↑(UScalar.cast .U8 i41) : Result U8)
+  let s2 ← Array.update s1 1#usize i42
+  let i43 ← i39 >>> 16#i32
+  let i44 ← (↑(UScalar.cast .U8 i43) : Result U8)
+  let s3 ← Array.update s2 2#usize i44
+  let i45 ← i39 >>> 24#i32
+  let i46 ← (↑(UScalar.cast .U8 i45) : Result U8)
+  let s4 ← Array.update s3 3#usize i46
+  let i47 ← i39 >>> 32#i32
+  let i48 ← (↑(UScalar.cast .U8 i47) : Result U8)
+  let s5 ← Array.update s4 4#usize i48
+  let i49 ← i39 >>> 40#i32
+  let i50 ← (↑(UScalar.cast .U8 i49) : Result U8)
+  let s6 ← Array.update s5 5#usize i50
+  let i51 ← i39 >>> 48#i32
+  let i52 ← Array.index_usize limbs9 1#usize
+  let i53 ← i52 <<< 3#i32
+  let i54 ← (↑(i51 ||| i53) : Result U64)
+  let i55 ← (↑(UScalar.cast .U8 i54) : Result U8)
+  let s7 ← Array.update s6 6#usize i55
+  let i56 ← i52 >>> 5#i32
+  let i57 ← (↑(UScalar.cast .U8 i56) : Result U8)
+  let s8 ← Array.update s7 7#usize i57
+  let i58 ← i52 >>> 13#i32
+  let i59 ← (↑(UScalar.cast .U8 i58) : Result U8)
+  let s9 ← Array.update s8 8#usize i59
+  let i60 ← i52 >>> 21#i32
+  let i61 ← (↑(UScalar.cast .U8 i60) : Result U8)
+  let s10 ← Array.update s9 9#usize i61
+  let i62 ← i52 >>> 29#i32
+  let i63 ← (↑(UScalar.cast .U8 i62) : Result U8)
+  let s11 ← Array.update s10 10#usize i63
+  let i64 ← i52 >>> 37#i32
+  let i65 ← (↑(UScalar.cast .U8 i64) : Result U8)
+  let s12 ← Array.update s11 11#usize i65
+  let i66 ← i52 >>> 45#i32
+  let i67 ← Array.index_usize limbs9 2#usize
+  let i68 ← i67 <<< 6#i32
+  let i69 ← (↑(i66 ||| i68) : Result U64)
+  let i70 ← (↑(UScalar.cast .U8 i69) : Result U8)
+  let s13 ← Array.update s12 12#usize i70
+  let i71 ← i67 >>> 2#i32
+  let i72 ← (↑(UScalar.cast .U8 i71) : Result U8)
+  let s14 ← Array.update s13 13#usize i72
+  let i73 ← i67 >>> 10#i32
+  let i74 ← (↑(UScalar.cast .U8 i73) : Result U8)
+  let s15 ← Array.update s14 14#usize i74
+  let i75 ← i67 >>> 18#i32
+  let i76 ← (↑(UScalar.cast .U8 i75) : Result U8)
+  let s16 ← Array.update s15 15#usize i76
+  let i77 ← i67 >>> 26#i32
+  let i78 ← (↑(UScalar.cast .U8 i77) : Result U8)
+  let s17 ← Array.update s16 16#usize i78
+  let i79 ← i67 >>> 34#i32
+  let i80 ← (↑(UScalar.cast .U8 i79) : Result U8)
+  let s18 ← Array.update s17 17#usize i80
+  let i81 ← i67 >>> 42#i32
+  let i82 ← (↑(UScalar.cast .U8 i81) : Result U8)
+  let s19 ← Array.update s18 18#usize i82
+  let i83 ← i67 >>> 50#i32
+  let i84 ← Array.index_usize limbs9 3#usize
+  let i85 ← i84 <<< 1#i32
+  let i86 ← (↑(i83 ||| i85) : Result U64)
+  let i87 ← (↑(UScalar.cast .U8 i86) : Result U8)
+  let s20 ← Array.update s19 19#usize i87
+  let i88 ← i84 >>> 7#i32
+  let i89 ← (↑(UScalar.cast .U8 i88) : Result U8)
+  let s21 ← Array.update s20 20#usize i89
+  let i90 ← i84 >>> 15#i32
+  let i91 ← (↑(UScalar.cast .U8 i90) : Result U8)
+  let s22 ← Array.update s21 21#usize i91
+  let i92 ← i84 >>> 23#i32
+  let i93 ← (↑(UScalar.cast .U8 i92) : Result U8)
+  let s23 ← Array.update s22 22#usize i93
+  let i94 ← i84 >>> 31#i32
+  let i95 ← (↑(UScalar.cast .U8 i94) : Result U8)
+  let s24 ← Array.update s23 23#usize i95
+  let i96 ← i84 >>> 39#i32
+  let i97 ← (↑(UScalar.cast .U8 i96) : Result U8)
+  let s25 ← Array.update s24 24#usize i97
+  let i98 ← i84 >>> 47#i32
+  let i99 ← Array.index_usize limbs9 4#usize
+  let i100 ← i99 <<< 4#i32
+  let i101 ← (↑(i98 ||| i100) : Result U64)
+  let i102 ← (↑(UScalar.cast .U8 i101) : Result U8)
+  let s26 ← Array.update s25 25#usize i102
+  let i103 ← i99 >>> 4#i32
+  let i104 ← (↑(UScalar.cast .U8 i103) : Result U8)
+  let s27 ← Array.update s26 26#usize i104
+  let i105 ← i99 >>> 12#i32
+  let i106 ← (↑(UScalar.cast .U8 i105) : Result U8)
+  let s28 ← Array.update s27 27#usize i106
+  let i107 ← i99 >>> 20#i32
+  let i108 ← (↑(UScalar.cast .U8 i107) : Result U8)
+  let s29 ← Array.update s28 28#usize i108
+  let i109 ← i99 >>> 28#i32
+  let i110 ← (↑(UScalar.cast .U8 i109) : Result U8)
+  let s30 ← Array.update s29 29#usize i110
+  let i111 ← i99 >>> 36#i32
+  let i112 ← (↑(UScalar.cast .U8 i111) : Result U8)
+  let s31 ← Array.update s30 30#usize i112
+  let i113 ← i99 >>> 44#i32
+  let i114 ← (↑(UScalar.cast .U8 i113) : Result U8)
+  let s32 ← Array.update s31 31#usize i114
+  let i115 ← Array.index_usize s32 31#usize
+  let i116 ← (↑(i115 &&& 128#u8) : Result U8)
+  massert (i116 = 0#u8)
+  ok s32
+
 /- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 43:4-45:5 -/
 def
@@ -247,6 +424,43 @@ def backend.serial.u64.scalar.Scalar52.square_internal
   let i32 ← backend.serial.u64.scalar.m i31 i18
   let i33 ← backend.serial.u64.scalar.m i18 i18
   ok (Array.make 9#usize [ i8, i10, i13, i17, i23, i27, i30, i32, i33 ])
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 564:4-564:53 -/
+@[global_simps]
+def scalar.Scalar.ZERO_body : Result scalar.Scalar :=
+  let a := Array.repeat 32#usize 0#u8
+  ok { bytes := a }
+@[global_simps, irreducible]
+def scalar.Scalar.ZERO : scalar.Scalar := eval_global scalar.Scalar.ZERO_body
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ONE]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 567:4-572:6 -/
+@[global_simps]
+def scalar.Scalar.ONE_body : Result scalar.Scalar :=
+  ok
+    {
+      bytes :=
+        (Array.make 32#usize [
+          1#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8,
+          0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8,
+          0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8
+          ])
+    }
+@[global_simps, irreducible]
+def scalar.Scalar.ONE : scalar.Scalar := eval_global scalar.Scalar.ONE_body
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 691:4-693:5 -/
+def scalar.Scalar.to_bytes
+  (self : scalar.Scalar) : Result (Array U8 32#usize) :=
+  ok self.bytes
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 706:4-708:5 -/
+def scalar.Scalar.as_bytes
+  (self : scalar.Scalar) : Result (Array U8 32#usize) :=
+  ok self.bytes
 
 /- [curve25519_dalek::scalar::clamp_integer]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1386:0-1391:1 -/

@@ -7,3 +7,8 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce
 curve25519_dalek::scalar::clamp_integer
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal
+curve25519_dalek::scalar::Scalar::ZERO
+curve25519_dalek::scalar::Scalar::ONE
+curve25519_dalek::scalar::Scalar::to_bytes
+curve25519_dalek::scalar::Scalar::as_bytes
+curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes

@@ -16,4 +16,9 @@ namespace curve25519_dalek
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
 @[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
 
+/- [curve25519_dalek::scalar::Scalar]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
+structure scalar.Scalar where
+  bytes : Array U8 32#usize
+
 end curve25519_dalek
