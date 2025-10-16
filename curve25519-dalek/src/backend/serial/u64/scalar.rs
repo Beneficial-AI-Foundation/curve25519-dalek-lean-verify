@@ -180,21 +180,31 @@ impl Scalar52 {
 
         // a - b
         let mut borrow: u64 = 0;
-        for i in 0..5 {
+        let mut i = 0;
+        while i < 5 {
             borrow = a[i].wrapping_sub(b[i] + (borrow >> 63));
             difference[i] = borrow & mask;
+            i += 1;
         }
 
         // conditionally add l if the difference is negative
+        difference.conditional_add_l(Choice::from((borrow >> 63) as u8));
+        difference
+    }
+
+    pub(crate) fn conditional_add_l(&mut self, condition: Choice) -> u64 {
         let mut carry: u64 = 0;
-        for i in 0..5 {
-            let underflow = Choice::from((borrow >> 63) as u8);
-            let addend = u64::conditional_select(&0, &constants::L[i], underflow);
-            carry = (carry >> 52) + difference[i] + addend;
-            difference[i] = carry & mask;
+        let mask = (1u64 << 52) - 1;
+
+        let mut i = 0;
+        while i < 5 {
+            let addend = u64::conditional_select(&0, &constants::L[i], condition);
+            carry = (carry >> 52) + self[i] + addend;
+            self[i] = carry & mask;
+            i += 1;
         }
 
-        difference
+        carry
     }
 
     /// Compute `a * b`
