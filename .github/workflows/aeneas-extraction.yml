@@ -1,0 +1,93 @@
+name: Aeneas Extraction Verification
+
+# This workflow verifies that the extracted Lean files are up to date.
+# It runs Aeneas to extract functions from the Rust codebase and checks
+# if the extracted files match what's committed in the repository.
+
+on:
+  push:
+    branches: [ '**' ]
+  pull_request:
+    branches: [ '**' ]
+
+jobs:
+  verify-extraction:
+    name: Verify Aeneas Extraction
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y opam build-essential git
+
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
+          components: rustfmt
+
+      - name: Setup Aeneas and Charon
+        run: |
+          # Initialize opam for CI environment
+          opam init --disable-sandboxing -y
+
+          # Run the setup script
+          ./scripts/setup-aeneas.sh
+
+      - name: Extract Lean files
+        run: |
+          echo "Running extraction script..."
+          ./scripts/extract-lean.sh
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Check if any files in Curve25519Dalek directory have changed
+          if git diff --exit-code Curve25519Dalek/; then
+            echo "✓ All extracted files are up to date"
+            echo "extraction_outdated=false" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Extracted files are out of sync!"
+            echo "extraction_outdated=true" >> $GITHUB_OUTPUT
+
+            # Get list of changed files
+            echo "### Changed Files:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            git diff --name-status Curve25519Dalek/ >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            # Show diff summary
+            echo "### Diff Summary:" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            git diff --stat Curve25519Dalek/ >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+
+            # Show actual changes (truncated if too long)
+            echo "### Changes Preview (first 100 lines):" >> $GITHUB_STEP_SUMMARY
+            echo '```diff' >> $GITHUB_STEP_SUMMARY
+            git diff Curve25519Dalek/ | head -100 >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Report extraction status
+        if: steps.check_changes.outputs.extraction_outdated == 'true'
+        run: |
+          echo "::error::The extracted Lean files are out of sync with the Rust source code!"
+          echo ""
+          echo "The following files have changed after running the extraction:"
+          git diff --name-status Curve25519Dalek/
+          echo ""
+          echo "To fix this issue:"
+          echo "1. Run './scripts/extract-lean.sh' locally"
+          echo "2. Review the changes in the Curve25519Dalek/ directory"
+          echo "3. Commit the updated files"
+          echo ""
+          echo "Detailed diff:"
+          git diff Curve25519Dalek/
+          exit 1
+
