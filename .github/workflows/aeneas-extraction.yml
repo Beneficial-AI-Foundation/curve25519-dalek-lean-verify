@@ -25,10 +25,8 @@ jobs:
           sudo apt-get install -y opam build-essential git
 
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          override: true
           components: rustfmt
 
       - name: Setup Aeneas and Charon
