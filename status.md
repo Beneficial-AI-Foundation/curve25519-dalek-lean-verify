@@ -21,7 +21,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `square` | [backend/serial/u64/field.rs:L561-L561](curve25519-dalek/src/backend/serial/u64/field.rs#L561-L561) | - | ☐ | ☐ |  |
 | `square2` | [backend/serial/u64/field.rs:L566-L570](curve25519-dalek/src/backend/serial/u64/field.rs#L566-L570) | - | ☐ | ☐ |  |
 | `to_bytes` | [backend/serial/u64/field.rs:L374-L456](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | - | ✅ | ☐ |  |
-| `L` | [backend/serial/u64/constants.rs:L127-L133](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ |  |
+| `L` | [backend/serial/u64/constants.rs:L127-L133](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `m` | [backend/serial/u64/scalar.rs:L56-L58](curve25519-dalek/src/backend/serial/u64/scalar.rs#L56-L58) | [Backend/Serial/U64/Scalar/M.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `ZERO` | [backend/serial/u64/scalar.rs:L62-L62](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
 | `add` | [backend/serial/u64/scalar.rs:L159-L174](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | - | ☐ | ☐ |  |
@@ -36,7 +36,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `montgomery_square` | [backend/serial/u64/scalar.rs:L310-L312](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | - | ☐ | ☐ |  |
 | `mul_internal` | [backend/serial/u64/scalar.rs:L203-L217](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs:L222-L241](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `sub` | [backend/serial/u64/scalar.rs:L175-L198](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | - | ✅ | ☐ |  |
+| `sub` | [backend/serial/u64/scalar.rs:L175-L198](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | - | ✅ | ☐ | Minor refactor of loop required |
 | `straus_multiscalar_mul` | [backend/mod.rs:L157-L191](curve25519-dalek/src/backend/mod.rs#L157-L191) | - | ☐ | ☐ |  |
 | `vartime_double_base_mul` | [backend/mod.rs:L240-L245](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
 | `as_bytes` | [edwards.rs:L180-L185](curve25519-dalek/src/edwards.rs#L180-L185) | - | ☐ | ☐ |  |
