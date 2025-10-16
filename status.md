@@ -63,31 +63,31 @@ This document tracks the progress of formally verifying functions from the curve
 | `multiscalar_mul` | [ristretto.rs:L980-L990](curve25519-dalek/src/ristretto.rs#L980-L990) | - | ☐ | ☐ |  |
 | `invert` | [scalar.rs:L1205-L1208](curve25519-dalek/src/scalar.rs#L1205-L1208) | - | ☐ | ☐ |  |
 | `montgomery_invert` | [scalar.rs:L1149-L1203](curve25519-dalek/src/scalar.rs#L1149-L1203) | - | ☐ | ☐ |  |
-| `pack` | [scalar.rs:L1140-L1145](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ☐ | ☐ |  |
+| `pack` | [scalar.rs:L1140-L1145](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `clamp_integer` | [scalar.rs:L1386-L1391](curve25519-dalek/src/scalar.rs#L1386-L1391) | [Scalar/ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `read_le_u64_into` | [scalar.rs:L1349-L1364](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ☐ |  |
-| `as_bytes` | [scalar.rs:L705-L708](curve25519-dalek/src/scalar.rs#L705-L708) | - | ☐ | ☐ |  |
-| `ct_eq` | [scalar.rs:L300-L304](curve25519-dalek/src/scalar.rs#L300-L304) | [Scalar/Scalar/CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | Draft Written (markus-dablander) |
-| `from_bytes_mod_order` | [scalar.rs:L236-L246](curve25519-dalek/src/scalar.rs#L236-L246) | - | ☐ | ☐ |  |
-| `from_bytes_mod_order_wide` | [scalar.rs:L249-L252](curve25519-dalek/src/scalar.rs#L249-L252) | - | ☐ | ☐ |  |
-| `from_canonical_bytes` | [scalar.rs:L260-L265](curve25519-dalek/src/scalar.rs#L260-L265) | - | ☐ | ☐ |  |
+| `read_le_u64_into` | [scalar.rs:L1349-L1364](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `as_bytes` | [scalar.rs:L705-L708](curve25519-dalek/src/scalar.rs#L705-L708) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `ct_eq` | [scalar.rs:L300-L304](curve25519-dalek/src/scalar.rs#L300-L304) | [Scalar/Scalar/CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_bytes_mod_order` | [scalar.rs:L236-L246](curve25519-dalek/src/scalar.rs#L236-L246) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_bytes_mod_order_wide` | [scalar.rs:L249-L252](curve25519-dalek/src/scalar.rs#L249-L252) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_canonical_bytes` | [scalar.rs:L260-L265](curve25519-dalek/src/scalar.rs#L260-L265) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_hash` | [scalar.rs:L670-L678](curve25519-dalek/src/scalar.rs#L670-L678) | - | ☐ | ☐ |  |
 | `hash_from_bytes` | [scalar.rs:L624-L632](curve25519-dalek/src/scalar.rs#L624-L632) | - | ☐ | ☐ |  |
-| `invert` | [scalar.rs:L746-L749](curve25519-dalek/src/scalar.rs#L746-L749) | - | ☐ | ☐ |  |
-| `is_canonical` | [scalar.rs:L1133-L1136](curve25519-dalek/src/scalar.rs#L1133-L1136) | - | ☐ | ☐ |  |
-| `non_adjacent_form` | [scalar.rs:L920-L973](curve25519-dalek/src/scalar.rs#L920-L973) | - | ☐ | ☐ |  |
-| `reduce` | [scalar.rs:L1124-L1130](curve25519-dalek/src/scalar.rs#L1124-L1130) | - | ☐ | ☐ |  |
-| `to_bytes` | [scalar.rs:L690-L693](curve25519-dalek/src/scalar.rs#L690-L693) | - | ☐ | ☐ |  |
-| `unpack` | [scalar.rs:L1118-L1121](curve25519-dalek/src/scalar.rs#L1118-L1121) | - | ☐ | ☐ |  |
+| `invert` | [scalar.rs:L746-L749](curve25519-dalek/src/scalar.rs#L746-L749) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `is_canonical` | [scalar.rs:L1133-L1136](curve25519-dalek/src/scalar.rs#L1133-L1136) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `non_adjacent_form` | [scalar.rs:L920-L973](curve25519-dalek/src/scalar.rs#L920-L973) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `reduce` | [scalar.rs:L1124-L1130](curve25519-dalek/src/scalar.rs#L1124-L1130) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `to_bytes` | [scalar.rs:L690-L693](curve25519-dalek/src/scalar.rs#L690-L693) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `unpack` | [scalar.rs:L1118-L1121](curve25519-dalek/src/scalar.rs#L1118-L1121) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 
 ## Summary
 
 - **Total Functions**: 73
 - **Extracted**: 5 / 73 (6%)
-- **Draft Spec**: 1 / 73 (1%)
+- **Draft Spec**: 13 / 73 (17%)
 - **Specified**: 0 / 73 (0%)
 - **Verified**: 5 / 73 (6%)
-- **Pending**: 67 / 73 (91%)
+- **Pending**: 55 / 73 (75%)
 
 ---
 

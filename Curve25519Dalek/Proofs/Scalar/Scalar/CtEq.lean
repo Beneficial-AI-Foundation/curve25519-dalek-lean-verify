@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
@@ -22,7 +22,8 @@ This function performs constant-time equality comparison.
 open Aeneas.Std Result curve25519_dalek
 open scalar
 
-/- natural language description:
+/-
+natural language description:
 
     • Compares two scalar types to determine whether they are equal or not.
 
@@ -30,6 +31,5 @@ open scalar
 
 natural language specs:
 
-    • scalar_to_nat(self) = scalar_to_nat(other) \iff Choice = True -/
-
--- Specification theorem to be written here
+    • scalar_to_nat(self) = scalar_to_nat(other) \iff Choice = True
+-/
