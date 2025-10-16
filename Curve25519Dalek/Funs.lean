@@ -33,10 +33,10 @@ def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
 def backend.serial.u64.constants.L_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    Array.make 5#usize [
+    (Array.make 5#usize [
       671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
       17592186044416#u64
-      ]
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.L_body

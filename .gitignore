@@ -15,8 +15,9 @@ build*.txt
 # Lean
 .lake
 
-# Repo specific
-/aeneas
+# Aeneas
+aeneas
 *.llbc
 .logs
-
+Curve25519Dalek/FunsExternal_Template.lean
+Curve25519Dalek/TypesExternal_Template.lean
