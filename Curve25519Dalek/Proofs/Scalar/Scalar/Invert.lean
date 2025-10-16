@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Oliver Butterley, Markus Dablander
+-/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
@@ -10,7 +15,6 @@ This function computes the multiplicative inverse.
 **Source**: curve25519-dalek/src/scalar.rs:L746-L749
 
 ## TODO
-- Write draft specification
 - Write formal specification
 - Complete proof
 -/
@@ -18,4 +22,15 @@ This function computes the multiplicative inverse.
 open Aeneas.Std Result curve25519_dalek
 open scalar
 
--- Specification theorem to be written here
+/-
+natural language description:
+
+    • Takes an input Scalar s and returns another Scalar s’ that
+      represents the multiplicative inverse of s within the underlying
+      field \mathbb{Z} / \ell \mathbb{Z}.
+
+natural language specs:
+
+    • \forall Scalars s:
+      scalar_to_nat(s) * scalar_to_nat(s’) is congruent to 1 (mod \ell)
+-/
