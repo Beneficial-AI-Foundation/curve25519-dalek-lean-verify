@@ -16,6 +16,5 @@ This function returns the identity element.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open edwards
 
 -- Specification theorem to be written here

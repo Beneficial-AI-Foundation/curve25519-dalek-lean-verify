@@ -16,6 +16,5 @@ This function compresses the point representation.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open ristretto
 
 -- Specification theorem to be written here

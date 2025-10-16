@@ -16,6 +16,5 @@ This function performs variable-time double-base multiplication.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open backend.serial.scalar_mul.vartime_double_base
 
 -- Specification theorem to be written here

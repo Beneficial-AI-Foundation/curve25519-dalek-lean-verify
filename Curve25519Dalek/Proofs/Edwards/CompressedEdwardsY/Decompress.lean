@@ -16,6 +16,5 @@ This function decompresses the point from its compressed form.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open edwards
 
 -- Specification theorem to be written here

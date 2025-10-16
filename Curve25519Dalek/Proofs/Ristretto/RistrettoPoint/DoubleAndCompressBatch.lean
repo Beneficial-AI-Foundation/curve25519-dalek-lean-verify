@@ -16,6 +16,5 @@ This function doubles and compresses a batch of points.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open ristretto
 
 -- Specification theorem to be written here

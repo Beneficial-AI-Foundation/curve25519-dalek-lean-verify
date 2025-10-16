@@ -16,6 +16,5 @@ This function converts to Edwards form.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open montgomery
 
 -- Specification theorem to be written here

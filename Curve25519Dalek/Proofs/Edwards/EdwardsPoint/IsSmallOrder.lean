@@ -16,6 +16,5 @@ This function checks if the point has small order.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open edwards
 
 -- Specification theorem to be written here

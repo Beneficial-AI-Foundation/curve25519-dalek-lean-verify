@@ -16,6 +16,5 @@ This function constructs a point from uniform random bytes.
 -/
 
 open Aeneas.Std Result curve25519_dalek
-open ristretto
 
 -- Specification theorem to be written here

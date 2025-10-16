@@ -9,6 +9,7 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
+linter.style.longLine = false
 
 [[require]]
 name = "aeneas"

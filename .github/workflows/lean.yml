@@ -6,18 +6,18 @@ name: Lean Verification
 on:
   push:
     branches: [ '**' ]
-    paths:
-      - 'Curve25519Dalek/**'
-      - 'lakefile.toml'
-      - 'lean-toolchain'
-      - '.github/workflows/lean.yml'
+    # paths:
+    #   - 'Curve25519Dalek/**'
+    #   - 'lakefile.toml'
+    #   - 'lean-toolchain'
+    #   - '.github/workflows/lean.yml'
   pull_request:
     branches: [ '**' ]
-    paths:
-      - 'Curve25519Dalek/**'
-      - 'lakefile.toml'
-      - 'lean-toolchain'
-      - '.github/workflows/lean.yml'
+    # paths:
+    #   - 'Curve25519Dalek/**'
+    #   - 'lakefile.toml'
+    #   - 'lean-toolchain'
+    #   - '.github/workflows/lean.yml'
 
 env:
   LEAN_ABORT_ON_PANIC: 1
