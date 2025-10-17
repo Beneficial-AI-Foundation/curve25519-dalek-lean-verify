@@ -33,9 +33,9 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes` | [backend/serial/u64/scalar.rs:L64-L85](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ✅ | ☐ | Nested loop refactored |
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs:L87-L116](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ☐ | ☐ |  |
 | `from_montgomery` | [backend/serial/u64/scalar.rs:L324-L432](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | - | ☐ | ☐ |  |
-| `montgomery_mul` | [backend/serial/u64/scalar.rs:L304-L306](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | - | ☐ | ☐ |  |
-| `montgomery_reduce` | [backend/serial/u64/scalar.rs:L253-L258](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | - | ☐ | ☐ |  |
-| `montgomery_square` | [backend/serial/u64/scalar.rs:L310-L312](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | - | ☐ | ☐ |  |
+| `montgomery_mul` | [backend/serial/u64/scalar.rs:L304-L306](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | - | ✅ | ☐ |  |
+| `montgomery_reduce` | [backend/serial/u64/scalar.rs:L253-L258](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | - | ✅ | ☐ |  |
+| `montgomery_square` | [backend/serial/u64/scalar.rs:L310-L312](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | - | ✅ | ☐ |  |
 | `mul_internal` | [backend/serial/u64/scalar.rs:L203-L217](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs:L222-L241](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `sub` | [backend/serial/u64/scalar.rs:L175-L198](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | - | ✅ | ☐ | Minor refactor of loop required |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 20 / 82 (24%)
+- **Extracted**: 23 / 82 (28%)
 - **Draft Spec**: 13 / 82 (15%)
 - **Specified**: 0 / 82 (0%)
 - **Verified**: 5 / 82 (6%)
