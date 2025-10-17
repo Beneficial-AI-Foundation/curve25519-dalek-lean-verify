@@ -29,7 +29,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `add` | [backend/serial/u64/scalar.rs:L159-L174](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | - | ☐ | ☐ |  |
 | `conditional_add_l` | [backend/serial/u64/scalar.rs:L195-L208](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
 | `as_bytes` | [backend/serial/u64/scalar.rs:L119-L158](curve25519-dalek/src/backend/serial/u64/scalar.rs#L119-L158) | - | ☐ | ☐ |  |
-| `as_montgomery` | [backend/serial/u64/scalar.rs:L317-L323](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | - | ☐ | ☐ |  |
+| `as_montgomery` | [backend/serial/u64/scalar.rs:L317-L323](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | - | ✅ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/scalar.rs:L64-L85](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ✅ | ☐ | Nested loop refactored |
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs:L87-L116](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ☐ | ☐ |  |
 | `from_montgomery` | [backend/serial/u64/scalar.rs:L324-L432](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | - | ☐ | ☐ |  |
@@ -70,7 +70,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `multiscalar_mul` | [ristretto.rs:L980-L990](curve25519-dalek/src/ristretto.rs#L980-L990) | - | ☐ | ☐ |  |
 | `invert` | [scalar.rs:L1205-L1208](curve25519-dalek/src/scalar.rs#L1205-L1208) | - | ☐ | ☐ |  |
 | `montgomery_invert` | [scalar.rs:L1149-L1203](curve25519-dalek/src/scalar.rs#L1149-L1203) | - | ☐ | ☐ |  |
-| `pack` | [scalar.rs:L1140-L1145](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `pack` | [scalar.rs:L1140-L1145](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `clamp_integer` | [scalar.rs:L1386-L1391](curve25519-dalek/src/scalar.rs#L1386-L1391) | [Scalar/ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `read_le_u64_into` | [scalar.rs:L1349-L1364](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `as_bytes` | [scalar.rs:L705-L708](curve25519-dalek/src/scalar.rs#L705-L708) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 23 / 82 (28%)
+- **Extracted**: 25 / 82 (30%)
 - **Draft Spec**: 13 / 82 (15%)
 - **Specified**: 0 / 82 (0%)
 - **Verified**: 5 / 82 (6%)
