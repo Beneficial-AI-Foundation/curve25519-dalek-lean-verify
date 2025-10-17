@@ -17,6 +17,9 @@ attribute [-simp] Int.reducePow Nat.reducePow
 /-- Curve25519 is the elliptic curve over the prime field with order p -/
 def p : Nat := 2^255 - 19
 
+/-- The group order L for Scalar52 arithmetic -/
+def L : Nat := 2^252 + 27742317777372353535851937790883648493
+
 /-- The cofactor of curve25519 -/
 @[simp]
 def h : Nat := 8
