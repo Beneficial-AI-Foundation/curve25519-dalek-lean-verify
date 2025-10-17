@@ -180,9 +180,11 @@ impl Scalar52 {
 
         // a + b
         let mut carry: u64 = 0;
-        for i in 0..5 {
+        let mut i = 0;
+        while i < 5 {
             carry = a[i] + b[i] + (carry >> 52);
             sum[i] = carry & mask;
+            i += 1;
         }
 
         // subtract l if the sum is >= l
