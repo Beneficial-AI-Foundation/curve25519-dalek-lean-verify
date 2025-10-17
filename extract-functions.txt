@@ -13,3 +13,4 @@ curve25519_dalek::scalar::Scalar::to_bytes
 curve25519_dalek::scalar::Scalar::as_bytes
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub
+curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes

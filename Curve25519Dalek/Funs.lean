@@ -115,6 +115,84 @@ def backend.serial.u64.field.FieldElement51.reduce
   let limbs10 ← Array.update limbs9 4#usize i24
   ok limbs10
 
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes::load8_at]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 339:8-348:9 -/
+def backend.serial.u64.field.FieldElement51.from_bytes.load8_at
+  (input : Slice U8) (i : Usize) : Result U64 :=
+  do
+  let i1 ← Slice.index_usize input i
+  let i2 ← (↑(UScalar.cast .U64 i1) : Result U64)
+  let i3 ← i + 1#usize
+  let i4 ← Slice.index_usize input i3
+  let i5 ← (↑(UScalar.cast .U64 i4) : Result U64)
+  let i6 ← i5 <<< 8#i32
+  let i7 ← (↑(i2 ||| i6) : Result U64)
+  let i8 ← i + 2#usize
+  let i9 ← Slice.index_usize input i8
+  let i10 ← (↑(UScalar.cast .U64 i9) : Result U64)
+  let i11 ← i10 <<< 16#i32
+  let i12 ← (↑(i7 ||| i11) : Result U64)
+  let i13 ← i + 3#usize
+  let i14 ← Slice.index_usize input i13
+  let i15 ← (↑(UScalar.cast .U64 i14) : Result U64)
+  let i16 ← i15 <<< 24#i32
+  let i17 ← (↑(i12 ||| i16) : Result U64)
+  let i18 ← i + 4#usize
+  let i19 ← Slice.index_usize input i18
+  let i20 ← (↑(UScalar.cast .U64 i19) : Result U64)
+  let i21 ← i20 <<< 32#i32
+  let i22 ← (↑(i17 ||| i21) : Result U64)
+  let i23 ← i + 5#usize
+  let i24 ← Slice.index_usize input i23
+  let i25 ← (↑(UScalar.cast .U64 i24) : Result U64)
+  let i26 ← i25 <<< 40#i32
+  let i27 ← (↑(i22 ||| i26) : Result U64)
+  let i28 ← i + 6#usize
+  let i29 ← Slice.index_usize input i28
+  let i30 ← (↑(UScalar.cast .U64 i29) : Result U64)
+  let i31 ← i30 <<< 48#i32
+  let i32 ← (↑(i27 ||| i31) : Result U64)
+  let i33 ← i + 7#usize
+  let i34 ← Slice.index_usize input i33
+  let i35 ← (↑(UScalar.cast .U64 i34) : Result U64)
+  let i36 ← i35 <<< 56#i32
+  ok (i32 ||| i36)
+
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 338:4-363:5 -/
+def backend.serial.u64.field.FieldElement51.from_bytes
+  (bytes : Array U8 32#usize) :
+  Result backend.serial.u64.field.FieldElement51
+  :=
+  do
+  let i ← 1#u64 <<< 51#i32
+  let low_51_bit_mask ← i - 1#u64
+  let s ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i1 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s 0#usize
+  let i2 ← (↑(i1 &&& low_51_bit_mask) : Result U64)
+  let s1 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i3 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s1 6#usize
+  let i4 ← i3 >>> 3#i32
+  let i5 ← (↑(i4 &&& low_51_bit_mask) : Result U64)
+  let s2 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i6 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s2 12#usize
+  let i7 ← i6 >>> 6#i32
+  let i8 ← (↑(i7 &&& low_51_bit_mask) : Result U64)
+  let s3 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i9 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s3 19#usize
+  let i10 ← i9 >>> 1#i32
+  let i11 ← (↑(i10 &&& low_51_bit_mask) : Result U64)
+  let s4 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i12 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
+  let i13 ← i12 >>> 12#i32
+  let i14 ← (↑(i13 &&& low_51_bit_mask) : Result U64)
+  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
+
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 374:4-456:5 -/
 def backend.serial.u64.field.FieldElement51.to_bytes
