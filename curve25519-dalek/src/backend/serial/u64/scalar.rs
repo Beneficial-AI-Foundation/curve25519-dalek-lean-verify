@@ -65,10 +65,18 @@ impl Scalar52 {
     #[rustfmt::skip] // keep alignment of s[*] calculations
     pub fn from_bytes(bytes: &[u8; 32]) -> Scalar52 {
         let mut words = [0u64; 4];
-        for i in 0..4 {
-            for j in 0..8 {
-                words[i] |= (bytes[(i * 8) + j] as u64) << (j * 8);
-            }
+        let mut i = 0;
+        while i < 4 {
+            let base = i * 8;
+            words[i] = (bytes[base] as u64)
+                | ((bytes[base + 1] as u64) << 8)
+                | ((bytes[base + 2] as u64) << 16)
+                | ((bytes[base + 3] as u64) << 24)
+                | ((bytes[base + 4] as u64) << 32)
+                | ((bytes[base + 5] as u64) << 40)
+                | ((bytes[base + 6] as u64) << 48)
+                | ((bytes[base + 7] as u64) << 56);
+            i += 1;
         }
 
         let mask = (1u64 << 52) - 1;

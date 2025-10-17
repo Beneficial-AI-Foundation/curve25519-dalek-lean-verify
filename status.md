@@ -97,4 +97,4 @@ This document tracks the progress of formally verifying functions from the curve
 
 ---
 
-*This report is automatically generated from `status.csv`. Run `python3 scripts/generate-status.py` to update.*
+*This report is automatically generated from `status.csv`. Run `./scripts/generate-status.py` to update.*
