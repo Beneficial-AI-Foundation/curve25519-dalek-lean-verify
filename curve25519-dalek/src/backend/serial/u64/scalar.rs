@@ -96,10 +96,18 @@ impl Scalar52 {
     #[rustfmt::skip] // keep alignment of lo[*] and hi[*] calculations
     pub fn from_bytes_wide(bytes: &[u8; 64]) -> Scalar52 {
         let mut words = [0u64; 8];
-        for i in 0..8 {
-            for j in 0..8 {
-                words[i] |= (bytes[(i * 8) + j] as u64) << (j * 8);
+        let mut i = 0;
+        while i < 8 {
+            #[inline(always)]
+            fn inner_loop(words: &mut [u64; 8], bytes: &[u8; 64], i: usize) {
+                let mut j = 0;
+                while j < 8 {
+                    words[i] |= (bytes[(i * 8) + j] as u64) << (j * 8);
+                    j += 1;
+                }
             }
+            inner_loop(&mut words, bytes, i);
+            i += 1;
         }
 
         let mask = (1u64 << 52) - 1;
