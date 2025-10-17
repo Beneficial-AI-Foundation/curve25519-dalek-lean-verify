@@ -24,11 +24,11 @@ open Aeneas.Std Result curve25519_dalek
 /-
 natural language description:
 
-    • Takes an input UnpackedScalar u and returns
+    • Takes an input UnpackedScalar r and returns
       the corresponding Scalar s.
 
 natural language specs:
 
-    • scalar_to_nat(s) = unpacked_scalar_to_nat(u)
-    • unpack(s) = u
+    • scalar_to_nat(s) = unpacked_scalar_to_nat(r)
+    • unpack(s) = r
 -/
