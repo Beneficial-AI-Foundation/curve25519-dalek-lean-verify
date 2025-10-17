@@ -22,13 +22,15 @@ This document tracks the progress of formally verifying functions from the curve
 | `square2` | [backend/serial/u64/field.rs:L566-L570](curve25519-dalek/src/backend/serial/u64/field.rs#L566-L570) | - | ☐ | ☐ |  |
 | `to_bytes` | [backend/serial/u64/field.rs:L374-L456](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | - | ✅ | ☐ |  |
 | `L` | [backend/serial/u64/constants.rs:L127-L133](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ | Brackets required in extracted Lean |
+| `LFACTOR` | [backend/serial/u64/constants.rs:L136-L136](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | - | ✅ | ☐ |  |
+| `RR` | [backend/serial/u64/constants.rs:L148-L154](curve25519-dalek/src/backend/serial/u64/constants.rs#L148-L154) | - | ✅ | ☐ |  |
 | `m` | [backend/serial/u64/scalar.rs:L56-L58](curve25519-dalek/src/backend/serial/u64/scalar.rs#L56-L58) | [Backend/Serial/U64/Scalar/M.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `ZERO` | [backend/serial/u64/scalar.rs:L62-L62](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
 | `add` | [backend/serial/u64/scalar.rs:L159-L174](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | - | ☐ | ☐ |  |
 | `conditional_add_l` | [backend/serial/u64/scalar.rs:L195-L208](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
 | `as_bytes` | [backend/serial/u64/scalar.rs:L119-L158](curve25519-dalek/src/backend/serial/u64/scalar.rs#L119-L158) | - | ☐ | ☐ |  |
 | `as_montgomery` | [backend/serial/u64/scalar.rs:L317-L323](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | - | ☐ | ☐ |  |
-| `from_bytes` | [backend/serial/u64/scalar.rs:L64-L85](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ☐ | ☐ |  |
+| `from_bytes` | [backend/serial/u64/scalar.rs:L64-L85](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ✅ | ☐ | Nested loop refactored |
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs:L87-L116](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ☐ | ☐ |  |
 | `from_montgomery` | [backend/serial/u64/scalar.rs:L324-L432](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | - | ☐ | ☐ |  |
 | `montgomery_mul` | [backend/serial/u64/scalar.rs:L304-L306](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | - | ☐ | ☐ |  |
@@ -37,6 +39,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul_internal` | [backend/serial/u64/scalar.rs:L203-L217](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs:L222-L241](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `sub` | [backend/serial/u64/scalar.rs:L175-L198](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | - | ✅ | ☐ | Minor refactor of loop required |
+| `to_bytes` | [backend/serial/u64/scalar.rs:L129-L166](curve25519-dalek/src/backend/serial/u64/scalar.rs#L129-L166) | - | ✅ | ☐ |  |
 | `straus_multiscalar_mul` | [backend/mod.rs:L157-L191](curve25519-dalek/src/backend/mod.rs#L157-L191) | - | ☐ | ☐ |  |
 | `vartime_double_base_mul` | [backend/mod.rs:L240-L245](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
 | `as_bytes` | [edwards.rs:L180-L185](curve25519-dalek/src/edwards.rs#L180-L185) | - | ☐ | ☐ |  |
@@ -83,17 +86,17 @@ This document tracks the progress of formally verifying functions from the curve
 | `ONE` | [scalar.rs:L567-L572](curve25519-dalek/src/scalar.rs#L567-L572) | - | ✅ | ☐ |  |
 | `reduce` | [scalar.rs:L1124-L1130](curve25519-dalek/src/scalar.rs#L1124-L1130) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `to_bytes` | [scalar.rs:L690-L693](curve25519-dalek/src/scalar.rs#L690-L693) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
-| `unpack` | [scalar.rs:L1118-L1121](curve25519-dalek/src/scalar.rs#L1118-L1121) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `unpack` | [scalar.rs:L1118-L1121](curve25519-dalek/src/scalar.rs#L1118-L1121) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `ZERO` | [scalar.rs:L564-L564](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
 
 ## Summary
 
-- **Total Functions**: 79
-- **Extracted**: 14 / 79 (17%)
-- **Draft Spec**: 13 / 79 (16%)
-- **Specified**: 0 / 79 (0%)
-- **Verified**: 5 / 79 (6%)
-- **Pending**: 61 / 79 (77%)
+- **Total Functions**: 82
+- **Extracted**: 19 / 82 (23%)
+- **Draft Spec**: 13 / 82 (15%)
+- **Specified**: 0 / 82 (0%)
+- **Verified**: 5 / 82 (6%)
+- **Pending**: 64 / 82 (78%)
 
 ---
 
