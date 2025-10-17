@@ -75,8 +75,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes_mod_order` | [scalar.rs:L236-L246](curve25519-dalek/src/scalar.rs#L236-L246) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_bytes_mod_order_wide` | [scalar.rs:L249-L252](curve25519-dalek/src/scalar.rs#L249-L252) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_canonical_bytes` | [scalar.rs:L260-L265](curve25519-dalek/src/scalar.rs#L260-L265) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_hash` | [scalar.rs:L670-L678](curve25519-dalek/src/scalar.rs#L670-L678) | - | ☐ | ☐ |  |
-| `hash_from_bytes` | [scalar.rs:L624-L632](curve25519-dalek/src/scalar.rs#L624-L632) | - | ☐ | ☐ |  |
+| `from_hash` | [scalar.rs:L670-L678](curve25519-dalek/src/scalar.rs#L670-L678) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `hash_from_bytes` | [scalar.rs:L624-L632](curve25519-dalek/src/scalar.rs#L624-L632) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `invert` | [scalar.rs:L746-L749](curve25519-dalek/src/scalar.rs#L746-L749) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `is_canonical` | [scalar.rs:L1133-L1136](curve25519-dalek/src/scalar.rs#L1133-L1136) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `non_adjacent_form` | [scalar.rs:L920-L973](curve25519-dalek/src/scalar.rs#L920-L973) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
@@ -90,10 +90,10 @@ This document tracks the progress of formally verifying functions from the curve
 
 - **Total Functions**: 79
 - **Extracted**: 14 / 79 (17%)
-- **Draft Spec**: 13 / 79 (16%)
+- **Draft Spec**: 15 / 79 (18%)
 - **Specified**: 0 / 79 (0%)
 - **Verified**: 5 / 79 (6%)
-- **Pending**: 61 / 79 (77%)
+- **Pending**: 59 / 79 (74%)
 
 ---
 
