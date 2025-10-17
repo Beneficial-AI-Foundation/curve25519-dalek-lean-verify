@@ -460,7 +460,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_loop
   (bytes : Array U8 32#usize) (words : Array U64 4#usize) (i : Usize) :
   Result backend.serial.u64.scalar.Scalar52
   :=
-  if i < 5#usize
+  if i < 4#usize
   then
     do
     let base ← i * 8#usize

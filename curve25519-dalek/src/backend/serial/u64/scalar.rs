@@ -66,7 +66,7 @@ impl Scalar52 {
     pub fn from_bytes(bytes: &[u8; 32]) -> Scalar52 {
         let mut words = [0u64; 4];
         let mut i = 0;
-        while i < 5 {
+        while i < 4 {
             let base = i * 8;
             words[i] = (bytes[base] as u64)
                 | ((bytes[base + 1] as u64) << 8)
