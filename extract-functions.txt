@@ -14,3 +14,10 @@ curve25519_dalek::scalar::Scalar::as_bytes
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_mul
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery
+curve25519_dalek::scalar::Scalar::unpack
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::pack
