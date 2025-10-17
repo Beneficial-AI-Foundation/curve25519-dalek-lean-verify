@@ -114,6 +114,9 @@ def format_source_link(source: str) -> str:
 
     # Remove curve25519-dalek/src/ prefix for display
     source_display = source.replace('curve25519-dalek/src/', '')
+    # Remove line numbers from display (everything after :)
+    if ':' in source_display:
+        source_display = source_display.split(':')[0]
     # Convert :L to #L for proper GitHub/VSCode markdown linking
     source_link_path = source.replace(':L', '#L')
     return f"[{source_display}]({source_link_path})"
@@ -124,8 +127,8 @@ def format_spec_link(spec_theorem: str) -> str:
     if not spec_theorem:
         return "-"
 
-    # Remove Curve25519Dalek/Proofs/ prefix for display
-    spec_display = spec_theorem.replace('Curve25519Dalek/Proofs/', '')
+    # Extract just the filename for display
+    spec_display = spec_theorem.split('/')[-1] if '/' in spec_theorem else spec_theorem
     return f"[{spec_display}]({spec_theorem})"
 
 
@@ -175,10 +178,22 @@ def write_markdown(rows: list, stats: Dict[str, int]) -> None:
         f.write(f"- **Verified**: {stats['verified']} / {total} ({verified_pct}%)\n")
         f.write(f"- **Pending**: {stats['pending']} / {total} ({pending_pct}%)\n")
 
+        # Legend
+        f.write("\n## Legend\n\n")
+        f.write("### Extracted\n")
+        f.write("- ✅ Extracted - Function has been successfully extracted to Lean\n")
+        f.write("- ☐ Not extracted - Function has not been extracted yet\n")
+        f.write("\n")
+        f.write("### Verified\n")
+        f.write("- ✅ Verified - Function has been formally verified with complete proofs\n")
+        f.write("- 📋 Specified - Function has formal specifications but no proofs yet\n")
+        f.write("- ✏️ Draft spec - Function has draft natural language specifications\n")
+        f.write("- ☐ Not verified - No verification work has been done yet\n")
+
         # Footer
         f.write("\n---\n\n")
         f.write("*This report is automatically generated from `status.csv`. "
-               "Run `python3 scripts/generate-status.py` to update.*\n")
+               "Run `./scripts/generate-status.py` to update.*\n")
 
 
 def main():
