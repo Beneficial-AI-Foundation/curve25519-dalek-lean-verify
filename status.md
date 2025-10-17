@@ -68,35 +68,35 @@ This document tracks the progress of formally verifying functions from the curve
 | `identity` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L806-L810) | - | ☐ | ☐ |  |
 | `mul_base` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L951-L962) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L980-L990) | - | ☐ | ☐ |  |
-| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1205-L1208) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `montgomery_invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1149-L1203) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
+| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1205-L1208) | [Invert.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Invert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `montgomery_invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1149-L1203) | [MontgomeryInvert.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1140-L1145) | [Pack.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Pack.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `clamp_integer` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1386-L1391) | [ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `as_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L705-L708) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
+| `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1349-L1364) | [ReadLeU64Into.lean](Curve25519Dalek/Proofs/Scalar/ReadLeU64Into.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `as_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L705-L708) | [AsBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/AsBytes.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `ct_eq` | [scalar.rs](curve25519-dalek/src/scalar.rs#L300-L304) | [CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L236-L246) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L249-L252) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L260-L265) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_hash` | [scalar.rs](curve25519-dalek/src/scalar.rs#L670-L678) | - | ☐ | ☐ |  |
-| `hash_from_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L624-L632) | - | ☐ | ☐ |  |
-| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L746-L749) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `is_canonical` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1133-L1136) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `non_adjacent_form` | [scalar.rs](curve25519-dalek/src/scalar.rs#L920-L973) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L236-L246) | [FromBytesModOrder.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L249-L252) | [FromBytesModOrderWide.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L260-L265) | [FromCanonicalBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_hash` | [scalar.rs](curve25519-dalek/src/scalar.rs#L670-L678) | [FromHash.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `hash_from_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L624-L632) | [HashFromBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/HashFromBytes.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L746-L749) | [Invert.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Invert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `is_canonical` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1133-L1136) | [IsCanonical.lean](Curve25519Dalek/Proofs/Scalar/Scalar/IsCanonical.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `non_adjacent_form` | [scalar.rs](curve25519-dalek/src/scalar.rs#L920-L973) | [NonAdjacentForm.lean](Curve25519Dalek/Proofs/Scalar/Scalar/NonAdjacentForm.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `ONE` | [scalar.rs](curve25519-dalek/src/scalar.rs#L567-L572) | - | ✅ | ☐ |  |
-| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L690-L693) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
-| `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
+| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | [Reduce.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L690-L693) | [ToBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
+| `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | [Unpack.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
 
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 25 / 82 (30%)
-- **Draft Spec**: 15 / 82 (18%)
+- **Extracted**: 24 / 82 (29%)
+- **Draft Spec**: 17 / 82 (20%)
 - **Specified**: 0 / 82 (0%)
 - **Verified**: 5 / 82 (6%)
-- **Pending**: 62 / 82 (75%)
+- **Pending**: 60 / 82 (73%)
 
 ## Legend
 
