@@ -31,6 +31,6 @@ natural language description:
 
 natural language specs:
 
-    • \forall Scalars s:
+    • \forall Scalars s with s ≠ 0:
       scalar_to_nat(s) * scalar_to_nat(s’) is congruent to 1 (mod \ell)
 -/

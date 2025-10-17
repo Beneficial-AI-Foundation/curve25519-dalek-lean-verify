@@ -68,8 +68,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `identity` | [ristretto.rs:L806-L810](curve25519-dalek/src/ristretto.rs#L806-L810) | - | ☐ | ☐ |  |
 | `mul_base` | [ristretto.rs:L951-L962](curve25519-dalek/src/ristretto.rs#L951-L962) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [ristretto.rs:L980-L990](curve25519-dalek/src/ristretto.rs#L980-L990) | - | ☐ | ☐ |  |
-| `invert` | [scalar.rs:L1205-L1208](curve25519-dalek/src/scalar.rs#L1205-L1208) | - | ☐ | ☐ |  |
-| `montgomery_invert` | [scalar.rs:L1149-L1203](curve25519-dalek/src/scalar.rs#L1149-L1203) | - | ☐ | ☐ |  |
+| `invert` | [scalar.rs:L1205-L1208](curve25519-dalek/src/scalar.rs#L1205-L1208) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `montgomery_invert` | [scalar.rs:L1149-L1203](curve25519-dalek/src/scalar.rs#L1149-L1203) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `pack` | [scalar.rs:L1140-L1145](curve25519-dalek/src/scalar.rs#L1140-L1145) | - | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `clamp_integer` | [scalar.rs:L1386-L1391](curve25519-dalek/src/scalar.rs#L1386-L1391) | [Scalar/ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `read_le_u64_into` | [scalar.rs:L1349-L1364](curve25519-dalek/src/scalar.rs#L1349-L1364) | - | ☐ | ✏️ | NL-specs written (markus-dablander) |
@@ -93,10 +93,10 @@ This document tracks the progress of formally verifying functions from the curve
 
 - **Total Functions**: 82
 - **Extracted**: 25 / 82 (30%)
-- **Draft Spec**: 13 / 82 (15%)
+- **Draft Spec**: 15 / 82 (18%)
 - **Specified**: 0 / 82 (0%)
 - **Verified**: 5 / 82 (6%)
-- **Pending**: 64 / 82 (78%)
+- **Pending**: 62 / 82 (75%)
 
 ---
 
