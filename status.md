@@ -13,7 +13,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `identity` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L229-L237) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [backend/serial/scalar_mul/straus.rs](curve25519-dalek/src/backend/serial/scalar_mul/straus.rs#L1-L47) | - | ☐ | ☐ |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | - | ☐ | ☐ |  |
-| `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | - | ☐ | ☐ |  |
+| `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | - | ✅ | ☐ |  |
 | `conditional_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L247-L254) | - | ☐ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L337-L363) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L460-L565) | - | ☐ | ☐ |  |
@@ -28,7 +28,6 @@ This document tracks the progress of formally verifying functions from the curve
 | `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
 | `add` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | - | ☐ | ☐ |  |
 | `conditional_add_l` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
-| `as_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L119-L158) | - | ☐ | ☐ |  |
 | `as_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | - | ✅ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ✅ | ☐ | Nested loop refactored |
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ☐ | ☐ |  |
@@ -91,12 +90,12 @@ This document tracks the progress of formally verifying functions from the curve
 
 ## Summary
 
-- **Total Functions**: 82
-- **Extracted**: 25 / 82 (30%)
-- **Draft Spec**: 13 / 82 (15%)
-- **Specified**: 0 / 82 (0%)
-- **Verified**: 5 / 82 (6%)
-- **Pending**: 64 / 82 (78%)
+- **Total Functions**: 81
+- **Extracted**: 26 / 81 (32%)
+- **Draft Spec**: 13 / 81 (16%)
+- **Specified**: 0 / 81 (0%)
+- **Verified**: 5 / 81 (6%)
+- **Pending**: 63 / 81 (77%)
 
 ## Legend
 

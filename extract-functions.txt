@@ -21,4 +21,4 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery
 curve25519_dalek::scalar::Scalar::unpack
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::pack
-curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes
+curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes
