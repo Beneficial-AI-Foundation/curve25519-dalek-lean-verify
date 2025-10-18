@@ -50,6 +50,20 @@ def backend.serial.u64.constants.LFACTOR_body : Result U64 :=
 def backend.serial.u64.constants.LFACTOR : U64 :=
   eval_global backend.serial.u64.constants.LFACTOR_body
 
+/- [curve25519_dalek::backend::serial::u64::constants::R]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 139:0-145:3 -/
+@[global_simps]
+def backend.serial.u64.constants.R_body
+  : Result backend.serial.u64.scalar.Scalar52 :=
+  ok
+    (Array.make 5#usize [
+      4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
+      4503599627370495#u64, 17592186044415#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
+  eval_global backend.serial.u64.constants.R_body
+
 /- [curve25519_dalek::backend::serial::u64::constants::RR]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 148:0-154:3 -/
 @[global_simps]
@@ -1253,6 +1267,57 @@ def backend.serial.u64.scalar.Scalar52.as_montgomery
   backend.serial.u64.scalar.Scalar52.montgomery_mul self
     backend.serial.u64.constants.RR
 
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
+def scalar.Scalar.unpack
+  (self : scalar.Scalar) : Result backend.serial.u64.scalar.Scalar52 :=
+  backend.serial.u64.scalar.Scalar52.from_bytes self.bytes
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1141:4-1145:5 -/
+def scalar.Scalar52.pack
+  (self : backend.serial.u64.scalar.Scalar52) : Result scalar.Scalar :=
+  do
+  let a ← backend.serial.u64.scalar.Scalar52.to_bytes self
+  ok { bytes := a }
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1125:4-1130:5 -/
+def scalar.Scalar.reduce (self : scalar.Scalar) : Result scalar.Scalar :=
+  do
+  let x ← scalar.Scalar.unpack self
+  let xR ←
+    backend.serial.u64.scalar.Scalar52.mul_internal x
+      backend.serial.u64.constants.R
+  let x_mod_l ← backend.serial.u64.scalar.Scalar52.montgomery_reduce xR
+  scalar.Scalar52.pack x_mod_l
+
+/- [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 310:4-312:5 -/
+def scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index
+  (self : scalar.Scalar) (_index : Usize) : Result U8 :=
+  Array.index_usize self.bytes _index
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 237:4-246:5 -/
+def scalar.Scalar.from_bytes_mod_order
+  (bytes : Array U8 32#usize) : Result scalar.Scalar :=
+  do
+  let s ← scalar.Scalar.reduce { bytes }
+  let i ← scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index s 31#usize
+  let right_val ← i >>> 7#i32
+  if 0#u8 = right_val
+  then ok s
+  else fail panic
+
+/- Trait implementation: [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 306:0-313:1 -/
+@[reducible]
+def core.ops.index.Indexcurve25519_dalekscalarScalarUsizeU8 :
+  core.ops.index.Index scalar.Scalar Usize U8 := {
+  index := scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index
+}
+
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO]
    Source: 'curve25519-dalek/src/scalar.rs', lines 564:4-564:53 -/
 @[global_simps]
@@ -1289,20 +1354,6 @@ def scalar.Scalar.to_bytes
 def scalar.Scalar.as_bytes
   (self : scalar.Scalar) : Result (Array U8 32#usize) :=
   ok self.bytes
-
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
-def scalar.Scalar.unpack
-  (self : scalar.Scalar) : Result backend.serial.u64.scalar.Scalar52 :=
-  backend.serial.u64.scalar.Scalar52.from_bytes self.bytes
-
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 1141:4-1145:5 -/
-def scalar.Scalar52.pack
-  (self : backend.serial.u64.scalar.Scalar52) : Result scalar.Scalar :=
-  do
-  let a ← backend.serial.u64.scalar.Scalar52.to_bytes self
-  ok { bytes := a }
 
 /- [curve25519_dalek::scalar::clamp_integer]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1386:0-1391:1 -/
