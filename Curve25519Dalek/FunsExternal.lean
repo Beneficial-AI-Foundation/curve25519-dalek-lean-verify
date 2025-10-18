@@ -2,10 +2,6 @@
 import Aeneas
 import Curve25519Dalek.Types
 open Aeneas.Std Result
-set_option linter.dupNamespace false
-set_option linter.hashCommand false
-set_option linter.unusedVariables false
-open curve25519_dalek
 
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
