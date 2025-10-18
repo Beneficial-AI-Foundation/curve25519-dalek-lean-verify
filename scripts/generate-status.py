@@ -71,6 +71,7 @@ def parse_csv() -> Tuple[list, Dict[str, int]]:
             # Extract and normalize values
             function = row.get('function', '').strip()
             source = row.get('source', '').strip()
+            lines = row.get('lines', '').strip()  # New column for line numbers
             spec_theorem = row.get('spec_theorem', '').strip()
             extracted = row.get('extracted', '').strip()
             verified = row.get('verified', '').strip()
@@ -98,6 +99,7 @@ def parse_csv() -> Tuple[list, Dict[str, int]]:
             rows.append({
                 'function': function,
                 'source': source,
+                'lines': lines,
                 'spec_theorem': spec_theorem,
                 'extracted': extracted,
                 'verified': verified,
@@ -107,18 +109,22 @@ def parse_csv() -> Tuple[list, Dict[str, int]]:
     return rows, stats
 
 
-def format_source_link(source: str) -> str:
-    """Format source path as markdown link."""
+def format_source_link(source: str, lines: str) -> str:
+    """Format source path and line numbers as markdown link."""
     if not source:
         return "-"
 
     # Remove curve25519-dalek/src/ prefix for display
     source_display = source.replace('curve25519-dalek/src/', '')
-    # Remove line numbers from display (everything after :)
-    if ':' in source_display:
-        source_display = source_display.split(':')[0]
-    # Convert :L to #L for proper GitHub/VSCode markdown linking
-    source_link_path = source.replace(':L', '#L')
+
+    # Combine source path with line numbers for the link
+    if lines:
+        # Convert L123-L456 to #L123-L456 for GitHub/VSCode linking
+        line_anchor = '#' + lines
+        source_link_path = source + line_anchor
+    else:
+        source_link_path = source
+
     return f"[{source_display}]({source_link_path})"
 
 
@@ -150,7 +156,7 @@ def write_markdown(rows: list, stats: Dict[str, int]) -> None:
         # Data rows
         for row in rows:
             function_name = get_function_name(row['function'])
-            source_link = format_source_link(row['source'])
+            source_link = format_source_link(row['source'], row['lines'])
             spec_link = format_spec_link(row['spec_theorem'])
             extracted_symbol = EXTRACTED_SYMBOLS[row['extracted']]
             verified_symbol = VERIFIED_SYMBOLS[row['verified']]
