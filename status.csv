@@ -16,6 +16,7 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::square2,curve2551
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L374-L456,,extracted,,
 curve25519_dalek::backend::serial::u64::constants::L,curve25519-dalek/src/backend/serial/u64/constants.rs,L127-L133,,extracted,,Brackets required in extracted Lean
 curve25519_dalek::backend::serial::u64::constants::LFACTOR,curve25519-dalek/src/backend/serial/u64/constants.rs,L136-L136,,extracted,,
+curve25519_dalek::backend::serial::u64::constants::R,curve25519-dalek/src/backend/serial/u64/constants.rs,L139-L145,,extracted,,
 curve25519_dalek::backend::serial::u64::constants::RR,curve25519-dalek/src/backend/serial/u64/constants.rs,L148-L154,,extracted,,
 curve25519_dalek::backend::serial::u64::scalar::m,curve25519-dalek/src/backend/serial/u64/scalar.rs,L56-L58,Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO,curve25519-dalek/src/backend/serial/u64/scalar.rs,L62-L62,,extracted,,
@@ -67,7 +68,7 @@ curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs,L1386-L13
 curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1349-L1364,Curve25519Dalek/Proofs/Scalar/ReadLeU64Into.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L705-L708,Curve25519Dalek/Proofs/Scalar/Scalar/AsBytes.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L300-L304,Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean,,draft spec,NL-specs written (markus-dablander)
-curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L236-L246,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L236-L246,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L249-L252,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L260-L265,Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_hash,curve25519-dalek/src/scalar.rs,L670-L678,Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean,,draft spec,NL-specs written (markus-dablander)
@@ -76,7 +77,7 @@ curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L746-L74
 curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1133-L1136,Curve25519Dalek/Proofs/Scalar/Scalar/IsCanonical.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L920-L973,Curve25519Dalek/Proofs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::ONE,curve25519-dalek/src/scalar.rs,L567-L572,,extracted,,
-curve25519_dalek::scalar::Scalar::reduce,curve25519-dalek/src/scalar.rs,L1124-L1130,Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::reduce,curve25519-dalek/src/scalar.rs,L1124-L1130,Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::to_bytes,curve25519-dalek/src/scalar.rs,L690-L693,Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::unpack,curve25519-dalek/src/scalar.rs,L1118-L1121,Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::ZERO,curve25519-dalek/src/scalar.rs,L564-L564,,extracted,,

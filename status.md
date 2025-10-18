@@ -23,6 +23,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | - | ✅ | ☐ |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | - | ✅ | ☐ |  |
+| `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | - | ✅ | ☐ |  |
 | `RR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L148-L154) | - | ✅ | ☐ |  |
 | `m` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L56-L58) | [M.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
@@ -74,7 +75,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1349-L1364) | [ReadLeU64Into.lean](Curve25519Dalek/Proofs/Scalar/ReadLeU64Into.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `as_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L705-L708) | [AsBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/AsBytes.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `ct_eq` | [scalar.rs](curve25519-dalek/src/scalar.rs#L300-L304) | [CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L236-L246) | [FromBytesModOrder.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L236-L246) | [FromBytesModOrder.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L249-L252) | [FromBytesModOrderWide.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L260-L265) | [FromCanonicalBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_hash` | [scalar.rs](curve25519-dalek/src/scalar.rs#L670-L678) | [FromHash.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
@@ -83,19 +84,19 @@ This document tracks the progress of formally verifying functions from the curve
 | `is_canonical` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1133-L1136) | [IsCanonical.lean](Curve25519Dalek/Proofs/Scalar/Scalar/IsCanonical.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `non_adjacent_form` | [scalar.rs](curve25519-dalek/src/scalar.rs#L920-L973) | [NonAdjacentForm.lean](Curve25519Dalek/Proofs/Scalar/Scalar/NonAdjacentForm.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `ONE` | [scalar.rs](curve25519-dalek/src/scalar.rs#L567-L572) | - | ✅ | ☐ |  |
-| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | [Reduce.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | [Reduce.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L690-L693) | [ToBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | [Unpack.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
 
 ## Summary
 
-- **Total Functions**: 81
-- **Extracted**: 28 / 81 (34%)
-- **Draft Spec**: 17 / 81 (20%)
-- **Specified**: 1 / 81 (1%)
-- **Verified**: 5 / 81 (6%)
-- **Pending**: 58 / 81 (71%)
+- **Total Functions**: 82
+- **Extracted**: 31 / 82 (37%)
+- **Draft Spec**: 17 / 82 (20%)
+- **Specified**: 1 / 82 (1%)
+- **Verified**: 5 / 82 (6%)
+- **Pending**: 59 / 82 (71%)
 
 ## Legend
 
