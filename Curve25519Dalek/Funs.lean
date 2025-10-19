@@ -1302,6 +1302,35 @@ def backend.serial.u64.scalar.Scalar52.as_montgomery
   backend.serial.u64.scalar.Scalar52.montgomery_mul self
     backend.serial.u64.constants.RR
 
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 348:8-351:9 -/
+def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
+  (self : backend.serial.u64.scalar.Scalar52) (limbs : Array U128 9#usize)
+  (i : Usize) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  if i < 5#usize
+  then
+    do
+    let i1 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        self i
+    let i2 ← (↑(UScalar.cast .U128 i1) : Result U128)
+    let limbs1 ← Array.update limbs i i2
+    let i3 ← i + 1#usize
+    backend.serial.u64.scalar.Scalar52.from_montgomery_loop self limbs1 i3
+  else backend.serial.u64.scalar.Scalar52.montgomery_reduce limbs
+partial_fixpoint
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 345:4-353:5 -/
+def backend.serial.u64.scalar.Scalar52.from_montgomery
+  (self : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  let limbs := Array.repeat 9#usize 0#u128
+  backend.serial.u64.scalar.Scalar52.from_montgomery_loop self limbs 0#usize
+
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
 def scalar.Scalar.unpack
