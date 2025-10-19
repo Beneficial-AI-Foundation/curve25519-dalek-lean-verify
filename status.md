@@ -18,8 +18,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L337-L363) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L460-L565) | - | ✅ | ☐ |  |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L290-L323) | [Reduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `square` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L561-L561) | - | ☐ | ☐ |  |
-| `square2` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L566-L570) | - | ☐ | ☐ |  |
+| `square` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L561-L561) | - | ✅ | ☐ |  |
+| `square2` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L566-L570) | - | ✅ | ☐ | Required loop refactor |
 | `to_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | - | ✅ | ☐ |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | - | ✅ | ☐ |  |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 31 / 82 (37%)
+- **Extracted**: 33 / 82 (40%)
 - **Draft Spec**: 17 / 82 (20%)
 - **Specified**: 1 / 82 (1%)
 - **Verified**: 5 / 82 (6%)
