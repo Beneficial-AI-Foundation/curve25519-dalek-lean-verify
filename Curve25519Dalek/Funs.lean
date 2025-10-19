@@ -564,6 +564,14 @@ def backend.serial.u64.field.FieldElement51.pow2k
   massert (k > 0#u32)
   backend.serial.u64.field.FieldElement51.pow2k_loop k self
 
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 568:4-570:5 -/
+def backend.serial.u64.field.FieldElement51.square
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  :=
+  backend.serial.u64.field.FieldElement51.pow2k self 1#u32
+
 /- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 43:4-45:5 -/
 def
