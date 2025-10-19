@@ -10,12 +10,38 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait implementation: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 159:0-159:22
+   Name pattern: [core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>] -/
+@[reducible]
+def core.ops.bit.BitAndsubtleChoicesubtleChoicesubtleChoice :
+  core.ops.bit.BitAnd subtle.Choice subtle.Choice subtle.Choice := {
+  bitand := subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand
+}
+
 /- Trait implementation: [subtle::{core::convert::From<u8> for subtle::Choice}]
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 236:0-236:24
    Name pattern: [core::convert::From<subtle::Choice, u8>] -/
 @[reducible]
 def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
   from_ := subtle.FromsubtleChoiceU8.from
+}
+
+/- Trait implementation: [subtle::{subtle::ConstantTimeEq for @Slice<T>}]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
+   Name pattern: [subtle::ConstantTimeEq<[@T]>] -/
+@[reducible]
+noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+  subtle.ConstantTimeEq T) : subtle.ConstantTimeEq (Slice T) := {
+  ct_eq := subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst
+}
+
+/- Trait implementation: [subtle::{subtle::ConstantTimeEq for u8}]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 346:8-346:36
+   Name pattern: [subtle::ConstantTimeEq<u8>] -/
+@[reducible]
+def subtle.ConstantTimeEqU8 : subtle.ConstantTimeEq U8 := {
+  ct_eq := subtle.ConstantTimeEqU8.ct_eq
 }
 
 /- Trait implementation: [subtle::{subtle::ConditionallySelectable for u64}]
@@ -1373,6 +1399,43 @@ def scalar.Scalar.from_bytes_mod_order
   if 0#u8 = right_val
   then ok s
   else fail panic
+
+/- [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 301:4-303:5 -/
+noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+  (self : scalar.Scalar) (other : scalar.Scalar) : Result subtle.Choice :=
+  do
+  let s ← (↑(Array.to_slice self.bytes) : Result (Slice U8))
+  let s1 ← (↑(Array.to_slice other.bytes) : Result (Slice U8))
+  subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1134:4-1136:5 -/
+noncomputable def scalar.Scalar.is_canonical (self : scalar.Scalar) : Result subtle.Choice :=
+  do
+  let s ← scalar.Scalar.reduce self
+  scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq self s
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 261:4-265:5 -/
+noncomputable def scalar.Scalar.from_canonical_bytes
+  (bytes : Array U8 32#usize) : Result (subtle.CtOption scalar.Scalar) :=
+  do
+  let i ← Array.index_usize bytes 31#usize
+  let i1 ← i >>> 7#i32
+  let high_bit_unset ← subtle.ConstantTimeEqU8.ct_eq i1 0#u8
+  let c ← scalar.Scalar.is_canonical { bytes }
+  let c1 ←
+    subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand high_bit_unset c
+  subtle.CtOption.new ({ bytes } : scalar.Scalar) c1
+
+/- Trait implementation: [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 300:0-304:1 -/
+@[reducible]
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
+  scalar.Scalar := {
+  ct_eq := scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+}
 
 /- Trait implementation: [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 306:0-313:1 -/

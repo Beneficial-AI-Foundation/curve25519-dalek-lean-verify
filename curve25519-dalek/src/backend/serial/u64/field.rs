@@ -572,8 +572,10 @@ impl FieldElement51 {
     /// Returns 2 times the square of this field element.
     pub fn square2(&self) -> FieldElement51 {
         let mut square = self.pow2k(1);
-        for i in 0..5 {
+        let mut i = 0;
+        while i < 5 {
             square.0[i] *= 2;
+            i += 1;
         }
 
         square

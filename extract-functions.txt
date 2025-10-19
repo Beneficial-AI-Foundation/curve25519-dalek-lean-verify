@@ -28,3 +28,4 @@ curve25519_dalek::scalar::Scalar::from_bytes_mod_order
 curve25519_dalek::backend::serial::u64::field::FieldElement51::square
 curve25519_dalek::backend::serial::u64::field::FieldElement51::square2
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery
+curve25519_dalek::scalar::Scalar::from_canonical_bytes

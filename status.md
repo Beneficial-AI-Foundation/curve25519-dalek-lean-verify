@@ -77,7 +77,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `ct_eq` | [scalar.rs](curve25519-dalek/src/scalar.rs#L300-L304) | [CtEq.lean](Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L236-L246) | [FromBytesModOrder.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L249-L252) | [FromBytesModOrderWide.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L260-L265) | [FromCanonicalBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L260-L265) | [FromCanonicalBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `from_hash` | [scalar.rs](curve25519-dalek/src/scalar.rs#L670-L678) | [FromHash.lean](Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `hash_from_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L624-L632) | [HashFromBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/HashFromBytes.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
 | `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L746-L749) | [Invert.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Invert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 34 / 82 (41%)
+- **Extracted**: 35 / 82 (42%)
 - **Draft Spec**: 17 / 82 (20%)
 - **Specified**: 1 / 82 (1%)
 - **Verified**: 5 / 82 (6%)

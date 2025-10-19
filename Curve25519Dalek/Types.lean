@@ -9,6 +9,13 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait declaration: [core::ops::bit::BitAnd]
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
+   Name pattern: [core::ops::bit::BitAnd] -/
+structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  bitand : Self → Rhs → Result Self_Output
+
 /- [core::panicking::AssertKind]
    Source: '/rustc/library/core/src/panicking.rs', lines 382:0-382:19
    Name pattern: [core::panicking::AssertKind] -/
@@ -16,6 +23,12 @@ inductive core.panicking.AssertKind where
 | Eq : core.panicking.AssertKind
 | Ne : core.panicking.AssertKind
 | Match : core.panicking.AssertKind
+
+/- Trait declaration: [subtle::ConstantTimeEq]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 262:0-262:24
+   Name pattern: [subtle::ConstantTimeEq] -/
+structure subtle.ConstantTimeEq (Self : Type) where
+  ct_eq : Self → Self → Result subtle.Choice
 
 /- Trait declaration: [subtle::ConditionallySelectable]
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 393:0-393:39

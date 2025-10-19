@@ -344,8 +344,10 @@ impl Scalar52 {
     #[inline(never)]
     pub fn from_montgomery(&self) -> Scalar52 {
         let mut limbs = [0u128; 9];
-        for i in 0..5 {
+        let mut i = 0;
+        while i < 5 {
             limbs[i] = self[i] as u128;
+            i += 1;
         }
         Scalar52::montgomery_reduce(&limbs)
     }
