@@ -21,10 +21,13 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.AsMontgomery
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Invert
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Proofs.Backend.StrausMultiscalarMul
@@ -56,9 +59,6 @@ import Curve25519Dalek.Proofs.Ristretto.RistrettoPoint.FromUniformBytes
 import Curve25519Dalek.Proofs.Ristretto.RistrettoPoint.Identity
 import Curve25519Dalek.Proofs.Ristretto.RistrettoPoint.MulBase
 import Curve25519Dalek.Proofs.Ristretto.RistrettoPoint.MultiscalarMul
-import Curve25519Dalek.Proofs.Scalar.Backend.Serial.U64.Scalar.Scalar52.Invert
-import Curve25519Dalek.Proofs.Scalar.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
-import Curve25519Dalek.Proofs.Scalar.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Proofs.Scalar.ClampInteger
 import Curve25519Dalek.Proofs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Proofs.Scalar.Scalar.AsBytes
