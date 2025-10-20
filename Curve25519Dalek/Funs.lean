@@ -1572,6 +1572,14 @@ def scalar.Scalar.from_bytes_mod_order
   then ok s
   else fail panic
 
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 250:4-252:5 -/
+def scalar.Scalar.from_bytes_mod_order_wide
+  (input : Array U8 64#usize) : Result scalar.Scalar :=
+  do
+  let s ← backend.serial.u64.scalar.Scalar52.from_bytes_wide input
+  scalar.Scalar52.pack s
+
 /- [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 301:4-303:5 -/
 noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
@@ -1746,6 +1754,14 @@ def scalar.Scalar52.invert
   let s ← backend.serial.u64.scalar.Scalar52.as_montgomery self
   let s1 ← scalar.Scalar52.montgomery_invert s
   backend.serial.u64.scalar.Scalar52.from_montgomery s1
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 747:4-749:5 -/
+def scalar.Scalar.invert (self : scalar.Scalar) : Result scalar.Scalar :=
+  do
+  let s ← scalar.Scalar.unpack self
+  let s1 ← scalar.Scalar52.invert s
+  scalar.Scalar52.pack s1
 
 /- [curve25519_dalek::scalar::clamp_integer]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1388:0-1393:1 -/
