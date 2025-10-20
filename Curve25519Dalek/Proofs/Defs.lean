@@ -41,3 +41,8 @@ def U128x9_as_Nat (limbs : Array U128 9#usize) : Nat :=
 @[simp]
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
+
+/-- Auxiliary definition to interpret a wide byte array (64 bytes) as a natural number (little-endian) -/
+@[simp]
+def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
+  ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
