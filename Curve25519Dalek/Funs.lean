@@ -790,6 +790,537 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let words := Array.repeat 4#usize 0#u64
   backend.serial.u64.scalar.Scalar52.from_bytes_loop bytes words 0#usize
 
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 231:4-245:5 -/
+def backend.serial.u64.scalar.Scalar52.mul_internal
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52) :
+  Result (Array U128 9#usize)
+  :=
+  do
+  let z := Array.repeat 9#usize 0#u128
+  let i ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      a 0#usize
+  let i1 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      b 0#usize
+  let i2 ← backend.serial.u64.scalar.m i i1
+  let z1 ← Array.update z 0#usize i2
+  let i3 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      b 1#usize
+  let i4 ← backend.serial.u64.scalar.m i i3
+  let i5 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      a 1#usize
+  let i6 ← backend.serial.u64.scalar.m i5 i1
+  let i7 ← i4 + i6
+  let z2 ← Array.update z1 1#usize i7
+  let i8 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      b 2#usize
+  let i9 ← backend.serial.u64.scalar.m i i8
+  let i10 ← backend.serial.u64.scalar.m i5 i3
+  let i11 ← i9 + i10
+  let i12 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      a 2#usize
+  let i13 ← backend.serial.u64.scalar.m i12 i1
+  let i14 ← i11 + i13
+  let z3 ← Array.update z2 2#usize i14
+  let i15 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      b 3#usize
+  let i16 ← backend.serial.u64.scalar.m i i15
+  let i17 ← backend.serial.u64.scalar.m i5 i8
+  let i18 ← i16 + i17
+  let i19 ← backend.serial.u64.scalar.m i12 i3
+  let i20 ← i18 + i19
+  let i21 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      a 3#usize
+  let i22 ← backend.serial.u64.scalar.m i21 i1
+  let i23 ← i20 + i22
+  let z4 ← Array.update z3 3#usize i23
+  let i24 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      b 4#usize
+  let i25 ← backend.serial.u64.scalar.m i i24
+  let i26 ← backend.serial.u64.scalar.m i5 i15
+  let i27 ← i25 + i26
+  let i28 ← backend.serial.u64.scalar.m i12 i8
+  let i29 ← i27 + i28
+  let i30 ← backend.serial.u64.scalar.m i21 i3
+  let i31 ← i29 + i30
+  let i32 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      a 4#usize
+  let i33 ← backend.serial.u64.scalar.m i32 i1
+  let i34 ← i31 + i33
+  let z5 ← Array.update z4 4#usize i34
+  let i35 ← backend.serial.u64.scalar.m i5 i24
+  let i36 ← backend.serial.u64.scalar.m i12 i15
+  let i37 ← i35 + i36
+  let i38 ← backend.serial.u64.scalar.m i21 i8
+  let i39 ← i37 + i38
+  let i40 ← backend.serial.u64.scalar.m i32 i3
+  let i41 ← i39 + i40
+  let z6 ← Array.update z5 5#usize i41
+  let i42 ← backend.serial.u64.scalar.m i12 i24
+  let i43 ← backend.serial.u64.scalar.m i21 i15
+  let i44 ← i42 + i43
+  let i45 ← backend.serial.u64.scalar.m i32 i8
+  let i46 ← i44 + i45
+  let z7 ← Array.update z6 6#usize i46
+  let i47 ← backend.serial.u64.scalar.m i21 i24
+  let i48 ← backend.serial.u64.scalar.m i32 i15
+  let i49 ← i47 + i48
+  let z8 ← Array.update z7 7#usize i49
+  let i50 ← backend.serial.u64.scalar.m i32 i24
+  Array.update z8 8#usize i50
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 277:8-280:9 -/
+def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
+  (sum : U128) : Result (U128 × U64) :=
+  do
+  let i ← (↑(UScalar.cast .U64 sum) : Result U64)
+  let i1 ←
+    (↑(core.num.U64.wrapping_mul i backend.serial.u64.constants.LFACTOR) :
+      Result U64)
+  let i2 ← 1#u64 <<< 52#i32
+  let i3 ← i2 - 1#u64
+  let p ← (↑(i1 &&& i3) : Result U64)
+  let i4 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      backend.serial.u64.constants.L 0#usize
+  let i5 ← backend.serial.u64.scalar.m p i4
+  let i6 ← sum + i5
+  let i7 ← i6 >>> 52#i32
+  ok (i7, p)
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 283:8-286:9 -/
+def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
+  (sum : U128) : Result (U128 × U64) :=
+  do
+  let i ← (↑(UScalar.cast .U64 sum) : Result U64)
+  let i1 ← 1#u64 <<< 52#i32
+  let i2 ← i1 - 1#u64
+  let w ← (↑(i &&& i2) : Result U64)
+  let i3 ← sum >>> 52#i32
+  ok (i3, w)
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:8-223:9 -/
+def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
+  (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
+  (carry : U64) (mask : U64) (i : Usize) :
+  Result (U64 × backend.serial.u64.scalar.Scalar52)
+  :=
+  if i < 5#usize
+  then
+    do
+    let i1 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        backend.serial.u64.constants.L i
+    let addend ←
+      subtle.ConditionallySelectableU64.conditional_select 0#u64 i1 condition
+    let i2 ← carry >>> 52#i32
+    let i3 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        self i
+    let i4 ← i2 + i3
+    let carry1 ← i4 + addend
+    let (_, index_mut_back) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        self i
+    let i5 ← (↑(carry1 &&& mask) : Result U64)
+    let i6 ← i + 1#usize
+    let self1 := index_mut_back i5
+    backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self1 condition
+      carry1 mask i6
+  else ok (carry, self)
+partial_fixpoint
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 213:4-226:5 -/
+def backend.serial.u64.scalar.Scalar52.conditional_add_l
+  (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice) :
+  Result (U64 × backend.serial.u64.scalar.Scalar52)
+  :=
+  do
+  let i ← 1#u64 <<< 52#i32
+  let mask ← i - 1#u64
+  backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self condition
+    0#u64 mask 0#usize
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 202:8-206:9 -/
+def backend.serial.u64.scalar.Scalar52.sub_loop
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52)
+  (difference : backend.serial.u64.scalar.Scalar52) (mask : U64) (borrow : U64)
+  (i : Usize) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  if i < 5#usize
+  then
+    do
+    let i1 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        a i
+    let i2 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        b i
+    let i3 ← borrow >>> 63#i32
+    let i4 ← i2 + i3
+    let borrow1 ← (↑(core.num.U64.wrapping_sub i1 i4) : Result U64)
+    let (_, index_mut_back) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        difference i
+    let i5 ← (↑(borrow1 &&& mask) : Result U64)
+    let i6 ← i + 1#usize
+    let difference1 := index_mut_back i5
+    backend.serial.u64.scalar.Scalar52.sub_loop a b difference1 mask borrow1 i6
+  else
+    do
+    let i1 ← borrow >>> 63#i32
+    let i2 ← (↑(UScalar.cast .U8 i1) : Result U8)
+    let c ← subtle.FromsubtleChoiceU8.from i2
+    let (_, difference1) ←
+      backend.serial.u64.scalar.Scalar52.conditional_add_l difference c
+    ok difference1
+partial_fixpoint
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 195:4-211:5 -/
+def backend.serial.u64.scalar.Scalar52.sub
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  do
+  let i ← 1#u64 <<< 52#i32
+  let mask ← i - 1#u64
+  backend.serial.u64.scalar.Scalar52.sub_loop a b
+    backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 274:4-307:5 -/
+def backend.serial.u64.scalar.Scalar52.montgomery_reduce
+  (limbs : Array U128 9#usize) : Result backend.serial.u64.scalar.Scalar52 :=
+  do
+  let i ← Array.index_usize limbs 0#usize
+  let (carry, n0) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i
+  let i1 ← Array.index_usize limbs 1#usize
+  let i2 ← carry + i1
+  let i3 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      backend.serial.u64.constants.L 1#usize
+  let i4 ← backend.serial.u64.scalar.m n0 i3
+  let i5 ← i2 + i4
+  let (carry1, n1) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i5
+  let i6 ← Array.index_usize limbs 2#usize
+  let i7 ← carry1 + i6
+  let i8 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      backend.serial.u64.constants.L 2#usize
+  let i9 ← backend.serial.u64.scalar.m n0 i8
+  let i10 ← i7 + i9
+  let i11 ← backend.serial.u64.scalar.m n1 i3
+  let i12 ← i10 + i11
+  let (carry2, n2) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i12
+  let i13 ← Array.index_usize limbs 3#usize
+  let i14 ← carry2 + i13
+  let i15 ← backend.serial.u64.scalar.m n1 i8
+  let i16 ← i14 + i15
+  let i17 ← backend.serial.u64.scalar.m n2 i3
+  let i18 ← i16 + i17
+  let (carry3, n3) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i18
+  let i19 ← Array.index_usize limbs 4#usize
+  let i20 ← carry3 + i19
+  let i21 ←
+    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      backend.serial.u64.constants.L 4#usize
+  let i22 ← backend.serial.u64.scalar.m n0 i21
+  let i23 ← i20 + i22
+  let i24 ← backend.serial.u64.scalar.m n2 i8
+  let i25 ← i23 + i24
+  let i26 ← backend.serial.u64.scalar.m n3 i3
+  let i27 ← i25 + i26
+  let (carry4, n4) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i27
+  let i28 ← Array.index_usize limbs 5#usize
+  let i29 ← carry4 + i28
+  let i30 ← backend.serial.u64.scalar.m n1 i21
+  let i31 ← i29 + i30
+  let i32 ← backend.serial.u64.scalar.m n3 i8
+  let i33 ← i31 + i32
+  let i34 ← backend.serial.u64.scalar.m n4 i3
+  let i35 ← i33 + i34
+  let (carry5, r0) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i35
+  let i36 ← Array.index_usize limbs 6#usize
+  let i37 ← carry5 + i36
+  let i38 ← backend.serial.u64.scalar.m n2 i21
+  let i39 ← i37 + i38
+  let i40 ← backend.serial.u64.scalar.m n4 i8
+  let i41 ← i39 + i40
+  let (carry6, r1) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i41
+  let i42 ← Array.index_usize limbs 7#usize
+  let i43 ← carry6 + i42
+  let i44 ← backend.serial.u64.scalar.m n3 i21
+  let i45 ← i43 + i44
+  let (carry7, r2) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i45
+  let i46 ← Array.index_usize limbs 8#usize
+  let i47 ← carry7 + i46
+  let i48 ← backend.serial.u64.scalar.m n4 i21
+  let i49 ← i47 + i48
+  let (carry8, r3) ←
+    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i49
+  let r4 ← (↑(UScalar.cast .U64 carry8) : Result U64)
+  backend.serial.u64.scalar.Scalar52.sub
+    (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 326:4-328:5 -/
+def backend.serial.u64.scalar.Scalar52.montgomery_mul
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  do
+  let a1 ← backend.serial.u64.scalar.Scalar52.mul_internal a b
+  backend.serial.u64.scalar.Scalar52.montgomery_reduce a1
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 184:8-188:9 -/
+def backend.serial.u64.scalar.Scalar52.add_loop
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52)
+  (sum : backend.serial.u64.scalar.Scalar52) (mask : U64) (carry : U64)
+  (i : Usize) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  if i < 5#usize
+  then
+    do
+    let i1 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        a i
+    let i2 ←
+      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+        b i
+    let i3 ← i1 + i2
+    let i4 ← carry >>> 52#i32
+    let carry1 ← i3 + i4
+    let (_, index_mut_back) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        sum i
+    let i5 ← (↑(carry1 &&& mask) : Result U64)
+    let i6 ← i + 1#usize
+    let sum1 := index_mut_back i5
+    backend.serial.u64.scalar.Scalar52.add_loop a b sum1 mask carry1 i6
+  else
+    backend.serial.u64.scalar.Scalar52.sub sum backend.serial.u64.constants.L
+partial_fixpoint
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 177:4-192:5 -/
+def backend.serial.u64.scalar.Scalar52.add
+  (a : backend.serial.u64.scalar.Scalar52)
+  (b : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  do
+  let i ← 1#u64 <<< 52#i32
+  let mask ← i - 1#u64
+  backend.serial.u64.scalar.Scalar52.add_loop a b
+    backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 100:8-111:9 -/
+def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
+  (bytes : Array U8 64#usize) (words : Array U64 8#usize) (i : Usize) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  if i < 8#usize
+  then
+    do
+    let i1 ← i * 8#usize
+    let i2 ← i1 + 0#usize
+    let i3 ← Array.index_usize bytes i2
+    let i4 ← (↑(UScalar.cast .U64 i3) : Result U64)
+    let i5 ← 0#i32 * 8#i32
+    let i6 ← i4 <<< i5
+    let i7 ← Array.index_usize words i
+    let i8 ← (↑(i7 ||| i6) : Result U64)
+    let words1 ← Array.update words i i8
+    let i9 ← i1 + 1#usize
+    let i10 ← Array.index_usize bytes i9
+    let i11 ← (↑(UScalar.cast .U64 i10) : Result U64)
+    let i12 ← 1#i32 * 8#i32
+    let i13 ← i11 <<< i12
+    let i14 ← Array.index_usize words1 i
+    let i15 ← (↑(i14 ||| i13) : Result U64)
+    let words2 ← Array.update words1 i i15
+    let i16 ← i1 + 2#usize
+    let i17 ← Array.index_usize bytes i16
+    let i18 ← (↑(UScalar.cast .U64 i17) : Result U64)
+    let i19 ← 2#i32 * 8#i32
+    let i20 ← i18 <<< i19
+    let i21 ← Array.index_usize words2 i
+    let i22 ← (↑(i21 ||| i20) : Result U64)
+    let words3 ← Array.update words2 i i22
+    let i23 ← i1 + 3#usize
+    let i24 ← Array.index_usize bytes i23
+    let i25 ← (↑(UScalar.cast .U64 i24) : Result U64)
+    let i26 ← 3#i32 * 8#i32
+    let i27 ← i25 <<< i26
+    let i28 ← Array.index_usize words3 i
+    let i29 ← (↑(i28 ||| i27) : Result U64)
+    let words4 ← Array.update words3 i i29
+    let i30 ← i1 + 4#usize
+    let i31 ← Array.index_usize bytes i30
+    let i32 ← (↑(UScalar.cast .U64 i31) : Result U64)
+    let i33 ← 4#i32 * 8#i32
+    let i34 ← i32 <<< i33
+    let i35 ← Array.index_usize words4 i
+    let i36 ← (↑(i35 ||| i34) : Result U64)
+    let words5 ← Array.update words4 i i36
+    let i37 ← i1 + 5#usize
+    let i38 ← Array.index_usize bytes i37
+    let i39 ← (↑(UScalar.cast .U64 i38) : Result U64)
+    let i40 ← 5#i32 * 8#i32
+    let i41 ← i39 <<< i40
+    let i42 ← Array.index_usize words5 i
+    let i43 ← (↑(i42 ||| i41) : Result U64)
+    let words6 ← Array.update words5 i i43
+    let i44 ← i1 + 6#usize
+    let i45 ← Array.index_usize bytes i44
+    let i46 ← (↑(UScalar.cast .U64 i45) : Result U64)
+    let i47 ← 6#i32 * 8#i32
+    let i48 ← i46 <<< i47
+    let i49 ← Array.index_usize words6 i
+    let i50 ← (↑(i49 ||| i48) : Result U64)
+    let words7 ← Array.update words6 i i50
+    let i51 ← i1 + 7#usize
+    let i52 ← Array.index_usize bytes i51
+    let i53 ← (↑(UScalar.cast .U64 i52) : Result U64)
+    let i54 ← 7#i32 * 8#i32
+    let i55 ← i53 <<< i54
+    let i56 ← Array.index_usize words7 i
+    let i57 ← (↑(i56 ||| i55) : Result U64)
+    let words8 ← Array.update words7 i i57
+    let i58 ← i + 1#usize
+    backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop bytes words8 i58
+  else
+    do
+    let i1 ← 1#u64 <<< 52#i32
+    let mask ← i1 - 1#u64
+    let i2 ← Array.index_usize words 0#usize
+    let (_, index_mut_back) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        backend.serial.u64.scalar.Scalar52.ZERO 0#usize
+    let i3 ← (↑(i2 &&& mask) : Result U64)
+    let i4 ← i2 >>> 52#i32
+    let i5 ← Array.index_usize words 1#usize
+    let i6 ← i5 <<< 12#i32
+    let i7 ← (↑(i4 ||| i6) : Result U64)
+    let lo := index_mut_back i3
+    let (_, index_mut_back1) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        lo 1#usize
+    let i8 ← (↑(i7 &&& mask) : Result U64)
+    let i9 ← i5 >>> 40#i32
+    let i10 ← Array.index_usize words 2#usize
+    let i11 ← i10 <<< 24#i32
+    let i12 ← (↑(i9 ||| i11) : Result U64)
+    let lo1 := index_mut_back1 i8
+    let (_, index_mut_back2) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        lo1 2#usize
+    let i13 ← (↑(i12 &&& mask) : Result U64)
+    let i14 ← i10 >>> 28#i32
+    let i15 ← Array.index_usize words 3#usize
+    let i16 ← i15 <<< 36#i32
+    let i17 ← (↑(i14 ||| i16) : Result U64)
+    let lo2 := index_mut_back2 i13
+    let (_, index_mut_back3) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        lo2 3#usize
+    let i18 ← (↑(i17 &&& mask) : Result U64)
+    let i19 ← i15 >>> 16#i32
+    let i20 ← Array.index_usize words 4#usize
+    let i21 ← i20 <<< 48#i32
+    let i22 ← (↑(i19 ||| i21) : Result U64)
+    let lo3 := index_mut_back3 i18
+    let (_, index_mut_back4) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        lo3 4#usize
+    let i23 ← (↑(i22 &&& mask) : Result U64)
+    let i24 ← i20 >>> 4#i32
+    let i25 ← (↑(i24 &&& mask) : Result U64)
+    let i26 ← i20 >>> 56#i32
+    let i27 ← Array.index_usize words 5#usize
+    let i28 ← i27 <<< 8#i32
+    let i29 ← (↑(i26 ||| i28) : Result U64)
+    let hi := index_mut_back i25
+    let (_, index_mut_back5) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        hi 1#usize
+    let i30 ← (↑(i29 &&& mask) : Result U64)
+    let i31 ← i27 >>> 44#i32
+    let i32 ← Array.index_usize words 6#usize
+    let i33 ← i32 <<< 20#i32
+    let i34 ← (↑(i31 ||| i33) : Result U64)
+    let hi1 := index_mut_back5 i30
+    let (_, index_mut_back6) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        hi1 2#usize
+    let i35 ← (↑(i34 &&& mask) : Result U64)
+    let i36 ← i32 >>> 32#i32
+    let i37 ← Array.index_usize words 7#usize
+    let i38 ← i37 <<< 32#i32
+    let i39 ← (↑(i36 ||| i38) : Result U64)
+    let hi2 := index_mut_back6 i35
+    let (_, index_mut_back7) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        hi2 3#usize
+    let i40 ← (↑(i39 &&& mask) : Result U64)
+    let i41 ← (↑(IScalar.hcast .U32 20#i32) : Result U32)
+    massert (i41 < 64#u32)
+    let hi3 := index_mut_back7 i40
+    let (_, index_mut_back8) ←
+      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+        hi3 4#usize
+    let i42 ← (i37 >>> 20#i32 : Result U64)
+    let lo4 := index_mut_back4 i23
+    let lo5 ←
+      backend.serial.u64.scalar.Scalar52.montgomery_mul lo4
+        backend.serial.u64.constants.R
+    let hi4 := index_mut_back8 i42
+    let hi5 ←
+      backend.serial.u64.scalar.Scalar52.montgomery_mul hi4
+        backend.serial.u64.constants.RR
+    backend.serial.u64.scalar.Scalar52.add hi5 lo5
+partial_fixpoint
+
+/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 97:4-132:5 -/
+def backend.serial.u64.scalar.Scalar52.from_bytes_wide
+  (bytes : Array U8 64#usize) : Result backend.serial.u64.scalar.Scalar52 :=
+  let words := Array.repeat 8#usize 0#u64
+  backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop bytes words 0#usize
+
 /- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 137:4-174:5 -/
 def backend.serial.u64.scalar.Scalar52.to_bytes
@@ -902,236 +1433,6 @@ def backend.serial.u64.scalar.Scalar52.to_bytes
   let i72 ← (↑(UScalar.cast .U8 i71) : Result U8)
   Array.update s31 31#usize i72
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:8-223:9 -/
-def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
-  (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
-  (carry : U64) (mask : U64) (i : Usize) :
-  Result (U64 × backend.serial.u64.scalar.Scalar52)
-  :=
-  if i < 5#usize
-  then
-    do
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        backend.serial.u64.constants.L i
-    let addend ←
-      subtle.ConditionallySelectableU64.conditional_select 0#u64 i1 condition
-    let i2 ← carry >>> 52#i32
-    let i3 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        self i
-    let i4 ← i2 + i3
-    let carry1 ← i4 + addend
-    let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        self i
-    let i5 ← (↑(carry1 &&& mask) : Result U64)
-    let i6 ← i + 1#usize
-    let self1 := index_mut_back i5
-    backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self1 condition
-      carry1 mask i6
-  else ok (carry, self)
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 213:4-226:5 -/
-def backend.serial.u64.scalar.Scalar52.conditional_add_l
-  (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice) :
-  Result (U64 × backend.serial.u64.scalar.Scalar52)
-  :=
-  do
-  let i ← 1#u64 <<< 52#i32
-  let mask ← i - 1#u64
-  backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self condition
-    0#u64 mask 0#usize
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 202:8-206:9 -/
-def backend.serial.u64.scalar.Scalar52.sub_loop
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52)
-  (difference : backend.serial.u64.scalar.Scalar52) (mask : U64) (borrow : U64)
-  (i : Usize) :
-  Result backend.serial.u64.scalar.Scalar52
-  :=
-  if i < 5#usize
-  then
-    do
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        a i
-    let i2 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        b i
-    let i3 ← borrow >>> 63#i32
-    let i4 ← i2 + i3
-    let borrow1 ← (↑(core.num.U64.wrapping_sub i1 i4) : Result U64)
-    let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        difference i
-    let i5 ← (↑(borrow1 &&& mask) : Result U64)
-    let i6 ← i + 1#usize
-    let difference1 := index_mut_back i5
-    backend.serial.u64.scalar.Scalar52.sub_loop a b difference1 mask borrow1 i6
-  else
-    do
-    let i1 ← borrow >>> 63#i32
-    let i2 ← (↑(UScalar.cast .U8 i1) : Result U8)
-    let c ← subtle.FromsubtleChoiceU8.from i2
-    let (_, difference1) ←
-      backend.serial.u64.scalar.Scalar52.conditional_add_l difference c
-    ok difference1
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 195:4-211:5 -/
-def backend.serial.u64.scalar.Scalar52.sub
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52) :
-  Result backend.serial.u64.scalar.Scalar52
-  :=
-  do
-  let i ← 1#u64 <<< 52#i32
-  let mask ← i - 1#u64
-  backend.serial.u64.scalar.Scalar52.sub_loop a b
-    backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 184:8-188:9 -/
-def backend.serial.u64.scalar.Scalar52.add_loop
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52)
-  (sum : backend.serial.u64.scalar.Scalar52) (mask : U64) (carry : U64)
-  (i : Usize) :
-  Result backend.serial.u64.scalar.Scalar52
-  :=
-  if i < 5#usize
-  then
-    do
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        a i
-    let i2 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        b i
-    let i3 ← i1 + i2
-    let i4 ← carry >>> 52#i32
-    let carry1 ← i3 + i4
-    let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        sum i
-    let i5 ← (↑(carry1 &&& mask) : Result U64)
-    let i6 ← i + 1#usize
-    let sum1 := index_mut_back i5
-    backend.serial.u64.scalar.Scalar52.add_loop a b sum1 mask carry1 i6
-  else
-    backend.serial.u64.scalar.Scalar52.sub sum backend.serial.u64.constants.L
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 177:4-192:5 -/
-def backend.serial.u64.scalar.Scalar52.add
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52) :
-  Result backend.serial.u64.scalar.Scalar52
-  :=
-  do
-  let i ← 1#u64 <<< 52#i32
-  let mask ← i - 1#u64
-  backend.serial.u64.scalar.Scalar52.add_loop a b
-    backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 231:4-245:5 -/
-def backend.serial.u64.scalar.Scalar52.mul_internal
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52) :
-  Result (Array U128 9#usize)
-  :=
-  do
-  let z := Array.repeat 9#usize 0#u128
-  let i ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 0#usize
-  let i1 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 0#usize
-  let i2 ← backend.serial.u64.scalar.m i i1
-  let z1 ← Array.update z 0#usize i2
-  let i3 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 1#usize
-  let i4 ← backend.serial.u64.scalar.m i i3
-  let i5 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 1#usize
-  let i6 ← backend.serial.u64.scalar.m i5 i1
-  let i7 ← i4 + i6
-  let z2 ← Array.update z1 1#usize i7
-  let i8 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 2#usize
-  let i9 ← backend.serial.u64.scalar.m i i8
-  let i10 ← backend.serial.u64.scalar.m i5 i3
-  let i11 ← i9 + i10
-  let i12 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 2#usize
-  let i13 ← backend.serial.u64.scalar.m i12 i1
-  let i14 ← i11 + i13
-  let z3 ← Array.update z2 2#usize i14
-  let i15 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 3#usize
-  let i16 ← backend.serial.u64.scalar.m i i15
-  let i17 ← backend.serial.u64.scalar.m i5 i8
-  let i18 ← i16 + i17
-  let i19 ← backend.serial.u64.scalar.m i12 i3
-  let i20 ← i18 + i19
-  let i21 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 3#usize
-  let i22 ← backend.serial.u64.scalar.m i21 i1
-  let i23 ← i20 + i22
-  let z4 ← Array.update z3 3#usize i23
-  let i24 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 4#usize
-  let i25 ← backend.serial.u64.scalar.m i i24
-  let i26 ← backend.serial.u64.scalar.m i5 i15
-  let i27 ← i25 + i26
-  let i28 ← backend.serial.u64.scalar.m i12 i8
-  let i29 ← i27 + i28
-  let i30 ← backend.serial.u64.scalar.m i21 i3
-  let i31 ← i29 + i30
-  let i32 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 4#usize
-  let i33 ← backend.serial.u64.scalar.m i32 i1
-  let i34 ← i31 + i33
-  let z5 ← Array.update z4 4#usize i34
-  let i35 ← backend.serial.u64.scalar.m i5 i24
-  let i36 ← backend.serial.u64.scalar.m i12 i15
-  let i37 ← i35 + i36
-  let i38 ← backend.serial.u64.scalar.m i21 i8
-  let i39 ← i37 + i38
-  let i40 ← backend.serial.u64.scalar.m i32 i3
-  let i41 ← i39 + i40
-  let z6 ← Array.update z5 5#usize i41
-  let i42 ← backend.serial.u64.scalar.m i12 i24
-  let i43 ← backend.serial.u64.scalar.m i21 i15
-  let i44 ← i42 + i43
-  let i45 ← backend.serial.u64.scalar.m i32 i8
-  let i46 ← i44 + i45
-  let z7 ← Array.update z6 6#usize i46
-  let i47 ← backend.serial.u64.scalar.m i21 i24
-  let i48 ← backend.serial.u64.scalar.m i32 i15
-  let i49 ← i47 + i48
-  let z8 ← Array.update z7 7#usize i49
-  let i50 ← backend.serial.u64.scalar.m i32 i24
-  Array.update z8 8#usize i50
-
 /- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 250:4-269:5 -/
 def backend.serial.u64.scalar.Scalar52.square_internal
@@ -1182,132 +1483,6 @@ def backend.serial.u64.scalar.Scalar52.square_internal
   let i32 ← backend.serial.u64.scalar.m i31 i18
   let i33 ← backend.serial.u64.scalar.m i18 i18
   ok (Array.make 9#usize [ i8, i10, i13, i17, i23, i27, i30, i32, i33 ])
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 277:8-280:9 -/
-def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
-  (sum : U128) : Result (U128 × U64) :=
-  do
-  let i ← (↑(UScalar.cast .U64 sum) : Result U64)
-  let i1 ←
-    (↑(core.num.U64.wrapping_mul i backend.serial.u64.constants.LFACTOR) :
-      Result U64)
-  let i2 ← 1#u64 <<< 52#i32
-  let i3 ← i2 - 1#u64
-  let p ← (↑(i1 &&& i3) : Result U64)
-  let i4 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      backend.serial.u64.constants.L 0#usize
-  let i5 ← backend.serial.u64.scalar.m p i4
-  let i6 ← sum + i5
-  let i7 ← i6 >>> 52#i32
-  ok (i7, p)
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 283:8-286:9 -/
-def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
-  (sum : U128) : Result (U128 × U64) :=
-  do
-  let i ← (↑(UScalar.cast .U64 sum) : Result U64)
-  let i1 ← 1#u64 <<< 52#i32
-  let i2 ← i1 - 1#u64
-  let w ← (↑(i &&& i2) : Result U64)
-  let i3 ← sum >>> 52#i32
-  ok (i3, w)
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 274:4-307:5 -/
-def backend.serial.u64.scalar.Scalar52.montgomery_reduce
-  (limbs : Array U128 9#usize) : Result backend.serial.u64.scalar.Scalar52 :=
-  do
-  let i ← Array.index_usize limbs 0#usize
-  let (carry, n0) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i
-  let i1 ← Array.index_usize limbs 1#usize
-  let i2 ← carry + i1
-  let i3 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      backend.serial.u64.constants.L 1#usize
-  let i4 ← backend.serial.u64.scalar.m n0 i3
-  let i5 ← i2 + i4
-  let (carry1, n1) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i5
-  let i6 ← Array.index_usize limbs 2#usize
-  let i7 ← carry1 + i6
-  let i8 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      backend.serial.u64.constants.L 2#usize
-  let i9 ← backend.serial.u64.scalar.m n0 i8
-  let i10 ← i7 + i9
-  let i11 ← backend.serial.u64.scalar.m n1 i3
-  let i12 ← i10 + i11
-  let (carry2, n2) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i12
-  let i13 ← Array.index_usize limbs 3#usize
-  let i14 ← carry2 + i13
-  let i15 ← backend.serial.u64.scalar.m n1 i8
-  let i16 ← i14 + i15
-  let i17 ← backend.serial.u64.scalar.m n2 i3
-  let i18 ← i16 + i17
-  let (carry3, n3) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i18
-  let i19 ← Array.index_usize limbs 4#usize
-  let i20 ← carry3 + i19
-  let i21 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      backend.serial.u64.constants.L 4#usize
-  let i22 ← backend.serial.u64.scalar.m n0 i21
-  let i23 ← i20 + i22
-  let i24 ← backend.serial.u64.scalar.m n2 i8
-  let i25 ← i23 + i24
-  let i26 ← backend.serial.u64.scalar.m n3 i3
-  let i27 ← i25 + i26
-  let (carry4, n4) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1 i27
-  let i28 ← Array.index_usize limbs 5#usize
-  let i29 ← carry4 + i28
-  let i30 ← backend.serial.u64.scalar.m n1 i21
-  let i31 ← i29 + i30
-  let i32 ← backend.serial.u64.scalar.m n3 i8
-  let i33 ← i31 + i32
-  let i34 ← backend.serial.u64.scalar.m n4 i3
-  let i35 ← i33 + i34
-  let (carry5, r0) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i35
-  let i36 ← Array.index_usize limbs 6#usize
-  let i37 ← carry5 + i36
-  let i38 ← backend.serial.u64.scalar.m n2 i21
-  let i39 ← i37 + i38
-  let i40 ← backend.serial.u64.scalar.m n4 i8
-  let i41 ← i39 + i40
-  let (carry6, r1) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i41
-  let i42 ← Array.index_usize limbs 7#usize
-  let i43 ← carry6 + i42
-  let i44 ← backend.serial.u64.scalar.m n3 i21
-  let i45 ← i43 + i44
-  let (carry7, r2) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i45
-  let i46 ← Array.index_usize limbs 8#usize
-  let i47 ← carry7 + i46
-  let i48 ← backend.serial.u64.scalar.m n4 i21
-  let i49 ← i47 + i48
-  let (carry8, r3) ←
-    backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i49
-  let r4 ← (↑(UScalar.cast .U64 carry8) : Result U64)
-  backend.serial.u64.scalar.Scalar52.sub
-    (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
-
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 326:4-328:5 -/
-def backend.serial.u64.scalar.Scalar52.montgomery_mul
-  (a : backend.serial.u64.scalar.Scalar52)
-  (b : backend.serial.u64.scalar.Scalar52) :
-  Result backend.serial.u64.scalar.Scalar52
-  :=
-  do
-  let a1 ← backend.serial.u64.scalar.Scalar52.mul_internal a b
-  backend.serial.u64.scalar.Scalar52.montgomery_reduce a1
 
 /- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 332:4-334:5 -/

@@ -98,15 +98,15 @@ impl Scalar52 {
         let mut words = [0u64; 8];
         let mut i = 0;
         while i < 8 {
-            #[inline(always)]
-            fn inner_loop(words: &mut [u64; 8], bytes: &[u8; 64], i: usize) {
-                let mut j = 0;
-                while j < 8 {
-                    words[i] |= (bytes[(i * 8) + j] as u64) << (j * 8);
-                    j += 1;
-                }
-            }
-            inner_loop(&mut words, bytes, i);
+            // Explicitly unrolled inner loop - 8 steps
+            words[i] |= (bytes[(i * 8) + 0] as u64) << (0 * 8);
+            words[i] |= (bytes[(i * 8) + 1] as u64) << (1 * 8);
+            words[i] |= (bytes[(i * 8) + 2] as u64) << (2 * 8);
+            words[i] |= (bytes[(i * 8) + 3] as u64) << (3 * 8);
+            words[i] |= (bytes[(i * 8) + 4] as u64) << (4 * 8);
+            words[i] |= (bytes[(i * 8) + 5] as u64) << (5 * 8);
+            words[i] |= (bytes[(i * 8) + 6] as u64) << (6 * 8);
+            words[i] |= (bytes[(i * 8) + 7] as u64) << (7 * 8);
             i += 1;
         }
 

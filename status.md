@@ -31,7 +31,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `conditional_add_l` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
 | `as_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | - | ✅ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L64-L85) | - | ✅ | ☐ | Nested loop refactored |
-| `from_bytes_wide` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ☐ | ☐ |  |
+| `from_bytes_wide` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | - | ✅ | ☐ | Nested loop refactored; required shr edit |
 | `from_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | - | ✅ | ☐ | Loop refactored |
 | `montgomery_mul` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | - | ✅ | ☐ |  |
 | `montgomery_reduce` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | - | ✅ | ☐ |  |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 37 / 82 (45%)
+- **Extracted**: 38 / 82 (46%)
 - **Draft Spec**: 17 / 82 (20%)
 - **Specified**: 1 / 82 (1%)
 - **Verified**: 5 / 82 (6%)
