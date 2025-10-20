@@ -68,8 +68,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `identity` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L806-L810) | - | ☐ | ☐ |  |
 | `mul_base` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L951-L962) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L980-L990) | - | ☐ | ☐ |  |
-| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1205-L1208) | [Invert.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Invert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
-| `montgomery_invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1149-L1203) | [MontgomeryInvert.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
+| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1205-L1208) | [Invert.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
+| `montgomery_invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1149-L1203) | [MontgomeryInvert.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1140-L1145) | [Pack.lean](Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Pack.lean) | ✅ | ✏️ | NL-specs written (markus-dablander) |
 | `clamp_integer` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1386-L1391) | [ClampInteger.lean](Curve25519Dalek/Proofs/Scalar/ClampInteger.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1349-L1364) | [ReadLeU64Into.lean](Curve25519Dalek/Proofs/Scalar/ReadLeU64Into.lean) | ☐ | ✏️ | NL-specs written (markus-dablander) |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 38 / 82 (46%)
+- **Extracted**: 40 / 82 (48%)
 - **Draft Spec**: 17 / 82 (20%)
 - **Specified**: 1 / 82 (1%)
 - **Verified**: 5 / 82 (6%)

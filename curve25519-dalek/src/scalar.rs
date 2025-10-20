@@ -1165,8 +1165,10 @@ impl UnpackedScalar {
 
         #[inline]
         fn square_multiply(y: &mut UnpackedScalar, squarings: usize, x: &UnpackedScalar) {
-            for _ in 0..squarings {
+            let mut i = 0;
+            while i <  squarings {
                 *y = y.montgomery_square();
+                i += 1;
             }
             *y = UnpackedScalar::montgomery_mul(y, x);
         }

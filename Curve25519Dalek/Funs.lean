@@ -1156,72 +1156,69 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
   then
     do
     let i1 ← i * 8#usize
-    let i2 ← i1 + 0#usize
-    let i3 ← Array.index_usize bytes i2
-    let i4 ← (↑(UScalar.cast .U64 i3) : Result U64)
-    let i5 ← 0#i32 * 8#i32
-    let i6 ← i4 <<< i5
-    let i7 ← Array.index_usize words i
-    let i8 ← (↑(i7 ||| i6) : Result U64)
-    let words1 ← Array.update words i i8
-    let i9 ← i1 + 1#usize
-    let i10 ← Array.index_usize bytes i9
-    let i11 ← (↑(UScalar.cast .U64 i10) : Result U64)
-    let i12 ← 1#i32 * 8#i32
-    let i13 ← i11 <<< i12
-    let i14 ← Array.index_usize words1 i
-    let i15 ← (↑(i14 ||| i13) : Result U64)
-    let words2 ← Array.update words1 i i15
-    let i16 ← i1 + 2#usize
-    let i17 ← Array.index_usize bytes i16
-    let i18 ← (↑(UScalar.cast .U64 i17) : Result U64)
-    let i19 ← 2#i32 * 8#i32
-    let i20 ← i18 <<< i19
-    let i21 ← Array.index_usize words2 i
-    let i22 ← (↑(i21 ||| i20) : Result U64)
-    let words3 ← Array.update words2 i i22
-    let i23 ← i1 + 3#usize
-    let i24 ← Array.index_usize bytes i23
-    let i25 ← (↑(UScalar.cast .U64 i24) : Result U64)
-    let i26 ← 3#i32 * 8#i32
-    let i27 ← i25 <<< i26
-    let i28 ← Array.index_usize words3 i
-    let i29 ← (↑(i28 ||| i27) : Result U64)
-    let words4 ← Array.update words3 i i29
-    let i30 ← i1 + 4#usize
-    let i31 ← Array.index_usize bytes i30
-    let i32 ← (↑(UScalar.cast .U64 i31) : Result U64)
-    let i33 ← 4#i32 * 8#i32
-    let i34 ← i32 <<< i33
-    let i35 ← Array.index_usize words4 i
-    let i36 ← (↑(i35 ||| i34) : Result U64)
-    let words5 ← Array.update words4 i i36
-    let i37 ← i1 + 5#usize
-    let i38 ← Array.index_usize bytes i37
-    let i39 ← (↑(UScalar.cast .U64 i38) : Result U64)
-    let i40 ← 5#i32 * 8#i32
-    let i41 ← i39 <<< i40
-    let i42 ← Array.index_usize words5 i
-    let i43 ← (↑(i42 ||| i41) : Result U64)
-    let words6 ← Array.update words5 i i43
-    let i44 ← i1 + 6#usize
-    let i45 ← Array.index_usize bytes i44
-    let i46 ← (↑(UScalar.cast .U64 i45) : Result U64)
-    let i47 ← 6#i32 * 8#i32
-    let i48 ← i46 <<< i47
-    let i49 ← Array.index_usize words6 i
-    let i50 ← (↑(i49 ||| i48) : Result U64)
-    let words7 ← Array.update words6 i i50
-    let i51 ← i1 + 7#usize
-    let i52 ← Array.index_usize bytes i51
-    let i53 ← (↑(UScalar.cast .U64 i52) : Result U64)
-    let i54 ← 7#i32 * 8#i32
-    let i55 ← i53 <<< i54
-    let i56 ← Array.index_usize words7 i
-    let i57 ← (↑(i56 ||| i55) : Result U64)
-    let words8 ← Array.update words7 i i57
-    let i58 ← i + 1#usize
-    backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop bytes words8 i58
+    let i2 ← Array.index_usize bytes i1
+    let i3 ← (↑(UScalar.cast .U64 i2) : Result U64)
+    let i4 ← i3 <<< 0#i32
+    let i5 ← Array.index_usize words i
+    let i6 ← (↑(i5 ||| i4) : Result U64)
+    let words1 ← Array.update words i i6
+    let i7 ← i1 + 1#usize
+    let i8 ← Array.index_usize bytes i7
+    let i9 ← (↑(UScalar.cast .U64 i8) : Result U64)
+    let i10 ← i9 <<< 8#i32
+    let i11 ← Array.index_usize words1 i
+    let i12 ← (↑(i11 ||| i10) : Result U64)
+    let words2 ← Array.update words1 i i12
+    let i13 ← i1 + 2#usize
+    let i14 ← Array.index_usize bytes i13
+    let i15 ← (↑(UScalar.cast .U64 i14) : Result U64)
+    let i16 ← 2#i32 * 8#i32
+    let i17 ← i15 <<< i16
+    let i18 ← Array.index_usize words2 i
+    let i19 ← (↑(i18 ||| i17) : Result U64)
+    let words3 ← Array.update words2 i i19
+    let i20 ← i1 + 3#usize
+    let i21 ← Array.index_usize bytes i20
+    let i22 ← (↑(UScalar.cast .U64 i21) : Result U64)
+    let i23 ← 3#i32 * 8#i32
+    let i24 ← i22 <<< i23
+    let i25 ← Array.index_usize words3 i
+    let i26 ← (↑(i25 ||| i24) : Result U64)
+    let words4 ← Array.update words3 i i26
+    let i27 ← i1 + 4#usize
+    let i28 ← Array.index_usize bytes i27
+    let i29 ← (↑(UScalar.cast .U64 i28) : Result U64)
+    let i30 ← 4#i32 * 8#i32
+    let i31 ← i29 <<< i30
+    let i32 ← Array.index_usize words4 i
+    let i33 ← (↑(i32 ||| i31) : Result U64)
+    let words5 ← Array.update words4 i i33
+    let i34 ← i1 + 5#usize
+    let i35 ← Array.index_usize bytes i34
+    let i36 ← (↑(UScalar.cast .U64 i35) : Result U64)
+    let i37 ← 5#i32 * 8#i32
+    let i38 ← i36 <<< i37
+    let i39 ← Array.index_usize words5 i
+    let i40 ← (↑(i39 ||| i38) : Result U64)
+    let words6 ← Array.update words5 i i40
+    let i41 ← i1 + 6#usize
+    let i42 ← Array.index_usize bytes i41
+    let i43 ← (↑(UScalar.cast .U64 i42) : Result U64)
+    let i44 ← 6#i32 * 8#i32
+    let i45 ← i43 <<< i44
+    let i46 ← Array.index_usize words6 i
+    let i47 ← (↑(i46 ||| i45) : Result U64)
+    let words7 ← Array.update words6 i i47
+    let i48 ← i1 + 7#usize
+    let i49 ← Array.index_usize bytes i48
+    let i50 ← (↑(UScalar.cast .U64 i49) : Result U64)
+    let i51 ← 7#i32 * 8#i32
+    let i52 ← i50 <<< i51
+    let i53 ← Array.index_usize words7 i
+    let i54 ← (↑(i53 ||| i52) : Result U64)
+    let words8 ← Array.update words7 i i54
+    let i55 ← i + 1#usize
+    backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop bytes words8 i55
   else
     do
     let i1 ← 1#u64 <<< 52#i32
@@ -1657,8 +1654,101 @@ def scalar.Scalar.as_bytes
   (self : scalar.Scalar) : Result (Array U8 32#usize) :=
   ok self.bytes
 
+/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]: loop 0:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1169:12-1172:13 -/
+def scalar.Scalar52.montgomery_invert.square_multiply_loop
+  (y : backend.serial.u64.scalar.Scalar52) (squarings : Usize)
+  (x : backend.serial.u64.scalar.Scalar52) (i : Usize) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  if i < squarings
+  then
+    do
+    let y1 ← backend.serial.u64.scalar.Scalar52.montgomery_square y
+    let i1 ← i + 1#usize
+    scalar.Scalar52.montgomery_invert.square_multiply_loop y1 squarings x i1
+  else backend.serial.u64.scalar.Scalar52.montgomery_mul y x
+partial_fixpoint
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1167:8-1174:9 -/
+@[reducible]
+def scalar.Scalar52.montgomery_invert.square_multiply
+  (y : backend.serial.u64.scalar.Scalar52) (squarings : Usize)
+  (x : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  scalar.Scalar52.montgomery_invert.square_multiply_loop y squarings x 0#usize
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1150:4-1205:5 -/
+def scalar.Scalar52.montgomery_invert
+  (self : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  do
+  let _10 ← backend.serial.u64.scalar.Scalar52.montgomery_square self
+  let _100 ← backend.serial.u64.scalar.Scalar52.montgomery_square _10
+  let _11 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _10 self
+  let _101 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _10 _11
+  let _111 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _10 _101
+  let _1001 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _10 _111
+  let _1011 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _10 _1001
+  let _1111 ← backend.serial.u64.scalar.Scalar52.montgomery_mul _100 _1011
+  let y ← backend.serial.u64.scalar.Scalar52.montgomery_mul _1111 self
+  let i ← 123#usize + 3#usize
+  let y1 ← scalar.Scalar52.montgomery_invert.square_multiply y i _101
+  let i1 ← 2#usize + 2#usize
+  let y2 ← scalar.Scalar52.montgomery_invert.square_multiply y1 i1 _11
+  let i2 ← 1#usize + 4#usize
+  let y3 ← scalar.Scalar52.montgomery_invert.square_multiply y2 i2 _1111
+  let y4 ← scalar.Scalar52.montgomery_invert.square_multiply y3 i2 _1111
+  let y5 ← scalar.Scalar52.montgomery_invert.square_multiply y4 4#usize _1001
+  let y6 ← scalar.Scalar52.montgomery_invert.square_multiply y5 2#usize _11
+  let y7 ← scalar.Scalar52.montgomery_invert.square_multiply y6 i2 _1111
+  let i3 ← 1#usize + 3#usize
+  let y8 ← scalar.Scalar52.montgomery_invert.square_multiply y7 i3 _101
+  let i4 ← 3#usize + 3#usize
+  let y9 ← scalar.Scalar52.montgomery_invert.square_multiply y8 i4 _101
+  let y10 ← scalar.Scalar52.montgomery_invert.square_multiply y9 3#usize _111
+  let y11 ← scalar.Scalar52.montgomery_invert.square_multiply y10 i2 _1111
+  let i5 ← 2#usize + 3#usize
+  let y12 ← scalar.Scalar52.montgomery_invert.square_multiply y11 i5 _111
+  let y13 ← scalar.Scalar52.montgomery_invert.square_multiply y12 i1 _11
+  let y14 ← scalar.Scalar52.montgomery_invert.square_multiply y13 i2 _1011
+  let i6 ← 2#usize + 4#usize
+  let y15 ← scalar.Scalar52.montgomery_invert.square_multiply y14 i6 _1011
+  let i7 ← 6#usize + 4#usize
+  let y16 ← scalar.Scalar52.montgomery_invert.square_multiply y15 i7 _1001
+  let y17 ← scalar.Scalar52.montgomery_invert.square_multiply y16 i1 _11
+  let i8 ← 3#usize + 2#usize
+  let y18 ← scalar.Scalar52.montgomery_invert.square_multiply y17 i8 _11
+  let y19 ← scalar.Scalar52.montgomery_invert.square_multiply y18 i8 _11
+  let y20 ← scalar.Scalar52.montgomery_invert.square_multiply y19 i2 _1001
+  let y21 ← scalar.Scalar52.montgomery_invert.square_multiply y20 i3 _111
+  let y22 ← scalar.Scalar52.montgomery_invert.square_multiply y21 i6 _1111
+  let y23 ← scalar.Scalar52.montgomery_invert.square_multiply y22 i2 _1011
+  let y24 ←
+    scalar.Scalar52.montgomery_invert.square_multiply y23 3#usize _101
+  let y25 ← scalar.Scalar52.montgomery_invert.square_multiply y24 i6 _1111
+  let y26 ←
+    scalar.Scalar52.montgomery_invert.square_multiply y25 3#usize _101
+  let i9 ← 1#usize + 2#usize
+  scalar.Scalar52.montgomery_invert.square_multiply y26 i9 _11
+
+/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1208:4-1210:5 -/
+def scalar.Scalar52.invert
+  (self : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  :=
+  do
+  let s ← backend.serial.u64.scalar.Scalar52.as_montgomery self
+  let s1 ← scalar.Scalar52.montgomery_invert s
+  backend.serial.u64.scalar.Scalar52.from_montgomery s1
+
 /- [curve25519_dalek::scalar::clamp_integer]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 1386:0-1391:1 -/
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1388:0-1393:1 -/
 def scalar.clamp_integer
   (bytes : Array U8 32#usize) : Result (Array U8 32#usize) :=
   do

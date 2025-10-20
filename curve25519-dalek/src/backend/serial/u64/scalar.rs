@@ -99,8 +99,8 @@ impl Scalar52 {
         let mut i = 0;
         while i < 8 {
             // Explicitly unrolled inner loop - 8 steps
-            words[i] |= (bytes[(i * 8) + 0] as u64) << (0 * 8);
-            words[i] |= (bytes[(i * 8) + 1] as u64) << (1 * 8);
+            words[i] |= (bytes[i * 8] as u64) << (0);
+            words[i] |= (bytes[(i * 8) + 1] as u64) << (8);
             words[i] |= (bytes[(i * 8) + 2] as u64) << (2 * 8);
             words[i] |= (bytes[(i * 8) + 3] as u64) << (3 * 8);
             words[i] |= (bytes[(i * 8) + 4] as u64) << (4 * 8);
