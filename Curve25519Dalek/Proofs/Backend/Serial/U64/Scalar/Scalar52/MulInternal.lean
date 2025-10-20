@@ -23,6 +23,8 @@ set_option linter.hashCommand false
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
+namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
 /-! ## Spec for `mul_internal` -/
 
 /- Using the specs with bit-vectors -/
@@ -39,4 +41,27 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
     ∃ result, mul_internal a b = ok (result) ∧
     U128x9_as_Nat result = U64x5_as_Nat a * U64x5_as_Nat b := by
-    sorry
+    unfold mul_internal
+    unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+    progress*
+    all_goals try {
+      subst_vars
+      have := ha 0 (by omega)
+      have := ha 1 (by omega)
+      have := ha 2 (by omega)
+      have := ha 3 (by omega)
+      have := ha 4 (by omega)
+      have := hb 0 (by omega)
+      have := hb 1 (by omega)
+      have := hb 2 (by omega)
+      have := hb 3 (by omega)
+      have := hb 4 (by omega)
+      scalar_tac
+    }
+    -- remains to show that `U128x9_as_Nat res = U64x5_as_Nat a * U64x5_as_Nat b`
+    simp [U128x9_as_Nat, U64x5_as_Nat, Finset.sum_range_succ, *]
+    ring
+
+
+
+end curve25519_dalek.backend.serial.u64.scalar.Scalar52
