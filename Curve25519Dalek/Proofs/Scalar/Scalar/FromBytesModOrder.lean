@@ -42,7 +42,7 @@ natural language specs:
 theorem from_bytes_mod_order_spec (bytes : Array U8 32#usize):
     ∃ result,
     from_bytes_mod_order bytes = ok result ∧
-    U8x32_as_Nat result.bytes = U8x32_as_Nat bytes % L ∧
+    U8x32_as_Nat result.bytes ≡ U8x32_as_Nat bytes [MOD L] ∧
     U8x32_as_Nat result.bytes < L
     := by
   sorry
