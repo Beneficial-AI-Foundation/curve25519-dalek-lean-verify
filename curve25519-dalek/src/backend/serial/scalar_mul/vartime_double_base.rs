@@ -30,7 +30,9 @@ pub fn mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
 
     // Find starting index
     let mut i: usize = 255;
-    for j in (0..256).rev() {
+    let mut j: usize = 256;
+    while j > 0 {
+        j -= 1;
         i = j;
         if a_naf[i] != 0 || b_naf[i] != 0 {
             break;

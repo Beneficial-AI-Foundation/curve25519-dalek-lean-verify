@@ -69,11 +69,11 @@ curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1349-
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L705-L708,Curve25519Dalek/Proofs/Scalar/Scalar/AsBytes.lean,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L300-L304,Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L236-L246,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L249-L252,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean,,specified,"Lean spec should already be correct, but should be double-checked once the underlying Lean function has been extracted"
+curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L249-L252,Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,specified,"Lean spec should already be correct, but should be double-checked once the underlying Lean function has been extracted"
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L260-L265,Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_hash,curve25519-dalek/src/scalar.rs,L670-L678,Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::hash_from_bytes,curve25519-dalek/src/scalar.rs,L624-L632,Curve25519Dalek/Proofs/Scalar/Scalar/HashFromBytes.lean,,draft spec,NL-specs written (markus-dablander)
-curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L746-L749,Curve25519Dalek/Proofs/Scalar/Scalar/Invert.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L746-L749,Curve25519Dalek/Proofs/Scalar/Scalar/Invert.lean,extracted,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1133-L1136,Curve25519Dalek/Proofs/Scalar/Scalar/IsCanonical.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L920-L973,Curve25519Dalek/Proofs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::ONE,curve25519-dalek/src/scalar.rs,L567-L572,,extracted,,

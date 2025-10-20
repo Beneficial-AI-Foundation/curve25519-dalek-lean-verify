@@ -31,3 +31,5 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery
 curve25519_dalek::scalar::Scalar::from_canonical_bytes
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert
+curve25519_dalek::scalar::Scalar::invert
+curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide
