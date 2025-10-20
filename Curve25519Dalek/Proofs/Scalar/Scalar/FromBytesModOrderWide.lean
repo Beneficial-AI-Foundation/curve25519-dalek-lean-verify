@@ -33,17 +33,17 @@ natural language specs:
     • scalar_to_nat(s) < \ell
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:
-- No panic (always returns successfully)
-- The result scalar, when converted to nat, equals the input bytes converted to nat modulo L
-- The result scalar is less than L (the group order)
--/
-theorem from_bytes_mod_order_wide_spec (bytes : Array U8 64#usize):
-    ∃ result,
-    from_bytes_mod_order_wide bytes = ok result ∧
-    U8x32_as_Nat result.bytes = U8x64_as_Nat bytes % L ∧
-    U8x32_as_Nat result.bytes < L
-    := by
-  sorry
+-- /-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:
+-- - No panic (always returns successfully)
+-- - The result scalar, when converted to nat, equals the input bytes converted to nat modulo L
+-- - The result scalar is less than L (the group order)
+-- -/
+-- theorem from_bytes_mod_order_wide_spec (bytes : Array U8 64#usize):
+--     ∃ result,
+--     from_bytes_mod_order_wide bytes = ok result ∧
+--     U8x32_as_Nat result.bytes = U8x64_as_Nat bytes % L ∧
+--     U8x32_as_Nat result.bytes < L
+--     := by
+--   sorry
 
 end curve25519_dalek.scalar.Scalar
