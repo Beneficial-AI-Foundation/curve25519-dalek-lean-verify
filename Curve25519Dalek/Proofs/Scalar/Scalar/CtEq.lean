@@ -6,21 +6,21 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # ct_eq
+/-! # Spec Theorem for `Scalar::ct_eq`
 
-Specification and proof for `scalar::Scalar::ct_eq`.
+Specification and proof for `Scalar::ct_eq`.
 
 This function performs constant-time equality comparison.
 
-**Source**: curve25519-dalek/src/scalar.rs:L300-L304
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
 - Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -33,3 +33,10 @@ natural language specs:
 
     • scalar_to_nat(self) = scalar_to_nat(other) \iff Choice = True
 -/
+
+
+
+
+
+
+end curve25519_dalek.scalar.Scalar

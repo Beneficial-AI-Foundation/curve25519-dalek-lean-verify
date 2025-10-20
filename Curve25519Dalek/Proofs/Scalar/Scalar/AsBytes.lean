@@ -31,13 +31,15 @@ natural language specs:
 
 /-- **Spec and proof concerning `scalar.Scalar.as_bytes`**:
 - No panic (always returns successfully)
-- The result is the byte representation of the scalar (self.bytes)
+- The result is the byte representation of the scalar (s.bytes)
 - Converting the result back to a Scalar via the constructor yields the original scalar
 -/
-theorem as_bytes_spec (self : scalar.Scalar) :
-    ∃ result, as_bytes self = ok result ∧
-    result = self.bytes ∧
-    mk result = self := by
+theorem as_bytes_spec (s : Scalar):
+    ∃ result,
+    as_bytes s = ok result ∧
+    result = s.bytes ∧
+    mk result = s
+    := by
   unfold as_bytes
   simp
 

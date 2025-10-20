@@ -6,21 +6,20 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # from_bytes_mod_order_wide
+/-! # Spec Theorem for `Scalar::from_bytes_mod_order_wide`
 
 Specification and proof for `Scalar::from_bytes_mod_order_wide`.
 
 This function constructs a scalar from a wide byte array, reducing modulo the group order.
 
-**Source**: curve25519-dalek/src/scalar.rs:L249-L252
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -33,3 +32,18 @@ natural language specs:
     • scalar_to_nat(s) = (u8x64_to_nat(a) mod \ell)
     • scalar_to_nat(s) < \ell
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:
+- No panic (always returns successfully)
+- The result scalar, when converted to nat, equals the input bytes converted to nat modulo L
+- The result scalar is less than L (the group order)
+-/
+theorem from_bytes_mod_order_wide_spec (bytes : Array U8 64#usize):
+    ∃ result,
+    from_bytes_mod_order_wide bytes = ok result ∧
+    U8x32_as_Nat result.bytes = U8x64_as_Nat bytes % L ∧
+    U8x32_as_Nat result.bytes < L
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar

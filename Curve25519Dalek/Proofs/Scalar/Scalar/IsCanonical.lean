@@ -6,21 +6,20 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # is_canonical
+/-! # Spec Theorem for `Scalar::is_canonical`
 
 Specification and proof for `Scalar::is_canonical`.
 
 This function checks if the representation is canonical.
 
-**Source**: curve25519-dalek/src/scalar.rs:L1133-L1136
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -33,3 +32,16 @@ natural language specs:
 
     • scalar_to_nat(s) \in \{0,…, \ell - 1 \} \iff Return value = True
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:
+- No panic (always returns successfully)
+- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
+-/
+theorem is_canonical_spec (s : Scalar):
+    ∃ result,
+    is_canonical s = ok result ∧
+    (result = Choice.one ↔ U8x32_as_Nat s.bytes < L)
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar
