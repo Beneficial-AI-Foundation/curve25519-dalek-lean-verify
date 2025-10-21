@@ -2,10 +2,12 @@ function,source,lines,spec_theorem,extracted,verified,notes
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L364-L372,,,,
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L352-L359,,,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L337-L345,,,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L380-L397,,,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L380-L397,,extracted,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L229-L237,,,,
 curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L1-L47,,,,
 curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,,,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::add,curve25519-dalek/src/backend/serial/u64/field.rs,L270-L274,,extracted,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L278-L284,,extracted,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L367-L369,,extracted,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L247-L254,,,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L337-L363,,extracted,,Brackets required in extracted Lean
@@ -13,6 +15,8 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k,curve25519-
 curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce,curve25519-dalek/src/backend/serial/u64/field.rs,L290-L323,Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::square,curve25519-dalek/src/backend/serial/u64/field.rs,L561-L561,,extracted,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::square2,curve25519-dalek/src/backend/serial/u64/field.rs,L566-L570,,extracted,,Loop refactored
+curve25519_dalek::backend::serial::u64::field::FieldElement51::sub,curve25519-dalek/src/backend/serial/u64/field.rs,L288-L305,,extracted,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L309-L312,,extracted,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L374-L456,,extracted,,
 curve25519_dalek::backend::serial::u64::constants::L,curve25519-dalek/src/backend/serial/u64/constants.rs,L127-L133,,extracted,,Brackets required in extracted Lean
 curve25519_dalek::backend::serial::u64::constants::LFACTOR,curve25519-dalek/src/backend/serial/u64/constants.rs,L136-L136,,extracted,,

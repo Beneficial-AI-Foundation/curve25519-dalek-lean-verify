@@ -37,3 +37,8 @@ curve25519_dalek::edwards::EdwardsPoint::as_projective
 curve25519_dalek::ristretto::CompressedRistretto::to_bytes
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes
+curve25519_dalek::backend::serial::u64::field::FieldElement51::add
+curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign
+curve25519_dalek::backend::serial::u64::field::FieldElement51::sub
+curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double

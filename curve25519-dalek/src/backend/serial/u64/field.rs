@@ -57,47 +57,27 @@ impl Zeroize for FieldElement51 {
 
 impl<'a> AddAssign<&'a FieldElement51> for FieldElement51 {
     fn add_assign(&mut self, _rhs: &'a FieldElement51) {
-        for i in 0..5 {
-            self.0[i] += _rhs.0[i];
-        }
+        FieldElement51::add_assign(self, _rhs);
     }
 }
 
 impl<'a> Add<&'a FieldElement51> for &FieldElement51 {
     type Output = FieldElement51;
     fn add(self, _rhs: &'a FieldElement51) -> FieldElement51 {
-        let mut output = *self;
-        output += _rhs;
-        output
+        FieldElement51::add(self, _rhs)
     }
 }
 
 impl<'a> SubAssign<&'a FieldElement51> for FieldElement51 {
     fn sub_assign(&mut self, _rhs: &'a FieldElement51) {
-        let result = (self as &FieldElement51) - _rhs;
-        self.0 = result.0;
+        FieldElement51::sub_assign(self, _rhs);
     }
 }
 
 impl<'a> Sub<&'a FieldElement51> for &FieldElement51 {
     type Output = FieldElement51;
     fn sub(self, _rhs: &'a FieldElement51) -> FieldElement51 {
-        // To avoid underflow, first add a multiple of p.
-        // Choose 16*p = p << 4 to be larger than 54-bit _rhs.
-        //
-        // If we could statically track the bitlengths of the limbs
-        // of every FieldElement51, we could choose a multiple of p
-        // just bigger than _rhs and avoid having to do a reduction.
-        //
-        // Since we don't yet have type-level integers to do this, we
-        // have to add an explicit reduction call here.
-        FieldElement51::reduce([
-            (self.0[0] + 36028797018963664u64) - _rhs.0[0],
-            (self.0[1] + 36028797018963952u64) - _rhs.0[1],
-            (self.0[2] + 36028797018963952u64) - _rhs.0[2],
-            (self.0[3] + 36028797018963952u64) - _rhs.0[3],
-            (self.0[4] + 36028797018963952u64) - _rhs.0[4],
-        ])
+        FieldElement51::sub(self, _rhs)
     }
 }
 
@@ -283,6 +263,48 @@ impl FieldElement51 {
             36028797018963952u64 - self.0[4],
         ]);
         self.0 = neg.0;
+    }
+
+    /// Add two field elements without reduction
+    pub fn add(a: &FieldElement51, b: &FieldElement51) -> FieldElement51 {
+        let mut output = *a;
+        FieldElement51::add_assign(&mut output, b);
+        output
+    }
+
+    /// Add a field element to this one in place
+    pub fn add_assign(a: &mut FieldElement51, b: &FieldElement51) {
+        let mut i = 0;
+        while i < 5 {
+            a.0[i] += b.0[i];
+            i += 1;
+        }
+    }
+
+    /// Subtract two field elements
+    pub fn sub(a: &FieldElement51, b: &FieldElement51) -> FieldElement51 {
+        // To avoid underflow, first add a multiple of p.
+        // Choose 16*p = p << 4 to be larger than 54-bit b.
+        //
+        // If we could statically track the bitlengths of the limbs
+        // of every FieldElement51, we could choose a multiple of p
+        // just bigger than b and avoid having to do a reduction.
+        //
+        // Since we don't yet have type-level integers to do this, we
+        // have to add an explicit reduction call here.
+        FieldElement51::reduce([
+            (a.0[0] + 36028797018963664u64) - b.0[0],
+            (a.0[1] + 36028797018963952u64) - b.0[1],
+            (a.0[2] + 36028797018963952u64) - b.0[2],
+            (a.0[3] + 36028797018963952u64) - b.0[3],
+            (a.0[4] + 36028797018963952u64) - b.0[4],
+        ])
+    }
+
+    /// Subtract a field element from this one in place
+    pub fn sub_assign(a: &mut FieldElement51, b: &FieldElement51) {
+        let result = FieldElement51::sub(a, b);
+        a.0 = result.0;
     }
 
     /// Given 64-bit input limbs, reduce to enforce the bound 2^(51 + epsilon).

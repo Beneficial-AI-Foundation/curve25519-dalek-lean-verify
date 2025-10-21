@@ -136,6 +136,9 @@ use crate::constants;
 
 use crate::edwards::EdwardsPoint;
 use crate::field::FieldElement;
+// Only import FieldElement51 when using the serial u64 backend
+#[cfg(all(curve25519_dalek_backend = "serial", curve25519_dalek_bits = "64"))]
+use crate::backend::serial::u64::field::FieldElement51;
 use crate::traits::ValidityCheck;
 
 // ------------------------------------------------------------------------
@@ -383,16 +386,35 @@ impl ProjectivePoint {
         let XX = self.X.square();
         let YY = self.Y.square();
         let ZZ2 = self.Z.square2();
-        let X_plus_Y = &self.X + &self.Y;
-        let X_plus_Y_sq = X_plus_Y.square();
-        let YY_plus_XX = &YY + &XX;
-        let YY_minus_XX = &YY - &XX;
 
-        CompletedPoint {
-            X: &X_plus_Y_sq - &YY_plus_XX,
-            Y: YY_plus_XX,
-            Z: YY_minus_XX,
-            T: &ZZ2 - &YY_minus_XX,
+        cfg_if::cfg_if! {
+            if #[cfg(all(curve25519_dalek_backend = "serial", curve25519_dalek_bits = "64"))] {
+                // Use FieldElement51 associated functions directly for serial u64 backend
+                let X_plus_Y = FieldElement51::add(&self.X, &self.Y);
+                let X_plus_Y_sq = X_plus_Y.square();
+                let YY_plus_XX = FieldElement51::add(&YY, &XX);
+                let YY_minus_XX = FieldElement51::sub(&YY, &XX);
+
+                CompletedPoint {
+                    X: FieldElement51::sub(&X_plus_Y_sq, &YY_plus_XX),
+                    Y: YY_plus_XX,
+                    Z: YY_minus_XX,
+                    T: FieldElement51::sub(&ZZ2, &YY_minus_XX),
+                }
+            } else {
+                // Use operators for other backends (fiat or u32)
+                let X_plus_Y = &self.X + &self.Y;
+                let X_plus_Y_sq = X_plus_Y.square();
+                let YY_plus_XX = &YY + &XX;
+                let YY_minus_XX = &YY - &XX;
+
+                CompletedPoint {
+                    X: &X_plus_Y_sq - &YY_plus_XX,
+                    Y: YY_plus_XX,
+                    Z: YY_minus_XX,
+                    T: &ZZ2 - &YY_minus_XX,
+                }
+            }
         }
     }
 }
