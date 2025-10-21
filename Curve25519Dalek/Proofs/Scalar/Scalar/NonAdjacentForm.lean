@@ -6,21 +6,20 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # non_adjacent_form
+/-! # Spec Theorem for `Scalar::non_adjacent_form`
 
 Specification and proof for `Scalar::non_adjacent_form`.
 
 This function computes the non-adjacent form representation.
 
-**Source**: curve25519-dalek/src/scalar.rs:L920-L973
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -48,3 +47,6 @@ natural language specs:
     • naf[255] \neq 0
     • \forall i \in \{0,…, 255 – w + 1\}: the sequence (naf[i], …, naf[i + w - 1]) contains at most one nonzero entry
 -/
+
+
+end curve25519_dalek.scalar.Scalar
