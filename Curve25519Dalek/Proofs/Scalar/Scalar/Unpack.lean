@@ -6,21 +6,20 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # unpack
+/-! # Spec Theorem for `Scalar::unpack`
 
 Specification and proof for `Scalar::unpack`.
 
 This function unpacks the element from a compact representation.
 
-**Source**: curve25519-dalek/src/scalar.rs:L1118-L1121
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result curve25519_dalek.scalar.Scalar52
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -30,6 +29,21 @@ natural language description:
 
 natural language specs:
 
-    • scalar_to_nat(s) = unpacked_scalar_to_nat(u)
     • pack(u) = s
+    • scalar_to_nat(s) = unpacked_scalar_to_nat(u)
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.unpack`**:
+- No panic (always returns successfully)
+- Packing the result back yields the original scalar: pack(u) = s
+- Both the packed s and the unpacked u represent the same natural number
+-/
+theorem unpack_spec (s : Scalar):
+    ∃ u,
+    unpack s = ok u ∧
+    pack u = ok s ∧
+    U64x5_as_Nat u = U8x32_as_Nat s.bytes
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar

@@ -35,14 +35,14 @@ natural language specs:
 
 /-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:
 - No panic (always returns successfully)
-- The result scalar, when converted to nat, equals the input bytes converted to nat modulo L
-- The result scalar is less than L (the group order)
+- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L
+- The result scalar s is less than L (the group order)
 -/
-theorem from_bytes_mod_order_wide_spec (bytes : Array U8 64#usize):
-    ∃ result,
-    from_bytes_mod_order_wide bytes = ok result ∧
-    U8x32_as_Nat result.bytes ≡ U8x64_as_Nat bytes [MOD L] ∧
-    U8x32_as_Nat result.bytes < L
+theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize):
+    ∃ s,
+    from_bytes_mod_order_wide b = ok s ∧
+    U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧
+    U8x32_as_Nat s.bytes < L
     := by
   sorry
 

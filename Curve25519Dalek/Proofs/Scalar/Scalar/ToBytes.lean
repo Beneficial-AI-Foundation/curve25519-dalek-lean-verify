@@ -4,23 +4,21 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Proofs.Defs
 
-/-! # to_bytes
+/-! # Spec Theorem for `Scalar::to_bytes`
 
 Specification and proof for `Scalar::to_bytes`.
 
 This function converts the structure to a byte array.
 
-**Source**: curve25519-dalek/src/scalar.rs:L690-L693
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -30,6 +28,22 @@ natural language description:
 
 natural language specs:
 
-    • scalar_to_nat(s) = u8x32_to_nat(a)
+    • s.bytes = a
     • Scalar{a} = s
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.to_bytes`**:
+- No panic (always returns successfully)
+- The result array a is the byte array representation of the scalar (s.bytes)
+- Converting the result a back to a Scalar via the constructor yields the original scalar s
+-/
+theorem to_bytes_spec (s : Scalar):
+    ∃ a,
+    to_bytes s = ok a ∧
+    a = s.bytes ∧
+    mk a = s
+    := by
+  unfold to_bytes
+  simp
+
+end curve25519_dalek.scalar.Scalar

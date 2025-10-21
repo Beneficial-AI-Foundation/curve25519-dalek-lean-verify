@@ -6,21 +6,20 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # reduce
+/-! # Spec Theorem for `Scalar::reduce`
 
 Specification and proof for `Scalar::reduce`.
 
 This function performs modular reduction.
 
-**Source**: curve25519-dalek/src/scalar.rs:L1124-L1130
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
@@ -31,6 +30,21 @@ natural language description:
 
 natural language specs:
 
-    • scalar_to_nat(s) is congruent to scalar_to_nat(s’) modulo \ell
-    • scalar_to_nat(s’) \in \{0,…, \ell – 1}
+    • scalar_to_nat(s) is congruent to scalar_to_nat(s') modulo \ell
+    • scalar_to_nat(s') \in \{0,…, \ell - 1}
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.reduce`**:
+- No panic (always returns successfully)
+- The result scalar s' is congruent to the input scalar s modulo L (the group order)
+- The result scalar s' is in canonical form (less than L)
+-/
+theorem reduce_spec (s : Scalar):
+    ∃ s',
+    reduce s = ok s' ∧
+    U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧
+    U8x32_as_Nat s'.bytes < L
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar
