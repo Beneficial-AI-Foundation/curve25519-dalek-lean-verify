@@ -35,10 +35,10 @@ natural language specs:
 - Converting the result back to a Scalar via the constructor yields the original scalar
 -/
 theorem as_bytes_spec (s : Scalar):
-    ∃ result,
-    as_bytes s = ok result ∧
-    result = s.bytes ∧
-    mk result = s
+    ∃ b,
+    as_bytes s = ok b ∧
+    b = s.bytes ∧
+    mk b = s
     := by
   unfold as_bytes
   simp

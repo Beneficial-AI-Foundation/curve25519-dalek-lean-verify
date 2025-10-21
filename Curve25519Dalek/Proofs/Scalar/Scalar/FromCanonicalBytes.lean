@@ -6,37 +6,54 @@ Authors: Oliver Butterley, Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # from_canonical_bytes
+/-! # Spec Theorem for `Scalar::from_canonical_bytes`
 
 Specification and proof for `Scalar::from_canonical_bytes`.
 
 This function constructs a scalar from canonical bytes.
 
-**Source**: curve25519-dalek/src/scalar.rs:L260-L265
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
-open scalar
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar
 
 /-
 natural language description:
 
-    • Takes an input array a of type [u8;32].
+    • Takes an input array b of type [u8;32].
 
-      Two conditions are checked:
-      (1) whether the most significant bit in the most significant byte of a is 0, and
-      (2) whether the Scalar s = Scalar{a} corresponding to the input array fulfils s.is_canonical(),
-          which means that it lies between 0 and \ell.
+      The condition checked is whether the Scalar s = Scalar{b} corresponding to the input array
+      fulfils s.is_canonical(), which means that the number represented by b lies in [0, \ell - 1].
 
-      If both conditions are true, then the Scalar s is returned,
+      If this condition is true, then the Scalar s is returned,
       otherwise None is returned.
+
+      Note: Likely for efficiency reasons, the implementation also checks whether the most significant bit
+      (bit with index 255) is 0, but this is redundant since any canonical scalar (< L ≈ 2^252) automatically has
+      bits 253-255 equal to 0.
 
 natural language specs:
 
-    • The Return value is not None \iff a[31][0] = 0 and u8x32_to_nat(a) < \ell
-    • The Return value is not None \implies scalar_to_nat(s) = u8x32_to_nat(a)
+    • If u8x32_to_nat(b) < \ell \then s = Scalar{b} else s = None
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar.from_canonical_bytes`**:
+- No panic (always returns successfully)
+- When the input bytes represent a canonical value (< L), the function returns a CtOption Scalar
+  where is_some = Choice.one and the scalar's byte representation equals the input bytes
+- When the input bytes represent a non-canonical value (≥ L), the function returns a CtOption Scalar
+  where is_some = Choice.zero (i.e., None)
+-/
+theorem from_canonical_bytes_spec (b : Array U8 32#usize):
+    ∃ s,
+    from_canonical_bytes b = ok s ∧
+    (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
+    (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero)
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar

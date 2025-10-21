@@ -38,9 +38,9 @@ natural language specs:
 - Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
 -/
 theorem is_canonical_spec (s : Scalar):
-    ∃ result,
-    is_canonical s = ok result ∧
-    (result = Choice.one ↔ U8x32_as_Nat s.bytes < L)
+    ∃ c,
+    is_canonical s = ok c ∧
+    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L)
     := by
   sorry
 
