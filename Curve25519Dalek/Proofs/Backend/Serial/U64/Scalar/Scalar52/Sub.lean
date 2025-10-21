@@ -35,20 +35,33 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `sub` -/
 
-/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
-- Helper function that performs the core subtraction with borrow propagation
-- Iterates through limbs performing subtraction with borrow
-- Conditionally adds L if the result would be negative
-- Requires that input limbs and intermediate values are within bounds -/
+/-- Auxiliary definition to interpret a vector of `j` u64 limbs as a number (51-bit limbs) -/
+def U64x5_slice_as_Nat (limbs : Array U64 5#usize) (j : Nat) : Nat :=
+  ∑ i ∈ Finset.range j, 2^(51 * i) * (limbs[i]!).val
+
+/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**: -/
+@[progress]
 theorem sub_loop_spec (a b difference : Array U64 5#usize) (mask borrow : U64) (i : Usize)
-    (ha : ∀ j, j < 5 → (a[j]!).val < 2 ^ 52)
-    (hb : ∀ j, j < 5 → (b[j]!).val < 2 ^ 52)
+    (ha : ∀ j, j < 5 → (a[j]!).val < 2 ^ 52) (hb : ∀ j, j < 5 → (b[j]!).val < 2 ^ 52)
+    (hd : ∀ j, i ≤ j → difference[j]!.val = 0)
     (hmask : mask.val = 2 ^ 52 - 1)
-    (hi : i.val ≤ 5) :
-    ∃ result, sub_loop a b difference mask borrow i = ok result ∧
-    (i.val = 5 →
-      U64x5_as_Nat result ≡ (U64x5_as_Nat a - U64x5_as_Nat b) [MOD L]) := by
-  sorry
+    (hi : i.val ≤ 5) (hborrow : i = 0#usize → borrow = 0#u64) :
+    ∃ difference', sub_loop a b difference mask borrow i = ok difference' ∧
+    U64x5_slice_as_Nat a i + 2 ^ (52 * i.val) * borrow.val.testBit 63 =
+      U64x5_slice_as_Nat b i + U64x5_slice_as_Nat difference' i ∧
+    (∀ j, j ≤ 5 → difference'[j]!.val < 2 ^ 52)
+  := by
+  unfold sub_loop
+  unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+  split
+  · progress*
+    · sorry
+    · sorry
+    · sorry
+  · sorry
+  termination_by 5 - i.val
+  decreasing_by scalar_decr_tac
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Does not error and hence returns a result
@@ -59,4 +72,7 @@ theorem sub_spec (a b : Array U64 5#usize)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
     ∃ result, sub a b = ok result ∧
     U64x5_as_Nat result ≡ (U64x5_as_Nat a - U64x5_as_Nat b) [MOD L] := by
+  unfold sub
+  -- progress*
+
   sorry
