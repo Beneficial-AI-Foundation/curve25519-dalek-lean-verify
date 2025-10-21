@@ -1529,6 +1529,14 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery
   let limbs := Array.repeat 9#usize 0#u128
   backend.serial.u64.scalar.Scalar52.from_montgomery_loop self limbs 0#usize
 
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 532:4-538:5 -/
+def edwards.EdwardsPoint.as_projective
+  (self : edwards.EdwardsPoint) :
+  Result backend.serial.curve_models.ProjectivePoint
+  :=
+  ok { X := self.X, Y := self.Y, Z := self.Z }
+
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
 def scalar.Scalar.unpack

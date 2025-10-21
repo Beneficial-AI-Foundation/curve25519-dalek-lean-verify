@@ -37,7 +37,7 @@ curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/m
 curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L240-L245,,,,
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L180-L185,,,,
 curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L193-L196,,,,
-curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,,,,
+curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,,,,
 curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,,,,
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,,,,

@@ -37,13 +37,28 @@ structure subtle.ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   conditional_select : Self → Self → subtle.Choice → Result Self
 
+/- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
+@[reducible] def backend.serial.u64.field.FieldElement51 := (Array U64 5#usize)
+
+/- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
+structure backend.serial.curve_models.ProjectivePoint where
+  X : backend.serial.u64.field.FieldElement51
+  Y : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+
 /- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
 @[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
 
-/- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
-@[reducible] def backend.serial.u64.field.FieldElement51 := (Array U64 5#usize)
+/- [curve25519_dalek::edwards::EdwardsPoint]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
+structure edwards.EdwardsPoint where
+  X : backend.serial.u64.field.FieldElement51
+  Y : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T : backend.serial.u64.field.FieldElement51
 
 /- [curve25519_dalek::scalar::Scalar]
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/

@@ -44,7 +44,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `vartime_double_base_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
 | `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L180-L185) | - | ☐ | ☐ |  |
 | `decompress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L193-L196) | - | ☐ | ☐ |  |
-| `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | - | ☐ | ☐ |  |
+| `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | - | ✅ | ☐ |  |
 | `as_projective_niels` | [edwards.rs](curve25519-dalek/src/edwards.rs#L508-L525) | - | ☐ | ☐ |  |
 | `compress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L565-L581) | - | ☐ | ☐ |  |
 | `double` | [edwards.rs](curve25519-dalek/src/edwards.rs#L613-L626) | - | ☐ | ☐ |  |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 42 / 82 (51%)
+- **Extracted**: 43 / 82 (52%)
 - **Draft Spec**: 13 / 82 (15%)
 - **Specified**: 4 / 82 (4%)
 - **Verified**: 6 / 82 (7%)
