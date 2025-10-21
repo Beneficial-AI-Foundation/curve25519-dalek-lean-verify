@@ -1329,9 +1329,11 @@ impl EdwardsPoint {
         debug_assert!(k > 0);
         let mut r: CompletedPoint;
         let mut s = self.as_projective();
-        for _ in 0..(k - 1) {
+        let mut i = 0;
+        while i < k - 1 {
             r = s.double();
             s = r.as_projective();
+            i += 1;
         }
         // Unroll last iteration so we can go directly as_extended()
         s.double().as_extended()

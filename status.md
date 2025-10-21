@@ -42,7 +42,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L129-L166) | - | ✅ | ☐ |  |
 | `straus_multiscalar_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L157-L191) | - | ☐ | ☐ |  |
 | `vartime_double_base_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
-| `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L180-L185) | - | ☐ | ☐ |  |
+| `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L180-L185) | - | ✅ | ☐ |  |
 | `decompress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L193-L196) | - | ☐ | ☐ |  |
 | `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | - | ✅ | ☐ |  |
 | `as_projective_niels` | [edwards.rs](curve25519-dalek/src/edwards.rs#L508-L525) | - | ☐ | ☐ |  |
@@ -56,10 +56,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_montgomery` | [edwards.rs](curve25519-dalek/src/edwards.rs#L552-L559) | - | ☐ | ☐ |  |
 | `vartime_double_scalar_mul_basepoint` | [edwards.rs](curve25519-dalek/src/edwards.rs#L901-L912) | - | ☐ | ☐ |  |
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | - | ☐ | ☐ |  |
-| `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L233-L236) | - | ☐ | ☐ |  |
+| `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L233-L236) | - | ✅ | ☐ |  |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L254-L269) | - | ☐ | ☐ |  |
 | `from_slice` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L243-L246) | - | ☐ | ☐ |  |
-| `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L228-L231) | - | ☐ | ☐ |  |
+| `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L228-L231) | - | ✅ | ☐ |  |
 | `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | - | ☐ | ☐ |  |
 | `default` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L812-L816) | - | ☐ | ☐ |  |
 | `double_and_compress_batch` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L552-L636) | - | ☐ | ☐ |  |
@@ -92,7 +92,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 82
-- **Extracted**: 43 / 82 (52%)
+- **Extracted**: 46 / 82 (56%)
 - **Draft Spec**: 13 / 82 (15%)
 - **Specified**: 4 / 82 (4%)
 - **Verified**: 6 / 82 (7%)

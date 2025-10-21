@@ -34,3 +34,6 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert
 curve25519_dalek::scalar::Scalar::invert
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide
 curve25519_dalek::edwards::EdwardsPoint::as_projective
+curve25519_dalek::ristretto::CompressedRistretto::to_bytes
+curve25519_dalek::ristretto::CompressedRistretto::as_bytes
+curve25519_dalek::edwards::CompressedEdwardsY::as_bytes
