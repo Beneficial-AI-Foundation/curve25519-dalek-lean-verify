@@ -9,7 +9,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L364-L372) | - | ☐ | ☐ |  |
 | `as_projective` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L352-L359) | - | ☐ | ☐ |  |
 | `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L337-L345) | - | ☐ | ☐ |  |
-| `double` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L380-L397) | - | ☐ | ☐ |  |
+| `double` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L380-L397) | - | ✅ | ☐ |  |
 | `identity` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L229-L237) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [backend/serial/scalar_mul/straus.rs](curve25519-dalek/src/backend/serial/scalar_mul/straus.rs#L1-L47) | - | ☐ | ☐ |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | - | ☐ | ☐ |  |
@@ -96,7 +96,7 @@ This document tracks the progress of formally verifying functions from the curve
 ## Summary
 
 - **Total Functions**: 86
-- **Extracted**: 50 / 86 (58%)
+- **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 13 / 86 (15%)
 - **Specified**: 4 / 86 (4%)
 - **Verified**: 6 / 86 (6%)

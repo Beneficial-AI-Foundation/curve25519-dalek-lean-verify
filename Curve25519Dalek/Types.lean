@@ -42,11 +42,19 @@ structure subtle.ConditionallySelectable (Self : Type) where
 @[reducible] def backend.serial.u64.field.FieldElement51 := (Array U64 5#usize)
 
 /- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 157:0-161:1 -/
 structure backend.serial.curve_models.ProjectivePoint where
   X : backend.serial.u64.field.FieldElement51
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
+
+/- [curve25519_dalek::backend::serial::curve_models::CompletedPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 172:0-177:1 -/
+structure backend.serial.curve_models.CompletedPoint where
+  X : backend.serial.u64.field.FieldElement51
+  Y : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T : backend.serial.u64.field.FieldElement51
 
 /- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/

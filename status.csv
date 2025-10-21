@@ -2,7 +2,7 @@ function,source,lines,spec_theorem,extracted,verified,notes
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L364-L372,,,,
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L352-L359,,,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L337-L345,,,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L380-L397,,,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L380-L397,,extracted,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L229-L237,,,,
 curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L1-L47,,,,
 curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,,,,
