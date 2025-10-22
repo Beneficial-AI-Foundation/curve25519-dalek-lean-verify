@@ -46,7 +46,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L129-L166) | [ToBytes.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `straus_multiscalar_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L157-L191) | - | ☐ | ☐ |  |
 | `vartime_double_base_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
-| `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L180-L185) | - | ✅ | ☐ |  |
+| `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L189-L191) | [AsBytes.lean](Curve25519Dalek/Proofs/Edwards/CompressedEdwardsY/AsBytes.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `decompress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L193-L196) | - | ☐ | ☐ |  |
 | `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | - | ✅ | ☐ |  |
 | `as_projective_niels` | [edwards.rs](curve25519-dalek/src/edwards.rs#L508-L525) | - | ☐ | ☐ |  |
@@ -99,8 +99,8 @@ This document tracks the progress of formally verifying functions from the curve
 - **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 5 / 86 (5%)
 - **Specified**: 15 / 86 (17%)
-- **Verified**: 9 / 86 (10%)
-- **Pending**: 57 / 86 (66%)
+- **Verified**: 10 / 86 (11%)
+- **Pending**: 56 / 86 (65%)
 
 ## Legend
 
