@@ -14,7 +14,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `multiscalar_mul` | [backend/serial/scalar_mul/straus.rs](curve25519-dalek/src/backend/serial/scalar_mul/straus.rs#L1-L47) | - | ☐ | ☐ |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | - | ☐ | ☐ |  |
 | `add` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L270-L274) | - | ✅ | ☐ |  |
-| `add_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L278-L284) | - | ✅ | ☐ |  |
+| `add_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L278-L284) | [AddAssign.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | - | ✅ | ☐ |  |
 | `conditional_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L247-L254) | - | ☐ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L337-L363) | - | ✅ | ☐ | Brackets required in extracted Lean |
@@ -99,8 +99,8 @@ This document tracks the progress of formally verifying functions from the curve
 - **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 5 / 86 (5%)
 - **Specified**: 15 / 86 (17%)
-- **Verified**: 7 / 86 (8%)
-- **Pending**: 59 / 86 (68%)
+- **Verified**: 8 / 86 (9%)
+- **Pending**: 58 / 86 (67%)
 
 ## Legend
 
