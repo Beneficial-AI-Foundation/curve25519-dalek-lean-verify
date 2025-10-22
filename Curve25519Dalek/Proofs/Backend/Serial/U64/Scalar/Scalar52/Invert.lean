@@ -6,20 +6,20 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # invert
+/-! # Spec Theorem for `Scalar52::invert`
 
 Specification and proof for `Scalar52::invert`.
 
 This function computes the multiplicative inverse.
 
-**Source**: curve25519-dalek/src/scalar.rs:L1205-L1208
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
+open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+namespace curve25519_dalek.scalar.Scalar52
 
 /-
 natural language description:
@@ -32,6 +32,21 @@ natural language description:
 
 natural language specs:
 
-    • \forall UnpackedScalars r with r ≠ 0:
-      scalar_to_nat(r) * scalar_to_nat(r’) is congruent to 1 (mod \ell)
+    • \forall UnpackedScalars u with u ≠ 0:
+      scalar_to_nat(u) * scalar_to_nat(u') is congruent to 1 (mod \ell)
 -/
+
+/-- **Spec and proof concerning `scalar.Scalar52.invert`**:
+- Precondition: The unpacked input scalar u must be non-zero (inverting zero has undefined behavior)
+- No panic (returns successfully for non-zero input)
+- The result u' satisfies the multiplicative inverse property:
+  U64x5_as_Nat(u) * U64x5_as_Nat(u') ≡ 1 (mod L)
+-/
+theorem invert_spec (u : Scalar52) (h : u ≠ ZERO):
+    ∃ u',
+    invert u = ok u' ∧
+    (U64x5_as_Nat u * U64x5_as_Nat u') ≡ 1 [MOD L]
+    := by
+  sorry
+
+end curve25519_dalek.scalar.Scalar52

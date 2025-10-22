@@ -6,32 +6,35 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Defs
 
-/-! # montgomery_invert
+/-! # Spec Theorem for `Scalar52::montgomery_invert`
 
 Specification and proof for `Scalar52::montgomery_invert`.
 
 This function computes the multiplicative inverse using Montgomery form.
 
-**Source**: curve25519-dalek/src/scalar.rs:L1149-L1203
+**Source**: curve25519-dalek/src/scalar.rs
 
 ## TODO
-- Write formal specification
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek
+open Aeneas.Std Result
+namespace curve25519_dalek.scalar.Scalar52
 
 /-
 natural language description:
 
-    • Takes as input an UnpackedScalar r that is assumed to be
+    • Takes as input an UnpackedScalar u that is assumed to be
       in Montgomery form. Then efficiently computes and returns an
-      UnpackedScalar r' (also in Montgomery form)  that represents
-      the multiplicative inverse of r within the underlying field
+      UnpackedScalar u' (also in Montgomery form)  that represents
+      the multiplicative inverse of u within the underlying field
       \mathbb{Z} / \ell \mathbb{Z}.
 
 natural language specs:
 
-    • \forall UnpackedScalars r in Montgomery form with r ≠ 0:
-      scalar_to_nat(r) * scalar_to_nat(r’) is congruent to 1 (mod \ell)
+    • \forall UnpackedScalars u in Montgomery form with u ≠ 0:
+      scalar_to_nat(u) * scalar_to_nat(u') is congruent to 1 (mod \ell)
 -/
+
+
+end curve25519_dalek.scalar.Scalar52
