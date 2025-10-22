@@ -1,0 +1,776 @@
+[
+  {
+    "function": "curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended",
+    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+    "lines": "L364-L372",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective",
+    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+    "lines": "L352-L359",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended",
+    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+    "lines": "L337-L345",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double",
+    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+    "lines": "L380-L397",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity",
+    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+    "lines": "L229-L237",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul",
+    "source": "curve25519-dalek/src/backend/serial/scalar_mul/straus.rs",
+    "lines": "L1-L47",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul",
+    "source": "curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs",
+    "lines": "L1-L15",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::add",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L270-L274",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L278-L284",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L367-L369",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L247-L254",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L337-L363",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": "Brackets required in extracted Lean"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L460-L565",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L290-L323",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::square",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L561-L561",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::square2",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L566-L570",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": "Loop refactored"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::sub",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L288-L305",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L309-L312",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes",
+    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+    "lines": "L374-L456",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::constants::L",
+    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
+    "lines": "L127-L133",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": "Brackets required in extracted Lean"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::constants::LFACTOR",
+    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
+    "lines": "L136-L136",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::constants::R",
+    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
+    "lines": "L139-L145",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::constants::RR",
+    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
+    "lines": "L148-L154",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::m",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L56-L58",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L62-L62",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::add",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L159-L174",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L195-L208",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L317-L323",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L64-L85",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Nested loop refactored; Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes_wide",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L87-L116",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Nested loop refactored; required shr edit; Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L324-L432",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": "Loop refactored"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_mul",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L304-L306",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_reduce",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L253-L258",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L310-L312",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L203-L217",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L222-L241",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L175-L198",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Loop refactored"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes",
+    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+    "lines": "L129-L166",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::backend::straus_multiscalar_mul",
+    "source": "curve25519-dalek/src/backend/mod.rs",
+    "lines": "L157-L191",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::vartime_double_base_mul",
+    "source": "curve25519-dalek/src/backend/mod.rs",
+    "lines": "L240-L245",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::CompressedEdwardsY::as_bytes",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L180-L185",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::CompressedEdwardsY::decompress",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L193-L196",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::as_projective",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L521-L623",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::as_projective_niels",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L508-L525",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::compress",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L565-L581",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::double",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L613-L626",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::identity",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L409-L416",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::is_small_order",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L1226-L1258",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L1186-L1188",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L1191-L1199",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::multiscalar_mul",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L799-L804",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::to_montgomery",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L552-L559",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint",
+    "source": "curve25519-dalek/src/edwards.rs",
+    "lines": "L901-L912",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::montgomery::MontgomeryPoint::to_edwards",
+    "source": "curve25519-dalek/src/montgomery.rs",
+    "lines": "L216-L252",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::CompressedRistretto::as_bytes",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L233-L236",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::CompressedRistretto::decompress",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L254-L269",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::CompressedRistretto::from_slice",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L243-L246",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::CompressedRistretto::to_bytes",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L228-L231",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::compress",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L488-L522",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::default",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L812-L816",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L552-L636",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L655-L692",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L786-L803",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::identity",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L806-L810",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::mul_base",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L951-L962",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul",
+    "source": "curve25519-dalek/src/ristretto.rs",
+    "lines": "L980-L990",
+    "spec_theorem": "",
+    "extracted": "",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1205-L1208",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_invert",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1149-L1203",
+    "spec_theorem": "Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
+    "extracted": "extracted",
+    "verified": "draft spec",
+    "notes": "NL-specs written (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1140-L1145",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Pack.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::clamp_integer",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1386-L1391",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/ClampInteger.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (oliver-butterley)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::read_le_u64_into",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1349-L1364",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/ReadLeU64Into.lean",
+    "extracted": "",
+    "verified": "draft spec",
+    "notes": "NL-specs written (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::as_bytes",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L705-L708",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/AsBytes.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::ct_eq",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L300-L304",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/CtEq.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::from_bytes_mod_order",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L236-L246",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrder.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L249-L252",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/FromBytesModOrderWide.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::from_canonical_bytes",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L260-L265",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/FromCanonicalBytes.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::from_hash",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L670-L678",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/FromHash.lean",
+    "extracted": "",
+    "verified": "draft spec",
+    "notes": "NL-specs written (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::hash_from_bytes",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L624-L632",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/HashFromBytes.lean",
+    "extracted": "",
+    "verified": "draft spec",
+    "notes": "NL-specs written (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::invert",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L746-L749",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/Invert.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::is_canonical",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1133-L1136",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/IsCanonical.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::non_adjacent_form",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L920-L973",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/NonAdjacentForm.lean",
+    "extracted": "",
+    "verified": "draft spec",
+    "notes": "NL-specs written (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::ONE",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L567-L572",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::reduce",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1124-L1130",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::to_bytes",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L690-L693",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean",
+    "extracted": "extracted",
+    "verified": "verified",
+    "notes": "Verified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::unpack",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L1118-L1121",
+    "spec_theorem": "Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean",
+    "extracted": "extracted",
+    "verified": "specified",
+    "notes": "Specified (markus-dablander)"
+  },
+  {
+    "function": "curve25519_dalek::scalar::Scalar::ZERO",
+    "source": "curve25519-dalek/src/scalar.rs",
+    "lines": "L564-L564",
+    "spec_theorem": "",
+    "extracted": "extracted",
+    "verified": "",
+    "notes": ""
+  }
+]
