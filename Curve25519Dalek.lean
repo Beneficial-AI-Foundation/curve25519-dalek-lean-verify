@@ -1,5 +1,6 @@
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
+import Curve25519Dalek.FunsExternal_Template
 import Curve25519Dalek.Proofs.Aux
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
@@ -8,6 +9,8 @@ import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.ProjectivePoint.Identity
 import Curve25519Dalek.Proofs.Backend.Serial.ScalarMul.Straus.Straus.MultiscalarMul
 import Curve25519Dalek.Proofs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.AsBytes
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.FromBytes
@@ -77,3 +80,4 @@ import Curve25519Dalek.Proofs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Proofs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesExternal
+import Curve25519Dalek.TypesExternal_Template

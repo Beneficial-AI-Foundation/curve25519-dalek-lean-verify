@@ -11,17 +11,17 @@ Specification and proof for `FieldElement51::add_assign`.
 
 This function performs element-wise addition of field element limbs.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek
-open backend.serial.u64.field.FieldElement51
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
 /-! ## Spec for `add_assign_loop` -/
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
@@ -77,3 +77,5 @@ theorem add_assign_spec (a b : Array U64 5#usize)
     simpa using hab i hi
   · intro i hi
     simpa using res_post_1 i hi (by simp)
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51

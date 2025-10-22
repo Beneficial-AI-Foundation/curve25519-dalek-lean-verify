@@ -13,7 +13,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `identity` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L229-L237) | - | ☐ | ☐ |  |
 | `multiscalar_mul` | [backend/serial/scalar_mul/straus.rs](curve25519-dalek/src/backend/serial/scalar_mul/straus.rs#L1-L47) | - | ☐ | ☐ |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | - | ☐ | ☐ |  |
-| `add` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L270-L274) | - | ✅ | ☐ |  |
+| `add` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L270-L274) | [Add.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Add.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `add_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L278-L284) | [AddAssign.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | - | ✅ | ☐ |  |
 | `conditional_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L247-L254) | - | ☐ | ☐ |  |
@@ -99,8 +99,8 @@ This document tracks the progress of formally verifying functions from the curve
 - **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 5 / 86 (5%)
 - **Specified**: 15 / 86 (17%)
-- **Verified**: 8 / 86 (9%)
-- **Pending**: 58 / 86 (67%)
+- **Verified**: 9 / 86 (10%)
+- **Pending**: 57 / 86 (66%)
 
 ## Legend
 

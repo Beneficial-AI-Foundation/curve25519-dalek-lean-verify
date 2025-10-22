@@ -6,7 +6,7 @@ curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L229-L237,,,,
 curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L1-L47,,,,
 curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,,,,
-curve25519_dalek::backend::serial::u64::field::FieldElement51::add,curve25519-dalek/src/backend/serial/u64/field.rs,L270-L274,,extracted,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::add,curve25519-dalek/src/backend/serial/u64/field.rs,L270-L274,Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Add.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L278-L284,Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L367-L369,,extracted,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L247-L254,,,,
