@@ -1,6 +1,5 @@
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
-import Curve25519Dalek.FunsExternal_Template
 import Curve25519Dalek.Proofs.Aux
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
@@ -80,4 +79,3 @@ import Curve25519Dalek.Proofs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Proofs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesExternal
-import Curve25519Dalek.TypesExternal_Template
