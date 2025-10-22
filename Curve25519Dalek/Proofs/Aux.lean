@@ -46,3 +46,10 @@ theorem Array.set_of_ne (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i <
     (bs.set j#usize a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
+
+/-- Setting the j part of an array doesn't change the i part if i ≠ j -/
+theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize) (hi : i < bs.length)
+    (h : i ≠ j) :
+    (bs.set j a)[i]! = bs[i] := by
+  rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
+  exact List.getElem!_set_ne bs j i a (by omega)

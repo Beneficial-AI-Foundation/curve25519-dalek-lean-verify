@@ -3,14 +3,7 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
-import Aeneas
-import Curve25519Dalek.Funs
 import Curve25519Dalek.Proofs.Aux
-import Curve25519Dalek.Proofs.Defs
-
-set_option linter.style.longLine false
-set_option linter.style.setOption false
-set_option maxHeartbeats 3000000
 
 /-! # AddAssign
 
@@ -28,55 +21,40 @@ open backend.serial.u64.field.FieldElement51
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
-attribute [-simp] Int.reducePow Nat.reducePow
-
 /-! ## Spec for `add_assign_loop` -/
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
-- Does not overflow if limb sums don't exceed U64.max
-- After each step `i`, updates the `i`th element of `a`,
-  i.e., `a'[i] = a[i] + b[i]` and `a'[j] = a[j]` for `j ≠ i`. -/
+- Does not overflow if limb sums don't exceed `U64.max`. -/
 @[progress]
 theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (hab : ∀ (j : Nat), j < 5 → i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :
     ∃ a', add_assign_loop a b i = ok a' ∧
     (∀ (j : Nat), j < 5 → i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧
-    (∀ (j : Nat), j < 5 → j < i.val → a'[j]! = a[j]!)
-    := by
+    (∀ (j : Nat), j < 5 → j < i.val → a'[j]! = a[j]!) := by
   unfold add_assign_loop
   split
   · progress*
-    · subst_vars
-      have := hab i (by scalar_tac) (by simp)
+    · have := hab i (by scalar_tac) (by simp)
       scalar_tac
-    · intro j hj hj'
+    · intro j hj _
       have := hab j hj
-      simp [*]
-      simp_all
-      have := hab j (by scalar_tac) (by bound)
+      have := hab j (by scalar_tac) (by omega)
       have : i.val ≠ j := by scalar_tac
-      simp [this]
       simp_all
     · refine ⟨?_, ?_⟩
       · intro j hj hj'
-        subst_vars
         obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
         · simp_all
         · have := res_post_1 j hj (by omega)
-          -- simp_all
-          rw [this]
-          have := Array.set_of_ne a i3 j i (by scalar_tac) (by scalar_tac) (by omega)
+          have := Array.set_of_ne' a i3 j i (by scalar_tac) (by omega)
+          have := Array.val_getElem!_eq' a j (by scalar_tac)
           simp_all
-
-          sorry
       · intro j hj hj'
-        simp_all
-        subst_vars
         have := res_post_2 j hj (by omega)
         simp_all
   · use a
-    simp
+    simp only [implies_true, and_true, true_and]
     intro j hj hj'
     have : j = 5 := by scalar_tac
     omega
@@ -86,7 +64,7 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
 /-! ## Spec for `add_assign` -/
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign`**:
-- Does not overflow when limb sums don't exceed U64.max
+- Does not overflow when limb sums don't exceed `U64.max`
 - Returns a field element where each limb is the sum of corresponding input limbs -/
 @[progress]
 theorem add_assign_spec (a b : Array U64 5#usize)
