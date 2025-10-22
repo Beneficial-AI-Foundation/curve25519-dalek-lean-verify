@@ -1,4 +1,5 @@
 import Curve25519Dalek.Funs
+import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Proofs.Aux
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Proofs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
@@ -16,7 +17,6 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Field.FieldElement51.Square2
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Add
-import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.AsBytes
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.AsMontgomery
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
@@ -30,6 +30,7 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Sub
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Proofs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Proofs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Proofs.Defs
@@ -75,3 +76,4 @@ import Curve25519Dalek.Proofs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Proofs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Proofs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Types
+import Curve25519Dalek.TypesExternal

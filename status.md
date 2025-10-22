@@ -43,7 +43,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `sub` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | - | ✅ | 📋 | Loop refactored |
-| `to_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L129-L166) | - | ✅ | ☐ |  |
+| `to_bytes` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L129-L166) | [ToBytes.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `straus_multiscalar_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L157-L191) | - | ☐ | ☐ |  |
 | `vartime_double_base_mul` | [backend/mod.rs](curve25519-dalek/src/backend/mod.rs#L240-L245) | - | ☐ | ☐ |  |
 | `as_bytes` | [edwards.rs](curve25519-dalek/src/edwards.rs#L180-L185) | - | ✅ | ☐ |  |
@@ -98,9 +98,9 @@ This document tracks the progress of formally verifying functions from the curve
 - **Total Functions**: 86
 - **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 5 / 86 (5%)
-- **Specified**: 14 / 86 (16%)
+- **Specified**: 15 / 86 (17%)
 - **Verified**: 7 / 86 (8%)
-- **Pending**: 60 / 86 (69%)
+- **Pending**: 59 / 86 (68%)
 
 ## Legend
 

@@ -36,7 +36,7 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square,curv
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal,curve25519-dalek/src/backend/serial/u64/scalar.rs,L203-L217,Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal,curve25519-dalek/src/backend/serial/u64/scalar.rs,L222-L241,Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub,curve25519-dalek/src/backend/serial/u64/scalar.rs,L175-L198,,extracted,specified,Loop refactored
-curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes,curve25519-dalek/src/backend/serial/u64/scalar.rs,L129-L166,,extracted,,
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes,curve25519-dalek/src/backend/serial/u64/scalar.rs,L129-L166,Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/mod.rs,L157-L191,,,,
 curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L240-L245,,,,
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L180-L185,,extracted,,
