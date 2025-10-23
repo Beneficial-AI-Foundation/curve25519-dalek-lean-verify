@@ -93,15 +93,6 @@ This document tracks the progress of formally verifying functions from the curve
 | `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | [Unpack.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
 
-## Summary
-
-- **Total Functions**: 86
-- **Extracted**: 51 / 86 (59%)
-- **Draft Spec**: 4 / 86 (4%)
-- **Specified**: 19 / 86 (22%)
-- **Verified**: 10 / 86 (11%)
-- **Pending**: 53 / 86 (61%)
-
 ## Legend
 
 ### Extracted
