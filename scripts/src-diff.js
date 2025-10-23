@@ -97,6 +97,15 @@ function generateDiff(upstreamSrc, localSrc) {
         return null;
     }
 
+    // Replace absolute paths with relative paths to make diff machine-independent
+    // This ensures the diff is the same regardless of where the repo is cloned
+    const upstreamPattern = new RegExp(upstreamSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+    const localPattern = new RegExp(localSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+
+    const normalizedDiff = diffOutput
+        .replace(upstreamPattern, 'a/curve25519-dalek/src')
+        .replace(localPattern, 'b/curve25519-dalek/src');
+
     // Add header to diff
     const header = `# Modifications to curve25519-dalek source code
 
@@ -111,7 +120,7 @@ and the modified version used in this verification project.
 
 `;
 
-    return header + diffOutput;
+    return header + normalizedDiff;
 }
 
 function saveDiff(diff) {
