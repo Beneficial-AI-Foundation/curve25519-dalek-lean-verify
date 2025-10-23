@@ -18,9 +18,8 @@ open Aeneas.Std Result
 
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
--- set_option linter.hashCommand false
--- -- This activates/deactives some simps to reason about lists
--- #setup_aeneas_simps
+set_option linter.hashCommand false
+#setup_aeneas_simps
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
