@@ -51,20 +51,22 @@ def get_file_from_commit(commit_hash, filepath):
         return None
 
 def count_verification_status(csv_content):
-    """Parse CSV and count total, verified, specified, and draft spec functions."""
+    """Parse CSV and count total, verified, specified, draft spec, and extracted functions."""
     if not csv_content:
-        return None, None, None, None
+        return None, None, None, None, None
 
     reader = csv.DictReader(io.StringIO(csv_content))
     total = 0
     verified = 0
     specified = 0
     draft_spec = 0
+    extracted = 0
 
     for row in reader:
         total += 1
         status = row.get('verified', '').strip().lower()
         spec_theorem = row.get('spec_theorem', '').strip()
+        extracted_status = row.get('extracted', '').strip().lower()
 
         if status == 'verified':
             verified += 1
@@ -73,7 +75,10 @@ def count_verification_status(csv_content):
         elif spec_theorem:  # Has spec_theorem but not verified/specified = draft
             draft_spec += 1
 
-    return total, verified, specified, draft_spec
+        if extracted_status == 'extracted':
+            extracted += 1
+
+    return total, verified, specified, draft_spec, extracted
 
 def main():
     print("Fetching commit history...")
@@ -86,6 +91,7 @@ def main():
     verifieds = []
     specifieds = []
     draft_specs = []
+    extracteds = []
 
     print("\nAnalyzing status.csv from each commit...")
     for i, commit in enumerate(commits):
@@ -93,7 +99,7 @@ def main():
             print(f"  Processing commit {i+1}/{len(commits)}", end='\r')
 
         csv_content = get_file_from_commit(commit['hash'], 'status.csv')
-        total, verified, specified, draft_spec = count_verification_status(csv_content)
+        total, verified, specified, draft_spec, extracted = count_verification_status(csv_content)
 
         if total is not None:
             dates.append(commit['datetime'])
@@ -101,6 +107,7 @@ def main():
             verifieds.append(verified)
             specifieds.append(specified)
             draft_specs.append(draft_spec)
+            extracteds.append(extracted)
 
     print(f"\n\nFound {len(dates)} commits with status.csv")
 
@@ -120,23 +127,25 @@ def main():
     # Calculate the remaining unspecified functions
     unspecified = [t - v - s - d for t, v, s, d in zip(totals, verifieds, specifieds, draft_specs)]
 
-    # Create stacked area plot
-    ax.fill_between(dates, 0, verified_arr,
-                     alpha=0.7, color='#2ecc71', label='Verified')
-    ax.fill_between(dates, verified_arr, verified_arr + specified_arr,
-                     alpha=0.7, color='#3498db', label='Specified (spec written)')
+    # Create stacked area plot (reverse order for legend)
+    ax.fill_between(dates, verified_arr + specified_arr + draft_spec_arr, totals,
+                     alpha=0.5, color='#95a5a6', label='Not started')
     ax.fill_between(dates, verified_arr + specified_arr,
                      verified_arr + specified_arr + draft_spec_arr,
-                     alpha=0.7, color='#f39c12', label='Draft Spec (WIP)')
-    ax.fill_between(dates, verified_arr + specified_arr + draft_spec_arr, totals,
-                     alpha=0.5, color='#95a5a6', label='No Spec Yet')
+                     alpha=0.7, color='#f9e79f', label='Draft')
+    ax.fill_between(dates, verified_arr, verified_arr + specified_arr,
+                     alpha=0.7, color='#5dade2', label='Specified')
+    ax.fill_between(dates, 0, verified_arr,
+                     alpha=0.7, color='#2ecc71', label='Verified')
 
-    # Add line plots on top for clarity
-    ax.plot(dates, verifieds, 'o-', color='darkgreen', linewidth=1.5, markersize=4)
-    ax.plot(dates, totals, 'o-', color='darkblue', linewidth=1.5, markersize=4)
+    # Add straight line plots without markers
+    ax.plot(dates, verifieds, color='darkgreen', linewidth=2, alpha=0.8)
+    ax.plot(dates, totals, color='darkblue', linewidth=2, alpha=0.8)
+
+    # Add dotted line for extracted (no points)
+    ax.plot(dates, extracteds, ':', color='purple', linewidth=2, alpha=0.7, label='Extracted')
 
     # Formatting
-    ax.set_xlabel('Date', fontsize=12)
     ax.set_ylabel('Number of Functions', fontsize=12)
     ax.set_title('Curve25519-Dalek Verification Progress Over Time',
                  fontsize=14, fontweight='bold')
@@ -144,41 +153,36 @@ def main():
     ax.grid(True, alpha=0.3, linestyle='--')
 
     # Format x-axis dates
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%y'))
     ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-    plt.xticks(rotation=45, ha='right')
+    plt.xticks(rotation=0)
 
-    # Add annotation for latest point with all categories
+    # Add "Verified: X/Y (Z%)" text anchored at the final verified point
     if verifieds:
         latest_verified = verifieds[-1]
-        latest_specified = specifieds[-1]
-        latest_draft = draft_specs[-1]
         latest_total = totals[-1]
-        latest_unspecified = unspecified[-1]
-
         verified_pct = (latest_verified / latest_total * 100) if latest_total > 0 else 0
-        with_spec_pct = ((latest_verified + latest_specified) / latest_total * 100) if latest_total > 0 else 0
 
-        annotation_text = (
-            f'Verified: {latest_verified} ({verified_pct:.1f}%)\n'
-            f'Specified: {latest_specified}\n'
-            f'Draft Spec: {latest_draft}\n'
-            f'No Spec: {latest_unspecified}\n'
-            f'Total: {latest_total}'
-        )
+        # Position text slightly higher and to the left of the final verified point
+        # Add a small offset in data coordinates
+        date_offset = mdates.date2num(dates[-1]) - mdates.date2num(dates[0])
+        text_date_num = mdates.date2num(dates[-1]) - 0.02 * date_offset
+        text_date = mdates.num2date(text_date_num)
 
-        ax.text(0.98, 0.98, annotation_text,
-                transform=ax.transAxes,
-                fontsize=10, fontweight='bold',
-                verticalalignment='top', horizontalalignment='right',
-                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+        ax.text(text_date, latest_verified + 1,
+                f'Verified: {latest_verified}/{latest_total} ({verified_pct:.1f}%)',
+                fontsize=11, fontweight='bold',
+                verticalalignment='bottom', horizontalalignment='right',
+                color='black')
 
     plt.tight_layout()
 
-    # Save the plot
-    output_file = 'verification_progress.png'
-    plt.savefig(output_file, dpi=300, bbox_inches='tight')
-    print(f"\nPlot saved to {output_file}")
+    # Save the plot in both PNG and SVG formats
+    output_png = 'verification_progress.png'
+    output_svg = 'verification_progress.svg'
+    plt.savefig(output_png, dpi=300, bbox_inches='tight')
+    plt.savefig(output_svg, format='svg', bbox_inches='tight')
+    print(f"\nPlots saved to {output_png} and {output_svg}")
 
     # Show the plot
     plt.show()
@@ -191,17 +195,20 @@ def main():
     print(f"    Verified:   {verifieds[0]:2d} ({verifieds[0]/totals[0]*100:5.1f}%)")
     print(f"    Specified:  {specifieds[0]:2d} ({specifieds[0]/totals[0]*100:5.1f}%)")
     print(f"    Draft Spec: {draft_specs[0]:2d} ({draft_specs[0]/totals[0]*100:5.1f}%)")
+    print(f"    Extracted:  {extracteds[0]:2d} ({extracteds[0]/totals[0]*100:5.1f}%)")
     print(f"    Total:      {totals[0]:2d}")
     print(f"\n  Current state ({dates[-1].strftime('%Y-%m-%d')}):")
     print(f"    Verified:   {verifieds[-1]:2d} ({verifieds[-1]/totals[-1]*100:5.1f}%)")
     print(f"    Specified:  {specifieds[-1]:2d} ({specifieds[-1]/totals[-1]*100:5.1f}%)")
     print(f"    Draft Spec: {draft_specs[-1]:2d} ({draft_specs[-1]/totals[-1]*100:5.1f}%)")
+    print(f"    Extracted:  {extracteds[-1]:2d} ({extracteds[-1]/totals[-1]*100:5.1f}%)")
     print(f"    No Spec:    {unspecified[-1]:2d} ({unspecified[-1]/totals[-1]*100:5.1f}%)")
     print(f"    Total:      {totals[-1]:2d}")
     print(f"\n  Progress:")
     print(f"    Verified:   +{verifieds[-1] - verifieds[0]}")
     print(f"    Specified:  +{specifieds[-1] - specifieds[0]}")
     print(f"    Draft Spec: +{draft_specs[-1] - draft_specs[0]}")
+    print(f"    Extracted:  +{extracteds[-1] - extracteds[0]}")
     print(f"    Total:      +{totals[-1] - totals[0]}")
 
 if __name__ == '__main__':
