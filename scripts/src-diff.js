@@ -86,25 +86,23 @@ function extractUpstreamSource() {
 function generateDiff(upstreamSrc, localSrc) {
     console.log('\n🔍 Generating diff...');
 
-    // Generate unified diff
+    // Escape paths for sed regex
+    const escapedUpstream = upstreamSrc.replace(/[\/&]/g, '\\$&');
+    const escapedLocal = localSrc.replace(/[\/&]/g, '\\$&');
+
+    // Generate unified diff and normalize paths/timestamps for reproducibility
+    // 1. Remove timestamps (tab followed by date/time)
+    // 2. Replace absolute upstream path with a/curve25519-dalek/src
+    // 3. Replace absolute local path with b/curve25519-dalek/src
     const diffOutput = run(
-        `diff -Naur "${upstreamSrc}" "${localSrc}"`,
-        { quiet: true, allowFail: true, stdio: 'pipe' }
+        `diff -Naur --no-dereference "${upstreamSrc}" "${localSrc}" | sed -e 's/\\t[0-9][0-9][0-9][0-9]-.*//g' -e 's|${escapedUpstream}|a/curve25519-dalek/src|g' -e 's|${escapedLocal}|b/curve25519-dalek/src|g'`,
+        { quiet: true, allowFail: true, stdio: 'pipe', shell: '/bin/bash' }
     );
 
     if (!diffOutput || diffOutput.trim() === '') {
         console.log('  ℹ️  No differences found');
         return null;
     }
-
-    // Replace absolute paths with relative paths to make diff machine-independent
-    // This ensures the diff is the same regardless of where the repo is cloned
-    const upstreamPattern = new RegExp(upstreamSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-    const localPattern = new RegExp(localSrc.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
-
-    const normalizedDiff = diffOutput
-        .replace(upstreamPattern, 'a/curve25519-dalek/src')
-        .replace(localPattern, 'b/curve25519-dalek/src');
 
     // Add header to diff
     const header = `# Modifications to curve25519-dalek source code
@@ -120,7 +118,7 @@ and the modified version used in this verification project.
 
 `;
 
-    return header + normalizedDiff;
+    return header + diffOutput;
 }
 
 function saveDiff(diff) {

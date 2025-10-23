@@ -9,9 +9,9 @@ and the modified version used in this verification project.
 
 ---
 
-diff -Naur a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
---- a/curve25519-dalek/src/backend/serial/curve_models/mod.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/backend/serial/curve_models/mod.rs	2025-10-21 15:16:46.467158069 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
+--- a/curve25519-dalek/src/backend/serial/curve_models/mod.rs
++++ b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
 @@ -136,6 +136,9 @@
  
  use crate::edwards::EdwardsPoint;
@@ -68,9 +68,9 @@ diff -Naur a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve2551
          }
      }
  }
-diff -Naur a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
---- a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs	2025-10-20 18:51:03.451744894 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
+--- a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
++++ b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 @@ -30,7 +30,9 @@
  
      // Find starting index
@@ -82,9 +82,9 @@ diff -Naur a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.
          i = j;
          if a_naf[i] != 0 || b_naf[i] != 0 {
              break;
-diff -Naur a/curve25519-dalek/src/backend/serial/u64/field.rs b/curve25519-dalek/src/backend/serial/u64/field.rs
---- a/curve25519-dalek/src/backend/serial/u64/field.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/backend/serial/u64/field.rs	2025-10-21 15:16:46.467158069 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/field.rs b/curve25519-dalek/src/backend/serial/u64/field.rs
+--- a/curve25519-dalek/src/backend/serial/u64/field.rs
++++ b/curve25519-dalek/src/backend/serial/u64/field.rs
 @@ -57,47 +57,27 @@
  
  impl<'a> AddAssign<&'a FieldElement51> for FieldElement51 {
@@ -198,9 +198,9 @@ diff -Naur a/curve25519-dalek/src/backend/serial/u64/field.rs b/curve25519-dalek
          }
  
          square
-diff -Naur a/curve25519-dalek/src/backend/serial/u64/scalar.rs b/curve25519-dalek/src/backend/serial/u64/scalar.rs
---- a/curve25519-dalek/src/backend/serial/u64/scalar.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/backend/serial/u64/scalar.rs	2025-10-20 15:12:51.627344330 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs b/curve25519-dalek/src/backend/serial/u64/scalar.rs
+--- a/curve25519-dalek/src/backend/serial/u64/scalar.rs
++++ b/curve25519-dalek/src/backend/serial/u64/scalar.rs
 @@ -65,10 +65,18 @@
      #[rustfmt::skip] // keep alignment of s[*] calculations
      pub fn from_bytes(bytes: &[u8; 32]) -> Scalar52 {
@@ -327,9 +327,9 @@ diff -Naur a/curve25519-dalek/src/backend/serial/u64/scalar.rs b/curve25519-dale
          }
          Scalar52::montgomery_reduce(&limbs)
      }
-diff -Naur a/curve25519-dalek/src/edwards.rs b/curve25519-dalek/src/edwards.rs
---- a/curve25519-dalek/src/edwards.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/edwards.rs	2025-10-21 08:39:26.978769720 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek/src/edwards.rs
+--- a/curve25519-dalek/src/edwards.rs
++++ b/curve25519-dalek/src/edwards.rs
 @@ -1329,9 +1329,11 @@
          debug_assert!(k > 0);
          let mut r: CompletedPoint;
@@ -343,9 +343,9 @@ diff -Naur a/curve25519-dalek/src/edwards.rs b/curve25519-dalek/src/edwards.rs
          }
          // Unroll last iteration so we can go directly as_extended()
          s.double().as_extended()
-diff -Naur a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/src/scalar.rs
---- a/curve25519-dalek/src/scalar.rs	2025-07-09 04:41:29.000000000 +0200
-+++ b/curve25519-dalek/src/scalar.rs	2025-10-20 16:37:02.522658883 +0200
+diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/src/scalar.rs
+--- a/curve25519-dalek/src/scalar.rs
++++ b/curve25519-dalek/src/scalar.rs
 @@ -1165,8 +1165,10 @@
  
          #[inline]
