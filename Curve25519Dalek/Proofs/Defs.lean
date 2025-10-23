@@ -20,6 +20,9 @@ def p : Nat := 2^255 - 19
 /-- The group order L for Scalar52 arithmetic -/
 def L : Nat := 2^252 + 27742317777372353535851937790883648493
 
+/-- The Montgomery constant R = 2^260 used for Scalar52 Montgomery form conversions -/
+def R : Nat := 2^260
+
 /-- The cofactor of curve25519 -/
 @[simp]
 def h : Nat := 8
