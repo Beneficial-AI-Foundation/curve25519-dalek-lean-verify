@@ -39,7 +39,7 @@ natural language specs:
 - The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L
 - The result scalar s is less than L (the group order)
 -/
-theorem from_bytes_mod_order_spec (b : Array U8 32#usize):
+theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
     ∃ s,
     from_bytes_mod_order b = ok s ∧
     U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧

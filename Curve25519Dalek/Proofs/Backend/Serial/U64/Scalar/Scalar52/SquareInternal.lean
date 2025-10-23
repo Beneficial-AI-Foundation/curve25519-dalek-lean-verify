@@ -3,6 +3,8 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.M
 
 set_option linter.style.setOption false
 set_option maxHeartbeats 2000000
+set_option exponentiation.threshold 500
+
 
 /-! # SquareInternal
 
@@ -10,7 +12,6 @@ The main statement concerning `square_internal` is `square_internal_spec` (below
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek
 
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -45,8 +46,9 @@ theorem square_internal_spec (a : Array U64 5#usize)
     scalar_tac
   }
   -- remains to show that `U128x9_as_Nat result = U64x5_as_Nat a * U64x5_as_Nat a`
-  simp [U128x9_as_Nat, U64x5_as_Nat, Finset.sum_range_succ, *]
   unfold Array.make at *
-  simp_all; ring
+  simp [U128x9_as_Nat, U64x5_as_Nat, Finset.sum_range_succ, *]
+  simp_all;
+  ring
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

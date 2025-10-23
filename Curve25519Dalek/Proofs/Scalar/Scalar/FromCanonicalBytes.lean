@@ -48,7 +48,7 @@ natural language specs:
 - When the input bytes represent a non-canonical value (≥ L), the function returns a CtOption Scalar
   where is_some = Choice.zero (i.e., None)
 -/
-theorem from_canonical_bytes_spec (b : Array U8 32#usize):
+theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     ∃ s,
     from_canonical_bytes b = ok s ∧
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧

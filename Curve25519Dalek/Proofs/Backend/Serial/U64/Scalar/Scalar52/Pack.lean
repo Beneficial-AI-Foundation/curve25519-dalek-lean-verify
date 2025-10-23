@@ -38,7 +38,7 @@ natural language specs:
 - Unpacking the result back yields the original scalar: unpack(s) = r
 - Both the unpacked r and the packed s represent the same natural number
 -/
-theorem pack_spec (u : Scalar52):
+theorem pack_spec (u : Scalar52) :
     ∃ s,
     pack u = ok s ∧
     unpack s = ok u ∧

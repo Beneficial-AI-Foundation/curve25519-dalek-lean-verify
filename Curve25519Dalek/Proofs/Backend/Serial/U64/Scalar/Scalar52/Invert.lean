@@ -42,7 +42,7 @@ natural language specs:
 - The result u' satisfies the multiplicative inverse property:
   U64x5_as_Nat(u) * U64x5_as_Nat(u') ≡ 1 (mod L)
 -/
-theorem invert_spec (u : Scalar52) (h : u ≠ ZERO):
+theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',
     invert u = ok u' ∧
     (U64x5_as_Nat u * U64x5_as_Nat u') ≡ 1 [MOD L]

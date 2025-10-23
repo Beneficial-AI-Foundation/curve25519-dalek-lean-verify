@@ -36,7 +36,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the sum of the two input scalars modulo L
 -/
-theorem add_spec (u u' : Scalar52):
+theorem add_spec (u u' : Scalar52) :
     ∃ v,
     add u u' = ok v ∧
     U64x5_as_Nat v = (U64x5_as_Nat u + U64x5_as_Nat u') % L
