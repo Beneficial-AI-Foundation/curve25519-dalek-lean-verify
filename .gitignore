@@ -30,3 +30,6 @@ __pycache__/
 # Generated plots
 verification_progress.png
 verification_progress.svg
+
+# Temporary files
+.tmp/
