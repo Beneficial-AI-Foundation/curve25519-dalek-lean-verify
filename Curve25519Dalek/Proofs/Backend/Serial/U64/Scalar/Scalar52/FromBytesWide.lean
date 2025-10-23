@@ -36,7 +36,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form)
 -/
-theorem from_bytes_wide_spec (b : Array U8 64#usize):
+theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     ∃ u,
     from_bytes_wide b = ok u ∧
     U64x5_as_Nat u = U8x64_as_Nat b % L

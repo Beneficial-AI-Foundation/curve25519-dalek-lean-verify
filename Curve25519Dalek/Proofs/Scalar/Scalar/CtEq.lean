@@ -37,7 +37,7 @@ natural language specs:
 - Returns `Choice` representing equality in constant time
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
 -/
-theorem ct_eq_spec (s s' : Scalar):
+theorem ct_eq_spec (s s' : Scalar) :
     ∃ c,
     ct_eq s s' = ok c ∧
     (c = Choice.one ↔ s.bytes = s'.bytes)

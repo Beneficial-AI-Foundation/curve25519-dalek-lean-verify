@@ -37,7 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result byte array represents the same number as the input unpacked scalar
 -/
-theorem to_bytes_spec (u : Scalar52):
+theorem to_bytes_spec (u : Scalar52) :
     ∃ b,
     to_bytes u = ok b ∧
     U8x32_as_Nat b = U64x5_as_Nat u

@@ -7,6 +7,7 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.M
 set_option linter.style.longLine false
 set_option linter.style.setOption false
 set_option maxHeartbeats 3000000
+set_option exponentiation.threshold 500
 
 /-! # MulInternal
 
@@ -14,11 +15,10 @@ The main statement concerning `mul_internal` is `mul_internal_spec` (below).
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek
-open backend.serial.u64.scalar.Scalar52
+
+namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option linter.hashCommand false
--- This activates/deactives some simps to reason about lists
 #setup_aeneas_simps
 
 attribute [-simp] Int.reducePow Nat.reducePow
@@ -41,12 +41,13 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
     U128x9_as_Nat result = U64x5_as_Nat a * U64x5_as_Nat b := by
   unfold mul_internal
   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-  simp only [Array.getElem!_Nat_eq]
+  -- simp only [Array.getElem!_Nat_eq]
   have := ha 0 (by simp); have := ha 1 (by simp); have := ha 2 (by simp); have := ha 3 (by simp); have := ha 4 (by simp);
   have := hb 0 (by simp); have := hb 1 (by simp); have := hb 2 (by simp); have := hb 3 (by simp); have := hb 4 (by simp)
   progress*
   all_goals try simp [*]; scalar_tac
   -- remains to show that `U128x9_as_Nat res = U64x5_as_Nat a * U64x5_as_Nat b`
   simp [*, Finset.sum_range_succ]
-  simp at *
   ring
+
+end curve25519_dalek.backend.serial.u64.scalar.Scalar52

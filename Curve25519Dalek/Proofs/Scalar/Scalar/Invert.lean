@@ -40,7 +40,7 @@ natural language specs:
 - The result s' satisfies the multiplicative inverse property:
   U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)
 -/
-theorem invert_spec (s : Scalar) (h : s ≠ ZERO):
+theorem invert_spec (s : Scalar) (h : s ≠ ZERO) :
     ∃ s',
     invert s = ok s' ∧
     (U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes) ≡ 1 [MOD L]
