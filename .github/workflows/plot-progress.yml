@@ -5,9 +5,7 @@ name: Plot Progress
 # The generated plot is uploaded as an artifact for download.
 
 on:
-  push:
-  pull_request:
-  workflow_dispatch:  # Also allow manual trigger
+  workflow_dispatch:  # Manual trigger only
 
 jobs:
   plot-progress:

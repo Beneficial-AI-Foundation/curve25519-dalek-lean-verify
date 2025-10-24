@@ -5,6 +5,9 @@ on:
   push:
     branches: [master]
 
+  # Check build on pull requests
+  pull_request:
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -50,6 +53,8 @@ jobs:
 
   # Deployment job
   deploy:
+    # Only deploy on push to master, not on PRs
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
