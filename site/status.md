@@ -201,12 +201,11 @@ function getVerifiedIcon(status: string): string {
 }
 
 .status-table {
-  overflow-x: auto;
   margin: 2rem 0;
 }
 
 .function-name {
-  max-width: 180px;
+  max-width: 202px;
 }
 
 .function-name code {
@@ -220,7 +219,7 @@ function getVerifiedIcon(status: string): string {
 }
 
 .rust-source {
-  max-width: 180px;
+  max-width: 202px;
 }
 
 .rust-source .source-link {
@@ -233,7 +232,7 @@ function getVerifiedIcon(status: string): string {
 }
 
 .lean-spec {
-  max-width: 160px;
+  max-width: 180px;
 }
 
 .lean-spec .spec-link {
