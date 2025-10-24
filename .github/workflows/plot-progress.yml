@@ -31,7 +31,7 @@ jobs:
           pip install matplotlib
 
       - name: Generate progress plot
-        run: python3 scripts/plot_verification_progress.py
+        run: python3 scripts/plot_progress.py
 
       - name: Upload plot as artifact
         uses: actions/upload-artifact@v4
