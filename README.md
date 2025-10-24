@@ -7,7 +7,9 @@
 
 # Project to formally verify Dalek elliptic curve cryptography
 
-To do: add brief details here
+**[📖 View Project Site](https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/)**
+
+A project to formally verify the Rust implementation of [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) using [Lean](https://lean-lang.org) and [Aeneas](https://github.com/AeneasVerif/aeneas).
 
 ## Contributing
 
