@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { Line } from 'vue-chartjs'
 import {
   Chart as ChartJS,
-  CategoryScale,
+  TimeScale,
   LinearScale,
   PointElement,
   LineElement,
@@ -13,10 +13,11 @@ import {
   Filler,
   type ChartOptions
 } from 'chart.js'
+import 'chartjs-adapter-date-fns'
 
 // Register Chart.js components
 ChartJS.register(
-  CategoryScale,
+  TimeScale,
   LinearScale,
   PointElement,
   LineElement,
@@ -41,24 +42,20 @@ const props = defineProps<{
 }>()
 
 const chartData = computed(() => {
-  const labels = props.dataPoints.map(dp => {
-    const date = new Date(dp.date)
-    return date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: '2-digit' })
-  })
-
-  const verified = props.dataPoints.map(dp => dp.verified)
-  const specified = props.dataPoints.map(dp => dp.specified)
-  const draftSpec = props.dataPoints.map(dp => dp.draftSpec)
-  const total = props.dataPoints.map(dp => dp.total)
-  const extracted = props.dataPoints.map(dp => dp.extracted)
-
-  // Calculate "not started" (everything else)
-  const notStarted = props.dataPoints.map(dp =>
-    dp.total - dp.verified - dp.specified - dp.draftSpec
-  )
+  // For TimeScale, we need to provide data as {x, y} objects
+  const verified = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.verified }))
+  const specified = props.dataPoints.map((dp, idx) => ({
+    x: dp.timestamp * 1000,
+    y: dp.specified + props.dataPoints[idx].verified
+  }))
+  const draftSpec = props.dataPoints.map((dp, idx) => ({
+    x: dp.timestamp * 1000,
+    y: dp.draftSpec + props.dataPoints[idx].specified + props.dataPoints[idx].verified
+  }))
+  const total = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total }))
+  const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
 
   return {
-    labels,
     datasets: [
       {
         label: 'Verified',
@@ -66,29 +63,29 @@ const chartData = computed(() => {
         borderColor: '#10b981',
         backgroundColor: 'rgba(16, 185, 129, 0.85)',
         fill: true,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 2,
         pointRadius: 0,
         order: 1
       },
       {
         label: 'Specified',
-        data: specified.map((val, idx) => val + verified[idx]),
+        data: specified,
         borderColor: '#fdba74',
         backgroundColor: 'rgba(253, 186, 116, 0.6)',
         fill: true,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 0,
         pointRadius: 0,
         order: 2
       },
       {
         label: 'Draft',
-        data: draftSpec.map((val, idx) => val + specified[idx] + verified[idx]),
+        data: draftSpec,
         borderColor: '#cbd5e1',
         backgroundColor: 'rgba(203, 213, 225, 0.5)',
         fill: true,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 0,
         pointRadius: 0,
         order: 3
@@ -99,7 +96,7 @@ const chartData = computed(() => {
         borderColor: '#e5e7eb',
         backgroundColor: 'rgba(229, 231, 235, 0.4)',
         fill: true,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 0,
         pointRadius: 0,
         order: 4
@@ -110,7 +107,7 @@ const chartData = computed(() => {
         borderColor: '#374151',
         backgroundColor: 'transparent',
         fill: false,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 2,
         pointRadius: 0,
         order: 0
@@ -121,7 +118,7 @@ const chartData = computed(() => {
         borderColor: '#9ca3af',
         backgroundColor: 'transparent',
         fill: false,
-        stepped: 'after',
+        stepped: 'after' as const,
         borderWidth: 1.5,
         borderDash: [3, 3],
         pointRadius: 0,
@@ -191,8 +188,20 @@ const chartOptions: ChartOptions<'line'> = {
       }
     },
     x: {
+      type: 'time',
+      time: {
+        unit: 'day',
+        displayFormats: {
+          day: 'dd/MM/yy'
+        },
+        tooltipFormat: 'PPP'
+      },
       grid: {
         display: false
+      },
+      ticks: {
+        maxRotation: 45,
+        minRotation: 45
       }
     }
   }
