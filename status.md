@@ -30,7 +30,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | - | ✅ | ☐ |  |
 | `RR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L148-L154) | - | ✅ | ☐ |  |
 | `m` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L56-L58) | [M.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
+| `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | [Zero.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Zero.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `add` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | [Add.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Add.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `conditional_add_l` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
 | `as_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | [AsMontgomery.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean) | ✅ | 📋 | Specified (markus-dablander) |
@@ -91,7 +91,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | [Reduce.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L690-L693) | [ToBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | [Unpack.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean) | ✅ | 📋 | Specified (markus-dablander) |
-| `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
+| `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | [Zero.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Zero.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 
 ## Legend
 

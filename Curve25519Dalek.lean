@@ -35,6 +35,7 @@ import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
+import Curve25519Dalek.Proofs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Proofs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Proofs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Proofs.Defs
