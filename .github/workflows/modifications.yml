@@ -26,8 +26,11 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Install dependencies
+        run: npm ci
+
       - name: Generate src-modifications.diff
-        run: node scripts/src-diff.js
+        run: npm run src-diff
 
       - name: Check if src-modifications.diff is up to date
         run: |
@@ -40,7 +43,7 @@ jobs:
             echo ""
             echo "Please run the following command and commit the updated src-modifications.diff:"
             echo ""
-            echo "  node scripts/src-diff.js"
+            echo "  npm run src-diff"
             echo "  git add src-modifications.diff"
             echo "  git commit -m 'Update src-modifications.diff'"
             echo ""
