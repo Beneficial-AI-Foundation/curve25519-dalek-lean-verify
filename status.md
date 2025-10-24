@@ -38,8 +38,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | [FromBytesWide.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean) | ✅ | 📋 | Nested loop refactored; required shr edit; Specified (markus-dablander) |
 | `from_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | [FromMontgomery.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean) | ✅ | 📋 | Loop refactored; Specified (markus-dablander) |
 | `montgomery_mul` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | [MontgomeryMul.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean) | ✅ | 📋 | Specified (markus-dablander) |
-| `montgomery_reduce` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | [MontgomeryReduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean) | ✅ | ☐ |  |
-| `montgomery_square` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | [MontgomerySquare.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean) | ✅ | ☐ |  |
+| `montgomery_reduce` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | [MontgomeryReduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean) | ✅ | 📋 | Specified (markus-dablander) |
+| `montgomery_square` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | [MontgomerySquare.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `mul_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `sub` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | [Sub.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean) | ✅ | 📋 | Loop refactored |
@@ -98,9 +98,9 @@ This document tracks the progress of formally verifying functions from the curve
 - **Total Functions**: 86
 - **Extracted**: 51 / 86 (59%)
 - **Draft Spec**: 4 / 86 (4%)
-- **Specified**: 19 / 86 (22%)
+- **Specified**: 21 / 86 (24%)
 - **Verified**: 10 / 86 (11%)
-- **Pending**: 53 / 86 (61%)
+- **Pending**: 51 / 86 (59%)
 
 ## Legend
 
