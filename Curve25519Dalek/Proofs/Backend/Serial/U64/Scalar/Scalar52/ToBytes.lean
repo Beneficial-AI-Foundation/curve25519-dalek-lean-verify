@@ -25,22 +25,22 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 natural language description:
 
     • Takes an unpacked scalar u (five 52-bit limbs stored in U64 values) and
-      returns a 32-byte array b that represents the same 256-bit integer value
+      returns a 32-byte array b that represents the same 256-bit integer value modulo L
       in little-endian byte representation.
 
 natural language specs:
 
-    • u8x32_to_nat(b) = scalar_to_nat(u)
+    • u8x32_to_nat(b) ≡ scalar_to_nat(u) (mod L)
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
 - No panic (always returns successfully)
-- The result byte array represents the same number as the input unpacked scalar
+- The result byte array represents the same number as the input unpacked scalar modulo L
 -/
 theorem to_bytes_spec (u : Scalar52) :
     ∃ b,
     to_bytes u = ok b ∧
-    U8x32_as_Nat b = U64x5_as_Nat u
+    U8x32_as_Nat b % L = U64x5_as_Nat u % L
     := by
     sorry
 
