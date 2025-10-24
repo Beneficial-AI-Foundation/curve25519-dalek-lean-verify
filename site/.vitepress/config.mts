@@ -4,10 +4,12 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "Verify curve25519-dalek",
   description: "A project to formally verify curve25519-dalek",
+  base: '/curve25519-dalek-lean-verify/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Status', link: '/status' },
       { text: 'Examples', link: '/markdown-examples' }
     ],
 
@@ -22,7 +24,7 @@ export default defineConfig({
     ],
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/vuejs/vitepress' }
+      { icon: 'github', link: 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify' }
     ]
   }
 })

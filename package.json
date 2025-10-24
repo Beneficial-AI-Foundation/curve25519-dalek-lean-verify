@@ -1,4 +1,8 @@
 {
+  "name": "curve25519-dalek-lean-verify",
+  "version": "1.0.0",
+  "description": "A project to formally verify curve25519-dalek",
+  "type": "module",
   "scripts": {
     "docs:dev": "vitepress dev site",
     "docs:build": "vitepress build site",
@@ -6,5 +10,8 @@
   },
   "devDependencies": {
     "vitepress": "^2.0.0-alpha.12"
+  },
+  "dependencies": {
+    "csv-parse": "^5.6.0"
   }
 }
