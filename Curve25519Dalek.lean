@@ -80,6 +80,7 @@ import Curve25519Dalek.Proofs.Scalar.Scalar.NonAdjacentForm
 import Curve25519Dalek.Proofs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Proofs.Scalar.Scalar.ToBytes
 import Curve25519Dalek.Proofs.Scalar.Scalar.Unpack
+import Curve25519Dalek.Proofs.Scalar.Scalar.Zero
 import Curve25519Dalek.Proofs.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesExternal
