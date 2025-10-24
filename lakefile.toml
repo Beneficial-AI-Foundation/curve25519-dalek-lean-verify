@@ -1,6 +1,6 @@
 name = "Curve25519Dalek"
 version = "0.1.0"
-keywords = ["math"]
+keywords = ["formal verification"]
 defaultTargets = ["Curve25519Dalek"]
 
 [leanOptions]
