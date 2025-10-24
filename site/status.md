@@ -153,15 +153,15 @@ function getVerifiedIcon(status: string): string {
     </div>
     <div class="legend-item">
       <span class="status-icon specified">📋</span>
-      <span>Function has formal specifications but no proofs</span>
+      <span>Formal specifications but no proofs</span>
     </div>
     <div class="legend-item">
       <span class="status-icon draft">✏️</span>
-      <span>Function has draft natural language specifications</span>
+      <span>Natural language specifications</span>
     </div>
     <div class="legend-item">
       <span class="status-icon unchecked">☐</span>
-      <span>No verification work has been done yet</span>
+      <span>No verification work completed yet</span>
     </div>
   </div>
 </div>
