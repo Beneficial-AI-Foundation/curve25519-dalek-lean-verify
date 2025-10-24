@@ -28,3 +28,16 @@ features:
     details: Read more about how, what and where.
     link: /details
 ---
+
+<script setup lang="ts">
+import { data as progressData } from './.vitepress/data/progress.data'
+import ProgressChart from './.vitepress/components/ProgressChart.vue'
+
+const { dataPoints } = progressData
+</script>
+
+## Verification Progress
+
+<a href="/curve25519-dalek-lean-verify/status" style="text-decoration: none; color: inherit;">
+  <ProgressChart :dataPoints="dataPoints" />
+</a>
