@@ -3,23 +3,28 @@
 layout: home
 
 hero:
-  name: "Verify curve25519-dalek"
-  text: "A project to formally verify curve25519-dalek"
-  tagline: My great project tagline
-  actions:
-    - theme: brand
-      text: Markdown Examples
-      link: /markdown-examples
-    - theme: alt
-      text: API Examples
-      link: /api-examples
+  name: "Formally verifying"
+  text: "Dalek elliptic curve cryptography"
+  tagline: Project to formally verify the Rust code of curve25519-dalek using Lean
+  image:
+    src: https://cdn.jsdelivr.net/gh/dalek-cryptography/curve25519-dalek/docs/assets/dalek-logo-clear.png
+    alt: dalek-cryptography logo
+  # actions:
+  #   - theme: brand
+  #     text: Markdown Examples
+  #     link: /markdown-examples
+  #   - theme: alt
+  #     text: API Examples
+  #     link: /api-examples
 
 features:
-  - title: Feature A
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature B
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
-  - title: Feature C
-    details: Lorem ipsum dolor sit amet, consectetur adipiscing elit
+  - title: Trust model
+    details: What does we need to trust in order to trust these proofs.
+    link: trust
+  - title: Project progress
+    details: Check out the latest status and track our progress through the codebase.
+    link: /status
+  - title: Project details
+    details: Read more about how, what and where.
+    link: /details
 ---
-

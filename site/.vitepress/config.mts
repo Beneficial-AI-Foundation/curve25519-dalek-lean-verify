@@ -10,12 +10,14 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Project', link: '/details' },
       { text: 'Status', link: '/status' },
       { text: 'Repository', link: '/repo-structure' },
       { text: 'Trust', link: '/trust' }
     ],
 
     sidebar: [
+      { text: 'Project Details', link: '/details' },
       { text: 'Verification Status', link: '/status' },
       { text: 'Repository Structure', link: '/repo-structure' },
       { text: 'Trust Model', link: '/trust' }

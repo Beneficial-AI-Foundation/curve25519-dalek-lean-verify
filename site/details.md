@@ -1,5 +1,36 @@
 # Project details
 
+## Curve25519-dalek
+
+[Curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) is a pure-Rust implementation of group operations on Curve25519. 
+It provides fast, safe cryptographic primitives used by thousands of projects for key agreement, signatures and zero-knowledge proofs.
+
+## Project aims
+
+This project aims to **prove the functional correctness** of the curve25519-dalek implementation. 
+Using [Aeneas](https://github.com/AeneasVerif/aeneas), we obtain a faithful representation of the Rust code in [Lean 4](https://lean-lang.org), a powerful proof assistant. This allows us to harness Lean's mathematical capabilities to write precise specifications and formally prove that the implementation satisfies them.
+
+The aims are two fold:
+
+- Formally verify the chosen subset of functions from this crate
+- Figure out how formal verification can be done on large scale, quicker, cheaper and commonplace
+
+
+## Our Progress
+
+Check out the [verification status](status) to see which functions have been verified and track our progress through the codebase.
+
+## The Scalability Challenge
+
+Formal verification has traditionally been resource-intensive and time-consuming. 
+**Can we find ways to solve the scalability problem of formal verification?** 
+
+If you're interested in the verification methodology or formal methods at scale, we'd love your insights and contributions.
+
+## Trust Model
+
+Read more about the [trust model](trust), what we need to trust to rely on these proofs
+
 ## Source Information
 
 This repository contains the curve25519-dalek Rust crate from:
