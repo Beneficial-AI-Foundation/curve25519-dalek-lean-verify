@@ -33,3 +33,8 @@ verification_progress.svg
 
 # Temporary files
 .tmp/
+
+# VitePress
+node_modules
+site/.vitepress/dist
+site/.vitepress/cache
