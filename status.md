@@ -15,22 +15,22 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | - | ☐ | ☐ |  |
 | `add` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L270-L274) | [Add.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Add.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `add_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L278-L284) | [AddAssign.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | - | ✅ | 📋 | Specified (markus-dablander) |
+| `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L367-L369) | [AsBytes.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean) | ✅ | ✅ | Verified (oliver-butterley) Specified (markus-dablander) |
 | `conditional_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L247-L254) | - | ☐ | ☐ |  |
-| `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L337-L363) | - | ✅ | ☐ | Brackets required in extracted Lean |
+| `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L337-L363) | [FromBytes.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean) | ✅ | 📋 | Brackets required in extracted Lean |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L460-L565) | - | ✅ | ☐ |  |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L290-L323) | [Reduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L561-L561) | - | ✅ | ☐ |  |
 | `square2` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L566-L570) | - | ✅ | ☐ | Loop refactored |
 | `sub` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L288-L305) | - | ✅ | ☐ |  |
 | `sub_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L309-L312) | - | ✅ | ☐ |  |
-| `to_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | - | ✅ | ☐ |  |
+| `to_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L374-L456) | [ToBytes.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean) | ✅ | 📋 |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | - | ✅ | ☐ | Brackets required in extracted Lean |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | - | ✅ | ☐ |  |
 | `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | - | ✅ | ☐ |  |
 | `RR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L148-L154) | - | ✅ | ☐ |  |
 | `m` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L56-L58) | [M.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/M.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | - | ✅ | ☐ |  |
+| `ZERO` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L62-L62) | [Zero.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Zero.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `add` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L159-L174) | [Add.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Add.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `conditional_add_l` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L195-L208) | - | ✅ | ☐ |  |
 | `as_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L317-L323) | [AsMontgomery.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean) | ✅ | 📋 | Specified (markus-dablander) |
@@ -38,8 +38,8 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes_wide` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L87-L116) | [FromBytesWide.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean) | ✅ | 📋 | Nested loop refactored; required shr edit; Specified (markus-dablander) |
 | `from_montgomery` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L324-L432) | [FromMontgomery.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean) | ✅ | 📋 | Loop refactored; Specified (markus-dablander) |
 | `montgomery_mul` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L304-L306) | [MontgomeryMul.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean) | ✅ | 📋 | Specified (markus-dablander) |
-| `montgomery_reduce` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | [MontgomeryReduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean) | ✅ | ☐ |  |
-| `montgomery_square` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | [MontgomerySquare.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean) | ✅ | ☐ |  |
+| `montgomery_reduce` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L253-L258) | [MontgomeryReduce.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean) | ✅ | 📋 | Specified (markus-dablander) |
+| `montgomery_square` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L310-L312) | [MontgomerySquare.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `mul_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L203-L217) | [MulInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `square_internal` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L222-L241) | [SquareInternal.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `sub` | [backend/serial/u64/scalar.rs](curve25519-dalek/src/backend/serial/u64/scalar.rs#L175-L198) | [Sub.lean](Curve25519Dalek/Proofs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean) | ✅ | 📋 | Loop refactored |
@@ -91,7 +91,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1124-L1130) | [Reduce.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Reduce.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L690-L693) | [ToBytes.lean](Curve25519Dalek/Proofs/Scalar/Scalar/ToBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1118-L1121) | [Unpack.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Unpack.lean) | ✅ | 📋 | Specified (markus-dablander) |
-| `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | - | ✅ | ☐ |  |
+| `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | [Zero.lean](Curve25519Dalek/Proofs/Scalar/Scalar/Zero.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 
 ## Legend
 

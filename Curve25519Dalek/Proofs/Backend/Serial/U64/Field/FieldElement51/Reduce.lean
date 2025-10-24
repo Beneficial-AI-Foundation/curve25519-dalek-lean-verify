@@ -45,6 +45,7 @@ attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
 - Does not overflow and hence returns a result
 - All the limbs of the result are small, ≤ 2^(51 + ε)
 - The result is equal to the input mod p. -/
+@[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
     ∃ result, reduce limbs = ok (result) ∧
     (∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧
