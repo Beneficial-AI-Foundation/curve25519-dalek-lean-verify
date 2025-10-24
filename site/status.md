@@ -4,8 +4,11 @@ title: Verification Status
 
 <script setup lang="ts">
 import { data } from './.vitepress/data/status.data'
+import { data as progressData } from './.vitepress/data/progress.data'
+import ProgressChart from './.vitepress/components/ProgressChart.vue'
 
 const { entries, stats } = data
+const { dataPoints } = progressData
 
 // Helper function to extract function name from full path
 function getFunctionName(fullPath: string): string {
@@ -65,7 +68,7 @@ function getVerifiedIcon(status: string): string {
 
 # Verification Status
 
-## Progress Overview
+## Current Status
 
 <div class="stats-grid">
   <div class="stat-card">
@@ -85,6 +88,10 @@ function getVerifiedIcon(status: string): string {
     <div class="stat-label">Verified</div>
   </div>
 </div>
+
+## Progress
+
+<ProgressChart :dataPoints="dataPoints" />
 
 ## Detailed Status
 

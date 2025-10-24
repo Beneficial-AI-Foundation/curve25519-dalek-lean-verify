@@ -5,6 +5,7 @@ export default defineConfig({
   title: "Verify curve25519-dalek",
   description: "A project to formally verify curve25519-dalek",
   base: '/curve25519-dalek-lean-verify/',
+  lastUpdated: true,
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
