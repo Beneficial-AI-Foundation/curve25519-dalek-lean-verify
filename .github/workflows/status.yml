@@ -1,4 +1,4 @@
-name: Check Status Report
+name: Status Report
 
 # This workflow ensures that status.md is kept in sync with status.csv.
 # The status.csv file is the source of truth for verification progress tracking,
@@ -12,8 +12,8 @@ on:
   push:
 
 jobs:
-  check-status:
-    name: Check Status
+  status:
+    name: Status
     runs-on: ubuntu-latest
 
     steps:

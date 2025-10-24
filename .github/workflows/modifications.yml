@@ -1,4 +1,4 @@
-name: Check Modifications Diff
+name: Modifications Diff
 
 # This workflow ensures that src-modifications.diff is kept in sync with the actual
 # modifications made to the curve25519-dalek source code.
@@ -13,8 +13,8 @@ on:
   push:
 
 jobs:
-  check-modifications:
-    name: Check Modifications
+  modifications:
+    name: Modifications
     runs-on: ubuntu-latest
 
     steps:
