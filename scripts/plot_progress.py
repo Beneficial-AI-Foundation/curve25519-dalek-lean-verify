@@ -127,23 +127,23 @@ def main():
     # Calculate the remaining unspecified functions
     unspecified = [t - v - s - d for t, v, s, d in zip(totals, verifieds, specifieds, draft_specs)]
 
-    # Create stacked area plot (reverse order for legend)
+    # Create stacked area plot with step behavior (reverse order for legend)
     ax.fill_between(dates, verified_arr + specified_arr + draft_spec_arr, totals,
-                     alpha=0.5, color='#95a5a6', label='Not started')
+                     alpha=0.5, color='#95a5a6', label='Not started', step='post')
     ax.fill_between(dates, verified_arr + specified_arr,
                      verified_arr + specified_arr + draft_spec_arr,
-                     alpha=0.7, color='#f9e79f', label='Draft')
+                     alpha=0.7, color='#f9e79f', label='Draft', step='post')
     ax.fill_between(dates, verified_arr, verified_arr + specified_arr,
-                     alpha=0.7, color='#5dade2', label='Specified')
+                     alpha=0.7, color='#5dade2', label='Specified', step='post')
     ax.fill_between(dates, 0, verified_arr,
-                     alpha=0.7, color='#2ecc71', label='Verified')
+                     alpha=0.7, color='#2ecc71', label='Verified', step='post')
 
-    # Add straight line plots without markers
-    ax.plot(dates, verifieds, color='darkgreen', linewidth=2, alpha=0.8)
-    ax.plot(dates, totals, color='darkblue', linewidth=2, alpha=0.8)
+    # Add step-style plots (horizontal lines with vertical jumps)
+    ax.plot(dates, verifieds, color='darkgreen', linewidth=2, alpha=0.8, drawstyle='steps-post')
+    ax.plot(dates, totals, color='darkblue', linewidth=2, alpha=0.8, drawstyle='steps-post')
 
     # Add dotted line for extracted (no points)
-    ax.plot(dates, extracteds, ':', color='purple', linewidth=2, alpha=0.7, label='Extracted')
+    ax.plot(dates, extracteds, ':', color='purple', linewidth=2, alpha=0.7, label='Extracted', drawstyle='steps-post')
 
     # Formatting
     ax.set_ylabel('Number of Functions', fontsize=12)
