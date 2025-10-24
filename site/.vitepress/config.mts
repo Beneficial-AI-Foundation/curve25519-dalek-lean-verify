@@ -11,17 +11,14 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Status', link: '/status' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Repository', link: '/repo-structure' },
+      { text: 'Trust', link: '/trust' }
     ],
 
     sidebar: [
-      {
-        text: 'Examples',
-        items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
-        ]
-      }
+      { text: 'Verification Status', link: '/status' },
+      { text: 'Repository Structure', link: '/repo-structure' },
+      { text: 'Trust Model', link: '/trust' }
     ],
 
     socialLinks: [
