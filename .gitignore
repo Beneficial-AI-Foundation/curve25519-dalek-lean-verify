@@ -21,3 +21,15 @@ aeneas
 .logs
 Curve25519Dalek/FunsExternal_Template.lean
 Curve25519Dalek/TypesExternal_Template.lean
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Generated plots
+verification_progress.png
+verification_progress.svg
+
+# Temporary files
+.tmp/

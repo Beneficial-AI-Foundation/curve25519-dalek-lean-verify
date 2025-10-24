@@ -176,13 +176,13 @@ def write_markdown(rows: list, stats: Dict[str, int]) -> None:
         else:
             extracted_pct = draft_spec_pct = specified_pct = verified_pct = pending_pct = 0
 
-        f.write("\n## Summary\n\n")
-        f.write(f"- **Total Functions**: {total}\n")
-        f.write(f"- **Extracted**: {stats['extracted']} / {total} ({extracted_pct}%)\n")
-        f.write(f"- **Draft Spec**: {stats['draft_spec']} / {total} ({draft_spec_pct}%)\n")
-        f.write(f"- **Specified**: {stats['specified']} / {total} ({specified_pct}%)\n")
-        f.write(f"- **Verified**: {stats['verified']} / {total} ({verified_pct}%)\n")
-        f.write(f"- **Pending**: {stats['pending']} / {total} ({pending_pct}%)\n")
+        # f.write("\n## Summary\n\n")
+        # f.write(f"- **Total Functions**: {total}\n")
+        # f.write(f"- **Extracted**: {stats['extracted']} / {total} ({extracted_pct}%)\n")
+        # f.write(f"- **Draft Spec**: {stats['draft_spec']} / {total} ({draft_spec_pct}%)\n")
+        # f.write(f"- **Specified**: {stats['specified']} / {total} ({specified_pct}%)\n")
+        # f.write(f"- **Verified**: {stats['verified']} / {total} ({verified_pct}%)\n")
+        # f.write(f"- **Pending**: {stats['pending']} / {total} ({pending_pct}%)\n")
 
         # Legend
         f.write("\n## Legend\n\n")

@@ -1,0 +1,43 @@
+name: Plot Progress
+
+# This workflow generates a visualization of verification progress over time.
+# It analyzes the git history to track how verification status has evolved.
+# The generated plot is uploaded as an artifact for download.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:  # Also allow manual trigger
+
+jobs:
+  plot-progress:
+    name: Plot Progress
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch full history for git log analysis
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install matplotlib
+
+      - name: Generate progress plot
+        run: python3 scripts/plot_progress.py
+
+      - name: Upload plot as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-progress
+          path: |
+            verification_progress.png
+            verification_progress.svg
+          retention-days: 90
