@@ -17,9 +17,9 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 
 def get_commit_history():
-    """Get list of commits on master branch with timestamps."""
+    """Get list of commits on current branch with timestamps."""
     result = subprocess.run(
-        ['git', 'log', 'master', '--format=%H|%at', '--reverse'],
+        ['git', 'log', '--format=%H|%at', '--reverse'],
         capture_output=True,
         text=True,
         check=True
