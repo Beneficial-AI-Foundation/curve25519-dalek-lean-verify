@@ -7,7 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
 set_option linter.style.setOption false
-set_option maxHeartbeats 1000000
+set_option maxHeartbeats 2000000
 
 /-! # from_bytes
 
@@ -60,6 +60,7 @@ theorem decide_le_eq_false_of_lt {n j : Nat} (hn : j < n) : decide (n ≤ j) = f
   rw [decide_eq_false_iff_not]
   omega
 
+-- TO DO: the following proof is long and repetitive, clean and refine it
 /-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 
 Each bit j of the result corresponds to bit (j mod 8) of byte (j / 8) in the input slice.
@@ -117,12 +118,86 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     all_goals grind
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-
+  · rw [hc]
+    have : j < 32 := by omega
+    have : 24 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 24 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) by grind]
+    rw [show decide (32 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    all_goals grind
+  · rw [hc]
+    have : j < 40 := by omega
+    have : 32 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 32 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) by grind]
+    rw [show decide (32 ≤ j) by grind]
+    rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    all_goals grind
+  · rw [hc]
+    have : j < 48 := by omega
+    have : 40 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 40 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) by grind]
+    rw [show decide (32 ≤ j) by grind]
+    rw [show decide (40 ≤ j) by grind]
+    rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    all_goals grind
+  · rw [hc]
+    have : j < 56 := by omega
+    have : 48 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 48 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) by grind]
+    rw [show decide (32 ≤ j) by grind]
+    rw [show decide (40 ≤ j) by grind]
+    rw [show decide (48 ≤ j) by grind]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    all_goals grind
+  · rw [hc]
+    have : j < 64 := by omega
+    have : 56 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 56 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) by grind]
+    rw [show decide (32 ≤ j) by grind]
+    rw [show decide (40 ≤ j) by grind]
+    rw [show decide (48 ≤ j) by grind]
+    rw [show decide (56 ≤ j) by grind]
+    all_goals grind
 
 
 /-! ## Spec for `from_bytes` -/
