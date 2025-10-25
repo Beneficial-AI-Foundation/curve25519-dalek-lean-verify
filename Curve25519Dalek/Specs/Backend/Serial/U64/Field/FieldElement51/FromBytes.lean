@@ -45,6 +45,11 @@ theorem load8_at_spec (input : Slice U8) (i : Usize)
 
   sorry
 
+
+theorem aux (byte : U8) : byte.val <<< 56 < U64.size := by
+  scalar_tac
+
+
 /-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 
 Each bit j of the result corresponds to bit (j mod 8) of byte (j / 8) in the input slice.
@@ -59,24 +64,26 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     ∃ result, from_bytes.load8_at input i = ok result ∧
     ∀ j : Nat, j < 64 →
       result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8) := by
+  have (byte : U8) : byte.val <<< 8 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 16 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 24 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 32 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 40 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 48 < U64.size := by scalar_tac
+  have (byte : U8) : byte.val <<< 56 < U64.size := by scalar_tac
   unfold from_bytes.load8_at
   progress*
   intro j hj
   simp [*]
   have : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
       j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
-  obtain hc | hc | hc | hc | hc | hc | hc | hc := this
+  obtain hc | hc | hc | hc | hc | hc | hc | hc : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
+      j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
   · rw [hc]
     have : j < 8 := by omega
     repeat rw [Nat.mod_eq_of_lt]
-    simp [Nat.testBit_shiftLeft]
-    grind
-    grind
-    simp only [U64.size, U64.numBits]
-    rw [Nat.shiftLeft_eq]
-
-
-
+    repeat rw [Nat.testBit_shiftLeft]
+    all_goals grind
   · sorry
   · sorry
   · sorry
