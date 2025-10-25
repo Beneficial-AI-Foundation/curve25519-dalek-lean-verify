@@ -45,14 +45,20 @@ theorem load8_at_spec (input : Slice U8) (i : Usize)
 
   sorry
 
-
-theorem aux (byte : U8) : byte.val <<< 56 < U64.size := by
-  scalar_tac
+theorem aux (byte : U8) : byte.val <<< 56 < U64.size := by scalar_tac
 
 theorem byte_testBit_of_ge (j : Nat) (hj : 8 ≤ j) (byte : U8) : (byte.val.testBit j) = false := by
   apply Nat.testBit_lt_two_pow
   calc byte.val < 2 ^ 8 := by scalar_tac
     _ ≤ 2^j := by apply Nat.pow_le_pow_right (by omega); omega
+
+theorem U8_shiftLeft_lt {n : Nat} (hn : n ≤ 56) (byte : U8) : byte.val <<< n < U64.size := by
+  interval_cases n
+  all_goals scalar_tac
+
+theorem decide_le_eq_false_of_lt {n j : Nat} (hn : j < n) : decide (n ≤ j) = false := by
+  rw [decide_eq_false_iff_not]
+  omega
 
 /-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 
@@ -66,55 +72,34 @@ Specification phrased in terms of individual bits:
 theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
     ∃ result, from_bytes.load8_at input i = ok result ∧
-    ∀ j : Nat, j < 64 →
+    ∀ (j : Nat), j < 64 →
       result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8) := by
-  have (byte : U8) : byte.val <<< 8 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 16 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 24 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 32 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 40 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 48 < U64.size := by scalar_tac
-  have (byte : U8) : byte.val <<< 56 < U64.size := by scalar_tac
   unfold from_bytes.load8_at
   progress*
   intro j hj
   simp [*]
-  have : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
-      j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
   obtain hc | hc | hc | hc | hc | hc | hc | hc : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
       j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
   · rw [hc]
     have : j < 8 := by omega
-    repeat rw [Nat.mod_eq_of_lt]
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
     repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j by omega]
     all_goals grind
   · rw [hc]
     have : j < 16 := by omega
     have : 8 ≤ j := by omega
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
-    rw [Nat.mod_eq_of_lt]
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
     repeat rw [Nat.testBit_shiftLeft]
-    have := byte_testBit_of_ge j (by grind)
-    rw [this]
-    have : decide (8 ≤ j) = true := by grind
-    rw [this]
-    have : decide (16 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
-    have : decide (24 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
-    have : decide (32 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
-    have : decide (40 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
-    have : decide (48 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
-    have : decide (56 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
-    rw [this]
+    rw [show j % 8 = j - 8 by omega]
+    rw [byte_testBit_of_ge j (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (16 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (24 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (32 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     all_goals grind
   · sorry
   · sorry
