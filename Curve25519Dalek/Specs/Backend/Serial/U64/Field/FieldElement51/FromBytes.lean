@@ -6,6 +6,9 @@ Authors: Oliver Butterley
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
+set_option linter.style.setOption false
+set_option maxHeartbeats 1000000
+
 /-! # from_bytes
 
 Specification and proof for `FieldElement51::from_bytes`.
@@ -20,7 +23,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 open Aeneas.Std Result
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## Spec for `load8_at` -/
 
@@ -32,16 +35,57 @@ Specification:
 - Requires at least 8 bytes available from index i
 - Returns the 64-bit value formed by bytes[i..i+8] in little-endian order
 -/
-@[progress]
+-- @[progress]
 theorem load8_at_spec (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
-    ∃ result, load8_at input i = ok result ∧
+    ∃ result, from_bytes.load8_at input i = ok result ∧
     result.val = ∑ j ∈ Finset.range 8, 2^(8*j) * (input.val[i.val + j]!).val := by
+  unfold from_bytes.load8_at
+  progress*
+
   sorry
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes
+/-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+Each bit j of the result corresponds to bit (j mod 8) of byte (j / 8) in the input slice.
+
+Specification phrased in terms of individual bits:
+- Bit j of the result equals bit (j mod 8) of input[i + j/8]
+- This captures the little-endian byte ordering where lower-indexed bytes contribute to lower bits
+-/
+@[progress]
+theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
+    (h : i.val + 8 ≤ input.val.length) :
+    ∃ result, from_bytes.load8_at input i = ok result ∧
+    ∀ j : Nat, j < 64 →
+      result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8) := by
+  unfold from_bytes.load8_at
+  progress*
+  intro j hj
+  simp [*]
+  have : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
+      j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
+  obtain hc | hc | hc | hc | hc | hc | hc | hc := this
+  · rw [hc]
+    have : j < 8 := by omega
+    repeat rw [Nat.mod_eq_of_lt]
+    simp [Nat.testBit_shiftLeft]
+    grind
+    grind
+    simp only [U64.size, U64.numBits]
+    rw [Nat.shiftLeft_eq]
+
+
+
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+
+
 
 /-! ## Spec for `from_bytes` -/
 
