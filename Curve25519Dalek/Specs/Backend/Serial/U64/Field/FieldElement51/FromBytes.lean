@@ -39,7 +39,7 @@ Specification:
 theorem load8_at_spec (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
     ∃ result, from_bytes.load8_at input i = ok result ∧
-    result.val = ∑ j ∈ Finset.range 8, 2^(8*j) * (input.val[i.val + j]!).val := by
+    result.val = ∑ j ∈ Finset.range 8, 2 ^ (8 * j) * (input.val[i.val + j]!).val := by
   unfold from_bytes.load8_at
   progress*
 
@@ -49,6 +49,10 @@ theorem load8_at_spec (input : Slice U8) (i : Usize)
 theorem aux (byte : U8) : byte.val <<< 56 < U64.size := by
   scalar_tac
 
+theorem byte_testBit_of_ge (j : Nat) (hj : 8 ≤ j) (byte : U8) : (byte.val.testBit j) = false := by
+  apply Nat.testBit_lt_two_pow
+  calc byte.val < 2 ^ 8 := by scalar_tac
+    _ ≤ 2^j := by apply Nat.pow_le_pow_right (by omega); omega
 
 /-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 
@@ -84,7 +88,34 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     repeat rw [Nat.mod_eq_of_lt]
     repeat rw [Nat.testBit_shiftLeft]
     all_goals grind
-  · sorry
+  · rw [hc]
+    have : j < 16 := by omega
+    have : 8 ≤ j := by omega
+    -- have : j % 8 < 8 := Nat.mod_lt j (by omega : 0 < 8)
+    -- have : j - 8 < 8 := by omega
+    repeat rw [Nat.mod_eq_of_lt]
+    repeat rw [Nat.testBit_shiftLeft]
+    have := byte_testBit_of_ge j (by grind)
+    rw [this]
+    simp
+    have : decide (8 ≤ j) = true := by grind
+    rw [this]
+    have : decide (16 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+    have : decide (24 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+    have : decide (32 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+    have : decide (40 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+    have : decide (48 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+    have : decide (56 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
+    rw [this]
+
+    simp
+    grind
+    -- all_goals grind
   · sorry
   · sorry
   · sorry
