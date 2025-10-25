@@ -91,13 +91,16 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
   · rw [hc]
     have : j < 16 := by omega
     have : 8 ≤ j := by omega
-    -- have : j % 8 < 8 := Nat.mod_lt j (by omega : 0 < 8)
-    -- have : j - 8 < 8 := by omega
-    repeat rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
+    rw [Nat.mod_eq_of_lt]
     repeat rw [Nat.testBit_shiftLeft]
     have := byte_testBit_of_ge j (by grind)
     rw [this]
-    simp
     have : decide (8 ≤ j) = true := by grind
     rw [this]
     have : decide (16 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
@@ -112,10 +115,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [this]
     have : decide (56 ≤ j) = false := by rw [decide_eq_false_iff_not]; omega
     rw [this]
-
-    simp
-    grind
-    -- all_goals grind
+    all_goals grind
   · sorry
   · sorry
   · sorry
