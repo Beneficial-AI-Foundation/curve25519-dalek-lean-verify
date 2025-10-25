@@ -92,7 +92,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
     repeat rw [Nat.testBit_shiftLeft]
     rw [show j % 8 = j - 8 by omega]
-    rw [byte_testBit_of_ge j (by grind)]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
     simp only [ge_iff_le]
     rw [show decide (16 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (24 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
@@ -101,7 +101,22 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     all_goals grind
-  · sorry
+  · rw [hc]
+    have : j < 24 := by omega
+    have : 16 ≤ j := by omega
+    repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
+    repeat rw [Nat.testBit_shiftLeft]
+    rw [show j % 8 = j - 16 by omega]
+    repeat rw [byte_testBit_of_ge _ (by grind)]
+    simp only [ge_iff_le]
+    rw [show decide (8 ≤ j) by grind]
+    rw [show decide (16 ≤ j) by grind]
+    rw [show decide (24 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (32 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
+    all_goals grind
   · sorry
   · sorry
   · sorry
