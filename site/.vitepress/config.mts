@@ -25,6 +25,11 @@ export default defineConfig({
 
     socialLinks: [
       { icon: 'github', link: 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify' }
-    ]
+    ],
+
+    editLink: {
+      pattern: 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/edit/master/site/:path',
+      text: 'Edit this page on GitHub'
+    }
   }
 })
