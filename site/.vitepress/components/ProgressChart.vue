@@ -69,7 +69,7 @@ const chartData = computed(() => {
         order: 1
       },
       {
-        label: 'Specified',
+        label: 'Spec only',
         data: specified,
         borderColor: '#fdba74',
         backgroundColor: 'rgba(253, 186, 116, 0.6)',
@@ -146,8 +146,8 @@ const chartOptions: ChartOptions<'line'> = {
         usePointStyle: true,
         padding: 15,
         filter: function(item, chart) {
-          // Only show Verified, Specified, and Draft in legend
-          return item.text === 'Verified' || item.text === 'Specified' || item.text === 'Draft'
+          // Only show Verified, Spec only, and Draft in legend
+          return item.text === 'Verified' || item.text === 'Spec only' || item.text === 'Draft'
         }
       }
     },
@@ -158,7 +158,7 @@ const chartOptions: ChartOptions<'line'> = {
           const value = context.parsed.y
 
           // For stacked areas, show the actual count, not cumulative
-          if (label === 'Specified' && context.dataIndex !== undefined) {
+          if (label === 'Spec only' && context.dataIndex !== undefined) {
             const verified = props.dataPoints[context.dataIndex].verified
             const specified = props.dataPoints[context.dataIndex].specified
             return `${label}: ${specified}`
