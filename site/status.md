@@ -82,7 +82,7 @@ function getVerifiedIcon(status: string): string {
   <div class="stat-card">
     <div class="stat-value">{{ stats.specified + stats.verified }}</div>
     <div class="stat-label">Specified</div>
-  </div>  
+  </div>
   <div class="stat-card">
     <div class="stat-value">{{ stats.verified }}</div>
     <div class="stat-label">Verified</div>
