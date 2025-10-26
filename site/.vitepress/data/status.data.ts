@@ -20,6 +20,7 @@ export interface StatusData {
   stats: {
     total: number
     extracted: number
+    draft_spec: number
     specified: number
     verified: number
   }
@@ -47,7 +48,8 @@ export default {
     const stats = {
       total: records.length,
       extracted: records.filter(r => r.extracted === 'extracted').length,
-      specified: records.filter(r => r.verified === 'specified' || r.verified === 'draft spec').length,
+      draft_spec: records.filter(r => r.verified === 'draft spec').length,
+      specified: records.filter(r => r.verified === 'specified').length,
       verified: records.filter(r => r.verified === 'verified').length
     }
 
