@@ -18,10 +18,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L389-L391) | [AsBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean) | ✅ | ✅ | Verified (oliver-butterley) Specified (markus-dablander) |
 | `conditional_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L228-L234) | - | ☐ | ☐ |  |
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L360-L385) | [FromBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean) | ✅ | 📋 | Brackets required in extracted Lean |
-| `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L482-L587) | - | ✅ | ☐ |  |
+| `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L482-L587) | - | ✅ | 📋 | Specified (markus-dablander) |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L312-L345) | [Reduce.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `square` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L590-L592) | - | ✅ | ☐ |  |
-| `square2` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L595-L604) | - | ✅ | ☐ | Loop refactored |
+| `square` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L590-L592) | - | ✅ | 📋 | Specified (markus-dablander) |
+| `square2` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L595-L604) | - | ✅ | 📋 | Loop refactored; Specified (markus-dablander) |
 | `sub` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L285-L302) | - | ✅ | ☐ |  |
 | `sub_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L305-L308) | - | ✅ | ☐ |  |
 | `to_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L396-L478) | [ToBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean) | ✅ | 📋 |  |
