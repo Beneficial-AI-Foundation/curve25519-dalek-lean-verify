@@ -11,10 +11,10 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign,curve2
 curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L389-L391,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean,extracted,verified,Verified (oliver-butterley) Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L228-L234,,,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L360-L385,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean,extracted,specified,Brackets required in extracted Lean
-curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k,curve25519-dalek/src/backend/serial/u64/field.rs,L482-L587,,extracted,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k,curve25519-dalek/src/backend/serial/u64/field.rs,L482-L587,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce,curve25519-dalek/src/backend/serial/u64/field.rs,L312-L345,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean,extracted,verified,Verified (oliver-butterley)
-curve25519_dalek::backend::serial::u64::field::FieldElement51::square,curve25519-dalek/src/backend/serial/u64/field.rs,L590-L592,,extracted,,
-curve25519_dalek::backend::serial::u64::field::FieldElement51::square2,curve25519-dalek/src/backend/serial/u64/field.rs,L595-L604,,extracted,,Loop refactored
+curve25519_dalek::backend::serial::u64::field::FieldElement51::square,curve25519-dalek/src/backend/serial/u64/field.rs,L590-L592,,extracted,specified,Specified (markus-dablander)
+curve25519_dalek::backend::serial::u64::field::FieldElement51::square2,curve25519-dalek/src/backend/serial/u64/field.rs,L595-L604,,extracted,specified,Loop refactored; Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub,curve25519-dalek/src/backend/serial/u64/field.rs,L285-L302,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L305-L308,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L396-L478,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean,extracted,specified,
