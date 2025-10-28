@@ -35,7 +35,7 @@ natural language description:
 natural language specs:
 
     • For any two UnpackedScalars m and m' in Montgomery form:
-      - (U64x5_as_Nat m * U64x5_as_Nat m') mod L = (U64x5_as_Nat w * R) mod L
+      - (Scalar52_as_Nat m * Scalar52_as_Nat m') mod L = (Scalar52_as_Nat w * R) mod L
       - This is equivalent to: w represents (m * m' * R⁻¹) mod L
 -/
 
@@ -45,10 +45,8 @@ natural language specs:
   (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 theorem montgomery_mul_spec (m m' : Scalar52) :
-    ∃ w,
-    montgomery_mul m m' = ok w ∧
-    (U64x5_as_Nat m * U64x5_as_Nat m') % L = (U64x5_as_Nat w * R) % L
-    := by
+    ∃ w, montgomery_mul m m' = ok w ∧
+    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

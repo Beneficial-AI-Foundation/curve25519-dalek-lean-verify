@@ -1,10 +1,9 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Oliver Butterley
 -/
-import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 
 /-! # Spec Theorem for `FieldElement51::square`
 
@@ -12,11 +11,7 @@ Specification and proof for `FieldElement51::square`.
 
 This function computes the square of the element.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
-
-## TODO
-- Complete proof
--/
+Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -39,10 +34,10 @@ natural language specs:
 - Note: this implements the `pow2k` function with k=1
 -/
 theorem square_spec (a : Array U64 5#usize) :
-    ∃ r,
-    square a = ok r ∧
-    U64x5_as_Nat r % p = (U64x5_as_Nat a)^2 % p
-    := by
-  sorry
+    ∃ r, square a = ok r ∧
+    U64x5_as_Nat r ≡ (U64x5_as_Nat a)^2 [MOD p] := by
+  unfold square
+  obtain ⟨r, pos, pos'⟩ := pow2k_spec a 1#u32
+  exact ⟨r, pos, by simp_all⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

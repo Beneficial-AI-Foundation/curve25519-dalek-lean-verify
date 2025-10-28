@@ -34,6 +34,10 @@ def h : Nat := 8
 def U64x5_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(51 * i) * (limbs[i]!).val
 
+/-- Auxiliary definition to interpret a Scalar52 (5 u64 limbs with 52-bit representation) as a natural number -/
+def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
+  ∑ i ∈ Finset.range 5, 2^(52 * i) * (limbs[i]!).val
+
 /-- Auxiliary definition to interpret a 9-element u128 array as a natural number.
 This represents the result of polynomial multiplication where each limb is at position 51*i bits. -/
 @[simp]

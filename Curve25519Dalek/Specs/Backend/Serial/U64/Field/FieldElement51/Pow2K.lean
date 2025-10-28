@@ -40,9 +40,8 @@ natural language specs:
 - Note: this generalizes the square operation (square is pow2k with k=1)
 -/
 theorem pow2k_spec (a : Array U64 5#usize) (k : U32) :
-    ∃ r,
-    pow2k a k = ok r ∧
-    U64x5_as_Nat r % p = (U64x5_as_Nat a)^(2^k.val) % p
+    ∃ r, pow2k a k = ok r ∧
+    U64x5_as_Nat r ≡ (U64x5_as_Nat a)^(2^k.val) [MOD p]
     := by
   sorry
 
