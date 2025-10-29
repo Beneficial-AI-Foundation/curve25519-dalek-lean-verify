@@ -157,7 +157,7 @@ Specification:
 @[progress]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     ∃ result, to_bytes self = ok result ∧
-    U8x32_as_Nat result ≡ U64x5_as_Nat self [MOD p] ∧
+    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
     U8x32_as_Nat result < p := by
   unfold to_bytes
   progress*

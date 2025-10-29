@@ -39,16 +39,7 @@ theorem LFACTOR_spec :
     (L * constants.LFACTOR + 1) % (2^52) = 0 ∧
     0 ≤ constants.LFACTOR.val ∧
     constants.LFACTOR.val < 2^52 := by
-  constructor
-  · -- Prove (L * constants.LFACTOR + 1) % (2^52) = 0
-    unfold constants.LFACTOR
-    decide
-  constructor
-  · -- Prove 0 ≤ constants.LFACTOR.val
-    unfold constants.LFACTOR
-    decide
-  · -- Prove constants.LFACTOR.val < 2^52
-    unfold constants.LFACTOR
-    decide
+  unfold constants.LFACTOR
+  decide
 
 end curve25519_dalek.backend.serial.u64

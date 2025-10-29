@@ -37,7 +37,7 @@ theorem square_spec (a : Array U64 5#usize) :
     ∃ r, square a = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] := by
   unfold square
-  obtain ⟨r, pos, pos'⟩ := pow2k_spec a 1#u32
-  exact ⟨r, pos, by simp_all⟩
+  obtain ⟨r, h_eq, ⟨h_mod, _⟩⟩ := pow2k_spec a 1#u32 (by decide)
+  exact ⟨r, h_eq, by simp_all⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

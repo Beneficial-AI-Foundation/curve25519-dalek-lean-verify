@@ -17,7 +17,7 @@ natural language description:
 
 natural language specs:
 
-    • u8x32_to_nat(b) ≡ u64x5_to_nat(fe) (mod p)
+    • U8x32_as_Nat(b) ≡ Field51_as_Nat(fe) (mod p)
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
@@ -34,7 +34,7 @@ Function was deprecated since 4.1.4 and renamed to `to_bytes`. Simply calls the 
 @[progress]
 theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     ∃ result, as_bytes self = ok result ∧
-    U8x32_as_Nat result ≡ U64x5_as_Nat self [MOD p] ∧
+    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
     U8x32_as_Nat result < p := by
   unfold as_bytes
   progress*

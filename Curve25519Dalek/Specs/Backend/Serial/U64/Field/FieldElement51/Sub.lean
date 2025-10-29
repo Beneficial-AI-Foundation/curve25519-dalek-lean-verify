@@ -44,6 +44,7 @@ natural language specs:
   Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
   where p = 2^255 - 19
 -/
+@[progress]
 theorem sub_spec (a b : Array U64 5#usize) :
     ∃ c,
     sub a b = ok c ∧

@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
 /-! # Spec Theorem for `FieldElement51::sub_assign`
 
@@ -14,10 +15,7 @@ This function performs field element subtraction assignment. In the Rust impleme
 this would modify the first operand in-place. In Lean, since values are immutable,
 this simply calls `sub` and returns the result.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
-
-## TODO
-- Complete proof
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
@@ -44,11 +42,11 @@ natural language specs:
   Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
   where p = 2^255 - 19
 -/
+@[progress]
 theorem sub_assign_spec (a b : Array U64 5#usize) :
-    ∃ c,
-    sub_assign a b = ok c ∧
-    Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p
-    := by
-  sorry
+    ∃ c, sub_assign a b = ok c ∧
+    Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p := by
+  unfold sub_assign
+  progress*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
