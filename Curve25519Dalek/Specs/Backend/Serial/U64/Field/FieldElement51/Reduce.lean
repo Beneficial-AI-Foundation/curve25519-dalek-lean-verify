@@ -1,6 +1,3 @@
-import Aeneas
-import Curve25519Dalek.Funs
-import Mathlib
 import Curve25519Dalek.Defs
 
 set_option linter.style.longLine false
@@ -49,7 +46,7 @@ attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
 theorem reduce_spec (limbs : Array U64 5#usize) :
     ∃ result, reduce limbs = ok (result) ∧
     (∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧
-    U64x5_as_Nat limbs ≡ U64x5_as_Nat result [MOD p] := by
+    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
   unfold reduce
   progress*
   all_goals try simp [*]; scalar_tac
@@ -57,4 +54,4 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   · intro i _
     interval_cases i
     all_goals simp [*]; scalar_tac
-  · simp [Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+  · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
