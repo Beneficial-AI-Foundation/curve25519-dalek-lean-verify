@@ -35,12 +35,10 @@ def U64x5_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(51 * i) * (limbs[i]!).val
 
 /-- Auxiliary definition to interpret a Field51 (five u64 limbs used to represent 51 bits each) as a natural number -/
-@[simp]
 def Field51_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(51 * i) * (limbs[i]!).val
 
 /-- Auxiliary definition to interpret a Scalar52 (five u64 limbs used to represent 52 bits each) as a natural number -/
-@[simp]
 def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(52 * i) * (limbs[i]!).val
 

@@ -35,7 +35,7 @@ natural language specs:
 -/
 theorem square_spec (a : Array U64 5#usize) :
     ∃ r, square a = ok r ∧
-    U64x5_as_Nat r ≡ (U64x5_as_Nat a)^2 [MOD p] := by
+    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] := by
   unfold square
   obtain ⟨r, pos, pos'⟩ := pow2k_spec a 1#u32
   exact ⟨r, pos, by simp_all⟩
