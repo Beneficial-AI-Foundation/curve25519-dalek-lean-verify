@@ -222,7 +222,7 @@ Specification:
 @[progress]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     ∃ result, from_bytes bytes = ok result ∧
-    U64x5_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by
+    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

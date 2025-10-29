@@ -32,7 +32,7 @@ natural language description:
 natural language specs:
 
     • For any UnpackedScalar m in Montgomery form:
-      - (U64x5_as_Nat m * U64x5_as_Nat m) mod L = (U64x5_as_Nat w * R) mod L
+      - (Scalar52_as_Nat m * Scalar52_as_Nat m) mod L = (Scalar52_as_Nat w * R) mod L
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_square`**:
@@ -43,7 +43,7 @@ natural language specs:
 theorem montgomery_square_spec (m : Scalar52) :
     ∃ w,
     montgomery_square m = ok w ∧
-    (U64x5_as_Nat m * U64x5_as_Nat m) % L = (U64x5_as_Nat w * R) % L
+    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L
     := by
   sorry
 

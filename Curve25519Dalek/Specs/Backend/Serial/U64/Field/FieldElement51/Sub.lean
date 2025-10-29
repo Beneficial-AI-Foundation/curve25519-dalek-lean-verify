@@ -34,20 +34,20 @@ natural language description:
 natural language specs:
 
     • For all FieldElement51s a and b:
-      U64x5_as_Nat(sub(a, b)) ≡ U64x5_as_Nat(a) - U64x5_as_Nat(b) (mod p)
+      Field51_as_Nat(sub(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
       where p = 2^255 - 19
 -/
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:
 - No panic (always succeeds due to bias addition preventing underflow)
 - The result c satisfies the field subtraction property:
-  U64x5_as_Nat(c) ≡ U64x5_as_Nat(a) - U64x5_as_Nat(b) (mod p)
+  Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
   where p = 2^255 - 19
 -/
 theorem sub_spec (a b : Array U64 5#usize) :
     ∃ c,
     sub a b = ok c ∧
-    U64x5_as_Nat c % p = (U64x5_as_Nat a - U64x5_as_Nat b) % p
+    Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p
     := by
   sorry
 

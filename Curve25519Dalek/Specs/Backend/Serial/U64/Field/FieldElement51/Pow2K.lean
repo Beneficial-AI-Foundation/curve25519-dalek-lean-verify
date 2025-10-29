@@ -31,7 +31,7 @@ natural language description:
 natural language specs:
 
     • The function always succeeds (no panic)
-    • U64x5_as_Nat(result) ≡ U64x5_as_Nat(a)^(2^k) (mod p)
+    • Field51_as_Nat(result) ≡ Field51_as_Nat(a)^(2^k) (mod p)
 -/
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.pow2k`**:
@@ -41,7 +41,7 @@ natural language specs:
 -/
 theorem pow2k_spec (a : Array U64 5#usize) (k : U32) :
     ∃ r, pow2k a k = ok r ∧
-    U64x5_as_Nat r ≡ (U64x5_as_Nat a)^(2^k.val) [MOD p]
+    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p]
     := by
   sorry
 

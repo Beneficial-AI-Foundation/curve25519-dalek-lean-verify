@@ -45,8 +45,8 @@ natural language specs:
 theorem conditional_add_l_spec (u : Scalar52) (c : subtle.Choice) :
     ∃ carry u',
     conditional_add_l u c = ok (carry, u') ∧
-    (c.val = 1#u8 → U64x5_as_Nat u' + carry.val * 2^260 = U64x5_as_Nat u + L) ∧
-    (c.val = 0#u8 → U64x5_as_Nat u' = U64x5_as_Nat u ∧ carry.val = 0)
+    (c.val = 1#u8 → Scalar52_as_Nat u' + carry.val * 2^260 = Scalar52_as_Nat u + L) ∧
+    (c.val = 0#u8 → Scalar52_as_Nat u' = Scalar52_as_Nat u ∧ carry.val = 0)
     := by
   sorry
 
