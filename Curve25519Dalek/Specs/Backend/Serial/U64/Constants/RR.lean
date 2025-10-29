@@ -23,16 +23,16 @@ namespace curve25519_dalek.backend.serial.u64
 /-
 natural language description:
 
-    • RR is a constant representing R² mod L where R = 2^260 and L is the group order
+    • constants.RR is a constant representing R² mod L where R = 2^260 and L is the group order
     • The scalar is represented as five u64 limbs (52-bit limbs)
 
 natural language specs:
 
-    • Scalar52_as_Nat(RR) ≡ R² (mod L) where R = 2^260
+    • Scalar52_as_Nat(constants.RR) ≡ R² (mod L) where R = 2^260
 -/
 
 /-- **Spec and proof concerning `backend.serial.u64.constants.RR`**:
-- The value of RR when converted to a natural number is congruent to R² modulo L
+- The value of constants.RR when converted to a natural number is congruent to R² modulo L
 -/
 theorem RR_spec : Scalar52_as_Nat constants.RR ≡ R ^ 2 [MOD L] := by
   unfold constants.RR
