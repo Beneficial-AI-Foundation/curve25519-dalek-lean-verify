@@ -42,6 +42,10 @@ def Field51_as_Nat (limbs : Array U64 5#usize) : Nat :=
 def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(52 * i) * (limbs[i]!).val
 
+/-- Auxiliary definition to interpret 9 u128 limbs used to represent 52 bits each as a natural number -/
+def Scaklar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
+  ∑ i ∈ Finset.range 9, 2^(52 * i) * (limbs[i]!).val
+
 /-- Auxiliary definition to interpret a 9-element u128 array as a natural number.
 This represents the result of polynomial multiplication where each limb is at position 51*i bits. -/
 @[simp]
