@@ -2,6 +2,7 @@ import Aeneas
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Tactics
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
 set_option linter.style.longLine false
@@ -25,11 +26,6 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `mul_internal` -/
 
-/- Using the specs with bit-vectors -/
--- attribute [-progress] U64.add_spec U64.mul_spec U128.add_spec U128.mul_spec
--- attribute [local progress] U64.add_bv_spec U64.mul_bv_spec U128.add_bv_spec U128.mul_bv_spec
-attribute [progress] m_spec
-
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:
 - Does not error and hence returns a result
 - The result represents the product of the two input field elements
@@ -38,16 +34,12 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
     (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
     ∃ result, mul_internal a b = ok (result) ∧
-    U128x9_as_Nat result = U64x5_as_Nat a * U64x5_as_Nat b := by
+    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b := by
   unfold mul_internal
   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-  -- simp only [Array.getElem!_Nat_eq]
-  have := ha 0 (by simp); have := ha 1 (by simp); have := ha 2 (by simp); have := ha 3 (by simp); have := ha 4 (by simp);
-  have := hb 0 (by simp); have := hb 1 (by simp); have := hb 2 (by simp); have := hb 3 (by simp); have := hb 4 (by simp)
   progress*
-  all_goals try simp [*]; scalar_tac
-  -- remains to show that `U128x9_as_Nat res = U64x5_as_Nat a * U64x5_as_Nat b`
-  simp [*, Finset.sum_range_succ]
-  ring
+  all_goals try expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  simp [*, Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ]
+  grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
