@@ -30,7 +30,7 @@ natural language description:
 natural language specs:
 
     • The function always succeeds (no panic)
-    • U64x5_as_Nat(result) ≡ 2 * U64x5_as_Nat(a)² (mod p)
+    • Field51_as_Nat(result) ≡ 2 * Field51_as_Nat(a)² (mod p)
 -/
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:
@@ -40,7 +40,7 @@ natural language specs:
 theorem square2_spec (a : Array U64 5#usize) :
     ∃ r,
     square2 a = ok r ∧
-    U64x5_as_Nat r % p = (2 * (U64x5_as_Nat a)^2) % p
+    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p
     := by
   sorry
 

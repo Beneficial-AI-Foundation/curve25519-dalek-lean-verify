@@ -24,10 +24,10 @@ namespace curve25519_dalek.scalar.Scalar52
 /-
 natural language description:
 
-    • Takes as input an UnpackedScalar r and returns another UnpackedScalar r’ that
-      represents the multiplicative inverse of r within the underlying
+    • Takes as input an UnpackedScalar u and returns another UnpackedScalar u’ that
+      represents the multiplicative inverse of u within the underlying
       field \mathbb{Z} / \ell \mathbb{Z}. This is done by first
-      converting r into Montgomery form, then inverting with
+      converting u into Montgomery form, then inverting with
       montgomery_invert, and then converting back into UnpackedScalar.
 
 natural language specs:
@@ -40,12 +40,12 @@ natural language specs:
 - Precondition: The unpacked input scalar u must be non-zero (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
 - The result u' satisfies the multiplicative inverse property:
-  U64x5_as_Nat(u) * U64x5_as_Nat(u') ≡ 1 (mod L)
+  Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)
 -/
 theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',
     invert u = ok u' ∧
-    (U64x5_as_Nat u * U64x5_as_Nat u') ≡ 1 [MOD L]
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]
     := by
   sorry
 

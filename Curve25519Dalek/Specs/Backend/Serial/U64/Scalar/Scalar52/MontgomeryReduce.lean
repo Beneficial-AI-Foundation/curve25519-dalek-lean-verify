@@ -37,7 +37,7 @@ natural language specs:
 
     • For any 9-limb array a of u128 values:
       - The function returns a Scalar52 m such that:
-        U64x5_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)
+        Scalar52_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
@@ -48,7 +48,7 @@ natural language specs:
 theorem montgomery_reduce_spec (a : Array U128 9#usize) :
     ∃ m,
     montgomery_reduce a = ok m ∧
-    (U64x5_as_Nat m * R) % L = U128x9_as_Nat a % L
+    (Scalar52_as_Nat m * R) % L = U128x9_as_Nat a % L
     := by
   sorry
 

@@ -39,7 +39,7 @@ natural language specs:
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     ∃ u,
     from_bytes_wide b = ok u ∧
-    U64x5_as_Nat u = U8x64_as_Nat b % L
+    Scalar52_as_Nat u = U8x64_as_Nat b % L
     := by
     sorry
 

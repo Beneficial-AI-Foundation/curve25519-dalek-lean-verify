@@ -42,7 +42,7 @@ theorem unpack_spec (s : Scalar) :
     ∃ u,
     unpack s = ok u ∧
     pack u = ok s ∧
-    U64x5_as_Nat u = U8x32_as_Nat s.bytes
+    Scalar52_as_Nat u = U8x32_as_Nat s.bytes
     := by
   sorry
 

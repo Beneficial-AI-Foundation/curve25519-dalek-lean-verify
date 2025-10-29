@@ -40,7 +40,7 @@ natural language specs:
 theorem to_bytes_spec (u : Scalar52) :
     ∃ b,
     to_bytes u = ok b ∧
-    U8x32_as_Nat b ≡ U64x5_as_Nat u [MOD L]
+    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L]
     := by
     sorry
 

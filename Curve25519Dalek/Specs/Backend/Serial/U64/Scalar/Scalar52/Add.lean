@@ -39,7 +39,7 @@ natural language specs:
 theorem add_spec (u u' : Scalar52) :
     ∃ v,
     add u u' = ok v ∧
-    U64x5_as_Nat v = (U64x5_as_Nat u + U64x5_as_Nat u') % L
+    Scalar52_as_Nat v = (Scalar52_as_Nat u + Scalar52_as_Nat u') % L
     := by
   sorry
 

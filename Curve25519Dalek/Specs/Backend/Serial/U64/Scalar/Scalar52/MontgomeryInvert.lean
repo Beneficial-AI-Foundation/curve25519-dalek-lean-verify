@@ -36,7 +36,7 @@ natural language specs:
 
     • For any non-zero UnpackedScalar u in Montgomery form:
       - The function returns successfully with result u'
-      - (U64x5_as_Nat u * U64x5_as_Nat u') mod L = R² mod L
+      - (Scalar52_as_Nat u * Scalar52_as_Nat u') mod L = R² mod L
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
@@ -48,7 +48,7 @@ natural language specs:
 theorem montgomery_invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',
     montgomery_invert u = ok u' ∧
-    (U64x5_as_Nat u * U64x5_as_Nat u') % L = (R * R) % L
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L
     := by
   sorry
 

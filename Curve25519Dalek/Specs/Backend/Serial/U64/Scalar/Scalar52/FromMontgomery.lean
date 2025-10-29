@@ -40,7 +40,7 @@ natural language specs:
 theorem from_montgomery_spec (m : Scalar52) :
     ∃ u,
     from_montgomery m = ok u ∧
-    (U64x5_as_Nat u * R) % L = U64x5_as_Nat m % L
+    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat m % L
     := by
   sorry
 
