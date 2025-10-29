@@ -21,6 +21,7 @@ open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64
 
 /-
+natural language description:
 
     • RR is a constant representing R² mod L where R = 2^260 and L is the group order
     • The scalar is represented as five u64 limbs (52-bit limbs)
