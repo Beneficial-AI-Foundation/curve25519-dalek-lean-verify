@@ -18,9 +18,9 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::square2,curve2551
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub,curve25519-dalek/src/backend/serial/u64/field.rs,L285-L302,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L305-L308,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L396-L478,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean,extracted,specified,
-curve25519_dalek::backend::serial::u64::constants::L,curve25519-dalek/src/backend/serial/u64/constants.rs,L127-L133,,extracted,,Brackets required in extracted Lean
-curve25519_dalek::backend::serial::u64::constants::LFACTOR,curve25519-dalek/src/backend/serial/u64/constants.rs,L136-L136,,extracted,,
-curve25519_dalek::backend::serial::u64::constants::R,curve25519-dalek/src/backend/serial/u64/constants.rs,L139-L145,,extracted,,
+curve25519_dalek::backend::serial::u64::constants::L,curve25519-dalek/src/backend/serial/u64/constants.rs,L127-L133,,extracted,verified,Brackets required in extracted Lean; Verified (markus-dablander)
+curve25519_dalek::backend::serial::u64::constants::LFACTOR,curve25519-dalek/src/backend/serial/u64/constants.rs,L136-L136,,extracted,verified,Verified (markus-dablander)
+curve25519_dalek::backend::serial::u64::constants::R,curve25519-dalek/src/backend/serial/u64/constants.rs,L139-L145,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::backend::serial::u64::constants::RR,curve25519-dalek/src/backend/serial/u64/constants.rs,L148-L154,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::m,curve25519-dalek/src/backend/serial/u64/scalar.rs,L56-L58,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO,curve25519-dalek/src/backend/serial/u64/scalar.rs,L62-L62,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Zero.lean,extracted,verified,Verified (oliver-butterley)
