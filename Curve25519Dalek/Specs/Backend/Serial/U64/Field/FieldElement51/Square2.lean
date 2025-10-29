@@ -83,14 +83,17 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 - No panic (always returns successfully)
 - The result, when converted to a natural number, is congruent to twice the square of the input modulo p
 -/
+@[progress]
 theorem square2_spec (a : Array U64 5#usize) :
     ∃ r, square2 a = ok r ∧
     Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p
     := by
   unfold square2
-  progress
-
-
-  sorry
+  progress*
+  · intro j hj _
+    have := square_post_1 j hj
+    scalar_tac
+  ·
+    sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
