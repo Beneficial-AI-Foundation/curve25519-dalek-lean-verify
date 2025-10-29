@@ -61,19 +61,19 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
       have : i.val ≠ j := by scalar_tac
       simp_all
     · refine ⟨?_, ?_⟩
-      · intro j hj hj'
+      · intro j hj _
         obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
         · simp_all
         · have := res_post_1 j hj (by omega)
           have := Array.set_of_ne' square i2 j i (by scalar_tac) (by omega)
           have := Array.val_getElem!_eq' square j (by scalar_tac)
           simp_all
-      · intro j hj hj'
+      · intro j hj _
         have := res_post_2 j hj (by omega)
         simp_all
   · use square
     simp only [implies_true, and_true, true_and]
-    intro j hj hj'
+    intro j hj _
     have : j = 5 := by scalar_tac
     omega
   termination_by 5 - i.val
@@ -93,7 +93,12 @@ theorem square2_spec (a : Array U64 5#usize) :
   · intro j hj _
     have := square_post_1 j hj
     scalar_tac
-  ·
-    sorry
+  · have h_doubled : Field51_as_Nat res = 2 * Field51_as_Nat square := by
+      unfold Field51_as_Nat
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      grind
+    rw [Nat.ModEq] at square_post_2
+    rw [h_doubled, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
