@@ -5,6 +5,7 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Mathlib
 
 set_option linter.style.setOption false
 set_option maxHeartbeats 2000000
