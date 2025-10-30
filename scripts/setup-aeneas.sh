@@ -63,19 +63,19 @@ check_dependencies() {
 # Setup OCaml environment
 setup_ocaml() {
     echo "Setting up OCaml environment..."
-    
+
     # Check if OCaml switch already exists
-    if opam switch list | grep -q "4.14.2"; then
-        echo "✓ OCaml 4.14.2 switch already exists"
-        opam switch 4.14.2
+    if opam switch list | grep -q "5.2.0"; then
+        echo "✓ OCaml 5.2.0 switch already exists"
+        opam switch 5.2.0
     else
-        echo "Creating OCaml 4.14.2 switch..."
-        opam switch create 4.14.2
+        echo "Creating OCaml 5.2.0 switch..."
+        opam switch create 5.2.0
     fi
-    
+
     # Update opam environment
     eval $(opam env)
-    
+
     echo "✓ OCaml environment ready"
     echo
 }
@@ -94,15 +94,19 @@ install_ocaml_deps() {
 # Clone Aeneas repository
 clone_aeneas() {
     echo "Cloning Aeneas repository..."
-    
+
+    AENEAS_BRANCH="son/regions2"  # PR #600
+
     if [ -d "aeneas" ]; then
         echo "✓ Aeneas directory already exists, pulling latest changes..."
         cd aeneas
-        git pull origin main
+        git fetch origin
+        git checkout $AENEAS_BRANCH
+        git pull origin $AENEAS_BRANCH
         cd ..
     else
-        git clone https://github.com/AeneasVerif/aeneas.git
-        echo "✓ Aeneas repository cloned"
+        git clone --branch $AENEAS_BRANCH https://github.com/AeneasVerif/aeneas.git
+        echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
     fi
     echo
 }
