@@ -16,6 +16,7 @@ CHARON_BIN="./aeneas/charon/bin/charon"
 AENEAS_BIN="./aeneas/bin/aeneas"
 OUTPUT_DIR="Curve25519Dalek"
 FUNCTIONS_FILE="extract-functions.txt"
+TWEAKS_FILE="aeneas-tweaks.txt"
 
 # RUSTFLAGS are configured in .cargo/config.toml:
 # - curve25519_dalek_backend="serial" (pure Rust implementation without SIMD)
@@ -113,17 +114,66 @@ generate_llbc() {
 # Generate Lean files using Aeneas
 generate_lean() {
     echo "Step 2: Generating Lean files with Aeneas..."
-    
+
     # Create output directory if it doesn't exist
     mkdir -p "$OUTPUT_DIR"
-    
+
     # Run Aeneas to generate Lean files
     echo "Running: $AENEAS_BIN -backend lean -split-files -dest $OUTPUT_DIR $LLBC_FILE"
     echo "Logging output to .logs/aeneas.log"
     "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee .logs/aeneas.log
-    
+
     echo "✓ Lean files generated in $OUTPUT_DIR"
     echo
+}
+
+# Apply tweaks to generated Lean files
+apply_tweaks() {
+    local input_file="$1"
+    local tweaks_file="$2"
+
+    if [ ! -f "$tweaks_file" ]; then
+        echo "No tweaks file found at $tweaks_file, skipping tweaks"
+        return
+    fi
+
+    echo "Applying tweaks from $tweaks_file to $input_file..."
+
+    local content=$(cat "$input_file")
+    local find_text=""
+    local replace_text=""
+    local in_find=false
+    local in_replace=false
+
+    while IFS= read -r line; do
+        if [[ "$line" == "===FIND===" ]]; then
+            in_find=true
+            in_replace=false
+            find_text=""
+        elif [[ "$line" == "===REPLACE===" ]]; then
+            in_find=false
+            in_replace=true
+            replace_text=""
+        elif [[ "$line" == "" ]] && [[ "$in_replace" == true ]]; then
+            # End of a substitution block - apply it (replaces ALL occurrences)
+            content="${content//"$find_text"/"$replace_text"}"
+            in_replace=false
+            find_text=""
+            replace_text=""
+        elif [[ "$in_find" == true ]]; then
+            find_text="${find_text}${find_text:+$'\n'}${line}"
+        elif [[ "$in_replace" == true ]]; then
+            replace_text="${replace_text}${replace_text:+$'\n'}${line}"
+        fi
+    done < "$tweaks_file"
+
+    # Apply last substitution if file doesn't end with blank line
+    if [[ "$in_replace" == true ]] && [[ -n "$find_text" ]]; then
+        content="${content//"$find_text"/"$replace_text"}"
+    fi
+
+    echo "$content" > "$input_file"
+    echo "✓ Tweaks applied to $input_file"
 }
 
 # Update lean-toolchain to match Aeneas
@@ -152,6 +202,10 @@ main() {
     check_tools
     generate_llbc
     generate_lean
+
+    # Apply tweaks to Funs.lean if tweaks file exists
+    apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+
     sync_toolchain
 
     echo "=== Extraction Complete! ==="
