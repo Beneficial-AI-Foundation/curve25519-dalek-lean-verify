@@ -30,12 +30,25 @@ structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   mul : Self → Rhs → Result Self_Output
 
+/- Trait declaration: [core::ops::arith::Neg]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 682:0-682:13
+   Name pattern: [core::ops::arith::Neg] -/
+structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
+  neg : Self → Result Self_Output
+
 /- Trait declaration: [core::ops::bit::BitAnd]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
    Name pattern: [core::ops::bit::BitAnd] -/
 structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitand : Self → Rhs → Result Self_Output
+
+/- Trait declaration: [core::ops::bit::BitOr]
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 244:0-244:27
+   Name pattern: [core::ops::bit::BitOr] -/
+structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  bitor : Self → Rhs → Result Self_Output
 
 /- [core::panicking::AssertKind]
    Source: '/rustc/library/core/src/panicking.rs', lines 382:0-382:19
@@ -57,6 +70,14 @@ structure subtle.ConstantTimeEq (Self : Type) where
 structure subtle.ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   conditional_select : Self → Self → subtle.Choice → Result Self
+  conditional_assign : Self → Self → subtle.Choice → Result Self
+  conditional_swap : Self → Self → subtle.Choice → Result (Self × Self)
+
+/- Trait declaration: [subtle::ConditionallyNegatable]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 604:0-604:32
+   Name pattern: [subtle::ConditionallyNegatable] -/
+structure subtle.ConditionallyNegatable (Self : Type) where
+  conditional_negate : Self → subtle.Choice → Result Self
 
 /- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
