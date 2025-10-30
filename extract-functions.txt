@@ -42,3 +42,4 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double
+curve25519_dalek::backend::serial::u64::field::FieldElement51::pow22501

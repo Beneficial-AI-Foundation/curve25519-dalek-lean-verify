@@ -9,6 +9,13 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait declaration: [core::ops::arith::Mul]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 323:0-323:25
+   Name pattern: [core::ops::arith::Mul] -/
+structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  mul : Self → Rhs → Result Self_Output
+
 /- Trait declaration: [core::ops::bit::BitAnd]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
    Name pattern: [core::ops::bit::BitAnd] -/

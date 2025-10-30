@@ -31,7 +31,7 @@ def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
    Name pattern: [subtle::ConstantTimeEq<[@T]>] -/
 @[reducible]
-noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
   subtle.ConstantTimeEq T) : subtle.ConstantTimeEq (Slice T) := {
   ct_eq := subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst
 }
@@ -418,10 +418,10 @@ def backend.serial.curve_models.ProjectivePoint.double
 def backend.serial.u64.constants.L_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    (Array.make 5#usize [
+    Array.make 5#usize [
       671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
       17592186044416#u64
-      ])
+      ]
 @[global_simps, irreducible]
 def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.L_body
@@ -441,10 +441,10 @@ def backend.serial.u64.constants.LFACTOR : U64 :=
 def backend.serial.u64.constants.R_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    (Array.make 5#usize [
+    Array.make 5#usize [
       4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
       4503599627370495#u64, 17592186044415#u64
-      ])
+      ]
 @[global_simps, irreducible]
 def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.R_body
@@ -455,13 +455,246 @@ def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
 def backend.serial.u64.constants.RR_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    (Array.make 5#usize [
+    Array.make 5#usize [
       2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
       1087343033131391#u64, 10175238647962#u64
-      ])
+      ]
 @[global_simps, irreducible]
 def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.RR_body
+
+/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 99:8-99:66 -/
+def
+  backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+  (x : U64) (y : U64) : Result U128 :=
+  do
+  let i ← (↑(UScalar.cast .U128 x) : Result U128)
+  let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
+  i * i1
+
+/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::LOW_51_BIT_MASK]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 152:8-152:54 -/
+@[global_simps]
+def
+  backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK_body
+  : Result U64 :=
+  do
+  let i ← 1#u64 <<< 51#i32
+  i - 1#u64
+@[global_simps, irreducible]
+def
+  backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK
+  : U64 :=
+  eval_global
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK_body
+
+/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 95:4-193:5 -/
+def
+  backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  :=
+  do
+  let i ← Array.index_usize _rhs 1#usize
+  let b1_19 ← i * 19#u64
+  let i1 ← Array.index_usize _rhs 2#usize
+  let b2_19 ← i1 * 19#u64
+  let i2 ← Array.index_usize _rhs 3#usize
+  let b3_19 ← i2 * 19#u64
+  let i3 ← Array.index_usize _rhs 4#usize
+  let b4_19 ← i3 * 19#u64
+  let i4 ← Array.index_usize self 0#usize
+  let i5 ← Array.index_usize _rhs 0#usize
+  let i6 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i4 i5
+  let i7 ← Array.index_usize self 4#usize
+  let i8 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i7 b1_19
+  let i9 ← i6 + i8
+  let i10 ← Array.index_usize self 3#usize
+  let i11 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i10 b2_19
+  let i12 ← i9 + i11
+  let i13 ← Array.index_usize self 2#usize
+  let i14 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i13 b3_19
+  let i15 ← i12 + i14
+  let i16 ← Array.index_usize self 1#usize
+  let i17 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i16 b4_19
+  let c0 ← i15 + i17
+  let i18 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i16 i5
+  let i19 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i4 i
+  let i20 ← i18 + i19
+  let i21 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i7 b2_19
+  let i22 ← i20 + i21
+  let i23 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i10 b3_19
+  let i24 ← i22 + i23
+  let i25 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i13 b4_19
+  let c1 ← i24 + i25
+  let i26 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i13 i5
+  let i27 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i16 i
+  let i28 ← i26 + i27
+  let i29 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i4 i1
+  let i30 ← i28 + i29
+  let i31 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i7 b3_19
+  let i32 ← i30 + i31
+  let i33 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i10 b4_19
+  let c2 ← i32 + i33
+  let i34 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i10 i5
+  let i35 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i13 i
+  let i36 ← i34 + i35
+  let i37 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i16 i1
+  let i38 ← i36 + i37
+  let i39 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i4 i2
+  let i40 ← i38 + i39
+  let i41 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i7 b4_19
+  let c3 ← i40 + i41
+  let i42 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i7 i5
+  let i43 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i10 i
+  let i44 ← i42 + i43
+  let i45 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i13 i1
+  let i46 ← i44 + i45
+  let i47 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i16 i2
+  let i48 ← i46 + i47
+  let i49 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.m
+      i4 i3
+  let c4 ← i48 + i49
+  let i50 ← 1#u64 <<< 54#i32
+  massert (i4 < i50)
+  massert (i5 < i50)
+  massert (i16 < i50)
+  massert (i < i50)
+  massert (i13 < i50)
+  massert (i1 < i50)
+  massert (i10 < i50)
+  massert (i2 < i50)
+  massert (i7 < i50)
+  massert (i3 < i50)
+  let out := Array.repeat 5#usize 0#u64
+  let i51 ← c0 >>> 51#i32
+  let i52 ← (↑(UScalar.cast .U64 i51) : Result U64)
+  let i53 ← (↑(UScalar.cast .U128 i52) : Result U128)
+  let c11 ← c1 + i53
+  let i54 ← (↑(UScalar.cast .U64 c0) : Result U64)
+  let i55 ←
+    (↑(i54 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out1 ← Array.update out 0#usize i55
+  let i56 ← c11 >>> 51#i32
+  let i57 ← (↑(UScalar.cast .U64 i56) : Result U64)
+  let i58 ← (↑(UScalar.cast .U128 i57) : Result U128)
+  let c21 ← c2 + i58
+  let i59 ← (↑(UScalar.cast .U64 c11) : Result U64)
+  let i60 ←
+    (↑(i59 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out2 ← Array.update out1 1#usize i60
+  let i61 ← c21 >>> 51#i32
+  let i62 ← (↑(UScalar.cast .U64 i61) : Result U64)
+  let i63 ← (↑(UScalar.cast .U128 i62) : Result U128)
+  let c31 ← c3 + i63
+  let i64 ← (↑(UScalar.cast .U64 c21) : Result U64)
+  let i65 ←
+    (↑(i64 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out3 ← Array.update out2 2#usize i65
+  let i66 ← c31 >>> 51#i32
+  let i67 ← (↑(UScalar.cast .U64 i66) : Result U64)
+  let i68 ← (↑(UScalar.cast .U128 i67) : Result U128)
+  let c41 ← c4 + i68
+  let i69 ← (↑(UScalar.cast .U64 c31) : Result U64)
+  let i70 ←
+    (↑(i69 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out4 ← Array.update out3 3#usize i70
+  let i71 ← c41 >>> 51#i32
+  let carry ← (↑(UScalar.cast .U64 i71) : Result U64)
+  let i72 ← (↑(UScalar.cast .U64 c41) : Result U64)
+  let i73 ←
+    (↑(i72 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out5 ← Array.update out4 4#usize i73
+  let i74 ← carry * 19#u64
+  let i75 ← Array.index_usize out5 0#usize
+  let i76 ← i75 + i74
+  let out6 ← Array.update out5 0#usize i76
+  let i77 ← Array.index_usize out6 0#usize
+  let i78 ← i77 >>> 51#i32
+  let i79 ← Array.index_usize out6 1#usize
+  let i80 ← i79 + i78
+  let out7 ← Array.update out6 1#usize i80
+  let i81 ← Array.index_usize out7 0#usize
+  let i82 ←
+    (↑(i81 &&&
+      backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out8 ← Array.update out7 0#usize i82
+  ok out8
+
+/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 91:0-194:1 -/
+@[reducible]
+def
+  core.ops.arith.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+  : core.ops.arith.Mul backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  mul :=
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+}
 
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 305:4-308:5 -/
@@ -550,7 +783,7 @@ def backend.serial.u64.field.FieldElement51.from_bytes
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
   let i13 ← i12 >>> 12#i32
   let i14 ← (↑(i13 &&& low_51_bit_mask) : Result U64)
-  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
+  ok Array.make 5#usize [ i2, i5, i8, i11, i14 ]
 
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 396:4-478:5 -/
@@ -1201,7 +1434,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
     backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i49
   let r4 ← (↑(UScalar.cast .U64 carry8) : Result U64)
   backend.serial.u64.scalar.Scalar52.sub
-    (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
+    Array.make 5#usize [ r0, r1, r2, r3, r4 ] backend.serial.u64.constants.L
 
 /- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 326:4-328:5 -/
@@ -1659,6 +1892,57 @@ def edwards.EdwardsPoint.as_projective
   Result backend.serial.curve_models.ProjectivePoint
   :=
   ok { X := self.X, Y := self.Y, Z := self.Z }
+
+/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501]:
+   Source: 'curve25519-dalek/src/field.rs', lines 170:4-204:5 -/
+def field.FieldElement51.pow22501
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result (backend.serial.u64.field.FieldElement51 ×
+    backend.serial.u64.field.FieldElement51)
+  :=
+  do
+  let t0 ← backend.serial.u64.field.FieldElement51.square self
+  let fe ← backend.serial.u64.field.FieldElement51.square t0
+  let t1 ← backend.serial.u64.field.FieldElement51.square fe
+  let t2 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self t1
+  let t3 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t0 t2
+  let t4 ← backend.serial.u64.field.FieldElement51.square t3
+  let t5 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t2 t4
+  let t6 ← backend.serial.u64.field.FieldElement51.pow2k t5 5#u32
+  let t7 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t6 t5
+  let t8 ← backend.serial.u64.field.FieldElement51.pow2k t7 10#u32
+  let t9 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t8 t7
+  let t10 ← backend.serial.u64.field.FieldElement51.pow2k t9 20#u32
+  let t11 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t10 t9
+  let t12 ← backend.serial.u64.field.FieldElement51.pow2k t11 10#u32
+  let t13 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t12 t7
+  let t14 ← backend.serial.u64.field.FieldElement51.pow2k t13 50#u32
+  let t15 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t14 t13
+  let t16 ← backend.serial.u64.field.FieldElement51.pow2k t15 100#u32
+  let t17 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t16 t15
+  let t18 ← backend.serial.u64.field.FieldElement51.pow2k t17 50#u32
+  let t19 ←
+    backend.serial.u64.field.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      t18 t13
+  ok (t19, t3)
 
 /- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 229:4-231:5 -/
