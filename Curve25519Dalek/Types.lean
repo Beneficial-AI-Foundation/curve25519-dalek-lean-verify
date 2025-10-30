@@ -63,14 +63,6 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
-@[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
-
-/- [curve25519_dalek::edwards::CompressedEdwardsY]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
-@[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
-
 /- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
@@ -78,6 +70,14 @@ structure edwards.EdwardsPoint where
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
+
+/- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
+@[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
+
+/- [curve25519_dalek::edwards::CompressedEdwardsY]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
+@[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
 
 /- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
