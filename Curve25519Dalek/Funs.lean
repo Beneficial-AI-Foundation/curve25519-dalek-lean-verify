@@ -1961,6 +1961,12 @@ def edwards.EdwardsPoint.mul_by_pow_2
   let cp ← backend.serial.curve_models.ProjectivePoint.double s1
   backend.serial.curve_models.CompletedPoint.as_extended cp
 
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 1323:4-1325:5 -/
+def edwards.EdwardsPoint.mul_by_cofactor
+  (self : edwards.EdwardsPoint) : Result edwards.EdwardsPoint :=
+  edwards.EdwardsPoint.mul_by_pow_2 self 3#u32
+
 /- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501]:
    Source: 'curve25519-dalek/src/field.rs', lines 170:4-204:5 -/
 def field.FieldElement51.pow22501
