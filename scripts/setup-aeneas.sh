@@ -63,19 +63,19 @@ check_dependencies() {
 # Setup OCaml environment
 setup_ocaml() {
     echo "Setting up OCaml environment..."
-    
+
     # Check if OCaml switch already exists
-    if opam switch list | grep -q "4.14.2"; then
-        echo "✓ OCaml 4.14.2 switch already exists"
-        opam switch 4.14.2
+    if opam switch list | grep -q "5.2.0"; then
+        echo "✓ OCaml 5.2.0 switch already exists"
+        opam switch 5.2.0
     else
-        echo "Creating OCaml 4.14.2 switch..."
-        opam switch create 4.14.2
+        echo "Creating OCaml 5.2.0 switch..."
+        opam switch create 5.2.0
     fi
-    
+
     # Update opam environment
     eval $(opam env)
-    
+
     echo "✓ OCaml environment ready"
     echo
 }
