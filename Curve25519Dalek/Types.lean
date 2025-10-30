@@ -9,6 +9,20 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait declaration: [core::ops::arith::Add]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 78:0-78:25
+   Name pattern: [core::ops::arith::Add] -/
+structure core.ops.arith.Add (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  add : Self → Rhs → Result Self_Output
+
+/- Trait declaration: [core::ops::arith::Sub]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 190:0-190:25
+   Name pattern: [core::ops::arith::Sub] -/
+structure core.ops.arith.Sub (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  sub : Self → Rhs → Result Self_Output
+
 /- Trait declaration: [core::ops::arith::Mul]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 323:0-323:25
    Name pattern: [core::ops::arith::Mul] -/
@@ -78,6 +92,10 @@ structure edwards.EdwardsPoint where
 /- [curve25519_dalek::edwards::CompressedEdwardsY]
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
+
+/- [curve25519_dalek::montgomery::MontgomeryPoint]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
+@[reducible] def montgomery.MontgomeryPoint := (Array U8 32#usize)
 
 /- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/

@@ -66,6 +66,21 @@ core.ops.arith.Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curv
 core.ops.arith.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
 
 ===FIND===
+Add&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+===REPLACE===
+Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
+backend.serial.u64.field.Sub&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+===REPLACE===
+backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
+core.ops.arith.Sub&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+===REPLACE===
+core.ops.arith.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
   ok Array.make 5#usize [ i2, i5, i8, i11, i14 ]
 ===REPLACE===
   ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
