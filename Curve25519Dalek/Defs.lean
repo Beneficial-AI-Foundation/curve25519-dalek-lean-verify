@@ -18,7 +18,7 @@ def L : Nat := 2^252 + 27742317777372353535851937790883648493
 /-- The Montgomery constant R = 2^260 used for Scalar52 Montgomery form conversions -/
 def R : Nat := 2^260
 
-/-- The cofactor of curve25519 -/
+/-- The cofactor of Curve25519 -/
 def h : Nat := 8
 
 /-! ## Auxiliary definitions for interpreting arrays as natural numbers -/
@@ -40,11 +40,9 @@ def U128x9_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(51 * i) * (limbs[i]!).val
 
 /-- Interpret a 32-element byte array as a natural number. -/
-@[simp]
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
 
 /-- Interpret a 64-element byte array as a natural number. -/
-@[simp]
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val

@@ -1,4 +1,6 @@
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Funs
+import Mathlib
 
 set_option linter.style.longLine false
 set_option linter.style.setOption false
