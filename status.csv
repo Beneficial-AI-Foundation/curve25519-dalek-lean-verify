@@ -1,15 +1,15 @@
 function,source,lines,spec_theorem,extracted,verified,notes
-curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L368-L375,,,,
-curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L356-L362,,,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,,,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L233-L239,,,,
-curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L103-L144,,,,
-curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,,,,
+curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L368-L375,Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean,,,
+curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L356-L362,Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean,,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean,,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean,extracted,specified,Specified (markus-dablander)
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L233-L239,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean,,,
+curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L103-L144,Curve25519Dalek/Specs/Backend/Serial/ScalarMul/Straus/Straus/MultiscalarMul.lean,,,
+curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean,,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::add,curve25519-dalek/src/backend/serial/u64/field.rs,L269-L273,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L276-L282,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L389-L391,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean,extracted,verified,Verified (oliver-butterley) Specified (markus-dablander)
-curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L228-L234,,,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L228-L234,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean,,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L360-L385,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean,extracted,specified,Brackets required in extracted Lean
 curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k,curve25519-dalek/src/backend/serial/u64/field.rs,L482-L587,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::field::FieldElement51::pow22501,curve25519-dalek/src/field.rs,L170-L204,,extracted,,
@@ -38,37 +38,37 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal,curve2551
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal,curve25519-dalek/src/backend/serial/u64/scalar.rs,L250-L269,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub,curve25519-dalek/src/backend/serial/u64/scalar.rs,L195-L211,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean,extracted,specified,Loop refactored
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes,curve25519-dalek/src/backend/serial/u64/scalar.rs,L137-L174,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/mod.rs,L196-L220,,,,
-curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L267-L277,,,,
+curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/mod.rs,L196-L220,Curve25519Dalek/Specs/Backend/StrausMultiscalarMul.lean,,,
+curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L267-L277,Curve25519Dalek/Specs/Backend/VartimeDoubleBaseMul.lean,,,
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L189-L191,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean,extracted,verified,Verified (oliver-butterley)
-curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,,,,
-curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,,extracted,verified,Verified (markus-dablander)
-curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,,,,
-curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,,,,
-curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,,,,
-curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,,,,
-curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,,,,
-curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,,,,
-curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,,,,
-curve25519_dalek::edwards::EdwardsPoint::multiscalar_mul,curve25519-dalek/src/edwards.rs,L799-L804,,,,
-curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,,,,
-curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,,,,
-curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,,,,
-curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,,extracted,verified,Verified (markus-dablander)
-curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,,,,
-curve25519_dalek::ristretto::CompressedRistretto::from_slice,curve25519-dalek/src/ristretto.rs,L244-L246,,,,
-curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,,extracted,verified,Verified (markus-dablander)
-curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristretto.rs,L488-L522,,,,
-curve25519_dalek::ristretto::RistrettoPoint::default,curve25519-dalek/src/ristretto.rs,L813-L816,,,,
-curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch,curve25519-dalek/src/ristretto.rs,L552-L636,,,,
-curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor,curve25519-dalek/src/ristretto.rs,L656-L692,,,,
-curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,,,,
-curve25519_dalek::ristretto::RistrettoPoint::identity,curve25519-dalek/src/ristretto.rs,L807-L810,,,,
-curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,,,,
-curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul,curve25519-dalek/src/ristretto.rs,L980-L990,,,,
+curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,Verified (markus-dablander)
+curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::multiscalar_mul,curve25519-dalek/src/edwards.rs,L799-L804,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MultiscalarMul.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean,,,
+curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean,,,
+curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean,extracted,verified,Verified (markus-dablander)
+curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean,,,
+curve25519_dalek::ristretto::CompressedRistretto::from_slice,curve25519-dalek/src/ristretto.rs,L244-L246,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean,,,
+curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean,extracted,verified,Verified (markus-dablander)
+curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristretto.rs,L488-L522,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::default,curve25519-dalek/src/ristretto.rs,L813-L816,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Default.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch,curve25519-dalek/src/ristretto.rs,L552-L636,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/DoubleAndCompressBatch.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor,curve25519-dalek/src/ristretto.rs,L656-L692,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::identity,curve25519-dalek/src/ristretto.rs,L807-L810,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul,curve25519-dalek/src/ristretto.rs,L980-L990,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MultiscalarMul.lean,,,
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert,curve25519-dalek/src/scalar.rs,L1208-L1210,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_invert,curve25519-dalek/src/scalar.rs,L1150-L1205,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve25519-dalek/src/scalar.rs,L1141-L1145,Curve25519Dalek/Specs/Scalar/Backend/Serial/U64/Scalar/Scalar52/Pack.lean,extracted,specified,Specified (markus-dablander)
+curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve25519-dalek/src/scalar.rs,L1141-L1145,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs,L1388-L1393,Curve25519Dalek/Specs/Scalar/ClampInteger.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1352-L1366,Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean,,draft spec,NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L706-L708,Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean,extracted,verified,Verified (markus-dablander)
