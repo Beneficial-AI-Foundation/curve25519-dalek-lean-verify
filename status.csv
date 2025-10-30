@@ -2,7 +2,7 @@ function,source,lines,spec_theorem,extracted,verified,notes
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L368-L375,,,,
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L356-L362,,,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,,,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,,extracted,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L233-L239,,,,
 curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L103-L144,,,,
 curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,,,,
@@ -41,7 +41,7 @@ curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/m
 curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L267-L277,,,,
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L189-L191,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,,,,
-curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,,extracted,,
+curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,,,,
 curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,,,,
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,,,,
