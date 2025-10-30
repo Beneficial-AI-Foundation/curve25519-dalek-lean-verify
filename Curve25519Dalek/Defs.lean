@@ -1,6 +1,4 @@
 import Aeneas
-import Curve25519Dalek.Funs
-import Mathlib
 
 /-! # Definitions
 
@@ -8,9 +6,6 @@ Common definitions used across spec theorems.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek
-
-attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Constants -/
 
@@ -41,16 +36,15 @@ def Scalar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(52 * i) * (limbs[i]!).val
 
 /-- Interpret a 9-element u128 array (each limb representing 51 bits) as a natural number. -/
-@[simp]
 def U128x9_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(51 * i) * (limbs[i]!).val
 
-/-- Auxiliary definition to interpret a byte array as a natural number (little-endian) -/
+/-- Interpret a 32-element byte array as a natural number. -/
 @[simp]
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
 
-/-- Auxiliary definition to interpret a wide byte array (64 bytes) as a natural number (little-endian) -/
+/-- Interpret a 64-element byte array as a natural number. -/
 @[simp]
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
