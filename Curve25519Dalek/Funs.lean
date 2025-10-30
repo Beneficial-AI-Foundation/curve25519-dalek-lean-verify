@@ -1962,6 +1962,30 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery
     backend.serial.u64.scalar.Scalar52.from_montgomery_loop self limbs 0#usize
   backend.serial.u64.scalar.Scalar52.montgomery_reduce limbs1
 
+/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative]:
+   Source: 'curve25519-dalek/src/field.rs', lines 150:4-153:5 -/
+def field.FieldElement51.is_negative
+  (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice :=
+  do
+  let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
+  let i ← Array.index_usize bytes 0#usize
+  let i1 ← (↑(i &&& 1#u8) : Result U8)
+  core.convert.IntoFrom.into core.convert.FromsubtleChoiceU8 i1
+
+/- [curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 71:4-75:5 -/
+def edwards.affine.AffinePoint.compress
+  (self : edwards.affine.AffinePoint) : Result edwards.CompressedEdwardsY :=
+  do
+  let s ← backend.serial.u64.field.FieldElement51.to_bytes self.y
+  let c ← field.FieldElement51.is_negative self.x
+  let i ← subtle.Choice.unwrap_u8 c
+  let i1 ← i <<< 7#i32
+  let i2 ← Array.index_usize s 31#usize
+  let i3 ← (↑(i2 ^^^ i1) : Result U8)
+  let s1 ← Array.update s 31#usize i3
+  ok s1
+
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 189:4-191:5 -/
 def edwards.CompressedEdwardsY.as_bytes
@@ -2039,6 +2063,20 @@ def field.FieldElement51.invert
   backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
     t20 t3
 
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 555:4-560:5 -/
+def edwards.EdwardsPoint.to_affine
+  (self : edwards.EdwardsPoint) : Result edwards.affine.AffinePoint :=
+  do
+  let recip ← field.FieldElement51.invert self.Z
+  let x ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.X recip
+  let y ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.Y recip
+  ok { x, y }
+
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 571:4-581:5 -/
 def edwards.EdwardsPoint.to_montgomery
@@ -2056,6 +2094,14 @@ def edwards.EdwardsPoint.to_montgomery
       U fe
   let a ← backend.serial.u64.field.FieldElement51.to_bytes u
   ok a
+
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 606:4-608:5 -/
+def edwards.EdwardsPoint.compress
+  (self : edwards.EdwardsPoint) : Result edwards.CompressedEdwardsY :=
+  do
+  let ap ← edwards.EdwardsPoint.to_affine self
+  edwards.affine.AffinePoint.compress ap
 
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]: loop 0:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1333:8-1337:9 -/

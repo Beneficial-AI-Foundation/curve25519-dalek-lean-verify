@@ -9,6 +9,12 @@ namespace curve25519_dalek
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
 def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
 
+/- [subtle::{subtle::Choice}::unwrap_u8]:
+   Name pattern: [subtle::{subtle::Choice}::unwrap_u8]
+   Returns 0u8 if Choice.zero (0), 1u8 if Choice.one (1) -/
+def subtle.Choice.unwrap_u8 (c : subtle.Choice) : Result U8 :=
+  ok c.val
+
 /- [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}::bitand]:
 Name pattern: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand]
 Bitwise AND for Choice values (0 & 0 = 0, 0 & 1 = 0, 1 & 0 = 0, 1 & 1 = 1) -/

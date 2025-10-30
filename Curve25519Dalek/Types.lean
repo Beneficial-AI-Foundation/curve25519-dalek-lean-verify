@@ -89,6 +89,12 @@ structure edwards.EdwardsPoint where
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
 @[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
 
+/- [curve25519_dalek::edwards::affine::AffinePoint]
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
+structure edwards.affine.AffinePoint where
+  x : backend.serial.u64.field.FieldElement51
+  y : backend.serial.u64.field.FieldElement51
+
 /- [curve25519_dalek::edwards::CompressedEdwardsY]
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)

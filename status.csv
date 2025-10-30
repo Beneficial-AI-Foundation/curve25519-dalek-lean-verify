@@ -44,7 +44,7 @@ curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edw
 curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean,,,
-curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,,,
+curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean,,,
 curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean,,,
 curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean,,,
