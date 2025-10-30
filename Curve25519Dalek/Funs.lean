@@ -31,7 +31,7 @@ def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
    Name pattern: [subtle::ConstantTimeEq<[@T]>] -/
 @[reducible]
-def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
   subtle.ConstantTimeEq T) : subtle.ConstantTimeEq (Slice T) := {
   ct_eq := subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst
 }
@@ -418,10 +418,10 @@ def backend.serial.curve_models.ProjectivePoint.double
 def backend.serial.u64.constants.L_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    Array.make 5#usize [
+    (Array.make 5#usize [
       671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
       17592186044416#u64
-      ]
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.L_body
@@ -441,10 +441,10 @@ def backend.serial.u64.constants.LFACTOR : U64 :=
 def backend.serial.u64.constants.R_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    Array.make 5#usize [
+    (Array.make 5#usize [
       4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
       4503599627370495#u64, 17592186044415#u64
-      ]
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.R_body
@@ -455,10 +455,10 @@ def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
 def backend.serial.u64.constants.RR_body
   : Result backend.serial.u64.scalar.Scalar52 :=
   ok
-    Array.make 5#usize [
+    (Array.make 5#usize [
       2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
       1087343033131391#u64, 10175238647962#u64
-      ]
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.RR_body
@@ -783,7 +783,7 @@ def backend.serial.u64.field.FieldElement51.from_bytes
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
   let i13 ← i12 >>> 12#i32
   let i14 ← (↑(i13 &&& low_51_bit_mask) : Result U64)
-  ok Array.make 5#usize [ i2, i5, i8, i11, i14 ]
+  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
 
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 396:4-478:5 -/
@@ -1434,7 +1434,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
     backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i49
   let r4 ← (↑(UScalar.cast .U64 carry8) : Result U64)
   backend.serial.u64.scalar.Scalar52.sub
-    Array.make 5#usize [ r0, r1, r2, r3, r4 ] backend.serial.u64.constants.L
+    (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
 
 /- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 326:4-328:5 -/
