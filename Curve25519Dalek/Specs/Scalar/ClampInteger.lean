@@ -1,4 +1,11 @@
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Oliver Butterley
+-/
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Funs
+import Mathlib
 
 set_option linter.style.setOption false
 set_option grind.warning false
@@ -37,9 +44,9 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     h ∣ U8x32_as_Nat result ∧
     U8x32_as_Nat result < 2^255 ∧
     2^254 ≤ U8x32_as_Nat result := by
-  unfold clamp_integer
+  unfold clamp_integer h
   progress*
-  simp
+  unfold U8x32_as_Nat
   refine ⟨?_, ?_, ?_⟩
   · apply Finset.dvd_sum
     intro i hi
