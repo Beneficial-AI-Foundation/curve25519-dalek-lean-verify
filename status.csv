@@ -53,10 +53,10 @@ curve25519_dalek::edwards::EdwardsPoint::multiscalar_mul,curve25519-dalek/src/ed
 curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,,,,
 curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,,,,
 curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,,,,
-curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,,extracted,,
+curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,,,,
 curve25519_dalek::ristretto::CompressedRistretto::from_slice,curve25519-dalek/src/ristretto.rs,L244-L246,,,,
-curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,,extracted,,
+curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristretto.rs,L488-L522,,,,
 curve25519_dalek::ristretto::RistrettoPoint::default,curve25519-dalek/src/ristretto.rs,L813-L816,,,,
 curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch,curve25519-dalek/src/ristretto.rs,L552-L636,,,,

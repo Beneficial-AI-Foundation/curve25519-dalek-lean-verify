@@ -60,10 +60,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_montgomery` | [edwards.rs](curve25519-dalek/src/edwards.rs#L552-L559) | - | ☐ | ☐ |  |
 | `vartime_double_scalar_mul_basepoint` | [edwards.rs](curve25519-dalek/src/edwards.rs#L901-L912) | - | ☐ | ☐ |  |
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | - | ☐ | ☐ |  |
-| `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | - | ✅ | ☐ |  |
+| `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | - | ✅ | ✅ | Verified (markus-dablander) |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | - | ☐ | ☐ |  |
 | `from_slice` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L244-L246) | - | ☐ | ☐ |  |
-| `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L229-L231) | - | ✅ | ☐ |  |
+| `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L229-L231) | - | ✅ | ✅ | Verified (markus-dablander) |
 | `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | - | ☐ | ☐ |  |
 | `default` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L813-L816) | - | ☐ | ☐ |  |
 | `double_and_compress_batch` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L552-L636) | - | ☐ | ☐ |  |
