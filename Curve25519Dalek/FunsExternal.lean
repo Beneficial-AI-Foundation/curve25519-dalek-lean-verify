@@ -9,6 +9,12 @@ namespace curve25519_dalek
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
 def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
 
+/- [subtle::{subtle::Choice}::unwrap_u8]:
+   Name pattern: [subtle::{subtle::Choice}::unwrap_u8]
+   Returns 0u8 if Choice.zero (0), 1u8 if Choice.one (1) -/
+def subtle.Choice.unwrap_u8 (c : subtle.Choice) : Result U8 :=
+  ok c.val
+
 /- [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}::bitand]:
 Name pattern: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand]
 Bitwise AND for Choice values (0 & 0 = 0, 0 & 1 = 0, 1 & 0 = 0, 1 & 1 = 1) -/
@@ -29,6 +35,32 @@ def subtle.FromsubtleChoiceU8.from (input : U8) : Result subtle.Choice :=
     ok { val := input, valid := Or.inr h' }
   else
     fail Error.panic
+
+/- [subtle::{core::convert::From<subtle::Choice> for bool}::from]:
+   Name pattern: [subtle::{core::convert::From<bool, subtle::Choice>}::from]
+   Converts Choice to bool: Choice.zero -> false, Choice.one -> true -/
+def subtle.FromBoolsubtleChoice.from (c : subtle.Choice) : Result Bool :=
+  ok (c.val = 1#u8)
+
+/- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
+   Name pattern: [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>}::bitor]
+   Bitwise OR for Choice values (0 | 0 = 0, 0 | 1 = 1, 1 | 0 = 1, 1 | 1 = 1) -/
+def subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor
+  (a : subtle.Choice) (b : subtle.Choice) : Result subtle.Choice :=
+  if a.val = 1#u8 ∨ b.val = 1#u8 then
+    ok Choice.one
+  else
+    ok Choice.zero
+
+/- [subtle::{subtle::ConditionallyNegatable for T}::conditional_negate]:
+   Name pattern: [subtle::{subtle::ConditionallyNegatable<@T>}::conditional_negate]
+   Negate self if choice == Choice(1); otherwise, leave it unchanged -/
+def subtle.ConditionallyNegatable.Blanket.conditional_negate
+  {T : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable T)
+  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T)
+  (self : T) (choice : subtle.Choice) : Result T := do
+  let self_neg ← coreopsarithNeg_TTInst.neg self
+  ConditionallySelectableInst.conditional_select self self_neg choice
 
 /- [subtle::{subtle::ConstantTimeEq for @Slice<T>}::ct_eq]:
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
@@ -66,6 +98,20 @@ def subtle.ConditionallySelectableU64.conditional_select
   (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
   if choice.val = 1#u8 then ok b
   else ok a
+
+/- [subtle::{subtle::ConditionallySelectable for u64}::conditional_assign]:
+   Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
+def subtle.ConditionallySelectableU64.conditional_assign
+  (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
+  subtle.ConditionallySelectableU64.conditional_select a b choice
+
+/- [subtle::{subtle::ConditionallySelectable for u64}::conditional_swap]:
+   Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
+def subtle.ConditionallySelectableU64.conditional_swap
+  (a : U64) (b : U64) (choice : subtle.Choice) : Result (U64 × U64) := do
+  let a_new ← subtle.ConditionallySelectableU64.conditional_select a b choice
+  let b_new ← subtle.ConditionallySelectableU64.conditional_select b a choice
+  ok (a_new, b_new)
 
 /- [subtle::{subtle::CtOption<T>}::new]:
 Name pattern: [subtle::{subtle::CtOption<@T>}::new]

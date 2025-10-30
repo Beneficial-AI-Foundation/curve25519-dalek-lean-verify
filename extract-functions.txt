@@ -43,3 +43,8 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::sub
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double
 curve25519_dalek::backend::serial::u64::field::FieldElement51::pow22501
+curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2
+curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor
+curve25519_dalek::edwards::EdwardsPoint::to_montgomery
+curve25519_dalek::edwards::EdwardsPoint::compress
+curve25519_dalek::edwards::CompressedEdwardsY::decompress

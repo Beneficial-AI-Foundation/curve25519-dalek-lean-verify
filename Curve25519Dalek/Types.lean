@@ -9,6 +9,20 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait declaration: [core::ops::arith::Add]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 78:0-78:25
+   Name pattern: [core::ops::arith::Add] -/
+structure core.ops.arith.Add (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  add : Self → Rhs → Result Self_Output
+
+/- Trait declaration: [core::ops::arith::Sub]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 190:0-190:25
+   Name pattern: [core::ops::arith::Sub] -/
+structure core.ops.arith.Sub (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  sub : Self → Rhs → Result Self_Output
+
 /- Trait declaration: [core::ops::arith::Mul]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 323:0-323:25
    Name pattern: [core::ops::arith::Mul] -/
@@ -16,12 +30,25 @@ structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   mul : Self → Rhs → Result Self_Output
 
+/- Trait declaration: [core::ops::arith::Neg]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 682:0-682:13
+   Name pattern: [core::ops::arith::Neg] -/
+structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
+  neg : Self → Result Self_Output
+
 /- Trait declaration: [core::ops::bit::BitAnd]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
    Name pattern: [core::ops::bit::BitAnd] -/
 structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitand : Self → Rhs → Result Self_Output
+
+/- Trait declaration: [core::ops::bit::BitOr]
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 244:0-244:27
+   Name pattern: [core::ops::bit::BitOr] -/
+structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  bitor : Self → Rhs → Result Self_Output
 
 /- [core::panicking::AssertKind]
    Source: '/rustc/library/core/src/panicking.rs', lines 382:0-382:19
@@ -43,6 +70,14 @@ structure subtle.ConstantTimeEq (Self : Type) where
 structure subtle.ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   conditional_select : Self → Self → subtle.Choice → Result Self
+  conditional_assign : Self → Self → subtle.Choice → Result Self
+  conditional_swap : Self → Self → subtle.Choice → Result (Self × Self)
+
+/- Trait declaration: [subtle::ConditionallyNegatable]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 604:0-604:32
+   Name pattern: [subtle::ConditionallyNegatable] -/
+structure subtle.ConditionallyNegatable (Self : Type) where
+  conditional_negate : Self → subtle.Choice → Result Self
 
 /- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
@@ -63,14 +98,6 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
-@[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
-
-/- [curve25519_dalek::edwards::CompressedEdwardsY]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
-@[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
-
 /- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
@@ -78,6 +105,24 @@ structure edwards.EdwardsPoint where
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
+
+/- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
+@[reducible] def backend.serial.u64.scalar.Scalar52 := (Array U64 5#usize)
+
+/- [curve25519_dalek::edwards::affine::AffinePoint]
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
+structure edwards.affine.AffinePoint where
+  x : backend.serial.u64.field.FieldElement51
+  y : backend.serial.u64.field.FieldElement51
+
+/- [curve25519_dalek::edwards::CompressedEdwardsY]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
+@[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
+
+/- [curve25519_dalek::montgomery::MontgomeryPoint]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
+@[reducible] def montgomery.MontgomeryPoint := (Array U8 32#usize)
 
 /- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
