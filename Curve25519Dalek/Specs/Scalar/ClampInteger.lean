@@ -37,7 +37,7 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     h ∣ U8x32_as_Nat result ∧
     U8x32_as_Nat result < 2^255 ∧
     2^254 ≤ U8x32_as_Nat result := by
-  unfold clamp_integer
+  unfold clamp_integer h
   progress*
   simp
   refine ⟨?_, ?_, ?_⟩

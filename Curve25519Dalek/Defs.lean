@@ -24,7 +24,6 @@ def L : Nat := 2^252 + 27742317777372353535851937790883648493
 def R : Nat := 2^260
 
 /-- The cofactor of curve25519 -/
-@[simp]
 def h : Nat := 8
 
 /-! ## Auxiliary definitions for interpreting arrays as natural numbers -/
@@ -37,12 +36,11 @@ def Field51_as_Nat (limbs : Array U64 5#usize) : Nat :=
 def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(52 * i) * (limbs[i]!).val
 
-/-- Interpret 9 u128 limbs used to represent 52 bits each as a natural number -/
+/-- Interpret a 9-element u128 array (each limb representing 52 bits) as a natural number -/
 def Scalar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(52 * i) * (limbs[i]!).val
 
-/-- Auxiliary definition to interpret a 9-element u128 array as a natural number.
-This represents the result of polynomial multiplication where each limb is at position 51*i bits. -/
+/-- Interpret a 9-element u128 array (each limb representing 51 bits) as a natural number. -/
 @[simp]
 def U128x9_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(51 * i) * (limbs[i]!).val
