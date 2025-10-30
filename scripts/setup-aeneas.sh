@@ -94,15 +94,19 @@ install_ocaml_deps() {
 # Clone Aeneas repository
 clone_aeneas() {
     echo "Cloning Aeneas repository..."
-    
+
+    AENEAS_BRANCH="son/regions2"  # PR #600
+
     if [ -d "aeneas" ]; then
         echo "✓ Aeneas directory already exists, pulling latest changes..."
         cd aeneas
-        git pull origin main
+        git fetch origin
+        git checkout $AENEAS_BRANCH
+        git pull origin $AENEAS_BRANCH
         cd ..
     else
-        git clone https://github.com/AeneasVerif/aeneas.git
-        echo "✓ Aeneas repository cloned"
+        git clone --branch $AENEAS_BRANCH https://github.com/AeneasVerif/aeneas.git
+        echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
     fi
     echo
 }
