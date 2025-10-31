@@ -31,14 +31,17 @@ const { dataPoints } = progressData
   <div class="stat-card">
     <div class="stat-value">{{ stats.extracted }}</div>
     <div class="stat-label">Extracted</div>
+    <div class="stat-percent">{{ Math.round(stats.extracted / stats.total * 100) }}%</div>
   </div>
   <div class="stat-card">
     <div class="stat-value">{{ stats.specified + stats.verified }}</div>
     <div class="stat-label">Specified</div>
+    <div class="stat-percent">{{ Math.round((stats.specified + stats.verified) / stats.total * 100) }}%</div>
   </div>
   <div class="stat-card">
     <div class="stat-value">{{ stats.verified }}</div>
     <div class="stat-label">Verified</div>
+    <div class="stat-percent">{{ Math.round(stats.verified / stats.total * 100) }}%</div>
   </div>
 </div>
 
@@ -75,5 +78,12 @@ const { dataPoints } = progressData
   margin-top: 0.5rem;
   color: var(--vp-c-text-2);
   font-size: 0.9rem;
+}
+
+.stat-percent {
+  font-size: 0.85rem;
+  font-weight: normal;
+  color: var(--vp-c-brand-1);
+  margin-top: 0.25rem;
 }
 </style>
