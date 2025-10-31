@@ -21,7 +21,7 @@ function shortenSourcePath(source) {
 
 // Helper function to create GitHub link for Rust source
 function getSourceLink(source, lines) {
-  const baseUrl = 'https://github.com/dalek-cryptography/curve25519-dalek/blob/main'
+  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
   const lineMatch = lines.match(/L(\d+)(?:-L(\d+))?/)
   if (lineMatch) {
     const start = lineMatch[1]
@@ -229,21 +229,11 @@ const stats = computed(() => ({
                 </span>
               </span>
             </th>
-            <th v-if="visibleColumns.extracted" @click="toggleSort('extracted')" class="sortable status-col">
+            <th v-if="visibleColumns.extracted" class="status-col">
               Extracted
-              <span class="sort-indicator">
-                <span v-if="sortColumn === 'extracted'">
-                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                </span>
-              </span>
             </th>
-            <th v-if="visibleColumns.verified" @click="toggleSort('verified')" class="sortable status-col">
+            <th v-if="visibleColumns.verified" class="status-col">
               Verified
-              <span class="sort-indicator">
-                <span v-if="sortColumn === 'verified'">
-                  {{ sortDirection === 'asc' ? '▲' : '▼' }}
-                </span>
-              </span>
             </th>
             <th v-if="visibleColumns.notes">Notes</th>
           </tr>
@@ -419,7 +409,6 @@ const stats = computed(() => ({
   padding: 1rem 1.5rem;
   background: var(--vp-c-bg-soft);
   border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
   flex-wrap: wrap;
 }
 
@@ -429,15 +418,8 @@ const stats = computed(() => ({
   align-items: baseline;
 }
 
-.stat-label {
-  font-weight: 500;
-  color: var(--vp-c-text-2);
-  font-size: 0.9em;
-}
-
 .stat-value {
   font-weight: 700;
-  font-size: 1.1em;
 }
 
 .stat-extracted {
@@ -471,15 +453,8 @@ const stats = computed(() => ({
   padding: 0.75rem 1rem;
   background: var(--vp-c-bg-soft);
   border-radius: 6px;
-  border: 1px solid var(--vp-c-divider);
   margin-top: 1rem;
   margin-bottom: 1rem;
-}
-
-.column-controls-label {
-  font-weight: 600;
-  color: var(--vp-c-text-2);
-  font-size: 0.9em;
 }
 
 .column-toggle {
@@ -487,33 +462,15 @@ const stats = computed(() => ({
   align-items: center;
   gap: 0.4rem;
   cursor: pointer;
-  font-size: 0.9em;
-  color: var(--vp-c-text-1);
   user-select: none;
-}
-
-.column-toggle input[type="checkbox"] {
-  cursor: pointer;
-}
-
-.column-toggle input[type="checkbox"]:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
-}
-
-.column-toggle:hover span {
-  color: var(--vp-c-brand-1);
 }
 
 .filter-input,
 .filter-select {
   padding: 0.5rem 0.75rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.9rem;
-  transition: border-color 0.2s;
 }
 
 .filter-input {
@@ -521,28 +478,14 @@ const stats = computed(() => ({
   flex: 1;
 }
 
-.filter-select {
-  min-width: 150px;
-}
-
-.filter-input:focus,
-.filter-select:focus {
-  outline: none;
-  border-color: var(--vp-c-brand-1);
-}
-
 .table-container {
   overflow-x: auto;
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 8px;
   margin-bottom: 1.5rem;
 }
 
 .status-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
-  table-layout: auto;
 }
 
 .status-table thead {
@@ -550,32 +493,21 @@ const stats = computed(() => ({
 }
 
 .status-table th {
-  padding: 0.75rem 1rem;
+  padding: 0.5rem 0.75rem;
   text-align: left;
   font-weight: 600;
   border-bottom: 2px solid var(--vp-c-divider);
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .status-table th.sortable {
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s;
-}
-
-.status-table th.sortable:hover {
-  background: var(--vp-c-bg-elv);
-}
-
-.sort-indicator {
-  display: inline-block;
-  margin-left: 0.25rem;
-  width: 14px;
-  color: var(--vp-c-brand-1);
 }
 
 .status-table td {
-  padding: 0.75rem 1rem;
+  padding: 0.4rem 0.75rem;
   border-bottom: 1px solid var(--vp-c-divider);
   vertical-align: top;
 }
@@ -584,33 +516,37 @@ const stats = computed(() => ({
   background: var(--vp-c-bg-soft);
 }
 
+.sort-indicator {
+  display: inline-block;
+  margin-left: 0.25rem;
+  color: var(--vp-c-brand-1);
+  font-size: 0.8em;
+  vertical-align: middle;
+  width: 14px;
+}
+
+/* Column width constraints */
 .function-col {
   max-width: 220px;
 }
 
 .function-col code {
   display: block;
-  font-family: var(--vp-font-family-mono);
-  font-size: 0.85em;
-  color: var(--vp-c-text-1);
-  background: transparent;
-  padding: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: help;
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
 }
 
 .source-col {
-  font-size: 0.85em;
   max-width: 220px;
 }
 
 .source-link {
   display: block;
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-  transition: color 0.2s;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -618,36 +554,21 @@ const stats = computed(() => ({
   text-align: left;
 }
 
-.source-link:hover {
-  color: var(--vp-c-brand-2);
-  text-decoration: underline;
-}
-
 .status-col {
   text-align: center;
   width: 80px;
-  white-space: nowrap;
 }
 
 .status-link {
   text-decoration: none;
-  display: inline-block;
-  transition: opacity 0.2s;
 }
 
-.status-link:hover {
-  opacity: 0.8;
-}
-
+/* Status icon colors */
 .status-icon {
   font-size: 1.2rem;
-  font-weight: bold;
 }
 
-.status-icon.checked {
-  color: #10b981;
-}
-
+.status-icon.checked,
 .status-icon.verified {
   color: #10b981;
 }
@@ -665,8 +586,6 @@ const stats = computed(() => ({
 }
 
 .notes-col {
-  color: var(--vp-c-text-2);
-  font-size: 0.85em;
   max-width: 300px;
 }
 
@@ -678,14 +597,10 @@ const stats = computed(() => ({
   padding: 1.5rem;
   background: var(--vp-c-bg-soft);
   border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
 }
 
 .legend-section h4 {
   margin: 0 0 1rem 0;
-  color: var(--vp-c-text-1);
-  font-size: 1rem;
-  font-weight: 600;
 }
 
 .legend-item {
@@ -693,16 +608,10 @@ const stats = computed(() => ({
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
-  font-size: 0.9rem;
 }
 
 .legend-item .status-icon {
-  font-size: 1.1rem;
   min-width: 1.5rem;
-}
-
-.legend-item span:last-child {
-  color: var(--vp-c-text-2);
 }
 
 .pagination {
@@ -711,11 +620,6 @@ const stats = computed(() => ({
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-}
-
-.pagination-info {
-  color: var(--vp-c-text-2);
-  font-size: 0.9em;
 }
 
 .pagination-controls {
@@ -727,17 +631,13 @@ const stats = computed(() => ({
 .pagination-btn {
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
   cursor: pointer;
-  font-size: 0.85rem;
-  transition: all 0.2s;
   min-width: 38px;
 }
 
 .pagination-btn:hover:not(:disabled) {
-  background: var(--vp-c-bg-soft);
   border-color: var(--vp-c-brand-1);
 }
 
@@ -749,21 +649,13 @@ const stats = computed(() => ({
 .pagination-btn.active {
   background: var(--vp-c-brand-1);
   color: white;
-  border-color: var(--vp-c-brand-1);
-}
-
-.pagination-ellipsis {
-  color: var(--vp-c-text-3);
-  padding: 0 0.25rem;
 }
 
 .per-page-select {
   padding: 0.4rem 0.6rem;
   border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
+  border-radius: 4px;
   background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  font-size: 0.85rem;
   cursor: pointer;
 }
 
