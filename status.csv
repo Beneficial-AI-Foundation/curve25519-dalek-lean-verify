@@ -80,7 +80,7 @@ curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristr
 curve25519_dalek::ristretto::RistrettoPoint::default,curve25519-dalek/src/ristretto.rs,L813-L816,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Default.lean,,,Charon can't find this function
 curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch,curve25519-dalek/src/ristretto.rs,L552-L636,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/DoubleAndCompressBatch.lean,,,Problem with extraction
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor,curve25519-dalek/src/ristretto.rs,L656-L692,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean,extracted,,
-curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean,extracted,,
 curve25519_dalek::ristretto::RistrettoPoint::identity,curve25519-dalek/src/ristretto.rs,L807-L810,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean,,,
 curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean,,,
 curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul,curve25519-dalek/src/ristretto.rs,L980-L990,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MultiscalarMul.lean,,,

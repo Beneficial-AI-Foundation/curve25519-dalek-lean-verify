@@ -56,3 +56,5 @@ curve25519_dalek::montgomery::MontgomeryPoint::to_edwards
 curve25519_dalek::ristretto::CompressedRistretto::decompress
 curve25519_dalek::ristretto::RistrettoPoint::compress
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor
+
+curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes

@@ -148,13 +148,13 @@ structure traits.Identity (Self : Type) where
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible] def montgomery.MontgomeryPoint := (Array U8 32#usize)
 
-/- [curve25519_dalek::ristretto::CompressedRistretto]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
-@[reducible] def ristretto.CompressedRistretto := (Array U8 32#usize)
-
 /- [curve25519_dalek::ristretto::RistrettoPoint]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 485:0-485:51 -/
 @[reducible] def ristretto.RistrettoPoint := edwards.EdwardsPoint
+
+/- [curve25519_dalek::ristretto::CompressedRistretto]
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
+@[reducible] def ristretto.CompressedRistretto := (Array U8 32#usize)
 
 /- [curve25519_dalek::scalar::Scalar]
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/

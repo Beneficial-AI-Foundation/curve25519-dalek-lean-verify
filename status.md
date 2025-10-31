@@ -87,7 +87,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `default` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L813-L816) | [Default.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Default.lean) | ☐ | ☐ | Charon can't find this function |
 | `double_and_compress_batch` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L552-L636) | [DoubleAndCompressBatch.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/DoubleAndCompressBatch.lean) | ☐ | ☐ | Problem with extraction |
 | `elligator_ristretto_flavor` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L656-L692) | [ElligatorRistrettoFlavor.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean) | ✅ | ☐ |  |
-| `from_uniform_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L787-L804) | [FromUniformBytes.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean) | ☐ | ☐ |  |
+| `from_uniform_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L787-L804) | [FromUniformBytes.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean) | ✅ | ☐ |  |
 | `identity` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L807-L810) | [Identity.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean) | ☐ | ☐ |  |
 | `mul_base` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L951-L962) | [MulBase.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean) | ☐ | ☐ |  |
 | `multiscalar_mul` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L980-L990) | [MultiscalarMul.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MultiscalarMul.lean) | ☐ | ☐ |  |
