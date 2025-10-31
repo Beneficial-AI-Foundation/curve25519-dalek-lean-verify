@@ -747,6 +747,21 @@ def backend.serial.u64.constants.EDWARDS_D
   : backend.serial.u64.field.FieldElement51 :=
   eval_global backend.serial.u64.constants.EDWARDS_D_body
 
+/- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 54:0-60:3 -/
+@[global_simps]
+def backend.serial.u64.constants.EDWARDS_D2_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1859910466990425#u64, 932731440258426#u64, 1072319116312658#u64,
+      1815898335770999#u64, 633789495995903#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D2
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.EDWARDS_D2_body
+
 /- [curve25519_dalek::backend::serial::u64::constants::SQRT_M1]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 99:0-105:3 -/
 @[global_simps]
@@ -2487,6 +2502,24 @@ noncomputable def edwards.CompressedEdwardsY.decompress
        let ep ← edwards.decompress.step_2 self X Y Z
        ok (some ep)
   else ok none
+
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 519:4-526:5 -/
+def edwards.EdwardsPoint.as_projective_niels
+  (self : edwards.EdwardsPoint) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  :=
+  do
+  let fe ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      self.Y self.X
+  let fe1 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      self.Y self.X
+  let fe2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.T backend.serial.u64.constants.EDWARDS_D2
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := self.Z, T2d := fe2 }
 
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 532:4-538:5 -/

@@ -98,6 +98,14 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
+/- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 209:0-214:1 -/
+structure backend.serial.curve_models.ProjectiveNielsPoint where
+  Y_plus_X : backend.serial.u64.field.FieldElement51
+  Y_minus_X : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T2d : backend.serial.u64.field.FieldElement51
+
 /- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
