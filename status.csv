@@ -81,22 +81,22 @@ curve25519_dalek::ristretto::RistrettoPoint::default,curve25519-dalek/src/ristre
 curve25519_dalek::ristretto::RistrettoPoint::double_and_compress_batch,curve25519-dalek/src/ristretto.rs,L552-L636,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/DoubleAndCompressBatch.lean,,,Problem with extraction
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor,curve25519-dalek/src/ristretto.rs,L656-L692,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean,extracted,,
 curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean,extracted,,
-curve25519_dalek::ristretto::RistrettoPoint::identity,curve25519-dalek/src/ristretto.rs,L807-L810,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean,,,
-curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean,,,
-curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul,curve25519-dalek/src/ristretto.rs,L980-L990,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MultiscalarMul.lean,,,
+curve25519_dalek::ristretto::RistrettoPoint::identity,curve25519-dalek/src/ristretto.rs,L807-L810,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean,,,Charon can't find this function
+curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean,,,Aeneas error on extraction
+curve25519_dalek::ristretto::RistrettoPoint::multiscalar_mul,curve25519-dalek/src/ristretto.rs,L980-L990,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MultiscalarMul.lean,,,Charon can't find this function
 curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve25519-dalek/src/scalar.rs,L1141-L1145,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs,L1388-L1393,Curve25519Dalek/Specs/Scalar/ClampInteger.lean,extracted,verified,Verified (oliver-butterley)
-curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1352-L1366,Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1352-L1366,Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean,,draft spec,Extraction problem due to nested borrows; NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L706-L708,Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L301-L303,Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L237-L247,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L250-L253,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,specified,"Specified (markus-dablander)"
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::scalar::Scalar::from_hash,curve25519-dalek/src/scalar.rs,L670-L678,Curve25519Dalek/Specs/Scalar/Scalar/FromHash.lean,,draft spec,NL-specs written (markus-dablander)
-curve25519_dalek::scalar::Scalar::hash_from_bytes,curve25519-dalek/src/scalar.rs,L624-L632,Curve25519Dalek/Specs/Scalar/Scalar/HashFromBytes.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::from_hash,curve25519-dalek/src/scalar.rs,L670-L678,Curve25519Dalek/Specs/Scalar/Scalar/FromHash.lean,,draft spec,Charon can't find this function; NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::hash_from_bytes,curve25519-dalek/src/scalar.rs,L624-L632,Curve25519Dalek/Specs/Scalar/Scalar/HashFromBytes.lean,,draft spec,Charon can't find this function; NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L747-L749,Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1134-L1136,Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L921-L973,Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,NL-specs written (markus-dablander)
+curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L921-L973,Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,Extraction problem due to nested borrows; NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::ONE,curve25519-dalek/src/scalar.rs,L567-L572,Curve25519Dalek/Specs/Scalar/Scalar/One.lean,extracted,verified,Verified (oliver-butterley)
 curve25519_dalek::scalar::Scalar::reduce,curve25519-dalek/src/scalar.rs,L1125-L1130,Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::to_bytes,curve25519-dalek/src/scalar.rs,L691-L693,Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean,extracted,verified,Verified (markus-dablander)
