@@ -52,5 +52,7 @@ curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels
 curve25519_dalek::edwards::EdwardsPoint::double
 curve25519_dalek::edwards::EdwardsPoint::is_small_order
-
 curve25519_dalek::montgomery::MontgomeryPoint::to_edwards
+
+
+curve25519_dalek::ristretto::CompressedRistretto::decompress

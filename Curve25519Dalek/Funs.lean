@@ -10,6 +10,33 @@ set_option linter.unusedVariables false
 
 namespace curve25519_dalek
 
+/- Trait implementation: [core::slice::index::private_slice_index::{core::slice::index::private_slice_index::Sealed for core::ops::range::RangeFull}]
+   Source: '/rustc/library/core/src/slice/index.rs', lines 128:4-128:34
+   Name pattern: [core::slice::index::private_slice_index::Sealed<core::ops::range::RangeFull>] -/
+@[reducible]
+def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
+  core.slice.index.private_slice_index.Sealed core.ops.range.RangeFull := {
+}
+
+/- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
+   Source: '/rustc/library/core/src/slice/index.rs', lines 626:0-626:55
+   Name pattern: [core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>] -/
+@[reducible]
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice (T : Type) :
+  core.slice.index.SliceIndex core.ops.range.RangeFull (Slice T) (Slice T) := {
+  sealedInst :=
+    core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull
+  get := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get
+  get_mut := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_mut
+  get_unchecked :=
+    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked
+  get_unchecked_mut :=
+    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked_mut
+  index := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index
+  index_mut :=
+    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
+}
+
 /- Trait implementation: [subtle::{core::convert::From<subtle::Choice> for bool}]
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 138:0-138:26
    Name pattern: [core::convert::From<bool, subtle::Choice>] -/
@@ -35,6 +62,15 @@ def core.ops.bit.BitAndsubtleChoicesubtleChoicesubtleChoice :
 def core.ops.bit.BitOrsubtleChoicesubtleChoicesubtleChoice : core.ops.bit.BitOr
   subtle.Choice subtle.Choice subtle.Choice := {
   bitor := subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor
+}
+
+/- Trait implementation: [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}]
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 204:0-204:19
+   Name pattern: [core::ops::bit::Not<subtle::Choice, subtle::Choice>] -/
+@[reducible]
+def core.ops.bit.NotsubtleChoicesubtleChoice : core.ops.bit.Not subtle.Choice
+  subtle.Choice := {
+  not := subtle.NotsubtleChoicesubtleChoice.not
 }
 
 /- Trait implementation: [subtle::{core::convert::From<u8> for subtle::Choice}]
@@ -2763,6 +2799,26 @@ noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFiel
     field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
 }
 
+/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero]:
+   Source: 'curve25519-dalek/src/field.rs', lines 160:4-165:5 -/
+noncomputable def field.FieldElement51.is_zero
+  (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice :=
+  do
+  let zero := Array.repeat 32#usize 0#u8
+  let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
+  let s ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let s1 ← (↑(Array.to_slice zero) : Result (Slice U8))
+  subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
+
+/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt]:
+   Source: 'curve25519-dalek/src/field.rs', lines 352:4-354:5 -/
+noncomputable def field.FieldElement51.invsqrt
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result (subtle.Choice × backend.serial.u64.field.FieldElement51)
+  :=
+  field.FieldElement51.sqrt_ratio_i backend.serial.u64.field.FieldElement51.ONE
+    self
+
 /- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 223:4-252:5 -/
 noncomputable def montgomery.MontgomeryPoint.to_edwards
@@ -2806,6 +2862,118 @@ def ristretto.CompressedRistretto.to_bytes
 def ristretto.CompressedRistretto.as_bytes
   (self : ristretto.CompressedRistretto) : Result (Array U8 32#usize) :=
   ok self
+
+/- [curve25519_dalek::ristretto::decompress::step_1]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 275:4-293:5 -/
+noncomputable def ristretto.decompress.step_1
+  (repr : ristretto.CompressedRistretto) :
+  Result (subtle.Choice × subtle.Choice ×
+    backend.serial.u64.field.FieldElement51)
+  :=
+  do
+  let a ← ristretto.CompressedRistretto.as_bytes repr
+  let s ← backend.serial.u64.field.FieldElement51.from_bytes a
+  let s_bytes_check ← backend.serial.u64.field.FieldElement51.to_bytes s
+  let s1 ←
+    core.array.Array.index (core.ops.index.IndexSliceInst
+      (core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice U8))
+      s_bytes_check ()
+  let s2 ← (↑(Array.to_slice a) : Result (Slice U8))
+  let s_encoding_is_canonical ←
+    subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s1 s2
+  let s_is_negative ← field.FieldElement51.is_negative s
+  ok (s_encoding_is_canonical, s_is_negative, s)
+
+/- [curve25519_dalek::ristretto::decompress::step_2]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 295:4-333:5 -/
+noncomputable def ristretto.decompress.step_2
+  (s : backend.serial.u64.field.FieldElement51) :
+  Result (subtle.Choice × subtle.Choice × subtle.Choice ×
+    ristretto.RistrettoPoint)
+  :=
+  do
+  let ss ← backend.serial.u64.field.FieldElement51.square s
+  let u1 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      backend.serial.u64.field.FieldElement51.ONE ss
+  let u2 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      backend.serial.u64.field.FieldElement51.ONE ss
+  let u2_sqr ← backend.serial.u64.field.FieldElement51.square u2
+  let fe ←
+    backend.serial.u64.field.Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.neg
+      backend.serial.u64.constants.EDWARDS_D
+  let fe1 ← backend.serial.u64.field.FieldElement51.square u1
+  let fe2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe fe1
+  let v ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      fe2 u2_sqr
+  let fe3 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      v u2_sqr
+  let (ok1, I) ← field.FieldElement51.invsqrt fe3
+  let Dx ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      I u2
+  let fe4 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      Dx v
+  let Dy ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      I fe4
+  let fe5 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      s s
+  let x ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe5 Dx
+  let x_neg ← field.FieldElement51.is_negative x
+  let x1 ←
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+      core.ops.arith.Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+      x x_neg
+  let y ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      u1 Dy
+  let t ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      x1 y
+  let c ← field.FieldElement51.is_negative t
+  let c1 ← field.FieldElement51.is_zero y
+  ok (ok1, c, c1,
+    { X := x1, Y := y, Z := backend.serial.u64.field.FieldElement51.ONE, T := t
+    })
+
+/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 255:4-269:5 -/
+noncomputable def ristretto.CompressedRistretto.decompress
+  (self : ristretto.CompressedRistretto) :
+  Result (Option ristretto.RistrettoPoint)
+  :=
+  do
+  let (s_encoding_is_canonical, s_is_negative, s) ←
+    ristretto.decompress.step_1 self
+  let c ← subtle.NotsubtleChoicesubtleChoice.not s_encoding_is_canonical
+  let c1 ←
+    subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c s_is_negative
+  let b ← core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c1
+  if b
+  then ok none
+  else
+    do
+    let (ok1, t_is_negative, y_is_zero, res) ← ristretto.decompress.step_2 s
+    let c2 ← subtle.NotsubtleChoicesubtleChoice.not ok1
+    let c3 ←
+      subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c2 t_is_negative
+    let c4 ←
+      subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c3 y_is_zero
+    let b1 ← core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c4
+    if b1
+    then ok none
+    else ok (some res)
 
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/

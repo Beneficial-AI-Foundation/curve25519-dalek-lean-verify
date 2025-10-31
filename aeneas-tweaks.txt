@@ -191,3 +191,28 @@ noncomputable def
 def montgomery.MontgomeryPoint.to_edwards
 ===REPLACE===
 noncomputable def montgomery.MontgomeryPoint.to_edwards
+
+===FIND===
+def field.FieldElement51.is_zero
+===REPLACE===
+noncomputable def field.FieldElement51.is_zero
+
+===FIND===
+def field.FieldElement51.invsqrt
+===REPLACE===
+noncomputable def field.FieldElement51.invsqrt
+
+===FIND===
+def ristretto.decompress.step_1
+===REPLACE===
+noncomputable def ristretto.decompress.step_1
+
+===FIND===
+def ristretto.decompress.step_2
+===REPLACE===
+noncomputable def ristretto.decompress.step_2
+
+===FIND===
+def ristretto.CompressedRistretto.decompress
+===REPLACE===
+noncomputable def ristretto.CompressedRistretto.decompress

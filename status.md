@@ -73,9 +73,11 @@ This document tracks the progress of formally verifying functions from the curve
 | `vartime_double_scalar_mul_basepoint` | [edwards.rs](curve25519-dalek/src/edwards.rs#L901-L912) | [VartimeDoubleScalarMulBasepoint.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean) | ☐ | ☐ | Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul |
 | `pow_p58` | [field.rs](curve25519-dalek/src/field.rs#L269-L290) | [PowP58.lean](Curve25519Dalek/Specs/Field/FieldElement/PowP58.lean) | ✅ | ☐ |  |
 | `sqrt_ratio_i` | [field.rs](curve25519-dalek/src/field.rs#L292-L331) | [SqrtRatioI.lean](Curve25519Dalek/Specs/Field/FieldElement/SqrtRatioI.lean) | ✅ | ☐ |  |
+| `is_zero` | [field.rs](curve25519-dalek/src/field.rs#L160-L165) | [IsZero.lean](Curve25519Dalek/Specs/Field/FieldElement/IsZero.lean) | ✅ | ☐ |  |
+| `invsqrt` | [field.rs](curve25519-dalek/src/field.rs#L352-L354) | [Invsqrt.lean](Curve25519Dalek/Specs/Field/FieldElement/Invsqrt.lean) | ✅ | ☐ |  |
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | [ToEdwards.lean](Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean) | ✅ | ☐ |  |
 | `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | [AsBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
-| `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ☐ | ☐ |  |
+| `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ✅ | ☐ |  |
 | `from_slice` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L244-L246) | [FromSlice.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean) | ☐ | ☐ |  |
 | `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L229-L231) | [ToBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | [Compress.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean) | ☐ | ☐ |  |

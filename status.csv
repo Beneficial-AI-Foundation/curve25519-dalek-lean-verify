@@ -66,9 +66,11 @@ curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwa
 curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul"
 curve25519_dalek::field::FieldElement::pow_p58,curve25519-dalek/src/field.rs,L269-L290,Curve25519Dalek/Specs/Field/FieldElement/PowP58.lean,extracted,,
 curve25519_dalek::field::FieldElement::sqrt_ratio_i,curve25519-dalek/src/field.rs,L292-L331,Curve25519Dalek/Specs/Field/FieldElement/SqrtRatioI.lean,extracted,,
+curve25519_dalek::field::FieldElement::is_zero,curve25519-dalek/src/field.rs,L160-L165,Curve25519Dalek/Specs/Field/FieldElement/IsZero.lean,extracted,,
+curve25519_dalek::field::FieldElement::invsqrt,curve25519-dalek/src/field.rs,L352-L354,Curve25519Dalek/Specs/Field/FieldElement/Invsqrt.lean,extracted,,
 curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean,extracted,,
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean,extracted,verified,Verified (markus-dablander)
-curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean,,,
+curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean,extracted,,
 curve25519_dalek::ristretto::CompressedRistretto::from_slice,curve25519-dalek/src/ristretto.rs,L244-L246,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean,,,
 curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean,extracted,verified,Verified (markus-dablander)
 curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristretto.rs,L488-L522,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean,,,
