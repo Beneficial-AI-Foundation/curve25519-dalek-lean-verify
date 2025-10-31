@@ -1,7 +1,7 @@
 function,source,lines,spec_theorem,extracted,verified,notes
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L368-L375,Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean,extracted,,
 curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L356-L362,Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean,extracted,,
-curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean,,,
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean,extracted,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::identity,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L233-L239,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean,,,
 curve25519_dalek::backend::serial::scalar_mul::straus::Straus::multiscalar_mul,curve25519-dalek/src/backend/serial/scalar_mul/straus.rs,L103-L144,Curve25519Dalek/Specs/Backend/Serial/ScalarMul/Straus/Straus/MultiscalarMul.lean,,,
