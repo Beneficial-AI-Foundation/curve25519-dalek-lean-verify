@@ -798,6 +798,21 @@ def backend.serial.u64.constants.EDWARDS_D2
   : backend.serial.u64.field.FieldElement51 :=
   eval_global backend.serial.u64.constants.EDWARDS_D2_body
 
+/- [curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 90:0-96:3 -/
+@[global_simps]
+def backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      278908739862762#u64, 821645201101625#u64, 8113234426968#u64,
+      1777959178193151#u64, 2118520810568447#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.INVSQRT_A_MINUS_D
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
+
 /- [curve25519_dalek::backend::serial::u64::constants::SQRT_M1]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 99:0-105:3 -/
 @[global_simps]
@@ -2974,6 +2989,86 @@ noncomputable def ristretto.CompressedRistretto.decompress
     if b1
     then ok none
     else ok (some res)
+
+/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 489:4-522:5 -/
+noncomputable def ristretto.RistrettoPoint.compress
+  (self : ristretto.RistrettoPoint) : Result ristretto.CompressedRistretto :=
+  do
+  let fe ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      self.Z self.Y
+  let fe1 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      self.Z self.Y
+  let u1 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe fe1
+  let u2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.X self.Y
+  let fe2 ← backend.serial.u64.field.FieldElement51.square u2
+  let fe3 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      u1 fe2
+  let (_, invsqrt) ← field.FieldElement51.invsqrt fe3
+  let i1 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      invsqrt u1
+  let i2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      invsqrt u2
+  let fe4 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      i2 self.T
+  let z_inv ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      i1 fe4
+  let iX ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.X backend.serial.u64.constants.SQRT_M1
+  let iY ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.Y backend.serial.u64.constants.SQRT_M1
+  let enchanted_denominator ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      i1 backend.serial.u64.constants.INVSQRT_A_MINUS_D
+  let fe5 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.T z_inv
+  let rotate ← field.FieldElement51.is_negative fe5
+  let X ←
+    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      self.X iY rotate
+  let Y ←
+    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      self.Y iX rotate
+  let i21 ←
+    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      i2 enchanted_denominator rotate
+  let fe6 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      X z_inv
+  let c ← field.FieldElement51.is_negative fe6
+  let Y1 ←
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+      core.ops.arith.Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+      Y c
+  let fe7 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      self.Z Y1
+  let s ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      i21 fe7
+  let s_is_negative ← field.FieldElement51.is_negative s
+  let s1 ←
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+      core.ops.arith.Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+      s s_is_negative
+  let a ← backend.serial.u64.field.FieldElement51.to_bytes s1
+  ok a
 
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/

@@ -216,3 +216,8 @@ noncomputable def ristretto.decompress.step_2
 def ristretto.CompressedRistretto.decompress
 ===REPLACE===
 noncomputable def ristretto.CompressedRistretto.decompress
+
+===FIND===
+def ristretto.RistrettoPoint.compress
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.compress

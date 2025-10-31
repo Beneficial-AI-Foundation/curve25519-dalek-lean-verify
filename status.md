@@ -15,6 +15,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | [Mul.lean](Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean) | ☐ | ☐ | Extracts to broken Lean code |
 | `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | [EdwardsD.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD.lean) | ✅ | ☐ |  |
 | `EDWARDS_D2` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L54-L60) | [EdwardsD2.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD2.lean) | ✅ | ☐ |  |
+| `INVSQRT_A_MINUS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L90-L96) | [InvsqrtAMinusD.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/InvsqrtAMinusD.lean) | ✅ | ☐ |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | [L.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean) | ✅ | ✅ | Brackets required in extracted Lean; Verified (markus-dablander) |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | [LFACTOR.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/LFACTOR.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | [R.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean) | ✅ | ✅ | Verified (markus-dablander) |
@@ -78,9 +79,9 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | [ToEdwards.lean](Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean) | ✅ | ☐ |  |
 | `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | [AsBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ✅ | ☐ |  |
-| `from_slice` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L244-L246) | [FromSlice.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean) | ☐ | ☐ |  |
+| `from_slice` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L244-L246) | [FromSlice.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean) | ☐ | ☐ | Problem with extracted Lean code |
 | `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L229-L231) | [ToBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
-| `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | [Compress.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean) | ☐ | ☐ |  |
+| `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | [Compress.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean) | ✅ | ☐ |  |
 | `default` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L813-L816) | [Default.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Default.lean) | ☐ | ☐ |  |
 | `double_and_compress_batch` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L552-L636) | [DoubleAndCompressBatch.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/DoubleAndCompressBatch.lean) | ☐ | ☐ |  |
 | `elligator_ristretto_flavor` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L656-L692) | [ElligatorRistrettoFlavor.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean) | ☐ | ☐ |  |
