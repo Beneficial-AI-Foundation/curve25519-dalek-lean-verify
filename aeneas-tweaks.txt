@@ -221,3 +221,8 @@ noncomputable def ristretto.CompressedRistretto.decompress
 def ristretto.RistrettoPoint.compress
 ===REPLACE===
 noncomputable def ristretto.RistrettoPoint.compress
+
+===FIND===
+def ristretto.RistrettoPoint.elligator_ristretto_flavor
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor

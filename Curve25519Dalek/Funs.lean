@@ -768,6 +768,21 @@ def backend.serial.u64.field.FieldElement51.from_limbs
   :=
   ok limbs
 
+/- [curve25519_dalek::backend::serial::u64::constants::MINUS_ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 26:0-32:3 -/
+@[global_simps]
+def backend.serial.u64.constants.MINUS_ONE_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
+      2251799813685247#u64, 2251799813685247#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MINUS_ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.MINUS_ONE_body
+
 /- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 45:0-51:3 -/
 @[global_simps]
@@ -797,6 +812,51 @@ def backend.serial.u64.constants.EDWARDS_D2_body
 def backend.serial.u64.constants.EDWARDS_D2
   : backend.serial.u64.field.FieldElement51 :=
   eval_global backend.serial.u64.constants.EDWARDS_D2_body
+
+/- [curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 63:0-69:3 -/
+@[global_simps]
+def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1136626929484150#u64, 1998550399581263#u64, 496427632559748#u64,
+      118527312129759#u64, 45110755273534#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
+
+/- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 72:0-78:3 -/
+@[global_simps]
+def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1507062230895904#u64, 1572317787530805#u64, 683053064812840#u64,
+      317374165784489#u64, 1572899562415810#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
+
+/- [curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 81:0-87:3 -/
+@[global_simps]
+def backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2241493124984347#u64, 425987919032274#u64, 2207028919301688#u64,
+      1220490630685848#u64, 974799131293748#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
 
 /- [curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 90:0-96:3 -/
@@ -3069,6 +3129,86 @@ noncomputable def ristretto.RistrettoPoint.compress
       s s_is_negative
   let a ← backend.serial.u64.field.FieldElement51.to_bytes s1
   ok a
+
+/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 656:4-692:5 -/
+noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
+  (r_0 : backend.serial.u64.field.FieldElement51) :
+  Result ristretto.RistrettoPoint
+  :=
+  do
+  let fe ← backend.serial.u64.field.FieldElement51.square r_0
+  let r ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      backend.serial.u64.constants.SQRT_M1 fe
+  let fe1 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      r backend.serial.u64.field.FieldElement51.ONE
+  let N_s ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe1 backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+  let fe2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      backend.serial.u64.constants.EDWARDS_D r
+  let fe3 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      backend.serial.u64.constants.MINUS_ONE fe2
+  let fe4 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      r backend.serial.u64.constants.EDWARDS_D
+  let D ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe3 fe4
+  let (Ns_D_is_sq, s) ← field.FieldElement51.sqrt_ratio_i N_s D
+  let s_prime ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      s r_0
+  let c ← field.FieldElement51.is_negative s_prime
+  let s_prime_is_pos ← subtle.NotsubtleChoicesubtleChoice.not c
+  let s_prime1 ←
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+      core.ops.arith.Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+      s_prime s_prime_is_pos
+  let c1 ← subtle.NotsubtleChoicesubtleChoice.not Ns_D_is_sq
+  let s1 ←
+    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      s s_prime1 c1
+  let c2 ←
+    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      backend.serial.u64.constants.MINUS_ONE r c1
+  let fe5 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      r backend.serial.u64.field.FieldElement51.ONE
+  let fe6 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      c2 fe5
+  let fe7 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe6 backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+  let N_t ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      fe7 D
+  let s_sq ← backend.serial.u64.field.FieldElement51.square s1
+  let fe8 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      s1 s1
+  let fe9 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      fe8 D
+  let fe10 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      N_t backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+  let fe11 ←
+    backend.serial.u64.field.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.sub
+      backend.serial.u64.field.FieldElement51.ONE s_sq
+  let fe12 ←
+    backend.serial.u64.field.Add0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.add
+      backend.serial.u64.field.FieldElement51.ONE s_sq
+  let ep ←
+    backend.serial.curve_models.CompletedPoint.as_extended
+      { X := fe9, Y := fe11, Z := fe10, T := fe12 }
+  ok ep
 
 /- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
