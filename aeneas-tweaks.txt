@@ -172,3 +172,22 @@ noncomputable def edwards.EdwardsPoint.is_small_order
 def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
 ===REPLACE===
 noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+
+===FIND===
+def
+  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+===REPLACE===
+noncomputable def
+  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+
+===FIND===
+def
+  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+===REPLACE===
+noncomputable def
+  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
+def montgomery.MontgomeryPoint.to_edwards
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.to_edwards
