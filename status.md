@@ -28,6 +28,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_limbs` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L238-L240) | [FromLimbs.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean) | ✅ | ☐ |  |
 | `negate` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L256-L262) | [Negate.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean) | ✅ | ☐ |  |
 | `ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L245-L245) | [One.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/One.lean) | ✅ | ☐ |  |
+| `ZERO` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L263-L263) | [Zero.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Zero.lean) | ✅ | ☐ |  |
 | `pow22501` | [field.rs](curve25519-dalek/src/field.rs#L170-L204) | - | ✅ | ☐ |  |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L482-L587) | [Pow2K.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L312-L345) | [Reduce.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ | Verified (oliver-butterley) |
@@ -60,9 +61,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | [AsProjective.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `as_projective_niels` | [edwards.rs](curve25519-dalek/src/edwards.rs#L508-L525) | [AsProjectiveNiels.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean) | ✅ | ☐ |  |
 | `compress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L565-L581) | [Compress.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean) | ✅ | ☐ |  |
+| `ct_eq` | [edwards.rs](curve25519-dalek/src/edwards.rs#L493-L502) | [CtEq.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean) | ✅ | ☐ |  |
 | `double` | [edwards.rs](curve25519-dalek/src/edwards.rs#L613-L626) | [Double.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean) | ✅ | ☐ |  |
-| `identity` | [edwards.rs](curve25519-dalek/src/edwards.rs#L420-L427) | [Identity.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean) | ☐ | ☐ |  |
-| `is_small_order` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1226-L1258) | [IsSmallOrder.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean) | ☐ | ☐ |  |
+| `identity` | [edwards.rs](curve25519-dalek/src/edwards.rs#L420-L427) | [Identity.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean) | ✅ | ☐ |  |
+| `is_small_order` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1226-L1258) | [IsSmallOrder.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean) | ✅ | ☐ |  |
 | `mul_by_cofactor` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1186-L1188) | [MulByCofactor.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean) | ✅ | ☐ |  |
 | `mul_by_pow_2` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1191-L1199) | [MulByPow2.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean) | ✅ | ☐ |  |
 | `multiscalar_mul` | [edwards.rs](curve25519-dalek/src/edwards.rs#L799-L804) | [MultiscalarMul.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MultiscalarMul.lean) | ☐ | ☐ |  |

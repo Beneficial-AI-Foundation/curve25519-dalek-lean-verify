@@ -112,9 +112,9 @@ def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
 noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
 
 ===FIND===
-def scalar.Scalar.is_canonical (self : scalar.Scalar) : Result subtle.Choice :=
+def scalar.Scalar.is_canonical
 ===REPLACE===
-noncomputable def scalar.Scalar.is_canonical (self : scalar.Scalar) : Result subtle.Choice :=
+noncomputable def scalar.Scalar.is_canonical
 
 ===FIND===
 def scalar.Scalar.from_canonical_bytes
@@ -122,9 +122,9 @@ def scalar.Scalar.from_canonical_bytes
 noncomputable def scalar.Scalar.from_canonical_bytes
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
+def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
 
 ===FIND===
 def
@@ -149,14 +149,26 @@ def edwards.decompress.step_1
 noncomputable def edwards.decompress.step_1
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51 :
+def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51 :
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
 
 ===FIND===
-@[reducible]
-def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+def subtle.ConstantTimeEqSlice
 ===REPLACE===
-@[reducible]
-noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+noncomputable def subtle.ConstantTimeEqSlice
 
+===FIND===
+def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+===REPLACE===
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+
+===FIND===
+def edwards.EdwardsPoint.is_small_order
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.is_small_order
+
+===FIND===
+def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+===REPLACE===
+noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq

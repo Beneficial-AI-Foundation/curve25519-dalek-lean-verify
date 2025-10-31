@@ -128,6 +128,11 @@ structure edwards.affine.AffinePoint where
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
 
+/- Trait declaration: [curve25519_dalek::traits::Identity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
+structure traits.Identity (Self : Type) where
+  identity : Result Self
+
 /- [curve25519_dalek::montgomery::MontgomeryPoint]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible] def montgomery.MontgomeryPoint := (Array U8 32#usize)
@@ -140,5 +145,10 @@ structure edwards.affine.AffinePoint where
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
 structure scalar.Scalar where
   bytes : Array U8 32#usize
+
+/- Trait declaration: [curve25519_dalek::traits::IsIdentity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 33:0-36:1 -/
+structure traits.IsIdentity (Self : Type) where
+  is_identity : Self → Result Bool
 
 end curve25519_dalek

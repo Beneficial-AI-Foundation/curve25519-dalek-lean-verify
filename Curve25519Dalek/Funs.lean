@@ -1072,6 +1072,18 @@ def
     backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_swap
 }
 
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 243:4-243:81 -/
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.ZERO_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  let a := Array.repeat 5#usize 0#u64
+  backend.serial.u64.field.FieldElement51.from_limbs a
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.ZERO
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.field.FieldElement51.ZERO_body
+
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 245:4-245:80 -/
 @[global_simps]
@@ -2503,6 +2515,61 @@ noncomputable def edwards.CompressedEdwardsY.decompress
        ok (some ep)
   else ok none
 
+/- [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 420:4-427:5 -/
+def edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity
+  : Result edwards.EdwardsPoint :=
+  ok
+    {
+      X := backend.serial.u64.field.FieldElement51.ZERO,
+      Y := backend.serial.u64.field.FieldElement51.ONE,
+      Z := backend.serial.u64.field.FieldElement51.ONE,
+      T := backend.serial.u64.field.FieldElement51.ZERO
+    }
+
+/- Trait implementation: [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 419:0-428:1 -/
+@[reducible]
+def traits.Identitycurve25519_dalekedwardsEdwardsPoint : traits.Identity
+  edwards.EdwardsPoint := {
+  identity := edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity
+}
+
+/- [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 493:4-502:5 -/
+noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+  (self : edwards.EdwardsPoint) (other : edwards.EdwardsPoint) :
+  Result subtle.Choice
+  :=
+  do
+  let fe ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.X other.Z
+  let fe1 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      other.X self.Z
+  let c ←
+    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
+      fe fe1
+  let fe2 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      self.Y other.Z
+  let fe3 ←
+    backend.serial.u64.field.Mul0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.mul
+      other.Y self.Z
+  let c1 ←
+    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
+      fe2 fe3
+  subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand c c1
+
+/- Trait implementation: [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 492:0-503:1 -/
+@[reducible]
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint :
+  subtle.ConstantTimeEq edwards.EdwardsPoint := {
+  ct_eq := edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+}
+
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 519:4-526:5 -/
 def edwards.EdwardsPoint.as_projective_niels
@@ -2624,6 +2691,28 @@ def edwards.EdwardsPoint.mul_by_pow_2
 def edwards.EdwardsPoint.mul_by_cofactor
   (self : edwards.EdwardsPoint) : Result edwards.EdwardsPoint :=
   edwards.EdwardsPoint.mul_by_pow_2 self 3#u32
+
+/- [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}::is_identity]:
+   Source: 'curve25519-dalek/src/traits.rs', lines 45:4-47:5 -/
+def traits.IsIdentity.Blanket.is_identity
+  {T : Type} (subtleConstantTimeEqInst : subtle.ConstantTimeEq T) (IdentityInst
+  : traits.Identity T) (self : T) :
+  Result Bool
+  :=
+  do
+  let t ← IdentityInst.identity
+  let c ← subtleConstantTimeEqInst.ct_eq self t
+  core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c
+
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 1365:4-1367:5 -/
+noncomputable def edwards.EdwardsPoint.is_small_order
+  (self : edwards.EdwardsPoint) : Result Bool :=
+  do
+  let ep ← edwards.EdwardsPoint.mul_by_cofactor self
+  traits.IsIdentity.Blanket.is_identity
+    subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+    traits.Identitycurve25519_dalekedwardsEdwardsPoint ep
 
 /- Trait implementation: [curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
    Source: 'curve25519-dalek/src/field.rs', lines 92:0-99:1 -/
@@ -2895,5 +2984,15 @@ def scalar.clamp_integer
   let i4 ← Array.index_usize bytes2 31#usize
   let i5 ← (↑(i4 ||| 64#u8) : Result U8)
   Array.update bytes2 31#usize i5
+
+/- Trait implementation: [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}]
+   Source: 'curve25519-dalek/src/traits.rs', lines 41:0-48:1 -/
+@[reducible]
+def traits.IsIdentity.Blanket {T : Type} (subtleConstantTimeEqInst :
+  subtle.ConstantTimeEq T) (IdentityInst : traits.Identity T) :
+  traits.IsIdentity T := {
+  is_identity := traits.IsIdentity.Blanket.is_identity subtleConstantTimeEqInst
+    IdentityInst
+}
 
 end curve25519_dalek
