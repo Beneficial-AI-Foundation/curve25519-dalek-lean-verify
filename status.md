@@ -11,25 +11,25 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L341-L348) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean) | ✅ | ☐ |  |
 | `double` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L384-L419) | [Double.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | [Mul.lean](Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean) | ☐ | ☐ | Extracts to broken Lean code |
-| `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | [EdwardsD.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD.lean) | ✅ | ☐ |  |
-| `EDWARDS_D2` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L54-L60) | [EdwardsD2.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD2.lean) | ✅ | ☐ |  |
-| `INVSQRT_A_MINUS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L90-L96) | [InvsqrtAMinusD.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/InvsqrtAMinusD.lean) | ✅ | ☐ |  |
-| `ONE_MINUS_EDWARDS_D_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L63-L69) | [OneMinusEdwardsDSquared.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/OneMinusEdwardsDSquared.lean) | ✅ | ☐ |  |
-| `EDWARDS_D_MINUS_ONE_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L72-L78) | [EdwardsDMinusOneSquared.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsDMinusOneSquared.lean) | ✅ | ☐ |  |
+| `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | - | ✅ | ☐ |  |
+| `EDWARDS_D2` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L54-L60) | - | ✅ | ☐ |  |
+| `INVSQRT_A_MINUS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L90-L96) | - | ✅ | ☐ |  |
+| `ONE_MINUS_EDWARDS_D_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L63-L69) | - | ✅ | ☐ |  |
+| `EDWARDS_D_MINUS_ONE_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L72-L78) | - | ✅ | ☐ |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | [L.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean) | ✅ | ✅ | Brackets required in extracted Lean; Verified (markus-dablander) |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | [LFACTOR.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/LFACTOR.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | [R.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `RR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L148-L154) | [RR.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean) | ✅ | ✅ | Verified (oliver-butterley) |
-| `SQRT_M1` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L99-L105) | [SqrtM1.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtM1.lean) | ✅ | ☐ |  |
+| `SQRT_M1` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L99-L105) | - | ✅ | ☐ |  |
 | `add` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L269-L273) | [Add.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `add_assign` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L276-L282) | [AddAssign.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean) | ✅ | ✅ | Verified (oliver-butterley) |
 | `as_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L389-L391) | [AsBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean) | ✅ | ✅ | Verified (oliver-butterley) Specified (markus-dablander) |
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L360-L385) | [FromBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean) | ✅ | 📋 | Brackets required in extracted Lean |
-| `from_limbs` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L238-L240) | [FromLimbs.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean) | ✅ | ☐ |  |
-| `negate` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L256-L262) | [Negate.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean) | ✅ | ☐ |  |
-| `ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L245-L245) | [One.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/One.lean) | ✅ | ☐ |  |
-| `ZERO` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L263-L263) | [Zero.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Zero.lean) | ✅ | ☐ |  |
-| `MINUS_ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L267-L273) | [MinusOne.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MinusOne.lean) | ✅ | ☐ |  |
+| `from_limbs` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L238-L240) | - | ✅ | ☐ |  |
+| `negate` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L256-L262) | - | ✅ | ☐ |  |
+| `ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L245-L245) | - | ✅ | ☐ |  |
+| `ZERO` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L263-L263) | - | ✅ | ☐ |  |
+| `MINUS_ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L267-L273) | - | ✅ | ☐ |  |
 | `pow22501` | [field.rs](curve25519-dalek/src/field.rs#L170-L204) | - | ✅ | ☐ |  |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L482-L587) | [Pow2K.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean) | ✅ | 📋 | Specified (markus-dablander) |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L312-L345) | [Reduce.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ | Verified (oliver-butterley) |
@@ -62,7 +62,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_projective` | [edwards.rs](curve25519-dalek/src/edwards.rs#L521-L623) | [AsProjective.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `as_projective_niels` | [edwards.rs](curve25519-dalek/src/edwards.rs#L508-L525) | [AsProjectiveNiels.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean) | ✅ | ☐ |  |
 | `compress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L565-L581) | [Compress.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean) | ✅ | ☐ |  |
-| `ct_eq` | [edwards.rs](curve25519-dalek/src/edwards.rs#L493-L502) | [CtEq.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean) | ✅ | ☐ |  |
+| `ct_eq` | [edwards.rs](curve25519-dalek/src/edwards.rs#L493-L502) | - | ✅ | ☐ |  |
 | `double` | [edwards.rs](curve25519-dalek/src/edwards.rs#L613-L626) | [Double.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean) | ✅ | ☐ |  |
 | `identity` | [edwards.rs](curve25519-dalek/src/edwards.rs#L420-L427) | [Identity.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean) | ✅ | ☐ |  |
 | `is_small_order` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1226-L1258) | [IsSmallOrder.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean) | ✅ | ☐ |  |
@@ -70,10 +70,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul_by_pow_2` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1191-L1199) | [MulByPow2.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean) | ✅ | ☐ |  |
 | `to_montgomery` | [edwards.rs](curve25519-dalek/src/edwards.rs#L552-L559) | [ToMontgomery.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean) | ✅ | ☐ |  |
 | `vartime_double_scalar_mul_basepoint` | [edwards.rs](curve25519-dalek/src/edwards.rs#L901-L912) | [VartimeDoubleScalarMulBasepoint.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean) | ☐ | ☐ | Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul |
-| `pow_p58` | [field.rs](curve25519-dalek/src/field.rs#L269-L290) | [PowP58.lean](Curve25519Dalek/Specs/Field/FieldElement/PowP58.lean) | ✅ | ☐ |  |
-| `sqrt_ratio_i` | [field.rs](curve25519-dalek/src/field.rs#L292-L331) | [SqrtRatioI.lean](Curve25519Dalek/Specs/Field/FieldElement/SqrtRatioI.lean) | ✅ | ☐ |  |
-| `is_zero` | [field.rs](curve25519-dalek/src/field.rs#L160-L165) | [IsZero.lean](Curve25519Dalek/Specs/Field/FieldElement/IsZero.lean) | ✅ | ☐ |  |
-| `invsqrt` | [field.rs](curve25519-dalek/src/field.rs#L352-L354) | [Invsqrt.lean](Curve25519Dalek/Specs/Field/FieldElement/Invsqrt.lean) | ✅ | ☐ |  |
+| `pow_p58` | [field.rs](curve25519-dalek/src/field.rs#L269-L290) | - | ✅ | ☐ |  |
+| `sqrt_ratio_i` | [field.rs](curve25519-dalek/src/field.rs#L292-L331) | - | ✅ | ☐ |  |
+| `is_zero` | [field.rs](curve25519-dalek/src/field.rs#L160-L165) | - | ✅ | ☐ |  |
+| `invsqrt` | [field.rs](curve25519-dalek/src/field.rs#L352-L354) | - | ✅ | ☐ |  |
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | [ToEdwards.lean](Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean) | ✅ | ☐ |  |
 | `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | [AsBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean) | ✅ | ✅ | Verified (markus-dablander) |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ✅ | ☐ |  |
