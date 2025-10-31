@@ -50,3 +50,4 @@ curve25519_dalek::edwards::EdwardsPoint::compress
 curve25519_dalek::edwards::CompressedEdwardsY::decompress
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels
+curve25519_dalek::edwards::EdwardsPoint::double

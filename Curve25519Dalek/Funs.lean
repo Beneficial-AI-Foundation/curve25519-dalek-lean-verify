@@ -2581,6 +2581,15 @@ def edwards.EdwardsPoint.compress
   let ap ← edwards.EdwardsPoint.to_affine self
   edwards.affine.AffinePoint.compress ap
 
+/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 744:4-746:5 -/
+def edwards.EdwardsPoint.double
+  (self : edwards.EdwardsPoint) : Result edwards.EdwardsPoint :=
+  do
+  let pp ← edwards.EdwardsPoint.as_projective self
+  let cp ← backend.serial.curve_models.ProjectivePoint.double pp
+  backend.serial.curve_models.CompletedPoint.as_extended cp
+
 /- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]: loop 0:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1333:8-1337:9 -/
 def edwards.EdwardsPoint.mul_by_pow_2_loop
