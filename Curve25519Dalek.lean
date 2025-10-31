@@ -2,7 +2,6 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
-import Curve25519Dalek.FunsExternal_Template
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
@@ -83,4 +82,3 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesExternal
-import Curve25519Dalek.TypesExternal_Template
