@@ -52,7 +52,7 @@ const sortDirection = ref('asc')
 
 // Pagination state
 const currentPage = ref(1)
-const perPage = ref(25)
+const perPage = ref(50)
 
 // Column visibility state
 const visibleColumns = ref({
@@ -369,6 +369,41 @@ const stats = computed(() => ({
         <option :value="100">100 per page</option>
       </select>
     </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-section">
+        <h4>Extracted</h4>
+        <div class="legend-item">
+          <span class="status-icon checked">✓</span>
+          <span>Rust code has been extracted to Lean</span>
+        </div>
+        <div class="legend-item">
+          <span class="status-icon unchecked">☐</span>
+          <span>Extraction pending</span>
+        </div>
+      </div>
+
+      <div class="legend-section">
+        <h4>Verified</h4>
+        <div class="legend-item">
+          <span class="status-icon verified">✓</span>
+          <span>Function has been formally verified</span>
+        </div>
+        <div class="legend-item">
+          <span class="status-icon specified">📋</span>
+          <span>Formal specifications but no proofs</span>
+        </div>
+        <div class="legend-item">
+          <span class="status-icon draft">✏️</span>
+          <span>Natural language specifications</span>
+        </div>
+        <div class="legend-item">
+          <span class="status-icon unchecked">☐</span>
+          <span>No verification work completed yet</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -507,6 +542,7 @@ const stats = computed(() => ({
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  table-layout: auto;
 }
 
 .status-table thead {
@@ -549,7 +585,7 @@ const stats = computed(() => ({
 }
 
 .function-col {
-  max-width: 200px;
+  max-width: 220px;
 }
 
 .function-col code {
@@ -567,7 +603,7 @@ const stats = computed(() => ({
 
 .source-col {
   font-size: 0.85em;
-  max-width: 200px;
+  max-width: 220px;
 }
 
 .source-link {
@@ -589,7 +625,8 @@ const stats = computed(() => ({
 
 .status-col {
   text-align: center;
-  width: 50px;
+  width: 80px;
+  white-space: nowrap;
 }
 
 .status-link {
@@ -631,6 +668,41 @@ const stats = computed(() => ({
   color: var(--vp-c-text-2);
   font-size: 0.85em;
   max-width: 300px;
+}
+
+.legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-divider);
+}
+
+.legend-section h4 {
+  margin: 0 0 1rem 0;
+  color: var(--vp-c-text-1);
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.legend-item .status-icon {
+  font-size: 1.1rem;
+  min-width: 1.5rem;
+}
+
+.legend-item span:last-child {
+  color: var(--vp-c-text-2);
 }
 
 .pagination {
@@ -709,6 +781,22 @@ const stats = computed(() => ({
     width: 100%;
   }
 
+  .function-col {
+    max-width: 180px;
+  }
+
+  .source-col {
+    max-width: 180px;
+  }
+
+  .status-col {
+    width: 60px;
+  }
+
+  .notes-col {
+    max-width: 200px;
+  }
+
   .pagination {
     flex-direction: column;
     align-items: stretch;
@@ -720,6 +808,11 @@ const stats = computed(() => ({
 
   .per-page-select {
     width: 100%;
+  }
+
+  .column-controls {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>
