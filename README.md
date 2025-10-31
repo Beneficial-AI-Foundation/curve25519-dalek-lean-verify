@@ -26,7 +26,7 @@ See [`repo-structure.md`](./site/repo-structure.md).
 
 ## Project workflow and verification trust model
 
-See [`details.md`](./site/details.md) and [`trust.md`](./site/trust.md).
+See [`details.md`](./site/details.md).
 
 ## Code of Conduct
 
