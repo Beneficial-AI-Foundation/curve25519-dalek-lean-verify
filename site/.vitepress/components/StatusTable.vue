@@ -1,5 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
+import FunctionDetailModal from './FunctionDetailModal.vue'
+import { useStatusFormatting } from '../composables/useStatusFormatting'
+
+const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
 
 const props = defineProps({
   data: {
@@ -69,6 +73,22 @@ const sortDirection = ref('asc')
 // Pagination state
 const currentPage = ref(1)
 const perPage = ref(50)
+
+// Modal state
+const isModalOpen = ref(false)
+const selectedFunction = ref(null)
+
+// Open modal with function details
+function openFunctionDetail(func) {
+  selectedFunction.value = func
+  isModalOpen.value = true
+}
+
+// Close modal
+function closeModal() {
+  isModalOpen.value = false
+  selectedFunction.value = null
+}
 
 // Column visibility state
 const visibleColumns = ref({
@@ -263,7 +283,13 @@ const stats = computed(() => ({
         <tbody>
           <tr v-for="func in paginatedData" :key="func.function">
             <td v-if="visibleColumns.function" class="function-col">
-              <code :title="func.function">{{ getFunctionName(func.function) }}</code>
+              <button
+                @click="openFunctionDetail(func)"
+                class="function-button"
+                :title="func.function"
+              >
+                <code>{{ getFunctionName(func.function) }}</code>
+              </button>
             </td>
             <td v-if="visibleColumns.source" class="source-col">
               <a
@@ -277,8 +303,8 @@ const stats = computed(() => ({
               </a>
             </td>
             <td v-if="visibleColumns.extracted" class="status-col">
-              <span :class="['status-icon', func.extracted === 'extracted' ? 'checked' : 'unchecked']">
-                {{ func.extracted === 'extracted' ? '✓' : '☐' }}
+              <span :class="['status-icon', getExtractedStatus(func.extracted).cssClass]">
+                {{ getExtractedStatus(func.extracted).icon }}
               </span>
             </td>
             <td v-if="visibleColumns.verified" class="status-col">
@@ -288,22 +314,12 @@ const stats = computed(() => ({
                  rel="noopener"
                  class="status-link"
                  :title="`View spec: ${func.spec_theorem}`">
-                <span :class="['status-icon',
-                  func.verified === 'verified' ? 'verified' :
-                  func.verified === 'specified' ? 'specified' :
-                  func.verified === 'draft spec' ? 'draft' : 'unchecked']">
-                  {{ func.verified === 'verified' ? '✓' :
-                     func.verified === 'specified' ? '📋' :
-                     func.verified === 'draft spec' ? '✏️' : '☐' }}
+                <span :class="['status-icon', getVerifiedStatus(func.verified).cssClass]">
+                  {{ getVerifiedStatus(func.verified).icon }}
                 </span>
               </a>
-              <span v-else :class="['status-icon',
-                func.verified === 'verified' ? 'verified' :
-                func.verified === 'specified' ? 'specified' :
-                func.verified === 'draft spec' ? 'draft' : 'unchecked']">
-                {{ func.verified === 'verified' ? '✓' :
-                   func.verified === 'specified' ? '📋' :
-                   func.verified === 'draft spec' ? '✏️' : '☐' }}
+              <span v-else :class="['status-icon', getVerifiedStatus(func.verified).cssClass]">
+                {{ getVerifiedStatus(func.verified).icon }}
               </span>
             </td>
             <td v-if="visibleColumns.issue" class="issue-col">
@@ -432,6 +448,13 @@ const stats = computed(() => ({
         </div>
       </div>
     </div>
+
+    <!-- Function Detail Modal -->
+    <FunctionDetailModal
+      :isOpen="isModalOpen"
+      :func="selectedFunction"
+      @close="closeModal"
+    />
   </div>
 </template>
 
@@ -568,15 +591,35 @@ const stats = computed(() => ({
   max-width: 220px;
 }
 
-.function-col code {
+.function-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.function-button:hover {
+  opacity: 0.8;
+}
+
+.function-button code {
   display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: help;
   background: transparent;
   padding: 0;
   font-size: inherit;
+  color: var(--vp-c-brand-1);
+  cursor: pointer;
+}
+
+.function-button:hover code {
+  text-decoration: underline;
 }
 
 .source-col {
