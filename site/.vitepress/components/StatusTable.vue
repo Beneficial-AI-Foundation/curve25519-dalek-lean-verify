@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { data as issuesData } from '../data/issues.data'
 
 const props = defineProps({
   data: {
@@ -7,6 +8,26 @@ const props = defineProps({
     required: true
   }
 })
+
+// Helper function to find related issue for a function
+function findRelatedIssue(functionName) {
+  if (!issuesData || issuesData.length === 0) return null
+
+  // Remove "curve25519_dalek::" prefix to get the function path we want to match
+  const functionPath = functionName.replace(/^curve25519_dalek::/, '')
+
+  // Search for function path in issue title or body
+  const issue = issuesData.find(issue => {
+    const titleLower = issue.title.toLowerCase()
+    const bodyLower = issue.body ? issue.body.toLowerCase() : ''
+
+    // Check if the function path (without curve25519_dalek prefix) appears in title or body
+    return titleLower.includes(functionPath.toLowerCase()) ||
+           bodyLower.includes(functionPath.toLowerCase())
+  })
+
+  return issue
+}
 
 // Helper function to extract function name from full path
 function getFunctionName(fullPath) {
@@ -60,6 +81,7 @@ const visibleColumns = ref({
   source: true,
   extracted: true,
   verified: true,
+  issue: true,
   notes: false  // Hidden by default
 })
 
@@ -235,6 +257,9 @@ const stats = computed(() => ({
             <th v-if="visibleColumns.verified" class="status-col">
               Verified
             </th>
+            <th v-if="visibleColumns.issue" class="issue-col">
+              Issue
+            </th>
             <th v-if="visibleColumns.notes">Notes</th>
           </tr>
         </thead>
@@ -284,6 +309,18 @@ const stats = computed(() => ({
                    func.verified === 'draft spec' ? '✏️' : '☐' }}
               </span>
             </td>
+            <td v-if="visibleColumns.issue" class="issue-col">
+              <a v-if="findRelatedIssue(func.function)"
+                 :href="findRelatedIssue(func.function).url"
+                 target="_blank"
+                 rel="noopener"
+                 class="issue-link"
+                 :title="findRelatedIssue(func.function).title">
+                #{{ findRelatedIssue(func.function).number }}
+                <span class="issue-title">{{ findRelatedIssue(func.function).title }}</span>
+              </a>
+              <span v-else class="no-issue">—</span>
+            </td>
             <td v-if="visibleColumns.notes" class="notes-col">{{ func.notes }}</td>
           </tr>
         </tbody>
@@ -304,6 +341,10 @@ const stats = computed(() => ({
       <label class="column-toggle">
         <input type="checkbox" v-model="visibleColumns.verified" />
         <span>Verified</span>
+      </label>
+      <label class="column-toggle">
+        <input type="checkbox" v-model="visibleColumns.issue" />
+        <span>Issue</span>
       </label>
       <label class="column-toggle">
         <input type="checkbox" v-model="visibleColumns.notes" />
@@ -582,6 +623,34 @@ const stats = computed(() => ({
 }
 
 .status-icon.unchecked {
+  color: var(--vp-c-text-3);
+}
+
+.issue-col {
+  max-width: 300px;
+}
+
+.issue-link {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.issue-link:hover {
+  text-decoration: underline;
+}
+
+.issue-title {
+  color: var(--vp-c-text-2);
+  font-weight: 400;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.no-issue {
   color: var(--vp-c-text-3);
 }
 
