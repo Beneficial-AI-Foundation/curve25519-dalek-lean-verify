@@ -69,8 +69,6 @@ import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrder
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrderWide
 import Curve25519Dalek.Specs.Scalar.Scalar.FromCanonicalBytes
-import Curve25519Dalek.Specs.Scalar.Scalar.FromHash
-import Curve25519Dalek.Specs.Scalar.Scalar.HashFromBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.Invert
 import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
 import Curve25519Dalek.Specs.Scalar.Scalar.NonAdjacentForm
