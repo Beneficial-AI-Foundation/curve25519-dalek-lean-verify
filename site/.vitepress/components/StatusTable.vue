@@ -1,32 +1,27 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { data as issuesData } from '../data/issues.data'
 
 const props = defineProps({
   data: {
     type: Object,
     required: true
+  },
+  issues: {
+    type: Array,
+    default: () => []
+  },
+  findIssueForFunction: {
+    type: Function,
+    default: null
   }
 })
 
 // Helper function to find related issue for a function
 function findRelatedIssue(functionName) {
-  if (!issuesData || issuesData.length === 0) return null
+  if (!props.issues || props.issues.length === 0) return null
+  if (!props.findIssueForFunction) return null
 
-  // Remove "curve25519_dalek::" prefix to get the function path we want to match
-  const functionPath = functionName.replace(/^curve25519_dalek::/, '')
-
-  // Search for function path in issue title or body
-  const issue = issuesData.find(issue => {
-    const titleLower = issue.title.toLowerCase()
-    const bodyLower = issue.body ? issue.body.toLowerCase() : ''
-
-    // Check if the function path (without curve25519_dalek prefix) appears in title or body
-    return titleLower.includes(functionPath.toLowerCase()) ||
-           bodyLower.includes(functionPath.toLowerCase())
-  })
-
-  return issue
+  return props.findIssueForFunction(functionName, props.issues)
 }
 
 // Helper function to extract function name from full path

@@ -14,11 +14,30 @@ hero:
 <script setup lang="ts">
 import { data } from './.vitepress/data/status.data'
 import { data as progressData } from './.vitepress/data/progress.data'
+import { data as issuesData } from './.vitepress/data/issues.data'
 import ProgressChart from './.vitepress/components/ProgressChart.vue'
 import StatusTable from './.vitepress/components/StatusTable.vue'
 
 const { entries, stats } = data
 const { dataPoints } = progressData
+
+// Function to match issues to functions
+function findIssueForFunction(functionName, issues) {
+  // Remove "curve25519_dalek::" prefix to get the function path we want to match
+  const functionPath = functionName.replace(/^curve25519_dalek::/, '')
+
+  // Search for function path in issue title or body
+  const issue = issues.find(issue => {
+    const titleLower = issue.title.toLowerCase()
+    const bodyLower = issue.body ? issue.body.toLowerCase() : ''
+
+    // Check if the function path (without curve25519_dalek prefix) appears in title or body
+    return titleLower.includes(functionPath.toLowerCase()) ||
+           bodyLower.includes(functionPath.toLowerCase())
+  })
+
+  return issue
+}
 </script>
 
 ## Current Status
@@ -51,7 +70,11 @@ const { dataPoints } = progressData
 
 ## Function Status
 
-<StatusTable :data="{ functions: entries }" />
+<StatusTable
+  :data="{ functions: entries }"
+  :issues="issuesData"
+  :findIssueForFunction="findIssueForFunction"
+/>
 
 <style scoped>
 .stats-grid {
