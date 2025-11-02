@@ -5,7 +5,7 @@
  src="https://cdn.jsdelivr.net/gh/dalek-cryptography/curve25519-dalek/docs/assets/dalek-logo-clear.png"/>
 </p>
 
-# Project to formally verify, using Lean, Dalek elliptic curve cryptography
+# Verify Dalek elliptic curve cryptography using Lean
 
 A project to formally verify [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek), a Rust implementation of elliptic curve cryptography.
 The formal verification uses [Lean](https://lean-lang.org) and relies on the Lean representation of the Rust code produced by [Aeneas](https://github.com/AeneasVerif/aeneas).
@@ -20,13 +20,9 @@ See [`CONTRIBUTING.md`](./CONTRIBUTING.md).
 
 See [`status.md`](./status.md) and the [Project Site](https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/) for full details.
 
-## Repo structure
+## Project workflow, verification trust model and repo structure
 
-See [`repo-structure.md`](./site/repo-structure.md). 
-
-## Project workflow and verification trust model
-
-See [`details.md`](./site/details.md) and [`trust.md`](./site/trust.md).
+See [`details.md`](./site/details.md).
 
 ## Code of Conduct
 

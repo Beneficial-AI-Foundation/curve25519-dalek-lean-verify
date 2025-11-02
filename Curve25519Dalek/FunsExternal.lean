@@ -52,6 +52,17 @@ def subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor
   else
     ok Choice.zero
 
+/- [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}::not]:
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 207:4-207:26
+   Name pattern: [subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not]
+   Bitwise NOT for Choice values (NOT 0 = 1, NOT 1 = 0) -/
+def subtle.NotsubtleChoicesubtleChoice.not
+  (c : subtle.Choice) : Result subtle.Choice :=
+  if c.val = 1#u8 then
+    ok Choice.zero
+  else
+    ok Choice.one
+
 /- [subtle::{subtle::ConditionallyNegatable for T}::conditional_negate]:
    Name pattern: [subtle::{subtle::ConditionallyNegatable<@T>}::conditional_negate]
    Negate self if choice == Choice(1); otherwise, leave it unchanged -/
@@ -61,6 +72,22 @@ def subtle.ConditionallyNegatable.Blanket.conditional_negate
   (self : T) (choice : subtle.Choice) : Result T := do
   let self_neg ← coreopsarithNeg_TTInst.neg self
   ConditionallySelectableInst.conditional_select self self_neg choice
+
+/- [subtle::ConditionallySelectable::conditional_assign]:
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
+   Name pattern: [subtle::ConditionallySelectable::conditional_assign] -/
+axiom subtle.ConditionallySelectable.conditional_assign.default
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
+  Self) :
+  Self → Self → subtle.Choice → Result Self
+
+/- [subtle::ConditionallySelectable::conditional_swap]:
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
+   Name pattern: [subtle::ConditionallySelectable::conditional_swap] -/
+axiom subtle.ConditionallySelectable.conditional_swap.default
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
+  Self) :
+  Self → Self → subtle.Choice → Result (Self × Self)
 
 /- [subtle::{subtle::ConstantTimeEq for @Slice<T>}::ct_eq]:
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
@@ -119,5 +146,69 @@ Create a new CtOption with a value and a Choice indicating if it's Some -/
 def subtle.CtOption.new
   {T : Type} (value : T) (is_some : subtle.Choice) : Result (subtle.CtOption T) :=
   ok { value := value, is_some := is_some }
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 630:4-630:45
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get]
+   Returns the entire slice wrapped in Some (RangeFull .. always selects the whole slice) -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result (Option (Slice T)) :=
+  fun _ slice => ok (some slice)
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:57
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut]
+   Returns the entire slice wrapped in Some and a back function for updating -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
+    (Option (Slice T) → Slice T)) :=
+  fun _ slice =>
+    let back := fun (opt : Option (Slice T)) =>
+      match opt with
+      | some s => s
+      | none => slice  -- fallback to original slice if None
+    ok (some slice, back)
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked]
+   Returns the pointer unchanged (RangeFull .. always selects the whole slice) -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked
+  {T : Type} :
+  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
+    (Slice T)) :=
+  fun _ ptr => ok ptr
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut]
+   Returns the mutable pointer unchanged (RangeFull .. always selects the whole slice) -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked_mut
+  {T : Type} :
+  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
+    T)) :=
+  fun _ ptr => ok ptr
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:39
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index]
+   Returns the entire slice unchanged (RangeFull .. always selects the whole slice) -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index
+  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
+  fun _ slice => ok slice
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:51
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut]
+   Returns the entire slice and a back function for updating -/
+def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
+    Slice T)) :=
+  fun _ slice =>
+    let back := fun (s : Slice T) => s
+    ok (slice, back)
 
 end curve25519_dalek

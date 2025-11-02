@@ -14,6 +14,7 @@
 # - Text matching is literal (not regex)
 # - Blank line after ===REPLACE=== marks end of substitution block
 # - Lines starting with # are comments
+# - Blank line required at the end of the file
 
 # Forbidden identifiers
 
@@ -46,6 +47,21 @@ core.ops.arith.Sub_0_curve25519_dalekbackendserialu64fieldFieldElement51_a_curve
 Neg&0 curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
 ===REPLACE===
 Neg_0_curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
+Add&0 curve25519_dalekedwardsEdwardsPoint&'a curve25519_dalekbackendserialcurve_modelsProjectiveNielsPointcurve25519_dalekbackendserialcurve_modelsCompletedPoint
+===REPLACE===
+Add_0_curve25519_dalekedwardsEdwardsPoint_a_curve25519_dalekbackendserialcurve_modelsProjectiveNielsPointcurve25519_dalekbackendserialcurve_modelsCompletedPoint
+
+===FIND===
+Add&0 curve25519_dalekedwardsEdwardsPoint&'a curve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint
+===REPLACE===
+Add_0_curve25519_dalekedwardsEdwardsPoint_a_curve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint
+
+===FIND===
+Add&0 curve25519_dalekristrettoRistrettoPoint&'a curve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint
+===REPLACE===
+Add_0_curve25519_dalekristrettoRistrettoPoint_a_curve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint
 
 ===FIND===
 coreopsarithNeg& TTInst
@@ -112,9 +128,9 @@ def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
 noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
 
 ===FIND===
-def scalar.Scalar.is_canonical (self : scalar.Scalar) : Result subtle.Choice :=
+def scalar.Scalar.is_canonical
 ===REPLACE===
-noncomputable def scalar.Scalar.is_canonical (self : scalar.Scalar) : Result subtle.Choice :=
+noncomputable def scalar.Scalar.is_canonical
 
 ===FIND===
 def scalar.Scalar.from_canonical_bytes
@@ -122,9 +138,9 @@ def scalar.Scalar.from_canonical_bytes
 noncomputable def scalar.Scalar.from_canonical_bytes
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
+def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
 
 ===FIND===
 def
@@ -149,14 +165,85 @@ def edwards.decompress.step_1
 noncomputable def edwards.decompress.step_1
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51 :
+def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51 :
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
 
 ===FIND===
-@[reducible]
-def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+def subtle.ConstantTimeEqSlice
 ===REPLACE===
-@[reducible]
-noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
+noncomputable def subtle.ConstantTimeEqSlice
 
+===FIND===
+def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+===REPLACE===
+noncomputable def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+
+===FIND===
+def edwards.EdwardsPoint.is_small_order
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.is_small_order
+
+===FIND===
+def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+===REPLACE===
+noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+
+===FIND===
+def
+  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+===REPLACE===
+noncomputable def
+  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+
+===FIND===
+def
+  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+===REPLACE===
+noncomputable def
+  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+
+===FIND===
+def montgomery.MontgomeryPoint.to_edwards
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.to_edwards
+
+===FIND===
+def field.FieldElement51.is_zero
+===REPLACE===
+noncomputable def field.FieldElement51.is_zero
+
+===FIND===
+def field.FieldElement51.invsqrt
+===REPLACE===
+noncomputable def field.FieldElement51.invsqrt
+
+===FIND===
+def ristretto.decompress.step_1
+===REPLACE===
+noncomputable def ristretto.decompress.step_1
+
+===FIND===
+def ristretto.decompress.step_2
+===REPLACE===
+noncomputable def ristretto.decompress.step_2
+
+===FIND===
+def ristretto.CompressedRistretto.decompress
+===REPLACE===
+noncomputable def ristretto.CompressedRistretto.decompress
+
+===FIND===
+def ristretto.RistrettoPoint.compress
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.compress
+
+===FIND===
+def ristretto.RistrettoPoint.elligator_ristretto_flavor
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
+
+===FIND===
+def ristretto.RistrettoPoint.from_uniform_bytes
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.from_uniform_bytes

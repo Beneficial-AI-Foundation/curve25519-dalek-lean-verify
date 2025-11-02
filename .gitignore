@@ -38,3 +38,5 @@ verification_progress.svg
 node_modules
 site/.vitepress/dist
 site/.vitepress/cache
+site/.env
+.env

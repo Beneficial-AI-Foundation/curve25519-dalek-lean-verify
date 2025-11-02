@@ -8,6 +8,10 @@ on:
   # Check build on pull requests
   pull_request:
 
+  # Run when issues are created, edited, or updated
+  issues:
+    types: [opened, edited, deleted, closed, reopened, labeled, unlabeled]
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -55,8 +59,8 @@ jobs:
 
   # Deployment job
   deploy:
-    # Only deploy on push to master, not on PRs
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # Deploy on push to master or when issues are updated
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'issues'
     needs: build
     runs-on: ubuntu-latest
     name: Deploy

@@ -11,6 +11,7 @@ import Curve25519Dalek.Defs
 set_option linter.style.longLine false
 set_option linter.style.setOption false
 set_option maxHeartbeats 3000000
+set_option exponentiation.threshold 260
 
 /-! # Sub
 

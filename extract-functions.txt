@@ -48,3 +48,12 @@ curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor
 curve25519_dalek::edwards::EdwardsPoint::to_montgomery
 curve25519_dalek::edwards::EdwardsPoint::compress
 curve25519_dalek::edwards::CompressedEdwardsY::decompress
+curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended
+curve25519_dalek::edwards::EdwardsPoint::as_projective_niels
+curve25519_dalek::edwards::EdwardsPoint::double
+curve25519_dalek::edwards::EdwardsPoint::is_small_order
+curve25519_dalek::montgomery::MontgomeryPoint::to_edwards
+curve25519_dalek::ristretto::CompressedRistretto::decompress
+curve25519_dalek::ristretto::RistrettoPoint::compress
+curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor
+curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes
