@@ -47,6 +47,7 @@ theorem sub_assign_spec (a b : Array U64 5#usize) :
     ∃ c, sub_assign a b = ok c ∧
     Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p := by
   unfold sub_assign
-  progress*
+  progress
+  assumption
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

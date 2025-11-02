@@ -36,6 +36,12 @@ structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
 structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
   neg : Self → Result Self_Output
 
+/- Trait declaration: [core::ops::bit::Not]
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 34:0-34:13
+   Name pattern: [core::ops::bit::Not] -/
+structure core.ops.bit.Not (Self : Type) (Self_Output : Type) where
+  not : Self → Result Self_Output
+
 /- Trait declaration: [core::ops::bit::BitAnd]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
    Name pattern: [core::ops::bit::BitAnd] -/
@@ -49,6 +55,11 @@ structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
 structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitor : Self → Rhs → Result Self_Output
+
+/- [core::ops::range::RangeFull]
+   Source: '/rustc/library/core/src/ops/range.rs', lines 43:0-43:20
+   Name pattern: [core::ops::range::RangeFull] -/
+@[reducible] def core.ops.range.RangeFull := Unit
 
 /- [core::panicking::AssertKind]
    Source: '/rustc/library/core/src/panicking.rs', lines 382:0-382:19
@@ -98,6 +109,14 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
+/- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 209:0-214:1 -/
+structure backend.serial.curve_models.ProjectiveNielsPoint where
+  Y_plus_X : backend.serial.u64.field.FieldElement51
+  Y_minus_X : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T2d : backend.serial.u64.field.FieldElement51
+
 /- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
@@ -120,9 +139,18 @@ structure edwards.affine.AffinePoint where
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible] def edwards.CompressedEdwardsY := (Array U8 32#usize)
 
+/- Trait declaration: [curve25519_dalek::traits::Identity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
+structure traits.Identity (Self : Type) where
+  identity : Result Self
+
 /- [curve25519_dalek::montgomery::MontgomeryPoint]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible] def montgomery.MontgomeryPoint := (Array U8 32#usize)
+
+/- [curve25519_dalek::ristretto::RistrettoPoint]
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 485:0-485:51 -/
+@[reducible] def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
 /- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
@@ -132,5 +160,10 @@ structure edwards.affine.AffinePoint where
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
 structure scalar.Scalar where
   bytes : Array U8 32#usize
+
+/- Trait declaration: [curve25519_dalek::traits::IsIdentity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 33:0-36:1 -/
+structure traits.IsIdentity (Self : Type) where
+  is_identity : Self → Result Bool
 
 end curve25519_dalek

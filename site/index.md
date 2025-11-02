@@ -9,35 +9,81 @@ hero:
   image:
     src: https://cdn.jsdelivr.net/gh/dalek-cryptography/curve25519-dalek/docs/assets/dalek-logo-clear.png
     alt: dalek-cryptography logo
-  # actions:
-  #   - theme: brand
-  #     text: Markdown Examples
-  #     link: /markdown-examples
-  #   - theme: alt
-  #     text: API Examples
-  #     link: /api-examples
-
-features:
-  - title: Trust model
-    details: What does we need to trust in order to trust these proofs.
-    link: trust
-  - title: Project progress
-    details: Check out the latest status and track our progress through the codebase.
-    link: /status
-  - title: Project details
-    details: Read more about how, what and where.
-    link: /details
 ---
 
 <script setup lang="ts">
+import { data } from './.vitepress/data/status.data'
 import { data as progressData } from './.vitepress/data/progress.data'
 import ProgressChart from './.vitepress/components/ProgressChart.vue'
+import StatusTable from './.vitepress/components/StatusTable.vue'
 
+const { entries, stats } = data
 const { dataPoints } = progressData
 </script>
 
+## Current Status
+
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.total }}</div>
+    <div class="stat-label">Total Functions</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.extracted }}</div>
+    <div class="stat-label">Extracted</div>
+    <div class="stat-percent">{{ Math.round(stats.extracted / stats.total * 100) }}%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.specified + stats.verified }}</div>
+    <div class="stat-label">Specified</div>
+    <div class="stat-percent">{{ Math.round((stats.specified + stats.verified) / stats.total * 100) }}%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.verified }}</div>
+    <div class="stat-label">Verified</div>
+    <div class="stat-percent">{{ Math.round(stats.verified / stats.total * 100) }}%</div>
+  </div>
+</div>
+
 ## Verification Progress
 
-<a href="/curve25519-dalek-lean-verify/status" style="text-decoration: none; color: inherit;">
-  <ProgressChart :dataPoints="dataPoints" />
-</a>
+<ProgressChart :dataPoints="dataPoints" />
+
+## Function Status
+
+<StatusTable :data="{ functions: entries }" />
+
+<style scoped>
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.stat-card {
+  background: var(--vp-c-bg-soft);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: var(--vp-c-brand-1);
+}
+
+.stat-label {
+  margin-top: 0.5rem;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+}
+
+.stat-percent {
+  font-size: 0.85rem;
+  font-weight: normal;
+  color: var(--vp-c-brand-1);
+  margin-top: 0.25rem;
+}
+</style>
