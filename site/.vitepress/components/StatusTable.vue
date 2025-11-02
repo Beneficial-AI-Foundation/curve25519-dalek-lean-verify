@@ -87,10 +87,10 @@ const filteredData = computed(() => {
       func.function.toLowerCase().includes(filters.value.function.toLowerCase())
 
     const matchesExtracted = !filters.value.extracted ||
-      func.extracted === filters.value.extracted
+      (filters.value.extracted === 'not-extracted' ? func.extracted !== 'extracted' : func.extracted === filters.value.extracted)
 
     const matchesVerified = !filters.value.verified ||
-      func.verified === filters.value.verified
+      (filters.value.verified === 'no-status' ? !func.verified || func.verified === '' : func.verified === filters.value.verified)
 
     return matchesFunction && matchesExtracted && matchesVerified
   })
@@ -215,6 +215,7 @@ const stats = computed(() => ({
       <select v-model="filters.extracted" class="filter-select" @change="currentPage = 1">
         <option value="">All (Extracted)</option>
         <option value="extracted">Extracted</option>
+        <option value="not-extracted">Not Extracted</option>
       </select>
 
       <select v-model="filters.verified" class="filter-select" @change="currentPage = 1">
@@ -222,6 +223,7 @@ const stats = computed(() => ({
         <option value="verified">Verified</option>
         <option value="specified">Specified</option>
         <option value="draft spec">Draft Spec</option>
+        <option value="no-status">No Status</option>
       </select>
     </div>
 
