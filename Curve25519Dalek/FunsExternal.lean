@@ -96,20 +96,19 @@ axiom subtle.ConstantTimeEqSlice.ct_eq
   {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T)
   : Slice T → Slice T → Result subtle.Choice
 
-/- Specification axiom for equal-length slices -/
+/-- **Spec axiom for `subtle.ConstantTimeEqSlice.ct_eq`**:
+- No panic (always returns successfully)
+- Returns Choice.one (true) if and only if all corresponding elements are equal
+- Requires equal-length slices with valid bounds
+-/
+@[progress]
 axiom subtle.ConstantTimeEqSlice.ct_eq_spec
-  {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T) (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
-  (hb : b.length < 2 ^ UScalarTy.Usize.numBits) (h_eq_len : a.length = b.length) :
-  let result := subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b
-  -- Returns Choice(1) if and only if all elements are equal
-  result = ok Choice.one ↔
-  (∀ i : Nat, (hi : i < a.length) →
-     ∃ (elem_a elem_b : T) (eq_result : subtle.Choice),
-       let i_bound : i < 2 ^ UScalarTy.Usize.numBits := Nat.lt_trans hi ha
-       Slice.index_usize a ⟨i, i_bound⟩ = ok elem_a ∧
-       Slice.index_usize b ⟨i, i_bound⟩ = ok elem_b ∧
-       ConstantTimeEqInst.ct_eq elem_a elem_b = ok eq_result ∧
-       eq_result.val = 1#u8)
+  {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
+  (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
+  (hb : b.length < 2 ^ UScalarTy.Usize.numBits)
+  (h_eq_len : a.length = b.length) :
+  ∃ c, subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b = ok c ∧
+  (c = Choice.one ↔ a = b)
 
 /- [subtle::{subtle::ConstantTimeEq for u8}::ct_eq]:
 Name pattern: [subtle::{subtle::ConstantTimeEq<u8>}::ct_eq]

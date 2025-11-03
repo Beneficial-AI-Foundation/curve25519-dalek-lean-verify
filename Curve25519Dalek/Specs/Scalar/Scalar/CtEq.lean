@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.FunsExternal
 
 /-! # Spec Theorem for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`
 
@@ -11,7 +12,7 @@ Specification and proof for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`.
 
 This function performs constant-time equality comparison.
 
-**Source**: curve25519-dalek/src/scalar.rs
+Source: curve25519-dalek/src/scalar.rs
 
 ## TODO
 - Complete proof
@@ -38,10 +39,19 @@ natural language specs:
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
 -/
 theorem ct_eq_spec (s s' : Scalar) :
-    ∃ c,
-    ct_eq s s' = ok c ∧
-    (c = Choice.one ↔ s.bytes = s'.bytes)
-    := by
-  sorry
+    ∃ c, ct_eq s s' = ok c ∧
+    (c = Choice.one ↔ s.bytes = s'.bytes) := by
+  unfold ct_eq
+  progress
+  progress
+  progress as ⟨c, hc⟩
+  simp [*]
+  constructor
+  · intro h
+    simp_all
+
+
+    sorry
+  · grind
 
 end curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar
