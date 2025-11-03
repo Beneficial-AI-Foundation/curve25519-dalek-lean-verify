@@ -82,7 +82,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `elligator_ristretto_flavor` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L656-L692) | [ElligatorRistrettoFlavor.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean) | ✅ | ☐ |  |
 | `from_uniform_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L787-L804) | [FromUniformBytes.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean) | ✅ | ☐ |  |
 | `mul_base` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L951-L962) | [MulBase.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean) | ☐ | ☐ | Aeneas error on extraction |
-| `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1141-L1145) | [Pack.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean) | ✅ | 📋 |  |
+| `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1141-L1145) | [Pack.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean) | ✅ | ✅ |  |
 | `clamp_integer` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1388-L1393) | [ClampInteger.lean](Curve25519Dalek/Specs/Scalar/ClampInteger.lean) | ✅ | ✅ |  |
 | `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1352-L1366) | [ReadLeU64Into.lean](Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean) | ☐ | ✏️ | Extraction problem due to nested borrows |
 | `as_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L706-L708) | [AsBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean) | ✅ | ✅ |  |

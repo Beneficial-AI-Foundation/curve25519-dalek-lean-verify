@@ -37,6 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result byte array represents the same number as the input unpacked scalar modulo L
 -/
+@[progress]
 theorem to_bytes_spec (u : Scalar52) :
     ∃ b,
     to_bytes u = ok b ∧

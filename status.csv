@@ -75,7 +75,7 @@ curve25519_dalek::ristretto::RistrettoPoint::compress,curve25519-dalek/src/ristr
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor,curve25519-dalek/src/ristretto.rs,L656-L692,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean,extracted,,
 curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes,curve25519-dalek/src/ristretto.rs,L787-L804,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean,extracted,,
 curve25519_dalek::ristretto::RistrettoPoint::mul_base,curve25519-dalek/src/ristretto.rs,L951-L962,Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean,,,Aeneas error on extraction
-curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve25519-dalek/src/scalar.rs,L1141-L1145,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean,extracted,specified,
+curve25519_dalek::scalar::backend::serial::u64::scalar::Scalar52::pack,curve25519-dalek/src/scalar.rs,L1141-L1145,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean,extracted,verified,
 curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs,L1388-L1393,Curve25519Dalek/Specs/Scalar/ClampInteger.lean,extracted,verified,
 curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1352-L1366,Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean,,draft spec,Extraction problem due to nested borrows
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L706-L708,Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean,extracted,verified,
