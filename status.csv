@@ -4,11 +4,11 @@ curve25519_dalek::backend::serial::curve_models::CompletedPoint::as_projective,c
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L341-L348,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean,extracted,,
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double,curve25519-dalek/src/backend/serial/curve_models/mod.rs,L384-L419,Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean,extracted,specified,
 curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul,curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs,L1-L15,Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean,,,Extracts to broken Lean code
-curve25519_dalek::backend::serial::u64::constants::EDWARDS_D,curve25519-dalek/src/backend/serial/u64/constants.rs,L45-L51,,extracted,,
-curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2,curve25519-dalek/src/backend/serial/u64/constants.rs,L54-L60,,extracted,,
+curve25519_dalek::backend::serial::u64::constants::EDWARDS_D,curve25519-dalek/src/backend/serial/u64/constants.rs,L45-L51,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean,extracted,verified,
+curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2,curve25519-dalek/src/backend/serial/u64/constants.rs,L54-L60,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D2.lean,extracted,verified,
 curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D,curve25519-dalek/src/backend/serial/u64/constants.rs,L90-L96,,extracted,,
-curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED,curve25519-dalek/src/backend/serial/u64/constants.rs,L63-L69,,extracted,,
-curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED,curve25519-dalek/src/backend/serial/u64/constants.rs,L72-L78,,extracted,,
+curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED,curve25519-dalek/src/backend/serial/u64/constants.rs,L63-L69,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ONE_MINUS_EDWARDS_D_SQUARED.lean,extracted,verified,
+curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED,curve25519-dalek/src/backend/serial/u64/constants.rs,L72-L78,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D_MINUS_ONE_SQUARED.lean,extracted,verified,
 curve25519_dalek::backend::serial::u64::constants::L,curve25519-dalek/src/backend/serial/u64/constants.rs,L127-L133,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean,extracted,verified,Brackets required in extracted Lean
 curve25519_dalek::backend::serial::u64::constants::LFACTOR,curve25519-dalek/src/backend/serial/u64/constants.rs,L136-L136,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/LFACTOR.lean,extracted,verified,
 curve25519_dalek::backend::serial::u64::constants::R,curve25519-dalek/src/backend/serial/u64/constants.rs,L139-L145,Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean,extracted,verified,
