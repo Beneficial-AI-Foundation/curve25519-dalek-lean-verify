@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.FunsExternal
 
 /-! # Spec Theorem for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`
 
@@ -13,9 +12,6 @@ Specification and proof for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`.
 This function performs constant-time equality comparison.
 
 Source: curve25519-dalek/src/scalar.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -42,16 +38,12 @@ theorem ct_eq_spec (s s' : Scalar) :
     ∃ c, ct_eq s s' = ok c ∧
     (c = Choice.one ↔ s.bytes = s'.bytes) := by
   unfold ct_eq
-  progress
-  progress
-  progress as ⟨c, hc⟩
-  simp [*]
+  repeat progress
   constructor
-  · intro h
-    simp_all
-
-
-    sorry
+  · intro _
+    have : s.bytes.to_slice = s'.bytes.to_slice := by grind
+    simp only [Array.to_slice, Slice.eq_iff] at *
+    exact Subtype.eq this
   · grind
 
 end curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar

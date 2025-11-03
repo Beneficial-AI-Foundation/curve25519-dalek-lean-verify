@@ -86,7 +86,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `clamp_integer` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1388-L1393) | [ClampInteger.lean](Curve25519Dalek/Specs/Scalar/ClampInteger.lean) | ✅ | ✅ |  |
 | `read_le_u64_into` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1352-L1366) | [ReadLeU64Into.lean](Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean) | ☐ | ✏️ | Extraction problem due to nested borrows |
 | `as_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L706-L708) | [AsBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean) | ✅ | ✅ |  |
-| `ct_eq` | [scalar.rs](curve25519-dalek/src/scalar.rs#L301-L303) | [CtEq.lean](Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean) | ✅ | 📋 |  |
+| `ct_eq` | [scalar.rs](curve25519-dalek/src/scalar.rs#L301-L303) | [CtEq.lean](Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean) | ✅ | ✅ |  |
 | `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L237-L247) | [FromBytesModOrder.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean) | ✅ | 📋 |  |
 | `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L250-L253) | [FromBytesModOrderWide.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean) | ✅ | 📋 |  |
 | `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L261-L266) | [FromCanonicalBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean) | ✅ | 📋 |  |
