@@ -11,10 +11,7 @@ Specification and proof for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`.
 
 This function performs constant-time equality comparison.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
-## TODO
-- Complete proof
+Source: curve25519-dalek/src/scalar.rs
 -/
 
 open Aeneas.Std Result
@@ -38,10 +35,15 @@ natural language specs:
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
 -/
 theorem ct_eq_spec (s s' : Scalar) :
-    ∃ c,
-    ct_eq s s' = ok c ∧
-    (c = Choice.one ↔ s.bytes = s'.bytes)
-    := by
-  sorry
+    ∃ c, ct_eq s s' = ok c ∧
+    (c = Choice.one ↔ s.bytes = s'.bytes) := by
+  unfold ct_eq
+  repeat progress
+  constructor
+  · intro _
+    have : s.bytes.to_slice = s'.bytes.to_slice := by grind
+    simp only [Array.to_slice, Slice.eq_iff] at *
+    exact Subtype.eq this
+  · grind
 
 end curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar
