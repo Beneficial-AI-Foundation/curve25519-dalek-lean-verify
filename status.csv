@@ -83,8 +83,6 @@ curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L301-L303
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L237-L247,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L250-L253,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,specified,Specified (markus-dablander)
-curve25519_dalek::scalar::Scalar::from_hash,curve25519-dalek/src/scalar.rs,L670-L678,Curve25519Dalek/Specs/Scalar/Scalar/FromHash.lean,,draft spec,Charon can't find this function; NL-specs written (markus-dablander)
-curve25519_dalek::scalar::Scalar::hash_from_bytes,curve25519-dalek/src/scalar.rs,L624-L632,Curve25519Dalek/Specs/Scalar/Scalar/HashFromBytes.lean,,draft spec,Charon can't find this function; NL-specs written (markus-dablander)
 curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L747-L749,Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1134-L1136,Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean,extracted,specified,Specified (markus-dablander)
 curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L921-L973,Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,Extraction problem due to nested borrows; NL-specs written (markus-dablander)
