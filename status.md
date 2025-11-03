@@ -11,11 +11,11 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L341-L348) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean) | ✅ | ☐ |  |
 | `double` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L384-L419) | [Double.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean) | ✅ | 📋 |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | [Mul.lean](Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean) | ☐ | ☐ | Extracts to broken Lean code |
-| `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | - | ✅ | ☐ |  |
-| `EDWARDS_D2` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L54-L60) | - | ✅ | ☐ |  |
+| `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | [EDWARDS_D.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean) | ✅ | ✅ |  |
+| `EDWARDS_D2` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L54-L60) | [EDWARDS_D2.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D2.lean) | ✅ | ✅ |  |
 | `INVSQRT_A_MINUS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L90-L96) | - | ✅ | ☐ |  |
-| `ONE_MINUS_EDWARDS_D_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L63-L69) | - | ✅ | ☐ |  |
-| `EDWARDS_D_MINUS_ONE_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L72-L78) | - | ✅ | ☐ |  |
+| `ONE_MINUS_EDWARDS_D_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L63-L69) | [ONE_MINUS_EDWARDS_D_SQUARED.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ONE_MINUS_EDWARDS_D_SQUARED.lean) | ✅ | ✅ |  |
+| `EDWARDS_D_MINUS_ONE_SQUARED` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L72-L78) | [EDWARDS_D_MINUS_ONE_SQUARED.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D_MINUS_ONE_SQUARED.lean) | ✅ | ✅ |  |
 | `L` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L127-L133) | [L.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean) | ✅ | ✅ | Brackets required in extracted Lean |
 | `LFACTOR` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L136-L136) | [LFACTOR.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/LFACTOR.lean) | ✅ | ✅ |  |
 | `R` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L139-L145) | [R.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean) | ✅ | ✅ |  |
