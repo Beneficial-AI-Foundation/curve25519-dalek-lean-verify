@@ -36,6 +36,12 @@ structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
 structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
   neg : Self → Result Self_Output
 
+/- Trait declaration: [core::ops::arith::AddAssign]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 755:0-755:31
+   Name pattern: [core::ops::arith::AddAssign] -/
+structure core.ops.arith.AddAssign (Self : Type) (Rhs : Type) where
+  add_assign : Self → Rhs → Result Self
+
 /- Trait declaration: [core::ops::bit::Not]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 34:0-34:13
    Name pattern: [core::ops::bit::Not] -/
@@ -95,14 +101,14 @@ structure subtle.ConditionallyNegatable (Self : Type) where
 @[reducible] def backend.serial.u64.field.FieldElement51 := (Array U64 5#usize)
 
 /- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 157:0-161:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
 structure backend.serial.curve_models.ProjectivePoint where
   X : backend.serial.u64.field.FieldElement51
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
 
 /- [curve25519_dalek::backend::serial::curve_models::CompletedPoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 172:0-177:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 169:0-174:1 -/
 structure backend.serial.curve_models.CompletedPoint where
   X : backend.serial.u64.field.FieldElement51
   Y : backend.serial.u64.field.FieldElement51
@@ -110,7 +116,7 @@ structure backend.serial.curve_models.CompletedPoint where
   T : backend.serial.u64.field.FieldElement51
 
 /- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 209:0-214:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
 structure backend.serial.curve_models.ProjectiveNielsPoint where
   Y_plus_X : backend.serial.u64.field.FieldElement51
   Y_minus_X : backend.serial.u64.field.FieldElement51

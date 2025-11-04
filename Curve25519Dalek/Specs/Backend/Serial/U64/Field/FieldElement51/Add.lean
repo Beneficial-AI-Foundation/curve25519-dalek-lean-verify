@@ -15,8 +15,9 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
+open curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
 
 /-! ## Spec for `add` -/
 
@@ -33,4 +34,4 @@ theorem add_spec (a b : Array U64 5#usize)
   unfold add
   exact add_assign_spec a b hab
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
