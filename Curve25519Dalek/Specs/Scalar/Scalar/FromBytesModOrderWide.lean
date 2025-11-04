@@ -5,6 +5,8 @@ Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 
 /-! # Spec Theorem for `Scalar::from_bytes_mod_order_wide`
 
@@ -12,10 +14,7 @@ Specification and proof for `Scalar::from_bytes_mod_order_wide`.
 
 This function constructs a scalar from a wide byte array, reducing modulo the group order.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
-## TODO
-- Complete proof
+Source: curve25519-dalek/src/scalar.rs
 -/
 
 open Aeneas.Std Result
@@ -36,14 +35,15 @@ natural language specs:
 /-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:
 - No panic (always returns successfully)
 - The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L
-- The result scalar s is less than L (the group order)
--/
+- The result scalar s is less than L (the group order) -/
+@[progress]
 theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :
-    ∃ s,
-    from_bytes_mod_order_wide b = ok s ∧
+    ∃ s, from_bytes_mod_order_wide b = ok s ∧
     U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧
-    U8x32_as_Nat s.bytes < L
-    := by
-  sorry
+    U8x32_as_Nat s.bytes < L := by
+  unfold from_bytes_mod_order_wide
+  progress*
+  constructor
+  all_goals simp_all [Nat.ModEq]
 
 end curve25519_dalek.scalar.Scalar
