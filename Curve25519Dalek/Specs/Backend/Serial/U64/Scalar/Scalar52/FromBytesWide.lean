@@ -34,13 +34,11 @@ natural language specs:
 
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
 - No panic (always returns successfully)
-- The result represents the input byte array reduced modulo L (canonical form)
--/
+- The result represents the input byte array reduced modulo L (canonical form) -/
+@[progress]
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
-    ∃ u,
-    from_bytes_wide b = ok u ∧
-    Scalar52_as_Nat u = U8x64_as_Nat b % L
-    := by
+    ∃ u, from_bytes_wide b = ok u ∧
+    Scalar52_as_Nat u = U8x64_as_Nat b % L := by
     sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
