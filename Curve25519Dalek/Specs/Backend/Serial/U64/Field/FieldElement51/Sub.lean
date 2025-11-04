@@ -20,7 +20,7 @@ of p is added.
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
 
 /-
 natural language description:
@@ -52,4 +52,4 @@ theorem sub_spec (a b : Array U64 5#usize) :
     := by
   sorry
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub

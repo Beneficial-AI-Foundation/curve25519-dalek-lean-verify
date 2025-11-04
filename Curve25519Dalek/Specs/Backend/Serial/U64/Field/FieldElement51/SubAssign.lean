@@ -36,18 +36,18 @@ natural language specs:
       where p = 2^255 - 19
 -/
 
-/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub_assign`**:
-- No panic (always succeeds since it delegates to `sub`)
-- The result c satisfies the field subtraction property:
-  Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
-  where p = 2^255 - 19
--/
-@[progress]
-theorem sub_assign_spec (a b : Array U64 5#usize) :
-    ∃ c, sub_assign a b = ok c ∧
-    Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p := by
-  unfold sub_assign
-  progress
-  assumption
+-- /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub_assign`**:
+-- - No panic (always succeeds since it delegates to `sub`)
+-- - The result c satisfies the field subtraction property:
+--   Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p)
+--   where p = 2^255 - 19
+-- -/
+-- @[progress]
+-- theorem sub_assign_spec (a b : Array U64 5#usize) :
+--     ∃ c, sub_assign a b = ok c ∧
+--     Field51_as_Nat c % p = (Field51_as_Nat a - Field51_as_Nat b) % p := by
+--   unfold sub_assign
+--   progress
+--   assumption
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

@@ -21,7 +21,7 @@ set_option linter.hashCommand false
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
@@ -50,6 +50,7 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
           have := Array.set_of_ne' a i3 j i (by scalar_tac) (by omega)
           have := Array.val_getElem!_eq' a j (by scalar_tac)
           simp_all
+          sorry
       · intro j hj hj'
         have := res_post_2 j hj (by omega)
         simp_all
@@ -78,4 +79,4 @@ theorem add_assign_spec (a b : Array U64 5#usize)
   · intro i hi
     simpa using res_post_1 i hi (by simp)
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign

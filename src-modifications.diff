@@ -9,65 +9,6 @@ and the modified version used in this verification project.
 
 ---
 
-diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
---- a/curve25519-dalek/src/backend/serial/curve_models/mod.rs
-+++ b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
-@@ -136,6 +136,9 @@
- 
- use crate::edwards::EdwardsPoint;
- use crate::field::FieldElement;
-+// Only import FieldElement51 when using the serial u64 backend
-+#[cfg(all(curve25519_dalek_backend = "serial", curve25519_dalek_bits = "64"))]
-+use crate::backend::serial::u64::field::FieldElement51;
- use crate::traits::ValidityCheck;
- 
- // ------------------------------------------------------------------------
-@@ -383,16 +386,35 @@
-         let XX = self.X.square();
-         let YY = self.Y.square();
-         let ZZ2 = self.Z.square2();
--        let X_plus_Y = &self.X + &self.Y;
--        let X_plus_Y_sq = X_plus_Y.square();
--        let YY_plus_XX = &YY + &XX;
--        let YY_minus_XX = &YY - &XX;
--
--        CompletedPoint {
--            X: &X_plus_Y_sq - &YY_plus_XX,
--            Y: YY_plus_XX,
--            Z: YY_minus_XX,
--            T: &ZZ2 - &YY_minus_XX,
-+
-+        cfg_if::cfg_if! {
-+            if #[cfg(all(curve25519_dalek_backend = "serial", curve25519_dalek_bits = "64"))] {
-+                // Use FieldElement51 associated functions directly for serial u64 backend
-+                let X_plus_Y = FieldElement51::add(&self.X, &self.Y);
-+                let X_plus_Y_sq = X_plus_Y.square();
-+                let YY_plus_XX = FieldElement51::add(&YY, &XX);
-+                let YY_minus_XX = FieldElement51::sub(&YY, &XX);
-+
-+                CompletedPoint {
-+                    X: FieldElement51::sub(&X_plus_Y_sq, &YY_plus_XX),
-+                    Y: YY_plus_XX,
-+                    Z: YY_minus_XX,
-+                    T: FieldElement51::sub(&ZZ2, &YY_minus_XX),
-+                }
-+            } else {
-+                // Use operators for other backends (fiat or u32)
-+                let X_plus_Y = &self.X + &self.Y;
-+                let X_plus_Y_sq = X_plus_Y.square();
-+                let YY_plus_XX = &YY + &XX;
-+                let YY_minus_XX = &YY - &XX;
-+
-+                CompletedPoint {
-+                    X: &X_plus_Y_sq - &YY_plus_XX,
-+                    Y: YY_plus_XX,
-+                    Z: YY_minus_XX,
-+                    T: &ZZ2 - &YY_minus_XX,
-+                }
-+            }
-         }
-     }
- }
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
@@ -85,108 +26,19 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/var
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/field.rs b/curve25519-dalek/src/backend/serial/u64/field.rs
 --- a/curve25519-dalek/src/backend/serial/u64/field.rs
 +++ b/curve25519-dalek/src/backend/serial/u64/field.rs
-@@ -57,47 +57,27 @@
+@@ -57,8 +57,10 @@
  
  impl<'a> AddAssign<&'a FieldElement51> for FieldElement51 {
      fn add_assign(&mut self, _rhs: &'a FieldElement51) {
 -        for i in 0..5 {
--            self.0[i] += _rhs.0[i];
--        }
-+        FieldElement51::add_assign(self, _rhs);
-     }
- }
- 
- impl<'a> Add<&'a FieldElement51> for &FieldElement51 {
-     type Output = FieldElement51;
-     fn add(self, _rhs: &'a FieldElement51) -> FieldElement51 {
--        let mut output = *self;
--        output += _rhs;
--        output
-+        FieldElement51::add(self, _rhs)
-     }
- }
- 
- impl<'a> SubAssign<&'a FieldElement51> for FieldElement51 {
-     fn sub_assign(&mut self, _rhs: &'a FieldElement51) {
--        let result = (self as &FieldElement51) - _rhs;
--        self.0 = result.0;
-+        FieldElement51::sub_assign(self, _rhs);
-     }
- }
- 
- impl<'a> Sub<&'a FieldElement51> for &FieldElement51 {
-     type Output = FieldElement51;
-     fn sub(self, _rhs: &'a FieldElement51) -> FieldElement51 {
--        // To avoid underflow, first add a multiple of p.
--        // Choose 16*p = p << 4 to be larger than 54-bit _rhs.
--        //
--        // If we could statically track the bitlengths of the limbs
--        // of every FieldElement51, we could choose a multiple of p
--        // just bigger than _rhs and avoid having to do a reduction.
--        //
--        // Since we don't yet have type-level integers to do this, we
--        // have to add an explicit reduction call here.
--        FieldElement51::reduce([
--            (self.0[0] + 36028797018963664u64) - _rhs.0[0],
--            (self.0[1] + 36028797018963952u64) - _rhs.0[1],
--            (self.0[2] + 36028797018963952u64) - _rhs.0[2],
--            (self.0[3] + 36028797018963952u64) - _rhs.0[3],
--            (self.0[4] + 36028797018963952u64) - _rhs.0[4],
--        ])
-+        FieldElement51::sub(self, _rhs)
-     }
- }
- 
-@@ -285,6 +265,48 @@
-         self.0 = neg.0;
-     }
- 
-+    /// Add two field elements without reduction
-+    pub fn add(a: &FieldElement51, b: &FieldElement51) -> FieldElement51 {
-+        let mut output = *a;
-+        FieldElement51::add_assign(&mut output, b);
-+        output
-+    }
-+
-+    /// Add a field element to this one in place
-+    pub fn add_assign(a: &mut FieldElement51, b: &FieldElement51) {
 +        let mut i = 0;
 +        while i < 5 {
-+            a.0[i] += b.0[i];
+             self.0[i] += _rhs.0[i];
 +            i += 1;
-+        }
-+    }
-+
-+    /// Subtract two field elements
-+    pub fn sub(a: &FieldElement51, b: &FieldElement51) -> FieldElement51 {
-+        // To avoid underflow, first add a multiple of p.
-+        // Choose 16*p = p << 4 to be larger than 54-bit b.
-+        //
-+        // If we could statically track the bitlengths of the limbs
-+        // of every FieldElement51, we could choose a multiple of p
-+        // just bigger than b and avoid having to do a reduction.
-+        //
-+        // Since we don't yet have type-level integers to do this, we
-+        // have to add an explicit reduction call here.
-+        FieldElement51::reduce([
-+            (a.0[0] + 36028797018963664u64) - b.0[0],
-+            (a.0[1] + 36028797018963952u64) - b.0[1],
-+            (a.0[2] + 36028797018963952u64) - b.0[2],
-+            (a.0[3] + 36028797018963952u64) - b.0[3],
-+            (a.0[4] + 36028797018963952u64) - b.0[4],
-+        ])
-+    }
-+
-+    /// Subtract a field element from this one in place
-+    pub fn sub_assign(a: &mut FieldElement51, b: &FieldElement51) {
-+        let result = FieldElement51::sub(a, b);
-+        a.0 = result.0;
-+    }
-+
-     /// Given 64-bit input limbs, reduce to enforce the bound 2^(51 + epsilon).
-     #[inline(always)]
-     fn reduce(mut limbs: [u64; 5]) -> FieldElement51 {
-@@ -572,8 +594,10 @@
+         }
+     }
+ }
+@@ -572,8 +574,10 @@
      /// Returns 2 times the square of this field element.
      pub fn square2(&self) -> FieldElement51 {
          let mut square = self.pow2k(1);
