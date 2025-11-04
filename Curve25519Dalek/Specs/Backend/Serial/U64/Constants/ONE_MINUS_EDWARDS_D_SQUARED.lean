@@ -20,8 +20,8 @@ namespace curve25519_dalek.backend.serial.u64
 /-
 natural language description:
 
-    • constants.ONE_MINUS_EDWARDS_D_SQUARED is a constant representing 1 - d² (mod p) whereby d is the
-      key parameter in the defining curve equation -x^2 + y^2 = 1 + dx^2y^2.
+    • constants.ONE_MINUS_EDWARDS_D_SQUARED is a constant representing 1 - d² (mod p) whereby d is a parameter
+      in the defining curve equation ax^2 + y^2 = 1 + dx^2y^2.
     • The field element constants.ONE_MINUS_EDWARDS_D_SQUARED is represented as five u64 limbs (51-bit limbs)
     • Note that the original Rust comment states
       "One minus edwards `d` value squared, equal to `(1 - (-121665/121666) mod p) pow 2`",
