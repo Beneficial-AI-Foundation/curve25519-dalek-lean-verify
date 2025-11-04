@@ -20,8 +20,8 @@ namespace curve25519_dalek.backend.serial.u64
 /-
 natural language description:
 
-    • constants.EDWARDS_D2 is a constant representing 2*d (mod p) whereby d is the
-      key parameter in the defining curve equation -x^2 + y^2 = 1 + dx^2y^2.
+    • constants.EDWARDS_D2 is a constant representing 2*d (mod p) whereby d is a
+      parameter in the defining curve equation ax^2 + y^2 = 1 + dx^2y^2.
     • The field element constants.EDWARDS_D2 is represented as five u64 limbs (51-bit limbs)
 
 natural language specs:
