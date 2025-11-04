@@ -112,7 +112,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs 
          }
  
          // subtract l if the sum is >= l
-@@ -180,27 +198,37 @@
+@@ -180,21 +198,31 @@
  
          // a - b
          let mut borrow: u64 = 0;
@@ -151,22 +151,6 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs 
      }
  
      /// Compute `a * b`
-     #[inline(always)]
-     #[rustfmt::skip] // keep alignment of z[*] calculations
--    pub (crate) fn mul_internal(a: &Scalar52, b: &Scalar52) -> [u128; 9] {
-+    pub fn mul_internal(a: &Scalar52, b: &Scalar52) -> [u128; 9] {
-         let mut z = [0u128; 9];
- 
-         z[0] = m(a[0], b[0]);
-@@ -219,7 +247,7 @@
-     /// Compute `a^2`
-     #[inline(always)]
-     #[rustfmt::skip] // keep alignment of return calculations
--    fn square_internal(a: &Scalar52) -> [u128; 9] {
-+    pub fn square_internal(a: &Scalar52) -> [u128; 9] {
-         let aa = [
-             a[0] * 2,
-             a[1] * 2,
 @@ -316,8 +344,10 @@
      #[inline(never)]
      pub fn from_montgomery(&self) -> Scalar52 {

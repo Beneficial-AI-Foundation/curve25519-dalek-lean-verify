@@ -228,7 +228,7 @@ impl Scalar52 {
     /// Compute `a * b`
     #[inline(always)]
     #[rustfmt::skip] // keep alignment of z[*] calculations
-    pub fn mul_internal(a: &Scalar52, b: &Scalar52) -> [u128; 9] {
+    pub (crate) fn mul_internal(a: &Scalar52, b: &Scalar52) -> [u128; 9] {
         let mut z = [0u128; 9];
 
         z[0] = m(a[0], b[0]);
@@ -247,7 +247,7 @@ impl Scalar52 {
     /// Compute `a^2`
     #[inline(always)]
     #[rustfmt::skip] // keep alignment of return calculations
-    pub fn square_internal(a: &Scalar52) -> [u128; 9] {
+    fn square_internal(a: &Scalar52) -> [u128; 9] {
         let aa = [
             a[0] * 2,
             a[1] * 2,

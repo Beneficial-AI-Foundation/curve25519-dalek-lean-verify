@@ -5,8 +5,6 @@
 
 curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce
 curve25519_dalek::scalar::clamp_integer
-curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal
-curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal
 curve25519_dalek::scalar::Scalar::ZERO
 curve25519_dalek::scalar::Scalar::ONE
 curve25519_dalek::scalar::Scalar::to_bytes
@@ -37,10 +35,6 @@ curve25519_dalek::edwards::EdwardsPoint::as_projective
 curve25519_dalek::ristretto::CompressedRistretto::to_bytes
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes
-# curve25519_dalek::backend::serial::u64::field::FieldElement51::add
-# curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign
-# curve25519_dalek::backend::serial::u64::field::FieldElement51::sub
-# curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign
 curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double
 curve25519_dalek::backend::serial::u64::field::FieldElement51::pow22501
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2
