@@ -39,6 +39,7 @@ natural language specs:
 - The result scalar s' is congruent to the input scalar s modulo L (the group order)
 - The result scalar s' is in canonical form (less than L)
 -/
+@[progress]
 theorem reduce_spec (s : Scalar) :
     ∃ s',
     reduce s = ok s' ∧

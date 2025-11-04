@@ -80,7 +80,7 @@ curve25519_dalek::scalar::clamp_integer,curve25519-dalek/src/scalar.rs,L1388-L13
 curve25519_dalek::scalar::read_le_u64_into,curve25519-dalek/src/scalar.rs,L1352-L1366,Curve25519Dalek/Specs/Scalar/ReadLeU64Into.lean,,draft spec,Extraction problem due to nested borrows
 curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L706-L708,Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean,extracted,verified,
 curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L301-L303,Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean,extracted,verified,
-curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L237-L247,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean,extracted,specified,
+curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L237-L247,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean,extracted,verified,
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L250-L253,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,specified,
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,specified,
 curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L747-L749,Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean,extracted,specified,
