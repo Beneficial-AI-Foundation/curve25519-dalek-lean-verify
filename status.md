@@ -27,9 +27,11 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L360-L385) | [FromBytes.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean) | ✅ | 📋 | Brackets required in extracted Lean |
 | `from_limbs` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L238-L240) | [FromLimbs.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean) | ✅ | ✅ |  |
 | `negate` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L256-L262) | [Negate.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean) | ✅ | 📋 |  |
-| `ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L245-L245) | - | ✅ | ☐ |  |
-| `ZERO` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L263-L263) | - | ✅ | ☐ |  |
-| `MINUS_ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L267-L273) | - | ✅ | ☐ |  |
+| `from_limbs` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L238-L240) | - | ✅ | ☐ |  |
+| `negate` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L256-L262) | - | ✅ | ☐ |  |
+| `ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L245-L245) | [ONE.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean) | ✅ | ✅ |  |
+| `ZERO` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L263-L263) | [ZERO.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean) | ✅ | ✅ |  |
+| `MINUS_ONE` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L267-L273) | [MINUS_ONE.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean) | ✅ | ✅ |  |
 | `pow22501` | [field.rs](curve25519-dalek/src/field.rs#L170-L204) | - | ✅ | ☐ |  |
 | `pow2k` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L482-L587) | [Pow2K.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean) | ✅ | 📋 |  |
 | `reduce` | [backend/serial/u64/field.rs](curve25519-dalek/src/backend/serial/u64/field.rs#L312-L345) | [Reduce.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean) | ✅ | ✅ |  |
