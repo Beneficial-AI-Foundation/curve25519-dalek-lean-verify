@@ -82,16 +82,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
       rw [i2_post]
       have hb_val : (b[i.val]!).val < 2 ^ 52 := hb i.val hi_lt
-      have hi3_bound : (↑i3 : ℕ) ≤ 1 := by
-        simp [i3_post_1, Nat.shiftRight_eq_div_pow]
-        -- borrow >>> 63 = borrow / 2^63
-        -- Since borrow < 2^64, we have borrow / 2^63 < 2^64 / 2^63 = 2
-        -- So borrow / 2^63 ≤ 1 (since it's integer division)
-        have : ↑borrow < 2 ^ 64 := by simp [U64.max]
-        -- Use Nat.div_le_iff_le_mul: a / b ≤ c ↔ a ≤ c * b
-        rw [Nat.div_le_iff_le_mul (by omega)]
-        omega
-      -- Use scalar_tac for U64 arithmetic bounds
+      -- Use scalar_tac for U64 arithmetic bounds - it handles shiftRight automatically
       scalar_tac
     · -- hd: show bounds for all limbs up to i6
       intro j hj
