@@ -81,7 +81,11 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
     · -- hmax: show i2 + i3 ≤ U64.max
       -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
       rw [i2_post]
-      scalar_tac
+      have : ↑b[i.val]! < 2 ^ 52 := hb i.val hi_lt
+      have : ↑i3 ≤ 1 := by
+        simp [i3_post_1, Nat.shiftRight_eq_div_pow]
+        omega
+      omega
     · -- hd: show bounds for all limbs up to i6
       intro j hj
       have hj_eq : j < ↑i6 := by simpa using hj
@@ -95,6 +99,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
         have hj_eq : j = i.val := by omega
         simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
         -- i5.val = (wrapping_sub result) % 2^52, so i5.val < 2^52
+        -- The expression is already of the form x % 2^52, so we can apply mod_lt directly
         rw [i5_post_1]
         apply Nat.mod_lt
         omega
