@@ -122,19 +122,19 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
       refine ⟨res_1, res_2, ?_, ?_⟩
-      · -- Equality proofs
-        simp
-      · -- Arithmetic invariant and bounds
-        refine ⟨?_, ?_⟩
-        · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
-          sorry
-        · -- Bounds from res_post_2
-          intro j hj
-          -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
-          have : ↑res_1[j]! < 2 ^ 52 := by
-            have := res_post_2 j hj
-            simpa using this
-          exact this
+      · rfl
+      · refine ⟨?_, ?_⟩
+        · rfl
+        · refine ⟨?_, ?_⟩
+          · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
+            sorry
+          · -- Bounds from res_post_2
+            intro j hj
+            -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
+            have : ↑res_1[j]! < 2 ^ 52 := by
+              have := res_post_2 j hj
+              simpa using this
+            exact this
   · have hnot : ¬ i.val < 5 := by
       simpa using hlt
     have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
