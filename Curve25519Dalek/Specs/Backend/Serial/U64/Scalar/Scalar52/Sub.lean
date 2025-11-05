@@ -82,7 +82,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
       rw [i2_post]
       have : (b[i.val]!).val < 2 ^ 52 := hb i.val hi_lt
-      have : ↑i3 ≤ 1 := by
+      have : (↑i3 : ℕ) ≤ 1 := by
         simp [i3_post_1, Nat.shiftRight_eq_div_pow]
         omega
       -- Convert to Nat for omega
@@ -110,8 +110,9 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       have : i.val ≠ j := by omega
       -- Use hd_rest since we only modified index i, and j > i
       -- Need to show that setting i doesn't affect j when j ≠ i
+      -- Array.set_of_ne' has signature: (bs, a, i:Nat, j:Usize), so we use it backwards
       have : ((difference.set i i5)[j]!).val = difference[j]!.val := by
-        simp [Array.set_of_ne' difference i5 j (by omega) i]
+        simp [Array.set_of_ne difference i5 j (by omega) (by omega) (by omega)]
       rw [this]
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
