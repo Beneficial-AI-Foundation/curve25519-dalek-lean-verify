@@ -81,9 +81,10 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
     · -- hmax: show i2 + i3 ≤ U64.max
       -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
       rw [i2_post]
-      have : (b[i.val]!).val < 2 ^ 52 := hb i.val hi_lt
-      have : (↑i3 : ℕ) ≤ 1 := by
+      have hb_val : (b[i.val]!).val < 2 ^ 52 := hb i.val hi_lt
+      have hi3_bound : (↑i3 : ℕ) ≤ 1 := by
         simp [i3_post_1, Nat.shiftRight_eq_div_pow]
+        have : ↑borrow < 2 ^ 64 := by simp [U64.max]
         omega
       -- Convert to Nat for omega
       simp only [U64.max]
@@ -110,14 +111,19 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       have : i.val ≠ j := by omega
       -- Use hd_rest since we only modified index i, and j > i
       -- Need to show that setting i doesn't affect j when j ≠ i
-      -- Array.set_of_ne' has signature: (bs, a, i:Nat, j:Usize), so we use it backwards
+      -- Array.set_of_ne: (bs.set j#usize a)[i]! = bs[i] when i ≠ j
+      -- We have: (difference.set i i5)[j]! - need to swap indices
       have : ((difference.set i i5)[j]!).val = difference[j]!.val := by
-        simp [Array.set_of_ne difference i5 j (by omega) (by omega) (by omega)]
+        have hj_bounds : j < difference.length := by simpa using hj_lt
+        have hi_bounds : i.val < difference.length := by simpa using hi_lt
+        -- Use set_of_ne with swapped indices: setting index i.val doesn't affect index j
+        rw [Array.set_of_ne difference i5 j i.val hj_bounds hi_bounds (by omega)]
       rw [this]
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
-      refine ⟨res_1, res_2, ?_, ?_, ?_⟩
-      · simp
+      refine ⟨res_1, res_2, ?_, ?_⟩
+      · -- Equality proofs
+        simp
       · -- Arithmetic invariant and bounds
         refine ⟨?_, ?_⟩
         · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
