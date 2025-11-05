@@ -123,12 +123,12 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
           · -- Bounds from res_post_2
             intro j hj
             -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
+            -- Convert 4503599627370496 to 2^52 using norm_num
             have : ↑res_1[j]! < (2:ℕ) ^ 52 := by
               have := res_post_2 j hj
-              -- 4503599627370496 = 2^52, convert using norm_num
               convert this using 1
               norm_num
-            exact this
+            this
   · have hnot : ¬ i.val < 5 := by
       simpa using hlt
     have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
