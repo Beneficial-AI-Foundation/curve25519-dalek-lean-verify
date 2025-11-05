@@ -95,7 +95,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
         -- j ≠ i.val is already handled by simp_all
       · -- j = i: show i5 < 2^52
         have hj_eq : j = i.val := by omega
-        simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
+        simp_all [Array.getElem!_Nat_eq, Array.set_val_eq, hj_eq]
         -- Goal is already of the form x % 2^52 < 2^52, apply mod_lt directly
         apply Nat.mod_lt
         omega
@@ -125,7 +125,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
             -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
             have : ↑res_1[j]! < (2:ℕ) ^ 52 := by
               have := res_post_2 j hj
-              -- 4503599627370496 = 2^52
+              -- 4503599627370496 = 2^52, convert using norm_num
               convert this using 1
               norm_num
             exact this
