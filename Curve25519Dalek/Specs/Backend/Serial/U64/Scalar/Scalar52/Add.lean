@@ -53,13 +53,13 @@ theorem add_spec (u u' : Scalar52) :
     := by
   unfold add
   progress*
-  
-  -- After progress*, we have expanded the initial computations (mask creation)
-  -- The remaining proof requires:
-  -- 1. Showing add_loop succeeds and computes sum = u + u' (modulo carry handling)
-  -- 2. Showing sub sum L succeeds and produces v such that v ≡ (u + u') mod L
-  -- 3. Showing v < L (canonical form)
-  -- This depends on sub_spec being complete, which is currently incomplete
+  -- After progress*, we have mask computed. The do-notation needs to be handled manually
+  -- since add_loop doesn't have a spec theorem yet.
+  -- Strategy: Use congruence properties to show the result is correct modulo L
+  -- Key insight: add_loop computes sum = u + u' + carry*2^260 where carry < 2^8
+  -- Since 2^260 ≡ 0 [MOD L], we have sum ≡ u + u' [MOD L]
+  -- Then sub computes (sum - L) mod L, which preserves congruence
+  -- The proof requires understanding sub's behavior (from sub_spec when complete)
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
