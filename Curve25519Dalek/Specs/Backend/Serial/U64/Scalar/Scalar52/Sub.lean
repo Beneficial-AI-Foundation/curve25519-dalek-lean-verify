@@ -81,10 +81,12 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
     · -- hmax: show i2 + i3 ≤ U64.max
       -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
       rw [i2_post]
-      have : ↑b[i.val]! < 2 ^ 52 := hb i.val hi_lt
+      have : (b[i.val]!).val < 2 ^ 52 := hb i.val hi_lt
       have : ↑i3 ≤ 1 := by
         simp [i3_post_1, Nat.shiftRight_eq_div_pow]
         omega
+      -- Convert to Nat for omega
+      simp only [U64.max]
       omega
     · -- hd: show bounds for all limbs up to i6
       intro j hj
@@ -98,9 +100,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       · -- j = i: show i5 < 2^52
         have hj_eq : j = i.val := by omega
         simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
-        -- i5.val = (wrapping_sub result) % 2^52, so i5.val < 2^52
-        -- The expression is already of the form x % 2^52, so we can apply mod_lt directly
-        rw [i5_post_1]
+        -- Goal is already of the form x % 2^52 < 2^52, apply mod_lt directly
         apply Nat.mod_lt
         omega
     · -- hd_rest: show limbs from i6 onwards are still 0
@@ -108,13 +108,20 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
       have : ↑i < j := by omega
       have : i.val ≠ j := by omega
-      simp_all
+      -- Use hd_rest since we only modified index i, and j > i
+      exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
       refine ⟨res_1, res_2, ?_, ?_, ?_⟩
       · simp
       · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
         sorry
-      · exact res_post_2
+      · -- res_post_2 gives bounds in different notation
+        intro j hj
+        -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
+        have : ↑res_1[j]! < 2 ^ 52 := by
+          have := res_post_2 j hj
+          simpa using this
+        exact this
   · have hnot : ¬ i.val < 5 := by
       simpa using hlt
     have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
