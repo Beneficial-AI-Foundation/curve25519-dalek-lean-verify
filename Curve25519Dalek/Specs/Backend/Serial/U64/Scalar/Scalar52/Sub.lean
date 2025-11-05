@@ -102,8 +102,8 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
     · -- hd_rest: show limbs from i6 onwards are still 0
       intro j hj_le hj_lt
       simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
-      have : ↑i < j := by omega
-      have : i.val ≠ j := by omega
+      have : ↑i < j := by grind
+      have : i.val ≠ j := by grind
       -- Use hd_rest since we only modified index i, and j > i
       -- Need to show that setting i doesn't affect j when j ≠ i.val
       have hj_bounds : j < difference.length := by simpa using hj_lt
