@@ -107,17 +107,10 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       -- Use hd_rest since we only modified index i, and j > i
       -- Need to show that setting i doesn't affect j when j ≠ i.val
       have hj_bounds : j < difference.length := by simpa using hj_lt
-      have hi_bounds : i.val < difference.length := by simpa using hi_lt
       have h_ne : j ≠ i.val := by omega
       -- After simp_all, we have ↑((↑difference).set (↑i) i5)[j]! = ↑(↑difference)[j]!
-      -- Use Array.set_of_ne: (bs.set j#usize a)[i]! = bs[i] when i ≠ j
-      -- We have (difference.set i.val#usize i5)[j]! = difference[j]! when j ≠ i.val
-      -- This matches Array.set_of_ne with bs=difference, a=i5, i=j, j=i.val
-      have : ((difference.set i i5)[j]!).val = difference[j]!.val := by
-        simp [Array.getElem!_Nat_eq, Array.set_val_eq]
-        -- Now: (difference.set i.val#usize i5)[j]! = difference[j]!
-        rw [Array.set_of_ne difference i5 j i.val hj_bounds hi_bounds h_ne]
-      simp_all [this]
+      -- Use Array.set_of_ne' to show this equals difference[j]!
+      simp_all [Array.set_of_ne' difference i5 j i hj_bounds h_ne]
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
       refine ⟨res_1, res_2, ?_, ?_⟩
