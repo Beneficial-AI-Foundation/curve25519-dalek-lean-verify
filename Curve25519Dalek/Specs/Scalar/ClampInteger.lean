@@ -56,12 +56,13 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     · have := List.mem_range.mp hi
       interval_cases i
       all_goals
-        -- For i > 0, we have 8 ∣ 2^(8*i) * x because 8 ∣ 2^(8*i) = (2^8)^i = 256^i
-        -- Since 8 ∣ 256, we have 8 ∣ 256^i, so 8 ∣ 256^i * x
+        -- For i > 0, we have 8 ∣ 2^(8*i) * x because 8 ∣ 2^(8*i)
+        -- Since 8 ∣ 2^8 = 256, we have 8 ∣ (2^8)^i = 2^(8*i), so 8 ∣ 2^(8*i) * x
+        have h8_div : 8 ∣ 2 ^ 8 := by norm_num
         have : 8 ∣ 2 ^ (8 * i) := by
-          rw [← Nat.pow_pow]
-          have : 8 ∣ 2 ^ 8 := by norm_num
-          exact Nat.pow_dvd_pow 2 this i
+          have : 2 ^ (8 * i) = (2 ^ 8) ^ i := by simp [Nat.pow_mul]
+          rw [this]
+          exact Nat.dvd_pow h8_div i
         exact Nat.dvd_mul_right (↑res[i]!) this
   · subst_vars
     simp [*]
