@@ -4,19 +4,25 @@ keywords = ["formal verification"]
 defaultTargets = ["Curve25519Dalek"]
 
 [leanOptions]
-pp.unicode.fun = true # pretty-prints `fun a ↦ b`
+pp.unicode.fun = true                 # pretty-prints `fun a ↦ b`
 autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 linter.style.longLine = false
-maxRecDepth = 10000
+maxRecDepth = 100_000
+# doc.verso = true
 
 [[require]]
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
-rev = "son/regions2"  # PR #600
+rev = "main"
+
+[[require]]
+name = "Canonical"
+scope = "chasenorman"
+rev = "v4.24.0"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
