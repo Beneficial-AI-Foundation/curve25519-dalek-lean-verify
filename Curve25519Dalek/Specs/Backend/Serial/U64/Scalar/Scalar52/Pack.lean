@@ -33,13 +33,15 @@ natural language specs:
 
 /-- **Spec and proof concerning `scalar.Scalar52.pack`**:
 - No panic (always returns successfully)
-- Both the unpacked r and the packed s represent the same natural number
--/
-theorem pack_spec (u : Scalar52) :
+- Both the unpacked r and the packed s represent the same natural number modulo L
+- The packed scalar is in canonical form (less than L) -/
+@[progress]
+theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :
     ∃ s, pack u = ok s ∧
-    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] := by
+    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧
+    U8x32_as_Nat s.bytes < L := by
   unfold pack
   progress
-  assumption
+  grind
 
 end curve25519_dalek.scalar.Scalar52

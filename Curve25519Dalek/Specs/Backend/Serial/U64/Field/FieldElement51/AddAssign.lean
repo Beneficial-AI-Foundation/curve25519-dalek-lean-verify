@@ -21,7 +21,7 @@ set_option linter.hashCommand false
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
@@ -40,22 +40,21 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
     · intro j hj _
       have := hab j hj
       have := hab j (by scalar_tac) (by omega)
-      have : i.val ≠ j := by scalar_tac
+      have : ↑i ≠ j := by scalar_tac
       simp_all
     · refine ⟨?_, ?_⟩
-      · intro j hj hj'
+      · intro j hj _
         obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
         · simp_all
         · have := res_post_1 j hj (by omega)
-          have := Array.set_of_ne' a i3 j i (by scalar_tac) (by omega)
-          have := Array.val_getElem!_eq' a j (by scalar_tac)
-          simp_all
-      · intro j hj hj'
+          have : ↑i ≠ j := by omega
+          simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
+      · intro j hj _
         have := res_post_2 j hj (by omega)
         simp_all
   · use a
     simp only [implies_true, and_true, true_and]
-    intro j hj hj'
+    intro j hj _
     have : j = 5 := by scalar_tac
     omega
   termination_by 5 - i.val
@@ -78,4 +77,4 @@ theorem add_assign_spec (a b : Array U64 5#usize)
   · intro i hi
     simpa using res_post_1 i hi (by simp)
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
