@@ -9,7 +9,7 @@
   - `progress` / `progress*` symbolic execution tactics
   - `scalar_tac` for limb arithmetic
   - `bvify`, `bv_decide` for bitvector reasoning
-  - Mathlib’s `omega` for linear arithmetic
+  - Mathlib's `grind` for automated proof search (preferred over `omega` as it subsumes it)
 - Built-in `grind` from Lean 4 for algebraic/simplifier-style reasoning (see Lean Reference: [Lean 4 Reference](https://lean-lang.org/doc/reference/latest)).
 - Canonical tactic for search/synthesis in dependent type theory; pin to Lean v4.24.0 (repo: [CanonicalLean](https://github.com/chasenorman/CanonicalLean)).
 - lean4-skills collection for additional skills/tactics (repo: `https://github.com/cameronfreer/lean4-skills`).
