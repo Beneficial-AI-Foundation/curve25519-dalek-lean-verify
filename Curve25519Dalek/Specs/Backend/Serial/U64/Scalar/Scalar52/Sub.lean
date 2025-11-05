@@ -36,9 +36,25 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `sub` -/
 
-/-- Auxiliary definition to interpret a vector of `j` u64 limbs as a number (51-bit limbs) -/
+/- Auxiliary definition to interpret a vector of `j` u64 limbs as a number (51-bit limbs) -/
 def U64x5_slice_as_Nat (limbs : Array U64 5#usize) (j : Nat) : Nat :=
   ∑ i ∈ Finset.range j, 2^(51 * i) * (limbs[i]!).val
+
+/-- Slicing zero limbs yields zero. -/
+@[simp]
+theorem U64x5_slice_as_Nat_zero (limbs : Array U64 5#usize) :
+    U64x5_slice_as_Nat limbs 0 = 0 := by
+  simp [U64x5_slice_as_Nat]
+
+/-- Slicing up to `j.succ` adds the `j`-th limb contribution. -/
+@[simp]
+theorem U64x5_slice_as_Nat_succ (limbs : Array U64 5#usize) (j : Nat) :
+    U64x5_slice_as_Nat limbs (j.succ) =
+      U64x5_slice_as_Nat limbs j + 2^(51 * j) * (limbs[j]!).val := by
+  have h :=
+    Finset.sum_range_succ (fun i => 2^(51 * i) * (limbs[i]!).val) j
+  simpa [U64x5_slice_as_Nat, add_comm, add_left_comm, add_assoc]
+    using h
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**: -/
 @[progress]
@@ -58,29 +74,53 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
   unfold sub_loop
   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   unfold backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-  split
-  · progress*
-    · sorry
-    · sorry
-    · sorry
-    · sorry
-  · use difference, borrow
-    constructor
-    · rfl
-    · constructor
-      · simp [U64x5_slice_as_Nat]
-        have : i.val = 5 := by scalar_tac
-        simp [this]
-        -- When we've processed all 5 limbs, the arithmetic property should hold
+  by_cases hlt : i < 5#usize
+  · have hi_lt : i.val < 5 := by simpa using hlt
+    -- Recursive case: establish updated bounds and invariant, then recurse.
+    progress*
+    · -- hmax: show i2 + i3 ≤ U64.max
+      -- i3 = borrow >>> 63 is either 0 or 1, and i2 < 2^52 < U64.max
+      rw [i2_post]
+      scalar_tac
+    · -- hd: show bounds for all limbs up to i6
+      intro j hj
+      have hj_eq : j < ↑i6 := by simpa using hj
+      have hj_lt : j < ↑i + 1 := by simpa [i6_post] using hj_eq
+      by_cases h : j < ↑i
+      · -- j < i: use existing bound
+        have := hd j h
+        simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
+        -- j ≠ i.val is already handled by simp_all
+      · -- j = i: show i5 < 2^52
+        have hj_eq : j = i.val := by omega
+        simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
+        -- i5.val = (wrapping_sub result) % 2^52, so i5.val < 2^52
+        rw [i5_post_1]
+        apply Nat.mod_lt
+        omega
+    · -- hd_rest: show limbs from i6 onwards are still 0
+      intro j hj_le hj_lt
+      simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
+      have : ↑i < j := by omega
+      have : i.val ≠ j := by omega
+      simp_all
+    · -- Main goal: combine recursive result with current step
+      refine ⟨res_1, res_2, ?_, ?_, ?_⟩
+      · simp
+      · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
         sorry
-      · intro j hj
-        by_cases h : j < i.val
-        · exact hd j h
-        · have : i.val ≤ j := by omega
-          have hz := hd_rest j this hj
-          omega
-  termination_by 5 - i.val
-  decreasing_by scalar_decr_tac
+      · exact res_post_2
+  · have hnot : ¬ i.val < 5 := by
+      simpa using hlt
+    have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
+    have hi_eq : i.val = 5 := Nat.le_antisymm hi hge
+    refine ⟨difference, borrow, ?_, ?_, ?_⟩
+    · simp [hlt]
+    · -- TODO: arithmetic invariant when the loop terminates.
+      sorry
+    · intro j hj
+      have : j < i.val := by simpa [hi_eq]
+      exact hd j this
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Does not error and hence returns a result
@@ -92,6 +132,6 @@ theorem sub_spec (a b : Array U64 5#usize)
     ∃ result, sub a b = ok result ∧
     Scalar52_as_Nat result ≡ (Scalar52_as_Nat a - Scalar52_as_Nat b) [MOD L] := by
   unfold sub
-  -- progress*
-
+  progress*
+  -- TODO: combine loop result, conditional addition, and congruence properties.
   sorry

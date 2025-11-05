@@ -34,23 +34,57 @@ attribute [-simp] Int.reducePow Nat.reducePow
 def U64x5_slice_as_Nat_add (limbs : Array U64 5#usize) (j : Nat) : Nat :=
   ∑ i ∈ Finset.range j, 2^(52 * i) * (limbs[i]!).val
 
+@[simp]
+theorem U64x5_slice_as_Nat_add_zero (limbs : Array U64 5#usize) :
+    U64x5_slice_as_Nat_add limbs 0 = 0 := by
+  simp [U64x5_slice_as_Nat_add]
+
+/-- Convenience theorem unfolding one more limb in `U64x5_slice_as_Nat_add`. -/
+@[simp]
+theorem U64x5_slice_as_Nat_add_succ (limbs : Array U64 5#usize) (j : Nat) :
+    U64x5_slice_as_Nat_add limbs (j.succ) =
+      U64x5_slice_as_Nat_add limbs j + 2^(52 * j) * (limbs[j]!).val := by
+  have h :=
+    Finset.sum_range_succ (fun i => 2^(52 * i) * (limbs[i]!).val) j
+  simpa [U64x5_slice_as_Nat_add, add_comm, add_left_comm, add_assoc]
+    using h
+
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
 - The loop adds two arrays limb by limb with carry propagation
 - After processing i limbs: U64x5_slice_as_Nat_add sum' i ≡ U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry*2^(52*i) [MOD 2^(52*i)]
 - When i = 5, this gives: Scalar52_as_Nat sum' ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD 2^260]
-- Note: Once proven, add @[progress] attribute to enable progress* to use it
 -/
+@[progress]
 theorem add_loop_spec (mask : U64) (a b sum : Array U64 5#usize) (carry : U64) (i : Usize)
     (ha : ∀ j, j < 5 → (a[j]!).val < 2 ^ 52) (hb : ∀ j, j < 5 → (b[j]!).val < 2 ^ 52)
     (hs : ∀ j, j < i.val → (sum[j]!).val < 2 ^ 52)
     (hs_rest : ∀ j, i.val ≤ j → j < 5 → (sum[j]!).val = 0)
     (hmask : mask.val = 2 ^ 52 - 1)
-    (hi : i.val ≤ 5) :
+    (hi : i.val ≤ 5)
+    (hmod : U64x5_slice_as_Nat_add sum i ≡
+      U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry.val * 2 ^ (52 * i.val)
+        [MOD 2 ^ (52 * i.val)]) :
     ∃ sum', add_loop mask a b sum carry i = ok sum' ∧
-    U64x5_slice_as_Nat_add sum' i ≡ U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry.val * 2^(52 * i.val) [MOD 2^(52 * i.val)] ∧
+    U64x5_slice_as_Nat_add sum' i ≡
+      U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry.val * 2 ^ (52 * i.val)
+        [MOD 2 ^ (52 * i.val)] ∧
     (∀ j, j < 5 → (sum'[j]!).val < 2 ^ 52)
     := by
-  sorry
+  unfold add_loop
+  by_cases hlt : i < 5#usize
+  · have hi_lt : i.val < 5 := by simpa using hlt
+    -- Recursive branch to be completed.
+    sorry
+  · have hnot : ¬ i.val < 5 := by
+      simpa using hlt
+    have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
+    have hi_eq : i.val = 5 := Nat.le_antisymm hi hge
+    refine ⟨sum, ?_, ?_, ?_⟩
+    · simp [hlt]
+    · simpa using hmod
+    · intro j hj
+      have : j < i.val := by simpa [hi_eq]
+      exact hs j this
 
 /-
 natural language description:
@@ -74,15 +108,6 @@ theorem add_spec (u u' : Scalar52) :
     Scalar52_as_Nat v = (Scalar52_as_Nat u + Scalar52_as_Nat u') % L
     := by
   unfold add
-  progress*
-  -- progress* expanded mask computation. Once add_loop_spec is proven, it will expand add_loop too
-  -- Strategy: Use add_loop_spec to show sum ≡ u + u' [MOD 2^260]
-  -- Since 2^260 ≡ 0 [MOD L], we have sum ≡ u + u' [MOD L]
-  -- Then sub computes (sum - L) mod L, which preserves congruence modulo L
-  -- So v ≡ u + u' [MOD L], and we need to show v = (u + u') % L
-  simp_all
-  -- Use congruence properties - sub preserves modulo L
-  -- This proof structure is ready for completion once add_loop_spec is proven
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
