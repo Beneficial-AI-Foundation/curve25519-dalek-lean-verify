@@ -53,6 +53,7 @@ theorem add_spec (u u' : Scalar52) :
     := by
   unfold add
   progress*
+  
   -- After progress*, we have expanded the initial computations (mask creation)
   -- The remaining proof requires:
   -- 1. Showing add_loop succeeds and computes sum = u + u' (modulo carry handling)
