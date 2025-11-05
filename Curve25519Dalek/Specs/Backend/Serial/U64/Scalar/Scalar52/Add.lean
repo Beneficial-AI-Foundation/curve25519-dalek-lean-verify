@@ -30,6 +30,28 @@ set_option linter.hashCommand false
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
+/-- Auxiliary definition to interpret a vector of `j` u64 limbs as a number (52-bit limbs) -/
+def U64x5_slice_as_Nat_add (limbs : Array U64 5#usize) (j : Nat) : Nat :=
+  ∑ i ∈ Finset.range j, 2^(52 * i) * (limbs[i]!).val
+
+/-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
+- The loop adds two arrays limb by limb with carry propagation
+- After processing i limbs: U64x5_slice_as_Nat_add sum' i ≡ U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry*2^(52*i) [MOD 2^(52*i)]
+- When i = 5, this gives: Scalar52_as_Nat sum' ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD 2^260]
+- Note: Once proven, add @[progress] attribute to enable progress* to use it
+-/
+theorem add_loop_spec (mask : U64) (a b sum : Array U64 5#usize) (carry : U64) (i : Usize)
+    (ha : ∀ j, j < 5 → (a[j]!).val < 2 ^ 52) (hb : ∀ j, j < 5 → (b[j]!).val < 2 ^ 52)
+    (hs : ∀ j, j < i.val → (sum[j]!).val < 2 ^ 52)
+    (hs_rest : ∀ j, i.val ≤ j → j < 5 → (sum[j]!).val = 0)
+    (hmask : mask.val = 2 ^ 52 - 1)
+    (hi : i.val ≤ 5) :
+    ∃ sum', add_loop mask a b sum carry i = ok sum' ∧
+    U64x5_slice_as_Nat_add sum' i ≡ U64x5_slice_as_Nat_add a i + U64x5_slice_as_Nat_add b i + carry.val * 2^(52 * i.val) [MOD 2^(52 * i.val)] ∧
+    (∀ j, j < 5 → (sum'[j]!).val < 2 ^ 52)
+    := by
+  sorry
+
 /-
 natural language description:
 
@@ -53,13 +75,14 @@ theorem add_spec (u u' : Scalar52) :
     := by
   unfold add
   progress*
-  -- After progress*, we have mask computed. The do-notation needs to be handled manually
-  -- since add_loop doesn't have a spec theorem yet.
-  -- Strategy: Use congruence properties to show the result is correct modulo L
-  -- Key insight: add_loop computes sum = u + u' + carry*2^260 where carry < 2^8
+  -- progress* expanded mask computation. Once add_loop_spec is proven, it will expand add_loop too
+  -- Strategy: Use add_loop_spec to show sum ≡ u + u' [MOD 2^260]
   -- Since 2^260 ≡ 0 [MOD L], we have sum ≡ u + u' [MOD L]
-  -- Then sub computes (sum - L) mod L, which preserves congruence
-  -- The proof requires understanding sub's behavior (from sub_spec when complete)
+  -- Then sub computes (sum - L) mod L, which preserves congruence modulo L
+  -- So v ≡ u + u' [MOD L], and we need to show v = (u + u') % L
+  simp_all
+  -- Use congruence properties - sub preserves modulo L
+  -- This proof structure is ready for completion once add_loop_spec is proven
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
