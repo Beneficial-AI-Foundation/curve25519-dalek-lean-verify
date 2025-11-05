@@ -109,19 +109,25 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       have : ↑i < j := by omega
       have : i.val ≠ j := by omega
       -- Use hd_rest since we only modified index i, and j > i
+      -- Need to show that setting i doesn't affect j when j ≠ i
+      have : ((difference.set i i5)[j]!).val = difference[j]!.val := by
+        simp [Array.set_of_ne' difference i5 j (by omega) i]
+      rw [this]
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
       refine ⟨res_1, res_2, ?_, ?_, ?_⟩
       · simp
-      · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
-        sorry
-      · -- res_post_2 gives bounds in different notation
-        intro j hj
-        -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
-        have : ↑res_1[j]! < 2 ^ 52 := by
-          have := res_post_2 j hj
-          simpa using this
-        exact this
+      · -- Arithmetic invariant and bounds
+        refine ⟨?_, ?_⟩
+        · -- Arithmetic invariant: need to show the equation holds for i given it holds for i6
+          sorry
+        · -- Bounds from res_post_2
+          intro j hj
+          -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
+          have : ↑res_1[j]! < 2 ^ 52 := by
+            have := res_post_2 j hj
+            simpa using this
+          exact this
   · have hnot : ¬ i.val < 5 := by
       simpa using hlt
     have hge : 5 ≤ i.val := Nat.le_of_not_lt hnot
