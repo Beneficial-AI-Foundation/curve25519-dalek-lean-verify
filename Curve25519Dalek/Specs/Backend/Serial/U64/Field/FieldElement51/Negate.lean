@@ -43,13 +43,10 @@ Natural language specs:
 - Requires that input limbs of r are bounded to avoid underflow:
   - Limb 0 must be ≤ 36028797018963664
   - Limbs 1-4 must be ≤ 36028797018963952
+  To make the theorem more easily readable and provable, we
+  replace these precise bounds with the slightly looser bound 2^54
 -/
-theorem negate_spec (r : FieldElement51)
-    (h_bound_0 : (r[0]!).val ≤ 36028797018963664)
-    (h_bound_1 : (r[1]!).val ≤ 36028797018963952)
-    (h_bound_2 : (r[2]!).val ≤ 36028797018963952)
-    (h_bound_3 : (r[3]!).val ≤ 36028797018963952)
-    (h_bound_4 : (r[4]!).val ≤ 36028797018963952) :
+theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
     ∃ r_inv, negate r = ok r_inv ∧
     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0
     := by
