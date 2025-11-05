@@ -105,13 +105,18 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       have : ↑i < j := by omega
       have : i.val ≠ j := by omega
       -- Use hd_rest since we only modified index i, and j > i
-      -- Need to show that setting i doesn't affect j when j ≠ i
+      -- Need to show that setting i doesn't affect j when j ≠ i.val
       have hj_bounds : j < difference.length := by simpa using hj_lt
       have hi_bounds : i.val < difference.length := by simpa using hi_lt
-      have h_ne : i.val ≠ j := by omega
-      -- Use set_of_ne: setting index i.val doesn't affect index j
+      have h_ne : j ≠ i.val := by omega
+      -- Array.set_of_ne: (bs.set j#usize a)[i]! = bs[i] when i ≠ j
+      -- We have (difference.set i i5)[j]! where i is Usize
+      -- Convert to: (difference.set i.val#usize i5)[j]! = difference[j]!
+      -- This matches Array.set_of_ne with bs=difference, a=i5, i=j, j=i.val
       have : ((difference.set i i5)[j]!).val = difference[j]!.val := by
-        simp [Array.set_of_ne difference i5 j i.val hj_bounds hi_bounds h_ne]
+        -- difference.set i i5 = difference.set i.val#usize i5
+        rw [Array.set_of_ne difference i5 j i.val hj_bounds hi_bounds h_ne]
+        simp [Array.getElem!_Nat_eq]
       simp_all [this]
       exact hd_rest j (by omega) hj_lt
     · -- Main goal: combine recursive result with current step
@@ -125,9 +130,11 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
           · -- Bounds from res_post_2
             intro j hj
             -- res_post_2: ↑res_1[j]! < 4503599627370496 where 4503599627370496 = 2^52
-            have : ↑res_1[j]! < 2 ^ 52 := by
+            have : ↑res_1[j]! < (2:ℕ) ^ 52 := by
               have := res_post_2 j hj
-              simpa using this
+              -- 4503599627370496 = 2^52
+              convert this using 1
+              norm_num
             exact this
   · have hnot : ¬ i.val < 5 := by
       simpa using hlt
