@@ -51,7 +51,7 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
       _ = 2^248 * (bytes[31]!).val := by norm_num
       _ ≥ 2^255 := by grind
   have : L < 2^255 := by unfold L; norm_num
-  omega
+  grind
 
 /-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order`**:
 - No panic (always returns successfully)

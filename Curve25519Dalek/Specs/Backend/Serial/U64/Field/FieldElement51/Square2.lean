@@ -57,25 +57,25 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
       scalar_tac
     · intro j hj _
       have := h_no_overflow j hj
-      have := h_no_overflow j (by scalar_tac) (by omega)
+      have := h_no_overflow j (by scalar_tac) (by grind)
       have : i.val ≠ j := by scalar_tac
       simp_all
     · refine ⟨?_, ?_⟩
       · intro j hj _
-        obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
+        obtain hc | hc := (show j = i ∨ i + 1 ≤ j by grind)
         · simp_all
-        · have := res_post_1 j hj (by omega)
-          have := Array.set_of_ne' square i2 j i (by scalar_tac) (by omega)
+        · have := res_post_1 j hj (by grind)
+          have := Array.set_of_ne' square i2 j i (by scalar_tac) (by grind)
           have := Array.val_getElem!_eq' square j (by scalar_tac)
           simp_all
       · intro j hj _
-        have := res_post_2 j hj (by omega)
+        have := res_post_2 j hj (by grind)
         simp_all
   · use square
     simp only [implies_true, and_true, true_and]
     intro j hj _
     have : j = 5 := by scalar_tac
-    omega
+    grind
   termination_by 5 - i.val
   decreasing_by scalar_decr_tac
 

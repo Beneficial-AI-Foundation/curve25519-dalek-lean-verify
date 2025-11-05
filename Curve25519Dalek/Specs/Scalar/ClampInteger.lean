@@ -54,7 +54,7 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     · subst_vars
       simpa [*] using clamp_integer_spec_aux_a _
     · have := List.mem_range.mp hi
-      interval_cases i <;> omega
+      interval_cases i <;> grind
   · subst_vars
     simp [*]
     rw [Finset.sum_range_succ]

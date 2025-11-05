@@ -94,11 +94,11 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
         simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
         -- j ≠ i.val is already handled by simp_all
       · -- j = i: show i5 < 2^52
-        have hj_eq : j = i.val := by omega
+        have hj_eq : j = i.val := by grind
         simp_all [Array.getElem!_Nat_eq, Array.set_val_eq, hj_eq]
         -- Goal is already of the form x % 2^52 < 2^52, apply mod_lt directly
         apply Nat.mod_lt
-        omega
+        grind
     · -- hd_rest: show limbs from i6 onwards are still 0
       intro j hj_le hj_lt
       simp_all [Array.getElem!_Nat_eq, Array.set_val_eq]
@@ -107,11 +107,11 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       -- Use hd_rest since we only modified index i, and j > i
       -- Need to show that setting i doesn't affect j when j ≠ i.val
       have hj_bounds : j < difference.length := by simpa using hj_lt
-      have h_ne : j ≠ i.val := by omega
+      have h_ne : j ≠ i.val := by grind
       -- After simp_all, we have ↑((↑difference).set (↑i) i5)[j]! = ↑(↑difference)[j]!
       -- Use Array.set_of_ne' to show this equals difference[j]!
       simp_all [Array.set_of_ne' difference i5 j i hj_bounds h_ne]
-      exact hd_rest j (by omega) hj_lt
+      exact hd_rest j (by grind) hj_lt
     · -- Main goal: combine recursive result with current step
       refine ⟨res_1, res_2, ?_, ?_⟩
       · rfl

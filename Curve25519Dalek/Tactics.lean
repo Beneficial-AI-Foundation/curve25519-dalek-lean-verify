@@ -18,7 +18,7 @@ Expand a universal quantifier hypothesis `h : ∀ i < n, P i` into individual hy
 
 Usage: `expand h with 5` creates hypotheses `h_0`, `h_1`, `h_2`, `h_3`, `h_4`.
 
-The bound `n` must be provided explicitly. Each hypothesis is proven using `omega`.
+The bound `n` must be provided explicitly. Each hypothesis is proven using `grind`.
 
 Example:
 ```lean
@@ -31,4 +31,4 @@ elab "expand " h:ident " with " n:num : tactic => do
   let n := n.getNat
   for i in [:n] do
     let newName := h.getId.appendAfter s!"_{i}"
-    evalTactic (← `(tactic| have $(mkIdent newName) := $h $(quote i) (by omega)))
+    evalTactic (← `(tactic| have $(mkIdent newName) := $h $(quote i) (by grind)))

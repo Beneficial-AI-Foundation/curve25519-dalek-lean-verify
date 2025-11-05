@@ -51,7 +51,7 @@ theorem aux (byte : U8) : byte.val <<< 56 < U64.size := by scalar_tac
 theorem byte_testBit_of_ge (j : Nat) (hj : 8 ≤ j) (byte : U8) : (byte.val.testBit j) = false := by
   apply Nat.testBit_lt_two_pow
   calc byte.val < 2 ^ 8 := by scalar_tac
-    _ ≤ 2^j := by apply Nat.pow_le_pow_right (by omega); omega
+    _ ≤ 2^j := by apply Nat.pow_le_pow_right (by grind); grind
 
 theorem U8_shiftLeft_lt {n : Nat} (hn : n ≤ 56) (byte : U8) : byte.val <<< n < U64.size := by
   interval_cases n
@@ -59,7 +59,7 @@ theorem U8_shiftLeft_lt {n : Nat} (hn : n ≤ 56) (byte : U8) : byte.val <<< n <
 
 theorem decide_le_eq_false_of_lt {n j : Nat} (hn : j < n) : decide (n ≤ j) = false := by
   rw [decide_eq_false_iff_not]
-  omega
+  grind
 
 -- TO DO: the following proof is long and repetitive, clean and refine it
 /-- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:

@@ -25,7 +25,7 @@ theorem LOW_51_BIT_MASK_val_eq : LOW_51_BIT_MASK.val = 2^51 - 1 := by
 
 /-- Bitwise AND with (2^51 - 1) keeps only the lower 51 bits so bounded ≤ 2^51 - 1 < 2^51. -/
 theorem and_LOW_51_BIT_MASK_lt (a : U64) : (a &&& LOW_51_BIT_MASK).val < 2^51 := by
-  simp [LOW_51_BIT_MASK_val_eq]; omega
+  simp [LOW_51_BIT_MASK_val_eq]; grind
 
 
 
@@ -56,4 +56,4 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   · intro i _
     interval_cases i
     all_goals simp [*]; scalar_tac
-  · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+  · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; grind
