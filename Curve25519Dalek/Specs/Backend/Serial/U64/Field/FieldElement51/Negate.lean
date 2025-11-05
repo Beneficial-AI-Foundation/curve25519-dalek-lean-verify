@@ -1,0 +1,55 @@
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Markus Dablander
+-/
+import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs
+
+/-! # Spec Theorem for `FieldElement51::negate`
+
+Specification and proof for `FieldElement51::negate`.
+
+This function computes the additive inverse (negation) of a field element in 𝔽_p where p = 2^255 - 19.
+
+**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+
+## TODO
+- Complete proof
+-/
+
+open Aeneas.Std Result
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+
+/-
+Natural language description:
+
+    • Computes the additive inverse of a field element in 𝔽_p where p = 2^255 - 19
+    • The field element is represented in radix 2^51 form with five u64 limbs
+    • The implementation subtracts each input limb from appropriately chosen constants (= 16*p)
+      to avoid underflow and then (weakly) reduces the result modulo p
+
+Natural language specs:
+
+    • The function always succeeds (no panic)
+    • For an appropriately bounded field element r, the result r_inv satisfies:
+      (Field51_as_Nat(r) + Field51_as_Nat(r_inv)) ≡ 0 (mod p)
+-/
+
+/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
+- No panic (always returns successfully)
+- The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,
+  Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)
+- Requires that input limbs of r are bounded to avoid underflow:
+  - Limb 0 must be ≤ 36028797018963664
+  - Limbs 1-4 must be ≤ 36028797018963952
+  To make the theorem more easily readable and provable, we
+  replace these precise bounds with the slightly looser bound 2^54
+-/
+theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
+    ∃ r_inv, negate r = ok r_inv ∧
+    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0
+    := by
+    sorry
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51
