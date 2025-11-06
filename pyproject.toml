@@ -1,7 +1,11 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "template-project"
+name = "dalek-lean-ai"
 version = "0.1.0"
-description = "Add your description here"
+description = "Evaluation framework for AI agents fixing Lean proofs in curve25519-dalek"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
@@ -9,6 +13,9 @@ dependencies = [
     "inspect-ai>=0.3.144",
     "openai>=2.7.1",
 ]
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.ruff.lint]
 ignore = ["F722"]
