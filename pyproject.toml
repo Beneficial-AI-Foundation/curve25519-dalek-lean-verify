@@ -5,7 +5,7 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "anthropic>=0.51.0",
+    "anthropic>=0.72.0",
     "inspect-ai>=0.3.144",
     "openai>=2.7.1",
 ]
