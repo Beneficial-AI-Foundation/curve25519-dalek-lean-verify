@@ -10,10 +10,10 @@ def build_dataset():
     build_script = project_root / "build_docker_image.bash"
 
     subprocess.run([str(build_script)], check=True, cwd=project_root)
-    # Get list of files with sorries from Docker
+    # Get list of files with sorries from Docker, only in Curve25519Dalek directory
     files_with_sorries = subprocess.run(
         ["docker", "run", "lean_agent", "bash", "-c",
-         "cd /workspace/curve25519-dalek-lean-verify && grep -r 'sorry' --include='*.lean' -l"],
+         "cd /workspace/curve25519-dalek-lean-verify && grep -r 'sorry' --include='*.lean' -l Curve25519Dalek/"],
         capture_output=True,
         check=True,
         text=True,
