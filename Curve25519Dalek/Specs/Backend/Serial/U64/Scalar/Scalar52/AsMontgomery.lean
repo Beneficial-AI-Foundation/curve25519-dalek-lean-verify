@@ -40,39 +40,16 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L
 -/
+@[progress]
 theorem as_montgomery_spec (u : Scalar52) :
     ∃ m, as_montgomery u = ok m ∧
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] := by
   unfold as_montgomery
-  have := montgomery_mul_spec u constants.RR
-  obtain ⟨m, pos, pos'⟩ := this
-  refine ⟨m, pos, ?_⟩
-  have rr_eq := RR_spec
-  -- From montgomery_mul_spec: (u * RR) ≡ m * R [MOD L]
-  -- From RR_spec: RR ≡ R^2 [MOD L]
-  -- Substituting: u * R^2 ≡ m * R [MOD L]
-  -- Therefore: m ≡ u * R [MOD L]
-  calc Scalar52_as_Nat m
-      ≡ Scalar52_as_Nat m [MOD L] := by rfl
-    _ ≡ Scalar52_as_Nat u * R [MOD L] := by
-        -- From pos': (u * RR) ≡ m * R [MOD L]
-        -- From rr_eq: RR ≡ R^2 [MOD L]
-        have h1 : Scalar52_as_Nat u * Scalar52_as_Nat constants.RR ≡
-                  Scalar52_as_Nat u * (R ^ 2) [MOD L] := by
-          apply Nat.ModEq.mul_left
-          exact rr_eq
-        have h2 : Scalar52_as_Nat u * (R ^ 2) ≡
-                  Scalar52_as_Nat m * R [MOD L] := by
-          exact Nat.ModEq.trans h1.symm pos'
-        -- Now we have: u * R^2 ≡ m * R [MOD L]
-        -- We need: m ≡ u * R [MOD L]
-        -- This requires cancelling R, which needs coprimality
-        have coprime_L_R : L.gcd R = 1 := by decide
-        have h3 : Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * (R ^ 2) [MOD L] := h2.symm
-        -- Rewrite R^2 as R * R
-        have h4 : Scalar52_as_Nat u * (R ^ 2) = Scalar52_as_Nat u * R * R := by ring
-        rw [h4] at h3
-        -- Cancel R from both sides
-        exact Nat.ModEq.cancel_right_of_coprime coprime_L_R h3
+  progress as ⟨m, pos⟩
+  suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
+    exact Nat.ModEq.cancel_right_of_coprime (by decide) this
+  have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
+  have := (Nat.ModEq.trans this.symm pos).symm
+  grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
