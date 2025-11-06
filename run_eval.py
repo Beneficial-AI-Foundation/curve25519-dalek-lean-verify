@@ -46,7 +46,7 @@ def build_dataset():
         text=True,
     ).stdout
 
-    sorry_files = [f.strip() for f in files_with_sorries.split("\n") if f.strip()]
+    sorry_files = sorted([f.strip() for f in files_with_sorries.split("\n") if f.strip()])
 
     samples = []
     for file_path in sorry_files:
