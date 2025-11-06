@@ -11,6 +11,11 @@ from inspect_ai.util import sandbox
 @scorer(metrics=[accuracy()])
 def lean_proof_scorer():
     async def score(state, target):
+        # Get the target file from the sample metadata
+        target_file = state.metadata.get("target_file")
+        if not target_file:
+            return Score(value=0, explanation="No target file specified")
+
         # Run lake build to check if proofs are valid
         build_result = await sandbox().exec(["lake", "build"])
         if not build_result.success:
@@ -18,12 +23,12 @@ def lean_proof_scorer():
                 value=0, explanation=f"lake build failed: {build_result.stderr}"
             )
 
-        # Check for remaining sorries
-        check_sorries = await sandbox().exec(["bash", "-c", "lake build | grep sorry"])
-        has_sorries = "sorry" in check_sorries.stdout
+        # Check if the specific file still contains sorry
+        check_sorries = await sandbox().exec(["grep", "-w", "sorry", target_file])
+        has_sorries = check_sorries.success  # grep returns success if it finds a match
 
         if has_sorries:
-            return Score(value=0, explanation="The file still contains sorries")
+            return Score(value=0, explanation=f"The file {target_file} still contains sorries")
 
         return Score(value=1, explanation="All proofs are valid")
 
@@ -32,22 +37,28 @@ def lean_proof_scorer():
 
 def build_dataset():
     subprocess.run(["./build_docker_image.bash"], check=True)
-    # Get MIL.lean contents from Docker
-    mil_contents = subprocess.run(
-        ["docker", "run", "lean_agent", "cat", "MIL.lean"],
+    # Get list of files with sorries from Docker
+    files_with_sorries = subprocess.run(
+        ["docker", "run", "lean_agent", "bash", "-c",
+         "cd /workspace/curve25519-dalek-lean-verify && grep -r 'sorry' --include='*.lean' -l"],
         capture_output=True,
         check=True,
         text=True,
     ).stdout
-    mil_lines = mil_contents.split("\n")
-    samples = [
-        Sample(
-            input="Fix the Lean file by replacing all 'sorry' statements with valid proofs. Run 'lake build' to check your work. Repeat until there are no more sorries.",
-            files={"MIL.lean": line},
+
+    sorry_files = [f.strip() for f in files_with_sorries.split("\n") if f.strip()]
+
+    samples = []
+    for file_path in sorry_files:
+        # Remove leading ./ if present and get relative path
+        rel_path = file_path.lstrip("./")
+
+        sample = Sample(
+            input=f"Fix the Lean file '{rel_path}' by replacing all 'sorry' statements with valid proofs. Run 'lake build' to check your work. Repeat until there are no more sorries in this file.",
+            metadata={"target_file": rel_path}
         )
-        for line in mil_lines
-        if line.strip()  # Skip empty lines
-    ]
+        samples.append(sample)
+
     return MemoryDataset(samples)
 
 
@@ -62,15 +73,17 @@ def evaluate_lean_fixing():
         You are an expert in the Lean theorem prover.
         Your task is to fix Lean files by replacing 'sorry' statements with valid proofs.
 
+        The working directory is /workspace/curve25519-dalek-lean-verify which contains a Lean project.
+
         Follow these steps:
         1. Run `lake build` to see the current state of the project
-        2. Examine the file that needs to be fixed
+        2. Examine the specific file mentioned in the task that needs to be fixed
         3. Replace each 'sorry' with a complete proof
         4. Run `lake build` again to verify your proofs
         5. If there are still errors or sorries, fix them and repeat
 
         When you're done, make sure `lake build` succeeds.
-        Then make sure that `lake build | grep sorry` returns nothing
+        Then verify that the specific file no longer contains any 'sorry' statements.
         """,
         # TODO Should the timeout be larger?
         tools=[bash_session(), text_editor()],
