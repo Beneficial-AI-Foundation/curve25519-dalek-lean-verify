@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from inspect_ai import Task, task
 from inspect_ai.agent import react
 from inspect_ai.tool import bash_session, text_editor
@@ -6,6 +8,10 @@ from dalek_lean_ai.dataset import build_dataset
 from dalek_lean_ai.scorer import lean_proof_scorer
 
 DATASET = build_dataset()
+
+# Get path to docker directory relative to project root
+_project_root = Path(__file__).parent.parent.parent
+_docker_dir = _project_root / "docker" / "Dockerfile"
 
 
 @task
@@ -37,5 +43,5 @@ def evaluate_lean_fixing():
         dataset=DATASET,
         solver=lean_agent,
         scorer=lean_proof_scorer(),
-        sandbox=("docker", "docker/Dockerfile"),
+        sandbox=("docker", str(_docker_dir)),
     )

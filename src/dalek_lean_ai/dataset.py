@@ -1,10 +1,15 @@
 import subprocess
+from pathlib import Path
 
 from inspect_ai.dataset import MemoryDataset, Sample
 
 
 def build_dataset():
-    subprocess.run(["./build_docker_image.bash"], check=True)
+    # Find project root (where build_docker_image.bash is located)
+    project_root = Path(__file__).parent.parent.parent
+    build_script = project_root / "build_docker_image.bash"
+
+    subprocess.run([str(build_script)], check=True, cwd=project_root)
     # Get list of files with sorries from Docker
     files_with_sorries = subprocess.run(
         ["docker", "run", "lean_agent", "bash", "-c",
