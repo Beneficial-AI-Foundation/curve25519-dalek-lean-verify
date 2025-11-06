@@ -20,9 +20,13 @@ def lean_proof_scorer():
         # Check if the specific file still contains sorry
         check_sorries = await sandbox().exec(["grep", "-w", "sorry", target_file])
         has_sorries = check_sorries.success  # grep returns success if it finds a match
+        check_axioms = await sandbox().exec(["grep", "-w", "axiom", target_file])
+        has_axioms = check_axioms.success
 
         if has_sorries:
             return Score(value=0, explanation=f"The file {target_file} still contains sorries")
+        if has_axioms:
+            return Score(value=0, explanation=f"The file {target_file} contains axioms")
 
         return Score(value=1, explanation="All proofs are valid")
 

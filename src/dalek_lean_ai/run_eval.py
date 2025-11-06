@@ -33,6 +33,8 @@ def evaluate_lean_fixing():
 
         When you're done, make sure `lake build` succeeds.
         Then verify that the specific file no longer contains any 'sorry' statements.
+
+        Your final response should not use sorries or axioms.
         """,
         # TODO Should the timeout be larger?
         tools=[bash_session(), text_editor()],
