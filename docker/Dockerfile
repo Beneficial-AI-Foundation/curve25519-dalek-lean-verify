@@ -5,9 +5,9 @@ RUN curl https://elan.lean-lang.org/elan-init.sh -sSf > install.sh
 RUN chmod +x install.sh
 RUN ./install.sh -y
 ENV PATH="$PATH:/root/.elan/bin/"
-RUN git clone https://github.com/leanprover-community/mathematics_in_lean.git
-WORKDIR /workspace/mathematics_in_lean
-RUN git checkout 6db6c0608c5935d52a8a7f8ac5391e40d517262a
+RUN git clone https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify
+WORKDIR /workspace/curve25519-dalek-lean-verify
+RUN git checkout dfccbc9927d779cbd75bc0d2027a52315dca3d98
 RUN lake exe cache get
 RUN lake build
 
