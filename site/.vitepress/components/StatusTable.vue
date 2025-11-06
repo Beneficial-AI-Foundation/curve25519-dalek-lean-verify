@@ -72,7 +72,7 @@ const sortDirection = ref('asc')
 
 // Pagination state
 const currentPage = ref(1)
-const perPage = ref(50)
+const perPage = ref(100)
 
 // Modal state
 const isModalOpen = ref(false)
@@ -97,7 +97,7 @@ const visibleColumns = ref({
   extracted: true,
   verified: true,
   issue: true,
-  notes: false  // Hidden by default
+  notes: true  // Shown by default
 })
 
 // Computed: Filter data
