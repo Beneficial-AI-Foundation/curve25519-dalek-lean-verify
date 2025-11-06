@@ -7,6 +7,7 @@
     "docs:dev": "vitepress dev site",
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
+    "docs:rust": "RUSTDOCFLAGS='--cfg docsrs --html-in-header curve25519-dalek/docs/assets/rustdoc-include-katex-header.html' cargo +nightly-2025-07-20 rustdoc -p curve25519-dalek --features 'serde rand_core digest legacy_compatibility' && mkdir -p site/public/doc && cp -r target/doc/* site/public/doc/",
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
