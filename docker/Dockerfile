@@ -14,6 +14,7 @@ RUN python3 -m venv /opt/inspect_tool_support && \
 # TODO Maybe instead start with aisiuk/inspect-tool-support image?
 
 ENV PATH="$PATH:/root/.elan/bin/"
+RUN echo "Needs repo after [2025-11-07 Fri 16:05]" # Update this to invalidate next line's cache
 RUN git clone https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify
 WORKDIR /workspace/curve25519-dalek-lean-verify
 # From mul_internal_sorry2
