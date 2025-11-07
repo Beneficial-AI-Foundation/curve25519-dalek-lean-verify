@@ -44,6 +44,7 @@ natural language specs:
 - The result w satisfies the Montgomery multiplication property:
   (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
+@[progress]
 theorem montgomery_mul_spec (m m' : Scalar52) :
     ∃ w, montgomery_mul m m' = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
