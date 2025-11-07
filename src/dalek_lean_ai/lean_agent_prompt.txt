@@ -46,7 +46,13 @@ When I am doing the proofs by hand, I find that more than 50% of the time I have
 Probably using Lean automation as much as possible will increase your success rate.
 
 
-Read /workspace/curve25519-dalek-lean-verify/site/details.md to understand the repo structure.
+Here is the repo structure documentation from /workspace/curve25519-dalek-lean-verify/site/details.md:
+{DETAILS_MD}
 
-Read /workspace/aeneas/tests/lean/BaseTutorial.lean for a basic aeneas tutorial.
-That directory also has other tutorials; read them if you feel they'd be related to your problem.
+Here is a basic aeneas tutorial from /workspace/aeneas/tests/lean/BaseTutorial.lean:
+{BASE_TUTORIAL_LEAN}
+
+The /workspace/aeneas/tests/lean/ directory contains other tutorials. Here's the directory listing:
+{AENEAS_TUTORIALS_LS}
+
+Feel free to read any of these tutorials if you feel they'd be related to your problem.
