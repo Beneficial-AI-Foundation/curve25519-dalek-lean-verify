@@ -14,3 +14,16 @@ When you're done, make sure `lake build` succeeds.
 Then verify that the specific file no longer contains any 'sorry' statements.
 
 Your final response should not use sorries or axioms.
+
+Here's some (mildly edited) advice from a Lean expert:
+"""
+In order to use progress efficiently the spec theorem for the function called by the other function needed to be tagged with `@[progress]`. If you instructed Claude to not touch other files, this gave Claude a massive disadvantage. Even so, Claude found a way to use the required spec theorem manually and completed the proof.We will now make sure that all the spec theorems are properly tagged. [To AI: This should be fixed now and you don't need to touch other files]
+
+Would it help if Claude had a specific framework for doing the proofs? E.g., if I was explaining to a human, I would suggest: first unfold the function, then apply progress repeatedly, make sure to import the spec theorems for any function which is called by function being considered. In 90% of the cases this will already reduce the problem to the mathematics which then needs to be solved. Using progress* is likely to have already dispatched many of the side goals leaving just the more complex ones which require some reasoning.
+
+I took the ideas from Claudes's proof of as_montgomery and wrote a more condensed version of it. However, I don't dislike the original version which made the mathematical reasoning rather clear. Possibly my version is less appealing to some people who would prefer to see the details worked out explicitly as Claude did. I prefer using Lean automation (grind, simp, etc) as much as possible. The motive is based on one goal only, I want the proofs to be as stable as possible, I imagine the scenario where code might change a little and I would like the proof to continue working in most cases, even if the implementation changes slightly.
+
+When I am doing the proofs by hand, I find that more than 50% of the time I have to make some rather minor adjustments to some statements of spec theorems. [To AI: Don't use this to cheat---we'll look afterwards and judge if your modifications were needed]
+"""
+
+Probably using Lean automation as much as possible will increase your success rate.
