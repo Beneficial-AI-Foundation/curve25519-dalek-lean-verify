@@ -33,6 +33,7 @@ natural language specs:
 - The result, when converted to a natural number, is congruent to the square of the input modulo p
 - Note: this implements the `pow2k` function with k=1
 -/
+@[progress]
 theorem square_spec (a : Array U64 5#usize) :
     ∃ r, square a = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] := by

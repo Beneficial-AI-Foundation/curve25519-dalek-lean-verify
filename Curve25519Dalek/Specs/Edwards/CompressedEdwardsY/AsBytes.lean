@@ -22,7 +22,9 @@ namespace curve25519_dalek.edwards.CompressedEdwardsY
 
 /-- **Spec for `edwards.CompressedEdwardsY.as_bytes`**:
 - The function succeeds (always returns `ok`)
-- The result is exactly the internal byte array representation. -/
+- The result is exactly the internal byte array representation.
+-/
+@[progress]
 theorem as_bytes_spec
     (self : edwards.CompressedEdwardsY) :
     ∃ result, as_bytes self = ok result ∧

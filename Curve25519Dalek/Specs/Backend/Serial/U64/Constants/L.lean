@@ -31,6 +31,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.L`**:
 - The value of constants.L when converted to a natural number equals L
 -/
+@[progress]
 theorem L_spec : Scalar52_as_Nat constants.L = L := by
   unfold constants.L
   decide

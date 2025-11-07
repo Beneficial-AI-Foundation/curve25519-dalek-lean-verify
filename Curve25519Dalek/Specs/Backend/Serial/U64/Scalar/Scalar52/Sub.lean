@@ -86,6 +86,7 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
 - Does not error and hence returns a result
 - The result represents (a - b) mod L where L is the group order
 - Requires that input limbs are within bounds (52-bit values) -/
+@[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :

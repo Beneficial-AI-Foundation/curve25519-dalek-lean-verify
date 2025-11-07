@@ -35,6 +35,7 @@ natural language specs:
 - The value of LFACTOR satisfies: L * LFACTOR ≡ -1 (mod 2^52)
 - LFACTOR is in the range [0, 2^52 - 1]
 -/
+@[progress]
 theorem LFACTOR_spec :
     (L * constants.LFACTOR + 1) % (2^52) = 0 ∧
     0 ≤ constants.LFACTOR.val ∧

@@ -33,6 +33,7 @@ natural language specs:
 - Field51_as_Nat(constants.SQRT_M1) ≡ sqrt(-1) (mod p), which is equivalent to
   Field51_as_Nat(constants.SQRT_M1)^2 ≡ p - 1 (mod p).
 -/
+@[progress]
 theorem SQRT_M1_spec :
     (Field51_as_Nat constants.SQRT_M1)^2 % p = p - 1 := by
   unfold constants.SQRT_M1

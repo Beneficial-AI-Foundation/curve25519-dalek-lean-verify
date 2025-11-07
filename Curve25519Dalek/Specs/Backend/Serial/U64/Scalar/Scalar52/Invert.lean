@@ -42,6 +42,7 @@ natural language specs:
 - The result u' satisfies the multiplicative inverse property:
   Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)
 -/
+@[progress]
 theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',
     invert u = ok u' ∧

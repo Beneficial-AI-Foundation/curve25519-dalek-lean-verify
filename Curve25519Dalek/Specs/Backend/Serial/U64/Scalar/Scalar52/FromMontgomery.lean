@@ -37,6 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the input scalar divided by the Montgomery constant R = 2^260, modulo L
 -/
+@[progress]
 theorem from_montgomery_spec (m : Scalar52) :
     ∃ u,
     from_montgomery m = ok u ∧

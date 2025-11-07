@@ -39,6 +39,7 @@ theorem clamp_integer_spec_aux_b (byte : U8) : byte.val &&& 127 ||| 64 ≤ 127 :
 - as_nat_32_u8 result < 2^255
 - 2^254 ≤ as_nat_32_u8 result
 -/
+@[progress]
 theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     ∃ result, clamp_integer bytes = ok (result) ∧
     h ∣ U8x32_as_Nat result ∧

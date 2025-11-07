@@ -39,6 +39,7 @@ Natural language specs:
 - No panic for field element inputs r (always returns c successfully)
 - c.val = 1 ↔ Field51_as_Nat(r) ≡ 0 (mod p)
 -/
+@[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
     ∃ c, is_zero r = ok c ∧
     (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0)

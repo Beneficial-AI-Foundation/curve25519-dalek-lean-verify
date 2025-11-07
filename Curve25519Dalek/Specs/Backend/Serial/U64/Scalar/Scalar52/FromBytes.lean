@@ -36,6 +36,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the same number as the input byte array
 -/
+@[progress]
 theorem from_bytes_spec (b : Array U8 32#usize) :
     ∃ u,
     from_bytes b = ok u ∧
