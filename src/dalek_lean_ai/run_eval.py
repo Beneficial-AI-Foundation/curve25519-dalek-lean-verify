@@ -19,36 +19,36 @@ _prompt_file = Path(__file__).parent / "lean_agent_prompt.txt"
 _LEAN_AGENT_PROMPT_TEMPLATE = _prompt_file.read_text()
 
 
-def _load_file_from_docker(container_name: str, file_path: str) -> str:
-    """Load a file from a docker container using docker exec."""
+def _load_file_from_docker(image_name: str, file_path: str) -> str:
+    """Load a file from a docker image using docker run."""
     result = subprocess.run(
-        ["docker", "exec", container_name, "cat", file_path],
+        ["docker", "run", "--rm", image_name, "cat", file_path],
         capture_output=True,
         text=True,
         check=False,
     )
     if result.returncode != 0:
         raise RuntimeError(
-            f"Failed to read {file_path} from container {container_name}: {result.stderr}"
+            f"Failed to read {file_path} from image {image_name}: {result.stderr}"
         )
     return result.stdout
 
 
 def _get_prompt() -> str:
-    """Get the prompt with files loaded from the docker container."""
-    container_name = "lean_agent"
+    """Get the prompt with files loaded from the docker image."""
+    image_name = "lean_agent"
 
-    # Read the files from the docker container
+    # Read the files from the docker image
     details_md = _load_file_from_docker(
-        container_name, "/workspace/curve25519-dalek-lean-verify/site/details.md"
+        image_name, "/workspace/curve25519-dalek-lean-verify/site/details.md"
     )
     base_tutorial = _load_file_from_docker(
-        container_name, "/workspace/aeneas/tests/lean/BaseTutorial.lean"
+        image_name, "/workspace/aeneas/tests/lean/BaseTutorial.lean"
     )
 
     # List the aeneas tutorials directory
     result = subprocess.run(
-        ["docker", "exec", container_name, "ls", "-1", "/workspace/aeneas/tests/lean/"],
+        ["docker", "run", "--rm", image_name, "ls", "-1", "/workspace/aeneas/tests/lean/"],
         capture_output=True,
         text=True,
         check=False,
