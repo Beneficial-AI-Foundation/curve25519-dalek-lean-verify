@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Oliver Butterley
+Authors: Markus Dablander, Oliver Butterley, Theo Ehrenborg
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -17,9 +17,6 @@ Specification and proof for `Scalar52::as_montgomery`.
 This function converts to Montgomery form.
 
 Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
