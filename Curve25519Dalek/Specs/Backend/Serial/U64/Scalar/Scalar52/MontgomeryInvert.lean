@@ -45,6 +45,7 @@ natural language specs:
 - The result u' satisfies the property that Montgomery multiplication of u and u'
   yields R mod L (the Montgomery representation of 1)
 -/
+@[progress]
 theorem montgomery_invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',
     montgomery_invert u = ok u' ∧

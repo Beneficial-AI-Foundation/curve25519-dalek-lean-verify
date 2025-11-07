@@ -42,6 +42,7 @@ natural language specs:
 - If condition is false (0), the result represents the input scalar unchanged
 - The carry bit captures any overflow from the 52-bit limb representation
 -/
+@[progress]
 theorem conditional_add_l_spec (u : Scalar52) (c : subtle.Choice) :
     ∃ carry u',
     conditional_add_l u c = ok (carry, u') ∧

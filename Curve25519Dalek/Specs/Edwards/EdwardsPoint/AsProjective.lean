@@ -34,6 +34,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting ProjectivePoint coordinates match the EdwardsPoint coordinates (X, Y, Z)
 -/
+@[progress]
 theorem as_projective_spec (e : EdwardsPoint) :
 ∃ q, edwards.EdwardsPoint.as_projective e = ok q ∧
 q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z := by

@@ -40,6 +40,7 @@ Natural language specs:
 - The result is identical to the input limbs array
 - The natural number representation of the result equals that of the input
 -/
+@[progress]
 theorem from_limbs_spec (a : Array U64 5#usize) :
     ∃ r, from_limbs a = ok r ∧
     r = a ∧

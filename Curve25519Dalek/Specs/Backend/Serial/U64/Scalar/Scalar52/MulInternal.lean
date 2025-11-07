@@ -30,6 +30,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 - Does not error and hence returns a result
 - The result represents the product of the two input field elements
 - Requires that each input limb is at most 62 bits to prevent overflow -/
+@[progress]
 theorem mul_internal_spec (a b : Array U64 5#usize)
     (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
