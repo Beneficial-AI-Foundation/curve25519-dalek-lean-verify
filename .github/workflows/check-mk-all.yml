@@ -30,6 +30,9 @@ jobs:
           elan --version
           lean --version
 
+      - name: Update dependencies
+        run: lake update
+
       - name: Cache Lean build
         uses: actions/cache@v4
         with:
@@ -42,9 +45,6 @@ jobs:
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
             ${{ runner.os }}-lean-
 
-      - name: Update dependencies
-        run: lake update
-
       - name: Download dependency caches
         run: lake exe cache get
 
@@ -52,4 +52,4 @@ jobs:
         run: lake build
 
       - name: Run mk_all
-        run: lake exe mk_all # will exit 1 if updates needed
+        run: lake exe mk_all --check
