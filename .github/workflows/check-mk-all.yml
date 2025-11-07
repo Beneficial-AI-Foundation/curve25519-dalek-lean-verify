@@ -45,8 +45,5 @@ jobs:
       - name: Download dependency caches
         run: lake exe cache get
 
-      - name: Build project (required for mk_all?)
-        run: lake build
-
       - name: Run mk_all
         run: lake exe mk_all --check
