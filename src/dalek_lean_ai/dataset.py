@@ -27,7 +27,7 @@ def build_dataset():
         rel_path = file_path.lstrip("./")
 
         sample = Sample(
-            input=f"Fix the Lean file '{rel_path}' by replacing all 'sorry' statements with valid proofs. Run 'lake build' to check your work. Repeat until there are no more sorries or axioms in this file.",
+            input=f"Fix the Lean file '{rel_path}' by replacing all 'sorry' statements with valid proofs.",
             metadata={"target_file": rel_path}
         )
         samples.append(sample)
