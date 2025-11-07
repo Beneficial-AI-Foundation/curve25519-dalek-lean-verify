@@ -16,8 +16,8 @@ RUN python3 -m venv /opt/inspect_tool_support && \
 ENV PATH="$PATH:/root/.elan/bin/"
 RUN git clone https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify
 WORKDIR /workspace/curve25519-dalek-lean-verify
-# From https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/pull/114
-RUN git checkout 34fbd465c987828de37f41a31d9c38cbc4d68d56
+# From mul_internal_sorry2
+RUN git checkout 40b1b91007605ee4de3ebdaaa78d5a193a3b34e9
 RUN lake exe cache get
 RUN lake build
 
