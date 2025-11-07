@@ -49,6 +49,7 @@ where p = 2^255 - 19
 These formulas implement Edwards curve point doubling, computing P + P
 (elliptic curve point addition) where P = (X:Y:Z).
 -/
+@[progress]
 theorem double_spec (q : ProjectivePoint) :
 ∃ c,
 double q = ok c ∧

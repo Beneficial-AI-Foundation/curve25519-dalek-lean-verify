@@ -40,6 +40,7 @@ natural language specs:
 - The result w satisfies the Montgomery squaring property:
   (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
+@[progress]
 theorem montgomery_square_spec (m : Scalar52) :
     ∃ w,
     montgomery_square m = ok w ∧

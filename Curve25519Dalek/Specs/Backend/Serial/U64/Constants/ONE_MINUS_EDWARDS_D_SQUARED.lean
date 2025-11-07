@@ -40,6 +40,7 @@ natural language specs:
   Note: the extra " + p" in the spec theorem is to avoided hitting 0 in the truncated subtraction
   implemented by Lean.
 -/
+@[progress]
 theorem ONE_MINUS_EDWARDS_D_SQUARED_spec : Field51_as_Nat constants.ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p:= by
   unfold constants.ONE_MINUS_EDWARDS_D_SQUARED
   decide

@@ -38,6 +38,7 @@ natural language specs:
 - Packing the result back yields the original scalar: pack(u) = s
 - Both the packed s and the unpacked u represent the same natural number
 -/
+@[progress]
 theorem unpack_spec (s : Scalar) :
     ∃ u,
     unpack s = ok u ∧

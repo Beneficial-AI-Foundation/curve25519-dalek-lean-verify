@@ -36,6 +36,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the sum of the two input scalars modulo L
 -/
+@[progress]
 theorem add_spec (u u' : Scalar52) :
     ∃ v,
     add u u' = ok v ∧

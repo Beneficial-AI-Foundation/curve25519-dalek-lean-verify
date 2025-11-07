@@ -46,6 +46,7 @@ Natural language specs:
   To make the theorem more easily readable and provable, we
   replace these precise bounds with the slightly looser bound 2^54
 -/
+@[progress]
 theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
     ∃ r_inv, negate r = ok r_inv ∧
     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0

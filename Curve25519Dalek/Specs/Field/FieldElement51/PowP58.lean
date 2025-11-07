@@ -39,6 +39,7 @@ Natural language specs:
 - No panic for field element inputs r (always returns r' successfully)
 - Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)
 -/
+@[progress]
 theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 51 - 1) :
     ∃ r', pow_p58 r = ok r' ∧
     Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p

@@ -25,7 +25,7 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 The ZERO constant represents the scalar 0.
 -/
-@[simp]
+@[progress]
 theorem ZERO_spec : Scalar52_as_Nat ZERO = 0 := by
   unfold ZERO ZERO_body
   decide
