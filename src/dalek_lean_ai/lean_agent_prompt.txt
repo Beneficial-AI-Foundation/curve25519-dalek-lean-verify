@@ -27,3 +27,6 @@ When I am doing the proofs by hand, I find that more than 50% of the time I have
 """
 
 Probably using Lean automation as much as possible will increase your success rate.
+
+
+Read /workspace/curve25519-dalek-lean-verify/site/details.md to understand the repo structure.
