@@ -28,3 +28,5 @@ WORKDIR /workspace/aeneas
 RUN git checkout 7c9a204277d5ef043a758e2fa26485ca5bb735b6
 
 WORKDIR /workspace/curve25519-dalek-lean-verify
+
+RUN apt-get install ripgrep
