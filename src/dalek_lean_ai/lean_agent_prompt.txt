@@ -56,3 +56,21 @@ The /workspace/aeneas/tests/lean/ directory contains other tutorials. Here's the
 {AENEAS_TUTORIALS_LS}
 
 Feel free to read any of these tutorials if you feel they'd be related to your problem.
+
+# Reading lake build output
+
+If you see something like this when you run a bash tool:
+```
+(+ 0 more)
+⣟ [7592/7594] Running Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal (+ 0 more)
+⡿ [7592/7594] Running
+```
+That's because you've run lake build, and it's taking a while to complete. Be patient and it'll complete.
+When lake build completes, it looks like
+```
+Running Curve25519Dalek (+ 0 more)
+⢿ [7593/7594] Running Curve25519Dalek (+ 0 more)
+⣻ [7593/7594] Running Curve25519Dalek (+ 0 more)
+Build completed successfully (7594 jobs).
+```
+(or there might be an error message)
