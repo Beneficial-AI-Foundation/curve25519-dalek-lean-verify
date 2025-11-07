@@ -48,14 +48,11 @@ jobs:
           path: |
             .lake
             build
-          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('Curve25519Dalek/**/*.lean') }}
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean') }}
           restore-keys: |
-            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
             ${{ runner.os }}-lean-
-
-      - name: Update dependencies
-        run: lake update
 
       - name: Download dependency caches
         run: lake exe cache get
