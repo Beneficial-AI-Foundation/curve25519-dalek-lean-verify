@@ -20,3 +20,9 @@ RUN git checkout afa6a3e50af21887c0f133cec190f6d73b7d51b1
 RUN lake exe cache get
 RUN lake build
 
+WORKDIR /workspace
+RUN git clone https://github.com/AeneasVerif/aeneas
+WORKDIR /workspace/aeneas
+RUN git checkout 7c9a204277d5ef043a758e2fa26485ca5bb735b6
+
+WORKDIR /workspace/curve25519-dalek-lean-verify

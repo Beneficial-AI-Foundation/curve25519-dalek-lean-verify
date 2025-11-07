@@ -30,3 +30,6 @@ Probably using Lean automation as much as possible will increase your success ra
 
 
 Read /workspace/curve25519-dalek-lean-verify/site/details.md to understand the repo structure.
+
+Read /workspace/aeneas/tests/lean/BaseTutorial.lean for a basic aeneas tutorial.
+That directory also has other tutorials; read them if you feel they'd be related to your problem.
