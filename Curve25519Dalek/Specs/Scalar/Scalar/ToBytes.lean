@@ -37,6 +37,7 @@ natural language specs:
 - The result array a is the byte array representation of the scalar (s.bytes)
 - Converting the result a back to a Scalar via the constructor yields the original scalar s
 -/
+@[progress]
 theorem to_bytes_spec (s : Scalar) :
     ∃ a,
     to_bytes s = ok a ∧

@@ -25,6 +25,7 @@ namespace curve25519_dalek.scalar.Scalar
 
 The ONE constant represents the scalar 1.
 -/
+@[progress]
 theorem ONE_spec : U8x32_as_Nat ONE.bytes = 1 := by
   unfold ONE ONE_body
   decide

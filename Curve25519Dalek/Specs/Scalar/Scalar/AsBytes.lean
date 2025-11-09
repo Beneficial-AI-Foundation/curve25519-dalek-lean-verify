@@ -34,6 +34,7 @@ natural language specs:
 - The result is the byte representation of the scalar (s.bytes)
 - Converting the result back to a Scalar via the constructor yields the original scalar
 -/
+@[progress]
 theorem as_bytes_spec (s : Scalar) :
     ∃ b,
     as_bytes s = ok b ∧

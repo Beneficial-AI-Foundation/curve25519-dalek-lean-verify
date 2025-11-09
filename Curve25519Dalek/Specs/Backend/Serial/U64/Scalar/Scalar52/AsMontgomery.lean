@@ -1,12 +1,14 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Oliver Butterley
+Authors: Markus Dablander, Oliver Butterley, Theo Ehrenborg
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
+
+set_option exponentiation.threshold 260
 
 /-! # Spec Theorem for `Scalar52::as_montgomery`
 
@@ -15,9 +17,6 @@ Specification and proof for `Scalar52::as_montgomery`.
 This function converts to Montgomery form.
 
 Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -38,18 +37,16 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L
 -/
+@[progress]
 theorem as_montgomery_spec (u : Scalar52) :
     ∃ m, as_montgomery u = ok m ∧
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] := by
   unfold as_montgomery
-  have := montgomery_mul_spec u constants.RR
-  obtain ⟨m, pos, pos'⟩ := this
-  refine ⟨m, pos, ?_⟩
-  have := RR_spec
-
-
-
-
-  sorry
+  progress as ⟨m, pos⟩
+  suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
+    exact Nat.ModEq.cancel_right_of_coprime (by decide) this
+  have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
+  have := (Nat.ModEq.trans this.symm pos).symm
+  grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

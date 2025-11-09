@@ -45,6 +45,7 @@ natural language specs:
 - The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 -/
+@[progress]
 theorem montgomery_reduce_spec (a : Array U128 9#usize) :
     ∃ m,
     montgomery_reduce a = ok m ∧

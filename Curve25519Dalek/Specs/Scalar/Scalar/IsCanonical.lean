@@ -37,6 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
 -/
+@[progress]
 theorem is_canonical_spec (s : Scalar) :
     ∃ c,
     is_canonical s = ok c ∧

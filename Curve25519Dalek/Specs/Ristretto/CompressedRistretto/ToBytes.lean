@@ -36,6 +36,7 @@ natural language specs:
 - The result is the byte representation of the compressed Ristretto point
 - Since CompressedRistretto is defined as Array U8 32#usize, to_bytes is essentially the identity
 -/
+@[progress]
 theorem to_bytes_spec (cr : CompressedRistretto) :
     ∃ b,
     to_bytes cr = ok b ∧

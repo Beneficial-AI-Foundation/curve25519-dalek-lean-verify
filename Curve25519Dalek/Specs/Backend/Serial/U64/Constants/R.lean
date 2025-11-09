@@ -34,7 +34,8 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.R`**:
 - The value of constants.R when converted to a natural number is congruent to R modulo L
 -/
-theorem R_spec : Scalar52_as_Nat constants.R ≡ R [MOD L] := by
+@[progress]
+theorem R_spec : Scalar52_as_Nat constants.R % L = R % L := by
   unfold constants.R
   decide
 
