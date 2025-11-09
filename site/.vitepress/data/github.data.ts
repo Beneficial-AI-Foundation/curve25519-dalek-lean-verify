@@ -1,5 +1,10 @@
 import { createContentLoader } from 'vitepress'
 
+export interface GitHubUser {
+  login: string
+  avatar_url: string
+}
+
 export interface GitHubItem {
   number: number
   title: string
@@ -8,9 +13,9 @@ export interface GitHubItem {
   url: string
   created_at: string
   updated_at: string
-  assignees: string[]
+  assignees: GitHubUser[]
   body: string
-  author: string
+  author: GitHubUser
   type: 'issue' | 'pr'
   isDraft?: boolean
 }
@@ -52,6 +57,8 @@ export default {
     const owner = 'Beneficial-AI-Foundation'
     const repo = 'curve25519-dalek-lean-verify'
 
+    console.log('Loading GitHub issue and PR data from GitHub...')
+
     try {
       // Add authentication token if available (for higher rate limits)
       const headers: HeadersInit = {
@@ -81,9 +88,15 @@ export default {
           url: issue.html_url,
           created_at: issue.created_at,
           updated_at: issue.updated_at,
-          assignees: issue.assignees.map((assignee: any) => assignee.login),
+          assignees: issue.assignees.map((assignee: any) => ({
+            login: assignee.login,
+            avatar_url: assignee.avatar_url
+          })),
           body: issue.body || '',
-          author: issue.user?.login || 'unknown',
+          author: {
+            login: issue.user?.login || 'unknown',
+            avatar_url: issue.user?.avatar_url || ''
+          },
           type: 'issue' as const
         }))
 
@@ -96,9 +109,15 @@ export default {
         url: pr.html_url,
         created_at: pr.created_at,
         updated_at: pr.updated_at,
-        assignees: pr.assignees.map((assignee: any) => assignee.login),
+        assignees: pr.assignees.map((assignee: any) => ({
+          login: assignee.login,
+          avatar_url: assignee.avatar_url
+        })),
         body: pr.body || '',
-        author: pr.user?.login || 'unknown',
+        author: {
+          login: pr.user?.login || 'unknown',
+          avatar_url: pr.user?.avatar_url || ''
+        },
         type: 'pr' as const,
         isDraft: pr.draft
       }))

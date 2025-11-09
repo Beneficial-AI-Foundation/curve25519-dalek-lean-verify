@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import FunctionDetailModal from './FunctionDetailModal.vue'
+import GitHubItemLink from './GitHubItemLink.vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
 
 const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
@@ -325,20 +326,11 @@ const stats = computed(() => ({
             </td>
             <td v-if="visibleColumns.issue" class="issue-col">
               <div v-if="findRelatedItems(func.function).length > 0" class="related-items">
-                <a v-for="item in findRelatedItems(func.function)"
-                   :key="item.number"
-                   :href="item.url"
-                   target="_blank"
-                   rel="noopener"
-                   :class="['item-link', `item-${item.type}`, `item-${item.state}`]"
-                   :title="`${item.type === 'pr' ? 'PR' : 'Issue'} #${item.number}: ${item.title}`">
-                  <span class="item-badge">
-                    <span class="item-type-icon">{{ item.type === 'pr' ? '⎇' : '●' }}</span>
-                    <span class="item-number">#{{ item.number }}</span>
-                    <span v-if="item.isDraft" class="item-state-icon" title="Draft PR">✏️</span>
-                  </span>
-                  <span class="item-title">{{ item.title }}</span>
-                </a>
+                <GitHubItemLink
+                  v-for="item in findRelatedItems(func.function)"
+                  :key="item.number"
+                  :item="item"
+                />
               </div>
               <span v-else class="no-issue">—</span>
             </td>
@@ -682,76 +674,6 @@ const stats = computed(() => ({
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-}
-
-.item-link {
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-}
-
-.item-link:hover {
-  background: var(--vp-c-bg-soft);
-  text-decoration: none;
-}
-
-.item-badge {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-weight: 600;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-.item-type-icon {
-  font-size: 1em;
-  line-height: 1;
-}
-
-.item-number {
-  font-size: 0.9em;
-}
-
-.item-state-icon {
-  font-size: 0.85em;
-  margin-left: 0.1rem;
-}
-
-/* Styling based on item type and state */
-.item-link.item-pr {
-  border-left: 3px solid var(--vp-c-purple-1);
-}
-
-.item-link.item-pr .item-type-icon {
-  color: var(--vp-c-purple-1);
-  font-weight: bold;
-}
-
-.item-link.item-issue {
-  border-left: 3px solid var(--vp-c-green-1);
-}
-
-.item-link.item-issue .item-type-icon {
-  color: var(--vp-c-green-1);
-}
-
-.item-state-icon {
-  color: var(--vp-c-yellow-1);
-}
-
-.item-title {
-  color: var(--vp-c-text-2);
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 0.9em;
 }
 
 .no-issue {
