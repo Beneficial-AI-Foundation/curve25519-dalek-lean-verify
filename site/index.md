@@ -40,11 +40,14 @@ function findIssueForFunction(functionName, issues) {
 }
 </script>
 
-This project aims to formally verify the [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) Rust library using the Lean theorem prover. We use [Aeneas](https://github.com/AeneasVerif/aeneas) to automatically extract Rust code into Lean, then write formal specifications and proofs to ensure the cryptographic implementations are mathematically correct and free from bugs. We aim to:
+This project aims to formally verify the [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) Rust library using the [Lean theorem prover](https://lean-lang.org). We use [Aeneas](https://github.com/AeneasVerif/aeneas) to automatically extract Rust code into Lean, then we write formal specifications and proofs to ensure the cryptographic implementations are mathematically correct and free from bugs. 
 
-- Demonstrate the viability of formally verifying Rust cryptographic code using Lean
-- Develop and share techniques to make Rust-to-Lean verification more accessible
-- Create a public resource for learning formal verification of real-world Rust code
+We aim to:
+Demonstrate the viability of verifying Rust cryptographic code using Lean;
+Develop techniques to make Rust-to-Lean verification more accessible;
+Create a resource for learning verification of real-world Rust code.
+
+See the [project repo](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify) or [project description](details.md) for further details. See below for the latest status and links to the individual spec theorems.
 
 ## Current Status
 

@@ -86,7 +86,7 @@ From this we have chosen a subset of functions which isn't all of those in this 
 
 [dalek]: https://github.com/dalek-cryptography/curve25519-dalek
 
-## Trust and Verification Method
+## Trust model and Verification Method
 
 ### Verification Approach
 
