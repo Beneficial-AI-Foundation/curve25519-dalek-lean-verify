@@ -14,30 +14,16 @@ hero:
 <script setup lang="ts">
 import { data } from './.vitepress/data/status.data'
 import { data as progressData } from './.vitepress/data/progress.data'
-import { data as issuesData } from './.vitepress/data/issues.data'
+import { data as githubData } from './.vitepress/data/github.data'
 import ProgressChart from './.vitepress/components/ProgressChart.vue'
 import StatusTable from './.vitepress/components/StatusTable.vue'
+import { useGitHubMatching } from './.vitepress/composables/useGitHubMatching'
 
 const { entries, stats } = data
 const { dataPoints } = progressData
 
-// Function to match issues to functions
-function findIssueForFunction(functionName, issues) {
-  // Remove "curve25519_dalek::" prefix to get the function path we want to match
-  const functionPath = functionName.replace(/^curve25519_dalek::/, '')
-
-  // Search for function path in issue title or body
-  const issue = issues.find(issue => {
-    const titleLower = issue.title.toLowerCase()
-    const bodyLower = issue.body ? issue.body.toLowerCase() : ''
-
-    // Check if the function path (without curve25519_dalek prefix) appears in title or body
-    return titleLower.includes(functionPath.toLowerCase()) ||
-           bodyLower.includes(functionPath.toLowerCase())
-  })
-
-  return issue
-}
+// Use the GitHub matching composable
+const { findItemsForFunction } = useGitHubMatching()
 </script>
 
 This project aims to formally verify the [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) Rust library using the [Lean theorem prover](https://lean-lang.org). We use [Aeneas](https://github.com/AeneasVerif/aeneas) to automatically extract Rust code into Lean, then we write formal specifications and proofs to ensure the cryptographic implementations are mathematically correct and free from bugs. 
@@ -81,8 +67,8 @@ See the [project repo](https://github.com/Beneficial-AI-Foundation/curve25519-da
 
 <StatusTable
   :data="{ functions: entries }"
-  :issues="issuesData"
-  :findIssueForFunction="findIssueForFunction"
+  :issues="githubData"
+  :findIssuesForFunction="findItemsForFunction"
 />
 
 <style scoped>

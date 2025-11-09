@@ -14,18 +14,19 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  findIssueForFunction: {
+  findIssuesForFunction: {
     type: Function,
     default: null
   }
 })
 
-// Helper function to find related issue for a function
-function findRelatedIssue(functionName) {
-  if (!props.issues || props.issues.length === 0) return null
-  if (!props.findIssueForFunction) return null
+// Helper function to find related issues/PRs for a function
+// Returns an array of matching items
+function findRelatedItems(functionName) {
+  if (!props.issues || props.issues.length === 0) return []
+  if (!props.findIssuesForFunction) return []
 
-  return props.findIssueForFunction(functionName, props.issues)
+  return props.findIssuesForFunction(functionName, props.issues)
 }
 
 // Helper function to extract function name from full path
@@ -323,15 +324,22 @@ const stats = computed(() => ({
               </span>
             </td>
             <td v-if="visibleColumns.issue" class="issue-col">
-              <a v-if="findRelatedIssue(func.function)"
-                 :href="findRelatedIssue(func.function).url"
-                 target="_blank"
-                 rel="noopener"
-                 class="issue-link"
-                 :title="findRelatedIssue(func.function).title">
-                #{{ findRelatedIssue(func.function).number }}
-                <span class="issue-title">{{ findRelatedIssue(func.function).title }}</span>
-              </a>
+              <div v-if="findRelatedItems(func.function).length > 0" class="related-items">
+                <a v-for="item in findRelatedItems(func.function)"
+                   :key="item.number"
+                   :href="item.url"
+                   target="_blank"
+                   rel="noopener"
+                   :class="['item-link', `item-${item.type}`, `item-${item.state}`]"
+                   :title="`${item.type === 'pr' ? 'PR' : 'Issue'} #${item.number}: ${item.title}`">
+                  <span class="item-badge">
+                    <span class="item-type-icon">{{ item.type === 'pr' ? '⎇' : '●' }}</span>
+                    <span class="item-number">#{{ item.number }}</span>
+                    <span v-if="item.isDraft" class="item-state-icon" title="Draft PR">✏️</span>
+                  </span>
+                  <span class="item-title">{{ item.title }}</span>
+                </a>
+              </div>
               <span v-else class="no-issue">—</span>
             </td>
             <td v-if="visibleColumns.notes" class="notes-col">{{ func.notes }}</td>
@@ -667,27 +675,83 @@ const stats = computed(() => ({
 }
 
 .issue-col {
-  max-width: 300px;
+  max-width: 400px;
 }
 
-.issue-link {
+.related-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.item-link {
   color: var(--vp-c-brand-1);
   text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  transition: background-color 0.2s;
 }
 
-.issue-link:hover {
-  text-decoration: underline;
+.item-link:hover {
+  background: var(--vp-c-bg-soft);
+  text-decoration: none;
 }
 
-.issue-title {
+.item-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.item-type-icon {
+  font-size: 1em;
+  line-height: 1;
+}
+
+.item-number {
+  font-size: 0.9em;
+}
+
+.item-state-icon {
+  font-size: 0.85em;
+  margin-left: 0.1rem;
+}
+
+/* Styling based on item type and state */
+.item-link.item-pr {
+  border-left: 3px solid var(--vp-c-purple-1);
+}
+
+.item-link.item-pr .item-type-icon {
+  color: var(--vp-c-purple-1);
+  font-weight: bold;
+}
+
+.item-link.item-issue {
+  border-left: 3px solid var(--vp-c-green-1);
+}
+
+.item-link.item-issue .item-type-icon {
+  color: var(--vp-c-green-1);
+}
+
+.item-state-icon {
+  color: var(--vp-c-yellow-1);
+}
+
+.item-title {
   color: var(--vp-c-text-2);
   font-weight: 400;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 0.9em;
 }
 
 .no-issue {
