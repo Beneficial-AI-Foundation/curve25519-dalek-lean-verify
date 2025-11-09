@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build Rust documentation with the correct backend configuration
 # The RUSTDOCFLAGS must match the configuration in .cargo/config.toml
-# The features list matches package.metadata.docs.rs in Cargo.toml
+# Using default features only to match verification scope
 
 set -e
 
@@ -12,8 +12,7 @@ RUSTDOCFLAGS='
   --html-in-header curve25519-dalek/docs/assets/rustdoc-include-katex-header.html
 ' \
 cargo +nightly-2025-07-20 rustdoc \
-  -p curve25519-dalek \
-  --features 'serde rand_core digest legacy_compatibility group-bits'
+  -p curve25519-dalek
 
 # Copy generated docs to the site public directory
 mkdir -p site/public/doc
