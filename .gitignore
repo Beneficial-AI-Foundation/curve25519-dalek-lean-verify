@@ -40,3 +40,4 @@ site/.vitepress/dist
 site/.vitepress/cache
 site/.env
 .env
+site/public/doc
