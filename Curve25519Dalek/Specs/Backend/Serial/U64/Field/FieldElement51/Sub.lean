@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -17,8 +17,6 @@ of p is added.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
