@@ -12,6 +12,7 @@ dependencies = [
     "anthropic>=0.72.0",
     "inspect-ai>=0.3.144",
     "openai>=2.7.1",
+    "pytest>=9.0.0",
 ]
 
 [tool.setuptools.packages.find]
