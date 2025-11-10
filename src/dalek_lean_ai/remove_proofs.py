@@ -12,7 +12,6 @@ def remove_proofs(content: str) -> str:
 
     Only processes theorems (not lemmas, defs, etc.). Proofs are identified by
     'theorem' followed by ':= by', with content removed until either:
-    - A blank line
     - End of file
     - A line starting with a non-indented keyword (theorem, def, etc.)
 
@@ -46,22 +45,16 @@ def remove_proofs(content: str) -> str:
             i += 1
             in_theorem = False  # Done processing this theorem
 
-            # Skip all lines until we hit a blank line or a top-level declaration
+            # Skip all lines until we hit a top-level declaration
             while i < len(lines):
                 current_line = lines[i]
-
-                # Stop at blank line
-                if current_line.strip() == '':
-                    result.append(current_line)
-                    i += 1
-                    break
 
                 # Stop at top-level keyword (starting at column 0)
                 if re.match(r'^(theorem|lemma|def|instance|structure|class|inductive|axiom|example)\s', current_line):
                     # Don't increment i, we want to process this line
                     break
 
-                # Otherwise skip this line (it's part of the proof)
+                # Otherwise skip this line (it's part of the proof, including blank lines)
                 i += 1
         else:
             result.append(line)
