@@ -2,16 +2,18 @@
 """Tests for remove_proofs.py"""
 
 from pathlib import Path
+import pytest
 
 from dalek_lean_ai.remove_proofs import remove_proofs
 
 
-def test_remove_proofs():
+@pytest.mark.parametrize("test_name", ["", "2"])
+def test_remove_proofs(test_name):
     """Test that remove_proofs transforms input.lean to match expected.lean"""
     tests_dir = Path(__file__).parent
 
-    input_path = tests_dir / "input.lean"
-    expected_path = tests_dir / "expected.lean"
+    input_path = tests_dir / f"input{test_name}.lean"
+    expected_path = tests_dir / f"expected{test_name}.lean"
 
     # Read the input and expected files
     input_content = input_path.read_text()
@@ -28,6 +30,3 @@ def test_remove_proofs():
     )
 
 
-if __name__ == "__main__":
-    test_remove_proofs()
-    print("✓ Test passed!")
