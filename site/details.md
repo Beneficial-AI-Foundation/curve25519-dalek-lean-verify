@@ -56,6 +56,11 @@ From this we have chosen a subset of functions which isn't all of those in this 
     - 📋 **specified** - Formal specification in Lean added
     - ✅ **verified** - Function has been formally verified (spec theorem has been proven)
 
+### Issue and PR Linking
+
+Open GitHub issues and pull requests are automatically linked to functions in the status table when they mention the full function name (including crate prefix) in any of these formats:
+- Rust path: `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`
+- Lean notation: `curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes`
 
 ## CI
 
@@ -86,7 +91,7 @@ From this we have chosen a subset of functions which isn't all of those in this 
 
 [dalek]: https://github.com/dalek-cryptography/curve25519-dalek
 
-## Trust and Verification Method
+## Trust model and Verification Method
 
 ### Verification Approach
 
