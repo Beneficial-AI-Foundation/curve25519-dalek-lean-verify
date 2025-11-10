@@ -45,7 +45,7 @@ def remove_proofs(content: str) -> str:
             i += 1
             in_theorem = False  # Done processing this theorem
 
-            # Skip all proof lines until we hit something at column 0 (non-indented)
+            # Skip all proof lines until we hit a new top-level declaration or end statement
             # Track if we've seen blank lines to preserve them
             seen_blank = False
             while i < len(lines):
@@ -57,15 +57,23 @@ def remove_proofs(content: str) -> str:
                     i += 1
                     continue
 
-                # If it starts at column 0 and is not empty, stop (it's a new declaration/comment)
-                if not current_line[0].isspace():
+                # Stop at top-level declarations or end statements (at any indentation)
+                if re.match(r'^\s*(theorem|lemma|def|instance|structure|class|inductive|axiom|example|end|namespace)\s', current_line):
                     # Add back one blank line if we saw any
                     if seen_blank:
                         result.append('')
                     # Don't increment i, we want to process this line normally
                     break
 
-                # Otherwise skip this line (it's part of the proof - it's indented)
+                # Stop at comments or annotations at column 0 (these are typically between declarations)
+                if current_line and not current_line[0].isspace() and (current_line.startswith(('--', '/-', '@['))):
+                    # Add back one blank line if we saw any
+                    if seen_blank:
+                        result.append('')
+                    # Don't increment i, we want to process this line normally
+                    break
+
+                # Otherwise skip this line (it's part of the proof)
                 i += 1
 
             # If we reached EOF and saw blank lines, add one back
