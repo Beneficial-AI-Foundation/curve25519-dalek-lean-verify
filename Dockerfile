@@ -23,6 +23,8 @@ COPY src/dalek_lean_ai/remove_proofs.py /tmp/remove_proofs.py
 RUN find Curve25519Dalek/ -name '*.lean' -exec python3 /tmp/remove_proofs.py -i {} +
 RUN lake exe cache get
 RUN lake build
+# Prevent cheating
+RUN rm -rf .git
 
 WORKDIR /workspace
 RUN git clone https://github.com/AeneasVerif/aeneas
