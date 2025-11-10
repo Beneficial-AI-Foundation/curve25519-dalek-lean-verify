@@ -8,9 +8,10 @@ from pathlib import Path
 
 def remove_proofs(content: str) -> str:
     """
-    Replace all proofs in Lean code with 'sorry'.
+    Replace all proofs in Lean theorems with 'sorry'.
 
-    Proofs are identified by ':= by' followed by content until either:
+    Only processes theorems (not lemmas, defs, etc.). Proofs are identified by
+    'theorem' followed by ':= by', with content removed until either:
     - A blank line
     - End of file
     - A line starting with a non-indented keyword (theorem, def, etc.)
@@ -19,21 +20,31 @@ def remove_proofs(content: str) -> str:
         content: The Lean file content as a string
 
     Returns:
-        The modified content with proofs replaced by 'sorry'
+        The modified content with theorem proofs replaced by 'sorry'
     """
     lines = content.split('\n')
     result = []
     i = 0
+    in_theorem = False
 
     while i < len(lines):
         line = lines[i]
 
-        # Check if this line contains ':= by'
-        if ':= by' in line:
+        # Track if we're starting a theorem
+        if re.match(r'^theorem\s', line):
+            in_theorem = True
+
+        # Reset theorem flag at other top-level declarations
+        if re.match(r'^(lemma|def|instance|structure|class|inductive|axiom|example)\s', line):
+            in_theorem = False
+
+        # Check if this line contains ':= by' and we're in a theorem
+        if ':= by' in line and in_theorem:
             # Split the line at ':= by'
             before_proof = line.split(':= by')[0]
             result.append(before_proof + ':= by sorry')
             i += 1
+            in_theorem = False  # Done processing this theorem
 
             # Skip all lines until we hit a blank line or a top-level declaration
             while i < len(lines):
@@ -79,7 +90,7 @@ def process_file(file_path: Path, in_place: bool = False) -> None:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Remove proofs from Lean files by replacing them with 'sorry'.",
+        description="Remove proofs from Lean theorems (only) by replacing them with 'sorry'.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
