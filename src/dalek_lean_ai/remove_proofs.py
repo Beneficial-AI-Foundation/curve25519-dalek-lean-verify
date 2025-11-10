@@ -75,8 +75,9 @@ def process_file(file_path: Path, in_place: bool = False) -> None:
     modified_content = remove_proofs(content)
 
     if in_place:
-        file_path.write_text(modified_content)
-        print(f"Modified: {file_path}")
+        if content != modified_content:
+            file_path.write_text(modified_content)
+            print(f"Modified: {file_path}")
     else:
         print(modified_content)
 
