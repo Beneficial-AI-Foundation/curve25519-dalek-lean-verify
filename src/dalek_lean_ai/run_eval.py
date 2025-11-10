@@ -46,6 +46,10 @@ def _get_prompt() -> str:
         image_name, "/workspace/aeneas/tests/lean/BaseTutorial.lean"
     )
 
+    # Load square_internal_tutorial from the host filesystem
+    square_internal_tutorial_path = Path(__file__).parent / "square_internal_tutorial.md"
+    square_internal_tutorial = square_internal_tutorial_path.read_text()
+
     # List the aeneas tutorials directory
     result = subprocess.run(
         ["docker", "run", "--rm", image_name, "ls", "-1", "/workspace/aeneas/tests/lean/"],
@@ -64,6 +68,7 @@ def _get_prompt() -> str:
         DETAILS_MD=details_md,
         BASE_TUTORIAL_LEAN=base_tutorial,
         AENEAS_TUTORIALS_LS=aeneas_ls,
+        SQUARE_INTERNAL_TUTORIAL=square_internal_tutorial,
     )
 
 

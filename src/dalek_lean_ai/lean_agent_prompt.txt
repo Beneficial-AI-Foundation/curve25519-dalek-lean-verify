@@ -57,6 +57,11 @@ The /workspace/aeneas/tests/lean/ directory contains other tutorials. Here's the
 
 Feel free to read any of these tutorials if you feel they'd be related to your problem.
 
+Here is an in-depth tutorial on proving the square_internal function.
+Please follow this approach for your proof:
+
+{SQUARE_INTERNAL_TUTORIAL}
+
 # Reading lake build output
 
 If you see something like this when you run a bash tool:
