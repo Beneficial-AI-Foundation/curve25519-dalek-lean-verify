@@ -11,13 +11,18 @@ weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 linter.style.longLine = false
 maxRecDepth = 100_000
-# doc.verso = true
+doc.verso = true
 
 [[require]]
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
 rev = "main"
+
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso.git"
+rev = "v4.24.0"
 
 [[require]]
 name = "Canonical"
