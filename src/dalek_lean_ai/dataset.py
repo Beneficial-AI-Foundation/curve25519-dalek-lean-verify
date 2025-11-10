@@ -10,9 +10,13 @@ def build_dataset():
     build_script = project_root / "build_docker_image.bash"
 
     subprocess.run([str(build_script)], check=True, cwd=project_root)
+
+    # Read docker image tag from centralized file
+    docker_tag = (project_root / "DOCKER_IMAGE_TAG").read_text().strip()
+
     # Get list of files with sorries from Docker, only in Curve25519Dalek directory
     files_with_sorries = subprocess.run(
-        ["docker", "run", "lean_agent", "bash", "-c",
+        ["docker", "run", docker_tag, "bash", "-c",
          "cd /workspace/curve25519-dalek-lean-verify && grep -r 'sorry' --include='*.lean' -l Curve25519Dalek/"],
         capture_output=True,
         check=True,

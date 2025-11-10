@@ -36,7 +36,7 @@ def _load_file_from_docker(image_name: str, file_path: str) -> str:
 
 def _get_prompt() -> str:
     """Get the prompt with files loaded from the docker image."""
-    image_name = "lean_agent"
+    image_name = (_project_root / "DOCKER_IMAGE_TAG").read_text().strip()
 
     # Read the files from the docker image
     details_md = _load_file_from_docker(
