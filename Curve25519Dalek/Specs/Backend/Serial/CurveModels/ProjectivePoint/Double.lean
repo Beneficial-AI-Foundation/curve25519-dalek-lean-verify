@@ -5,6 +5,10 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
 /-! # Spec Theorem for `ProjectivePoint::double`
 
@@ -18,6 +22,11 @@ elliptic curve addition).
 -/
 
 open Aeneas.Std Result
+
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
+open curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
+
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
 /-
@@ -65,6 +74,80 @@ Y' % p = (Y^2 + X^2) % p ∧
 Z' % p = (Y^2 - X^2) % p ∧
 T' % p = (2 * Z^2 - Y^2 + X^2) % p
 := by
-sorry
+  unfold double
+
+  progress*
+
+
+  · -- Goal 1: Precondition for `add q.X q.Y`
+    intro c hc
+    ring_nf at XX_post YY_post ZZ2_post
+    unfold Field51_as_Nat at *
+
+    sorry
+  · -- Goal 2: Precondition for `square X_plus_Y`
+    sorry
+  · -- Goal 3: Precondition for `add YY XX`
+    sorry
+  · -- Goal 4: Precondition for `sub YY XX`
+    sorry
+  · -- Goal 5: Precondition for `sub X_plus_Y_sq YY_plus_XX`
+    sorry
+  · -- Goal 6: Precondition for `sub ZZ2 YY_minus_XX`
+    sorry
+  · -- Goal 7: Precondition for `square q.X` (from 'let XX')
+    -- (Note: The order of goals might differ slightly)
+    sorry
+  · -- Goal 8: Precondition for `square q.Y` (from 'let YY')
+    sorry
+
+  -- Goal 9:
+  constructor
+
+  · -- Goal 9.1: X' coordinate
+    unfold Field51_as_Nat at *;
+
+    have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
+                      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
+                      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      rw [X_plus_Y_post, Nat.mul_add]; exact Finset.mem_range.mp hi
+
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
+
+    rw [h_X_plus_Y] at X_plus_Y_sq_post; rw [h_YY_plus_XX] at fe_post;
+
+    have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) ≡
+                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) ^ 2 +
+                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) ^ 2 [MOD p] := by
+      apply Nat.ModEq.add; (ring_nf at *; exact YY_post); (ring_nf at *; exact XX_post)
+
+    apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
+    ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
+
+
+
+
+
+
+  · -- Goal 9.2: Y' coordinate
+    -- Context: YY_plus_XX_post, YY_post, XX_post
+
+    sorry
+
+
+
+
+
+
+
+
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
