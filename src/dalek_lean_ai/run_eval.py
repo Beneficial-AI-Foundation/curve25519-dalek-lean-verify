@@ -10,9 +10,9 @@ from dalek_lean_ai.scorer import lean_proof_scorer
 
 DATASET = build_dataset()
 
-# Get path to docker directory relative to project root
+# Get path to Dockerfile relative to project root
 _project_root = Path(__file__).parent.parent.parent
-_docker_dir = _project_root / "docker" / "Dockerfile"
+_dockerfile_path = _project_root / "Dockerfile"
 
 # Load the prompt template from file
 _prompt_file = Path(__file__).parent / "lean_agent_prompt.txt"
@@ -81,5 +81,5 @@ def evaluate_lean_fixing():
         dataset=DATASET,
         solver=lean_agent,
         scorer=lean_proof_scorer(),
-        sandbox=("docker", str(_docker_dir)),
+        sandbox=("docker", str(_dockerfile_path)),
     )

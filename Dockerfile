@@ -19,6 +19,8 @@ RUN git clone https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-
 WORKDIR /workspace/curve25519-dalek-lean-verify
 # From mul_internal_sorry2
 RUN git checkout 40b1b91007605ee4de3ebdaaa78d5a193a3b34e9
+COPY src/dalek_lean_ai/remove_proofs.py /tmp/remove_proofs.py
+RUN find Curve25519Dalek/ -name '*.lean' -exec python3 /tmp/remove_proofs.py -i {} +
 RUN lake exe cache get
 RUN lake build
 
