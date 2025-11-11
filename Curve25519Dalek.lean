@@ -96,3 +96,4 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesExternal
+import Curve25519Dalek.Experiments.CanonicalTrials
