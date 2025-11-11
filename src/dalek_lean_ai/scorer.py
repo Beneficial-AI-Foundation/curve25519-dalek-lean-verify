@@ -13,8 +13,13 @@ def lean_proof_scorer():
         # Run lake build to check if proofs are valid
         build_result = await sandbox().exec(["lake", "build"])
         if not build_result.success:
+            error_output = ""
+            if build_result.stdout:
+                error_output += f"stdout: {build_result.stdout}\n"
+            if build_result.stderr:
+                error_output += f"stderr: {build_result.stderr}"
             return Score(
-                value=0, explanation=f"lake build failed: {build_result.stderr}"
+                value=0, explanation=f"lake build failed:\n{error_output}"
             )
 
         # Check if the specific file still contains sorry
