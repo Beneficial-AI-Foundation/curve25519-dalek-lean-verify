@@ -84,7 +84,7 @@ curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scal
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L250-L253,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,specified,,
 curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L747-L749,Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean,extracted,specified,,
-curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1134-L1136,Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean,extracted,specified,,
+curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1134-L1136,Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L921-L973,Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,Extraction problem due to nested borrows,
 curve25519_dalek::scalar::Scalar::ONE,curve25519-dalek/src/scalar.rs,L567-L572,Curve25519Dalek/Specs/Scalar/Scalar/One.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::scalar::Scalar::reduce,curve25519-dalek/src/scalar.rs,L1125-L1130,Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean,extracted,specified,,
