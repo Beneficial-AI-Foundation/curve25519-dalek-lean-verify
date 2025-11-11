@@ -3,8 +3,10 @@ import { ref, computed } from 'vue'
 import FunctionDetailModal from './FunctionDetailModal.vue'
 import GitHubItemLink from './GitHubItemLink.vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useGitHubLinks } from '../composables/useGitHubLinks'
 
 const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
+const { getSourceLink, getSpecLink } = useGitHubLinks()
 
 const props = defineProps({
   data: {
@@ -39,26 +41,6 @@ function getFunctionName(fullPath) {
 // Helper function to shorten source path
 function shortenSourcePath(source) {
   return source.replace('curve25519-dalek/src/', '')
-}
-
-// Helper function to create GitHub link for Rust source
-function getSourceLink(source, lines) {
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  const lineMatch = lines.match(/L(\d+)(?:-L(\d+))?/)
-  if (lineMatch) {
-    const start = lineMatch[1]
-    const end = lineMatch[2]
-    const lineFragment = end ? `#L${start}-L${end}` : `#L${start}`
-    return `${baseUrl}/${source}${lineFragment}`
-  }
-  return `${baseUrl}/${source}`
-}
-
-// Helper function to create GitHub link for Lean spec file
-function getSpecLink(specPath) {
-  if (!specPath) return null
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  return `${baseUrl}/${specPath}`
 }
 
 // Filter state

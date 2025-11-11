@@ -1,8 +1,10 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useGitHubLinks } from '../composables/useGitHubLinks'
 
 const { getExtractedStatus, getVerifiedStatus, getAiProveableStatus } = useStatusFormatting()
+const { getSourceLink, getSpecLink } = useGitHubLinks()
 
 const props = defineProps({
   isOpen: {
@@ -104,13 +106,45 @@ watch(() => props.isOpen, (isOpen) => {
 
             <div class="detail-section" v-if="func.source">
               <h3>Source</h3>
-              <p>{{ func.source }}</p>
+              <p>
+                <a
+                  v-if="getSourceLink(func.source, func.lines)"
+                  :href="getSourceLink(func.source, func.lines)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="github-link"
+                >
+                  {{ func.source }}
+                  <svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+                <span v-else>{{ func.source }}</span>
+              </p>
               <p v-if="func.lines" class="lines-info">Lines: {{ func.lines }}</p>
             </div>
 
             <div class="detail-section" v-if="func.spec_theorem">
               <h3>Specification</h3>
-              <code class="spec-path">{{ func.spec_theorem }}</code>
+              <p>
+                <a
+                  v-if="getSpecLink(func.spec_theorem)"
+                  :href="getSpecLink(func.spec_theorem)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="github-link"
+                >
+                  {{ func.spec_theorem }}
+                  <svg class="external-link-icon" xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                    <polyline points="15 3 21 3 21 9"></polyline>
+                    <line x1="10" y1="14" x2="21" y2="3"></line>
+                  </svg>
+                </a>
+                <span v-else>{{ func.spec_theorem }}</span>
+              </p>
             </div>
 
             <div class="detail-section">
@@ -287,14 +321,59 @@ watch(() => props.isOpen, (isOpen) => {
   height: 16px;
 }
 
-.spec-path {
+.spec-wrapper {
   display: block;
+}
+
+.spec-path {
+  display: inline;
   padding: 0.75rem;
   background: var(--vp-c-bg-soft);
   border-radius: 6px;
   word-break: break-all;
   font-size: 0.85rem;
   user-select: all;
+}
+
+.github-link {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: color 0.2s;
+}
+
+.github-link:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration: underline;
+}
+
+.github-link.spec-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 6px;
+}
+
+.github-link.spec-link .spec-path {
+  padding: 0;
+  background: transparent;
+}
+
+.github-link.spec-link:hover .spec-path {
+  text-decoration: underline;
+}
+
+.external-link-icon {
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.github-link:hover .external-link-icon {
+  opacity: 1;
 }
 
 .lines-info {
