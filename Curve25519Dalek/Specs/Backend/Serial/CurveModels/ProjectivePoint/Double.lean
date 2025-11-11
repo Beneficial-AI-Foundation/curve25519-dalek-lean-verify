@@ -132,15 +132,78 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
 
+  · -- Goal 9.2: ⊢ Y' ∧ Z' ∧ T'
+    constructor
+    · -- Goal 9.2.1: Y' coordinate
+      unfold Field51_as_Nat at *;
+      have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+                          (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+                          (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+        rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+        intro i hi
+        rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
+
+      rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
+      apply Nat.ModEq.add
+      · exact YY_post
+      · exact XX_post
+
+    · -- Goal 9.2.2: ⊢ Z' ∧ T'
+      constructor
+      · -- Goal 9.2.2.1: Z' coordinate
+        unfold Field51_as_Nat at *;
+        rw [← Nat.ModEq] at *; ring_nf at *;
+        rw [Nat.modEq_iff_dvd];
+
+        have h_Z_dvd := Nat.modEq_iff_dvd.mp YY_minus_XX_post;
+        have h_X_dvd := Nat.modEq_iff_dvd.mp XX_post;
+        have h_Y_dvd := Nat.modEq_iff_dvd.mp YY_post;
+
+        by_cases h_le : (∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2 ≤ (∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2;
+
+        · rw [Int.ofNat_sub h_le];
+          have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
+          have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
+          have h_all := Int.dvd_add h_Y_dvd h_add_12;
+          ring_nf at h_all;
+          rw [Int.sub_sub];
+          rw [Int.sub_right_comm] at h_all;
+          exact h_all;
+
+        · have h_lt : (∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2 < (∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2 := Nat.lt_of_not_le h_le;
+          rw [Nat.sub_eq_zero_of_le (Nat.le_of_lt h_lt), Int.ofNat_zero, sub_zero];
+          rw [Int.dvd_neg];
+
+          have h_all : (p : ℤ) ∣ (↑((∑ x ∈ Finset.range 5, ↑q.Y[x]! * 2 ^ (x * 51)) ^ 2) - ↑((∑ x ∈ Finset.range 5, ↑q.X[x]! * 2 ^ (x * 51)) ^ 2)) - ↑(∑ x ∈ Finset.range 5, ↑YY_minus_XX[x]! * 2 ^ (x * 51)) := by
+            have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
+            have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
+            have h_all := Int.dvd_add h_Y_dvd h_add_12;
+            ring_nf at h_all;
+            rw [Int.sub_sub];
+            exact h_all;
+
+          have h_Y2_sub_X2 : (p : ℤ) ∣ ↑((∑ x ∈ Finset.range 5, ↑q.Y[x]! * 2 ^ (x * 51)) ^ 2) - ↑((∑ x ∈ Finset.range 5, ↑q.X[x]! * 2 ^ (x * 51)) ^ 2) := by
+            apply (Nat.modEq_iff_dvd.mp (h_Y_dvd.trans h_X_dvd.symm));
+
+          apply (Int.dvd_sub h_Y2_sub_X2 h_all).trans
+          ring
+
+
+
+        --rw [← Nat.ModEq.add_iff_right] at YY_minus_XX_post
+
+        sorry
+
+      · -- Goal 9.2.2.2: T' coordinate
+        -- ⊢ (∑...fe1...) % p = ( 2*(∑...q.Z^2) - (∑...q.Y^2) + (∑...q.X^2) ) % p
+
+        sorry
 
 
 
 
 
-  · -- Goal 9.2: Y' coordinate
-    -- Context: YY_plus_XX_post, YY_post, XX_post
 
-    sorry
 
 
 
