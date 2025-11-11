@@ -2,7 +2,7 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
 
-const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
+const { getExtractedStatus, getVerifiedStatus, getAiProveableStatus } = useStatusFormatting()
 
 const props = defineProps({
   isOpen: {
@@ -133,8 +133,8 @@ watch(() => props.isOpen, (isOpen) => {
                 </div>
                 <div class="status-item">
                   <span class="status-label">AI-Verifiable:</span>
-                  <span :class="['status-badge', func['ai-proveable'] && func['ai-proveable'].trim() !== '' ? 'ai-proveable' : 'pending']">
-                    {{ func['ai-proveable'] && func['ai-proveable'].trim() !== '' ? '🤖 Yes' : '☐ No' }}
+                  <span :class="['status-badge', getAiProveableStatus(func['ai-proveable']).cssClass]">
+                    {{ getAiProveableStatus(func['ai-proveable']).icon }} {{ getAiProveableStatus(func['ai-proveable']).label }}
                   </span>
                 </div>
               </div>
