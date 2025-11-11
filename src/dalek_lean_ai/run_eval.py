@@ -3,7 +3,8 @@ from pathlib import Path
 
 from inspect_ai import Task, task
 from inspect_ai.agent import react
-from inspect_ai.tool import bash_session, text_editor
+from inspect_ai.tool import text_editor, tool
+from inspect_ai.util import sandbox
 
 from dalek_lean_ai.dataset import build_dataset
 from dalek_lean_ai.scorer import lean_proof_scorer
@@ -72,13 +73,41 @@ def _get_prompt() -> str:
     )
 
 
+@tool
+def lake_build():
+    async def execute():
+        """Run lake build to compile the Lean project and check for errors.
+
+        This command builds the entire Lean project in /workspace/curve25519-dalek-lean-verify.
+        It will show compilation errors if any exist.
+        Use this to verify your proofs are correct.
+
+        Returns:
+            The output from lake build, including any error messages.
+        """
+        result = await sandbox().exec(
+            ["lake", "build"],
+            cwd="/workspace/curve25519-dalek-lean-verify"
+        )
+        output = ""
+        if result.stdout:
+            output += result.stdout
+        if result.stderr:
+            if output:
+                output += "\n"
+            output += result.stderr
+        return output if output else "Build completed with no output."
+
+    return execute
+
+
 @task
 def evaluate_lean_fixing():
     lean_agent = react(
         description="Expert Lean theorem prover",
         prompt=_get_prompt(),
         # TODO Should the timeout be larger?
-        tools=[bash_session(), text_editor()],
+        tools=[lake_build(), text_editor()],
         attempts=3,
     )
 
