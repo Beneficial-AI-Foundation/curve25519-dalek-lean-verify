@@ -35,6 +35,6 @@ theorem identity_spec :
   ∃ q, identity = ok q ∧
   q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
   unfold identity
-  progress*
+  simp
 
 end curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint
