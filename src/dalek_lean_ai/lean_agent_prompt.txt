@@ -86,3 +86,11 @@ Of course you can still view files.
 IMPORTANT: lake build may take over 2 min to finish. This is normal; just be patient.
 
 IMPORTANT: Do not try using any alternative build method (like `lake exe lean`). Only use `lake build`
+
+# Constant equality
+If both sides of an equality are known values, then `unfold` and `decide` usually are enough:
+```
+theorem R_spec : Scalar52_as_Nat constants.R % L = R % L := by
+  unfold constants.R
+  decide
+```
