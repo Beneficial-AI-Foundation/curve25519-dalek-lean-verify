@@ -59,8 +59,27 @@ export function useStatusFormatting() {
     }
   }
 
+  /**
+   * Get formatted configuration for AI-proveable status
+   */
+  function getAiProveableStatus(aiProveable: string | undefined): StatusConfig {
+    if (aiProveable && aiProveable.trim() !== '') {
+      return {
+        icon: '🤖',
+        label: 'Yes',
+        cssClass: 'ai-proveable'
+      }
+    }
+    return {
+      icon: '☐',
+      label: 'No',
+      cssClass: 'pending'
+    }
+  }
+
   return {
     getExtractedStatus,
-    getVerifiedStatus
+    getVerifiedStatus,
+    getAiProveableStatus
   }
 }
