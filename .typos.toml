@@ -2,7 +2,8 @@
 extend-exclude = [
     ".git/",
     "*.svg",
-    "TESTVECTORS"
+    "TESTVECTORS",
+    "*.lean" # Allow in lean anything since identifies are often false positives
 ]
 
 [default]

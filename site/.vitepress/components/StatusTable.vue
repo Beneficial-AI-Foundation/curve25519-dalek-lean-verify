@@ -1,9 +1,12 @@
 <script setup>
 import { ref, computed } from 'vue'
 import FunctionDetailModal from './FunctionDetailModal.vue'
+import GitHubItemLink from './GitHubItemLink.vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useGitHubLinks } from '../composables/useGitHubLinks'
 
 const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
+const { getSourceLink, getSpecLink } = useGitHubLinks()
 
 const props = defineProps({
   data: {
@@ -14,18 +17,19 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
-  findIssueForFunction: {
+  findIssuesForFunction: {
     type: Function,
     default: null
   }
 })
 
-// Helper function to find related issue for a function
-function findRelatedIssue(functionName) {
-  if (!props.issues || props.issues.length === 0) return null
-  if (!props.findIssueForFunction) return null
+// Helper function to find related issues/PRs for a function
+// Returns an array of matching items
+function findRelatedItems(functionName) {
+  if (!props.issues || props.issues.length === 0) return []
+  if (!props.findIssuesForFunction) return []
 
-  return props.findIssueForFunction(functionName, props.issues)
+  return props.findIssuesForFunction(functionName, props.issues)
 }
 
 // Helper function to extract function name from full path
@@ -37,26 +41,6 @@ function getFunctionName(fullPath) {
 // Helper function to shorten source path
 function shortenSourcePath(source) {
   return source.replace('curve25519-dalek/src/', '')
-}
-
-// Helper function to create GitHub link for Rust source
-function getSourceLink(source, lines) {
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  const lineMatch = lines.match(/L(\d+)(?:-L(\d+))?/)
-  if (lineMatch) {
-    const start = lineMatch[1]
-    const end = lineMatch[2]
-    const lineFragment = end ? `#L${start}-L${end}` : `#L${start}`
-    return `${baseUrl}/${source}${lineFragment}`
-  }
-  return `${baseUrl}/${source}`
-}
-
-// Helper function to create GitHub link for Lean spec file
-function getSpecLink(specPath) {
-  if (!specPath) return null
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  return `${baseUrl}/${specPath}`
 }
 
 // Filter state
@@ -72,7 +56,7 @@ const sortDirection = ref('asc')
 
 // Pagination state
 const currentPage = ref(1)
-const perPage = ref(50)
+const perPage = ref(100)
 
 // Modal state
 const isModalOpen = ref(false)
@@ -97,7 +81,7 @@ const visibleColumns = ref({
   extracted: true,
   verified: true,
   issue: true,
-  notes: false  // Hidden by default
+  notes: true  // Shown by default
 })
 
 // Computed: Filter data
@@ -192,6 +176,7 @@ const stats = computed(() => ({
   extracted: props.data.functions.filter(f => f.extracted === 'extracted').length,
   verified: props.data.functions.filter(f => f.verified === 'verified').length,
   specified: props.data.functions.filter(f => f.verified === 'specified').length,
+  ai_proveable: props.data.functions.filter(f => f['ai-proveable'] && f['ai-proveable'].trim() !== '').length,
   filtered: sortedData.value.length
 }))
 </script>
@@ -215,6 +200,10 @@ const stats = computed(() => ({
       <div class="stat">
         <span class="stat-label">Spec only:</span>
         <span class="stat-value stat-specified">{{ stats.specified }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">AI Proveable:</span>
+        <span class="stat-value stat-ai-proveable">{{ stats.ai_proveable }}</span>
       </div>
       <div class="stat" v-if="stats.filtered !== stats.total">
         <span class="stat-label">Filtered:</span>
@@ -323,15 +312,13 @@ const stats = computed(() => ({
               </span>
             </td>
             <td v-if="visibleColumns.issue" class="issue-col">
-              <a v-if="findRelatedIssue(func.function)"
-                 :href="findRelatedIssue(func.function).url"
-                 target="_blank"
-                 rel="noopener"
-                 class="issue-link"
-                 :title="findRelatedIssue(func.function).title">
-                #{{ findRelatedIssue(func.function).number }}
-                <span class="issue-title">{{ findRelatedIssue(func.function).title }}</span>
-              </a>
+              <div v-if="findRelatedItems(func.function).length > 0" class="related-items">
+                <GitHubItemLink
+                  v-for="item in findRelatedItems(func.function)"
+                  :key="item.number"
+                  :item="item"
+                />
+              </div>
               <span v-else class="no-issue">—</span>
             </td>
             <td v-if="visibleColumns.notes" class="notes-col">{{ func.notes }}</td>
@@ -493,6 +480,10 @@ const stats = computed(() => ({
 
 .stat-specified {
   color: var(--vp-c-purple-1);
+}
+
+.stat-ai-proveable {
+  color: #8b5cf6;
 }
 
 .stat-filtered {
@@ -667,27 +658,13 @@ const stats = computed(() => ({
 }
 
 .issue-col {
-  max-width: 300px;
+  max-width: 400px;
 }
 
-.issue-link {
-  color: var(--vp-c-brand-1);
-  text-decoration: none;
+.related-items {
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.issue-link:hover {
-  text-decoration: underline;
-}
-
-.issue-title {
-  color: var(--vp-c-text-2);
-  font-weight: 400;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
 .no-issue {

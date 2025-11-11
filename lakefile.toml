@@ -16,7 +16,7 @@ maxRecDepth = 10000
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
-rev = "son/regions2"  # PR #600
+rev = "main"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
