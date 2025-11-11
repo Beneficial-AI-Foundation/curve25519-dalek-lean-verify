@@ -131,6 +131,12 @@ watch(() => props.isOpen, (isOpen) => {
                     {{ getVerifiedStatus(func.verified).icon }} {{ getVerifiedStatus(func.verified).label }}
                   </span>
                 </div>
+                <div class="status-item">
+                  <span class="status-label">AI-Verifiable:</span>
+                  <span :class="['status-badge', func['ai-proveable'] && func['ai-proveable'].trim() !== '' ? 'ai-proveable' : 'pending']">
+                    {{ func['ai-proveable'] && func['ai-proveable'].trim() !== '' ? '🤖 Yes' : '☐ No' }}
+                  </span>
+                </div>
               </div>
             </div>
 
@@ -342,6 +348,11 @@ watch(() => props.isOpen, (isOpen) => {
 .status-badge.pending {
   background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-3);
+}
+
+.status-badge.ai-proveable {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
 }
 
 .notes-text {

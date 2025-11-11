@@ -13,6 +13,7 @@ export interface StatusEntry {
   extracted: string
   verified: string
   notes: string
+  'ai-proveable'?: string
 }
 
 export interface StatusData {
@@ -23,6 +24,7 @@ export interface StatusData {
     draft_spec: number
     specified: number
     verified: number
+    ai_proveable: number
   }
 }
 
@@ -41,7 +43,8 @@ export default {
     const records = parse(csvContent, {
       columns: true,
       skip_empty_lines: true,
-      trim: true
+      trim: true,
+      relax_column_count: true
     }) as StatusEntry[]
 
     // Calculate statistics
@@ -50,7 +53,8 @@ export default {
       extracted: records.filter(r => r.extracted === 'extracted').length,
       draft_spec: records.filter(r => r.verified === 'draft spec').length,
       specified: records.filter(r => r.verified === 'specified').length,
-      verified: records.filter(r => r.verified === 'verified').length
+      verified: records.filter(r => r.verified === 'verified').length,
+      ai_proveable: records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
     }
 
     return {
