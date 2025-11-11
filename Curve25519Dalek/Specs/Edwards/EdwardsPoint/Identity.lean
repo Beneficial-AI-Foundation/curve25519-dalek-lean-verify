@@ -1,3 +1,8 @@
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors:
+-/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
