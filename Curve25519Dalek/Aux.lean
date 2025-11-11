@@ -52,3 +52,6 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
     (bs.set j a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
+
+lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
+  sorry
