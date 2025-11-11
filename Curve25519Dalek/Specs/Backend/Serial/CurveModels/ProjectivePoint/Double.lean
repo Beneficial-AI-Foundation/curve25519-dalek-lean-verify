@@ -80,10 +80,6 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
 
 
   · -- Goal 1: Precondition for `add q.X q.Y`
-    intro c hc
-    ring_nf at XX_post YY_post ZZ2_post
-    unfold Field51_as_Nat at *
-
     sorry
   · -- Goal 2: Precondition for `square X_plus_Y`
     sorry
@@ -153,44 +149,44 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
       · -- Goal 9.2.2.1: Z' coordinate
         unfold Field51_as_Nat at *;
         rw [← Nat.ModEq] at *; ring_nf at *;
-        rw [Nat.modEq_iff_dvd];
 
         have h_Z_dvd := Nat.modEq_iff_dvd.mp YY_minus_XX_post;
         have h_X_dvd := Nat.modEq_iff_dvd.mp XX_post;
         have h_Y_dvd := Nat.modEq_iff_dvd.mp YY_post;
+        have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
+        have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
 
-        by_cases h_le : (∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2 ≤ (∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2;
+        have h_all := Int.dvd_add h_Y_dvd h_add_12;
 
-        · rw [Int.ofNat_sub h_le];
-          have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
-          have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
-          have h_all := Int.dvd_add h_Y_dvd h_add_12;
-          ring_nf at h_all;
-          rw [Int.sub_sub];
-          rw [Int.sub_right_comm] at h_all;
-          exact h_all;
+        set Y2_int := ((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2);
+        set X2_int := ((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2);
+        set Z_int  := (∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51));
+        set YY_int := (∑ x ∈ Finset.range 5, (YY[x]!).val * 2 ^ (x * 51));
+        set XX_int := (∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51));
 
-        · have h_lt : (∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2 < (∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2 := Nat.lt_of_not_le h_le;
-          rw [Nat.sub_eq_zero_of_le (Nat.le_of_lt h_lt), Int.ofNat_zero, sub_zero];
-          rw [Int.dvd_neg];
+        have h_eq : (↑Y2_int : ℤ) - ((↑Z_int : ℤ) + (↑X2_int : ℤ))=
+                      (↑Y2_int : ℤ) + (-↑ (XX_int:ℤ) + - (Z_int:ℤ) - (↑X2_int:ℤ)) + (↑XX_int:ℤ) := by
+                      ring
 
-          have h_all : (p : ℤ) ∣ (↑((∑ x ∈ Finset.range 5, ↑q.Y[x]! * 2 ^ (x * 51)) ^ 2) - ↑((∑ x ∈ Finset.range 5, ↑q.X[x]! * 2 ^ (x * 51)) ^ 2)) - ↑(∑ x ∈ Finset.range 5, ↑YY_minus_XX[x]! * 2 ^ (x * 51)) := by
-            have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
-            have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
-            have h_all := Int.dvd_add h_Y_dvd h_add_12;
-            ring_nf at h_all;
-            rw [Int.sub_sub];
-            exact h_all;
+        have h_all_simple : ↑p ∣ (↑Y2_int : ℤ) - ((↑Z_int : ℤ) + (↑X2_int : ℤ)) := by
+          ring_nf at h_all
+          simp only [Nat.cast_add, neg_add_rev] at h_all
+          rw [h_eq.symm] at h_all
+          exact h_all
 
-          have h_Y2_sub_X2 : (p : ℤ) ∣ ↑((∑ x ∈ Finset.range 5, ↑q.Y[x]! * 2 ^ (x * 51)) ^ 2) - ↑((∑ x ∈ Finset.range 5, ↑q.X[x]! * 2 ^ (x * 51)) ^ 2) := by
-            apply (Nat.modEq_iff_dvd.mp (h_Y_dvd.trans h_X_dvd.symm));
-
-          apply (Int.dvd_sub h_Y2_sub_X2 h_all).trans
+        apply Int.modEq_iff_dvd.mpr at h_all_simple
+        have h_rewrite : (↑Y2_int : ℤ) = (↑Y2_int : ℤ) - (↑X2_int : ℤ) + (↑X2_int : ℤ) := by
           ring
+        rw [h_rewrite] at h_all_simple
+        apply Int.ModEq.add_right_cancel' X2_int at h_all_simple
+
+        apply Int.natCast_modEq_iff.mp
+        apply Int.ModEq.trans h_all_simple
+        apply Int.ModEq.symm
+        
 
 
-
-        --rw [← Nat.ModEq.add_iff_right] at YY_minus_XX_post
+        --exact Int.natCast_modEq_iff.mp h_all_simple
 
         sorry
 
@@ -198,19 +194,6 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
         -- ⊢ (∑...fe1...) % p = ( 2*(∑...q.Z^2) - (∑...q.Y^2) + (∑...q.X^2) ) % p
 
         sorry
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
