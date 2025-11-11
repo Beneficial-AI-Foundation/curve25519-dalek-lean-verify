@@ -108,7 +108,7 @@ def evaluate_lean_fixing():
         prompt=_get_prompt(),
         # TODO Should the timeout be larger?
         tools=[lake_build(), text_editor()],
-        attempts=3,
+        attempts=1000,
     )
 
     return Task(
