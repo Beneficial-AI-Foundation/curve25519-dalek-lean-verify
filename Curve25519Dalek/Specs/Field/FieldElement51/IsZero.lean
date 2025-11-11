@@ -5,8 +5,9 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
-
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 
 set_option linter.style.longLine false
 set_option linter.style.setOption false
@@ -74,67 +75,72 @@ lemma array_eq_of_to_slice_eq
 
 
 
-@[progress] 
+@[simp]
+theorem UScalar.ofNat_inj {a b : U8} (h : ↑a = ↑b) : a = b := by
+  cases a; cases b
+  simp_all
+
+theorem Array.val_getElem!_eq'_U8 (bs : Array U8 32#usize) (i : Nat) (h : i < bs.length) :
+    (bs.val)[i]! = bs[i] := by
+  simpa [Subtype.val] using getElem!_pos bs.val i _
+
+
+
+
+@[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
     ∃ c, is_zero r = ok c ∧
     (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0)
     := by
-    unfold is_zero 
-    cases h : r.to_bytes
-    repeat progress
+    unfold is_zero
+    progress as ⟨bytes, h_to_bytes⟩
+    progress as ⟨s, h_bytes_slice⟩
+    progress as ⟨s1, h_zero_slice⟩
+    progress as ⟨result, h_ct_eq⟩
     constructor
-    intro h
-    --unfold Field51_as_Nat
-    rename_i h1 h2 h3 h4 h5 h6 h7 h8
-    --rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,Finset.sum_range_one]
-    have h3eqh5 : h3 = h5 := h8.mp ((Choice.val_eq_one_iff h7).mp h)
-    rw[h4,h6,] at h3eqh5
-    have heq: h1 = (Array.repeat 32#usize 0#u8) := by
+    . intro h
+      rename_i h1
+      have s_eq_s1 : s = s1 := by exact h_ct_eq.mp ((Choice.val_eq_one_iff result).mp h)
+      rw[h_bytes_slice ,h_zero_slice ] at s_eq_s1
+      have heq: bytes = (Array.repeat 32#usize 0#u8) := by
         apply array_eq_of_to_slice_eq
-        exact h3eqh5
+        exact s_eq_s1
+      rw[heq,Nat.ModEq] at h_to_bytes
+      rw[← h_to_bytes]
+      unfold U8x32_as_Nat
 
-    set zero:= (Array.repeat 32#usize 0#u8) with hzero
-    rw [heq,hzero] at h2
-    revert h2
-    unfold backend.serial.u64.field.FieldElement51.to_bytes
-    obtain ⟨a, ha_ok,h_bounds_a,hao_mod⟩ := reduce_spec r
-    simp only [ha_ok, bind_tc_ok]
-    
-     -- Index a[0]
-    have hlen_a0 : 0#usize < a.length := by scalar_tac
-    obtain ⟨a0, ha0_ok⟩ := Array.index_usize_spec a 0#usize hlen_a0
-    simp only [ha0_ok, bind_tc_ok, UScalar.ofNat_val_eq]
-    generalize ha0 : (a.val)[0]! = a0
+      iterate 31 (rw [Finset.sum_range_succ])
+      rw[Finset.sum_range_one]
+      simp[ Array.repeat]
 
-    have ha0_bound : a0.val + 19#u64 ≤ U64.max := by
-      have := h_bounds_a 0 (by simp)
-      scalar_tac
-    obtain ⟨a0', ha0'_ok, ha0'_val⟩ := U64.add_spec ha0_bound
-    simp only [ha0'_ok, bind_tc_ok]
+    intro h
+    rename_i h1
+    rw[Nat.ModEq,h] at h_to_bytes
+    have h_bytes_zero : U8x32_as_Nat bytes = 0 := by
+      have h2 := Nat.mod_eq_of_lt h1
+      rw [h2] at h_to_bytes
+      exact h_to_bytes
 
 
+    have by_eq1 :bytes= (Array.repeat 32#usize 0#u8) := by
+      unfold U8x32_as_Nat at h_bytes_zero
+      simp_all
+      apply Subtype.ext
+      apply List.ext_getElem
+      simp
+      simp
+      intro i h₁ h₂
+      have h:= h_bytes_zero i h₁
+      have hval : ((Array.repeat 32#usize 0#u8).val)[i] = (0#u8 : U8) := by
+         sorry
+      rw[hval]
+      sorry
 
-
-    have ha0'_bound : a0'.val >>> (51:Nat) ≤ U64.max := by
-      have := h_bounds_a 0 (by simp)
-      scalar_tac
-    
-      
-    
-    
-
-
-
-
-
-
-
-
+    have   s_eq_s1 : s = s1 := by
+      rw[h_bytes_slice,h_zero_slice,by_eq1]
+    rw[← h_ct_eq] at s_eq_s1
+    simp[s_eq_s1,Choice.one]
 
 
 
 end curve25519_dalek.field.FieldElement51
-
-
-
-  
