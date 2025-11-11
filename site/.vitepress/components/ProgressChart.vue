@@ -35,11 +35,51 @@ interface ProgressDataPoint {
   specified: number
   draft_spec: number
   extracted: number
+  ai_proveable: number
 }
 
 const props = defineProps<{
   dataPoints: ProgressDataPoint[]
 }>()
+
+// Custom plugin to draw robot emoji at the end of AI-proveable line
+const robotEmojiPlugin = {
+  id: 'robotEmoji',
+  afterDatasetsDraw(chart: any) {
+    const ctx = chart.ctx
+    const datasets = chart.data.datasets
+
+    // Find the AI Proveable dataset
+    const aiProveableDataset = datasets.find((ds: any) => ds.label === 'AI Proveable')
+    if (!aiProveableDataset || !aiProveableDataset.data.length) return
+
+    // Get the last point
+    const lastPoint = aiProveableDataset.data[aiProveableDataset.data.length - 1]
+    if (!lastPoint) return
+
+    // Get the meta for this dataset to access pixel coordinates
+    const meta = chart.getDatasetMeta(datasets.indexOf(aiProveableDataset))
+    if (!meta || !meta.data.length) return
+
+    const lastElement = meta.data[meta.data.length - 1]
+    const x = lastElement.x
+    const y = lastElement.y
+
+    // Draw robot emoji centered on the last data point
+    ctx.save()
+
+    // Draw the emoji centered on the point
+    ctx.font = 'bold 22px Arial, sans-serif'
+    ctx.textAlign = 'center'
+    ctx.textBaseline = 'middle'
+    ctx.fillText('🤖', x, y)
+
+    ctx.restore()
+  }
+}
+
+// Register the plugin
+ChartJS.register(robotEmojiPlugin)
 
 const chartData = computed(() => {
   // For TimeScale, we need to provide data as {x, y} objects
@@ -54,6 +94,7 @@ const chartData = computed(() => {
   }))
   const total = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total }))
   const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
+  const ai_proveable = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.ai_proveable }))
 
   return {
     datasets: [
@@ -123,6 +164,18 @@ const chartData = computed(() => {
         borderDash: [3, 3],
         pointRadius: 0,
         order: 0
+      },
+      {
+        label: 'AI Proveable',
+        data: ai_proveable,
+        borderColor: '#8b5cf6',
+        backgroundColor: 'transparent',
+        fill: false,
+        stepped: 'after' as const,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointStyle: false,
+        order: -1
       }
     ]
   }
@@ -135,6 +188,11 @@ const chartOptions: ChartOptions<'line'> = {
   interaction: {
     mode: 'index',
     intersect: false
+  },
+  layout: {
+    padding: {
+      right: 40  // Add padding on the right for the robot emoji
+    }
   },
   plugins: {
     title: {
