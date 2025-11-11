@@ -1,16 +1,15 @@
 import Aeneas
-import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs
 import Mathlib
 
 set_option linter.style.longLine false
 
 /-! # Auxiliary theorems
 
-Theorems which are useful for proving spec theorems in this project but aren't available upstream. -/
+Theorems which are useful for proving spec theorems in this project but aren't available upstream.
+This file is for theorems which depend only on Defs.lean, not on Funs.lean or Types.lean. -/
 
 open Aeneas.Std Result
-open curve25519_dalek
-open backend.serial.u64.field.FieldElement51.reduce
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
