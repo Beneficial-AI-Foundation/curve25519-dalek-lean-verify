@@ -79,3 +79,10 @@ Running Curve25519Dalek (+ 0 more)
 Build completed successfully (7594 jobs).
 ```
 (or there might be an error message)
+
+IMPORTANT: Do not edit any file while lake build is running.
+Of course you can still view files.
+
+IMPORTANT: lake build may take over 2 min to finish. This is normal; just be patient.
+
+IMPORTANT: Do not try using any alternative build method (like `lake exe lean`). Only use `lake build`
