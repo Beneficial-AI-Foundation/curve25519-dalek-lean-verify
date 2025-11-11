@@ -33,6 +33,10 @@ def lean_proof_scorer():
         if has_axioms:
             return Score(value=0, explanation=f"The file {target_file} contains axioms")
 
-        return Score(value=1, explanation="All proofs are valid")
+        # Read the file contents to include in the success message
+        file_contents_result = await sandbox().exec(["cat", target_file])
+        file_contents = file_contents_result.stdout if file_contents_result.success else "Could not read file"
+
+        return Score(value=1, explanation=f"All proofs are valid. File contents:\n{file_contents}")
 
     return score
