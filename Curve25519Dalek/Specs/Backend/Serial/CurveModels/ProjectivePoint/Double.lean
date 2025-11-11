@@ -163,30 +163,16 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
         set Z_int  := (∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51));
         set YY_int := (∑ x ∈ Finset.range 5, (YY[x]!).val * 2 ^ (x * 51));
         set XX_int := (∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51));
+        have h_sub_Y : Z_int + XX_int ≡ Y2_int [MOD p] := by
+          apply Nat.ModEq.trans YY_minus_XX_post YY_post
+        have h_final : Z_int + X2_int ≡ Y2_int [MOD p] := by
+          have h_sub_X := Nat.ModEq.add_left Z_int XX_post
+          apply Nat.ModEq.trans h_sub_X.symm h_sub_Y
 
-        have h_eq : (↑Y2_int : ℤ) - ((↑Z_int : ℤ) + (↑X2_int : ℤ))=
-                      (↑Y2_int : ℤ) + (-↑ (XX_int:ℤ) + - (Z_int:ℤ) - (↑X2_int:ℤ)) + (↑XX_int:ℤ) := by
-                      ring
-
-        have h_all_simple : ↑p ∣ (↑Y2_int : ℤ) - ((↑Z_int : ℤ) + (↑X2_int : ℤ)) := by
-          ring_nf at h_all
-          simp only [Nat.cast_add, neg_add_rev] at h_all
-          rw [h_eq.symm] at h_all
-          exact h_all
-
-        apply Int.modEq_iff_dvd.mpr at h_all_simple
-        have h_rewrite : (↑Y2_int : ℤ) = (↑Y2_int : ℤ) - (↑X2_int : ℤ) + (↑X2_int : ℤ) := by
-          ring
-        rw [h_rewrite] at h_all_simple
-        apply Int.ModEq.add_right_cancel' X2_int at h_all_simple
-
-        apply Int.natCast_modEq_iff.mp
-        apply Int.ModEq.trans h_all_simple
-        apply Int.ModEq.symm
-        
-
-
-        --exact Int.natCast_modEq_iff.mp h_all_simple
+        apply Nat.ModEq.add_right_cancel' X2_int
+        apply Nat.ModEq.trans h_final
+        apply Nat.ModEq.symm
+        rw [Nat.ModEq]
 
         sorry
 
