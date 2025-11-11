@@ -11,26 +11,26 @@ echo
 # Check if required tools are installed
 check_dependencies() {
     echo "Checking dependencies..."
-    
+
     # Check for git
     if ! command -v git &> /dev/null; then
         echo "Error: git is not installed. Please install git first."
         exit 1
     fi
-    
+
     # Check for OCaml/opam
     if ! command -v opam &> /dev/null; then
         echo "Error: opam is not installed. Please install OCaml and opam first."
         echo "Follow instructions at: https://ocaml.org/docs/install.html"
         exit 1
     fi
-    
+
     # Check for make
     if ! command -v make &> /dev/null; then
         echo "Error: make is not installed. Please install make first."
         exit 1
     fi
-    
+
     # Check for Rust toolchain
     if ! command -v rustup &> /dev/null; then
         if ! command -v nix &> /dev/null; then
@@ -43,19 +43,19 @@ check_dependencies() {
         fi
     else
         echo "✓ Rustup found"
-        
+
         # Check if cargo is available
         if ! command -v cargo &> /dev/null; then
             echo "Error: cargo is not available. Please ensure Rust toolchain is properly installed."
             exit 1
         fi
-        
+
         # Display Rust version info
         echo "Rust version information:"
         rustc --version
         cargo --version
     fi
-    
+
     echo "✓ All required dependencies found"
     echo
 }
@@ -74,7 +74,7 @@ setup_ocaml() {
     fi
 
     # Update opam environment
-    eval $(opam env)
+    eval "$(opam env)"
 
     echo "✓ OCaml environment ready"
     echo
@@ -83,10 +83,14 @@ setup_ocaml() {
 # Install OCaml dependencies
 install_ocaml_deps() {
     echo "Installing OCaml dependencies..."
-    
+
+    # Update opam package list to ensure we have latest package metadata
+    echo "Updating opam package list..."
+    opam update
+
     opam install -y ppx_deriving visitors easy_logging zarith yojson core_unix odoc \
-        ocamlgraph menhir ocamlformat unionFind
-    
+        ocamlgraph menhir ocamlformat unionFind domainslib progress
+
     echo "✓ OCaml dependencies installed"
     echo
 }
@@ -95,20 +99,30 @@ install_ocaml_deps() {
 clone_aeneas() {
     echo "Cloning Aeneas repository..."
 
-    AENEAS_BRANCH="son/regions2"  # PR #600
+    local AENEAS_BRANCH="main"
 
     if [ -d "aeneas" ]; then
         echo "✓ Aeneas directory already exists, pulling latest changes..."
         cd aeneas
         git fetch origin
-        git checkout $AENEAS_BRANCH
-        git pull origin $AENEAS_BRANCH
+        git checkout "$AENEAS_BRANCH"
+        git pull origin "$AENEAS_BRANCH"
         cd ..
     else
-        git clone --branch $AENEAS_BRANCH https://github.com/AeneasVerif/aeneas.git
+        git clone --branch "$AENEAS_BRANCH" https://github.com/AeneasVerif/aeneas.git
         echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
     fi
     echo
+}
+
+# Install Rust nightly toolchain for Charon
+install_rust_nightly() {
+    local NIGHTLY_VERSION="$1"
+
+    echo "Found Charon toolchain specification: $NIGHTLY_VERSION"
+    rustup toolchain install "$NIGHTLY_VERSION"
+    rustup component add --toolchain "$NIGHTLY_VERSION" rustfmt
+    echo "✓ Installed $NIGHTLY_VERSION with rustfmt"
 }
 
 # Setup Charon
@@ -116,89 +130,76 @@ setup_charon() {
     echo "Setting up Charon..."
 
     cd aeneas
-    
-    # First, get the Charon repository at the correct commit
-    echo "Setting up Charon repository..."
-    make setup-charon
+
+    # Display pinned commit if available
+    if [ -f "charon-pin" ]; then
+        local PINNED_COMMIT
+        PINNED_COMMIT=$(tail -1 charon-pin)
+        echo "Charon pinned commit: $PINNED_COMMIT"
+    fi
 
     # Install the required nightly toolchain specified by Charon
     echo "Installing required Rust nightly toolchain for Charon..."
-    if [ -f "charon/charon/rust-toolchain" ]; then
+
+    # Check for rust-toolchain.toml (new format) or rust-toolchain (old format)
+    if [ -f "charon/charon/rust-toolchain.toml" ]; then
+        local NIGHTLY_VERSION
+        NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain.toml | sed 's/.*"\(.*\)".*/\1/')
+        install_rust_nightly "$NIGHTLY_VERSION"
+    elif [ -f "charon/charon/rust-toolchain" ]; then
+        local NIGHTLY_VERSION
         NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain | sed 's/.*"\(.*\)".*/\1/')
-        echo "Found Charon toolchain specification: $NIGHTLY_VERSION"
-        rustup toolchain install $NIGHTLY_VERSION
-        rustup component add --toolchain $NIGHTLY_VERSION rustfmt
-        echo "✓ Installed $NIGHTLY_VERSION with rustfmt"
+        install_rust_nightly "$NIGHTLY_VERSION"
     else
         echo "Warning: Charon rust-toolchain file not found, using latest nightly"
         rustup toolchain install nightly
         rustup component add --toolchain nightly rustfmt
+        echo "✓ Installed nightly with rustfmt"
     fi
     echo
 
-    # Now build Charon manually with proper OCaml environment
-    echo "Building Charon with OCaml environment..."
-    cd charon
-    
-    # Ensure OCaml environment is active
-    eval $(opam env)
-    
-    # Build Charon
-    if ! make build-charon-rust; then
-        echo "Error: Charon build failed."
-        echo
-        echo "Troubleshooting steps:"
-        echo "1. Ensure OCaml environment is active:"
-        echo "   eval \$(opam env)"
-        echo "2. Check that you're in the charon directory"
-        echo "3. Try building manually:"
-        echo "   cd aeneas/charon"
-        echo "   eval \$(opam env)"
-        echo "   make build-charon-rust"
-        exit 1
-    fi
-    
-    cd .. # Back to aeneas directory
-    
+    # Clone and build Charon using the setup-charon target
+    # Note: This runs `make test` in charon which builds in debug mode and runs tests
+    echo "Cloning Charon and building (this will take a few minutes)..."
+    make setup-charon
+
     echo "✓ Charon setup and build complete"
     echo
-    
+
     cd .. # Back to original directory
 }
 
 # Build Aeneas
 build_aeneas() {
     echo "Building Aeneas..."
-    
+
     cd aeneas
-    
+
     # Update opam environment in case it changed
-    eval $(opam env)
-    
+    eval "$(opam env)"
+
     # Build the project
     make
-    
+
     echo "✓ Aeneas build complete"
     echo
-    
-    cd ..
+
+    cd .. # Back to original directory
 }
-
-
 
 # Main execution
 main() {
     echo "Starting Aeneas and Charon setup..."
     echo "Working directory: $(pwd)"
     echo
-    
+
     check_dependencies
     setup_ocaml
     install_ocaml_deps
     clone_aeneas
     setup_charon
     build_aeneas
-    
+
     echo "=== Setup Complete! ==="
     echo
     echo "Aeneas has been successfully installed in: $(pwd)/aeneas"
