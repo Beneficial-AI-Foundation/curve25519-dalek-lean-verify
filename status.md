@@ -64,7 +64,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `compress` | [edwards.rs](curve25519-dalek/src/edwards.rs#L565-L581) | [Compress.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean) | ✅ | ☐ |  |
 | `ct_eq` | [edwards.rs](curve25519-dalek/src/edwards.rs#L493-L502) | - | ✅ | ☐ |  |
 | `double` | [edwards.rs](curve25519-dalek/src/edwards.rs#L613-L626) | [Double.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean) | ✅ | ☐ |  |
-| `identity` | [edwards.rs](curve25519-dalek/src/edwards.rs#L420-L427) | [Identity.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean) | ✅ | ☐ |  |
+| `identity` | [edwards.rs](curve25519-dalek/src/edwards.rs#L420-L427) | [Identity.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean) | ✅ | ✅ |  |
 | `is_small_order` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1226-L1258) | [IsSmallOrder.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean) | ✅ | ☐ |  |
 | `mul_by_cofactor` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1186-L1188) | [MulByCofactor.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean) | ✅ | ☐ |  |
 | `mul_by_pow_2` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1191-L1199) | [MulByPow2.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean) | ✅ | ☐ |  |

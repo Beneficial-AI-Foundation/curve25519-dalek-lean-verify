@@ -57,7 +57,7 @@ curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/sr
 curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::ct_eq,curve25519-dalek/src/edwards.rs,L493-L502,,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean,extracted,,
-curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean,extracted,,
+curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean,extracted,verified,
 curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,extracted,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean,extracted,,
