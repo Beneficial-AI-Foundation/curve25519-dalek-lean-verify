@@ -41,10 +41,6 @@ def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
 def Scalar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
   ∑ i ∈ Finset.range 9, 2^(52 * i) * (limbs[i]!).val
 
-/-- Interpret a 9-element u128 array (each limb representing 51 bits) as a natural number. -/
-def U128x9_as_Nat (limbs : Array U128 9#usize) : Nat :=
-  ∑ i ∈ Finset.range 9, 2^(51 * i) * (limbs[i]!).val
-
 /-- Interpret a 32-element byte array as a natural number. -/
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
