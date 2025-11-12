@@ -42,7 +42,7 @@ natural language specs:
 - Note: this generalizes the square operation (square is pow2k with k=1)
 -/
 @[progress]
-theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val) :
+theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
     ∃ r, pow2k a k = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧
     (∀ i : Nat, i < 5 → r[i]!.val < 2^51)
