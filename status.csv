@@ -59,7 +59,7 @@ curve25519_dalek::edwards::EdwardsPoint::ct_eq,curve25519-dalek/src/edwards.rs,L
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.rs,L420-L427,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean,extracted,verified,,
 curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean,extracted,specified,,
-curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,extracted,,,
+curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul",
