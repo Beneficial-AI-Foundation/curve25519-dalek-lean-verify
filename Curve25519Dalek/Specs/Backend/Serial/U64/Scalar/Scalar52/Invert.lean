@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.AsMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
@@ -25,7 +26,9 @@ This function computes the multiplicative inverse.
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
+set_option linter.style.commandStart false
 set_option exponentiation.threshold 260
+
 
 /-
 natural language description:
@@ -49,17 +52,12 @@ natural language specs:
   Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)
 -/
 
-
-
-
-
 lemma coprime_pow_left {a b : ℕ} :
     ∀ n, Nat.Coprime a b → Nat.Coprime (a ^ n) b
   | 0, _ => by simp
   | n + 1, h => by
     simp [pow_succ]
     exact Nat.Coprime.mul_left (coprime_pow_left n h) h
-
 
 theorem coprimeRL : Nat.Coprime R L:= by
   unfold R L Nat.Coprime
@@ -77,17 +75,20 @@ theorem cancelRR {a b : ℕ}
   have h' : R ^ 2 * a ≡ R ^ 2 * b [MOD L] := by simpa [Nat.mul_comm] using h
   exact Nat.ModEq.cancel_left_of_coprime h1' h'
 
+theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
+  -- prove that R and L are coprime
+  have hcoprime : Nat.Coprime R L := by
+    unfold R L Nat.Coprime
+    simp
+  have h1 := Nat.Coprime.symm hcoprime
 
+  -- use the standard lemma for cancelling a factor modulo L
+  exact Nat.ModEq.cancel_right_of_coprime h1 h
 
-
-theorem ZERO_mod (u : Scalar52) (h : Scalar52_as_Nat u  ≡ 0 [MOD L]) : u = ZERO := by
+theorem as_montgomery_ne_zero (u : Scalar52) (h : u ≠ ZERO) :
+    ∃ m, as_montgomery u = ok m ∧
+    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧ m ≠ ZERO := by
   sorry
-
-
-
-
-
-
 
 @[progress]
 theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
@@ -95,28 +96,10 @@ theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     invert u = ok u' ∧
     (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]
     := by
-  unfold invert backend.serial.u64.scalar.Scalar52.as_montgomery
-  obtain ⟨s, hs_ok,hs_val⟩ := montgomery_mul_spec u backend.serial.u64.constants.RR
+  unfold invert
+  obtain ⟨s, hs_ok,hs_val,ne_zero⟩ := as_montgomery_ne_zero   u h
   simp only [hs_ok, bind_tc_ok]
-  have n_zero: s ≠ ZERO :=by
-    intro hz
-    rw[hz,backend.serial.u64.scalar.Scalar52.ZERO_spec] at hs_val
-    apply h
-    have hr:=backend.serial.u64.RR_spec
-    rw[← Nat.ModEq] at hr
-    have hrm:= Nat.ModEq.mul_left (Scalar52_as_Nat u) hr
-    have hmr:= Nat.ModEq.symm hrm
-    have ur:= Nat.ModEq.trans hmr hs_val
-    set su:=Scalar52_as_Nat u with hu
-    have ca:=@cancelRR su 0
-    simp at ca
-    simp at ur
-    have ca:= ca ur
-    rw[hu] at ca
-    apply ZERO_mod
-    exact ca
-
-  obtain ⟨r, hr_ok,hr_val⟩ := montgomery_invert_spec s n_zero
+  obtain ⟨r, hr_ok,hr_val⟩ := montgomery_invert_spec s ne_zero
   simp only [hr_ok, bind_tc_ok]
   obtain ⟨s1, hs1_ok,hs1_val⟩ := from_montgomery_spec r
   simp only [hs1_ok]
@@ -126,47 +109,15 @@ theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
   rw[← Nat.ModEq] at hs1_val
   have hrm:= Nat.ModEq.mul_left (Scalar52_as_Nat s) hs1_val
   have ur:= Nat.ModEq.trans hrm hr_val
-  have hr:=backend.serial.u64.RR_spec
-  rw[← Nat.ModEq] at hr
-  have eq: Scalar52_as_Nat s * ((Scalar52_as_Nat s1) * R)
-  = (Scalar52_as_Nat s * R) * Scalar52_as_Nat s1:= by
-   ring
-  rw[eq] at ur
-  have hrm1:= Nat.ModEq.mul_right (Scalar52_as_Nat s1) hs_val
-  have ur1:= Nat.ModEq.trans hrm1 ur
-  set su:=Scalar52_as_Nat u with hu
-  set ss1:=Scalar52_as_Nat s1 with hs1
-  set R2:=Scalar52_as_Nat backend.serial.u64.constants.RR with hss
-
-
-  have eq1: su * R2 * ss1  =  (su* ss1)*R2  := by
-   ring
-  rw[eq1] at ur1
-  have hsu1:= Nat.ModEq.mul_left (su * ss1) hr
-  have hus1:= Nat.ModEq.symm hsu1
-  have husr:= Nat.ModEq.trans hus1 ur1
+  have hrm1:= Nat.ModEq.mul_right (Scalar52_as_Nat s1 * R) hs_val
+  have hmr1:= Nat.ModEq.symm hrm1
+  have ur1  := Nat.ModEq.trans hmr1 ur
+  have eq:  Scalar52_as_Nat u * R * (Scalar52_as_Nat s1 * R)  = (Scalar52_as_Nat u * Scalar52_as_Nat s1) * (R * R):= by ring
+  rw[eq] at ur1
   apply  cancelRR
   simp
   have : R * R = R^2:= by ring
-  rw[this] at husr
-  exact husr
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  rw[this] at ur1
+  exact ur1
 
 end curve25519_dalek.scalar.Scalar52
