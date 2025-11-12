@@ -8,6 +8,7 @@ import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
 /-! # Spec Theorem for `ProjectivePoint::double`
@@ -59,7 +60,10 @@ These formulas implement Edwards curve point doubling, computing P + P
 (elliptic curve point addition) where P = (X:Y:Z).
 -/
 @[progress]
-theorem double_spec (q : ProjectivePoint) :
+theorem double_spec (q : ProjectivePoint)
+  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val ≤ 2 ^ 54)
+  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val ≤ 2 ^ 54)
+  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val ≤ 2 ^ 54) :
 ∃ c,
 double q = ok c ∧
 let X := Field51_as_Nat q.X
@@ -78,26 +82,42 @@ Y' % p = (Y^2 + X^2) % p ∧
   progress*
 
   · -- Goal 1: Precondition for `add q.X q.Y`
+    intro i hi
+    have hx := h_qX_bounds i hi
+    have hy := h_qY_bounds i hi
+
+    calc
+      ↑q.X[i]! + ↑q.Y[i]!
+        ≤ 2 ^ 54 + 2 ^ 54 := by apply Nat.add_le_add; exact hx; exact hy
+      _ = 2 * (2 ^ 54)   := by ring
+      _ = 2 ^ 55           := by ring
+      _ ≤ U64.max       := by scalar_tac
+
+  · -- Goal 2: Precondition for `add YY XX`
+    intro i hi
+
     sorry
-  · -- Goal 2: Precondition for `square X_plus_Y`
+  · -- Goal 3: Precondition for `YY`
+
     sorry
-  · -- Goal 3: Precondition for `add YY XX`
+  · -- Goal 4: Precondition for `XX`
+
     sorry
-  · -- Goal 4: Precondition for `sub YY XX`
+  · -- Goal 5: Precondition for `X_plus_Y_sq`
+
     sorry
-  · -- Goal 5: Precondition for `sub X_plus_Y_sq YY_plus_XX`
+  · -- Goal 6: Precondition for `YY_plus_XX`
+
     sorry
-  · -- Goal 6: Precondition for `sub ZZ2 YY_minus_XX`
+  · -- Goal 7: Precondition for `ZZ2`
+
     sorry
-  · -- Goal 7: Precondition for `square q.X` (from 'let XX')
-    -- (Note: The order of goals might differ slightly)
-    sorry
-  · -- Goal 8: Precondition for `square q.Y` (from 'let YY')
+  · -- Goal 8: Precondition for `YY_minus_XX`
+
     sorry
 
   -- Goal 9:
-  -- Goal 9:
-  constructor
+  refine ⟨?_, ?_, ?_, ?_⟩
 
   · -- Goal 9.1: X' coordinate
     unfold Field51_as_Nat at *;
@@ -127,37 +147,32 @@ Y' % p = (Y^2 + X^2) % p ∧
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
 
-  · -- Goal 9.2: ⊢ Y' ∧ Z' ∧ T'
-    constructor
-    · -- Goal 9.2.1: Y' coordinate
-      unfold Field51_as_Nat at *;
-      have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
-                          (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-                          (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
-        rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-        intro i hi
-        rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
+  · -- Goal 9.2: Y' coordinate
+    unfold Field51_as_Nat at *;
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
 
-      rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
-      apply Nat.ModEq.add
-      · exact YY_post
-      · exact XX_post
+    rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
+    apply Nat.ModEq.add
+    · exact YY_post
+    · exact XX_post
 
-    · -- Goal 9.2.2: ⊢ Z' ∧ T'
-      constructor
-      · -- Goal 9.2.2.1: Z' coordinate
-        unfold Field51_as_Nat at *;
-        rw [← Nat.ModEq] at *; ring_nf at *;
-        apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
-        apply Nat.ModEq.trans YY_minus_XX_post
-        exact YY_post
+  · -- Goal 9.3: Z' coordinate
+    unfold Field51_as_Nat at *;
+    rw [← Nat.ModEq] at *; ring_nf at *;
+    apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
+    apply Nat.ModEq.trans YY_minus_XX_post
+    exact YY_post
 
-      · -- Goal 9.2.2.2: T' coordinate
-        unfold Field51_as_Nat at *;
-        rw [← Nat.ModEq] at *; ring_nf at *;
-        apply Nat.ModEq.trans fe1_post
-        exact ZZ2_post
-
+  · -- Goal 9.4: T' coordinate
+    unfold Field51_as_Nat at *;
+    rw [← Nat.ModEq] at *; ring_nf at *;
+    apply Nat.ModEq.trans fe1_post
+    exact ZZ2_post
 
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
