@@ -150,29 +150,49 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
         unfold Field51_as_Nat at *;
         rw [← Nat.ModEq] at *; ring_nf at *;
 
-        have h_Z_dvd := Nat.modEq_iff_dvd.mp YY_minus_XX_post;
-        have h_X_dvd := Nat.modEq_iff_dvd.mp XX_post;
-        have h_Y_dvd := Nat.modEq_iff_dvd.mp YY_post;
-        have h_X_dvd_neg := Int.dvd_neg.mpr h_X_dvd;
-        have h_add_12 := Int.dvd_add h_Z_dvd h_X_dvd_neg;
 
-        have h_all := Int.dvd_add h_Y_dvd h_add_12;
+        have h_int_goal : (↑(∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51)) : ℤ) ≡
+                          (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
+                          (↑((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ)
+                          [PMOD (↑p : ℤ)] := by
+          calc
+            (↑(∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51)) : ℤ)
+              ≡ (↑(∑ x ∈ Finset.range 5, (YY[x]!).val * 2 ^ (x * 51)) : ℤ) -
+                (↑(∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51)) : ℤ)
+                [PMOD (↑p : ℤ)] := by
+                apply AddCommGroup.modEq_sub_iff_add_modEq.mpr
+                simp_rw [← Nat.cast_add]
+                apply AddCommGroup.ModEq.natCast
+                exact YY_minus_XX_post
 
-        set Y2_int := ((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2);
-        set X2_int := ((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2);
-        set Z_int  := (∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51));
-        set YY_int := (∑ x ∈ Finset.range 5, (YY[x]!).val * 2 ^ (x * 51));
-        set XX_int := (∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51));
-        have h_sub_Y : Z_int + XX_int ≡ Y2_int [MOD p] := by
-          apply Nat.ModEq.trans YY_minus_XX_post YY_post
-        have h_final : Z_int + X2_int ≡ Y2_int [MOD p] := by
-          have h_sub_X := Nat.ModEq.add_left Z_int XX_post
-          apply Nat.ModEq.trans h_sub_X.symm h_sub_Y
 
-        apply Nat.ModEq.add_right_cancel' X2_int
-        apply Nat.ModEq.trans h_final
-        apply Nat.ModEq.symm
-        rw [Nat.ModEq]
+              -- Step 2: Substitute YY using `YY_post`
+            _ ≡ (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
+                (↑(∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51)) : ℤ)
+                [PMOD (↑p : ℤ)] := by
+                apply AddCommGroup.ModEq.sub_right
+                apply AddCommGroup.ModEq.natCast
+                exact YY_post
+
+              -- Step 3: Substitute XX using `XX_post`
+            _ ≡ (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
+                (↑((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ)
+                [PMOD (↑p : ℤ)] := by
+                apply AddCommGroup.ModEq.sub_left
+                apply AddCommGroup.ModEq.natCast
+                exact XX_post
+
+
+        rw [← Int.natCast_modEq_iff]
+
+        rw [AddCommGroup.modEq_iff_int_modEq] at h_int_goal
+        apply Int.ModEq.trans h_int_goal
+
+        --Stuck here because probably we need to change the thm signature:
+        --It looks like (A-B)%p is casting A and B as Nat, and performing Nat.sub, instead of
+        --the subtraction operation inside Field51. If so the thm needs a statement like:
+        --(A-B+B)%p=A%p that is false as MOD p type
+
 
         sorry
 
