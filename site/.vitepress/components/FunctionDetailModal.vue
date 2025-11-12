@@ -1,8 +1,10 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useGitHubLinks } from '../composables/useGitHubLinks'
 
-const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
+const { getExtractedStatus, getVerifiedStatus, getAiProveableStatus } = useStatusFormatting()
+const { getSourceLink, getSpecLink } = useGitHubLinks()
 
 const props = defineProps({
   isOpen: {
@@ -104,13 +106,35 @@ watch(() => props.isOpen, (isOpen) => {
 
             <div class="detail-section" v-if="func.source">
               <h3>Source</h3>
-              <p>{{ func.source }}</p>
+              <p>
+                <a
+                  v-if="getSourceLink(func.source, func.lines)"
+                  :href="getSourceLink(func.source, func.lines)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="vp-external-link-icon"
+                >
+                  {{ func.source }}
+                </a>
+                <span v-else>{{ func.source }}</span>
+              </p>
               <p v-if="func.lines" class="lines-info">Lines: {{ func.lines }}</p>
             </div>
 
             <div class="detail-section" v-if="func.spec_theorem">
               <h3>Specification</h3>
-              <code class="spec-path">{{ func.spec_theorem }}</code>
+              <p>
+                <a
+                  v-if="getSpecLink(func.spec_theorem)"
+                  :href="getSpecLink(func.spec_theorem)"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="vp-external-link-icon"
+                >
+                  {{ func.spec_theorem }}
+                </a>
+                <span v-else>{{ func.spec_theorem }}</span>
+              </p>
             </div>
 
             <div class="detail-section">
@@ -129,6 +153,12 @@ watch(() => props.isOpen, (isOpen) => {
                     getVerifiedStatus(func.verified).cssClass === 'specified' ? 'info' :
                     getVerifiedStatus(func.verified).cssClass === 'draft' ? 'warning' : 'pending']">
                     {{ getVerifiedStatus(func.verified).icon }} {{ getVerifiedStatus(func.verified).label }}
+                  </span>
+                </div>
+                <div class="status-item">
+                  <span class="status-label">AI-Verifiable:</span>
+                  <span :class="['status-badge', getAiProveableStatus(func['ai-proveable']).cssClass]">
+                    {{ getAiProveableStatus(func['ai-proveable']).icon }} {{ getAiProveableStatus(func['ai-proveable']).label }}
                   </span>
                 </div>
               </div>
@@ -281,14 +311,15 @@ watch(() => props.isOpen, (isOpen) => {
   height: 16px;
 }
 
-.spec-path {
-  display: block;
-  padding: 0.75rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 6px;
-  word-break: break-all;
-  font-size: 0.85rem;
-  user-select: all;
+.vp-external-link-icon {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.vp-external-link-icon:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration: underline;
 }
 
 .lines-info {
@@ -342,6 +373,11 @@ watch(() => props.isOpen, (isOpen) => {
 .status-badge.pending {
   background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-3);
+}
+
+.status-badge.ai-proveable {
+  background: rgba(139, 92, 246, 0.1);
+  color: #8b5cf6;
 }
 
 .notes-text {

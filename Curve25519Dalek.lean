@@ -58,6 +58,7 @@ import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjectiveNiels
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Compress
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Double
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder

@@ -3,8 +3,10 @@ import { ref, computed } from 'vue'
 import FunctionDetailModal from './FunctionDetailModal.vue'
 import GitHubItemLink from './GitHubItemLink.vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useGitHubLinks } from '../composables/useGitHubLinks'
 
 const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
+const { getSourceLink, getSpecLink } = useGitHubLinks()
 
 const props = defineProps({
   data: {
@@ -39,26 +41,6 @@ function getFunctionName(fullPath) {
 // Helper function to shorten source path
 function shortenSourcePath(source) {
   return source.replace('curve25519-dalek/src/', '')
-}
-
-// Helper function to create GitHub link for Rust source
-function getSourceLink(source, lines) {
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  const lineMatch = lines.match(/L(\d+)(?:-L(\d+))?/)
-  if (lineMatch) {
-    const start = lineMatch[1]
-    const end = lineMatch[2]
-    const lineFragment = end ? `#L${start}-L${end}` : `#L${start}`
-    return `${baseUrl}/${source}${lineFragment}`
-  }
-  return `${baseUrl}/${source}`
-}
-
-// Helper function to create GitHub link for Lean spec file
-function getSpecLink(specPath) {
-  if (!specPath) return null
-  const baseUrl = 'https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master'
-  return `${baseUrl}/${specPath}`
 }
 
 // Filter state
@@ -194,6 +176,7 @@ const stats = computed(() => ({
   extracted: props.data.functions.filter(f => f.extracted === 'extracted').length,
   verified: props.data.functions.filter(f => f.verified === 'verified').length,
   specified: props.data.functions.filter(f => f.verified === 'specified').length,
+  ai_proveable: props.data.functions.filter(f => f['ai-proveable'] && f['ai-proveable'].trim() !== '').length,
   filtered: sortedData.value.length
 }))
 </script>
@@ -217,6 +200,10 @@ const stats = computed(() => ({
       <div class="stat">
         <span class="stat-label">Spec only:</span>
         <span class="stat-value stat-specified">{{ stats.specified }}</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">AI Proveable:</span>
+        <span class="stat-value stat-ai-proveable">{{ stats.ai_proveable }}</span>
       </div>
       <div class="stat" v-if="stats.filtered !== stats.total">
         <span class="stat-label">Filtered:</span>
@@ -493,6 +480,10 @@ const stats = computed(() => ({
 
 .stat-specified {
   color: var(--vp-c-purple-1);
+}
+
+.stat-ai-proveable {
+  color: #8b5cf6;
 }
 
 .stat-filtered {
