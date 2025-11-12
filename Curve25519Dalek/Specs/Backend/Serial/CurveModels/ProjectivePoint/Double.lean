@@ -71,13 +71,11 @@ let Z' := Field51_as_Nat c.Z
 let T' := Field51_as_Nat c.T
 X' % p = (2 * X * Y) % p ∧
 Y' % p = (Y^2 + X^2) % p ∧
-Z' % p = (Y^2 - X^2) % p ∧
-T' % p = (2 * Z^2 - Y^2 + X^2) % p
+(Z' + X^2) % p = Y^2 % p ∧
+(T' + Z') % p = (2 * Z^2) % p
 := by
   unfold double
-
   progress*
-
 
   · -- Goal 1: Precondition for `add q.X q.Y`
     sorry
@@ -97,6 +95,7 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
   · -- Goal 8: Precondition for `square q.Y` (from 'let YY')
     sorry
 
+  -- Goal 9:
   -- Goal 9:
   constructor
 
@@ -149,57 +148,16 @@ T' % p = (2 * Z^2 - Y^2 + X^2) % p
       · -- Goal 9.2.2.1: Z' coordinate
         unfold Field51_as_Nat at *;
         rw [← Nat.ModEq] at *; ring_nf at *;
-
-
-        have h_int_goal : (↑(∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51)) : ℤ) ≡
-                          (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
-                          (↑((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ)
-                          [PMOD (↑p : ℤ)] := by
-          calc
-            (↑(∑ x ∈ Finset.range 5, (YY_minus_XX[x]!).val * 2 ^ (x * 51)) : ℤ)
-              ≡ (↑(∑ x ∈ Finset.range 5, (YY[x]!).val * 2 ^ (x * 51)) : ℤ) -
-                (↑(∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51)) : ℤ)
-                [PMOD (↑p : ℤ)] := by
-                apply AddCommGroup.modEq_sub_iff_add_modEq.mpr
-                simp_rw [← Nat.cast_add]
-                apply AddCommGroup.ModEq.natCast
-                exact YY_minus_XX_post
-
-
-              -- Step 2: Substitute YY using `YY_post`
-            _ ≡ (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
-                (↑(∑ x ∈ Finset.range 5, (XX[x]!).val * 2 ^ (x * 51)) : ℤ)
-                [PMOD (↑p : ℤ)] := by
-                apply AddCommGroup.ModEq.sub_right
-                apply AddCommGroup.ModEq.natCast
-                exact YY_post
-
-              -- Step 3: Substitute XX using `XX_post`
-            _ ≡ (↑((∑ x ∈ Finset.range 5, (q.Y[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ) -
-                (↑((∑ x ∈ Finset.range 5, (q.X[x]!).val * 2 ^ (x * 51)) ^ 2) : ℤ)
-                [PMOD (↑p : ℤ)] := by
-                apply AddCommGroup.ModEq.sub_left
-                apply AddCommGroup.ModEq.natCast
-                exact XX_post
-
-
-        rw [← Int.natCast_modEq_iff]
-
-        rw [AddCommGroup.modEq_iff_int_modEq] at h_int_goal
-        apply Int.ModEq.trans h_int_goal
-
-        --Stuck here because probably we need to change the thm signature:
-        --It looks like (A-B)%p is casting A and B as Nat, and performing Nat.sub, instead of
-        --the subtraction operation inside Field51. If so the thm needs a statement like:
-        --(A-B+B)%p=A%p that is false as MOD p type
-
-
-        sorry
+        apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
+        apply Nat.ModEq.trans YY_minus_XX_post
+        exact YY_post
 
       · -- Goal 9.2.2.2: T' coordinate
-        -- ⊢ (∑...fe1...) % p = ( 2*(∑...q.Z^2) - (∑...q.Y^2) + (∑...q.X^2) ) % p
+        unfold Field51_as_Nat at *;
+        rw [← Nat.ModEq] at *; ring_nf at *;
+        apply Nat.ModEq.trans fe1_post
+        exact ZZ2_post
 
-        sorry
 
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
