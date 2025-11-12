@@ -33,20 +33,25 @@ natural language specs:
     • scalar_to_nat(m) = (scalar_to_nat(u) * R) mod L
 -/
 
+theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
+  unfold constants.RR
+  decide
+
 /-- **Spec and proof concerning `scalar.Scalar52.as_montgomery`**:
 - No panic (always returns successfully)
 - The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L
 -/
 @[progress]
-theorem as_montgomery_spec (u : Scalar52) :
+theorem as_montgomery_spec (u : Scalar52) (hm : ∀ i < 5, u[i]!.val < 2 ^ 62) :
     ∃ m, as_montgomery u = ok m ∧
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] := by
   unfold as_montgomery
   progress as ⟨m, pos⟩
-  suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
-    exact Nat.ModEq.cancel_right_of_coprime (by decide) this
-  have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
-  have := (Nat.ModEq.trans this.symm pos).symm
-  grind
+  · exact RR_lt
+  · suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
+      exact Nat.ModEq.cancel_right_of_coprime (by decide) this
+    have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
+    have := (Nat.ModEq.trans this.symm pos).symm
+    grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
