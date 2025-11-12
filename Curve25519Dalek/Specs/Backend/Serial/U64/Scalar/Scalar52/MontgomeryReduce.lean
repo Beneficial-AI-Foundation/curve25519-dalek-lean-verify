@@ -49,7 +49,7 @@ natural language specs:
 theorem montgomery_reduce_spec (a : Array U128 9#usize) :
     ∃ m,
     montgomery_reduce a = ok m ∧
-    (Scalar52_as_Nat m * R) % L = U128x9_as_Nat a % L
+    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L
     := by
   sorry
 
