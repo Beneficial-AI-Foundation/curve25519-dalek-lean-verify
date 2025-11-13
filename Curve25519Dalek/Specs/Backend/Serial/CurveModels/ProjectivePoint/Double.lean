@@ -85,57 +85,43 @@ Y' % p = (Y^2 + X^2) % p ∧
     intro i hi
     have hx := h_qX_bounds i hi
     have hy := h_qY_bounds i hi
-
-    calc
-      ↑q.X[i]! + ↑q.Y[i]!
-        ≤ 2 ^ 54 + 2 ^ 54 := by apply Nat.add_le_add; exact hx; exact hy
-      _ = 2 * (2 ^ 54)   := by ring
-      _ = 2 ^ 55           := by ring
-      _ ≤ U64.max       := by scalar_tac
+    scalar_tac
 
   · -- Goal 2: Precondition for `add YY XX`
-    intro i hi
-
     sorry
   · -- Goal 3: Precondition for `YY`
-
     sorry
   · -- Goal 4: Precondition for `XX`
-
     sorry
   · -- Goal 5: Precondition for `X_plus_Y_sq`
-
     sorry
   · -- Goal 6: Precondition for `YY_plus_XX`
-
     sorry
   · -- Goal 7: Precondition for `ZZ2`
-
     sorry
   · -- Goal 8: Precondition for `YY_minus_XX`
-
     sorry
 
   -- Goal 9:
-  refine ⟨?_, ?_, ?_, ?_⟩
+  unfold Field51_as_Nat at *
 
-  · -- Goal 9.1: X' coordinate
-    unfold Field51_as_Nat at *;
-
-    have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
+  have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
                       (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
                       (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
       rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
       intro i hi
       rw [X_plus_Y_post, Nat.mul_add]; exact Finset.mem_range.mp hi
 
-    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+  have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
                         (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
                         (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
       rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
       intro i hi
       rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
 
+  refine ⟨?_, ?_, ?_, ?_⟩
+
+  · -- Goal 9.1: X' coordinate
     rw [h_X_plus_Y] at X_plus_Y_sq_post; rw [h_YY_plus_XX] at fe_post;
 
     have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
@@ -148,29 +134,19 @@ Y' % p = (Y^2 + X^2) % p ∧
     ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
 
   · -- Goal 9.2: Y' coordinate
-    unfold Field51_as_Nat at *;
-    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
-                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
-      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-      intro i hi
-      rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
-
     rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
     apply Nat.ModEq.add
     · exact YY_post
     · exact XX_post
 
   · -- Goal 9.3: Z' coordinate
-    unfold Field51_as_Nat at *;
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
     apply Nat.ModEq.trans YY_minus_XX_post
     exact YY_post
 
   · -- Goal 9.4: T' coordinate
-    unfold Field51_as_Nat at *;
-    rw [← Nat.ModEq] at *; ring_nf at *;
+    rw [← Nat.ModEq] at *;
     apply Nat.ModEq.trans fe1_post
     exact ZZ2_post
 
