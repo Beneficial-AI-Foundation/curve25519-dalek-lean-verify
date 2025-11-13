@@ -34,11 +34,11 @@ natural language specs:
 - Note: this implements the `pow2k` function with k=1
 -/
 @[progress]
-theorem square_spec (a : Array U64 5#usize) :
+theorem square_spec (a : Array U64 5#usize) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
     ∃ r, square a = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] := by
   unfold square
-  obtain ⟨r, h_eq, ⟨h_mod, _⟩⟩ := pow2k_spec a 1#u32 (by decide)
+  obtain ⟨r, h_eq, ⟨h_mod, _⟩⟩ := pow2k_spec a 1#u32 (by decide) h_bounds
   exact ⟨r, h_eq, by simp_all⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

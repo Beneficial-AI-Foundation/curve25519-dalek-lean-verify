@@ -84,11 +84,13 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 - The result, when converted to a natural number, is congruent to twice the square of the input modulo p
 -/
 @[progress]
-theorem square2_spec (a : Array U64 5#usize) :
+theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
     ∃ r, square2 a = ok r ∧
     Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p
     := by
   unfold square2
+  have ⟨square, h_square, square_post_2, square_post_1⟩ := pow2k_spec a 1#u32 (by decide) h_bounds
+  simp [h_square]
   progress*
   · intro j hj _
     have := square_post_1 j hj
@@ -98,7 +100,7 @@ theorem square2_spec (a : Array U64 5#usize) :
       rw [Finset.mul_sum]
       apply Finset.sum_congr rfl
       grind
-    rw [Nat.ModEq] at square_post_2
+    simp [Nat.ModEq] at square_post_2 ⊢
     rw [h_doubled, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
