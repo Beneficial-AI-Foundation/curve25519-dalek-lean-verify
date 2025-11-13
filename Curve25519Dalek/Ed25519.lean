@@ -70,6 +70,7 @@ universe u
 
 open curve25519_dalek CategoryTheory
 
+
 namespace Ed25519Bridge
 
 /-!
@@ -136,6 +137,22 @@ The discriminant `B(A² - 4)` must be non-zero. -/
 class IsNonsingular {K : Type*} [CommRing K] (M : MontgomeryCurve K) : Prop where
   nonsingular : M.B * (M.A^2 - 4) ≠ 0
 
+@[ext]
+structure AffinePoint {K : Type*} [CommRing K] (M : MontgomeryCurve K) where
+  x : K
+  y : K
+  h : M.B * y^2 = x^3 + M.A * x^2 + x
+
+/-- A point on a Montgomery curve, which is either the point at infinity
+    (`zero`) or an affine point (`some`). -/
+inductive Point {K : Type*} [CommRing K] (M : MontgomeryCurve K)
+  | zero
+  | some (pt : M.AffinePoint)
+
+-- Add a helpful Coe for construction
+instance {K : Type*} [CommRing K] (M : MontgomeryCurve K) : Coe (M.AffinePoint)
+  (Point M) := ⟨Point.some⟩
+
 end MontgomeryCurve
 
 /-!
@@ -154,6 +171,17 @@ instance : MontgomeryCurve.IsNonsingular curve25519_montgomery := by
   unfold CurveField
   decide
 
+instance : Fact (Nat.Prime p) := by
+  unfold p
+  -- Similar to: LucasLehmer proves Mersenne primes
+  -- You would prove: p is prime via certificate
+  -- cf. Mathlib.NumberTheory.LucasLehmer
+  sorry
+
+instance : Field CurveField := by
+  unfold CurveField
+  infer_instance
+
 -- Store constants for easy access
 def M_A : CurveField := curve25519_montgomery.A
 def M_B : CurveField := curve25519_montgomery.B
@@ -165,32 +193,27 @@ def M_B : CurveField := curve25519_montgomery.B
 -- The coefficients are:
 -- a₄ = (3 - A²)/3
 -- a₆ = (2A³ - 9A)/27
---def w_a₄ : CurveField := (3 - M_A^2) / 3
---def w_a₆ : CurveField := (2 * M_A^3 - 9 * M_A) / 27
+def w_a₄ : CurveField := (3 - M_A^2) / 3
+def w_a₆ : CurveField := (2 * M_A^3 - 9 * M_A) / 27
 
--- def curve25519_weierstrass : WeierstrassCurve CurveField := {
---   a₁ := 0, a₂ := 0, a₃ := 0, -- Short Weierstrass form
---   a₄ := w_a₄,
---   a₆ := w_a₆
--- }
+def curve25519_weierstrass : WeierstrassCurve.Affine CurveField := {
+  a₁ := 0, a₂ := 0, a₃ := 0, -- Short Weierstrass form
+  a₄ := w_a₄,
+  a₆ := w_a₆
+}
 
--- -- 4. Define Point Type Aliases
--- -- The user's `EdwardsPoint` from `Types.lean` (projective)
--- abbrev EdwardsPoint := curve25519_dalek.edwards.EdwardsPoint
+-- 4. Define Point Type Aliases
+-- The `EdwardsPoint` from `Types.lean` (projective)
+abbrev EdwardsPoint := curve25519_dalek.edwards.EdwardsPoint
 
--- -- The mathlib affine point type for our Montgomery curve
--- abbrev MontgomeryPoint := curve25519_montgomery.Point
+-- Newly defined MontgomeryPoint using the def's from above
+abbrev MontgomeryPoint := curve25519_montgomery.Point
 
--- -- The mathlib affine point type for our target Weierstrass curve
--- abbrev WeierstrassPoint := curve25519_weierstrass.Point
-
-
-
-
-/-
+-- The mathlib affine point type for our target Weierstrass curve
+abbrev WeierstrassPoint :=  WeierstrassCurve.Affine.Point curve25519_weierstrass
 
 /-!
-## Phase 2: Coordinate Transformations
+## 2: Coordinate Transformations
 -/
 
 -- Montgomery → Weierstrass (Affine Coords)
@@ -223,71 +246,160 @@ def montgomeryToEdwards_coords (u v : CurveField) : CurveField × CurveField :=
     (u - 1) / (u + 1) -- y
   )
 
-
 /-!
-## Phase 3: Prove Curve Preservation (Structural)
+## 3: Prove Curve Preservation (Structural)
 -/
 
 -- These theorems prove that the coordinate maps preserve the curve equations.
 -- This is necessary to show the point-level maps are well-defined.
 
 theorem montgomery_to_weierstrass_on_curve (x y : CurveField)
-  (h : y^2 = x^3 + M_A * x^2 + x) : -- B=1
+  (h : y ^ 2 = x ^ 3 + M_A * x ^ 2 + x) : -- B=1
   let (t, v) := montgomeryToWeierstrass_coords x y
   v^2 = t^3 + w_a₄ * t + w_a₆ := by
-  -- This is a pure algebraic identity.
   simp [montgomeryToWeierstrass_coords, w_a₄, w_a₆, h]
-  field_simp [three_ne_zero, twentyseven_ne_zero]
-  ring
+  field_simp [
+    (by unfold CurveField; decide : (3 : CurveField) ≠ 0),
+    (by unfold CurveField; decide : (27 : CurveField) ≠ 0)
+  ]
+  ring_nf
 
 theorem weierstrass_to_montgomery_on_curve (t v : CurveField)
-  (h : v^2 = t^3 + w_a₄ * t + w_a₆) :
+  (h : v ^ 2 = t ^ 3 + w_a₄ * t + w_a₆) :
   let (x, y) := weierstrassToMontgomery_coords t v
-  y^2 = x^3 + M_A * x^2 + x := by -- B=1
+  y^2 = x^3 + M_A * x^2 + x := by
   simp [weierstrassToMontgomery_coords, w_a₄, w_a₆, h]
-  field_simp [three_ne_zero, twentyseven_ne_zero]
-  ring
+  field_simp [
+    (by unfold CurveField; decide : (3 : CurveField) ≠ 0),
+    (by unfold CurveField; decide : (27 : CurveField) ≠ 0)
+  ]
+  ring_nf
 
 -- The Edwards ↔ Montgomery birational equivalence is a standard
--- but very complex proof. We accept it as an axiom here (`sorry`).
--- This proof relies on the specific values of `A` and `d` being correct.
+-- but very complex proof. For now we'll use a (`sorry`).
 theorem edwards_to_montgomery_on_curve (x y : CurveField)
-  (h_curve : curve25519_edwards.a * x^2 + y^2 = 1 + curve25519_edwards.d * x^2 * y^2)
+  (h_curve : curve25519_edwards.a * x ^ 2 + y ^ 2 = 1 + curve25519_edwards.d * x ^ 2 * y ^ 2)
   (h_denom_y : 1 - y ≠ 0) (h_denom_x : x ≠ 0) :
   let (u, v) := edwardsToMontgomery_coords x y
   curve25519_montgomery.B * v^2 = u^3 + curve25519_montgomery.A * u^2 + u := by
+  -- probably we need to use IsoOfJ in mathlib Elliptic curves at some point.
   sorry -- TODO: This is a complex polynomial identity proof.
 
 theorem montgomery_to_edwards_on_curve (u v : CurveField)
-  (h_curve : curve25519_montgomery.B * v^2 = u^3 + curve25519_montgomery.A * u^2 + u)
+  (h_curve : curve25519_montgomery.B * v ^ 2 = u ^ 3 + curve25519_montgomery.A * u ^ 2 + u)
   (h_denom_v : v ≠ 0) (h_denom_u : u + 1 ≠ 0) :
   let (x, y) := montgomeryToEdwards_coords u v
   curve25519_edwards.a * x^2 + y^2 = 1 + curve25519_edwards.d * x^2 * y^2 := by
   sorry -- TODO: Inverse of the above.
 
-
 /-!
-## Phase 4: Point Type Equivalences
+## 4: Point Type Equivalences
 -/
 
--- 5. Point type transformations
+-- 4.1. Point type transformations
 -- These functions lift the coordinate maps to the point types,
 -- correctly mapping the identity elements (O ↔ O).
 
 -- Montgomery ↔ Weierstrass
 def montgomeryPointToWeierstrass (P : MontgomeryPoint) : WeierstrassPoint :=
   match P with
+  | .zero =>
+    WeierstrassCurve.Affine.Point.zero
+
+  | .some hP => by
+    have h_mont_simple : hP.y ^ 2 = hP.x ^ 3 + M_A * hP.x ^ 2 + hP.x := by
+        have h := hP.h
+        simp only [curve25519_montgomery, one_mul, M_A] at h ⊢
+        exact h
+
+    have h_eq : (montgomeryToWeierstrass_coords hP.x hP.y).2 ^ 2 =
+                (montgomeryToWeierstrass_coords hP.x hP.y).1 ^ 3 +
+                w_a₄ * (montgomeryToWeierstrass_coords hP.x hP.y).1 + w_a₆ := by
+      exact montgomery_to_weierstrass_on_curve hP.x hP.y h_mont_simple
+
+    refine WeierstrassCurve.Affine.Point.some (x := (montgomeryToWeierstrass_coords hP.x hP.y).1)
+      (y := (montgomeryToWeierstrass_coords hP.x hP.y).2) ?h
+
+    -- 3. The goal is now `⊢ (curve25519_weierstrass).Nonsingular ...`
+    case h =>
+      refine ⟨?left, ?right⟩
+
+      -- 4. Solve the `left` goal
+      case left =>
+        simp only [
+          WeierstrassCurve.Affine.Equation, WeierstrassCurve.Affine.polynomial,
+          curve25519_weierstrass,
+          Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
+          Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
+          zero_mul, add_zero, map_zero
+        ]
+        rw [sub_eq_zero]
+        exact h_eq
+
+      -- 5. Solve the `right` goal
+      case right =>
+        simp only [
+          WeierstrassCurve.Affine.polynomialX, WeierstrassCurve.Affine.polynomialY,
+          curve25519_weierstrass,
+          Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
+          Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
+          zero_mul, add_zero, map_zero, montgomeryToWeierstrass_coords, w_a₄
+        ]
+        field_simp [(by unfold CurveField; decide : (3 : CurveField) ≠ 0)]
+        field_simp [(by unfold CurveField; decide : (3 : CurveField) ≠ 0)]
+
+        simp only [M_A, Polynomial.eval_zero, mul_zero, add_zero, ne_eq]
+
+        right
+        simp only [← ne_eq]
+
+        apply mul_ne_zero
+        · unfold CurveField
+          decide
+        · -- Goal 2: ⊢ hP.y ≠ 0
+          sorry -- TODO: Prove hP.y ≠ 0 from curve nonsingularity
+
+
+def weierstrassPointToMontgomery (P : WeierstrassPoint) : MontgomeryPoint :=
+  match P with
   | .zero => .zero -- Identity maps to identity
-  | .some hP =>
-    let (t, v) := montgomeryToWeierstrass_coords hP.x hP.y
-    .some {
-      x := t,
-      y := v,
-      -- We must prove the new point is on the new curve
-      h := by
-        apply montgomery_to_weierstrass_on_curve
-        exact hP.h
+  | @WeierstrassCurve.Affine.Point.some _ _ _ t v hP => by
+    --have h_weierstrass_eq_r := hP.right
+    have h_weierstrass_eq_l := hP.left
+    simp only [
+        WeierstrassCurve.Affine.Equation, WeierstrassCurve.Affine.polynomial,
+        curve25519_weierstrass,
+        Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
+        Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
+        zero_mul, add_zero, map_zero,
+        sub_eq_zero
+      ] at h_weierstrass_eq_l
+
+    let (x, y) := weierstrassToMontgomery_coords t v
+
+    have h_montgomery_eq : curve25519_montgomery.B * y^2 = x^3 + curve25519_montgomery.A * x^2 + x := by
+      simp only [curve25519_montgomery, one_mul]
+      --rw [montgomery_to_weierstrass_on_curve t v _] at h_weierstrass_eq_l
+
+      sorry
+
+    let mont_affine_pt : curve25519_montgomery.AffinePoint := {
+      x := x,
+      y := y,
+      h := h_montgomery_eq
     }
+    exact .some mont_affine_pt
+
+
+
+
+
+
+
+
+/-
+
+
 
 def weierstrassPointToMontgomery (P : WeierstrassPoint) : MontgomeryPoint :=
   match P with
@@ -484,5 +596,7 @@ example (p : EdwardsPoint) : p + p = (2 : ℤ) • p := by
   -- This is a standard theorem in `AddCommGroup`.
   exact AddCommGroup.two_zsmul p
 
-end Ed25519Bridge
+
 -/
+
+end Ed25519Bridge
