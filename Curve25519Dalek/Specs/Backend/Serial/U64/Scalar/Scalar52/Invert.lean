@@ -27,7 +27,6 @@ namespace curve25519_dalek.scalar.Scalar52
 set_option linter.style.commandStart false
 set_option exponentiation.threshold 260
 
-
 /-
 natural language description:
 
