@@ -1,10 +1,12 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
 /-! # Spec Theorem for `Scalar52::montgomery_mul`
 
@@ -14,8 +16,6 @@ This function performs Montgomery multiplication.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -45,9 +45,19 @@ natural language specs:
   (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_mul_spec (m m' : Scalar52) :
+theorem montgomery_mul_spec (m m' : Scalar52)
+  (hm : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
+  (hm' : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
     ∃ w, montgomery_mul m m' = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
-  sorry
+  unfold montgomery_mul
+  progress*
+  have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
+    rw [Nat.ModEq]
+    exact res_post
+  have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
+    rw [← a1_post]
+  rw [Nat.ModEq]
+  grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
