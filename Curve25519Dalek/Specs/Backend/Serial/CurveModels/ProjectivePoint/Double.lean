@@ -61,9 +61,9 @@ These formulas implement Edwards curve point doubling, computing P + P
 -/
 @[progress]
 theorem double_spec (q : ProjectivePoint)
-  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val ≤ 2 ^ 54)
-  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val ≤ 2 ^ 54)
-  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val ≤ 2 ^ 54) :
+  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val ≤ 2 ^ 52)
+  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val ≤ 2 ^ 52)
+  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val ≤ 2 ^ 52) :
 ∃ c,
 double q = ok c ∧
 let X := Field51_as_Nat q.X
@@ -81,28 +81,45 @@ Y' % p = (Y^2 + X^2) % p ∧
   unfold double
   progress*
 
-  · -- Goal 1: Precondition for `add q.X q.Y`
+  · -- Goal 1: Precondition for `X`
+    intro i hi
+    have hx := h_qX_bounds i hi
+    scalar_tac
+  · -- Goal 2: Precondition for `Y`
+    intro i hi
+    have hy := h_qY_bounds i hi
+    scalar_tac
+  · -- Goal 3: Precondition for `Z`
+    intro i hi
+    have hz := h_qZ_bounds i hi
+    scalar_tac
+  · -- Goal 4: Precondition for `q.X+q.Y`
     intro i hi
     have hx := h_qX_bounds i hi
     have hy := h_qY_bounds i hi
     scalar_tac
-
-  · -- Goal 2: Precondition for `add YY XX`
-    sorry
-  · -- Goal 3: Precondition for `YY`
-    sorry
-  · -- Goal 4: Precondition for `XX`
-    sorry
-  · -- Goal 5: Precondition for `X_plus_Y_sq`
-    sorry
+  · -- Goal 5: Precondition for `X_plus_Y`
+    intro i hi
+    have hx := h_qX_bounds i hi
+    have hy := h_qY_bounds i hi
+    rw [X_plus_Y_post i hi]
+    scalar_tac
   · -- Goal 6: Precondition for `YY_plus_XX`
     sorry
-  · -- Goal 7: Precondition for `ZZ2`
+  · -- Goal 7: Precondition for `YY`
     sorry
-  · -- Goal 8: Precondition for `YY_minus_XX`
+  · -- Goal 8: Precondition for `XX`
+    sorry
+  · -- Goal 9: Precondition for `X_plus_Y_sq`
+    sorry
+  · -- Goal 10: Precondition for `YY_plus_XX`
+    sorry
+  · -- Goal 11: Precondition for `ZZ2`
+    sorry
+  · -- Goal 12: Precondition for `YY_minus_XX`
     sorry
 
-  -- Goal 9:
+  -- Goal 13:
   unfold Field51_as_Nat at *
 
   have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
@@ -121,7 +138,7 @@ Y' % p = (Y^2 + X^2) % p ∧
 
   refine ⟨?_, ?_, ?_, ?_⟩
 
-  · -- Goal 9.1: X' coordinate
+  · -- Goal 13.1: X' coordinate
     rw [h_X_plus_Y] at X_plus_Y_sq_post; rw [h_YY_plus_XX] at fe_post;
 
     have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
@@ -133,19 +150,19 @@ Y' % p = (Y^2 + X^2) % p ∧
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
 
-  · -- Goal 9.2: Y' coordinate
+  · -- Goal 13.2: Y' coordinate
     rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
     apply Nat.ModEq.add
     · exact YY_post
     · exact XX_post
 
-  · -- Goal 9.3: Z' coordinate
+  · -- Goal 13.3: Z' coordinate
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
     apply Nat.ModEq.trans YY_minus_XX_post
     exact YY_post
 
-  · -- Goal 9.4: T' coordinate
+  · -- Goal 13.4: T' coordinate
     rw [← Nat.ModEq] at *;
     apply Nat.ModEq.trans fe1_post
     exact ZZ2_post
