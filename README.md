@@ -1,4 +1,4 @@
-# lean_agent
+# dalek_lean_ai
 
 This repository uses [inspect](https://inspect.aisi.org.uk) to see how many
 of the functions from
