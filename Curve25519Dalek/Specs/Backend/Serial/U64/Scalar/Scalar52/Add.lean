@@ -47,6 +47,32 @@ lemma add_loop_spec (u u' : Scalar52)
     sorry
 
 
+theorem add_less_than_L_spec (a b : Scalar52)
+    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
+    (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52)
+    :
+    let a_nat := Scalar52_as_Nat a;
+    let b_nat := Scalar52_as_Nat b;
+    (a_nat + b_nat < L) ->
+    ∃ v, add a b = ok v ∧ Scalar52_as_Nat v = (L -(b_nat - a_nat) % L)%L
+    := by
+  intro a_nat b_nat h_lt
+  unfold add
+  progress*
+  obtain ⟨sum, h_sum_ok, h_sum_eq⟩ := add_loop_spec a b ha hb mask
+  obtain ⟨h_sum_geq, _⟩ := h_sum_eq
+  have h_sub :
+    let sum_nat := Scalar52_as_Nat sum;
+    ∃ v,
+    sub sum constants.L = ok v ∧ Scalar52_as_Nat v = (L -(b_nat - a_nat) % L)%L := by
+    sorry
+  obtain ⟨v, h_v_ok, h_v_mod⟩ := h_sub
+  use v
+  constructor
+  · rw [h_sum_ok]
+    simp [h_v_ok]
+  · omega
+
 theorem add_greater_equal_to_L_spec (u u' : Scalar52)
     (hu : ∀ i, i < 5 → (u[i]!).val < 2 ^ 52)
     (hu' : ∀ i, i < 5 → (u'[i]!).val < 2 ^ 52):
