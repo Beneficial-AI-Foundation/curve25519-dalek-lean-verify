@@ -90,8 +90,12 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
+    let a_nat := Scalar52_as_Nat a;
+    let b_nat := Scalar52_as_Nat b;
     ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result ≡ (Scalar52_as_Nat a - Scalar52_as_Nat b) [MOD L] := by
+    ((a_nat ≥ b_nat ∧ Scalar52_as_Nat result = (a_nat - b_nat) % L)
+    ∨ (a_nat < b_nat ∧ Scalar52_as_Nat result = (L -(b_nat - a_nat) % L)%L))
+     := by
   unfold sub
   -- progress*
 
