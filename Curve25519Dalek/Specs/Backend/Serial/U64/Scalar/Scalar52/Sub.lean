@@ -97,6 +97,16 @@ theorem sub_spec_geq (a b : Array U64 5#usize)
      := by
   sorry
 
+theorem sub_spec_lt (a b : Array U64 5#usize)
+    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
+    (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
+    let a_nat := Scalar52_as_Nat a;
+    let b_nat := Scalar52_as_Nat b;
+    a_nat < b_nat ->
+    ∃ result, sub a b = ok result ∧
+    Scalar52_as_Nat result = (L -(b_nat - a_nat) % L)%L
+     := by
+  sorry
 
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)

@@ -54,7 +54,7 @@ theorem add_less_than_L_spec (a b : Scalar52)
     let a_nat := Scalar52_as_Nat a;
     let b_nat := Scalar52_as_Nat b;
     (a_nat + b_nat < L) ->
-    ∃ v, add a b = ok v ∧ Scalar52_as_Nat v = (L -(b_nat - a_nat) % L)%L
+    ∃ v, add a b = ok v ∧ Scalar52_as_Nat v = (L -(L - (a_nat + b_nat)) % L)%L
     := by
   intro a_nat b_nat h_lt
   unfold add
@@ -63,15 +63,30 @@ theorem add_less_than_L_spec (a b : Scalar52)
   obtain ⟨h_sum_geq, _⟩ := h_sum_eq
   have h_sub :
     let sum_nat := Scalar52_as_Nat sum;
-    ∃ v,
-    sub sum constants.L = ok v ∧ Scalar52_as_Nat v = (L -(b_nat - a_nat) % L)%L := by
-    sorry
+    ∃ v, sub sum constants.L = ok v ∧ Scalar52_as_Nat v = (L -(L - (b_nat + a_nat)) % L)%L := by
+    have h_sum_bounds : ∀ i < 5, (sum[i]!).val < 2 ^ 52 := by
+      grind
+    have h_L_bounds : ∀ i < 5, (constants.L[i]!).val < 2 ^ 52 := by
+      unfold constants.L
+      decide
+    intro sum_nat
+    by_cases sum_lt_L: (sum_nat < L)
+    · have scalar_lt : Scalar52_as_Nat sum < Scalar52_as_Nat constants.L := by
+        rw [L_spec]
+        omega
+      obtain ⟨v, h_v_ok, h_v_eq⟩ := sub_spec_lt sum constants.L h_sum_bounds h_L_bounds scalar_lt
+      use v
+      constructor
+      · rw [h_v_ok]
+      · rw [L_spec, h_sum_geq] at h_v_eq
+        grind
+    · grind
   obtain ⟨v, h_v_ok, h_v_mod⟩ := h_sub
   use v
   constructor
   · rw [h_sum_ok]
     simp [h_v_ok]
-  · omega
+  · grind
 
 theorem add_greater_equal_to_L_spec (u u' : Scalar52)
     (hu : ∀ i, i < 5 → (u[i]!).val < 2 ^ 52)
