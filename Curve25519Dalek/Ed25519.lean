@@ -4,6 +4,7 @@ import Curve25519Dalek.Types
 
 -- Mathlib imports for elliptic curves
 import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
+import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Basic
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Formula
 import Mathlib.AlgebraicGeometry.EllipticCurve.Projective.Basic
@@ -18,7 +19,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.Algebra.Category.Ring.Basic
 
 -- -- Mathlib imports for group structure transfer
--- import Mathlib.Algebra.Group.TransferInstance
+import Mathlib.Algebra.Group.TransferInstance
 
 -- -- Mathlib imports for field arithmetic
 -- import Mathlib.Algebra.ModEq
@@ -68,7 +69,7 @@ The `Equiv.injective.addCommGroup` pattern is then used to transfer the
 
 universe u
 
-open curve25519_dalek CategoryTheory
+open curve25519_dalek CategoryTheory WeierstrassCurve.Affine WeierstrassCurve.Affine.Point Aeneas.Std Result
 
 
 namespace Ed25519Bridge
@@ -212,6 +213,12 @@ abbrev MontgomeryPoint := curve25519_montgomery.Point
 -- The mathlib affine point type for our target Weierstrass curve
 abbrev WeierstrassPoint :=  WeierstrassCurve.Affine.Point curve25519_weierstrass
 
+-- Ensure the elliptic curve group law instance is synthesized for our target type.
+-- This provides the necessary Add/HAdd operation.
+instance : AddCommGroup WeierstrassPoint := by
+  unfold WeierstrassPoint CurveField
+  exact instAddCommGroup
+
 /-!
 ## 2: Coordinate Transformations
 -/
@@ -331,7 +338,7 @@ def montgomeryPointToWeierstrass (P : MontgomeryPoint) : WeierstrassPoint :=
           curve25519_weierstrass,
           Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
           Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
-          zero_mul, add_zero, map_zero
+          zero_mul, add_zero, --map_zero
         ]
         rw [sub_eq_zero]
         exact h_eq
@@ -343,15 +350,14 @@ def montgomeryPointToWeierstrass (P : MontgomeryPoint) : WeierstrassPoint :=
           curve25519_weierstrass,
           Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
           Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
-          zero_mul, add_zero, map_zero, montgomeryToWeierstrass_coords, w_a₄
+          zero_mul, add_zero, --map_zero,
+          montgomeryToWeierstrass_coords, w_a₄
         ]
         field_simp [(by unfold CurveField; decide : (3 : CurveField) ≠ 0)]
-        field_simp [(by unfold CurveField; decide : (3 : CurveField) ≠ 0)]
+        --field_simp [(by unfold CurveField; decide : (3 : CurveField) ≠ 0)]
 
-        simp only [M_A, Polynomial.eval_zero, mul_zero, add_zero, ne_eq]
-
+        simp only [M_A]
         right
-        simp only [← ne_eq]
 
         apply mul_ne_zero
         · unfold CurveField
@@ -371,7 +377,7 @@ def weierstrassPointToMontgomery (P : WeierstrassPoint) : MontgomeryPoint :=
         curve25519_weierstrass,
         Polynomial.evalEval, Polynomial.eval_X, Polynomial.eval_C,
         Polynomial.eval_add, Polynomial.eval_sub, Polynomial.eval_mul, Polynomial.eval_pow,
-        zero_mul, add_zero, map_zero,
+        zero_mul, add_zero, --map_zero,
         sub_eq_zero
       ] at h_weierstrass_eq_l
 
@@ -389,67 +395,34 @@ def weierstrassPointToMontgomery (P : WeierstrassPoint) : MontgomeryPoint :=
       h := h_montgomery_eq
     }
     exact .some mont_affine_pt
+/-!
+## 5. Math version of Edwards Points
+-/
 
+-- Define a version of EdwardsPoint aligned with our Field structure
+structure EdwardsPointMath where
+  X : CurveField
+  Y : CurveField
+  Z : CurveField
+  T : CurveField
 
+-- Equivalence for the Dalek type and the Math type
+def dalekToMathEquiv : EdwardsPoint ≃ EdwardsPointMath := sorry
 
-
-
-
-
-
-/-
-
-
-
-def weierstrassPointToMontgomery (P : WeierstrassPoint) : MontgomeryPoint :=
-  match P with
-  | .zero => .zero -- Identity maps to identity
-  | .some hP =>
-    let (x, y) := weierstrassToMontgomery_coords hP.x hP.y
-    .some {
-      x := x,
-      y := y,
-      h := by
-        apply weierstrass_to_montgomery_on_curve
-        exact hP.h
-    }
-
--- Edwards ↔ Montgomery
--- This is the most complex step, bridging:
--- `EdwardsPoint` (projective, from `Types.lean`)
--- `MontgomeryPoint` (affine `O | some`, from mathlib)
--- This requires:
--- 1. `FieldElement51` ↔ `CurveField` equivalence.
--- 2. Projective `(X,Y,Z,T)` ↔ Affine `(x,y)` map.
--- 3. Handling exceptional points (identity, 2-torsion) manually.
---
--- The Edwards identity `(0, 1, 1, 0)` *must* map to `MontgomeryPoint.zero`.
--- All other points `(X,Y,Z,T)` map to `(X/Z, Y/Z)`, then to `(u,v)`,
--- then to `MontgomeryPoint.some (u,v)`.
-def edwardsPointToMontgomery (P_ed : EdwardsPoint) : MontgomeryPoint :=
-  -- TODO: This is the core of the `dalek ↔ mathlib` bridge.
-  -- 1. Check if P_ed is identity (0, 1, 1, 0). If so, return .zero
-  -- 2. Else, convert projective to affine: (x, y) := (X/Z, Y/Z)
-  -- 3. Check for exceptional points (e.g., y=1, x=0)
-  -- 4. Convert (x, y) to (u, v) via edwardsToMontgomery_coords
-  -- 5. Return .some { u := u, v := v, h := ... }
+-- EdwardsMath ↔ Montgomery: Coordinate transformation functions (now using total functions on CurveField)
+def edwardsMathPointToMontgomery (P_ed : EdwardsPointMath) : MontgomeryPoint :=
   sorry
 
-def montgomeryToEdwardsPoint (P_mont : MontgomeryPoint) : EdwardsPoint :=
-  match P_mont with
-  | .zero =>
-    -- Return the Edwards identity (0, 1, 1, 0)
-    -- This requires building the `FieldElement51` struct.
-    sorry -- TODO: Return EdwardsPoint identity
-  | .some hP =>
-    -- 1. Get (u, v) from hP
-    -- 2. Check for exceptional points (e.g., v=0, u=-1)
-    -- 3. Convert (u, v) to (x, y) via montgomeryToEdwards_coords
-    -- 4. Convert (x, y) to projective (X, Y, Z, T)
-    --    (e.g., X=x, Y=y, Z=1, T=x*y)
-    -- 5. Convert `CurveField` elements to `FieldElement51`.
-    -- 6. Return the `EdwardsPoint` struct.
-    sorry
+def montgomeryToEdwardsMathPoint (P_mont : MontgomeryPoint) : EdwardsPointMath :=
+  sorry
+
+-- Establish the EdwardsMath ↔ Montgomery equivalence
+def edwardsMathMontgomeryEquiv : EdwardsPointMath ≃ MontgomeryPoint where
+  toFun := edwardsMathPointToMontgomery
+  invFun := montgomeryToEdwardsMathPoint
+  left_inv := by sorry
+  right_inv := by sorry
+
 
 -- 7. Establish equivalences
 def montgomeryWeierstrassEquiv : MontgomeryPoint ≃ WeierstrassPoint where
@@ -460,96 +433,157 @@ def montgomeryWeierstrassEquiv : MontgomeryPoint ≃ WeierstrassPoint where
     intro P
     cases P
     · rfl
-    · simp [montgomeryPointToWeierstrass, weierstrassPointToMontgomery,
-           montgomeryToWeierstrass_coords, weierstrassToMontgomery_coords,
-           WeierstrassCurve.Point.some_inj]
-      -- Goal is `(hP.x + M_A / 3) - M_A / 3 = hP.x` and `hP.y = hP.y`
-      constructor
-      · field_simp [three_ne_zero]; ring
-      · rfl
+    · simp only [weierstrassPointToMontgomery, montgomeryPointToWeierstrass,
+      montgomeryToWeierstrass_coords, weierstrassToMontgomery_coords, add_sub_cancel_right]
   right_inv := by
-    -- Same logic
     intro P
     cases P
     · rfl
-    · simp [montgomeryPointToWeierstrass, weierstrassPointToMontgomery,
-           montgomeryToWeierstrass_coords, weierstrassToMontgomery_coords,
-           WeierstrassCurve.Point.some_inj]
-      constructor
-      · field_simp [three_ne_zero]; ring
-      · rfl
+    · simp only [montgomeryPointToWeierstrass, weierstrassPointToMontgomery,
+      weierstrassToMontgomery_coords, montgomeryToWeierstrass_coords, sub_add_cancel]
 
-def edwardsMontgomeryEquiv : EdwardsPoint ≃ MontgomeryPoint where
-  toFun := edwardsPointToMontgomery
-  invFun := montgomeryToEdwardsPoint
-  left_inv := by sorry -- TODO: Relies on `sorry`d functions
-  right_inv := by sorry -- TODO: Relies on `sorry`d functions
+-- 8. Chained equivalence (Math-Aligned EdwardsPointMath ↔ WeierstrassPoint)
+def edwardsWeierstrassEquivMath : EdwardsPointMath ≃ WeierstrassPoint :=
+  edwardsMathMontgomeryEquiv.trans montgomeryWeierstrassEquiv
 
--- 8. Chained equivalence
--- This is the final `Equiv` from our source type to our target type.
+-- The ultimate equivalence from the Dalek type to the final target
 def edwardsWeierstrassEquiv : EdwardsPoint ≃ WeierstrassPoint :=
-  edwardsMontgomeryEquiv.trans montgomeryWeierstrassEquiv
-
+  dalekToMathEquiv.trans edwardsWeierstrassEquivMath
 
 /-!
-## Phase 5: Group Structure Transfer
+## 6. Group Structure Transfer
 -/
 
+def MontgomeryPoint.add (P Q : MontgomeryPoint) : MontgomeryPoint :=
+  montgomeryWeierstrassEquiv.symm (montgomeryWeierstrassEquiv P + montgomeryWeierstrassEquiv Q)
+
+-- Define the Add instance on MontgomeryPoint using the transferred operation.
+instance : Add MontgomeryPoint where
+  add := MontgomeryPoint.add
+
+instance : Zero MontgomeryPoint where
+  zero := MontgomeryCurve.Point.zero
+
+instance : AddCommGroup MontgomeryPoint := by
+  exact Equiv.addCommGroup montgomeryWeierstrassEquiv
+
 -- 9. Prove addition is preserved through transformations
--- This theorem states that the isomorphism `montgomeryWeierstrassEquiv`
--- is a group homomorphism. This is a standard result in mathlib,
--- often called `map_add`.
 theorem montgomery_weierstrass_addition_preserved (p q : MontgomeryPoint) :
   montgomeryWeierstrassEquiv (p + q) =
   montgomeryWeierstrassEquiv p + montgomeryWeierstrassEquiv q := by
-  -- The map is a known isomorphism, which preserves the group op.
-  -- This proof is non-trivial but standard.
-  sorry -- TODO: Prove using `map_add` from mathlib
+  sorry -- TODO
 
--- TODO: We must also prove `edwardsMontgomeryEquiv` preserves addition.
-theorem edwards_montgomery_addition_preserved (p q : EdwardsPoint) :
-  edwardsMontgomeryEquiv (p + q) =
-  edwardsMontgomeryEquiv p + edwardsMontgomeryEquiv q := by
-  -- This is the "Edwards-Montgomery addition law is equivalent" theorem.
-  -- This is the hardest proof.
-  sorry
+-- 1. Define addition on EdwardsPointMath via operation transfer
+def EdwardsPointMath.add (P Q : EdwardsPointMath) : EdwardsPointMath :=
+  edwardsWeierstrassEquivMath.symm (edwardsWeierstrassEquivMath P + edwardsWeierstrassEquivMath Q)
 
--- 10. Transfer group structure to Edwards points
--- We use the `Equiv` `edwardsWeierstrassEquiv` to pull the
--- `AddCommGroup` instance from `WeierstrassPoint` (mathlib)
--- back to our `EdwardsPoint` (from `Types.lean`).
-instance : AddCommGroup EdwardsPoint :=
-  edwardsWeierstrassEquiv.injective.addCommGroup
-    edwardsWeierstrassEquiv.toFun -- toTarget
-    -- Define `add` on `EdwardsPoint`
-    (add := fun p q => edwardsWeierstrassEquiv.invFun
-      (edwardsWeierstrassEquiv.toFun p + edwardsWeierstrassEquiv.toFun q))
-    -- Define `zero` on `EdwardsPoint`
-    (zero := edwardsWeierstrassEquiv.invFun 0)
-    -- Define `neg` on `EdwardsPoint`
-    (neg := fun p => edwardsWeierstrassEquiv.invFun (- edwardsWeierstrassEquiv.toFun p))
-    -- Define `sub` on `EdwardsPoint`
-    (sub := fun p q => edwardsWeierstrassEquiv.invFun
-      (edwardsWeierstrassEquiv.toFun p - edwardsWeierstrassEquiv.toFun q))
-    -- nsmul
-    (nsmul := fun n p => edwardsWeierstrassEquiv.invFun (n • edwardsWeierstrassEquiv.toFun p))
-    -- zsmul
-    (zsmul := fun n p => edwardsWeierstrassEquiv.invFun (n • edwardsWeierstrassEquiv.toFun p))
-    -- Proofs that our definitions match (follow the pattern)
-    (by intros; apply edwardsWeierstrassEquiv.injective; simp) -- add
-    (by apply edwardsWeierstrassEquiv.injective; simp)         -- zero
-    (by intros; apply edwardsWeierstrassEquiv.injective; simp) -- neg
-    (by intros; apply edwardsWeierstrassEquiv.injective; simp) -- sub
-    (by intros; apply edwardsWeierstrassEquiv.injective; simp) -- nsmul
-    (by intros; apply edwardsWeierstrassEquiv.injective; simp) -- zsmul
+instance : Add EdwardsPointMath where
+  add := EdwardsPointMath.add
 
+instance : Zero EdwardsPointMath where
+  zero := edwardsWeierstrassEquivMath.symm WeierstrassCurve.Affine.Point.zero
+
+def edwardsWeierstrassAddEquivMath : EdwardsPointMath ≃+ WeierstrassPoint :=
+  AddEquiv.mk edwardsWeierstrassEquivMath (by
+    intro P Q
+    dsimp only [HAdd.hAdd, Add.add, EdwardsPointMath.add]
+    simp only [Equiv.toFun_as_coe, Equiv.apply_symm_apply]
+  )
+
+instance : AddCommGroup EdwardsPointMath := edwardsWeierstrassAddEquivMath.toEquiv.addCommGroup
+
+instance : AddCommGroup EdwardsPoint := Equiv.addCommGroup dalekToMathEquiv
+
+-- 1. Redefine addition on EdwardsPointMath (via MontgomeryPoint)
+def EdwardsPointMath.add_via_montgomery (P Q : EdwardsPointMath) : EdwardsPointMath :=
+  edwardsMathMontgomeryEquiv.symm (edwardsMathMontgomeryEquiv P + edwardsMathMontgomeryEquiv Q)
+
+-- 2. New AddEquiv Definition: EdwardsMath ↔ Montgomery
+def edwardsMathMontgomeryAddEquiv : EdwardsPointMath ≃+ MontgomeryPoint :=
+  AddEquiv.mk edwardsMathMontgomeryEquiv (by
+    intro P Q
+    simp only [Equiv.toFun_as_coe]
+    dsimp only [HAdd.hAdd, Add.add]
+    exact (Equiv.apply_eq_iff_eq_symm_apply edwardsMathMontgomeryEquiv).mpr rfl
+  )
+
+-- 3. The theorem proves the equivalence is an AddEquiv (now recast for the final Dalek type)
+theorem edwards_montgomery_addition_preserved (p q : EdwardsPointMath) :
+  edwardsMathMontgomeryEquiv (p + q) =
+  edwardsMathMontgomeryEquiv p + edwardsMathMontgomeryEquiv q := by
+  exact edwardsMathMontgomeryAddEquiv.map_add p q
 
 /-!
-## Phase 6: Condition Verification & Demonstration
+## 7. A Math Doubling Spec Thm
 -/
 
--- These theorems were requested to prove the validity of the
--- general W → M transformation.
+-- Placeholder: This is what P.double_impl must encapsulate:
+def EdwardsPointMath.double_impl (P : EdwardsPointMath) :
+  Result EdwardsPointMath :=
+  -- This requires: dalekToMathEquiv.invFun P → EdwardsPoint.double → dalekToMathEquiv
+  -- (This represents the execution of the low-level hardware operation)
+  sorry
+
+-- It performs the required safe projection, extracting the successful value or defaulting to Zero.
+def EdwardsPointMath.safe_extract (P_res : Result EdwardsPointMath) : EdwardsPointMath :=
+  match P_res with
+  | ok r => r
+  | fail _ => 0 -- Default to the identity element (0) upon failure.
+  | div => 0   -- Explicitly handle the 'div' (division/panic) failure state revealed by the elaborator.
+
+-- The high-level function that executes the doubling implementation and safely extracts the result.
+def EdwardsPointMath.double_result (P : EdwardsPointMath) : EdwardsPointMath := by
+  sorry
+
+-- Fix for HMul/Scalar Multiplication:
+-- We define this instance explicitly to resolve the HMul typeclass dependency for '2 * P'.
+instance : HMul ℕ EdwardsPointMath EdwardsPointMath where
+  -- Redirect the multiplication notation (*) to the scalar multiplication operation (•).
+  hMul := SMul.smul
+
+-- Theorem asserting the low-level implementation (double_impl) succeeds and
+-- is equivalent to the high-level group operation (P + P).
+-- NOTE: This theorem encapsulates the massive algebraic complexity of the Dalek verification.
+theorem double_eq_add (P : EdwardsPointMath) :
+  P.double_impl = ok (P + P) := by
+  sorry -- The core verification proof lives here.
+
+-- The final, clean, high-level specification.
+-- This theorem asserts that the mapped result of the low-level double equals the mapped result
+-- of scalar multiplication by two (2 * P), which holds by the group axioms.
+theorem double_spec_math (P : EdwardsPointMath) :
+  edwardsWeierstrassEquivMath (P.double_result) = edwardsWeierstrassEquivMath (2 * P) := by
+  unfold EdwardsPointMath.double_result
+
+  -- -- Substitute P.double_impl with its successful group law definition (P + P).
+  -- rw [double_eq_add]
+  -- simp only [EdwardsPointMath.safe_extract]
+  -- simp only [nsmul_eq_mul, two_nsmul]
+  sorry
+
+
+
+
+
+
+/-
+
+/-!
+## Phase 6: Condition Verification & Demonstration for Birational Mappings
+
+What is the actual purpose of those three condition theorems?
+These conditions are typically prerequisites for proving the map from:
+ Montgomery $\leftrightarrow$ Weierstrass
+is a valid birational map over specific fields or points. Specifically, they relate to:
+ · 2-Torsion: Conditions 2 and 3 relate to the existence and nature of the curve's 2-torsion points,
+   often required to prove the canonical map is well-defined.
+  · Isomorphism: They are necessary for establishing that the curve algebraically satisfies the
+    requirements for the elliptic curve group structure and the specific birational equivalence
+    being used
+-/
+
+-- These theorems are requested to prove the validity of the
+-- general W → M  birational transformation.
 
 theorem weierstrass_to_montgomery_condition_1 :
   -- Order divisibility by 4
