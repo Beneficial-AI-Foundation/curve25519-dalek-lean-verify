@@ -76,7 +76,8 @@ theorem add_greater_equal_to_L_spec (u u' : Scalar52)
       · grind
       · have geq_L: sum_nat ≥ L := by omega
         have scalar_geq : Scalar52_as_Nat sum ≥ Scalar52_as_Nat constants.L := by
-          sorry
+          rw [L_spec]
+          omega
         obtain ⟨v, h_v_ok, h_v_eq⟩ := sub_spec_geq sum constants.L h_sum_bounds h_L_bounds scalar_geq
         use v
         constructor
