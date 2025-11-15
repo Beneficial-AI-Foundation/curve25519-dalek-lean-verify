@@ -34,7 +34,10 @@ natural language specs:
 -/
 
 lemma U8x64_as_Nat_split (b : Array U8 64#usize) :
-    ∃ lo4 hi4, U8x64_as_Nat b = Scalar52_as_Nat lo4 + Scalar52_as_Nat hi4 * 2^256 := by
+    ∃ lo4 hi4, U8x64_as_Nat b = Scalar52_as_Nat lo4 + Scalar52_as_Nat hi4 * 2^256
+    ∧ (∀ i, i < 5 → (lo4[i]!).val < 2 ^ 62)
+    ∧ (∀ i, i < 5 → (hi4[i]!).val < 2 ^ 62)
+    := by
   sorry
 
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
@@ -48,8 +51,10 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize) :
   progress*
 
   -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
-  have h_lo4_hi4: ∃ lo4 hi4, U8x64_as_Nat b = Scalar52_as_Nat lo4 + Scalar52_as_Nat hi4 * 2^256 := U8x64_as_Nat_split b
-  obtain ⟨lo4, hi4, h_lo4_hi4⟩ := h_lo4_hi4
+  have h_lo4_hi4: ∃ lo4 hi4, U8x64_as_Nat b = Scalar52_as_Nat lo4 + Scalar52_as_Nat hi4 * 2^256
+  ∧ (∀ i, i < 5 → (lo4[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi4[i]!).val < 2 ^ 62)
+   := U8x64_as_Nat_split b
+  obtain ⟨lo4, hi4, h_lo4_hi4, lo_range, hi_range⟩ := h_lo4_hi4
   -- (lo * R) / R = lo
   obtain ⟨lo5, h_lo5_ok, h_lo5_spec⟩ := montgomery_mul_spec lo4 constants.R (by sorry) (by sorry)
   obtain ⟨hi5, h_hi5_ok, h_hi5_spec⟩ := montgomery_mul_spec hi4 constants.RR (by sorry) (by sorry)
