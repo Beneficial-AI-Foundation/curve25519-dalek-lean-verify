@@ -7,6 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.AsMontgomery
 /-! # Spec Theorem for `Scalar52::from_bytes_wide`
 
 Specification and proof for `Scalar52::from_bytes_wide`.
@@ -40,6 +41,11 @@ lemma U8x64_as_Nat_split (b : Array U8 64#usize) :
     := by
   sorry
 
+lemma R_lt: ∀ i, i < 5 → constants.R[i]!.val < 2 ^62 := by
+  unfold constants.R
+  decide
+--   omega
+
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form) -/
@@ -55,9 +61,9 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize) :
    := U8x64_as_Nat_split b
   obtain ⟨lo, hi, h_lo_hi, lo_range, hi_range⟩ := h_lo_hi
   -- (lo * R) / R = lo2
-  obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (by sorry)
+  obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (R_lt)
   -- (hi * R^2) / R = hi2
-  obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (by sorry)
+  obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (RR_lt)
 
   -- (hi * R^2) / R + (lo * R) / R = u
   -- True according to line 128 - line 131 in curve25519-dalek/src/backend/serial/u64/scalar.rs
