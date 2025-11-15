@@ -141,12 +141,24 @@ theorem add_greater_equal_to_L_spec (u u' : Scalar52)
 - The result represents the sum of the two input scalars modulo L
 -/
 @[progress]
-theorem add_spec (u u' : Scalar52)
-    (hu : ∀ i, i < 5 → (u[i]!).val < 2 ^ 52)
-    (hu' : ∀ i, i < 5 → (u'[i]!).val < 2 ^ 52):
-    ∃ v,
-    add u u' = ok v ∧
-    Scalar52_as_Nat v = (Scalar52_as_Nat u + Scalar52_as_Nat u') % L
-    := by
-  sorry
+theorem add_spec (a b : Scalar52)
+  (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
+  (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52):
+  ∃ v, add a b = ok v ∧
+  (Scalar52_as_Nat v = if Scalar52_as_Nat a + Scalar52_as_Nat b < L
+    then (L - (L - (Scalar52_as_Nat a + Scalar52_as_Nat b)) % L) % L
+    else (Scalar52_as_Nat a + Scalar52_as_Nat b) % L)
+  := by
+  by_cases h: (Scalar52_as_Nat a + Scalar52_as_Nat b < L)
+  · obtain ⟨v, h_ok, h_eq⟩ := add_less_than_L_spec a b ha hb h
+    use v
+    constructor
+    · exact h_ok
+    · simp [h, h_eq]
+  · have h_geq : Scalar52_as_Nat a + Scalar52_as_Nat b ≥ L := by omega
+    obtain ⟨v, h_ok, h_eq⟩ := add_greater_equal_to_L_spec a b ha hb h_geq
+    use v
+    constructor
+    · exact h_ok
+    · simp [h, h_eq]
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
