@@ -47,30 +47,38 @@ lemma U8x64_as_Nat_split (b : Array U8 64#usize) :
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     ∃ u, from_bytes_wide b = ok u ∧
     Scalar52_as_Nat u = U8x64_as_Nat b % L := by
-  unfold from_bytes_wide
-  progress*
-
+  -- unfold from_bytes_wide
+  -- progress*
   -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
-  have h_lo4_hi4: ∃ lo4 hi4, U8x64_as_Nat b = Scalar52_as_Nat lo4 + Scalar52_as_Nat hi4 * 2^256
-  ∧ (∀ i, i < 5 → (lo4[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi4[i]!).val < 2 ^ 62)
+  have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
+  ∧ (∀ i, i < 5 → (lo[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi[i]!).val < 2 ^ 62)
    := U8x64_as_Nat_split b
-  obtain ⟨lo4, hi4, h_lo4_hi4, lo_range, hi_range⟩ := h_lo4_hi4
-  -- (lo * R) / R = lo
-  obtain ⟨lo5, h_lo5_ok, h_lo5_spec⟩ := montgomery_mul_spec lo4 constants.R (by sorry) (by sorry)
-  obtain ⟨hi5, h_hi5_ok, h_hi5_spec⟩ := montgomery_mul_spec hi4 constants.RR (by sorry) (by sorry)
+  obtain ⟨lo, hi, h_lo_hi, lo_range, hi_range⟩ := h_lo_hi
+  -- (lo * R) / R = lo2
+  obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (by sorry)
+  -- (hi * R^2) / R = hi2
+  obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (by sorry)
 
   -- (hi * R^2) / R + (lo * R) / R = u
-  obtain ⟨u, h_u_ok, h_u_spec⟩ := add_spec hi5 lo5
+  -- True according to line 128 - line 131 in curve25519-dalek/src/backend/serial/u64/scalar.rs
+  obtain ⟨u, h_u_ok, h_u_spec⟩ := add_spec (hi2) (lo2)
 
   -- Keypoint:2^256 * R ≡ R^2 [MOD L]
   have h_key : 2^256 * R % L = R^2 % L := by
+    unfold R
+  -- 2^256 * 2^260 = 2^516
+  -- R^2 = (2^260)^2 = 2^520
+  -- need to prove 2^516 % L = 2^520 % L
     sorry
-  -- Combine all relations
   use u
   constructor
   · -- from_bytes_wide b = ok u
+    -- True by the definition of from_bytes_wide_spec
     sorry
   · -- Scalar52_as_Nat u = U8x64_as_Nat b % L
+    rw [h_u_spec]
+    rw [h_lo_hi]
+
     sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
