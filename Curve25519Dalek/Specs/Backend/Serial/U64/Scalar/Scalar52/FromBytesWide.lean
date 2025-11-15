@@ -39,6 +39,16 @@ lemma U8x64_as_Nat_split (b : Array U8 64#usize) :
     ∧ (∀ i, i < 5 → (lo4[i]!).val < 2 ^ 62)
     ∧ (∀ i, i < 5 → (hi4[i]!).val < 2 ^ 62)
     := by
+  unfold U8x64_as_Nat
+  have: ∑ i ∈ Finset.range 64, 2 ^ (8 * i) * (b[i]!.val) =
+    (∑ i ∈ Finset.range 32, 2 ^ (8 * i) * b[i]!.val) +
+    (∑ i ∈ Finset.range 32, 2 ^ (8 * (i + 32)) * b[i + 32]!.val) := by
+    sorry
+  have low_bits_eq: ∃ lo4, ∑ i ∈ Finset.range 64, 2 ^ (8 * i) * (b[i]!.val) = Scalar52_as_Nat lo4 ∧ (∀ i, i < 5 → (lo4[i]!).val < 2 ^ 62) := by sorry
+  have high_bits_eq: ∃ hi4, ∑ i ∈ Finset.range 32, 2 ^ (8 * (i + 32)) * b[i + 32]!.val = Scalar52_as_Nat hi4 ∧ (∀ i, i < 5 → (hi4[i]!).val < 2 ^ 62) := by sorry
+  obtain ⟨lo4, h_lo4_eq, h_lo4_range⟩ := low_bits_eq
+  obtain ⟨hi4, h_hi4_eq, h_hi4_range⟩ := high_bits_eq
+  use lo4, hi4
   sorry
 
 lemma R_lt: ∀ i, i < 5 → constants.R[i]!.val < 2 ^62 := by
