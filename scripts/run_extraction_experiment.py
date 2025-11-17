@@ -96,13 +96,13 @@ def main():
     )
     parser.add_argument(
         "--charon",
-        default="aeneas/charon/bin/charon",
-        help="Path to charon binary (default: aeneas/charon/bin/charon)"
+        default="charon",
+        help="Path to charon binary (default: charon from PATH)"
     )
     parser.add_argument(
         "--aeneas",
-        default="aeneas/bin/aeneas",
-        help="Path to aeneas binary (default: aeneas/bin/aeneas)"
+        default="aeneas",
+        help="Path to aeneas binary (default: aeneas from PATH)"
     )
     parser.add_argument(
         "--output",
