@@ -9,8 +9,10 @@ in
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
     opam
+    pkg-config
   ];
   buildInputs = with pkgs; [
+    gmp
   ];
   
   shellHook = ''
