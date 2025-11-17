@@ -167,7 +167,7 @@ def main():
 
     # Step 1: Generate rustdoc JSON
     print("Step 1: Generating rustdoc JSON...")
-    rustdoc_cmd = f"cargo +nightly rustdoc --all-features -- -Z unstable-options --output-format json"
+    rustdoc_cmd = "cargo +nightly rustdoc --all-features -- -Z unstable-options --output-format json --document-private-items"
     success, duration, _, _, _, _ = run_command(rustdoc_cmd, 60, crate_dir, args.debug)
 
     if not success:
