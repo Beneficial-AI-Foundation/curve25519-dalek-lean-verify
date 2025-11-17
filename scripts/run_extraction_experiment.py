@@ -95,6 +95,10 @@ def main():
         help="Name of the crate (default: curve25519-dalek)"
     )
     parser.add_argument(
+        "--target-dir",
+        help="Target directory for cargo build artifacts (default: <crate_dir>/target)"
+    )
+    parser.add_argument(
         "--charon",
         default="charon",
         help="Path to charon binary (default: charon from PATH)"
@@ -133,7 +137,15 @@ def main():
 
     # Step 2: Extract items
     print("Step 2: Extracting items from rustdoc JSON...")
-    json_path = crate_dir / "target" / "doc" / f"{args.crate_name.replace('-', '_')}.json"
+
+    # Determine target directory
+    if args.target_dir:
+        target_dir = Path(args.target_dir).resolve()
+    else:
+        target_dir = crate_dir / "target"
+
+    json_filename = f"{args.crate_name.replace('-', '_')}.json"
+    json_path = target_dir / "doc" / json_filename
 
     if not json_path.exists():
         print(f"Error: JSON file not found at {json_path}", file=sys.stderr)
