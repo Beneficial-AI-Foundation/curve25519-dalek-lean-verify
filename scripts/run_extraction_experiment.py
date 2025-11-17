@@ -60,7 +60,7 @@ def remove_llbc_files(cwd):
         f.unlink()
 
 
-def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path, timeout, debug):
+def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path, aeneas_path, timeout, debug):
     """
     Test if an item can be extracted with Charon and Aeneas.
 
@@ -68,8 +68,8 @@ def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path, t
         (success: bool, stage: str, duration: float)
         stage is one of: "charon", "aeneas", "success"
     """
-    # Remove old LLBC files
-    remove_llbc_files(cwd)
+    # Remove old LLBC files (in workspace root where charon generates them)
+    remove_llbc_files(workspace_root)
 
     # Run Charon
     charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings -- -p {crate_name}"
@@ -78,10 +78,10 @@ def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path, t
     if not charon_success:
         return False, "charon", charon_duration
 
-    # Run Aeneas
+    # Run Aeneas (from workspace root where .llbc file is)
     llbc_file = f"{crate_name}.llbc"
     aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
-    aeneas_success, aeneas_duration, _, _ = run_command(aeneas_cmd, timeout, cwd, debug)
+    aeneas_success, aeneas_duration, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
 
     total_duration = charon_duration + aeneas_duration
 
@@ -141,7 +141,16 @@ def main():
         print(f"Error: Directory {crate_dir} does not exist", file=sys.stderr)
         sys.exit(1)
 
-    print(f"Working directory: {crate_dir}")
+    # Determine target directory and workspace root
+    if args.target_dir:
+        target_dir = Path(args.target_dir).resolve()
+    else:
+        target_dir = crate_dir / "target"
+
+    workspace_root = target_dir.parent
+
+    print(f"Crate directory: {crate_dir}")
+    print(f"Workspace root: {workspace_root}")
     print()
 
     # Step 1: Generate rustdoc JSON
@@ -158,12 +167,6 @@ def main():
 
     # Step 2: Extract items
     print("Step 2: Extracting items from rustdoc JSON...")
-
-    # Determine target directory
-    if args.target_dir:
-        target_dir = Path(args.target_dir).resolve()
-    else:
-        target_dir = crate_dir / "target"
 
     json_filename = f"{args.crate_name.replace('-', '_')}.json"
     json_path = target_dir / "doc" / json_filename
@@ -190,6 +193,7 @@ def main():
             item,
             args.crate_name,
             crate_dir,
+            workspace_root,
             args.charon,
             args.aeneas,
             args.timeout,
