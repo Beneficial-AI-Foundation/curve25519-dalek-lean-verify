@@ -7,22 +7,12 @@ let
 in
 
 pkgs.mkShell {
-  LIBCLANG_PATH = with pkgs; "${llvmPackages.libclang.lib}/lib";
   nativeBuildInputs = with pkgs; [
-    cmake
-    protobuf
-    pkg-config
-    rustc
-    cargo
-    clang
-    llvmPackages.libclang
+    opam
   ];
   buildInputs = with pkgs; [
-    stdenv.cc.cc.lib
   ];
   
   shellHook = ''
-    export CC=clang
-    export CXX=clang++
   '';
 }
