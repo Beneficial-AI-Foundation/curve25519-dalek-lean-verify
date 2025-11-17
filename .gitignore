@@ -41,3 +41,5 @@ site/.vitepress/cache
 site/.env
 .env
 site/public/doc
+
+.direnv
