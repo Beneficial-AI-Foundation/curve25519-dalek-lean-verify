@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Aeneas and Charon Setup Script
 # This script downloads the Aeneas repo, sets up Charon, and builds both projects
