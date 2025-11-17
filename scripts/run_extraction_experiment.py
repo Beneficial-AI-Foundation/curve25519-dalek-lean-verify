@@ -24,7 +24,8 @@ def run_command(cmd, timeout, cwd, debug):
     Run a command with timeout.
 
     Returns:
-        (success: bool, duration: float, stdout: str, stderr: str)
+        (success: bool, duration: float, exit_code: int|None, timed_out: bool, stdout: str, stderr: str)
+        exit_code is None if timed out
     """
     start = time.time()
     try:
@@ -45,12 +46,12 @@ def run_command(cmd, timeout, cwd, debug):
             print(result.stderr)
             print("--- END ---\n")
 
-        return result.returncode == 0, duration, result.stdout, result.stderr
+        return result.returncode == 0, duration, result.returncode, False, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         duration = time.time() - start
         if debug:
             print("\n[Command timed out]\n")
-        return False, duration, "", ""
+        return False, duration, None, True, "", ""
 
 
 def remove_llbc_files(cwd):
@@ -65,30 +66,46 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     Test if an item can be extracted with Charon and Aeneas.
 
     Returns:
-        (success: bool, stage: str, duration: float)
-        stage is one of: "charon", "aeneas", "success"
+        (success: bool, result_info: dict)
+        result_info contains: stage, charon_duration, aeneas_duration, exit_code, timed_out
     """
     # Remove old LLBC files (in workspace root where charon generates them)
     remove_llbc_files(workspace_root)
 
     # Run Charon
     charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings -- -p {crate_name}"
-    charon_success, charon_duration, _, _ = run_command(charon_cmd, timeout, cwd, debug)
+    charon_success, charon_duration, charon_exit_code, charon_timed_out, _, _ = run_command(charon_cmd, timeout, cwd, debug)
 
     if not charon_success:
-        return False, "charon", charon_duration
+        return False, {
+            "stage": "charon",
+            "charon_duration": charon_duration,
+            "aeneas_duration": None,
+            "exit_code": charon_exit_code,
+            "timed_out": charon_timed_out
+        }
 
     # Run Aeneas (from workspace root where .llbc file is)
     llbc_file = f"{crate_name.replace('-', '_')}.llbc"
     aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
-    aeneas_success, aeneas_duration, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
-
-    total_duration = charon_duration + aeneas_duration
+    aeneas_success, aeneas_duration, aeneas_exit_code, aeneas_timed_out, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
 
     if not aeneas_success:
-        return False, "aeneas", total_duration
+        return False, {
+            "stage": "aeneas",
+            "charon_duration": charon_duration,
+            "aeneas_duration": aeneas_duration,
+            "exit_code": aeneas_exit_code,
+            "timed_out": aeneas_timed_out
+        }
 
-    return True, "success", total_duration
+    return True, {
+        "stage": "success",
+        "charon_duration": charon_duration,
+        "aeneas_duration": aeneas_duration,
+        "exit_code": 0,
+        "timed_out": False
+    }
 
 
 def main():
@@ -156,7 +173,7 @@ def main():
     # Step 1: Generate rustdoc JSON
     print("Step 1: Generating rustdoc JSON...")
     rustdoc_cmd = f"cargo +nightly rustdoc -p {args.crate_name} --all-features -- -Z unstable-options --output-format json"
-    success, duration, _, _ = run_command(rustdoc_cmd, 60, crate_dir, args.debug)
+    success, duration, _, _, _, _ = run_command(rustdoc_cmd, 60, crate_dir, args.debug)
 
     if not success:
         print("Error: Failed to generate rustdoc JSON", file=sys.stderr)
@@ -189,7 +206,7 @@ def main():
     for i, item in enumerate(items, 1):
         print(f"[{i}/{len(items)}] Testing {item}... ", end="", flush=True)
 
-        success, stage, duration = test_item_extraction(
+        success, result_info = test_item_extraction(
             item,
             args.crate_name,
             crate_dir,
@@ -201,11 +218,37 @@ def main():
         )
 
         if success:
-            print(f"✓ ({duration:.2f}s)")
+            charon_time = result_info["charon_duration"]
+            aeneas_time = result_info["aeneas_duration"]
+            total_time = charon_time + aeneas_time
+            print(f"✓ (charon: {charon_time:.2f}s, aeneas: {aeneas_time:.2f}s, total: {total_time:.2f}s)")
             successes.append(item)
         else:
-            print(f"✗ (failed at {stage}, {duration:.2f}s)")
-            failures.append({"item": item, "stage": stage, "duration": duration})
+            stage = result_info["stage"]
+            charon_time = result_info["charon_duration"]
+            aeneas_time = result_info["aeneas_duration"]
+            exit_code = result_info["exit_code"]
+            timed_out = result_info["timed_out"]
+
+            error_info = f"failed at {stage}"
+            if timed_out:
+                error_info += " (timeout)"
+            elif exit_code is not None:
+                error_info += f" (exit code {exit_code})"
+
+            times = f"charon: {charon_time:.2f}s"
+            if aeneas_time is not None:
+                times += f", aeneas: {aeneas_time:.2f}s"
+
+            print(f"✗ ({error_info}, {times})")
+            failures.append({
+                "item": item,
+                "stage": stage,
+                "charon_duration": charon_time,
+                "aeneas_duration": aeneas_time,
+                "exit_code": exit_code,
+                "timed_out": timed_out
+            })
 
     # Step 4: Print summary
     print()
@@ -221,7 +264,12 @@ def main():
 
     print(f"Failures ({len(failures)}):")
     for failure in failures:
-        print(f"  ✗ {failure['item']} (failed at {failure['stage']})")
+        error_info = f"failed at {failure['stage']}"
+        if failure['timed_out']:
+            error_info += " (timeout)"
+        elif failure['exit_code'] is not None:
+            error_info += f" (exit code {failure['exit_code']})"
+        print(f"  ✗ {failure['item']} ({error_info})")
     print()
 
     # Save results to JSON if requested
@@ -231,10 +279,7 @@ def main():
             "successes": len(successes),
             "failures": len(failures),
             "success_list": successes,
-            "failure_list": [
-                {"item": f["item"], "stage": f["stage"], "duration": f["duration"]}
-                for f in failures
-            ]
+            "failure_list": failures
         }
 
         with open(args.output, 'w') as f:
