@@ -72,8 +72,8 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     # Remove old LLBC files (in workspace root where charon generates them)
     remove_llbc_files(workspace_root)
 
-    # Run Charon
-    charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings -- -p {crate_name}"
+    # Run Charon (from crate directory)
+    charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
     charon_success, charon_duration, charon_exit_code, charon_timed_out, _, _ = run_command(charon_cmd, timeout, cwd, debug)
 
     if not charon_success:
@@ -172,7 +172,7 @@ def main():
 
     # Step 1: Generate rustdoc JSON
     print("Step 1: Generating rustdoc JSON...")
-    rustdoc_cmd = f"cargo +nightly rustdoc -p {args.crate_name} --all-features -- -Z unstable-options --output-format json"
+    rustdoc_cmd = f"cargo +nightly rustdoc --all-features -- -Z unstable-options --output-format json"
     success, duration, _, _, _, _ = run_command(rustdoc_cmd, 60, crate_dir, args.debug)
 
     if not success:
