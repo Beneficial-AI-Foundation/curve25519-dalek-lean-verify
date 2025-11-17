@@ -117,11 +117,6 @@ def main():
         help="Directory containing the Rust crate to test"
     )
     parser.add_argument(
-        "--crate-name",
-        default="curve25519-dalek",
-        help="Name of the crate (default: curve25519-dalek)"
-    )
-    parser.add_argument(
         "--target-dir",
         help="Target directory for cargo build artifacts (default: <crate_dir>/target)"
     )
@@ -185,12 +180,30 @@ def main():
     # Step 2: Extract items
     print("Step 2: Extracting items from rustdoc JSON...")
 
-    json_filename = f"{args.crate_name.replace('-', '_')}.json"
-    json_path = target_dir / "doc" / json_filename
-
-    if not json_path.exists():
-        print(f"Error: JSON file not found at {json_path}", file=sys.stderr)
+    doc_dir = target_dir / "doc"
+    if not doc_dir.exists():
+        print(f"Error: Doc directory not found at {doc_dir}", file=sys.stderr)
         sys.exit(1)
+
+    # Find all JSON files in doc directory
+    json_files = list(doc_dir.glob("*.json"))
+
+    if len(json_files) == 0:
+        print(f"Error: No JSON files found in {doc_dir}", file=sys.stderr)
+        sys.exit(1)
+    elif len(json_files) > 1:
+        print(f"Error: Multiple JSON files found in {doc_dir}:", file=sys.stderr)
+        for jf in json_files:
+            print(f"  - {jf.name}", file=sys.stderr)
+        print("Likely this script needs tweaking so you can choose the right one", file=sys.stderr)
+        sys.exit(1)
+
+    json_path = json_files[0]
+    print(f"  Using JSON file: {json_path.name}")
+
+    # Derive crate name from JSON filename (remove .json extension)
+    crate_name = json_path.stem
+    print(f"  Crate name: {crate_name}")
 
     items = extract_items_from_json(str(json_path))
     print(f"  ✓ Found {len(items)} items")
@@ -208,7 +221,7 @@ def main():
 
         success, result_info = test_item_extraction(
             item,
-            args.crate_name,
+            crate_name,
             crate_dir,
             workspace_root,
             args.charon,
