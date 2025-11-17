@@ -19,12 +19,12 @@ from pathlib import Path
 from extract_items import extract_items_from_json
 
 
-def run_command(cmd, timeout=10, cwd=None):
+def run_command(cmd, timeout=10, cwd=None, debug):
     """
     Run a command with timeout.
 
     Returns:
-        (success: bool, duration: float)
+        (success: bool, duration: float, stdout: str, stderr: str)
     """
     start = time.time()
     try:
@@ -37,10 +37,20 @@ def run_command(cmd, timeout=10, cwd=None):
             text=True
         )
         duration = time.time() - start
-        return result.returncode == 0, duration
+
+        if debug and (result.stdout or result.stderr):
+            print("\n--- STDOUT ---")
+            print(result.stdout)
+            print("--- STDERR ---")
+            print(result.stderr)
+            print("--- END ---\n")
+
+        return result.returncode == 0, duration, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         duration = time.time() - start
-        return False, duration
+        if debug:
+            print("\n[Command timed out]\n")
+        return False, duration, "", ""
 
 
 def remove_llbc_files(cwd):
@@ -50,7 +60,7 @@ def remove_llbc_files(cwd):
         f.unlink()
 
 
-def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path):
+def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path, debug):
     """
     Test if an item can be extracted with Charon and Aeneas.
 
@@ -63,7 +73,7 @@ def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path):
 
     # Run Charon
     charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings -- -p {crate_name}"
-    charon_success, charon_duration = run_command(charon_cmd, timeout=10, cwd=cwd)
+    charon_success, charon_duration, _, _ = run_command(charon_cmd, timeout=10, cwd=cwd, debug=debug)
 
     if not charon_success:
         return False, "charon", charon_duration
@@ -71,7 +81,7 @@ def test_item_extraction(item_path, crate_name, cwd, charon_path, aeneas_path):
     # Run Aeneas
     llbc_file = f"{crate_name}.llbc"
     aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
-    aeneas_success, aeneas_duration = run_command(aeneas_cmd, timeout=10, cwd=cwd)
+    aeneas_success, aeneas_duration, _, _ = run_command(aeneas_cmd, timeout=10, cwd=cwd, debug=debug)
 
     total_duration = charon_duration + aeneas_duration
 
@@ -112,6 +122,11 @@ def main():
         "--output",
         help="Output file for results (JSON format)"
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Print stdout/stderr from charon and aeneas commands"
+    )
 
     args = parser.parse_args()
 
@@ -126,7 +141,7 @@ def main():
     # Step 1: Generate rustdoc JSON
     print("Step 1: Generating rustdoc JSON...")
     rustdoc_cmd = f"cargo +nightly rustdoc -p {args.crate_name} --all-features -- -Z unstable-options --output-format json"
-    success, duration = run_command(rustdoc_cmd, timeout=60, cwd=crate_dir)
+    success, duration, _, _ = run_command(rustdoc_cmd, timeout=60, cwd=crate_dir, debug=args.debug)
 
     if not success:
         print("Error: Failed to generate rustdoc JSON", file=sys.stderr)
@@ -170,7 +185,8 @@ def main():
             args.crate_name,
             crate_dir,
             args.charon,
-            args.aeneas
+            args.aeneas,
+            debug=args.debug
         )
 
         if success:
