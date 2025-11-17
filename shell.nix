@@ -15,6 +15,4 @@ pkgs.mkShell {
     gmp
   ];
   
-  shellHook = ''
-  '';
 }
