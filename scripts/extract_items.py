@@ -8,12 +8,17 @@ import json
 import sys
 from collections import defaultdict
 
-def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 extract_items.py <rustdoc_json_file>", file=sys.stderr)
-        sys.exit(1)
+def extract_items_from_json(json_path):
+    """
+    Extract all inherent functions, methods, and constants from rustdoc JSON.
 
-    with open(sys.argv[1], 'r') as f:
+    Args:
+        json_path: Path to the rustdoc JSON file
+
+    Returns:
+        List of item paths (e.g., "crate::module::Type::method")
+    """
+    with open(json_path, 'r') as f:
         data = json.load(f)
 
     index = data['index']
@@ -95,8 +100,15 @@ def main():
     # Sort and deduplicate
     results = sorted(set(results))
 
-    # Print results
-    for path in results:
+    return results
+
+def main():
+    if len(sys.argv) != 2:
+        print("Usage: python3 extract_items.py <rustdoc_json_file>", file=sys.stderr)
+        sys.exit(1)
+
+    items = extract_items_from_json(sys.argv[1])
+    for path in items:
         print(path)
 
 if __name__ == '__main__':
