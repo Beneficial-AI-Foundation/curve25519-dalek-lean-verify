@@ -6,4 +6,4 @@ TAG=$(cat DOCKER_TAG)
 
 # Run the docker image with bash
 echo "Running curve25519-dalek-verify:$TAG"
-docker run -it --rm curve25519-dalek-verify:$TAG /bin/bash
+docker run -it curve25519-dalek-verify:$TAG /bin/bash
