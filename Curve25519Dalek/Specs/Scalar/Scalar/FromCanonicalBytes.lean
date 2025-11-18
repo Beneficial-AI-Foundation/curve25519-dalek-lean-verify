@@ -13,19 +13,16 @@ Specification and proof for `Scalar::from_canonical_bytes`.
 
 This function constructs a scalar from canonical bytes.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
-## TODO
-- Complete proof
--/
+Source: curve25519-dalek/src/scalar.rs -/
 
 theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice) (h : a ≠ Choice.zero) : a = Choice.one := by
   obtain h' | h' := a.valid
-  · by_contra hc
-    simp_all [Choice.zero, Choice.one]
-    sorry
-  · simp_all [Choice.zero, Choice.one]
-    sorry
+  · exfalso
+    apply h
+    cases a
+    simpa [Choice.zero]
+  · cases a
+    simpa [Choice.one]
 
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
@@ -93,20 +90,18 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
     (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero) := by
   unfold from_canonical_bytes
-  progress as ⟨a, ha⟩
-  progress as ⟨e, he, he'⟩
-  progress as ⟨c, hc⟩
-  progress as ⟨d, hd⟩
+  progress as ⟨_, ha⟩
+  progress as ⟨_, he, _⟩
+  progress as ⟨_, _⟩
+  progress as ⟨_, hd⟩
   progress as ⟨f, hf⟩
-  progress as ⟨g, hg, hg'⟩
-  refine ⟨?_, ?_⟩
-  · intro hb
-    constructor
-    · rw [ha, high_bit_zero_of_lt_L' b hb] at he
-      simp_all; bv_tac
-    · simp_all
-  · intro hb
-    rw [hg']
+  progress as ⟨_, _, hg⟩
+  refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
+  · rw [ha, high_bit_zero_of_lt_L' b hb] at he
+    simp_all; bv_tac
+  · simp_all
+  · intro _
+    rw [hg]
     by_contra h
     have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
     grind
