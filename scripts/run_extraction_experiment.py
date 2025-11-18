@@ -158,8 +158,8 @@ def main():
     parser.add_argument(
         "--timeout",
         type=int,
-        default=10,
-        help="Timeout in seconds for charon and aeneas commands (default: 10)"
+        default=20,
+        help="Timeout in seconds for charon and aeneas commands (default: 20)"
     )
 
     args = parser.parse_args()
