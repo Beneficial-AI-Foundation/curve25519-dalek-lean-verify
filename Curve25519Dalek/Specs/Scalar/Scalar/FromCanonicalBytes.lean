@@ -5,6 +5,7 @@ Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
 
 /-! # Spec Theorem for `Scalar::from_canonical_bytes`
 
@@ -20,6 +21,28 @@ This function constructs a scalar from canonical bytes.
 
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
+
+/-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
+must be 0. -/
+theorem high_bit_zero_of_lt_255 (b : Array U8 32#usize) (h : U8x32_as_Nat b < 2 ^ 255) :
+    (b[31]!).val >>> 7 = 0 := by
+  by_contra!
+  have : 2 ^ 7 ≤ b[31]!.val := by omega
+  have : 2 ^ 255 ≤ U8x32_as_Nat b := by
+    unfold U8x32_as_Nat
+    have : ∑ i ∈ Finset.range 32, 2^(8*i) * (b[i]!).val =
+        ∑ i ∈ Finset.range 31, 2^(8*i) * (b[i]!).val + 2^(8*31) * (b[31]!).val := by
+      rw [Finset.sum_range_succ]
+    grind
+  omega
+
+/-- If a 32-byte array represents a value less than `L`, then the high bit (bit 7) of byte 31
+must be 0. -/
+theorem high_bit_zero_of_lt_L (b : Array U8 32#usize) (h : U8x32_as_Nat b < L) :
+    (b[31]!).val >>> 7 = 0 := by
+  refine high_bit_zero_of_lt_255 b ?_
+  have : L ≤ 2 ^ 255 := by decide
+  grind
 
 /-
 natural language description:
@@ -50,11 +73,25 @@ natural language specs:
 -/
 @[progress]
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
-    ∃ s,
-    from_canonical_bytes b = ok s ∧
+    ∃ s, from_canonical_bytes b = ok s ∧
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
-    (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero)
-    := by
+    (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero) := by
+  unfold from_canonical_bytes
+  progress
+  progress
+  progress
+  progress
+  progress
+  progress
+  refine ⟨?_, ?_⟩
+  · intro hb
+    constructor
+    ·
+      sorry
+    ·
+      sorry
+
+
   sorry
 
 end curve25519_dalek.scalar.Scalar
