@@ -43,6 +43,14 @@ theorem high_bit_zero_of_lt_L (b : Array U8 32#usize) (h : U8x32_as_Nat b < L) :
   refine high_bit_zero_of_lt_255 b ?_
   have : L ≤ 2 ^ 255 := by decide
   grind
+/-- If a 32-byte array represents a value less than `L`, then the high bit (bit 7) of byte 31
+must be 0. -/
+
+theorem high_bit_zero_of_lt_L' (b : Array U8 32#usize) (h : U8x32_as_Nat b < L) :
+    ((b : List U8)[31]!).val >>> 7 = 0 := by
+  have : L ≤ 2 ^ 255 := by decide
+  have := high_bit_zero_of_lt_255 b (show U8x32_as_Nat b < 2 ^ 255 by grind )
+  simp_all
 
 /-
 natural language description:
@@ -77,21 +85,22 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
     (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero) := by
   unfold from_canonical_bytes
-  progress
-  progress
-  progress
-  progress
-  progress
-  progress
+  progress as ⟨a, ha⟩
+  progress as ⟨e, he, he'⟩
+  progress as ⟨c, hc⟩
+  progress as ⟨d, hd⟩
+  progress as ⟨f, hf⟩
+  progress as ⟨g, hg, hg'⟩
   refine ⟨?_, ?_⟩
   · intro hb
     constructor
-    ·
-      sorry
-    ·
-      sorry
+    · rw [ha, high_bit_zero_of_lt_L' b hb] at he
+      simp_all; bv_tac
+    · simp_all
+  · intro hb
 
+    have := hd.mpr
 
-  sorry
+    sorry
 
 end curve25519_dalek.scalar.Scalar
