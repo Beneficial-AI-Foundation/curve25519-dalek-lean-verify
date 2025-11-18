@@ -73,7 +73,14 @@ def remove_llbc_files(cwd):
         f.unlink()
 
 
-def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path, aeneas_path, timeout, debug):
+def remove_cargo_lock(target_dir):
+    """Remove cargo lock file to prevent 'waiting for file lock' issues."""
+    lock_file = Path(target_dir) / ".cargo-lock"
+    if lock_file.exists():
+        lock_file.unlink()
+
+
+def test_item_extraction(item_path, crate_name, cwd, workspace_root, target_dir, charon_path, aeneas_path, timeout, debug):
     """
     Test if an item can be extracted with Charon and Aeneas.
 
@@ -83,6 +90,9 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     """
     # Remove old LLBC files (in workspace root where charon generates them)
     remove_llbc_files(workspace_root)
+
+    # Remove cargo lock file to prevent lock issues from previous killed processes
+    remove_cargo_lock(target_dir)
 
     # Run Charon (from crate directory)
     charon_cmd = f"RUST_BACKTRACE=1 {charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
@@ -236,6 +246,7 @@ def main():
             crate_name,
             crate_dir,
             workspace_root,
+            target_dir,
             args.charon,
             args.aeneas,
             args.timeout,
