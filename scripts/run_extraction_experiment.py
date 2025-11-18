@@ -85,7 +85,7 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     remove_llbc_files(workspace_root)
 
     # Run Charon (from crate directory)
-    charon_cmd = f"{charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
+    charon_cmd = f"RUST_BACKTRACE=1 {charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
     charon_success, charon_duration, charon_exit_code, charon_timed_out, _, _ = run_command(charon_cmd, timeout, cwd, debug)
 
     if not charon_success:
@@ -99,7 +99,7 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
 
     # Run Aeneas (from workspace root where .llbc file is)
     llbc_file = f"{crate_name.replace('-', '_')}.llbc"
-    aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
+    aeneas_cmd = f"{aeneas_path} -log-debug -backend lean -split-files {llbc_file}"
     aeneas_success, aeneas_duration, aeneas_exit_code, aeneas_timed_out, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
 
     if not aeneas_success:
