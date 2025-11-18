@@ -109,7 +109,7 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, target_dir,
 
     # Run Aeneas (from workspace root where .llbc file is)
     llbc_file = f"{crate_name.replace('-', '_')}.llbc"
-    aeneas_cmd = f"{aeneas_path} -log-debug -backend lean -split-files {llbc_file}"
+    aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
     aeneas_success, aeneas_duration, aeneas_exit_code, aeneas_timed_out, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
 
     if not aeneas_success:
