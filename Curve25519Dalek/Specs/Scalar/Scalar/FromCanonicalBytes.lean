@@ -68,10 +68,6 @@ natural language description:
       If this condition is true, then the Scalar s is returned,
       otherwise None is returned.
 
-      Note: Likely for efficiency reasons, the implementation also checks whether the most significant bit
-      (bit with index 255) is 0, but this is redundant since any canonical scalar (< L ≈ 2^252) automatically has
-      bits 253-255 equal to 0.
-
 natural language specs:
 
     • If u8x32_to_nat(b) < \ell \then s = Scalar{b} else s = None
@@ -88,7 +84,7 @@ natural language specs:
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     ∃ s, from_canonical_bytes b = ok s ∧
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
-    (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero) := by
+    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) := by
   unfold from_canonical_bytes
   progress as ⟨_, ha⟩
   progress as ⟨_, he, _⟩
