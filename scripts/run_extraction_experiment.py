@@ -47,11 +47,23 @@ def run_command(cmd, timeout, cwd, debug):
             print("--- END ---\n")
 
         return result.returncode == 0, duration, result.returncode, False, result.stdout, result.stderr
-    except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired as e:
         duration = time.time() - start
+        stdout = e.stdout.decode('utf-8') if e.stdout else ""
+        stderr = e.stderr.decode('utf-8') if e.stderr else ""
+
         if debug:
-            print("\n[Command timed out]\n")
-        return False, duration, None, True, "", ""
+            print("\n[Command timed out]")
+            if stdout or stderr:
+                print("--- STDOUT (before timeout) ---")
+                print(stdout)
+                print("--- STDERR (before timeout) ---")
+                print(stderr)
+                print("--- END ---\n")
+            else:
+                print()
+
+        return False, duration, None, True, stdout, stderr
 
 
 def remove_llbc_files(cwd):
