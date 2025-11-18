@@ -19,6 +19,14 @@ This function constructs a scalar from canonical bytes.
 - Complete proof
 -/
 
+theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice) (h : a ≠ Choice.zero) : a = Choice.one := by
+  obtain h' | h' := a.valid
+  · by_contra hc
+    simp_all [Choice.zero, Choice.one]
+    sorry
+  · simp_all [Choice.zero, Choice.one]
+    sorry
+
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
 
@@ -99,10 +107,8 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     · simp_all
   · intro hb
     rw [hg']
-    -- use hd together with hb to show that d ≠ Choice.one
-    -- use hf to show that  f ≠ Choice.one
-    -- consequently f = Choice.zero
-
-    sorry
+    by_contra h
+    have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
+    grind
 
 end curve25519_dalek.scalar.Scalar
