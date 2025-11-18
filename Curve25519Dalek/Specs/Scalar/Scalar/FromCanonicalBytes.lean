@@ -98,8 +98,10 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
       simp_all; bv_tac
     · simp_all
   · intro hb
-
-    have := hd.mpr
+    rw [hg']
+    -- use hd together with hb to show that d ≠ Choice.one
+    -- use hf to show that  f ≠ Choice.one
+    -- consequently f = Choice.zero
 
     sorry
 
