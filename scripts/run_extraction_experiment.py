@@ -84,6 +84,10 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     # Remove old LLBC files (in workspace root where charon generates them)
     remove_llbc_files(workspace_root)
 
+    # Run cargo clean to clear build artifacts and lock files
+    clean_cmd = "cargo clean"
+    run_command(clean_cmd, 30, cwd, False)  # Don't print output unless debug
+
     # Run Charon (from crate directory)
     charon_cmd = f"RUST_BACKTRACE=1 {charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
     charon_success, charon_duration, charon_exit_code, charon_timed_out, _, _ = run_command(charon_cmd, timeout, cwd, debug)
