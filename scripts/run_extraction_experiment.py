@@ -12,6 +12,7 @@ This script:
 import argparse
 import json
 import os
+import signal
 import subprocess
 import sys
 import time
@@ -22,7 +23,7 @@ from extract_items import extract_items_from_json
 
 def run_command(cmd, timeout, cwd, debug):
     """
-    Run a command with timeout.
+    Run a command with timeout, properly killing child processes on timeout.
 
     Returns:
         (success: bool, duration: float, exit_code: int|None, timed_out: bool, stdout: str, stderr: str)
@@ -30,31 +31,50 @@ def run_command(cmd, timeout, cwd, debug):
     """
     start = time.time()
     try:
-        result = subprocess.run(
+        # Use Popen with start_new_session=True to properly handle child processes
+        p = subprocess.Popen(
             cmd,
             shell=True,
             cwd=cwd,
-            timeout=timeout,
-            capture_output=True,
-            text=True
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            start_new_session=True
         )
+
+        # Wait for completion with timeout
+        stdout, stderr = p.communicate(timeout=timeout)
         duration = time.time() - start
 
-        if debug and (result.stdout or result.stderr):
+        if debug and (stdout or stderr):
             print("\n--- STDOUT ---")
-            print(result.stdout)
+            print(stdout)
             print("--- STDERR ---")
-            print(result.stderr)
+            print(stderr)
             print("--- END ---\n")
 
-        return result.returncode == 0, duration, result.returncode, False, result.stdout, result.stderr
-    except subprocess.TimeoutExpired as e:
+        return p.returncode == 0, duration, p.returncode, False, stdout, stderr
+    except subprocess.TimeoutExpired:
         duration = time.time() - start
-        stdout = e.stdout.decode('utf-8') if e.stdout else ""
-        stderr = e.stderr.decode('utf-8') if e.stderr else ""
 
+        # Kill the whole process group to ensure all children are terminated
         if debug:
             print("\n[Command timed out]")
+            print("Terminating the whole process group...", file=sys.stderr)
+
+        try:
+            os.killpg(os.getpgid(p.pid), signal.SIGTERM)
+        except ProcessLookupError:
+            # Process already died
+            pass
+
+        # Try to get any partial output
+        try:
+            stdout, stderr = p.communicate(timeout=1)
+        except:
+            stdout, stderr = "", ""
+
+        if debug:
             if stdout or stderr:
                 print("--- STDOUT (before timeout) ---")
                 print(stdout)
