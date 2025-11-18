@@ -15,6 +15,7 @@ import os
 import subprocess
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 from extract_items import extract_items_from_json
 
@@ -78,8 +79,9 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
     Test if an item can be extracted with Charon and Aeneas.
 
     Returns:
-        (success: bool, result_info: dict)
+        (success: bool, result_info: dict, logs: dict)
         result_info contains: stage, charon_duration, aeneas_duration, exit_code, timed_out
+        logs contains: charon_stdout, charon_stderr, aeneas_stdout, aeneas_stderr
     """
     # Remove old LLBC files (in workspace root where charon generates them)
     remove_llbc_files(workspace_root)
@@ -90,7 +92,14 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
 
     # Run Charon (from crate directory)
     charon_cmd = f"RUST_BACKTRACE=1 {charon_path} cargo --preset=aeneas --start-from '{item_path}' --error-on-warnings"
-    charon_success, charon_duration, charon_exit_code, charon_timed_out, _, _ = run_command(charon_cmd, timeout, cwd, debug)
+    charon_success, charon_duration, charon_exit_code, charon_timed_out, charon_stdout, charon_stderr = run_command(charon_cmd, timeout, cwd, debug)
+
+    logs = {
+        "charon_stdout": charon_stdout,
+        "charon_stderr": charon_stderr,
+        "aeneas_stdout": None,
+        "aeneas_stderr": None
+    }
 
     if not charon_success:
         return False, {
@@ -99,12 +108,15 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
             "aeneas_duration": None,
             "exit_code": charon_exit_code,
             "timed_out": charon_timed_out
-        }
+        }, logs
 
     # Run Aeneas (from workspace root where .llbc file is)
     llbc_file = f"{crate_name.replace('-', '_')}.llbc"
     aeneas_cmd = f"{aeneas_path} -backend lean -split-files {llbc_file}"
-    aeneas_success, aeneas_duration, aeneas_exit_code, aeneas_timed_out, _, _ = run_command(aeneas_cmd, timeout, workspace_root, debug)
+    aeneas_success, aeneas_duration, aeneas_exit_code, aeneas_timed_out, aeneas_stdout, aeneas_stderr = run_command(aeneas_cmd, timeout, workspace_root, debug)
+
+    logs["aeneas_stdout"] = aeneas_stdout
+    logs["aeneas_stderr"] = aeneas_stderr
 
     if not aeneas_success:
         return False, {
@@ -113,7 +125,7 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
             "aeneas_duration": aeneas_duration,
             "exit_code": aeneas_exit_code,
             "timed_out": aeneas_timed_out
-        }
+        }, logs
 
     return True, {
         "stage": "success",
@@ -121,7 +133,7 @@ def test_item_extraction(item_path, crate_name, cwd, workspace_root, charon_path
         "aeneas_duration": aeneas_duration,
         "exit_code": 0,
         "timed_out": False
-    }
+    }, logs
 
 
 def main():
@@ -231,11 +243,12 @@ def main():
 
     successes = []
     failures = []
+    all_logs = []  # Collect all logs for saving at the end
 
     for i, item in enumerate(items, 1):
         print(f"[{i}/{len(items)}] Testing {item}... ", end="", flush=True)
 
-        success, result_info = test_item_extraction(
+        success, result_info, logs = test_item_extraction(
             item,
             crate_name,
             crate_dir,
@@ -245,6 +258,14 @@ def main():
             args.timeout,
             args.debug
         )
+
+        # Store logs for this item
+        all_logs.append({
+            "item": item,
+            "success": success,
+            "result_info": result_info,
+            "logs": logs
+        })
 
         if success:
             charon_time = result_info["charon_duration"]
@@ -315,6 +336,16 @@ def main():
             json.dump(results, f, indent=2)
 
         print(f"Results saved to {args.output}")
+
+    # Save detailed logs with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_filename = f"extraction_logs_{crate_name}_{timestamp}.json"
+    log_path = workspace_root / log_filename
+
+    with open(log_path, 'w') as f:
+        json.dump(all_logs, f, indent=2)
+
+    print(f"Detailed logs saved to {log_path}")
 
 
 if __name__ == "__main__":
