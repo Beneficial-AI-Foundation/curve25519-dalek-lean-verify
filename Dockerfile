@@ -21,3 +21,13 @@ RUN opam init --disable-sandboxing
 RUN apt-get install -y libgmp-dev pkg-config
 
 RUN ./setup-aeneas.sh
+
+COPY scripts/extract_items.py .
+
+COPY scripts/run_extraction_experiment.py .
+
+RUN cp aeneas/bin/aeneas /usr/local/bin
+
+RUN cp aeneas/charon/bin/charon /usr/local/bin
+
+RUN cp aeneas/charon/bin/charon-driver /usr/local/bin
