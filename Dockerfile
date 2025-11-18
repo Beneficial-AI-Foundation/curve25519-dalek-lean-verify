@@ -31,3 +31,5 @@ RUN cp aeneas/bin/aeneas /usr/local/bin
 RUN cp aeneas/charon/bin/charon /usr/local/bin
 
 RUN cp aeneas/charon/bin/charon-driver /usr/local/bin
+
+RUN apt-get install -y protobuf-compiler
