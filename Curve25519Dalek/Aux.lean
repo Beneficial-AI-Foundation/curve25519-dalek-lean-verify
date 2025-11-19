@@ -55,3 +55,25 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
 
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
   sorry
+
+/-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
+must be 0. -/
+theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < 2 ^ 255) :
+    bytes.val[31]!.val >>> 7 = 0 := by
+  by_contra!
+  have : 2 ^ 7 ≤ bytes.val[31]!.val := by omega
+  have : 2 ^ 255 ≤ U8x32_as_Nat bytes := by
+    unfold U8x32_as_Nat
+    have : ∑ i ∈ Finset.range 32, 2^(8*i) * bytes.val[i]!.val =
+        ∑ i ∈ Finset.range 31, 2^(8*i) * bytes.val[i]!.val + 2^(8*31) * bytes.val[31]!.val := by
+      rw [Finset.sum_range_succ]
+    simp_all; grind
+  grind
+
+/-- If a 32-byte array represents a value less than `L`, then the high bit (bit 7) of byte 31
+must be 0. -/
+theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < L) :
+    bytes.val[31]!.val >>> 7 = 0 := by
+  refine high_bit_zero_of_lt_255 bytes ?_
+  have : L ≤ 2 ^ 255 := by decide
+  grind
