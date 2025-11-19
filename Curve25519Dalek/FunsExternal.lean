@@ -1,6 +1,8 @@
 -- [curve25519_dalek]: external functions.
 import Aeneas
 import Curve25519Dalek.Types
+import Mathlib
+
 open Aeneas.Std Result
 
 namespace curve25519_dalek
@@ -24,6 +26,15 @@ def subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand
     ok Choice.zero
   else
     ok Choice.one
+
+/-- **Spec theorem for `subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand`**:
+- No panic (always returns successfully)
+- Returns `Choice.one` if and only if both inputs are `Choice.one`
+-/
+@[progress]
+axiom subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand_spec (a b : subtle.Choice) :
+    ∃ c, subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand a b = ok c ∧
+    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one)
 
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
@@ -117,6 +128,15 @@ def subtle.ConstantTimeEqU8.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
+/-- **Spec axiom for `subtle.ConstantTimeEqU8.ct_eq`**:
+- No panic (always returns successfully)
+- Returns `Choice.one` if and only if the two U8 values are equal
+-/
+@[progress]
+axiom subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
+  ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
+  (c = Choice.one ↔ a = b)
+
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
 Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_select]
 Conditional select: returns a if choice(0), b if choice(1) -/
@@ -145,6 +165,16 @@ Create a new CtOption with a value and a Choice indicating if it's Some -/
 def subtle.CtOption.new
   {T : Type} (value : T) (is_some : subtle.Choice) : Result (subtle.CtOption T) :=
   ok { value := value, is_some := is_some }
+
+/-- **Spec axiom for `subtle.CtOption.new`**:
+- No panic (always returns successfully)
+- Returns a CtOption with the given value and is_some flag
+- The returned CtOption's fields match the inputs exactly
+-/
+@[progress]
+axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
+  ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
+  opt.value = value ∧ opt.is_some = is_some
 
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 630:4-630:45
