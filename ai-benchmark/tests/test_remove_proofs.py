@@ -20,7 +20,7 @@ def test_remove_proofs(test_name):
     expected_content = expected_path.read_text()
 
     # Apply the transformation
-    actual_output, _ = remove_proofs(input_content)
+    actual_output, _ = remove_proofs(input_content, task_counter=1)
 
     # Compare the result with expected
     assert actual_output == expected_content, (
