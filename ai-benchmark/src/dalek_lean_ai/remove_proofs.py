@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 
 
-def remove_proofs(content: str, task_counter: int = 1) -> tuple[str, int]:
+def remove_proofs(content: str, task_counter: int) -> tuple[str, int]:
     """
     Replace all proofs in Lean theorems with 'sorry' wrapped in task markers.
 
@@ -40,16 +40,13 @@ def remove_proofs(content: str, task_counter: int = 1) -> tuple[str, int]:
 
         # Check if this line contains ':= by' and we're in a theorem
         if ':= by' in line and in_theorem:
-            # Split the line at ':= by' and get the indentation
+            # Split the line at ':= by'
             before_proof = line.split(':= by')[0]
-            # Determine the indentation level (add 2 spaces for the proof body)
-            indent = len(before_proof) - len(before_proof.lstrip())
-            proof_indent = ' ' * (indent + 2)
 
             result.append(before_proof + ':= by')
-            result.append(f'{proof_indent}-- BEGIN task {task_counter}')
-            result.append(f'{proof_indent}sorry')
-            result.append(f'{proof_indent}-- END task {task_counter}')
+            result.append(f'  -- BEGIN task {task_counter}')
+            result.append(f'  sorry')
+            result.append(f'  -- END task {task_counter}')
             task_counter += 1
             i += 1
             in_theorem = False  # Done processing this theorem
@@ -95,7 +92,7 @@ def remove_proofs(content: str, task_counter: int = 1) -> tuple[str, int]:
     return '\n'.join(result), task_counter
 
 
-def process_file(file_path: Path, in_place: bool = False, task_counter: int = 1) -> int:
+def process_file(file_path: Path, in_place: bool, task_counter: int) -> int:
     """
     Process a single Lean file.
 
