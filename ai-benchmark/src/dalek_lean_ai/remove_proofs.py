@@ -6,9 +6,9 @@ import re
 from pathlib import Path
 
 
-def remove_proofs(content: str) -> str:
+def remove_proofs(content: str, task_counter: int = 1) -> tuple[str, int]:
     """
-    Replace all proofs in Lean theorems with 'sorry'.
+    Replace all proofs in Lean theorems with 'sorry' wrapped in task markers.
 
     Only processes theorems (not lemmas, defs, etc.). Proofs are identified by
     'theorem' followed by ':= by', with content removed until either:
@@ -17,9 +17,10 @@ def remove_proofs(content: str) -> str:
 
     Args:
         content: The Lean file content as a string
+        task_counter: Starting task number for this file
 
     Returns:
-        The modified content with theorem proofs replaced by 'sorry'
+        A tuple of (modified content with theorem proofs replaced by numbered sorry, next task counter)
     """
     lines = content.split('\n')
     result = []
@@ -39,9 +40,17 @@ def remove_proofs(content: str) -> str:
 
         # Check if this line contains ':= by' and we're in a theorem
         if ':= by' in line and in_theorem:
-            # Split the line at ':= by'
+            # Split the line at ':= by' and get the indentation
             before_proof = line.split(':= by')[0]
-            result.append(before_proof + ':= by sorry')
+            # Determine the indentation level (add 2 spaces for the proof body)
+            indent = len(before_proof) - len(before_proof.lstrip())
+            proof_indent = ' ' * (indent + 2)
+
+            result.append(before_proof + ':= by')
+            result.append(f'{proof_indent}-- BEGIN task {task_counter}')
+            result.append(f'{proof_indent}sorry')
+            result.append(f'{proof_indent}-- END task {task_counter}')
+            task_counter += 1
             i += 1
             in_theorem = False  # Done processing this theorem
 
@@ -83,19 +92,23 @@ def remove_proofs(content: str) -> str:
             result.append(line)
             i += 1
 
-    return '\n'.join(result)
+    return '\n'.join(result), task_counter
 
 
-def process_file(file_path: Path, in_place: bool = False) -> None:
+def process_file(file_path: Path, in_place: bool = False, task_counter: int = 1) -> int:
     """
     Process a single Lean file.
 
     Args:
         file_path: Path to the Lean file
         in_place: If True, modify the file in place. Otherwise, print to stdout.
+        task_counter: Starting task number for this file
+
+    Returns:
+        The next task counter value
     """
     content = file_path.read_text()
-    modified_content = remove_proofs(content)
+    modified_content, next_counter = remove_proofs(content, task_counter)
 
     if in_place:
         if content != modified_content:
@@ -103,6 +116,8 @@ def process_file(file_path: Path, in_place: bool = False) -> None:
             print(f"Modified: {file_path}")
     else:
         print(modified_content)
+
+    return next_counter
 
 
 def main():
@@ -137,7 +152,11 @@ Examples:
 
     args = parser.parse_args()
 
-    for file_path in args.files:
+    # Sort files for deterministic ordering
+    sorted_files = sorted(args.files)
+
+    task_counter = 1
+    for file_path in sorted_files:
         if not file_path.exists():
             print(f"Error: File not found: {file_path}")
             continue
@@ -145,7 +164,7 @@ Examples:
         if not file_path.suffix == '.lean':
             print(f"Warning: {file_path} doesn't have .lean extension, processing anyway...")
 
-        process_file(file_path, args.in_place)
+        task_counter = process_file(file_path, args.in_place, task_counter)
 
 
 if __name__ == '__main__':

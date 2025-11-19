@@ -12,7 +12,10 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
       U64x5_slice_as_Nat b i + U64x5_slice_as_Nat difference' i +
       2 ^ (52 * 5) * (if borrow'.val.testBit 63 then 1 else 0) ∧
     (∀ j, j < 5 → difference'[j]!.val < 2 ^ 52)
-  := by sorry
+  := by
+    -- BEGIN task 1
+    sorry
+    -- END task 1
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Does not error and hence returns a result
@@ -23,4 +26,7 @@ theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
     (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
     ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result ≡ (Scalar52_as_Nat a - Scalar52_as_Nat b) [MOD L] := by sorry
+    Scalar52_as_Nat result ≡ (Scalar52_as_Nat a - Scalar52_as_Nat b) [MOD L] := by
+    -- BEGIN task 2
+    sorry
+    -- END task 2
