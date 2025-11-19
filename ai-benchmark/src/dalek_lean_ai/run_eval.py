@@ -1,9 +1,10 @@
+import re
 import subprocess
 from pathlib import Path
 
 from inspect_ai import Task, task
 from inspect_ai.agent import react
-from inspect_ai.tool import text_editor, tool
+from inspect_ai.tool import tool
 from inspect_ai.util import sandbox
 
 from dalek_lean_ai.dataset import build_dataset
@@ -74,6 +75,109 @@ def _get_prompt() -> str:
 
 
 @tool
+def view_file():
+    async def execute(file_path: str):
+        """View the contents of a Lean file in the project.
+
+        Args:
+            file_path: Path to the file relative to /workspace/curve25519-dalek-lean-verify.
+                      For example: "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean"
+
+        Returns:
+            The contents of the file.
+        """
+        # Validate the file path to prevent directory traversal
+        # Remove any leading slashes and resolve to ensure it's within the project
+        clean_path = file_path.lstrip("/")
+
+        # Check for directory traversal attempts
+        if ".." in clean_path or clean_path.startswith("/"):
+            return "Error: Invalid file path. Path must be relative and within the project directory."
+
+        # Only allow .lean files in Curve25519Dalek directory
+        if not clean_path.startswith("Curve25519Dalek/") or not clean_path.endswith(".lean"):
+            return "Error: Can only view .lean files in the Curve25519Dalek/ directory."
+
+        full_path = f"/workspace/curve25519-dalek-lean-verify/{clean_path}"
+
+        result = await sandbox().exec(["cat", full_path])
+        if result.success:
+            return result.stdout
+        else:
+            return f"Error reading file: {result.stderr}"
+
+    return execute
+
+
+@tool
+def submit_proof():
+    async def execute(task_id: int, proof: str):
+        """Submit a proof for a specific task by replacing the content between task anchors.
+
+        Args:
+            task_id: The task number to submit a proof for (from the task markers)
+            proof: The proof code to insert between the task anchors. Do NOT include
+                  the task anchor comments (-- BEGIN task N / -- END task N) in your proof.
+
+        Returns:
+            Success or error message.
+        """
+        # Check that the proof doesn't contain anchor comments
+        if "-- BEGIN task" in proof or "-- END task" in proof:
+            return "Error: Your proof contains task anchor comments. Please submit only the proof code without the anchor markers."
+
+        # Find all files with this task ID
+        find_result = await sandbox().exec(
+            ["bash", "-c", f"cd /workspace/curve25519-dalek-lean-verify && grep -r 'BEGIN task {task_id}' --include='*.lean' -l Curve25519Dalek/"],
+        )
+
+        if not find_result.success or not find_result.stdout.strip():
+            return f"Error: Could not find task {task_id} in any file."
+
+        # Should only be one file with this task ID
+        target_file = find_result.stdout.strip().split('\n')[0]
+        full_path = f"/workspace/curve25519-dalek-lean-verify/{target_file}"
+
+        # Read the current file contents
+        read_result = await sandbox().exec(["cat", full_path])
+        if not read_result.success:
+            return f"Error reading file: {read_result.stderr}"
+
+        file_contents = read_result.stdout
+
+        # Replace content between task anchors
+        pattern = re.compile(
+            rf'(  -- BEGIN task {task_id}\n)(.*?)(  -- END task {task_id})',
+            re.DOTALL
+        )
+
+        # Check if pattern exists
+        if not pattern.search(file_contents):
+            return f"Error: Could not find task {task_id} anchors in {target_file}"
+
+        # Replace the content, preserving the anchors
+        # Add indentation to the proof if it doesn't start with whitespace
+        indented_proof = proof
+        if proof and not proof[0].isspace():
+            indented_proof = '  ' + proof.replace('\n', '\n  ')
+
+        new_contents = pattern.sub(rf'\1{indented_proof}\n\3', file_contents)
+
+        # Write back to the file
+        write_result = await sandbox().exec(
+            ["bash", "-c", f"cat > {full_path}"],
+            input=new_contents
+        )
+
+        if not write_result.success:
+            return f"Error writing file: {write_result.stderr}"
+
+        return f"Successfully submitted proof for task {task_id} in {target_file}. Use lake_build to verify it compiles."
+
+    return execute
+
+
+@tool
 def lake_build():
     async def execute():
         """Run lake build to compile the Lean project and check for errors.
@@ -107,7 +211,7 @@ def evaluate_lean_fixing():
         description="Expert Lean theorem prover",
         prompt=_get_prompt(),
         # TODO Should the timeout be larger?
-        tools=[lake_build(), text_editor()],
+        tools=[view_file(), submit_proof(), lake_build()],
         attempts=1000,
     )
 

@@ -1,3 +1,5 @@
+import re
+
 from inspect_ai.scorer import Score, accuracy, scorer
 from inspect_ai.util import sandbox
 
@@ -5,13 +7,48 @@ from inspect_ai.util import sandbox
 @scorer(metrics=[accuracy()])
 def lean_proof_scorer():
     async def score(state, target):
-        # Get the target file from the sample metadata
+        # Get the task_id and target file from the sample metadata
+        task_id = state.metadata.get("task_id")
         target_file = state.metadata.get("target_file")
+
+        if not task_id:
+            return Score(value=0, explanation="No task_id specified")
         if not target_file:
             return Score(value=0, explanation="No target file specified")
 
+        # Read the file to check the task region
+        full_path = f"/workspace/curve25519-dalek-lean-verify/{target_file}"
+        file_result = await sandbox().exec(["cat", full_path])
+        if not file_result.success:
+            return Score(value=0, explanation=f"Could not read file {target_file}")
+
+        file_contents = file_result.stdout
+
+        # Extract the content between the task anchors
+        pattern = re.compile(
+            rf'  -- BEGIN task {task_id}\n(.*?)  -- END task {task_id}',
+            re.DOTALL
+        )
+        match = pattern.search(file_contents)
+
+        if not match:
+            return Score(value=0, explanation=f"Could not find task {task_id} anchors in {target_file}")
+
+        task_content = match.group(1)
+
+        # Check for cheating: no sorry, no axiom, no task anchors within the proof
+        if "sorry" in task_content:
+            return Score(value=0, explanation=f"Task {task_id} still contains 'sorry'")
+        if "axiom" in task_content:
+            return Score(value=0, explanation=f"Task {task_id} contains 'axiom' (cheating)")
+        if "-- BEGIN task" in task_content or "-- END task" in task_content:
+            return Score(value=0, explanation=f"Task {task_id} contains task anchor comments (cheating)")
+
         # Run lake build to check if proofs are valid
-        build_result = await sandbox().exec(["lake", "build"])
+        build_result = await sandbox().exec(
+            ["lake", "build"],
+            cwd="/workspace/curve25519-dalek-lean-verify"
+        )
         if not build_result.success:
             error_output = ""
             if build_result.stdout:
@@ -22,21 +59,9 @@ def lean_proof_scorer():
                 value=0, explanation=f"lake build failed:\n{error_output}"
             )
 
-        # Check if the specific file still contains sorry
-        check_sorries = await sandbox().exec(["grep", "-w", "sorry", target_file])
-        has_sorries = check_sorries.success  # grep returns success if it finds a match
-        check_axioms = await sandbox().exec(["grep", "-w", "axiom", target_file])
-        has_axioms = check_axioms.success
-
-        if has_sorries:
-            return Score(value=0, explanation=f"The file {target_file} still contains sorries")
-        if has_axioms:
-            return Score(value=0, explanation=f"The file {target_file} contains axioms")
-
-        # Read the file contents to include in the success message
-        file_contents_result = await sandbox().exec(["cat", target_file])
-        file_contents = file_contents_result.stdout if file_contents_result.success else "Could not read file"
-
-        return Score(value=1, explanation=f"All proofs are valid. File contents:\n{file_contents}")
+        return Score(
+            value=1,
+            explanation=f"Task {task_id} completed successfully! Proof content:\n{task_content}"
+        )
 
     return score
