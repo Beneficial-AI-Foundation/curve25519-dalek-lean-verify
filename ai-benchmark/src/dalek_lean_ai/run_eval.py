@@ -79,6 +79,9 @@ def view_file():
     async def execute(abs_file_path: str):
         """View the contents of a Lean file in the project.
 
+        Args:
+            abs_file_path: Absolute file path to the Lean file
+
         Returns:
             The contents of the file.
         """
