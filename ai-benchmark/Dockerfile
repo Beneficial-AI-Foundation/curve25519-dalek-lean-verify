@@ -14,10 +14,11 @@ RUN python3 -m venv /opt/inspect_tool_support && \
 # TODO Maybe instead start with aisiuk/inspect-tool-support image?
 
 ENV PATH="$PATH:/root/.elan/bin/"
-RUN echo "Needs repo after [2025-11-07 Fri 16:05]" # Update this to invalidate next line's cache
+RUN echo "Needs repo after [2025-11-07 Fri 16:05]" # NOTE: Update this to invalidate next line's cache
 RUN git clone https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify
 WORKDIR /workspace/curve25519-dalek-lean-verify
 # From mul_internal_sorry2
+# NOTE: When you change this commit, please bump the date in DOCKER_IMAGE_TAG
 RUN git checkout 40b1b91007605ee4de3ebdaaa78d5a193a3b34e9
 COPY src/dalek_lean_ai/remove_proofs.py /tmp/remove_proofs.py
 RUN find Curve25519Dalek/ -name '*.lean' -exec python3 /tmp/remove_proofs.py -i {} +
