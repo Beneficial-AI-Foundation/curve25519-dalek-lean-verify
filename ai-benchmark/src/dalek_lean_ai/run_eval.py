@@ -93,12 +93,12 @@ def view_file():
 
 
 @tool
-def submit_proof():
+def insert_proof():
     async def execute(task_id: int, proof: str):
-        """Submit a proof for a specific task by replacing the content between task anchors.
+        """Insert a proof for a specific task by replacing the content between task anchors.
 
         Args:
-            task_id: The task number to submit a proof for (from the task markers)
+            task_id: The task number to insert a proof for (from the task markers)
             proof: The proof code to insert between the task anchors. Do NOT include
                   the task anchor comments (-- BEGIN task N / -- END task N) in your proof.
 
@@ -194,7 +194,7 @@ def evaluate_lean_fixing():
         description="Expert Lean theorem prover",
         prompt=_get_prompt(),
         # TODO Should the timeout be larger?
-        tools=[view_file(), submit_proof(), lake_build()],
+        tools=[view_file(), insert_proof(), lake_build()],
         attempts=1000,
     )
 
