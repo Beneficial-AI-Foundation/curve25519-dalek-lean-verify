@@ -76,31 +76,14 @@ def _get_prompt() -> str:
 
 @tool
 def view_file():
-    async def execute(file_path: str):
+    async def execute(abs_file_path: str):
         """View the contents of a Lean file in the project.
-
-        Args:
-            file_path: Path to the file relative to /workspace/curve25519-dalek-lean-verify.
-                      For example: "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean"
 
         Returns:
             The contents of the file.
         """
-        # Validate the file path to prevent directory traversal
-        # Remove any leading slashes and resolve to ensure it's within the project
-        clean_path = file_path.lstrip("/")
 
-        # Check for directory traversal attempts
-        if ".." in clean_path or clean_path.startswith("/"):
-            return "Error: Invalid file path. Path must be relative and within the project directory."
-
-        # Only allow .lean files in Curve25519Dalek directory
-        if not clean_path.startswith("Curve25519Dalek/") or not clean_path.endswith(".lean"):
-            return "Error: Can only view .lean files in the Curve25519Dalek/ directory."
-
-        full_path = f"/workspace/curve25519-dalek-lean-verify/{clean_path}"
-
-        result = await sandbox().exec(["cat", full_path])
+        result = await sandbox().exec(["cat", abs_file_path])
         if result.success:
             return result.stdout
         else:
