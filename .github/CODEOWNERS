@@ -1,7 +1,7 @@
 # This file defines code owners for the repository
 # These users will be automatically requested for review when someone opens a pull request
 
-# Global owner for all files in the repository
+# Default owner for files in the repository
 * @oliver-butterley
 
-/ai-benchmark/ @TheodoreEhrenborg @oliver-butterley
+/ai-benchmark/ @TheodoreEhrenborg
