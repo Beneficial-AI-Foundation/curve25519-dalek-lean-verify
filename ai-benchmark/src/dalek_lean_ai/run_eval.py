@@ -76,17 +76,37 @@ def _get_prompt() -> str:
 
 @tool
 def view_file():
-    async def execute(abs_file_path: str):
-        """View the contents of a Lean file in the project.
+    async def execute(abs_file_path: str, lines: list[int] | None = None):
+        """View the contents of a file or directory in the project.
 
         Args:
-            abs_file_path: Absolute file path to the Lean file
+            abs_file_path: Absolute file path to view
+            lines: Optional list of two integers [start, end] to show only lines start through end (inclusive).
+                  Line numbers are 1-indexed. Example: [10, 19] shows lines 10-19.
 
         Returns:
-            The contents of the file.
+            The contents of the file with line numbers, or directory listing.
         """
+        # Check if it's a directory
+        check_dir = await sandbox().exec(["test", "-d", abs_file_path])
+        if check_dir.success:
+            # It's a directory, run ls
+            result = await sandbox().exec(["ls", "-la", abs_file_path])
+            if result.success:
+                return result.stdout
+            else:
+                return f"Error listing directory: {result.stderr}"
 
-        result = await sandbox().exec(["cat", abs_file_path])
+        # It's a file, use cat -n to show line numbers
+        if lines is not None and len(lines) == 2:
+            start, end = lines
+            # Use sed to extract specific line range
+            result = await sandbox().exec(
+                ["bash", "-c", f"cat -n {abs_file_path} | sed -n '{start},{end}p'"]
+            )
+        else:
+            result = await sandbox().exec(["cat", "-n", abs_file_path])
+
         if result.success:
             return result.stdout
         else:
@@ -131,7 +151,7 @@ def insert_proof():
 
         file_contents = read_result.stdout
 
-        # Replace content between task anchors
+        # Replace content between task anchors (replace everything between them)
         pattern = re.compile(
             rf'(  -- BEGIN task {task_id}\n)(.*?)(  -- END task {task_id})',
             re.DOTALL
@@ -141,13 +161,8 @@ def insert_proof():
         if not pattern.search(file_contents):
             return f"Error: Could not find task {task_id} anchors in {target_file}"
 
-        # Replace the content, preserving the anchors
-        # Add indentation to the proof if it doesn't start with whitespace
-        indented_proof = proof
-        if proof and not proof[0].isspace():
-            indented_proof = '  ' + proof.replace('\n', '\n  ')
-
-        new_contents = pattern.sub(rf'\1{indented_proof}\n\3', file_contents)
+        # Replace the content, preserving the anchors and letting LLM handle indentation
+        new_contents = pattern.sub(rf'\g<1>{proof}\n\g<3>', file_contents)
 
         # Write back to the file
         write_result = await sandbox().exec(
