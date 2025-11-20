@@ -6,7 +6,6 @@ Authors: Markus Dablander, Alok Beniwal
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
-import Curve25519Dalek.Tactics
 
 /-! # Spec Theorem for `FieldElement51::negate`
 
@@ -14,7 +13,7 @@ Specification and proof for `FieldElement51::negate`.
 
 This function computes the additive inverse (negation) of a field element in 𝔽_p where p = 2^255 - 19.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
@@ -42,17 +41,19 @@ Natural language specs:
 - Requires that input limbs of r are bounded to avoid underflow:
   - Limb 0 must be ≤ 36028797018963664
   - Limbs 1-4 must be ≤ 36028797018963952
-  To make the theorem more easily readable and provable, we
--/
+  To make the theorem more readable we use a single bound for all limbs. -/
 @[progress]
 theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     ∃ r_inv, negate r = ok r_inv ∧
-    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0
-    := by
-    unfold negate
-    progress*
-    all_goals try expand h_bounds with 5; simp_all; grind
-    have : 16 * p =
+    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 := by
+  unfold negate
+  progress*
+  · have := h_bounds 0 (by simp); simp_all; grind
+  · have := h_bounds 1 (by simp); simp_all; grind
+  · have := h_bounds 2 (by simp); simp_all; grind
+  · have := h_bounds 3 (by simp); simp_all; grind
+  · have := h_bounds 4 (by simp); simp_all; grind
+  · have : 16 * p =
       36028797018963664 * 2^0 +
       36028797018963952 * 2^51 +
       36028797018963952 * 2^102 +
