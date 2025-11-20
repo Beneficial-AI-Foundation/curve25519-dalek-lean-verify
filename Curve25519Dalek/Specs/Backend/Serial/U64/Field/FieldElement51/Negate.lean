@@ -6,7 +6,6 @@ Authors: Markus Dablander, Alok Singh
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
-import Curve25519Dalek.Tactics
 
 /-! # Spec Theorem for `FieldElement51::negate`
 
@@ -45,13 +44,17 @@ Natural language specs:
   - Limbs 1-4 must be ≤ 36028797018963952
   To make the theorem more readable we use a single bound for all limbs. -/
 @[progress]
-theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i < 5, r[i]!.val < 2 ^ 54) :
+theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
     ∃ r_inv, negate r = ok r_inv ∧
     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
     (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
   unfold negate
   progress*
-  all_goals try expand h_bounds with 5; simp_all; grind
+  · have := h 0 (by simp); simp_all; grind
+  · have := h 1 (by simp); simp_all; grind
+  · have := h 2 (by simp); simp_all; grind
+  · have := h 3 (by simp); simp_all; grind
+  · have := h 4 (by simp); simp_all; grind
   constructor
   · have : 16 * p =
       36028797018963664 * 2^0 +
