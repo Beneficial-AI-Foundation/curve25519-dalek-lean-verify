@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alok Beniwal
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -15,9 +15,6 @@ Specification and proof for `FieldElement51::negate`.
 This function computes the additive inverse (negation) of a field element in 𝔽_p where p = 2^255 - 19.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -54,78 +51,14 @@ theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).va
     := by
     unfold negate
     progress*
-    /- this one is because otherwise we have a chain of similar assertions and we wanna program them away, hence the tactic
-
-    but a model super super human at term mode, my god.
-
-    idee: eliminate the 'code' into math, then simplify math, solve, then loop math into code by improving it
-
-
-
-     aeneas's internal comments look like;
-
-     `v_✝¹ : [> let i6 ← Array.index_usize r 3#usize <]  `
-
-    the `try` is so the similar ones can be cleared and the rest of the goals fall out: this is how tactic mode is imperative
-
-
-
-
-    -/
-    subst_vars
-    -- Discharge bound checks
-    all_goals try {
-      expand h_bounds with 5
-      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-        getElem!_pos, Nat.reducePow, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
-        ge_iff_le]
-      first | omega | scalar_tac | grind
-    }
-
-    -- Expand definitions to reveal the arithmetic structure
-    unfold Nat.ModEq at *
-
-    -- Use reduction property: sum neg % p = sum pre_neg % p
-    rw [Nat.add_mod]
-    rw [← neg_post_2]
-    rw [← Nat.add_mod]
-    clear neg_post_2
-
-    unfold Field51_as_Nat
-    simp only [Finset.sum_range_succ, Finset.sum_range_zero, Nat.mul_zero, Nat.pow_zero, mul_one]
-
-    -- Reduce Array.make indices
-    have id0 : (Array.make 5#usize [i1, i3, i5, i7, i9])[0]! = i1 := by rfl
-    have id1 : (Array.make 5#usize [i1, i3, i5, i7, i9])[1]! = i3 := by rfl
-    have id2 : (Array.make 5#usize [i1, i3, i5, i7, i9])[2]! = i5 := by rfl
-    have id3 : (Array.make 5#usize [i1, i3, i5, i7, i9])[3]! = i7 := by rfl
-    have id4 : (Array.make 5#usize [i1, i3, i5, i7, i9])[4]! = i9 := by rfl
-    rw [id0, id1, id2, id3, id4]
-
-    -- Substitute variables to get the arithmetic expression
-    simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-      getElem!_pos, Nat.reducePow, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
-      one_mul, zero_add, Nat.reduceMul]
-
-    -- Prove the sum equals 16 * p
-    trans (16 * p) % p
-    · congr 1
-      simp only [p, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
-      omega
-    · simp only [Nat.mul_mod_left]
-
-
-/-! lean mod support is meh-/
-/-
-i want it to support verso
-
-assembly should be easy when semantics
-
-what are machines with hardware level good semantics
-
-
-
--/
-
+    all_goals try expand h_bounds with 5; simp_all; grind
+    have : 16 * p =
+      36028797018963664 * 2^0 +
+      36028797018963952 * 2^51 +
+      36028797018963952 * 2^102 +
+      36028797018963952 * 2^153 +
+      36028797018963952 * 2^204 := by simp [p]
+    simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
+    grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
