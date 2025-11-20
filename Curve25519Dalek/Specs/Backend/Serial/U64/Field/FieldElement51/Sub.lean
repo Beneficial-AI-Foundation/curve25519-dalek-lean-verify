@@ -15,7 +15,7 @@ Specification and proof for `FieldElement51::sub`.
 This function performs field element subtraction. To avoid underflow, a multiple
 of p is added.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 -/
 
@@ -58,11 +58,11 @@ natural language specs:
 -/
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
-    (h_bounds_a : ∀ i, i < 5 → (a[i]!).val < 2 ^ 63)
-    (h_bounds_b : ∀ i, i < 5 → (b[i]!).val < 2 ^ 54) :
+    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
+    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
     ∃ d,
     sub a b = ok d ∧
-    (∀ i : Nat, i < 5 → (d[i]!).val < 2 ^ 52) ∧
+    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
     (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
   unfold sub
   set k := 36028797018963664#u64 with hk
@@ -263,11 +263,6 @@ theorem sub_spec (a b : Array U64 5#usize)
     have final := Nat.ModEq.add_left asum kmod0
     simp at final
     exact final
-  refine ⟨?_, h_mod_eq⟩
-  intro i hi
-  have h_reduce := hreduce_bounds i hi
-  have : 2^51 + (2^13 - 1) * 19 < 2 ^ 52 := by norm_num
-  omega
-
+  grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
