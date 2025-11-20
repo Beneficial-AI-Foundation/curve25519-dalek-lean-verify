@@ -19,7 +19,7 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign,curve2
 curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L389-L391,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L360-L385,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean,extracted,specified,Brackets required in extracted Lean,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_limbs,curve25519-dalek/src/backend/serial/u64/field.rs,L238-L240,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
-curve25519_dalek::backend::serial::u64::field::FieldElement51::negate,curve25519-dalek/src/backend/serial/u64/field.rs,L256-L262,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean,extracted,specified,,
+curve25519_dalek::backend::serial::u64::field::FieldElement51::negate,curve25519-dalek/src/backend/serial/u64/field.rs,L256-L262,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::ONE,curve25519-dalek/src/backend/serial/u64/field.rs,L245-L245,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::ZERO,curve25519-dalek/src/backend/serial/u64/field.rs,L263-L263,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE,curve25519-dalek/src/backend/serial/u64/field.rs,L267-L273,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
@@ -61,13 +61,13 @@ curve25519_dalek::edwards::EdwardsPoint::identity,curve25519-dalek/src/edwards.r
 curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edwards.rs,L1226-L1258,Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean,extracted,specified,,
-curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,extracted,,,
+curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul",
 curve25519_dalek::field::FieldElement51::pow_p58,curve25519-dalek/src/field.rs,L269-L290,Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean,extracted,specified,,
 curve25519_dalek::field::FieldElement51::sqrt_ratio_i,curve25519-dalek/src/field.rs,L292-L331,Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean,extracted,specified,,
 curve25519_dalek::field::FieldElement51::is_zero,curve25519-dalek/src/field.rs,L160-L165,Curve25519Dalek/Specs/Field/FieldElement51/IsZero.lean,extracted,verified,To be refactored when problem with progress is solved,
 curve25519_dalek::field::FieldElement51::invsqrt,curve25519-dalek/src/field.rs,L352-L354,Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean,extracted,specified,,
-curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean,extracted,,,
+curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean,extracted,specified,,
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean,extracted,,,
 curve25519_dalek::ristretto::CompressedRistretto::to_bytes,curve25519-dalek/src/ristretto.rs,L229-L231,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
@@ -82,7 +82,7 @@ curve25519_dalek::scalar::Scalar::as_bytes,curve25519-dalek/src/scalar.rs,L706-L
 curve25519_dalek::scalar::Scalar::ct_eq,curve25519-dalek/src/scalar.rs,L301-L303,Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order,curve25519-dalek/src/scalar.rs,L237-L247,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide,curve25519-dalek/src/scalar.rs,L250-L253,Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean,extracted,verified,,
-curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,specified,,
+curve25519_dalek::scalar::Scalar::from_canonical_bytes,curve25519-dalek/src/scalar.rs,L261-L266,Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::invert,curve25519-dalek/src/scalar.rs,L747-L749,Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean,extracted,specified,,
 curve25519_dalek::scalar::Scalar::is_canonical,curve25519-dalek/src/scalar.rs,L1134-L1136,Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean,extracted,verified,,
 curve25519_dalek::scalar::Scalar::non_adjacent_form,curve25519-dalek/src/scalar.rs,L921-L973,Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean,,draft spec,Extraction problem due to nested borrows,
