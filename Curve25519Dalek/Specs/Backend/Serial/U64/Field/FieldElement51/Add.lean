@@ -25,13 +25,16 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
 - Does not overflow when limb sums don't exceed U64.max
 - Returns a field element where each limb is the sum of corresponding input limbs
 - This is element-wise addition, not modular field addition (use reduce for that)
+- Input bounds: both inputs have limbs < 2^53
+- Output bounds: output has limbs < 2^54
 - Simply wraps add_assign -/
 @[progress]
 theorem add_spec (a b : Array U64 5#usize)
-    (hab : ∀ i, i < 5 → (a[i]!).val + (b[i]!).val ≤ U64.max) :
+    (h_bounds_a : ∀ i, i < 5 → a[i]!.val < 2 ^ 53)
+    (h_bounds_b : ∀ i, i < 5 → b[i]!.val < 2 ^ 53) :
     ∃ result, add a b = ok result ∧
-    (∀ i, i < 5 → (result[i]!).val = (a[i]!).val + (b[i]!).val) := by
-  unfold add
-  exact add_assign_spec a b hab
+    (∀ i, i < 5 → (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
+    (∀ i, i < 5 → result[i]!.val < 2^54) := by
+  unfold add; exact add_assign_spec a b h_bounds_a h_bounds_b
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Add

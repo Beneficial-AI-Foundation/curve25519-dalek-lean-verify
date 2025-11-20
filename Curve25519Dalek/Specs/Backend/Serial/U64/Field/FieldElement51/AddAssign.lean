@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Oliver Butterley
+Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
@@ -65,17 +65,32 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
 
 /-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign`**:
 - Does not overflow when limb sums don't exceed `U64.max`
-- Returns a field element where each limb is the sum of corresponding input limbs -/
+- Returns a field element where each limb is the sum of corresponding input limbs
+- Input bounds: both inputs have limbs < 2^53
+- Output bounds: output has limbs < 2^54 -/
 @[progress]
 theorem add_assign_spec (a b : Array U64 5#usize)
-    (hab : ∀ i, i < 5 → (a[i]!).val + (b[i]!).val ≤ U64.max) :
+    (h_bounds_a : ∀ i, i < 5 → a[i]!.val < 2 ^ 53)
+    (h_bounds_b : ∀ i, i < 5 → b[i]!.val < 2 ^ 53) :
     ∃ result, add_assign a b = ok result ∧
-    (∀ i, i < 5 → (result[i]!).val = (a[i]!).val + (b[i]!).val) := by
+    (∀ i, i < 5 → (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
+    (∀ i, i < 5 → result[i]!.val < 2^54) := by
   unfold add_assign
+  have hab : ∀ i, i < 5 → (a[i]!).val + (b[i]!).val ≤ U64.max := by
+    intro i hi
+    have ha := h_bounds_a i hi
+    have hb := h_bounds_b i hi
+    scalar_tac
   progress*
   · intro i hi
     simpa using hab i hi
-  · intro i hi
-    simpa using res_post_1 i hi (by simp)
+  · refine ⟨?_, ?_⟩
+    · intro i hi
+      simpa using res_post_1 i hi (by simp)
+    · intro i hi
+      have := res_post_1 i hi (by simp)
+      have ha := h_bounds_a i hi
+      have hb := h_bounds_b i hi
+      omega
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
