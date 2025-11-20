@@ -38,21 +38,24 @@ Natural language specs:
 - No panic (always returns successfully)
 - The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,
   Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)
+- All the limbs of the result are small, ≤ 2^(51 + ε)
 - Requires that input limbs of r are bounded to avoid underflow:
   - Limb 0 must be ≤ 36028797018963664
   - Limbs 1-4 must be ≤ 36028797018963952
   To make the theorem more readable we use a single bound for all limbs. -/
 @[progress]
-theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
+theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
     ∃ r_inv, negate r = ok r_inv ∧
-    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 := by
+    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
+    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
   unfold negate
   progress*
-  · have := h_bounds 0 (by simp); simp_all; grind
-  · have := h_bounds 1 (by simp); simp_all; grind
-  · have := h_bounds 2 (by simp); simp_all; grind
-  · have := h_bounds 3 (by simp); simp_all; grind
-  · have := h_bounds 4 (by simp); simp_all; grind
+  · have := h 0 (by simp); simp_all; grind
+  · have := h 1 (by simp); simp_all; grind
+  · have := h 2 (by simp); simp_all; grind
+  · have := h 3 (by simp); simp_all; grind
+  · have := h 4 (by simp); simp_all; grind
+  constructor
   · have : 16 * p =
       36028797018963664 * 2^0 +
       36028797018963952 * 2^51 +
@@ -61,5 +64,6 @@ theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).va
       36028797018963952 * 2^204 := by simp [p]
     simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
     grind
+  · assumption
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
