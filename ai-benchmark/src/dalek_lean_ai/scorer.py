@@ -26,7 +26,7 @@ def lean_proof_scorer():
 
         # Extract the content between the task anchors (handle any indentation)
         pattern = re.compile(
-            rf'\s*-- BEGIN task {task_id}\n(.*?)\s*-- END task {task_id}',
+            rf'\s*-- BEGIN TASK {task_id}\n(.*?)\s*-- END TASK {task_id}',
             re.DOTALL
         )
         match = pattern.search(file_contents)
@@ -41,7 +41,7 @@ def lean_proof_scorer():
             return Score(value=0, explanation=f"Task {task_id} still contains 'sorry'")
         if "axiom" in task_content:
             return Score(value=0, explanation=f"Task {task_id} contains 'axiom' (cheating)")
-        if "-- BEGIN task" in task_content or "-- END task" in task_content:
+        if "-- BEGIN TASK" in task_content or "-- END TASK" in task_content:
             return Score(value=0, explanation=f"Task {task_id} contains task anchor comments (cheating)")
 
         # Run lake build to check if proofs are valid

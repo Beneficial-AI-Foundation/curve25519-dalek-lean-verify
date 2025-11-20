@@ -129,12 +129,12 @@ def insert_proof():
             Success or error message.
         """
         # Check that the proof doesn't contain anchor comments
-        if "-- BEGIN task" in proof or "-- END task" in proof:
+        if "-- BEGIN TASK" in proof or "-- END TASK" in proof:
             return "Error: Your proof contains task anchor comments. Please submit only the proof code without the anchor markers."
 
         # Find all files with this task ID
         find_result = await sandbox().exec(
-            ["bash", "-c", f"cd /workspace/curve25519-dalek-lean-verify && grep -r 'BEGIN task {task_id}' --include='*.lean' -l Curve25519Dalek/"],
+            ["bash", "-c", f"cd /workspace/curve25519-dalek-lean-verify && grep -r 'BEGIN TASK {task_id}' --include='*.lean' -l Curve25519Dalek/"],
         )
 
         if not find_result.success or not find_result.stdout.strip():
@@ -153,7 +153,7 @@ def insert_proof():
 
         # Replace content between task anchors (handle any indentation)
         pattern = re.compile(
-            rf'(\s*-- BEGIN task {task_id}\n)(.*?)(\s*-- END task {task_id})',
+            rf'(\s*-- BEGIN TASK {task_id}\n)(.*?)(\s*-- END TASK {task_id})',
             re.DOTALL
         )
 
