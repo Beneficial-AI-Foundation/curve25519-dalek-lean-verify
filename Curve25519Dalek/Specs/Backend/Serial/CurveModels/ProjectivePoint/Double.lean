@@ -11,6 +11,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 /-! # Spec Theorem for `ProjectivePoint::double`
 
 Specification and proof for `ProjectivePoint::double`.
@@ -152,16 +155,21 @@ theorem double_spec (q : ProjectivePoint)
   · -- Goal 13.1: X' coordinate
     rw [h_X_plus_Y] at X_plus_Y_sq_post_1;
     rw [h_YY_plus_XX] at fe_post_2;
-    have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) ≡
-        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) ^ 2 +
-        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) ^ 2 [MOD p] := by
+    have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * YY[i]!.val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
       apply Nat.ModEq.add; grind; grind
     simp [*]
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *;
+
     -- apply Nat.ModEq.trans fe_post;
     -- exact X_plus_Y_sq_post
+
+
+
+
     sorry
 
   · -- Goal 13.2: Y' coordinate
