@@ -39,24 +39,58 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
   unfold mul_internal
   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   progress*
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+  -- END TASK
+  -- BEGIN TASK
   · simp [*, Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ]
     grind
+  -- END TASK
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
