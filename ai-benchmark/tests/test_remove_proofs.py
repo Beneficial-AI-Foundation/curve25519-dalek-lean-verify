@@ -4,12 +4,12 @@
 from pathlib import Path
 import pytest
 
-from dalek_lean_ai.remove_proofs import remove_proofs
+from dalek_lean_ai.remove_proofs import remove_task_proofs
 
 
 @pytest.mark.parametrize("test_name", ["", "2"])
 def test_remove_proofs(test_name):
-    """Test that remove_proofs transforms input.lean to match expected.lean"""
+    """Test that remove_task_proofs transforms input.lean to match expected.lean"""
     tests_dir = Path(__file__).parent
 
     input_path = tests_dir / f"input{test_name}.lean"
@@ -20,7 +20,7 @@ def test_remove_proofs(test_name):
     expected_content = expected_path.read_text()
 
     # Apply the transformation
-    actual_output, _ = remove_proofs(input_content, task_counter=1)
+    actual_output, _ = remove_task_proofs(input_content, task_counter=1)
 
     # Compare the result with expected
     assert actual_output == expected_content, (
