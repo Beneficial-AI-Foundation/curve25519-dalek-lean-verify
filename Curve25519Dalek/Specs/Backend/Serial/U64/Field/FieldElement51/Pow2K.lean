@@ -38,14 +38,15 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.pow2k`**:
 - No panic (always returns successfully) when k > 0
 - The result, when converted to a natural number, is congruent to the input raised to the (2^k)-th power modulo p
-- Each limb of the result is strictly less than 2^51 (maintained by LOW_51_BIT_MASK)
-- Note: this generalizes the square operation (square is pow2k with k=1)
+- Input bounds: each limb < 2^54
+- Output bounds: each limb < 2^52
 -/
 @[progress]
-theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
+theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     ∃ r, pow2k a k = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧
-    (∀ i : Nat, i < 5 → r[i]!.val < 2^51)
+    (∀ i < 5, r[i]!.val < 2 ^ 52)
     := by
   sorry
 
