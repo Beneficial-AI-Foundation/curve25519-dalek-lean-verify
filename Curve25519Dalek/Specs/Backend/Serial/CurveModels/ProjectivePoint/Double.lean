@@ -160,17 +160,11 @@ theorem double_spec (q : ProjectivePoint)
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
       apply Nat.ModEq.add; grind; grind
-    simp [*]
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
-    ring_nf at *;
-
-    -- apply Nat.ModEq.trans fe_post;
-    -- exact X_plus_Y_sq_post
-
-
-
-
-    sorry
+    ring_nf at *
+    rw [← Nat.ModEq] at fe_post_2
+    apply Nat.ModEq.trans fe_post_2
+    exact X_plus_Y_sq_post_1
 
   · -- Goal 13.2: Y' coordinate
     rw [← Nat.ModEq] at *
