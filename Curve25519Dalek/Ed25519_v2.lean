@@ -237,7 +237,7 @@ theorem double_spec_math
     (low : ProjectivePoint)
     (h_valid : ∃ P, IsValidProjective low P)
     (h_bounds :
-      ∀ i, i < 5 → (low.X[i]!).val ≤ 2 ^ 52 ∧ (low.Y[i]!).val ≤ 2 ^ 52 ∧ (low.Z[i]!).val ≤ 2 ^ 52) :
+      ∀ i < 5, (low.X[i]!).val ≤ 2 ^ 52 ∧ (low.Y[i]!).val ≤ 2 ^ 52 ∧ (low.Z[i]!).val ≤ 2 ^ 52) :
   ∃ (out : CompletedPoint) (h_run : ProjectivePoint.double low = .ok out),
     ∃ (h_out_valid : ∃ P, IsValidCompleted out P),
       CompletedPoint.toPoint out h_out_valid =
