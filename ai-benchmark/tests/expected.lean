@@ -1,14 +1,15 @@
 theorem example_spec (a b : Nat) :
     a + b = b + a := by
-  -- BEGIN task 1
-  · sorry
-  -- END task 1
-  -- BEGIN task 2
-  · sorry
-  -- END task 2
+  progress*
+  · -- BEGIN TASK 1
+    sorry
+    -- END TASK 1
+  · -- BEGIN TASK 2
+    sorry
+    -- END TASK 2
 
 theorem another_spec (x : Nat) :
     x * 1 = x := by
-  -- BEGIN task 3
-  · sorry
-  -- END task 3
+  · -- BEGIN TASK 3
+    sorry
+    -- END TASK 3

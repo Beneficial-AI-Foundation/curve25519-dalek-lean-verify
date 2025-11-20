@@ -10,7 +10,11 @@ def remove_task_proofs(content: str, task_counter: int) -> tuple[str, int]:
     """
     Replace proofs between -- BEGIN TASK / -- END TASK markers with 'sorry'.
 
-    Preserves the cdot (·) and replaces everything after it with sorry.
+    Handles format: · -- BEGIN TASK
+                      proof content
+                    -- END TASK
+
+    Replaces proof content with just 'sorry', preserving the cdot and task markers.
     Adds task numbers to the markers.
 
     Args:
@@ -27,46 +31,39 @@ def remove_task_proofs(content: str, task_counter: int) -> tuple[str, int]:
     while i < len(lines):
         line = lines[i]
 
-        # Check if this line contains -- BEGIN TASK
+        # Check if this line contains -- BEGIN TASK (with or without cdot)
         if '-- BEGIN TASK' in line:
-            # Get the indentation of this line
-            indent = len(line) - len(line.lstrip())
-            indent_str = ' ' * indent
+            # Check if cdot is on the same line
+            if '·' in line:
+                # Get the indentation and cdot part
+                before_comment = line.split('-- BEGIN TASK')[0]
+                indent = len(before_comment) - len(before_comment.lstrip())
+                indent_str = ' ' * indent
 
-            # Replace BEGIN TASK with numbered version
-            result.append(f'{indent_str}-- BEGIN task {task_counter}')
+                # Replace with numbered version, keeping the cdot
+                result.append(f'{indent_str}· -- BEGIN TASK {task_counter}')
+                result.append(f'{indent_str}  sorry')
+            else:
+                # No cdot on the BEGIN TASK line
+                indent = len(line) - len(line.lstrip())
+                indent_str = ' ' * indent
+                result.append(f'{indent_str}-- BEGIN TASK {task_counter}')
+                result.append(f'{indent_str}sorry')
+
             i += 1
 
-            # Find the line with the cdot (·)
-            cdot_found = False
+            # Skip all lines until END TASK
             while i < len(lines):
                 current_line = lines[i]
 
-                # Check for -- END TASK
                 if '-- END TASK' in current_line:
-                    # Add the numbered END marker
-                    result.append(f'{indent_str}-- END task {task_counter}')
+                    # Get indentation of END TASK line
+                    end_indent = len(current_line) - len(current_line.lstrip())
+                    end_indent_str = ' ' * end_indent
+                    result.append(f'{end_indent_str}-- END TASK {task_counter}')
                     task_counter += 1
                     i += 1
                     break
-
-                # Check if this line has a cdot
-                if '·' in current_line and not cdot_found:
-                    # Extract everything up to and including the cdot
-                    cdot_index = current_line.index('·')
-                    cdot_indent = len(current_line) - len(current_line.lstrip())
-                    cdot_indent_str = ' ' * cdot_indent
-
-                    # Add the cdot line with sorry
-                    result.append(f'{cdot_indent_str}· sorry')
-                    cdot_found = True
-                    i += 1
-                    # Skip remaining lines until END TASK
-                    continue
-
-                # If we haven't found cdot yet, keep the line
-                if not cdot_found:
-                    result.append(current_line)
 
                 i += 1
         else:

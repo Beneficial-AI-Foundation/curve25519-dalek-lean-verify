@@ -19,7 +19,7 @@ def build_dataset():
     # Files should have numbered task markers after being processed by remove_proofs.py
     files_with_tasks = subprocess.run(
         ["docker", "run", docker_tag, "bash", "-c",
-         "cd /workspace/curve25519-dalek-lean-verify && grep -rE 'BEGIN task [0-9]+' --include='*.lean' -l Curve25519Dalek/"],
+         "cd /workspace/curve25519-dalek-lean-verify && grep -rE 'BEGIN TASK [0-9]+' --include='*.lean' -l Curve25519Dalek/"],
         capture_output=True,
         check=True,
         text=True,
@@ -42,7 +42,7 @@ def build_dataset():
         ).stdout
 
         # Find all task IDs in this file
-        task_pattern = re.compile(r'-- BEGIN task (\d+)')
+        task_pattern = re.compile(r'-- BEGIN TASK (\d+)')
         for match in task_pattern.finditer(file_contents):
             task_id = int(match.group(1))
 
