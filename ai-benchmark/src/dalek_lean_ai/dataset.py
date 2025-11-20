@@ -16,9 +16,10 @@ def build_dataset():
     docker_tag = (project_root / "DOCKER_IMAGE_TAG").read_text().strip()
 
     # Get list of files with task markers from Docker, only in Curve25519Dalek directory
+    # Files should have numbered task markers after being processed by remove_proofs.py
     files_with_tasks = subprocess.run(
         ["docker", "run", docker_tag, "bash", "-c",
-         "cd /workspace/curve25519-dalek-lean-verify && grep -r 'BEGIN task' --include='*.lean' -l Curve25519Dalek/"],
+         "cd /workspace/curve25519-dalek-lean-verify && grep -rE 'BEGIN task [0-9]+' --include='*.lean' -l Curve25519Dalek/"],
         capture_output=True,
         check=True,
         text=True,

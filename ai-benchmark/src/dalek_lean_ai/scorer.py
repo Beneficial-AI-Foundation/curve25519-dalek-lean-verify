@@ -24,9 +24,9 @@ def lean_proof_scorer():
 
         file_contents = file_result.stdout
 
-        # Extract the content between the task anchors
+        # Extract the content between the task anchors (handle any indentation)
         pattern = re.compile(
-            rf'  -- BEGIN task {task_id}\n(.*?)  -- END task {task_id}',
+            rf'\s*-- BEGIN task {task_id}\n(.*?)\s*-- END task {task_id}',
             re.DOTALL
         )
         match = pattern.search(file_contents)

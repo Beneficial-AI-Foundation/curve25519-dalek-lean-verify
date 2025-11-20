@@ -6,90 +6,76 @@ import re
 from pathlib import Path
 
 
-def remove_proofs(content: str, task_counter: int) -> tuple[str, int]:
+def remove_task_proofs(content: str, task_counter: int) -> tuple[str, int]:
     """
-    Replace all proofs in Lean theorems with 'sorry' wrapped in task markers.
+    Replace proofs between -- BEGIN TASK / -- END TASK markers with 'sorry'.
 
-    Only processes theorems (not lemmas, defs, etc.). Proofs are identified by
-    'theorem' followed by ':= by', with content removed until either:
-    - End of file
-    - A line starting with a non-indented keyword (theorem, def, etc.)
+    Preserves the cdot (·) and replaces everything after it with sorry.
+    Adds task numbers to the markers.
 
     Args:
         content: The Lean file content as a string
         task_counter: Starting task number for this file
 
     Returns:
-        A tuple of (modified content with theorem proofs replaced by numbered sorry, next task counter)
+        A tuple of (modified content, next task counter)
     """
     lines = content.split('\n')
     result = []
     i = 0
-    in_theorem = False
 
     while i < len(lines):
         line = lines[i]
 
-        # Track if we're starting a theorem
-        if re.match(r'^theorem\s', line):
-            in_theorem = True
+        # Check if this line contains -- BEGIN TASK
+        if '-- BEGIN TASK' in line:
+            # Get the indentation of this line
+            indent = len(line) - len(line.lstrip())
+            indent_str = ' ' * indent
 
-        # Reset theorem flag at other top-level declarations
-        if re.match(r'^(lemma|def|instance|structure|class|inductive|axiom|example)\s', line):
-            in_theorem = False
-
-        # Check if this line contains ':= by' and we're in a theorem
-        if ':= by' in line and in_theorem:
-            # Split the line at ':= by'
-            before_proof = line.split(':= by')[0]
-
-            result.append(before_proof + ':= by')
-            result.append(f'  -- BEGIN task {task_counter}')
-            result.append(f'  sorry')
-            result.append(f'  -- END task {task_counter}')
-            task_counter += 1
+            # Replace BEGIN TASK with numbered version
+            result.append(f'{indent_str}-- BEGIN task {task_counter}')
             i += 1
-            in_theorem = False  # Done processing this theorem
 
-            # Skip all proof lines until we hit a new top-level declaration or end statement
-            # Track if we've seen blank lines to preserve them
-            seen_blank = False
+            # Find the line with the cdot (·)
+            cdot_found = False
             while i < len(lines):
                 current_line = lines[i]
 
-                # If it's a blank line, note it and skip
-                if current_line == '':
-                    seen_blank = True
+                # Check for -- END TASK
+                if '-- END TASK' in current_line:
+                    # Add the numbered END marker
+                    result.append(f'{indent_str}-- END task {task_counter}')
+                    task_counter += 1
                     i += 1
+                    break
+
+                # Check if this line has a cdot
+                if '·' in current_line and not cdot_found:
+                    # Extract everything up to and including the cdot
+                    cdot_index = current_line.index('·')
+                    cdot_indent = len(current_line) - len(current_line.lstrip())
+                    cdot_indent_str = ' ' * cdot_indent
+
+                    # Add the cdot line with sorry
+                    result.append(f'{cdot_indent_str}· sorry')
+                    cdot_found = True
+                    i += 1
+                    # Skip remaining lines until END TASK
                     continue
 
-                # Stop at top-level declarations or end statements (at any indentation)
-                if re.match(r'^\s*(theorem|lemma|def|instance|structure|class|inductive|axiom|example|end|namespace)\s', current_line):
-                    # Add back one blank line if we saw any
-                    if seen_blank:
-                        result.append('')
-                    # Don't increment i, we want to process this line normally
-                    break
+                # If we haven't found cdot yet, keep the line
+                if not cdot_found:
+                    result.append(current_line)
 
-                # Stop at comments or annotations at column 0 (these are typically between declarations)
-                if current_line and not current_line[0].isspace() and (current_line.startswith(('--', '/-', '@['))):
-                    # Add back one blank line if we saw any
-                    if seen_blank:
-                        result.append('')
-                    # Don't increment i, we want to process this line normally
-                    break
-
-                # Otherwise skip this line (it's part of the proof)
                 i += 1
-
-            # If we reached EOF and saw blank lines, add one back
-            if i >= len(lines) and seen_blank:
-                result.append('')
         else:
             result.append(line)
             i += 1
 
     return '\n'.join(result), task_counter
+
+
 
 
 def process_file(file_path: Path, in_place: bool, task_counter: int) -> int:
@@ -105,7 +91,7 @@ def process_file(file_path: Path, in_place: bool, task_counter: int) -> int:
         The next task counter value
     """
     content = file_path.read_text()
-    modified_content, next_counter = remove_proofs(content, task_counter)
+    modified_content, next_counter = remove_task_proofs(content, task_counter)
 
     if in_place:
         if content != modified_content:
@@ -119,7 +105,7 @@ def process_file(file_path: Path, in_place: bool, task_counter: int) -> int:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Remove proofs from Lean theorems (only) by replacing them with 'sorry'.",
+        description="Replace proofs between -- BEGIN TASK / -- END TASK markers with numbered sorry statements.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:

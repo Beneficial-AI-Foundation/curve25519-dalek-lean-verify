@@ -151,9 +151,9 @@ def insert_proof():
 
         file_contents = read_result.stdout
 
-        # Replace content between task anchors (replace everything between them)
+        # Replace content between task anchors (handle any indentation)
         pattern = re.compile(
-            rf'(  -- BEGIN task {task_id}\n)(.*?)(  -- END task {task_id})',
+            rf'(\s*-- BEGIN task {task_id}\n)(.*?)(\s*-- END task {task_id})',
             re.DOTALL
         )
 
