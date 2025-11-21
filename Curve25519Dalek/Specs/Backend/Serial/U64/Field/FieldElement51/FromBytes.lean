@@ -88,7 +88,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     repeat rw [Nat.mod_eq_of_lt (U8_shiftLeft_lt (by grind) _)]
     repeat rw [Nat.testBit_shiftLeft]
     rw [show j % 8 = j by omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -105,7 +105,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -123,7 +123,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -141,7 +141,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -159,7 +159,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -177,7 +177,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) by grind]
     rw [show decide (48 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -195,7 +195,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) by grind]
     rw [show decide (48 ≤ j) by grind]
     rw [show decide (56 ≤ j) = false by rw [decide_eq_false_iff_not]; omega]
-    all_goals grind
+    grind
     -- END TASK
   · -- BEGIN TASK
     rw [hc]
@@ -213,7 +213,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (40 ≤ j) by grind]
     rw [show decide (48 ≤ j) by grind]
     rw [show decide (56 ≤ j) by grind]
-    all_goals grind
+    grind
     -- END TASK
 
 
