@@ -22,5 +22,7 @@ theorem m_spec (x y : U64) :
     result.val = x.val * y.val := by
   unfold m
   progress*
+  -- BEGIN TASK
   simp [*];
   scalar_tac
+  -- END TASK

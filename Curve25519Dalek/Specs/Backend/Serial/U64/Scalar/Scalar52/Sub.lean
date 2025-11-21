@@ -60,25 +60,39 @@ theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow 
   unfold backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
   split
   · progress*
-    · sorry
-    · sorry
-    · sorry
-    · sorry
+    · -- BEGIN TASK
+      sorry
+      -- END TASK
+    · -- BEGIN TASK
+      sorry
+      -- END TASK
+    · -- BEGIN TASK
+      sorry
+      -- END TASK
+    · -- BEGIN TASK
+      sorry
+      -- END TASK
   · use difference, borrow
     constructor
-    · rfl
+    · -- BEGIN TASK
+      rfl
+      -- END TASK
     · constructor
-      · simp [U64x5_slice_as_Nat]
+      · -- BEGIN TASK
+        simp [U64x5_slice_as_Nat]
         have : i.val = 5 := by scalar_tac
         simp [this]
         -- When we've processed all 5 limbs, the arithmetic property should hold
         sorry
-      · intro j hj
+        -- END TASK
+      · -- BEGIN TASK
+        intro j hj
         by_cases h : j < i.val
         · exact hd j h
         · have : i.val ≤ j := by omega
           have hz := hd_rest j this hj
           omega
+        -- END TASK
   termination_by 5 - i.val
   decreasing_by scalar_decr_tac
 

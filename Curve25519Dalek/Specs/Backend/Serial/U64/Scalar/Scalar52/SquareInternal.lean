@@ -31,9 +31,40 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a := by
   unfold square_internal Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   progress*
-  all_goals try subst_vars; expand ha with 5; scalar_tac
-  unfold Array.make at *
-  simp [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ, *]
-  grind
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars; expand ha with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    unfold Array.make at *
+    simp [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ, *]
+    grind
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

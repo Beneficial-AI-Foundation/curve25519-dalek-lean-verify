@@ -161,19 +161,43 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     U8x32_as_Nat result < p := by
   unfold to_bytes
   progress*
-  · expand fe_post_1 with 5; scalar_tac
-  · expand fe_post_1 with 5; scalar_tac
-  · expand fe_post_1 with 5; scalar_tac
-  · expand fe_post_1 with 5; scalar_tac
-  · expand fe_post_1 with 5; scalar_tac
-  · expand fe_post_1 with 5; scalar_tac
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-  refine ⟨?_, ?_⟩
-  · sorry
-  · sorry
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand fe_post_1 with 5; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    sorry
+    -- END TASK
+  · -- BEGIN TASK
+    sorry
+    -- END TASK
+  · -- BEGIN TASK
+    sorry
+    -- END TASK
+  · -- BEGIN TASK
+    sorry
+    -- END TASK
+  · -- BEGIN TASK
+    sorry
+    -- END TASK
+  · -- BEGIN TASK
+    refine ⟨?_, ?_⟩
+    · sorry
+    · sorry
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

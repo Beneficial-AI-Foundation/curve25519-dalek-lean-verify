@@ -61,13 +61,19 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
   progress as ⟨f, hf⟩
   progress as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
-  · rw [ha, high_bit_zero_of_lt_L b hb] at he
+  · -- BEGIN TASK
+    rw [ha, high_bit_zero_of_lt_L b hb] at he
     simp_all; bv_tac
-  · simp_all
-  · intro _
+    -- END TASK
+  · -- BEGIN TASK
+    simp_all
+    -- END TASK
+  · -- BEGIN TASK
+    intro _
     rw [hg]
     by_contra h
     have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
     grind
+    -- END TASK
 
 end curve25519_dalek.scalar.Scalar
