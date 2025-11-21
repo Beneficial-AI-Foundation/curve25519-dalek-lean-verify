@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dalek-lean-ai"
+version = "0.1.0"
+description = "Evaluation framework for AI agents fixing Lean proofs in curve25519-dalek"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "anthropic>=0.72.0",
+    "inspect-ai>=0.3.144",
+    "openai>=2.7.1",
+    "pytest>=9.0.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff.lint]
+ignore = ["F722"]
+extend-select = ["I"]
+
+[tool.ruff.lint.isort]
+split-on-trailing-comma = false
+
+[tool.ruff.format]
+skip-magic-trailing-comma = true
