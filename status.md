@@ -6,9 +6,9 @@ This document tracks the progress of formally verifying functions from the curve
 
 | Function | Source | Spec Theorem | Extracted | Verified | Notes |
 |----------|--------|--------------|-----------|----------|-------|
-| `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L368-L375) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean) | ✅ | ☐ |  |
-| `as_projective` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L356-L362) | [AsProjective.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean) | ✅ | ☐ |  |
-| `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L341-L348) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean) | ✅ | ☐ |  |
+| `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L368-L375) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean) | ✅ | 📋 |  |
+| `as_projective` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L356-L362) | [AsProjective.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean) | ✅ | 📋 |  |
+| `as_extended` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L341-L348) | [AsExtended.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean) | ✅ | 📋 |  |
 | `double` | [backend/serial/curve_models/mod.rs](curve25519-dalek/src/backend/serial/curve_models/mod.rs#L384-L419) | [Double.lean](Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean) | ✅ | ✅ |  |
 | `mul` | [backend/serial/scalar_mul/vartime_double_base.rs](curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs#L1-L15) | [Mul.lean](Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VartimeDoubleBase/Mul.lean) | ☐ | ☐ | Extracts to broken Lean code |
 | `EDWARDS_D` | [backend/serial/u64/constants.rs](curve25519-dalek/src/backend/serial/u64/constants.rs#L45-L51) | [EDWARDS_D.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean) | ✅ | ✅ |  |
