@@ -69,7 +69,8 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
   progress as ⟨s1, h_zero_slice⟩
   progress as ⟨result, h_ct_eq⟩
   constructor
-  · intro h
+  · -- BEGIN TASK
+    intro h
     have s_eq_s1 : s = s1 := h_ct_eq.mp ((Choice.val_eq_one_iff result).mp h)
     rw [h_bytes_slice, h_zero_slice] at s_eq_s1
     have heq : bytes = Array.repeat 32#usize 0#u8 :=
@@ -80,7 +81,9 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
     iterate 31 (rw [Finset.sum_range_succ])
     rw [Finset.sum_range_one]
     simp [Array.repeat]
-  · intro h
+    -- END TASK
+  · -- BEGIN TASK
+    intro h
     rename_i h1
     rw [Nat.ModEq, h] at h_to_bytes
     have h_bytes_zero : U8x32_as_Nat bytes = 0 := by
@@ -101,5 +104,6 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
       rw [h_bytes_slice, h_zero_slice, bytes_eq]
     rw [← h_ct_eq] at s_eq_s1
     simp [s_eq_s1, Choice.one]
+    -- END TASK
 
 end curve25519_dalek.field.FieldElement51
