@@ -87,6 +87,7 @@ theorem as_montgomery_ne_zero (u : Scalar52) (h : u ≠ ZERO) :
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧ m ≠ ZERO := by
   sorry
 
+-- TODO Quarkify
 @[progress]
 theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     ∃ u',

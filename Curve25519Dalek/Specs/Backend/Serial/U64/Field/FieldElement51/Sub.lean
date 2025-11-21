@@ -56,6 +56,7 @@ natural language specs:
   replace these precise bounds with the slightly looser bounds
   a[i] < 2^63  and b[i] < 2^54
 -/
+-- TODO Quarkify
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
