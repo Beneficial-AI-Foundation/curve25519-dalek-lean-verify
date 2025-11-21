@@ -51,9 +51,27 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
   unfold reduce
   progress*
-  all_goals try simp [*]; scalar_tac
-  constructor
-  · intro i _
-    interval_cases i
-    all_goals simp [*]; scalar_tac
-  · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · constructor
+    · -- BEGIN TASK
+      intro i _
+      interval_cases i
+      all_goals simp [*]; scalar_tac
+      -- END TASK
+    · -- BEGIN TASK
+      simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+      -- END TASK
