@@ -83,57 +83,82 @@ theorem double_spec (q : ProjectivePoint)
     (T' + Z') % p = (2 * Z^2) % p := by
   unfold double
   progress*
-  · -- Goal 1: Precondition for `X`
+  · -- BEGIN TASK
+    -- Goal 1: Precondition for `X`
     intro i hi
     have hx := h_qX_bounds i hi
     scalar_tac
-  · -- Goal 2: Precondition for `Y`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 2: Precondition for `Y`
     intro i hi
     have hy := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 3: Precondition for `Z`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 3: Precondition for `Z`
     intro i hi
     have hz := h_qZ_bounds i hi
     scalar_tac
-  · -- Goal 4: Precondition for `q.X+q.Y`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 4: Precondition for `q.X+q.Y`
     intro i hi
     have hx := h_qX_bounds i hi
     have hy := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 5: Precondition for `X_plus_Y`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 5: Precondition for `X_plus_Y`
     intro i hi
     have hx := h_qX_bounds i hi
     have hy := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 6: Precondition for `YY_plus_XX`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 6: Precondition for `YY_plus_XX`
     intro i hi
     have := YY_post_2 i hi
     scalar_tac
-  · -- Goal 7: Precondition for `YY`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 7: Precondition for `YY`
     intro i hi
     have := XX_post_2 i hi
     scalar_tac
-  · -- Goal 8: Precondition for `XX`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 8: Precondition for `XX`
     intro i hi
     have := YY_post_2 i hi
     scalar_tac
-  · -- Goal 9: Precondition for `X_plus_Y_sq`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 9: Precondition for `X_plus_Y_sq`
     intro i hi
     have := XX_post_2 i hi
     scalar_tac
-  · -- Goal 10: Precondition for `YY_plus_XX`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 10: Precondition for `YY_plus_XX`
     intro i hi
     have := X_plus_Y_sq_post_2 i hi
     scalar_tac
-  · -- Goal 11: Precondition for `ZZ2`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 11: Precondition for `ZZ2`
     intro i hi
     have := ZZ2_post_2 i hi
     scalar_tac
-  · -- Goal 12: Precondition for `YY_minus_XX`
+    -- END TASK
+  · -- BEGIN TASK
+    -- Goal 12: Precondition for `YY_minus_XX`
     intro i hi
     have := YY_minus_XX_post_1 i hi
     scalar_tac
+    -- END TASK
   -- Goal 13:
+  -- BEGIN TASK
   unfold Field51_as_Nat at *
 
   have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
@@ -183,6 +208,7 @@ theorem double_spec (q : ProjectivePoint)
     rw [← Nat.ModEq] at *;
     apply Nat.ModEq.trans fe1_post_2
     exact ZZ2_post_1
+  -- END TASK
 
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
