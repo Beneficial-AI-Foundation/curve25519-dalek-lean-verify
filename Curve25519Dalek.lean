@@ -1,5 +1,6 @@
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Ed25519
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
