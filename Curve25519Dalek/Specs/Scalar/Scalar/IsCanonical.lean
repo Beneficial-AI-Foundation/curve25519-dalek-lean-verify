@@ -45,12 +45,16 @@ theorem is_canonical_spec (s : Scalar) :
   progress*
   rw [res_post]
   constructor
-  · grind
-  · intro h
+  · -- BEGIN TASK
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro h
     rename_i s' _
     have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post_1 s_post_2 h
     apply U8x32_as_Nat_injective
     symm
     exact bytes_eq
+    -- END TASK
 
 end curve25519_dalek.scalar.Scalar

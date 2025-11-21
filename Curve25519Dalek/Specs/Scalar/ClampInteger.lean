@@ -49,14 +49,17 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
   progress*
   unfold U8x32_as_Nat
   refine ⟨?_, ?_, ?_⟩
-  · apply Finset.dvd_sum
+  · -- BEGIN TASK
+    apply Finset.dvd_sum
     intro i hi
     by_cases hc : i = 0
     · subst_vars
       simpa [*] using clamp_integer_spec_aux_a _
     · have := List.mem_range.mp hi
       interval_cases i <;> omega
-  · subst_vars
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars
     simp [*]
     rw [Finset.sum_range_succ]
     simp [*]
@@ -70,7 +73,10 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
         gcongr
       _ < 2 ^ 255 := by
         bound
-  · subst_vars
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars
     simp [Finset.sum_range_succ, *]
     have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
     scalar_tac
+    -- END TASK
