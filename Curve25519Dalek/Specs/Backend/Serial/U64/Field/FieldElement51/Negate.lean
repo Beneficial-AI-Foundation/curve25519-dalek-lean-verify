@@ -3,9 +3,14 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alok Singh
 -/
+import Aeneas
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
+import Curve25519Dalek.mvcgen
+import Std.Do
+import Std.Tactic.Do
+open Std.Do
 
 /-! # Spec Theorem for `FieldElement51::negate`
 
@@ -65,5 +70,24 @@ theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
     simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
     grind
   · assumption
+
+
+/- TODO impl OfNat and OfScientific for `FieldElement51` -/
+
+@[spec]
+theorem negate_spec' (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
+⦃⌜True⌝⦄
+negate r
+⦃⇓ r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
+    := by
+    -- WIP sketch (once the helper lemmas are finished):
+    apply Aeneas.Std.Result.of_wp_run_eq
+    mvcgen [negate] with grind
+    -- ·
+    --   -- prove `negate r = ok _`
+    -- ·
+    --   mvcgen [negate] with grind
+    --   progress*
+
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
