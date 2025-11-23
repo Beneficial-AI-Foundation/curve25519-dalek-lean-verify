@@ -14,10 +14,7 @@ Specification and proof for `FieldElement51::square2`.
 
 This function computes the square of the element and then doubles it.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
-
-## TODO
-- Complete proof
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
@@ -46,10 +43,10 @@ natural language specs:
 -/
 @[progress]
 theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
-    (h_no_overflow : ∀ (j : Nat), j < 5 → i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :
+    (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :
     ∃ r, square2_loop square i = ok r ∧
-    (∀ (j : Nat), j < 5 → i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧
-    (∀ (j : Nat), j < 5 → j < i.val → r[j]! = square[j]!) := by
+    (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧
+    (∀ j < 5, j < i.val → r[j]! = square[j]!) := by
   unfold square2_loop
   split
   · progress*
@@ -82,15 +79,14 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:
 - No panic (always returns successfully)
 - The result, when converted to a natural number, is congruent to twice the square of the input modulo p
+- Input bounds: each limb < 2^54
+- Output bounds: each limb < 2^53
 -/
 @[progress]
-theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
+theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     ∃ r, square2 a = ok r ∧
-    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p
-    := by
+    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) := by
   unfold square2
-  have ⟨square, h_square, square_post_2, square_post_1⟩ := pow2k_spec a 1#u32 (by decide) h_bounds
-  simp [h_square]
   progress*
   · intro j hj _
     have := square_post_1 j hj
@@ -101,6 +97,11 @@ theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i, i < 5 → a[i]!.
       apply Finset.sum_congr rfl
       grind
     simp [Nat.ModEq] at square_post_2 ⊢
-    rw [h_doubled, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
+    constructor
+    · rw [h_doubled, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
+    · intro i hi
+      have := res_post_1 i hi (by omega)
+      have := square_post_1 i hi
+      scalar_tac
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
