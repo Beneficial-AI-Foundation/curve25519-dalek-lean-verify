@@ -1,0 +1,106 @@
+name: Aeneas Extract Check
+
+# This workflow verifies that the Lean files extracted from Rust code are up-to-date.
+# It sets up Aeneas, runs the extraction, and checks if any generated files differ
+# from the committed versions.
+
+on:
+  push:
+    branches: [ '**' ]
+    paths:
+      - 'curve25519-dalek/**'
+      - 'extract-functions.txt'
+      - 'aeneas-tweaks.txt'
+      - 'aeneas-toolchain'
+      - 'scripts/setup-aeneas.sh'
+      - 'scripts/extract-lean.sh'
+      - '.github/workflows/aeneas-extract.yml'
+  pull_request:
+    branches: [ '**' ]
+  workflow_dispatch:
+
+jobs:
+  extract-check:
+    name: Check Aeneas Extraction
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git curl opam pkg-config libgmp-dev
+
+      - name: Initialize opam
+        run: opam init --disable-sandboxing -y -a
+
+      - name: Cache OCaml environment
+        uses: actions/cache@v4
+        with:
+          path: ~/.opam
+          key: ${{ runner.os }}-opam-5.2.0-${{ hashFiles('scripts/setup-aeneas.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-opam-5.2.0-
+            ${{ runner.os }}-opam-
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Aeneas repository
+        id: cache-aeneas
+        uses: actions/cache@v4
+        with:
+          path: aeneas
+          key: ${{ runner.os }}-aeneas-${{ hashFiles('aeneas-toolchain') }}
+          restore-keys: |
+            ${{ runner.os }}-aeneas-
+
+      - name: Setup Aeneas (installs OCaml, dependencies, builds Aeneas & Charon)
+        run: ./scripts/setup-aeneas.sh
+
+      - name: Cache Rust build artifacts
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            curve25519-dalek/target/
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-
+
+      - name: Run Aeneas extraction
+        run: |
+          eval $(opam env)
+          ./scripts/extract-lean.sh
+
+      - name: Check for modifications in generated files
+        id: check-diff
+        run: |
+          echo "Checking if Funs.lean and Types.lean were modified..."
+
+          # Check if files were modified
+          if git diff --exit-code Curve25519Dalek/Funs.lean Curve25519Dalek/Types.lean; then
+            echo "✓ Generated files match committed versions"
+            echo "modified=false" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Generated files differ from committed versions"
+            echo "modified=true" >> $GITHUB_OUTPUT
+
+            # Show the diff for troubleshooting
+            echo ""
+            echo "=== Diff for Curve25519Dalek/Types.lean ==="
+            git diff Curve25519Dalek/Types.lean || true
+
+            echo ""
+            echo "=== Diff for Curve25519Dalek/Funs.lean ==="
+            git diff Curve25519Dalek/Funs.lean || true
+
+            exit 1
+          fi
