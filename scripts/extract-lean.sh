@@ -144,22 +144,36 @@ apply_tweaks() {
     local replace_text=""
     local in_find=false
     local in_replace=false
+    local use_regex=false
 
     while IFS= read -r line; do
         if [[ "$line" == "===FIND===" ]]; then
             in_find=true
             in_replace=false
+            use_regex=false
+            find_text=""
+        elif [[ "$line" == "===FIND_REGEX===" ]]; then
+            in_find=true
+            in_replace=false
+            use_regex=true
             find_text=""
         elif [[ "$line" == "===REPLACE===" ]]; then
             in_find=false
             in_replace=true
             replace_text=""
         elif [[ "$line" == "" ]] && [[ "$in_replace" == true ]]; then
-            # End of a substitution block - apply it (replaces ALL occurrences)
-            content="${content//"$find_text"/"$replace_text"}"
+            # End of a substitution block - apply it
+            if [[ "$use_regex" == true ]]; then
+                # Use sed for regex replacement (in-place via temp variable)
+                content=$(echo "$content" | sed "s|$find_text|$replace_text|g")
+            else
+                # Use bash string replacement for literal text (replaces ALL occurrences)
+                content="${content//"$find_text"/"$replace_text"}"
+            fi
             in_replace=false
             find_text=""
             replace_text=""
+            use_regex=false
         elif [[ "$in_find" == true ]]; then
             find_text="${find_text}${find_text:+$'\n'}${line}"
         elif [[ "$in_replace" == true ]]; then
@@ -169,7 +183,11 @@ apply_tweaks() {
 
     # Apply last substitution if file doesn't end with blank line
     if [[ "$in_replace" == true ]] && [[ -n "$find_text" ]]; then
-        content="${content//"$find_text"/"$replace_text"}"
+        if [[ "$use_regex" == true ]]; then
+            content=$(echo "$content" | sed "s|$find_text|$replace_text|g")
+        else
+            content="${content//"$find_text"/"$replace_text"}"
+        fi
     fi
 
     echo "$content" > "$input_file"
@@ -203,8 +221,11 @@ main() {
     generate_llbc
     generate_lean
 
-    # Apply tweaks to Funs.lean if tweaks file exists
-    apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+    # Apply tweaks to generated Lean files if tweaks file exists
+    if [ -f "$TWEAKS_FILE" ]; then
+        apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+        apply_tweaks "$OUTPUT_DIR/Types.lean" "$TWEAKS_FILE"
+    fi
 
     sync_toolchain
 
