@@ -10,65 +10,65 @@ set_option linter.unusedVariables false
 namespace curve25519_dalek
 
 /- Trait declaration: [core::ops::arith::Add]
-   Source: '/rustc/library/core/src/ops/arith.rs', lines 78:0-78:25
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 77:0-77:31
    Name pattern: [core::ops::arith::Add] -/
 structure core.ops.arith.Add (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   add : Self → Rhs → Result Self_Output
 
 /- Trait declaration: [core::ops::arith::Sub]
-   Source: '/rustc/library/core/src/ops/arith.rs', lines 190:0-190:25
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 190:0-190:31
    Name pattern: [core::ops::arith::Sub] -/
 structure core.ops.arith.Sub (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   sub : Self → Rhs → Result Self_Output
 
 /- Trait declaration: [core::ops::arith::Mul]
-   Source: '/rustc/library/core/src/ops/arith.rs', lines 323:0-323:25
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 324:0-324:31
    Name pattern: [core::ops::arith::Mul] -/
 structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   mul : Self → Rhs → Result Self_Output
 
 /- Trait declaration: [core::ops::arith::Neg]
-   Source: '/rustc/library/core/src/ops/arith.rs', lines 682:0-682:13
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 692:0-692:19
    Name pattern: [core::ops::arith::Neg] -/
 structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
   neg : Self → Result Self_Output
 
 /- Trait declaration: [core::ops::arith::AddAssign]
-   Source: '/rustc/library/core/src/ops/arith.rs', lines 755:0-755:31
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 769:0-769:37
    Name pattern: [core::ops::arith::AddAssign] -/
 structure core.ops.arith.AddAssign (Self : Type) (Rhs : Type) where
   add_assign : Self → Rhs → Result Self
 
 /- Trait declaration: [core::ops::bit::Not]
-   Source: '/rustc/library/core/src/ops/bit.rs', lines 34:0-34:13
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 35:0-35:19
    Name pattern: [core::ops::bit::Not] -/
 structure core.ops.bit.Not (Self : Type) (Self_Output : Type) where
   not : Self → Result Self_Output
 
 /- Trait declaration: [core::ops::bit::BitAnd]
-   Source: '/rustc/library/core/src/ops/bit.rs', lines 144:0-144:28
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 150:0-150:34
    Name pattern: [core::ops::bit::BitAnd] -/
 structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitand : Self → Rhs → Result Self_Output
 
 /- Trait declaration: [core::ops::bit::BitOr]
-   Source: '/rustc/library/core/src/ops/bit.rs', lines 244:0-244:27
+   Source: '/rustc/library/core/src/ops/bit.rs', lines 254:0-254:33
    Name pattern: [core::ops::bit::BitOr] -/
 structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitor : Self → Rhs → Result Self_Output
 
 /- [core::ops::range::RangeFull]
-   Source: '/rustc/library/core/src/ops/range.rs', lines 43:0-43:20
+   Source: '/rustc/library/core/src/ops/range.rs', lines 44:0-44:20
    Name pattern: [core::ops::range::RangeFull] -/
 @[reducible] def core.ops.range.RangeFull := Unit
 
 /- [core::panicking::AssertKind]
-   Source: '/rustc/library/core/src/panicking.rs', lines 382:0-382:19
+   Source: '/rustc/library/core/src/panicking.rs', lines 378:0-378:19
    Name pattern: [core::panicking::AssertKind] -/
 inductive core.panicking.AssertKind where
 | Eq : core.panicking.AssertKind

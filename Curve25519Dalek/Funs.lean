@@ -11,7 +11,7 @@ set_option linter.unusedVariables false
 namespace curve25519_dalek
 
 /- Trait implementation: [core::slice::index::private_slice_index::{core::slice::index::private_slice_index::Sealed for core::ops::range::RangeFull}]
-   Source: '/rustc/library/core/src/slice/index.rs', lines 128:4-128:34
+   Source: '/rustc/library/core/src/slice/index.rs', lines 120:4-120:34
    Name pattern: [core::slice::index::private_slice_index::Sealed<core::ops::range::RangeFull>] -/
 @[reducible]
 def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
@@ -19,7 +19,7 @@ def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
 }
 
 /- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
-   Source: '/rustc/library/core/src/slice/index.rs', lines 626:0-626:55
+   Source: '/rustc/library/core/src/slice/index.rs', lines 632:0-632:55
    Name pattern: [core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>] -/
 @[reducible]
 def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice (T : Type) :
