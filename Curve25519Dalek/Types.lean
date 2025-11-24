@@ -76,13 +76,13 @@ inductive core.panicking.AssertKind where
 | Match : core.panicking.AssertKind
 
 /- Trait declaration: [subtle::ConstantTimeEq]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 262:0-262:24
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 262:0-262:24
    Name pattern: [subtle::ConstantTimeEq] -/
 structure subtle.ConstantTimeEq (Self : Type) where
   ct_eq : Self → Self → Result subtle.Choice
 
 /- Trait declaration: [subtle::ConditionallySelectable]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 393:0-393:39
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 393:0-393:39
    Name pattern: [subtle::ConditionallySelectable] -/
 structure subtle.ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
@@ -91,7 +91,7 @@ structure subtle.ConditionallySelectable (Self : Type) where
   conditional_swap : Self → Self → subtle.Choice → Result (Self × Self)
 
 /- Trait declaration: [subtle::ConditionallyNegatable]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 604:0-604:32
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 604:0-604:32
    Name pattern: [subtle::ConditionallyNegatable] -/
 structure subtle.ConditionallyNegatable (Self : Type) where
   conditional_negate : Self → subtle.Choice → Result Self

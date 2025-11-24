@@ -221,8 +221,11 @@ main() {
     generate_llbc
     generate_lean
 
-    # Apply tweaks to Funs.lean if tweaks file exists
-    apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+    # Apply tweaks to generated Lean files if tweaks file exists
+    if [ -f "$TWEAKS_FILE" ]; then
+        apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+        apply_tweaks "$OUTPUT_DIR/Types.lean" "$TWEAKS_FILE"
+    fi
 
     sync_toolchain
 

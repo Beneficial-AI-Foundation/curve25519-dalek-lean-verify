@@ -1,6 +1,6 @@
 # Aeneas Tweaks File
 #
-# This file contains substitutions to apply to Funs.lean after Aeneas generation.
+# This file contains substitutions to apply to Funs.lean and Types.lean after Aeneas generation.
 # Each substitution consists of:
 #   ===FIND===  (for literal text matching)
 #   OR
