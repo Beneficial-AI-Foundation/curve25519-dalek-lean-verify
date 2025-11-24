@@ -14,6 +14,8 @@ on:
       - 'aeneas-toolchain'
       - 'scripts/setup-aeneas.sh'
       - 'scripts/extract-lean.sh'
+      - 'Curve25519Dalek/Funs.lean'
+      - 'Curve25519Dalek/Types.lean'
       - '.github/workflows/aeneas-extract.yml'
   pull_request:
     branches: [ '**' ]
