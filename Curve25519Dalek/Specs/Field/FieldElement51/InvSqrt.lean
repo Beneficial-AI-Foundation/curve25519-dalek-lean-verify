@@ -25,6 +25,8 @@ Here i = sqrt(-1) = SQRT_M1 constant
 -/
 
 open Aeneas.Std Result
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.field.FieldElement51
 
 /-
@@ -66,11 +68,11 @@ theorem invsqrt_spec
 
     (v : backend.serial.u64.field.FieldElement51)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
-    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE [MOD p]) :
+    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
     ∃ c r, invsqrt v = ok (c, r) ∧
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat r % p
-    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p
+    let i_nat := Field51_as_Nat SQRT_M1 % p
 
     -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
     (v_nat = 0 →
@@ -87,7 +89,7 @@ theorem invsqrt_spec
     := by
     unfold invsqrt
     progress as ⟨ u, one, h1, h2, h3, h4⟩
-    · unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+    · unfold ONE ONE_body
       decide
     use u
     use one
@@ -96,19 +98,19 @@ theorem invsqrt_spec
     · intro h5
       apply h2
       simp[h5]
-      unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      unfold ONE ONE_body
       decide
     constructor
     · intro h5 x hx
-      have : ¬Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p = 0 := by
-        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      have : ¬Field51_as_Nat ONE % p = 0 := by
+        unfold ONE ONE_body
         decide
       simp[this, h5] at h3
       have h3:= h3 x
       rw[← Nat.ModEq] at h3
       rw[← Nat.ModEq] at hx
-      have : Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
-        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      have : Field51_as_Nat ONE % p =1 :=by
+        unfold ONE ONE_body
         decide
       rw[this] at h3
       apply h3
@@ -116,8 +118,8 @@ theorem invsqrt_spec
       apply Nat.ModEq.trans this
       exact pow
     · intro h5 hx
-      have : Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
-        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      have : Field51_as_Nat ONE % p =1 :=by
+        unfold ONE ONE_body
         decide
       simp[this] at h4
       apply h4
@@ -130,8 +132,8 @@ theorem invsqrt_spec
         have eq1:= Nat.ModEq.mul_right (Field51_as_Nat v) hx1
         have eq2:= Nat.ModEq.mul_left (x ^2) pow
         rw[← mul_assoc] at eq2
-        have eq3: Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
-          unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+        have eq3: Field51_as_Nat ONE % p =1 :=by
+          unfold ONE ONE_body
           decide
         have : 1 = 1 % p:= by decide
         rw [this, ← Nat.ModEq] at eq3
