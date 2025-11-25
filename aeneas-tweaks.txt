@@ -1,9 +1,11 @@
 # Aeneas Tweaks File
 #
-# This file contains substitutions to apply to Funs.lean after Aeneas generation.
+# This file contains substitutions to apply to Funs.lean and Types.lean after Aeneas generation.
 # Each substitution consists of:
-#   ===FIND===
-#   <text to find (can be multiple lines)>
+#   ===FIND===  (for literal text matching)
+#   OR
+#   ===FIND_REGEX===  (for regex pattern matching)
+#   <text/pattern to find (can be multiple lines)>
 #   ===REPLACE===
 #   <replacement text (can be multiple lines)>
 #   <blank line>
@@ -11,10 +13,18 @@
 # Notes:
 # - Substitutions are applied in order
 # - Each substitution replaces ALL occurrences (global replace)
-# - Text matching is literal (not regex)
+# - ===FIND=== uses literal text matching
+# - ===FIND_REGEX=== uses sed regex pattern matching
 # - Blank line after ===REPLACE=== marks end of substitution block
 # - Lines starting with # are comments
 # - Blank line required at the end of the file
+
+# Path normalization - use regex to handle different usernames (oliver, runner, etc.)
+
+===FIND_REGEX===
+/home/[^/]*/\.cargo/registry/
+===REPLACE===
+~/.cargo/registry/
 
 # Forbidden identifiers
 

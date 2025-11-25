@@ -31,14 +31,15 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square`**:
 - No panic (always returns successfully)
 - The result, when converted to a natural number, is congruent to the square of the input modulo p
+- Input bounds: each limb < 2^54
+- Output bounds: each limb < 2^52
 - Note: this implements the `pow2k` function with k=1
 -/
 @[progress]
-theorem square_spec (a : Array U64 5#usize) (h_bounds : ∀ i, i < 5 → a[i]!.val < 2 ^ 54) :
+theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     ∃ r, square a = ok r ∧
-    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] := by
+    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2^52) := by
   unfold square
-  obtain ⟨r, h_eq, ⟨h_mod, _⟩⟩ := pow2k_spec a 1#u32 (by decide) h_bounds
-  exact ⟨r, h_eq, by simp_all⟩
+  progress*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

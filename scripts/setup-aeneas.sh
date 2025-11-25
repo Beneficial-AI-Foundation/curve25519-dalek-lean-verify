@@ -99,18 +99,40 @@ install_ocaml_deps() {
 clone_aeneas() {
     echo "Cloning Aeneas repository..."
 
-    local AENEAS_BRANCH="main"
+    # Check for aeneas-toolchain file to determine which commit/branch to use
+    if [ -f "aeneas-toolchain" ]; then
+        local AENEAS_COMMIT
+        AENEAS_COMMIT=$(cat aeneas-toolchain | tr -d '[:space:]')
+        echo "Found aeneas-toolchain file, using pinned commit: $AENEAS_COMMIT"
 
-    if [ -d "aeneas" ]; then
-        echo "✓ Aeneas directory already exists, pulling latest changes..."
-        cd aeneas
-        git fetch origin
-        git checkout "$AENEAS_BRANCH"
-        git pull origin "$AENEAS_BRANCH"
-        cd ..
+        if [ -d "aeneas" ]; then
+            echo "✓ Aeneas directory already exists, updating to pinned commit..."
+            cd aeneas
+            git fetch origin
+            git checkout "$AENEAS_COMMIT"
+            cd ..
+        else
+            git clone https://github.com/AeneasVerif/aeneas.git
+            cd aeneas
+            git checkout "$AENEAS_COMMIT"
+            cd ..
+            echo "✓ Aeneas repository cloned and checked out to: $AENEAS_COMMIT"
+        fi
     else
-        git clone --branch "$AENEAS_BRANCH" https://github.com/AeneasVerif/aeneas.git
-        echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
+        local AENEAS_BRANCH="main"
+        echo "No aeneas-toolchain file found, using branch: $AENEAS_BRANCH"
+
+        if [ -d "aeneas" ]; then
+            echo "✓ Aeneas directory already exists, pulling latest changes..."
+            cd aeneas
+            git fetch origin
+            git checkout "$AENEAS_BRANCH"
+            git pull origin "$AENEAS_BRANCH"
+            cd ..
+        else
+            git clone --branch "$AENEAS_BRANCH" https://github.com/AeneasVerif/aeneas.git
+            echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
+        fi
     fi
     echo
 }
