@@ -99,7 +99,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `from_bytes_mod_order` | [scalar.rs](curve25519-dalek/src/scalar.rs#L237-L247) | [FromBytesModOrder.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean) | ✅ | ✅ |  |
 | `from_bytes_mod_order_wide` | [scalar.rs](curve25519-dalek/src/scalar.rs#L250-L253) | [FromBytesModOrderWide.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean) | ✅ | ✅ |  |
 | `from_canonical_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L261-L266) | [FromCanonicalBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean) | ✅ | ✅ |  |
-| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L747-L749) | [Invert.lean](Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean) | ✅ | 📋 |  |
+| `invert` | [scalar.rs](curve25519-dalek/src/scalar.rs#L747-L749) | [Invert.lean](Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean) | ✅ | ✅ |  |
 | `is_canonical` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1134-L1136) | [IsCanonical.lean](Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean) | ✅ | ✅ |  |
 | `non_adjacent_form` | [scalar.rs](curve25519-dalek/src/scalar.rs#L921-L973) | [NonAdjacentForm.lean](Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean) | ☐ | ✏️ | Extraction problem due to nested borrows |
 | `ONE` | [scalar.rs](curve25519-dalek/src/scalar.rs#L567-L572) | [One.lean](Curve25519Dalek/Specs/Scalar/Scalar/One.lean) | ✅ | ✅ |  |
