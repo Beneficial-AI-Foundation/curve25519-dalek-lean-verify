@@ -145,7 +145,7 @@ instance : AddCommGroup (Point C) where
   neg := Neg.neg
   zsmul := zsmul C
   neg_add_cancel := by sorry
-  add_comm := by sorry 
+  add_comm := by sorry
   nsmul_succ := by sorry
   zsmul_succ':= by sorry
 
@@ -215,7 +215,264 @@ noncomputable def CompletedPoint.toPoint (p : CompletedPoint) (h : ∃ P, p.IsVa
       apply_fun (fun t => (field_from_limbs p.Z)^2 * (field_from_limbs p.T)^2 * t) at h_curve
       convert h_curve using 1 <;> ring }
 
+/-- Existential validity predicate for ProjectivePoint. -/
+def ProjectivePoint.IsValid' (p : ProjectivePoint) : Prop := ∃ P, p.IsValid P
+
+/-- Existential validity predicate for CompletedPoint. -/
+def CompletedPoint.IsValid' (p : CompletedPoint) : Prop := ∃ P, p.IsValid P
+
+/--
+Total conversion function.
+If the point is valid, returns the unique `Point Ed25519` it represents.
+If invalid, returns the neutral element `0` (garbage value).
+-/
+noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519 :=
+  open Classical in
+  if h : p.IsValid' then
+    choose h
+  else
+    0
+
+/-- Total conversion function for CompletedPoint. -/
+noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 :=
+  open Classical in
+  if h : p.IsValid' then
+    choose h
+  else
+    0
+
+/-!
+## Bridge Lemmas
+These connect the new total functions back to the underlying logic.
+-/
+
+theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point Ed25519}
+    (h : p.IsValid P) : p.toPoint' = P := by
+  rw [toPoint', dif_pos ⟨P, h⟩]
+  -- We need to show the point P is unique.
+  -- IsValid definition: Z ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * Z
+  have h_uniq : ∀ P' : Point Ed25519, p.IsValid P' → P' = P := by
+    intro P' h'
+    unfold IsValid at h h'
+    rcases h with ⟨hz, hx, hy⟩
+    rcases h' with ⟨_, hx', hy'⟩
+    ext
+    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
+    · apply mul_right_cancel₀ hz (Eq.trans hy'.symm hy)
+  apply h_uniq
+  exact Classical.choose_spec ⟨P, h⟩
+
+theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed25519}
+    (h : p.IsValid P) : p.toPoint' = P := by
+  rw [toPoint', dif_pos ⟨P, h⟩]
+  have h_uniq : ∀ P' : Point Ed25519, p.IsValid P' → P' = P := by
+    intro P' h'
+    unfold IsValid at h h'
+    rcases h with ⟨hz, ht, hx, hy⟩
+    rcases h' with ⟨_, _, hx', hy'⟩
+    ext
+    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
+    · apply mul_right_cancel₀ ht (Eq.trans hy'.symm hy)
+  apply h_uniq
+  exact Classical.choose_spec ⟨P, h⟩
+
 end curve25519_dalek.backend.serial.curve_models
+
+namespace Edwards
+
+open curve25519_dalek.backend.serial.curve_models
+
+/-!
+## The Refactored Theorem
+-/
+
+-- Helper lemma
+theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
+  apply (ZMod.natCast_eq_natCast_iff a b p).mpr
+  exact h
+
+theorem double_spec_math'
+    (q : ProjectivePoint) (hq_valid : q.IsValid') (hq_bounds : q.InBounds) :
+    ∃ c, ProjectivePoint.double q = .ok c ∧ c.IsValid' ∧
+    c.toPoint' = q.toPoint' + q.toPoint' := by
+
+  rcases hq_valid with ⟨P, hP⟩
+  rw [ProjectivePoint.toPoint'_eq_of_isValid hP]
+
+  have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec q
+    (fun i h => hq_bounds.1 i h)
+    (fun i h => hq_bounds.2.1 i h)
+    (fun i h => hq_bounds.2.2 i h)
+
+  exists out
+  constructor
+  · exact h_run -- The function runs successfully
+
+  let P2 := P + P
+
+  have h_out_represents_P2 : out.IsValid P2 := by
+    rw [ProjectivePoint.IsValid] at hP; rcases hP with ⟨hZ_nonzero, hX_in, hY_in⟩
+    rcases h_arith with ⟨hX_new, hY_new, hZ_new, hT_new⟩
+
+    let X_nat := Field51_as_Nat q.X
+    let Y_nat := Field51_as_Nat q.Y
+    let Z_nat := Field51_as_Nat q.Z
+
+    have hX_F : field_from_limbs out.X = 2 * field_from_limbs q.X * field_from_limbs q.Y := by
+      dsimp [field_from_limbs]; rw [lift_mod_eq _ _ hX_new]; push_cast; rfl
+
+    have hY_F : field_from_limbs out.Y = field_from_limbs q.Y ^ 2 + field_from_limbs q.X ^ 2 := by
+      dsimp [field_from_limbs]; rw [lift_mod_eq _ _ hY_new]; push_cast; rfl
+
+    have hZ_F : field_from_limbs out.Z = field_from_limbs q.Y ^ 2 - field_from_limbs q.X ^ 2 := by
+      have h := lift_mod_eq _ _ hZ_new; push_cast at h; apply eq_sub_of_add_eq h
+
+    have hT_F : field_from_limbs out.T = 2 * field_from_limbs q.Z ^ 2 - field_from_limbs out.Z := by
+      have h := lift_mod_eq _ _ hT_new; push_cast at h; apply eq_sub_of_add_eq h
+
+    unfold CompletedPoint.IsValid
+    have h_curve : -P.x^2 + P.y^2 = 1 + Ed25519.d * P.x^2 * P.y^2 := by
+      have h := P.h_on_curve; simp only [Ed25519, neg_mul, one_mul] at h; exact h
+
+    -- This is a known property of Ed25519 parameters.
+    have h_d_not_square : ¬IsSquare Ed25519.d := sorry
+
+    -- Prove -1 is a square in this field (since p ≡ 1 mod 4)
+    have h_neg_one_square : IsSquare (-1 : CurveField) := by
+      apply ZMod.exists_sq_eq_neg_one_iff.mpr
+      decide
+
+    have h_denom_plus : 1 + Ed25519.d * P.x^2 * P.y^2 ≠ 0 := by
+      intro h_zero
+      apply h_d_not_square
+
+      -- d * (xy)^2 = -1
+      rw [add_eq_zero_iff_eq_neg] at h_zero
+      rw [← neg_eq_iff_eq_neg] at h_zero
+      have ⟨k, hk⟩ := h_neg_one_square -- k^2 = -1
+      ring_nf at hk h_zero
+      rw [hk] at h_zero -- d * (xy)^2 = k^2
+
+      by_cases h_xy_nz : P.x * P.y = 0
+      · -- Contradiction case
+        rw [mul_assoc, ← mul_pow, h_xy_nz] at h_zero
+        simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero,
+          pow_eq_zero_iff] at h_zero
+        rw [h_zero] at hk;  rw [zero_pow (by decide)] at hk;  norm_num at hk
+
+      -- 3. Construct the square root of d: k / (x*y)
+      · use k / (P.x * P.y)
+        ring_nf
+        field_simp [h_xy_nz]
+        rw [h_zero]
+        have h_nz : P.x^2 * P.y^2 ≠ 0 := by
+          rw [←mul_pow]
+          exact pow_ne_zero 2 h_xy_nz
+        rw [mul_assoc, mul_div_cancel_right₀ _ h_nz]
+
+    refine ⟨?_ ,?_, ?_, ?_⟩
+
+    -- Goal 1: Z ≠ 0
+    · rw [hZ_F, hX_in, hY_in]
+      grind
+      
+    -- Goal 2: T ≠ 0
+    · rw [hT_F, hZ_F, hX_in, hY_in]
+      rw [mul_pow, mul_pow]
+      have h_factor : 2 * field_from_limbs q.Z ^ 2 - (P.y^2 * field_from_limbs q.Z ^ 2 - P.x^2 * field_from_limbs q.Z ^ 2) =
+                      field_from_limbs q.Z ^ 2 * (2 - (P.y^2 - P.x^2)) := by ring
+      rw [h_factor]
+      apply mul_ne_zero
+      · -- Z^2 ≠ 0 because Z ≠ 0
+        exact pow_ne_zero 2 hZ_nonzero
+      · -- proof of 2-(y^2-x^2) ≠ 0
+        have h_curve' : 2 - (P.y^2 - P.x^2) = 1 - Ed25519.d * P.x^2 * P.y^2 := by
+          calc
+            2 - (P.y ^ 2 - P.x ^ 2)
+            _ = 2 - (-P.x ^ 2 + P.y ^ 2) := by ring
+            _= 2 - (1 + Ed25519.d * P.x ^ 2 * P.y ^ 2) := by rw [← h_curve]
+            _ = 1 - Ed25519.d * P.x ^ 2 * P.y ^ 2 := by ring
+
+        rw [h_curve']
+
+        -- Proof that 1 - d(xy)^2 ≠ 0
+        intro h_zero
+        apply h_d_not_square -- Strategy: prove d is a square to get a contradiction
+
+        -- Algebraic rearrangement: 1 = d * (xy)^2
+        rw [sub_eq_zero, eq_comm] at h_zero
+
+        -- We need to divide by (xy), so handle the zero case first
+        by_cases h_xy : P.x * P.y = 0
+        · rw [mul_assoc, ←mul_pow, h_xy, zero_pow two_ne_zero, mul_zero] at h_zero
+          norm_num at h_zero
+
+        · -- Construct the square root of d: 1/(xy)
+          use 1 / (P.x * P.y)
+          field_simp [h_xy]
+          have h_nz : P.x^2 * P.y^2 ≠ 0 := by
+            rw [←mul_pow]; exact pow_ne_zero 2 h_xy
+          rw [eq_div_iff h_nz]; ring_nf at h_zero ⊢
+          exact h_zero
+
+    -- Verify X coordinate: out.X = P2.x * out.Z
+    -- Goal: 2*X*Y = ( (x*y + y*x) / (1 + dxyxy) ) * (Y^2 - X^2)
+    · rw [(add_def P P).1]
+      dsimp only [add_coords]
+      rw [hX_F, hZ_F, hX_in, hY_in]
+
+      have h_denom : 1 + Ed25519.d * P.x * P.x * P.y * P.y ≠ 0 := sorry
+      have h_subst : 1 + Ed25519.d * P.x^2 * P.y^2 = P.y^2 - P.x^2 := by
+        rw [←h_curve]; ring
+      have h_denom' : P.y^2 - P.x^2 ≠ 0 := by
+        rw [← h_subst]; ring_nf at ⊢ h_denom; exact h_denom
+      have h_comm : 1 + P.x^2 * P.y^2 * Ed25519.d = 1 + Ed25519.d * P.x^2 * P.y^2 := by ring
+
+      field_simp [h_denom, ← h_curve]
+      rw [h_comm, h_subst]
+
+      field_simp [h_denom']
+      ring
+
+    -- Verify Y coordinate: out.Y = P2.y * out.T
+    -- Goal: Y^2 + X^2 = ( (y*y - a*x*x) / (1 - dxyxy) ) * (2Z^2 - (Y^2 - X^2))
+    · rw [(add_def P P).2]
+
+      dsimp only [add_coords]
+
+      rw [hY_F, hT_F, hZ_F, hX_in, hY_in]
+
+      have h_a : Ed25519.a = -1 := rfl
+      rw [h_a]
+
+      have h_denom : 1 - Ed25519.d * P.x * P.x * P.y * P.y ≠ 0 := sorry
+      field_simp [hZ_nonzero, h_denom]
+      ring_nf at h_denom
+
+      have h_comm : 1 - Ed25519.d * P.x * P.x * P.y * P.y = 1 - P.y ^ 2 * P.x ^ 2 * Ed25519.d := by ring
+      have h_denom': 1 - P.y ^ 2 * P.x ^ 2 * Ed25519.d ≠ 0 := by
+        rw [← h_comm]
+        ring_nf
+        exact h_denom
+
+      field_simp [h_denom]
+      have h_subst : 2 - (P.y ^ 2 - P.x ^ 2) =
+        1 - Ed25519.d * P.x ^ 2 * P.y ^ 2 := by
+        calc
+          2 - (P.y ^ 2 - P.x ^ 2)
+          _ = 2 - (-P.x ^ 2 + P.y ^ 2) := by ring
+          _= 2 - (1 + Ed25519.d * P.x ^ 2 * P.y ^ 2) := by rw [← h_curve]
+          _ = 1 - Ed25519.d * P.x ^ 2 * P.y ^ 2 := by ring
+
+      rw [h_subst]
+      ring
+
+  constructor
+  · exact ⟨P2, h_out_represents_P2⟩
+  · rw [CompletedPoint.toPoint'_eq_of_isValid h_out_represents_P2]
+
+
+end Edwards
 
 namespace Edwards
 
