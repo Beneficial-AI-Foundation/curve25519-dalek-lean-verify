@@ -8,9 +8,7 @@ import Curve25519Dalek.Defs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
-import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 
 /-! # Spec Theorem for `Scalar::invert`
 
@@ -42,14 +40,17 @@ lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0 := b
   decide
 
 lemma U8x32_as_Nat_eq_zero_iff_ZERO (s : Scalar) : U8x32_as_Nat s.bytes = 0 ↔ s = ZERO := by
-  constructor
-  · intro h
-    have := U8x32_as_Nat_injective
-
-    sorry
-  · intro h
-    simp [h, ZERO]
+  have : U8x32_as_Nat ZERO.bytes = 0 := by
+    unfold ZERO ZERO_body eval_global U8x32_as_Nat
     decide
+  constructor
+  · intro _
+    have : s.bytes = ZERO.bytes := U8x32_as_Nat_injective (by grind)
+    -- a.bytes = b.bytes → a = b
+    cases s with | mk bytes =>
+      unfold ZERO ZERO_body eval_global at *
+      grind
+  · grind
 
 /-- **Spec and proof concerning `scalar.Scalar.invert`**:
 - Precondition: The input scalar s must be non-zero (inverting zero has undefined behavior)
