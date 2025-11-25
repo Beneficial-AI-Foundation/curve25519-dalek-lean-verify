@@ -33,6 +33,44 @@ Demonstrate the viability of verifying Rust cryptographic code using Lean;
 Develop techniques to make Rust-to-Lean verification more accessible;
 Create a resource for learning verification of real-world Rust code.
 
+```mermaid
+---
+config:
+  layout: elk
+  look: handDrawn
+  theme: base
+---
+flowchart TD
+    subgraph extraction [" "]
+        direction TB
+        A@{ shape: lin-cyl, label: "Rust crate" }
+        AE@{ shape: stadium, label: "Aeneas extraction" }
+        B[Funs]
+        C[Types]
+
+        A -.- AE
+        AE -.- B
+        AE -.- C
+    end
+
+    D[FunsExternal]
+    E[TypesExternal]
+    F[Defs]
+    H[Aux]
+    G@{ shape: docs, label: "Specs" }
+
+    B --> D
+    C --> E
+
+    G --> B
+    G --> C
+    G --> F
+    G --> H
+
+    style AE fill:#f5f5f5,stroke:#999
+    style extraction fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
+```
+
 See the [project repo](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify) or [project description](details.md) for further details. See below for the latest status and links to the individual spec theorems.
 
 ## Current Status
