@@ -104,8 +104,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
 
       intro i hi
       rw [Finset.mem_range] at hi; rw [← Nat.mul_add]; congr 1
-      --simp [*]
-      sorry
+      progress
 
     · assumption
 
