@@ -7,7 +7,7 @@ It provides fast, safe cryptographic primitives used by thousands of projects fo
 
 ## Project aims
 
-This project aims to **prove the functional correctness** of the curve25519-dalek implementation. 
+This project aims to **prove the functional correctness** of the curve25519-dalek implementation.
 Using [Aeneas](https://github.com/AeneasVerif/aeneas), we obtain a faithful representation of the Rust code in [Lean 4](https://lean-lang.org), a powerful proof assistant. This allows us to harness Lean's mathematical capabilities to write precise specifications and formally prove that the implementation satisfies them.
 
 The aims are two fold:
