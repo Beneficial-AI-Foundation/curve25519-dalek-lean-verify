@@ -27,10 +27,6 @@ namespace curve25519_dalek.scalar.Scalar52
 set_option linter.style.commandStart false
 set_option exponentiation.threshold 260
 
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/master
 /-
 natural language description:
 
@@ -82,7 +78,6 @@ theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := b
     unfold R L Nat.Coprime
     simp
   have h1 := Nat.Coprime.symm hcoprime
-
   -- use the standard lemma for cancelling a factor modulo L
   exact Nat.ModEq.cancel_right_of_coprime h1 h
 
@@ -98,7 +93,7 @@ theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
     (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]
     := by
   unfold invert
-  obtain ⟨s, hs_ok,hs_val,ne_zero⟩ := as_montgomery_ne_zero   u h
+  obtain ⟨s, hs_ok,hs_val,ne_zero⟩ := as_montgomery_ne_zero u h
   simp only [hs_ok, bind_tc_ok]
   obtain ⟨r, hr_ok,hr_val⟩ := montgomery_invert_spec s ne_zero
   simp only [hr_ok, bind_tc_ok]
@@ -108,12 +103,12 @@ theorem invert_spec (u : Scalar52) (h : u ≠ ZERO) :
   simp
   rw[← Nat.ModEq] at hr_val
   rw[← Nat.ModEq] at hs1_val
-  have hrm:= Nat.ModEq.mul_left (Scalar52_as_Nat s) hs1_val
-  have ur:= Nat.ModEq.trans hrm hr_val
-  have hrm1:= Nat.ModEq.mul_right (Scalar52_as_Nat s1 * R) hs_val
-  have hmr1:= Nat.ModEq.symm hrm1
-  have ur1  := Nat.ModEq.trans hmr1 ur
-  have eq:  Scalar52_as_Nat u * R * (Scalar52_as_Nat s1 * R)  = (Scalar52_as_Nat u * Scalar52_as_Nat s1) * (R * R):= by ring
+  have hrm := Nat.ModEq.mul_left (Scalar52_as_Nat s) hs1_val
+  have ur := Nat.ModEq.trans hrm hr_val
+  have hrm1 := Nat.ModEq.mul_right (Scalar52_as_Nat s1 * R) hs_val
+  have hmr1 := Nat.ModEq.symm hrm1
+  have ur1 := Nat.ModEq.trans hmr1 ur
+  have eq : Scalar52_as_Nat u * R * (Scalar52_as_Nat s1 * R)  = (Scalar52_as_Nat u * Scalar52_as_Nat s1) * (R * R):= by ring
   rw[eq] at ur1
   apply  cancelRR
   simp
