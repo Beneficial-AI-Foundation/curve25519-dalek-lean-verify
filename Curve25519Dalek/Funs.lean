@@ -11,7 +11,7 @@ set_option linter.unusedVariables false
 namespace curve25519_dalek
 
 /- Trait implementation: [core::slice::index::private_slice_index::{core::slice::index::private_slice_index::Sealed for core::ops::range::RangeFull}]
-   Source: '/rustc/library/core/src/slice/index.rs', lines 128:4-128:34
+   Source: '/rustc/library/core/src/slice/index.rs', lines 120:4-120:34
    Name pattern: [core::slice::index::private_slice_index::Sealed<core::ops::range::RangeFull>] -/
 @[reducible]
 def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
@@ -19,7 +19,7 @@ def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
 }
 
 /- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
-   Source: '/rustc/library/core/src/slice/index.rs', lines 626:0-626:55
+   Source: '/rustc/library/core/src/slice/index.rs', lines 632:0-632:55
    Name pattern: [core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>] -/
 @[reducible]
 def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice (T : Type) :
@@ -38,7 +38,7 @@ def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice (T : Type) :
 }
 
 /- Trait implementation: [subtle::{core::convert::From<subtle::Choice> for bool}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 138:0-138:26
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 138:0-138:26
    Name pattern: [core::convert::From<bool, subtle::Choice>] -/
 @[reducible]
 def core.convert.FromBoolsubtleChoice : core.convert.From Bool subtle.Choice
@@ -47,7 +47,7 @@ def core.convert.FromBoolsubtleChoice : core.convert.From Bool subtle.Choice
 }
 
 /- Trait implementation: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 159:0-159:22
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 159:0-159:22
    Name pattern: [core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>] -/
 @[reducible]
 def core.ops.bit.BitAndsubtleChoicesubtleChoicesubtleChoice :
@@ -56,7 +56,7 @@ def core.ops.bit.BitAndsubtleChoicesubtleChoicesubtleChoice :
 }
 
 /- Trait implementation: [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 174:0-174:21
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 174:0-174:21
    Name pattern: [core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>] -/
 @[reducible]
 def core.ops.bit.BitOrsubtleChoicesubtleChoicesubtleChoice : core.ops.bit.BitOr
@@ -65,7 +65,7 @@ def core.ops.bit.BitOrsubtleChoicesubtleChoicesubtleChoice : core.ops.bit.BitOr
 }
 
 /- Trait implementation: [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 204:0-204:19
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 204:0-204:19
    Name pattern: [core::ops::bit::Not<subtle::Choice, subtle::Choice>] -/
 @[reducible]
 def core.ops.bit.NotsubtleChoicesubtleChoice : core.ops.bit.Not subtle.Choice
@@ -74,7 +74,7 @@ def core.ops.bit.NotsubtleChoicesubtleChoice : core.ops.bit.Not subtle.Choice
 }
 
 /- Trait implementation: [subtle::{core::convert::From<u8> for subtle::Choice}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 236:0-236:24
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 236:0-236:24
    Name pattern: [core::convert::From<subtle::Choice, u8>] -/
 @[reducible]
 def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
@@ -82,7 +82,7 @@ def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
 }
 
 /- Trait implementation: [subtle::{subtle::ConstantTimeEq for @Slice<T>}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
    Name pattern: [subtle::ConstantTimeEq<[@T]>] -/
 @[reducible]
 noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
@@ -91,7 +91,7 @@ noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
 }
 
 /- Trait implementation: [subtle::{subtle::ConstantTimeEq for u8}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 346:8-346:36
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 346:8-346:36
    Name pattern: [subtle::ConstantTimeEq<u8>] -/
 @[reducible]
 def subtle.ConstantTimeEqU8 : subtle.ConstantTimeEq U8 := {
@@ -99,7 +99,7 @@ def subtle.ConstantTimeEqU8 : subtle.ConstantTimeEq U8 := {
 }
 
 /- Trait implementation: [subtle::{subtle::ConditionallySelectable for u64}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u64>] -/
 @[reducible]
 def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
@@ -110,7 +110,7 @@ def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
 }
 
 /- Trait implementation: [subtle::{subtle::ConditionallyNegatable for T}]
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 614:0-617:35
+   Source: '~/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 614:0-617:35
    Name pattern: [subtle::ConditionallyNegatable<@T>] -/
 @[reducible]
 def subtle.ConditionallyNegatable.Blanket {T : Type}
