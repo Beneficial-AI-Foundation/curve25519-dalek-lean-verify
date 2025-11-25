@@ -100,4 +100,3 @@ curve25519_dalek::scalar::Scalar::reduce,curve25519-dalek/src/scalar.rs,L1125-L1
 curve25519_dalek::scalar::Scalar::to_bytes,curve25519-dalek/src/scalar.rs,L691-L693,Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::scalar::Scalar::unpack,curve25519-dalek/src/scalar.rs,L1119-L1121,Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean,extracted,specified,,
 curve25519_dalek::scalar::Scalar::ZERO,curve25519-dalek/src/scalar.rs,L564-L564,Curve25519Dalek/Specs/Scalar/Scalar/Zero.lean,extracted,verified,,
->>>>>>> upstream/master,,,,,,,

@@ -107,7 +107,6 @@ This document tracks the progress of formally verifying functions from the curve
 | `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L691-L693) | [ToBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean) | ✅ | ✅ |  |
 | `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1119-L1121) | [Unpack.lean](Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean) | ✅ | 📋 |  |
 | `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | [Zero.lean](Curve25519Dalek/Specs/Scalar/Scalar/Zero.lean) | ✅ | ✅ |  |
-| `>>>>>>> upstream/master` | - | - | ☐ | ☐ |  |
 
 ## Legend
 
