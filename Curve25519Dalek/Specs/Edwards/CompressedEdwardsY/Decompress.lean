@@ -32,15 +32,12 @@ Natural language description:
     - Extracts the sign bit from the high bit of byte 31
     - Computes x from y using the curve equation: given y, solve for x² in ax² + y² = 1 + dx²y²
     - Adjusts the sign of x to match the encoded sign bit
-    - Returns ok none if the input array does not encode a valid Edwards point, otherwise returns ok some edwards_point
+    - Returns "ok none" if the input array does not encode a valid Edwards point, otherwise returns "ok some edwards_point"
 
 Natural language specs:
 
     - The function always succeeds (no panic)
-    - Returns Some(EdwardsPoint) if the encoded y-coordinate corresponds to a valid
-      point on the Edwards curve
-    - Returns None if the encoded y-coordinate does not correspond to a valid curve point
-    - When returning Some(ep) with ep = (X, Y, Z, T), then:
+    - If the function does not return none, but Some(ep) with ep = (X, Y, Z, T), then:
       - The pair (x,y) fulfils the curve equation ax² + y² = 1 + dx²y² (mod p), whereby x = X/Z and y = Y/Z
       - y equals the y-coordinate encoded in the input byte array
       - The sign (parity) of x matches the high bit of byte 31 in the input byte array
@@ -48,9 +45,35 @@ Natural language specs:
 -/
 
 /-- **Spec and proof concerning `edwards.CompressedEdwardsY.decompress`**:
+- No panic (always returns successfully)
+- If the function returns Some(ep) with ep = (X, Y, Z, T), then:
+  - The affine coordinates (x,y) where x = X/Z and y = Y/Z satisfy the curve equation
+    ax² + y² = 1 + dx²y² (mod p)
+  - y equals the y-coordinate encoded in the input byte array (bytes 0-30 and low 7 bits of byte 31)
+  - The sign (parity) of x matches the high bit of byte 31 in the input byte array
+  - T = X * Y (mod p)
 -/
+@[progress]
+theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
+    ∃ result, edwards.CompressedEdwardsY.decompress cey = ok result ∧
 
+      (∀ ep, result = some ep →
+        let y_encoded := (U8x32_as_Nat cey) % (2^255)
+        let x_sign_bit := cey[31]!.val.testBit 7
 
+        (∃ Z_inv x_val y_val x_is_neg,
+          field.FieldElement51.invert ep.Z = ok Z_inv ∧
+          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧
+          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧
+          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧
 
+          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧
+
+          y_val % p = y_encoded % p ∧
+
+          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧
+
+          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) := by
+  sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY
