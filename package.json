@@ -11,10 +11,8 @@
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
-    "elkjs": "^0.11.0",
     "mermaid": "^11.12.1",
-    "vitepress": "^1.6.4",
-    "vitepress-plugin-mermaid": "^2.0.17"
+    "vitepress": "^2.0.0-alpha.12"
   },
   "dependencies": {
     "chart.js": "^4.4.1",

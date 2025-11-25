@@ -17,6 +17,7 @@ import { data as progressData } from './.vitepress/data/progress.data'
 import { data as githubData } from './.vitepress/data/github.data'
 import ProgressChart from './.vitepress/components/ProgressChart.vue'
 import StatusTable from './.vitepress/components/StatusTable.vue'
+import MermaidDiagram from './.vitepress/components/MermaidDiagram.vue'
 import { useGitHubMatching } from './.vitepress/composables/useGitHubMatching'
 
 const { entries, stats } = data
@@ -24,23 +25,8 @@ const { dataPoints } = progressData
 
 // Use the GitHub matching composable
 const { findItemsForFunction } = useGitHubMatching()
-</script>
 
-This project aims to formally verify the [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) Rust library using the [Lean theorem prover](https://lean-lang.org). We use [Aeneas](https://github.com/AeneasVerif/aeneas) to automatically extract Rust code into Lean, then we write formal specifications and proofs to ensure the cryptographic implementations are mathematically correct and free from bugs. 
-
-We aim to:
-Demonstrate the viability of verifying Rust cryptographic code using Lean;
-Develop techniques to make Rust-to-Lean verification more accessible;
-Create a resource for learning verification of real-world Rust code.
-
-```mermaid
----
-config:
-  layout: elk
-  look: handDrawn
-  theme: base
----
-flowchart TD
+const diagramCode = `flowchart TD
     subgraph extraction [" "]
         direction TB
         A@{ shape: lin-cyl, label: "Rust crate" }
@@ -68,8 +54,17 @@ flowchart TD
     G --> H
 
     style AE fill:#f5f5f5,stroke:#999
-    style extraction fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5
-```
+    style extraction fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5`
+</script>
+
+This project aims to formally verify the [curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) Rust library using the [Lean theorem prover](https://lean-lang.org). We use [Aeneas](https://github.com/AeneasVerif/aeneas) to automatically extract Rust code into Lean, then we write formal specifications and proofs to ensure the cryptographic implementations are mathematically correct and free from bugs. 
+
+We aim to:
+Demonstrate the viability of verifying Rust cryptographic code using Lean;
+Develop techniques to make Rust-to-Lean verification more accessible;
+Create a resource for learning verification of real-world Rust code.
+
+<MermaidDiagram :graph="diagramCode" />
 
 See the [project repo](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify) or [project description](details.md) for further details. See below for the latest status and links to the individual spec theorems.
 

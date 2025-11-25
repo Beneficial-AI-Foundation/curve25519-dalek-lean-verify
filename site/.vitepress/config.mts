@@ -1,8 +1,7 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
 
 // https://vitepress.dev/reference/site-config
-export default withMermaid(defineConfig({
+export default defineConfig({
   title: "Verify curve25519-dalek",
   description: "A project to formally verify curve25519-dalek",
   base: '/curve25519-dalek-lean-verify/',
@@ -24,4 +23,4 @@ export default withMermaid(defineConfig({
       text: 'Edit this page on GitHub'
     }
   }
-}))
+})
