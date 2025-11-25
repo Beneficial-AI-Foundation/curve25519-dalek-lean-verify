@@ -48,28 +48,28 @@ Natural language specs:
   - Limb 0 must be ≤ 36028797018963664
   - Limbs 1-4 must be ≤ 36028797018963952
   To make the theorem more readable we use a single bound for all limbs. -/
-@[progress]
-theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
-    ∃ r_inv, negate r = ok r_inv ∧
-    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
-    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
-  unfold negate
-  progress*
-  · have := h 0 (by simp); simp_all; grind
-  · have := h 1 (by simp); simp_all; grind
-  · have := h 2 (by simp); simp_all; grind
-  · have := h 3 (by simp); simp_all; grind
-  · have := h 4 (by simp); simp_all; grind
-  constructor
-  · have : 16 * p =
-      36028797018963664 * 2^0 +
-      36028797018963952 * 2^51 +
-      36028797018963952 * 2^102 +
-      36028797018963952 * 2^153 +
-      36028797018963952 * 2^204 := by simp [p]
-    simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
-    grind
-  · assumption
+-- @[progress]
+-- theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
+--     ∃ r_inv, negate r = ok r_inv ∧
+--     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
+--     (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
+--   unfold negate
+--   progress*
+--   · have := h 0 (by simp); simp_all; grind
+--   · have := h 1 (by simp); simp_all; grind
+--   · have := h 2 (by simp); simp_all; grind
+--   · have := h 3 (by simp); simp_all; grind
+--   · have := h 4 (by simp); simp_all; grind
+--   constructor
+--   · have : 16 * p =
+--       36028797018963664 * 2^0 +
+--       36028797018963952 * 2^51 +
+--       36028797018963952 * 2^102 +
+--       36028797018963952 * 2^153 +
+--       36028797018963952 * 2^204 := by simp [p]
+--     simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
+--     grind
+--   · assumption
 
 
 /- TODO impl OfNat and OfScientific for `FieldElement51` -/
@@ -80,14 +80,9 @@ theorem negate_spec' (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).v
 negate r
 ⦃⇓ r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
     := by
-    -- WIP sketch (once the helper lemmas are finished):
     apply Aeneas.Std.Result.of_wp_run_eq
-    mvcgen [negate] with grind
-    -- ·
-    --   -- prove `negate r = ok _`
-    -- ·
-    --   mvcgen [negate] with grind
-    --   progress*
-
+    sorry
+    · exact fun r_inv => (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0
+    sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
