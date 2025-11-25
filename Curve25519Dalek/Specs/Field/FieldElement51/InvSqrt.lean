@@ -1,10 +1,11 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 
 /-! # Spec Theorem for `FieldElement51::invsqrt`
 
@@ -21,8 +22,6 @@ Here i = sqrt(-1) = SQRT_M1 constant
 
 **Source**: curve25519-dalek/src/field.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -66,8 +65,8 @@ Natural language specs:
 theorem invsqrt_spec
 
     (v : backend.serial.u64.field.FieldElement51)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1) :
-
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
+    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE [MOD p]) :
     ∃ c r, invsqrt v = ok (c, r) ∧
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat r % p
@@ -86,6 +85,60 @@ theorem invsqrt_spec
     c.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat)
 
     := by
-    sorry
+    unfold invsqrt
+    progress as ⟨ u, one, h1, h2, h3, h4⟩
+    · unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      decide
+    use u
+    use one
+    simp
+    constructor
+    · intro h5
+      apply h2
+      simp[h5]
+      unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+      decide
+    constructor
+    · intro h5 x hx
+      have : ¬Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p = 0 := by
+        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+        decide
+      simp[this, h5] at h3
+      have h3:= h3 x
+      rw[← Nat.ModEq] at h3
+      rw[← Nat.ModEq] at hx
+      have : Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
+        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+        decide
+      rw[this] at h3
+      apply h3
+      have := Nat.ModEq.mul_right (Field51_as_Nat v) hx
+      apply Nat.ModEq.trans this
+      exact pow
+    · intro h5 hx
+      have : Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
+        unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+        decide
+      simp[this] at h4
+      apply h4
+      ·  exact h5
+      · intro x hx1
+        apply hx x
+        rw[← Nat.ModEq]
+        have : 1 = 1 % p:= by decide
+        rw [this, ← Nat.ModEq] at hx1
+        have eq1:= Nat.ModEq.mul_right (Field51_as_Nat v) hx1
+        have eq2:= Nat.ModEq.mul_left (x ^2) pow
+        rw[← mul_assoc] at eq2
+        have eq3: Field51_as_Nat backend.serial.u64.field.FieldElement51.ONE % p =1 :=by
+          unfold backend.serial.u64.field.FieldElement51.ONE backend.serial.u64.field.FieldElement51.ONE_body
+          decide
+        have : 1 = 1 % p:= by decide
+        rw [this, ← Nat.ModEq] at eq3
+        have eq4:= Nat.ModEq.mul_left (x ^2) eq3
+        have := Nat.ModEq.trans eq2 eq4
+        have := Nat.ModEq.trans (Nat.ModEq.symm eq1) this
+        simp at this
+        exact (Nat.ModEq.symm this)
 
 end curve25519_dalek.field.FieldElement51

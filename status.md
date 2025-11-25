@@ -82,7 +82,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `is_negative` | [field.rs](curve25519-dalek/src/field.rs#L150-L153) | - | ✅ | ☐ |  |
 | `is_zero` | [field.rs](curve25519-dalek/src/field.rs#L160-L165) | [IsZero.lean](Curve25519Dalek/Specs/Field/FieldElement51/IsZero.lean) | ✅ | ✅ | To be refactored when problem with progress is solved |
 | `invert` | [field.rs](curve25519-dalek/src/field.rs#L255-L264) | - | ✅ | ☐ |  |
-| `invsqrt` | [field.rs](curve25519-dalek/src/field.rs#L352-L354) | [InvSqrt.lean](Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean) | ✅ | 📋 |  |
+| `invsqrt` | [field.rs](curve25519-dalek/src/field.rs#L352-L354) | [InvSqrt.lean](Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean) | ✅ | ✅ | it requires the additional hypothesis |
 | `to_edwards` | [montgomery.rs](curve25519-dalek/src/montgomery.rs#L216-L252) | [ToEdwards.lean](Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean) | ✅ | 📋 |  |
 | `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | [AsBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean) | ✅ | ✅ |  |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ✅ | ☐ |  |
