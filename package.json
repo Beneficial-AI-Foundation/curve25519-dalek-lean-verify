@@ -11,6 +11,7 @@
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
+    "mermaid": "^11.12.1",
     "vitepress": "^2.0.0-alpha.12"
   },
   "dependencies": {

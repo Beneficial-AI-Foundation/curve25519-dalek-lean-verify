@@ -26,6 +26,7 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::negate,curve25519
 curve25519_dalek::backend::serial::u64::field::FieldElement51::ONE,curve25519-dalek/src/backend/serial/u64/field.rs,L245-L245,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::ZERO,curve25519-dalek/src/backend/serial/u64/field.rs,L263-L263,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE,curve25519-dalek/src/backend/serial/u64/field.rs,L267-L273,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
+curve25519_dalek::backend::serial::u64::field::FieldElement51::mul,curve25519-dalek/src/backend/serial/u64/field.rs,L117-L215,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean,extracted,specified,,
 curve25519_dalek::field::FieldElement51::pow22501,curve25519-dalek/src/field.rs,L170-L204,Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean,extracted,specified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k,curve25519-dalek/src/backend/serial/u64/field.rs,L482-L587,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean,extracted,specified,,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce,curve25519-dalek/src/backend/serial/u64/field.rs,L312-L345,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean,extracted,verified,,
@@ -54,7 +55,7 @@ curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO,curve25519-dalek/
 curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/mod.rs,L196-L220,Curve25519Dalek/Specs/Backend/StrausMultiscalarMul.lean,,,Problem with extraction,
 curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L267-L277,Curve25519Dalek/Specs/Backend/VartimeDoubleBaseMul.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul",
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L189-L191,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
-curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,extracted,,,
+curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,extracted,specified,,
 curve25519_dalek::edwards::affine::AffinePoint::compress,curve25519-dalek/src/edwards/affine.rs,L71-L75,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::add,curve25519-dalek/src/edwards.rs,L755-L757,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
