@@ -41,10 +41,14 @@ theorem ct_eq_spec (s s' : Scalar) :
   unfold ct_eq
   repeat progress
   constructor
-  · intro _
+  · -- BEGIN TASK
+    intro _
     have : s.bytes.to_slice = s'.bytes.to_slice := by grind
     simp only [Array.to_slice, Slice.eq_iff] at *
     exact Subtype.eq this
-  · grind
+    -- END TASK
+  · -- BEGIN TASK
+    grind
+    -- END TASK
 
 end curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar

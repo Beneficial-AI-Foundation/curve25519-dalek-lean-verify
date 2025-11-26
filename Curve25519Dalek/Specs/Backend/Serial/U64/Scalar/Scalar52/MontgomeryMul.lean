@@ -46,12 +46,12 @@ natural language specs:
 -/
 @[progress]
 theorem montgomery_mul_spec (m m' : Scalar52)
-  (hm : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
-  (hm' : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
+    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
     ∃ w, montgomery_mul m m' = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
   unfold montgomery_mul
   progress*
+  -- BEGIN TASK
   have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
     rw [Nat.ModEq]
     exact res_post
@@ -59,5 +59,6 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     rw [← a1_post]
   rw [Nat.ModEq]
   grind
+  -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

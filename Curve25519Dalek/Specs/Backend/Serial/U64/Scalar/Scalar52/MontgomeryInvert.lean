@@ -34,23 +34,23 @@ natural language description:
 
 natural language specs:
 
-    • For any non-zero UnpackedScalar u in Montgomery form:
+    • For any UnpackedScalar u in Montgomery form with scalar_to_nat(u) ≢ 0 (mod L):
       - The function returns successfully with result u'
       - (Scalar52_as_Nat u * Scalar52_as_Nat u') mod L = R² mod L
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
+- Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 - No panic (always returns successfully for non-zero inputs)
 - The result u' satisfies the property that Montgomery multiplication of u and u'
   yields R mod L (the Montgomery representation of 1)
 -/
 @[progress]
-theorem montgomery_invert_spec (u : Scalar52) (h : u ≠ ZERO) :
-    ∃ u',
-    montgomery_invert u = ok u' ∧
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L
-    := by
+theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) :
+    ∃ u', montgomery_invert u = ok u' ∧
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L := by
+
   sorry
 
 end curve25519_dalek.scalar.Scalar52
