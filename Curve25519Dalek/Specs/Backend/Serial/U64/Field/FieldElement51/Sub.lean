@@ -56,16 +56,17 @@ natural language specs:
   replace these precise bounds with the slightly looser bounds
   a[i] < 2^63  and b[i] < 2^54
 -/
--- TODO Quarkify
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
     (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
-    ∃ d,
-    sub a b = ok d ∧
+    ∃ d, sub a b = ok d ∧
     (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
     (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
   unfold sub
+  -- To do: some problem using `progress*` in this proof and so doing each step manually.
+  -- Change to `progress*` when possible.
+
   set k := 36028797018963664#u64 with hk
   set j := 36028797018963952#u64 with hj
 
@@ -184,9 +185,13 @@ theorem sub_spec (a b : Array U64 5#usize)
     reduce_spec (Array.make 5#usize [i3, i7, i11, i15, i19])
   simp only [hreduce_ok, ok.injEq, exists_eq_left']
 
-  -- Prove the modular arithmetic property
-  -- Move to Nat.ModEq style and reduce to sums over limbs
-  have h_mod_eq : (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
+  refine ⟨fun i hi ↦ ?_, ?_⟩
+  · -- BEGIN TASK
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    -- Prove the modular arithmetic property
+    -- Move to Nat.ModEq style and reduce to sums over limbs
     -- First, replace result with the array of limbs via hreduce_eq (Nat.ModEq form)
     have htmp : Field51_as_Nat d + Field51_as_Nat b ≡
       Field51_as_Nat (Array.make 5#usize [i3, i7, i11, i15, i19]) + Field51_as_Nat b [MOD p] := by
@@ -264,6 +269,6 @@ theorem sub_spec (a b : Array U64 5#usize)
     have final := Nat.ModEq.add_left asum kmod0
     simp at final
     exact final
-  grind
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub

@@ -61,9 +61,8 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
       have : i.val ≠ j := by scalar_tac
       simp_all
       -- END TASK
-    · refine ⟨?_, ?_⟩
+    · refine ⟨fun j hj _ ↦ ?_, fun j hj _ ↦ ?_⟩
       · -- BEGIN TASK
-        intro j hj _
         obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
         · simp_all
         · have := res_post_1 j hj (by omega)
@@ -72,12 +71,11 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
           simp_all
       -- END TASK
       · -- BEGIN TASK
-        intro j hj _
         have := res_post_2 j hj (by omega)
         simp_all
         -- END TASK
-  · -- BEGIN TASK
-    use square
+  · use square
+    -- BEGIN TASK
     simp only [implies_true, and_true, true_and]
     intro j hj _
     have : j = 5 := by scalar_tac
@@ -103,19 +101,18 @@ theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 
     have := square_post_1 j hj
     scalar_tac
     -- END TASK
-  · -- BEGIN TASK
-    have h_doubled : Field51_as_Nat res = 2 * Field51_as_Nat square := by
-      unfold Field51_as_Nat
-      rw [Finset.mul_sum]
-      apply Finset.sum_congr rfl
-      grind
-    simp [Nat.ModEq] at square_post_2 ⊢
-    constructor
-    · rw [h_doubled, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
-    · intro i hi
+  · refine ⟨?_, fun i hi ↦ ?_⟩
+    · -- BEGIN TASK
+      have : Field51_as_Nat res = 2 * Field51_as_Nat square := by
+        unfold Field51_as_Nat
+        rw [Finset.mul_sum]
+        apply Finset.sum_congr rfl
+        grind
+      rw [this, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
+    · -- BEGIN TASK
       have := res_post_1 i hi (by omega)
       have := square_post_1 i hi
       scalar_tac
-    -- END TASK
+      -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

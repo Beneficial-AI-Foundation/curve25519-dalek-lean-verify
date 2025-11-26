@@ -61,8 +61,8 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
         have := res_post_2 j hj (by omega)
         simp_all
         -- END TASK
-  · -- BEGIN TASK
-    use a
+  · use a
+    -- BEGIN TASK
     simp only [implies_true, and_true, true_and]
     intro j hj _
     have : j = 5 := by scalar_tac
@@ -92,12 +92,14 @@ theorem add_assign_spec (a b : Array U64 5#usize)
     have := ha i hi; have := hb i hi
     scalar_tac
     -- END TASK
-  · -- BEGIN TASK
-    refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
-    · simpa using res_post_1 i hi (by simp)
-    · have := res_post_1 i hi (by simp)
+  · refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
+    · -- BEGIN TASK
+      simpa using res_post_1 i hi (by simp)
+      -- END TASK
+    · -- BEGIN TASK
+      have := res_post_1 i hi (by simp)
       have := ha i hi; have := hb i hi
       omega
-    -- END TASK
+      -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
