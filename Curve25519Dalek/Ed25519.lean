@@ -276,6 +276,26 @@ theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed
   apply h_uniq
   exact Classical.choose_spec ⟨P, h⟩
 
+
+-- 1. Coercion for ProjectivePoint -> Point Ed25519
+-- This allows writing `q + q` where q is a ProjectivePoint
+noncomputable instance : Coe ProjectivePoint (Point Ed25519) where
+  coe p := p.toPoint'
+
+-- 2. Coercion for CompletedPoint -> Point Ed25519
+-- This allows comparing the result `c` directly to mathematical objects
+noncomputable instance : Coe CompletedPoint (Point Ed25519) where
+  coe p := p.toPoint'
+
+-- 3. Helper simp lemma to fold toPoint' into the coercion arrow `↑`
+@[simp] theorem ProjectivePoint.toPoint'_eq_coe (p : ProjectivePoint) :
+  p.toPoint' = ↑p := rfl
+
+@[simp] theorem CompletedPoint.toPoint'_eq_coe (p : CompletedPoint) :
+  p.toPoint' = ↑p := rfl
+
+
+
 end curve25519_dalek.backend.serial.curve_models
 
 namespace Edwards
@@ -375,7 +395,7 @@ theorem double_spec_math'
     -- Goal 1: Z ≠ 0
     · rw [hZ_F, hX_in, hY_in]
       grind
-      
+
     -- Goal 2: T ≠ 0
     · rw [hT_F, hZ_F, hX_in, hY_in]
       rw [mul_pow, mul_pow]
@@ -470,6 +490,41 @@ theorem double_spec_math'
   constructor
   · exact ⟨P2, h_out_represents_P2⟩
   · rw [CompletedPoint.toPoint'_eq_of_isValid h_out_represents_P2]
+
+
+theorem double_spec__math_coerced
+    (q : ProjectivePoint)
+    (hq_valid : q.IsValid')
+    (hq_bounds : q.InBounds) :
+    ∃ c, ProjectivePoint.double q = .ok c ∧
+    c.IsValid' ∧
+    (↑c : Point Ed25519) = ↑q + ↑q := by
+
+  rcases hq_valid with ⟨P, hP⟩
+
+  have h_q_eq_P : (↑q : Point Ed25519) = P := ProjectivePoint.toPoint'_eq_of_isValid hP
+  rw [h_q_eq_P]
+
+  have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec q
+    (fun i h => hq_bounds.1 i h)
+    (fun i h => hq_bounds.2.1 i h)
+    (fun i h => hq_bounds.2.2 i h)
+
+  exists out
+  constructor; · exact h_run
+
+  let P2 := P + P
+
+  -- We reuse the logic from the previous proof
+  -- TODO: extract the big arithmetic proof into a separate lemma
+  -- `theorem double_arithmetic_correct ...` to keep this clean.
+  have h_out_represents_P2 : out.IsValid P2 := by
+     sorry
+
+  constructor
+  · exact ⟨P2, h_out_represents_P2⟩
+  · -- Bridge: Convert ↑out to P2
+    rw [CompletedPoint.toPoint'_eq_of_isValid h_out_represents_P2]
 
 
 end Edwards
