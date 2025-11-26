@@ -17,7 +17,7 @@
 # - ===FIND_REGEX=== uses sed regex pattern matching
 # - Blank line after ===REPLACE=== marks end of substitution block
 # - Lines starting with # are comments
-# - Blank line required at the end of the file
+# - Two blank lines required at the end of the file
 
 # Path normalization - use regex to handle different usernames (oliver, runner, etc.)
 
@@ -279,3 +279,4 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
 def ristretto.RistrettoPoint.from_uniform_bytes
 ===REPLACE===
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
+
