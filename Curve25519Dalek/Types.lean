@@ -6,6 +6,7 @@ open Aeneas.Std Result Error
 set_option linter.dupNamespace false
 set_option linter.hashCommand false
 set_option linter.unusedVariables false
+set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
@@ -54,14 +55,6 @@ structure core.ops.arith.AddAssign (Self : Type) (Rhs : Type) where
 structure core.ops.bit.Not (Self : Type) (Self_Output : Type) where
   not : Self → Result Self_Output
 
-/- Trait declaration: [core::ops::bit::BitAnd]
-   Source: '/rustc/library/core/src/ops/bit.rs', lines 150:0-150:34
-   Name pattern: [core::ops::bit::BitAnd] -/
-@[rust_trait "core::ops::bit::BitAnd"]
-structure core.ops.bit.BitAnd (Self : Type) (Rhs : Type) (Self_Output : Type)
-  where
-  bitand : Self → Rhs → Result Self_Output
-
 /- Trait declaration: [core::ops::bit::BitOr]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 254:0-254:33
    Name pattern: [core::ops::bit::BitOr] -/
@@ -73,17 +66,8 @@ structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
 /- [core::ops::range::RangeFull]
    Source: '/rustc/library/core/src/ops/range.rs', lines 44:0-44:20
    Name pattern: [core::ops::range::RangeFull] -/
-@[rust_type "core::ops::range::RangeFull"]
-@[reducible] def core.ops.range.RangeFull := Unit
-
-/- [core::panicking::AssertKind]
-   Source: '/rustc/library/core/src/panicking.rs', lines 378:0-378:19
-   Name pattern: [core::panicking::AssertKind] -/
-@[rust_type "core::panicking::AssertKind"]
-inductive core.panicking.AssertKind where
-| Eq : core.panicking.AssertKind
-| Ne : core.panicking.AssertKind
-| Match : core.panicking.AssertKind
+@[reducible, rust_type "core::ops::range::RangeFull"]
+def core.ops.range.RangeFull := Unit
 
 /- Trait declaration: [subtle::ConstantTimeEq]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 262:0-262:24
@@ -96,7 +80,7 @@ structure subtle.ConstantTimeEq (Self : Type) where
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 393:0-393:39
    Name pattern: [subtle::ConditionallySelectable] -/
 @[rust_trait "subtle::ConditionallySelectable"
-  (parentClauses := [coremarkerCopyInst])]
+  (parentClauses := ["coremarkerCopyInst"])]
 structure subtle.ConditionallySelectable (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   conditional_select : Self → Self → subtle.Choice → Result Self
@@ -112,7 +96,8 @@ structure subtle.ConditionallyNegatable (Self : Type) where
 
 /- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
-@[reducible] def backend.serial.u64.field.FieldElement51 := Array U64 5#usize
+@[reducible]
+def backend.serial.u64.field.FieldElement51 := Array U64 5#usize
 
 /- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
@@ -147,7 +132,8 @@ structure edwards.EdwardsPoint where
 
 /- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
-@[reducible] def backend.serial.u64.scalar.Scalar52 := Array U64 5#usize
+@[reducible]
+def backend.serial.u64.scalar.Scalar52 := Array U64 5#usize
 
 /- [curve25519_dalek::edwards::affine::AffinePoint]
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
@@ -157,7 +143,8 @@ structure edwards.affine.AffinePoint where
 
 /- [curve25519_dalek::edwards::CompressedEdwardsY]
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
-@[reducible] def edwards.CompressedEdwardsY := Array U8 32#usize
+@[reducible]
+def edwards.CompressedEdwardsY := Array U8 32#usize
 
 /- Trait declaration: [curve25519_dalek::traits::Identity]
    Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
@@ -166,15 +153,18 @@ structure traits.Identity (Self : Type) where
 
 /- [curve25519_dalek::montgomery::MontgomeryPoint]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
-@[reducible] def montgomery.MontgomeryPoint := Array U8 32#usize
+@[reducible]
+def montgomery.MontgomeryPoint := Array U8 32#usize
 
 /- [curve25519_dalek::ristretto::RistrettoPoint]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 485:0-485:51 -/
-@[reducible] def ristretto.RistrettoPoint := edwards.EdwardsPoint
+@[reducible]
+def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
 /- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
-@[reducible] def ristretto.CompressedRistretto := Array U8 32#usize
+@[reducible]
+def ristretto.CompressedRistretto := Array U8 32#usize
 
 /- [curve25519_dalek::scalar::Scalar]
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/

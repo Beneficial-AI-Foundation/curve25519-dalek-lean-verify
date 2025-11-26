@@ -7,6 +7,7 @@ open Aeneas.Std Result Error
 set_option linter.dupNamespace false
 set_option linter.hashCommand false
 set_option linter.unusedVariables false
+set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
@@ -20,7 +21,7 @@ def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
 }
 
 /- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
-   Source: '/rustc/library/core/src/slice/index.rs', lines 632:0-632:55
+   Source: '/rustc/library/core/src/slice/index.rs', lines 631:0-631:55
    Name pattern: [core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>] -/
 @[reducible, rust_trait_impl
   "core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>"]
@@ -120,11 +121,11 @@ def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
 @[reducible, rust_trait_impl "subtle::ConditionallyNegatable<@T>"]
 def subtle.ConditionallyNegatable.Blanket {T : Type} {Clause1_Output : Type}
   (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNeg& TClause1_OutputInst : core.ops.arith.Neg T Clause1_Output)
+  (coreopsarithNegTClause1_OutputInst : core.ops.arith.Neg T T)
   : subtle.ConditionallyNegatable T := {
   conditional_negate :=
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-    ConditionallySelectableInst coreopsarithNeg& TClause1_OutputInst
+    ConditionallySelectableInst coreopsarithNegTClause1_OutputInst
 }
 
 /- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:
