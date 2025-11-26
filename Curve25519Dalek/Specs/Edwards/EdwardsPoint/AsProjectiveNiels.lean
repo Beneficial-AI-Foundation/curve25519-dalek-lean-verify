@@ -1,11 +1,12 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
 /-! # Spec Theorem for `EdwardsPoint::as_projective_niels`
@@ -17,11 +18,10 @@ representation optimized for point addition operations.
 
 **Source**: curve25519-dalek/src/edwards.rs
 
-## TODO
-- Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
+
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -84,17 +84,21 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     progress
     progress
 
-    -- Solve the bounds for Sub (goals h_bounds_a and h_bounds_b)
     · intro i hi; apply lt_trans (hY i hi); norm_num
     · intro i hi; apply lt_trans (hX i hi); norm_num
 
-    have ⟨fe2, h_mul_call, h_mul_math⟩ : ∃ fe2,
-    backend.serial.u64.field.FieldElement51.Mul.mul e.T backend.serial.u64.constants.EDWARDS_D2 = ok fe2 ∧
-    Field51_as_Nat fe2 % p = (Field51_as_Nat e.T * Field51_as_Nat backend.serial.u64.constants.EDWARDS_D2) % p := by
-      sorry -- Mul.lean is missing?
+    progress with Mul.mul_spec as ⟨ fe2, h_mul_math, h_mul_bounds ⟩
 
-    rw [h_mul_call]
-    simp only [bind_tc_ok, ok.injEq, exists_eq_left', true_and]
+    · intro i hi
+      apply lt_trans (hT i hi)
+      norm_num
+
+    · intro i hi
+      simp only [backend.serial.u64.constants.EDWARDS_D2]
+      dsimp [Aeneas.Std.eval_global, backend.serial.u64.constants.EDWARDS_D2_body]
+      dsimp [backend.serial.u64.field.FieldElement51.from_limbs]
+      interval_cases i
+      all_goals decide
 
     refine ⟨?_, ?_, ?_⟩
 
