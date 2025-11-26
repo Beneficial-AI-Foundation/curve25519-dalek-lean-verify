@@ -23,6 +23,6 @@ theorem m_spec (x y : U64) :
   unfold m
   progress*
   -- BEGIN TASK
-  simp [*];
+  simp [*]
   scalar_tac
   -- END TASK

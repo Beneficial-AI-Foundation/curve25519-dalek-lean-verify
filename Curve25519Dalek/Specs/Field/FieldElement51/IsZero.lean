@@ -49,9 +49,7 @@ lemma Choice.val_eq_one_iff (c : subtle.Choice) :
     simp [Choice.one]
 
 /-- Arrays are equal if their slices are equal. -/
-lemma array_eq_of_to_slice_eq
-    {α : Type} {n : Usize}
-    {h1 h2 : Array α n}
+lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
     (h : h1.to_slice = h2.to_slice) :
     h1 = h2 := by
   simp [Array.to_slice] at h
@@ -62,7 +60,8 @@ lemma array_eq_of_to_slice_eq
 
 @[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
-  ∃ c, is_zero r = ok c ∧ (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) := by
+    ∃ c, is_zero r = ok c ∧
+    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) := by
   unfold is_zero
   progress as ⟨bytes, h_to_bytes⟩
   progress as ⟨s, h_bytes_slice⟩

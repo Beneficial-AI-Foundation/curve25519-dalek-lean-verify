@@ -52,8 +52,11 @@ theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
     U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] := by
   unfold invert
   progress*
+  -- BEGIN TASK
   rw [← s_post_2]
   have := Nat.ModEq.mul_left (Scalar52_as_Nat s) res_post_1
   exact Nat.ModEq.trans this s1_post
+  -- END TASK
+
 
 end curve25519_dalek.scalar.Scalar

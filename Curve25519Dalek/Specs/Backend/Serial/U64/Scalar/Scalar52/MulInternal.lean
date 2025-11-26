@@ -32,8 +32,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 - Requires that each input limb is at most 62 bits to prevent overflow -/
 @[progress]
 theorem mul_internal_spec (a b : Array U64 5#usize)
-    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62)
-    (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     ∃ result, mul_internal a b = ok (result) ∧
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b := by
   unfold mul_internal
