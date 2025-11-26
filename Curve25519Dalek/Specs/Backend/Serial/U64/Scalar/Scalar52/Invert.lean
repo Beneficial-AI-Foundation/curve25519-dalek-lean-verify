@@ -63,9 +63,9 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
   · -- BEGIN TASK
     rw [Nat.ModEq] at *
     have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
-          = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
-        _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp [*]
-        _ = R * R % L := by simp [s1_post]
+        = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
+      _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp [*]
+      _ = R * R % L := by simp [s1_post]
     have : (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) =
         Scalar52_as_Nat u * Scalar52_as_Nat res * (R * R) := by grind
     rw [this] at h
