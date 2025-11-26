@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Hoang Le Truong
+Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -53,22 +53,15 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
     (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] := by
   unfold invert
   progress*
-  · by_contra hc
-    unfold Nat.ModEq at *
-    rw [s_post] at hc
-    have : Scalar52_as_Nat u % L = 0 := by
-      rw [Nat.mul_mod] at hc
-      have eq : (Scalar52_as_Nat u % L) * (R % L) % L = 0 := hc
-      have h1 : (Scalar52_as_Nat u % L) * (R % L) ≡ 0 [MOD L] := by
-        rw [Nat.ModEq, eq]
-      have h2 : Scalar52_as_Nat u % L ≡ 0 [MOD L] := by
-        have coprime' : Nat.Coprime L R := by
-          sorry -- Coprimality of L and R (2^252 + ... and 2^260)
-        exact Nat.ModEq.cancel_right_of_coprime coprime' h1
-      rw [Nat.ModEq] at h2
-      exact h2
-    exact h this
-  · rw [Nat.ModEq] at *
+  · -- BEGIN TASK
+    by_contra _
+    have : Scalar52_as_Nat u % L = 0 % L := by
+      apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by decide)
+      simp_all [Nat.ModEq]
+    simp_all
+    -- END TASK
+  · -- BEGIN TASK
+    rw [Nat.ModEq] at *
     have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
           = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
         _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp [*]
@@ -80,5 +73,6 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
       have coprime : Nat.Coprime (R ^ 2) L := by decide
       apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by grind)
     exact this h
+    -- END TASK
 
 end curve25519_dalek.scalar.Scalar52
