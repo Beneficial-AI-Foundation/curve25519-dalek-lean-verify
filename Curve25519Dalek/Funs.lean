@@ -119,13 +119,13 @@ def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 614:0-617:35
    Name pattern: [subtle::ConditionallyNegatable<@T>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallyNegatable<@T>"]
-def subtle.ConditionallyNegatable.Blanket {T : Type} {Clause1_Output : Type}
+def subtle.ConditionallyNegatable.Blanket {T : Type}
   (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNegTClause1_OutputInst : core.ops.arith.Neg T T)
-  : subtle.ConditionallyNegatable T := {
+  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T) :
+  subtle.ConditionallyNegatable T := {
   conditional_negate :=
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-    ConditionallySelectableInst coreopsarithNegTClause1_OutputInst
+    ConditionallySelectableInst coreopsarithNeg_TTInst
 }
 
 /- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:

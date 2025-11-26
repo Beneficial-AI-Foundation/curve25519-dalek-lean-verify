@@ -78,19 +78,14 @@ def subtle.ConditionallyNegatable.Blanket {T : Type} {Clause1_Output : Type}
     ConditionallySelectableInst coreopsarithNeg& TClause1_OutputInst
 }
 ===REPLACE===
-def subtle.ConditionallyNegatable.Blanket {T : Type} {Clause1_Output : Type}
+def subtle.ConditionallyNegatable.Blanket {T : Type}
   (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNegTClause1_OutputInst : core.ops.arith.Neg T T)
-  : subtle.ConditionallyNegatable T := {
+  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T) :
+  subtle.ConditionallyNegatable T := {
   conditional_negate :=
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-    ConditionallySelectableInst coreopsarithNegTClause1_OutputInst
+    ConditionallySelectableInst coreopsarithNeg_TTInst
 }
-
-===FIND===
-coreopsarithNeg& TTInst
-===REPLACE===
-coreopsarithNeg_TTInst
 
 # Avoid linter complaints
 
