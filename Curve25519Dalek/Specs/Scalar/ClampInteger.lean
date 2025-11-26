@@ -24,13 +24,6 @@ attribute [-simp] Int.reducePow Nat.reducePow
    which can then be lifted to something which uses bit-vectors -/
 attribute [bvify_simps] Nat.dvd_iff_mod_eq_zero
 
-theorem clamp_integer_spec_aux_a (byte : U8) : 8 ∣ (byte &&& 248#u8).val := by
-  bvify 8; bv_decide
-
-theorem clamp_integer_spec_aux_b (byte : U8) : byte.val &&& 127 ||| 64 ≤ 127 := by
-  have h : (byte.bv &&& 127 ||| 64) ≤ 127 := by bv_decide
-  bound
-
 /-! ## Spec for `clamp_integer` -/
 
 /-- **Spec and proof concerning `scalar.clamp_integer`**:
@@ -49,28 +42,32 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
   progress*
   unfold U8x32_as_Nat
   refine ⟨?_, ?_, ?_⟩
-  · apply Finset.dvd_sum
+  · -- BEGIN TASK
+    apply Finset.dvd_sum
     intro i hi
     by_cases hc : i = 0
     · subst_vars
-      simpa [*] using clamp_integer_spec_aux_a _
+      have (byte : U8) : 8 ∣ (byte &&& 248#u8).val := by bvify 8; bv_decide
+      simpa [*] using this _
     · have := List.mem_range.mp hi
       interval_cases i <;> omega
-  · subst_vars
+    -- END TASK
+  · -- BEGIN TASK
+    subst_vars
     simp [*]
     rw [Finset.sum_range_succ]
     simp [*]
-    have := clamp_integer_spec_aux_b (bytes : List U8)[31]
+    have : (bytes : List U8)[31].val &&& 127 ||| 64 ≤ 127 := by
+      have h : ((bytes : List U8)[31].bv &&& 127 ||| 64) ≤ 127 := by bv_decide
+      bound
     calc
       _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) +
-          2 ^ 248 * ((bytes : List U8)[31] &&& 127 ||| 64) := by
-        gcongr
-        bv_tac
-      _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) + 2 ^ 248 * 127 := by
-        gcongr
-      _ < 2 ^ 255 := by
-        bound
-  · subst_vars
-    simp [Finset.sum_range_succ, *]
+          2 ^ 248 * ((bytes : List U8)[31] &&& 127 ||| 64) := by gcongr; bv_tac
+      _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) + 2 ^ 248 * 127 := by gcongr
+      _ < 2 ^ 255 := by bound
+    -- END TASK
+  · -- BEGIN TASK
     have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
+    simp [Finset.sum_range_succ, *]
     scalar_tac
+    -- END TASK

@@ -34,6 +34,7 @@ theorem add_spec (a b : Array U64 5#usize)
     ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) := by
-  unfold add; exact add_assign_spec a b ha hb
+  unfold add;
+  progress*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
