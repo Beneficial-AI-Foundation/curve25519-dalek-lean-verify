@@ -143,9 +143,9 @@ apply_tweaks() {
     # File should end with two newlines (visible as one blank line in editor)
     local last_two_bytes=$(tail -c 2 "$tweaks_file" | od -An -tx1)
     if [[ "$last_two_bytes" != " 0a 0a" ]]; then
-        echo "⚠ Warning: $tweaks_file does not end with a blank line!"
+        echo "⚠ Warning: $tweaks_file does not end with two blank lines!"
         echo "  The last substitution may not be processed correctly."
-        echo "  Please ensure there is a blank line at the end of the file."
+        echo "  Please ensure there are two blank lines at the end of the file."
     fi
 
     local content=$(cat "$input_file")
