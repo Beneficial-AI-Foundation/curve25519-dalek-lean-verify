@@ -954,10 +954,10 @@ def backend.serial.u64.constants.SQRT_M1
 def backend.serial.u64.constants.L_body
   : Result backend.serial.u64.scalar.Scalar52 := do
   ok
-    ((Array.make 5#usize [
+    (Array.make 5#usize [
       671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
       17592186044416#u64
-      ]))
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.L_body
@@ -977,10 +977,10 @@ def backend.serial.u64.constants.LFACTOR : U64 :=
 def backend.serial.u64.constants.R_body
   : Result backend.serial.u64.scalar.Scalar52 := do
   ok
-    ((Array.make 5#usize [
+    (Array.make 5#usize [
       4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
       4503599627370495#u64, 17592186044415#u64
-      ]))
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.R_body
@@ -991,10 +991,10 @@ def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
 def backend.serial.u64.constants.RR_body
   : Result backend.serial.u64.scalar.Scalar52 := do
   ok
-    ((Array.make 5#usize [
+    (Array.make 5#usize [
       2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
       1087343033131391#u64, 10175238647962#u64
-      ]))
+      ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.constants.RR_body
