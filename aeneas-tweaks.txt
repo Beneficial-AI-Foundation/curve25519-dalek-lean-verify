@@ -19,13 +19,6 @@
 # - Lines starting with # are comments
 # - Two blank lines required at the end of the file
 
-# Path normalization - use regex to handle different usernames (oliver, runner, etc.)
-
-===FIND_REGEX===
-/home/[^/]*/\.cargo/registry/
-===REPLACE===
-~/.cargo/registry/
-
 # Forbidden identifiers
 
 ===FIND===
