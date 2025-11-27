@@ -7,6 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
 
 /-! # Spec Theorem for `FieldElement51::invsqrt`
 
@@ -94,93 +95,29 @@ theorem invsqrt_spec
       simp_all; decide
       --- END TASK
     · -- BEGIN TASK
-      have : (Field51_as_Nat ONE % p ≠ 0 ∧
-          Field51_as_Nat v % p ≠ 0 ∧
-          ∃ x, x ^ 2 * (Field51_as_Nat v % p) % p = Field51_as_Nat ONE % p) := by
-        refine ⟨?_, ?_, ?_⟩
+      have := res_2 ?_
+      · simp_all [ONE]; decide
+      · refine ⟨?_, ?_, ?_⟩
         · simp [ONE_spec, show ¬p = 1 by decide]
         · grind
         · obtain ⟨x, hx⟩ := h.2
-          simp [ONE_spec]
-          simp [Nat.ModEq, ONE_spec] at pow
           use x
-          -- rw using hx and then use pow to conclude
-          sorry
-      have h' := res_2 this
-      · simp_all [ONE]; decide
-      -- · have : ¬p = 1 := by decide
-        -- have := h.2
-
-        -- simp_all [ONE_spec]
-
-
-        -- sorry
+          rw [Nat.ModEq, ONE_spec] at pow
+          rw [ONE_spec, Nat.mul_mod, Nat.mul_mod]
+          simpa [hx, Nat.mod_mul, ← Nat.mul_mod]
       --- END TASK
     · -- BEGIN TASK
       have := res_post ?_
-      · simp_all [ONE]
-
-        sorry
+      · simp_all [ONE_spec]
       · simp_all [ONE_spec, show ¬p = 1 by decide]
+        have := h.2 (Field51_as_Nat v)
+        --
+
+
 
 
         sorry
       --- END TASK
-
-    progress as ⟨ u, one, h1, h2, h3, h4⟩
-    · unfold ONE ONE_body
-      decide
-    use u
-    use one
-    simp
-    constructor
-    · intro h5
-      apply h2
-      simp[h5]
-      unfold ONE ONE_body
-      decide
-    constructor
-    · intro h5 x hx
-      have : ¬Field51_as_Nat ONE % p = 0 := by
-        unfold ONE ONE_body
-        decide
-      simp[this, h5] at h3
-      have h3:= h3 x
-      rw[← Nat.ModEq] at h3
-      rw[← Nat.ModEq] at hx
-      have : Field51_as_Nat ONE % p =1 :=by
-        unfold ONE ONE_body
-        decide
-      rw[this] at h3
-      apply h3
-      have := Nat.ModEq.mul_right (Field51_as_Nat v) hx
-      apply Nat.ModEq.trans this
-      exact pow
-    · intro h5 hx
-      have : Field51_as_Nat ONE % p =1 :=by
-        unfold ONE ONE_body
-        decide
-      simp[this] at h4
-      apply h4
-      ·  exact h5
-      · intro x hx1
-        apply hx x
-        rw[← Nat.ModEq]
-        have : 1 = 1 % p:= by decide
-        rw [this, ← Nat.ModEq] at hx1
-        have eq1:= Nat.ModEq.mul_right (Field51_as_Nat v) hx1
-        have eq2:= Nat.ModEq.mul_left (x ^2) pow
-        rw[← mul_assoc] at eq2
-        have eq3: Field51_as_Nat ONE % p =1 :=by
-          unfold ONE ONE_body
-          decide
-        have : 1 = 1 % p:= by decide
-        rw [this, ← Nat.ModEq] at eq3
-        have eq4:= Nat.ModEq.mul_left (x ^2) eq3
-        have := Nat.ModEq.trans eq2 eq4
-        have := Nat.ModEq.trans (Nat.ModEq.symm eq1) this
-        simp at this
-        exact (Nat.ModEq.symm this)
 
 @[progress]
 theorem invsqrt_spec'
