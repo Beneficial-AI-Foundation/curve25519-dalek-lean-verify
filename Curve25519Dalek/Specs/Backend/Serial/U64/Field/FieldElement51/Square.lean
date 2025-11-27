@@ -38,7 +38,7 @@ natural language specs:
 @[progress]
 theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     ∃ r, square a = ok r ∧
-    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2^52) := by
+    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2 ^ 52) := by
   unfold square
   progress*
 
