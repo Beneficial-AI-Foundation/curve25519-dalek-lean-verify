@@ -59,7 +59,7 @@ curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/e
 curve25519_dalek::edwards::affine::AffinePoint::compress,curve25519-dalek/src/edwards/affine.rs,L71-L75,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::add,curve25519-dalek/src/edwards.rs,L755-L757,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
-curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean,extracted,specified,,
+curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean,extracted,verified,,
 curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::ct_eq,curve25519-dalek/src/edwards.rs,L493-L502,Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::double,curve25519-dalek/src/edwards.rs,L613-L626,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean,extracted,specified,,
