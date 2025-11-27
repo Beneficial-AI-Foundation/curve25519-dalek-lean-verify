@@ -118,48 +118,18 @@ theorem invsqrt_spec
           simp at h
           apply h.2 x
           rw[← Nat.ModEq]
-          have : 1 = 1 % p:= by decide
-          rw [this, ← Nat.ModEq] at hx
-          -- hx: x ^ 2 * (Field51_as_Nat v % p) ≡ 1 [MOD p]
-          -- pow: Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]
-          -- Goal: x ^ 2 ≡ Field51_as_Nat v % p [MOD p]
+          rw [show 1 = 1 % p by decide, ← Nat.ModEq] at hx
           have eq1:= Nat.ModEq.mul_right (Field51_as_Nat v % p) hx
-          -- eq1: x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) ≡ 1 * (Field51_as_Nat v % p) [MOD p]
           simp at eq1
-          -- eq1: x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) ≡ Field51_as_Nat v % p [MOD p]
-          have eq2:= Nat.ModEq.mul_left (x ^2) pow
-          -- eq2: x ^ 2 * (Field51_as_Nat v * Field51_as_Nat v) ≡ x ^ 2 * Field51_as_Nat ONE [MOD p]
-          have eq3: Field51_as_Nat ONE % p =1 :=by
-            unfold ONE ONE_body
-            decide
-          have : 1 = 1 % p:= by decide
-          rw [this, ← Nat.ModEq] at eq3
-          have eq4:= Nat.ModEq.mul_left (x ^2) eq3
-          have eq5 := Nat.ModEq.trans eq2 eq4
-          -- eq5: x ^ 2 * (Field51_as_Nat v * Field51_as_Nat v) ≡ x ^ 2 * 1 [MOD p]
-          simp at eq5
-          -- eq5: x ^ 2 * (Field51_as_Nat v * Field51_as_Nat v) ≡ x ^ 2 [MOD p]
-          -- Now we need to connect eq1 and eq5 using the fact that (Field51_as_Nat v % p) ≡ Field51_as_Nat v [MOD p]
-          have v_mod : Field51_as_Nat v % p ≡ Field51_as_Nat v [MOD p] := by
-            rw [Nat.ModEq]
-            simp
-          have key : (Field51_as_Nat v % p) * (Field51_as_Nat v % p) ≡ Field51_as_Nat v * Field51_as_Nat v [MOD p] := by
-            apply Nat.ModEq.mul v_mod v_mod
-          have key2 : x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) ≡ x ^ 2 * (Field51_as_Nat v * Field51_as_Nat v) [MOD p] := by
-            apply Nat.ModEq.mul_left
-            exact key
-          have key3 : x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) = x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) := by ring
-          rw [key3] at eq1
-          have := Nat.ModEq.trans key2 eq5
-          -- this: x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) ≡ x ^ 2 [MOD p]
-          have step1 := Nat.ModEq.trans (Nat.ModEq.symm this) eq1
-          -- step1: x ^ 2 ≡ 1 % p * (Field51_as_Nat v % p) [MOD p]
-          have step2 : 1 % p * (Field51_as_Nat v % p) ≡ Field51_as_Nat v % p [MOD p] := by
-            rw [Nat.ModEq]
-            simp
-          have step3 : x ^ 2 ≡ Field51_as_Nat v % p [MOD p] := Nat.ModEq.trans step1 step2
-          have : x ^ 2 ≡ Field51_as_Nat v [MOD p] := Nat.ModEq.trans step3 v_mod
-          exact this
+          have eq5:= Nat.ModEq.mul_left (x ^2) pow
+          simp [ONE_spec] at eq5
+          have v_mod : Field51_as_Nat v % p ≡ Field51_as_Nat v [MOD p] := by rw [Nat.ModEq]; simp
+          have key2 : x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) ≡ x ^ 2 * (Field51_as_Nat v * Field51_as_Nat v) [MOD p] :=
+            Nat.ModEq.mul_left _ (Nat.ModEq.mul v_mod v_mod)
+          rw [show x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) = x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) by ring] at eq1
+          have step1 := Nat.ModEq.trans (Nat.ModEq.symm (Nat.ModEq.trans key2 eq5)) eq1
+          have step2 : 1 % p * (Field51_as_Nat v % p) ≡ Field51_as_Nat v % p [MOD p] := by rw [Nat.ModEq]; simp
+          exact Nat.ModEq.trans (Nat.ModEq.trans step1 step2) v_mod
       --- END TASK
 
 @[progress]
