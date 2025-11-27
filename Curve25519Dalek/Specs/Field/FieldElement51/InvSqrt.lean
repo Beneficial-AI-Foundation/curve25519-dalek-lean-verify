@@ -65,6 +65,111 @@ Natural language specs:
 -/
 @[progress]
 theorem invsqrt_spec
+    -- TO DO: improve the statement and proof
+
+    (v : backend.serial.u64.field.FieldElement51)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
+    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
+    ∃ res, invsqrt v = ok res ∧
+    let v_nat := Field51_as_Nat v % p
+    let r_nat := Field51_as_Nat res.snd % p
+    let i_nat := Field51_as_Nat SQRT_M1 % p
+
+    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
+    (v_nat = 0 →
+    res.fst.val = 0#u8 ∧ r_nat = 0) ∧
+
+    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
+    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) →
+    res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧
+
+    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
+    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →
+    res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) := by
+  unfold invsqrt
+  progress*
+  · -- BEGIN TASK
+    intro i _
+    unfold ONE
+    interval_cases i; all_goals decide
+    --- END TASK
+  · refine ⟨fun h ↦ ?_, fun h ↦ ⟨?_, ?_⟩, fun h ↦ ⟨?_, ?_⟩⟩
+    · -- BEGIN TASK
+      refine (res_1 ?_)
+      unfold ONE
+      simp_all; decide
+      --- END TASK
+    · -- BEGIN TASK
+      sorry
+      --- END TASK
+    · -- BEGIN TASK
+      sorry
+      --- END TASK
+    · -- BEGIN TASK
+      sorry
+      --- END TASK
+    · -- BEGIN TASK
+      sorry
+      --- END TASK
+
+    progress as ⟨ u, one, h1, h2, h3, h4⟩
+    · unfold ONE ONE_body
+      decide
+    use u
+    use one
+    simp
+    constructor
+    · intro h5
+      apply h2
+      simp[h5]
+      unfold ONE ONE_body
+      decide
+    constructor
+    · intro h5 x hx
+      have : ¬Field51_as_Nat ONE % p = 0 := by
+        unfold ONE ONE_body
+        decide
+      simp[this, h5] at h3
+      have h3:= h3 x
+      rw[← Nat.ModEq] at h3
+      rw[← Nat.ModEq] at hx
+      have : Field51_as_Nat ONE % p =1 :=by
+        unfold ONE ONE_body
+        decide
+      rw[this] at h3
+      apply h3
+      have := Nat.ModEq.mul_right (Field51_as_Nat v) hx
+      apply Nat.ModEq.trans this
+      exact pow
+    · intro h5 hx
+      have : Field51_as_Nat ONE % p =1 :=by
+        unfold ONE ONE_body
+        decide
+      simp[this] at h4
+      apply h4
+      ·  exact h5
+      · intro x hx1
+        apply hx x
+        rw[← Nat.ModEq]
+        have : 1 = 1 % p:= by decide
+        rw [this, ← Nat.ModEq] at hx1
+        have eq1:= Nat.ModEq.mul_right (Field51_as_Nat v) hx1
+        have eq2:= Nat.ModEq.mul_left (x ^2) pow
+        rw[← mul_assoc] at eq2
+        have eq3: Field51_as_Nat ONE % p =1 :=by
+          unfold ONE ONE_body
+          decide
+        have : 1 = 1 % p:= by decide
+        rw [this, ← Nat.ModEq] at eq3
+        have eq4:= Nat.ModEq.mul_left (x ^2) eq3
+        have := Nat.ModEq.trans eq2 eq4
+        have := Nat.ModEq.trans (Nat.ModEq.symm eq1) this
+        simp at this
+        exact (Nat.ModEq.symm this)
+
+@[progress]
+theorem invsqrt_spec'
+    -- TO DO: improve the statement and proof
 
     (v : backend.serial.u64.field.FieldElement51)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
