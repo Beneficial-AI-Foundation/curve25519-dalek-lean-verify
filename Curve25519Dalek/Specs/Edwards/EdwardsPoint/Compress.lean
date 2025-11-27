@@ -48,12 +48,11 @@ Natural language specs:
 @[progress]
 theorem compress_spec (e : EdwardsPoint) (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip) :
     ∃ (cey : CompressedEdwardsY) (ae : edwards.affine.AffinePoint) (x_sign : subtle.Choice),
-      compress e = ok cey ∧
-      to_affine e = ok ae ∧
-      field.FieldElement51.is_negative ae.x = ok x_sign ∧
-      U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
-      (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8)
-      := by
+    compress e = ok cey ∧
+    to_affine e = ok ae ∧
+    field.FieldElement51.is_negative ae.x = ok x_sign ∧
+    U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
+    (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8) := by
   sorry
 
 

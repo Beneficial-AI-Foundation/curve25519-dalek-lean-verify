@@ -37,8 +37,8 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-  ∃ q, identity = ok q ∧
-  q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
+    ∃ q, identity = ok q ∧
+    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
   unfold identity
   simp
 
