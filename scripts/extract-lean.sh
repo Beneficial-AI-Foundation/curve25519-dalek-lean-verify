@@ -139,6 +139,15 @@ apply_tweaks() {
 
     echo "Applying tweaks from $tweaks_file to $input_file..."
 
+    # Validate that tweaks file ends with a blank line
+    # File should end with two newlines (visible as one blank line in editor)
+    local last_two_bytes=$(tail -c 2 "$tweaks_file" | od -An -tx1)
+    if [[ "$last_two_bytes" != " 0a 0a" ]]; then
+        echo "⚠ Warning: $tweaks_file does not end with two blank lines!"
+        echo "  The last substitution may not be processed correctly."
+        echo "  Please ensure there are two blank lines at the end of the file."
+    fi
+
     local content=$(cat "$input_file")
     local find_text=""
     local replace_text=""
@@ -180,15 +189,6 @@ apply_tweaks() {
             replace_text="${replace_text}${replace_text:+$'\n'}${line}"
         fi
     done < "$tweaks_file"
-
-    # Apply last substitution if file doesn't end with blank line
-    if [[ "$in_replace" == true ]] && [[ -n "$find_text" ]]; then
-        if [[ "$use_regex" == true ]]; then
-            content=$(echo "$content" | sed "s|$find_text|$replace_text|g")
-        else
-            content="${content//"$find_text"/"$replace_text"}"
-        fi
-    fi
 
     echo "$content" > "$input_file"
     echo "✓ Tweaks applied to $input_file"

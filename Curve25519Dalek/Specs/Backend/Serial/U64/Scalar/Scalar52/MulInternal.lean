@@ -32,15 +32,64 @@ attribute [-simp] Int.reducePow Nat.reducePow
 - Requires that each input limb is at most 62 bits to prevent overflow -/
 @[progress]
 theorem mul_internal_spec (a b : Array U64 5#usize)
-    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62)
-    (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     ∃ result, mul_internal a b = ok (result) ∧
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b := by
   unfold mul_internal
   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   progress*
-  all_goals try expand ha with 5; expand hb with 5; simp [*]; scalar_tac
-  simp [*, Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ]
-  grind
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    expand ha with 5; expand hb with 5; simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*, Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ]
+    grind
+    -- END TASK
+
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

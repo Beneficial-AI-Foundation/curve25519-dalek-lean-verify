@@ -37,14 +37,15 @@ natural language specs:
 - No panic (always returns successfully)
 - Packing the result back yields the original scalar: pack(u) = s
 - Both the packed s and the unpacked u represent the same natural number
+- Each limb of the unpacked scalar is bounded by 2^62
 -/
 @[progress]
 theorem unpack_spec (s : Scalar) :
     ∃ u,
     unpack s = ok u ∧
     pack u = ok s ∧
-    Scalar52_as_Nat u = U8x32_as_Nat s.bytes
-    := by
+    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧
+    (∀ i < 5, u[i]!.val < 2 ^ 62) := by
   sorry
 
 end curve25519_dalek.scalar.Scalar
