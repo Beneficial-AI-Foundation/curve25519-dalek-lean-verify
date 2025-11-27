@@ -46,8 +46,8 @@ theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : 
     ∃ r1 r2, pow22501 r = ok (r1, r2) ∧
     Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧
     Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧
-    (∀ i, i < 5 → (r1[i]!).val ≤ 2 ^ 52) ∧
-    (∀ i, i < 5 → (r2[i]!).val ≤ 2 ^ 52)
+    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
+    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52)
     := by
     sorry
 
