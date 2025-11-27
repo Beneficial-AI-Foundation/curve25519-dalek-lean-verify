@@ -16,8 +16,7 @@ Specification and proof for `EdwardsPoint::as_projective_niels`.
 This function converts an EdwardsPoint to a ProjectiveNielsPoint, which is a
 representation optimized for point addition operations.
 
-**Source**: curve25519-dalek/src/edwards.rs
-
+Source: curve25519-dalek/src/edwards.rs
 -/
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -56,10 +55,9 @@ where p = 2^255 - 19
 -/
 @[progress]
 theorem as_projective_niels_spec (e : EdwardsPoint)
-    (h_bounds : ∀ i < 5, e.X[i]!.val < 2^53 ∧ e.Y[i]!.val < 2^53 ∧ e.Z[i]!.val < 2^53 ∧ e.T[i]!.val < 2^53) :
-    ∃ pn,
-    as_projective_niels e = ok pn ∧
-
+    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧
+      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :
+    ∃ pn, as_projective_niels e = ok pn ∧
     let X := Field51_as_Nat e.X
     let Y := Field51_as_Nat e.Y
     let Z := Field51_as_Nat e.Z
@@ -69,51 +67,58 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     let Z' := Field51_as_Nat pn.Z
     let C := Field51_as_Nat pn.T2d
     let d2 := Field51_as_Nat backend.serial.u64.constants.EDWARDS_D2
-
     A % p = (Y + X) % p ∧
     (B + X) % p = Y % p ∧
     Z' % p = Z % p ∧
     C % p = (T * d2) % p := by
-    unfold as_projective_niels
-
-    have hX : ∀ i < 5, e.X[i]!.val < 2^53 := fun i hi => (h_bounds i hi).1
-    have hY : ∀ i < 5, e.Y[i]!.val < 2^53 := fun i hi => (h_bounds i hi).2.1
-    have hZ : ∀ i < 5, e.Z[i]!.val < 2^53 := fun i hi => (h_bounds i hi).2.2.1
-    have hT : ∀ i < 5, e.T[i]!.val < 2^53 := fun i hi => (h_bounds i hi).2.2.2
-
-    progress
-    progress
-
-    · intro i hi; apply lt_trans (hY i hi); norm_num
-    · intro i hi; apply lt_trans (hX i hi); norm_num
-
-    progress with Mul.mul_spec as ⟨ fe2, h_mul_math, h_mul_bounds ⟩
-
-    · intro i hi
-      apply lt_trans (hT i hi)
-      norm_num
-
-    · intro i hi
-      simp only [backend.serial.u64.constants.EDWARDS_D2]
-      dsimp [Aeneas.Std.eval_global, backend.serial.u64.constants.EDWARDS_D2_body]
-      dsimp [backend.serial.u64.field.FieldElement51.from_limbs]
-      interval_cases i
-      all_goals decide
-
-    refine ⟨?_, ?_, ?_⟩
-
-    · -- Addition (A % p = (Y + X) % p)
-      apply congrArg (· % p); unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]
+  unfold as_projective_niels
+  progress*
+  · -- BEGIN TASK
+    intro i hi
+    have := (h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := (h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    unfold backend.serial.u64.constants.EDWARDS_D2
+      Aeneas.Std.eval_global backend.serial.u64.constants.EDWARDS_D2_body
+      backend.serial.u64.field.FieldElement51.from_limbs
+    interval_cases i
+    all_goals decide
+    -- END TASK
+  · refine ⟨?_, ?_, ?_⟩
+    · -- BEGIN TASK
+      apply congrArg (· % p)
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
       apply Finset.sum_congr rfl
-
-      intro i hi
-      rw [Finset.mem_range] at hi; rw [← Nat.mul_add]; congr 1
-      progress
-
-    · assumption
-
-    · exact h_mul_math
-
-
+      grind
+      -- END TASK
+    · -- BEGIN TASK
+      assumption
+      -- END TASK
+    · -- BEGIN TASK
+      assumption
+      -- END TASK
 
 end curve25519_dalek.edwards.EdwardsPoint
