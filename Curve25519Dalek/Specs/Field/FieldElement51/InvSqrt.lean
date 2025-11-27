@@ -6,6 +6,7 @@ Authors: Markus Dablander, Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
 /-! # Spec Theorem for `FieldElement51::invsqrt`
 
@@ -65,8 +66,6 @@ Natural language specs:
 -/
 @[progress]
 theorem invsqrt_spec
-    -- TO DO: improve the statement and proof
-
     (v : backend.serial.u64.field.FieldElement51)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
     (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
@@ -74,18 +73,13 @@ theorem invsqrt_spec
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat res.snd % p
     let i_nat := Field51_as_Nat SQRT_M1 % p
-
     -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
-    (v_nat = 0 →
-    res.fst.val = 0#u8 ∧ r_nat = 0) ∧
-
+    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧
     -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
-    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) →
-    res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧
-
+    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧
     -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
     (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →
-    res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) := by
+      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) := by
   unfold invsqrt
   progress*
   · -- BEGIN TASK
@@ -93,23 +87,44 @@ theorem invsqrt_spec
     unfold ONE
     interval_cases i; all_goals decide
     --- END TASK
-  · refine ⟨fun h ↦ ?_, fun h ↦ ⟨?_, ?_⟩, fun h ↦ ⟨?_, ?_⟩⟩
+  · refine ⟨fun h ↦ ?_, fun h ↦ ?_, fun h ↦ ?_⟩
     · -- BEGIN TASK
       refine (res_1 ?_)
       unfold ONE
       simp_all; decide
       --- END TASK
     · -- BEGIN TASK
-      sorry
+      have : (Field51_as_Nat ONE % p ≠ 0 ∧
+          Field51_as_Nat v % p ≠ 0 ∧
+          ∃ x, x ^ 2 * (Field51_as_Nat v % p) % p = Field51_as_Nat ONE % p) := by
+        refine ⟨?_, ?_, ?_⟩
+        · simp [ONE_spec, show ¬p = 1 by decide]
+        · grind
+        · obtain ⟨x, hx⟩ := h.2
+          simp [ONE_spec]
+          simp [Nat.ModEq, ONE_spec] at pow
+          use x
+          -- rw using hx and then use pow to conclude
+          sorry
+      have h' := res_2 this
+      · simp_all [ONE]; decide
+      -- · have : ¬p = 1 := by decide
+        -- have := h.2
+
+        -- simp_all [ONE_spec]
+
+
+        -- sorry
       --- END TASK
     · -- BEGIN TASK
-      sorry
-      --- END TASK
-    · -- BEGIN TASK
-      sorry
-      --- END TASK
-    · -- BEGIN TASK
-      sorry
+      have := res_post ?_
+      · simp_all [ONE]
+
+        sorry
+      · simp_all [ONE_spec, show ¬p = 1 by decide]
+
+
+        sorry
       --- END TASK
 
     progress as ⟨ u, one, h1, h2, h3, h4⟩
