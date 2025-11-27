@@ -43,9 +43,7 @@ Natural language specs:
 @[progress]
 theorem from_limbs_spec (a : Array U64 5#usize) :
     ∃ r, from_limbs a = ok r ∧
-    r = a ∧
-    Field51_as_Nat r = Field51_as_Nat a
-    := by
+    r = a ∧ Field51_as_Nat r = Field51_as_Nat a := by
   simp [from_limbs]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
