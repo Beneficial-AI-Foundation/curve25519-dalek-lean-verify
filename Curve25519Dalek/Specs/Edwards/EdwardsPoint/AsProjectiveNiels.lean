@@ -20,7 +20,7 @@ Source: curve25519-dalek/src/edwards.rs
 -/
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
-
+  curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -66,7 +66,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     let B := Field51_as_Nat pn.Y_minus_X
     let Z' := Field51_as_Nat pn.Z
     let C := Field51_as_Nat pn.T2d
-    let d2 := Field51_as_Nat backend.serial.u64.constants.EDWARDS_D2
+    let d2 := Field51_as_Nat EDWARDS_D2
     A % p = (Y + X) % p ∧
     (B + X) % p = Y % p ∧
     Z' % p = Z % p ∧
@@ -100,9 +100,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     -- END TASK
   · -- BEGIN TASK
     intro i hi
-    unfold backend.serial.u64.constants.EDWARDS_D2
-      Aeneas.Std.eval_global backend.serial.u64.constants.EDWARDS_D2_body
-      backend.serial.u64.field.FieldElement51.from_limbs
+    unfold EDWARDS_D2 Aeneas.Std.eval_global EDWARDS_D2_body from_limbs
     interval_cases i
     all_goals decide
     -- END TASK
