@@ -1,4 +1,37 @@
 /-
+This file was edited by Aristotle.
+
+Lean Toolchain version: leanprover/lean4:v4.20.0-rc5
+Mathlib version: d62eab0cc36ea522904895389c301cf8d844fd69 (May 9, 2025)
+
+Aristotle failed to load this code into its environment. Double check that the syntax is correct.
+Details:
+Lean error:
+Errors during import; aborting. Details:
+input.lean:6:0: error: unknown module prefix 'Curve25519Dalek'
+
+No directory 'Curve25519Dalek' or file 'Curve25519Dalek.olean' in the search path entries:
+/code/harmonic-lean/.lake/packages/batteries/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/Qq/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/aesop/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/proofwidgets/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/importGraph/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/LeanSearchClient/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/plausible/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/MD4Lean/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/BibtexQuery/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/UnicodeBasic/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/Cli/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/mathlib/.lake/build/lib/lean
+/code/harmonic-lean/.lake/packages/doc-gen4/.lake/build/lib/lean
+/code/harmonic-lean/.lake/build/lib/lean
+/workspace/lean4/build/release/stage1/lib/lean
+/workspace/lean4/build/release/stage1/lib/lean
+
+
+-/
+
+/-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander

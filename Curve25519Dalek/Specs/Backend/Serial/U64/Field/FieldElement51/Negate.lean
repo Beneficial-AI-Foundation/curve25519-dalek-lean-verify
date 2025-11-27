@@ -10,6 +10,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.mvcgen
 import Std.Do
 import Std.Tactic.Do
+set_option mvcgen.warning false
 open Std.Do
 
 /-! # Spec Theorem for `FieldElement51::negate`
@@ -74,20 +75,69 @@ theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
 
 /- TODO impl OfNat and OfScientific for `FieldElement51` -/
 
+/-! ## mvcgen-based spec theorem
+
+The `@[spec]` attribute tells `mvcgen` to use this theorem when it encounters
+calls to `negate`. The precondition encodes the wp transformer of the function body.
+-/
+
+/-- Spec for negate in Triple form, suitable for mvcgen.
+    Tagged with @[spec] so mvcgen can use it for calls to negate.
+
+    This follows the pattern from Std.Do.Triple.SpecLemmas:
+    - Precondition includes bounds check AND continuation condition
+    - Postcondition is the generic Q passed in
+
+    Note: For ResultPostShape, `Assertion` = `ULift Prop`, so we use `.down` to extract the Prop. -/
 @[spec]
-theorem negate_spec' (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
+theorem negate_spec_triple (r : FieldElement51) (Q : PostCond FieldElement51 Aeneas.Std.ResultPostShape) :
+    ⦃⌜(∀ i < 5, (r[i]!).val < 2 ^ 54) ∧
+      (∀ r_inv, (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 →
+                (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) →
+                (Q.1 r_inv).down)⌝⦄
+    negate r
+    ⦃Q⦄ := by
+  -- Prove using the existing negate_spec
+  unfold Triple
+  intro ⟨h_bounds, h_Q⟩
+  -- Get the result from negate_spec
+  obtain ⟨r_inv, h_ok, h_mod, h_limbs⟩ := negate_spec r h_bounds
+  -- Show wp⟦negate r⟧ Q
+  simp only [WP.wp, h_ok, Aeneas.Std.Result.wp_apply_ok]
+  exact h_Q r_inv h_mod h_limbs
+
+/-- User-friendly spec with precondition bounds and modular arithmetic postcondition. -/
+@[spec]
+theorem negate_spec' (r : FieldElement51) (h_bounds : ∀ i < 5, (r[i]!).val < 2 ^ 54) :
 ⦃⌜True⌝⦄
 negate r
 ⦃⇓ r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
     := by
-    -- WIP sketch (once the helper lemmas are finished):
-    apply Aeneas.Std.Result.of_wp_run_eq
-    mvcgen [negate] with grind
-    -- ·
-    --   -- prove `negate r = ok _`
-    -- ·
-    --   mvcgen [negate] with grind
-    --   progress*
+    -- Use the negate_spec result directly
+    obtain ⟨r_inv, h_ok, h_mod, _⟩ := negate_spec r h_bounds
+    unfold Triple
+    intro _htrue
+    simp only [WP.wp, h_ok, Aeneas.Std.Result.wp_apply_ok, PostCond.noThrow, ExceptConds.false]
+    exact h_mod
+
+/-- Example: using mvcgen on a function that calls negate.
+    This demonstrates how mvcgen can use the @[spec] lemma. -/
+example (r : FieldElement51) (h : ∀ i < 5, (r[i]!).val < 2 ^ 54) :
+    ⦃⌜True⌝⦄
+    do let res ← negate r; pure res
+    ⦃⇓ r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄ := by
+  -- mvcgen uses @[spec] negate_spec_triple to handle the negate call
+  mvcgen
+  -- VC after mvcgen: bounds ∧ continuation
+  constructor
+  · -- Bounds: ∀ i < 5, r[i]! < 2^54
+    exact h
+  · -- Continuation: ∀ r_inv, spec_props → wp⟦pure r_inv⟧ Q
+    intro r_inv h_mod _h_limbs
+    -- Goal: ((wp (pure r_inv)).apply (PostCond.noThrow ...)).down
+    -- Simplify wp of pure
+    simp only [WP.pure, PostCond.noThrow, ExceptConds.false]
+    exact h_mod
 
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
