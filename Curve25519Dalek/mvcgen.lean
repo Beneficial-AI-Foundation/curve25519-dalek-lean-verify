@@ -74,33 +74,25 @@ theorem Result.of_wp_run_eq {α : Type u} {x : α} {prog : Result α}
   subst h
   have hx := hspec True.intro
   simpa [Result.wp, PostCond.noThrow] using hx
-instance Result.instWP : WP Result (.except Error .pure) where
-  wp x := match x with
-  | .ok v => wp (pure v : Except Error _)
-  | .fail e => wp (throw e : Except Error _)
-  | .div => PredTrans.const ⌜False⌝
 
-instance Result.instWPMonad : WPMonad Result (.except Error .pure) where
-  wp_pure := by intros; ext Q; simp [wp, PredTrans.pure, pure, Except.pure, Id.run]
-  wp_bind x f := by
-    simp only [instWP, bind]
-    ext Q
-    cases x <;> simp [PredTrans.bind, PredTrans.const]
-
-theorem Result.of_wp {α} {x : Result α} (P : Result α → Prop) :
-    (⊢ₛ wp⟦x⟧ post⟨fun a => ⌜P (.ok a)⌝, fun e => ⌜P (.fail e)⌝⟩) → P x := by
+/-- Extract a property from a Result via the weakest-precondition transformer.
+    The postcondition has shape `(α → Assertion) × ((ResultError → Assertion) × PUnit)`. -/
+theorem Result.of_wp {α : Type u} {x : Result α} (P : Result α → Prop) :
+    (⊢ₛ wp⟦x⟧ (fun a => ⌜P (.ok a)⌝, (fun e => ⌜P (.fail e.down)⌝, ⟨⟩))) → P x := by
   intro hspec
-  simp only [instWP] at hspec
-  split at hspec <;> simp_all
-
-
-
-
-theorem Result.of_wp {α} {x : Result α} (P : Result α → Prop) :
-    (⊢ₛ wp⟦x⟧ post⟨fun a => ⌜P (.ok a)⌝, fun e => ⌜P (.fail e)⌝⟩) → P x := by
-  intro hspec
-  simp only [WP] at hspec
-  split at hspec <;> simp_all
+  cases x with
+  | ok v =>
+    have hx := hspec True.intro
+    simp only [WP.wp, Result.wp_apply_ok] at hx
+    exact hx
+  | fail e =>
+    have hx := hspec True.intro
+    simp only [WP.wp, Result.wp_apply_fail] at hx
+    exact hx
+  | div =>
+    have hx := hspec True.intro
+    simp only [WP.wp, Result.wp_apply_div] at hx
+    exact hx.elim
 
 
 end Std

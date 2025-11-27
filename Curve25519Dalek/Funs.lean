@@ -3083,7 +3083,7 @@ noncomputable def ristretto.decompress.step_1
   let s ← backend.serial.u64.field.FieldElement51.from_bytes a
   let s_bytes_check ← backend.serial.u64.field.FieldElement51.to_bytes s
   let s1 ←
-    core.array.Array.index (core.ops.index.IndexSliceInst
+    core.array.Array.index (core.ops.index.IndexSlice
       (core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice U8))
       s_bytes_check ()
   let s2 ← (↑(Array.to_slice a) : Result (Slice U8))
@@ -3353,8 +3353,8 @@ noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
     (↑(Array.to_slice_mut r_1_bytes) : Result ((Slice U8) × (Slice U8 →
       Array U8 32#usize)))
   let s1 ←
-    core.array.Array.index (core.ops.index.IndexSliceInst
-      (core.slice.index.SliceIndexRangeUsizeSliceInst U8)) bytes
+    core.array.Array.index (core.ops.index.IndexSlice
+      (core.slice.index.SliceIndexRangeUsizeSlice U8)) bytes
       { start := 0#usize, end_ := 32#usize }
   let s2 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s s1
   let r_1_bytes1 := to_slice_mut_back s2
@@ -3365,8 +3365,8 @@ noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
     (↑(Array.to_slice_mut r_2_bytes) : Result ((Slice U8) × (Slice U8 →
       Array U8 32#usize)))
   let s4 ←
-    core.array.Array.index (core.ops.index.IndexSliceInst
-      (core.slice.index.SliceIndexRangeUsizeSliceInst U8)) bytes
+    core.array.Array.index (core.ops.index.IndexSlice
+      (core.slice.index.SliceIndexRangeUsizeSlice U8)) bytes
       { start := 32#usize, end_ := 64#usize }
   let s5 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s3 s4
   let r_2_bytes1 := to_slice_mut_back1 s5
