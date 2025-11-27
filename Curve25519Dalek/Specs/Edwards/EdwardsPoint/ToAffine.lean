@@ -90,27 +90,28 @@ theorem to_affine_spec (e : EdwardsPoint)
 
         · split_ifs
 
-          · constructor
+          · rename_i h_Z_zero
+            have h_inv_zero : Field51_as_Nat Z_inv % p = 0 := recip h_Z_zero
+            constructor
 
-            · rename_i h_Z_zero
-              have h_inv_zero : Field51_as_Nat Z_inv % p = 0 := recip h_Z_zero
-              rw [x_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
+            · rw [x_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
 
-            · rename_i h_Z_zero
-              have h_inv_zero : Field51_as_Nat Z_inv % p = 0 := recip h_Z_zero
-              rw [y_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
+            · rw [y_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
 
-          · constructor
+          · rename_i h_Z_nonzero
+            have h_inv_nonzero : Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p) % p = 1 := h_recip_nonzero h_Z_nonzero
+            rw [Nat.mul_mod] at h_inv_nonzero
+            constructor
 
-            · rename_i h_Z_nonzero
-              have h_inv_nonzero : Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p) % p = 1 := h_recip_nonzero h_Z_nonzero
-              rw [Nat.mul_mod, x_post_1]
-              rw [Nat.mul_mod] at h_inv_nonzero
-              simp [mul_assoc]
+            · rw [Nat.mul_mod, x_post_1]
+              simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
+              simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_inv_nonzero
+              simp [Nat.mul_mod, h_inv_nonzero]
 
-              sorry
-
-            · sorry
+            · rw [Nat.mul_mod, y_post_1]
+              simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
+              simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_inv_nonzero
+              simp [Nat.mul_mod, h_inv_nonzero]
 
         · constructor
 
@@ -121,7 +122,5 @@ theorem to_affine_spec (e : EdwardsPoint)
           · intro i hi
             have := y_post_2 i hi
             omega
-
-
 
 end curve25519_dalek.edwards.EdwardsPoint
