@@ -56,7 +56,6 @@ curve25519_dalek::backend::straus_multiscalar_mul,curve25519-dalek/src/backend/m
 curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/mod.rs,L267-L277,Curve25519Dalek/Specs/Backend/VartimeDoubleBaseMul.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul",
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L189-L191,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,extracted,specified,,
-curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,extracted,specified,,
 curve25519_dalek::edwards::affine::AffinePoint::compress,curve25519-dalek/src/edwards/affine.rs,L71-L75,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::add,curve25519-dalek/src/edwards.rs,L755-L757,,extracted,,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
