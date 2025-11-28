@@ -16,7 +16,6 @@ open Aeneas.Std Result
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
-
 /-- Right-shifting a 64-bit value by 51 bits leaves at most 13 bits so bounded by 2^13 - 1. -/
 theorem U64_shiftRight_le (a : U64) : a.val >>> 51 ≤ 2 ^ 13 - 1 := by
   bvify 64 at *; bv_decide
@@ -56,123 +55,73 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
-/-- The sum of the first i terms of a base-256 number is less than 2^(8*i). -/
-private lemma base256_sum_bound (bytes : Array U8 32#usize) (i : Nat) :
+/-- The sum of the first i terms of a base-256 number is less than `2 ^ (8 * i)`. -/
+private lemma U8x32_extract_byte_aux (bytes : Array U8 32#usize) (i : Nat) :
     ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) := by
-  have h_byte_bound : ∀ j : Nat, bytes[j]!.val ≤ 2^8 - 1 := fun j => by
-    have hlt : bytes[j]!.val < 2^UScalarTy.U8.numBits := bytes[j]!.bv.isLt
-    simp only [UScalarTy.numBits] at hlt; omega
+  have h_byte_bound : ∀ j : Nat, bytes[j]!.val ≤ 2 ^ 8 - 1 := by
+    intro j
+    have : bytes[j]!.val < 2 ^ UScalarTy.U8.numBits := bytes[j]!.bv.isLt
+    grind [UScalarTy.numBits]
   induction i with
   | zero => simp
-  | succ n ih =>
-    rw [Finset.sum_range_succ]
-    have h2 : 2 ^ (8 * n) * bytes[n]!.val ≤ 2 ^ (8 * n) * (2 ^ 8 - 1) :=
+  | succ n _ =>
+    have : 2 ^ (8 * n) * bytes[n]!.val ≤ 2 ^ (8 * n) * (2 ^ 8 - 1) :=
       Nat.mul_le_mul_left _ (h_byte_bound n)
-    calc ∑ j ∈ Finset.range n, 2 ^ (8 * j) * bytes[j]!.val + 2 ^ (8 * n) * bytes[n]!.val
-        < 2 ^ (8 * n) + 2 ^ (8 * n) * (2 ^ 8 - 1) := Nat.add_lt_add_of_lt_of_le ih h2
-      _ = 2 ^ (8 * n) * (1 + (2 ^ 8 - 1)) := by ring
-      _ = 2 ^ (8 * n) * 2 ^ 8 := by norm_num
-      _ = 2 ^ (8 * n + 8) := by rw [← pow_add]
-      _ = 2 ^ (8 * (n + 1)) := by ring_nf
+    rw [Finset.sum_range_succ]
+    grind
 
 /-- Extract a byte from its position in the base-256 representation. -/
 lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
-    (bytes : List U8)[i]! = (U8x32_as_Nat bytes / 2 ^ (8 * i)) % 2 ^ 8 := by
-  -- The key insight: we can extract the i-th digit from a base-256 number
-  -- by dividing by 256^i and taking modulo 256
-
-  -- First establish that bytes[i]! means the same thing
+    bytes[i]! = (U8x32_as_Nat bytes / 2 ^ (8 * i)) % 2 ^ 8 := by
   have h_eq : (bytes : List U8)[i]! = bytes[i]! := by simp [Array.getElem!_Nat_eq]
-  rw [h_eq]
-
-  -- Now we need: bytes[i]!.val = (U8x32_as_Nat bytes / 2^(8*i)) % 2^8
-  -- where U8x32_as_Nat bytes = ∑_{j=0}^{31} 2^(8j) * bytes[j].val
-
   unfold U8x32_as_Nat
-
-  -- Split the sum into: before i, at i, after i
-  have split : ∑ j ∈ Finset.range 32, 2^(8*j) * bytes[j]!.val =
+  have : ∑ j ∈ Finset.range 32, 2^(8*j) * bytes[j]!.val =
       (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) +
       2 ^ (8 * i) * bytes[i]!.val +
       (∑ j ∈ Finset.Ico (i + 1) 32, 2 ^ (8 * j) * bytes[j]!.val) := by
-    rw [← Finset.sum_range_add_sum_Ico _ hi]
-    have : i.succ = i + 1 := rfl
-    simp only [this]
-    -- Now split Finset.range (i+1) = Finset.range i ∪ {i}
-    rw [← Finset.sum_range_succ]
-
-  simp only [split]
-
-  -- Now: (lower + 2^(8i)*bytes[i] + upper) / 2^(8i) % 2^8 = bytes[i]
-
-  -- Prove auxiliary facts
-  -- Fact 1: Sum of lower terms is < 2^(8*i)
-  -- Each byte[j] ≤ 2^8 - 1, so ∑ 2^(8*j) * bytes[j] ≤ (2^8 - 1) * ∑ 2^(8*j) = (2^8 - 1) * (2^(8*i) - 1)/(2^8 - 1) = 2^(8*i) - 1
+    simp [← Finset.sum_range_add_sum_Ico _ hi, ← Finset.sum_range_succ]
+  rw [this]
   have lower_bound : ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) :=
-    base256_sum_bound bytes i
-
-  -- Fact 2: Sum of upper terms is divisible by 2^(8*(i+1))
-  -- This is because each j ≥ i+1, so each term has 2^(8*j) with 8*j ≥ 8*(i+1)
-  have upper_div_multiple : ∃ k, ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val = k * 2^(8*(i+1)) := by
-    -- Factor out 2^(8*(i+1)) from each term: 2^(8j) = 2^(8(i+1)) * 2^(8j - 8(i+1))
+    U8x32_extract_byte_aux bytes i
+  have : ∃ k, ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val = k * 2^(8*(i+1)) := by
     use ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j - 8*(i+1)) * bytes[j]!.val
     rw [Finset.sum_mul]
     apply Finset.sum_congr rfl
     intro j hj
-    have hj_ge : i + 1 ≤ j := (Finset.mem_Ico.mp hj).1
-    have h_exp : 8 * j = 8 * (i + 1) + (8 * j - 8 * (i + 1)) := by omega
+    have : 8 * (i + 1) + (8 * j - 8 * (i + 1)) = 8 * j := by
+      have : i + 1 ≤ j := (Finset.mem_Ico.mp hj).1
+      omega
     calc 2 ^ (8 * j) * bytes[j]!.val
-        = 2 ^ (8 * (i + 1) + (8 * j - 8 * (i + 1))) * bytes[j]!.val := by rw [← h_exp]
-      _ = 2 ^ (8 * (i + 1)) * 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val := by rw [pow_add]
-      _ = 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val * 2 ^ (8 * (i + 1)) := by ring
-
-  have byte_bound : bytes[i]!.val < 2^8 := by
-    have h1 : bytes[i]!.val < 2^UScalarTy.U8.numBits := bytes[i]!.bv.isLt
-    simp [UScalarTy.numBits] at h1
-    have h2 : (bytes : List U8)[i]!.val = bytes[i]!.val := congrArg (·.val) h_eq
-    rw [← h2]
-    exact h1
-
-  -- Use the auxiliary facts to show the formula
-  -- We have: (lower + 2^(8*i) * bytes[i] + upper) / 2^(8*i) % 2^8 = bytes[i]
-  -- where lower < 2^(8*i) and upper = k * 2^(8*(i+1))
-
-  -- Extract k from upper_div_multiple
-  obtain ⟨k, hk⟩ := upper_div_multiple
-
-  -- Key insight: lower / 2^(8*i) = 0 since lower < 2^(8*i)
-  have lower_div_zero : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) / 2^(8*i) = 0 := by
+        = 2 ^ (8 * (i + 1) + (8 * j - 8 * (i + 1))) * bytes[j]!.val := by simp [*]
+      _ = 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val * 2 ^ (8 * (i + 1)) := by grind
+  obtain ⟨k, hk⟩ := this
+  have : bytes[i]!.val < 2^8 := by
+    have : bytes[i]!.val < 2^UScalarTy.U8.numBits := bytes[i]!.bv.isLt
+    simp only [Array.getElem!_Nat_eq, UScalarTy.numBits] at this
+    grind
+  have : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) / 2^(8*i) = 0 := by
     exact Nat.div_eq_zero_iff.mpr (Or.inr lower_bound)
-
-  -- Now prove bytes[i]!.val = (... / 2^(8*i)) % 2^8
-  -- Main calculation
   calc bytes[i]!.val
-      = bytes[i]!.val % 2^8 := (Nat.mod_eq_of_lt byte_bound).symm
-    _ = (bytes[i]!.val + k * 2^8) % 2^8 := by grind
     _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) / 2^(8*i) +
-         bytes[i]!.val + k * 2^8) % 2^8 := by rw [lower_div_zero]; simp
+        bytes[i]!.val + k * 2^8) % 2^8 := by grind
     _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
-          2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8) % 2^8 := by
-          rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
+        2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8) % 2^8 := by
+      rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
     _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
-          2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i)) % 2^8 := by
-          have h_pow : 2^(8*(i+1)) = 2^(8*i) * 2^8 := by
-            rw [← pow_add]; ring_nf
-          -- Show that (a + b*x + c*x) / x = a/x + b + c
-          have h_div : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
-                        2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i) =
-                       (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
-                        2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8 := by
-            rw [h_pow]
-            have h1 : k * (2^(8*i) * 2^8) = 2^(8*i) * (k * 2^8) := by ring
-            rw [h1]
-            rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
-          rw [h_div]
+        2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i)) % 2^8 := by
+      have h_pow : 2^(8*(i+1)) = 2^(8*i) * 2^8 := by
+        rw [← pow_add]; ring_nf
+      have : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+          2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i) =
+            (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+              2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8 := by
+        have : k * (2^(8*i) * 2^8) = 2^(8*i) * (k * 2^8) := by ring
+        rw [h_pow, this, Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
+      rw [this]
     _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
-          2^(8*i) * bytes[i]!.val +
-          ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val) / 2^(8*i)) % 2^8 := by
-          rw [← hk]
-
+        2^(8*i) * bytes[i]!.val +
+        ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val) / 2^(8*i)) % 2^8 := by
+      rw [← hk]
 
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
   intro a b hab
@@ -180,9 +129,9 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
   apply List.ext_getElem
   · simp [a.property, b.property]
   · intro i hi _
-    have hi32 : i < 32 := by simpa [a.property] using hi
-    have : (a : List U8)[i]!.val = (b : List U8)[i]!.val := by
-      rw [U8x32_extract_byte a i hi32, U8x32_extract_byte b i hi32, hab]
+    have hi : i < 32 := by simpa [a.property] using hi
+    have : (a)[i]!.val = (b)[i]!.val := by
+      rw [U8x32_extract_byte a i hi, U8x32_extract_byte b i hi, hab]
     bvify 8 at *
     simp_all
 
