@@ -9,6 +9,9 @@ set_option linter.style.longLine false
 Theorems which are useful for proving spec theorems in this project but aren't available upstream.
 This file is for theorems which depend only on Defs.lean, not on Funs.lean or Types.lean. -/
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 open Aeneas.Std Result
 
 attribute [-simp] Int.reducePow Nat.reducePow
@@ -53,8 +56,34 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
-lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
+/-- Extract a byte from its position in the base-256 representation. -/
+lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
+    (bytes : List U8)[i]! = (U8x32_as_Nat bytes / 2^(8*i)) % 2^8 := by
+  unfold U8x32_as_Nat
+
+  -- Key idea: The sum can be written as lower + 2^(8*i) * bytes[i] + upper
+  -- where lower < 2^(8*i) and upper is divisible by 2^(8*(i+1))
+
+  -- When we divide by 2^(8*i):
+  -- (lower + 2^(8*i) * bytes[i] + upper) / 2^(8*i)
+  -- = lower / 2^(8*i) + bytes[i] + upper / 2^(8*i)
+  -- = 0 + bytes[i] + (multiple of 2^8)
+
+  -- Then mod 2^8 gives us bytes[i]
+
   sorry
+
+lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
+  intro a b hab
+  apply Subtype.eq
+  apply List.ext_getElem
+  · simp [a.property, b.property]
+  · intro i hi _
+    have hi32 : i < 32 := by simpa [a.property] using hi
+    have : (a : List U8)[i]!.val = (b : List U8)[i]!.val := by
+      rw [U8x32_extract_byte a i hi32, U8x32_extract_byte b i hi32, hab]
+    bvify 8 at *
+    simp_all
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
