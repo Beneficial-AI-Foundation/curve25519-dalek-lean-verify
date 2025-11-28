@@ -222,6 +222,10 @@ theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : Cu
   apply (ZMod.natCast_eq_natCast_iff a b p).mpr
   exact h
 
+/-- Ed25519 curve parameter d is not a square in the field.
+This is a mathematical fact that requires separate verification. -/
+lemma Ed25519_d_not_square : ¬IsSquare Ed25519.d := sorry
+
 /--
 Verification of the `double` function.
 The theorem states that the Rust implementation of point doubling corresponds
@@ -276,7 +280,7 @@ theorem double_spec_math
 
     -- Setup Curve Identities
     unfold CompletedPoint.IsValid
-    have h_d_not_square : ¬IsSquare Ed25519.d := sorry
+    have h_d_not_square : ¬IsSquare Ed25519.d := Ed25519_d_not_square
     have h_neg_one_square : IsSquare (-1 : CurveField) := by
       apply ZMod.exists_sq_eq_neg_one_iff.mpr; decide
 
