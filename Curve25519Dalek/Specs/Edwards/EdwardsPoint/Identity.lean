@@ -5,7 +5,10 @@ Authors: Liao Zhang, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-
+import Curve25519Dalek.mvcgen
+import Std.Do
+import Std.Tactic.Do
+open Std.Do
 
 /-! # identity
 
@@ -35,11 +38,20 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
+
 @[progress]
 theorem identity_spec :
   ∃ q, identity = ok q ∧
   q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
   unfold identity
   simp
+
+@[spec]
+theorem identity_spec' :
+⦃⌜True⌝⦄
+identity
+⦃⇓ q => ⌜q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO⌝⦄
+  := by
+  mvcgen
 
 end curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint
