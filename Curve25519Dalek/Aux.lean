@@ -56,6 +56,25 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- The sum of the first i terms of a base-256 number is less than 2^(8*i). -/
+private lemma base256_sum_bound (bytes : Array U8 32#usize) (i : Nat) :
+    ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) := by
+  have h_byte_bound : ∀ j : Nat, bytes[j]!.val ≤ 2^8 - 1 := fun j => by
+    have hlt : bytes[j]!.val < 2^UScalarTy.U8.numBits := bytes[j]!.bv.isLt
+    simp only [UScalarTy.numBits] at hlt; omega
+  induction i with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ]
+    have h2 : 2 ^ (8 * n) * bytes[n]!.val ≤ 2 ^ (8 * n) * (2 ^ 8 - 1) :=
+      Nat.mul_le_mul_left _ (h_byte_bound n)
+    calc ∑ j ∈ Finset.range n, 2 ^ (8 * j) * bytes[j]!.val + 2 ^ (8 * n) * bytes[n]!.val
+        < 2 ^ (8 * n) + 2 ^ (8 * n) * (2 ^ 8 - 1) := Nat.add_lt_add_of_lt_of_le ih h2
+      _ = 2 ^ (8 * n) * (1 + (2 ^ 8 - 1)) := by ring
+      _ = 2 ^ (8 * n) * 2 ^ 8 := by norm_num
+      _ = 2 ^ (8 * n + 8) := by rw [← pow_add]
+      _ = 2 ^ (8 * (n + 1)) := by ring_nf
+
 /-- Extract a byte from its position in the base-256 representation. -/
 lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
     (bytes : List U8)[i]! = (U8x32_as_Nat bytes / 2 ^ (8 * i)) % 2 ^ 8 := by
@@ -89,13 +108,23 @@ lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
   -- Prove auxiliary facts
   -- Fact 1: Sum of lower terms is < 2^(8*i)
   -- Each byte[j] ≤ 2^8 - 1, so ∑ 2^(8*j) * bytes[j] ≤ (2^8 - 1) * ∑ 2^(8*j) = (2^8 - 1) * (2^(8*i) - 1)/(2^8 - 1) = 2^(8*i) - 1
-  have lower_bound : ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) := by
-    sorry
+  have lower_bound : ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) :=
+    base256_sum_bound bytes i
 
   -- Fact 2: Sum of upper terms is divisible by 2^(8*(i+1))
   -- This is because each j ≥ i+1, so each term has 2^(8*j) with 8*j ≥ 8*(i+1)
   have upper_div_multiple : ∃ k, ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val = k * 2^(8*(i+1)) := by
-    sorry
+    -- Factor out 2^(8*(i+1)) from each term: 2^(8j) = 2^(8(i+1)) * 2^(8j - 8(i+1))
+    use ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j - 8*(i+1)) * bytes[j]!.val
+    rw [Finset.sum_mul]
+    apply Finset.sum_congr rfl
+    intro j hj
+    have hj_ge : i + 1 ≤ j := (Finset.mem_Ico.mp hj).1
+    have h_exp : 8 * j = 8 * (i + 1) + (8 * j - 8 * (i + 1)) := by omega
+    calc 2 ^ (8 * j) * bytes[j]!.val
+        = 2 ^ (8 * (i + 1) + (8 * j - 8 * (i + 1))) * bytes[j]!.val := by rw [← h_exp]
+      _ = 2 ^ (8 * (i + 1)) * 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val := by rw [pow_add]
+      _ = 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val * 2 ^ (8 * (i + 1)) := by ring
 
   have byte_bound : bytes[i]!.val < 2^8 := by
     have h1 : bytes[i]!.val < 2^UScalarTy.U8.numBits := bytes[i]!.bv.isLt
@@ -129,9 +158,16 @@ lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
           2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i)) % 2^8 := by
           have h_pow : 2^(8*(i+1)) = 2^(8*i) * 2^8 := by
             rw [← pow_add]; ring_nf
-          rw [h_pow]
-          rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
-          sorry
+          -- Show that (a + b*x + c*x) / x = a/x + b + c
+          have h_div : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+                        2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i) =
+                       (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+                        2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8 := by
+            rw [h_pow]
+            have h1 : k * (2^(8*i) * 2^8) = 2^(8*i) * (k * 2^8) := by ring
+            rw [h1]
+            rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
+          rw [h_div]
     _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
           2^(8*i) * bytes[i]!.val +
           ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val) / 2^(8*i)) % 2^8 := by
