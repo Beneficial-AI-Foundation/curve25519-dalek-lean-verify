@@ -75,7 +75,7 @@ curve25519_dalek::field::FieldElement51::sqrt_ratio_i,curve25519-dalek/src/field
 curve25519_dalek::field::FieldElement51::is_negative,curve25519-dalek/src/field.rs,L150-L153,,extracted,,,
 curve25519_dalek::field::FieldElement51::is_zero,curve25519-dalek/src/field.rs,L160-L165,Curve25519Dalek/Specs/Field/FieldElement51/IsZero.lean,extracted,verified,To be refactored when problem with progress is solved,
 curve25519_dalek::field::FieldElement51::invert,curve25519-dalek/src/field.rs,L255-L264,Curve25519Dalek/Specs/Field/FieldElement51/Invert.lean,extracted,specified,,
-curve25519_dalek::field::FieldElement51::invsqrt,curve25519-dalek/src/field.rs,L352-L354,Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean,extracted,specified,,
+curve25519_dalek::field::FieldElement51::invsqrt,curve25519-dalek/src/field.rs,L352-L354,Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean,extracted,verified,,
 curve25519_dalek::montgomery::MontgomeryPoint::to_edwards,curve25519-dalek/src/montgomery.rs,L216-L252,Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean,extracted,specified,,
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes,curve25519-dalek/src/ristretto.rs,L234-L236,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::ristretto::CompressedRistretto::decompress,curve25519-dalek/src/ristretto.rs,L255-L382,Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean,extracted,,,
