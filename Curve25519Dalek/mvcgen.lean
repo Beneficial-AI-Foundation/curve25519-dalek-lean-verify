@@ -74,44 +74,7 @@ theorem Result.of_wp_run_eq {α : Type u} {x : α} {prog : Result α}
   subst h
   have hx := hspec True.intro
   simpa [Result.wp, PostCond.noThrow] using hx
--- instance Result.instWP : WP Result (.except Error .pure) where
---   wp x := match x with
---   | .ok v => wp (pure v : Except Error _)
---   | .fail e => wp (throw e : Except Error _)
---   | .div => PredTrans.const ⌜False⌝
-
--- instance Result.instWPMonad : WPMonad Result (.except Error .pure) where
---   wp_pure := by intros; ext Q; simp [wp, PredTrans.pure, pure, Except.pure, Id.run]
---   wp_bind x f := by
---     simp only [instWP, bind]
---     ext Q
---     cases x <;> simp [PredTrans.bind, PredTrans.const]
-
--- theorem Result.of_wp {α} {x : Result α} (P : Result α → Prop) :
---     (⊢ₛ wp⟦x⟧ post⟨fun a => ⌜P (.ok a)⌝, fun e => ⌜P (.fail e)⌝⟩) → P x := by
---   intro hspec
---   simp only [instWP] at hspec
---   split at hspec <;> simp_all
-
 
 end Std
 
 end Aeneas
-
-/-
-
-alok:
-
-- [ ] look at aeneas.std.primitives in aeneas source code
-
-ref: https://lean-lang.org/doc/reference/latest/The--mvcgen--tactic
-
-see `18.1.7. Extending mvcgen With Support for Custom Monads`
-
-goal: implement for aeneas primitive monad types
-
-may need to implement monad and lawfulMonad too
-
-then implement WP and WPMonad (see ref)
-
--/
