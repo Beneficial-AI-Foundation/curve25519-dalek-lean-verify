@@ -6,138 +6,35 @@ Authors: Alessandro D'Angelo
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Types
+import Curve25519Dalek.Defs.Edwards.Curve
 
 import Mathlib.Algebra.Field.ZMod
 
 /-!
-# Edwards Curve Definitions for Ed25519
+# Bridge Infrastructure for Edwards Curve Representations
 
-This file provides the mathematical foundations and bridge infrastructure for Ed25519:
+This file provides the bridge between low-level Rust implementation types
+(ProjectivePoint, CompletedPoint, AffinePoint) and high-level mathematical
+objects (Point Ed25519).
 
-1. **Mathematical Foundations**: Defines the Twisted Edwards curve `Ed25519` over `ZMod p`,
-   including the Point structure and group operations.
-2. **Bridge Infrastructure**: Provides validity predicates and "Total Function" conversions
-   to map low-level Rust types (`ProjectivePoint`, `CompletedPoint`, `AffinePoint`) to
-   high-level mathematical objects (`Point Ed25519`).
+## Contents
+
+1. **field_from_limbs**: Converts 5-limb FieldElement51 arrays to CurveField
+2. **IsValid Predicates**: Link low-level representations to mathematical points
+3. **Total Conversion Functions**: toPoint' with Classical choice for invalid inputs
+4. **Coercions**: Enable natural syntax like `↑q` for conversions
+5. **InBounds**: Hardware bounds checking predicates
+
+## Architecture Note
+
+This file imports `Funs.lean` and `Types.lean` to access Rust implementation types.
+It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
 -/
 
 namespace Edwards
 
 open curve25519_dalek CategoryTheory curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.curve_models Function ZMod
-
-
-
-/-! ## 1. Mathematical Foundations: Twisted Edwards Curves -/
-
-/-- The finite field F_p where p = 2^255 - 19. -/
-abbrev CurveField : Type := ZMod p
-
-instance : Fact (Nat.Prime p) := by
-  unfold p
-  -- Proof omitted: p = 2^255 - 19 is prime.
-  sorry
-
-instance : Field CurveField := by
-  unfold CurveField
-  infer_instance
-
-/-- A Twisted Edwards curve structure defined by parameters a and d. -/
-structure EdwardsCurve (F : Type) [Field F] where
-  a : F
-  d : F
-
-/-- The specific Ed25519 curve parameters lifted to the field. -/
-def Ed25519 : EdwardsCurve CurveField := {
-  a := -1,
-  d := (d : CurveField)
-}
-
-/-- An affine point on the Edwards curve. -/
-@[ext]
-structure Point {F : Type} [Field F] (C : EdwardsCurve F) where
-  x : F
-  y : F
-  h_on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2
-  deriving Repr
-
-instance : Inhabited (Point Ed25519) :=
-  ⟨{ x := 0, y := 1, h_on_curve := by simp [Ed25519] }⟩
-
-variable {F : Type} [Field F] (C : EdwardsCurve F)
-
-/-- Implements the unified addition formulas for Twisted Edwards curves. -/
-def add_coords (p1 p2 : F × F) : F × F :=
-  let (x₁, y₁) := p1
-  let (x₂, y₂) := p2
-  let lambda_val := C.d * x₁ * x₂ * y₁ * y₂
-  ( (x₁ * y₂ + y₁ * x₂) / (1 + lambda_val),
-    (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lambda_val) )
-
-/-- Theorem: The sum of two points on the curve stays on the curve. -/
-theorem add_closure (p1 p2 : Point C) :
-    let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
-    C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
-  simp only [add_coords]
-  -- Proof requires analyzing denominators (omitted for brevity)
-  sorry
-
-instance : Add (Point C) where
-  add p1 p2 :=
-  let coords := add_coords C (p1.x, p1.y) (p2.x, p2.y)
-  { x := coords.1
-    y := coords.2
-    h_on_curve := add_closure C p1 p2 }
-
-instance : Zero (Point C) where
-  zero := { x := 0, y := 1, h_on_curve := by simp }
-
-instance : Neg (Point C) where
-  neg p := {
-    x := -p.x
-    y := p.y
-    h_on_curve := by
-      have h := p.h_on_curve
-      simp only [neg_pow_two]
-      exact h
-  }
-
-instance : Sub (Point C) where
-  sub p1 p2 := p1 + (-p2)
-
-def nsmul (n : ℕ) (p : Point C) : Point C :=
-  match n with
-  | 0 => 0
-  | n + 1 => p + (nsmul n p)
-
-def zsmul (z : ℤ) (p : Point C) : Point C :=
-  match z with
-  | (n : ℕ) => nsmul C n p
-  | (Int.negSucc n) => -(nsmul C (n + 1) p)
-
-instance : SMul ℕ (Point C) := ⟨nsmul C⟩
-instance : SMul ℤ (Point C) := ⟨zsmul C⟩
-
-/-- The Edwards Curve forms an additive abelian group. -/
-instance : AddCommGroup (Point C) where
-  add := Add.add
-  add_assoc := by sorry
-  zero := 0
-  zero_add p := by sorry
-  add_zero := by sorry
-  nsmul := nsmul C
-  neg := Neg.neg
-  zsmul := zsmul C
-  neg_add_cancel := by sorry
-  add_comm := by sorry
-  nsmul_succ := by sorry
-  zsmul_succ' := by sorry
-
-/-- Helper lemma to expose the addition formula without unfolding the whole structure. -/
-theorem add_def (p1 p2 : Point Ed25519) :
-  (p1 + p2).x = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).1 ∧
-  (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
-  exact Prod.mk_inj.mp rfl
 
 /-- Convert the 5-limb array to a field element in ZMod p. -/
 def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField :=

@@ -10,7 +10,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
-import Curve25519Dalek.Defs.Edwards
+import Curve25519Dalek.Defs.Edwards.Curve
+import Curve25519Dalek.Defs.Edwards.Representation
 import Mathlib.Data.ZMod.Basic
 
 set_option linter.hashCommand false
