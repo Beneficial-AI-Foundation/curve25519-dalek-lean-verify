@@ -111,12 +111,17 @@ def aa : Aeneas.Std.Array U8 32#usize :=
 
 
 
+
+
 lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
     U8x32_as_Nat a = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val) := by
-    sorry
-
-
-
+    unfold U8x32_as_Nat
+    have h := Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val)
+    rw [h]
+    simp only [pow_mul]
+    rw [Finset.sum_range]
+    change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
+    simp [Nat.mul_comm]
 
 
 lemma U8_Array_elements_lt_256 {n : Usize} (a : Aeneas.Std.Array U8 n) :
