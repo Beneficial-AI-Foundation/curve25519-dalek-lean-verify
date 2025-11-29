@@ -53,9 +53,6 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
-lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
-  sorry
-
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
 theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < 2 ^ 255) :
@@ -77,3 +74,92 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
   refine high_bit_zero_of_lt_255 bytes ?_
   have : L ≤ 2 ^ 255 := by decide
   grind
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def aa : Aeneas.Std.Array U8 32#usize :=
+  ⟨[1#u8, 1#u8, 0#u8, 0#u8, 32#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 1#u8, 0#u8, 8#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 1#u8], by decide⟩
+
+#eval U8x32_as_Nat aa = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => aa[i]!.val)
+
+#check (List.ofFn fun i : Fin 32 => aa[i]!.val)
+
+
+
+
+
+
+
+
+
+lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Nat a = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val) := by
+    sorry
+
+
+
+
+
+lemma U8_Array_elements_lt_256 {n : Usize} (a : Aeneas.Std.Array U8 n) :
+    ∀ l ∈ (List.ofFn fun i : Fin 32 => a[i]!.val), l < 2 ^ 8 := by
+  intro l hl
+  rw [List.mem_ofFn] at hl
+  obtain ⟨i, rfl⟩ := hl
+  exact Aeneas.Std.UScalar.hBounds (a[i]!)
+
+
+lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
+
+  intro a a' h_funs_eq
+
+  rw [U8x32_as_Nat_is_NatofDigits a, U8x32_as_Nat_is_NatofDigits a'] at h_funs_eq
+
+  set L := (List.ofFn fun i : Fin 32 => a[i]!.val)
+  set L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
+  set b := (2 ^ 8 : Nat)
+
+  have h_inj := Nat.ofDigits_inj_of_len_eq
+    (b := b)
+    (by omega : 1 < b)
+    (L1 := L)
+    (L2 := L')
+    (by rw [List.length_ofFn, List.length_ofFn])
+    (by exact U8_Array_elements_lt_256 a)
+    (by exact U8_Array_elements_lt_256 a')
+    (by exact h_funs_eq)
+
+  simp only [L, L'] at h_inj
+  rw [List.ofFn_inj] at h_inj
+  apply Subtype.eq
+  apply List.ext_get
+
+  · simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+  · intro n h_a h_a'
+    have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
+        List.Vector.length_val, UScalar.ofNat_val_eq, Fin.is_lt, getElem!_pos]
+    have h_congr := congr_fun h_inj ⟨n, h_len⟩
+    have h_a_len : a.val.length = 32 := by simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+    cases a' with | mk val_a' =>
+    cases a with | mk val_a =>
+    simp_all only [UScalar.ofNat_val_eq, Fin.getElem!_fin, Array.getElem!_Nat_eq, Fin.is_lt,
+        getElem!_pos, List.get_eq_getElem]
+    exact UScalar.eq_of_val_eq h_congr
