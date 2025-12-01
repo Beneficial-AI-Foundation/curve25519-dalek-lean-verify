@@ -104,9 +104,9 @@ This document tracks the progress of formally verifying functions from the curve
 | `is_canonical` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1134-L1136) | [IsCanonical.lean](Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean) | ✅ | ✅ |  |
 | `non_adjacent_form` | [scalar.rs](curve25519-dalek/src/scalar.rs#L921-L973) | [NonAdjacentForm.lean](Curve25519Dalek/Specs/Scalar/Scalar/NonAdjacentForm.lean) | ☐ | ✏️ | Extraction problem due to nested borrows |
 | `ONE` | [scalar.rs](curve25519-dalek/src/scalar.rs#L567-L572) | [One.lean](Curve25519Dalek/Specs/Scalar/Scalar/One.lean) | ✅ | ✅ |  |
-| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1125-L1130) | [Reduce.lean](Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean) | ✅ | 📋 |  |
+| `reduce` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1125-L1130) | [Reduce.lean](Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean) | ✅ | ✅ |  |
 | `to_bytes` | [scalar.rs](curve25519-dalek/src/scalar.rs#L691-L693) | [ToBytes.lean](Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean) | ✅ | ✅ |  |
-| `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1119-L1121) | [Unpack.lean](Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean) | ✅ | 📋 |  |
+| `unpack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1119-L1121) | [Unpack.lean](Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean) | ✅ | ✅ |  |
 | `ZERO` | [scalar.rs](curve25519-dalek/src/scalar.rs#L564-L564) | [Zero.lean](Curve25519Dalek/Specs/Scalar/Scalar/Zero.lean) | ✅ | ✅ |  |
 
 ## Legend
