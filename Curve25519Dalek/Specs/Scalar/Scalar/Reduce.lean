@@ -64,7 +64,7 @@ theorem reduce_spec (s : Scalar) :
   progress*
   · unfold constants.R; decide
   simp[res_post_2]
-  rw[← x_post_2]
+  rw[← x_post_1]
   rw[← Nat.ModEq] at x_mod_l_post
   rw[xR_post] at x_mod_l_post
   have Rs := R_spec
