@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Oliver Butterley, Markus Dablander
+Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -15,8 +15,6 @@ This function unpacks the element from a compact representation.
 
 **Source**: curve25519-dalek/src/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result curve25519_dalek.scalar.Scalar52
