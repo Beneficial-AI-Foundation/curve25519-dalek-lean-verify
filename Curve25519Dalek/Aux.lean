@@ -75,85 +75,36 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
   have : L ≤ 2 ^ 255 := by decide
   grind
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def aa : Aeneas.Std.Array U8 32#usize :=
-  ⟨[1#u8, 1#u8, 0#u8, 0#u8, 32#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 1#u8, 0#u8, 8#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 0#u8, 1#u8], by decide⟩
-
-#eval U8x32_as_Nat aa = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => aa[i]!.val)
-
-#check (List.ofFn fun i : Fin 32 => aa[i]!.val)
-
-
-
-
-
-
-
-
-
-
-
+/-- The function U8x32_as_Nat can be represented via Nat.ofDigits applied to an appropriate
+list representation of the input array -/
 lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
     U8x32_as_Nat a = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val) := by
     unfold U8x32_as_Nat
-    have h := Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val)
-    rw [h]
+    rw [Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val), Finset.sum_range]
     simp only [pow_mul]
-    rw [Finset.sum_range]
     change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
     simp [Nat.mul_comm]
 
-
-lemma U8_Array_elements_lt_256 {n : Usize} (a : Aeneas.Std.Array U8 n) :
-    ∀ l ∈ (List.ofFn fun i : Fin 32 => a[i]!.val), l < 2 ^ 8 := by
-  intro l hl
-  rw [List.mem_ofFn] at hl
-  obtain ⟨i, rfl⟩ := hl
-  exact Aeneas.Std.UScalar.hBounds (a[i]!)
-
-
+/-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
+number representation, then the input arrays must be equal. -/
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 
   intro a a' h_funs_eq
-
   rw [U8x32_as_Nat_is_NatofDigits a, U8x32_as_Nat_is_NatofDigits a'] at h_funs_eq
-
-  set L := (List.ofFn fun i : Fin 32 => a[i]!.val)
-  set L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
-  set b := (2 ^ 8 : Nat)
+  let L := (List.ofFn fun i : Fin 32 => a[i]!.val)
+  let L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
 
   have h_inj := Nat.ofDigits_inj_of_len_eq
-    (b := b)
-    (by omega : 1 < b)
+    (b := 2 ^ 8)
+    (by omega : 1 < 2 ^ 8)
     (L1 := L)
     (L2 := L')
     (by rw [List.length_ofFn, List.length_ofFn])
-    (by exact U8_Array_elements_lt_256 a)
-    (by exact U8_Array_elements_lt_256 a')
-    (by exact h_funs_eq)
+    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
+    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
+    (h_funs_eq)
 
-  simp only [L, L'] at h_inj
-  rw [List.ofFn_inj] at h_inj
+  simp only [L, L', List.ofFn_inj] at h_inj
   apply Subtype.eq
   apply List.ext_get
 
@@ -162,9 +113,5 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
         List.Vector.length_val, UScalar.ofNat_val_eq, Fin.is_lt, getElem!_pos]
     have h_congr := congr_fun h_inj ⟨n, h_len⟩
-    have h_a_len : a.val.length = 32 := by simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
-    cases a' with | mk val_a' =>
-    cases a with | mk val_a =>
-    simp_all only [UScalar.ofNat_val_eq, Fin.getElem!_fin, Array.getElem!_Nat_eq, Fin.is_lt,
-        getElem!_pos, List.get_eq_getElem]
+    simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
