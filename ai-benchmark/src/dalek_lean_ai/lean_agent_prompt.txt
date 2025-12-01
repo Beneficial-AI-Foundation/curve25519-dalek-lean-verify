@@ -1,0 +1,96 @@
+You are an expert in the Lean theorem prover.
+Your task is to fix a Lean file by replacing 'sorry' statements with valid proofs.
+
+The working directory is /workspace/curve25519-dalek-lean-verify which contains a Lean project.
+
+Follow these steps:
+1. Run `lake build` to see the current state of the project
+2. Examine the specific file mentioned in the task that needs to be fixed
+3. Replace each 'sorry' with a complete proof
+4. Run `lake build` again to verify your proofs
+5. If there are still errors or sorries, fix them and repeat
+
+When you're done, make sure `lake build` succeeds.
+Then verify that the specific file no longer contains any 'sorry' statements.
+
+When you're done, the number of sorries should have gone down by one (assuming that file only had one sorry).
+If your theorem needs to use a preexisting theorem in another file, but that 2nd theorem contains a sorry,
+go ahead and use it. You're being judged on if you can prove how a certain piece of Rust code behaves,
+not whether you also prove how that Rust code's dependencies behave.
+
+If your file contains more than one sorry, you'll have to prove them all to pass.
+
+Your final response should not use sorries or axioms.
+
+You may notice that FunsExternal.lean and TypesExternal.lean contain axioms.
+Those preexisting axioms are the only ones we allow in the project.
+Don't add any more.
+In particular, if you think a proof is too hard to prove without axioms,
+we'd like you to prove it anyway, without axioms.
+You're being judged on whether you can prove hard theorems.
+Of course take shortcuts in the proof whenever you can.
+
+
+
+Here's some (mildly edited) advice from a Lean expert:
+"""
+In order to use progress efficiently the spec theorem for the function called by the other function needed to be tagged with `@[progress]`. If you instructed Claude to not touch other files, this gave Claude a massive disadvantage. Even so, Claude found a way to use the required spec theorem manually and completed the proof.We will now make sure that all the spec theorems are properly tagged. [To AI: This should be fixed now and you don't need to touch other files]
+
+Would it help if Claude had a specific framework for doing the proofs? E.g., if I was explaining to a human, I would suggest: first unfold the function, then apply progress repeatedly, make sure to import the spec theorems for any function which is called by function being considered. In 90% of the cases this will already reduce the problem to the mathematics which then needs to be solved. Using progress* is likely to have already dispatched many of the side goals leaving just the more complex ones which require some reasoning.
+
+I took the ideas from Claudes's proof of as_montgomery and wrote a more condensed version of it. However, I don't dislike the original version which made the mathematical reasoning rather clear. Possibly my version is less appealing to some people who would prefer to see the details worked out explicitly as Claude did. I prefer using Lean automation (grind, simp, etc) as much as possible. The motive is based on one goal only, I want the proofs to be as stable as possible, I imagine the scenario where code might change a little and I would like the proof to continue working in most cases, even if the implementation changes slightly.
+
+When I am doing the proofs by hand, I find that more than 50% of the time I have to make some rather minor adjustments to some statements of spec theorems. [To AI: Don't use this to cheat---we'll look afterwards and judge if your modifications were needed]
+"""
+
+Probably using Lean automation as much as possible will increase your success rate.
+
+
+Here is the repo structure documentation from /workspace/curve25519-dalek-lean-verify/site/details.md:
+{DETAILS_MD}
+
+Here is a basic aeneas tutorial from /workspace/aeneas/tests/lean/BaseTutorial.lean:
+{BASE_TUTORIAL_LEAN}
+
+The /workspace/aeneas/tests/lean/ directory contains other tutorials. Here's the directory listing:
+{AENEAS_TUTORIALS_LS}
+
+Feel free to read any of these tutorials if you feel they'd be related to your problem.
+
+Here is an in-depth tutorial on proving the square_internal function.
+Please follow this approach for your proof:
+
+{SQUARE_INTERNAL_TUTORIAL}
+
+# Reading lake build output
+
+If you see something like this when you run a bash tool:
+```
+(+ 0 more)
+⣟ [7592/7594] Running Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal (+ 0 more)
+⡿ [7592/7594] Running
+```
+That's because you've run lake build, and it's taking a while to complete. Be patient and it'll complete.
+When lake build completes, it looks like
+```
+Running Curve25519Dalek (+ 0 more)
+⢿ [7593/7594] Running Curve25519Dalek (+ 0 more)
+⣻ [7593/7594] Running Curve25519Dalek (+ 0 more)
+Build completed successfully (7594 jobs).
+```
+(or there might be an error message)
+
+IMPORTANT: Do not edit any file while lake build is running.
+Of course you can still view files.
+
+IMPORTANT: lake build may take over 2 min to finish. This is normal; just be patient.
+
+IMPORTANT: Do not try using any alternative build method (like `lake exe lean`). Only use `lake build`
+
+# Constant equality
+If both sides of an equality are known values, then `unfold` and `decide` usually are enough:
+```
+theorem R_spec : Scalar52_as_Nat constants.R % L = R % L := by
+  unfold constants.R
+  decide
+```

@@ -11,6 +11,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 /-! # Spec Theorem for `ProjectivePoint::double`
 
 Specification and proof for `ProjectivePoint::double`.
@@ -47,6 +50,8 @@ natural language specs:
 - T' ≡ 2Z² - Y² + X² (mod p)
 -/
 
+set_option maxHeartbeats 1000000 in
+-- simp_all is heavy
 /-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.double`**:
 - No panic (always returns successfully)
 - Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
@@ -61,111 +66,136 @@ These formulas implement Edwards curve point doubling, computing P + P
 -/
 @[progress]
 theorem double_spec (q : ProjectivePoint)
-  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val ≤ 2 ^ 52)
-  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val ≤ 2 ^ 52)
-  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val ≤ 2 ^ 52) :
-∃ c,
-double q = ok c ∧
-let X := Field51_as_Nat q.X
-let Y := Field51_as_Nat q.Y
-let Z := Field51_as_Nat q.Z
-let X' := Field51_as_Nat c.X
-let Y' := Field51_as_Nat c.Y
-let Z' := Field51_as_Nat c.Z
-let T' := Field51_as_Nat c.T
-X' % p = (2 * X * Y) % p ∧
-Y' % p = (Y^2 + X^2) % p ∧
-(Z' + X^2) % p = Y^2 % p ∧
-(T' + Z') % p = (2 * Z^2) % p
-:= by
+    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52)
+    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52)
+    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52) :
+    ∃ c, double q = ok c ∧
+    let X := Field51_as_Nat q.X
+    let Y := Field51_as_Nat q.Y
+    let Z := Field51_as_Nat q.Z
+    let X' := Field51_as_Nat c.X
+    let Y' := Field51_as_Nat c.Y
+    let Z' := Field51_as_Nat c.Z
+    let T' := Field51_as_Nat c.T
+    X' % p = (2 * X * Y) % p ∧
+    Y' % p = (Y^2 + X^2) % p ∧
+    (Z' + X^2) % p = Y^2 % p ∧
+    (T' + Z') % p = (2 * Z^2) % p := by
   unfold double
   progress*
-
-  · -- Goal 1: Precondition for `X`
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
+    have := h_qX_bounds i hi
     scalar_tac
-  · -- Goal 2: Precondition for `Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hy := h_qY_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 3: Precondition for `Z`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hz := h_qZ_bounds i hi
+    have := h_qZ_bounds i hi
     scalar_tac
-  · -- Goal 4: Precondition for `q.X+q.Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
-    have hy := h_qY_bounds i hi
+    have := h_qX_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 5: Precondition for `X_plus_Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
-    have hy := h_qY_bounds i hi
-    rw [X_plus_Y_post i hi]
+    have := h_qX_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 6: Precondition for `YY_plus_XX`
-    sorry
-  · -- Goal 7: Precondition for `YY`
-    sorry
-  · -- Goal 8: Precondition for `XX`
-    sorry
-  · -- Goal 9: Precondition for `X_plus_Y_sq`
-    sorry
-  · -- Goal 10: Precondition for `YY_plus_XX`
-    sorry
-  · -- Goal 11: Precondition for `ZZ2`
-    sorry
-  · -- Goal 12: Precondition for `YY_minus_XX`
-    sorry
-
-  -- Goal 13:
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := YY_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := XX_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := YY_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := XX_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := X_plus_Y_sq_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := ZZ2_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := YY_minus_XX_post_1 i hi
+    scalar_tac
+    -- END TASK
   unfold Field51_as_Nat at *
-
-  have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
-                      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
-                      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
-      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-      intro i hi
-      rw [X_plus_Y_post, Nat.mul_add]; exact Finset.mem_range.mp hi
-
-  have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
-                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-                        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
-      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-      intro i hi
-      rw [YY_plus_XX_post, Nat.mul_add]; exact Finset.mem_range.mp hi
-
   refine ⟨?_, ?_, ?_, ?_⟩
-
-  · -- Goal 13.1: X' coordinate
-    rw [h_X_plus_Y] at X_plus_Y_sq_post; rw [h_YY_plus_XX] at fe_post;
-
-    have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) ≡
-                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) ^ 2 +
-                    (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) ^ 2 [MOD p] := by
-      apply Nat.ModEq.add; (ring_nf at *; exact YY_post); (ring_nf at *; exact XX_post)
-
+  · -- BEGIN TASK
+    have : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
+    rw [this] at X_plus_Y_sq_post_1;
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
+    rw [h_YY_plus_XX] at fe_post_2;
+    have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * YY[i]!.val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
+      apply Nat.ModEq.add; grind; grind
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
-    ring_nf at *; apply Nat.ModEq.trans fe_post; exact X_plus_Y_sq_post
-
-  · -- Goal 13.2: Y' coordinate
-    rw [← Nat.ModEq] at *; rw [h_YY_plus_XX]
+    ring_nf at *
+    rw [← Nat.ModEq] at fe_post_2
+    apply Nat.ModEq.trans fe_post_2
+    exact X_plus_Y_sq_post_1
+    -- END TASK
+  · -- BEGIN TASK
+    rw [← Nat.ModEq] at *
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
+    rw [h_YY_plus_XX]
     apply Nat.ModEq.add
-    · exact YY_post
-    · exact XX_post
-
-  · -- Goal 13.3: Z' coordinate
+    · grind
+    · grind
+    -- END TASK
+  · -- BEGIN TASK
     rw [← Nat.ModEq] at *; ring_nf at *;
-    apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post.symm)
-    apply Nat.ModEq.trans YY_minus_XX_post
-    exact YY_post
-
-  · -- Goal 13.4: T' coordinate
+    apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post_1.symm)
+    apply Nat.ModEq.trans YY_minus_XX_post_2
+    exact YY_post_1
+    -- END TASK
+  · -- BEGIN TASK
     rw [← Nat.ModEq] at *;
-    apply Nat.ModEq.trans fe1_post
-    exact ZZ2_post
-
+    apply Nat.ModEq.trans fe1_post_2
+    exact ZZ2_post_1
+    -- END TASK
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint

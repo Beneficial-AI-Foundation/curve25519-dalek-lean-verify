@@ -5,6 +5,8 @@ Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Aux
+import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
 
 /-! # Spec Theorem for `Scalar::from_canonical_bytes`
 
@@ -12,11 +14,13 @@ Specification and proof for `Scalar::from_canonical_bytes`.
 
 This function constructs a scalar from canonical bytes.
 
-**Source**: curve25519-dalek/src/scalar.rs
+Source: curve25519-dalek/src/scalar.rs -/
 
-## TODO
-- Complete proof
--/
+theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice)
+    (h : a ≠ Choice.zero) : a = Choice.one := by
+  obtain _ | _ := a.valid
+  · exfalso; apply h; cases a; simpa [Choice.zero]
+  · cases a; simpa [Choice.one]
 
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
@@ -32,10 +36,6 @@ natural language description:
       If this condition is true, then the Scalar s is returned,
       otherwise None is returned.
 
-      Note: Likely for efficiency reasons, the implementation also checks whether the most significant bit
-      (bit with index 255) is 0, but this is redundant since any canonical scalar (< L ≈ 2^252) automatically has
-      bits 253-255 equal to 0.
-
 natural language specs:
 
     • If u8x32_to_nat(b) < \ell \then s = Scalar{b} else s = None
@@ -50,11 +50,30 @@ natural language specs:
 -/
 @[progress]
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
-    ∃ s,
-    from_canonical_bytes b = ok s ∧
+    ∃ s, from_canonical_bytes b = ok s ∧
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
-    (U8x32_as_Nat b ≥ L → s.is_some = Choice.zero)
-    := by
-  sorry
+    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) := by
+  unfold from_canonical_bytes
+  progress as ⟨_, ha⟩
+  progress as ⟨_, he, _⟩
+  progress as ⟨_, _⟩
+  progress as ⟨_, hd⟩
+  progress as ⟨f, hf⟩
+  progress as ⟨_, _, hg⟩
+  refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
+  · -- BEGIN TASK
+    rw [ha, high_bit_zero_of_lt_L b hb] at he
+    simp_all; bv_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp_all
+    -- END TASK
+  · -- BEGIN TASK
+    intro _
+    rw [hg]
+    by_contra h
+    have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
+    grind
+    -- END TASK
 
 end curve25519_dalek.scalar.Scalar

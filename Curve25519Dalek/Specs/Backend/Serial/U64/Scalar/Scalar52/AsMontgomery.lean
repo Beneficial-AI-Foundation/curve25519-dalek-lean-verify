@@ -42,16 +42,20 @@ theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
 - The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L
 -/
 @[progress]
-theorem as_montgomery_spec (u : Scalar52) (hm : ∀ i < 5, u[i]!.val < 2 ^ 62) :
+theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :
     ∃ m, as_montgomery u = ok m ∧
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] := by
   unfold as_montgomery
   progress as ⟨m, pos⟩
-  · exact RR_lt
-  · suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
+  · -- BEGIN TASK
+    exact RR_lt
+    -- END TASK
+  · -- BEGIN TASK
+    suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
       exact Nat.ModEq.cancel_right_of_coprime (by decide) this
     have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
     have := (Nat.ModEq.trans this.symm pos).symm
     grind
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

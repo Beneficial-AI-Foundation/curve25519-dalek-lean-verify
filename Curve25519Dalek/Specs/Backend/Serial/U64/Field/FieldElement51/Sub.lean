@@ -15,7 +15,7 @@ Specification and proof for `FieldElement51::sub`.
 This function performs field element subtraction. To avoid underflow, a multiple
 of p is added.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 -/
 
@@ -25,7 +25,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
 /-
 natural language description:
 
-    • Takes two input FieldElement51s a and b and returns another FieldElement51
+    • Takes two input FieldElement51s a and b and returns another FieldElement51 d
       that is a representant of the difference a - b in the field (modulo p = 2^255 - 19).
 
     • The implementation adds a multiple of p (namely 16p) as a bias value to a before
@@ -40,10 +40,10 @@ natural language specs:
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:
 - No panic (always returns successfully when bounds are satisfied)
-- The result c satisfies the field subtraction property:
+- The result d satisfies the field subtraction property:
 
-  Field51_as_Nat(c) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
-  Field51_as_Nat(c) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
+  Field51_as_Nat(d) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
+  Field51_as_Nat(d) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
 
 - Requires that input limbs are bounded:
   - For a: limbs must allow addition with 16*p without U64 overflow
@@ -54,26 +54,19 @@ natural language specs:
     - b[1..4] must be ≤ 36028797018963952
   To make the theorem more easily readable and provable, we
   replace these precise bounds with the slightly looser bounds
-  a[i] ≤ 2^63  and b[i] ≤ 2^54
+  a[i] < 2^63  and b[i] < 2^54
 -/
-
-
-
-
-
-
-
-
-
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
-    (h_bounds_a : ∀ i, i < 5 → (a[i]!).val ≤ 2 ^ 63)
-    (h_bounds_b : ∀ i, i < 5 → (b[i]!).val ≤ 2 ^ 54) :
-    ∃ c,
-    sub a b = ok c ∧
-    (Field51_as_Nat c + Field51_as_Nat b) % p = Field51_as_Nat a % p
-    := by
+    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
+    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
+    ∃ d, sub a b = ok d ∧
+    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
+    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
   unfold sub
+  -- To do: some problem using `progress*` in this proof and so doing each step manually.
+  -- Change to `progress*` when possible.
+
   set k := 36028797018963664#u64 with hk
   set j := 36028797018963952#u64 with hj
 
@@ -188,15 +181,19 @@ theorem sub_spec (a b : Array U64 5#usize)
   simp only [hi19_ok, bind_tc_ok]
 
   -- Call reduce and get the result
-  obtain ⟨result, hreduce_ok, hreduce_bounds, hreduce_eq⟩ :=
+  obtain ⟨d, hreduce_ok, hreduce_bounds, hreduce_eq⟩ :=
     reduce_spec (Array.make 5#usize [i3, i7, i11, i15, i19])
   simp only [hreduce_ok, ok.injEq, exists_eq_left']
 
-  -- Prove the modular arithmetic property
-  -- Move to Nat.ModEq style and reduce to sums over limbs
-  have h_mod_eq : (Field51_as_Nat result + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
+  refine ⟨fun i hi ↦ ?_, ?_⟩
+  · -- BEGIN TASK
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    -- Prove the modular arithmetic property
+    -- Move to Nat.ModEq style and reduce to sums over limbs
     -- First, replace result with the array of limbs via hreduce_eq (Nat.ModEq form)
-    have htmp : Field51_as_Nat result + Field51_as_Nat b ≡
+    have htmp : Field51_as_Nat d + Field51_as_Nat b ≡
       Field51_as_Nat (Array.make 5#usize [i3, i7, i11, i15, i19]) + Field51_as_Nat b [MOD p] := by
       apply Nat.ModEq.add_right; apply Nat.ModEq.symm; exact hreduce_eq
     apply Nat.ModEq.trans htmp
@@ -272,7 +269,6 @@ theorem sub_spec (a b : Array U64 5#usize)
     have final := Nat.ModEq.add_left asum kmod0
     simp at final
     exact final
-  exact h_mod_eq
-
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub

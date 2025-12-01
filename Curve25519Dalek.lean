@@ -23,6 +23,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AsBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
@@ -64,9 +65,11 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.VartimeDoubleScalarMulBasepoint
 import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
+import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
@@ -96,4 +99,5 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
+import Curve25519Dalek.TypesAux
 import Curve25519Dalek.TypesExternal

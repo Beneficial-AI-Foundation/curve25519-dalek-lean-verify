@@ -39,11 +39,8 @@ natural language specs:
 -/
 @[progress]
 theorem to_bytes_spec (s : Scalar) :
-    ∃ a,
-    to_bytes s = ok a ∧
-    a = s.bytes ∧
-    mk a = s
-    := by
+    ∃ a, to_bytes s = ok a ∧
+    a = s.bytes ∧ mk a = s := by
   unfold to_bytes
   simp
 

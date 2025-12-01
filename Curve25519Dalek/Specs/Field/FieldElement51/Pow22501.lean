@@ -37,15 +37,17 @@ Natural language specs:
 -/
 
 /-- **Spec and proof concerning `field.FieldElement51.pow22501`**:
-- No panic for field element inputs r (always returns (r1, r2) successfully)
+- No panic (always returns (r1, r2) successfully)
 - Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)
   Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)
 -/
 @[progress]
-theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 51 - 1) :
+theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     ∃ r1 r2, pow22501 r = ok (r1, r2) ∧
     Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧
-    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p
+    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧
+    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
+    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52)
     := by
     sorry
 
