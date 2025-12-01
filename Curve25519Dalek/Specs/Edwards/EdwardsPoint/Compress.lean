@@ -6,6 +6,9 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+
 /-! # Spec Theorem for `EdwardsPoint::compress`
 
 Specification and proof for `EdwardsPoint::compress`.
@@ -20,6 +23,9 @@ given the defining equation $ax^2 + y^2 = 1 + dx^2y^2$ of the Edwards curve whic
 -/
 
 open Aeneas.Std Result
+
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -46,14 +52,64 @@ Natural language specs:
   - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
 -/
 @[progress]
-theorem compress_spec (e : EdwardsPoint) (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip) :
+theorem compress_spec (e : EdwardsPoint)
+    (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip)
+    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 54 ∧ e.Y[i]!.val < 2 ^ 54 ∧ e.Z[i]!.val < 2 ^ 54) :
     ∃ (cey : CompressedEdwardsY) (ae : edwards.affine.AffinePoint) (x_sign : subtle.Choice),
     compress e = ok cey ∧
     to_affine e = ok ae ∧
     field.FieldElement51.is_negative ae.x = ok x_sign ∧
     U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
     (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8) := by
-  sorry
+
+  unfold compress
+  progress with to_affine_spec as ⟨ ae, hae ⟩
+  · -- Bound 1
+    intro i hi
+    have := h_bounds i hi
+    scalar_tac
+  · -- Bound 2
+    intro i hi
+    have := h_bounds i hi
+    scalar_tac
+  · -- Bound 3
+    intro i hi
+    have := h_bounds i hi
+    scalar_tac
+
+  unfold edwards.affine.AffinePoint.compress
+
+  progress with to_bytes_spec as ⟨ y_bytes, hy_bytes ⟩
+  unfold field.FieldElement51.is_negative
+  progress with to_bytes_spec as ⟨ x_bytes, hx_bytes ⟩
+
+  progress*
+  unfold subtle.FromsubtleChoiceU8.from subtle.Choice.unwrap_u8
+
+  split
+  · -- Subgoal 1
+    progress*
+    have h_i1 : i1 = 0#u8 := by scalar_tac
+    have h_xor : i2 ^^^ 0#u8 = i2 := by
+      cases i2
+      simp only [HXor.hXor, UScalar.xor, UScalar.mk.injEq]
+      simp only [UScalarTy.U8_numBits_eq, Aeneas.Bvify.U8.UScalar_bv, U8.ofNat_bv]
+      
+      change BitVec.xor _ (BitVec.ofNat _ _) = _
+      simp only [BitVec.xor_eq]
+      sorry
+
+    simp only [h_i1]
+
+
+    sorry
+  · split
+    · progress*
+      sorry
+    · exfalso
+      sorry
+
+
 
 
 
