@@ -9,10 +9,12 @@ set_option linter.style.longLine false
 Theorems which are useful for proving spec theorems in this project but aren't available upstream.
 This file is for theorems which depend only on Defs.lean, not on Funs.lean or Types.lean. -/
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 open Aeneas.Std Result
 
 attribute [-simp] Int.reducePow Nat.reducePow
-
 
 /-- Right-shifting a 64-bit value by 51 bits leaves at most 13 bits so bounded by 2^13 - 1. -/
 theorem U64_shiftRight_le (a : U64) : a.val >>> 51 ≤ 2 ^ 13 - 1 := by
@@ -53,8 +55,85 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- The sum of the first i terms of a base-256 number is less than `2 ^ (8 * i)`. -/
+private lemma U8x32_extract_byte_aux (bytes : Array U8 32#usize) (i : Nat) :
+    ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) := by
+  have h_byte_bound : ∀ j : Nat, bytes[j]!.val ≤ 2 ^ 8 - 1 := by
+    intro j
+    have : bytes[j]!.val < 2 ^ UScalarTy.U8.numBits := bytes[j]!.bv.isLt
+    grind [UScalarTy.numBits]
+  induction i with
+  | zero => simp
+  | succ n _ =>
+    have : 2 ^ (8 * n) * bytes[n]!.val ≤ 2 ^ (8 * n) * (2 ^ 8 - 1) :=
+      Nat.mul_le_mul_left _ (h_byte_bound n)
+    rw [Finset.sum_range_succ]
+    grind
+
+/-- Extract a byte from its position in the base-256 representation. -/
+lemma U8x32_extract_byte (bytes : Array U8 32#usize) (i : Nat) (hi : i < 32) :
+    bytes[i]! = (U8x32_as_Nat bytes / 2 ^ (8 * i)) % 2 ^ 8 := by
+  have h_eq : (bytes : List U8)[i]! = bytes[i]! := by simp [Array.getElem!_Nat_eq]
+  unfold U8x32_as_Nat
+  have : ∑ j ∈ Finset.range 32, 2^(8*j) * bytes[j]!.val =
+      (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) +
+      2 ^ (8 * i) * bytes[i]!.val +
+      (∑ j ∈ Finset.Ico (i + 1) 32, 2 ^ (8 * j) * bytes[j]!.val) := by
+    simp [← Finset.sum_range_add_sum_Ico _ hi, ← Finset.sum_range_succ]
+  rw [this]
+  have lower_bound : ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) :=
+    U8x32_extract_byte_aux bytes i
+  have : ∃ k, ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val = k * 2^(8*(i+1)) := by
+    use ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j - 8*(i+1)) * bytes[j]!.val
+    rw [Finset.sum_mul]
+    apply Finset.sum_congr rfl
+    intro j hj
+    have : 8 * (i + 1) + (8 * j - 8 * (i + 1)) = 8 * j := by
+      have : i + 1 ≤ j := (Finset.mem_Ico.mp hj).1
+      omega
+    calc 2 ^ (8 * j) * bytes[j]!.val
+        = 2 ^ (8 * (i + 1) + (8 * j - 8 * (i + 1))) * bytes[j]!.val := by simp [*]
+      _ = 2 ^ (8 * j - 8 * (i + 1)) * bytes[j]!.val * 2 ^ (8 * (i + 1)) := by grind
+  obtain ⟨k, hk⟩ := this
+  have : bytes[i]!.val < 2^8 := by
+    have : bytes[i]!.val < 2^UScalarTy.U8.numBits := bytes[i]!.bv.isLt
+    simp only [Array.getElem!_Nat_eq, UScalarTy.numBits] at this
+    grind
+  have : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) / 2^(8*i) = 0 := by
+    exact Nat.div_eq_zero_iff.mpr (Or.inr lower_bound)
+  calc bytes[i]!.val
+    _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val) / 2^(8*i) +
+        bytes[i]!.val + k * 2^8) % 2^8 := by grind
+    _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+        2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8) % 2^8 := by
+      rw [Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
+    _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+        2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i)) % 2^8 := by
+      have h_pow : 2^(8*(i+1)) = 2^(8*i) * 2^8 := by
+        rw [← pow_add]; ring_nf
+      have : (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+          2^(8*i) * bytes[i]!.val + k * 2^(8*(i+1))) / 2^(8*i) =
+            (∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+              2^(8*i) * bytes[i]!.val) / 2^(8*i) + k * 2^8 := by
+        have : k * (2^(8*i) * 2^8) = 2^(8*i) * (k * 2^8) := by ring
+        rw [h_pow, this, Nat.add_mul_div_left _ _ (by omega : 0 < 2^(8*i))]
+      rw [this]
+    _ = ((∑ j ∈ Finset.range i, 2^(8*j) * bytes[j]!.val +
+        2^(8*i) * bytes[i]!.val +
+        ∑ j ∈ Finset.Ico (i+1) 32, 2^(8*j) * bytes[j]!.val) / 2^(8*i)) % 2^8 := by
+      rw [← hk]
+
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
-  sorry
+  intro a b hab
+  apply Subtype.eq
+  apply List.ext_getElem
+  · simp [a.property, b.property]
+  · intro i hi _
+    have hi : i < 32 := by simpa [a.property] using hi
+    have : (a)[i]!.val = (b)[i]!.val := by
+      rw [U8x32_extract_byte a i hi, U8x32_extract_byte b i hi, hab]
+    bvify 8 at *
+    simp_all
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
