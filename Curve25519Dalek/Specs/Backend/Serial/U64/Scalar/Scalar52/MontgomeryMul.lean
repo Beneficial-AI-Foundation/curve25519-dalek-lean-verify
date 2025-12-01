@@ -76,12 +76,15 @@ theorem montgomery_mul_spec' (m m' : Scalar52)
  :
 ⦃⌜True⌝⦄
 montgomery_mul m m'
-⦃⇓ w => ⌜montgomery_mul m m' = ok w ∧
-    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
+⦃⇓ w => ⌜(Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
   := by
-  -- unfold montgomery_mul
   mvcgen [montgomery_mul]
   grind
-  sorry
-  sorry
+  grind
+  intro h1 h2
+  rename_i r1 h3 r2
+  obtain ⟨h4, h5⟩ := h3
+  rw [Nat.ModEq]
+  grind
+
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
