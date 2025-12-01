@@ -49,14 +49,39 @@ natural language specs:
 -/
 
 @[spec]
-theorem montgomery_mul_spec' (m m' : Scalar52) :
-⦃⌜∀ i, i < 5 → (m[i]!).val < 2 ^ 62 ∧ i < 5 → (m'[i]!).val < 2 ^ 62⌝⦄
+theorem montgomery_reduce_spec' (a : Array U128 9#usize) :
+⦃⌜True⌝⦄
+montgomery_reduce a
+⦃⇓ m => ⌜montgomery_reduce a = ok m ∧
+    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L⌝⦄
+  := by
+  sorry
+
+@[spec]
+theorem mul_internal_spec' (a b : Array U64 5#usize)
+(ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62)
+(hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
+⦃⌜True⌝⦄
+mul_internal a b
+⦃⇓ result => ⌜mul_internal a b = ok result ∧
+  Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄
+  := by
+  sorry
+
+
+@[spec]
+theorem montgomery_mul_spec' (m m' : Scalar52)
+(range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
+(range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62)
+ :
+⦃⌜True⌝⦄
 montgomery_mul m m'
 ⦃⇓ w => ⌜montgomery_mul m m' = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
   := by
-  -- apply Result.of_wp_run_eq
-  -- mvcgen
+  -- unfold montgomery_mul
+  mvcgen [montgomery_mul]
+  grind
   sorry
-
+  sorry
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
