@@ -8,6 +8,7 @@
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
     "docs:rust": "bash scripts/build-rust-docs.sh",
+    "docs:lean": "bash scripts/build-lean-docs.sh",
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
