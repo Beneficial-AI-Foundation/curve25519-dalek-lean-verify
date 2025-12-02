@@ -7,6 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Mathlib.Data.Nat.ModEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
+-- import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Mathlib.Data.Nat.ModEq
 
@@ -21,6 +22,9 @@ This function adds two elements.
 ## TODO
 - Complete proof
 -/
+
+set_option linter.hashCommand false
+#setup_aeneas_simps
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -71,11 +75,15 @@ theorem add_spec (a b : Scalar52)
     (Scalar52_as_Nat v % L = Scalar52_as_Nat a + Scalar52_as_Nat b % L) := by
   unfold add
   progress*
-  · intro j hj hj'
+  · intro j _ _
+    unfold ZERO
+    interval_cases j <;> decide
+  · intro i _
+    unfold constants.L
+    interval_cases i <;> decide
+  · simp_all
 
     sorry
-  · sorry
-  · sorry
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
