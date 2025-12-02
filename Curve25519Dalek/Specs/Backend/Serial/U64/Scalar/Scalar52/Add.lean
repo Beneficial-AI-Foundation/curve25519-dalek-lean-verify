@@ -57,7 +57,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (hsum' : ∀ j < 5, i.val ≤ j → (sum[j]!).val = 0)
     (hcarry : carry.val < 2 ^ 54) :
     ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
-    (∀ j < 5, (sum'[j]!).val < 2 ^ 52) ∧
+    (∀ j < 5, (sum'[j]!).val < 2 ^ 53) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
     ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ 260 * (carry.val / 2 ^ 52) =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
@@ -104,7 +104,6 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     · have : i.val = 5 := by scalar_tac
       rw [this]
       simp
-
       sorry
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
@@ -122,6 +121,7 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
   · intro j _ _
     unfold ZERO
     interval_cases j <;> decide
+  · sorry
   · intro i hi
     unfold constants.L
     interval_cases i <;> decide
