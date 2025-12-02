@@ -6,6 +6,8 @@ Authors: Alessandro D'Angelo
 import Curve25519Dalek.Defs
 
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.NumberTheory.LegendreSymbol.Basic
+import Mathlib.Tactic.NormNum.LegendreSymbol
 
 /-!
 # Pure Mathematical Foundations for Edwards Curves
@@ -32,7 +34,8 @@ open ZMod
 
 /-! ## 1. Mathematical Foundations: Twisted Edwards Curves -/
 
-/-- The finite field F_p where p = 2^255 - 19. -/
+/-- The finite field F_p where p = 2^255 - 19.
+    Proof can be found at: https://github.com/kckennylau/PrimeCert/blob/master/PrimeCert/PrimeList.lean#L84 -/
 abbrev CurveField : Type := ZMod p
 
 instance : Fact (Nat.Prime p) := by
@@ -44,6 +47,11 @@ instance : Field CurveField := by
   unfold CurveField
   infer_instance
 
+/-- Helper lemma for modular arithmetic lifting -/
+theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
+  apply (ZMod.natCast_eq_natCast_iff a b p).mpr
+  exact h
+
 /-- A Twisted Edwards curve structure defined by parameters a and d. -/
 structure EdwardsCurve (F : Type) [Field F] where
   a : F
@@ -54,6 +62,14 @@ def Ed25519 : EdwardsCurve CurveField := {
   a := -1,
   d := (d : CurveField)
 }
+
+/-- Ed25519 curve parameter d is not a square in the field. -/
+lemma d_not_square : ¬IsSquare Ed25519.d := by
+  dsimp only [Ed25519]
+  rw [← legendreSym.eq_neg_one_iff' p]
+  dsimp only [d, p]
+  norm_num [p]
+
 
 /-- An affine point on the Edwards curve. -/
 @[ext]

@@ -217,23 +217,14 @@ namespace Edwards
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-/-- Helper lemma for modular arithmetic lifting -/
-theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
-  apply (ZMod.natCast_eq_natCast_iff a b p).mpr
-  exact h
-
-/-- Ed25519 curve parameter d is not a square in the field.
-This is a mathematical fact that requires separate verification. -/
-lemma Ed25519_d_not_square : ¬IsSquare Ed25519.d := sorry
-
 /--
 Verification of the `double` function.
 The theorem states that the Rust implementation of point doubling corresponds
 exactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.
 -/
-theorem double_spec_math
-    (q : ProjectivePoint) (hq_valid : q.IsValid') (hq_bounds : q.InBounds) :
-    ∃ c, ProjectivePoint.double q = .ok c ∧ c.IsValid' ∧
+theorem double_spec'
+    (q : ProjectivePoint) (hq_valid : q.IsValid) (hq_bounds : q.InBounds) :
+    ∃ c, ProjectivePoint.double q = .ok c ∧ c.IsValid ∧
     (↑c : Point Ed25519) = ↑q + ↑q := by
 
   -- 1. Unwrap validity witness P from the input
@@ -256,8 +247,8 @@ theorem double_spec_math
   -- This block proves that the output limbs correspond to P + P coordinates.
   let P2 := P + P
 
-  have h_out_represents_P2 : out.IsValid P2 := by
-    rw [ProjectivePoint.IsValid] at hP
+  have h_out_represents_P2 : out.IsValid' P2 := by
+    dsimp only at hP
     rcases hP with ⟨hZ_nonzero, hX_in, hY_in⟩
     rcases h_arith with ⟨hX_new, hY_new, hZ_new, hT_new⟩
 
@@ -267,20 +258,20 @@ theorem double_spec_math
     let Z_nat := Field51_as_Nat q.Z
 
     have hX_F : field_from_limbs out.X = 2 * field_from_limbs q.X * field_from_limbs q.Y := by
-      dsimp [field_from_limbs]; rw [lift_mod_eq _ _ hX_new]; push_cast; rfl
+      dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hX_new]; push_cast; rfl
 
     have hY_F : field_from_limbs out.Y = field_from_limbs q.Y ^ 2 + field_from_limbs q.X ^ 2 := by
-      dsimp [field_from_limbs]; rw [lift_mod_eq _ _ hY_new]; push_cast; rfl
+      dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hY_new]; push_cast; rfl
 
     have hZ_F : field_from_limbs out.Z = field_from_limbs q.Y ^ 2 - field_from_limbs q.X ^ 2 := by
-      have h := lift_mod_eq _ _ hZ_new; push_cast at h; apply eq_sub_of_add_eq h
+      have h := Edwards.lift_mod_eq _ _ hZ_new; push_cast at h; apply eq_sub_of_add_eq h
 
     have hT_F : field_from_limbs out.T = 2 * field_from_limbs q.Z ^ 2 - field_from_limbs out.Z := by
-      have h := lift_mod_eq _ _ hT_new; push_cast at h; apply eq_sub_of_add_eq h
+      have h := Edwards.lift_mod_eq _ _ hT_new; push_cast at h; apply eq_sub_of_add_eq h
 
     -- Setup Curve Identities
-    unfold CompletedPoint.IsValid
-    have h_d_not_square : ¬IsSquare Ed25519.d := Ed25519_d_not_square
+    unfold CompletedPoint.IsValid'
+    have h_d_not_square : ¬IsSquare Ed25519.d := d_not_square
     have h_neg_one_square : IsSquare (-1 : CurveField) := by
       apply ZMod.exists_sq_eq_neg_one_iff.mpr; decide
 

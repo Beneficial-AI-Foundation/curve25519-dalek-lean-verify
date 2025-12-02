@@ -62,47 +62,53 @@ end curve25519_dalek.edwards.affine
 namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
-/-- Validity predicate linking low-level ProjectivePoint to mathematical Point. -/
-def ProjectivePoint.IsValid (low : ProjectivePoint) (high : Point Ed25519) : Prop :=
+-- === Validity Predicates ===
+
+/-- Existential validity predicate for ProjectivePoint. -/
+def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
+  ∃ P : Point Ed25519,
+    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y; let Z := field_from_limbs p.Z
+    Z ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * Z
+
+/-- Existential validity predicate for CompletedPoint. -/
+def CompletedPoint.IsValid (p : CompletedPoint) : Prop :=
+  ∃ P : Point Ed25519,
+    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y
+    let Z := field_from_limbs p.Z; let T := field_from_limbs p.T
+    Z ≠ 0 ∧ T ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * T
+
+/-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point. -/
+def ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop :=
     let X := field_from_limbs low.X; let Y := field_from_limbs low.Y; let Z := field_from_limbs low.Z
     Z ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * Z
 
-/-- Validity predicate linking low-level CompletedPoint to mathematical Point. -/
-def CompletedPoint.IsValid (low : CompletedPoint) (high : Point Ed25519) : Prop :=
+/-- Relational validity predicate linking low-level CompletedPoint to mathematical Point. -/
+def CompletedPoint.IsValid' (low : CompletedPoint) (high : Point Ed25519) : Prop :=
   let X := field_from_limbs low.X; let Y := field_from_limbs low.Y
   let Z := field_from_limbs low.Z; let T := field_from_limbs low.T
   Z ≠ 0 ∧ T ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * T
-
--- === Total Function / Garbage Value Infrastructure ===
--- These definitions live in the Edwards namespace to ensure they resolve correctly together.
-
-/-- Existential validity predicate for ProjectivePoint. -/
-def ProjectivePoint.IsValid' (p : ProjectivePoint) : Prop := ∃ P, p.IsValid P
-
-/-- Existential validity predicate for CompletedPoint. -/
-def CompletedPoint.IsValid' (p : CompletedPoint) : Prop := ∃ P, p.IsValid P
 
 /--
 Total conversion function for ProjectivePoint.
 If the point is valid, returns the unique `Point Ed25519` it represents.
 If invalid, returns the neutral element `0`.
 -/
-noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519 :=
-  open Classical in
-  if h : p.IsValid' then choose h else 0
+noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519 := by
+  classical
+  exact if h : p.IsValid then Classical.choose h else 0
 
 /-- Total conversion function for CompletedPoint. -/
-noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 :=
-  open Classical in
-  if h : p.IsValid' then choose h else 0
+noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 := by
+  classical
+  exact if h : p.IsValid then Classical.choose h else 0
 
 /-- Bridge Lemma: If a ProjectivePoint is valid, `toPoint'` returns the correct mathematical point. -/
 theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point Ed25519}
-    (h : p.IsValid P) : p.toPoint' = P := by
+    (h : p.IsValid' P) : p.toPoint' = P := by
   rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid P' → P' = P := by
+  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
     intro P' h'
-    unfold IsValid at h h'
+    unfold IsValid' at h h'
     rcases h with ⟨hz, hx, hy⟩
     rcases h' with ⟨_, hx', hy'⟩
     ext
@@ -113,11 +119,11 @@ theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point 
 
 /-- Bridge Lemma: If a CompletedPoint is valid, `toPoint'` returns the correct mathematical point. -/
 theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed25519}
-    (h : p.IsValid P) : p.toPoint' = P := by
+    (h : p.IsValid' P) : p.toPoint' = P := by
   rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid P' → P' = P := by
+  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
     intro P' h'
-    unfold IsValid at h h'
+    unfold IsValid' at h h'
     rcases h with ⟨hz, ht, hx, hy⟩
     rcases h' with ⟨_, _, hx', hy'⟩
     ext
@@ -146,8 +152,8 @@ theorem CompletedPoint.toPoint'_eq_coe (p : CompletedPoint) :
   p.toPoint' = ↑p := rfl
 
 def ProjectivePoint.InBounds (p : ProjectivePoint) : Prop :=
-  (∀ i, i < 5 → (p.X[i]!).val ≤ 2^52) ∧
-  (∀ i, i < 5 → (p.Y[i]!).val ≤ 2^52) ∧
-  (∀ i, i < 5 → (p.Z[i]!).val ≤ 2^52)
+  (∀ i < 5, p.X[i]!.val ≤ 2^52) ∧
+  (∀ i < 5, p.Y[i]!.val ≤ 2^52) ∧
+  (∀ i < 5, p.Z[i]!.val ≤ 2^52)
 
 end curve25519_dalek.backend.serial.curve_models
