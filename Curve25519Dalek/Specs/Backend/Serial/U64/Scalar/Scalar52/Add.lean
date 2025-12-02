@@ -5,6 +5,7 @@ Authors: Markus Dablander, Liao Zhang, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Aux
 import Mathlib.Data.Nat.ModEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
@@ -38,6 +39,8 @@ natural language specs:
     • scalar_to_nat(v) = (scalar_to_nat(u) + scalar_to_nat(u')) mod L
 -/
 
+set_option maxHeartbeats 1000000 in
+-- bad case bashing proof
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
 - Starting from index `i` with accumulator `sum` and carry `carry`
 - Computes limb-wise addition with carry propagation
@@ -49,9 +52,9 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha : ∀ j < 5, (a[j]!).val < 2 ^ 52)
     (hb : ∀ j < 5, (b[j]!).val < 2 ^ 52)
     (hmask : mask.val = 2 ^ 52 - 1)
-    (hi : i.val < 5)
-    (hsum_bounds : ∀ j < i.val, (sum[j]!).val < 2 ^ 52)
-    (hsum_rest : ∀ j < 5, i.val ≤ j → (sum[j]!).val = 0)
+    (hi : i.val ≤ 5)
+    (hsum : ∀ j < i.val, (sum[j]!).val < 2 ^ 52)
+    (hsum' : ∀ j < 5, i.val ≤ j → (sum[j]!).val = 0)
     (hcarry : carry.val < 2 ^ 54) :
     ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
     (∀ j < 5, (sum'[j]!).val < 2 ^ 52) ∧
@@ -62,27 +65,47 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
   progress*
-  · have := ha i (by grind)
-    have := hb i (by grind)
+  · have := ha i (by scalar_tac)
+    have := hb i (by scalar_tac)
     scalar_tac
-  · have := ha i (by grind)
-    have := hb i (by grind)
+  · have := ha i (by scalar_tac)
+    have := hb i (by scalar_tac)
     scalar_tac
-  · -- something wrong here...
-    sorry
   · intro j hj
-    sorry
+    by_cases hc : j = i
+    · rw [hc]
+      have := Array.set_of_eq sum i5 i (by scalar_tac)
+      simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
+      simp [this, i5_post_1, hmask]
+      grind
+    · have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
+      have := hsum j (by scalar_tac)
+      simp_all
   · intro j hj hj'
     sorry
-  · have := ha i (by grind)
-    have := hb i (by grind)
+  · have := ha i (by scalar_tac)
+    have := hb i (by scalar_tac)
     simp [*]
     bvify 64
     sorry
   · refine ⟨fun j hj ↦ ?_, fun j hj ↦ ?_, ?_⟩
+    · have := res_post_1 j (by scalar_tac)
+      scalar_tac
+    · simp only [Array.getElem!_Nat_eq]
+      have A := res_post_2 j (by scalar_tac)
+      have B := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
+      have : j < 5 := by grind
+      interval_cases j
+      all_goals simp at A B; grind
     · sorry
-    · sorry
-    · sorry
+  · refine ⟨fun j hj ↦ ?_, fun j hj ↦ ?_, ?_⟩
+    · by_cases j < i <;> grind
+    · simp
+    · have : i.val = 5 := by scalar_tac
+      rw [this]
+      simp
+
+      sorry
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 

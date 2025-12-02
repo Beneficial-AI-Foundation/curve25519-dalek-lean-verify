@@ -55,6 +55,12 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- Setting the j part of an array gives exactly the i part if i = j -/
+theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
+    (bs.set i#usize a)[i]! = a := by
+  simp [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNat_val_eq]
+  grind
+
 /-- The sum of the first i terms of a base-256 number is less than `2 ^ (8 * i)`. -/
 private lemma U8x32_extract_byte_aux (bytes : Array U8 32#usize) (i : Nat) :
     ∑ j ∈ Finset.range i, 2 ^ (8 * j) * bytes[j]!.val < 2 ^ (8 * i) := by
