@@ -224,14 +224,14 @@ exactly to the mathematical addition of the point to itself (`q + q`) on the Edw
 -/
 theorem double_spec'
     (q : ProjectivePoint) (hq_valid : q.IsValid) (hq_bounds : q.InBounds) :
-    ∃ c, ProjectivePoint.double q = .ok c ∧ c.IsValid ∧
-    (↑c : Point Ed25519) = ↑q + ↑q := by
+    ∃ c, ProjectivePoint.double q = ok c ∧ c.IsValid ∧
+    (c : Point Ed25519) = q + q := by
 
   -- 1. Unwrap validity witness P from the input
   rcases hq_valid with ⟨P, hP⟩
 
   -- Bridge: Convert the coerced q back to P using our previous lemmas
-  have h_q_eq_P : (↑q : Point Ed25519) = P := ProjectivePoint.toPoint'_eq_of_isValid hP
+  have h_q_eq_P : (q : Point Ed25519) = P := ProjectivePoint.toPoint'_eq_of_isValid hP
   rw [h_q_eq_P]
 
   -- 2. Run the Aeneas specification

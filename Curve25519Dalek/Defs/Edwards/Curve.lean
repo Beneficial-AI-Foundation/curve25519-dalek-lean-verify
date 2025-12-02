@@ -65,10 +65,8 @@ def Ed25519 : EdwardsCurve CurveField := {
 
 /-- Ed25519 curve parameter d is not a square in the field. -/
 lemma d_not_square : ¬IsSquare Ed25519.d := by
-  dsimp only [Ed25519]
-  rw [← legendreSym.eq_neg_one_iff' p]
-  dsimp only [d, p]
-  norm_num [p]
+  apply (legendreSym.eq_neg_one_iff' p).mp
+  norm_num [d, p]
 
 
 /-- An affine point on the Edwards curve. -/
