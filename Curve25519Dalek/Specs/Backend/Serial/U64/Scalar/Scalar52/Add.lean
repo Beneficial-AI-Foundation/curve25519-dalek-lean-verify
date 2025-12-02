@@ -61,8 +61,11 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
     ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ 260 * (carry.val / 2 ^ 52) =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
+  unfold add_loop
+  progress*
   sorry
-
+termination_by 5 - i.val
+decreasing_by scalar_decr_tac
 
 /-- **Spec and proof concerning `scalar.Scalar52.add`**:
 - No panic (always returns successfully)
