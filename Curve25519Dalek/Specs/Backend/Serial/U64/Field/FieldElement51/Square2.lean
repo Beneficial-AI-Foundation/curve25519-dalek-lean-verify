@@ -109,6 +109,7 @@ theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 
         apply Finset.sum_congr rfl
         grind
       rw [this, Nat.mul_mod, square_post_2, ← Nat.mul_mod]
+      -- END TASK
     · -- BEGIN TASK
       have := res_post_1 i hi (by omega)
       have := square_post_1 i hi

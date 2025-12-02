@@ -1,9 +1,10 @@
+import re
 import subprocess
 from pathlib import Path
 
 from inspect_ai import Task, task
 from inspect_ai.agent import react
-from inspect_ai.tool import text_editor, tool
+from inspect_ai.tool import tool
 from inspect_ai.util import sandbox
 
 from dalek_lean_ai.dataset import build_dataset
@@ -74,6 +75,110 @@ def _get_prompt() -> str:
 
 
 @tool
+def view_file():
+    async def execute(abs_file_path: str, lines: list[int] | None = None):
+        """View the contents of a file or directory in the project.
+
+        Args:
+            abs_file_path: Absolute file path to view
+            lines: Optional list of two integers [start, end] to show only lines start through end (inclusive).
+                  Line numbers are 1-indexed. Example: [10, 19] shows lines 10-19.
+
+        Returns:
+            The contents of the file with line numbers, or directory listing.
+        """
+        # Check if it's a directory
+        check_dir = await sandbox().exec(["test", "-d", abs_file_path])
+        if check_dir.success:
+            # It's a directory, run ls
+            result = await sandbox().exec(["ls", "-la", abs_file_path])
+            if result.success:
+                return result.stdout
+            else:
+                return f"Error listing directory: {result.stderr}"
+
+        # It's a file, use cat -n to show line numbers
+        if lines is not None and len(lines) == 2:
+            start, end = lines
+            # Use sed to extract specific line range
+            result = await sandbox().exec(
+                ["bash", "-c", f"cat -n {abs_file_path} | sed -n '{start},{end}p'"]
+            )
+        else:
+            result = await sandbox().exec(["cat", "-n", abs_file_path])
+
+        if result.success:
+            return result.stdout
+        else:
+            return f"Error reading file: {result.stderr}"
+
+    return execute
+
+
+@tool
+def insert_proof():
+    async def execute(task_id: int, proof: str):
+        """Insert a proof for a specific task by replacing the content between task anchors.
+
+        Args:
+            task_id: The task number to insert a proof for (from the task markers)
+            proof: The proof code to insert between the task anchors. Do NOT include
+                  the task anchor comments (-- BEGIN task N / -- END task N) in your proof.
+
+        Returns:
+            Success or error message.
+        """
+        # Check that the proof doesn't contain anchor comments
+        if "-- BEGIN TASK" in proof or "-- END TASK" in proof:
+            return "Error: Your proof contains task anchor comments. Please submit only the proof code without the anchor markers."
+
+        # Find all files with this task ID
+        find_result = await sandbox().exec(
+            ["bash", "-c", f"cd /workspace/curve25519-dalek-lean-verify && grep -r 'BEGIN TASK {task_id}' --include='*.lean' -l Curve25519Dalek/"],
+        )
+
+        if not find_result.success or not find_result.stdout.strip():
+            return f"Error: Could not find task {task_id} in any file."
+
+        # Should only be one file with this task ID
+        target_file = find_result.stdout.strip().split('\n')[0]
+        full_path = f"/workspace/curve25519-dalek-lean-verify/{target_file}"
+
+        # Read the current file contents
+        read_result = await sandbox().exec(["cat", full_path])
+        if not read_result.success:
+            return f"Error reading file: {read_result.stderr}"
+
+        file_contents = read_result.stdout
+
+        # Replace content between task anchors (handle any indentation)
+        pattern = re.compile(
+            rf'(\s*-- BEGIN TASK {task_id}\n)(.*?)(\s*-- END TASK {task_id})',
+            re.DOTALL
+        )
+
+        # Check if pattern exists
+        if not pattern.search(file_contents):
+            return f"Error: Could not find task {task_id} anchors in {target_file}"
+
+        # Replace the content, preserving the anchors and letting LLM handle indentation
+        new_contents = pattern.sub(rf'\g<1>{proof}\n\g<3>', file_contents)
+
+        # Write back to the file
+        write_result = await sandbox().exec(
+            ["bash", "-c", f"cat > {full_path}"],
+            input=new_contents
+        )
+
+        if not write_result.success:
+            return f"Error writing file: {write_result.stderr}"
+
+        return f"Successfully submitted proof for task {task_id} in {target_file}. Use lake_build to verify it compiles."
+
+    return execute
+
+
+@tool
 def lake_build():
     async def execute():
         """Run lake build to compile the Lean project and check for errors.
@@ -107,7 +212,7 @@ def evaluate_lean_fixing():
         description="Expert Lean theorem prover",
         prompt=_get_prompt(),
         # TODO Should the timeout be larger?
-        tools=[lake_build(), text_editor()],
+        tools=[view_file(), insert_proof(), lake_build()],
         attempts=1000,
     )
 

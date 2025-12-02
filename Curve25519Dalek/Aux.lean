@@ -9,10 +9,12 @@ set_option linter.style.longLine false
 Theorems which are useful for proving spec theorems in this project but aren't available upstream.
 This file is for theorems which depend only on Defs.lean, not on Funs.lean or Types.lean. -/
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 open Aeneas.Std Result
 
 attribute [-simp] Int.reducePow Nat.reducePow
-
 
 /-- Right-shifting a 64-bit value by 51 bits leaves at most 13 bits so bounded by 2^13 - 1. -/
 theorem U64_shiftRight_le (a : U64) : a.val >>> 51 ≤ 2 ^ 13 - 1 := by
