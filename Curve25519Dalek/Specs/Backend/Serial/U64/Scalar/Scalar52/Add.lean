@@ -24,6 +24,7 @@ This function adds two elements.
 -/
 
 set_option linter.hashCommand false
+set_option exponentiation.threshold 280
 #setup_aeneas_simps
 
 open Aeneas.Std Result
@@ -58,8 +59,8 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
     (∀ j < 5, (sum'[j]!).val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
-    ∑ j ∈ Finset.range i.val, 2 ^ (52 * j) * sum[j]!.val + 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) =
-      ∑ j ∈ Finset.range i.val, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
+    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ 260 * (carry.val / 2 ^ 52) =
+      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
   sorry
 
 
@@ -81,7 +82,9 @@ theorem add_spec (a b : Scalar52)
   · intro i _
     unfold constants.L
     interval_cases i <;> decide
-  · simp_all
+  · simp_all [Nat.ModEq, L_spec]
+    simp [Scalar52_as_Nat]
+
 
     sorry
 
