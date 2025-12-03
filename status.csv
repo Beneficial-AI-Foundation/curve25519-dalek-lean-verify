@@ -57,7 +57,7 @@ curve25519_dalek::backend::vartime_double_base_mul,curve25519-dalek/src/backend/
 curve25519_dalek::edwards::CompressedEdwardsY::as_bytes,curve25519-dalek/src/edwards.rs,L189-L191,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::edwards::CompressedEdwardsY::decompress,curve25519-dalek/src/edwards.rs,L202-L296,Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean,extracted,specified,,
 curve25519_dalek::edwards::affine::AffinePoint::compress,curve25519-dalek/src/edwards/affine.rs,L71-L75,Curve25519Dalek/Specs/Edwards/Compress.lean,extracted,specified,,
-curve25519_dalek::edwards::EdwardsPoint::add,curve25519-dalek/src/edwards.rs,L755-L757,,extracted,,,
+curve25519_dalek::edwards::EdwardsPoint::add,curve25519-dalek/src/edwards.rs,L755-L757,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::as_projective,curve25519-dalek/src/edwards.rs,L521-L623,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean,extracted,verified,,theo - GPT-5-mini - 07/11/2025
 curve25519_dalek::edwards::EdwardsPoint::as_projective_niels,curve25519-dalek/src/edwards.rs,L508-L525,Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean,extracted,verified,,
 curve25519_dalek::edwards::EdwardsPoint::compress,curve25519-dalek/src/edwards.rs,L565-L581,Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean,extracted,specified,,
