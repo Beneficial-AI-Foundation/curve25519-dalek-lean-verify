@@ -11,6 +11,8 @@ import Curve25519Dalek.mvcgen
 import Std.Do
 import Std.Tactic.Do
 open Std.Do
+set_option trace.Progress true
+
 /-! # Spec Theorem for `FieldElement51::negate`
 
 Specification and proof for `FieldElement51::negate`.
@@ -84,19 +86,17 @@ theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
 theorem index_usize_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
   (hbound : i.val < v.length) :
 ⦃⌜True⌝⦄
-v.index_usize i
+Array.index_usize v i
 ⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
 sorry
 
 @[spec]
-theorem sub_spec (a b : Array U64 5#usize)
-    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
-    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
+theorem sub_spec (x y : U64):
 ⦃⌜True⌝⦄
-  backend.serial.u64.field.FieldElement51.Sub.sub
- a b
-⦃⇓d => ⌜(∀ i < 5, d[i]!.val < 2 ^ 52) ∧ (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p⌝⦄ :=
+(x - y)
+⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
 by sorry
+
 
 @[spec]
 theorem reduce_spec (limbs : Array U64 5#usize) :
@@ -111,9 +111,15 @@ theorem negate_spec2 (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).v
 negate r
 ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
     := by
-    mvcgen [negate, reduce]
+    mvcgen [negate]; all_goals try (simp)
     exact inferInstance
+    exact inferInstance
+    exact inferInstance
+    exact inferInstance
+    exact inferInstance
+    intro h1 h2
+    rename_i r1 h1 r2 h2 r3 h3 r4 h4 r5 h5 r6 h6 r7 h7 r8 h8 r9 h9 r10 h10
     sorry
-    sorry
+
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
