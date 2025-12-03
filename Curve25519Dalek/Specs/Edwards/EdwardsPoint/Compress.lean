@@ -80,9 +80,31 @@ theorem affine_compress (ae : edwards.affine.AffinePoint) :
       try grind
 
     simp only [h_i1, h_xor]
-    try simp
+    rw [show (↑i2 : Result U8) = ok i2 by rfl]
+    progress*
 
-    sorry
+    have h_s1 : s1 = y_bytes := by
+      rw [s1_post, i2_post]
+      simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem!_pos]
+      simpa [Aeneas.Std.Array.getElem!_Usize_eq] using
+        (Aeneas.Std.Array.set_getElem!_eq (α := U8) (n := 32#usize) (x := y_bytes) (i := 31#usize))
+
+    simp only [h_s1]
+    have hx : x = 0#u8 := by
+      rw [h_i1] at i1_post_2
+      try grind
+
+    simp only [hx]
+    try refine ⟨y_bytes, ⟨0#u8, by decide⟩, rfl, rfl, ?_, ?_⟩
+    · --subgoal 1.a
+      simp only [Nat.ModEq] at hy_bytes
+      
+      sorry
+    · --subgoal 1.b
+
+      sorry
+
+
 
   · -- Subgoal 2: x ≠ 0
     split
@@ -118,7 +140,8 @@ theorem compress_spec (e : EdwardsPoint)
   · intro i hi; have := h_bounds i hi; scalar_tac
 
   progress with affine_compress as ⟨ cey, x_sign, h_comp ⟩
-  exists cey, ae, x_sign
+  --exists cey, ae, x_sign
+
   sorry
 
 
