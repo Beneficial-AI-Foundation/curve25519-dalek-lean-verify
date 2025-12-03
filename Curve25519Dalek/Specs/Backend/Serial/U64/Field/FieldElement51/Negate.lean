@@ -11,7 +11,6 @@ import Curve25519Dalek.mvcgen
 import Std.Do
 import Std.Tactic.Do
 open Std.Do
-set_option trace.Progress true
 
 /-! # Spec Theorem for `FieldElement51::negate`
 
@@ -117,9 +116,29 @@ negate r
     exact inferInstance
     exact inferInstance
     exact inferInstance
-    intro h1 h2
+    intro h01 h02
     rename_i r1 h1 r2 h2 r3 h3 r4 h4 r5 h5 r6 h6 r7 h7 r8 h8 r9 h9 r10 h10
-    sorry
+    rename_i r11
+    -- First, establish the key fact about 16*p
+    have h_16p : 16 * p =
+      36028797018963664 * 2^0 +
+      36028797018963952 * 2^51 +
+      36028797018963952 * 2^102 +
+      36028797018963952 * 2^153 +
+      36028797018963952 * 2^204 := by simp [p]
 
+    -- Show that the array [h1✝, h3, h5, h7, h9] represents 16*p - r
+    have h_sub : Field51_as_Nat (Array.make 5#usize [h1, h3, h5, h7, h9] Sub.sub._proof_4) = 16 * p - Field51_as_Nat r := by
+      sorry
+    -- Use h2 (from reduce_spec) to relate to h10
+    have h_reduce : Field51_as_Nat (Array.make 5#usize [h1, h3, h5, h7, h9] Sub.sub._proof_4) ≡ Field51_as_Nat h10 [MOD p] := h02
+
+    -- Combine: 16*p - r ≡ h10 (mod p)
+    have : (16 * p - Field51_as_Nat r) ≡ Field51_as_Nat h10 [MOD p] := by
+      rw [←h_sub]; exact h_reduce
+
+    -- Therefore: r + h10 ≡ 16*p ≡ 0 (mod p)
+    simp [Nat.ModEq] at *
+    sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
