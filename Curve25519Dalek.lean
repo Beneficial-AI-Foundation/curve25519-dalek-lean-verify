@@ -4,6 +4,7 @@ import Curve25519Dalek.Defs.Edwards.Curve
 import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
@@ -15,9 +16,11 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQ
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQUARED
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_AD_MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
@@ -56,6 +59,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
+import Curve25519Dalek.Specs.Edwards.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
@@ -72,6 +76,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.VartimeDoubleScalarMulBasepoint
 import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
+import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
