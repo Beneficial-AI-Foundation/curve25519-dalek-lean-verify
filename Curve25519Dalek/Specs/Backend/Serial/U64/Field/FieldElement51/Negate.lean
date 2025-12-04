@@ -110,35 +110,20 @@ theorem negate_spec2 (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).v
 negate r
 ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
     := by
-    mvcgen [negate]; all_goals try (simp)
+    mvcgen [negate]; all_goals try simp
     exact inferInstance
     exact inferInstance
     exact inferInstance
     exact inferInstance
     exact inferInstance
-    intro h01 h02
-    rename_i r1 h1 r2 h2 r3 h3 r4 h4 r5 h5 r6 h6 r7 h7 r8 h8 r9 h9 r10 h10
-    rename_i r11
-    -- First, establish the key fact about 16*p
+    simp [Std.Do.wp, PostCond.noThrow] at *
     have h_16p : 16 * p =
       36028797018963664 * 2^0 +
       36028797018963952 * 2^51 +
       36028797018963952 * 2^102 +
       36028797018963952 * 2^153 +
       36028797018963952 * 2^204 := by simp [p]
-
-    -- Show that the array [h1✝, h3, h5, h7, h9] represents 16*p - r
-    have h_sub : Field51_as_Nat (Array.make 5#usize [h1, h3, h5, h7, h9] Sub.sub._proof_4) = 16 * p - Field51_as_Nat r := by
-      sorry
-    -- Use h2 (from reduce_spec) to relate to h10
-    have h_reduce : Field51_as_Nat (Array.make 5#usize [h1, h3, h5, h7, h9] Sub.sub._proof_4) ≡ Field51_as_Nat h10 [MOD p] := h02
-
-    -- Combine: 16*p - r ≡ h10 (mod p)
-    have : (16 * p - Field51_as_Nat r) ≡ Field51_as_Nat h10 [MOD p] := by
-      rw [←h_sub]; exact h_reduce
-
-    -- Therefore: r + h10 ≡ 16*p ≡ 0 (mod p)
-    simp [Nat.ModEq] at *
-    sorry
+    simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
+    grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
