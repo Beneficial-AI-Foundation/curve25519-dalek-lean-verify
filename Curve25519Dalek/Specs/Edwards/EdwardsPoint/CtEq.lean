@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 
 /-! # Spec Theorem for `EdwardsPoint::ct_eq`
 
@@ -41,16 +42,42 @@ Natural language specs:
 @[progress]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     (h_Z1_nonzero : Field51_as_Nat e1.Z % p ≠ 0)
-    (h_Z2_nonzero : Field51_as_Nat e2.Z % p ≠ 0) :
-    ∃ c u u' v v',
-      backend.serial.u64.field.FieldElement51.Mul.mul e1.X e2.Z = ok u ∧
-      backend.serial.u64.field.FieldElement51.Mul.mul e2.X e1.Z = ok u' ∧
-      backend.serial.u64.field.FieldElement51.Mul.mul e1.Y e2.Z = ok v ∧
-      backend.serial.u64.field.FieldElement51.Mul.mul e2.Y e1.Z = ok v' ∧
+    (h_Z2_nonzero : Field51_as_Nat e2.Z % p ≠ 0)
+    -- Bounds for e1 (Input 1)
+    (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)
+    (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)
+    (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)
+    -- Bounds for e2 (Input 2)
+    (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)
+    (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)
+    (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :
+    ∃ c,
       ct_eq e1 e2 = ok c ∧
-      (c = Choice.one ↔
-        Field51_as_Nat u % p = Field51_as_Nat u' % p ∧
-        Field51_as_Nat v % p = Field51_as_Nat v' % p) := by
+      (c.val = 1#u8 ↔
+        (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
+        (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) := by
+  unfold ct_eq
+  progress*
+
+  -- Bounds
+  · --subgoal 1
+    intro i hi
+    have := h_e1_X i hi
+    scalar_tac
+  · --subgoal 2
+    intro i hi
+    have := h_e2_Z i hi
+    scalar_tac
+  · --subgoal 3
+    intro i hi
+    have := h_e2_X i hi
+    scalar_tac
+  · --subgoal 4
+    intro i hi
+    have := h_e1_Z i hi
+    scalar_tac
+
+
   sorry
 
 end curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
