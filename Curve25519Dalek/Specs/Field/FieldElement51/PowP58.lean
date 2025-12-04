@@ -1,11 +1,13 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-
+import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 /-! # Spec Theorem for `FieldElement51::pow_p58`
 
 Specification and proof for `FieldElement51::pow_p58`.
@@ -14,9 +16,6 @@ This function computes r^((p-5)/8) for a field element r in 𝔽_p where p = 2^2
 and thus (p-5)/8 = 2^252 -3
 
 **Source**: curve25519-dalek/src/field.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -44,6 +43,33 @@ theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : �
     ∃ r', pow_p58 r = ok r' ∧
     Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p
     := by
-    sorry
+    unfold pow_p58
+    progress*
+    · intro i hi
+      apply lt_of_le_of_lt (h_bounds i hi)
+      simp
+    · intro i hi
+      apply lt_trans  (__discr_post_3 i hi)
+      simp
+    · intro i hi
+      apply lt_of_le_of_lt (h_bounds i hi)
+      simp
+    · intro i hi
+      apply lt_trans  (t20_post_1 i hi)
+      simp
+    rw[← Nat.ModEq]
+    apply Nat.ModEq.trans  res_post_1
+    have := Nat.ModEq.mul_left (Field51_as_Nat r) t20_post_2
+    apply Nat.ModEq.trans  this
+    rw[← Nat.ModEq] at __discr_post_1
+    have := Nat.ModEq.pow 4 __discr_post_1
+    have := Nat.ModEq.mul_left (Field51_as_Nat r) this
+    apply Nat.ModEq.trans  this
+    rw[← pow_mul]
+    have one:= pow_one (Field51_as_Nat r)
+    have := pow_add (Field51_as_Nat r) 1 (1809251394333065553493296640760748560207343510400633813116524750123642650623 * 4)
+    rw[one] at this
+    simp[← this]
+    apply Nat.ModEq.rfl
 
 end curve25519_dalek.field.FieldElement51
