@@ -111,19 +111,19 @@ negate r
 ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
     := by
     mvcgen [negate]; all_goals try simp
-    exact inferInstance
-    exact inferInstance
-    exact inferInstance
-    exact inferInstance
-    exact inferInstance
-    simp [Std.Do.wp, PostCond.noThrow] at *
-    have h_16p : 16 * p =
-      36028797018963664 * 2^0 +
-      36028797018963952 * 2^51 +
-      36028797018963952 * 2^102 +
-      36028797018963952 * 2^153 +
-      36028797018963952 * 2^204 := by simp [p]
-    simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
-    grind
+    · exact inferInstance
+    · exact inferInstance
+    · exact inferInstance
+    · exact inferInstance
+    · exact inferInstance
+    · simp [Std.Do.wp, PostCond.noThrow] at *
+      have h_16p : 16 * p =
+        36028797018963664 * 2^0 +
+        36028797018963952 * 2^51 +
+        36028797018963952 * 2^102 +
+        36028797018963952 * 2^153 +
+        36028797018963952 * 2^204 := by simp [p]
+      simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
+      grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
