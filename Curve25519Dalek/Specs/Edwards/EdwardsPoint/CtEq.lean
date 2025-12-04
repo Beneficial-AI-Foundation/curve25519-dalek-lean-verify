@@ -39,6 +39,25 @@ Natural language specs:
 - No panic (always returns successfully)
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 -/
+
+/- This lemma is also present in IsZero and IsNegative. TODO: refactor to a single source file
+to be imported in all needed places-/
+lemma choice_val_eq_one_iff (c : subtle.Choice) :
+  c.val = 1#u8 ↔ c = Choice.one := by
+  cases c with
+  | mk v hv =>
+    simp [Choice.one]
+
+
+theorem field_ct_eq_spec (x y : backend.serial.u64.field.FieldElement51)
+    (hx : ∀ i < 5, x.val[i]!.val < 2 ^ 54)
+    (hy : ∀ i < 5, y.val[i]!.val < 2 ^ 54) :
+    ∃ c,
+      field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq x y = ok c ∧
+      (c.val = 1#u8 ↔ Field51_as_Nat x % p = Field51_as_Nat y % p) := by
+  sorry
+
+
 @[progress]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     (h_Z1_nonzero : Field51_as_Nat e1.Z % p ≠ 0)
@@ -60,23 +79,33 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   progress*
 
   -- Bounds
-  · --subgoal 1
-    intro i hi
-    have := h_e1_X i hi
-    scalar_tac
-  · --subgoal 2
-    intro i hi
-    have := h_e2_Z i hi
-    scalar_tac
-  · --subgoal 3
-    intro i hi
-    have := h_e2_X i hi
-    scalar_tac
-  · --subgoal 4
-    intro i hi
-    have := h_e1_Z i hi
-    scalar_tac
+  · intro i hi; have := h_e1_X i hi; scalar_tac
+  · intro i hi; have := h_e2_Z i hi; scalar_tac
+  · intro i hi; have := h_e2_X i hi; scalar_tac
+  · intro i hi; have := h_e1_Z i hi; scalar_tac
 
+
+  progress with field_ct_eq_spec
+
+  · intro i hi; have := fe_post_2 i hi; scalar_tac
+  · intro i hi; have := fe1_post_2 i hi; scalar_tac
+
+  progress
+
+  · intro i hi; have := h_e1_Y i hi; scalar_tac
+  · intro i hi; have := h_e2_Z i hi; scalar_tac
+
+  progress*
+
+  · intro i hi; have := h_e2_Y i hi; scalar_tac
+  · intro i hi; have := h_e1_Z i hi; scalar_tac
+
+  progress with field_ct_eq_spec
+  · intro i hi;
+    rename_i _ _ fe2 _ h_fe2_bounds
+
+    sorry
+  · intro i hi; have := fe3_post_2 i hi; scalar_tac
 
   sorry
 
