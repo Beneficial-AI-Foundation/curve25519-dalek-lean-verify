@@ -3,12 +3,8 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
-import Aeneas
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Tactics
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Std.Do
 import Curve25519Dalek.mvcgen
 open Std.Do

@@ -5,7 +5,6 @@ Authors: Liao Zhang, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.mvcgen
 
 /-! # identity
 
@@ -35,7 +34,6 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
-
 @[progress]
 theorem identity_spec :
     ∃ q, identity = ok q ∧
