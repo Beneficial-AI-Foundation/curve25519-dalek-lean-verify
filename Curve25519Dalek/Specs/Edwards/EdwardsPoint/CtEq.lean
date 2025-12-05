@@ -3,10 +3,12 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 
 import Mathlib.Data.Nat.ModEq
 
@@ -20,6 +22,8 @@ This function performs constant-time equality comparison for Edwards points.
 -/
 
 open Aeneas.Std Result
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+
 namespace curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
 
 /-
@@ -43,8 +47,8 @@ Natural language specs:
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 -/
 
-/- This lemma is also present in IsZero and IsNegative. TODO: refactor to a single source file
-to be imported in all needed places-/
+/- This lemma is also present in IsZero and IsNegative.
+  TODO: refactor/move it to Aux.lean -/
 lemma choice_val_eq_one_iff (c : subtle.Choice) :
   c.val = 1#u8 ↔ c = Choice.one := by
   cases c with
@@ -53,14 +57,67 @@ lemma choice_val_eq_one_iff (c : subtle.Choice) :
 
 
 theorem field_ct_eq_spec (x y : backend.serial.u64.field.FieldElement51)
-    (hx : ∀ i < 5, x.val[i]!.val < 2 ^ 54)
-    (hy : ∀ i < 5, y.val[i]!.val < 2 ^ 54) :
+    (_ : ∀ i < 5, x.val[i]!.val < 2 ^ 54)
+    (_ : ∀ i < 5, y.val[i]!.val < 2 ^ 54) :
     ∃ c,
       field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq x y = ok c ∧
       (c.val = 1#u8 ↔ Field51_as_Nat x % p = Field51_as_Nat y % p) := by
-  
-  sorry
+  unfold field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
 
+  progress with to_bytes_spec as ⟨xb, h_xb_mod, h_xb_lt⟩
+
+  progress as ⟨yb, h_yb_mod⟩
+  progress as   ⟨c, h_bitand, h_xb_eq_yb⟩
+  progress as ⟨h_x_mod_p, h_y_mod_p⟩
+  progress as ⟨ choice, h_choice ⟩
+
+  apply Iff.intro
+  · -- Forward direction: (choice.val = 1) → (x % p = y % p)
+    intro h_val
+    let to_one {ch : subtle.Choice} (h : ch.val = 1#u8) : ch = Choice.one := by
+      cases ch; dsimp at h; simp only [Choice.one]; congr
+
+    have h_choice_true : choice = Choice.one := to_one h_val
+    rw [h_choice_true] at h_choice
+    simp only [true_iff] at h_choice
+
+    rw [h_yb_mod, h_y_mod_p] at h_choice
+    have h_arr_eq : xb = c := by
+      simp only [Array.to_slice, Slice.eq_iff] at h_choice
+      cases xb
+      cases c
+      simp_all
+
+    have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat c := by rw [h_arr_eq]
+
+    have h_x_canon : U8x32_as_Nat xb = Field51_as_Nat x % p := by
+      rw [←Nat.mod_eq_of_lt h_xb_lt]
+      exact h_xb_mod
+
+    have h_y_canon : U8x32_as_Nat c = Field51_as_Nat y % p := by
+      rw [←Nat.mod_eq_of_lt h_xb_eq_yb]
+      exact h_bitand
+
+    rw [←h_x_canon, ←h_y_canon]
+    exact h_nat_eq
+  · -- Backward direction: (x % p = y % p) → (choice.val = 1)
+    intro h_math
+    have h_x_canon : U8x32_as_Nat xb = Field51_as_Nat x % p := by
+      rw [←Nat.mod_eq_of_lt h_xb_lt]; exact h_xb_mod
+    have h_y_canon : U8x32_as_Nat c = Field51_as_Nat y % p := by
+      rw [←Nat.mod_eq_of_lt h_xb_eq_yb]; exact h_bitand
+    have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat c := by
+      rw [h_x_canon, h_y_canon]
+      exact h_math
+
+    have h_arr_eq : xb = c := by
+      exact U8x32_as_Nat_injective h_nat_eq
+
+    have h_slice_eq : xb.to_slice = c.to_slice := by rw [h_arr_eq]
+
+    rw [← h_yb_mod, ← h_y_mod_p, ←h_choice] at h_slice_eq
+    rw [h_slice_eq]
+    rfl
 
 @[progress]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
