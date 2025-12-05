@@ -34,6 +34,7 @@ lake build Curve25519Dalek:docs
 
 # Copy all generated docs to the site public directory
 echo "Copying documentation to site/public/lean-doc/"
+mkdir -p "$PROJECT_ROOT/site/public"
 rm -rf "$PROJECT_ROOT/site/public/lean-doc"
 cp -r "$DOCBUILD_DIR/.lake/build/doc" "$PROJECT_ROOT/site/public/lean-doc"
 
