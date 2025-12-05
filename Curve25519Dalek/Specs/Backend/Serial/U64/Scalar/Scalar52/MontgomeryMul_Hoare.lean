@@ -49,7 +49,7 @@ natural language specs:
 -/
 
 @[spec]
-theorem montgomery_mul_spec (m m' : Scalar52)
+theorem montgomery_mul_hoare_spec (m m' : Scalar52)
 (range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
 (range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
 ⦃⌜True⌝⦄

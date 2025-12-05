@@ -40,7 +40,7 @@ natural language specs:
 -/
 
 @[spec]
-theorem identity_spec :
+theorem identity_hoare_spec :
 ⦃⌜True⌝⦄
 identity
 ⦃⇓ q => ⌜q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO⌝⦄

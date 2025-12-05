@@ -39,7 +39,7 @@ Natural language specs:
 -/
 
 @[spec]
-theorem index_usize_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
+theorem index_usize_hoare_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
   (hbound : i.val < v.length) :
 ⦃⌜True⌝⦄
 Array.index_usize v i
@@ -47,7 +47,7 @@ Array.index_usize v i
 sorry
 
 @[spec]
-theorem sub_spec (x y : U64):
+theorem sub_hoare_spec (x y : U64):
 ⦃⌜True⌝⦄
 (x - y)
 ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
@@ -64,7 +64,7 @@ by sorry
   To make the theorem more readable we use a single bound for all limbs. -/
 
 @[spec]
-theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
+theorem negate_hoare_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
 ⦃⌜True⌝⦄
 negate r
 ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄

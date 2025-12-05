@@ -56,7 +56,7 @@ attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
 - The result is equal to the input mod p. -/
 
 @[spec]
-theorem reduce_spec (limbs : Array U64 5#usize) :
+theorem reduce_hoare_spec (limbs : Array U64 5#usize) :
 ⦃⌜True⌝⦄
 reduce limbs
 ⦃⇓result => ⌜(∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧ Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]⌝⦄ := by
