@@ -38,10 +38,8 @@ natural language specs:
 -/
 @[progress]
 theorem as_bytes_spec (cr : CompressedRistretto) :
-    ∃ b,
-    as_bytes cr = ok b ∧
-    b = cr
-    := by
+    ∃ b, as_bytes cr = ok b ∧
+    b = cr := by
   unfold as_bytes
   simp
 
