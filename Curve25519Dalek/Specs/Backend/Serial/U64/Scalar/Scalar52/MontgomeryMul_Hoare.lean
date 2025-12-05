@@ -5,9 +5,12 @@ Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
-
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal_Hoare
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce_Hoare
+import Curve25519Dalek.mvcgen
+import Std.Do
+import Std.Tactic.Do
+open Std.Do
 /-! # Spec Theorem for `Scalar52::montgomery_mul`
 
 Specification and proof for `Scalar52::montgomery_mul`.
@@ -44,21 +47,23 @@ natural language specs:
 - The result w satisfies the Montgomery multiplication property:
   (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
-@[progress]
-theorem montgomery_mul_spec (m m' : Scalar52)
-    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
-    ∃ w, montgomery_mul m m' = ok w ∧
-    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
-  unfold montgomery_mul
-  progress*
-  -- BEGIN TASK
-  have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [Nat.ModEq]
-    exact res_post
-  have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [← a1_post]
+
+@[spec]
+theorem montgomery_mul_hoare_spec (m m' : Scalar52)
+(range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
+(range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62)
+ :
+⦃⌜True⌝⦄
+montgomery_mul m m'
+⦃⇓ w => ⌜(Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
+  := by
+  mvcgen [montgomery_mul]
+  grind
+  grind
+  intro h1 h2
+  rename_i r1 h3 r2
+  obtain ⟨h4, h5⟩ := h3
   rw [Nat.ModEq]
   grind
-  -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
