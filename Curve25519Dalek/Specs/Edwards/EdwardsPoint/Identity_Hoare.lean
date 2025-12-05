@@ -1,11 +1,14 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Liao Zhang, Oliver Butterley
+Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.mvcgen
+import Std.Do
+import Std.Tactic.Do
+open Std.Do
 
 /-! # identity
 
@@ -36,11 +39,12 @@ natural language specs:
 - The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
 
-@[progress]
+@[spec]
 theorem identity_spec :
-  ∃ q, identity = ok q ∧
-  q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
-  unfold identity
-  simp
+⦃⌜True⌝⦄
+identity
+⦃⇓ q => ⌜q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO⌝⦄
+  := by
+  mvcgen
 
 end curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint
