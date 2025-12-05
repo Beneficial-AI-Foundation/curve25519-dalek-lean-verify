@@ -10,6 +10,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
+import Curve25519Dalek.Defs.Edwards.Curve
+import Curve25519Dalek.Defs.Edwards.Representation
+import Mathlib.Data.ZMod.Basic
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
@@ -51,7 +54,7 @@ natural language specs:
 -/
 
 set_option maxHeartbeats 1000000 in
--- simp_all is too heavy?
+-- simp_all is heavy
 /-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.double`**:
 - No panic (always returns successfully)
 - Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
@@ -83,77 +86,84 @@ theorem double_spec (q : ProjectivePoint)
     (T' + Z') % p = (2 * Z^2) % p := by
   unfold double
   progress*
-  · -- Goal 1: Precondition for `X`
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
+    have := h_qX_bounds i hi
     scalar_tac
-  · -- Goal 2: Precondition for `Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hy := h_qY_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 3: Precondition for `Z`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hz := h_qZ_bounds i hi
+    have := h_qZ_bounds i hi
     scalar_tac
-  · -- Goal 4: Precondition for `q.X+q.Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
-    have hy := h_qY_bounds i hi
+    have := h_qX_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 5: Precondition for `X_plus_Y`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
-    have hx := h_qX_bounds i hi
-    have hy := h_qY_bounds i hi
+    have := h_qX_bounds i hi
+    have := h_qY_bounds i hi
     scalar_tac
-  · -- Goal 6: Precondition for `YY_plus_XX`
-    intro i hi
-    have := YY_post_2 i hi
-    scalar_tac
-  · -- Goal 7: Precondition for `YY`
-    intro i hi
-    have := XX_post_2 i hi
-    scalar_tac
-  · -- Goal 8: Precondition for `XX`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
     have := YY_post_2 i hi
     scalar_tac
-  · -- Goal 9: Precondition for `X_plus_Y_sq`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
     have := XX_post_2 i hi
     scalar_tac
-  · -- Goal 10: Precondition for `YY_plus_XX`
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := YY_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := XX_post_2 i hi
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
     have := X_plus_Y_sq_post_2 i hi
     scalar_tac
-  · -- Goal 11: Precondition for `ZZ2`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
     have := ZZ2_post_2 i hi
     scalar_tac
-  · -- Goal 12: Precondition for `YY_minus_XX`
+    -- END TASK
+  · -- BEGIN TASK
     intro i hi
     have := YY_minus_XX_post_1 i hi
     scalar_tac
-  -- Goal 13:
+    -- END TASK
   unfold Field51_as_Nat at *
-
-  have h_X_plus_Y : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
-      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
-      (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
-    rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-    intro i hi
-    simp_all [Finset.mem_range, Nat.mul_add]
-
-  have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
-      (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
-      (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
-    rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
-    intro i hi
-    simp_all [Finset.mem_range, Nat.mul_add]
-
   refine ⟨?_, ?_, ?_, ?_⟩
-
-  · -- Goal 13.1: X' coordinate
-    rw [h_X_plus_Y] at X_plus_Y_sq_post_1;
+  · -- BEGIN TASK
+    have : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
+    rw [this] at X_plus_Y_sq_post_1;
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
     rw [h_YY_plus_XX] at fe_post_2;
     have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * YY[i]!.val) +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
@@ -165,24 +175,199 @@ theorem double_spec (q : ProjectivePoint)
     rw [← Nat.ModEq] at fe_post_2
     apply Nat.ModEq.trans fe_post_2
     exact X_plus_Y_sq_post_1
-
-  · -- Goal 13.2: Y' coordinate
+    -- END TASK
+  · -- BEGIN TASK
     rw [← Nat.ModEq] at *
+    have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
+        (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
+      rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
+      intro i hi
+      simp_all [Finset.mem_range, Nat.mul_add]
     rw [h_YY_plus_XX]
     apply Nat.ModEq.add
     · grind
     · grind
-
-  · -- Goal 13.3: Z' coordinate
+    -- END TASK
+  · -- BEGIN TASK
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post_1.symm)
     apply Nat.ModEq.trans YY_minus_XX_post_2
     exact YY_post_1
-
-  · -- Goal 13.4: T' coordinate
+    -- END TASK
+  · -- BEGIN TASK
     rw [← Nat.ModEq] at *;
     apply Nat.ModEq.trans fe1_post_2
     exact ZZ2_post_1
-
+    -- END TASK
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
+
+/-! ## Mathematical Verification
+
+This section proves that the geometric implementation `double_spec` corresponds to the
+mathematical operation of point doubling on the Edwards curve.
+
+The proof bridges low-level Rust implementation to high-level mathematics using the
+infrastructure from `Curve25519Dalek.Defs.Edwards`.
+-/
+
+namespace Edwards
+
+open curve25519_dalek.backend.serial.curve_models
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+
+/--
+Verification of the `double` function.
+The theorem states that the Rust implementation of point doubling corresponds
+exactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.
+-/
+theorem double_spec'
+    (q : ProjectivePoint) (hq_valid : q.IsValid) (hq_bounds : q.InBounds) :
+    ∃ c, ProjectivePoint.double q = ok c ∧ c.IsValid ∧
+    (c : Point Ed25519) = q + q := by
+
+  -- 1. Unwrap validity witness P from the input
+  rcases hq_valid with ⟨P, hP⟩
+
+  -- Bridge: Convert the coerced q back to P using our previous lemmas
+  have h_q_eq_P : (q : Point Ed25519) = P := ProjectivePoint.toPoint'_eq_of_isValid hP
+  rw [h_q_eq_P]
+
+  -- 2. Run the Aeneas specification
+  have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec q
+    (fun i h => hq_bounds.1 i h)
+    (fun i h => hq_bounds.2.1 i h)
+    (fun i h => hq_bounds.2.2 i h)
+
+  exists out
+  constructor; · exact h_run
+
+  -- 3. Mathematical Arithmetic Proof
+  -- This block proves that the output limbs correspond to P + P coordinates.
+  let P2 := P + P
+
+  have h_out_represents_P2 : out.IsValid' P2 := by
+    dsimp only at hP
+    rcases hP with ⟨hZ_nonzero, hX_in, hY_in⟩
+    rcases h_arith with ⟨hX_new, hY_new, hZ_new, hT_new⟩
+
+    -- Lift low-level limbs to field elements
+    let X_nat := Field51_as_Nat q.X
+    let Y_nat := Field51_as_Nat q.Y
+    let Z_nat := Field51_as_Nat q.Z
+
+    have hX_F : field_from_limbs out.X = 2 * field_from_limbs q.X * field_from_limbs q.Y := by
+      dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hX_new]; push_cast; rfl
+
+    have hY_F : field_from_limbs out.Y = field_from_limbs q.Y ^ 2 + field_from_limbs q.X ^ 2 := by
+      dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hY_new]; push_cast; rfl
+
+    have hZ_F : field_from_limbs out.Z = field_from_limbs q.Y ^ 2 - field_from_limbs q.X ^ 2 := by
+      have h := Edwards.lift_mod_eq _ _ hZ_new; push_cast at h; apply eq_sub_of_add_eq h
+
+    have hT_F : field_from_limbs out.T = 2 * field_from_limbs q.Z ^ 2 - field_from_limbs out.Z := by
+      have h := Edwards.lift_mod_eq _ _ hT_new; push_cast at h; apply eq_sub_of_add_eq h
+
+    -- Setup Curve Identities
+    unfold CompletedPoint.IsValid'
+    have h_d_not_square : ¬IsSquare Ed25519.d := d_not_square
+    have h_neg_one_square : IsSquare (-1 : CurveField) := by
+      apply ZMod.exists_sq_eq_neg_one_iff.mpr; decide
+
+    have h_curve : -P.x^2 + P.y^2 = 1 + Ed25519.d * P.x^2 * P.y^2 := by
+      have h := P.h_on_curve; simp only [Ed25519, neg_mul, one_mul] at h; exact h
+
+    -- Helper: Prove denominators are non-zero
+    have h_denom_plus : 1 + Ed25519.d * P.x^2 * P.y^2 ≠ 0 := by
+      intro h_zero
+      rw [add_eq_zero_iff_eq_neg] at h_zero
+      have ⟨k, hk⟩ := h_neg_one_square
+      rw [←neg_eq_iff_eq_neg, hk] at h_zero
+      by_cases h_xy_nz : P.x * P.y = 0
+      · rw [mul_assoc, ← mul_pow, h_xy_nz] at h_zero
+        simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero] at h_zero
+        rw [h_zero] at hk; norm_num at hk;
+
+      · apply h_d_not_square
+        use k / (P.x * P.y)
+        field_simp [h_xy_nz]; ring_nf at h_zero; rw [h_zero]
+        have h_nz : P.x^2 * P.y^2 ≠ 0 := by
+          rw [←mul_pow]
+          exact pow_ne_zero 2 h_xy_nz
+        rw [mul_assoc, mul_div_cancel_right₀ _ h_nz]
+
+    have h_denom_minus : 1 - Ed25519.d * P.x^2 * P.y^2 ≠ 0 := by
+      intro h_zero
+      rw [sub_eq_zero] at h_zero
+
+      by_cases h_xy_nz : P.x * P.y = 0
+      · rw [mul_assoc, ← mul_pow, h_xy_nz] at h_zero
+        simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero] at h_zero
+        norm_num at h_zero
+      · apply h_d_not_square
+        use 1 / (P.x * P.y)
+        rw [mul_assoc] at h_zero; field_simp [h_xy_nz]; rw [← mul_pow] at h_zero ⊢
+        have h_nz_sq : (P.x * P.y) ^ 2 ≠ 0 := pow_ne_zero 2 h_xy_nz
+        rw [eq_div_iff h_nz_sq]; ring_nf at h_zero ⊢; exact h_zero.symm
+
+    -- Prove the 4 components of IsValid (Z≠0, T≠0, X correct, Y correct)
+    refine ⟨?_, ?_, ?_, ?_⟩
+
+    -- 1. Prove Z ≠ 0
+    · rw [hZ_F, hX_in, hY_in]
+      grind
+
+    -- 2. Prove T ≠ 0
+    · rw [hT_F, hZ_F, hX_in, hY_in]
+      rw [mul_pow, mul_pow]
+      have h_factor : 2 * field_from_limbs q.Z ^ 2 -
+        (P.y^2 * field_from_limbs q.Z ^ 2 - P.x^2 * field_from_limbs q.Z ^ 2) =
+                      field_from_limbs q.Z ^ 2 * (2 - (P.y^2 - P.x^2)) := by ring
+      rw [h_factor]
+      apply mul_ne_zero
+      · exact pow_ne_zero 2 hZ_nonzero
+      · have h_curve' : 2 - (P.y^2 - P.x^2) = 1 - Ed25519.d * P.x^2 * P.y^2 := by
+          calc
+            2 - (P.y ^ 2 - P.x ^ 2)
+            _ = 2 - (-P.x ^ 2 + P.y ^ 2) := by ring
+            _= 2 - (1 + Ed25519.d * P.x ^ 2 * P.y ^ 2) := by rw [← h_curve]
+            _ = 1 - Ed25519.d * P.x ^ 2 * P.y ^ 2 := by ring
+        rw [h_curve']
+        exact h_denom_minus
+
+    -- 3. Verify X coordinate
+    · rw [(add_def P P).1]; dsimp only [add_coords]
+      rw [hX_F, hZ_F, hX_in, hY_in]
+
+      have h_denom : 1 + Ed25519.d * P.x * P.x * P.y * P.y ≠ 0 := by convert h_denom_plus using 1; ring
+      have h_subst : 1 + Ed25519.d * P.x^2 * P.y^2 = P.y^2 - P.x^2 := by rw [←h_curve]; ring
+      have h_comm : 1 + P.x^2 * P.y^2 * Ed25519.d = 1 + Ed25519.d * P.x^2 * P.y^2 := by ring
+      field_simp [h_denom, ← h_curve]; rw [h_comm]; ring_nf at h_denom; rw [eq_div_iff h_denom, h_subst]
+      ring_nf
+
+    -- 4. Verify Y coordinate
+    · rw [(add_def P P).2]; dsimp only [add_coords]
+
+      rw [hY_F, hT_F, hZ_F, hX_in, hY_in]
+
+      have h_a : Ed25519.a = -1 := rfl; rw [h_a]
+
+      have h_denom : 1 - Ed25519.d * P.x * P.x * P.y * P.y ≠ 0 := by convert h_denom_minus using 1; ring
+      have h_subst : 1 - Ed25519.d * P.x^2 * P.y^2 = 2 - (P.y^2 - P.x^2) := by
+        calc
+          1 - Ed25519.d * P.x ^ 2 * P.y ^ 2
+          _ = 2 - (1 + Ed25519.d * P.x ^ 2 * P.y ^ 2) := by ring
+          _ = 2 - (- P.x ^ 2 + P.y ^ 2 ) := by rw [h_curve]
+          _= 2 - (P.y ^ 2 - P.x ^ 2) := by ring
+      have h_comm : 1 - P.y^2 * P.x^2 * Ed25519.d = 1 - Ed25519.d * P.x^2 * P.y^2 := by ring
+      field_simp [h_denom]; rw [h_comm]; ring_nf at h_denom; rw [eq_div_iff h_denom]; rw [h_subst]
+      ring
+
+  -- 4. Re-pack validity and equality using bridge lemmas
+  constructor
+  · exact ⟨P2, h_out_represents_P2⟩
+  · rw [CompletedPoint.toPoint'_eq_of_isValid h_out_represents_P2]
+
+
+end Edwards

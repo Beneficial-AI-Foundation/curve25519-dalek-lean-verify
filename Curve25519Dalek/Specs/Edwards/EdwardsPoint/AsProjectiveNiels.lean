@@ -1,10 +1,13 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 
 /-! # Spec Theorem for `EdwardsPoint::as_projective_niels`
 
@@ -13,13 +16,11 @@ Specification and proof for `EdwardsPoint::as_projective_niels`.
 This function converts an EdwardsPoint to a ProjectiveNielsPoint, which is a
 representation optimized for point addition operations.
 
-**Source**: curve25519-dalek/src/edwards.rs
-
-## TODO
-- Complete proof
+Source: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
+  curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -53,10 +54,10 @@ where p = 2^255 - 19
 where p = 2^255 - 19
 -/
 @[progress]
-theorem as_projective_niels_spec (e : EdwardsPoint) :
-    ∃ pn,
-    as_projective_niels e = ok pn ∧
-
+theorem as_projective_niels_spec (e : EdwardsPoint)
+    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧
+      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :
+    ∃ pn, as_projective_niels e = ok pn ∧
     let X := Field51_as_Nat e.X
     let Y := Field51_as_Nat e.Y
     let Z := Field51_as_Nat e.Z
@@ -65,12 +66,57 @@ theorem as_projective_niels_spec (e : EdwardsPoint) :
     let B := Field51_as_Nat pn.Y_minus_X
     let Z' := Field51_as_Nat pn.Z
     let C := Field51_as_Nat pn.T2d
-    let d2 := Field51_as_Nat backend.serial.u64.constants.EDWARDS_D2
-
+    let d2 := Field51_as_Nat EDWARDS_D2
     A % p = (Y + X) % p ∧
-    B % p = (Y - X) % p ∧
+    (B + X) % p = Y % p ∧
     Z' % p = Z % p ∧
     C % p = (T * d2) % p := by
-    sorry
+  unfold as_projective_niels
+  progress*
+  · -- BEGIN TASK
+    intro i hi
+    have := (h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := (h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have :=(h_bounds i hi).2.2.2
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    unfold EDWARDS_D2 Aeneas.Std.eval_global EDWARDS_D2_body from_limbs
+    interval_cases i
+    all_goals decide
+    -- END TASK
+  · refine ⟨?_, ?_, ?_⟩
+    · -- BEGIN TASK
+      apply congrArg (· % p)
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      grind
+      -- END TASK
+    · -- BEGIN TASK
+      assumption
+      -- END TASK
+    · -- BEGIN TASK
+      assumption
+      -- END TASK
 
 end curve25519_dalek.edwards.EdwardsPoint
