@@ -39,8 +39,7 @@ theorem mul_internal_hoare_spec (a b : Array U64 5#usize)
 (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
 ⦃⌜True⌝⦄
 mul_internal a b
-⦃⇓ result => ⌜mul_internal a b = ok result ∧
-  Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄
+⦃⇓ result => ⌜Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄
   := by
   sorry
 

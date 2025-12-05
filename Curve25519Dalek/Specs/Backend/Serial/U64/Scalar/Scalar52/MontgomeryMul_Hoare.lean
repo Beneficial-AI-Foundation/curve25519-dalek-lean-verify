@@ -60,9 +60,7 @@ montgomery_mul m m'
   mvcgen [montgomery_mul]
   grind
   grind
-  intro h1 h2
-  rename_i r1 h3 r2
-  obtain ⟨h4, h5⟩ := h3
+  intro h1
   rw [Nat.ModEq]
   grind
 
