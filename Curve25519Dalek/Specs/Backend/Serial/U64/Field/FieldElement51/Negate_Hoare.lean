@@ -38,15 +38,6 @@ Natural language specs:
       (Field51_as_Nat(r) + Field51_as_Nat(r_inv)) ≡ 0 (mod p)
 -/
 
-/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
-- No panic (always returns successfully)
-- The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,
-  Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)
-- All the limbs of the result are small, ≤ 2^(51 + ε)
-- Requires that input limbs of r are bounded to avoid underflow:
-  - Limb 0 must be ≤ 36028797018963664
-  - Limbs 1-4 must be ≤ 36028797018963952
-  To make the theorem more readable we use a single bound for all limbs. -/
 @[spec]
 theorem index_usize_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
   (hbound : i.val < v.length) :
@@ -61,6 +52,16 @@ theorem sub_spec (x y : U64):
 (x - y)
 ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
 by sorry
+
+/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
+- No panic (always returns successfully)
+- The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,
+  Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)
+- All the limbs of the result are small, ≤ 2^(51 + ε)
+- Requires that input limbs of r are bounded to avoid underflow:
+  - Limb 0 must be ≤ 36028797018963664
+  - Limbs 1-4 must be ≤ 36028797018963952
+  To make the theorem more readable we use a single bound for all limbs. -/
 
 @[spec]
 theorem negate_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :

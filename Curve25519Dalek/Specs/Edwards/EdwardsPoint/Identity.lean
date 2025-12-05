@@ -6,6 +6,7 @@ Authors: Liao Zhang, Oliver Butterley
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
+
 /-! # identity
 
 Specification and proof for `EdwardsPoint::identity`.
