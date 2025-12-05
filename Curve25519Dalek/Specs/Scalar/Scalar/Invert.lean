@@ -53,7 +53,7 @@ theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
   unfold invert
   progress*
   -- BEGIN TASK
-  rw [← s_post_2]
+  rw [← s_post_1]
   have := Nat.ModEq.mul_left (Scalar52_as_Nat s) res_post_1
   exact Nat.ModEq.trans this s1_post
   -- END TASK
