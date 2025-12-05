@@ -78,5 +78,4 @@ negate r
         36028797018963952 * 2^204 := by simp [p]
       simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
       grind
-
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

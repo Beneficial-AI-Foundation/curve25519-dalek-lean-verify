@@ -7,10 +7,6 @@ import Aeneas
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
-import Curve25519Dalek.mvcgen
-import Std.Do
-import Std.Tactic.Do
-open Std.Do
 
 /-! # Spec Theorem for `FieldElement51::negate`
 
@@ -80,50 +76,5 @@ theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
   · -- BEGIN TASK
     assumption
     -- END TASK
-
-@[spec]
-theorem index_usize_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
-  (hbound : i.val < v.length) :
-⦃⌜True⌝⦄
-Array.index_usize v i
-⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
-sorry
-
-@[spec]
-theorem sub_spec (x y : U64):
-⦃⌜True⌝⦄
-(x - y)
-⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
-by sorry
-
-
-@[spec]
-theorem reduce_spec (limbs : Array U64 5#usize) :
-⦃⌜True⌝⦄
-reduce limbs
-⦃⇓result => ⌜(∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧ Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]⌝⦄ := by
-sorry
-
-@[spec]
-theorem negate_spec2 (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
-⦃⌜True⌝⦄
-negate r
-⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
-    := by
-    mvcgen [negate]; all_goals try simp
-    · exact inferInstance
-    · exact inferInstance
-    · exact inferInstance
-    · exact inferInstance
-    · exact inferInstance
-    · simp [Std.Do.wp, PostCond.noThrow] at *
-      have h_16p : 16 * p =
-        36028797018963664 * 2^0 +
-        36028797018963952 * 2^51 +
-        36028797018963952 * 2^102 +
-        36028797018963952 * 2^153 +
-        36028797018963952 * 2^204 := by simp [p]
-      simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
-      grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
