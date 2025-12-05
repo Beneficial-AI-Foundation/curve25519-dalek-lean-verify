@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Liao Zhang
+Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -51,8 +51,7 @@ natural language specs:
 @[spec]
 theorem montgomery_mul_hoare_spec (m m' : Scalar52)
 (range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
-(range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62)
- :
+(range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
 ⦃⌜True⌝⦄
 montgomery_mul m m'
 ⦃⇓ w => ⌜(Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
