@@ -24,8 +24,9 @@ fi
 cd "$DOCBUILD_DIR"
 
 # Update dependencies if needed
+# Use MATHLIB_NO_CACHE_ON_UPDATE=1 to mitigate mathlib caching issues (per doc-gen4 docs)
 echo "Updating Lake dependencies..."
-lake update Curve25519Dalek
+MATHLIB_NO_CACHE_ON_UPDATE=1 lake update Curve25519Dalek
 
 # Build the documentation
 echo "Building documentation (this may take a while on first run)..."
