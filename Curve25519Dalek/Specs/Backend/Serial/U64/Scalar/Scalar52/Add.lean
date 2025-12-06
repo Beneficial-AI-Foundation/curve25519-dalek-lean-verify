@@ -76,24 +76,26 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     · have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
       have := hsum j (by scalar_tac)
       simp_all
-  · intro j hj hj'
-    have : j ≠ i := by grind
-    -- since j ≠ i, suffices to show that sum[j] = 0
-    have : i ≤ j := by grind
-    -- by `hsum'`, sum[j] = 0
-    sorry
+  · intro j hj _
+    have hne : j ≠ i := by grind
+    have := Array.set_of_ne' sum i5 j i (by scalar_tac) (by omega)
+    have := hsum' j hj (by omega)
+    simp_all
   · refine ⟨?_, ?_, ?_⟩
     · grind
     · intro j hj
-      have : i ≠ j := by grind
-      -- since j ≠ i, sum[j] hasn't changed
-      sorry
-    · -- partial sum
+      have := res_post_2 j (by omega)
+      have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+      simp_all
+    · -- partial sum - inductive case
       sorry
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
     · grind
     · simp
-    · -- partial sum
+    · -- partial sum - base case when i = 5
+      have : i.val = 5 := by scalar_tac
+      simp [this]
+      -- needs either a bound for carry or reformulate the invariant
       sorry
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
