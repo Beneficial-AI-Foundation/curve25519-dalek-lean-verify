@@ -82,28 +82,6 @@ attribute [-simp] Int.reducePow Nat.reducePow
 - Does not error and hence returns a result
 - The result represents (a - b) mod L where L is the group order
 - Requires that input limbs are within bounds (52-bit values) -/
-theorem sub_spec_geq (a b : Array U64 5#usize)
-    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
-    (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
-    let a_nat := Scalar52_as_Nat a;
-    let b_nat := Scalar52_as_Nat b;
-    a_nat ≥ b_nat ->
-    ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result = (a_nat - b_nat) % L
-     := by
-  sorry
-
-theorem sub_spec_lt (a b : Array U64 5#usize)
-    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
-    (hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
-    let a_nat := Scalar52_as_Nat a;
-    let b_nat := Scalar52_as_Nat b;
-    a_nat < b_nat ->
-    ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result = (L -(b_nat - a_nat) % L)%L
-     := by
-  sorry
-
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
