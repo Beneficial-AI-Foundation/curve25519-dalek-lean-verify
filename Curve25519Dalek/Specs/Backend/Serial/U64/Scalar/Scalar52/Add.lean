@@ -49,15 +49,10 @@ set_option maxHeartbeats 1000000 in
 - The result satisfies the modular arithmetic property -/
 @[progress]
 theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
-    (ha : ∀ j < 5, (a[j]!).val < 2 ^ 52)
-    (hb : ∀ j < 5, (b[j]!).val < 2 ^ 52)
-    (hmask : mask.val = 2 ^ 52 - 1)
-    (hi : i.val ≤ 5)
-    (hsum : ∀ j < i.val, (sum[j]!).val < 2 ^ 52)
-    (hsum' : ∀ j < 5, i.val ≤ j → (sum[j]!).val = 0)
-    (hcarry : carry.val < 2 ^ 54) :
-    ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
-    (∀ j < 5, (sum'[j]!).val < 2 ^ 53) ∧
+    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
+    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)
+    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52) (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
+    ∃ sum', add_loop a b sum mask carry i = ok sum' ∧ (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
     ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ 260 * (carry.val / 2 ^ 52) =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
@@ -82,28 +77,23 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       have := hsum j (by scalar_tac)
       simp_all
   · intro j hj hj'
+    have : j ≠ i := by grind
+    -- since j ≠ i, suffices to show that sum[j] = 0
+    have : i ≤ j := by grind
+    -- by `hsum'`, sum[j] = 0
     sorry
-  · have := ha i (by scalar_tac)
-    have := hb i (by scalar_tac)
-    simp [*]
-    bvify 64
-    sorry
-  · refine ⟨fun j hj ↦ ?_, fun j hj ↦ ?_, ?_⟩
-    · have := res_post_1 j (by scalar_tac)
-      scalar_tac
-    · simp only [Array.getElem!_Nat_eq]
-      have A := res_post_2 j (by scalar_tac)
-      have B := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
-      have : j < 5 := by grind
-      interval_cases j
-      all_goals simp at A B; grind
-    · sorry
-  · refine ⟨fun j hj ↦ ?_, fun j hj ↦ ?_, ?_⟩
-    · by_cases j < i <;> grind
+  · refine ⟨?_, ?_, ?_⟩
+    · grind
+    · intro j hj
+      have : i ≠ j := by grind
+      -- since j ≠ i, sum[j] hasn't changed
+      sorry
+    · -- partial sum
+      sorry
+  · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
+    · grind
     · simp
-    · have : i.val = 5 := by scalar_tac
-      rw [this]
-      simp
+    · -- partial sum
       sorry
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
@@ -118,10 +108,10 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
     Scalar52_as_Nat v % L = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
   unfold add
   progress*
-  · intro j _ _
+  · intro j _
     unfold ZERO
     interval_cases j <;> decide
-  · sorry
+  · unfold ZERO; decide
   · intro i hi
     unfold constants.L
     interval_cases i <;> decide
