@@ -47,7 +47,7 @@ Array.index_usize v i
 sorry
 
 @[spec]
-theorem sub_hoare_spec (x y : U64):
+theorem sub_hoare_spec (x y : U64) (h : y.val ≤ x.val) :
 ⦃⌜True⌝⦄
 (x - y)
 ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
@@ -71,10 +71,15 @@ negate r
     := by
     mvcgen [negate]; all_goals try simp
     · exact inferInstance
+    · have := h_bounds 0 (by simp); simp_all; grind
     · exact inferInstance
+    · have := h_bounds 1 (by simp); simp_all; grind
     · exact inferInstance
+    · have := h_bounds 2 (by simp); simp_all; grind
     · exact inferInstance
+    · have := h_bounds 3 (by simp); simp_all; grind
     · exact inferInstance
+    · have := h_bounds 4 (by simp); simp_all; grind
     · simp [Std.Do.wp, PostCond.noThrow] at *
       have h_16p : 16 * p =
         36028797018963664 * 2^0 +
