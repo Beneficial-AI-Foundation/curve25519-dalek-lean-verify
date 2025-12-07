@@ -39,20 +39,8 @@ natural language specs:
     • scalar_to_nat(v) = (scalar_to_nat(u) + scalar_to_nat(u')) mod L
 -/
 
-/-- If `Scalar52_as_Nat a < 2^259`, then the top limb `a[4]` is bounded by `2^51`.
-This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < 2^259` implies `a[4] < 2^51`. -/
-theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Scalar52)
-    (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by
-  unfold Scalar52_as_Nat at h
-  have h4 : 2 ^ 208 * a[4]!.val ≤ ∑ j ∈ Finset.range 5, 2 ^ (52 * j) * a[j]!.val := by
-    have hmem : 4 ∈ Finset.range 5 := by simp
-    have := Finset.single_le_sum (f := fun j => 2 ^ (52 * j) * a[j]!.val)
-      (fun j _ => Nat.zero_le _) hmem
-    convert this using 2
-  omega
-
 set_option maxHeartbeats 1000000 in
--- probably the simp_all
+-- probably the simp_all is heavy
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
 - Starting from index `i` with accumulator `sum` and carry `carry`
 - Computes limb-wise addition with carry propagation
@@ -151,7 +139,7 @@ termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
 /-- **Spec and proof concerning `scalar.Scalar52.add`**:
-- No panic (always returns successfully)
+- Requires the input values to be bounded by  2 ^ 259
 - The result represents the sum of the two input scalars modulo L
 -/
 @[progress]

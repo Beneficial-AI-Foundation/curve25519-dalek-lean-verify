@@ -162,3 +162,15 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
   refine high_bit_zero_of_lt_255 bytes ?_
   have : L ≤ 2 ^ 255 := by decide
   grind
+
+/-- If `Scalar52_as_Nat a < 2^259`, then the top limb `a[4]` is bounded by `2^51`.
+This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < 2^259` implies `a[4] < 2^51`. -/
+theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
+    (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by
+  unfold Scalar52_as_Nat at h
+  have h4 : 2 ^ 208 * a[4]!.val ≤ ∑ j ∈ Finset.range 5, 2 ^ (52 * j) * a[j]!.val := by
+    have hmem : 4 ∈ Finset.range 5 := by simp
+    have := Finset.single_le_sum (f := fun j => 2 ^ (52 * j) * a[j]!.val)
+      (fun j _ => Nat.zero_le _) hmem
+    convert this using 2
+  omega
