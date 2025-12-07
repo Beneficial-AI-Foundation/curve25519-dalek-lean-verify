@@ -147,29 +147,41 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       -- 4. for carry1 = a[i]+b[i]+carry/2^52,
       --   2^(52*i) * (carry1 % 2^52) + 2^(52*(i+1)) * (carry1 / 2^52) = 2^(52*i) * carry1
       -- because 2^(52*(i+1)) = 2^(52*i) * 2^52.
-      have D : 2 ^ (52 * i.val) * (carry1.val % 2 ^ 52) = 2 ^ (52 * i.val) * carry1 % 2 ^ 52 := by
-        sorry
       --
       calc ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * res[j]!
         _ = 2 ^ (52 * ↑i) * res[i]! +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * res[j]! := by
           have hi : i.val < 5 := by scalar_tac
           simp [Finset.sum_eq_sum_Ico_succ_bot hi]
-        _ = 2 ^ (52 * ↑i) * carry1.val % 2 ^ 52 +
+        _ = 2 ^ (52 * ↑i) * (carry1.val % 2 ^ 52) +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * res[j]! := by
           rw [B]
-          congr
-        _ = 2 ^ (52 * ↑i) * carry1.val % 2 ^ 52 +
+        _ = 2 ^ (52 * ↑i) * (carry1.val % 2 ^ 52) +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
             2 ^ (52 * (↑i + 1)) * (carry1.val / 2^52) := by
           grind
         _ = 2 ^ (52 * ↑i) * carry1.val +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
-          have : 2 ^ (52 * i.val) * carry1.val % 2 ^ 52 +
-              2 ^ (52 * (i.val + 1)) * (carry1.val / 2 ^ 52) =
-              2 ^ (52 * i.val) * carry1.val := by
-            sorry
-          grind
+          -- Key: 2^(52*i) * (y % n) + 2^(52*(i+1)) * (y / n) = 2^(52*i) * y
+          -- Factor: 2^(52*i) * ((y % n) + 2^52 * (y / n)) = 2^(52*i) * y
+          -- Division algorithm: (y % n) + n * (y / n) = y
+          have hpow : 2 ^ (52 * (i.val + 1)) = 2 ^ (52 * i.val) * 2 ^ 52 := by
+            rw [mul_add, mul_one, pow_add]
+          have hdiv : carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) = carry1.val :=
+            Nat.mod_add_div carry1.val (2 ^ 52)
+          calc 2 ^ (52 * ↑i) * (carry1.val % 2 ^ 52) +
+               ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
+               2 ^ (52 * (↑i + 1)) * (carry1.val / 2 ^ 52)
+            _ = 2 ^ (52 * ↑i) * (carry1.val % 2 ^ 52) +
+                2 ^ (52 * ↑i) * 2 ^ 52 * (carry1.val / 2 ^ 52) +
+                ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+              rw [hpow]; ring
+            _ = 2 ^ (52 * ↑i) * ((carry1.val % 2 ^ 52) + 2 ^ 52 * (carry1.val / 2 ^ 52)) +
+                ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+              ring
+            _ = 2 ^ (52 * ↑i) * carry1.val +
+                ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+              rw [hdiv]
         _ = 2 ^ (52 * ↑i) * (a[i]!.val + b[i]!.val + carry.val / 2 ^ 52) +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
           grind
