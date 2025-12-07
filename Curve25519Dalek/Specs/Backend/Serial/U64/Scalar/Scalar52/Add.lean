@@ -39,6 +39,18 @@ natural language specs:
     • scalar_to_nat(v) = (scalar_to_nat(u) + scalar_to_nat(u')) mod L
 -/
 
+/-- If `Scalar52_as_Nat a < 2^259`, then the top limb `a[4]` is bounded by `2^51`.
+This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < 2^259` implies `a[4] < 2^51`. -/
+theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Scalar52)
+    (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by
+  unfold Scalar52_as_Nat at h
+  have h4 : 2 ^ 208 * a[4]!.val ≤ ∑ j ∈ Finset.range 5, 2 ^ (52 * j) * a[j]!.val := by
+    have hmem : 4 ∈ Finset.range 5 := by simp
+    have := Finset.single_le_sum (f := fun j => 2 ^ (52 * j) * a[j]!.val)
+      (fun j _ => Nat.zero_le _) hmem
+    convert this using 2
+  omega
+
 set_option maxHeartbeats 1000000 in
 -- bad case bashing proof
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
@@ -50,11 +62,15 @@ set_option maxHeartbeats 1000000 in
 @[progress]
 theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
+    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)
     (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)
-    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52) (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
-    ∃ sum', add_loop a b sum mask carry i = ok sum' ∧ (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
+    (hcarry : i.val = 5 → carry.val < 2 ^ 52)
+    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)
+    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
+    ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
+    (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
-    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ 260 * (carry.val / 2 ^ 52) =
+    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
   unfold add_loop
   unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
@@ -66,6 +82,17 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   · have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     scalar_tac
+  · intro hi
+    have : i.val = 4 := by grind
+    have : a[4]!.val < 2 ^ 51 := by
+      grind [Scalar52_top_limb_lt_of_as_Nat_lt]
+    have : b[4]!.val < 2 ^ 51 := by
+      grind [Scalar52_top_limb_lt_of_as_Nat_lt]
+    simp [*]
+    have : carry.val >>> 52 ≤ 1 := by
+
+      sorry
+    simp at *; grind
   · intro j hj
     by_cases hc : j = i
     · rw [hc]
@@ -92,11 +119,8 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
     · grind
     · simp
-    · -- partial sum - base case when i = 5
-      have : i.val = 5 := by scalar_tac
-      simp [this]
-      -- needs either a bound for carry or reformulate the invariant
-      sorry
+    · have : i.val = 5 := by scalar_tac
+      simp [this]; grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
@@ -105,7 +129,8 @@ decreasing_by scalar_decr_tac
 - The result represents the sum of the two input scalars modulo L
 -/
 @[progress]
-theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
+theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
+    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259) :
     ∃ v, add a b = ok v ∧
     Scalar52_as_Nat v % L = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
   unfold add
