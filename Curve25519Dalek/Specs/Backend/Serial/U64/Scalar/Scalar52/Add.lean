@@ -126,30 +126,57 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       have hi : i.val < 5 := by scalar_tac
       rw [Finset.sum_eq_sum_Ico_succ_bot hi]
       rw [Finset.sum_eq_sum_Ico_succ_bot hi]
-      simp [*] at res_post_3
-      simp [← res_post_3]
-      -- Step 2: Show res[i] = (a[i] + b[i] + carry >>> 52) &&& mask
-      have hres_i : res[i.val]!.val = i5.val := by
-        have h1 := res_post_2 i.val (by omega)
-        have h2 := Array.set_of_eq sum i5 i (by scalar_tac)
-        simp only [Array.getElem!_Nat_eq] at h1 h2 ⊢
-        simp_all
-      -- i5 = carry1 &&& mask, and carry1 = a[i] + b[i] + carry >>> 52
-      have hi5_eq : i5.val = (a[i]!.val + b[i]!.val + carry.val / 2^52) &&& (2^52 - 1) := by
-        have hcarry1 : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2^52 := by
-          simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post]
-          simp_all
-          omega
-        simp only [i5_post_1]
-        -- ↑(carry1 &&& mask) = ↑carry1 &&& ↑mask
-        simp only [UScalar.val_and, hcarry1, hmask]
+      -- Show res[i] = (a[i] + b[i] + carry >>> 52) &&& mask
       have : res[i.val]! = a[i]! + b[i]! + carry.val / 2 ^ 52 &&& 2 ^ 52 - 1 := by
+        have hres_i : res[i.val]!.val = i5.val := by
+          have h1 := res_post_2 i.val (by omega)
+          have h2 := Array.set_of_eq sum i5 i (by scalar_tac)
+          simp only [Array.getElem!_Nat_eq] at h1 h2 ⊢
+          simp_all
+        have hi5_eq : i5.val = (a[i]!.val + b[i]!.val + carry.val / 2^52) &&& (2^52 - 1) := by
+          have hcarry1 : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2^52 := by
+            simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post]
+            simp_all
+            omega
+          simp only [i5_post_1]
+          simp only [UScalar.val_and, hcarry1, hmask]
         grind
-      simp at this
       rw [this]
-
-
-
+      simp [*] at res_post_3
+      -- Use res_post_3 to relate the sums over Ico (i+1) 5
+      -- Note: a[i]! and (↑a)[↑i]! are the same, help omega see this
+      have ha_eq : a[i]!.val = (↑a)[i.val]!.val := rfl
+      have hb_eq : b[i]!.val = (↑b)[i.val]!.val := rfl
+      have hcarry1_eq : carry1.val = (↑a)[i.val]!.val + (↑b)[i.val]!.val + carry.val / 2 ^ 52 := by
+        simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post, Array.getElem!_Nat_eq]
+        omega
+      have hcarry_shift : carry.val >>> 52 = carry.val / 2 ^ 52 := by omega
+      -- i5 = carry1 &&& mask = carry1 % 2^52
+      have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
+        simp only [i5_post_1, UScalar.val_and, hmask]
+        have : carry1.val &&& (2^52 - 1) = carry1.val % 2^52 := Nat.and_two_pow_sub_one_eq_mod _ _
+        omega
+      -- Key: carry1 = (carry1 % 2^52) + 2^52 * (carry1 / 2^52) (division algorithm)
+      have hdiv_alg : carry1.val = carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) := by
+        omega
+      -- So: a[i] + b[i] + carry/2^52 = i5 + 2^52 * (carry1/2^52)
+      have hkey : a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 = i5.val + 2 ^ 52 * (carry1.val / 2 ^ 52) := by
+        omega
+      -- From res_post_3, we can substitute the sum over res with the sum over (a+b) minus the carry term
+      have h := res_post_3
+      -- res_post_3 says: ∑ res[j] + 2^(52*(i+1)) * ((a[i]+b[i]+carry>>>52)/2^52) = ∑ (a[j]+b[j])
+      -- Note: (a[i]+b[i]+carry>>>52)/2^52 = carry1/2^52
+      have hcarry1_div : (a[i]!.val + b[i]!.val + carry.val / 2^52) / (2^52 : ℕ) = carry1.val / 2^52 := by
+        omega
+      simp only [hcarry_shift] at h
+      -- have (j : ℕ) (hj : i < j) : (res.val)[j]!.val = 0 := by
+      --   -- have := res_post_2 j (by sorry)
+      have : 4503599627370496 = 2 ^ 52 := by grind
+      rw [this] at h
+      simp at h ⊢
+      rw [← h]
+      rw [← add_assoc]
+      rw [add_comm]
 
       sorry
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
