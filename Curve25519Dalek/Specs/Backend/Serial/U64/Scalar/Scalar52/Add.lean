@@ -71,8 +71,9 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
     (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
-    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val + 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) =
-      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) := by
+    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =
+      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
+      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) := by
   unfold add_loop
   unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
@@ -122,63 +123,64 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       have := res_post_2 j (by omega)
       have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
       simp_all
-    · -- partial sum - inductive case
-      have hi : i.val < 5 := by scalar_tac
-      rw [Finset.sum_eq_sum_Ico_succ_bot hi]
-      rw [Finset.sum_eq_sum_Ico_succ_bot hi]
-      -- Show res[i] = (a[i] + b[i] + carry >>> 52) &&& mask
-      have : res[i.val]! = a[i]! + b[i]! + carry.val / 2 ^ 52 &&& 2 ^ 52 - 1 := by
-        have hres_i : res[i.val]!.val = i5.val := by
-          have h1 := res_post_2 i.val (by omega)
-          have h2 := Array.set_of_eq sum i5 i (by scalar_tac)
-          simp only [Array.getElem!_Nat_eq] at h1 h2 ⊢
-          simp_all
-        have hi5_eq : i5.val = (a[i]!.val + b[i]!.val + carry.val / 2^52) &&& (2^52 - 1) := by
-          have hcarry1 : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2^52 := by
-            simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post]
-            simp_all
-            omega
-          simp only [i5_post_1]
-          simp only [UScalar.val_and, hcarry1, hmask]
-        grind
-      rw [this]
-      simp [*] at res_post_3
-      -- Use res_post_3 to relate the sums over Ico (i+1) 5
-      -- Note: a[i]! and (↑a)[↑i]! are the same, help omega see this
-      have ha_eq : a[i]!.val = (↑a)[i.val]!.val := rfl
-      have hb_eq : b[i]!.val = (↑b)[i.val]!.val := rfl
-      have hcarry1_eq : carry1.val = (↑a)[i.val]!.val + (↑b)[i.val]!.val + carry.val / 2 ^ 52 := by
-        simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post, Array.getElem!_Nat_eq]
-        omega
-      have hcarry_shift : carry.val >>> 52 = carry.val / 2 ^ 52 := by omega
-      -- i5 = carry1 &&& mask = carry1 % 2^52
-      have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
-        simp only [i5_post_1, UScalar.val_and, hmask]
-        have : carry1.val &&& (2^52 - 1) = carry1.val % 2^52 := Nat.and_two_pow_sub_one_eq_mod _ _
-        omega
-      -- Key: carry1 = (carry1 % 2^52) + 2^52 * (carry1 / 2^52) (division algorithm)
-      have hdiv_alg : carry1.val = carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) := by
-        omega
-      -- So: a[i] + b[i] + carry/2^52 = i5 + 2^52 * (carry1/2^52)
-      have hkey : a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 = i5.val + 2 ^ 52 * (carry1.val / 2 ^ 52) := by
-        omega
-      -- From res_post_3, we can substitute the sum over res with the sum over (a+b) minus the carry term
-      have h := res_post_3
-      -- res_post_3 says: ∑ res[j] + 2^(52*(i+1)) * ((a[i]+b[i]+carry>>>52)/2^52) = ∑ (a[j]+b[j])
-      -- Note: (a[i]+b[i]+carry>>>52)/2^52 = carry1/2^52
-      have hcarry1_div : (a[i]!.val + b[i]!.val + carry.val / 2^52) / (2^52 : ℕ) = carry1.val / 2^52 := by
-        omega
-      simp only [hcarry_shift] at h
-      -- have (j : ℕ) (hj : i < j) : (res.val)[j]!.val = 0 := by
-      --   -- have := res_post_2 j (by sorry)
-      have : 4503599627370496 = 2 ^ 52 := by grind
-      rw [this] at h
-      simp at h ⊢
-      rw [← h]
-      rw [← add_assoc]
-      rw [add_comm]
-
-      sorry
+    · -- Goal:
+      --  2^(52*i) * res[i] + ∑_{j>i} res[j] =
+      --    2^(52*i) * (a[i]+b[i]) + ∑_{j>i}(a+b) + 2^(52*i) * (carry/2^52)
+      -- Key facts from the algorithm:
+      -- 1. carry1 = a[i] + b[i] + carry/2^52 (sum of limbs plus incoming carry)
+      have A : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 := by
+        simp [*]; omega
+      have A' : carry1 = a[i]! + b[i]! + carry.val / 2 ^ 52 := by
+        simp [*]; omega
+      -- 2. i5 = carry1 % 2^52 (the new limb value, stored in res[i])
+      have B : res[i]! = carry1.val % 2 ^ 52 := by
+        have h1 := res_post_2 i.val (by omega)
+        have h2 := Array.set_of_eq sum i5 i (by scalar_tac)
+        simp_all
+      -- 3. res_post_3 (IH): ∑_{j>i} res[j] = ∑_{j>i}(a+b) + 2^(52*(i+1)) * (carry1/2^52)
+      have C : ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * res[j]!.val =
+          ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * ((a)[j]!.val + (b)[j]!.val) +
+          2 ^ (52 * (i.val + 1)) * (↑carry1 / 2 ^ 52) := by
+        have : 4503599627370496 = 2 ^ 52 := by grind
+        simp only [Array.getElem!_Nat_eq, i6_post] at res_post_3
+        simp [res_post_3, this]
+      -- 4. for carry1 = a[i]+b[i]+carry/2^52,
+      --   2^(52*i) * (carry1 % 2^52) + 2^(52*(i+1)) * (carry1 / 2^52) = 2^(52*i) * carry1
+      -- because 2^(52*(i+1)) = 2^(52*i) * 2^52.
+      have D : 2 ^ (52 * i.val) * (carry1.val % 2 ^ 52) = 2 ^ (52 * i.val) * carry1 % 2 ^ 52 := by
+        sorry
+      --
+      calc ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * res[j]!
+        _ = 2 ^ (52 * ↑i) * res[i]! +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * res[j]! := by
+          have hi : i.val < 5 := by scalar_tac
+          simp [Finset.sum_eq_sum_Ico_succ_bot hi]
+        _ = 2 ^ (52 * ↑i) * carry1.val % 2 ^ 52 +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * res[j]! := by
+          rw [B]
+          congr
+        _ = 2 ^ (52 * ↑i) * carry1.val % 2 ^ 52 +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
+            2 ^ (52 * (↑i + 1)) * (carry1.val / 2^52) := by
+          grind
+        _ = 2 ^ (52 * ↑i) * carry1.val +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+          have : 2 ^ (52 * i.val) * carry1.val % 2 ^ 52 +
+              2 ^ (52 * (i.val + 1)) * (carry1.val / 2 ^ 52) =
+              2 ^ (52 * i.val) * carry1.val := by
+            sorry
+          grind
+        _ = 2 ^ (52 * ↑i) * (a[i]!.val + b[i]!.val + carry.val / 2 ^ 52) +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+          grind
+        _ = 2 ^ (52 * ↑i) * (a[i]!.val + b[i]!.val) + 2 ^ (52 * ↑i) * (carry.val / 2 ^ 52) +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) := by
+          grind
+        _ = ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
+            2 ^ (52 * ↑i) * (↑carry / 2 ^ 52) := by
+          have hi : i.val < 5 := by scalar_tac
+          rw [Finset.sum_eq_sum_Ico_succ_bot hi]
+          grind
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
     · grind
     · simp
