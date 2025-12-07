@@ -123,6 +123,14 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
       simp_all
     · -- partial sum - inductive case
+      have hi : i.val < 5 := by scalar_tac
+      rw [Finset.sum_eq_sum_Ico_succ_bot hi]
+      rw [Finset.sum_eq_sum_Ico_succ_bot hi]
+      simp [*] at res_post_3
+      simp [← res_post_3]
+
+
+
       sorry
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
     · grind
