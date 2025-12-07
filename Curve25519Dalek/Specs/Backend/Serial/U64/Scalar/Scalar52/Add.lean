@@ -128,6 +128,26 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       rw [Finset.sum_eq_sum_Ico_succ_bot hi]
       simp [*] at res_post_3
       simp [← res_post_3]
+      -- Step 2: Show res[i] = (a[i] + b[i] + carry >>> 52) &&& mask
+      have hres_i : res[i.val]!.val = i5.val := by
+        have h1 := res_post_2 i.val (by omega)
+        have h2 := Array.set_of_eq sum i5 i (by scalar_tac)
+        simp only [Array.getElem!_Nat_eq] at h1 h2 ⊢
+        simp_all
+      -- i5 = carry1 &&& mask, and carry1 = a[i] + b[i] + carry >>> 52
+      have hi5_eq : i5.val = (a[i]!.val + b[i]!.val + carry.val / 2^52) &&& (2^52 - 1) := by
+        have hcarry1 : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2^52 := by
+          simp only [carry1_post, i3_post, i4_post_1, i1_post, i2_post]
+          simp_all
+          omega
+        simp only [i5_post_1]
+        -- ↑(carry1 &&& mask) = ↑carry1 &&& ↑mask
+        simp only [UScalar.val_and, hcarry1, hmask]
+      have : res[i.val]! = a[i]! + b[i]! + carry.val / 2 ^ 52 &&& 2 ^ 52 - 1 := by
+        grind
+      simp at this
+      rw [this]
+
 
 
 
