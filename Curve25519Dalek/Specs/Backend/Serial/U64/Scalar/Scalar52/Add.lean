@@ -65,6 +65,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)
     (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)
     (hcarry : i.val = 5 → carry.val < 2 ^ 52)
+    (hcarry : ∀ i < 5, carry.val < 2 ^ 53)
     (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)
     (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
     ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
@@ -90,8 +91,15 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       grind [Scalar52_top_limb_lt_of_as_Nat_lt]
     simp [*]
     have : carry.val >>> 52 ≤ 1 := by
-
-      sorry
+      have := hcarry i (by scalar_tac)
+      omega
+    simp at *; grind
+  · intro j hj
+    have : carry.val >>> 52 ≤ 1 := by
+      have := hcarry i (by scalar_tac)
+      omega
+    have := ha i (by scalar_tac)
+    have := hb i (by scalar_tac)
     simp at *; grind
   · intro j hj
     by_cases hc : j = i
