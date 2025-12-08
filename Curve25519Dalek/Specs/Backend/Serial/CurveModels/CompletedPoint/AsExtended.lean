@@ -1,11 +1,11 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 /-! # Spec Theorem for `CompletedPoint::as_extended`
 
 Specification and proof for `CompletedPoint::as_extended`.
@@ -73,6 +73,9 @@ Y' % p = (Y * Z) % p ∧
 Z' % p = (Z * T) % p ∧
 T' % p = (X * Y) % p
 := by
-  sorry
+  unfold as_extended
+  progress*
+  rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
+  simp_all
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint
