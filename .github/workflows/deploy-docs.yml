@@ -81,13 +81,13 @@ jobs:
             ${{ runner.os }}-lean-docs-
 
       - name: Install elan (Lean version manager)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.rebuild_lean_docs == true) || steps.cache-lean-docs.outputs.cache-hit != 'true'
+        if: (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')) && steps.cache-lean-docs.outputs.cache-hit != 'true'
         run: |
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
       - name: Cache Lean build artifacts
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.rebuild_lean_docs == true) || steps.cache-lean-docs.outputs.cache-hit != 'true'
+        if: (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')) && steps.cache-lean-docs.outputs.cache-hit != 'true'
         uses: actions/cache@v4
         with:
           path: |
@@ -105,11 +105,11 @@ jobs:
         run: npm run docs:rust
 
       - name: Build Lean docs (full rebuild)
-        if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.rebuild_lean_docs == true) || steps.cache-lean-docs.outputs.cache-hit != 'true'
+        if: (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master')) && steps.cache-lean-docs.outputs.cache-hit != 'true'
         run: npm run docs:lean
 
       - name: Copy Lean docs from cache
-        if: steps.cache-lean-docs.outputs.cache-hit == 'true' && github.event_name != 'schedule' && (github.event_name != 'workflow_dispatch' || inputs.rebuild_lean_docs != true)
+        if: steps.cache-lean-docs.outputs.cache-hit == 'true'
         run: |
           rm -rf site/public/lean-doc
           cp -r docbuild/.lake/build/doc site/public/lean-doc
