@@ -87,10 +87,10 @@ This document tracks the progress of formally verifying functions from the curve
 | `as_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L234-L236) | [AsBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean) | ✅ | ✅ |  |
 | `decompress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L255-L382) | [Decompress.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean) | ✅ | ☐ |  |
 | `to_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L229-L231) | [ToBytes.lean](Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean) | ✅ | ✅ |  |
-| `add` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L854-L856) | - | ✅ | ☐ |  |
+| `add` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L854-L856) | [Add.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean) | ✅ | 📋 |  |
 | `compress` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L488-L522) | [Compress.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean) | ✅ | ☐ |  |
 | `elligator_ristretto_flavor` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L656-L692) | [ElligatorRistrettoFlavor.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean) | ✅ | ☐ |  |
-| `from_uniform_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L787-L804) | [FromUniformBytes.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean) | ✅ | ☐ |  |
+| `from_uniform_bytes` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L787-L804) | [FromUniformBytes.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean) | ✅ | 📋 |  |
 | `mul_base` | [ristretto.rs](curve25519-dalek/src/ristretto.rs#L951-L962) | [MulBase.lean](Curve25519Dalek/Specs/Ristretto/RistrettoPoint/MulBase.lean) | ☐ | ☐ | Aeneas error on extraction |
 | `pack` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1141-L1145) | [Pack.lean](Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean) | ✅ | ✅ |  |
 | `clamp_integer` | [scalar.rs](curve25519-dalek/src/scalar.rs#L1388-L1393) | [ClampInteger.lean](Curve25519Dalek/Specs/Scalar/ClampInteger.lean) | ✅ | ✅ |  |
