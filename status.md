@@ -75,7 +75,7 @@ This document tracks the progress of formally verifying functions from the curve
 | `mul_by_cofactor` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1186-L1188) | [MulByCofactor.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean) | ✅ | 📋 |  |
 | `mul_by_pow_2` | [edwards.rs](curve25519-dalek/src/edwards.rs#L1191-L1199) | [MulByPow2.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean) | ✅ | 📋 |  |
 | `to_affine` | [edwards.rs](curve25519-dalek/src/edwards.rs#L555-L560) | [ToAffine.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToAffine.lean) | ✅ | ✅ |  |
-| `to_montgomery` | [edwards.rs](curve25519-dalek/src/edwards.rs#L552-L559) | [ToMontgomery.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean) | ✅ | 📋 |  |
+| `to_montgomery` | [edwards.rs](curve25519-dalek/src/edwards.rs#L552-L559) | [ToMontgomery.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean) | ✅ | ✅ |  |
 | `vartime_double_scalar_mul_basepoint` | [edwards.rs](curve25519-dalek/src/edwards.rs#L901-L912) | [VartimeDoubleScalarMulBasepoint.lean](Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean) | ☐ | ☐ | Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul |
 | `pow_p58` | [field.rs](curve25519-dalek/src/field.rs#L269-L290) | [PowP58.lean](Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean) | ✅ | ✅ |  |
 | `sqrt_ratio_i` | [field.rs](curve25519-dalek/src/field.rs#L292-L331) | [SqrtRatioi.lean](Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean) | ✅ | 📋 |  |
