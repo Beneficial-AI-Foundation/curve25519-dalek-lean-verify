@@ -173,14 +173,21 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
     Scalar52_as_Nat v % L = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
   unfold add
   progress*
-  · intro j _
+  · -- BEGIN TASK
+    intro j _
     unfold ZERO
     interval_cases j <;> decide
-  · unfold ZERO; decide
-  · intro i hi
+    -- END TASK
+  · -- BEGIN TASK
+    unfold ZERO; decide
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
     unfold constants.L
     interval_cases i <;> decide
-  · rw [L_spec] at res_post
+    -- END TASK
+  · -- BEGIN TASK
+    rw [L_spec] at res_post
     have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
       have hL_mod : L ≡ 0 [MOD L] := by
         rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
@@ -195,5 +202,6 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
       conv_lhs => rw [sum_post_3]
       simp [Finset.sum_add_distrib, Nat.mul_add]
     rw [h1, h2]
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
