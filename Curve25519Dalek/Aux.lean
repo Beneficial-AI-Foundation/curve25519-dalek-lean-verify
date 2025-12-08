@@ -55,6 +55,12 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- Setting the j part of an array gives exactly the i part if i = j -/
+theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
+    (bs.set i#usize a)[i]! = a := by
+  simp [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNat_val_eq]
+  grind
+
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
 theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < 2 ^ 255) :
@@ -76,6 +82,18 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
   refine high_bit_zero_of_lt_255 bytes ?_
   have : L ≤ 2 ^ 255 := by decide
   grind
+
+/-- If `Scalar52_as_Nat a < 2^259`, then the top limb `a[4]` is bounded by `2^51`.
+This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < 2^259` implies `a[4] < 2^51`. -/
+theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
+    (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by
+  unfold Scalar52_as_Nat at h
+  have h4 : 2 ^ 208 * a[4]!.val ≤ ∑ j ∈ Finset.range 5, 2 ^ (52 * j) * a[j]!.val := by
+    have hmem : 4 ∈ Finset.range 5 := by simp
+    have := Finset.single_le_sum (f := fun j => 2 ^ (52 * j) * a[j]!.val)
+      (fun j _ => Nat.zero_le _) hmem
+    convert this using 2
+  omega
 
 /-- The function U8x32_as_Nat can be represented via Nat.ofDigits applied to an appropriate
 list representation of the input array -/

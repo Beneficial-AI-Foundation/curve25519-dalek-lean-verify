@@ -36,7 +36,7 @@ curve25519_dalek::backend::serial::u64::field::FieldElement51::sub,curve25519-da
 curve25519_dalek::backend::serial::u64::field::FieldElement51::sub_assign,curve25519-dalek/src/backend/serial/u64/field.rs,L305-L308,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean,extracted,verified,No longer present among extracted functions,
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes,curve25519-dalek/src/backend/serial/u64/field.rs,L396-L478,Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean,extracted,specified,,
 curve25519_dalek::backend::serial::u64::scalar::m,curve25519-dalek/src/backend/serial/u64/scalar.rs,L56-L58,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean,extracted,verified,,
-curve25519_dalek::backend::serial::u64::scalar::Scalar52::add,curve25519-dalek/src/backend/serial/u64/scalar.rs,L177-L192,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean,extracted,specified,,
+curve25519_dalek::backend::serial::u64::scalar::Scalar52::add,curve25519-dalek/src/backend/serial/u64/scalar.rs,L177-L192,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean,extracted,verified,,
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery,curve25519-dalek/src/backend/serial/u64/scalar.rs,L338-L340,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean,extracted,verified,🤖🏆🌈🎉⭐,theo
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l,curve25519-dalek/src/backend/serial/u64/scalar.rs,L213-L226,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean,extracted,specified,,
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes,curve25519-dalek/src/backend/serial/u64/scalar.rs,L66-L93,Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean,extracted,specified,Nested loop refactored,
@@ -68,7 +68,7 @@ curve25519_dalek::edwards::EdwardsPoint::is_small_order,curve25519-dalek/src/edw
 curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor,curve25519-dalek/src/edwards.rs,L1186-L1188,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2,curve25519-dalek/src/edwards.rs,L1191-L1199,Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean,extracted,specified,,
 curve25519_dalek::edwards::EdwardsPoint::to_affine,curve25519-dalek/src/edwards.rs,L555-L560,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToAffine.lean,extracted,verified,,
-curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,extracted,specified,,
+curve25519_dalek::edwards::EdwardsPoint::to_montgomery,curve25519-dalek/src/edwards.rs,L552-L559,Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean,extracted,verified,,
 curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint,curve25519-dalek/src/edwards.rs,L901-L912,Curve25519Dalek/Specs/Edwards/EdwardsPoint/VartimeDoubleScalarMulBasepoint.lean,,,"Problem with extraction due to nested borrows, uses serial::scalar_mul::vartime_double_base::mul",
 curve25519_dalek::field::FieldElement51::pow_p58,curve25519-dalek/src/field.rs,L269-L290,Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean,extracted,verified,,
 curve25519_dalek::field::FieldElement51::sqrt_ratio_i,curve25519-dalek/src/field.rs,L292-L331,Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean,extracted,specified,,
