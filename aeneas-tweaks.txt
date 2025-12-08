@@ -62,13 +62,13 @@ Add&0 curve25519_dalekristrettoRistrettoPoint&'a curve25519_dalekristrettoRistre
 RistrettoPoint
 
 ===FIND===
-def subtle.ConditionallyNegatable.Blanket {T : Type} {Clause1_Output : Type}
+def subtle.ConditionallyNegatable.Blanket {T : Type}
   (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNeg& TClause1_OutputInst : core.ops.arith.Neg T Clause1_Output)
-  : subtle.ConditionallyNegatable T := {
+  (coreopsarithNeg& TTInst : core.ops.arith.Neg T T) :
+  subtle.ConditionallyNegatable T := {
   conditional_negate :=
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-    ConditionallySelectableInst coreopsarithNeg& TClause1_OutputInst
+    ConditionallySelectableInst coreopsarithNeg& TTInst
 }
 ===REPLACE===
 def subtle.ConditionallyNegatable.Blanket {T : Type}
