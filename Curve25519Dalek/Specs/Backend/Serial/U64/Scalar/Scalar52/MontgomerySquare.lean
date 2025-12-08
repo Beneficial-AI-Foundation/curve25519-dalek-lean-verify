@@ -15,8 +15,6 @@ This function performs Montgomery squaring.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
