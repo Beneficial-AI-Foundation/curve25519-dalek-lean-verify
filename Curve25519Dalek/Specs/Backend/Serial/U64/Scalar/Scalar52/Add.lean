@@ -66,25 +66,34 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
   progress*
-  · have := ha i (by scalar_tac)
+  · -- BEGIN TASK
+    have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     scalar_tac
-  · have := ha i (by scalar_tac)
+    -- END TASK
+  · -- BEGIN TASK
+    have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     scalar_tac
-  · intro hi
+    -- END TASK
+  · -- BEGIN TASK
+    intro hi
     have : i.val = 4 := by grind
     have : a[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
     have : b[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
     simp [*]
     have : carry.val >>> 52 ≤ 1 := by have := hcarry i (by scalar_tac); omega
     simp at *; grind
-  · intro j hj
+    -- END TASK
+  · -- BEGIN TASK
+    intro j hj
     have : carry.val >>> 52 ≤ 1 := by have := hcarry i (by scalar_tac); omega
     have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     simp at *; grind
-  · intro j hj
+    -- END TASK
+  · -- BEGIN TASK
+    intro j hj
     by_cases hc : j = i
     · rw [hc]
       have := Array.set_of_eq sum i5 i (by scalar_tac)
@@ -94,18 +103,26 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     · have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
       have := hsum j (by scalar_tac)
       simp_all
-  · intro j hj _
+    -- END TASK
+  · -- BEGIN TASK
+    intro j hj _
     have hne : j ≠ i := by grind
     have := Array.set_of_ne' sum i5 j i (by scalar_tac) (by omega)
     have := hsum' j hj (by omega)
     simp_all
+    -- END TASK
   · refine ⟨?_, ?_, ?_⟩
-    · grind
-    · intro j hj
+    · -- BEGIN TASK
+      grind
+      -- END TASK
+    · -- BEGIN TASK
+      intro j hj
       have := res_post_2 j (by omega)
       have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
       simp_all
-    · have : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 := by
+      -- END TASK
+    · -- BEGIN TASK
+      have : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 := by
         simp [*]; omega
       have : res[i]! = carry1.val % 2 ^ 52 := by
         have := res_post_2 i.val (by omega)
@@ -130,11 +147,18 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
           have hi : i.val < 5 := by scalar_tac
           rw [Finset.sum_eq_sum_Ico_succ_bot hi]
           grind
+      -- END TASK
   · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
-    · grind
-    · simp
-    · have : i.val = 5 := by scalar_tac
+    · -- BEGIN TASK
+      grind
+      -- END TASK
+    · -- BEGIN TASK
+      simp
+      -- END TASK
+    · -- BEGIN TASK
+      have : i.val = 5 := by scalar_tac
       simp [this]; grind
+      -- END TASK
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
