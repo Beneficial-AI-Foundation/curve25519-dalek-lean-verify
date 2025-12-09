@@ -197,8 +197,32 @@ instance : AddCommGroup (Point C) where
       exact _root_.add_comm _ _
     · -- y coordinate: ring_nf solves directly
       ring_nf
-  nsmul_succ := by sorry
-  zsmul_succ' := by sorry
+  nsmul_succ := by
+    intro n p
+    simp only [nsmul]
+    -- Need: p + nsmul C n p = nsmul C n p + p (commutativity)
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
+  zsmul_succ' := by
+    intro n p
+    simp [zsmul, nsmul]
+    -- Need: p + nsmul C n p = nsmul C n p + p (commutativity)
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
 
 /-- Helper lemma to expose the addition formula without unfolding the whole structure. -/
 theorem add_def (p1 p2 : Point Ed25519) :
