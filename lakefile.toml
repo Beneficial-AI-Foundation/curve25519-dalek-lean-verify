@@ -9,7 +9,7 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
-linter.style.longLine = false
+weak.linter.style.longLine = false
 maxRecDepth = 10000
 
 [[require]]
@@ -17,6 +17,11 @@ name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
 rev = "main"
+
+[[require]]
+name = "Canonical"
+git = "https://github.com/chasenorman/CanonicalLean"
+rev = "v4.25.0"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
