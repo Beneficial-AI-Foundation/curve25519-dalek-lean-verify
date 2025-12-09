@@ -4,7 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
 Specification and proof for `EdwardsPoint::is_small_order`.
@@ -47,6 +49,28 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     Identitycurve25519_dalekedwardsEdwardsPoint.identity = ok id ∧
     ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e8 id = ok eq_choice ∧
     (b = true ↔ eq_choice = Choice.one) := by
+    unfold is_small_order
+    progress*
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
     sorry
+    constructor
+
+    have h_eq : ep_1 = ep_4 := by
+    -- 这里需要使用 ct_eq_spec，但可能需要非零 Z 坐标的条件
+    -- 或者使用 mul_by_cofactor_spec 来建立连接
+      sorry
+    exact h_eq
+    sorry
+    constructor
+    obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
+    sorry
+    constructor
+    sorry
+    sorry
+    exact true
 
 end curve25519_dalek.edwards.EdwardsPoint
