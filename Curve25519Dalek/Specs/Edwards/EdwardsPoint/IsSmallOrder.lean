@@ -58,12 +58,6 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     constructor
     sorry
     constructor
-
-    have h_eq : ep_1 = ep_4 := by
-    -- 这里需要使用 ct_eq_spec，但可能需要非零 Z 坐标的条件
-    -- 或者使用 mul_by_cofactor_spec 来建立连接
-      sorry
-    exact h_eq
     sorry
     constructor
     obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
@@ -71,6 +65,9 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     constructor
     sorry
     sorry
+    exact Choice.one
+    exact e
+    exact e
     exact true
 
 end curve25519_dalek.edwards.EdwardsPoint
