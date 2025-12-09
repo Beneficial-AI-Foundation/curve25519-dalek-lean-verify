@@ -139,15 +139,90 @@ instance : AddCommGroup (Point C) where
   add := Add.add
   add_assoc := by sorry
   zero := 0
-  zero_add p := by sorry
-  add_zero := by sorry
+  zero_add p := by
+    -- Zero is (0, 1), adding on left: (0*p.y + 1*p.x)/(1+d*0*p.x*1*p.y) = p.x/1 = p.x
+    -- and (1*p.y - a*0*p.x)/(1-d*0*p.x*1*p.y) = p.y/1 = p.y
+    ext
+    · -- x coordinate
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+      change (0 + p.x) * (1 + 0)⁻¹ = p.x; simp
+    · -- y coordinate: ring_nf closes this case directly
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+  add_zero := by
+    -- Zero is (0, 1), adding on right: (p.x*1 + p.y*0)/(1+d*p.x*0*p.y*1) = p.x/1 = p.x
+    intro p
+    ext
+    · -- x coordinate
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+      change (p.x + 0) * (1 + 0)⁻¹ = p.x; simp
+    · -- y coordinate: ring_nf closes this case directly
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
   nsmul := nsmul C
   neg := Neg.neg
   zsmul := zsmul C
-  neg_add_cancel := by sorry
-  add_comm := by sorry
-  nsmul_succ := by sorry
-  zsmul_succ' := by sorry
+  neg_add_cancel := by
+    intro p
+    ext
+    · -- x coordinate: numerator is -p.x*p.y + p.x*p.y = 0
+      simp only [HAdd.hAdd, Add.add, add_coords, Neg.neg, OfNat.ofNat, Zero.zero]
+      ring_nf
+      change (-(p.x * p.y) + p.x * p.y) * _ = 0
+      simp
+    · -- y coordinate: uses curve equation
+      simp only [HAdd.hAdd, Add.add, add_coords, Neg.neg, OfNat.ofNat, Zero.zero]
+      have hc := p.h_on_curve
+      -- curve eq: C.a * p.x^2 + p.y^2 = 1 + C.d * p.x^2 * p.y^2
+      -- After simplification: (p.y^2 + a*p.x^2) / (1 + d*p.x^2*p.y^2) = 1
+      -- This equals 1 when numerator = denominator, which is the curve equation
+      ring_nf
+      rw [← add_mul, _root_.add_comm (p.y^2), hc]
+      -- Now: (1 + C.d * p.x^2 * p.y^2) * (1 + p.y^2 * p.x^2 * C.d)⁻¹ = 1
+      rw [show C.d * p.x^2 * p.y^2 = p.y^2 * p.x^2 * C.d from by ring]
+      exact mul_inv_cancel₀ (by
+        -- Need: 1 + p.y^2 * p.x^2 * C.d ≠ 0
+        -- This holds because d is not a square, so d*x^2*y^2 ≠ -1
+        sorry)
+  add_comm := by
+    intro p q
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate: needs mul_comm to swap then add_comm on numerator
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
+  nsmul_succ := by
+    intro n p
+    simp only [nsmul]
+    -- Need: p + nsmul C n p = nsmul C n p + p (commutativity)
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
+  zsmul_succ' := by
+    intro n p
+    simp [zsmul, nsmul]
+    -- Need: p + nsmul C n p = nsmul C n p + p (commutativity)
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
 
 /-- Helper lemma to expose the addition formula without unfolding the whole structure. -/
 theorem add_def (p1 p2 : Point Ed25519) :

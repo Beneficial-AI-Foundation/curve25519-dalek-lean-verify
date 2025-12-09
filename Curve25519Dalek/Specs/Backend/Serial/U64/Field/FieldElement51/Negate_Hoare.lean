@@ -44,14 +44,25 @@ theorem index_usize_hoare_spec {α : Type u} {n : Usize} [Inhabited α] (v : Arr
     ⦃⌜True⌝⦄
     Array.index_usize v i
     ⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
-  sorry
+  simp only [Std.Do.Triple, Std.Do.wp, Aeneas.Std.Result.wp, Array.index_usize]
+  split <;> simp_all
 
 @[spec]
 theorem sub_hoare_spec (x y : U64) (h : y.val ≤ x.val) :
     ⦃⌜True⌝⦄
     (x - y)
     ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ := by
-  sorry
+  simp only [Std.Do.Triple, Std.Do.wp, Aeneas.Std.Result.wp, HSub.hSub, Aeneas.Std.UScalar.sub]
+  split_ifs with hx
+  · omega
+  · intro _
+    simp only [Aeneas.Std.UScalar.val, BitVec.toNat_ofNat, UScalarTy.numBits]
+    constructor
+    · have hx' := x.hBounds; have hy' := y.hBounds
+      simp only [UScalarTy.numBits] at hx' hy'
+      have hlt : x.bv.toNat - y.bv.toNat < 2^64 := by omega
+      exact Nat.mod_eq_of_lt hlt
+    · exact h
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
 - No panic (always returns successfully)
