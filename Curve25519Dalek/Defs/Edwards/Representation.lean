@@ -62,6 +62,9 @@ end curve25519_dalek.edwards.affine
 namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
+-- Abbreviation for shorter notation
+abbrev ExtendedPoint := edwards.EdwardsPoint
+
 -- === Validity Predicates ===
 
 /-- Existential validity predicate for ProjectivePoint. -/
@@ -76,6 +79,14 @@ def CompletedPoint.IsValid (p : CompletedPoint) : Prop :=
     let X := field_from_limbs p.X; let Y := field_from_limbs p.Y
     let Z := field_from_limbs p.Z; let T := field_from_limbs p.T
     Z ≠ 0 ∧ T ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * T
+
+def ExtendedPoint.IsValid (e : ExtendedPoint) : Prop :=
+  ∃ P : Point Ed25519,
+    let X := field_from_limbs e.X
+    let Y := field_from_limbs e.Y
+    let Z := field_from_limbs e.Z
+    let T := field_from_limbs e.T
+    Z ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * Z ∧ T = P.x * P.y * Z
 
 /-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point. -/
 def ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop :=
@@ -101,6 +112,11 @@ noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519
 noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 := by
   classical
   exact if h : p.IsValid then Classical.choose h else 0
+
+/-- Total conversion for ExtendedPoint. -/
+noncomputable def ExtendedPoint.toPoint' (e : ExtendedPoint) : Point Ed25519 := by
+  classical
+  exact if h : e.IsValid then Classical.choose h else 0
 
 /-- Bridge Lemma: If a ProjectivePoint is valid, `toPoint'` returns the correct mathematical point. -/
 theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point Ed25519}
@@ -132,6 +148,28 @@ theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed
   apply h_uniq
   exact Classical.choose_spec ⟨P, h⟩
 
+open Edwards
+
+/-- Validity for ProjectiveNielsPoint (A, B, C, D).
+    Represents P(x,y) if A=(y+x)Z, B=(y-x)Z, C=Z, D=2dxyZ. -/
+def ProjectiveNielsPoint.IsValid (n : ProjectiveNielsPoint) : Prop :=
+  ∃ P : Point Ed25519,
+    let A := field_from_limbs n.Y_plus_X
+    let B := field_from_limbs n.Y_minus_X
+    let C := field_from_limbs n.Z
+    let D := field_from_limbs n.T2d
+    C ≠ 0 ∧
+    A = (P.y + P.x) * C ∧
+    B = (P.y - P.x) * C ∧
+    D = (2 * Ed25519.d * P.x * P.y) * C
+
+/-- Total conversion to high-level Point. -/
+noncomputable def ProjectiveNielsPoint.toPoint' (n : ProjectiveNielsPoint) : Point Ed25519 := by
+  classical
+  exact if h : n.IsValid then Classical.choose h else 0
+
+noncomputable instance : Coe ProjectiveNielsPoint (Point Ed25519) := ⟨ProjectiveNielsPoint.toPoint'⟩
+
 -- === Coercions ===
 -- These allow using low-level types in high-level equations
 
@@ -142,6 +180,10 @@ noncomputable instance : Coe ProjectivePoint (Point Ed25519) where
 /-- Coercion allowing comparison of `CompletedPoint` results with mathematical points. -/
 noncomputable instance : Coe CompletedPoint (Point Ed25519) where
   coe p := p.toPoint'
+
+/-- Coercion allowing for ExtendedPoint -/
+noncomputable instance : Coe ExtendedPoint (Point Ed25519) where
+  coe e := e.toPoint'
 
 @[simp]
 theorem ProjectivePoint.toPoint'_eq_coe (p : ProjectivePoint) :
@@ -155,5 +197,12 @@ def ProjectivePoint.InBounds (p : ProjectivePoint) : Prop :=
   (∀ i < 5, p.X[i]!.val ≤ 2^52) ∧
   (∀ i < 5, p.Y[i]!.val ≤ 2^52) ∧
   (∀ i < 5, p.Z[i]!.val ≤ 2^52)
+
+/-- Bounds check predicate for ExtendedPoint -/
+def ExtendedPoint.InBounds (e : ExtendedPoint) : Prop :=
+  (∀ i < 5, e.X[i]!.val ≤ 2^52) ∧
+  (∀ i < 5, e.Y[i]!.val ≤ 2^52) ∧
+  (∀ i < 5, e.Z[i]!.val ≤ 2^52) ∧
+  (∀ i < 5, e.T[i]!.val ≤ 2^52)
 
 end curve25519_dalek.backend.serial.curve_models

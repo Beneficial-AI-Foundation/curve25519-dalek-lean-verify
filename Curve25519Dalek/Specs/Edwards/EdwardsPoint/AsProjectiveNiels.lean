@@ -5,6 +5,7 @@ Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
@@ -21,6 +22,10 @@ Source: curve25519-dalek/src/edwards.rs
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
   curve25519_dalek.backend.serial.u64.constants
+open curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.curve_models
+open Edwards
+
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -118,5 +123,17 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     · -- BEGIN TASK
       assumption
       -- END TASK
+
+/--
+Geometric verification of `as_projective_niels`.
+The theorem states that converting an EdwardsPoint to ProjectiveNiels coordinates
+preserves the underlying mathematical point.
+-/
+theorem as_projective_niels_spec'
+    (e : ExtendedPoint) (he_valid : e.IsValid) (he_bounds : e.InBounds) :
+    ∃ n, e.as_projective_niels = ok n ∧
+    n.IsValid ∧
+    (n : Point Ed25519) = (e : Point Ed25519) := by
+  sorry
 
 end curve25519_dalek.edwards.EdwardsPoint
