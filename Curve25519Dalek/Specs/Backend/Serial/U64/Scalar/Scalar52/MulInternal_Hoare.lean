@@ -7,6 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Std.Do
 import Curve25519Dalek.mvcgen
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 open Std.Do
 
 /-! # MulInternal
@@ -37,6 +38,11 @@ theorem mul_internal_hoare_spec (a b : Array U64 5#usize)
 mul_internal a b
 ⦃⇓ result => ⌜Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄
   := by
-  sorry
+  simp only [Std.Do.Triple, Std.Do.wp]
+  intro _
+  have h := mul_internal_spec a b ha hb
+  obtain ⟨result, hok, hprop⟩ := h
+  simp only [Aeneas.Std.Result.wp, hok]
+  exact hprop
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
