@@ -11,7 +11,7 @@ Specification and proof for `EdwardsPoint::is_small_order`.
 
 This function determines if an Edwards point is of small order (i.e., if it is in E[8]).
 
-**Source**: curve25519-dalek/src/edwards.rs:L1365-L1367
+**Source**: curve25519-dalek/src/edwards.rs
 
 ## TODO
 - Complete proof
