@@ -139,8 +139,28 @@ instance : AddCommGroup (Point C) where
   add := Add.add
   add_assoc := by sorry
   zero := 0
-  zero_add p := by sorry
-  add_zero := by sorry
+  zero_add p := by
+    -- Zero is (0, 1), adding on left: (0*p.y + 1*p.x)/(1+d*0*p.x*1*p.y) = p.x/1 = p.x
+    -- and (1*p.y - a*0*p.x)/(1-d*0*p.x*1*p.y) = p.y/1 = p.y
+    ext
+    · -- x coordinate
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+      change (0 + p.x) * (1 + 0)⁻¹ = p.x; simp
+    · -- y coordinate: ring_nf closes this case directly
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+  add_zero := by
+    -- Zero is (0, 1), adding on right: (p.x*1 + p.y*0)/(1+d*p.x*0*p.y*1) = p.x/1 = p.x
+    intro p
+    ext
+    · -- x coordinate
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
+      change (p.x + 0) * (1 + 0)⁻¹ = p.x; simp
+    · -- y coordinate: ring_nf closes this case directly
+      simp only [HAdd.hAdd, Add.add, add_coords, OfNat.ofNat, Zero.zero]
+      ring_nf
   nsmul := nsmul C
   neg := Neg.neg
   zsmul := zsmul C
