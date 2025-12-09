@@ -165,7 +165,17 @@ instance : AddCommGroup (Point C) where
   neg := Neg.neg
   zsmul := zsmul C
   neg_add_cancel := by sorry
-  add_comm := by sorry
+  add_comm := by
+    intro p q
+    simp only [Point.ext_iff, HAdd.hAdd, Add.add, add_coords]
+    constructor
+    · -- x coordinate: needs mul_comm to swap then add_comm on numerator
+      ring_nf
+      rw [mul_comm]
+      congr 1
+      exact _root_.add_comm _ _
+    · -- y coordinate: ring_nf solves directly
+      ring_nf
   nsmul_succ := by sorry
   zsmul_succ' := by sorry
 
