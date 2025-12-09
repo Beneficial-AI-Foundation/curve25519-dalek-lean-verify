@@ -84,13 +84,13 @@ theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
 
 
 -- This is specific to the problem below
+-- TODO: This lemma needs a proof that OR = ADD when bits are disjoint
+-- The key insight is that limb0 >>> 48 < 8 (uses bits 0-2) and
+-- (limb1 <<< 4) % 256 uses bits 4-7, so they don't overlap
 theorem decompose_or_limbs (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
   ((limb0.val >>> 48 ||| limb1.val <<< 4 % U64.size) % 2 ^ 8) =
   (limb0.val >>> 48 % 2 ^ 8) +
   ((limb1.val <<< 4) % 2 ^ 8) := by
-  bvify 64 at *
-  -- The idea is to do something similar to the proof above
-
   sorry
 
 /-! ## Spec for `to_bytes` -/
