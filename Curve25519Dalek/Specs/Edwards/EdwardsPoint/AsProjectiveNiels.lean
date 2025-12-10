@@ -3,8 +3,6 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
-import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
 import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -20,10 +18,12 @@ representation optimized for point addition operations.
 Source: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
-  curve25519_dalek.backend.serial.u64.constants
+open Aeneas.Std Result
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+     curve25519_dalek.backend.serial.u64.constants
+     curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.edwards
-open curve25519_dalek.backend.serial.curve_models
+
 open Edwards
 
 namespace curve25519_dalek.edwards.EdwardsPoint
@@ -134,6 +134,129 @@ theorem as_projective_niels_spec'
     ∃ n, e.as_projective_niels = ok n ∧
     n.IsValid ∧
     (n : Point Ed25519) = (e : Point Ed25519) := by
-  sorry
+  have he_valid' : e.IsValid := he_valid
+  rcases he_valid' with ⟨P, hP⟩
+
+  have h_bounds_spec : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧
+      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53 := by
+    intro i hi
+    rcases he_bounds with ⟨hX, hY, hZ, hT⟩
+    refine ⟨?_, ?_, ?_, ?_ ⟩
+    · --
+      have hX' := hX i hi; scalar_tac
+    · --
+      have hY' := hY i hi; scalar_tac
+    · --
+      have hZ' := hZ i hi; scalar_tac
+    · --
+      have hT' := hT i hi; scalar_tac
+
+  have ⟨n, h_run, h_arith⟩ := as_projective_niels_spec e h_bounds_spec
+  rcases h_arith with ⟨hA_raw, hB_raw, hZ_raw, hT_raw⟩
+
+  have hA : (Field51_as_Nat n.Y_plus_X : CurveField) = Field51_as_Nat e.Y + Field51_as_Nat e.X := by
+    rw [←Nat.cast_add]
+    apply lift_mod_eq _ _ hA_raw
+
+  have hB : (Field51_as_Nat n.Y_minus_X : CurveField) = Field51_as_Nat e.Y - Field51_as_Nat e.X := by
+    apply eq_sub_of_add_eq
+    rw [←Nat.cast_add]
+    apply lift_mod_eq _ _ hB_raw
+
+  have hZ' : (Field51_as_Nat n.Z : CurveField) = Field51_as_Nat e.Z := by
+    apply lift_mod_eq _ _ hZ_raw
+
+  have hC : (Field51_as_Nat n.T2d : CurveField) = Field51_as_Nat e.T * Field51_as_Nat EDWARDS_D2 := by
+    rw [←Nat.cast_mul]
+    apply lift_mod_eq _ _ hT_raw
+
+  use n
+
+  refine ⟨by exact h_run, ?_, ?_ ⟩
+  · -- subgoal 1
+    rcases hP with ⟨hZ_ne_zero, hX_eq, hY_eq, hT_eq⟩
+    use P
+    dsimp [field_from_limbs] at *
+    refine ⟨?_, ?_, ?_, ?_⟩
+    · --
+      rw [hZ']; exact hZ_ne_zero
+    · --
+      rw [hA, hX_eq, hY_eq, hZ']; try ring
+    · --
+      rw [hB, hY_eq, hX_eq, hZ']; try ring
+    · --
+      rw [hC, hZ', hT_eq]
+      have h_const : (Field51_as_Nat EDWARDS_D2 : CurveField) = 2 * Ed25519.d := by
+          rw [EDWARDS_D2, Ed25519]
+          dsimp; rw [d];
+          unfold Aeneas.Std.eval_global EDWARDS_D2_body from_limbs
+          try decide
+      rw [h_const]; try ring
+  · --subgoal 2
+    have he_eq : e.toPoint' = P := by
+      rw [ExtendedPoint.toPoint', dif_pos he_valid]
+      progress*
+      rcases hP with ⟨hz, hx, hy, ht⟩
+      ext <;> apply mul_right_cancel₀ hz
+      · rw [←hx];
+        sorry
+      · rw [←hy];
+        sorry
+
+    have hn_valid : n.IsValid := by
+      rcases hP with ⟨hZ_ne_zero, hX_eq, hY_eq, hT_eq⟩
+      unfold ProjectiveNielsPoint.IsValid
+      use P
+      dsimp only [field_from_limbs] at *
+      refine ⟨?_, ?_, ?_, ?_⟩
+      · --
+        rw [hZ']; exact hZ_ne_zero
+      · --
+        rw [hA, hZ', hY_eq, hX_eq]; try ring
+      · --
+        rw [hB, hZ', hY_eq, hX_eq]; try ring
+      · --
+        rw [hC, hT_eq, hZ']
+        have h_const : (Field51_as_Nat EDWARDS_D2 : CurveField) = 2 * Ed25519.d := by
+          rw [EDWARDS_D2, Ed25519]
+          dsimp; rw [d];
+          unfold Aeneas.Std.eval_global EDWARDS_D2_body from_limbs
+          try decide
+
+        rw [h_const]; try ring
+
+
+    /-
+    -- Subgoal 2: Equality of points
+    -- 1. Prove input e maps to P
+    have he_eq : e.toPoint' = P := by
+      rw [ExtendedPoint.toPoint', dif_pos he_valid]
+      apply Classical.choose_spec (p := fun P' => e.IsValid P') he_valid |> fun h' => ?_
+      rcases hP with ⟨hz, hx, hy, _⟩
+      rcases h' with ⟨_, hx', hy', _⟩
+      ext <;> apply mul_right_cancel₀ hz
+      · rw [←hx, hx']
+      · rw [←hy, hy']
+
+    -- 3. Prove output n maps to P
+    have hn_eq : n.toPoint' = P := by
+      rw [ProjectiveNielsPoint.toPoint', dif_pos ⟨P, hn_valid⟩]
+      apply Classical.choose_spec (p := fun P' => n.IsValid P') ⟨P, hn_valid⟩ |> fun h' => ?_
+      rcases hn_valid with ⟨hz, ha, hb, _⟩
+      rcases h' with ⟨_, ha', hb', _⟩
+      ext
+      · have : 2 * P.x * field_from_limbs n.Z = 2 * P'.x * field_from_limbs n.Z := by
+          rw [←sub_eq_sub_iff_sub_eq_sub.mpr ⟨ha, ha'⟩, hb, hb']
+        apply mul_right_cancel₀ two_ne_zero (mul_right_cancel₀ hz this)
+      · have : 2 * P.y * field_from_limbs n.Z = 2 * P'.y * field_from_limbs n.Z := by
+          rw [←add_eq_add_iff_add_eq_add.mpr ⟨ha, ha'⟩, hb, hb']
+        apply mul_right_cancel₀ two_ne_zero (mul_right_cancel₀ hz this)
+
+    -- 4. Conclude
+    rw [he_eq, hn_eq]
+    -/
+    
+    sorry
+
 
 end curve25519_dalek.edwards.EdwardsPoint
