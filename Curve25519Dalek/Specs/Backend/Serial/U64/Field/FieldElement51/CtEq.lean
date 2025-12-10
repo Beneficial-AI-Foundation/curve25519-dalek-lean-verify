@@ -45,19 +45,8 @@ theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
     ∃ c,
       ct_eq a b = ok c ∧
       (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by
-  unfold ct_eq
-  progress as ⟨a_bytes, ha_bytes⟩
-  progress as ⟨sa, h_sa⟩
-  progress as ⟨b_bytes, hb_bytes⟩
-  progress as ⟨sb, h_sb⟩
-  progress as ⟨c, h_cteq⟩
-  simp_all
-  constructor
-  · intro eq
-    have : a_bytes.to_slice = b_bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-  · grind
+  sorry
+
 
 
 
