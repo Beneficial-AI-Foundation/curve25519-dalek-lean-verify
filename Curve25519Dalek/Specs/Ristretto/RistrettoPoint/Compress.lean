@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
 
 /-! # Spec Theorem for `RistrettoPoint::compress`
 
@@ -40,11 +39,13 @@ natural language description:
 natural language specs:
 
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
-• Different representations of the same Ristretto point (which constitutes an equivalence class of 8 Edwards points)
-  result in the same output byte representation (this property has not been added yet to the formal spec theorem)
+• Different Edwards point representations of the same Ristretto point
+  (which constitutes an equivalence class of 8 Edwards points)
+  result in the same output byte representation
 
-To check whether two Edwards points e and e' mathematically represent the same Ristretto point, one can for example
-check whether mul_by_cofactor e = mul_by_cofactor e', since
+Note: To check whether two Edwards points e and e' mathematically represent the same Ristretto point, one can for example
+check whether
+mul_by_cofactor e = mul_by_cofactor e', since
 8e = 8e' is equivalent to
 8 (e - e') = 0, which is equivalent to
 e - e' being in the torsion subgroup E[8], which is equivalent to
