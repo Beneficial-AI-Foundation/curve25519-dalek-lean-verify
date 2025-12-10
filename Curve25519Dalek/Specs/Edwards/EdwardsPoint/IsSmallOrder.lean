@@ -36,6 +36,10 @@ natural language specs:
 • Equivalently, returns `true` iff multiplying by the cofactor yields the identity element
 -/
 
+-- theorem
+--  traits.IsIdentity.Blanket.is_identity subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+--     traits.Identitycurve25519_dalekedwardsEdwardsPoint ep_
+
 /-- **Spec and proof concerning `edwards.EdwardsPoint.is_small_order`**:
 - No panic (always returns successfully)
 - Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
@@ -56,16 +60,30 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     constructor
     constructor
     constructor
+    simp [traits.IsIdentity.Blanket.is_identity]
+    progress*
+    simp [ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq ]
+    progress*
     sorry
     constructor
     sorry
     constructor
-    obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
+    -- obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
     sorry
     constructor
     sorry
+
+    -- case h.h.h.h.right.right.right.right =>
+    -- subst ep_post_5
+    -- simp [core.convert.IntoFrom.into, core.convert.FromBoolsubtleChoice,
+    --       subtle.FromBoolsubtleChoice.from, Choice.one]
+    -- core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice ep_5 = true
+    -- ↔ ep_5 = Choice.one
+    -- rw [← ep_post_5]
+    -- simp [subtle.FromBoolsubtleChoice.from, Choice.one]
     sorry
-    exact Choice.one
+    exact ep_5
+    -- exact eq_choice
     exact e
     exact e
     exact true
