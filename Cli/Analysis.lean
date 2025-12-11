@@ -50,7 +50,9 @@ structure AnalysisResult where
   name : Name
   allDeps : Array Name
   filteredDeps : Array Name
+  /-- True if a spec theorem exists for this function (i.e., `{name}_spec` is defined) -/
   specified : Bool
+  /-- True if specified AND the spec theorem's proof contains no `sorry` -/
   verified : Bool
   error : Option String := none
   deriving Repr

@@ -1,23 +1,49 @@
 /-
-  Deps: A CLI tool to find dependencies of Lean functions.
+  Deps: A CLI tool to analyze Lean functions for verification status and dependencies.
+
+  This tool loads a compiled Lean environment and analyzes functions to determine:
+  1. Their dependencies on other functions in the input set
+  2. Whether they have a specification theorem (`{function}_spec`)
+  3. Whether that specification is fully proven (no `sorry`)
+  4. Whether all transitive dependencies are also verified
 
   Usage:
     lake exe deps <input.json> [output.json]
 
   Input JSON format:
-    { "functions": [{ "lean_name": "curve25519_dalek.some.function" }, ...] }
+    {
+      "functions": [
+        { "lean_name": "curve25519_dalek.some.function" },
+        ...
+      ]
+    }
 
   Output JSON format:
     {
       "functions": [
-        { "lean_name": "...", "dependencies": ["...", ...], "specified": true/false, "verified": true/false }
+        {
+          "lean_name": "curve25519_dalek.some.function",
+          "dependencies": ["dep1", "dep2", ...],
+          "specified": true,
+          "verified": true,
+          "fully_verified": false
+        },
+        ...
       ]
     }
 
-  - specified: true if a theorem named {function}_spec exists
-  - verified: true if {function}_spec exists and its proof doesn't contain sorry
+  Output fields:
+  - lean_name: The fully-qualified Lean name of the function
+  - dependencies: Other functions from the input set that this function depends on
+  - specified: True if a theorem `{lean_name}_spec` exists in the environment
+  - verified: True if specified AND the spec theorem's proof contains no `sorry`
+  - fully_verified: True if verified AND all transitive dependencies are also verified
 
-  Exits with code 1 on any error.
+  Naming convention:
+  - Functions must be specified with their exact fully-qualified Lean names
+  - Spec theorems must be named `{function_name}_spec` in the same namespace
+
+  Exits with code 1 on any error (missing function, parse error, etc.)
 
   Example:
     lake exe deps functions.json deps.json
@@ -35,14 +61,19 @@ open Cli.Analysis
 def printUsage : IO Unit := do
   IO.println "Usage: lake exe deps <input.json> [output.json]"
   IO.println ""
-  IO.println "Analyzes Lean function dependencies."
+  IO.println "Analyzes Lean functions for verification status and dependencies."
   IO.println ""
   IO.println "Arguments:"
   IO.println "  <input.json>   JSON file with functions to analyze"
   IO.println "  [output.json]  Output file (prints to stdout if omitted)"
   IO.println ""
   IO.println "Input format:"
-  IO.println "  { \"functions\": [{ \"name\": \"some.function.name\" }, ...] }"
+  IO.println "  { \"functions\": [{ \"lean_name\": \"curve25519_dalek.some.function\" }, ...] }"
+  IO.println ""
+  IO.println "Output fields:"
+  IO.println "  - specified: theorem {name}_spec exists"
+  IO.println "  - verified: specified AND proof has no sorry"
+  IO.println "  - fully_verified: verified AND all transitive deps verified"
   IO.println ""
   IO.println "Example:"
   IO.println "  lake exe deps functions.json deps.json"
