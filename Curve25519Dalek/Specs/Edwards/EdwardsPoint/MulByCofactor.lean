@@ -14,9 +14,6 @@ This function computes 8*e (the Edwards point e multiplied by the cofactor 8)
 by calling mul_by_pow_2 with k=3 (since 2^3 = 8).
 
 **Source**: curve25519-dalek/src/edwards.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
