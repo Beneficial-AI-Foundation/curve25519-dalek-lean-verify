@@ -8,6 +8,10 @@ open Lean
 
 namespace Cli.Analysis
 
+/-- Suffix appended to function names to form spec theorem names.
+    Convention: for function `foo`, the spec theorem is `foo_spec`. -/
+def specSuffix : String := "_spec"
+
 /-- Get direct dependencies of a constant from its value expression -/
 def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
   let some constInfo := env.find? name
@@ -20,9 +24,9 @@ def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name)
 def filterToKnownFunctions (knownNames : Std.HashSet Name) (deps : Array Name) : Array Name :=
   deps.filter (fun name => knownNames.contains name)
 
-/-- Check if a _spec theorem exists for the given function name -/
+/-- Check if a spec theorem exists for the given function name -/
 def hasSpecTheorem (env : Environment) (name : Name) : Bool :=
-  let specName := name.appendAfter "_spec"
+  let specName := name.appendAfter specSuffix
   env.find? specName |>.isSome
 
 /-- Check if a proof directly contains sorry (sorryAx) -/
@@ -34,9 +38,9 @@ def proofContainsSorry (env : Environment) (name : Name) : Bool :=
     | none => true  -- No value means axiom/opaque, treat as not verified
   | none => true
 
-/-- Check if a function is verified (has _spec theorem without direct sorry) -/
+/-- Check if a function is verified (has spec theorem without direct sorry) -/
 def isVerified (env : Environment) (name : Name) : Bool :=
-  let specName := name.appendAfter "_spec"
+  let specName := name.appendAfter specSuffix
   match env.find? specName with
   | some _ => !proofContainsSorry env specName
   | none => false
