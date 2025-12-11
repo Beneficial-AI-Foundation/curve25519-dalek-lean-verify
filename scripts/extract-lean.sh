@@ -5,6 +5,9 @@
 
 set -e  # Exit on any error
 
+HERE=$(cd `dirname $0`; pwd)
+ROOT=$HERE/..
+
 echo "=== Extracting Lean Files from Rust Code ==="
 echo
 
@@ -12,11 +15,11 @@ echo
 # The main crate we're extracting
 CRATE_DIR="curve25519-dalek"
 CRATE_NAME="curve25519_dalek"  # Underscored version for LLBC file
-CHARON_BIN="./aeneas/charon/bin/charon"
-AENEAS_BIN="./aeneas/bin/aeneas"
-OUTPUT_DIR="Curve25519Dalek"
-FUNCTIONS_FILE="extract-functions.txt"
-TWEAKS_FILE="aeneas-tweaks.txt"
+CHARON_BIN="$ROOT/aeneas/charon/bin/charon"
+AENEAS_BIN="$ROOT/aeneas/bin/aeneas"
+OUTPUT_DIR="$ROOT/Curve25519Dalek"
+FUNCTIONS_FILE="$ROOT/extract-functions.txt"
+TWEAKS_FILE="$ROOT/aeneas-tweaks.txt"
 
 # RUSTFLAGS are configured in .cargo/config.toml:
 # - curve25519_dalek_backend="serial" (pure Rust implementation without SIMD)
@@ -58,13 +61,13 @@ check_tools() {
     
     if [ ! -f "$CHARON_BIN" ]; then
         echo "Error: Charon not found at $CHARON_BIN"
-        echo "Run the setup script first: ./scripts/setup-aeneas.sh"
+        echo "Run the setup script first: $HERE/setup-aeneas.sh"
         exit 1
     fi
     
     if [ ! -f "$AENEAS_BIN" ]; then
         echo "Error: Aeneas not found at $AENEAS_BIN"
-        echo "Run the setup script first: ./scripts/setup-aeneas.sh"
+        echo "Run the setup script first: $HERE/setup-aeneas.sh"
         exit 1
     fi
     
@@ -75,7 +78,7 @@ check_tools() {
 # Generate LLBC file using Charon
 generate_llbc() {
     echo "Step 1: Generating LLBC file with Charon..."
-    echo "Using configuration from .cargo/config.toml (serial backend, 64-bit, verify cfg)"
+    echo "Using configuration from $ROOT/.cargo/config.toml (serial backend, 64-bit, verify cfg)"
     echo
 
     # Create .logs directory if it doesn't exist
@@ -99,8 +102,8 @@ generate_llbc() {
 
     echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} -- -p $CRATE_DIR"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
-    echo "Logging output to .logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee .logs/charon.log
+    echo "Logging output to $ROOT/.logs/charon.log"
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"
@@ -120,8 +123,8 @@ generate_lean() {
 
     # Run Aeneas to generate Lean files
     echo "Running: $AENEAS_BIN -backend lean -split-files -dest $OUTPUT_DIR $LLBC_FILE"
-    echo "Logging output to .logs/aeneas.log"
-    "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee .logs/aeneas.log
+    echo "Logging output to $ROOT/.logs/aeneas.log"
+    "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
 
     echo "✓ Lean files generated in $OUTPUT_DIR"
     echo
@@ -198,8 +201,8 @@ apply_tweaks() {
 sync_toolchain() {
     echo "Step 3: Synchronizing Lean toolchain..."
     
-    if [ -f "./scripts/update-lean-toolchain.sh" ]; then
-        ./scripts/update-lean-toolchain.sh
+    if [ -f "$HERE/update-lean-toolchain.sh" ]; then
+        $HERE/update-lean-toolchain.sh
     else
         echo "⚠ Toolchain sync script not found, skipping"
     fi
