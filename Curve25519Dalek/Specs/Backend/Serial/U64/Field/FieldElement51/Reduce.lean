@@ -51,27 +51,24 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
   unfold reduce
   progress*
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
+  · simp [*];
+    have : (limbs : List U64)[4].val < 2 ^ 64 := by scalar_tac
+
+    grind
+
+  · simp [*]; scalar_tac
+  · simp [*]; scalar_tac
+  · simp [*]; scalar_tac
+  · simp [*]; scalar_tac
   · constructor
-    · -- BEGIN TASK
-      intro i _
+    · intro i _
       interval_cases i
       all_goals simp [*]; scalar_tac
-      -- END TASK
-    · -- BEGIN TASK
-      simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
-      -- END TASK
+      ·   simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+
+  example (n m : ℕ) : n >>> m = n / 2^m := by grind
+
+
+  example (m n : ℕ) (h : n < 2 ^ 64) : m % 2 ^ 52 + n >>> 51 * 19 < 2 ^ 64 := by
+   grind
+   sorry
