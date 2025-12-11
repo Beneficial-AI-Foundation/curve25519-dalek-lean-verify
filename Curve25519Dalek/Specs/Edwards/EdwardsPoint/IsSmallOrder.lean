@@ -6,10 +6,11 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsIdentity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
-import Curve25519Dalek.Specs.Field.FieldElement51.CtEq
+-- import Curve25519Dalek.Specs.Field.FieldElement51.CtEq
 
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
@@ -40,9 +41,6 @@ natural language specs:
 • Equivalently, returns `true` iff multiplying by the cofactor yields the identity element
 -/
 
--- theorem
---  traits.IsIdentity.Blanket.is_identity subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
---     traits.Identitycurve25519_dalekedwardsEdwardsPoint ep_
 
 /-- **Spec and proof concerning `edwards.EdwardsPoint.is_small_order`**:
 - No panic (always returns successfully)
@@ -59,30 +57,5 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     (b = true ↔ eq_choice = Choice.one) := by
     unfold is_small_order
     progress*
-    constructor
-    constructor
-    constructor
-    constructor
-    constructor
-    simp [traits.IsIdentity.Blanket.is_identity]
-    progress*
-    -- simp [ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq ]
-    -- progress*
-    sorry
-    -- constructor
-    sorry
-    sorry
-    sorry
-    constructor
-    -- obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
-    sorry
-    constructor
-    sorry
-    sorry
-    exact ep_5
-    -- exact eq_choice
-    exact e
-    exact e
-    exact true
 
 end curve25519_dalek.edwards.EdwardsPoint
