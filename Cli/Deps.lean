@@ -97,7 +97,7 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
 
   -- Build output
   let output : AnalysisOutput := {
-    results := results
+    functions := results
   }
 
   -- Write or print output

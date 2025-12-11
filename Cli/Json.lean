@@ -23,17 +23,12 @@ structure DependencyOutput where
   dependencies : Array String
   specified : Bool
   verified : Bool
-  deriving ToJson, Repr
+  deriving FromJson, ToJson, Repr
 
 /-- Output: Full analysis results -/
 structure AnalysisOutput where
-  results : Array DependencyOutput
-  deriving Repr
-
-instance : ToJson AnalysisOutput where
-  toJson o := Json.mkObj [
-    ("functions", toJson o.results)
-  ]
+  functions : Array DependencyOutput
+  deriving FromJson, ToJson, Repr
 
 /-- Parse JSON input from string -/
 def parseInput (s : String) : Except String AnalysisInput :=
@@ -45,8 +40,7 @@ def parseInput (s : String) : Except String AnalysisInput :=
     | .ok input => .ok input
 
 /-- Render output to JSON string -/
-def renderOutput (output : AnalysisOutput) (pretty : Bool := true) : String :=
-  let json := toJson output
-  if pretty then json.pretty else json.compress
+def renderOutput (output : AnalysisOutput) : String :=
+  (toJson output).pretty
 
 end Cli.Json
