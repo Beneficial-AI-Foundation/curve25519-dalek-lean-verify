@@ -16,7 +16,7 @@ group order.
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -37,10 +37,10 @@ natural language specs:
 -/
 @[progress]
 theorem LFACTOR_spec :
-    (L * constants.LFACTOR + 1) % (2^52) = 0 ∧
-    0 ≤ constants.LFACTOR.val ∧
-    constants.LFACTOR.val < 2^52 := by
-  unfold constants.LFACTOR
+    (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧
+    0 ≤ LFACTOR.val ∧
+    LFACTOR.val < 2^52 := by
+  unfold LFACTOR
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants

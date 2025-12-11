@@ -26,6 +26,8 @@ attribute [bvify_simps] Nat.dvd_iff_mod_eq_zero
 
 /-! ## Spec for `clamp_integer` -/
 
+namespace curve25519_dalek.scalar
+
 /-- **Spec and proof concerning `scalar.clamp_integer`**:
 - No panic
 - (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)
@@ -71,3 +73,5 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     simp [Finset.sum_range_succ, *]
     scalar_tac
     -- END TASK
+
+end curve25519_dalek.scalar

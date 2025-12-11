@@ -40,6 +40,8 @@ attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
 
 /-! ## Spec for `reduce` -/
 
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - Does not overflow and hence returns a result
 - All the limbs of the result are small, ≤ 2^(51 + ε)
@@ -51,11 +53,7 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
   unfold reduce
   progress*
-  · simp [*];
-    have : (limbs : List U64)[4].val < 2 ^ 64 := by scalar_tac
-
-    grind
-
+  · simp [*]; scalar_tac
   · simp [*]; scalar_tac
   · simp [*]; scalar_tac
   · simp [*]; scalar_tac
@@ -64,11 +62,6 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     · intro i _
       interval_cases i
       all_goals simp [*]; scalar_tac
-      ·   simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+    · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
 
-  example (n m : ℕ) : n >>> m = n / 2^m := by grind
-
-
-  example (m n : ℕ) (h : n < 2 ^ 64) : m % 2 ^ 52 + n >>> 51 * 19 < 2 ^ 64 := by
-   grind
-   sorry
+end curve25519_dalek.backend.serial.u64.field.FieldElement51
