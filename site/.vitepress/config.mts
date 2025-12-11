@@ -11,6 +11,7 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Project', link: '/details' },
+      { text: 'Dependencies', link: '/dependencies' },
       { text: 'Rust API', link: '/doc/curve25519_dalek/index.html', target: '_blank' }
     ],
 
