@@ -5,11 +5,14 @@
 
 set -e  # Exit on any error
 
+HOME=$(cd `dirname $0`; pwd)
+ROOT=$HOME/..
+
 echo "=== Lean Toolchain Update Script ==="
 echo
 
-VERIFY_TOOLCHAIN="lean-toolchain"
-AENEAS_TOOLCHAIN="aeneas/backends/lean/lean-toolchain"
+VERIFY_TOOLCHAIN="$ROOT/lean-toolchain"
+AENEAS_TOOLCHAIN="$ROOT/aeneas/backends/lean/lean-toolchain"
 
 # Check if both files exist
 if [ ! -f "$VERIFY_TOOLCHAIN" ]; then
@@ -21,7 +24,7 @@ fi
 if [ ! -f "$AENEAS_TOOLCHAIN" ]; then
     echo "Error: $AENEAS_TOOLCHAIN is missing"
     echo "This file should exist after running the Aeneas setup script."
-    echo "Try running: ./scripts/setup-aeneas.sh"
+    echo "Try running: $HERE/setup-aeneas.sh"
     exit 1
 fi
 
@@ -30,8 +33,8 @@ VERIFY_VERSION=$(cat "$VERIFY_TOOLCHAIN" | tr -d '\n\r')
 AENEAS_VERSION=$(cat "$AENEAS_TOOLCHAIN" | tr -d '\n\r')
 
 echo "Current Lean versions:"
-echo "  lean-toolchain: $VERIFY_VERSION"
-echo "  aeneas/backends/lean/lean-toolchain: $AENEAS_VERSION"
+echo "  $VERIFY_TOOLCHAIN: $VERIFY_VERSION"
+echo "  $AENEAS_TOOLCHAIN: $AENEAS_VERSION"
 echo
 
 # Compare versions

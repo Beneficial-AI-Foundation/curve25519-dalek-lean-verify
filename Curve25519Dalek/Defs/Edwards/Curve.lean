@@ -9,6 +9,8 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 
+import PrimeCert.PrimeList
+
 /-!
 # Pure Mathematical Foundations for Edwards Curves
 
@@ -35,13 +37,14 @@ open ZMod
 /-! ## 1. Mathematical Foundations: Twisted Edwards Curves -/
 
 /-- The finite field F_p where p = 2^255 - 19.
-    Proof can be found at: https://github.com/kckennylau/PrimeCert/blob/master/PrimeCert/PrimeList.lean#L84 -/
+    Proof can be found at:
+    https://github.com/kckennylau/PrimeCert/blob/master/PrimeCert/PrimeList.lean#L84 -/
 abbrev CurveField : Type := ZMod p
 
 instance : Fact (Nat.Prime p) := by
   unfold p
-  -- Proof omitted: p = 2^255 - 19 is prime.
-  sorry
+  exact ⟨PrimeCert.prime_25519''⟩
+
 
 instance : Field CurveField := by
   unfold CurveField

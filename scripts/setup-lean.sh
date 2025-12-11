@@ -6,21 +6,19 @@
 
 set -e  # Exit on any error
 
+HOME=$(cd `dirname $0`; pwd)
+ROOT=$HOME/..
+
 echo "=== Lean Project Setup Script ==="
 echo
 
-# Get the absolute path to the script directory
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
-VERIFY_DIR="$PROJECT_ROOT"
-
-echo "Project root: $PROJECT_ROOT"
+echo "Project root: $ROOT"
 echo "Note: Lean project is co-located with Rust project"
 echo
 
 # Check if lakefile.toml exists
-if [ ! -f "$VERIFY_DIR/lakefile.toml" ]; then
-    echo "Error: lakefile.toml not found in $VERIFY_DIR"
+if [ ! -f "$ROOT/lakefile.toml" ]; then
+    echo "Error: lakefile.toml not found in $ROOT"
     echo "This doesn't appear to be a valid Lean project."
     exit 1
 fi
@@ -87,12 +85,12 @@ check_prerequisites() {
 setup_project() {
     echo "Setting up Lean project..."
     
-    cd "$VERIFY_DIR"
+    cd "$ROOT"
     
     # Lake will automatically install Lean via elan if needed based on lean-toolchain file
     echo "Lake will automatically install/use Lean based on lean-toolchain file:"
-    if [ -f "lean-toolchain" ]; then
-        cat lean-toolchain
+    if [ -f "$ROOT/lean-toolchain" ]; then
+        cat $ROOT/lean-toolchain
     else
         echo "Warning: No lean-toolchain file found"
     fi
@@ -121,7 +119,7 @@ setup_project() {
 verify_setup() {
     echo "Verifying setup..."
     
-    cd "$VERIFY_DIR"
+    cd "$ROOT"
     
     # Check if we can build the main target
     if lake build Curve25519Dalek; then
@@ -152,10 +150,10 @@ main() {
     
     echo "=== Setup Complete! ==="
     echo
-    echo "Your Lean project in $VERIFY_DIR is ready!"
+    echo "Your Lean project in $ROOT is ready!"
     echo
     echo "Useful commands:"
-    echo "  cd $VERIFY_DIR"
+    echo "  cd $ROOT"
     echo "  lake build              # Build the project"
     echo "  lake exe cache get      # Download/update caches"
     echo "  lake update             # Update dependencies"

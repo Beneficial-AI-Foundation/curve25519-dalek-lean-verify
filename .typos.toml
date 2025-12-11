@@ -1,5 +1,6 @@
 [files]
 extend-exclude = [
+    "scripts/", # Scripts can easily contain false positives
     ".git/",
     "*.svg",
     "TESTVECTORS",

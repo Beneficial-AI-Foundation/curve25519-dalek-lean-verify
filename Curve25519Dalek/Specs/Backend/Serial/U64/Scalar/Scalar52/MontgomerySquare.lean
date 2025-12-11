@@ -1,11 +1,12 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 /-! # Spec Theorem for `Scalar52::montgomery_square`
 
 Specification and proof for `Scalar52::montgomery_square`.
@@ -14,8 +15,6 @@ This function performs Montgomery squaring.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -41,11 +40,12 @@ natural language specs:
   (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_square_spec (m : Scalar52) :
+theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62):
     ∃ w,
     montgomery_square m = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L
     := by
-  sorry
+  unfold montgomery_square
+  progress*
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
