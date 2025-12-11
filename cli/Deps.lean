@@ -1,67 +1,124 @@
 /-
-  Deps: A CLI tool to find dependencies of a Lean function/definition.
+  Deps: A CLI tool to find dependencies of Lean functions.
 
-  Usage: lake exe deps <module> <name>
+  Usage:
+    lake exe deps <input.json> [output.json]
 
-  Example: lake exe deps Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce reduce
+  Input JSON format:
+    { "functions": [{ "name": "curve25519_dalek.some.function" }, ...] }
+
+  Output JSON format:
+    {
+      "results": [
+        { "name": "...", "dependencies": ["...", ...] },
+        { "name": "...", "dependencies": [], "error": "..." }
+      ],
+      "summary": { "total": N, "succeeded": M, "failed": K }
+    }
+
+  Example:
+    lake exe deps functions.json deps.json
 -/
 import Lean
+import Std.Data.HashSet
+import cli.Json
+import cli.Analysis
 
 open Lean
+open cli.Json
+open cli.Analysis
 
-/-- Get direct dependencies of a constant from its value expression -/
-def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
-  let some constInfo := env.find? name
-    | throw s!"Constant '{name}' not found in environment"
-  let some value := constInfo.value?
-    | throw s!"Constant '{name}' has no value (it may be an axiom, opaque, or primitive)"
-  return value.getUsedConstants
+/-- Print usage information -/
+def printUsage : IO Unit := do
+  IO.println "Usage: lake exe deps <input.json> [output.json]"
+  IO.println ""
+  IO.println "Analyzes Lean function dependencies."
+  IO.println ""
+  IO.println "Arguments:"
+  IO.println "  <input.json>   JSON file with functions to analyze"
+  IO.println "  [output.json]  Output file (prints to stdout if omitted)"
+  IO.println ""
+  IO.println "Input format:"
+  IO.println "  { \"functions\": [{ \"name\": \"some.function.name\" }, ...] }"
+  IO.println ""
+  IO.println "Example:"
+  IO.println "  lake exe deps functions.json deps.json"
 
-/-- Filter to only show "interesting" dependencies (exclude Lean builtins) -/
-def isInteresting (name : Name) : Bool :=
-  -- Filter out very common Lean primitives
-  let prefixes := #[`Lean, `IO, `String, `Nat, `Int, `Bool, `List, `Array, `Option, `Except, `Unit, `UInt8, `UInt16, `UInt32, `UInt64, `USize, `Float, `Char]
-  !prefixes.any (fun p => p.isPrefixOf name) &&
-  !name.isInternal &&
-  name != `sorryAx
+/-- Run the analysis -/
+def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 := do
+  -- Read input JSON
+  let content ← IO.FS.readFile inputPath
+
+  -- Parse input
+  let input ← match parseInput content with
+    | .ok i => pure i
+    | .error e =>
+      IO.eprintln s!"Error: {e}"
+      return 1
+
+  IO.println s!"Found {input.functions.size} functions to analyze"
+
+  -- Build set of known function names for filtering
+  let knownNames : Std.HashSet Name := input.functions.foldl
+    (fun set func => set.insert func.name.toName) {}
+
+  -- Initialize Lean search path
+  Lean.initSearchPath (← Lean.findSysroot)
+
+  -- Import the main module
+  IO.println "Loading Curve25519Dalek.Funs module..."
+  let env ← importModules #[{ module := `Curve25519Dalek.Funs }] {}
+  IO.println "Module loaded successfully"
+
+  -- Analyze each function
+  let mut results : Array DependencyOutput := #[]
+  let mut successCount := 0
+  let mut errorCount := 0
+
+  for func in input.functions do
+    let name := func.name.toName
+    let analysisResult := analyzeFunction env knownNames name
+
+    let output : DependencyOutput := {
+      name := func.name
+      dependencies := analysisResult.filteredDeps.map (·.toString)
+      error := analysisResult.error
+    }
+    results := results.push output
+
+    match analysisResult.error with
+    | some _ => errorCount := errorCount + 1
+    | none => successCount := successCount + 1
+
+  IO.println s!"Analysis complete: {successCount} succeeded, {errorCount} errors"
+
+  -- Build output
+  let output : AnalysisOutput := {
+    results := results
+    summary := {
+      total := input.functions.size
+      succeeded := successCount
+      failed := errorCount
+    }
+  }
+
+  -- Write or print output
+  let jsonOutput := renderOutput output
+  match outputPath with
+  | some path =>
+    IO.FS.writeFile path jsonOutput
+    IO.println s!"Results written to {path}"
+  | none =>
+    IO.println jsonOutput
+
+  return 0
 
 def main (args : List String) : IO UInt32 := do
   match args with
-  | [moduleName, constName] =>
-    -- Parse module name
-    let module := moduleName.toName
-
-    -- Parse constant name (try as-is first, then qualified with module)
-    let name := constName.toName
-
-    -- Initialize Lean search path
-    Lean.initSearchPath (← Lean.findSysroot)
-
-    -- Import the module
-    let env ← importModules #[{ module }] {}
-
-    -- Try to find the constant (first as given, then qualified)
-    let fullName := if env.find? name |>.isSome then name else module ++ name
-
-    match getDirectDeps env fullName with
-    | .ok deps =>
-      let interesting := deps.filter isInteresting
-      IO.println s!"Dependencies of '{fullName}':"
-      IO.println s!"  Total: {deps.size}, Filtered: {interesting.size}"
-      IO.println ""
-      for dep in interesting.toList.mergeSort (·.toString < ·.toString) do
-        IO.println s!"  {dep}"
-      return 0
-    | .error msg =>
-      IO.eprintln s!"Error: {msg}"
-      return 1
+  | [inputPath] =>
+    runAnalysis inputPath none
+  | [inputPath, outputPath] =>
+    runAnalysis inputPath (some outputPath)
   | _ =>
-    IO.eprintln "Usage: lake exe deps <module> <name>"
-    IO.eprintln ""
-    IO.eprintln "Arguments:"
-    IO.eprintln "  <module>  The module to import (e.g., Curve25519Dalek.SomeModule)"
-    IO.eprintln "  <name>    The constant name (can be unqualified if unique)"
-    IO.eprintln ""
-    IO.eprintln "Example:"
-    IO.eprintln "  lake exe deps Mathlib.Data.Nat.Basic Nat.add_comm"
+    printUsage
     return 1

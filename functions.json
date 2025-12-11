@@ -1,0 +1,322 @@
+{
+  "functions": [
+    {
+      "name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.add"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.scalar_mul.vartime_double_base.mul"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.L"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.R"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.RR"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Add.add"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign.add_assign"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul.mul"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.pow22501"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"
+    },
+    {
+      "name": "curve25519_dalek.subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.SubAssign.sub_assign"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.m"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar52.invert"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar52.montgomery_invert"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"
+    },
+    {
+      "name": "curve25519_dalek.backend.straus_multiscalar_mul"
+    },
+    {
+      "name": "curve25519_dalek.backend.vartime_double_base_mul"
+    },
+    {
+      "name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"
+    },
+    {
+      "name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"
+    },
+    {
+      "name": "curve25519_dalek.edwards.affine.AffinePoint.compress"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.add"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.as_projective"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.compress"
+    },
+    {
+      "name": "curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.double"
+    },
+    {
+      "name": "curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.to_affine"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"
+    },
+    {
+      "name": "curve25519_dalek.edwards.EdwardsPoint.vartime_double_scalar_mul_basepoint"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.pow_p58"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.is_negative"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.is_zero"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.invert"
+    },
+    {
+      "name": "curve25519_dalek.field.FieldElement51.invsqrt"
+    },
+    {
+      "name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.RistrettoPoint.add"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.RistrettoPoint.compress"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"
+    },
+    {
+      "name": "curve25519_dalek.ristretto.RistrettoPoint.mul_base"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar52.pack"
+    },
+    {
+      "name": "curve25519_dalek.scalar.clamp_integer"
+    },
+    {
+      "name": "curve25519_dalek.scalar.read_le_u64_into"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.as_bytes"
+    },
+    {
+      "name": "curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.invert"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.is_canonical"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.non_adjacent_form"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.ONE"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.reduce"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.to_bytes"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.unpack"
+    },
+    {
+      "name": "curve25519_dalek.scalar.Scalar.ZERO"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.conditional_assign"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.conditional_select"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ct_eq"
+    },
+    {
+      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.neg"
+    }
+  ]
+}

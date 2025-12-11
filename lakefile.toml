@@ -26,6 +26,10 @@ rev = "c113fd9"
 [[lean_lib]]
 name = "Curve25519Dalek"
 
+[[lean_lib]]
+name = "cli"
+globs = ["cli.Json", "cli.Analysis"]
+
 [[lean_exe]]
 name = "deps"
 root = "cli.Deps"
