@@ -73,18 +73,10 @@ def analyzeFunction (env : Environment) (knownNames : Std.HashSet Name) (name : 
 def analyzeFunctions (env : Environment) (knownNames : Std.HashSet Name) (names : List Name) : List AnalysisResult :=
   names.map (analyzeFunction env knownNames)
 
-/-- Try to find a constant by name, with fallback to common prefixes -/
+/-- Try to find a constant by exact name -/
 def resolveConstantName (env : Environment) (nameStr : String) : Option Name :=
   let name := nameStr.toName
-  -- Try as-is first
-  if env.find? name |>.isSome then
-    some name
-  else
-    -- Try with common prefixes
-    let prefixes := #[`curve25519_dalek, `Curve25519Dalek]
-    prefixes.findSome? (fun pfx =>
-      let qualified := pfx ++ name
-      if env.find? qualified |>.isSome then some qualified else none)
+  if env.find? name |>.isSome then some name else none
 
 /-- Compute transitive dependencies within a set of known functions -/
 partial def getTransitiveDeps (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
