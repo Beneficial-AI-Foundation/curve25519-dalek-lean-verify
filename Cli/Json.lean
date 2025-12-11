@@ -23,6 +23,7 @@ structure DependencyOutput where
   dependencies : Array String
   specified : Bool
   verified : Bool
+  fully_verified : Bool  -- true if this function and all transitive deps are verified
   deriving FromJson, ToJson, Repr
 
 /-- Output: Full analysis results -/

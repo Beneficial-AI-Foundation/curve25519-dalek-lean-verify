@@ -90,6 +90,7 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
         dependencies := analysisResult.filteredDeps.map (·.toString)
         specified := analysisResult.specified
         verified := analysisResult.verified
+        fully_verified := isFullyVerified env knownNames name
       }
       results := results.push output
 

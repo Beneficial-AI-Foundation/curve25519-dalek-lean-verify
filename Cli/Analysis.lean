@@ -86,4 +86,27 @@ def resolveConstantName (env : Environment) (nameStr : String) : Option Name :=
       let qualified := pfx ++ name
       if env.find? qualified |>.isSome then some qualified else none)
 
+/-- Compute transitive dependencies within a set of known functions -/
+partial def getTransitiveDeps (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
+    (visited : Std.HashSet Name := {}) : Std.HashSet Name :=
+  if visited.contains name then visited
+  else
+    let visited := visited.insert name
+    match getDirectDeps env name with
+    | .error _ => visited
+    | .ok deps =>
+      let filteredDeps := filterToKnownFunctions knownNames deps
+      filteredDeps.foldl (fun acc dep => getTransitiveDeps env knownNames dep acc) visited
+
+/-- Check if a function and all its transitive dependencies are verified -/
+def isFullyVerified (env : Environment) (knownNames : Std.HashSet Name) (name : Name) : Bool :=
+  -- First check if the function itself is verified
+  if !isVerified env name then false
+  else
+    -- Get all transitive dependencies (excluding the function itself)
+    let allDeps := getTransitiveDeps env knownNames name
+    let transitiveDeps := allDeps.erase name
+    -- Check if all transitive dependencies are verified
+    transitiveDeps.all (isVerified env)
+
 end Cli.Analysis
