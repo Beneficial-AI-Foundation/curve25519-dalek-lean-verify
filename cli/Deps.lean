@@ -5,13 +5,13 @@
     lake exe deps <input.json> [output.json]
 
   Input JSON format:
-    { "functions": [{ "name": "curve25519_dalek.some.function" }, ...] }
+    { "functions": [{ "lean_name": "curve25519_dalek.some.function" }, ...] }
 
   Output JSON format:
     {
       "results": [
-        { "name": "...", "dependencies": ["...", ...] },
-        { "name": "...", "dependencies": [], "error": "..." }
+        { "lean_name": "...", "dependencies": ["...", ...] },
+        { "lean_name": "...", "dependencies": [], "error": "..." }
       ],
       "summary": { "total": N, "succeeded": M, "failed": K }
     }
@@ -60,7 +60,7 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
 
   -- Build set of known function names for filtering
   let knownNames : Std.HashSet Name := input.functions.foldl
-    (fun set func => set.insert func.name.toName) {}
+    (fun set func => set.insert func.lean_name.toName) {}
 
   -- Initialize Lean search path
   Lean.initSearchPath (← Lean.findSysroot)
@@ -76,11 +76,11 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
   let mut errorCount := 0
 
   for func in input.functions do
-    let name := func.name.toName
+    let name := func.lean_name.toName
     let analysisResult := analyzeFunction env knownNames name
 
     let output : DependencyOutput := {
-      name := func.name
+      lean_name := func.lean_name
       dependencies := analysisResult.filteredDeps.map (·.toString)
       error := analysisResult.error
     }

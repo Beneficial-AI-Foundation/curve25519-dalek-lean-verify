@@ -9,7 +9,7 @@ namespace cli.Json
 
 /-- Input: A single function to analyze -/
 structure FunctionInput where
-  name : String
+  lean_name : String
   deriving FromJson, ToJson, Repr
 
 /-- Input: List of functions to analyze -/
@@ -19,7 +19,7 @@ structure AnalysisInput where
 
 /-- Output: Dependencies for a single function -/
 structure DependencyOutput where
-  name : String
+  lean_name : String
   dependencies : Array String
   error : Option String := none
   deriving Repr
@@ -27,7 +27,7 @@ structure DependencyOutput where
 instance : ToJson DependencyOutput where
   toJson d :=
     let base := Json.mkObj [
-      ("name", Json.str d.name),
+      ("lean_name", Json.str d.lean_name),
       ("dependencies", toJson d.dependencies)
     ]
     match d.error with
