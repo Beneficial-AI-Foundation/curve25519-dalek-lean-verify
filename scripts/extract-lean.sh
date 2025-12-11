@@ -130,6 +130,20 @@ generate_lean() {
     echo
 }
 
+# Quote a string to be used as a sed regex.
+# This is used to properly escape any 'raw' search strings in the
+# tweaks file by turning the input into a proper (but inefficient)
+# regular expression.
+quoteRe() { sed -e 's/[^^]/[&]/g; s/\^/\\^/g; $!a\'$'\n''\\n' <<< "$1" | tr -d '\n'; }
+
+# Quote a string to be used as the target for replacement with sed.
+# This properly escapes sed's supported shortcuts for referencing the
+# string / match groups.
+quoteSubst() {
+  IFS= read -d '' -r < <(sed -e ':a' -e '$!{N;ba' -e '}' -e 's/[&/\]/\\&/g; s/\n/\\&/g' <<<"$1") || true
+  printf %s "${REPLY%$'\n'}"
+}
+
 # Apply tweaks to generated Lean files
 apply_tweaks() {
     local input_file="$1"
@@ -175,13 +189,10 @@ apply_tweaks() {
             replace_text=""
         elif [[ "$line" == "" ]] && [[ "$in_replace" == true ]]; then
             # End of a substitution block - apply it
-            if [[ "$use_regex" == true ]]; then
-                # Use sed for regex replacement (in-place via temp variable)
-                content=$(echo "$content" | sed "s|$find_text|$replace_text|g")
-            else
-                # Use bash string replacement for literal text (replaces ALL occurrences)
-                content="${content//"$find_text"/"$replace_text"}"
+            if [[ "$use_regex" == false ]]; then
+                find_text=$(quoteRe "$find_text")
             fi
+            content=$(sed -e ':a' -e '$!{N;ba' -e '}' -e "s/$find_text/$(quoteSubst "$replace_text")/g" <<< "$content")
             in_replace=false
             find_text=""
             replace_text=""
