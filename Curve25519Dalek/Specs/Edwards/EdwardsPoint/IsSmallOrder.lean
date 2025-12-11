@@ -7,6 +7,10 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
+import Curve25519Dalek.Specs.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
+import Curve25519Dalek.Specs.Field.FieldElement51.CtEq
+
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
 Specification and proof for `EdwardsPoint::is_small_order`.
@@ -62,25 +66,18 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     constructor
     simp [traits.IsIdentity.Blanket.is_identity]
     progress*
-    simp [ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq ]
-    progress*
+    -- simp [ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq ]
+    -- progress*
     sorry
-    constructor
+    -- constructor
+    sorry
+    sorry
     sorry
     constructor
     -- obtain ⟨id, h_id_ok, _⟩ := Identitycurve25519_dalekedwardsEdwardsPoint.identity_spec
     sorry
     constructor
     sorry
-
-    -- case h.h.h.h.right.right.right.right =>
-    -- subst ep_post_5
-    -- simp [core.convert.IntoFrom.into, core.convert.FromBoolsubtleChoice,
-    --       subtle.FromBoolsubtleChoice.from, Choice.one]
-    -- core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice ep_5 = true
-    -- ↔ ep_5 = Choice.one
-    -- rw [← ep_post_5]
-    -- simp [subtle.FromBoolsubtleChoice.from, Choice.one]
     sorry
     exact ep_5
     -- exact eq_choice
