@@ -16,9 +16,6 @@
       "name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"
     },
     {
-      "name": "curve25519_dalek.backend.serial.scalar_mul.vartime_double_base.mul"
-    },
-    {
       "name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"
     },
     {
@@ -103,9 +100,6 @@
       "name": "curve25519_dalek.subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51"
     },
     {
-      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.SubAssign.sub_assign"
-    },
-    {
       "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
     },
     {
@@ -160,12 +154,6 @@
       "name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"
     },
     {
-      "name": "curve25519_dalek.backend.straus_multiscalar_mul"
-    },
-    {
-      "name": "curve25519_dalek.backend.vartime_double_base_mul"
-    },
-    {
       "name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"
     },
     {
@@ -211,9 +199,6 @@
       "name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"
     },
     {
-      "name": "curve25519_dalek.edwards.EdwardsPoint.vartime_double_scalar_mul_basepoint"
-    },
-    {
       "name": "curve25519_dalek.field.FieldElement51.pow_p58"
     },
     {
@@ -256,16 +241,10 @@
       "name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"
     },
     {
-      "name": "curve25519_dalek.ristretto.RistrettoPoint.mul_base"
-    },
-    {
       "name": "curve25519_dalek.scalar.Scalar52.pack"
     },
     {
       "name": "curve25519_dalek.scalar.clamp_integer"
-    },
-    {
-      "name": "curve25519_dalek.scalar.read_le_u64_into"
     },
     {
       "name": "curve25519_dalek.scalar.Scalar.as_bytes"
@@ -289,9 +268,6 @@
       "name": "curve25519_dalek.scalar.Scalar.is_canonical"
     },
     {
-      "name": "curve25519_dalek.scalar.Scalar.non_adjacent_form"
-    },
-    {
       "name": "curve25519_dalek.scalar.Scalar.ONE"
     },
     {
@@ -305,15 +281,6 @@
     },
     {
       "name": "curve25519_dalek.scalar.Scalar.ZERO"
-    },
-    {
-      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.conditional_assign"
-    },
-    {
-      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.conditional_select"
-    },
-    {
-      "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ct_eq"
     },
     {
       "name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.neg"
