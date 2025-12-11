@@ -9,12 +9,12 @@
 
   Output JSON format:
     {
-      "results": [
-        { "lean_name": "...", "dependencies": ["...", ...] },
-        { "lean_name": "...", "dependencies": [], "error": "..." }
-      ],
-      "summary": { "total": N, "succeeded": M, "failed": K }
+      "functions": [
+        { "lean_name": "...", "dependencies": ["...", ...] }
+      ]
     }
+
+  Exits with code 1 on any error.
 
   Example:
     lake exe deps functions.json deps.json
@@ -72,34 +72,27 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
 
   -- Analyze each function
   let mut results : Array DependencyOutput := #[]
-  let mut successCount := 0
-  let mut errorCount := 0
 
   for func in input.functions do
     let name := func.lean_name.toName
     let analysisResult := analyzeFunction env knownNames name
 
-    let output : DependencyOutput := {
-      lean_name := func.lean_name
-      dependencies := analysisResult.filteredDeps.map (·.toString)
-      error := analysisResult.error
-    }
-    results := results.push output
-
     match analysisResult.error with
-    | some _ => errorCount := errorCount + 1
-    | none => successCount := successCount + 1
+    | some msg =>
+      IO.eprintln s!"Error analyzing '{func.lean_name}': {msg}"
+      return 1
+    | none =>
+      let output : DependencyOutput := {
+        lean_name := func.lean_name
+        dependencies := analysisResult.filteredDeps.map (·.toString)
+      }
+      results := results.push output
 
-  IO.println s!"Analysis complete: {successCount} succeeded, {errorCount} errors"
+  IO.println s!"Analysis complete: {results.size} functions analyzed"
 
   -- Build output
   let output : AnalysisOutput := {
     results := results
-    summary := {
-      total := input.functions.size
-      succeeded := successCount
-      failed := errorCount
-    }
   }
 
   -- Write or print output

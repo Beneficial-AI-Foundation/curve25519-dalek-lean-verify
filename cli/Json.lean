@@ -21,39 +21,16 @@ structure AnalysisInput where
 structure DependencyOutput where
   lean_name : String
   dependencies : Array String
-  error : Option String := none
-  deriving Repr
-
-instance : ToJson DependencyOutput where
-  toJson d :=
-    let base := Json.mkObj [
-      ("lean_name", Json.str d.lean_name),
-      ("dependencies", toJson d.dependencies)
-    ]
-    match d.error with
-    | none => base
-    | some err =>
-      match base with
-      | .obj fields => .obj (fields.insert "error" (Json.str err))
-      | other => other
-
-/-- Summary statistics -/
-structure Summary where
-  total : Nat
-  succeeded : Nat
-  failed : Nat
   deriving ToJson, Repr
 
 /-- Output: Full analysis results -/
 structure AnalysisOutput where
   results : Array DependencyOutput
-  summary : Summary
   deriving Repr
 
 instance : ToJson AnalysisOutput where
   toJson o := Json.mkObj [
-    ("results", toJson o.results),
-    ("summary", toJson o.summary)
+    ("functions", toJson o.results)
   ]
 
 /-- Parse JSON input from string -/

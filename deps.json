@@ -1,5 +1,4 @@
-{"summary": {"total": 95, "succeeded": 95, "failed": 0},
- "results":
+{"functions":
  [{"lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended",
    "dependencies":
