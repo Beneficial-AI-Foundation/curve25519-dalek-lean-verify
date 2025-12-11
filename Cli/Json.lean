@@ -5,7 +5,7 @@ import Lean.Data.Json
 
 open Lean
 
-namespace cli.Json
+namespace Cli.Json
 
 /-- Input: A single function to analyze -/
 structure FunctionInput where
@@ -21,6 +21,8 @@ structure AnalysisInput where
 structure DependencyOutput where
   lean_name : String
   dependencies : Array String
+  specified : Bool
+  verified : Bool
   deriving ToJson, Repr
 
 /-- Output: Full analysis results -/
@@ -47,4 +49,4 @@ def renderOutput (output : AnalysisOutput) (pretty : Bool := true) : String :=
   let json := toJson output
   if pretty then json.pretty else json.compress
 
-end cli.Json
+end Cli.Json

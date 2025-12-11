@@ -6,7 +6,7 @@ import Std.Data.HashSet
 
 open Lean
 
-namespace cli.Analysis
+namespace Cli.Analysis
 
 /-- Get direct dependencies of a constant from its value expression -/
 def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
@@ -20,11 +20,34 @@ def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name)
 def filterToKnownFunctions (knownNames : Std.HashSet Name) (deps : Array Name) : Array Name :=
   deps.filter (fun name => knownNames.contains name)
 
+/-- Check if a _spec theorem exists for the given function name -/
+def hasSpecTheorem (env : Environment) (name : Name) : Bool :=
+  let specName := name.appendAfter "_spec"
+  env.find? specName |>.isSome
+
+/-- Check if a proof directly contains sorry (sorryAx) -/
+def proofContainsSorry (env : Environment) (name : Name) : Bool :=
+  match env.find? name with
+  | some constInfo =>
+    match constInfo.value? with
+    | some value => value.getUsedConstants.any (· == ``sorryAx)
+    | none => true  -- No value means axiom/opaque, treat as not verified
+  | none => true
+
+/-- Check if a function is verified (has _spec theorem without direct sorry) -/
+def isVerified (env : Environment) (name : Name) : Bool :=
+  let specName := name.appendAfter "_spec"
+  match env.find? specName with
+  | some _ => !proofContainsSorry env specName
+  | none => false
+
 /-- Result of analyzing a single function -/
 structure AnalysisResult where
   name : Name
   allDeps : Array Name
   filteredDeps : Array Name
+  specified : Bool
+  verified : Bool
   error : Option String := none
   deriving Repr
 
@@ -35,11 +58,15 @@ def analyzeFunction (env : Environment) (knownNames : Std.HashSet Name) (name : 
     { name := name
       allDeps := deps
       filteredDeps := filterToKnownFunctions knownNames deps
+      specified := hasSpecTheorem env name
+      verified := isVerified env name
       error := none }
   | .error msg =>
     { name := name
       allDeps := #[]
       filteredDeps := #[]
+      specified := false
+      verified := false
       error := some msg }
 
 /-- Analyze multiple functions -/
@@ -59,4 +86,4 @@ def resolveConstantName (env : Environment) (nameStr : String) : Option Name :=
       let qualified := pfx ++ name
       if env.find? qualified |>.isSome then some qualified else none)
 
-end cli.Analysis
+end Cli.Analysis

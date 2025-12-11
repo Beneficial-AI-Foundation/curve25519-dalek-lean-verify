@@ -10,9 +10,12 @@
   Output JSON format:
     {
       "functions": [
-        { "lean_name": "...", "dependencies": ["...", ...] }
+        { "lean_name": "...", "dependencies": ["...", ...], "specified": true/false, "verified": true/false }
       ]
     }
+
+  - specified: true if a theorem named {function}_spec exists
+  - verified: true if {function}_spec exists and its proof doesn't contain sorry
 
   Exits with code 1 on any error.
 
@@ -21,12 +24,12 @@
 -/
 import Lean
 import Std.Data.HashSet
-import cli.Json
-import cli.Analysis
+import Cli.Json
+import Cli.Analysis
 
 open Lean
-open cli.Json
-open cli.Analysis
+open Cli.Json
+open Cli.Analysis
 
 /-- Print usage information -/
 def printUsage : IO Unit := do
@@ -65,9 +68,9 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
   -- Initialize Lean search path
   Lean.initSearchPath (← Lean.findSysroot)
 
-  -- Import the main module
-  IO.println "Loading Curve25519Dalek.Funs module..."
-  let env ← importModules #[{ module := `Curve25519Dalek.Funs }] {}
+  -- Import the main module (includes Funs and all Specs)
+  IO.println "Loading Curve25519Dalek module..."
+  let env ← importModules #[{ module := `Curve25519Dalek }] {}
   IO.println "Module loaded successfully"
 
   -- Analyze each function
@@ -85,6 +88,8 @@ def runAnalysis (inputPath : String) (outputPath : Option String) : IO UInt32 :=
       let output : DependencyOutput := {
         lean_name := func.lean_name
         dependencies := analysisResult.filteredDeps.map (·.toString)
+        specified := analysisResult.specified
+        verified := analysisResult.verified
       }
       results := results.push output
 
