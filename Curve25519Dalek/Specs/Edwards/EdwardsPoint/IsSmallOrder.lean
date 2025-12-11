@@ -5,7 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
-import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
+-- import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsIdentity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Field.FieldElement51.Mul
@@ -24,8 +24,11 @@ This function determines if an Edwards point is of small order (i.e., if it is i
 - Complete proof
 -/
 
+
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.EdwardsPoint
+
+
 
 /-
 natural language description:
@@ -57,5 +60,7 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     (b = true ↔ eq_choice = Choice.one) := by
     unfold is_small_order
     progress*
+    sorry
 
+-- TODO: shoud e not be 0?
 end curve25519_dalek.edwards.EdwardsPoint

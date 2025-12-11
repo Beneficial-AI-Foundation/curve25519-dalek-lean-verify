@@ -18,7 +18,9 @@ namespace curve25519_dalek.edwards.EdwardsPoint
 - Always succeeds
 - Returns `true` iff the constant-time equality check with the identity point succeeds -/
 @[progress]
-theorem is_identity_spec (e : EdwardsPoint) :
+theorem is_identity_spec (e : EdwardsPoint)
+(h_Z_nonzero : Field51_as_Nat e.Z % p ≠ 0)
+:
     ∃ b id eq_choice,
       traits.IsIdentity.Blanket.is_identity
           subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
