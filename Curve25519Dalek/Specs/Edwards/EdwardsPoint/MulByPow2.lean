@@ -37,6 +37,7 @@ natural language specs:
 - For k = 1, returns the doubled point 2e for the input point e
 - For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))
 -/
+@[progress]
 theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :
     ∃ e_result,
     mul_by_pow_2 e k = ok e_result ∧

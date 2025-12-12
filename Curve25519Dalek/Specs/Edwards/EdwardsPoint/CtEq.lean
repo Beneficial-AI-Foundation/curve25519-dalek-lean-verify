@@ -38,6 +38,8 @@ Natural language specs:
 - No panic (always returns successfully)
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 -/
+
+-- curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq (self other : EdwardsPoint)
 @[progress]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     (h_Z1_nonzero : Field51_as_Nat e1.Z % p ≠ 0)

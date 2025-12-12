@@ -4,6 +4,13 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
+-- import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsIdentity
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
+import Curve25519Dalek.Specs.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
+-- import Curve25519Dalek.Specs.Field.FieldElement51.CtEq
 
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
@@ -17,8 +24,11 @@ This function determines if an Edwards point is of small order (i.e., if it is i
 - Complete proof
 -/
 
+
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.EdwardsPoint
+
+
 
 /-
 natural language description:
@@ -34,6 +44,7 @@ natural language specs:
 • Equivalently, returns `true` iff multiplying by the cofactor yields the identity element
 -/
 
+
 /-- **Spec and proof concerning `edwards.EdwardsPoint.is_small_order`**:
 - No panic (always returns successfully)
 - Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
@@ -47,6 +58,9 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     Identitycurve25519_dalekedwardsEdwardsPoint.identity = ok id ∧
     ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e8 id = ok eq_choice ∧
     (b = true ↔ eq_choice = Choice.one) := by
+    unfold is_small_order
+    progress*
     sorry
 
+-- TODO: shoud e not be 0?
 end curve25519_dalek.edwards.EdwardsPoint
