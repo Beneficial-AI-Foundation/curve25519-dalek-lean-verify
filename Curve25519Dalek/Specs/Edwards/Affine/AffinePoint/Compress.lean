@@ -40,31 +40,17 @@ Natural language specs:
       - The high bit of byte 31 encodes the sign (parity) of the x-coordinate
 -/
 
-/-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:
-- No panic (always returns successfully)
-- On success, returns a CompressedEdwardsY (U8x32) where:
-  - Bytes 0–30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian
-  - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
-  - Numerically, interpreting the 32-byte string as an integer in [0, 2^256),
-    it equals (y + (sign_x ? 2^255 : 0)) modulo p
--/
-@[progress]
-theorem compress_spec (a : edwards.affine.AffinePoint) :
-    ∃ (cey : edwards.CompressedEdwardsY) (x_sign : subtle.Choice),
-    edwards.affine.AffinePoint.compress a = ok cey ∧
-    field.FieldElement51.is_negative a.x = ok x_sign ∧
-    U8x32_as_Nat cey % p = (Field51_as_Nat a.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
-    (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8) := by
-  /-
-  Proof idea (sketch):
-  • By unfolding `edwards.affine.AffinePoint.compress` (see Funs.lean), we get:
-      s ← to_bytes a.y; c ← is_negative a.x; bit ← unwrap_u8 c; s[31] ^= bit<<7
-    hence the returned array is exactly y's encoding with MSB of last byte XOR'ed
-    with the sign bit of x.
-  • The last-bit equivalence follows from this construction.
-  • The numeric statement follows because the low 255 bits are y's canonical
-    little-endian representation and the MSB contributes 2^255 iff set.
-  -/
-  sorry
+-- /-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:
+-- - Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero
+-- - Returns a CompressedEdwardsY equal to the input AffinePoint
+-- -/
+-- @[progress]
+-- theorem compress_spec (self : AffinePoint) (hself : self.IsValid)
+--     (h : Field51_as_Nat self.y < 2 ^ 255) :
+--     ∃ result, compress self = ok result ∧
+--     result.IsValid ∧ result.toPoint = self.toPoint := by
+--   sorry
+
+-- To do: update this when relevant definitions have been added.
 
 end curve25519_dalek.edwards.affine.AffinePoint
