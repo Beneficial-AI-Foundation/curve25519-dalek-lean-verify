@@ -202,6 +202,7 @@ theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : 
     simp
     constructor
     · -- BEGIN TASK
+      simp_all
       rw[← Nat.ModEq]
       apply Nat.ModEq.trans t19_post_1
       have := Nat.ModEq.mul_right (Field51_as_Nat t13) t18_post_2

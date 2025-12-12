@@ -47,7 +47,9 @@ Natural language specs:
 -/
 
 theorem prime_25519 : Nat.Prime p := by
-  sorry
+  have h : Fact (Nat.Prime p) := by infer_instance
+  exact h.out
+
 
 
 lemma coprime_of_prime_not_dvd {a p : ℕ}
