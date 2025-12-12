@@ -11,6 +11,7 @@
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
+    "@types/cytoscape-dagre": "^2.3.4",
     "mermaid": "^11.12.1",
     "vitepress": "^2.0.0-alpha.12"
   },
@@ -18,9 +19,9 @@
     "chart.js": "^4.4.1",
     "chartjs-adapter-date-fns": "^3.0.0",
     "csv-parse": "^5.6.0",
-    "graphology": "^0.26.0",
-    "graphology-layout-forceatlas2": "^0.10.1",
-    "sigma": "^3.0.2",
+    "cytoscape": "^3.33.1",
+    "cytoscape-dagre": "^2.5.0",
+    "dagre": "^0.8.5",
     "vue-chartjs": "^5.3.0"
   }
 }

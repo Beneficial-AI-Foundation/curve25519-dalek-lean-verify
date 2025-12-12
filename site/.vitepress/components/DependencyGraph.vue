@@ -17,9 +17,7 @@ const container = ref<HTMLElement | null>(null)
 const isClient = ref(false)
 const isLoading = ref(true)
 
-// Store sigma and graph instances
-let sigmaInstance: any = null
-let graphInstance: any = null
+let cyInstance: any = null
 
 // Node colors based on verification status
 const nodeColors = {
@@ -40,7 +38,6 @@ function getNodeColor(func: FunctionDep): string {
 // Get short label from lean_name (last component)
 function getShortLabel(lean_name: string): string {
   const parts = lean_name.split('.')
-  // Return last 2 components for better identification
   return parts.slice(-2).join('.')
 }
 
@@ -49,126 +46,154 @@ async function initGraph() {
 
   isLoading.value = true
 
-  // Dynamic imports - only load on client
-  const [
-    { default: Graph },
-    Sigma,
-    forceAtlas2Module,
-    edgeArrowProgram
-  ] = await Promise.all([
-    import('graphology'),
-    import('sigma'),
-    import('graphology-layout-forceatlas2'),
-    import('sigma/rendering')
-  ])
+  // Dynamic import - only load on client
+  const cytoscape = (await import('cytoscape')).default
+  const dagre = (await import('cytoscape-dagre')).default
 
-  const SigmaClass = Sigma.default || Sigma
-  const forceAtlas2 = forceAtlas2Module.default || forceAtlas2Module
-  const EdgeArrowProgram = edgeArrowProgram.EdgeArrowProgram
+  // Register dagre layout
+  cytoscape.use(dagre)
 
-  // Clean up existing sigma instance
-  if (sigmaInstance) {
-    sigmaInstance.kill()
-    sigmaInstance = null
+  // Clean up existing instance
+  if (cyInstance) {
+    cyInstance.destroy()
+    cyInstance = null
   }
-
-  // Create directed graph
-  graphInstance = new Graph({ type: 'directed' })
 
   // Create a map for quick lookup
   const funcMap = new Map(props.functions.map(f => [f.lean_name, f]))
 
-  // Add nodes
-  props.functions.forEach((func) => {
-    graphInstance.addNode(func.lean_name, {
+  // Build nodes
+  const nodes = props.functions.map(func => ({
+    data: {
+      id: func.lean_name,
       label: getShortLabel(func.lean_name),
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      size: 10,
-      color: getNodeColor(func)
-    })
-  })
+      color: getNodeColor(func),
+      fullName: func.lean_name,
+      specified: func.specified,
+      verified: func.verified,
+      fullyVerified: func.fully_verified
+    }
+  }))
 
-  // Add edges (dependencies)
+  // Build edges
+  const edges: any[] = []
   props.functions.forEach(func => {
     func.dependencies.forEach(dep => {
-      // Only add edge if target exists in our function set
       if (funcMap.has(dep)) {
-        // Check if edge already exists
-        if (!graphInstance.hasEdge(func.lean_name, dep)) {
-          graphInstance.addEdge(func.lean_name, dep, {
-            size: 2,
-            color: '#94a3b8'
-          })
-        }
+        edges.push({
+          data: {
+            id: `${func.lean_name}->${dep}`,
+            source: func.lean_name,
+            target: dep
+          }
+        })
       }
     })
   })
 
-  // Apply ForceAtlas2 layout
-  forceAtlas2.assign(graphInstance, {
-    iterations: 100,
-    settings: {
-      gravity: 1,
-      scalingRatio: 10,
-      strongGravityMode: false,
-      barnesHutOptimize: true
-    }
+  // Create cytoscape instance
+  cyInstance = cytoscape({
+    container: container.value,
+    elements: { nodes, edges },
+    style: [
+      {
+        selector: 'node',
+        style: {
+          'background-color': 'data(color)',
+          'label': 'data(label)',
+          'font-size': '10px',
+          'font-family': 'monospace',
+          'text-valign': 'bottom',
+          'text-halign': 'center',
+          'text-margin-y': 5,
+          'width': 20,
+          'height': 20,
+          'color': '#374151'
+        }
+      },
+      {
+        selector: 'edge',
+        style: {
+          'width': 1.5,
+          'line-color': '#94a3b8',
+          'target-arrow-color': '#94a3b8',
+          'target-arrow-shape': 'triangle',
+          'curve-style': 'bezier',
+          'arrow-scale': 0.8
+        }
+      },
+      {
+        selector: 'node:selected',
+        style: {
+          'border-width': 3,
+          'border-color': '#1e40af'
+        }
+      },
+      {
+        selector: '.highlighted',
+        style: {
+          'background-color': 'data(color)',
+          'line-color': '#475569',
+          'target-arrow-color': '#475569',
+          'opacity': 1,
+          'z-index': 10
+        }
+      },
+      {
+        selector: '.faded',
+        style: {
+          'opacity': 0.15
+        }
+      }
+    ],
+    layout: {
+      name: 'dagre',
+      rankDir: 'TB',        // Top to bottom (TB), or try 'LR' for left-to-right
+      nodeSep: 50,          // Separation between nodes in same rank
+      rankSep: 80,          // Separation between ranks
+      edgeSep: 10,          // Separation between edges
+      animate: false,
+      fit: true,
+      padding: 30
+    } as any,
+    minZoom: 0.2,
+    maxZoom: 3
   })
 
-  // Create sigma instance with edge arrows
-  sigmaInstance = new SigmaClass(graphInstance, container.value, {
-    defaultEdgeType: 'arrow',
-    edgeProgramClasses: {
-      arrow: EdgeArrowProgram
-    },
-    labelRenderedSizeThreshold: 8,
-    labelFont: 'monospace',
-    labelSize: 11,
-    labelColor: { color: '#374151' },
-    allowInvalidContainer: true,
-    renderEdgeLabels: false
-  })
-
-  // Add hover behavior for highlighting connections
-  sigmaInstance.on('enterNode', ({ node }: { node: string }) => {
+  // Add hover behavior
+  cyInstance.on('mouseover', 'node', (e: any) => {
+    const node = e.target
     highlightConnections(node)
   })
 
-  sigmaInstance.on('leaveNode', () => {
+  cyInstance.on('mouseout', 'node', () => {
     resetHighlight()
   })
+
+  // Fit graph to container
+  cyInstance.fit(undefined, 30)
 
   isLoading.value = false
 }
 
-function highlightConnections(node: string) {
-  if (!graphInstance || !sigmaInstance) return
+function highlightConnections(node: any) {
+  if (!cyInstance) return
 
-  const connectedNodes = new Set<string>([node])
+  // Get connected nodes and edges
+  const connectedEdges = node.connectedEdges()
+  const connectedNodes = connectedEdges.connectedNodes().add(node)
 
-  // Get all connected nodes (both directions)
-  graphInstance.forEachEdge(node, (edge: string, attrs: any, source: string, target: string) => {
-    connectedNodes.add(source)
-    connectedNodes.add(target)
-  })
+  // Fade everything
+  cyInstance.elements().addClass('faded')
 
-  // Dim non-connected nodes
-  graphInstance.forEachNode((n: string) => {
-    graphInstance.setNodeAttribute(n, 'hidden', !connectedNodes.has(n))
-  })
-
-  sigmaInstance.refresh()
+  // Highlight connected elements
+  connectedNodes.removeClass('faded').addClass('highlighted')
+  connectedEdges.removeClass('faded').addClass('highlighted')
 }
 
 function resetHighlight() {
-  if (!graphInstance || !sigmaInstance) return
-
-  graphInstance.forEachNode((n: string) => {
-    graphInstance.setNodeAttribute(n, 'hidden', false)
-  })
-
-  sigmaInstance.refresh()
+  if (!cyInstance) return
+  cyInstance.elements().removeClass('faded').removeClass('highlighted')
 }
 
 // Legend items
@@ -194,9 +219,9 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (sigmaInstance) {
-    sigmaInstance.kill()
-    sigmaInstance = null
+  if (cyInstance) {
+    cyInstance.destroy()
+    cyInstance = null
   }
 })
 
@@ -230,7 +255,7 @@ watch(() => props.functions, () => {
       </div>
     </div>
     <div class="graph-footer">
-      <p class="hint">Hover over nodes to highlight connections. Arrows point from function to its dependencies.</p>
+      <p class="hint">Hover over nodes to highlight connections. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</p>
     </div>
   </div>
 </template>

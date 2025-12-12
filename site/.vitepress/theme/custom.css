@@ -26,3 +26,17 @@
     --vp-home-hero-image-filter: blur(72px);
   }
 }
+
+/* Full-width page layout for dependency graph */
+.full-width-page .VPDoc .container {
+  max-width: 100% !important;
+}
+
+.full-width-page .VPDoc .content {
+  max-width: 100% !important;
+  padding: 0 24px;
+}
+
+.full-width-page .VPDoc .content-container {
+  max-width: 100% !important;
+}
