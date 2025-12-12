@@ -5,6 +5,9 @@
 
 set -e  # Exit on any error
 
+HERE=$(cd `dirname $0`; pwd)
+ROOT=$HERE/..
+
 echo "=== Aeneas and Charon Setup Script ==="
 echo
 
@@ -100,12 +103,12 @@ clone_aeneas() {
     echo "Cloning Aeneas repository..."
 
     # Check for aeneas-toolchain file to determine which commit/branch to use
-    if [ -f "aeneas-toolchain" ]; then
+    if [ -f $ROOT/"aeneas-toolchain" ]; then
         local AENEAS_COMMIT
-        AENEAS_COMMIT=$(cat aeneas-toolchain | tr -d '[:space:]')
+        AENEAS_COMMIT=$(cat $ROOT/aeneas-toolchain | tr -d '[:space:]')
         echo "Found aeneas-toolchain file, using pinned commit: $AENEAS_COMMIT"
 
-        if [ -d "aeneas" ]; then
+        if [ -d "$ROOT/aeneas" ]; then
             echo "✓ Aeneas directory already exists, updating to pinned commit..."
             cd aeneas
             git fetch origin
@@ -122,7 +125,7 @@ clone_aeneas() {
         local AENEAS_BRANCH="main"
         echo "No aeneas-toolchain file found, using branch: $AENEAS_BRANCH"
 
-        if [ -d "aeneas" ]; then
+        if [ -d "$ROOT/aeneas" ]; then
             echo "✓ Aeneas directory already exists, pulling latest changes..."
             cd aeneas
             git fetch origin
@@ -151,7 +154,7 @@ install_rust_nightly() {
 setup_charon() {
     echo "Setting up Charon..."
 
-    cd aeneas
+    cd $ROOT/aeneas
 
     # Display pinned commit if available
     if [ -f "charon-pin" ]; then
@@ -164,13 +167,13 @@ setup_charon() {
     echo "Installing required Rust nightly toolchain for Charon..."
 
     # Check for rust-toolchain.toml (new format) or rust-toolchain (old format)
-    if [ -f "charon/charon/rust-toolchain.toml" ]; then
+    if [ -f "$ROOT/aeneas/charon/charon/rust-toolchain.toml" ]; then
         local NIGHTLY_VERSION
-        NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain.toml | sed 's/.*"\(.*\)".*/\1/')
+        NIGHTLY_VERSION=$(grep 'channel = ' $ROOT/aeneas/charon/charon/rust-toolchain.toml | sed 's/.*"\(.*\)".*/\1/')
         install_rust_nightly "$NIGHTLY_VERSION"
-    elif [ -f "charon/charon/rust-toolchain" ]; then
+    elif [ -f "$ROOT/aeneas/charon/charon/rust-toolchain" ]; then
         local NIGHTLY_VERSION
-        NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain | sed 's/.*"\(.*\)".*/\1/')
+        NIGHTLY_VERSION=$(grep 'channel = ' $ROOT/aeneas/charon/charon/rust-toolchain | sed 's/.*"\(.*\)".*/\1/')
         install_rust_nightly "$NIGHTLY_VERSION"
     else
         echo "Warning: Charon rust-toolchain file not found, using latest nightly"
@@ -237,7 +240,7 @@ main() {
     echo "   $(pwd)/aeneas/bin/aeneas -backend lean [OPTIONS] your_project.llbc"
     echo
     echo "Available backends: fstar, coq, lean, hol4"
-    echo "Use --help for more options: ./aeneas/bin/aeneas --help"
+    echo "Use --help for more options: $(pwd)/aeneas/bin/aeneas --help"
     echo
     echo "You can run tests later with: cd aeneas && make test"
 }
