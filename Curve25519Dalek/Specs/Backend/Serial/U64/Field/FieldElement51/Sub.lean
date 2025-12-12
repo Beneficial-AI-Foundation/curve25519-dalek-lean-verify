@@ -267,7 +267,7 @@ theorem sub_spec (a b : Array U64 5#usize)
       simp
     -- adding a multiple of p doesn't change the residue
     have final := Nat.ModEq.add_left asum kmod0
-    simp at final
+    simp only [add_zero] at final
     exact final
     -- END TASK
 

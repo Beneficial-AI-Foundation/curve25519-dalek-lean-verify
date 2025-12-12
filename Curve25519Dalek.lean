@@ -25,10 +25,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AsBytes
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
@@ -64,7 +68,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
-import Curve25519Dalek.Specs.Edwards.Compress
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add

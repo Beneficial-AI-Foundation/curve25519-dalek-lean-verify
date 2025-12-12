@@ -316,7 +316,19 @@ theorem double_spec'
 
     -- 1. Prove Z ≠ 0
     · rw [hZ_F, hX_in, hY_in]
-      grind
+      rw [mul_pow, mul_pow]
+      have h_factor : P.y^2 * field_from_limbs q.Z ^ 2 - P.x^2 * field_from_limbs q.Z ^ 2 =
+                      field_from_limbs q.Z ^ 2 * (P.y^2 - P.x^2) := by ring
+      rw [h_factor]
+      apply mul_ne_zero
+      · exact pow_ne_zero 2 hZ_nonzero
+      · have h_curve' : P.y^2 - P.x^2 = 1 + Ed25519.d * P.x^2 * P.y^2 := by
+          calc
+            P.y ^ 2 - P.x ^ 2
+            _ = -P.x ^ 2 + P.y ^ 2 := by ring
+            _ = 1 + Ed25519.d * P.x ^ 2 * P.y ^ 2 := h_curve
+        rw [h_curve']
+        exact h_denom_plus
 
     -- 2. Prove T ≠ 0
     · rw [hT_F, hZ_F, hX_in, hY_in]

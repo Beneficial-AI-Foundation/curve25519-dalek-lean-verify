@@ -49,16 +49,12 @@ natural language specs:
 -/
 
 @[spec]
-theorem montgomery_mul_hoare_spec (m m' : Scalar52)
-(range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
-(range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
-⦃⌜True⌝⦄
-montgomery_mul m m'
-⦃⇓ w => ⌜(Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄
-  := by
+theorem montgomery_mul_hoare_spec (m m' : Scalar52) (range_a : ∀ i, i < 5 → (m[i]!).val < 2 ^ 62)
+    (range_b : ∀ i, i < 5 → (m'[i]!).val < 2 ^ 62) :
+    ⦃⌜True⌝⦄
+    montgomery_mul m m'
+    ⦃⇓ w => ⌜(Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L]⌝⦄ := by
   mvcgen [montgomery_mul]
-  grind
-  grind
   intro h1
   rw [Nat.ModEq]
   grind
