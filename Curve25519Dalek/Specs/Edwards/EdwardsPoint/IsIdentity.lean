@@ -13,6 +13,7 @@ namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-! # Spec for `traits::IsIdentity::is_identity` -/
 
+
 /-- **Spec and proof concerning `traits.IsIdentity.Blanket.is_identity` specialized to
 `EdwardsPoint`**:
 - Always succeeds
@@ -30,6 +31,8 @@ theorem is_identity_spec (e : EdwardsPoint)
       (b = true ↔ eq_choice = Choice.one) := by
   unfold traits.IsIdentity.Blanket.is_identity
   progress*
+  -- progress as ⟨c, hc⟩ with ct_eq_spec
   sorry
+
 
 end curve25519_dalek.edwards.EdwardsPoint
