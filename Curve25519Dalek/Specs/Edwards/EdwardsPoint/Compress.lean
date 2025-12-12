@@ -26,7 +26,7 @@ open Aeneas.Std Result
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-namespace curve25519_dalek.edwards.EdwardsPoint
+namespace curve25519_dalek.edwards.EdwardsPoint.affine
 
 /-
 Natural language description:
@@ -52,100 +52,19 @@ Natural language specs:
   - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
 -/
 @[progress]
-theorem affine_compress (ae : edwards.affine.AffinePoint) :
-    ∃ (cey : CompressedEdwardsY) (x_sign : subtle.Choice),
-    ae.compress = ok cey ∧
-    field.FieldElement51.is_negative ae.x = ok x_sign ∧
-    U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31]!.val.testBit 7 then 2^255 else 0)) % p ∧
-    (cey[31]!.val.testBit 7 ↔ x_sign.val = 1#u8) := by
-
-  unfold edwards.affine.AffinePoint.compress
-  progress with to_bytes_spec as ⟨ y_bytes, hy_bytes ⟩
-  unfold field.FieldElement51.is_negative
-  progress with to_bytes_spec as ⟨ x_bytes, hx_bytes ⟩
-  progress*
-  unfold subtle.FromsubtleChoiceU8.from subtle.Choice.unwrap_u8
-  progress*
-
-  split
-  · -- Subgoal 1
-    progress*
-    have h_i1 : i1 = 0#u8 := by scalar_tac
-    have h_xor : i2 ^^^ 0#u8 = i2 := by
-      cases i2
-      simp only [HXor.hXor, UScalar.xor, UScalar.mk.injEq]
-      simp only [UScalarTy.U8_numBits_eq, Aeneas.Bvify.U8.UScalar_bv, U8.ofNat_bv]
-      change BitVec.xor _ (BitVec.ofNat _ _) = _
-      apply BitVec.eq_of_toNat_eq
-      try grind
-
-    simp only [h_i1, h_xor]
-    rw [show (↑i2 : Result U8) = ok i2 by rfl]
-    progress*
-
-    have h_s1 : s1 = y_bytes := by
-      rw [s1_post, i2_post]
-      simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem!_pos]
-      simpa [Aeneas.Std.Array.getElem!_Usize_eq] using
-        (Aeneas.Std.Array.set_getElem!_eq (α := U8) (n := 32#usize) (x := y_bytes) (i := 31#usize))
-
-    simp only [h_s1]
-    have hx : x = 0#u8 := by
-      rw [h_i1] at i1_post_2
-      try grind
-
-    simp only [hx]
-    try refine ⟨y_bytes, ⟨0#u8, by decide⟩, rfl, rfl, ?_, ?_⟩
-    · --subgoal 1.a
-      simp only [Nat.ModEq] at hy_bytes
-      
-      sorry
-    · --subgoal 1.b
-
-      sorry
-
-
-
-  · -- Subgoal 2: x ≠ 0
-    split
-    · -- Case 2a: x = 1 (Negative case)
-      -- 1. Prove i1 is 128 (1 << 7)
-      progress*
-      sorry
-    · -- Case 2b: Panic (x is neither 0 nor 1)
-      exfalso
-      -- x comes from (val &&& 1), so it must be <= 1
-      sorry
-
-
-
-
-
-
-@[progress]
-theorem compress_spec (e : EdwardsPoint)
-    (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip)
-    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 54 ∧ e.Y[i]!.val < 2 ^ 54 ∧ e.Z[i]!.val < 2 ^ 54) :
-    ∃ (cey : CompressedEdwardsY) (ae : edwards.affine.AffinePoint) (x_sign : subtle.Choice),
-    compress e = ok cey ∧
+theorem compress_spec (self : EdwardsPoint) :
+    -- (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip)
+    -- (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 54 ∧ e.Y[i]!.val < 2 ^ 54 ∧ e.Z[i]!.val < 2 ^ 54) :
+    ∃ result, compress self = ok result ∧
     to_affine e = ok ae ∧
     field.FieldElement51.is_negative ae.x = ok x_sign ∧
     U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
     (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8) := by
-
   unfold compress
-  progress with to_affine_spec as ⟨ ae, hae ⟩
-  · intro i hi; have := h_bounds i hi; scalar_tac
-  · intro i hi; have := h_bounds i hi; scalar_tac
-  · intro i hi; have := h_bounds i hi; scalar_tac
-
-  progress with affine_compress as ⟨ cey, x_sign, h_comp ⟩
-  --exists cey, ae, x_sign
-
   sorry
 
 
 
 
 
-end curve25519_dalek.edwards.EdwardsPoint
+end curve25519_dalek.edwards.EdwardsPoint.affine

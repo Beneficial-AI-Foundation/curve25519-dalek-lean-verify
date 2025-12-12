@@ -40,16 +40,17 @@ Natural language specs:
       - The high bit of byte 31 encodes the sign (parity) of the x-coordinate
 -/
 
--- /-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:
--- - Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero
--- - Returns a CompressedEdwardsY equal to the input AffinePoint
--- -/
--- @[progress]
--- theorem compress_spec (self : AffinePoint) (hself : self.IsValid)
---     (h : Field51_as_Nat self.y < 2 ^ 255) :
---     ∃ result, compress self = ok result ∧
---     result.IsValid ∧ result.toPoint = self.toPoint := by
---   sorry
+/-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:
+- Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero
+- Returns a CompressedEdwardsY equal to the input AffinePoint
+-/
+@[progress]
+theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)
+    (h : Field51_as_Nat self.y < 2 ^ 255) :
+    ∃ result, compress self = ok result -- ∧
+    -- result.IsValid ∧ result.toPoint = self.toPoint
+    := by
+  sorry
 
 -- To do: update this when relevant definitions have been added.
 
