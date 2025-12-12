@@ -1,5 +1,5 @@
 ---
-title: Dependency Graph
+title: Stats
 layout: home
 ---
 
