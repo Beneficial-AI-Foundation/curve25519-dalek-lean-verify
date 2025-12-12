@@ -198,7 +198,6 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
     have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
       unfold Scalar52_as_Nat
       simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
-      simp only [add_zero] at sum_post_3
       conv_lhs => rw [sum_post_3]
       simp [Finset.sum_add_distrib, Nat.mul_add]
     rw [h1, h2]

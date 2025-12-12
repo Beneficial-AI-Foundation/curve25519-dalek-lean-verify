@@ -39,19 +39,19 @@ Natural language specs:
 -/
 
 @[spec]
-theorem index_usize_hoare_spec {α : Type u} {n : Usize} [Inhabited α] (v: Array α n) (i: Usize)
-  (hbound : i.val < v.length) :
-⦃⌜True⌝⦄
-Array.index_usize v i
-⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
-sorry
+theorem index_usize_hoare_spec {α : Type u} {n : Usize} [Inhabited α] (v : Array α n) (i : Usize)
+    (hbound : i.val < v.length) :
+    ⦃⌜True⌝⦄
+    Array.index_usize v i
+    ⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
+  sorry
 
 @[spec]
 theorem sub_hoare_spec (x y : U64) (h : y.val ≤ x.val) :
-⦃⌜True⌝⦄
-(x - y)
-⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ :=
-by sorry
+    ⦃⌜True⌝⦄
+    (x - y)
+    ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ := by
+  sorry
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
 - No panic (always returns successfully)
@@ -65,28 +65,28 @@ by sorry
 
 @[spec]
 theorem negate_hoare_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 54) :
-⦃⌜True⌝⦄
-negate r
-⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄
-    := by
-    mvcgen [negate]; all_goals try simp
-    · exact inferInstance
-    · have := h_bounds 0 (by simp); simp_all; grind
-    · exact inferInstance
-    · have := h_bounds 1 (by simp); simp_all; grind
-    · exact inferInstance
-    · have := h_bounds 2 (by simp); simp_all; grind
-    · exact inferInstance
-    · have := h_bounds 3 (by simp); simp_all; grind
-    · exact inferInstance
-    · have := h_bounds 4 (by simp); simp_all; grind
-    · simp [Std.Do.wp, PostCond.noThrow] at *
-      have h_16p : 16 * p =
-        36028797018963664 * 2^0 +
-        36028797018963952 * 2^51 +
-        36028797018963952 * 2^102 +
-        36028797018963952 * 2^153 +
-        36028797018963952 * 2^204 := by simp [p]
-      simp_all [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Array.make, Array.getElem!_Nat_eq]
-      grind
+    ⦃⌜True⌝⦄
+    negate r
+    ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄ := by
+  mvcgen [negate]
+  · simp
+  · have := h_bounds 0 (by simp); simp_all; grind
+  · simp
+  · have := h_bounds 1 (by simp); simp_all; grind
+  · simp
+  · have := h_bounds 2 (by simp); simp_all; grind
+  · simp
+  · have := h_bounds 3 (by simp); simp_all; grind
+  · simp
+  · have := h_bounds 4 (by simp); simp_all; grind
+  · have h_16p : 16 * p =
+      36028797018963664 * 2^0 +
+      36028797018963952 * 2^51 +
+      36028797018963952 * 2^102 +
+      36028797018963952 * 2^153 +
+      36028797018963952 * 2^204 := by simp [p]
+    simp_all [Std.Do.wp, PostCond.noThrow, Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ,
+      Array.make, Array.getElem!_Nat_eq]
+    grind
+
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
