@@ -225,38 +225,17 @@ theorem as_projective_niels_spec'
 
         rw [h_const]; try ring
 
-
-    /-
-    -- Subgoal 2: Equality of points
-    -- 1. Prove input e maps to P
-    have he_eq : e.toPoint' = P := by
-      rw [ExtendedPoint.toPoint', dif_pos he_valid]
-      apply Classical.choose_spec (p := fun P' => e.IsValid P') he_valid |> fun h' => ?_
-      rcases hP with ⟨hz, hx, hy, _⟩
-      rcases h' with ⟨_, hx', hy', _⟩
-      ext <;> apply mul_right_cancel₀ hz
-      · rw [←hx, hx']
-      · rw [←hy, hy']
-
-    -- 3. Prove output n maps to P
     have hn_eq : n.toPoint' = P := by
-      rw [ProjectiveNielsPoint.toPoint', dif_pos ⟨P, hn_valid⟩]
-      apply Classical.choose_spec (p := fun P' => n.IsValid P') ⟨P, hn_valid⟩ |> fun h' => ?_
-      rcases hn_valid with ⟨hz, ha, hb, _⟩
-      rcases h' with ⟨_, ha', hb', _⟩
+      rw [ProjectiveNielsPoint.toPoint']
+      rcases hn_valid with ⟨hz, ha, hb, hy_minus_x⟩
       ext
-      · have : 2 * P.x * field_from_limbs n.Z = 2 * P'.x * field_from_limbs n.Z := by
-          rw [←sub_eq_sub_iff_sub_eq_sub.mpr ⟨ha, ha'⟩, hb, hb']
-        apply mul_right_cancel₀ two_ne_zero (mul_right_cancel₀ hz this)
-      · have : 2 * P.y * field_from_limbs n.Z = 2 * P'.y * field_from_limbs n.Z := by
-          rw [←add_eq_add_iff_add_eq_add.mpr ⟨ha, ha'⟩, hb, hb']
-        apply mul_right_cancel₀ two_ne_zero (mul_right_cancel₀ hz this)
+      · --
+        sorry
+      · --
+        sorry
 
-    -- 4. Conclude
     rw [he_eq, hn_eq]
-    -/
     
-    sorry
 
 
 end curve25519_dalek.edwards.EdwardsPoint
