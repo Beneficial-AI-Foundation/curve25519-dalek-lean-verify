@@ -96,6 +96,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
