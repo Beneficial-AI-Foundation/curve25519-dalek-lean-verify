@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
+import FunctionDetailModal from './FunctionDetailModal.vue'
 
 interface FunctionDep {
   lean_name: string
@@ -9,9 +10,26 @@ interface FunctionDep {
   fully_verified: boolean
 }
 
+interface StatusEntry {
+  function: string
+  lean_name?: string
+  source: string
+  lines: string
+  spec_theorem: string
+  extracted: string
+  verified: string
+  notes: string
+  'ai-proveable'?: string
+}
+
 const props = defineProps<{
   functions: FunctionDep[]
+  statusEntries?: StatusEntry[]
 }>()
+
+// Modal state
+const isModalOpen = ref(false)
+const selectedFunction = ref<StatusEntry | undefined>(undefined)
 
 const container = ref<HTMLElement | null>(null)
 const tooltip = ref<HTMLElement | null>(null)
@@ -146,6 +164,12 @@ async function initGraph() {
         }
       },
       {
+        selector: 'node:active',
+        style: {
+          'overlay-opacity': 0.1
+        }
+      },
+      {
         selector: 'edge',
         style: {
           'width': 1.5,
@@ -212,6 +236,12 @@ async function initGraph() {
     hideTooltip()
   })
 
+  // Add click handler to open modal
+  cyInstance.on('tap', 'node', (e: any) => {
+    const node = e.target
+    handleNodeClick(node)
+  })
+
   // Fit graph to container
   cyInstance.fit(undefined, 30)
 
@@ -249,6 +279,27 @@ function showTooltip(node: any, event: MouseEvent) {
 function hideTooltip() {
   if (!tooltip.value) return
   tooltip.value.style.display = 'none'
+}
+
+// Handle node click to open modal
+function handleNodeClick(node: any) {
+  if (!props.statusEntries) return
+
+  const leanName = node.data('id')
+  // Find the matching status entry by lean_name
+  const statusEntry = props.statusEntries.find(
+    entry => entry.lean_name === leanName || entry.function?.replace(/::/g, '.') === leanName
+  )
+
+  if (statusEntry) {
+    selectedFunction.value = statusEntry
+    isModalOpen.value = true
+  }
+}
+
+function closeModal() {
+  isModalOpen.value = false
+  selectedFunction.value = undefined
 }
 
 // Legend items (simplified: verified includes fully_verified)
@@ -327,8 +378,15 @@ watch(() => props.functions, () => {
           <span>{{ stats.notSpecified }} not specified</span>
         </div>
       </div>
-      <p class="hint">Hover over nodes to highlight connections. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</p>
+      <p class="hint">Hover over nodes to highlight connections. Click a node for details. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</p>
     </div>
+
+    <!-- Function detail modal -->
+    <FunctionDetailModal
+      :isOpen="isModalOpen"
+      :func="selectedFunction"
+      @close="closeModal"
+    />
   </div>
 </template>
 

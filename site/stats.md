@@ -10,7 +10,7 @@ import { data as depsData } from './.vitepress/data/deps.data'
 import ProgressChart from './.vitepress/components/ProgressChart.vue'
 import DependencyGraph from './.vitepress/components/DependencyGraph.vue'
 
-const { stats } = data
+const { stats, entries } = data
 const { dataPoints } = progressData
 </script>
 
@@ -44,7 +44,7 @@ const { dataPoints } = progressData
 
 ## Dependency Graph
 
-<DependencyGraph :functions="depsData.functions" />
+<DependencyGraph :functions="depsData.functions" :statusEntries="entries" />
 
 <style scoped>
 .stats-grid {
