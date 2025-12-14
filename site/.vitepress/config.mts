@@ -10,15 +10,10 @@ export default defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Stats', link: '/stats' },
+      { text: 'Status', link: '/status' },
       { text: 'Project', link: '/details' },
-      {
-        text: 'Stats',
-        items: [
-          { text: '3D Graph', link: '/stats' },
-          { text: '2D Graph', link: '/stats-2d' }
-        ]
-      },
-      { text: 'Rust API', link: '/doc/curve25519_dalek/index.html', target: '_blank' }
+      { text: 'Rust Docs', link: '/doc/curve25519_dalek/index.html', target: '_blank' }
     ],
 
     socialLinks: [

@@ -251,10 +251,9 @@ function hideTooltip() {
   tooltip.value.style.display = 'none'
 }
 
-// Legend items
+// Legend items (simplified: verified includes fully_verified)
 const legendItems = computed(() => [
-  { color: nodeColors.fully_verified, label: 'Fully Verified' },
-  { color: nodeColors.verified, label: 'Verified' },
+  { color: nodeColors.fully_verified, label: 'Verified' },
   { color: nodeColors.specified, label: 'Specified' },
   { color: nodeColors.nothing, label: 'Not Specified' }
 ])
@@ -262,10 +261,10 @@ const legendItems = computed(() => [
 // Stats
 const stats = computed(() => {
   const total = props.functions.length
-  const specified = props.functions.filter(f => f.specified).length
-  const verified = props.functions.filter(f => f.verified).length
-  const fullyVerified = props.functions.filter(f => f.fully_verified).length
-  return { total, specified, verified, fullyVerified }
+  const specified = props.functions.filter(f => f.specified && !f.verified && !f.fully_verified).length
+  const verified = props.functions.filter(f => f.verified || f.fully_verified).length
+  const notSpecified = props.functions.filter(f => !f.specified && !f.verified && !f.fully_verified).length
+  return { total, specified, verified, notSpecified }
 })
 
 onMounted(() => {
