@@ -19,13 +19,20 @@ const isClient = ref(false)
 const isLoading = ref(true)
 
 let cyInstance: any = null
+let themeObserver: MutationObserver | null = null
+
+// Check if dark mode is active
+function isDarkMode(): boolean {
+  if (typeof document === 'undefined') return false
+  return document.documentElement.classList.contains('dark')
+}
 
 // Node colors based on verification status
 const nodeColors = {
   nothing: '#9ca3af',       // gray-400 - not specified
   specified: '#f59e0b',     // amber-500 - has spec but not verified
-  verified: '#22c55e',      // green-500 - verified
-  fully_verified: '#3b82f6' // blue-500 - fully verified
+  verified: '#86efac',      // green-300 - verified (lighter green)
+  fully_verified: '#22c55e' // green-500 - fully verified
 }
 
 // Get color for a function based on its status
@@ -56,10 +63,11 @@ async function initGraph() {
 
   // Dynamic import - only load on client
   const cytoscape = (await import('cytoscape')).default
-  const dagre = (await import('cytoscape-dagre')).default
+  // @ts-ignore - no types for cytoscape-elk
+  const elk = (await import('cytoscape-elk')).default
 
-  // Register dagre layout
-  cytoscape.use(dagre)
+  // Register ELK layout
+  cytoscape.use(elk)
 
   // Clean up existing instance
   if (cyInstance) {
@@ -69,6 +77,9 @@ async function initGraph() {
 
   // Create a map for quick lookup
   const funcMap = new Map(props.functions.map(f => [f.lean_name, f]))
+
+  // Border color based on theme
+  const borderColor = isDarkMode() ? '#ffffff' : '#374151'
 
   // Build nodes
   const nodes = props.functions.map(func => ({
@@ -86,14 +97,19 @@ async function initGraph() {
 
   // Build edges
   const edges: any[] = []
+  const edgeColorDefault = '#94a3b8'  // slate-400
+  const edgeColorVerified = '#4ade80' // green-400 (softer than node green)
   props.functions.forEach(func => {
     func.dependencies.forEach(dep => {
       if (funcMap.has(dep)) {
+        const targetFunc = funcMap.get(dep)!
+        const isTargetVerified = targetFunc.verified || targetFunc.fully_verified
         edges.push({
           data: {
             id: `${func.lean_name}->${dep}`,
             source: func.lean_name,
-            target: dep
+            target: dep,
+            color: isTargetVerified ? edgeColorVerified : edgeColorDefault
           }
         })
       }
@@ -110,28 +126,34 @@ async function initGraph() {
         style: {
           'background-color': 'data(color)',
           'label': 'data(label)',
-          'font-size': '8px',
+          'font-size': '9px',
+          'font-weight': 'bold',
           'font-family': 'monospace',
           'text-valign': 'center',
           'text-halign': 'center',
           'text-wrap': 'ellipsis',
-          'text-max-width': '60px',
+          'text-max-width': '64px',
           'width': 70,
           'height': 30,
           'shape': 'round-rectangle',
-          'color': '#ffffff',
-          'text-outline-color': 'data(color)',
-          'text-outline-width': 1
+          'color': '#1f2937',
+          'text-background-color': '#ffffff',
+          'text-background-opacity': 0.85,
+          'text-background-shape': 'roundrectangle',
+          'text-background-padding': '2px',
+          'border-width': 2,
+          'border-color': borderColor
         }
       },
       {
         selector: 'edge',
         style: {
           'width': 1.5,
-          'line-color': '#94a3b8',
-          'target-arrow-color': '#94a3b8',
+          'line-color': 'data(color)',
+          'target-arrow-color': 'data(color)',
           'target-arrow-shape': 'triangle',
-          'curve-style': 'bezier',
+          'curve-style': 'taxi',
+          'taxi-direction': 'rightward',
           'arrow-scale': 0.8
         }
       },
@@ -146,8 +168,8 @@ async function initGraph() {
         selector: '.highlighted',
         style: {
           'background-color': 'data(color)',
-          'line-color': '#475569',
-          'target-arrow-color': '#475569',
+          'line-color': 'data(color)',
+          'target-arrow-color': 'data(color)',
           'opacity': 1,
           'z-index': 10
         }
@@ -160,11 +182,16 @@ async function initGraph() {
       }
     ],
     layout: {
-      name: 'dagre',
-      rankDir: 'TB',        // Top to bottom (TB), or try 'LR' for left-to-right
-      nodeSep: 80,          // Separation between nodes in same rank
-      rankSep: 60,          // Separation between ranks
-      edgeSep: 10,          // Separation between edges
+      name: 'elk',
+      elk: {
+        algorithm: 'layered',
+        'elk.direction': 'RIGHT',
+        'elk.spacing.nodeNode': 100,
+        'elk.layered.spacing.nodeNodeBetweenLayers': 120,
+        'elk.layered.spacing.edgeEdgeBetweenLayers': 20,
+        'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+        'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX'
+      },
       animate: false,
       fit: true,
       padding: 30
@@ -244,12 +271,27 @@ const stats = computed(() => {
 onMounted(() => {
   isClient.value = true
   initGraph()
+
+  // Watch for theme changes
+  themeObserver = new MutationObserver((mutations) => {
+    for (const mutation of mutations) {
+      if (mutation.attributeName === 'class') {
+        initGraph()
+        break
+      }
+    }
+  })
+  themeObserver.observe(document.documentElement, { attributes: true })
 })
 
 onUnmounted(() => {
   if (cyInstance) {
     cyInstance.destroy()
     cyInstance = null
+  }
+  if (themeObserver) {
+    themeObserver.disconnect()
+    themeObserver = null
   }
 })
 
