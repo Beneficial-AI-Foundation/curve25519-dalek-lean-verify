@@ -14,6 +14,7 @@ const props = defineProps<{
 }>()
 
 const container = ref<HTMLElement | null>(null)
+const tooltip = ref<HTMLElement | null>(null)
 const isClient = ref(false)
 const isLoading = ref(true)
 
@@ -35,10 +36,17 @@ function getNodeColor(func: FunctionDep): string {
   return nodeColors.nothing
 }
 
-// Get short label from lean_name (last component)
+// Get short label from lean_name (last component only)
 function getShortLabel(lean_name: string): string {
   const parts = lean_name.split('.')
-  return parts.slice(-2).join('.')
+  return parts[parts.length - 1]
+}
+
+// Get medium label (strip common prefixes, show on hover)
+function getMediumLabel(lean_name: string): string {
+  return lean_name
+    .replace(/^curve25519_dalek\./, '')
+    .replace(/^backend\.serial\.(u64\.)?/, '')
 }
 
 async function initGraph() {
@@ -67,6 +75,7 @@ async function initGraph() {
     data: {
       id: func.lean_name,
       label: getShortLabel(func.lean_name),
+      mediumLabel: getMediumLabel(func.lean_name),
       color: getNodeColor(func),
       fullName: func.lean_name,
       specified: func.specified,
@@ -101,14 +110,18 @@ async function initGraph() {
         style: {
           'background-color': 'data(color)',
           'label': 'data(label)',
-          'font-size': '10px',
+          'font-size': '8px',
           'font-family': 'monospace',
-          'text-valign': 'bottom',
+          'text-valign': 'center',
           'text-halign': 'center',
-          'text-margin-y': 5,
-          'width': 20,
-          'height': 20,
-          'color': '#374151'
+          'text-wrap': 'ellipsis',
+          'text-max-width': '60px',
+          'width': 70,
+          'height': 30,
+          'shape': 'round-rectangle',
+          'color': '#ffffff',
+          'text-outline-color': 'data(color)',
+          'text-outline-width': 1
         }
       },
       {
@@ -149,8 +162,8 @@ async function initGraph() {
     layout: {
       name: 'dagre',
       rankDir: 'TB',        // Top to bottom (TB), or try 'LR' for left-to-right
-      nodeSep: 50,          // Separation between nodes in same rank
-      rankSep: 80,          // Separation between ranks
+      nodeSep: 80,          // Separation between nodes in same rank
+      rankSep: 60,          // Separation between ranks
       edgeSep: 10,          // Separation between edges
       animate: false,
       fit: true,
@@ -164,10 +177,12 @@ async function initGraph() {
   cyInstance.on('mouseover', 'node', (e: any) => {
     const node = e.target
     highlightConnections(node)
+    showTooltip(node, e.originalEvent)
   })
 
   cyInstance.on('mouseout', 'node', () => {
     resetHighlight()
+    hideTooltip()
   })
 
   // Fit graph to container
@@ -194,6 +209,19 @@ function highlightConnections(node: any) {
 function resetHighlight() {
   if (!cyInstance) return
   cyInstance.elements().removeClass('faded').removeClass('highlighted')
+}
+
+function showTooltip(node: any, event: MouseEvent) {
+  if (!tooltip.value) return
+  tooltip.value.textContent = node.data('mediumLabel')
+  tooltip.value.style.display = 'block'
+  tooltip.value.style.left = `${event.clientX + 10}px`
+  tooltip.value.style.top = `${event.clientY + 10}px`
+}
+
+function hideTooltip() {
+  if (!tooltip.value) return
+  tooltip.value.style.display = 'none'
 }
 
 // Legend items
@@ -234,6 +262,7 @@ watch(() => props.functions, () => {
 
 <template>
   <div class="dependency-graph-wrapper">
+    <div ref="tooltip" class="tooltip"></div>
     <div class="graph-header">
       <div class="legend">
         <div v-for="item in legendItems" :key="item.label" class="legend-item">
@@ -266,6 +295,23 @@ watch(() => props.functions, () => {
   background: var(--vp-c-bg-soft);
   border-radius: 8px;
   overflow: hidden;
+  position: relative;
+}
+
+.tooltip {
+  display: none;
+  position: fixed;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: monospace;
+  color: var(--vp-c-text-1);
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
 }
 
 .graph-header {
