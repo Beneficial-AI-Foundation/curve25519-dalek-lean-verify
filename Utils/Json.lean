@@ -5,7 +5,7 @@ import Lean.Data.Json
 
 open Lean
 
-namespace Cli.Json
+namespace Utils.Json
 
 /-- Input: A single function to analyze -/
 structure FunctionInput where
@@ -44,4 +44,4 @@ def parseInput (s : String) : Except String AnalysisInput :=
 def renderOutput (output : AnalysisOutput) : String :=
   (toJson output).pretty
 
-end Cli.Json
+end Utils.Json

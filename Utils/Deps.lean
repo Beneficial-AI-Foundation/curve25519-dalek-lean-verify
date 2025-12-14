@@ -50,12 +50,12 @@
 -/
 import Lean
 import Std.Data.HashSet
-import Cli.Json
-import Cli.Analysis
+import Utils.Json
+import Utils.Analysis
 
 open Lean
-open Cli.Json
-open Cli.Analysis
+open Utils.Json
+open Utils.Analysis
 
 /-- Print usage information -/
 def printUsage : IO Unit := do

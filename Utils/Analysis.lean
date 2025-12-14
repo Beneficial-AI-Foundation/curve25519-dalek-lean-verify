@@ -6,7 +6,7 @@ import Std.Data.HashSet
 
 open Lean
 
-namespace Cli.Analysis
+namespace Utils.Analysis
 
 /-- Suffix appended to function names to form spec theorem names.
     Convention: for function `foo`, the spec theorem is `foo_spec`. -/
@@ -107,4 +107,4 @@ def isFullyVerified (env : Environment) (knownNames : Std.HashSet Name) (name : 
     -- Check if all transitive dependencies are verified
     transitiveDeps.all (isVerified env)
 
-end Cli.Analysis
+end Utils.Analysis
