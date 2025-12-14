@@ -1,26 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import FunctionDetailModal from './FunctionDetailModal.vue'
-
-interface FunctionDep {
-  lean_name: string
-  dependencies: string[]
-  specified: boolean
-  verified: boolean
-  fully_verified: boolean
-}
-
-interface StatusEntry {
-  function: string
-  lean_name?: string
-  source: string
-  lines: string
-  spec_theorem: string
-  extracted: string
-  verified: string
-  notes: string
-  'ai-proveable'?: string
-}
+import { useThemeWatcher, isDarkMode } from '../composables/useThemeWatcher'
+import { getShortLabel, getMediumLabel } from '../utils/labelUtils'
+import {
+  nodeColors,
+  edgeColors,
+  getNodeColor,
+  createCytoscapeStyles,
+  elkLayoutConfig,
+  cytoscapeOptions
+} from '../config/cytoscapeConfig'
+import type { FunctionDep, StatusEntry } from '../types'
 
 const props = defineProps<{
   functions: FunctionDep[]
@@ -31,55 +22,29 @@ const props = defineProps<{
 const isModalOpen = ref(false)
 const selectedFunction = ref<StatusEntry | undefined>(undefined)
 
+// DOM refs
 const container = ref<HTMLElement | null>(null)
 const tooltip = ref<HTMLElement | null>(null)
 const wrapper = ref<HTMLElement | null>(null)
+
+// State
 const isClient = ref(false)
 const isLoading = ref(true)
 const isFullscreen = ref(false)
+
+let cyInstance: any = null
 
 // Teleport target for modal - use wrapper when fullscreen, body otherwise
 const modalTeleportTarget = computed(() => {
   return isFullscreen.value && wrapper.value ? wrapper.value : 'body'
 })
 
-let cyInstance: any = null
-let themeObserver: MutationObserver | null = null
-
-// Check if dark mode is active
-function isDarkMode(): boolean {
-  if (typeof document === 'undefined') return false
-  return document.documentElement.classList.contains('dark')
-}
-
-// Node colors based on verification status
-const nodeColors = {
-  nothing: '#9ca3af',       // gray-400 - not specified
-  specified: '#f59e0b',     // amber-500 - has spec but not verified
-  verified: '#86efac',      // green-300 - verified (lighter green)
-  fully_verified: '#22c55e' // green-500 - fully verified
-}
-
-// Get color for a function based on its status
-function getNodeColor(func: FunctionDep): string {
-  if (func.fully_verified) return nodeColors.fully_verified
-  if (func.verified) return nodeColors.verified
-  if (func.specified) return nodeColors.specified
-  return nodeColors.nothing
-}
-
-// Get short label from lean_name (last component only)
-function getShortLabel(lean_name: string): string {
-  const parts = lean_name.split('.')
-  return parts[parts.length - 1]
-}
-
-// Get medium label (strip common prefixes, show on hover)
-function getMediumLabel(lean_name: string): string {
-  return lean_name
-    .replace(/^curve25519_dalek\./, '')
-    .replace(/^backend\.serial\.(u64\.)?/, '')
-}
+// Theme change handler
+useThemeWatcher(() => {
+  if (isClient.value) {
+    initGraph()
+  }
+})
 
 async function initGraph() {
   if (!container.value || !isClient.value) return
@@ -122,8 +87,6 @@ async function initGraph() {
 
   // Build edges
   const edges: any[] = []
-  const edgeColorDefault = '#94a3b8'  // slate-400
-  const edgeColorVerified = '#4ade80' // green-400 (softer than node green)
   props.functions.forEach(func => {
     func.dependencies.forEach(dep => {
       if (funcMap.has(dep)) {
@@ -134,7 +97,7 @@ async function initGraph() {
             id: `${func.lean_name}->${dep}`,
             source: func.lean_name,
             target: dep,
-            color: isTargetVerified ? edgeColorVerified : edgeColorDefault
+            color: isTargetVerified ? edgeColors.verified : edgeColors.default
           }
         })
       }
@@ -145,90 +108,9 @@ async function initGraph() {
   cyInstance = cytoscape({
     container: container.value,
     elements: { nodes, edges },
-    style: [
-      {
-        selector: 'node',
-        style: {
-          'background-color': 'data(color)',
-          'label': 'data(label)',
-          'font-size': '9px',
-          'font-weight': 'bold',
-          'font-family': 'monospace',
-          'text-valign': 'center',
-          'text-halign': 'center',
-          'text-wrap': 'ellipsis',
-          'text-max-width': '64px',
-          'width': 70,
-          'height': 30,
-          'shape': 'round-rectangle',
-          'color': '#1f2937',
-          'text-background-color': '#ffffff',
-          'text-background-opacity': 0.85,
-          'text-background-shape': 'roundrectangle',
-          'text-background-padding': '2px',
-          'border-width': 2,
-          'border-color': borderColor
-        }
-      },
-      {
-        selector: 'node:active',
-        style: {
-          'overlay-opacity': 0.1
-        }
-      },
-      {
-        selector: 'edge',
-        style: {
-          'width': 1.5,
-          'line-color': 'data(color)',
-          'target-arrow-color': 'data(color)',
-          'target-arrow-shape': 'triangle',
-          'curve-style': 'taxi',
-          'taxi-direction': 'rightward',
-          'arrow-scale': 0.8
-        }
-      },
-      {
-        selector: 'node:selected',
-        style: {
-          'border-width': 3,
-          'border-color': '#1e40af'
-        }
-      },
-      {
-        selector: '.highlighted',
-        style: {
-          'background-color': 'data(color)',
-          'line-color': 'data(color)',
-          'target-arrow-color': 'data(color)',
-          'opacity': 1,
-          'z-index': 10
-        }
-      },
-      {
-        selector: '.faded',
-        style: {
-          'opacity': 0.15
-        }
-      }
-    ],
-    layout: {
-      name: 'elk',
-      elk: {
-        algorithm: 'layered',
-        'elk.direction': 'RIGHT',
-        'elk.spacing.nodeNode': 100,
-        'elk.layered.spacing.nodeNodeBetweenLayers': 120,
-        'elk.layered.spacing.edgeEdgeBetweenLayers': 20,
-        'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-        'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX'
-      },
-      animate: false,
-      fit: true,
-      padding: 30
-    } as any,
-    minZoom: 0.2,
-    maxZoom: 3
+    style: createCytoscapeStyles(borderColor) as any,
+    layout: elkLayoutConfig as any,
+    ...cytoscapeOptions
   })
 
   // Add hover behavior
@@ -360,17 +242,6 @@ onMounted(() => {
   isClient.value = true
   initGraph()
 
-  // Watch for theme changes
-  themeObserver = new MutationObserver((mutations) => {
-    for (const mutation of mutations) {
-      if (mutation.attributeName === 'class') {
-        initGraph()
-        break
-      }
-    }
-  })
-  themeObserver.observe(document.documentElement, { attributes: true })
-
   // Listen for fullscreen changes
   document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
@@ -379,10 +250,6 @@ onUnmounted(() => {
   if (cyInstance) {
     cyInstance.destroy()
     cyInstance = null
-  }
-  if (themeObserver) {
-    themeObserver.disconnect()
-    themeObserver = null
   }
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
