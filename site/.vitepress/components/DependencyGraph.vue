@@ -33,8 +33,10 @@ const selectedFunction = ref<StatusEntry | undefined>(undefined)
 
 const container = ref<HTMLElement | null>(null)
 const tooltip = ref<HTMLElement | null>(null)
+const wrapper = ref<HTMLElement | null>(null)
 const isClient = ref(false)
 const isLoading = ref(true)
+const isFullscreen = ref(false)
 
 let cyInstance: any = null
 let themeObserver: MutationObserver | null = null
@@ -302,6 +304,30 @@ function closeModal() {
   selectedFunction.value = undefined
 }
 
+// Fullscreen toggle
+function toggleFullscreen() {
+  if (!wrapper.value) return
+
+  if (!document.fullscreenElement) {
+    wrapper.value.requestFullscreen().catch(err => {
+      console.error('Error attempting to enable fullscreen:', err)
+    })
+  } else {
+    document.exitFullscreen()
+  }
+}
+
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+  // Resize graph when fullscreen changes
+  if (cyInstance) {
+    setTimeout(() => {
+      cyInstance.resize()
+      cyInstance.fit(undefined, 30)
+    }, 100)
+  }
+}
+
 // Legend items (simplified: verified includes fully_verified)
 const legendItems = computed(() => [
   { color: nodeColors.fully_verified, label: 'Verified' },
@@ -332,6 +358,9 @@ onMounted(() => {
     }
   })
   themeObserver.observe(document.documentElement, { attributes: true })
+
+  // Listen for fullscreen changes
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
 })
 
 onUnmounted(() => {
@@ -343,6 +372,7 @@ onUnmounted(() => {
     themeObserver.disconnect()
     themeObserver = null
   }
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 
 watch(() => props.functions, () => {
@@ -353,8 +383,16 @@ watch(() => props.functions, () => {
 </script>
 
 <template>
-  <div class="dependency-graph-wrapper">
+  <div ref="wrapper" class="dependency-graph-wrapper" :class="{ fullscreen: isFullscreen }">
     <div ref="tooltip" class="tooltip"></div>
+    <button @click="toggleFullscreen" class="fullscreen-btn" :title="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'">
+      <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+      </svg>
+      <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+      </svg>
+    </button>
     <div ref="container" class="graph-container">
       <div v-if="isLoading" class="loading-overlay">
         <span>Loading graph...</span>
@@ -482,5 +520,47 @@ watch(() => props.functions, () => {
   margin: 0;
   font-size: 0.75rem;
   color: var(--vp-c-text-3);
+}
+
+.fullscreen-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 10;
+  background: var(--vp-c-bg);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.fullscreen-btn:hover {
+  background: var(--vp-c-bg-soft);
+  color: var(--vp-c-text-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+/* Fullscreen mode styles */
+.dependency-graph-wrapper.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0;
+  border-radius: 0;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+}
+
+.dependency-graph-wrapper.fullscreen .graph-container {
+  flex: 1;
+  height: auto;
 }
 </style>
