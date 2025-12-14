@@ -79,6 +79,9 @@ jobs:
       - name: Download Lean dependency caches
         run: lake exe cache get
 
+      - name: Build Lean project
+        run: lake build
+
       - name: Install dependencies
         run: npm ci
 
