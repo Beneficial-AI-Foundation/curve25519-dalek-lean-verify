@@ -38,6 +38,11 @@ const isClient = ref(false)
 const isLoading = ref(true)
 const isFullscreen = ref(false)
 
+// Teleport target for modal - use wrapper when fullscreen, body otherwise
+const modalTeleportTarget = computed(() => {
+  return isFullscreen.value && wrapper.value ? wrapper.value : 'body'
+})
+
 let cyInstance: any = null
 let themeObserver: MutationObserver | null = null
 
@@ -328,6 +333,13 @@ function handleFullscreenChange() {
   }
 }
 
+// Recenter the graph
+function recenterGraph() {
+  if (cyInstance) {
+    cyInstance.fit(undefined, 30)
+  }
+}
+
 // Legend items (simplified: verified includes fully_verified)
 const legendItems = computed(() => [
   { color: nodeColors.fully_verified, label: 'Verified' },
@@ -385,14 +397,22 @@ watch(() => props.functions, () => {
 <template>
   <div ref="wrapper" class="dependency-graph-wrapper" :class="{ fullscreen: isFullscreen }">
     <div ref="tooltip" class="tooltip"></div>
-    <button @click="toggleFullscreen" class="fullscreen-btn" :title="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'">
-      <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
-      </svg>
-    </button>
+    <div class="graph-controls">
+      <button @click="recenterGraph" class="graph-btn" title="Recenter graph">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M12 2v4m0 12v4M2 12h4m12 0h4"/>
+        </svg>
+      </button>
+      <button @click="toggleFullscreen" class="graph-btn" :title="isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'">
+        <svg v-if="!isFullscreen" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/>
+        </svg>
+        <svg v-else xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"/>
+        </svg>
+      </button>
+    </div>
     <div ref="container" class="graph-container">
       <div v-if="isLoading" class="loading-overlay">
         <span>Loading graph...</span>
@@ -423,6 +443,7 @@ watch(() => props.functions, () => {
     <FunctionDetailModal
       :isOpen="isModalOpen"
       :func="selectedFunction"
+      :teleportTo="modalTeleportTarget"
       @close="closeModal"
     />
   </div>
@@ -487,6 +508,10 @@ watch(() => props.functions, () => {
   height: 600px;
   background: var(--vp-c-bg);
   position: relative;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 4px;
+  margin: 0.5rem;
+  width: calc(100% - 1rem);
 }
 
 .loading-overlay {
@@ -522,11 +547,16 @@ watch(() => props.functions, () => {
   color: var(--vp-c-text-3);
 }
 
-.fullscreen-btn {
+.graph-controls {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 1rem;
+  right: 1rem;
   z-index: 10;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.graph-btn {
   background: var(--vp-c-bg);
   border: 1px solid var(--vp-c-divider);
   border-radius: 6px;
@@ -539,7 +569,7 @@ watch(() => props.functions, () => {
   transition: all 0.2s;
 }
 
-.fullscreen-btn:hover {
+.graph-btn:hover {
   background: var(--vp-c-bg-soft);
   color: var(--vp-c-text-1);
   border-color: var(--vp-c-brand-1);
