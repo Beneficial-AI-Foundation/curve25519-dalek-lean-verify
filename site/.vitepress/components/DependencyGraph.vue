@@ -304,27 +304,29 @@ watch(() => props.functions, () => {
 <template>
   <div class="dependency-graph-wrapper">
     <div ref="tooltip" class="tooltip"></div>
-    <div class="graph-header">
-      <div class="legend">
-        <div v-for="item in legendItems" :key="item.label" class="legend-item">
-          <span class="legend-dot" :style="{ backgroundColor: item.color }"></span>
-          <span>{{ item.label }}</span>
-        </div>
-      </div>
-      <div class="stats">
-        <span>{{ stats.total }} functions</span>
-        <span class="stat-divider">|</span>
-        <span>{{ stats.fullyVerified }} fully verified</span>
-        <span class="stat-divider">|</span>
-        <span>{{ stats.verified }} verified</span>
-      </div>
-    </div>
     <div ref="container" class="graph-container">
       <div v-if="isLoading" class="loading-overlay">
         <span>Loading graph...</span>
       </div>
     </div>
     <div class="graph-footer">
+      <div class="footer-content">
+        <div class="legend">
+          <div v-for="item in legendItems" :key="item.label" class="legend-item">
+            <span class="legend-dot" :style="{ backgroundColor: item.color }"></span>
+            <span>{{ item.label }}</span>
+          </div>
+        </div>
+        <div class="stats">
+          <span>{{ stats.total }} functions</span>
+          <span class="stat-divider">|</span>
+          <span>{{ stats.verified }} verified</span>
+          <span class="stat-divider">|</span>
+          <span>{{ stats.specified }} specified</span>
+          <span class="stat-divider">|</span>
+          <span>{{ stats.notSpecified }} not specified</span>
+        </div>
+      </div>
       <p class="hint">Hover over nodes to highlight connections. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</p>
     </div>
   </div>
@@ -353,16 +355,6 @@ watch(() => props.functions, () => {
   pointer-events: none;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   white-space: nowrap;
-}
-
-.graph-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1rem;
-  border-bottom: 1px solid var(--vp-c-divider);
-  flex-wrap: wrap;
-  gap: 1rem;
 }
 
 .legend {
@@ -415,8 +407,17 @@ watch(() => props.functions, () => {
 }
 
 .graph-footer {
-  padding: 0.75rem 1rem;
+  padding: 1rem;
   border-top: 1px solid var(--vp-c-divider);
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .hint {
