@@ -31,6 +31,9 @@ __pycache__/
 verification_progress.png
 verification_progress.svg
 
+# Generated dependency analysis
+deps.json
+
 # Temporary files
 .tmp/
 

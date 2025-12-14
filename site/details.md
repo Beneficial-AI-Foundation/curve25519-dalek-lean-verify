@@ -1,5 +1,39 @@
 # Project
 
+<script setup lang="ts">
+import MermaidDiagram from './.vitepress/components/MermaidDiagram.vue'
+
+const diagramCode = `flowchart TD
+    subgraph extraction [" "]
+        direction TB
+        A@{ shape: lin-cyl, label: "Rust crate" }
+        AE@{ shape: stadium, label: "Aeneas extraction" }
+        B[Funs]
+        C[Types]
+
+        A -.- AE
+        AE -.- B
+        AE -.- C
+    end
+
+    D[FunsExternal]
+    E[TypesExternal]
+    F[Defs]
+    H[Aux]
+    G@{ shape: docs, label: "Specs" }
+
+    B --> D
+    C --> E
+
+    G --> B
+    G --> C
+    G --> F
+    G --> H
+
+    style AE fill:#f5f5f5,stroke:#999
+    style extraction fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5`
+</script>
+
 ## Curve25519-dalek
 
 [Curve25519-dalek](https://github.com/dalek-cryptography/curve25519-dalek) is a pure-Rust implementation of group operations on Curve25519. 
@@ -15,10 +49,13 @@ The aims are two fold:
 - Formally verify the chosen subset of functions from this crate
 - Figure out how formal verification can be done on large scale, quicker, cheaper and commonplace
 
+## Extraction Overview
+
+<MermaidDiagram :graph="diagramCode" />
 
 ## Our Progress
 
-Check out the [home page](/) to see which functions have been verified and track our progress through the codebase.
+Check out the [Stats](/stats) page to track our progress, or the [Status](/status) page to see which functions have been verified.
 
 ## The Scalability Challenge
 

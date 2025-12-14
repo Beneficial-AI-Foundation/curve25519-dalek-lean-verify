@@ -9,7 +9,7 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
-linter.style.longLine = false
+weak.linter.style.longLine = false
 maxRecDepth = 10000
 
 [[require]]
@@ -25,3 +25,11 @@ rev = "c113fd9"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
+
+[[lean_lib]]
+name = "Utils"
+
+[[lean_exe]]
+name = "deps"
+root = "Utils.Deps"
+supportInterpreter = true

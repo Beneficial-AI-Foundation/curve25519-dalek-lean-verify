@@ -53,7 +53,7 @@ theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :
   · -- BEGIN TASK
     suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
       exact Nat.ModEq.cancel_right_of_coprime (by decide) this
-    have := Nat.ModEq.mul_left (Scalar52_as_Nat u) RR_spec
+    have := Nat.ModEq.mul_left (Scalar52_as_Nat u) constants.RR_spec
     have := (Nat.ModEq.trans this.symm pos).symm
     grind
     -- END TASK

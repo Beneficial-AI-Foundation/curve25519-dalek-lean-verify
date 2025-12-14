@@ -15,7 +15,7 @@ This constant represents 1 - d² (mod p) whereby d is the twisted Edwards curve 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -41,8 +41,8 @@ natural language specs:
   implemented by Lean.
 -/
 @[progress]
-theorem ONE_MINUS_EDWARDS_D_SQUARED_spec : Field51_as_Nat constants.ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p:= by
-  unfold constants.ONE_MINUS_EDWARDS_D_SQUARED
+theorem ONE_MINUS_EDWARDS_D_SQUARED_spec : Field51_as_Nat ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p:= by
+  unfold ONE_MINUS_EDWARDS_D_SQUARED
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants
