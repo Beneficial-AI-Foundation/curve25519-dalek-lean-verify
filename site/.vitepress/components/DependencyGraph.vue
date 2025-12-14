@@ -435,8 +435,14 @@ watch(() => props.functions, () => {
           <span class="stat-divider">|</span>
           <span>{{ stats.notSpecified }} not specified</span>
         </div>
+        <div class="hint-wrapper">
+          <svg class="hint-icon" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 16v-4m0-4h.01"/>
+          </svg>
+          <span class="hint-text">Hover over nodes to highlight connections. Click a node for details. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</span>
+        </div>
       </div>
-      <p class="hint">Hover over nodes to highlight connections. Click a node for details. Arrows point from function to its dependencies. Scroll to zoom, drag to pan.</p>
     </div>
 
     <!-- Function detail modal -->
@@ -538,13 +544,38 @@ watch(() => props.functions, () => {
   align-items: center;
   flex-wrap: wrap;
   gap: 1rem;
-  margin-bottom: 0.75rem;
 }
 
-.hint {
-  margin: 0;
-  font-size: 0.75rem;
+.hint-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.hint-icon {
   color: var(--vp-c-text-3);
+  cursor: help;
+}
+
+.hint-text {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: var(--vp-c-bg-elv);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 6px;
+  font-size: 0.75rem;
+  color: var(--vp-c-text-2);
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.hint-wrapper:hover .hint-text {
+  display: block;
 }
 
 .graph-controls {
