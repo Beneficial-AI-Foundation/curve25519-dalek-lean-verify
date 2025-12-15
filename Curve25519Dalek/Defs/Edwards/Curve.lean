@@ -45,10 +45,10 @@ instance : Fact (Nat.Prime p) := by
   unfold p
   exact ⟨PrimeCert.prime_25519''⟩
 
-
-instance : Field CurveField := by
-  unfold CurveField
-  infer_instance
+-- **FAE** Useless
+-- instance : Field CurveField := by
+--   -- unfold CurveField
+--   infer_instance
 
 /-- Helper lemma for modular arithmetic lifting -/
 theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
@@ -77,11 +77,11 @@ lemma d_not_square : ¬IsSquare Ed25519.d := by
 structure Point {F : Type} [Field F] (C : EdwardsCurve F) where
   x : F
   y : F
-  h_on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2
+  h_on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
   deriving Repr
 
 instance : Inhabited (Point Ed25519) :=
-  ⟨{ x := 0, y := 1, h_on_curve := by simp [Ed25519] }⟩
+  ⟨{ x := 0, y := 1}⟩
 
 variable {F : Type} [Field F] (C : EdwardsCurve F)
 
@@ -98,6 +98,8 @@ theorem add_closure (p1 p2 : Point C) :
     let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
     C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
   simp only [add_coords]
+  field_simp
+
   -- Proof requires analyzing denominators (omitted for brevity)
   sorry
 
@@ -109,7 +111,7 @@ instance : Add (Point C) where
     h_on_curve := add_closure C p1 p2 }
 
 instance : Zero (Point C) where
-  zero := { x := 0, y := 1, h_on_curve := by simp }
+  zero := { x := 0, y := 1}
 
 instance : Neg (Point C) where
   neg p := {
