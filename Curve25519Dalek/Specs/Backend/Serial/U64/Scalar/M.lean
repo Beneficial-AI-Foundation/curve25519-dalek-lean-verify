@@ -13,6 +13,8 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `m` -/
 
+namespace curve25519_dalek.backend.serial.u64.scalar
+
 /-- **Spec for `backend.serial.u64.scalar.m`**:
 - Does not overflow and hence returns a result
 - The result equals the product of the two input values -/
@@ -22,5 +24,9 @@ theorem m_spec (x y : U64) :
     result.val = x.val * y.val := by
   unfold m
   progress*
-  simp [*];
+  -- BEGIN TASK
+  simp [*]
   scalar_tac
+  -- END TASK
+
+end curve25519_dalek.backend.serial.u64.scalar

@@ -1,9 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Aeneas and Charon Setup Script
 # This script downloads the Aeneas repo, sets up Charon, and builds both projects
 
 set -e  # Exit on any error
+
+HERE=$(cd `dirname $0`; pwd)
+ROOT=$HERE/..
 
 echo "=== Aeneas and Charon Setup Script ==="
 echo
@@ -99,18 +102,40 @@ install_ocaml_deps() {
 clone_aeneas() {
     echo "Cloning Aeneas repository..."
 
-    local AENEAS_BRANCH="main"
+    # Check for aeneas-toolchain file to determine which commit/branch to use
+    if [ -f $ROOT/"aeneas-toolchain" ]; then
+        local AENEAS_COMMIT
+        AENEAS_COMMIT=$(cat $ROOT/aeneas-toolchain | tr -d '[:space:]')
+        echo "Found aeneas-toolchain file, using pinned commit: $AENEAS_COMMIT"
 
-    if [ -d "aeneas" ]; then
-        echo "✓ Aeneas directory already exists, pulling latest changes..."
-        cd aeneas
-        git fetch origin
-        git checkout "$AENEAS_BRANCH"
-        git pull origin "$AENEAS_BRANCH"
-        cd ..
+        if [ -d "$ROOT/aeneas" ]; then
+            echo "✓ Aeneas directory already exists, updating to pinned commit..."
+            cd aeneas
+            git fetch origin
+            git checkout "$AENEAS_COMMIT"
+            cd ..
+        else
+            git clone https://github.com/AeneasVerif/aeneas.git
+            cd aeneas
+            git checkout "$AENEAS_COMMIT"
+            cd ..
+            echo "✓ Aeneas repository cloned and checked out to: $AENEAS_COMMIT"
+        fi
     else
-        git clone --branch "$AENEAS_BRANCH" https://github.com/AeneasVerif/aeneas.git
-        echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
+        local AENEAS_BRANCH="main"
+        echo "No aeneas-toolchain file found, using branch: $AENEAS_BRANCH"
+
+        if [ -d "$ROOT/aeneas" ]; then
+            echo "✓ Aeneas directory already exists, pulling latest changes..."
+            cd aeneas
+            git fetch origin
+            git checkout "$AENEAS_BRANCH"
+            git pull origin "$AENEAS_BRANCH"
+            cd ..
+        else
+            git clone --branch "$AENEAS_BRANCH" https://github.com/AeneasVerif/aeneas.git
+            echo "✓ Aeneas repository cloned (branch: $AENEAS_BRANCH)"
+        fi
     fi
     echo
 }
@@ -129,7 +154,7 @@ install_rust_nightly() {
 setup_charon() {
     echo "Setting up Charon..."
 
-    cd aeneas
+    cd $ROOT/aeneas
 
     # Display pinned commit if available
     if [ -f "charon-pin" ]; then
@@ -142,13 +167,13 @@ setup_charon() {
     echo "Installing required Rust nightly toolchain for Charon..."
 
     # Check for rust-toolchain.toml (new format) or rust-toolchain (old format)
-    if [ -f "charon/charon/rust-toolchain.toml" ]; then
+    if [ -f "$ROOT/aeneas/charon/charon/rust-toolchain.toml" ]; then
         local NIGHTLY_VERSION
-        NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain.toml | sed 's/.*"\(.*\)".*/\1/')
+        NIGHTLY_VERSION=$(grep 'channel = ' $ROOT/aeneas/charon/charon/rust-toolchain.toml | sed 's/.*"\(.*\)".*/\1/')
         install_rust_nightly "$NIGHTLY_VERSION"
-    elif [ -f "charon/charon/rust-toolchain" ]; then
+    elif [ -f "$ROOT/aeneas/charon/charon/rust-toolchain" ]; then
         local NIGHTLY_VERSION
-        NIGHTLY_VERSION=$(grep 'channel = ' charon/charon/rust-toolchain | sed 's/.*"\(.*\)".*/\1/')
+        NIGHTLY_VERSION=$(grep 'channel = ' $ROOT/aeneas/charon/charon/rust-toolchain | sed 's/.*"\(.*\)".*/\1/')
         install_rust_nightly "$NIGHTLY_VERSION"
     else
         echo "Warning: Charon rust-toolchain file not found, using latest nightly"
@@ -215,7 +240,7 @@ main() {
     echo "   $(pwd)/aeneas/bin/aeneas -backend lean [OPTIONS] your_project.llbc"
     echo
     echo "Available backends: fstar, coq, lean, hol4"
-    echo "Use --help for more options: ./aeneas/bin/aeneas --help"
+    echo "Use --help for more options: $(pwd)/aeneas/bin/aeneas --help"
     echo
     echo "You can run tests later with: cd aeneas && make test"
 }

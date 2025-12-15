@@ -15,7 +15,7 @@ This constant represents 2*d (mod p) whereby d is the twisted Edwards curve para
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -35,8 +35,8 @@ natural language specs:
   the canonical (reduced) representation of 2*d (mod p) in [0, p-1].
 -/
 @[progress]
-theorem EDWARDS_D2_spec : Field51_as_Nat constants.EDWARDS_D2 =  (2 * d) % p := by
-  unfold constants.EDWARDS_D2
+theorem EDWARDS_D2_spec : Field51_as_Nat EDWARDS_D2 =  (2 * d) % p := by
+  unfold EDWARDS_D2
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants

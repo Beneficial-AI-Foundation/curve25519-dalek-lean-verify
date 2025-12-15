@@ -1,9 +1,11 @@
 # Aeneas Tweaks File
 #
-# This file contains substitutions to apply to Funs.lean after Aeneas generation.
+# This file contains substitutions to apply to Funs.lean and Types.lean after Aeneas generation.
 # Each substitution consists of:
-#   ===FIND===
-#   <text to find (can be multiple lines)>
+#   ===FIND===  (for literal text matching)
+#   OR
+#   ===FIND_REGEX===  (for regex pattern matching)
+#   <text/pattern to find (can be multiple lines)>
 #   ===REPLACE===
 #   <replacement text (can be multiple lines)>
 #   <blank line>
@@ -11,10 +13,11 @@
 # Notes:
 # - Substitutions are applied in order
 # - Each substitution replaces ALL occurrences (global replace)
-# - Text matching is literal (not regex)
+# - ===FIND=== uses literal text matching
+# - ===FIND_REGEX=== uses sed regex pattern matching
 # - Blank line after ===REPLACE=== marks end of substitution block
 # - Lines starting with # are comments
-# - Blank line required at the end of the file
+# - Two blank lines required at the end of the file
 
 # Forbidden identifiers
 
@@ -59,54 +62,31 @@ Add&0 curve25519_dalekristrettoRistrettoPoint&'a curve25519_dalekristrettoRistre
 RistrettoPoint
 
 ===FIND===
-coreopsarithNeg& TTInst
+def subtle.ConditionallyNegatable.Blanket {T : Type}
+  (ConditionallySelectableInst : subtle.ConditionallySelectable T)
+  (coreopsarithNeg& TTInst : core.ops.arith.Neg T T) :
+  subtle.ConditionallyNegatable T := {
+  conditional_negate :=
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+    ConditionallySelectableInst coreopsarithNeg& TTInst
+}
 ===REPLACE===
-coreopsarithNeg_TTInst
+def subtle.ConditionallyNegatable.Blanket {T : Type}
+  (ConditionallySelectableInst : subtle.ConditionallySelectable T)
+  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T) :
+  subtle.ConditionallyNegatable T := {
+  conditional_negate :=
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+    ConditionallySelectableInst coreopsarithNeg_TTInst
+}
 
-# Missing brackets
-
-===FIND===
-Array.make 5#usize [
-      671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
-      17592186044416#u64
-      ]
-===REPLACE===
-(Array.make 5#usize [
-      671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
-      17592186044416#u64
-      ])
-
-===FIND===
-Array.make 5#usize [
-      4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
-      4503599627370495#u64, 17592186044415#u64
-      ]
-===REPLACE===
-(Array.make 5#usize [
-      4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
-      4503599627370495#u64, 17592186044415#u64
-      ])
+# Avoid linter complaints
 
 ===FIND===
-Array.make 5#usize [
-      2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
-      1087343033131391#u64, 10175238647962#u64
-      ]
+set_option linter.unusedVariables false
 ===REPLACE===
-(Array.make 5#usize [
-      2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
-      1087343033131391#u64, 10175238647962#u64
-      ])
-
-===FIND===
-  ok Array.make 5#usize [ i2, i5, i8, i11, i14 ]
-===REPLACE===
-  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
-
-===FIND===
-    Array.make 5#usize [ r0, r1, r2, r3, r4 ] backend.serial.u64.constants.L
-===REPLACE===
-    (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
+set_option linter.unusedVariables false
+set_option linter.style.commandStart false
 
 # Other syntax errors
 
@@ -242,3 +222,4 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
 def ristretto.RistrettoPoint.from_uniform_bytes
 ===REPLACE===
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
+

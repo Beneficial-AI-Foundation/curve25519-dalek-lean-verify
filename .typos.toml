@@ -1,5 +1,6 @@
 [files]
 extend-exclude = [
+    "scripts/", # Scripts can easily contain false positives
     ".git/",
     "*.svg",
     "TESTVECTORS",
@@ -18,3 +19,4 @@ extend-ignore-re = [
 "Ono" = "Ono" # Surname
 "Tung" = "Tung" # Name
 "Monts" = "Monts" # Abbreviation for Montgomery
+"thm" = "thm" # Abbreviation for theorem

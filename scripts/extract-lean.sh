@@ -5,6 +5,9 @@
 
 set -e  # Exit on any error
 
+HERE=$(cd `dirname $0`; pwd)
+ROOT=$HERE/..
+
 echo "=== Extracting Lean Files from Rust Code ==="
 echo
 
@@ -12,11 +15,11 @@ echo
 # The main crate we're extracting
 CRATE_DIR="curve25519-dalek"
 CRATE_NAME="curve25519_dalek"  # Underscored version for LLBC file
-CHARON_BIN="./aeneas/charon/bin/charon"
-AENEAS_BIN="./aeneas/bin/aeneas"
-OUTPUT_DIR="Curve25519Dalek"
-FUNCTIONS_FILE="extract-functions.txt"
-TWEAKS_FILE="aeneas-tweaks.txt"
+CHARON_BIN="$ROOT/aeneas/charon/bin/charon"
+AENEAS_BIN="$ROOT/aeneas/bin/aeneas"
+OUTPUT_DIR="$ROOT/Curve25519Dalek"
+FUNCTIONS_FILE="$ROOT/extract-functions.txt"
+TWEAKS_FILE="$ROOT/aeneas-tweaks.txt"
 
 # RUSTFLAGS are configured in .cargo/config.toml:
 # - curve25519_dalek_backend="serial" (pure Rust implementation without SIMD)
@@ -58,13 +61,13 @@ check_tools() {
     
     if [ ! -f "$CHARON_BIN" ]; then
         echo "Error: Charon not found at $CHARON_BIN"
-        echo "Run the setup script first: ./scripts/setup-aeneas.sh"
+        echo "Run the setup script first: $HERE/setup-aeneas.sh"
         exit 1
     fi
     
     if [ ! -f "$AENEAS_BIN" ]; then
         echo "Error: Aeneas not found at $AENEAS_BIN"
-        echo "Run the setup script first: ./scripts/setup-aeneas.sh"
+        echo "Run the setup script first: $HERE/setup-aeneas.sh"
         exit 1
     fi
     
@@ -75,7 +78,7 @@ check_tools() {
 # Generate LLBC file using Charon
 generate_llbc() {
     echo "Step 1: Generating LLBC file with Charon..."
-    echo "Using configuration from .cargo/config.toml (serial backend, 64-bit, verify cfg)"
+    echo "Using configuration from $ROOT/.cargo/config.toml (serial backend, 64-bit, verify cfg)"
     echo
 
     # Create .logs directory if it doesn't exist
@@ -99,8 +102,8 @@ generate_llbc() {
 
     echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} -- -p $CRATE_DIR"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
-    echo "Logging output to .logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee .logs/charon.log
+    echo "Logging output to $ROOT/.logs/charon.log"
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"
@@ -120,11 +123,25 @@ generate_lean() {
 
     # Run Aeneas to generate Lean files
     echo "Running: $AENEAS_BIN -backend lean -split-files -dest $OUTPUT_DIR $LLBC_FILE"
-    echo "Logging output to .logs/aeneas.log"
-    "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee .logs/aeneas.log
+    echo "Logging output to $ROOT/.logs/aeneas.log"
+    "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
 
     echo "✓ Lean files generated in $OUTPUT_DIR"
     echo
+}
+
+# Quote a string to be used as a sed regex.
+# This is used to properly escape any 'raw' search strings in the
+# tweaks file by turning the input into a proper (but inefficient)
+# regular expression.
+quoteRe() { sed -e 's/[^^]/[&]/g; s/\^/\\^/g; $!a\'$'\n''\\n' <<< "$1" | tr -d '\n'; }
+
+# Quote a string to be used as the target for replacement with sed.
+# This properly escapes sed's supported shortcuts for referencing the
+# string / match groups.
+quoteSubst() {
+  IFS= read -d '' -r < <(sed -e ':a' -e '$!{N;ba' -e '}' -e 's/[&/\]/\\&/g; s/\n/\\&/g' <<<"$1") || true
+  printf %s "${REPLY%$'\n'}"
 }
 
 # Apply tweaks to generated Lean files
@@ -139,38 +156,53 @@ apply_tweaks() {
 
     echo "Applying tweaks from $tweaks_file to $input_file..."
 
+    # Validate that tweaks file ends with a blank line
+    # File should end with two newlines (visible as one blank line in editor)
+    local last_two_bytes=$(tail -c 2 "$tweaks_file" | xxd -p)
+    if [[ "$last_two_bytes" != "0a0a" ]]; then
+        echo "⚠ Warning: $tweaks_file does not end with two blank lines!"
+        echo "  The last substitution may not be processed correctly."
+        echo "  Please ensure there are two blank lines at the end of the file."
+    fi
+
     local content=$(cat "$input_file")
     local find_text=""
     local replace_text=""
     local in_find=false
     local in_replace=false
+    local use_regex=false
 
     while IFS= read -r line; do
         if [[ "$line" == "===FIND===" ]]; then
             in_find=true
             in_replace=false
+            use_regex=false
+            find_text=""
+        elif [[ "$line" == "===FIND_REGEX===" ]]; then
+            in_find=true
+            in_replace=false
+            use_regex=true
             find_text=""
         elif [[ "$line" == "===REPLACE===" ]]; then
             in_find=false
             in_replace=true
             replace_text=""
         elif [[ "$line" == "" ]] && [[ "$in_replace" == true ]]; then
-            # End of a substitution block - apply it (replaces ALL occurrences)
-            content="${content//"$find_text"/"$replace_text"}"
+            # End of a substitution block - apply it
+            if [[ "$use_regex" == false ]]; then
+                find_text=$(quoteRe "$find_text")
+            fi
+            content=$(sed -e ':a' -e '$!{N;ba' -e '}' -e "s/$find_text/$(quoteSubst "$replace_text")/g" <<< "$content")
             in_replace=false
             find_text=""
             replace_text=""
+            use_regex=false
         elif [[ "$in_find" == true ]]; then
             find_text="${find_text}${find_text:+$'\n'}${line}"
         elif [[ "$in_replace" == true ]]; then
             replace_text="${replace_text}${replace_text:+$'\n'}${line}"
         fi
     done < "$tweaks_file"
-
-    # Apply last substitution if file doesn't end with blank line
-    if [[ "$in_replace" == true ]] && [[ -n "$find_text" ]]; then
-        content="${content//"$find_text"/"$replace_text"}"
-    fi
 
     echo "$content" > "$input_file"
     echo "✓ Tweaks applied to $input_file"
@@ -180,8 +212,8 @@ apply_tweaks() {
 sync_toolchain() {
     echo "Step 3: Synchronizing Lean toolchain..."
     
-    if [ -f "./scripts/update-lean-toolchain.sh" ]; then
-        ./scripts/update-lean-toolchain.sh
+    if [ -f "$HERE/update-lean-toolchain.sh" ]; then
+        $HERE/update-lean-toolchain.sh
     else
         echo "⚠ Toolchain sync script not found, skipping"
     fi
@@ -203,8 +235,11 @@ main() {
     generate_llbc
     generate_lean
 
-    # Apply tweaks to Funs.lean if tweaks file exists
-    apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+    # Apply tweaks to generated Lean files if tweaks file exists
+    if [ -f "$TWEAKS_FILE" ]; then
+        apply_tweaks "$OUTPUT_DIR/Funs.lean" "$TWEAKS_FILE"
+        apply_tweaks "$OUTPUT_DIR/Types.lean" "$TWEAKS_FILE"
+    fi
 
     sync_toolchain
 

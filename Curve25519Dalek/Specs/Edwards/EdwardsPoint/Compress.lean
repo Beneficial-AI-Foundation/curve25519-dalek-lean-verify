@@ -6,6 +6,9 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+
 /-! # Spec Theorem for `EdwardsPoint::compress`
 
 Specification and proof for `EdwardsPoint::compress`.
@@ -20,7 +23,10 @@ given the defining equation $ax^2 + y^2 = 1 + dx^2y^2$ of the Edwards curve whic
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.edwards.EdwardsPoint
+
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+
+namespace curve25519_dalek.edwards.EdwardsPoint.affine
 
 /-
 Natural language description:
@@ -46,16 +52,18 @@ Natural language specs:
   - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
 -/
 @[progress]
-theorem compress_spec (e : EdwardsPoint) (h_Z_nonzero : ∃ recip, field.FieldElement51.invert e.Z = ok recip) :
-    ∃ (cey : CompressedEdwardsY) (ae : edwards.affine.AffinePoint) (x_sign : subtle.Choice),
-      compress e = ok cey ∧
-      to_affine e = ok ae ∧
-      field.FieldElement51.is_negative ae.x = ok x_sign ∧
-      U8x32_as_Nat cey % p = (Field51_as_Nat ae.y + (if cey[31].val.testBit 7 then 2^255 else 0)) % p ∧
-      (cey[31].val.testBit 7 ↔ x_sign.val = 1#u8)
-      := by
+theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)
+      (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)
+      -- (hself : self.IsValid)
+      :
+    ∃ result, compress self = ok result -- ∧
+    -- result.IsValid ∧ result.toPoint = self.toPoint
+    := by
+  unfold compress
   sorry
 
 
 
-end curve25519_dalek.edwards.EdwardsPoint
+
+
+end curve25519_dalek.edwards.EdwardsPoint.affine

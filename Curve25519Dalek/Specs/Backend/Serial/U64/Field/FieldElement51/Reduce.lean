@@ -40,20 +40,42 @@ attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
 
 /-! ## Spec for `reduce` -/
 
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - Does not overflow and hence returns a result
 - All the limbs of the result are small, ≤ 2^(51 + ε)
 - The result is equal to the input mod p. -/
 @[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
-    ∃ result, reduce limbs = ok (result) ∧
-    (∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧
+    ∃ result, reduce limbs = ok result ∧
+    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
     Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
   unfold reduce
   progress*
-  all_goals try simp [*]; scalar_tac
-  constructor
-  · intro i _
-    interval_cases i
-    all_goals simp [*]; scalar_tac
-  · simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    simp [*]; scalar_tac
+    -- END TASK
+  · constructor
+    · -- BEGIN TASK
+      intro i _
+      interval_cases i
+      all_goals simp [*]; scalar_tac
+      -- END TASK
+    · -- BEGIN TASK
+      simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+      -- END TASK
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51

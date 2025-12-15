@@ -213,13 +213,23 @@ const stats = computed(() => ({
 
     <!-- Filters -->
     <div class="filters">
-      <input
-        v-model="filters.function"
-        type="text"
-        placeholder="Filter by function name..."
-        class="filter-input"
-        @input="currentPage = 1"
-      />
+      <div class="filter-input-wrapper">
+        <input
+          v-model="filters.function"
+          type="text"
+          placeholder="Filter by function name..."
+          class="filter-input"
+          @input="currentPage = 1"
+        />
+        <button
+          v-if="filters.function"
+          @click="filters.function = ''; currentPage = 1"
+          class="filter-clear-btn"
+          aria-label="Clear filter"
+        >
+          &times;
+        </button>
+      </div>
 
       <select v-model="filters.extracted" class="filter-select" @change="currentPage = 1">
         <option value="">All (Extracted)</option>
@@ -525,9 +535,35 @@ const stats = computed(() => ({
   background: var(--vp-c-bg);
 }
 
+.filter-input-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 250px;
+}
+
 .filter-input {
   min-width: 250px;
   flex: 1;
+  padding-right: 2rem;
+}
+
+.filter-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--vp-c-text-3);
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.filter-clear-btn:hover {
+  color: var(--vp-c-text-1);
 }
 
 .table-container {
