@@ -20,6 +20,7 @@ This function constructs an unpacked scalar from a wide byte array.
 - Complete proof
 -/
 
+set_option maxHeartbeats 4000000
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -89,8 +90,22 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     ∃ u, from_bytes_wide b = ok u ∧
     Scalar52_as_Nat u = U8x64_as_Nat b % L := by
   unfold from_bytes_wide
+  unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
   progress*
+  -- decide
+  -- scalar_tac
   sorry
+  sorry
+  sorry
+  sorry
+  sorry
+  sorry
+  sorry
+  sorry
+  sorry
+  sorry
+
+
   -- -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
   -- have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
   -- ∧ (∀ i, i < 5 → (lo[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi[i]!).val < 2 ^ 62)
