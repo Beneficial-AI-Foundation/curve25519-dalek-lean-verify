@@ -86,7 +86,9 @@ theorem from_bytes_wide_loop_spec (bytes : Array U8 64#usize) (words : Array U64
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form) -/
 @[progress]
-theorem from_bytes_wide_spec (b : Array U8 64#usize) :
+theorem from_bytes_wide_spec (b : Array U8 64#usize)
+(h_bounds : ∀ i, i < 8 → b[i]!.val < 2 ^ 52)
+ :
     ∃ u, from_bytes_wide b = ok u ∧
     Scalar52_as_Nat u = U8x64_as_Nat b % L := by
   unfold from_bytes_wide
