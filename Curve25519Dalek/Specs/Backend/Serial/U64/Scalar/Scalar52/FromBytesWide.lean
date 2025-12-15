@@ -94,16 +94,18 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize) :
   progress*
   -- decide
   -- scalar_tac
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
-  sorry
+  · rw [i40_post]
+    decide
+  · sorry
+  · sorry
+  · sorry
+  · unfold constants.RR
+    decide
+  · sorry
+  · sorry
+  · sorry
+  · sorry
+  · sorry
 
 
   -- -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
