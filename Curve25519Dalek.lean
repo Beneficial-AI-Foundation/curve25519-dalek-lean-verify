@@ -52,6 +52,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.IndexMut
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
