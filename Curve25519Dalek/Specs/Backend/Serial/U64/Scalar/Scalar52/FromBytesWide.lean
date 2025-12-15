@@ -99,12 +99,11 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
   · rw [i40_post]
     decide
   · sorry
-  · sorry
+  · unfold constants.R
+    decide
   · sorry
   · unfold constants.RR
     decide
-  · sorry
-  · sorry
   · sorry
   · sorry
   · sorry
