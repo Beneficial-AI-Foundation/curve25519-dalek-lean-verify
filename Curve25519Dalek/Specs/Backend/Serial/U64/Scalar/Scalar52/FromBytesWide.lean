@@ -59,6 +59,28 @@ lemma R_lt: ∀ i, i < 5 → constants.R[i]!.val < 2 ^62 := by
   decide
 --   omega
 
+/-- Interpret 8 consecutive bytes as a little-endian U64 value -/
+def bytes_to_u64_le (bytes : Array U8 64#usize) (start : Nat) : Nat :=
+  ∑ k ∈ Finset.range 8, 2^(8 * k) * (bytes[start + k]!).val
+
+/-- Interpret an 8-element U64 array as a natural number -/
+def U64x8_as_Nat (words : Array U64 8#usize) : Nat :=
+  ∑ j ∈ Finset.range 8, 2^(64 * j) * (words[j]!).val
+
+/-- **Spec for `backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop`**:
+- Starting from index `i`, converts each group of 8 bytes into a U64 word
+- For indices j ≥ i, the result word equals the little-endian interpretation of bytes[j*8..j*8+8]
+- Words before index i are preserved
+- The loop always succeeds (no panic) -/
+@[progress]
+theorem from_bytes_wide_loop_spec (bytes : Array U8 64#usize) (words : Array U64 8#usize) (i : Usize)
+    (hi : i.val ≤ 8) :
+    ∃ words', from_bytes_wide_loop bytes words i = ok words' ∧
+    (∀ j, i.val ≤ j → j < 8 → words'[j]!.val = bytes_to_u64_le bytes (j * 8)) ∧
+    (∀ j, j < i.val → words'[j]! = words[j]!) := by
+  sorry
+
+
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form) -/
@@ -66,38 +88,39 @@ lemma R_lt: ∀ i, i < 5 → constants.R[i]!.val < 2 ^62 := by
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     ∃ u, from_bytes_wide b = ok u ∧
     Scalar52_as_Nat u = U8x64_as_Nat b % L := by
-  -- unfold from_bytes_wide
-  -- progress*
-  -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
-  have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
-  ∧ (∀ i, i < 5 → (lo[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi[i]!).val < 2 ^ 62)
-   := U8x64_as_Nat_split b
-  obtain ⟨lo, hi, h_lo_hi, lo_range, hi_range⟩ := h_lo_hi
-  -- (lo * R) / R = lo2
-  obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (R_lt)
-  -- (hi * R^2) / R = hi2
-  obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (RR_lt)
+  unfold from_bytes_wide
+  progress*
+  sorry
+  -- -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
+  -- have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
+  -- ∧ (∀ i, i < 5 → (lo[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi[i]!).val < 2 ^ 62)
+  --  := U8x64_as_Nat_split b
+  -- obtain ⟨lo, hi, h_lo_hi, lo_range, hi_range⟩ := h_lo_hi
+  -- -- (lo * R) / R = lo2
+  -- obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (R_lt)
+  -- -- (hi * R^2) / R = hi2
+  -- obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (RR_lt)
 
-  -- (hi * R^2) / R + (lo * R) / R = u
-  -- True according to line 128 - line 131 in curve25519-dalek/src/backend/serial/u64/scalar.rs
-  obtain ⟨u, h_u_ok, h_u_spec⟩ := add_spec (hi2) (lo2)
+  -- -- (hi * R^2) / R + (lo * R) / R = u
+  -- -- True according to line 128 - line 131 in curve25519-dalek/src/backend/serial/u64/scalar.rs
+  -- obtain ⟨u, h_u_ok, h_u_spec⟩ := add_spec (hi2) (lo2)
 
-  -- Keypoint:2^256 * R ≡ R^2 [MOD L]
-  have h_key : 2^256 * R % L = R^2 % L := by
-    unfold R
-  -- 2^256 * 2^260 = 2^516
-  -- R^2 = (2^260)^2 = 2^520
-  -- need to prove 2^516 % L = 2^520 % L
-    sorry
-  use u
-  constructor
-  · -- from_bytes_wide b = ok u
-    -- True by the definition of from_bytes_wide_spec
-    sorry
-  · -- Scalar52_as_Nat u = U8x64_as_Nat b % L
-    rw [h_u_spec]
-    rw [h_lo_hi]
+  -- -- Keypoint:2^256 * R ≡ R^2 [MOD L]
+  -- have h_key : 2^256 * R % L = R^2 % L := by
+  --   unfold R
+  -- -- 2^256 * 2^260 = 2^516
+  -- -- R^2 = (2^260)^2 = 2^520
+  -- -- need to prove 2^516 % L = 2^520 % L
+  --   sorry
+  -- use u
+  -- constructor
+  -- · -- from_bytes_wide b = ok u
+  --   -- True by the definition of from_bytes_wide_spec
+  --   sorry
+  -- · -- Scalar52_as_Nat u = U8x64_as_Nat b % L
+  --   rw [h_u_spec]
+  --   rw [h_lo_hi]
 
-    sorry
+  --   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
