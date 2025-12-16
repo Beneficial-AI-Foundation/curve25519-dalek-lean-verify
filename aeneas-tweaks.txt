@@ -223,3 +223,4 @@ def ristretto.RistrettoPoint.from_uniform_bytes
 ===REPLACE===
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
 
+
