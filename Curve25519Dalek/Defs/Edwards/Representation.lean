@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo
+Authors: Alessandro D'Angelo, Markus Dablander
 -/
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
@@ -59,10 +59,34 @@ noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P)
 end curve25519_dalek.edwards.affine
 
 -- Attach Projective/Completed definitions to their native namespace
-namespace curve25519_dalek.backend.serial.curve_models
-open Edwards
+
 
 -- === Validity Predicates ===
+
+namespace curve25519_dalek.edwards
+
+def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
+  let X := Field51_as_Nat e.X
+  let Y := Field51_as_Nat e.Y
+  let Z := Field51_as_Nat e.Z
+  let T := Field51_as_Nat e.T
+  ¬(Z ≡ 0 [MOD p]) ∧
+  X * Y ≡ T * Z [MOD p] ∧
+  Y ^ 2 ≡ X ^ 2 + Z ^ 2 + d * T ^ 2 [MOD p]
+
+end curve25519_dalek.edwards
+
+namespace curve25519_dalek.ristretto
+open curve25519_dalek.edwards
+
+def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
+  EdwardsPoint.IsValid r
+-- To do: potentially add extra information regarding canonical representation of Ristretto point
+
+end curve25519_dalek.ristretto
+
+namespace curve25519_dalek.backend.serial.curve_models
+open Edwards
 
 /-- Existential validity predicate for ProjectivePoint. -/
 def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
