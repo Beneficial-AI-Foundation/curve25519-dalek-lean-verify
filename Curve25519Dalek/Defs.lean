@@ -33,6 +33,39 @@ def a : Int := -1
 def Field51_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(51 * i) * (limbs[i]!).val
 
+/-- Interpret a Field51 (five UInt64 limbs used to represent 51 bits each) as a natural number -/
+def FAE_Field51_as_Nat (limbs : Vector UInt64 5) : ℕ :=
+  ∑ i : Fin 5, 2^(51 * (i : ℕ)) * (((limbs.get i).toBitVec).toNat)
+
+def U64.to_UInt : U64 → UInt64 := (.ofBitVec ·)
+
+def UInt.to_U64 : UInt64 → U64 := (⟨·.toBitVec.toNat, by scalar_tac⟩)
+
+def UInt_equiv : UInt64 ≃ U64 where
+  toFun := UInt.to_U64
+  invFun := U64.to_UInt
+  left_inv := by
+    intro v
+    simp [U64.to_UInt, UInt.to_U64]
+  right_inv := by
+    intro v
+    simp [U64.to_UInt, UInt.to_U64]; rfl
+
+@[simp]
+lemma UInt_comp : UInt.to_U64 ∘ U64.to_UInt = id := Function.RightInverse.id UInt_equiv.right_inv
+
+@[simp]
+lemma U64_comp : U64.to_UInt ∘ UInt.to_U64 = id := Function.RightInverse.id UInt_equiv.left_inv
+
+def eq_field51 : Array U64 5#usize ≃ Vector UInt64 5 where
+  toFun := fun A ↦ ⟨(List.map U64.to_UInt A).toArray,
+      by simp [List.size_toArray, List.length_map, List.Vector.length_val, UScalar.ofNat_val_eq]⟩
+  invFun := fun ⟨A, l⟩ ↦ ⟨List.map UInt.to_U64 A.toList, by
+      rwa [List.length_map, Array.length_toList, UScalar.ofNat_val_eq]⟩
+  left_inv := fun _ ↦ by simp
+  right_inv := fun _ ↦ by simp
+
+
 /-- Interpret a Scalar52 (five u64 limbs used to represent 52 bits each) as a natural number -/
 def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
   ∑ i ∈ Finset.range 5, 2^(52 * i) * (limbs[i]!).val
