@@ -103,6 +103,15 @@
       "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
     },
     {
+      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign"
+    },
+    {
+      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select"
+    },
+    {
+      "lean_name": "curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq"
+    },
+    {
       "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"
     },
     {
