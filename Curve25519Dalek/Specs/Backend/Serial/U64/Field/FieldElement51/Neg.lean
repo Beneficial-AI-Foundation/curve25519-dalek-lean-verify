@@ -17,7 +17,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 open Aeneas.Std Result
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Neg
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## Spec for `neg` -/
 
@@ -40,4 +40,4 @@ theorem neg_spec (r : backend.serial.u64.field.FieldElement51)
   · exact hmod
   · exact hbnd
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Neg
+end curve25519_dalek.backend.serial.u64.field.FieldElement51
