@@ -99,22 +99,46 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
   · rw [i40_post]
     decide
   · intro i hi
-    interval_cases i; all_goals simp; all_goals try simp
+    have h_mask_val : mask.val = 2^52 - 1 := by
+      scalar_tac
+    have h_mask_lt : mask.val < 2^62 := by
+      scalar_tac
+    interval_cases i <;> simp
     · rw [i2_post_1]
-      have h_mask_val : mask.val = 2^52 - 1 := by
-        scalar_tac
       have h_bound : (i1 &&& mask).val ≤ mask.val := by
         bvify 64 at *
         bv_decide
-      have h_mask_lt : mask.val < 2^62 := by
-        scalar_tac
       have h_final : (i1 &&& mask).val < 2^62 := by
         linarith [h_bound, h_mask_lt]
       exact h_final
-    · sorry
-    · sorry
-    · sorry
-    · sorry
+    · rw [i7_post_1]
+      have h_bound : (i6&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i6 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i12_post_1]
+      have h_bound : (i11&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i11 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i17_post_1]
+      have h_bound : (i16&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i16 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i22_post_1]
+      have h_bound : (i21&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i21 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
   · unfold constants.R
     decide
   · sorry
