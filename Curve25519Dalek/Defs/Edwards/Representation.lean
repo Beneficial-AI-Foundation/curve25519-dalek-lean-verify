@@ -60,7 +60,6 @@ end curve25519_dalek.edwards.affine
 
 -- Attach Projective/Completed definitions to their native namespace
 
-
 -- === Validity Predicates ===
 
 namespace curve25519_dalek.edwards
