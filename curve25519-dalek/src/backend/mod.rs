@@ -251,15 +251,7 @@ where
 
 /// Perform constant-time, variable-base scalar multiplication.
 pub fn variable_base_mul(point: &EdwardsPoint, scalar: &Scalar) -> EdwardsPoint {
-    match get_selected_backend() {
-        #[cfg(curve25519_dalek_backend = "simd")]
-        BackendKind::Avx2 => vector::scalar_mul::variable_base::spec_avx2::mul(point, scalar),
-        #[cfg(all(curve25519_dalek_backend = "unstable_avx512", nightly))]
-        BackendKind::Avx512 => {
-            vector::scalar_mul::variable_base::spec_avx512ifma_avx512vl::mul(point, scalar)
-        }
-        BackendKind::Serial => serial::scalar_mul::variable_base::mul(point, scalar),
-    }
+    serial::scalar_mul::variable_base::mul(point, scalar)
 }
 
 /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.

@@ -51,3 +51,9 @@ curve25519_dalek::ristretto::CompressedRistretto::decompress
 curve25519_dalek::ristretto::RistrettoPoint::compress
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor
 curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes
+curve25519_dalek::scalar::read_le_u64_into
+curve25519_dalek::backend::variable_base_mul
+
+
+
+

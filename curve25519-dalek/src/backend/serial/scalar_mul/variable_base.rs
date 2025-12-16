@@ -29,9 +29,12 @@ pub(crate) fn mul(point: &EdwardsPoint, scalar: &Scalar) -> EdwardsPoint {
     // Unwrap first loop iteration to save computing 16*identity
     let mut tmp2;
     let mut tmp3 = EdwardsPoint::identity();
-    let mut tmp1 = &tmp3 + &lookup_table.select(scalar_digits[63]);
+    let selected = lookup_table.select(scalar_digits[63]);
+    let mut tmp1 = &tmp3 + &selected;
     // Now tmp1 = s_63*P in P1xP1 coords
-    for i in (0..63).rev() {
+    let mut i: usize = 63;
+    while i > 0 {
+        i -= 1;
         tmp2 = tmp1.as_projective(); // tmp2 =    (prev) in P2 coords
         tmp1 = tmp2.double();        // tmp1 =  2*(prev) in P1xP1 coords
         tmp2 = tmp1.as_projective(); // tmp2 =  2*(prev) in P2 coords
@@ -41,7 +44,8 @@ pub(crate) fn mul(point: &EdwardsPoint, scalar: &Scalar) -> EdwardsPoint {
         tmp2 = tmp1.as_projective(); // tmp2 =  8*(prev) in P2 coords
         tmp1 = tmp2.double();        // tmp1 = 16*(prev) in P1xP1 coords
         tmp3 = tmp1.as_extended();   // tmp3 = 16*(prev) in P3 coords
-        tmp1 = &tmp3 + &lookup_table.select(scalar_digits[i]);
+        let selected = lookup_table.select(scalar_digits[i]);
+        tmp1 = &tmp3 + &selected;
         // Now tmp1 = s_i*P + 16*(prev) in P1xP1 coords
     }
     tmp1.as_extended()
