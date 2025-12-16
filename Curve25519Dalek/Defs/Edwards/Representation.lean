@@ -3,7 +3,6 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
-import Batteries.Tactic.Instances
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Types
@@ -36,39 +35,10 @@ namespace Edwards
 
 open curve25519_dalek CategoryTheory curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.curve_models Function ZMod
-open Aeneas.Std
+
 /-- Convert the 5-limb array to a field element in ZMod p. -/
 def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
-
-#eval UScalar.cMax UScalarTy.U64
-#eval 2^64
-#eval p
-#eval 2^256
-#eval (2^64)^5
-#eval ((2^64)^5 : BitVec 24443).toNat
--- #check (3 : backend.serial.u64.field.FieldElement51)
-example (x : CurveField) : backend.serial.u64.field.FieldElement51 := by
-  let n := x.val
-  have : n ≤ 2^64 := by
-    apply (ZMod.val_le _).trans
-    grind [p]
-  let y := U64.ofNat n ?_--
-  · use [y, y, y, y, y]
-    · simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, UScalar.ofNat_val_eq]
-  ·
-
-
-
--- example : (BitVec 128) → Aeneas.Std.Array UInt64 (2#usize) := by
---   intro u
---   fconstructor
---   ·
-#print BitVec.toNat
-instance : Mul backend.serial.u64.field.FieldElement51 := by
-  let := backend.serial.u64.field.FieldElement51.Mul.mul
-  constructor
-  convert this
 
 end Edwards
 
