@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -46,6 +46,14 @@ theorem zero_array (i : ℕ) (hi : i < 9) :
     ((Array.repeat 9#usize 0#u128) : List U128)[i]!.val = 0 := by
   interval_cases i <;> exact rfl
 
+/-- **Spec and proof concerning `from_montgomery_loop`**:
+- Specification for the loop that copies limbs from a Scalar52 (5 × U64) into a 9-element U128 array
+- Ensures that:
+  - The loop always succeeds (no panic)
+  - Limbs at indices [i, 5) are copied from the input Scalar52 to the result array
+  - Limbs at indices [5, 9) remain unchanged from the input limbs array
+  - Limbs at indices [0, i) remain unchanged from the input limbs array
+-/
 @[progress]
 theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)
     (hi : i.val ≤ 5) :
@@ -75,65 +83,6 @@ theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize)
     grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
-
-
--- /-- **Spec for `from_montgomery_loop`**:
--- - The loop simply copies limbs from the Scalar52 (5 × U64) into a 9-element U128 array
--- - When called with i = 0 and input limbs initialized to zeros, the resulting wide representation
---   has the same natural number value as the input Scalar52
--- - Always succeeds (no panic)
--- -/
--- @[progress]
--- theorem from_montgomery_loop_spec' (m : Scalar52) :
---     ∃ result,
---     from_montgomery_loop m (Array.repeat 9#usize 0#u128) 0#usize = ok result ∧
---     Scalar52_wide_as_Nat result = Scalar52_as_Nat m
---     := by
-
---     unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---     rw [if_pos (by decide)]
-
---     -- Loop iterations 1-4
---     (unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---      progress as ⟨i1_1, h1_1⟩; progress as ⟨i2_1, h2_1⟩; progress as ⟨a_1, ha_1⟩; progress as ⟨i3_1, _⟩
---      rw [if_pos (by scalar_tac)])
---     (unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---      progress as ⟨i1_2, h1_2⟩; progress as ⟨i2_2, h2_2⟩; progress as ⟨a_2, ha_2⟩; progress as ⟨i3_2, _⟩
---      rw [if_pos (by scalar_tac)])
---     (unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---      progress as ⟨i1_3, h1_3⟩; progress as ⟨i2_3, h2_3⟩; progress as ⟨a_3, ha_3⟩; progress as ⟨i3_3, _⟩
---      rw [if_pos (by scalar_tac)])
---     (unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---      progress as ⟨i1_4, h1_4⟩; progress as ⟨i2_4, h2_4⟩; progress as ⟨a_4, ha_4⟩; progress as ⟨i3_4, _⟩
---      rw [if_pos (by scalar_tac)])
-
---     -- Loop iteration 5 (exit)
---     unfold from_montgomery_loop Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---     progress as ⟨i1_5, h1_5⟩; progress as ⟨i2_5, h2_5⟩; progress as ⟨a_5, ha_5⟩; progress as ⟨i3_5, _⟩
---     rw [if_neg (by scalar_tac)]
---     progress*
-
---     -- Show that Scalar52_wide_as_Nat a_5 = Scalar52_as_Nat m, whereby a_5 has been built during the loop
---     unfold Scalar52_as_Nat Scalar52_wide_as_Nat
---     obtain ⟨rfl, rfl, rfl, rfl⟩ : i3_1 = 1#usize ∧ i3_2 = 2#usize ∧ i3_3 = 3#usize ∧ i3_4 = 4#usize := by
---       constructor <;> scalar_tac
---     rw [show Finset.range 9 = Finset.range 5 ∪ Finset.Ico 5 9 by ext x; simp only [Finset.mem_range, Finset.mem_union, Finset.mem_Ico]; omega]
---     rw [Finset.sum_union (by decide)]
-
---     have h_zero : ∀ i, 5 ≤ i → i < 9 → a_5[i]! = 0#u128 := by
---       intro i _ _; interval_cases i <;>
---       simp only [ha_5, ha_4, ha_3, ha_2, ha_1, Array.repeat, UScalar.ofNat_val_eq, List.reduceReplicate,
---         Array.getElem!_Nat_eq, Array.set_val_eq, List.set_cons_zero, List.set_cons_succ, List.length_cons, List.length_nil,
---         zero_add, Nat.reduceAdd, Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-
---     have : ∑ x ∈ Finset.Ico 5 9, 2 ^ (52 * x) * (a_5[x]! : ℕ) = 0 := by
---       refine Finset.sum_eq_zero fun i hi => ?_; simp only [Finset.mem_Ico] at hi
---       rw [h_zero i hi.1 hi.2]; simp only [UScalar.ofNat_val_eq, mul_zero]
-
---     rw [this, add_zero]; refine Finset.sum_congr rfl fun i hi => ?_; simp only [Finset.mem_range] at hi
---     interval_cases i <;>
---     simp [ha_5, ha_4, ha_3, ha_2, ha_1, Array.repeat, h2_5, h2_4, h2_3, h2_2, h2_1, h1_5, h1_4, h1_3, h1_2, h1_1]
-
 
 /-- **Spec and proof concerning `scalar.Scalar52.from_montgomery`**:
 - No panic (always returns successfully)
