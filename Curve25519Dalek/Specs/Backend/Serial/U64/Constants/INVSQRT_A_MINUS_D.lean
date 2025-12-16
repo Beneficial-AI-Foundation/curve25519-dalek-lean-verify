@@ -16,7 +16,7 @@ in the defining equation ax^2 + y^2 = 1 + dx^2y^2.
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -37,8 +37,8 @@ natural language specs:
 -/
 @[progress]
 theorem INVSQRT_A_MINUS_D_spec :
-    (Field51_as_Nat constants.INVSQRT_A_MINUS_D)^2 * (a - d) % p = 1 := by
-  unfold constants.INVSQRT_A_MINUS_D
+    (Field51_as_Nat INVSQRT_A_MINUS_D)^2 * (a - d) % p = 1 := by
+  unfold INVSQRT_A_MINUS_D
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants

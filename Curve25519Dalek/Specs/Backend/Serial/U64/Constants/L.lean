@@ -15,7 +15,7 @@ This constant represents the group order L of Curve25519.
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -32,8 +32,8 @@ natural language specs:
 - The value of constants.L when converted to a natural number equals L
 -/
 @[progress]
-theorem L_spec : Scalar52_as_Nat constants.L = L := by
-  unfold constants.L
+theorem L_spec : Scalar52_as_Nat L = _root_.L := by
+  unfold L
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants

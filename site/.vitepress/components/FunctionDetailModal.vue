@@ -14,6 +14,10 @@ const props = defineProps({
   func: {
     type: Object,
     default: null
+  },
+  teleportTo: {
+    type: [String, Object],
+    default: 'body'
   }
 })
 
@@ -71,7 +75,7 @@ watch(() => props.isOpen, (isOpen) => {
 </script>
 
 <template>
-  <Teleport to="body">
+  <Teleport :to="teleportTo">
     <Transition name="modal">
       <div v-if="isOpen && func" class="modal-backdrop" @click="handleBackdropClick">
         <div class="modal-content" role="dialog" aria-modal="true">

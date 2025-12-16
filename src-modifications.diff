@@ -194,3 +194,37 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              }
              *y = UnpackedScalar::montgomery_mul(y, x);
          }
+@@ -1348,18 +1350,21 @@
+ /// ## Panics
+ /// Panics if `src.len() != 8 * dst.len()`.
+ fn read_le_u64_into(src: &[u8], dst: &mut [u64]) {
+-    assert!(
+-        src.len() == 8 * dst.len(),
+-        "src.len() = {}, dst.len() = {}",
+-        src.len(),
+-        dst.len()
+-    );
+-    for (bytes, val) in src.chunks(8).zip(dst.iter_mut()) {
+-        *val = u64::from_le_bytes(
+-            bytes
+-                .try_into()
+-                .expect("Incorrect src length, should be 8 * dst.len()"),
+-        );
++    assert!(src.len() == 8 * dst.len());
++    let mut i = 0;
++    while i < dst.len() {
++        let start = i * 8;
++        dst[i] = u64::from_le_bytes([
++            src[start],
++            src[start + 1],
++            src[start + 2],
++            src[start + 3],
++            src[start + 4],
++            src[start + 5],
++            src[start + 6],
++            src[start + 7],
++        ]);
++        i += 1;
+     }
+ }
+ 

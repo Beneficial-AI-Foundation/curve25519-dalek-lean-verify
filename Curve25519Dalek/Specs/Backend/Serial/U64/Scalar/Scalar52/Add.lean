@@ -187,7 +187,7 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
     interval_cases i <;> decide
     -- END TASK
   · -- BEGIN TASK
-    rw [L_spec] at res_post
+    rw [constants.L_spec] at res_post
     have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
       have hL_mod : L ≡ 0 [MOD L] := by
         rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]

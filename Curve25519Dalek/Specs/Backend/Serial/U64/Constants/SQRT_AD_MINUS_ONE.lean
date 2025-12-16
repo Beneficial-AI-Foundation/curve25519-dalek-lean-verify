@@ -16,7 +16,7 @@ curve parameters in the defining equation ax^2 + y^2 = 1 + dx^2y^2, with a = -1 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -37,8 +37,8 @@ natural language specs:
 -/
 @[progress]
 theorem SQRT_AD_MINUS_ONE_spec :
-    (Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 % p = (a * d - 1) % p := by
-  unfold constants.SQRT_AD_MINUS_ONE
+    (Field51_as_Nat SQRT_AD_MINUS_ONE)^2 % p = (a * d - 1) % p := by
+  unfold SQRT_AD_MINUS_ONE
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants
