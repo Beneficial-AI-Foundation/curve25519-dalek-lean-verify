@@ -259,6 +259,9 @@
       "lean_name": "curve25519_dalek.scalar.clamp_integer"
     },
     {
+      "lean_name": "curve25519_dalek.scalar.read_le_u64_into"
+    },
+    {
       "lean_name": "curve25519_dalek.scalar.Scalar.as_bytes"
     },
     {

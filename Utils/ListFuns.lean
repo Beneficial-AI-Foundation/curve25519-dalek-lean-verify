@@ -146,7 +146,7 @@ def shouldInclude (name : Name) : Bool :=
   !hasExcludedPattern name
 
 /-- Get all function names defined in Funs.lean -/
-def getFunsDefinitions (env : Environment) : Array Name := Id.run do
+def getFunsDefinitions (env : Environment) : IO (Array Name) := do
   -- Get the module index for Funs.lean
   let some moduleIdx := env.header.moduleNames.idxOf? funsModule
     | return #[]  -- Module not found
@@ -166,7 +166,7 @@ def getFunsDefinitions (env : Environment) : Array Name := Id.run do
   let filtered := filterNested candidates
 
   -- Sort alphabetically for consistent output
-  filtered.qsort (·.toString < ·.toString)
+  return filtered.qsort (·.toString < ·.toString)
 
 /-- Output structure for a single function -/
 structure FunctionOutput where
@@ -211,7 +211,7 @@ def main (args : List String) : IO UInt32 := do
   IO.eprintln "Module loaded successfully"
 
   -- Get all functions from Funs.lean
-  let names := getFunsDefinitions env
+  let names ← getFunsDefinitions env
   IO.eprintln s!"Found {names.size} definitions in {funsModule}"
 
   -- Build output
