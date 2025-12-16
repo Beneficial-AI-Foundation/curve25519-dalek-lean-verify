@@ -52,11 +52,10 @@ instance : Fact (Nat.Prime p) := by
 
 /-- Helper lemma for modular arithmetic lifting -/
 theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
-  apply (ZMod.natCast_eq_natCast_iff a b p).mpr
-  exact h
+  exact (ZMod.natCast_eq_natCast_iff a b p).mpr h
 
 /-- A Twisted Edwards curve structure defined by parameters a and d. -/
-structure EdwardsCurve (F : Type) [Field F] where
+structure EdwardsCurve (F : Type) where
   a : F
   d : F
 
@@ -74,11 +73,17 @@ lemma d_not_square : ¬IsSquare Ed25519.d := by
 
 /-- An affine point on the Edwards curve. -/
 @[ext]
-structure Point {F : Type} [Field F] (C : EdwardsCurve F) where
+structure Point {F : Type} [Mul F] [Add F] [Pow F ℕ] [One F] (C : EdwardsCurve F) where
   x : F
   y : F
   h_on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
   deriving Repr
+
+
+def FAE_Curve : EdwardsCurve UInt64 := --I need to cap `d` at `2^51` to see it as a `UInt64`
+    ⟨⟨a.toNat, by norm_num [a]⟩, ⟨d % 2^51, by norm_num [d]⟩⟩
+
+def FAE_Point : Point (FAE_Curve) := ({ x := 0, y := 1})
 
 instance : Inhabited (Point Ed25519) :=
   ⟨{ x := 0, y := 1}⟩

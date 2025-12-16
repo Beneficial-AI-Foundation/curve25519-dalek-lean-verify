@@ -40,6 +40,16 @@ open curve25519_dalek.backend.serial.curve_models Function ZMod
 def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
+abbrev FAE_Field51 := Vector UInt64 5
+
+/- Convert the 5-limb array to a field element in ZMod p. -/
+-- def FAE_field_from_limbs_aux (fe : FAE_Field51) : CurveField :=
+--   (FAE_Field51_as_Nat fe : CurveField)
+
+/-- Convert the 5-limb array to a field element in ZMod p. -/
+def FAE_field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField :=
+  (FAE_Field51_as_Nat ∘ eq_Field51.toFun) fe
+
 end Edwards
 
 

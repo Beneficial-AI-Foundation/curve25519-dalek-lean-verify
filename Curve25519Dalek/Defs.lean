@@ -57,7 +57,7 @@ lemma UInt_comp : UInt.to_U64 ∘ U64.to_UInt = id := Function.RightInverse.id U
 @[simp]
 lemma U64_comp : U64.to_UInt ∘ UInt.to_U64 = id := Function.RightInverse.id UInt_equiv.left_inv
 
-def eq_field51 : Array U64 5#usize ≃ Vector UInt64 5 where
+def eq_Field51 : Array U64 5#usize ≃ Vector UInt64 5 where
   toFun := fun A ↦ ⟨(List.map U64.to_UInt A).toArray,
       by simp [List.size_toArray, List.length_map, List.Vector.length_val, UScalar.ofNat_val_eq]⟩
   invFun := fun ⟨A, l⟩ ↦ ⟨List.map UInt.to_U64 A.toList, by
@@ -65,6 +65,12 @@ def eq_field51 : Array U64 5#usize ≃ Vector UInt64 5 where
   left_inv := fun _ ↦ by simp
   right_inv := fun _ ↦ by simp
 
+-- #synth Add U64 -- failed to synthesize
+#synth Add UInt64
+-- #synth Mul U64 -- failed to synthesize
+#synth Mul UInt64
+#synth One UInt64
+#synth Pow UInt64 ℕ
 
 /-- Interpret a Scalar52 (five u64 limbs used to represent 52 bits each) as a natural number -/
 def Scalar52_as_Nat (limbs : Array U64 5#usize) : Nat :=
