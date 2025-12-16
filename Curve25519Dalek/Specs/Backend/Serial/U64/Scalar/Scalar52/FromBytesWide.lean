@@ -141,7 +141,42 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
       exact h_final
   · unfold constants.R
     decide
-  · sorry
+  · intro i hi
+    have h_mask_val : mask.val = 2^52 - 1 := by
+      scalar_tac
+    have h_mask_lt : mask.val < 2^62 := by
+      scalar_tac
+    interval_cases i <;> simp
+    · rw [i24_post_1]
+      have h_bound : (i23&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i23 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i29_post_1]
+      have h_bound : (i28&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i28 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i34_post_1]
+      have h_bound : (i33&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i33 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i39_post_1]
+      have h_bound : (i38&&& mask).val ≤ mask.val := by
+        bvify 64 at *
+        bv_decide
+      have h_final : (i38 &&& mask).val < 2^62 := by
+        linarith [h_bound, h_mask_lt]
+      exact h_final
+    · rw [i41_post_1]
+      scalar_tac
   · unfold constants.RR
     decide
   · sorry
