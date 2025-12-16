@@ -40,7 +40,8 @@ theorem mul_by_cofactor_spec (e : EdwardsPoint) :
     ∃ e_result,
     mul_by_cofactor e = ok e_result ∧
     ok e_result = mul_by_pow_2 e 3#u32 := by
-
+    -- TO DO: this line needs to be adjusted, we can't have another `ok` in the spec statement
+    -- this should use the mathematical notion of edwards curve and multiplication by 8
   obtain ⟨e_result, h', _⟩ := mul_by_pow_2_spec e 3#u32 (by decide)
   use e_result
   constructor
