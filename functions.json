@@ -160,6 +160,12 @@
       "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"
     },
     {
+      "lean_name": "curve25519_dalek.edwards.decompress.step_1"
+    },
+    {
+      "lean_name": "curve25519_dalek.edwards.decompress.step_2"
+    },
+    {
       "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress"
     },
     {
@@ -224,6 +230,12 @@
     },
     {
       "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"
+    },
+    {
+      "lean_name": "curve25519_dalek.ristretto.decompress.step_1"
+    },
+    {
+      "lean_name": "curve25519_dalek.ristretto.decompress.step_2"
     },
     {
       "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"
