@@ -70,15 +70,8 @@ def excludedSuffixes : List String := [
 ### Internal Name Patterns
 
 Functions containing any of these patterns will be EXCLUDED.
-These are typically compiler-generated auxiliary definitions.
 -/
 def excludedPatterns : List String := [
-  ".match_",    -- Match expression helpers
-  ".proof_",    -- Proof helpers
-  "._private",  -- Private definitions
-  "._cstage",   -- Compilation stage helpers
-  "._unsafe_rec", -- Unsafe recursion helpers
-  ".mutual"     -- Mutual recursion helpers
 ]
 
 /-!
@@ -91,7 +84,6 @@ components.
 Example:
 - `curve25519_dalek...Mul.mul` is kept (it's a top-level function)
 - `curve25519_dalek...Mul.mul.LOW_51_BIT_MASK` is excluded (it's internal to `mul`)
-- `curve25519_dalek...Mul.mul.m` is excluded (it's internal to `mul`)
 -/
 def filterNestedFunctions : Bool := true
 
