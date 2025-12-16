@@ -154,6 +154,9 @@
       "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"
     },
     {
+      "lean_name": "curve25519_dalek.edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add"
+    },
+    {
       "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"
     },
     {
@@ -230,6 +233,9 @@
     },
     {
       "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"
+    },
+    {
+      "lean_name": "curve25519_dalek.ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add"
     },
     {
       "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"
