@@ -97,7 +97,7 @@
       "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"
     },
     {
-      "lean_name": "curve25519_dalek.subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51"
+      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub.sub"
     },
     {
       "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
