@@ -26,7 +26,7 @@ open Aeneas.Std Result
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-namespace curve25519_dalek.edwards.EdwardsPoint.affine
+namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
 Natural language description:
@@ -66,4 +66,4 @@ theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 
 
 
 
-end curve25519_dalek.edwards.EdwardsPoint.affine
+end curve25519_dalek.edwards.EdwardsPoint
