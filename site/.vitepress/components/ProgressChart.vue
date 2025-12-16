@@ -38,9 +38,12 @@ interface ProgressDataPoint {
   ai_proveable: number
 }
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   dataPoints: ProgressDataPoint[]
-}>()
+  showAiProveable?: boolean
+}>(), {
+  showAiProveable: false
+})
 
 // Custom plugin to draw robot emoji at the end of AI-proveable line
 const robotEmojiPlugin = {
@@ -96,89 +99,93 @@ const chartData = computed(() => {
   const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
   const ai_proveable = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.ai_proveable }))
 
-  return {
-    datasets: [
-      {
-        label: 'Verified',
-        data: verified,
-        borderColor: '#10b981',
-        backgroundColor: 'rgba(16, 185, 129, 0.85)',
-        fill: true,
-        stepped: 'after' as const,
-        borderWidth: 2,
-        pointRadius: 0,
-        order: 1
-      },
-      {
-        label: 'Spec only',
-        data: specified,
-        borderColor: '#fdba74',
-        backgroundColor: 'rgba(253, 186, 116, 0.6)',
-        fill: true,
-        stepped: 'after' as const,
-        borderWidth: 0,
-        pointRadius: 0,
-        order: 2
-      },
-      {
-        label: 'Draft',
-        data: draft_spec,
-        borderColor: '#cbd5e1',
-        backgroundColor: 'rgba(203, 213, 225, 0.5)',
-        fill: true,
-        stepped: 'after' as const,
-        borderWidth: 0,
-        pointRadius: 0,
-        order: 3
-      },
-      {
-        label: 'Not started',
-        data: total,
-        borderColor: '#e5e7eb',
-        backgroundColor: 'rgba(229, 231, 235, 0.4)',
-        fill: true,
-        stepped: 'after' as const,
-        borderWidth: 0,
-        pointRadius: 0,
-        order: 4
-      },
-      {
-        label: 'Total Functions',
-        data: total,
-        borderColor: '#374151',
-        backgroundColor: 'transparent',
-        fill: false,
-        stepped: 'after' as const,
-        borderWidth: 2,
-        pointRadius: 0,
-        order: 0
-      },
-      {
-        label: 'Extracted',
-        data: extracted,
-        borderColor: '#9ca3af',
-        backgroundColor: 'transparent',
-        fill: false,
-        stepped: 'after' as const,
-        borderWidth: 1.5,
-        borderDash: [3, 3],
-        pointRadius: 0,
-        order: 0
-      },
-      {
-        label: 'AI Proveable',
-        data: ai_proveable,
-        borderColor: '#8b5cf6',
-        backgroundColor: 'transparent',
-        fill: false,
-        stepped: 'after' as const,
-        borderWidth: 2.5,
-        pointRadius: 0,
-        pointStyle: false,
-        order: -1
-      }
-    ]
+  const datasets = [
+    {
+      label: 'Verified',
+      data: verified,
+      borderColor: '#10b981',
+      backgroundColor: 'rgba(16, 185, 129, 0.85)',
+      fill: true,
+      stepped: 'after' as const,
+      borderWidth: 2,
+      pointRadius: 0,
+      order: 1
+    },
+    {
+      label: 'Spec only',
+      data: specified,
+      borderColor: '#fdba74',
+      backgroundColor: 'rgba(253, 186, 116, 0.6)',
+      fill: true,
+      stepped: 'after' as const,
+      borderWidth: 0,
+      pointRadius: 0,
+      order: 2
+    },
+    {
+      label: 'Draft',
+      data: draft_spec,
+      borderColor: '#cbd5e1',
+      backgroundColor: 'rgba(203, 213, 225, 0.5)',
+      fill: true,
+      stepped: 'after' as const,
+      borderWidth: 0,
+      pointRadius: 0,
+      order: 3
+    },
+    {
+      label: 'Not started',
+      data: total,
+      borderColor: '#e5e7eb',
+      backgroundColor: 'rgba(229, 231, 235, 0.4)',
+      fill: true,
+      stepped: 'after' as const,
+      borderWidth: 0,
+      pointRadius: 0,
+      order: 4
+    },
+    {
+      label: 'Total Functions',
+      data: total,
+      borderColor: '#374151',
+      backgroundColor: 'transparent',
+      fill: false,
+      stepped: 'after' as const,
+      borderWidth: 2,
+      pointRadius: 0,
+      order: 0
+    },
+    {
+      label: 'Extracted',
+      data: extracted,
+      borderColor: '#9ca3af',
+      backgroundColor: 'transparent',
+      fill: false,
+      stepped: 'after' as const,
+      borderWidth: 1.5,
+      borderDash: [3, 3],
+      pointRadius: 0,
+      order: 0
+    }
+  ]
+
+  // Only add AI Proveable dataset if enabled
+  if (props.showAiProveable) {
+    datasets.push({
+      label: 'AI Proveable',
+      data: ai_proveable,
+      borderColor: '#8b5cf6',
+      backgroundColor: 'transparent',
+      fill: false,
+      stepped: 'after' as const,
+      borderWidth: 2.5,
+      pointRadius: 0,
+      pointStyle: false,
+      order: -1
+    } as any)
   }
+
+  return { datasets }
 })
 
 const chartOptions: ChartOptions<'line'> = {

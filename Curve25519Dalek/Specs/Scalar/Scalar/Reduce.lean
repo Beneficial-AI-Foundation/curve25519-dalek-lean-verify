@@ -67,7 +67,7 @@ theorem reduce_spec (s : Scalar) :
   rw[← x_post_1]
   rw[← Nat.ModEq] at x_mod_l_post
   rw[xR_post] at x_mod_l_post
-  have Rs := R_spec
+  have Rs := constants.R_spec
   rw[← Nat.ModEq] at Rs
   have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
   have := Nat.ModEq.trans x_mod_l_post this

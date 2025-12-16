@@ -15,7 +15,7 @@ This constant represents the twisted Edwards curve parameter d.
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64
+namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
 natural language description:
@@ -34,8 +34,8 @@ natural language specs:
 - The value of constants.EDWARDS_D when converted to a natural number equals d
 -/
 @[progress]
-theorem EDWARDS_D_spec : Field51_as_Nat constants.EDWARDS_D = d := by
-  unfold constants.EDWARDS_D
+theorem EDWARDS_D_spec : Field51_as_Nat EDWARDS_D = d := by
+  unfold EDWARDS_D
   decide
 
-end curve25519_dalek.backend.serial.u64
+end curve25519_dalek.backend.serial.u64.constants
