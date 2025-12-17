@@ -179,8 +179,12 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
       scalar_tac
   · unfold constants.RR
     decide
-  · sorry
-
+  · have h_res_mod : Scalar52_as_Nat res ≡ Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 [MOD L] := by
+      rw [Nat.ModEq]
+      exact res_post
+    have h_RR : Scalar52_as_Nat constants.RR ≡ R^2 [MOD L] := by
+      grind [constants.RR_spec, Nat.ModEq]
+    sorry
 
   -- -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
   -- have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
