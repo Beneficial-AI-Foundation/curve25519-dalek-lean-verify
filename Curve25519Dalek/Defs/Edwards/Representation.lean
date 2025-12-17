@@ -58,8 +58,6 @@ noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P)
 
 end curve25519_dalek.edwards.affine
 
--- Attach Projective/Completed definitions to their native namespace
-
 -- === Validity Predicates ===
 
 namespace curve25519_dalek.edwards
@@ -84,8 +82,7 @@ def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
 
 end curve25519_dalek.ristretto
 
-namespace curve25519_dalek.backend.serial.curve_models
-open Edwards
+-- Attach Projective/Completed definitions to their native namespace
 
 /-- Existential validity predicate for ProjectivePoint. -/
 def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
