@@ -25,8 +25,7 @@ to ensure the result is non-negative.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek
-open backend.serial.u64.scalar.Scalar52
+namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option linter.hashCommand false
 -- This activates/deactives some simps to reason about lists
@@ -92,3 +91,5 @@ theorem sub_spec (a b : Array U64 5#usize)
   -- progress*
 
   sorry
+
+end curve25519_dalek.backend.serial.u64.scalar.Scalar52
