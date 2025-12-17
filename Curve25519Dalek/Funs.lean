@@ -647,6 +647,42 @@ def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK : U64 :=
   eval_global
     backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
 
+-- #loogle _[_]? = _
+-- **FAE** Should rather benefit of the `LawfulGetElem` class
+example (α : Type*) (n i : ℕ) (v : Vector α n) (h : ∃ a : α, v[i]? = a) : i < n := by
+  apply lt_of_not_ge
+  intro h
+  have := @List.getElem?_eq_none α v.toArray.toList i -- (e := v) α ℕ
+  simp only [Array.length_toList, Vector.size_toArray, Array.getElem?_toList,
+    Vector.getElem?_toArray, getElem?_eq_none_iff, not_lt, imp_self] at this
+  sorry
+  -- have := @of_getElem?_eq_some (e := v) α ℕ
+
+
+/-- Given a vector in `α` of length `n : Usize` (that can be transformed into a `ℕ` by first turning
+it into a `BitVector` via `n.bv` and then to a `ℕ` via `.toNat`), and another index `i : Usize`,
+this returns an error if `n < i` and the `i`th value if `i ≤ n`. -/
+
+def FAE_Array.index_usize {α : Type*} {n i : Usize} (v : Vector α n.bv.toNat) : Result α :=
+  match v[i.bv.toNat]? with
+  | none => fail .arrayOutOfBounds
+  | some x => ok x
+
+def FAE_Array.update {α : Type*} {n i : Usize} (v: Vector α n.bv.toNat) (x : α) :
+    Result (Vector α n) :=
+  match v[i.bv.toNat]? with
+  | none => fail .arrayOutOfBounds
+  | some g => by
+    use ok <| v.set (i := i.bv.toNat) (h := ?_) x
+    sorry
+
+    -- infer_instance
+    -- have := v.property
+
+    -- use ok w
+    -- refine ok ⟨ v.set i.bv.toNat x, ?_⟩
+    -- ok ⟨ v.set i.bv.toNat x, by have := v.property; simp [*] ⟩
+
 /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 292:4-325:5 -/
 def backend.serial.u64.field.FieldElement51.reduce

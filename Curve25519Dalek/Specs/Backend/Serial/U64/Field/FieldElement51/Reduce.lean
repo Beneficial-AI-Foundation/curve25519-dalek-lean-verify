@@ -44,7 +44,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - Does not overflow and hence returns a result
-- All the limbs of the result are small, ≤ 2^(51 + ε)
+- All the limbs of the result are small, ≤ 2^(51 + ε)s
 - The result is equal to the input mod p. -/
 @[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
@@ -77,5 +77,37 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     · -- BEGIN TASK
       simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
       -- END TASK
+--
+-- @[progress]
+-- theorem FAE_reduce_spec (limbs : Vector UInt64 5) :
+--     ∃ result, reduce limbs = ok result ∧
+--     (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
+--     Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
+--   unfold reduce
+--   progress*
+--   · -- BEGIN TASK
+--     simp [*]; scalar_tac
+--     -- END TASK
+--   · -- BEGIN TASK
+--     simp [*]; scalar_tac
+--     -- END TASK
+--   · -- BEGIN TASK
+--     simp [*]; scalar_tac
+--     -- END TASK
+--   · -- BEGIN TASK
+--     simp [*]; scalar_tac
+--     -- END TASK
+--   · -- BEGIN TASK
+--     simp [*]; scalar_tac
+--     -- END TASK
+--   · constructor
+--     · -- BEGIN TASK
+--       intro i _
+--       interval_cases i
+--       all_goals simp [*]; scalar_tac
+--       -- END TASK
+--     · -- BEGIN TASK
+--       simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+--       -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
