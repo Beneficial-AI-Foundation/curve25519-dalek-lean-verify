@@ -83,8 +83,6 @@ def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
 end curve25519_dalek.ristretto
 
 -- Attach Projective/Completed definitions to their native namespace
-namespace curve25519_dalek.backend.serial.curve_models
-open Edwards
 
 /-- Existential validity predicate for ProjectivePoint. -/
 def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
