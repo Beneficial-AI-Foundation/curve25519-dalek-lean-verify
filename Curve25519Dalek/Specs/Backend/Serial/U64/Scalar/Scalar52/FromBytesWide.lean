@@ -179,43 +179,24 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
       scalar_tac
   · unfold constants.RR
     decide
-  · have h_res_mod : Scalar52_as_Nat res ≡ Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 [MOD L] := by
+  · let lo := (((((Aeneas.Std.Array.set ZERO 0#usize i2).set 1#usize i7).set 2#usize i12).set
+    3#usize i17).set 4#usize i22)
+    let hi := (((((Aeneas.Std.Array.set ZERO 0#usize i24).set 1#usize i29).set 2#usize i34).set 3#usize i39).set 4#usize i41)
+    have h_res_mod : Scalar52_as_Nat res ≡ Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 [MOD L] := by
       rw [Nat.ModEq]
       exact res_post
     have h_RR : Scalar52_as_Nat constants.RR ≡ R^2 [MOD L] := by
       grind [constants.RR_spec, Nat.ModEq]
+    have h_b_decomp : U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256 := by
+      sorry
+    -- grind []
+
+    have h_combined : Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 ≡ Scalar52_as_Nat hi * R + Scalar52_as_Nat lo [MOD L] := by
+      sorry
+    have h_final : Scalar52_as_Nat hi * 2^256 + Scalar52_as_Nat lo ≡ U8x64_as_Nat b [MOD L] := by
+      rw [h_b_decomp]
+      -- grind
+      sorry
     sorry
-
-  -- -- U8x64_as_Nat b = lo_nat + hi_nat * 2^256
-  -- have h_lo_hi: ∃ lo hi, U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256
-  -- ∧ (∀ i, i < 5 → (lo[i]!).val < 2 ^ 62) ∧ (∀ i, i < 5 → (hi[i]!).val < 2 ^ 62)
-  --  := U8x64_as_Nat_split b
-  -- obtain ⟨lo, hi, h_lo_hi, lo_range, hi_range⟩ := h_lo_hi
-  -- -- (lo * R) / R = lo2
-  -- obtain ⟨lo2, h_lo2_ok, h_lo2_spec⟩ := montgomery_mul_spec lo constants.R (lo_range) (R_lt)
-  -- -- (hi * R^2) / R = hi2
-  -- obtain ⟨hi2, h_hi2_ok, h_hi2_spec⟩ := montgomery_mul_spec hi constants.RR (hi_range) (RR_lt)
-
-  -- -- (hi * R^2) / R + (lo * R) / R = u
-  -- -- True according to line 128 - line 131 in curve25519-dalek/src/backend/serial/u64/scalar.rs
-  -- obtain ⟨u, h_u_ok, h_u_spec⟩ := add_spec (hi2) (lo2)
-
-  -- -- Keypoint:2^256 * R ≡ R^2 [MOD L]
-  -- have h_key : 2^256 * R % L = R^2 % L := by
-  --   unfold R
-  -- -- 2^256 * 2^260 = 2^516
-  -- -- R^2 = (2^260)^2 = 2^520
-  -- -- need to prove 2^516 % L = 2^520 % L
-  --   sorry
-  -- use u
-  -- constructor
-  -- · -- from_bytes_wide b = ok u
-  --   -- True by the definition of from_bytes_wide_spec
-  --   sorry
-  -- · -- Scalar52_as_Nat u = U8x64_as_Nat b % L
-  --   rw [h_u_spec]
-  --   rw [h_lo_hi]
-
-  --   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
