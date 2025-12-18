@@ -68,7 +68,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
-import Curve25519Dalek.Specs.Edwards.Compress
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
@@ -96,6 +96,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes

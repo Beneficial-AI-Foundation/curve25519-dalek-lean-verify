@@ -3544,8 +3544,51 @@ def scalar.Scalar.invert (self : scalar.Scalar) : Result scalar.Scalar := do
   let s1 ← scalar.Scalar52.invert s
   scalar.Scalar52.pack s1
 
+/- [curve25519_dalek::scalar::read_le_u64_into]: loop 0:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1355:4-1368:5 -/
+def scalar.read_le_u64_into_loop
+  (src : Slice U8) (dst : Slice U64) (i : Usize) : Result (Slice U64) := do
+  let i1 := Slice.len dst
+  if i < i1
+  then
+    let start ← i * 8#usize
+    let i2 ← Slice.index_usize src start
+    let i3 ← start + 1#usize
+    let i4 ← Slice.index_usize src i3
+    let i5 ← start + 2#usize
+    let i6 ← Slice.index_usize src i5
+    let i7 ← start + 3#usize
+    let i8 ← Slice.index_usize src i7
+    let i9 ← start + 4#usize
+    let i10 ← Slice.index_usize src i9
+    let i11 ← start + 5#usize
+    let i12 ← Slice.index_usize src i11
+    let i13 ← start + 6#usize
+    let i14 ← Slice.index_usize src i13
+    let i15 ← start + 7#usize
+    let i16 ← Slice.index_usize src i15
+    let i17 ←
+      (↑(core.num.U64.from_le_bytes
+        (Array.make 8#usize [ i2, i4, i6, i8, i10, i12, i14, i16 ])) : Result
+        U64)
+    let s ← Slice.update dst i i17
+    let i18 ← i + 1#usize
+    scalar.read_le_u64_into_loop src s i18
+  else ok dst
+partial_fixpoint
+
+/- [curve25519_dalek::scalar::read_le_u64_into]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1352:0-1369:1 -/
+def scalar.read_le_u64_into
+  (src : Slice U8) (dst : Slice U64) : Result (Slice U64) := do
+  let i := Slice.len src
+  let i1 := Slice.len dst
+  let i2 ← 8#usize * i1
+  massert (i = i2)
+  scalar.read_le_u64_into_loop src dst 0#usize
+
 /- [curve25519_dalek::scalar::clamp_integer]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 1388:0-1393:1 -/
+   Source: 'curve25519-dalek/src/scalar.rs', lines 1391:0-1396:1 -/
 def scalar.clamp_integer
   (bytes : Array U8 32#usize) : Result (Array U8 32#usize) := do
   let i ← Array.index_usize bytes 0#usize
