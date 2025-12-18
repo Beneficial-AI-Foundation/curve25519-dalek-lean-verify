@@ -18,8 +18,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 228:4-240:5)
 -/
 
 open Aeneas.Std Result
-
-namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.ConditionalSelect
 
 /-! ## Spec for `conditional_select` -/
 
@@ -41,8 +40,48 @@ theorem conditional_select_spec
       (∀ i < 5,
         res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by
   unfold backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
-  -- Direct limbwise case analysis mirrors five calls to U64 conditional_select.
-  -- We leave the low-level unfolding proof obligations to future work.
-  sorry
+  progress*
+  unfold subtle.ConditionallySelectableU64.conditional_select
+  by_cases h: choice.val = 1#u8
+  · simp_all
+    progress*
+    intro i a
+    rw[Array.make]
+    simp_all
+    cases i
+    · simp
+    · rename_i i
+      cases i
+      · simp
+      · rename_i i
+        cases i
+        · simp
+        · rename_i i
+          cases i
+          · simp
+          · rename_i i
+            cases i
+            · simp
+            · scalar_tac
+  · simp_all
+    progress*
+    rw[Array.make]
+    intro i a
+    simp_all
+    cases i
+    · simp
+    · rename_i i
+      cases i
+      · simp
+      · rename_i i
+        cases i
+        · simp
+        · rename_i i
+          cases i
+          · simp
+          · rename_i i
+            cases i
+            · simp
+            · scalar_tac
 
-end curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.ConditionalSelect
