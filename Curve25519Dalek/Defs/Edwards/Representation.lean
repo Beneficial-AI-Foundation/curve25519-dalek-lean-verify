@@ -58,6 +58,8 @@ noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P)
 
 end curve25519_dalek.edwards.affine
 
+
+
 -- === Validity Predicates ===
 
 namespace curve25519_dalek.edwards
@@ -73,6 +75,9 @@ def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
 
 end curve25519_dalek.edwards
 
+
+
+
 namespace curve25519_dalek.ristretto
 open curve25519_dalek.edwards
 
@@ -80,7 +85,19 @@ def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
   EdwardsPoint.IsValid r
 -- To do: potentially add extra information regarding canonical representation of Ristretto point
 
+def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
+  U8x32_as_Nat c < p ∧
+  U8x32_as_Nat c % 2 = 0
+  -- To do: this predicate is not complete yet, as some more complex
+  -- properties also need to be checked to assure a valid compressed Ristretto point:
+  -- (1) The square root computation in step_2 must succeed (invsqrt returns Choice.one)
+  -- (2) The computed t coordinate must be non-negative (t.is_negative returns Choice.zero)
+  -- (3) The computed y coordinate must be nonzero (y.is_zero returns Choice.zero)
+
 end curve25519_dalek.ristretto
+
+
+
 
 -- Attach Projective/Completed definitions to their native namespace
 namespace curve25519_dalek.backend.serial.curve_models

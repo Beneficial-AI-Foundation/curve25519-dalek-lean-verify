@@ -16,7 +16,7 @@ decode a (valid) 32-byte representation back to a RistrettoPoint. The function i
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1).
 
 It takes a CompressedRistretto (a 32-byte array) and attempts to produce a RistrettoPoint,
-returning None if the input is not a valid canonical encoding.
+returning None if the input byte array is not a valid canonical encoding.
 
 **Source**: curve25519-dalek/src/ristretto.rs
 
@@ -36,33 +36,31 @@ RistrettoPoint according to the Ristretto DECODE function specified in:
 
 https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1
 
-Returns None if the input is not a valid canonical encoding.
+Returns none if the input is not a valid canonical encoding.
 
 natural language specs:
 
 - The function always succeeds for all U8x32 input arrays (no panic)
-- If the output is not None, then it is a valid Ristretto point, i.e., it fulfils the Edwards point curve equation
-- If the output is not None, then compressing the output Ristretto point gives back the original input byte array
+- If the input is not valid, then the output is none
+- If the input is valid, then the output is a valid Ristretto point, i.e., it fulfils the Edwards point curve equation
 -/
 
 /-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:
-- The function always succeeds (no panic)
-- If the output is not None, then it is a valid Ristretto point, i.e., it fulfils the Edwards point curve equation
-- If the output is not None, then compressing the output Ristretto point gives back the original input byte array
+- The function always succeeds for all U8x32 input arrays (no panic)
+- If the input is not valid, then the output is none
+- If the input is valid, then the output is a valid Ristretto point, i.e.,
+  it fulfils the Edwards point curve equation
 -/
-theorem decompress_spec
-  (comp : CompressedRistretto) :
+theorem decompress_spec (comp : CompressedRistretto) :
 
   ∃ result, decompress comp = ok result ∧
 
-    ((result = none) ∨
+  (¬comp.IsValid →
+    result = none) ∧
 
-    (∃ rist,
-      result = some rist ∧
-      RistrettoPoint.compress rist = ok comp ∧
-      (∃ proj,
-        edwards.EdwardsPoint.as_projective rist = ok proj ∧
-        ProjectivePoint.IsValid proj))) := by
+  (comp.IsValid →
+    ∃ rist, result = some rist ∧ rist.IsValid) := by
+
   sorry
 
 end curve25519_dalek.ristretto.CompressedRistretto
