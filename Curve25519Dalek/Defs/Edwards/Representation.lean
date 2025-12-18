@@ -89,7 +89,8 @@ def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
   U8x32_as_Nat c < p ∧
   U8x32_as_Nat c % 2 = 0
   -- To do: this predicate is not complete yet, as some more complex
-  -- properties also need to be checked to assure a valid compressed Ristretto point:
+  -- properties also need to be checked for the field element corresponding to c
+  -- to assure a valid compressed Ristretto point:
   -- (1) The square root computation in step_2 must succeed (invsqrt returns Choice.one)
   -- (2) The computed t coordinate must be non-negative (t.is_negative returns Choice.zero)
   -- (3) The computed y coordinate must be nonzero (y.is_zero returns Choice.zero)
