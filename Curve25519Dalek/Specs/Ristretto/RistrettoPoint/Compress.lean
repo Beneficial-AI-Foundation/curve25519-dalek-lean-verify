@@ -20,6 +20,7 @@ and produces a unique, canonical byte representation.
 **Source**: curve25519-dalek/src/ristretto.rs
 
 ## TODO
+- Write specification
 - Complete proof
 -/
 
