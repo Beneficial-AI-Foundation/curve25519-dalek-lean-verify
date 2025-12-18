@@ -52,10 +52,9 @@ natural language specs:
 theorem elligator_ristretto_flavor_spec
   (r_0 : backend.serial.u64.field.FieldElement51)
   (h_r_0_bounds : ∀ i, i < 5 → (r_0[i]!).val < 2 ^ 54) :
-  ∃ rist proj,
+  ∃ rist,
     elligator_ristretto_flavor r_0 = ok rist ∧
-    edwards.EdwardsPoint.as_projective rist = ok proj ∧
-    ProjectivePoint.IsValid proj := by
+    rist.IsValid := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
