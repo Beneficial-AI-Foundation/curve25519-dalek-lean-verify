@@ -647,6 +647,17 @@ def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK : U64 :=
   eval_global
     backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
 
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK_body
+  : Result UInt64 := do
+  let i ← (1 : UInt64) <<< 51 + (1 : UInt64)
+  i
+
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK : UInt64 :=
+  eval_global
+    backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK_body
+
 -- #loogle _[_]? = _
 -- **FAE** Should rather benefit of the `LawfulGetElem` class
 example (α : Type*) (n i : ℕ) (v : Vector α n) (h : ∃ a : α, v[i]? = a) : i < n := by
@@ -663,17 +674,17 @@ example (α : Type*) (n i : ℕ) (v : Vector α n) (h : ∃ a : α, v[i]? = a) :
 it into a `BitVector` via `n.bv` and then to a `ℕ` via `.toNat`), and another index `i : Usize`,
 this returns an error if `n < i` and the `i`th value if `i ≤ n`. -/
 
-def FAE_Array.index_usize {α : Type*} {n i : Usize} (v : Vector α n.bv.toNat) : Result α :=
-  match v[i.bv.toNat]? with
+def FAE_Array.index_usize {α : Type*} {n : ℕ/- Usize -/} (v : Vector α n/- .bv.toNat -/) (i : ℕ/- Usize -/) : Result α :=
+  match v[i/- .bv.toNat -/]? with
   | none => fail .arrayOutOfBounds
   | some x => ok x
 
-def FAE_Array.update {α : Type*} {n i : Usize} (v: Vector α n.bv.toNat) (x : α) :
+def FAE_Array.update {α : Type*} {n : ℕ/- Usize -/} (v: Vector α n/- .bv.toNat -/) (i : ℕ/- Usize -/) (x : α) :
     Result (Vector α n) :=
-  match v[i.bv.toNat]? with
+  match v[i/- .bv.toNat -/]? with
   | none => fail .arrayOutOfBounds
   | some g => by
-    use ok <| v.set (i := i.bv.toNat) (h := ?_) x
+    use ok <| v.set (i := i/- .bv.toNat -/) (h := ?_) x
     sorry
 
     -- infer_instance
@@ -741,6 +752,64 @@ def backend.serial.u64.field.FieldElement51.reduce
   let i23 ← Array.index_usize limbs9 4#usize
   let i24 ← i23 + c3
   let limbs10 ← Array.update limbs9 4#usize i24
+  ok limbs10
+
+def backend.serial.u64.field.FieldElement51.FAE_reduce
+  (limbs : Vector UInt64 5) :
+  Result (Vector UInt64 5)--backend.serial.u64.field.FieldElement51
+  := do
+  let i ← FAE_Array.index_usize limbs 0--#usize
+  let (c0 : UInt64) ← i >>> 51
+  let i1 ← FAE_Array.index_usize limbs 1--#usize
+  let (c1 : UInt64) ← i1 >>> 51
+  let i2 ← FAE_Array.index_usize limbs 2--#usize
+  let (c2 : UInt64) ← i2 >>> 51
+  let i3 ← FAE_Array.index_usize limbs 3--#usize
+  let (c3 : UInt64) ← i3 >>> 51
+  let i4 ← FAE_Array.index_usize limbs 4--#usize
+  let (c4 : UInt64) ← i4 >>> 51
+  let i5 ←
+    (↑(i &&& backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK)
+      : Result UInt64)
+  let limbs1 ← FAE_Array.update limbs 0/- #usize -/ i5
+  let i6 ← FAE_Array.index_usize limbs1 1/- #usize -/
+  let i7 ←
+    (↑(i6 &&& backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK)
+      : Result UInt64)
+  let limbs2 ← FAE_Array.update limbs1 1/- #usize -/ i7
+  let i8 ← FAE_Array.index_usize limbs2 2/- #usize -/
+  let i9 ←
+    (↑(i8 &&& backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK)
+      : Result UInt64)
+  let limbs3 ← FAE_Array.update limbs2 2/- #usize -/ i9
+  let i10 ← FAE_Array.index_usize limbs3 3/- #usize -/
+  let i11 ←
+    (↑(i10 &&&
+      backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK) : Result
+      UInt64)
+  let limbs4 ← FAE_Array.update limbs3 3/- #usize -/ i11
+  let i12 ← FAE_Array.index_usize limbs4 4--#usize
+  let i13 ←
+    (↑(i12 &&&
+      backend.serial.u64.field.FieldElement51.reduce.FAE_LOW_51_BIT_MASK) : Result
+      UInt64)
+  let limbs5 ← FAE_Array.update limbs4 4/- #usize -/ i13
+  let (i14 : UInt64) ← c4 * (19 : UInt64)
+  let i15 ← FAE_Array.index_usize limbs5 0/- #usize -/
+  let i16 ← i15 + i14
+  let limbs6 ← FAE_Array.update limbs5 0#usize i16
+  let i17 ← FAE_Array.index_usize limbs6 1#usize
+  let i18 ← i17 + c0
+  let limbs7 ← FAE_Array.update limbs6 1#usize i18
+  let i19 ← FAE_Array.index_usize limbs7 2#usize
+  let i20 ← i19 + c1
+  let limbs8 ← FAE_Array.update limbs7 2#usize i20
+  let i21 ← FAE_Array.index_usize limbs8 3#usize
+  let i22 ← i21 + c2
+  let limbs9 ← FAE_Array.update limbs8 3#usize i22
+  let i23 ← FAE_Array.index_usize limbs9 4#usize
+  let i24 ← i23 + c3
+  let limbs10 ← FAE_Array.update limbs9 4#usize i24
   ok limbs10
 
 /- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub]:
