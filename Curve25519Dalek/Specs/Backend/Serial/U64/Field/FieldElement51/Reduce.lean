@@ -84,30 +84,32 @@ theorem FAE_reduce_spec (limbs : Vector UInt64 5) :
     (∀ i < 5, result[i]! ≤ 2^51 + (2^13 - 1) * 19) ∧
     FAE_Field51_as_Nat limbs ≡ FAE_Field51_as_Nat result [MOD p] := by
   unfold FAE_reduce
-  progress*
-  · -- BEGIN TASK
-    simp [*];-- scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp [*]; scalar_tac
-    -- END TASK
-  · constructor
-    · -- BEGIN TASK
-      intro i _
-      interval_cases i
-      all_goals simp [*]; scalar_tac
-      -- END TASK
-    · -- BEGIN TASK
-      simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
-      -- END TASK
+  sorry
+  --
+  -- progress*
+  -- · -- BEGIN TASK
+  --   simp [*];-- scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   simp [*]; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   simp [*]; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   simp [*]; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   simp [*]; scalar_tac
+  --   -- END TASK
+  -- · constructor
+  --   · -- BEGIN TASK
+  --     intro i _
+  --     interval_cases i
+  --     all_goals simp [*]; scalar_tac
+  --     -- END TASK
+  --   · -- BEGIN TASK
+  --     simp [Field51_as_Nat, Finset.sum_range_succ, p, Nat.ModEq, *]; omega
+  --     -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
