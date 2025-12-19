@@ -40,48 +40,15 @@ theorem conditional_select_spec
       (∀ i < 5,
         res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by
   unfold backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
-  progress*
   unfold subtle.ConditionallySelectableU64.conditional_select
   by_cases h: choice.val = 1#u8
-  · simp_all
+  · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
     progress*
-    intro i a
-    rw[Array.make]
-    simp_all
-    cases i
-    · simp
-    · rename_i i
-      cases i
-      · simp
-      · rename_i i
-        cases i
-        · simp
-        · rename_i i
-          cases i
-          · simp
-          · rename_i i
-            cases i
-            · simp
-            · scalar_tac
-  · simp_all
+    intro i _
+    interval_cases i; all_goals simp_all [Array.make]
+  · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
     progress*
-    rw[Array.make]
-    intro i a
-    simp_all
-    cases i
-    · simp
-    · rename_i i
-      cases i
-      · simp
-      · rename_i i
-        cases i
-        · simp
-        · rename_i i
-          cases i
-          · simp
-          · rename_i i
-            cases i
-            · simp
-            · scalar_tac
+    intro i _
+    interval_cases i; all_goals simp_all [Array.make]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.ConditionalSelect
