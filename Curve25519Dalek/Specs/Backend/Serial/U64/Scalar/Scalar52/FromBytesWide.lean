@@ -186,8 +186,7 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
 
     have h_b_decomp : U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * R := by
       sorry
-    -- grind []
-
+    -- worng?
     have h_combined : Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 = (Scalar52_as_Nat hi * R + Scalar52_as_Nat lo) := by
       sorry
 
