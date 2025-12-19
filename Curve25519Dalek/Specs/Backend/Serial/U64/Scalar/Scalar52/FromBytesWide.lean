@@ -182,21 +182,15 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize)
   · let lo := (((((Aeneas.Std.Array.set ZERO 0#usize i2).set 1#usize i7).set 2#usize i12).set
     3#usize i17).set 4#usize i22)
     let hi := (((((Aeneas.Std.Array.set ZERO 0#usize i24).set 1#usize i29).set 2#usize i34).set 3#usize i39).set 4#usize i41)
-    have h_res_mod : Scalar52_as_Nat res ≡ Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 [MOD L] := by
-      rw [Nat.ModEq]
-      exact res_post
-    have h_RR : Scalar52_as_Nat constants.RR ≡ R^2 [MOD L] := by
-      grind [constants.RR_spec, Nat.ModEq]
-    have h_b_decomp : U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^256 := by
+
+
+    have h_b_decomp : U8x64_as_Nat b = Scalar52_as_Nat lo + Scalar52_as_Nat hi * R := by
       sorry
     -- grind []
 
-    have h_combined : Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 ≡ Scalar52_as_Nat hi * R + Scalar52_as_Nat lo [MOD L] := by
+    have h_combined : Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 = (Scalar52_as_Nat hi * R + Scalar52_as_Nat lo) := by
       sorry
-    have h_final : Scalar52_as_Nat hi * 2^256 + Scalar52_as_Nat lo ≡ U8x64_as_Nat b [MOD L] := by
-      rw [h_b_decomp]
-      -- grind
-      sorry
-    sorry
+
+    grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

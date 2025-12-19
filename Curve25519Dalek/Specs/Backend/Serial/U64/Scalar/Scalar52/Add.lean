@@ -170,37 +170,38 @@ decreasing_by scalar_decr_tac
 theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259) :
     ∃ v, add a b = ok v ∧
-    Scalar52_as_Nat v % L = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
-  unfold add
-  progress*
-  · -- BEGIN TASK
-    intro j _
-    unfold ZERO
-    interval_cases j <;> decide
-    -- END TASK
-  · -- BEGIN TASK
-    unfold ZERO; decide
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    unfold constants.L
-    interval_cases i <;> decide
-    -- END TASK
-  · -- BEGIN TASK
-    rw [constants.L_spec] at res_post
-    have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
-      have hL_mod : L ≡ 0 [MOD L] := by
-        rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
-      have : Scalar52_as_Nat res + L ≡ Scalar52_as_Nat res + 0 [MOD L] :=
-        Nat.ModEq.add_left _ hL_mod
-      simp only [add_zero] at this
-      exact this.symm.trans res_post
-    have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
-      unfold Scalar52_as_Nat
-      simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
-      conv_lhs => rw [sum_post_3]
-      simp [Finset.sum_add_distrib, Nat.mul_add]
-    rw [h1, h2]
-    -- END TASK
+    Scalar52_as_Nat v = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
+  sorry
+  -- unfold add
+  -- progress*
+  -- · -- BEGIN TASK
+  --   intro j _
+  --   unfold ZERO
+  --   interval_cases j <;> decide
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   unfold ZERO; decide
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   intro i hi
+  --   unfold constants.L
+  --   interval_cases i <;> decide
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   rw [constants.L_spec] at res_post
+  --   have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
+  --     have hL_mod : L ≡ 0 [MOD L] := by
+  --       rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
+  --     have : Scalar52_as_Nat res + L ≡ Scalar52_as_Nat res + 0 [MOD L] :=
+  --       Nat.ModEq.add_left _ hL_mod
+  --     simp only [add_zero] at this
+  --     exact this.symm.trans res_post
+  --   have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
+  --     unfold Scalar52_as_Nat
+  --     simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
+  --     conv_lhs => rw [sum_post_3]
+  --     simp [Finset.sum_add_distrib, Nat.mul_add]
+  --   rw [h1, h2]
+  --   -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
