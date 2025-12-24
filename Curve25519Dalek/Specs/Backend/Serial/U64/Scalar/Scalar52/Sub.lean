@@ -81,15 +81,17 @@ attribute [-simp] Int.reducePow Nat.reducePow
 - Does not error and hence returns a result
 - The result represents (a - b) mod L where L is the group order
 - Requires that input limbs are within bounds (52-bit values) -/
+
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
-    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
+    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
+    (hbound : Scalar52_as_Nat a + L ≥ Scalar52_as_Nat b ∧
+              Scalar52_as_Nat a < Scalar52_as_Nat b + L) :
     ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] := by
-  unfold sub
-  -- progress*
-
+    Scalar52_as_Nat result = (Scalar52_as_Nat a + L - Scalar52_as_Nat b) % L ∧
+    (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
+    Scalar52_as_Nat result < L := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
