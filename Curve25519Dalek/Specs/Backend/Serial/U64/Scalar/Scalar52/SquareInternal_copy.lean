@@ -70,8 +70,10 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
     · try grind
     · --
       intro i hi
+
       expand ha with 5
       interval_cases i
+
       all_goals
         simp only [List.getElem?_cons_zero, List.getElem?_cons_succ, Option.getD_some]
         simp [*]
