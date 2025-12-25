@@ -40,7 +40,7 @@ natural language specs:
   (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62):
+theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :
     ∃ w,
     montgomery_square m = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
@@ -48,7 +48,6 @@ theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 6
     := by
   unfold montgomery_square
   progress*
-  
-  sorry
+
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
