@@ -19,6 +19,39 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
+namespace Calc
+
+/-- Helper: x * y < 2^124 -/
+theorem mul {x y : Nat} (hx : x < 2 ^ 62) (hy : y < 2 ^ 62) :
+    x * y < 2^124 := by
+  calc
+    x * y < 2^62 * 2^62 := Nat.mul_lt_mul_of_le_of_lt (Nat.le_of_lt hx) hy (by decide)
+    _ = 2^124 := by norm_num
+
+/-- Helper: x * x < 2^124 (Special case for squares) -/
+theorem sq {x : Nat} (hx : x < 2 ^ 62) : x * x < 2^124 := mul hx hx
+
+/-- Helper: 2 * x * y < 2^125 -/
+theorem mul2 {x y : Nat} (hx : x < 2 ^ 62) (hy : y < 2 ^ 62) :
+    2 * x * y < 2^125 := by
+  rw [Nat.mul_assoc]
+  calc
+    2 * (x * y) < 2 * 2^124 := by
+      apply Nat.mul_lt_mul_of_pos_left
+      · exact mul hx hy
+      · decide
+    _ = 2^125 := by norm_num
+
+/-- Helper: a + b < 2^127 -/
+theorem add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
+    a + b < 2^127 := by
+  calc
+    a + b < 2^126 + 2^126 := Nat.add_lt_add ha hb
+    _ = 2 * 2^126 := by ring
+    _ = 2^127 := by norm_num
+
+end Calc
+
 /-! ## Spec for `square_internal` -/
 
 /-- **Spec for `square_internal`**:
@@ -33,6 +66,7 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
     (∀ i < 9, result[i]!.val < 2 ^ 127) := by
   unfold square_internal Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
   progress*
+
   · -- BEGIN TASK
     subst_vars; expand ha with 5; scalar_tac
     -- END TASK
@@ -63,101 +97,70 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
   · -- BEGIN TASK
     subst_vars; expand ha with 5; scalar_tac
     -- END TASK
+
   · -- BEGIN TASK
     unfold Array.make at *
-    simp [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ, *]
+    simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ, *]
     refine ⟨?_, ?_⟩
-    · try grind
     · --
-      intro i hi
-      expand ha with 5
-      interval_cases i
-      all_goals
-        simp only [List.getElem?_cons_zero, List.getElem?_cons_succ, Option.getD_some]
-        simp [*]
-        simp only [Array.getElem!_Nat_eq] at *
+      try grind
+      
+      sorry
+    · -- Postcondition Logic
+      sorry
 
-        have h_len : a.val.length = 5 := List.Vector.length_val a
+    --   intro i hi
 
-        have h_limbs (i : Nat) (hi : i < 5) : a[i].val < 2^62 := by
-          have := ha i hi; norm_cast at this; rw [getElem!_pos] at this; exact this
+    --   let n (k : Nat) : Nat := a[k]!.val
+    --   have hn (k : Nat) (hk : k < 5) : n k < 2^62 := by
+    --     dsimp [n]; have := ha k hk; norm_cast at this
+    --     rw [List.getElem!_pos] at this <;> simp [*, List.Vector.length_val a]
+    --     exact this
 
-      · -- subgoal 1
-        rw [getElem!_pos] at ha_0
-        · --
-          have ha_0' : a[0].val < 2^62 := by
-            have h_raw := ha 0 (by decide)
-            norm_cast at h_raw
+    --   norm_cast
+    --   expand ha with 5
+    --   interval_cases i
 
-          have h_sq_nat : a[0].val * a[0].val < 2^127 := by
-            calc
-              a[0].val * a[0].val < 2^62 * 2^62 := by
-                apply Nat.mul_lt_mul_of_le_of_lt
-                · exact Nat.le_of_lt ha_0'
-                · exact ha_0'
-                · decide
-              _ = 2^124 := by norm_num
-              _ < 2^127 := by norm_num
-          norm_cast
-      · -- subgoal 2
-        calc
-          a[0].val * 2 * a[1].val
-            = 2 * (a[0].val * a[1].val) := by ring
-          _ < 2 * (2^62 * 2^62) := by
-            apply Nat.mul_lt_mul_of_pos_left
-            · apply Nat.mul_lt_mul_of_le_of_lt
-              · exact Nat.le_of_lt (h_limbs 0 (by decide))
-              · exact h_limbs 1 (by decide)
-              · decide
-            · decide -- 0 < 2
-          _ = 2^125 := by norm_num
-          _ < 2^127 := by norm_num
-      · -- subgoal 3
-        have h_part1 : a[0].val * 2 * a[2].val < 2^125 := by
-          rw [Nat.mul_comm _ 2, Nat.mul_assoc]
-          calc
-            2 * (a[0].val * a[2].val)
-              < 2 * (2^62 * 2^62) := by
-                apply Nat.mul_lt_mul_of_pos_left
-                · apply Nat.mul_lt_mul_of_le_of_lt
-                  · apply Nat.le_of_lt; exact h_limbs 0 (by decide)
-                  · exact h_limbs 2 (by decide)
-                  · decide
-                · decide
-            _ = 2^125 := by norm_num
+    --   -- 1. n0 * n0
+    --   · apply Nat.lt_trans (Calc.sq (hn 0 (by decide))); norm_num
 
-        have h_part2 : a[1].val * a[1].val < 2^124 := by
-          calc
-            a[1].val * a[1].val
-              < 2^62 * 2^62 := by
-                apply Nat.mul_lt_mul_of_le_of_lt
-                · apply Nat.le_of_lt; exact h_limbs 1 (by decide)
-                · exact h_limbs 1 (by decide)
-                · decide
-            _ = 2^124 := by norm_num
+    --   -- 2. 2 * n0 * n1
+    --   · apply Nat.lt_trans (Calc.mul2 (hn 0 (by decide)) (hn 1 (by decide))); norm_num
 
-        calc
-          _ < 2^125 + 2^124 := by apply Nat.add_lt_add h_part1 h_part2
-          _ = 3 * 2^124     := by ring
-          _ < 4 * 2^124     := by apply Nat.mul_lt_mul_of_pos_right <;> decide
-          _ = 2^126         := by ring
-          _ < 2^127         := by norm_num
+    --   -- 3. 2*n0*n2 + n1*n1
+    --   · apply Calc.add
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 0 (by decide)) (hn 2 (by decide))); norm_num
+    --     · apply Nat.lt_trans (Calc.sq (hn 1 (by decide))); norm_num
 
-      · --
-        sorry
-      · --
-        sorry
-      · --
-        sorry
-      · --
-        sorry
-      · --
-        sorry
-      · --
-        sorry
+    --   -- 4. 2*n0*n3 + 2*n1*n2
+    --   · apply Calc.add
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 0 (by decide)) (hn 3 (by decide))); norm_num
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 1 (by decide)) (hn 2 (by decide))); norm_num
 
+    --   -- 5. 2*n0*n4 + 2*n1*n3 + n2*n2
+    --   · apply Nat.lt_trans _ (show 2^126 + 2^124 < 2^127 by norm_num)
+    --     apply Nat.add_lt_add
+    --     · apply Calc.add -- recursive add for the first two
+    --       · apply Nat.lt_trans (Calc.mul2 (hn 0 (by decide)) (hn 4 (by decide))); norm_num
+    --       · apply Nat.lt_trans (Calc.mul2 (hn 1 (by decide)) (hn 3 (by decide))); norm_num
+    --     · apply Nat.lt_trans (Calc.sq (hn 2 (by decide))); norm_num
 
-    -- END TASK
+    --   -- 6. 2*n1*n4 + 2*n2*n3
+    --   · apply Calc.add
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 1 (by decide)) (hn 4 (by decide))); norm_num
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 2 (by decide)) (hn 3 (by decide))); norm_num
+
+    --   -- 7. 2*n2*n4 + n3*n3
+    --   · apply Calc.add
+    --     · apply Nat.lt_trans (Calc.mul2 (hn 2 (by decide)) (hn 4 (by decide))); norm_num
+    --     · apply Nat.lt_trans (Calc.sq (hn 3 (by decide))); norm_num
+
+    --   -- 8. 2*n3*n4
+    --   · apply Nat.lt_trans (Calc.mul2 (hn 3 (by decide)) (hn 4 (by decide))); norm_num
+
+    --   -- 9. n4*n4
+    --   · apply Nat.lt_trans (Calc.sq (hn 4 (by decide))); norm_num
+    -- -- END TASK
 
 
 
