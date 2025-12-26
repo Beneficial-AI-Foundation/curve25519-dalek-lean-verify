@@ -78,20 +78,20 @@ attribute [-simp] Int.reducePow Nat.reducePow
 --   decreasing_by scalar_decr_tac
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
-- Does not error and hence returns a result
-- The result represents (a - b) mod L where L is the group order
-- Requires that input limbs are within bounds (52-bit values) -/
-
+- Requires bounded limbs for both inputs
+- Requires both inputs to be bounded from above
+- The result represents (a - b) mod L
+- The result has bounded limbs and is canonical -/
 @[progress]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
-    (hbound : Scalar52_as_Nat a + L ≥ Scalar52_as_Nat b ∧
-              Scalar52_as_Nat a < Scalar52_as_Nat b + L) :
+    (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
+    (hb' : Scalar52_as_Nat b ≤ L) :
     ∃ result, sub a b = ok result ∧
-    Scalar52_as_Nat result = (Scalar52_as_Nat a + L - Scalar52_as_Nat b) % L ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
-    Scalar52_as_Nat result < L := by
+    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
+    Scalar52_as_Nat result < L ∧
+    (∀ i < 5, result[i]!.val < 2 ^ 52) := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
