@@ -167,10 +167,13 @@ decreasing_by scalar_decr_tac
 - The result represents the sum of the two input scalars modulo L
 -/
 @[progress]
-theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
-    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259) :
+theorem add_spec (a b : Scalar52)
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
+    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b < L) :
     ∃ v, add a b = ok v ∧
-    Scalar52_as_Nat v = (Scalar52_as_Nat a + Scalar52_as_Nat b) % L := by
+    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
+    Scalar52_as_Nat v < L := by
+  unfold add
   sorry
 --   unfold add
 --   progress*
@@ -197,7 +200,7 @@ theorem add_spec (a b : Scalar52) (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀
 --       -- have : Scalar52_as_Nat res + L = Scalar52_as_Nat res + 0 % L :=
 --       --   sorry
 --       -- simp only [add_zero] at this
---       sorry
+  --       sorry
 --       -- grind [Nat.ModEq]
 --       -- exact this.symm.trans
 --       -- res_post
