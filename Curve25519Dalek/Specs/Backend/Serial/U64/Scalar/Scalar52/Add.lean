@@ -40,7 +40,7 @@ natural language specs:
 -/
 
 set_option maxHeartbeats 1000000 in
--- probably the simp_all is heavy
+-- simp_all is heavy
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:
 - Starting from index `i` with accumulator `sum` and carry `carry`
 - Computes limb-wise addition with carry propagation
@@ -174,45 +174,51 @@ theorem add_spec (a b : Scalar52)
     Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
     Scalar52_as_Nat v < L := by
   unfold add
-  sorry
---   unfold add
---   progress*
---   · -- BEGIN TASK
---     intro j _
---     unfold ZERO
---     interval_cases j <;> decide
---     -- END TASK
---   · -- BEGIN TASK
---     unfold ZERO; decide
---     -- END TASK
---   · -- BEGIN TASK
---     intro i hi
---     unfold constants.L
---     interval_cases i <;> decide
---     -- END TASK
---   · -- BEGIN TASK
---     rw [constants.L_spec] at res_post
---     have h1 : Scalar52_as_Nat res = Scalar52_as_Nat sum % L := by
---       have hL_mod : L = 0 % L := by
---         sorry
---         -- grind [Nat.zero_mod]
---         -- -- omega
---       -- have : Scalar52_as_Nat res + L = Scalar52_as_Nat res + 0 % L :=
---       --   sorry
---       -- simp only [add_zero] at this
-  --       sorry
---       -- grind [Nat.ModEq]
---       -- exact this.symm.trans
---       -- res_post
-
---     have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
---       unfold Scalar52_as_Nat
---       simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
---       conv_lhs => rw [sum_post_3]
---       simp [Finset.sum_add_distrib, Nat.mul_add]
---     -- decide
---     rw [h1, h2]
---     -- END TASK
-
+  progress*
+  · -- BEGIN TASK
+    have : L ≤ 2 ^ 259 := by unfold L; grind
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    have : L ≤ 2 ^ 259 := by unfold L; grind
+    grind
+    -- END TASK
+  · -- BEGIN TASK
+    intro j _
+    unfold ZERO
+    interval_cases j <;> decide
+    -- END TASK
+  · -- BEGIN TASK
+    unfold ZERO; decide
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    unfold constants.L
+    interval_cases i <;> decide
+    -- END TASK
+  · sorry
+  · -- BEGIN TASK
+    rw [constants.L_spec]
+    -- END TASK
+  · constructor
+    · -- BEGIN TASK
+      rw [constants.L_spec] at res_post_1
+      have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
+        have hL_mod : L ≡ 0 [MOD L] := by
+          rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
+        have : Scalar52_as_Nat res + L ≡ Scalar52_as_Nat res + 0 [MOD L] :=
+          Nat.ModEq.add_left _ hL_mod
+        simp only [add_zero] at this
+        exact this.symm.trans res_post_1
+      have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
+        unfold Scalar52_as_Nat
+        simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
+        conv_lhs => rw [sum_post_3]
+        simp [Finset.sum_add_distrib, Nat.mul_add]
+      grind
+      -- END TASK
+    · -- BEGIN TASK
+      assumption
+      -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
