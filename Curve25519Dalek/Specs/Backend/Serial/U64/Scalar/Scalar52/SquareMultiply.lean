@@ -46,12 +46,12 @@ natural language specs:
         result * R^(2^s) = y^(2^s) * x (mod L)
 -/
 
--- Helper: Simple definition for powers of 2 using Nat
+-- Helper function
 def pow2 (n : Nat) : Nat := 2^n
 
 /--
 Specification for the inner loop `square_multiply_loop`.
-It performs `squarings - i` remaining squarings on `y`.
+It performs `squarings - i` remaining squarings on `y` (all in Montgomery form).
 
 Mathematically, if the loop runs `k` times, it computes:
   res = y^(2^k) * R^{-(2^k - 1)}
@@ -103,8 +103,15 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
 
       refine ⟨res, h_call_loop, ?_, h_res_bound⟩
       · -- Proof of Equality
-        
-        sorry
+        have h_pow_split : pow2 (n + 1) - 1 = (pow2 n - 1) + pow2 n := by
+          simp [pow2, Nat.pow_succ, Nat.mul_succ]
+          have : 1 ≤ 2^n := Nat.one_le_pow n 2 (by decide)
+          omega
+
+        rw [h_pow_split, Nat.pow_add]
+        unfold pow2 at *; try ring_nf at ⊢ h_math_ih
+        rw [Nat.mul_mod, h_math_ih, ← Nat.mul_mod, ← Nat.mul_pow, Nat.pow_mod, ← hy1_eq, ← Nat.pow_mod]
+        try ring_nf
 
     · -- Case 2: Loop Terminates (i >= squarings)
       -- This contradicts the induction hypothesis (squarings - i = n + 1 >= 1)
@@ -130,13 +137,13 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
 
   -- -- 1. Run the loop (squaring phase)
   -- -- Loop runs from 0 to squarings, so it runs `squarings` times.
-  -- progress with square_multiply_loop_spec as ⟨y_pow, h_loop_bnds, h_loop_eq⟩
+  -- progress with square_multiply_loop_spec as ⟨y_pow, h_loop_eq, h_loop_bnds⟩
   -- · simp
   -- · exact hy
 
   -- -- 2. Run the multiplication phase
   -- -- y_pow is roughly y^(2^s) * R^(-(2^s - 1))
-  -- progress with montgomery_mul_spec as ⟨res, h_mul_bnds, h_mul_eq⟩
+  -- progress with montgomery_mul_spec as ⟨res, h_mul_eq, h_mul_bnds⟩
   -- · exact h_loop_bnds
   -- · exact hx
 
