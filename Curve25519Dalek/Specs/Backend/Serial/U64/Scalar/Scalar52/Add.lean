@@ -196,7 +196,15 @@ theorem add_spec (a b : Scalar52)
     unfold constants.L
     interval_cases i <;> decide
     -- END TASK
-  · sorry
+  · rw [constants.L_spec]
+    simp at sum_post_3
+    -- Remains to prove
+    -- `⊢ Scalar52_as_Nat sum < L + L`
+    -- This follow from the combination of
+    -- `ha' : Scalar52_as_Nat a < L`
+    -- `hb' : Scalar52_as_Nat b < L`
+    -- `sum_post_3 : ∑ x ∈ Finset.range 5, 2 ^ (52 * x) * ↑(↑sum)[x]! = ∑ x ∈ Finset.range 5, 2 ^ (52 * x) * (↑(↑a)[x]! + ↑(↑b)[x]!)`
+    sorry
   · -- BEGIN TASK
     rw [constants.L_spec]
     -- END TASK
