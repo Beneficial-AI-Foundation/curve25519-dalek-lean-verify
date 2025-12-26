@@ -132,28 +132,27 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     (Scalar52_as_Nat res * R ^ (pow2 squarings.val)) % L =
     ((Scalar52_as_Nat y) ^ (pow2 squarings.val) * (Scalar52_as_Nat x)) % L ∧
     (∀ i < 5, res[i]!.val < 2 ^ 62) := by
-  sorry
-  -- unfold montgomery_invert.square_multiply
+  unfold montgomery_invert.square_multiply
+  progress with square_multiply_loop_spec as ⟨ h_loop_res, h_loop_math, h_loop_bound ⟩
 
-  -- -- 1. Run the loop (squaring phase)
-  -- -- Loop runs from 0 to squarings, so it runs `squarings` times.
-  -- progress with square_multiply_loop_spec as ⟨y_pow, h_loop_eq, h_loop_bnds⟩
-  -- · simp
-  -- · exact hy
+  simp only [tsub_zero] at h_loop_math
+  progress as ⟨ h_mul_res, h_mul_math, h_mul_bound ⟩
+  refine ⟨?_, h_mul_bound⟩
 
-  -- -- 2. Run the multiplication phase
-  -- -- y_pow is roughly y^(2^s) * R^(-(2^s - 1))
-  -- progress with montgomery_mul_spec as ⟨res, h_mul_eq, h_mul_bnds⟩
-  -- · exact h_loop_bnds
-  -- · exact hx
+  have h_pow_split : R ^ (pow2 squarings.val) = R * R ^ (pow2 squarings.val - 1) := by
+    rw [← Nat.pow_succ']; congr 1
+    have : 1 ≤ pow2 squarings.val := Nat.one_le_pow _ _ (by decide)
+    omega
 
-  -- exists res
-  -- constructor
-  -- · exact h_mul_bnds
-  -- · -- Algebra:
-  --   -- 1. y_pow * R^(2^s - 1) = y^(2^s)
-  --   -- 2. res * R = y_pow * x
-  --   -- Combine to prove: res * R^(2^s) = y^(2^s) * x
-  --   sorry
+  have h_mul_eq : (Scalar52_as_Nat h_mul_res * R) % L =
+                  (Scalar52_as_Nat h_loop_res * Scalar52_as_Nat x) % L :=
+    h_mul_math.symm
+
+  rw [h_pow_split, ← Nat.mul_assoc, Nat.mul_mod, h_mul_eq, ← Nat.mul_mod]
+  unfold pow2 at *
+  try ring_nf
+
+  rw [Nat.mul_comm (Scalar52_as_Nat h_loop_res), Nat.mul_assoc, Nat.mul_mod, h_loop_math]
+  rw [← Nat.mul_mod]
 
 end curve25519_dalek.scalar.Scalar52
