@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -57,11 +57,10 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
 
   progress as ⟨h1, h1_eq, h1_bnds⟩
   progress as ⟨h2, h2_eq, h2_bnds⟩
-  · --
 
-    sorry
-  · --
-    sorry
+
+  sorry
+
 
 
 end curve25519_dalek.scalar.Scalar52
