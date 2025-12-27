@@ -30,7 +30,7 @@ instance : Fact (Nat.Prime L) := ⟨by
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
-set_option maxHeartbeats 2000000 in
+set_option maxHeartbeats 2000000 in -- progress* failed with normal heartbeats
 set_option exponentiation.threshold 262 in
 
 /-
@@ -64,50 +64,68 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     ∃ u', montgomery_invert u = ok u' ∧
     (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L := by
   unfold montgomery_invert
-
   progress*
   unfold pow2 at *
 
+  -- 1. Setup L as Prime (Makes ZMod L a Field)
+  have hL_gt_1 : 1 < L := by unfold L; try decide
+  letI : Fact (Nat.Prime L) := ⟨by sorry⟩ -- Essential for Field instance
+  letI : Fact (1 < L) := ⟨hL_gt_1⟩
 
+  -- 2. Setup R Invertibility
   have hR_inv : Invertible (R : ZMod L) := by
     apply invertibleOfCoprime
     unfold R
     rw [Nat.coprime_pow_left_iff (n := 260) (by decide)]
     rw [Nat.coprime_two_left]
-    try decide
-
-  simp only [*] at *
-
-  repeat rw [← ZMod.natCast_eq_natCast_iff (c := L)] at *
-  simp only [Nat.cast_mul] at *
-
-  have hL_gt_1 : 1 < L := by
-    unfold L; try decide
-  letI : Fact (1 < L) := ⟨hL_gt_1⟩ -- Essential for Nontrivial
+    exact Nat.Prime.odd_of_ne_two (Fact.out) (by unfold L; decide)
   letI : Invertible (R : ZMod L) := hR_inv
+  have hR_ne_zero : (R : ZMod L) ≠ 0 := IsUnit.ne_zero (isUnit_of_invertible _)
 
-  have hR_ne_zero : (R : ZMod L) ≠ 0 := IsUnit.ne_zero (isUnit_of_invertible (R : ZMod L))
-  -- 4. Create a specific rewrite rule for R and its powers
-  -- This lemma says: "If x * R^n = y, then x = y * (R^n)⁻¹"
-  -- It automatically handles R, R^2, R^8 etc. because R^1 = R.
-  have h_iso (n : ℕ) (x y : ZMod L) : x * (R : ZMod L) ^ n = y ↔ x = y * ((R : ZMod L) ^ n)⁻¹ :=
-    (eq_mul_inv_iff_mul_eq₀ (pow_ne_zero n hR_ne_zero)).symm
-
-  simp only [h_iso] at *
-  field_simp [hR_ne_zero] at *
-
-  try ring_nf
+  -- 3. Lift from Nat to ZMod L
   apply (ZMod.natCast_eq_natCast_iff (Scalar52_as_Nat u * Scalar52_as_Nat res) (R * R) L).mp
   push_cast
 
-  field_simp
+  have lift_to_zmod (a b : ℕ) : a % L = b % L ↔ (a : ZMod L) = (b : ZMod L) := by
+    rw [ZMod.natCast_eq_natCast_iff]
+    exact Eq.to_iff rfl
+
+  simp only [lift_to_zmod] at *
+  simp only [Nat.cast_mul, Nat.cast_pow] at *
+
+  -- 4. Isolate Variables
+  -- Case A: R^n * x = y  ->  x = y * R^-n
+  have h_iso_L (n : ℕ) (x y : ZMod L) : (R : ZMod L) ^ n * x = y ↔ x = y * ((R : ZMod L) ^ n)⁻¹ := by
+    rw [mul_comm ((R : ZMod L)^n), eq_mul_inv_iff_mul_eq₀]
+    apply pow_ne_zero; exact hR_ne_zero
+
+  -- Case B: x * R^n = y  ->  x = y * R^-n
+  have h_iso_R (n : ℕ) (x y : ZMod L) : x * (R : ZMod L) ^ n = y ↔ x = y * ((R : ZMod L) ^ n)⁻¹ := by
+    rw [eq_mul_inv_iff_mul_eq₀]
+    apply pow_ne_zero; exact hR_ne_zero
+
+  -- Case C: Simple R * x = y (Captures n=1 cases that matching might miss)
+  have h_iso_L1 (x y : ZMod L) : (R : ZMod L) * x = y ↔ x = y * (R : ZMod L)⁻¹ := by
+    rw [mul_comm, eq_mul_inv_iff_mul_eq₀ hR_ne_zero]
+
+  -- Case D: Simple x * R = y
+  have h_iso_R1 (x y : ZMod L) : x * (R : ZMod L) = y ↔ x = y * (R : ZMod L)⁻¹ := by
+    rw [eq_mul_inv_iff_mul_eq₀ hR_ne_zero]
+
+  simp only [*] at *
+  simp only [Nat.reduceAdd, Nat.reducePow] at *
+
+  -- generalize h_r_def : (R : ZMod L) = r
+  -- have hr_ne_zero : r ≠ 0 := by rw [← h_r_def]; exact hR_ne_zero
+
+  simp only [h_iso_L, h_iso_R, h_iso_L1, h_iso_R1] at *
+
+  --field_simp [hR_ne_zero] at *
 
   group
 
-  -- have hL_prime : Fact (Nat.Prime L) := ⟨by sorry⟩
-  -- rw [ZMod.pow_card_sub_one_eq_one hL_prime (Scalar52_as_Nat u)]
-
   sorry
+
   -- progress as ⟨h1, h1_eq, h1_bnds⟩
   -- progress as ⟨h2, h2_eq, h2_bnds⟩
   -- progress as ⟨h3, h3_eq, h3_bnds⟩
