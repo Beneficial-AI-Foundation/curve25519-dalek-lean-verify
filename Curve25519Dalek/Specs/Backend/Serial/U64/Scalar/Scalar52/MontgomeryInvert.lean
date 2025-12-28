@@ -22,10 +22,11 @@ This function computes the multiplicative inverse using Montgomery form.
 
 -/
 
-instance : Fact (Nat.Prime L) := ⟨by
-  -- This is a known prime (2^252 + ...). TODO: find PrimeCert proof
-  sorry
-⟩
+instance : Fact (Nat.Prime L) := by
+  unfold L
+  exact ⟨PrimeCert.prime_ed25519_order⟩
+
+
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
@@ -130,7 +131,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
 
   -- 1. Setup
   have hL_gt_1 : 1 < L := by unfold L; try decide
-  letI : Fact (Nat.Prime L) := ⟨by sorry⟩ -- TODO: find PrimeCert proof
+  letI : Fact (Nat.Prime L) := by infer_instance
   letI : Fact (1 < L) := ⟨hL_gt_1⟩
 
   have hR_inv : Invertible (R : ZMod L) := by
@@ -217,7 +218,6 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   -- Run y1 with the abstract N_huge
   have step_y1 := run_loop_nat y _101 y1 16 5 N_huge step_y step_101 y1_post_safe
 
-
   -- THE REST OF THE CHAIN (Small Exponents)
   have step_y2  := run_loop_nat y1 _11 y2 _ 3 16 step_y1 step_11 y2_post_1
   have step_y3  := run_loop_nat y2  _1111 y3  _  15 32 step_y2  step_1111 y3_post_1
@@ -248,7 +248,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   have step_res := run_loop_nat y26 _11 res _ 3 8 step_y26 step_11 res_post_1
 
   -- =========================================================
-  -- 3. CONCLUSION
+  -- CONCLUSION
   -- =========================================================
 
   -- The Goal: u * res = R * R
@@ -271,14 +271,12 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
 
   -- Final Algebraic Simplification
   -- uZ * (uZ^(L-2) * RZ^(1-(L-2))) = RZ^2
-  -- a. Combine uZ
-  -- uZ * uZ^(L-2) = uZ^(1 + L - 2) = uZ^(L-1)
+  -- a. uZ * uZ^(L-2) = uZ^(1 + L - 2) = uZ^(L-1)
   rw [← mul_assoc, ← pow_succ']
   have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
   rw [h_fermat_exp]
 
   -- b. Apply Fermat's Little Theorem: uZ^(L-1) = 1
-  -- We need to prove uZ != 0
   rw [← h_uZ]
   have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
     rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
