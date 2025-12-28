@@ -43,8 +43,8 @@ natural language specs:
 theorem double_spec (e : EdwardsPoint) :
     ∃ e_double e_plus_e eq_choice,
     double e = ok e_double ∧
-    add e e = ok e_plus_e ∧
-    ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧
+    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add e e = ok e_plus_e ∧
+    edwards.ConstantTimeEqEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧
     eq_choice = Choice.one := by
     sorry
 

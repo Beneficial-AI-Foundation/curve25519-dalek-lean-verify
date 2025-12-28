@@ -19,7 +19,7 @@ This function adds two Ristretto points by delegating to the underlying Edwards 
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.ristretto.RistrettoPoint
+namespace curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint
 
 /-
 natural language description:
@@ -59,8 +59,7 @@ theorem add_spec (self other : RistrettoPoint)
     (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)
     (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :
 
-    ∃ result,
-    add self other = ok result ∧
+    ∃ result, add self other = ok result ∧
 
     (∀ i < 5,
       result.X[i]!.val < 2 ^ 54  ∧
@@ -89,4 +88,4 @@ theorem add_spec (self other : RistrettoPoint)
     Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by
     sorry
 
-end curve25519_dalek.ristretto.RistrettoPoint
+end curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint
