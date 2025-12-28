@@ -37,11 +37,11 @@ theorem conditional_assign_spec
     (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
     ∃ res,
-      ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
         self other choice = ok res ∧
       (∀ i < 5,
         res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) := by
-  unfold ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+  unfold backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
   -- Directly discharge by unfolding; detailed limbwise reasoning mirrors
   -- the sequence of index_mut_usize updates and U64 conditional_assign.
   -- We leave the mechanical proof obligations to future work.

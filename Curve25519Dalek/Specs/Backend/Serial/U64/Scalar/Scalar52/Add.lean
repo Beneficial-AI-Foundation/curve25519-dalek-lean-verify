@@ -63,8 +63,8 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
       2 ^ (52 * i.val) * (carry.val / 2 ^ 52) := by
   unfold add_loop
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-  unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
   progress*
   · -- BEGIN TASK
     have := ha i (by scalar_tac)

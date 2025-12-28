@@ -35,11 +35,11 @@ theorem conditional_select_spec
     (a b : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
     ∃ res,
-      backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
+      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
         a b choice = ok res ∧
       (∀ i < 5,
         res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by
-  unfold backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
+  unfold backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
   unfold subtle.ConditionallySelectableU64.conditional_select
   by_cases h: choice.val = 1#u8
   · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]

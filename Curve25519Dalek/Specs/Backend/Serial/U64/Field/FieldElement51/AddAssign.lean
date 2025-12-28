@@ -22,9 +22,9 @@ set_option linter.hashCommand false
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
+namespace curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51
 
-/-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign_loop`**:
+/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
 - Does not overflow if limb sums don't exceed `U64.max`. -/
 @[progress]
@@ -73,7 +73,7 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val â
 
 /-! ## Spec for `add_assign` -/
 
-/-- **Spec for `backend.serial.u64.field.FieldElement51.add_assign`**:
+/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign`**:
 - Does not overflow when limb sums don't exceed `U64.max`
 - Returns a field element where each limb is the sum of corresponding input limbs
 - Input bounds: both inputs have limbs < 2^53
@@ -102,4 +102,4 @@ theorem add_assign_spec (a b : Array U64 5#usize)
       omega
       -- END TASK
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign
+end curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51
