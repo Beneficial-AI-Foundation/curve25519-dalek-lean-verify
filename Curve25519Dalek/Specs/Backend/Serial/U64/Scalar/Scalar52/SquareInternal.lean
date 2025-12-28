@@ -51,6 +51,13 @@ private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
 
 /-! ## Spec for `square_internal` -/
 
+/-
+Square_internal computes `a^2` using 52-bit limb optimizations.
+
+Corresponds to the Rust function `Scalar52::square_internal` defined
+in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
+-/
+
 /-- **Spec for `square_internal`**:
 - Does not error and hence returns a result
 - The result represents the square of the input field element
