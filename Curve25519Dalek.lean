@@ -63,6 +63,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
