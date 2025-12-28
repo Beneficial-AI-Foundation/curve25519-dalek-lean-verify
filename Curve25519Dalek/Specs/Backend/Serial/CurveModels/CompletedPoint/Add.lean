@@ -76,10 +76,10 @@ returning the result in completed coordinates.
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 55) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi hi0
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:=by
@@ -88,7 +88,7 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
       _  < 2 ^ 54 + 2 ^ 52 := add_lt_add_left  (hb i hi) _
     apply le_trans (le_of_lt this)
     scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp[hw_ok]
   constructor
   · simp_all
@@ -103,10 +103,10 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^55) := by
-  unfold FieldElement51.Add.add;
+  unfold backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add;
   obtain ⟨w, hw_ok, hw, hw0 ⟩:= add_assign_spec' a b ha hb
   simp_all
 
@@ -126,7 +126,7 @@ theorem add_spec
   (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)
   (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :
 ∃ c,
-add self other = ok c ∧
+backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add self other = ok c ∧
 let X := Field51_as_Nat self.X
 let Y := Field51_as_Nat self.Y
 let Z := Field51_as_Nat self.Z
@@ -144,7 +144,7 @@ let T' := Field51_as_Nat c.T
 Z' % p = ((2 * Z * Z₀) + (T * T2d)) % p ∧
 (T' + T * T2d) % p = (2 * Z * Z₀ ) % p
 := by
-unfold add
+unfold backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
 progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
 progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
 · intro i hi

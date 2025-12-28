@@ -31,8 +31,8 @@ elliptic curve addition).
 open Aeneas.Std Result
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.backend.serial.u64.field.FieldElement51.Add
-open curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
+open curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51
+open curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
 
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
