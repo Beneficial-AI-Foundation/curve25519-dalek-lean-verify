@@ -121,7 +121,8 @@ natural language specs:
 theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :
     ∃ u', montgomery_invert u = ok u' ∧
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L := by
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
+    (∀ i < 5, u'[i]!.val < 2 ^ 62) := by
   unfold montgomery_invert
   progress*
   unfold pow2 at *
@@ -254,43 +255,47 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   -- The Goal: u * res = R * R
   -- Substitute 'res' with 'u^K * R^(1-K)'
   unfold IsMont at step_res
-  apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
-  rw [h_uZ, h_RZ, step_res]
-  -- Restore N_huge to calculate the exponent K
-  have h_eqn : N_huge = 2^126 := by rw [← h_huge]; norm_num
-  rw [h_eqn]
+  refine ⟨?_, ?_⟩
+  · -- Main Equation
+    apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
+    rw [h_uZ, h_RZ, step_res]
+    -- Restore N_huge to calculate the exponent K
+    have h_eqn : N_huge = 2^126 := by rw [← h_huge]; norm_num
+    rw [h_eqn]
 
-  have h_exp_val :
-    (((((((((((((((((((((((((((16 * 2^126 + 5)
-    * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
-    * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
-    * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
-    = L - 2 := by rw [L]; norm_num
+    have h_exp_val :
+      (((((((((((((((((((((((((((16 * 2^126 + 5)
+      * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
+      * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
+      * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
+      = L - 2 := by rw [L]; norm_num
 
-  rw [h_exp_val]
+    rw [h_exp_val]
 
-  -- Final Algebraic Simplification
-  -- uZ * (uZ^(L-2) * RZ^(1-(L-2))) = RZ^2
-  -- a. uZ * uZ^(L-2) = uZ^(1 + L - 2) = uZ^(L-1)
-  rw [← mul_assoc, ← pow_succ']
-  have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
-  rw [h_fermat_exp]
+    -- Final Algebraic Simplification
+    -- uZ * (uZ^(L-2) * RZ^(1-(L-2))) = RZ^2
+    -- a. uZ * uZ^(L-2) = uZ^(1 + L - 2) = uZ^(L-1)
+    rw [← mul_assoc, ← pow_succ']
+    have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
+    rw [h_fermat_exp]
 
-  -- b. Apply Fermat's Little Theorem: uZ^(L-1) = 1
-  rw [← h_uZ]
-  have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
-    rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
-  rw [ZMod.pow_card_sub_one_eq_one hu_ne]
-  rw [one_mul]
+    -- b. Apply Fermat's Little Theorem: uZ^(L-1) = 1
+    rw [← h_uZ]
+    have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
+      rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
+    rw [ZMod.pow_card_sub_one_eq_one hu_ne]
+    rw [one_mul]
 
-  -- Simplify RZ exponent: RZ^(1 - (L-2)) = RZ^2
-  rw [← pow_two]
-  have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
-    have h_ge : 2 ≤ L := by decide; -- Prove L is large enough symbolically (avoids computation)
-    rw [Int.ofNat_sub h_ge] -- This prevents Lean from trying to compute (L - 2) in Nat
-    try ring
+    -- Simplify RZ exponent: RZ^(1 - (L-2)) = RZ^2
+    rw [← pow_two]
+    have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
+      have h_ge : 2 ≤ L := by decide; -- Prove L is large enough symbolically (avoids computation)
+      rw [Int.ofNat_sub h_ge] -- This prevents Lean from trying to compute (L - 2) in Nat
+      try ring
 
-  rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
-  field_simp
+    rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
+    field_simp
+  · -- Bounds
+    intro i hi; have bounds := res_post_2 i hi; exact bounds
 
 end curve25519_dalek.scalar.Scalar52
