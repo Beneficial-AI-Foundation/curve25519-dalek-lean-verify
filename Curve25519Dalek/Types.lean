@@ -114,6 +114,13 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
+/- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 184:0-188:1 -/
+structure backend.serial.curve_models.AffineNielsPoint where
+  y_plus_x : backend.serial.u64.field.FieldElement51
+  y_minus_x : backend.serial.u64.field.FieldElement51
+  xy2d : backend.serial.u64.field.FieldElement51
+
 /- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
 structure backend.serial.curve_models.ProjectiveNielsPoint where
