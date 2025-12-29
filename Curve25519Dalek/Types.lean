@@ -94,6 +94,22 @@ structure subtle.ConditionallySelectable (Self : Type) where
 structure subtle.ConditionallyNegatable (Self : Type) where
   conditional_negate : Self → subtle.Choice → Result Self
 
+/- Trait declaration: [zeroize::Zeroize]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 272:0-272:17
+   Name pattern: [zeroize::Zeroize] -/
+@[rust_trait "zeroize::Zeroize"]
+structure zeroize.Zeroize (Self : Type) where
+  zeroize : Self → Result Self
+
+/- Trait declaration: [zeroize::DefaultIsZeroes]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 282:0-282:49
+   Name pattern: [zeroize::DefaultIsZeroes] -/
+@[rust_trait "zeroize::DefaultIsZeroes"
+  (parentClauses := ["coremarkerCopyInst", "coredefaultDefaultInst"])]
+structure zeroize.DefaultIsZeroes (Self : Type) where
+  coremarkerCopyInst : core.marker.Copy Self
+  coredefaultDefaultInst : core.default.Default Self
+
 /- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
 @[reducible]
@@ -129,6 +145,16 @@ structure backend.serial.curve_models.ProjectiveNielsPoint where
   Z : backend.serial.u64.field.FieldElement51
   T2d : backend.serial.u64.field.FieldElement51
 
+/- Trait declaration: [curve25519_dalek::traits::Identity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
+structure traits.Identity (Self : Type) where
+  identity : Result Self
+
+/- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
+   Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
+structure traits.ValidityCheck (Self : Type) where
+  is_valid : Self → Result Bool
+
 /- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
@@ -152,11 +178,6 @@ structure edwards.affine.AffinePoint where
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible]
 def edwards.CompressedEdwardsY := Array U8 32#usize
-
-/- Trait declaration: [curve25519_dalek::traits::Identity]
-   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
-structure traits.Identity (Self : Type) where
-  identity : Result Self
 
 /- [curve25519_dalek::montgomery::MontgomeryPoint]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/

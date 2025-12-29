@@ -52,17 +52,8 @@ curve25519_dalek::ristretto::RistrettoPoint::compress
 curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor
 curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes
 curve25519_dalek::scalar::read_le_u64_into
-
-
-curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint
-# ProjectiveNielsPoint::conditional_assign
-# curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint::neg
-# ProjectivePoint::is_valid
-curve25519_dalek::backend::serial::curve_models::AffineNielsPoint
-# curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::conditional_assign
-# AffineNielsPoint::add
-# curve25519_dalek::backend::serial::curve_models::AffineNielsPoint::sub
-# AffineNielsPoint::neg
+curve25519_dalek::backend::serial::curve_models
+# curve25519_dalek::backend::variable_base_mul
 
 
 

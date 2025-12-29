@@ -249,4 +249,149 @@ def subtle.ConstantTimeEqFieldElement51
 ===REPLACE===
 noncomputable def subtle.ConstantTimeEqFieldElement51
 
+===FIND===
+def zeroize.Zeroize.Blanket
+===REPLACE===
+noncomputable def zeroize.Zeroize.Blanket
+
+
+
+
+
+===FIND===
+def backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+===REPLACE===
+noncomputable def backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+
+
+===FIND===
+def core.cmp.PartialEqAffineNielsPointAffineNielsPoint
+===REPLACE===
+noncomputable def core.cmp.PartialEqAffineNielsPointAffineNielsPoint
+
+
+===FIND===
+def core.cmp.EqAffineNielsPoint
+===REPLACE===
+noncomputable def core.cmp.EqAffineNielsPoint
+
+
+===FIND===
+def backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+===REPLACE===
+noncomputable def backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+
+
+===FIND===
+def backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+===REPLACE===
+noncomputable def backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+
+
+===FIND===
+def zeroize.ZeroizeAffineNielsPoint
+===REPLACE===
+noncomputable def zeroize.ZeroizeAffineNielsPoint
+
+
+===FIND===
+def backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+===REPLACE===
+noncomputable def backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+
+
+===FIND===
+def zeroize.ZeroizeProjectiveNielsPoint
+===REPLACE===
+noncomputable def zeroize.ZeroizeProjectiveNielsPoint
+
+
+===FIND===
+def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+===REPLACE===
+noncomputable def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+
+
+
+===FIND===
+def traits.ValidityCheckProjectivePoint
+===REPLACE===
+noncomputable def traits.ValidityCheckProjectivePoint
+
+
+
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
+
+
+
+===FIND===
+def subtle.ConditionallySelectableProjectiveNielsPoint
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableProjectiveNielsPoint
+
+
+
+
+===FIND===
+def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+
+
+
+
+===FIND===
+def subtle.ConditionallySelectableAffineNielsPoint
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableAffineNielsPoint
+
+
+
+
+===FIND===
+def zeroize.ZeroizeFieldElement51
+===REPLACE===
+noncomputable def zeroize.ZeroizeFieldElement51
+
+
+
+
+===FIND===
+def zeroize.ZeroizeArray
+===REPLACE===
+noncomputable def zeroize.ZeroizeArray
+
+
+
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
+
+
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+
+
+
+
+===FIND===
+def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
 
