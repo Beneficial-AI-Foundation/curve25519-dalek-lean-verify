@@ -251,6 +251,21 @@ axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) 
   ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
   opt.value = value ∧ opt.is_some = is_some
 
+/- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
+   Name pattern: [zeroize::{zeroize::Zeroize<@Z>}::zeroize] -/
+@[rust_fun "zeroize::{zeroize::Zeroize<@Z>}::zeroize"]
+axiom zeroize.Zeroize.Blanket.zeroize
+  {Z : Type} (DefaultIsZeroesInst : zeroize.DefaultIsZeroes Z) : Z → Result Z
+
+/- [zeroize::{zeroize::Zeroize for @Array<Z, N>}::zeroize]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 373:4-373:25
+   Name pattern: [zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize] -/
+@[rust_fun "zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize"]
+axiom zeroize.ZeroizeArray.zeroize
+  {Z : Type} {N : Usize} (ZeroizeInst : zeroize.Zeroize Z) :
+  Array Z N → Result (Array Z N)
+
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 630:4-630:45
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get]
@@ -314,5 +329,25 @@ def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
   fun _ slice =>
     let back := fun (s : Slice T) => s
     ok (slice, back)
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 295:0-311:1 -/
+axiom
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_swap
+  :
+  backend.serial.curve_models.ProjectiveNielsPoint →
+    backend.serial.curve_models.ProjectiveNielsPoint → subtle.Choice →
+    Result (backend.serial.curve_models.ProjectiveNielsPoint ×
+    backend.serial.curve_models.ProjectiveNielsPoint)
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 313:0-327:1 -/
+axiom
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_swap
+  :
+  backend.serial.curve_models.AffineNielsPoint →
+    backend.serial.curve_models.AffineNielsPoint → subtle.Choice → Result
+    (backend.serial.curve_models.AffineNielsPoint ×
+    backend.serial.curve_models.AffineNielsPoint)
 
 end curve25519_dalek
