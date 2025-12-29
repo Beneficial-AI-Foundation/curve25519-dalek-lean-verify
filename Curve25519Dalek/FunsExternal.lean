@@ -210,8 +210,9 @@ def subtle.ConditionallySelectableU64.conditional_select
    Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<u64>}::conditional_assign"]
-axiom subtle.ConditionallySelectableU64.conditional_assign
-  : U64 → U64 → subtle.Choice → Result U64
+def subtle.ConditionallySelectableU64.conditional_assign
+  (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
+  subtle.ConditionallySelectableU64.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
