@@ -47,8 +47,9 @@ Examples of excluded names:
 - `curve25519_dalek.subtle.Choice...` (prefix: `subtle`)
 -/
 def excludedNamespacePrefixes : List String := [
-  "core",    -- Rust core library implementations
-  "subtle"   -- Subtle crate implementations
+  "curve25519_dalek.core",     -- Rust core library implementations
+  "curve25519_dalek.subtle",   -- Subtle crate implementations
+  "_private"  --
 ]
 
 /-!
@@ -62,8 +63,10 @@ Examples of excluded names:
 - `curve25519_dalek...add_assign_loop` (suffix: `_loop`)
 -/
 def excludedSuffixes : List String := [
-  "_body",   -- Internal body definitions for lazy constants (lowercase)
-  "_loop"    -- Loop helper functions
+  "_body",             -- Internal body definitions for lazy constants (lowercase)
+  "_loop",             -- Loop helper functions
+  "_loop._unsafe_rec", -- Loop helper functions
+  "_loop.mutual"       -- Loop helper functions
 ]
 
 /-!
@@ -99,9 +102,8 @@ def isDefinition (ci : ConstantInfo) : Bool :=
 
 /-- Check if a name starts with an excluded namespace prefix -/
 def hasExcludedPrefix (name : Name) : Bool :=
-  -- The name format is "curve25519_dalek.X.Y.Z", we check if X is excluded
   excludedNamespacePrefixes.any fun pfx =>
-    (`curve25519_dalek).str pfx |>.isPrefixOf name
+    pfx.toName.isPrefixOf name
 
 /-- Check if string `s` ends with suffix `sfx` -/
 def String.endsWith (s sfx : String) : Bool :=

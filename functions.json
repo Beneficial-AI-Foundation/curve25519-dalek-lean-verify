@@ -1,319 +1,166 @@
-{
-  "functions": [
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.L"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.R"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.RR"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Add.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign.add_assign"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul.mul"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub.sub"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.neg"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.double"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_affine"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.decompress.step_1"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.decompress.step_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.invsqrt"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.is_negative"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.is_zero"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.pow22501"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.pow_p58"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"
-    },
-    {
-      "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.decompress.step_1"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.decompress.step_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.is_canonical"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.unpack"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.montgomery_invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.pack"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.clamp_integer"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.read_le_u64_into"
-    }
-  ]
-}
+{"functions":
+ [{"lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CompletedPoint.add"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.L"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.R"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.RR"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.Clonecurve25519_dalekbackendserialu64fieldFieldElement51.clone"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_swap"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Add.add"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign.add_assign"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul.mul"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub.sub"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.neg"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop.match_1"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"},
+  {"lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"},
+  {"lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"},
+  {"lean_name":
+   "curve25519_dalek.edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add"},
+  {"lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"},
+  {"lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"},
+  {"lean_name":
+   "curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.add"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.compress"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.double"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_affine"},
+  {"lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"},
+  {"lean_name":
+   "curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity"},
+  {"lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress"},
+  {"lean_name": "curve25519_dalek.edwards.decompress.step_1"},
+  {"lean_name": "curve25519_dalek.edwards.decompress.step_2"},
+  {"lean_name":
+   "curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.invert"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.invsqrt"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.is_negative"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.is_zero"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.pow22501"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.pow_p58"},
+  {"lean_name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"},
+  {"lean_name":
+   "curve25519_dalek.field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq"},
+  {"lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"},
+  {"lean_name":
+   "curve25519_dalek.ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add"},
+  {"lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"},
+  {"lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"},
+  {"lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"},
+  {"lean_name": "curve25519_dalek.ristretto.RistrettoPoint.add"},
+  {"lean_name": "curve25519_dalek.ristretto.RistrettoPoint.compress"},
+  {"lean_name":
+   "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor"},
+  {"lean_name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"},
+  {"lean_name": "curve25519_dalek.ristretto.decompress.step_1"},
+  {"lean_name": "curve25519_dalek.ristretto.decompress.step_2"},
+  {"lean_name":
+   "curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq"},
+  {"lean_name":
+   "curve25519_dalek.scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.ONE"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.ZERO"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.as_bytes"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.invert"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.is_canonical"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.reduce"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.to_bytes"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar.unpack"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar52.invert"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar52.montgomery_invert"},
+  {"lean_name": "curve25519_dalek.scalar.Scalar52.pack"},
+  {"lean_name": "curve25519_dalek.scalar.clamp_integer"},
+  {"lean_name": "curve25519_dalek.scalar.read_le_u64_into"},
+  {"lean_name":
+   "curve25519_dalek.traits.Identitycurve25519_dalekedwardsEdwardsPoint"},
+  {"lean_name": "curve25519_dalek.traits.IsIdentity.Blanket"}]}
