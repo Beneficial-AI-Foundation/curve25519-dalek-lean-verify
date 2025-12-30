@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2024 Oliver Butterley. All rights reserved.
+Copyright (c) 2025 Oliver Butterley. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -65,6 +65,7 @@ def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
 set_option maxHeartbeats 4000000 in
+-- proof could be better
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
 
 The loop computes the subtraction a - b with borrow propagation.
