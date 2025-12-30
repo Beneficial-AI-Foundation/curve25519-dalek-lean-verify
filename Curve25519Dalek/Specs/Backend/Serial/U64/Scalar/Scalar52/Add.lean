@@ -169,18 +169,18 @@ decreasing_by scalar_decr_tac
 @[progress]
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
-    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b < L) :
+    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
     ∃ v, add a b = ok v ∧
     Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
     Scalar52_as_Nat v < L := by
   unfold add
   progress*
   · -- BEGIN TASK
-    have : L ≤ 2 ^ 259 := by unfold L; grind
+    have : L < 2 ^ 259 := by unfold L; grind
     grind
     -- END TASK
   · -- BEGIN TASK
-    have : L ≤ 2 ^ 259 := by unfold L; grind
+    have : L < 2 ^ 259 := by unfold L; grind
     grind
     -- END TASK
   · -- BEGIN TASK
