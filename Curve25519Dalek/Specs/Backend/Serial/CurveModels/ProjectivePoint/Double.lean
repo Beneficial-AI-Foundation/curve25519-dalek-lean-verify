@@ -169,7 +169,10 @@ theorem double_spec (q : ProjectivePoint)
         (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
-      apply Nat.ModEq.add; grind; grind
+      apply Nat.ModEq.add;
+      · try grind
+      · try grind
+
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *
     rw [← Nat.ModEq] at fe_post_2
