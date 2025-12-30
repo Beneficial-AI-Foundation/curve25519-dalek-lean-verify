@@ -163,16 +163,46 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     try scalar_tac
     )
 
-  progress as ⟨i14, h_i₁₄⟩; progress as ⟨i15, h_i₁₅⟩; progress as ⟨i16, i17, h_i₁₆, h_i₁₇⟩
-  progress as ⟨i18, h_i₁₈⟩; progress as ⟨i19, h_i₁₉⟩; progress as ⟨i20, h_i₂₀⟩;
-  progress as ⟨i21, h_i₂₁⟩; progress as ⟨i22, h_i₂₂⟩; progress as ⟨i23, h_i₂₃⟩;
-  progress as ⟨i24, i25, h_i₂₄, h_i₂₅⟩; progress as ⟨i26, h_i₂₆⟩; progress as ⟨i27, h_i₂₇⟩
-  progress as ⟨i28, h_i₂₈⟩; progress as ⟨i29, h_i₂₉⟩;
+  progress as ⟨i14, h_i₁₄⟩; progress as ⟨i15, h_i₁₅⟩;
+  · -- Solve subgoal for i13 + i14
+    simp only [h_i₁₃, h_i₁₄, h_i₁₀, h_i₁₂, h_i₉, h_i₈, h_i₇,h_i₆, h_i₅, h_i₃, h_b₁, h_i₁₁, h_i₄,
+                h_i₂, h_i₁, hi₀]
+    simp only [Array.getElem!_Nat_eq] at *
+
+    generalize h_b1_val : ((↑a)[0]!).val * constants.LFACTOR.val % 2 ^ 52 = b1_val
+    generalize h_i1_val : ( (↑a)[0]!).val + b1_val * ((constants.L)[0]!).val  / 2 ^ 52 = i1_val
+    generalize h_i7_val : _ * constants.LFACTOR.val % 2 ^ 52 = i7_val
+    generalize h_i8_val : _ / 2^52 = i8_val
+
+    have h_b1_bound : b1_val < 2^52 := by
+      rw [← h_b1_val]
+      apply Nat.mod_lt; norm_num
+
+    have h_i1_bound : i1_val < 2^76 := by
+      rw [← h_i1_val]
+      --apply Nat.div_lt_of_lt_mul
+      try scalar_tac -- Solves (a[0] + b1*L[0]) < 2^128
+      sorry
+
+    -- Bound i7 (< 2^52)
+    have h_i7_bound : i7_val < 2^52 := by
+      rw [← h_i7_val]
+      apply Nat.mod_lt; norm_num
+
+    -- Bound i8 (< 2^76)
+    have h_i8_bound : i8_val < 2^76 := by
+      rw [← h_i8_val]
+      apply Nat.div_lt_of_lt_mul
+      try scalar_tac
+
+    try scalar_tac
+    sorry
+  · --
+
+    sorry
 
 
-  sorry
-
-  -- progress as ⟨i14, h_i₁₄⟩; progress as ⟨i15, h_i₁₅⟩; progress as ⟨i16, i17, h_i₁₆, h_i₁₇⟩
+  -- progress as ⟨i16, i17, h_i₁₆, h_i₁₇⟩
   -- progress as ⟨i18, h_i₁₈⟩; progress as ⟨i19, h_i₁₉⟩; progress as ⟨i20, h_i₂₀⟩;
   -- progress as ⟨i21, h_i₂₁⟩; progress as ⟨i22, h_i₂₂⟩; progress as ⟨i23, h_i₂₃⟩;
   -- progress as ⟨i24, i25, h_i₂₄, h_i₂₅⟩; progress as ⟨i26, h_i₂₆⟩; progress as ⟨i27, h_i₂₇⟩
@@ -182,96 +212,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- -- progress as ⟨i31, h_i₃₁⟩; -- progress as ⟨i32, h_i₃₂⟩
 
   -- progress as ⟨i31, h_i₃₁⟩
-
-
-
-
--- /--
--- Lightweight tactic for bounds checks.
--- Avoids 'subst' and 'simp_all' to prevent term explosion.
--- -/
--- macro "light_bound" : tactic => `(tactic| {
---   -- 1. Only reveal the numeric values of array accesses
---   try simp only [
---     Array.getElem!_Nat_eq,
---     List.Vector.length_val,
---     UScalar.ofNat_val_eq,
---     getElem!_pos
---   ] at *
-
---   -- 2. Convert division/modulo goals into linear arithmetic
---   try apply Nat.div_lt_of_lt_mul
---   try (apply Nat.mod_lt; norm_num)
-
---   -- 3. Solve linear arithmetic without substituting definitions
---   try scalar_tac
--- })
-
--- -- 1. FORCE HEARTBEATS EXTERNALLY
--- set_option maxHeartbeats 10000000 in -- progress times out otherwise
--- @[progress]
--- theorem montgomery_reduce_spec' (a : Array U128 9#usize)
---     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
---     ∃ m,
---     montgomery_reduce a = ok m ∧
---     (Scalar52_as_Nat m * _root_.R) % _root_.L = Scalar52_wide_as_Nat a % _root_.L ∧
---     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
---     (Scalar52_as_Nat m < 2 ^ 259)
---     := by
---   -- 1. Setup Context
---   have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
---   have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
---   have ha2 : a[2]!.val < 2^127 := h_bounds 2 (by decide)
---   have ha3 : a[3]!.val < 2^127 := h_bounds 3 (by decide)
---   have ha4 : a[4]!.val < 2^127 := h_bounds 4 (by decide)
---   have ha5 : a[5]!.val < 2^127 := h_bounds 5 (by decide)
---   have ha6 : a[6]!.val < 2^127 := h_bounds 6 (by decide)
---   have ha7 : a[7]!.val < 2^127 := h_bounds 7 (by decide)
---   have ha8 : a[8]!.val < 2^127 := h_bounds 8 (by decide)
-
---   have hL0 : (constants.L[0]!).val < 2 ^ 52 := constants.L_limbs_spec 0#usize (by decide)
---   have hL1 : (constants.L[1]!).val < 2 ^ 52 := constants.L_limbs_spec 1#usize (by decide)
---   have hL2 : (constants.L[2]!).val < 2 ^ 52 := constants.L_limbs_spec 2#usize (by decide)
---   have hL3 : (constants.L[3]!).val < 2 ^ 52 := constants.L_limbs_spec 3#usize (by decide)
---   have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
-
---   unfold montgomery_reduce
---   unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-
---   -- 2. EXECUTION LOOP
---   repeat (
---     progress
---     <;> try light_bound
---   )
-
---   · -- subgoal 1
---     rename_i _ x_1 x_2 __1 __2 x_3 __3 x_4 __4 x_5 __5 x_6 __6
---     subst __3 __5
---     try scalar_tac
-
---   · -- subgoal 2
---     repeat (
---       progress
---       <;> try light_bound
---       <;> try (
---         simp_all only [getElem!_pos]
---         generalize h_carry : ( _ / 2^52 ) = carry
---         have : carry < 2^76 := by
---           rw [← h_carry]; apply Nat.div_lt_of_lt_mul; scalar_tac
---         scalar_tac
---       )
---     )
-
-
---     · --
-
---       sorry
---     · --
-
---      sorry
-
-
-
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
