@@ -7,6 +7,7 @@ import Aeneas
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ConditionalAddL
 
 set_option linter.style.longLine false
 set_option linter.style.setOption false
@@ -58,47 +59,37 @@ attribute [-simp] Int.reducePow Nat.reducePow
 
 /-! ## Spec for `sub` -/
 
--- /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**: -/
--- @[progress]
--- theorem sub_loop_spec (mask : U64) (a b difference : Array U64 5#usize) (borrow : U64) (i : Usize)
---     (ha : ∀ j, j < 5 → (a[j]!).val < 2 ^ 52) (hb : ∀ j, j < 5 → (b[j]!).val < 2 ^ 52)
---     (hd : ∀ j, j < i.val → difference[j]!.val < 2 ^ 52)
---     (hd_rest : ∀ j, i.val ≤ j → j < 5 → difference[j]!.val = 0)
---     (hmask : mask.val = 2 ^ 52 - 1)
---     (hi : i.val ≤ 5)
---     (hborrow : borrow.val.testBit 63 = false ∨ borrow.val.testBit 63 = true) :
---     ∃ difference' borrow', sub_loop mask a b difference borrow i = ok (difference', borrow') ∧
---     U64x5_slice_as_Nat a i + 2 ^ (52 * i.val) * (if borrow.val.testBit 63 then 1 else 0) =
---       U64x5_slice_as_Nat b i + U64x5_slice_as_Nat difference' i +
---       2 ^ (52 * 5) * (if borrow'.val.testBit 63 then 1 else 0) ∧
---     (∀ j, j < 5 → difference'[j]!.val < 2 ^ 52)
---   := by
---   unfold sub_loop
---   unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
---   unfold backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
---   split
---   · progress*
---     · sorry
---     · sorry
---     · sorry
---     · sorry
---   · use difference, borrow
---     constructor
---     · rfl
---     · constructor
---       · simp [U64x5_slice_as_Nat]
---         have : i.val = 5 := by scalar_tac
---         simp [this]
---         -- When we've processed all 5 limbs, the arithmetic property should hold
---         sorry
---       · intro j hj
---         by_cases h : j < i.val
---         · exact hd j h
---         · have : i.val ≤ j := by omega
---           have hz := hd_rest j this hj
---           omega
---   termination_by 5 - i.val
---   decreasing_by scalar_decr_tac
+/-- Partial sum of limbs up to index n: Σ (j < n) limbs[j] * 2^(52*j) -/
+def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
+  ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
+
+/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
+
+The loop computes the subtraction a - b with borrow propagation.
+After processing indices 0..i, the loop invariant holds:
+  partial_a(i) + (borrow / 2^63) * 2^(52*i) = partial_b(i) + partial_diff(i)
+
+When the loop completes (i = 5), this gives:
+  A + (borrow / 2^63) * 2^260 = B + D
+
+Where (borrow / 2^63) = 1 means A < B (underflow occurred), and the difference D
+represents (A - B) mod 2^260.
+-/
+@[progress]
+theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)
+    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52)
+    (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
+    (hdiff : ∀ j < i.val, difference[j]!.val < 2 ^ 52)
+    (hdiff_rest : ∀ j, i.val ≤ j → j < 5 → difference[j]!.val = 0)
+    (hmask : mask.val = 2 ^ 52 - 1)
+    (hi : i.val ≤ 5)
+    (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =
+            Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :
+    ∃ result, sub_loop a b difference mask borrow i = ok result ∧
+    (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
+    (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
+     Scalar52_as_Nat b + Scalar52_as_Nat result.1) := by
+  sorry
 
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Requires bounded limbs for both inputs
