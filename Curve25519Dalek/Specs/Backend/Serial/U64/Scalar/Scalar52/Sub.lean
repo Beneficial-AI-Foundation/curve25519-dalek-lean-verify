@@ -22,6 +22,29 @@ The function performs subtraction with borrow handling and conditional addition 
 to ensure the result is non-negative.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs:L175-L198
+
+## Algorithm Summary
+
+The subtraction uses base-2^52 arithmetic with borrow propagation:
+
+1. **Loop iteration**: For each limb i:
+   - `borrow = a[i].wrapping_sub(b[i] + (borrow >> 63))`
+   - `difference[i] = borrow & mask` (keep lower 52 bits)
+
+2. **Borrow detection**: `borrow >> 63` extracts a 0/1 flag:
+   - 0 if no underflow occurred
+   - 1 if underflow occurred (wrapped value has top bits set)
+
+3. **Telescoping property**: The borrows cancel perfectly:
+   - `difference[i] = (a[i] - b[i] - c_i) mod 2^52 = a[i] - b[i] - c_i + c_{i+1} * 2^52`
+   - Summing: `Σ difference[i] * 2^(52*i) = A - B + c_5 * 2^260`
+
+4. **Final correction**: If `c_5 = 1` (final borrow set), then `A < B`, so add L
+   to get a positive result in `[0, L)`.
+
+**Key insight**: The final borrow `c_5` is just a sign indicator, not a quantity to subtract.
+When `A < B`, the difference array stores `2^260 + (A - B)` (the representation in Z/(2^260)Z).
+Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
 -/
 
 open Aeneas.Std Result
