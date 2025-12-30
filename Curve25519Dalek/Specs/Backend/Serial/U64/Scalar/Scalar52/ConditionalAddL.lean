@@ -25,30 +25,41 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 natural language description:
 
     • Takes an input unpacked scalar u and a binary condition c.
-    • If condition is true (1), adds L to the scalar and returns the result u' and a carry bit;
+    • If condition is true (1), adds L modulo 2^260 and returns the result u' and a carry value;
       if false (0), returns the scalar unchanged.
-    • The carry bit represents potential overflow beyond the
-      52-bit limb representation.
+    • This function is only used in `sub` where the carry value is ignored.
 
-natural language specs:
+natural language specs (tailored for use in `sub`):
 
-    • If condition is 1: scalar_to_nat(u') + (carry * 2^260) = scalar_to_nat(u) + L
-    • If condition is 0: scalar_to_nat(u') = scalar_to_nat(u) and carry = 0
+    • Input: limbs bounded by 2^52
+    • If condition is 1 (and input ∈ [2^260 - L, 2^260)):
+        - Output value: u' + 2^260 = u + L, equivalently u' = u + L - 2^260
+        - Output bounded: u' < L
+        - Output limbs: < 2^52
+    • If condition is 0:
+        - Output value: u' = u
+        - Output limbs: < 2^52
+    • Carry value: not specified (not used by caller)
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.conditional_add_l`**:
-- No panic (always returns successfully)
-- If condition is true (1), the result represents the input scalar plus L
-- If condition is false (0), the result represents the input scalar unchanged
-- The carry bit captures any overflow from the 52-bit limb representation
+/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):
+- Requires input limbs bounded by 2^52
+- When condition is 1, requires input value in [2^260 - L, 2^260)
+- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
+- When condition is 0: result unchanged with limbs < 2^52
+- Carry value not specified (not used by sub)
 -/
 @[progress]
-theorem conditional_add_l_spec (u : Scalar52) (c : subtle.Choice) :
-    ∃ carry u',
-    conditional_add_l u c = ok (carry, u') ∧
-    (c.val = 1#u8 → Scalar52_as_Nat u' + carry.val * 2^260 = Scalar52_as_Nat u + L) ∧
-    (c.val = 0#u8 → Scalar52_as_Nat u' = Scalar52_as_Nat u ∧ carry.val = 0)
-    := by
+theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
+    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)
+    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)
+    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)
+    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :
+    ∃ result, conditional_add_l self condition = ok result ∧
+    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧
+    (Scalar52_as_Nat result.2 < L) ∧
+    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧
+    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
