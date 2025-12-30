@@ -16,7 +16,6 @@ import Utils.ListFuns
 import Utils.StatusCsv
 import Std.Data.HashSet
 
-open Utils.ListFuns
 open Utils.StatusCsv
 
 /-- Print usage information -/
@@ -42,10 +41,10 @@ def main (args : List String) : IO UInt32 := do
 
   -- Load Lean environment and get functions
   IO.eprintln "Loading Curve25519Dalek module..."
-  let env ← loadEnvironment
+  let env ← Utils.ListFuns.loadEnvironment
   IO.eprintln "Module loaded successfully"
 
-  let funNames ← getFunsDefinitionsAsStrings env
+  let funNames ← Utils.ListFuns.getFunsDefinitionsAsStrings env
   IO.eprintln s!"Found {funNames.size} functions in Funs.lean"
 
   -- Find functions not in status.csv

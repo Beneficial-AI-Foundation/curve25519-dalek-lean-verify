@@ -95,10 +95,11 @@ def readStatusFile (path : System.FilePath := defaultPath) : IO StatusFile := do
     let rows := dataLines.filterMap parseRow
     return { header := header, rows := rows.toArray }
 
-/-- Write status.csv -/
+/-- Write status.csv (sorted alphabetically by lean_name) -/
 def writeStatusFile (file : StatusFile) (path : System.FilePath := defaultPath) : IO Unit := do
   let headerLine := file.header
-  let dataLines := file.rows.map StatusRow.toCsvLine
+  let sortedRows := file.rows.qsort (·.lean_name < ·.lean_name)
+  let dataLines := sortedRows.map StatusRow.toCsvLine
   let allLines := #[headerLine] ++ dataLines
   let content := "\n".intercalate allLines.toList
   IO.FS.writeFile path (content ++ "\n")
@@ -109,8 +110,7 @@ def StatusFile.getLeanNames (file : StatusFile) : Array String :=
 
 /-- Create a new StatusRow with just the lean_name (other fields empty) -/
 def StatusRow.fromLeanName (leanName : String) : StatusRow :=
-  let rustName := leanName.replace "." "::"
-  { function := rustName
+  { function := ""
     lean_name := leanName
     source := ""
     lines := ""
