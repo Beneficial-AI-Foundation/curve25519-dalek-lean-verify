@@ -51,14 +51,14 @@ private theorem part1_spec (sum : U128) :
   montgomery_reduce.part1 sum = ok (carry, p) ∧
   p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
   carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
-  carry.val < 2 ^ 77 ∧ -- Keep this
+  carry.val < 2 ^ 77 ∧
   p.val < 2 ^ 52 := by
 
   -- Proof of the spec
   rw [montgomery_reduce.part1]
   simp only [constants.LFACTOR, constants.L]
 
-  -- You'll need to prove the bound here once
+  -- We need to prove the bound here once
   -- Logic: sum < 2^128, p < 2^52, L[0] < 2^52
   -- Numerator < 2^128 + 2^104
   -- Result / 2^52 < 2^76 + 2^52 < 2^77
@@ -71,7 +71,7 @@ private theorem part2_spec (sum : U128) :
   montgomery_reduce.part2 sum = ok (carry, w) ∧
   w.val = sum.val % (2 ^ 52) ∧
   carry.val = sum.val / (2 ^ 52) ∧
-  carry.val < 2 ^ 76 ∧ -- Keep this
+  carry.val < 2 ^ 76 ∧
   w.val < 2 ^ 52 := by -- 2^128 / 2^52 = 2^76
 
   rw [montgomery_reduce.part2]
@@ -164,10 +164,44 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- Clear intermediate accumulators from Rows 0-4
   -- Keep: a, limbs*, carry*, n*, L*, and their bounds
   -- =========================================================
-  try clear n1_partial prod1 sum1
+  try clear n1_partial product1 sum1
+  try clear h_n1_partial h_product1 h_sum1
   try clear n2_partial prod2_0 n2_accum prod2_1 sum2
+  try clear h_n2_partial h_n2_accum h_prod2_1 h_sum2
   try clear n3_partial prod3_1 n3_accum prod3_2 sum3
+  try clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
   try clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3 sum4
+  try clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
+
+  -- === ROW 5: Compute Result Limb 0 (r0) ===
+  -- Formula: S5 = n4 + a[5] + carry1*L4 + carry3*L2 + carry4*L1
+  progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
+  progress as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
+  progress as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
+  progress as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
+  progress as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
+  progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
+  progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
+  progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
+  -- 9. Reduction Part 2: Returns (carry_out, result_limb)
+  progress as ⟨n5, r0, h_n5, h_r0, h_n5_bounds, h_r0_bound⟩
+
+  try clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3 sum5
+  try clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
+
+  -- === ROW 6: Compute Result Limb 1 (r1) ===
+  -- Formula: S6 = n5 + a[6] + carry2*L4 + carry4*L2
+  progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
+  progress as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
+  progress as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
+  progress as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
+  progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
+  progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
+  progress as ⟨n6, r1, h_n6, h_r1, h_n6_bound, h_r1_bound⟩
+
+  try clear n6_partial prod6_1 n6_accum1 prod6_2 sum6
+  try clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
+
   
   sorry
 
