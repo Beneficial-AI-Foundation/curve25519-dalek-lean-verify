@@ -38,3 +38,8 @@ supportInterpreter = true
 name = "listfuns"
 root = "Utils.ListFuns"
 supportInterpreter = true
+
+[[lean_exe]]
+name = "syncstatus"
+root = "Utils.SyncStatus"
+supportInterpreter = true

@@ -1,11 +1,10 @@
 /-
-  ListFuns: A CLI tool to list all functions defined in Curve25519Dalek/Funs.lean.
+  ListFuns: Core logic for listing functions defined in Curve25519Dalek/Funs.lean.
 
-  This tool loads the compiled Lean environment and extracts all constant
-  definitions that originate from the Funs.lean file by checking the module
-  where each constant was defined.
+  This module provides reusable functions for extracting function definitions
+  from the compiled Lean environment. The main entry point is `getFunsDefinitions`.
 
-  Usage:
+  CLI Usage:
     lake exe listfuns [output.json]
 
   Output JSON format:
@@ -162,6 +161,16 @@ def getFunsDefinitions (env : Environment) : IO (Array Name) := do
   -- Sort alphabetically for consistent output
   return filtered.qsort (·.toString < ·.toString)
 
+/-- Load the Curve25519Dalek environment -/
+def loadEnvironment : IO Environment := do
+  Lean.initSearchPath (← Lean.findSysroot)
+  importModules #[{ module := `Curve25519Dalek }] {}
+
+/-- Get all function names as strings (convenience function for other scripts) -/
+def getFunsDefinitionsAsStrings (env : Environment) : IO (Array String) := do
+  let names ← getFunsDefinitions env
+  return names.map (·.toString)
+
 /-- Output structure for a single function -/
 structure FunctionOutput where
   lean_name : String
@@ -196,12 +205,9 @@ def printUsage : IO Unit := do
 def main (args : List String) : IO UInt32 := do
   let outputPath : Option String := args.head?
 
-  -- Initialize Lean search path
-  Lean.initSearchPath (← Lean.findSysroot)
-
-  -- Import the main module (includes Funs)
+  -- Load environment
   IO.eprintln "Loading Curve25519Dalek module..."
-  let env ← importModules #[{ module := `Curve25519Dalek }] {}
+  let env ← loadEnvironment
   IO.eprintln "Module loaded successfully"
 
   -- Get all functions from Funs.lean
