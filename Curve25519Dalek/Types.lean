@@ -10,7 +10,7 @@ set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
-/- Trait declaration: [core::ops::arith::Add]
+/-- Trait declaration: [core::ops::arith::Add]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 77:0-77:31
    Name pattern: [core::ops::arith::Add] -/
 @[rust_trait "core::ops::arith::Add"]
@@ -18,7 +18,7 @@ structure core.ops.arith.Add (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   add : Self → Rhs → Result Self_Output
 
-/- Trait declaration: [core::ops::arith::Sub]
+/-- Trait declaration: [core::ops::arith::Sub]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 190:0-190:31
    Name pattern: [core::ops::arith::Sub] -/
 @[rust_trait "core::ops::arith::Sub"]
@@ -26,7 +26,7 @@ structure core.ops.arith.Sub (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   sub : Self → Rhs → Result Self_Output
 
-/- Trait declaration: [core::ops::arith::Mul]
+/-- Trait declaration: [core::ops::arith::Mul]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 324:0-324:31
    Name pattern: [core::ops::arith::Mul] -/
 @[rust_trait "core::ops::arith::Mul"]
@@ -34,28 +34,28 @@ structure core.ops.arith.Mul (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   mul : Self → Rhs → Result Self_Output
 
-/- Trait declaration: [core::ops::arith::Neg]
+/-- Trait declaration: [core::ops::arith::Neg]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 692:0-692:19
    Name pattern: [core::ops::arith::Neg] -/
 @[rust_trait "core::ops::arith::Neg"]
 structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
   neg : Self → Result Self_Output
 
-/- Trait declaration: [core::ops::arith::AddAssign]
+/-- Trait declaration: [core::ops::arith::AddAssign]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 769:0-769:37
    Name pattern: [core::ops::arith::AddAssign] -/
 @[rust_trait "core::ops::arith::AddAssign"]
 structure core.ops.arith.AddAssign (Self : Type) (Rhs : Type) where
   add_assign : Self → Rhs → Result Self
 
-/- Trait declaration: [core::ops::bit::Not]
+/-- Trait declaration: [core::ops::bit::Not]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 35:0-35:19
    Name pattern: [core::ops::bit::Not] -/
 @[rust_trait "core::ops::bit::Not"]
 structure core.ops.bit.Not (Self : Type) (Self_Output : Type) where
   not : Self → Result Self_Output
 
-/- Trait declaration: [core::ops::bit::BitOr]
+/-- Trait declaration: [core::ops::bit::BitOr]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 254:0-254:33
    Name pattern: [core::ops::bit::BitOr] -/
 @[rust_trait "core::ops::bit::BitOr"]
@@ -63,20 +63,20 @@ structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
   where
   bitor : Self → Rhs → Result Self_Output
 
-/- [core::ops::range::RangeFull]
+/-- [core::ops::range::RangeFull]
    Source: '/rustc/library/core/src/ops/range.rs', lines 44:0-44:20
    Name pattern: [core::ops::range::RangeFull] -/
 @[reducible, rust_type "core::ops::range::RangeFull"]
 def core.ops.range.RangeFull := Unit
 
-/- Trait declaration: [subtle::ConstantTimeEq]
+/-- Trait declaration: [subtle::ConstantTimeEq]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 262:0-262:24
    Name pattern: [subtle::ConstantTimeEq] -/
 @[rust_trait "subtle::ConstantTimeEq"]
 structure subtle.ConstantTimeEq (Self : Type) where
   ct_eq : Self → Self → Result subtle.Choice
 
-/- Trait declaration: [subtle::ConditionallySelectable]
+/-- Trait declaration: [subtle::ConditionallySelectable]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 393:0-393:39
    Name pattern: [subtle::ConditionallySelectable] -/
 @[rust_trait "subtle::ConditionallySelectable"
@@ -87,21 +87,21 @@ structure subtle.ConditionallySelectable (Self : Type) where
   conditional_assign : Self → Self → subtle.Choice → Result Self
   conditional_swap : Self → Self → subtle.Choice → Result (Self × Self)
 
-/- Trait declaration: [subtle::ConditionallyNegatable]
+/-- Trait declaration: [subtle::ConditionallyNegatable]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 604:0-604:32
    Name pattern: [subtle::ConditionallyNegatable] -/
 @[rust_trait "subtle::ConditionallyNegatable"]
 structure subtle.ConditionallyNegatable (Self : Type) where
   conditional_negate : Self → subtle.Choice → Result Self
 
-/- Trait declaration: [zeroize::Zeroize]
+/-- Trait declaration: [zeroize::Zeroize]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 272:0-272:17
    Name pattern: [zeroize::Zeroize] -/
 @[rust_trait "zeroize::Zeroize"]
 structure zeroize.Zeroize (Self : Type) where
   zeroize : Self → Result Self
 
-/- Trait declaration: [zeroize::DefaultIsZeroes]
+/-- Trait declaration: [zeroize::DefaultIsZeroes]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 282:0-282:49
    Name pattern: [zeroize::DefaultIsZeroes] -/
 @[rust_trait "zeroize::DefaultIsZeroes"
@@ -110,19 +110,19 @@ structure zeroize.DefaultIsZeroes (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   coredefaultDefaultInst : core.default.Default Self
 
-/- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
+/-- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
 @[reducible]
 def backend.serial.u64.field.FieldElement51 := Array U64 5#usize
 
-/- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
+/-- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
 structure backend.serial.curve_models.ProjectivePoint where
   X : backend.serial.u64.field.FieldElement51
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::curve_models::CompletedPoint]
+/-- [curve25519_dalek::backend::serial::curve_models::CompletedPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 169:0-174:1 -/
 structure backend.serial.curve_models.CompletedPoint where
   X : backend.serial.u64.field.FieldElement51
@@ -130,14 +130,14 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
+/-- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 184:0-188:1 -/
 structure backend.serial.curve_models.AffineNielsPoint where
   y_plus_x : backend.serial.u64.field.FieldElement51
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
+/-- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
 structure backend.serial.curve_models.ProjectiveNielsPoint where
   Y_plus_X : backend.serial.u64.field.FieldElement51
@@ -145,17 +145,17 @@ structure backend.serial.curve_models.ProjectiveNielsPoint where
   Z : backend.serial.u64.field.FieldElement51
   T2d : backend.serial.u64.field.FieldElement51
 
-/- Trait declaration: [curve25519_dalek::traits::Identity]
+/-- Trait declaration: [curve25519_dalek::traits::Identity]
    Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
 structure traits.Identity (Self : Type) where
   identity : Result Self
 
-/- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
+/-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
 structure traits.ValidityCheck (Self : Type) where
   is_valid : Self → Result Bool
 
-/- [curve25519_dalek::edwards::EdwardsPoint]
+/-- [curve25519_dalek::edwards::EdwardsPoint]
    Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
   X : backend.serial.u64.field.FieldElement51
@@ -163,43 +163,43 @@ structure edwards.EdwardsPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
+/-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
 @[reducible]
 def backend.serial.u64.scalar.Scalar52 := Array U64 5#usize
 
-/- [curve25519_dalek::edwards::affine::AffinePoint]
+/-- [curve25519_dalek::edwards::affine::AffinePoint]
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
 structure edwards.affine.AffinePoint where
   x : backend.serial.u64.field.FieldElement51
   y : backend.serial.u64.field.FieldElement51
 
-/- [curve25519_dalek::edwards::CompressedEdwardsY]
+/-- [curve25519_dalek::edwards::CompressedEdwardsY]
    Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
 @[reducible]
 def edwards.CompressedEdwardsY := Array U8 32#usize
 
-/- [curve25519_dalek::montgomery::MontgomeryPoint]
+/-- [curve25519_dalek::montgomery::MontgomeryPoint]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible]
 def montgomery.MontgomeryPoint := Array U8 32#usize
 
-/- [curve25519_dalek::ristretto::RistrettoPoint]
+/-- [curve25519_dalek::ristretto::RistrettoPoint]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 485:0-485:51 -/
 @[reducible]
 def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
-/- [curve25519_dalek::ristretto::CompressedRistretto]
+/-- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
 @[reducible]
 def ristretto.CompressedRistretto := Array U8 32#usize
 
-/- [curve25519_dalek::scalar::Scalar]
+/-- [curve25519_dalek::scalar::Scalar]
    Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
 structure scalar.Scalar where
   bytes : Array U8 32#usize
 
-/- Trait declaration: [curve25519_dalek::traits::IsIdentity]
+/-- Trait declaration: [curve25519_dalek::traits::IsIdentity]
    Source: 'curve25519-dalek/src/traits.rs', lines 33:0-36:1 -/
 structure traits.IsIdentity (Self : Type) where
   is_identity : Self → Result Bool
