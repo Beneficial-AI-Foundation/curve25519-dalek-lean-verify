@@ -9,7 +9,6 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import Mathlib.Tactic.LinearCombination
-
 import PrimeCert.PrimeList
 
 /-!
@@ -85,7 +84,10 @@ lemma neg_one_is_square : IsSquare (-1 : CurveField) := by
 
 /-! ## Completeness of Twisted Edwards Curves -/
 
-variable {F : Type} [Field F] [NeZero (2 : F)]
+variable {F : Type} [Field F]
+
+section Completeness
+variable [NeZero (2 : F)]
 
 /-- **Completeness of Twisted Edwards Addition**
 
@@ -137,6 +139,8 @@ theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
   formulas into the curve equation. -/
   sorry
 
+end Completeness
+
 /-- The sum of two points on Ed25519 stays on the curve.
     For Ed25519, d is not a square, so the denominators are never zero (complete curve). -/
 theorem add_closure_Ed25519 (p1 p2 : Point Ed25519) :
@@ -160,10 +164,7 @@ instance : Neg (Point Ed25519) where
   neg p := {
     x := -p.x
     y := p.y
-    h_on_curve := by
-      have h := p.h_on_curve
-      simp only [neg_pow_two]
-      exact h
+    h_on_curve := by simpa [neg_pow_two] using p.h_on_curve
   }
 
 instance : Sub (Point Ed25519) where
@@ -182,20 +183,118 @@ def zsmul_Ed25519 (z : ℤ) (p : Point Ed25519) : Point Ed25519 :=
 instance : SMul ℕ (Point Ed25519) := ⟨nsmul_Ed25519⟩
 instance : SMul ℤ (Point Ed25519) := ⟨zsmul_Ed25519⟩
 
+/-! ### Group Law Lemmas -/
+
+/-- Simplification lemma for add_coords with explicit pairs. -/
+theorem add_coords_mk (C : EdwardsCurve F) (x₁ y₁ x₂ y₂ : F) :
+    let lam := C.d * x₁ * x₂ * y₁ * y₂;
+    add_coords C (x₁, y₁) (x₂, y₂) =
+    ((x₁ * y₂ + y₁ * x₂) / (1 + lam), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lam)) := rfl
+
+/-- The identity element (0, 1) is a left identity for addition. -/
+theorem zero_add_Ed25519 (p : Point Ed25519) : (0 : Point Ed25519) + p = p := by
+  ext
+  · -- x coordinate: (0·y + 1·x) / (1 + d·0·x·1·y) = x
+    change (add_coords Ed25519 (0, 1) (p.x, p.y)).1 = p.x
+    simp only [add_coords_mk, zero_mul, one_mul, add_zero, mul_zero, zero_add, div_one]
+  · -- y coordinate: (1·y - a·0·x) / (1 - d·0·x·1·y) = y
+    change (add_coords Ed25519 (0, 1) (p.x, p.y)).2 = p.y
+    simp only [add_coords_mk, Ed25519, one_mul, mul_zero, sub_zero, zero_mul, div_one]
+
+/-- The identity element (0, 1) is a right identity for addition. -/
+theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
+  ext
+  · -- x coordinate: (x·1 + y·0) / (1 + d·x·0·y·1) = x
+    change (add_coords Ed25519 (p.x, p.y) (0, 1)).1 = p.x
+    simp only [add_coords_mk, mul_one, mul_zero, add_zero, zero_mul, div_one]
+  · -- y coordinate: (y·1 - a·x·0) / (1 - d·x·0·y·1) = y
+    change (add_coords Ed25519 (p.x, p.y) (0, 1)).2 = p.y
+    simp only [add_coords_mk, Ed25519, mul_one, mul_zero, sub_zero, zero_mul, div_one]
+
+/-- Negation is a left inverse: -p + p = 0. -/
+theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
+  have h := p.h_on_curve
+  simp only [Ed25519] at h
+  -- h : -1 * p.x ^ 2 + p.y ^ 2 = 1 + d * p.x ^ 2 * p.y ^ 2
+  ext
+  · -- x coordinate: (-x·y + y·x) / denom = 0
+    change (add_coords Ed25519 (-p.x, p.y) (p.x, p.y)).1 = 0
+    simp only [add_coords_mk]
+    have : -p.x * p.y + p.y * p.x = 0 := by ring
+    simp only [this, zero_div]
+  · -- y coordinate: (y² - a·(-x)·x) / (1 - d·(-x)·x·y²) = 1
+    -- With a = -1: = (y² - x²) / (1 + d·x²·y²) = 1
+    change (add_coords Ed25519 (-p.x, p.y) (p.x, p.y)).2 = 1
+    simp only [add_coords_mk, Ed25519]
+    -- Goal: (p.y * p.y - -1 * -p.x * p.x) / (1 - d * -p.x * p.x * p.y * p.y) = 1
+    -- From h: -1 * p.x^2 + p.y^2 = 1 + d * p.x^2 * p.y^2
+    -- So: p.y^2 - p.x^2 = 1 + d * p.x^2 * p.y^2
+    have h' : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by linear_combination h
+    have denom_ne : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := by
+      have := (Ed25519.denomsNeZero (-p) p).2
+      -- (-p).x = -p.x and (-p).y = p.y by definition of Neg for Point
+      simp only [Ed25519] at this
+      have hx : (-p).x = -p.x := rfl
+      have hy : (-p).y = p.y := rfl
+      simp only [hx, hy] at this
+      -- this : 1 - d * -p.x * p.x * p.y * p.y ≠ 0
+      -- which equals 1 + d * p.x^2 * p.y^2 ≠ 0
+      have eq : (1 : CurveField) - d * (-p.x) * p.x * p.y * p.y = 1 + d * p.x^2 * p.y^2 := by ring
+      rwa [eq] at this
+    calc (p.y * p.y - -1 * (-p.x) * p.x) / (1 - (d : CurveField) * (-p.x) * p.x * p.y * p.y)
+        = (p.y^2 - p.x^2) / (1 + d * p.x^2 * p.y^2) := by ring_nf
+      _ = (1 + d * p.x^2 * p.y^2) / (1 + d * p.x^2 * p.y^2) := by rw [h']
+      _ = 1 := div_self denom_ne
+
+/-- Addition is commutative. -/
+theorem add_comm_Ed25519 (p q : Point Ed25519) : p + q = q + p := by
+  ext
+  · change (add_coords Ed25519 (p.x, p.y) (q.x, q.y)).1 = (add_coords Ed25519 (q.x, q.y) (p.x, p.y)).1
+    simp [add_coords_mk]; ring
+  · change (add_coords Ed25519 (p.x, p.y) (q.x, q.y)).2 = (add_coords Ed25519 (q.x, q.y) (p.x, p.y)).2
+    simp [add_coords_mk]; ring
+
+/-- nsmul satisfies the successor property (for AddCommGroup). -/
+theorem nsmul_succ_Ed25519 (n : ℕ) (p : Point Ed25519) :
+    nsmul_Ed25519 (n + 1) p = nsmul_Ed25519 n p + p := by
+  rw [add_comm_Ed25519]
+  rfl
+
+/-- zsmul satisfies the successor property. -/
+theorem zsmul_succ_Ed25519 (n : ℕ) (p : Point Ed25519) :
+    zsmul_Ed25519 (Int.ofNat n.succ) p = zsmul_Ed25519 (Int.ofNat n) p + p := by
+  simp only [zsmul_Ed25519]
+  induction n with
+  | zero =>
+    simp only [nsmul_Ed25519]
+    -- Goal: p + 0 = 0 + p
+    rw [add_zero_Ed25519, zero_add_Ed25519]
+  | succ k _ih =>
+    simp only [nsmul_Ed25519]
+    rw [add_comm_Ed25519]
+
+/-- Addition on Ed25519 is associative: (p + q) + r = p + (q + r). -/
+theorem add_assoc_Ed25519 (p q r : Point Ed25519) : p + q + r = p + (q + r) := by
+  /- **Reference**: Hales, Thomas and Raya, Rodrigo.
+  "Formal Proof of the Group Law for Edwards Elliptic Curves".
+  Automated Reasoning (IJCAR 2020), pp. 254–269.
+  https://doi.org/10.1007/978-3-030-51054-1_15 -/
+  sorry
+
 /-- The Ed25519 curve points form an additive abelian group. -/
 instance : AddCommGroup (Point Ed25519) where
   add := Add.add
-  add_assoc := by sorry
+  add_assoc := add_assoc_Ed25519
   zero := 0
-  zero_add p := by sorry
-  add_zero := by sorry
+  zero_add := zero_add_Ed25519
+  add_zero := add_zero_Ed25519
   nsmul := nsmul_Ed25519
   neg := Neg.neg
   zsmul := zsmul_Ed25519
-  neg_add_cancel := by sorry
-  add_comm := by sorry
-  nsmul_succ := by sorry
-  zsmul_succ' := by sorry
+  neg_add_cancel := neg_add_cancel_Ed25519
+  add_comm := add_comm_Ed25519
+  nsmul_succ := nsmul_succ_Ed25519
+  zsmul_succ' := zsmul_succ_Ed25519
 
 /-- Helper lemma to expose the addition formula without unfolding the whole structure. -/
 theorem add_def (p1 p2 : Point Ed25519) :
