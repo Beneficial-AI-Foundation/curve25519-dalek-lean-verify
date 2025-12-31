@@ -29,29 +29,25 @@ independent of any implementation-specific types.
 
 This file has NO dependencies on `Funs.lean` or `Types.lean`, making it purely mathematical.
 Bridge functions that connect to Rust implementation types are in `Edwards/Representation.lean`.
+
+## References
+
+* Bernstein, Birkner, Joye, Lange, Peters: "Twisted Edwards Curves" (2008)
+  https://eprint.iacr.org/2008/013.pdf
 -/
 
 namespace Edwards
 
 open ZMod
 
-/-! ## 1. Mathematical Foundations: Twisted Edwards Curves -/
+/-! ## Mathematical Foundations: Twisted Edwards Curves -/
 
-/-- The finite field F_p where p = 2^255 - 19.
-    Proof can be found at:
-    https://github.com/kckennylau/PrimeCert/blob/master/PrimeCert/PrimeList.lean#L84 -/
+/-- The finite field F_p where p = 2^255 - 19. -/
 abbrev CurveField : Type := ZMod p
 
-instance : Fact (Nat.Prime p) := by
-  unfold p
-  exact ⟨PrimeCert.prime_25519''⟩
+instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
 
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
-
--- Useless
--- instance : Field CurveField := by
---   unfold CurveField
---   infer_instance
 
 /-- Helper lemma for modular arithmetic lifting -/
 theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
@@ -83,81 +79,74 @@ structure Point {F : Type} [Mul F] [Add F] [Pow F ℕ] [One F] (C : EdwardsCurve
 
 instance : Inhabited (Point Ed25519) := ⟨{ x := 0, y := 1}⟩
 
-/-- Key lemma: For Ed25519 (where d is not a square), the denominators
-    1 ± d·x₁x₂y₁y₂ are never zero for points on the curve.
-    This is what makes Ed25519 a "complete" Edwards curve (no exceptional cases).
+/-- -1 is a square in F_p since p ≡ 1 (mod 4). -/
+lemma neg_one_is_square : IsSquare (-1 : CurveField) := by
+  apply ZMod.exists_sq_eq_neg_one_iff.mpr; decide
 
-    Reference: Bernstein, Birkner, Joye, Lange, Peters: "Twisted Edwards Curves" (2008)
-    https://eprint.iacr.org/2008/013.pdf, Theorem 3.3 -/
-lemma denom_ne_zero_Ed25519 (p1 p2 : Point Ed25519) :
-    let lam := Ed25519.d * p1.x * p2.x * p1.y * p2.y
+/-! ## Completeness of Twisted Edwards Curves -/
+
+variable {F : Type} [Field F] [NeZero (2 : F)]
+
+/-- **Theorem 3.3** (Bernstein et al. "Twisted Edwards Curves", 2008):
+    For a twisted Edwards curve E_{a,d} over a field k with char(k) ≠ 2,
+    if a is a square and d is not a square in k, then
+    for all points (x₁, y₁), (x₂, y₂) on E_{a,d}:
+    1 + d·x₁x₂y₁y₂ ≠ 0 and 1 - d·x₁x₂y₁y₂ ≠ 0.
+
+    This makes the addition law complete (no exceptional cases).
+
+    Reference: https://eprint.iacr.org/2008/013.pdf, Theorem 3.3 -/
+theorem complete_addition_denominators_ne_zero
+    (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C) :
+    let lam := C.d * p1.x * p2.x * p1.y * p2.y
     (1 + lam ≠ 0) ∧ (1 - lam ≠ 0) := by
-  set x1 := p1.x; set y1 := p1.y; set x2 := p2.x; set y2 := p2.y
-  set dd := Ed25519.d
-  set lam := dd * x1 * x2 * y1 * y2
-  have h1 := p1.h_on_curve  -- -1 * x1^2 + y1^2 = 1 + d * x1^2 * y1^2
-  have h2 := p2.h_on_curve  -- -1 * x2^2 + y2^2 = 1 + d * x2^2 * y2^2
-  have hd := d_not_square
-  -- Proof sketch from Theorem 3.3: If d·x₁x₂y₁y₂ = ±1, then using the curve
-  -- equations one can show d = (some expression)², contradicting d_not_square.
-  constructor
-  · sorry
-  · sorry
+  sorry -- See Theorem 3.3 in https://eprint.iacr.org/2008/013.pdf
 
-variable {F : Type} [Field F] [NeZero (2 : F)] (C : EdwardsCurve F)
+/-- For Ed25519, the addition formula denominators are never zero.
+    This follows from Theorem 3.3 since a = -1 is a square (p ≡ 1 mod 4)
+    and d is not a square in F_p. -/
+theorem Ed25519.denomsNeZero (p1 p2 : Point Ed25519) :
+    let lam := Ed25519.d * p1.x * p2.x * p1.y * p2.y
+    (1 + lam ≠ 0) ∧ (1 - lam ≠ 0) :=
+  complete_addition_denominators_ne_zero Ed25519 neg_one_is_square d_not_square p1 p2
+
+/-! ## Addition Formulas -/
 
 /-- Implements the unified addition formulas for Twisted Edwards curves. -/
-def add_coords (p1 p2 : F × F) : F × F :=
+def add_coords (C : EdwardsCurve F) (p1 p2 : F × F) : F × F :=
   let (x₁, y₁) := p1
   let (x₂, y₂) := p2
   let lambda_val := C.d * x₁ * x₂ * y₁ * y₂
   ( (x₁ * y₂ + y₁ * x₂) / (1 + lambda_val), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lambda_val) )
 
--- Edwards curve addition closure for Ed25519 (complete curve, no exceptional cases)
-set_option maxHeartbeats 800000 in
-/-- Theorem: The sum of two points on Ed25519 stays on the curve.
+/-- The sum of two points on a twisted Edwards curve stays on the curve,
+    provided the denominators in the addition formula are non-zero. -/
+theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
+    (h : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
+    let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
+    C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
+  sorry -- Standard algebraic verification using curve equations
+
+/-- The sum of two points on Ed25519 stays on the curve.
     For Ed25519, d is not a square, so the denominators are never zero (complete curve). -/
 theorem add_closure_Ed25519 (p1 p2 : Point Ed25519) :
     let (x, y) := add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)
-    Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := by
-  simp only [add_coords]
-  -- Extract curve equations
-  have h1 := p1.h_on_curve
-  have h2 := p2.h_on_curve
-  -- Introduce convenient names
-  set x1 := p1.x; set y1 := p1.y; set x2 := p2.x; set y2 := p2.y
-  set a := Ed25519.a; set d := Ed25519.d
-  set lam := d * x1 * x2 * y1 * y2 with hlam
-  -- Key fact: For Ed25519, denominators are never zero (d is not a square)
-  have hdenom := denom_ne_zero_Ed25519 p1 p2
-  have h_plus_ne : 1 + lam ≠ 0 := hdenom.1
-  have h_minus_ne : 1 - lam ≠ 0 := hdenom.2
-  -- field_simp clears denominators, leaving a polynomial identity
-  field_simp [h_plus_ne, h_minus_ne]
-  -- Goal is now the polynomial identity:
-  -- a*(x1*y2+y1*x2)^2*(1-lam)^2 + (1+lam)^2*(y1*y2-a*x1*x2)^2
-  -- = (1+lam)^2*(1-lam)^2 + d*(x1*y2+y1*x2)^2*(y1*y2-a*x1*x2)^2
-  -- This is a well-known algebraic identity that follows from h1 and h2
-  -- The polynomial lies in the ideal generated by the curve equations
-  sorry
+    Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 :=
+  add_closure Ed25519 p1 p2 (Ed25519.denomsNeZero p1 p2)
 
-/-- Generic add_closure for any curve (uses the Ed25519 proof when applicable). -/
-theorem add_closure (p1 p2 : Point C) :
-    let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
-    C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
-  sorry  -- For non-Ed25519 curves, would need additional hypotheses
+/-! ## Group Structure for Ed25519 -/
 
-instance : Add (Point C) where
+instance : Add (Point Ed25519) where
   add p1 p2 :=
-  let coords := add_coords C (p1.x, p1.y) (p2.x, p2.y)
+  let coords := add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)
   { x := coords.1
     y := coords.2
-    h_on_curve := add_closure C p1 p2 }
+    h_on_curve := add_closure_Ed25519 p1 p2 }
 
-instance : Zero (Point C) where
+instance : Zero (Point Ed25519) where
   zero := { x := 0, y := 1 }
 
-instance : Neg (Point C) where
+instance : Neg (Point Ed25519) where
   neg p := {
     x := -p.x
     y := p.y
@@ -167,32 +156,32 @@ instance : Neg (Point C) where
       exact h
   }
 
-instance : Sub (Point C) where
+instance : Sub (Point Ed25519) where
   sub p1 p2 := p1 + (-p2)
 
-def nsmul (n : ℕ) (p : Point C) : Point C :=
+def nsmul_Ed25519 (n : ℕ) (p : Point Ed25519) : Point Ed25519 :=
   match n with
   | 0 => 0
-  | n + 1 => p + (nsmul n p)
+  | n + 1 => p + (nsmul_Ed25519 n p)
 
-def zsmul (z : ℤ) (p : Point C) : Point C :=
+def zsmul_Ed25519 (z : ℤ) (p : Point Ed25519) : Point Ed25519 :=
   match z with
-  | (n : ℕ) => nsmul C n p
-  | (Int.negSucc n) => -(nsmul C (n + 1) p)
+  | (n : ℕ) => nsmul_Ed25519 n p
+  | (Int.negSucc n) => -(nsmul_Ed25519 (n + 1) p)
 
-instance : SMul ℕ (Point C) := ⟨nsmul C⟩
-instance : SMul ℤ (Point C) := ⟨zsmul C⟩
+instance : SMul ℕ (Point Ed25519) := ⟨nsmul_Ed25519⟩
+instance : SMul ℤ (Point Ed25519) := ⟨zsmul_Ed25519⟩
 
-/-- The Edwards Curve forms an additive abelian group. -/
-instance : AddCommGroup (Point C) where
+/-- The Ed25519 curve points form an additive abelian group. -/
+instance : AddCommGroup (Point Ed25519) where
   add := Add.add
   add_assoc := by sorry
   zero := 0
   zero_add p := by sorry
   add_zero := by sorry
-  nsmul := nsmul C
+  nsmul := nsmul_Ed25519
   neg := Neg.neg
-  zsmul := zsmul C
+  zsmul := zsmul_Ed25519
   neg_add_cancel := by sorry
   add_comm := by sorry
   nsmul_succ := by sorry
