@@ -60,6 +60,14 @@ def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField
 
 end Edwards
 
+namespace curve25519_dalek.backend.serial.u64.field
+
+/-- A FieldElement51 is valid when all 5 limbs are bounded by 2^52. -/
+def FieldElement51.IsValid (fe : FieldElement51) : Prop :=
+  ∀ i < 5, fe[i]!.val ≤ 2^52
+
+end curve25519_dalek.backend.serial.u64.field
+
 
 namespace curve25519_dalek.edwards.affine
 open Edwards
@@ -122,29 +130,49 @@ end curve25519_dalek.ristretto
 namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
+open curve25519_dalek.backend.serial.u64.field in
+/-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point.
+    Includes both the projective coordinate relations and limb bounds. -/
+structure ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop where
+  /-- All limbs of X are bounded by 2^52. -/
+  X_bounds : FieldElement51.IsValid low.X
+  /-- All limbs of Y are bounded by 2^52. -/
+  Y_bounds : FieldElement51.IsValid low.Y
+  /-- All limbs of Z are bounded by 2^52. -/
+  Z_bounds : FieldElement51.IsValid low.Z
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : field_from_limbs low.Z ≠ 0
+  /-- X represents high.x * Z. -/
+  X_eq : field_from_limbs low.X = high.x * field_from_limbs low.Z
+  /-- Y represents high.y * Z. -/
+  Y_eq : field_from_limbs low.Y = high.y * field_from_limbs low.Z
+
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for CompletedPoint.
+    A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
+    For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
+    Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y² -/
+structure CompletedPoint.IsValid' (cp : CompletedPoint) : Prop where
+  /-- X, Y, Z, T are all valid field elements, i.e., limbs of each are bounded by 2^52. -/
+  X_bounds : FieldElement51.IsValid cp.X
+  Y_bounds : FieldElement51.IsValid cp.Y
+  Z_bounds : FieldElement51.IsValid cp.Z
+  T_bounds : FieldElement51.IsValid cp.T
+  /-- The Z and T coordinates are non-zero. -/
+  Z_ne_zero : field_from_limbs cp.Z ≠ 0
+  T_ne_zero : field_from_limbs cp.T ≠ 0
+  /-- The curve equation (cleared denominators). -/
+  on_curve : let X := field_from_limbs cp.X; let Y := field_from_limbs cp.Y
+             let Z := field_from_limbs cp.Z; let T := field_from_limbs cp.T
+             Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
+
 /-- Existential validity predicate for ProjectivePoint. -/
 def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
-  ∃ P : Point Ed25519,
-    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y; let Z := field_from_limbs p.Z
-    Z ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * Z
+  ∃ P : Point Ed25519, p.IsValid' P
 
 /-- Existential validity predicate for CompletedPoint. -/
 def CompletedPoint.IsValid (p : CompletedPoint) : Prop :=
-  ∃ P : Point Ed25519,
-    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y
-    let Z := field_from_limbs p.Z; let T := field_from_limbs p.T
-    Z ≠ 0 ∧ T ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * T
-
-/-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point. -/
-def ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop :=
-    let X := field_from_limbs low.X; let Y := field_from_limbs low.Y; let Z := field_from_limbs low.Z
-    Z ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * Z
-
-/-- Relational validity predicate linking low-level CompletedPoint to mathematical Point. -/
-def CompletedPoint.IsValid' (low : CompletedPoint) (high : Point Ed25519) : Prop :=
-  let X := field_from_limbs low.X; let Y := field_from_limbs low.Y
-  let Z := field_from_limbs low.Z; let T := field_from_limbs low.T
-  Z ≠ 0 ∧ T ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * T
+  ∃ P : Point Ed25519, p.IsValid' P
 
 /--
 Total conversion function for ProjectivePoint.
@@ -166,12 +194,9 @@ theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point 
   rw [toPoint', dif_pos ⟨P, h⟩]
   have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
     intro P' h'
-    unfold IsValid' at h h'
-    rcases h with ⟨hz, hx, hy⟩
-    rcases h' with ⟨_, hx', hy'⟩
     ext
-    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
-    · apply mul_right_cancel₀ hz (Eq.trans hy'.symm hy)
+    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.X_eq.symm h.X_eq)
+    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.Y_eq.symm h.Y_eq)
   apply h_uniq
   exact Classical.choose_spec ⟨P, h⟩
 
@@ -181,12 +206,9 @@ theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed
   rw [toPoint', dif_pos ⟨P, h⟩]
   have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
     intro P' h'
-    unfold IsValid' at h h'
-    rcases h with ⟨hz, ht, hx, hy⟩
-    rcases h' with ⟨_, _, hx', hy'⟩
     ext
-    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
-    · apply mul_right_cancel₀ ht (Eq.trans hy'.symm hy)
+    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.X_eq.symm h.X_eq)
+    · apply mul_right_cancel₀ h.T_ne_zero (Eq.trans h'.Y_eq.symm h.Y_eq)
   apply h_uniq
   exact Classical.choose_spec ⟨P, h⟩
 
@@ -209,9 +231,15 @@ theorem ProjectivePoint.toPoint'_eq_coe (p : ProjectivePoint) :
 theorem CompletedPoint.toPoint'_eq_coe (p : CompletedPoint) :
   p.toPoint' = ↑p := rfl
 
+open curve25519_dalek.backend.serial.u64.field in
+/-- A ProjectivePoint has all coordinates in bounds. -/
 def ProjectivePoint.InBounds (p : ProjectivePoint) : Prop :=
-  (∀ i < 5, p.X[i]!.val ≤ 2^52) ∧
-  (∀ i < 5, p.Y[i]!.val ≤ 2^52) ∧
-  (∀ i < 5, p.Z[i]!.val ≤ 2^52)
+  FieldElement51.IsValid p.X ∧ FieldElement51.IsValid p.Y ∧ FieldElement51.IsValid p.Z
+
+open curve25519_dalek.backend.serial.u64.field in
+/-- A CompletedPoint has all coordinates in bounds. -/
+def CompletedPoint.InBounds (p : CompletedPoint) : Prop :=
+  FieldElement51.IsValid p.X ∧ FieldElement51.IsValid p.Y ∧
+  FieldElement51.IsValid p.Z ∧ FieldElement51.IsValid p.T
 
 end curve25519_dalek.backend.serial.curve_models
