@@ -2,18 +2,31 @@
 
 [Verus](https://github.com/Beneficial-AI-Foundation/dalek-lite/tree/master/curve25519-dalek/src/specs) · [Lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/tree/master/Curve25519Dalek/Specs)
 
-## Lean proves tighter bounds
+## Lean exports tighter bounds
 
-Lean's type system enables proving more precise bounds than Verus currently does:
+| Op | Verus exports | Lean exports | Ratio |
+|----|---------------|--------------|-------|
+| square | < 2⁵⁴ | < 2⁵² | 4× |
+| reduce | < 2⁵² | ≤ 2⁵¹+155k | 2× |
 
-| Op | Verus | Lean | Improvement |
-|----|-------|------|-------------|
-| square | < 2⁵⁴ | < 2⁵² | 4× tighter |
-| reduce | < 2⁵² | ≤ 2⁵¹+155k | 2× tighter |
+**Key insight**: Verus *internally* proves tighter bounds but rounds up for simpler API:
 
-**Further tightening possible in Lean** (not yet proved):
-- reduce limbs 1-4: could be `≤ 2^51 + 8k` instead of `2^51 + 155k` (19× tighter, no `*19` factor)
-- square: comment in Pow2K.lean:208 claims `< 2^51` is achievable
+```rust
+// reduce_lemmas.rs:47-60 - Verus knows:
+limb 0: < 2^51 + 2^18  (= 2^51 + 262144)
+limbs 1-4: < 2^51 + 2^13  (= 2^51 + 8192)
+// But exports: < 2^52 for all
+```
+
+Lean exports the tighter bound directly: `≤ 2^51 + 155629` (tighter than Verus's internal 2^51 + 262144).
+
+**Could Verus match Lean?** Yes - it's a design choice, not a capability limit. Verus could:
+1. Export per-limb bounds (limb 0 vs limbs 1-4)
+2. Use `(2^13 - 1) * 19 = 155629` instead of `2^18 = 262144`
+
+**Further tightening possible** (neither project does yet):
+- reduce limbs 1-4: `≤ 2^51 + 8191` (no `*19` factor)
+- square: Pow2K.lean:208 claims `< 2^51` achievable
 
 ## FieldElement51 (5×51-bit limbs, GF(2²⁵⁵-19))
 
