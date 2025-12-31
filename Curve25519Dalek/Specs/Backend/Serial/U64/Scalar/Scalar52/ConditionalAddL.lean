@@ -372,40 +372,39 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
     (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) := by
   unfold conditional_add_l
   progress*
-  simp only [Finset.Ico_self, Finset.sum_empty, Nat.zero_div, mul_zero, add_zero] at res_post_2
   rw [constants.L_spec] at *
-  have hL_bound : L < 2 ^ 260 := by unfold L; grind
   refine ⟨by assumption, ?_, ?_, ?_⟩
-  · -- result < L
+  · -- BEGIN TASK
+    -- result < L
     cases Choice.val_cases condition with
-    | inl hc0 =>
-      have hcz : condition = Choice.zero := by
-        cases condition; simp only [Choice.zero, subtle.Choice.mk.injEq]; exact hc0
-      simp only [hc0, U8_zero_ne_one, reduceIte, add_zero, Nat.sub_zero] at res_post_2
-      have hself_bound := hself''' hcz
-      have hcarry_zero : res.1.val / 2 ^ 52 = 0 := by omega
-      omega
-    | inr hc1 =>
-      have hco : condition = Choice.one := by
-        cases condition; simp only [Choice.one, subtle.Choice.mk.injEq]; exact hc1
-      simp only [hc1, ↓reduceIte, Nat.sub_zero] at res_post_2
-      have h1 := hself' hco
-      have h2 := hself'' hco
-      have hres_bounded : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 res_post_1
-      have hsum_bound : Scalar52_as_Nat self + L < 2 ^ 261 := by omega
-      have hcarry_bound : res.1.val / 2 ^ 52 ≤ 1 := by omega
-      have hcarry_lower : 1 ≤ res.1.val / 2 ^ 52 := by omega
-      have hcarry_eq : res.1.val / 2 ^ 52 = 1 := by omega
-      omega
-  · -- condition = Choice.one case
+    | inl =>
+      have : condition = Choice.zero := by cases condition; simp [Choice.zero]; grind
+      have : Scalar52_as_Nat res.2 + 2 ^ 260 * (res.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
+        simp_all
+      grind
+    | inr =>
+      have : condition = Choice.one := by cases condition; simp [Choice.one]; grind
+      have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
+      simp only [Finset.Ico_self] at *
+      grind
+    -- END TASK
+  · -- BEGIN TASK
+    -- condition = Choice.one case
     intro hc
     have : condition.val = 1#u8 := by rw [hc]; rfl
     have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
+    have : L < 2 ^ 260 := by unfold L; grind
+    simp only [Finset.Ico_self] at *
     grind
-  · -- condition = Choice.zero case
+    -- END TASK
+  · -- BEGIN TASK
+    -- condition = Choice.zero case
     intro hc
-    have hc0 : condition.val = 0#u8 := by rw [hc]; rfl
-    simp only [hc0, U8_zero_ne_one, reduceIte, add_zero, Nat.sub_zero] at res_post_2
+    have : condition.val = 0#u8 := by rw [hc]; rfl
+    have : Scalar52_as_Nat res.2 + 2 ^ 260 * (res.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
+      simp_all
+    have : L < 2 ^ 260 := by unfold L; grind
     grind
+    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
