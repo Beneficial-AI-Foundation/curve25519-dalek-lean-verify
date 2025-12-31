@@ -223,9 +223,10 @@ The theorem states that the Rust implementation of point doubling corresponds
 exactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.
 -/
 theorem double_spec'
-    (q : ProjectivePoint) (hq_valid : q.IsValid) (hq_bounds : q.InBounds) :
-    ∃ c, ProjectivePoint.double q = ok c ∧ c.IsValid ∧
-    (c : Point Ed25519) = q + q := by
+    (q : ProjectivePoint) (hq_valid : q.IsValid) :
+    ∃ c, ProjectivePoint.double q = ok c ∧
+    c.IsValid ∧
+    c.toPoint = q.toPoint + q.toPoint := by
 
   -- 1. Unwrap validity witness P from the input
   rcases hq_valid with ⟨P, hP⟩

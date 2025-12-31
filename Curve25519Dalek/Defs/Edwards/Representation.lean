@@ -68,9 +68,13 @@ open Edwards FieldElement51
 def FieldElement51.toField (fe : FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
+-- To do: move to the file where this belongs
 /-- A FieldElement51 is valid when all 5 limbs are bounded by 2^52. -/
 def FieldElement51.IsValid (fe : FieldElement51) : Prop :=
   ∀ i < 5, fe[i]!.val ≤ 2^52
+
+instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
+  show Decidable (∀ i < 5, fe[i]!.val ≤ 2^52) from inferInstance
 
 end curve25519_dalek.backend.serial.u64.field
 
@@ -171,88 +175,112 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
              let Z := cp.Z.toField; let T := cp.T.toField
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
-/-- Convert a valid ProjectivePoint to the affine point (X/Z, Y/Z). -/
-noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) (h : pp.IsValid := by assumption) : Point Ed25519 :=
-  let X := pp.X.toField
-  let Y := pp.Y.toField
-  let Z := pp.Z.toField
-  { x := X / Z
-    y := Y / Z
-    on_curve := by
-      -- Need to show: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
-      -- From h.on_curve: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
-      -- Divide both sides by Z⁴
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
-      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [hz2, hz4]
-      linear_combination hcurve }
+open curve25519_dalek.backend.serial.u64.field in
+instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
+  if hX : pp.X.IsValid then
+    if hY : pp.Y.IsValid then
+      if hZ : pp.Z.IsValid then
+        if hZne : pp.Z.toField ≠ 0 then
+          if hcurve : Ed25519.a * pp.X.toField^2 * pp.Z.toField^2 + pp.Y.toField^2 * pp.Z.toField^2
+                    = pp.Z.toField^4 + Ed25519.d * pp.X.toField^2 * pp.Y.toField^2 then
+            isTrue ⟨hX, hY, hZ, hZne, hcurve⟩
+          else isFalse fun h => hcurve h.on_curve
+        else isFalse fun h => hZne h.Z_ne_zero
+      else isFalse fun h => hZ h.Z_valid
+    else isFalse fun h => hY h.Y_valid
+  else isFalse fun h => hX h.X_valid
 
-/-- Convert a valid CompletedPoint to the affine point (X/Z, Y/T). -/
-noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) (h : cp.IsValid := by assumption) : Point Ed25519 :=
-  let X := cp.X.toField
-  let Y := cp.Y.toField
-  let Z := cp.Z.toField
-  let T := cp.T.toField
-  { x := X / Z
-    y := Y / T
-    on_curve := by
-      -- Need to show: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
-      -- From h.on_curve: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
-      -- Divide both sides by Z²*T²
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have ht : T ≠ 0 := h.T_ne_zero
-      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-      have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
-      have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [hz2, ht2]
-      linear_combination hcurve }
+open curve25519_dalek.backend.serial.u64.field in
+instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
+  if hX : cp.X.IsValid then
+    if hY : cp.Y.IsValid then
+      if hZ : cp.Z.IsValid then
+        if hT : cp.T.IsValid then
+          if hZne : cp.Z.toField ≠ 0 then
+            if hTne : cp.T.toField ≠ 0 then
+              if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
+                        = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
+                isTrue ⟨hX, hY, hZ, hT, hZne, hTne, hcurve⟩
+              else isFalse fun h => hcurve h.on_curve
+            else isFalse fun h => hTne h.T_ne_zero
+          else isFalse fun h => hZne h.Z_ne_zero
+        else isFalse fun h => hT h.T_valid
+      else isFalse fun h => hZ h.Z_valid
+    else isFalse fun h => hY h.Y_valid
+  else isFalse fun h => hX h.X_valid
 
-/-- Total conversion function for ProjectivePoint.
-    If valid, returns the point (X/Z, Y/Z). If invalid, returns 0. -/
-noncomputable def ProjectivePoint.toPoint' (pp : ProjectivePoint) : Point Ed25519 := by
-  classical
-  exact if h : pp.IsValid then pp.toPoint h else 0
+/-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
+    Returns 0 if the point is not valid. -/
+noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
+  if h : pp.IsValid then
+    let X := pp.X.toField
+    let Y := pp.Y.toField
+    let Z := pp.Z.toField
+    { x := X / Z
+      y := Y / Z
+      on_curve := by
+        have hz : Z ≠ 0 := h.Z_ne_zero
+        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+        have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+        have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        simp only [Ed25519] at hcurve ⊢
+        simp only [div_pow]
+        field_simp [hz2, hz4]
+        linear_combination hcurve }
+  else 0
 
-/-- Total conversion function for CompletedPoint.
-    If valid, returns the point (X/Z, Y/T). If invalid, returns 0. -/
-noncomputable def CompletedPoint.toPoint' (cp : CompletedPoint) : Point Ed25519 := by
-  classical
-  exact if h : cp.IsValid then cp.toPoint h else 0
+/-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
+    Returns 0 if the point is not valid. -/
+noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :=
+  if h : cp.IsValid then
+    let X := cp.X.toField
+    let Y := cp.Y.toField
+    let Z := cp.Z.toField
+    let T := cp.T.toField
+    { x := X / Z
+      y := Y / T
+      on_curve := by
+        have hz : Z ≠ 0 := h.Z_ne_zero
+        have ht : T ≠ 0 := h.T_ne_zero
+        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+        have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
+        have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        simp only [Ed25519] at hcurve ⊢
+        simp only [div_pow]
+        field_simp [hz2, ht2]
+        linear_combination hcurve }
+  else 0
 
-/-- If a ProjectivePoint is valid, `toPoint'` equals `toPoint`. -/
-theorem ProjectivePoint.toPoint'_eq_toPoint {pp : ProjectivePoint} (h : pp.IsValid) :
-    pp.toPoint' = pp.toPoint h := by
-  rw [toPoint', dif_pos h]
+/-- Unfolding lemma: when a ProjectivePoint is valid, toPoint computes (X/Z, Y/Z). -/
+theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsValid) :
+    (pp.toPoint).x = pp.X.toField / pp.Z.toField ∧
+    (pp.toPoint).y = pp.Y.toField / pp.Z.toField := by
+  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
 
-/-- If a CompletedPoint is valid, `toPoint'` equals `toPoint`. -/
-theorem CompletedPoint.toPoint'_eq_toPoint {cp : CompletedPoint} (h : cp.IsValid) :
-    cp.toPoint' = cp.toPoint h := by
-  rw [toPoint', dif_pos h]
+/-- Unfolding lemma: when a CompletedPoint is valid, toPoint computes (X/Z, Y/T). -/
+theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid) :
+    (cp.toPoint).x = cp.X.toField / cp.Z.toField ∧
+    (cp.toPoint).y = cp.Y.toField / cp.T.toField := by
+  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
 
 -- === Coercions ===
 -- These allow using low-level types in high-level equations
 
 /-- Coercion allowing `q + q` syntax where `q` is a ProjectivePoint. -/
 noncomputable instance : Coe ProjectivePoint (Point Ed25519) where
-  coe p := p.toPoint'
+  coe p := p.toPoint
 
 /-- Coercion allowing comparison of `CompletedPoint` results with mathematical points. -/
 noncomputable instance : Coe CompletedPoint (Point Ed25519) where
-  coe p := p.toPoint'
+  coe p := p.toPoint
 
 @[simp]
-theorem ProjectivePoint.toPoint'_eq_coe (p : ProjectivePoint) :
-  p.toPoint' = ↑p := rfl
+theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
+  p.toPoint = ↑p := rfl
 
 @[simp]
-theorem CompletedPoint.toPoint'_eq_coe (p : CompletedPoint) :
-  p.toPoint' = ↑p := rfl
+theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
+  p.toPoint = ↑p := rfl
 
 open curve25519_dalek.backend.serial.u64.field in
 /-- A ProjectivePoint has all coordinates in bounds. -/
