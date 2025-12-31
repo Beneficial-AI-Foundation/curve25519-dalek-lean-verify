@@ -15,7 +15,7 @@
 
 | Op | Verus In | Lean In |
 |----|----------|---------|
-| montgomery_mul | 2⁵² | 2⁶² |
+| montgomery_mul | 2⁵² | 2⁵² |
 
 ## Gaps
 

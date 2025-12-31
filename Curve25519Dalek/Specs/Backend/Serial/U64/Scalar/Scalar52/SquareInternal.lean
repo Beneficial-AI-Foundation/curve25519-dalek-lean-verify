@@ -23,10 +23,9 @@ attribute [-simp] Int.reducePow Nat.reducePow
 /-- **Spec for `square_internal`**:
 - Does not error and hence returns a result
 - The result represents the square of the input field element
-- Requires each limb to be less than 62 bits to prevent overflow
-(The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
+- Requires each limb to be at most 52 bits (matching Verus) -/
 @[progress]
-theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
+theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52) :
     ∃ result, square_internal a = ok (result) ∧
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a := by
   unfold square_internal Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
