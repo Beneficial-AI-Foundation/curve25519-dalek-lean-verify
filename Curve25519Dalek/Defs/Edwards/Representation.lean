@@ -29,6 +29,24 @@ objects (Point Ed25519).
 
 This file imports `Funs.lean` and `Types.lean` to access Rust implementation types.
 It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
+
+## Validity Predicates
+
+The Rust code uses 9 different Rust structures for representing points on the elliptic curve:
+
+- backend.serial.curve_models.ProjectivePoint
+- backend.serial.curve_models.CompletedPoint
+- backend.serial.curve_models.ProjectiveNielsPoint
+- edwards.EdwardsPoint
+- edwards.affine.AffinePoint
+- edwards.CompressedEdwardsY
+- montgomery.MontgomeryPoint
+- ristretto.RistrettoPoint
+- ristretto.CompressedRistretto
+
+The Rust code is designed so that the constructors and the various operations guarantee that the
+data held by any of these is always a valid combination of coordinates. To track this we introduce
+Lean predicates for each of these represenations.
 -/
 
 namespace Edwards
