@@ -295,7 +295,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
-set_option maxHeartbeats 5000000 in
+set_option maxHeartbeats 5000000 in -- the usual heavy stuff
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Requires bounded limbs for both inputs
 - Requires both inputs to be bounded from above
