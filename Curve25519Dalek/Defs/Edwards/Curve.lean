@@ -160,12 +160,18 @@ instance : Add (Point Ed25519) where
 instance : Zero (Point Ed25519) where
   zero := { x := 0, y := 1 }
 
+@[simp] theorem zero_x : (0 : Point Ed25519).x = 0 := rfl
+@[simp] theorem zero_y : (0 : Point Ed25519).y = 1 := rfl
+
 instance : Neg (Point Ed25519) where
   neg p := {
     x := -p.x
     y := p.y
     h_on_curve := by simpa [neg_pow_two] using p.h_on_curve
   }
+
+@[simp] theorem neg_x (p : Point Ed25519) : (-p).x = -p.x := rfl
+@[simp] theorem neg_y (p : Point Ed25519) : (-p).y = p.y := rfl
 
 instance : Sub (Point Ed25519) where
   sub p1 p2 := p1 + (-p2)
@@ -189,76 +195,51 @@ instance : SMul ℤ (Point Ed25519) := ⟨zsmul_Ed25519⟩
 theorem add_coords_mk (C : EdwardsCurve F) (x₁ y₁ x₂ y₂ : F) :
     let lam := C.d * x₁ * x₂ * y₁ * y₂;
     add_coords C (x₁, y₁) (x₂, y₂) =
-    ((x₁ * y₂ + y₁ * x₂) / (1 + lam), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lam)) := rfl
+      ((x₁ * y₂ + y₁ * x₂) / (1 + lam), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lam)) := rfl
+
+/-- The x-coordinate of p + q on Ed25519. Used for unfolding in specific proofs. -/
+theorem add_x (p q : Point Ed25519) :
+    (p + q).x = (p.x * q.y + p.y * q.x) / (1 + Ed25519.d * p.x * q.x * p.y * q.y) := rfl
+
+/-- The y-coordinate of p + q on Ed25519. Used for unfolding in specific proofs. -/
+theorem add_y (p q : Point Ed25519) :
+    (p + q).y = (p.y * q.y - Ed25519.a * p.x * q.x) / (1 - Ed25519.d * p.x * q.x * p.y * q.y) := rfl
 
 /-- The identity element (0, 1) is a left identity for addition. -/
 theorem zero_add_Ed25519 (p : Point Ed25519) : (0 : Point Ed25519) + p = p := by
   ext
-  · -- x coordinate: (0·y + 1·x) / (1 + d·0·x·1·y) = x
-    change (add_coords Ed25519 (0, 1) (p.x, p.y)).1 = p.x
-    simp only [add_coords_mk, zero_mul, one_mul, add_zero, mul_zero, zero_add, div_one]
-  · -- y coordinate: (1·y - a·0·x) / (1 - d·0·x·1·y) = y
-    change (add_coords Ed25519 (0, 1) (p.x, p.y)).2 = p.y
-    simp only [add_coords_mk, Ed25519, one_mul, mul_zero, sub_zero, zero_mul, div_one]
+  · rw [add_x]; simp [Ed25519]
+  · rw [add_y]; simp [Ed25519]
 
 /-- The identity element (0, 1) is a right identity for addition. -/
 theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
   ext
-  · -- x coordinate: (x·1 + y·0) / (1 + d·x·0·y·1) = x
-    change (add_coords Ed25519 (p.x, p.y) (0, 1)).1 = p.x
-    simp only [add_coords_mk, mul_one, mul_zero, add_zero, zero_mul, div_one]
-  · -- y coordinate: (y·1 - a·x·0) / (1 - d·x·0·y·1) = y
-    change (add_coords Ed25519 (p.x, p.y) (0, 1)).2 = p.y
-    simp only [add_coords_mk, Ed25519, mul_one, mul_zero, sub_zero, zero_mul, div_one]
+  · rw [add_x]; simp [Ed25519]
+  · rw [add_y]; simp [Ed25519]
 
 /-- Negation is a left inverse: -p + p = 0. -/
 theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
-  have h := p.h_on_curve
-  simp only [Ed25519] at h
-  -- h : -1 * p.x ^ 2 + p.y ^ 2 = 1 + d * p.x ^ 2 * p.y ^ 2
+  have h : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by
+    have := p.h_on_curve; simp [Ed25519] at this; grind
+  have : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := calc
+    1 + d * p.x^2 * p.y^2 = 1 - d * (-p.x) * p.x * p.y * p.y := by ring
+    _ ≠ 0 := (Ed25519.denomsNeZero (-p) p).2
   ext
-  · -- x coordinate: (-x·y + y·x) / denom = 0
-    change (add_coords Ed25519 (-p.x, p.y) (p.x, p.y)).1 = 0
-    simp only [add_coords_mk]
-    have : -p.x * p.y + p.y * p.x = 0 := by ring
-    simp only [this, zero_div]
-  · -- y coordinate: (y² - a·(-x)·x) / (1 - d·(-x)·x·y²) = 1
-    -- With a = -1: = (y² - x²) / (1 + d·x²·y²) = 1
-    change (add_coords Ed25519 (-p.x, p.y) (p.x, p.y)).2 = 1
-    simp only [add_coords_mk, Ed25519]
-    -- Goal: (p.y * p.y - -1 * -p.x * p.x) / (1 - d * -p.x * p.x * p.y * p.y) = 1
-    -- From h: -1 * p.x^2 + p.y^2 = 1 + d * p.x^2 * p.y^2
-    -- So: p.y^2 - p.x^2 = 1 + d * p.x^2 * p.y^2
-    have h' : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by linear_combination h
-    have denom_ne : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := by
-      have := (Ed25519.denomsNeZero (-p) p).2
-      -- (-p).x = -p.x and (-p).y = p.y by definition of Neg for Point
-      simp only [Ed25519] at this
-      have hx : (-p).x = -p.x := rfl
-      have hy : (-p).y = p.y := rfl
-      simp only [hx, hy] at this
-      -- this : 1 - d * -p.x * p.x * p.y * p.y ≠ 0
-      -- which equals 1 + d * p.x^2 * p.y^2 ≠ 0
-      have eq : (1 : CurveField) - d * (-p.x) * p.x * p.y * p.y = 1 + d * p.x^2 * p.y^2 := by ring
-      rwa [eq] at this
-    calc (p.y * p.y - -1 * (-p.x) * p.x) / (1 - (d : CurveField) * (-p.x) * p.x * p.y * p.y)
-        = (p.y^2 - p.x^2) / (1 + d * p.x^2 * p.y^2) := by ring_nf
-      _ = (1 + d * p.x^2 * p.y^2) / (1 + d * p.x^2 * p.y^2) := by rw [h']
-      _ = 1 := div_self denom_ne
+  · rw [add_x, neg_x, neg_y]; ring_nf; rfl
+  · have := calc (p.y * p.y - -1 * (-p.x) * p.x) / (1 - d * (-p.x) * p.x * p.y * p.y)
+      _ = (p.y^2 - p.x^2) / (1 + d * p.x^2 * p.y^2) := by ring_nf
+      _ = 1 := by rw [h]; grind
+    rw [add_y]; simp only [Ed25519, zero_y]
+    omega
 
 /-- Addition is commutative. -/
 theorem add_comm_Ed25519 (p q : Point Ed25519) : p + q = q + p := by
-  ext
-  · change (add_coords Ed25519 (p.x, p.y) (q.x, q.y)).1 = (add_coords Ed25519 (q.x, q.y) (p.x, p.y)).1
-    simp [add_coords_mk]; ring
-  · change (add_coords Ed25519 (p.x, p.y) (q.x, q.y)).2 = (add_coords Ed25519 (q.x, q.y) (p.x, p.y)).2
-    simp [add_coords_mk]; ring
+  ext <;> simp only [add_x, add_y] <;> ring
 
 /-- nsmul satisfies the successor property (for AddCommGroup). -/
 theorem nsmul_succ_Ed25519 (n : ℕ) (p : Point Ed25519) :
     nsmul_Ed25519 (n + 1) p = nsmul_Ed25519 n p + p := by
-  rw [add_comm_Ed25519]
-  rfl
+  rw [add_comm_Ed25519]; rfl
 
 /-- zsmul satisfies the successor property. -/
 theorem zsmul_succ_Ed25519 (n : ℕ) (p : Point Ed25519) :
