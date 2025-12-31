@@ -17,6 +17,8 @@
 |----|----------|---------|
 | montgomery_mul | 2⁵² | 2⁵² |
 
+Tighter 2⁵¹+155k: proofs work, but RR constant limbs ∈ [2⁵¹+155k, 2⁵²). Not recommended.
+
 ## Gaps
 
 | | Verus only | Lean only |
