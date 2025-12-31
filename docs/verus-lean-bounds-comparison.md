@@ -253,6 +253,172 @@ This section lists which functions have specifications in each project to help c
 - `EdwardsPoint::mul_by_pow2`
 - `Scalar::from_uniform_bytes`
 
+---
+
+## Detailed Coordination Analysis
+
+### FieldElement51 - Full Parity ✅
+
+Both projects have complete coverage of all 21 core field operations. This is the cryptographic foundation - **no coordination gaps**.
+
+### Scalar52 - Minor Gaps
+
+| Gap | Description | Impact |
+|-----|-------------|--------|
+| `mul`/`square` (Verus only) | High-level scalar multiply wrapping Montgomery | Low - Lean has underlying `montgomery_mul` |
+| `invert` (Lean only) | Computing s⁻¹ mod L | Medium - needed for some signing variants |
+
+These gaps are **complementary** - neither blocks the other project.
+
+### EdwardsPoint - Significant Gaps ⚠️
+
+This is where coordination matters most for end-to-end protocol verification.
+
+#### Verus Has, Lean Needs (for X25519/ECDH)
+
+| Function | Purpose | Priority | Verus Source |
+|----------|---------|----------|--------------|
+| `mul_base` | `[scalar] * basepoint` | 🔴 Critical | [edwards.rs#L470](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L470) |
+| `mul_base_clamped` | X25519-style basepoint mul | 🔴 Critical | [edwards.rs#L485](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L485) |
+| `mul_clamped` | X25519 arbitrary point mul | 🔴 Critical | [edwards.rs#L500](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L500) |
+| `multiscalar_mul` | Batch: `∑ [sᵢ] * Pᵢ` | 🟡 Medium | [edwards.rs#L520](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L520) |
+| `is_torsion_free` | Subgroup check | 🟢 Low | [edwards.rs#L380](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L380) |
+
+#### Lean Has, Verus Could Use
+
+| Function | Purpose | Lean Source |
+|----------|---------|-------------|
+| `mul_by_pow2` | Compute `[2^k] * P` | [MulByPow2.lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean) |
+| `from_uniform_bytes` | Hash-to-scalar | [FromUniformBytes.lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Scalar/Scalar/FromUniformBytes.lean) |
+| `Scalar52::invert` | Scalar inversion | [Invert.lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean) |
+
+---
+
+## Side-by-Side Spec Examples
+
+### Example 1: Field Addition Bounds
+
+**Verus** ([field_specs.rs#L27-L38](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/field_specs.rs#L27-L38)):
+```rust
+/// Spec predicate: all limbs are bounded by a given bit limit
+pub open spec fn fe51_limbs_bounded(fe: &FieldElement51, bit_limit: u64) -> bool {
+    forall|i: int| 0 <= i < 5 ==> fe.limbs[i] < (1u64 << bit_limit)
+}
+
+/// Spec function: result of limb-wise addition
+pub open spec fn spec_add_fe51_limbs(a: &FieldElement51, b: &FieldElement51) -> FieldElement51 {
+    FieldElement51 {
+        limbs: [
+            (a.limbs[0] + b.limbs[0]) as u64,
+            // ... limbs 1-4
+        ],
+    }
+}
+```
+
+**Lean** ([Add.lean#L24-L36](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean#L24-L36)):
+```lean
+/-- **Spec for `FieldElement51.add`**:
+- Input bounds: both inputs have limbs < 2^53
+- Output bounds: output has limbs < 2^54 -/
+@[progress]
+theorem add_spec (a b : Array U64 5#usize)
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
+    ∃ result, add a b = ok result ∧
+    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
+    (∀ i < 5, result[i]!.val < 2^54) := by
+  unfold add; progress*
+```
+
+**Verdict**: ✅ Same bounds (`< 2^53` input, `< 2^54` output)
+
+---
+
+### Example 2: Montgomery Multiplication
+
+**Verus** ([scalar52_specs.rs#L69-L103](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/scalar52_specs.rs#L69-L103)):
+```rust
+/// Returns the mathematical value of a Scalar52 modulo the group order.
+pub open spec fn spec_scalar52(s: &Scalar52) -> nat {
+    scalar52_to_nat(s) % group_order()
+}
+
+// Check that all limbs of a Scalar52 are properly bounded (< 2^52)
+pub open spec fn limbs_bounded(s: &Scalar52) -> bool {
+    forall|i: int| 0 <= i < 5 ==> s.limbs[i] < (1u64 << 52)
+}
+
+// Montgomery radix R = 2^260
+pub open spec fn montgomery_radix() -> nat {
+    pow2(260)
+}
+```
+
+**Lean** ([MontgomeryMul.lean#L41-L51](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean#L41-L51)):
+```lean
+/-- **Spec for `Scalar52.montgomery_mul`**:
+- The result w satisfies: (m * m') ≡ w * R (mod L)
+- where R = 2^260 is the Montgomery constant -/
+@[progress]
+theorem montgomery_mul_spec (m m' : Scalar52)
+    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
+    ∃ w, montgomery_mul m m' = ok w ∧
+    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] := by
+  unfold montgomery_mul; progress*
+```
+
+**Verdict**: ✅ Same correctness property. Lean allows larger inputs (`< 2^62` vs `< 2^52`).
+
+---
+
+### Example 3: Reduce Operation
+
+**Verus** ([field_specs_u64.rs#L62-L71](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/field_specs_u64.rs#L62-L71)):
+```rust
+pub open spec fn spec_reduce(limbs: [u64; 5]) -> (r: [u64; 5]) {
+    let r = [
+        ((limbs[0] & mask51) + (limbs[4] >> 51) * 19) as u64,
+        ((limbs[1] & mask51) + (limbs[0] >> 51)) as u64,
+        ((limbs[2] & mask51) + (limbs[1] >> 51)) as u64,
+        ((limbs[3] & mask51) + (limbs[2] >> 51)) as u64,
+        ((limbs[4] & mask51) + (limbs[3] >> 51)) as u64,
+    ];
+    r
+}
+```
+
+**Lean** ([Reduce.lean#L45-L53](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean#L45-L53)):
+```lean
+/-- **Spec for `FieldElement51.reduce`**:
+- All limbs of result are small: ≤ 2^51 + (2^13 - 1) * 19
+- The result is equal to the input mod p -/
+@[progress]
+theorem reduce_spec (limbs : Array U64 5#usize) :
+    ∃ result, reduce limbs = ok result ∧
+    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
+    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
+  unfold reduce; progress*
+```
+
+**Verdict**: ✅ Same algorithm. Lean's bound `2^51 + (2^13-1)*19` is more precise than Verus's `< 2^52`.
+
+---
+
+## Protocol-Level Implications
+
+### For X25519 Verification
+- **Verus**: Has complete path (`mul_base_clamped`, `mul_clamped`)
+- **Lean**: Missing these functions - would need to add them
+
+### For EdDSA Signing
+- **Both**: Have `vartime_double_scalar_mul_basepoint` for verification
+- **Lean**: Has `from_uniform_bytes` for hash-to-scalar
+- **Verus**: Has `mul_base` for signature generation
+
+### For Batch Verification
+- **Verus**: Has `multiscalar_mul`
+- **Lean**: Has `StrausMultiscalarMul` (similar capability)
+
 ## References
 
 - Verus: [dalek-lite/curve25519-dalek/src/specs/](https://github.com/Beneficial-AI-Foundation/dalek-lite/tree/master/curve25519-dalek/src/specs)
