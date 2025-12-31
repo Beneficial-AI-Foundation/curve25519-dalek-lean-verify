@@ -40,7 +40,7 @@ natural language specs:
 theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
     ∃ s, from_bytes_mod_order b = ok s ∧
     U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L := by
-  unfold from_bytes_mod_order scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index
+  unfold from_bytes_mod_order scalar.IndexScalarUsizeU8.index
   progress*
   -- BEGIN TASK
   have := high_bit_zero_of_lt_L s.bytes

@@ -73,7 +73,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
   -/
   unfold is_negative
   progress*
-  unfold subtle.FromsubtleChoiceU8.from
+  unfold subtle.FromChoiceU8.from
   simp_all
   have : i1.val<2:= by
    rw[i1_post_1]

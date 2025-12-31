@@ -18,7 +18,7 @@ This function returns the identity element.
 
 open Aeneas.Std Result curve25519_dalek
 open backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint
+namespace curve25519_dalek.edwards.IdentityEdwardsPoint
 
 /-
 natural language description:
@@ -31,7 +31,7 @@ natural language specs:
 • The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
 
-/-- **Spec and proof concerning `edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity`**:
+/-- **Spec and proof concerning `edwards.IdentityEdwardsPoint.identity`**:
 - No panic (always returns successfully)
 - The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
@@ -42,4 +42,4 @@ theorem identity_spec :
   unfold identity
   simp
 
-end curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint
+end curve25519_dalek.edwards.IdentityEdwardsPoint

@@ -25,7 +25,7 @@ This function performs constant-time equality comparison for Edwards points.
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-namespace curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+namespace curve25519_dalek.edwards.ConstantTimeEqEdwardsPoint
 
 /-
 Natural language description:
@@ -43,7 +43,7 @@ Natural language specs:
     • (e1.X · e2.Z, e1.Y · e2.Z) = (e2.X · e1.Z, e2.Y · e1.Z) ⟺ Choice = True
 -/
 
-/-- **Spec and proof concerning `edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq`**:
+/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:
 - No panic (always returns successfully)
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 -/
@@ -124,4 +124,4 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     exact Nat.ModEq.trans (Nat.ModEq.trans h8 hy) (Nat.ModEq.symm h10)
 
 
-end curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+end curve25519_dalek.edwards.ConstantTimeEqEdwardsPoint

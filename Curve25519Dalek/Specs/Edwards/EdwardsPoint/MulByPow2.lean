@@ -44,7 +44,7 @@ theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :
     (k = 1#u32 →
       ∃ e_double eq_choice,
       double e = ok e_double ∧
-      ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e_result e_double = ok eq_choice ∧
+      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_double = ok eq_choice ∧
       eq_choice = Choice.one) ∧
 
     (k.val > 1 →
@@ -52,7 +52,7 @@ theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :
       k - 1#u32 = ok km1 ∧
       mul_by_pow_2 e km1 = ok e_km1 ∧
       double e_km1 = ok e_km1_double ∧
-      ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e_result e_km1_double = ok eq_choice ∧
+      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_km1_double = ok eq_choice ∧
       eq_choice = Choice.one) := by
 
     sorry

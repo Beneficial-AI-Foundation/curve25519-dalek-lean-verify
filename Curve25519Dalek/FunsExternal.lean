@@ -7,6 +7,64 @@ open Aeneas.Std Result
 
 namespace curve25519_dalek
 
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:45
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.get
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result (Option (Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:57
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
+    (Option (Slice T) → Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked
+  {T : Type} :
+  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
+    (Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked_mut
+  {T : Type} :
+  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
+    T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:39
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.index
+  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T)
+
+/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 660:4-660:51
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
+axiom core.slice.index.SliceIndexRangeFullSliceSlice.index_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
+    Slice T))
+
 /- Convenience definitions for Choice values -/
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
 def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
@@ -17,88 +75,71 @@ def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
 def subtle.Choice.unwrap_u8 (c : subtle.Choice) : Result U8 :=
   ok c.val
 
+/- [subtle::{core::convert::From<subtle::Choice> for bool}::from]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 153:4-153:35
+   Name pattern: [subtle::{core::convert::From<bool, subtle::Choice>}::from]
+   Converts Choice to bool: Choice.zero -> false, Choice.one -> true -/
+@[rust_fun "subtle::{core::convert::From<bool, subtle::Choice>}::from"]
+def subtle.FromBoolChoice.from (c : subtle.Choice) : Result Bool :=
+  ok (c.val = 1#u8)
+
 /- [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}::bitand]:
-Name pattern: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand]
-Bitwise AND for Choice values (0 & 0 = 0, 0 & 1 = 0, 1 & 0 = 0, 1 & 1 = 1) -/
-def subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 162:4-162:42
+   Name pattern: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand] -/
+@[rust_fun
+  "subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand"]
+def subtle.BitAndChoiceChoiceChoice.bitand
   (a : subtle.Choice) (b : subtle.Choice) : Result subtle.Choice :=
   if a.val = 0#u8 ∨ b.val = 0#u8 then
     ok Choice.zero
   else
     ok Choice.one
 
-/-- **Spec theorem for `subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand`**:
+/-- **Spec theorem for `subtle.BitAndChoiceChoiceChoice.bitand`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if both inputs are `Choice.one`
 -/
 @[progress]
-axiom subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand_spec (a b : subtle.Choice) :
-    ∃ c, subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand a b = ok c ∧
+axiom subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
+    ∃ c, subtle.BitAndChoiceChoiceChoice.bitand a b = ok c ∧
     (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one)
 
-/- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
-   Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
-   Converts a u8 to a Choice. The input should be 0 or 1. -/
-def subtle.FromsubtleChoiceU8.from (input : U8) : Result subtle.Choice :=
-  if h : input = 0#u8 then
-    ok { val := input, valid := Or.inl h }
-  else if h' : input = 1#u8 then
-    ok { val := input, valid := Or.inr h' }
-  else
-    fail Error.panic
-
-/- [subtle::{core::convert::From<subtle::Choice> for bool}::from]:
-   Name pattern: [subtle::{core::convert::From<bool, subtle::Choice>}::from]
-   Converts Choice to bool: Choice.zero -> false, Choice.one -> true -/
-def subtle.FromBoolsubtleChoice.from (c : subtle.Choice) : Result Bool :=
-  ok (c.val = 1#u8)
-
 /- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 177:4-177:41
    Name pattern: [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>}::bitor]
    Bitwise OR for Choice values (0 | 0 = 0, 0 | 1 = 1, 1 | 0 = 1, 1 | 1 = 1) -/
-def subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor
-  (a : subtle.Choice) (b : subtle.Choice) : Result subtle.Choice :=
+@[rust_fun
+  "subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>}::bitor"]
+def subtle.BitOrChoiceChoiceChoice.bitor (a : subtle.Choice) (b : subtle.Choice) :
+    Result subtle.Choice :=
   if a.val = 1#u8 ∨ b.val = 1#u8 then
     ok Choice.one
   else
     ok Choice.zero
 
 /- [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}::not]:
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 207:4-207:26
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 207:4-207:26
    Name pattern: [subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not]
    Bitwise NOT for Choice values (NOT 0 = 1, NOT 1 = 0) -/
-def subtle.NotsubtleChoicesubtleChoice.not
-  (c : subtle.Choice) : Result subtle.Choice :=
+@[rust_fun
+  "subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not"]
+def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
   if c.val = 1#u8 then
     ok Choice.zero
   else
     ok Choice.one
 
-/- [subtle::{subtle::ConditionallyNegatable for T}::conditional_negate]:
-   Name pattern: [subtle::{subtle::ConditionallyNegatable<@T>}::conditional_negate]
-   Negate self if choice == Choice(1); otherwise, leave it unchanged -/
-def subtle.ConditionallyNegatable.Blanket.conditional_negate
-  {T : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T)
-  (self : T) (choice : subtle.Choice) : Result T := do
-  let self_neg ← coreopsarithNeg_TTInst.neg self
-  ConditionallySelectableInst.conditional_select self self_neg choice
-
-/- [subtle::ConditionallySelectable::conditional_assign]:
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
-   Name pattern: [subtle::ConditionallySelectable::conditional_assign] -/
-axiom subtle.ConditionallySelectable.conditional_assign.default
-  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
-  Self) :
-  Self → Self → subtle.Choice → Result Self
-
-/- [subtle::ConditionallySelectable::conditional_swap]:
-   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
-   Name pattern: [subtle::ConditionallySelectable::conditional_swap] -/
-axiom subtle.ConditionallySelectable.conditional_swap.default
-  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
-  Self) :
-  Self → Self → subtle.Choice → Result (Self × Self)
+/- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
+   Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
+   Converts a u8 to a Choice. The input should be 0 or 1. -/
+def subtle.FromChoiceU8.from (input : U8) : Result subtle.Choice :=
+  if h : input = 0#u8 then
+    ok { val := input, valid := Or.inl h }
+  else if h' : input = 1#u8 then
+    ok { val := input, valid := Or.inr h' }
+  else
+    fail Error.panic
 
 /- [subtle::{subtle::ConstantTimeEq for @Slice<T>}::ct_eq]:
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
@@ -137,8 +178,26 @@ axiom subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
   ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
   (c = Choice.one ↔ a = b)
 
+/- [subtle::ConditionallySelectable::conditional_assign]:
+   Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
+   Name pattern: [subtle::ConditionallySelectable::conditional_assign] -/
+axiom subtle.ConditionallySelectable.conditional_assign.default
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
+  Self) :
+  Self → Self → subtle.Choice → Result Self
+
+/- [subtle::ConditionallySelectable::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
+   Name pattern: [subtle::ConditionallySelectable::conditional_swap] -/
+@[rust_fun "subtle::ConditionallySelectable::conditional_swap"]
+axiom subtle.ConditionallySelectable.conditional_swap.default
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
+  Self) :
+  Self → Self → subtle.Choice → Result (Self × Self)
+
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
-Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_select]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_select]
 Conditional select: returns a if choice(0), b if choice(1) -/
 def subtle.ConditionallySelectableU64.conditional_select
   (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
@@ -154,18 +213,35 @@ theorem conditional_select_U64_spec (a b : U64) (choice : subtle.Choice) :
   split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_assign]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_assign]
    Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<u64>}::conditional_assign"]
 def subtle.ConditionallySelectableU64.conditional_assign
   (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
   subtle.ConditionallySelectableU64.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_swap]
    Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
+@[rust_fun "subtle::{subtle::ConditionallySelectable<u64>}::conditional_swap"]
 def subtle.ConditionallySelectableU64.conditional_swap
   (a : U64) (b : U64) (choice : subtle.Choice) : Result (U64 × U64) := do
   let a_new ← subtle.ConditionallySelectableU64.conditional_select a b choice
   let b_new ← subtle.ConditionallySelectableU64.conditional_select b a choice
   ok (a_new, b_new)
+
+/- [subtle::{subtle::ConditionallyNegatable for T}::conditional_negate]:
+   Name pattern: [subtle::{subtle::ConditionallyNegatable<@T>}::conditional_negate]
+   Negate self if choice == Choice(1); otherwise, leave it unchanged -/
+def subtle.ConditionallyNegatable.Blanket.conditional_negate
+  {T : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable T)
+  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T)
+  (self : T) (choice : subtle.Choice) : Result T := do
+  let self_neg ← coreopsarithNeg_TTInst.neg self
+  ConditionallySelectableInst.conditional_select self self_neg choice
 
 /- [subtle::{subtle::CtOption<T>}::new]:
 Name pattern: [subtle::{subtle::CtOption<@T>}::new]
@@ -183,6 +259,21 @@ def subtle.CtOption.new
 axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
   ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
   opt.value = value ∧ opt.is_some = is_some
+
+/- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
+   Name pattern: [zeroize::{zeroize::Zeroize<@Z>}::zeroize] -/
+@[rust_fun "zeroize::{zeroize::Zeroize<@Z>}::zeroize"]
+axiom zeroize.Zeroize.Blanket.zeroize
+  {Z : Type} (DefaultIsZeroesInst : zeroize.DefaultIsZeroes Z) : Z → Result Z
+
+/- [zeroize::{zeroize::Zeroize for @Array<Z, N>}::zeroize]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 373:4-373:25
+   Name pattern: [zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize] -/
+@[rust_fun "zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize"]
+axiom zeroize.ZeroizeArray.zeroize
+  {Z : Type} {N : Usize} (ZeroizeInst : zeroize.Zeroize Z) :
+  Array Z N → Result (Array Z N)
 
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 630:4-630:45
@@ -247,5 +338,25 @@ def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
   fun _ slice =>
     let back := fun (s : Slice T) => s
     ok (slice, back)
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 295:0-311:1 -/
+axiom
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_swap
+  :
+  backend.serial.curve_models.ProjectiveNielsPoint →
+    backend.serial.curve_models.ProjectiveNielsPoint → subtle.Choice →
+    Result (backend.serial.curve_models.ProjectiveNielsPoint ×
+    backend.serial.curve_models.ProjectiveNielsPoint)
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 313:0-327:1 -/
+axiom
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_swap
+  :
+  backend.serial.curve_models.AffineNielsPoint →
+    backend.serial.curve_models.AffineNielsPoint → subtle.Choice → Result
+    (backend.serial.curve_models.AffineNielsPoint ×
+    backend.serial.curve_models.AffineNielsPoint)
 
 end curve25519_dalek

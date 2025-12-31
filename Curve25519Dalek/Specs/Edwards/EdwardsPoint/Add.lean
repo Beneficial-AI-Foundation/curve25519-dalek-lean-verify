@@ -19,7 +19,7 @@ This function adds two Edwards points using elliptic curve point addition.
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.edwards.EdwardsPoint
+namespace curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint
 
 /-
 natural language description:
@@ -58,8 +58,7 @@ theorem add_spec (self other : EdwardsPoint)
     (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)
     (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :
 
-    ∃ result,
-    add self other = ok result ∧
+    ∃ result, add self other = ok result ∧
 
     (∀ i < 5,
       result.X[i]!.val < 2 ^ 54  ∧
@@ -88,4 +87,4 @@ theorem add_spec (self other : EdwardsPoint)
     Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by
     sorry
 
-end curve25519_dalek.edwards.EdwardsPoint
+end curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint

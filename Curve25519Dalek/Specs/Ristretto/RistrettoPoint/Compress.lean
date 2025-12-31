@@ -80,7 +80,7 @@ theorem compress_spec
       ∃ eq_choice,
         edwards.EdwardsPoint.mul_by_cofactor rist1 = ok p1_times_8 ∧
         edwards.EdwardsPoint.mul_by_cofactor rist2 = ok p2_times_8 ∧
-        edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧
+        edwards.ConstantTimeEqEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧
         eq_choice = Choice.one) →
       c1 = c2) := by
   sorry

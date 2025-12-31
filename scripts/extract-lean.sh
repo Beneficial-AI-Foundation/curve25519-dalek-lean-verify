@@ -100,10 +100,10 @@ generate_llbc() {
         START_FROM_ARGS+=(--start-from "$item")
     done
 
-    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} -- -p $CRATE_DIR"
+    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p $CRATE_DIR"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
     echo "Logging output to $ROOT/.logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"
