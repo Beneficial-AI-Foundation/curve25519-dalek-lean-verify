@@ -2,6 +2,19 @@
 
 [Verus](https://github.com/Beneficial-AI-Foundation/dalek-lite/tree/master/curve25519-dalek/src/specs) · [Lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/tree/master/Curve25519Dalek/Specs)
 
+## Lean proves tighter bounds
+
+Lean's type system enables proving more precise bounds than Verus currently does:
+
+| Op | Verus | Lean | Improvement |
+|----|-------|------|-------------|
+| square | < 2⁵⁴ | < 2⁵² | 4× tighter |
+| reduce | < 2⁵² | ≤ 2⁵¹+155k | 2× tighter |
+
+**Further tightening possible in Lean** (not yet proved):
+- reduce limbs 1-4: could be `≤ 2^51 + 8k` instead of `2^51 + 155k` (19× tighter, no `*19` factor)
+- square: comment in Pow2K.lean:208 claims `< 2^51` is achievable
+
 ## FieldElement51 (5×51-bit limbs, GF(2²⁵⁵-19))
 
 | Op | In | Verus Out | Lean Out | Tighter |
