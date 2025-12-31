@@ -87,23 +87,25 @@ lemma neg_one_is_square : IsSquare (-1 : CurveField) := by
 
 variable {F : Type} [Field F] [NeZero (2 : F)]
 
-/-- **Theorem 3.3** (Bernstein et al. "Twisted Edwards Curves", 2008):
-    For a twisted Edwards curve E_{a,d} over a field k with char(k) ≠ 2,
-    if a is a square and d is not a square in k, then
-    for all points (x₁, y₁), (x₂, y₂) on E_{a,d}:
-    1 + d·x₁x₂y₁y₂ ≠ 0 and 1 - d·x₁x₂y₁y₂ ≠ 0.
+/-- **Completeness of Twisted Edwards Addition**
 
-    This makes the addition law complete (no exceptional cases).
-
-    Reference: https://eprint.iacr.org/2008/013.pdf, Theorem 3.3 -/
+For a twisted Edwards curve E_{a,d} over a field k with char(k) ≠ 2,
+if a is a square and d is not a square in k, then
+for all points (x₁, y₁), (x₂, y₂) on E_{a,d}: 1 + d·x₁x₂y₁y₂ ≠ 0 and 1 - d·x₁x₂y₁y₂ ≠ 0.
+This makes the addition law "complete" (no exceptional cases). -/
 theorem complete_addition_denominators_ne_zero
     (C : EdwardsCurve F) (ha : IsSquare C.a) (hd : ¬IsSquare C.d) (p1 p2 : Point C) :
     let lam := C.d * p1.x * p2.x * p1.y * p2.y
     (1 + lam ≠ 0) ∧ (1 - lam ≠ 0) := by
-  sorry -- See Theorem 3.3 in https://eprint.iacr.org/2008/013.pdf
+  /- **Reference**: Bernstein, Birkner, Joye, Lange, Peters.
+  "Twisted Edwards Curves". AFRICACRYPT 2008.
+  https://eprint.iacr.org/2008/013.pdf, Section 6.
+  The proof shows that if ε = d·x₁x₂y₁y₂ ∈ {-1, 1}, then d would be a square,
+  contradicting the hypothesis. -/
+  sorry
 
 /-- For Ed25519, the addition formula denominators are never zero.
-    This follows from Theorem 3.3 since a = -1 is a square (p ≡ 1 mod 4)
+    This follows from the completeness theorem since a = -1 is a square (p ≡ 1 mod 4)
     and d is not a square in F_p. -/
 theorem Ed25519.denomsNeZero (p1 p2 : Point Ed25519) :
     let lam := Ed25519.d * p1.x * p2.x * p1.y * p2.y
@@ -119,13 +121,21 @@ def add_coords (C : EdwardsCurve F) (p1 p2 : F × F) : F × F :=
   let lambda_val := C.d * x₁ * x₂ * y₁ * y₂
   ( (x₁ * y₂ + y₁ * x₂) / (1 + lambda_val), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lambda_val) )
 
-/-- The sum of two points on a twisted Edwards curve stays on the curve,
-    provided the denominators in the addition formula are non-zero. -/
+/-- **Closure of Twisted Edwards Addition**
+
+The sum of two points on a twisted Edwards curve stays on the curve, provided the denominators in
+the addition formula are non-zero. -/
 theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
     (h : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
     let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
     C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
-  sorry -- Standard algebraic verification using curve equations
+  /- **Reference**: Bernstein, Birkner, Joye, Lange, Peters.
+  "Twisted Edwards Curves". AFRICACRYPT 2008.
+  https://eprint.iacr.org/2008/013.pdf, Section 6, Addition formulas.
+
+  This is a straightforward algebraic verification substituting the addition
+  formulas into the curve equation. -/
+  sorry
 
 /-- The sum of two points on Ed25519 stays on the curve.
     For Ed25519, d is not a square, so the denominators are never zero (complete curve). -/
