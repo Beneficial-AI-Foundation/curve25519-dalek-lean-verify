@@ -46,3 +46,6 @@ site/.env
 site/public/doc
 
 .direnv
+
+# FAE
+WorkSimulation.md

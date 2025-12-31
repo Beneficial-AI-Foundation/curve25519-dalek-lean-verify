@@ -72,7 +72,7 @@ theorem double_spec (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52) :
-    ∃ c, double q = ok c ∧
+    ∃ c : CompletedPoint, double q = ok c ∧
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
     let Z := Field51_as_Nat q.Z
@@ -85,7 +85,7 @@ theorem double_spec (q : ProjectivePoint)
     (Z' + X^2) % p = Y^2 % p ∧
     (T' + Z') % p = (2 * Z^2) % p := by
   unfold double
-  progress*
+  progress*?
   · -- BEGIN TASK
     intro i hi
     have := h_qX_bounds i hi
@@ -201,7 +201,51 @@ theorem double_spec (q : ProjectivePoint)
     exact ZZ2_post_1
     -- END TASK
 
-end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
+-- end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
+
+
+structure ValidProjectivePoint extends ProjectivePoint where
+  X_bounds {i : ℕ} (_ : i < 5) : X[i]!.val ≤ 2 ^ 52
+  Y_bounds {i : ℕ} (_ : i < 5) : Y[i]!.val ≤ 2 ^ 52
+  Z_bounds {i : ℕ} (_ : i < 5) : Z[i]!.val ≤ 2 ^ 52
+
+open backend.serial.u64.field.FieldElement51 in
+def FAE_double : ValidProjectivePoint → CompletedPoint := by
+  rintro ⟨⟨qX, qY, qZ⟩, _, _, _⟩
+  sorry
+  --let fe := square (backend.serial.u64.field.FieldElement51.Add.add qX qY)--sub X_plus_Y_sq YY_plus_XX
+
+-- (do
+--         let XX ← q.X.square
+--         let YY ← q.Y.square
+--         let ZZ2 ← q.Z.square2
+--         let X_plus_Y ← add q.X q.Y
+--         let X_plus_Y_sq ← X_plus_Y.square
+--         let YY_plus_XX ← add YY XX
+--         let YY_minus_XX ← sub YY XX
+--         let fe ← sub X_plus_Y_sq YY_plus_XX
+--         let fe1 ← sub ZZ2 YY_minus_XX
+--         ok { X := fe, Y := YY_plus_XX, Z := YY_minus_XX, T := fe1 }) =
+
+
+        -- (q : ProjectivePoint)
+-- theorem double_spec (q : ProjectivePoint)
+--     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52)
+--     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52)
+--     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52) :
+--     ∃ c, double q = ok c ∧
+--     let X := Field51_as_Nat q.X
+--     let Y := Field51_as_Nat q.Y
+--     let Z := Field51_as_Nat q.Z sorry
+--     let X' := Field51_as_Nat c.X
+--     let Y' := Field51_as_Nat c.Y
+--     let Z' := Field51_as_Nat c.Z
+--     let T' := Field51_as_Nat c.T
+--     X' % p = (2 * X * Y) % p ∧
+--     Y' % p = (Y^2 + X^2) % p ∧
+--     (Z' + X^2) % p = Y^2 % p ∧
+--     (T' + Z') % p = (2 * Z^2) % p := by
+--   unfold double
 
 /-! ## Mathematical Verification
 
@@ -231,26 +275,19 @@ theorem double_spec'
   rcases hq_valid with ⟨P, hP⟩
 
   -- Bridge: Convert the coerced q back to P using our previous lemmas
-  have h_q_eq_P : (q : Point Ed25519) = P := ProjectivePoint.toPoint'_eq_of_isValid hP
-  rw [h_q_eq_P]
+  rw [ProjectivePoint.toPoint'_eq_of_isValid hP]
 
   -- 2. Run the Aeneas specification
-  have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec q
-    (fun i h => hq_bounds.1 i h)
-    (fun i h => hq_bounds.2.1 i h)
-    (fun i h => hq_bounds.2.2 i h)
-
-  exists out
-  constructor; · exact h_run
+  obtain ⟨out, h_run, ⟨hX_new, hY_new, hZ_new, hT_new⟩⟩ := ProjectivePoint.double_spec q
+    hq_bounds.1 hq_bounds.2.1 hq_bounds.2.2
+  refine ⟨out, h_run, ?_⟩
 
   -- 3. Mathematical Arithmetic Proof
   -- This block proves that the output limbs correspond to P + P coordinates.
   let P2 := P + P
 
   have h_out_represents_P2 : out.IsValid' P2 := by
-    dsimp only at hP
     rcases hP with ⟨hZ_nonzero, hX_in, hY_in⟩
-    rcases h_arith with ⟨hX_new, hY_new, hZ_new, hT_new⟩
 
     -- Lift low-level limbs to field elements
     let X_nat := Field51_as_Nat q.X
@@ -258,7 +295,10 @@ theorem double_spec'
     let Z_nat := Field51_as_Nat q.Z
 
     have hX_F : field_from_limbs out.X = 2 * field_from_limbs q.X * field_from_limbs q.Y := by
-      dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hX_new]; push_cast; rfl
+      dsimp [field_from_limbs];
+      rw [Edwards.lift_mod_eq _ _ hX_new];
+      push_cast;
+      rfl
 
     have hY_F : field_from_limbs out.Y = field_from_limbs q.Y ^ 2 + field_from_limbs q.X ^ 2 := by
       dsimp [field_from_limbs]; rw [Edwards.lift_mod_eq _ _ hY_new]; push_cast; rfl
