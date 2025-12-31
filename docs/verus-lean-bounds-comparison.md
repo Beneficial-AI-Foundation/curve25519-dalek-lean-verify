@@ -137,6 +137,122 @@ The scalar uses 5 limbs with a 52-bit radix for arithmetic modulo L.
 
 **Overall**: All specifications are compatible. The minor differences in bound tightness (e.g., `2^52` vs `2^54` for square output, `2^52` vs `2^62` for Montgomery mul input) are not contradictions - one project may have proven a tighter bound than necessary.
 
+## Function Coverage Comparison
+
+This section lists which functions have specifications in each project to help coordinate work.
+
+### FieldElement51 Functions
+
+| Function | Verus | Lean | Notes |
+|----------|:-----:|:----:|-------|
+| `add` | ✅ | ✅ | Both have specs |
+| `add_assign` | ✅ | ✅ | Both have specs |
+| `sub` | ✅ | ✅ | Both have specs |
+| `sub_assign` | ✅ | ✅ | Both have specs |
+| `mul` | ✅ | ✅ | Both have specs |
+| `square` | ✅ | ✅ | Both have specs |
+| `square2` | ✅ | ✅ | Both have specs |
+| `pow2k` | ✅ | ✅ | Both have specs |
+| `reduce` | ✅ | ✅ | Both have specs |
+| `negate` | ✅ | ✅ | Both have specs |
+| `from_bytes` | ✅ | ✅ | Both have specs |
+| `to_bytes` / `as_bytes` | ✅ | ✅ | Both have specs |
+| `invert` | ✅ | ✅ | Both have specs |
+| `pow_p58` | ✅ | ✅ | Both have specs |
+| `pow22501` | ✅ | ✅ | Both have specs |
+| `sqrt_ratio_i` | ✅ | ✅ | Both have specs |
+| `conditional_select` | ✅ | ✅ | Both have specs |
+| `conditional_assign` | ✅ | ✅ | Both have specs |
+| `ct_eq` | ✅ | ✅ | Both have specs |
+| `from_limbs` | ✅ | ✅ | Both have specs |
+| Constants (ZERO, ONE, MINUS_ONE) | ✅ | ✅ | Both have specs |
+
+### Scalar52 Functions
+
+| Function | Verus | Lean | Notes |
+|----------|:-----:|:----:|-------|
+| `add` | ✅ | ✅ | Both have specs |
+| `sub` | ✅ | ✅ | Both have specs |
+| `mul` | ✅ | ❌ | **Verus only** |
+| `square` | ✅ | ❌ | **Verus only** |
+| `mul_internal` | ✅ | ✅ | Both have specs |
+| `square_internal` | ✅ | ✅ | Both have specs |
+| `montgomery_mul` | ✅ | ✅ | Both have specs |
+| `montgomery_square` | ✅ | ✅ | Both have specs |
+| `montgomery_reduce` | ✅ | ✅ | Both have specs |
+| `as_montgomery` | ✅ | ✅ | Both have specs |
+| `from_montgomery` | ✅ | ✅ | Both have specs |
+| `from_bytes` | ✅ | ✅ | Both have specs |
+| `from_bytes_wide` | ✅ | ✅ | Both have specs |
+| `to_bytes` / `as_bytes` | ✅ | ✅ | Both have specs |
+| `pack` | ✅ | ✅ | Both have specs |
+| `conditional_add_l` | ✅ | ✅ | Both have specs |
+| `invert` | ❌ | ✅ | **Lean only** |
+| `montgomery_invert` | ❌ | ✅ | **Lean only** |
+
+### EdwardsPoint Functions
+
+| Function | Verus | Lean | Notes |
+|----------|:-----:|:----:|-------|
+| `add` | ✅ | ✅ | Both have specs |
+| `double` | ✅ | ✅ | Both have specs |
+| `identity` | ✅ | ✅ | Both have specs |
+| `compress` | ✅ | ✅ | Both have specs |
+| `decompress` | ✅ | ✅ | Both have specs |
+| `as_projective` | ✅ | ✅ | Both have specs |
+| `as_projective_niels` | ✅ | ✅ | Both have specs |
+| `to_affine` | ✅ | ✅ | Both have specs |
+| `to_montgomery` | ✅ | ✅ | Both have specs |
+| `is_small_order` | ✅ | ✅ | Both have specs |
+| `mul_by_cofactor` | ✅ | ✅ | Both have specs |
+| `mul_by_pow2` | ❌ | ✅ | **Lean only** |
+| `ct_eq` | ✅ | ✅ | Both have specs |
+| `vartime_double_scalar_mul_basepoint` | ✅ | ✅ | Both have specs |
+| `mul_base` | ✅ | ❌ | **Verus only** |
+| `mul_base_clamped` | ✅ | ❌ | **Verus only** |
+| `mul_clamped` | ✅ | ❌ | **Verus only** |
+| `multiscalar_mul` | ✅ | ❌ | **Verus only** |
+| `is_torsion_free` | ✅ | ❌ | **Verus only** |
+
+### Scalar (high-level) Functions
+
+| Function | Verus | Lean | Notes |
+|----------|:-----:|:----:|-------|
+| `from_bytes` | ✅ | ✅ | Both have specs |
+| `from_bytes_mod_order` | ✅ | ✅ | Both have specs |
+| `from_bytes_mod_order_wide` | ✅ | ✅ | Both have specs |
+| `from_canonical_bytes` | ✅ | ✅ | Both have specs |
+| `from_uniform_bytes` | ❌ | ✅ | **Lean only** |
+| `to_bytes` | ✅ | ✅ | Both have specs |
+| `is_canonical` | ✅ | ✅ | Both have specs |
+| `clamp_integer` | ✅ | ✅ | Both have specs |
+| `non_adjacent_form` | ✅ | ✅ | Both have specs |
+| `invert` | ✅ | ✅ | Both have specs |
+
+### Other Components
+
+| Component | Verus | Lean | Notes |
+|-----------|:-----:|:----:|-------|
+| Montgomery point ops | ✅ | ✅ | Both have specs |
+| Ristretto encoding | ✅ | ✅ | Both have specs |
+| Window/LookupTable | ✅ | ❌ | **Verus only** |
+| Basepoint tables | ✅ | ❌ | **Verus only** |
+| Straus multiscalar mul | ✅ | ✅ | Both have specs |
+
+### Summary: Functions Needing Coordination
+
+**In Verus but not Lean:**
+- `Scalar52::mul`, `Scalar52::square` (high-level scalar mul)
+- `EdwardsPoint::mul_base`, `mul_base_clamped`, `mul_clamped`
+- `EdwardsPoint::multiscalar_mul`, `is_torsion_free`
+- Window/LookupTable optimizations
+- Precomputed basepoint tables
+
+**In Lean but not Verus:**
+- `Scalar52::invert`, `montgomery_invert`
+- `EdwardsPoint::mul_by_pow2`
+- `Scalar::from_uniform_bytes`
+
 ## References
 
 - Verus: [dalek-lite/curve25519-dalek/src/specs/](https://github.com/Beneficial-AI-Foundation/dalek-lite/tree/master/curve25519-dalek/src/specs)
