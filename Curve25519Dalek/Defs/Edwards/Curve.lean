@@ -73,7 +73,7 @@ lemma d_not_square : ¬IsSquare Ed25519.d := by
 structure Point {F : Type} [Mul F] [Add F] [Pow F ℕ] [One F] (C : EdwardsCurve F) where
   x : F
   y : F
-  h_on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
+  on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
   deriving Repr
 
 instance : Inhabited (Point Ed25519) := ⟨{ x := 0, y := 1}⟩
@@ -155,7 +155,7 @@ instance : Add (Point Ed25519) where
   let coords := add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)
   { x := coords.1
     y := coords.2
-    h_on_curve := add_closure_Ed25519 p1 p2 }
+    on_curve := add_closure_Ed25519 p1 p2 }
 
 instance : Zero (Point Ed25519) where
   zero := { x := 0, y := 1 }
@@ -167,7 +167,7 @@ instance : Neg (Point Ed25519) where
   neg p := {
     x := -p.x
     y := p.y
-    h_on_curve := by simpa [neg_pow_two] using p.h_on_curve
+    on_curve := by simpa [neg_pow_two] using p.on_curve
   }
 
 @[simp] theorem neg_x (p : Point Ed25519) : (-p).x = -p.x := rfl
@@ -220,7 +220,7 @@ theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
 /-- Negation is a left inverse: -p + p = 0. -/
 theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
   have h : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by
-    have := p.h_on_curve; simp [Ed25519] at this; grind
+    have := p.on_curve; simp [Ed25519] at this; grind
   have : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := calc
     1 + d * p.x^2 * p.y^2 = 1 - d * (-p.x) * p.x * p.y * p.y := by ring
     _ ≠ 0 := (Ed25519.denomsNeZero (-p) p).2

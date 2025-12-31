@@ -71,8 +71,8 @@ def AffinePoint.IsValid (low : AffinePoint) (high : Point Ed25519) : Prop :=
 noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P) : Point Ed25519 :=
  { x := field_from_limbs p.x,
     y := field_from_limbs p.y,
-    h_on_curve := by
-      have ⟨P, hP⟩ := h; rw [AffinePoint.IsValid] at hP; rw [hP.1, hP.2]; exact P.h_on_curve }
+    on_curve := by
+      have ⟨P, hP⟩ := h; rw [AffinePoint.IsValid] at hP; rw [hP.1, hP.2]; exact P.on_curve }
 
 end curve25519_dalek.edwards.affine
 

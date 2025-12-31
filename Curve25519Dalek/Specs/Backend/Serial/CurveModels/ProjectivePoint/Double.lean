@@ -276,7 +276,7 @@ theorem double_spec'
       apply ZMod.exists_sq_eq_neg_one_iff.mpr; decide
 
     have h_curve : -P.x^2 + P.y^2 = 1 + Ed25519.d * P.x^2 * P.y^2 := by
-      have h := P.h_on_curve; simp only [Ed25519, neg_mul, one_mul] at h; exact h
+      have h := P.on_curve; simp only [Ed25519, neg_mul, one_mul] at h; exact h
 
     -- Helper: Prove denominators are non-zero
     have h_denom_plus : 1 + Ed25519.d * P.x^2 * P.y^2 ≠ 0 := by
