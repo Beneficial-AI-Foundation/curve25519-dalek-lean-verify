@@ -28,11 +28,11 @@ attribute [-simp] Int.reducePow Nat.reducePow
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:
 - Does not error and hence returns a result
 - The result represents the product of the two input field elements
-- Requires that each input limb is at most 62 bits to prevent overflow -/
+- Requires that each input limb is at most 52 bits (matching Verus) -/
 @[spec]
 theorem mul_internal_hoare_spec (a b : Array U64 5#usize)
-(ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62)
-(hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 62) :
+(ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 52)
+(hb : ∀ i, i < 5 → (b[i]!).val < 2 ^ 52) :
 ⦃⌜True⌝⦄
 mul_internal a b
 ⦃⇓ result => ⌜Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄

@@ -48,7 +48,7 @@ natural language specs:
   Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)
 -/
 @[progress]
-theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :
+theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 52) :
     ∃ u', invert u = ok u' ∧
     (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] := by
   unfold invert
