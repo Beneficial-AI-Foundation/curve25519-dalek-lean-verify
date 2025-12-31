@@ -61,6 +61,12 @@ def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField
 end Edwards
 
 namespace curve25519_dalek.backend.serial.u64.field
+open Edwards FieldElement51
+
+/-- Convert a FieldElement51 to the mathematical field element in ZMod p.
+    This is the same as `field_from_limbs` but with dot notation support. -/
+def FieldElement51.toField (fe : FieldElement51) : CurveField :=
+  (Field51_as_Nat fe : CurveField)
 
 /-- A FieldElement51 is valid when all 5 limbs are bounded by 2^52. -/
 def FieldElement51.IsValid (fe : FieldElement51) : Prop :=
@@ -131,86 +137,103 @@ namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
 open curve25519_dalek.backend.serial.u64.field in
-/-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point.
-    Includes both the projective coordinate relations and limb bounds. -/
-structure ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop where
-  /-- All limbs of X are bounded by 2^52. -/
-  X_bounds : FieldElement51.IsValid low.X
-  /-- All limbs of Y are bounded by 2^52. -/
-  Y_bounds : FieldElement51.IsValid low.Y
-  /-- All limbs of Z are bounded by 2^52. -/
-  Z_bounds : FieldElement51.IsValid low.Z
+/-- Validity predicate for ProjectivePoint.
+    A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
+    For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
+    Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y² -/
+structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
+  /-- X, Y, Z are all valid field elements, i.e., limbs of each are bounded by 2^52. -/
+  X_valid : pp.X.IsValid
+  Y_valid : pp.Y.IsValid
+  Z_valid : pp.Z.IsValid
   /-- The Z coordinate is non-zero. -/
-  Z_ne_zero : field_from_limbs low.Z ≠ 0
-  /-- X represents high.x * Z. -/
-  X_eq : field_from_limbs low.X = high.x * field_from_limbs low.Z
-  /-- Y represents high.y * Z. -/
-  Y_eq : field_from_limbs low.Y = high.y * field_from_limbs low.Z
+  Z_ne_zero : pp.Z.toField ≠ 0
+  /-- The curve equation (cleared denominators). -/
+  on_curve : let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
+             Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
 open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for CompletedPoint.
     A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y² -/
-structure CompletedPoint.IsValid' (cp : CompletedPoint) : Prop where
+structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
   /-- X, Y, Z, T are all valid field elements, i.e., limbs of each are bounded by 2^52. -/
-  X_bounds : FieldElement51.IsValid cp.X
-  Y_bounds : FieldElement51.IsValid cp.Y
-  Z_bounds : FieldElement51.IsValid cp.Z
-  T_bounds : FieldElement51.IsValid cp.T
+  X_valid : cp.X.IsValid
+  Y_valid : cp.Y.IsValid
+  Z_valid : cp.Z.IsValid
+  T_valid : cp.T.IsValid
   /-- The Z and T coordinates are non-zero. -/
-  Z_ne_zero : field_from_limbs cp.Z ≠ 0
-  T_ne_zero : field_from_limbs cp.T ≠ 0
+  Z_ne_zero : cp.Z.toField ≠ 0
+  T_ne_zero : cp.T.toField ≠ 0
   /-- The curve equation (cleared denominators). -/
-  on_curve : let X := field_from_limbs cp.X; let Y := field_from_limbs cp.Y
-             let Z := field_from_limbs cp.Z; let T := field_from_limbs cp.T
+  on_curve : let X := cp.X.toField; let Y := cp.Y.toField
+             let Z := cp.Z.toField; let T := cp.T.toField
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
-/-- Existential validity predicate for ProjectivePoint. -/
-def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
-  ∃ P : Point Ed25519, p.IsValid' P
+/-- Convert a valid ProjectivePoint to the affine point (X/Z, Y/Z). -/
+noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) (h : pp.IsValid := by assumption) : Point Ed25519 :=
+  let X := pp.X.toField
+  let Y := pp.Y.toField
+  let Z := pp.Z.toField
+  { x := X / Z
+    y := Y / Z
+    on_curve := by
+      -- Need to show: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
+      -- From h.on_curve: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
+      -- Divide both sides by Z⁴
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, hz4]
+      linear_combination hcurve }
 
-/-- Existential validity predicate for CompletedPoint. -/
-def CompletedPoint.IsValid (p : CompletedPoint) : Prop :=
-  ∃ P : Point Ed25519, p.IsValid' P
+/-- Convert a valid CompletedPoint to the affine point (X/Z, Y/T). -/
+noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) (h : cp.IsValid := by assumption) : Point Ed25519 :=
+  let X := cp.X.toField
+  let Y := cp.Y.toField
+  let Z := cp.Z.toField
+  let T := cp.T.toField
+  { x := X / Z
+    y := Y / T
+    on_curve := by
+      -- Need to show: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
+      -- From h.on_curve: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
+      -- Divide both sides by Z²*T²
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have ht : T ≠ 0 := h.T_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
+      have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, ht2]
+      linear_combination hcurve }
 
-/--
-Total conversion function for ProjectivePoint.
-If the point is valid, returns the unique `Point Ed25519` it represents.
-If invalid, returns the neutral element `0`.
--/
-noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519 := by
+/-- Total conversion function for ProjectivePoint.
+    If valid, returns the point (X/Z, Y/Z). If invalid, returns 0. -/
+noncomputable def ProjectivePoint.toPoint' (pp : ProjectivePoint) : Point Ed25519 := by
   classical
-  exact if h : p.IsValid then Classical.choose h else 0
+  exact if h : pp.IsValid then pp.toPoint h else 0
 
-/-- Total conversion function for CompletedPoint. -/
-noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 := by
+/-- Total conversion function for CompletedPoint.
+    If valid, returns the point (X/Z, Y/T). If invalid, returns 0. -/
+noncomputable def CompletedPoint.toPoint' (cp : CompletedPoint) : Point Ed25519 := by
   classical
-  exact if h : p.IsValid then Classical.choose h else 0
+  exact if h : cp.IsValid then cp.toPoint h else 0
 
-/-- Bridge Lemma: If a ProjectivePoint is valid, `toPoint'` returns the correct mathematical point. -/
-theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point Ed25519}
-    (h : p.IsValid' P) : p.toPoint' = P := by
-  rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
-    intro P' h'
-    ext
-    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.X_eq.symm h.X_eq)
-    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.Y_eq.symm h.Y_eq)
-  apply h_uniq
-  exact Classical.choose_spec ⟨P, h⟩
+/-- If a ProjectivePoint is valid, `toPoint'` equals `toPoint`. -/
+theorem ProjectivePoint.toPoint'_eq_toPoint {pp : ProjectivePoint} (h : pp.IsValid) :
+    pp.toPoint' = pp.toPoint h := by
+  rw [toPoint', dif_pos h]
 
-/-- Bridge Lemma: If a CompletedPoint is valid, `toPoint'` returns the correct mathematical point. -/
-theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed25519}
-    (h : p.IsValid' P) : p.toPoint' = P := by
-  rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
-    intro P' h'
-    ext
-    · apply mul_right_cancel₀ h.Z_ne_zero (Eq.trans h'.X_eq.symm h.X_eq)
-    · apply mul_right_cancel₀ h.T_ne_zero (Eq.trans h'.Y_eq.symm h.Y_eq)
-  apply h_uniq
-  exact Classical.choose_spec ⟨P, h⟩
+/-- If a CompletedPoint is valid, `toPoint'` equals `toPoint`. -/
+theorem CompletedPoint.toPoint'_eq_toPoint {cp : CompletedPoint} (h : cp.IsValid) :
+    cp.toPoint' = cp.toPoint h := by
+  rw [toPoint', dif_pos h]
 
 -- === Coercions ===
 -- These allow using low-level types in high-level equations
