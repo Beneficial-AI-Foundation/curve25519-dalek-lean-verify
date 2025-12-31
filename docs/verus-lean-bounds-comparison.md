@@ -4,17 +4,24 @@
 
 ## FieldElement51 (5×51-bit limbs, GF(2²⁵⁵-19))
 
-| Op | In | Out | Sources |
-|----|---:|----:|---------|
-| add | 2⁵³ | 2⁵⁴ | [V](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/field_specs.rs#L27) [L](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean#L24) |
-| mul | 2⁵⁴ | 2⁵² | [V](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/backend/serial/u64/field_verus.rs) [L](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean) |
-| square | 2⁵⁴ | 2⁵⁴/2⁵² | [V](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/backend/serial/u64/field_verus.rs) [L](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean) |
-| reduce | ∞ | 2⁵¹+155k | [V](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/field_specs_u64.rs#L62) [L](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean#L50) |
+| Op | In | Verus Out | Lean Out | Tighter |
+|----|---:|----------:|---------:|:-------:|
+| add | 2⁵³ | 2⁵⁴ | 2⁵⁴ | = |
+| mul | 2⁵⁴ | 2⁵² | 2⁵² | = |
+| square | 2⁵⁴ | 2⁵⁴ | 2⁵² | **L** |
+| reduce | ∞ | 2⁵² | 2⁵¹+155k | **L** |
+
+Sources: [V:field_verus.rs#L163](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/backend/serial/u64/field_verus.rs#L163) [V:pow2k#L468](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/backend/serial/u64/field_verus.rs#L468) [L:Square.lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean#L39) [L:Reduce.lean](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean#L50)
+
+### Why Lean is tighter
+
+**square**: Verus proves output < 2⁵⁴ via `pow2k` loop invariant. Lean proves < 2⁵² directly for k=1.
+
+**reduce**: Verus proves `< 2^52`. Lean proves the precise bound `≤ 2^51 + (2^13-1)*19 = 2^51 + 155629`. Since 2⁵¹+155629 ≈ 2⁵¹·⁰⁰⁰¹ < 2⁵², Lean's bound is ~2× tighter.
 
 ## Scalar52 (5×52-bit limbs, mod L)
 
 Montgomery mul: V requires 2⁵², L allows 2⁶². Both: `m·m' ≡ w·R (mod L)`.
-[V](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/specs/scalar52_specs.rs#L69) [L](https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify/blob/master/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean#L41)
 
 ## Gaps
 
@@ -25,25 +32,37 @@ Montgomery mul: V requires 2⁵², L allows 2⁶². Both: `m·m' ≡ w·R (mod L
 
 **X25519 blocked**: Lean missing [mul_clamped](https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/master/curve25519-dalek/src/edwards.rs#L500)
 
-## Side-by-side
+## Evidence
 
-**add**
+**Verus pow2k** (used by square):
 ```rust
-// Verus: field_specs.rs
-forall|i: int| 0 <= i < 5 ==> fe.limbs[i] < (1u64 << bit_limit)
-```
-```lean
--- Lean: Add.lean
-∀ i < 5, a[i]!.val < 2^53 → ∀ i < 5, result[i]!.val < 2^54
+// field_verus.rs#L468-L475
+pub fn pow2k(&self, mut k: u32) -> (r: FieldElement51)
+    requires
+        forall|i: int| 0 <= i < 5 ==> self.limbs[i] < 1u64 << 54,
+    ensures
+        forall|i: int| 0 <= i < 5 ==> r.limbs[i] < 1u64 << 54,  // output bound
 ```
 
-**reduce**
-```rust
-// Verus: field_specs_u64.rs
-((limbs[0] & mask51) + (limbs[4] >> 51) * 19) as u64  // limb 0
-((limbs[k] & mask51) + (limbs[k-1] >> 51)) as u64     // limbs 1-4
-```
+**Lean square**:
 ```lean
--- Lean: Reduce.lean
-∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19
+-- Square.lean#L39-L41
+theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
+    ∃ r, square a = ok r ∧ ... ∧ (∀ i < 5, r[i]!.val < 2 ^ 52)  -- tighter!
+```
+
+**Verus reduce**:
+```rust
+// field_verus.rs#L163-L166
+fn reduce(mut limbs: [u64; 5]) -> (r: FieldElement51)
+    ensures
+        forall|i: int| 0 <= i < 5 ==> r.limbs[i] < (1u64 << 52),
+```
+
+**Lean reduce**:
+```lean
+-- Reduce.lean#L50-L52
+theorem reduce_spec (limbs : Array U64 5#usize) :
+    ∃ result, reduce limbs = ok result ∧
+    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19)  -- tighter!
 ```
