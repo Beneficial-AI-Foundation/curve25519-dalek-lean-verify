@@ -64,23 +64,15 @@ theorem Choice.val_cases (c : subtle.Choice) : c.val = 0#u8 ∨ c.val = 1#u8 := 
     | inl h => left; exact h
     | inr h => right; exact h
 
-/-- Helper: 0#u8 ≠ 1#u8 for simp -/
+/-- 0#u8 ≠ 1#u8 -/
 @[simp] theorem U8_zero_ne_one : (0#u8 = 1#u8) = False := by decide
 
-/-- Helper: If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
+/-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
 theorem Scalar52_as_Nat_bounded (s : Scalar52) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     Scalar52_as_Nat s < 2 ^ 260 := by
-  unfold Scalar52_as_Nat
-  have h0 := hs 0 (by decide)
-  have h1 := hs 1 (by decide)
-  have h2 := hs 2 (by decide)
-  have h3 := hs 3 (by decide)
-  have h4 := hs 4 (by decide)
-  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-  omega
+  simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+  grind
 
--- Loop spec with complex invariant tracking partial sums
--- The proof requires careful induction on carry propagation
 set_option maxHeartbeats 5000000 in -- Needed for complex loop invariant proof
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
@@ -100,8 +92,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
   split
   case isTrue hlt =>
     -- i < 5 case: process one limb and recurse
-    -- The full proof requires careful tracking of carry propagation through
-    -- the loop. Each iteration:
+    -- Each iteration:
     -- 1. Gets addend = L[i] if condition=1, else 0
     -- 2. Computes carry1 = (carry >>> 52) + self[i] + addend
     -- 3. Stores carry1 % 2^52 in self[i]
@@ -219,110 +210,37 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         simp_all
       -- Expand both sums and show equality
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-      -- For each index j: new[j] = old[j] except at i where new[i] = i5
-      have h0 : (Aeneas.Std.Array.set self i i5)[0]!.val = if (0 : Nat) = i.val then i5.val else self[0]!.val := by
-        by_cases hc : (0 : Nat) = i.val
-        · simp only [hc, ↓reduceIte]; exact heq_i
-        · simp only [hc, ↓reduceIte]; exact heq 0 (by omega) hc
-      have h1 : (Aeneas.Std.Array.set self i i5)[1]!.val = if (1 : Nat) = i.val then i5.val else self[1]!.val := by
-        by_cases hc : (1 : Nat) = i.val
-        · simp only [hc, ↓reduceIte]; exact heq_i
-        · simp only [hc, ↓reduceIte]; exact heq 1 (by omega) hc
-      have h2 : (Aeneas.Std.Array.set self i i5)[2]!.val = if (2 : Nat) = i.val then i5.val else self[2]!.val := by
-        by_cases hc : (2 : Nat) = i.val
-        · simp only [hc, ↓reduceIte]; exact heq_i
-        · simp only [hc, ↓reduceIte]; exact heq 2 (by omega) hc
-      have h3 : (Aeneas.Std.Array.set self i i5)[3]!.val = if (3 : Nat) = i.val then i5.val else self[3]!.val := by
-        by_cases hc : (3 : Nat) = i.val
-        · simp only [hc, ↓reduceIte]; exact heq_i
-        · simp only [hc, ↓reduceIte]; exact heq 3 (by omega) hc
-      have h4 : (Aeneas.Std.Array.set self i i5)[4]!.val = if (4 : Nat) = i.val then i5.val else self[4]!.val := by
-        by_cases hc : (4 : Nat) = i.val
-        · simp only [hc, ↓reduceIte]; exact heq_i
-        · simp only [hc, ↓reduceIte]; exact heq 4 (by omega) hc
-      simp only [h0, h1, h2, h3, h4]
-      -- Now case split on i to verify the arithmetic
-      interval_cases i.val <;> simp (config := {decide := true}) only [↓reduceIte] <;> omega
-    -- 2^(52*(i+1)) = 2^(52*i) * 2^52
+      interval_cases i.val <;> grind
     have hpow_split : 2 ^ (52 * (i.val + 1)) = 2 ^ (52 * i.val) * 2 ^ 52 := by
       rw [Nat.mul_add, Nat.mul_one, Nat.pow_add]
-    -- Apply hsum_split at i
-    have hsum_at_i : ∑ j ∈ Finset.Ico 0 (i.val + 1), 2 ^ (52 * j) * constants.L[j]!.val =
-        ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val + 2 ^ (52 * i.val) * constants.L[i.val]!.val :=
-      hsum_split i.val hi'
-    -- addend relationship
-    have haddend_eq : addend.val = if condition.val = 1#u8 then constants.L[i.val]!.val else 0 := by
-      simp only [haddend]
-      split
-      · simp [hi1_eq]
-      · rfl
+    have : ∑ j ∈ Finset.Ico 0 (i.val + 1), 2 ^ (52 * j) * constants.L[j]!.val =
+        ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val +
+        2 ^ (52 * i.val) * constants.L[i.val]!.val := by grind
     -- Final algebraic manipulation: case split on condition
     cases Choice.val_cases condition with
     | inl hc0 =>
-      simp only [hc0, U8_zero_ne_one, ↓reduceIte, add_zero, Nat.sub_zero] at hres_inv ⊢
-      have haddend_zero : addend.val = 0 := by simp [haddend_eq, hc0]
-      have hcarry1_simp : carry1.val = carry.val / 2 ^ 52 + self[i.val]!.val := by
-        rw [hcarry1_expand, haddend_zero]; ring
-      have hself_bound : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
-      -- Key: 2^(52*i) * i5 + 2^(52*i) * 2^52 * (carry1/2^52) = 2^(52*i) * carry1
-      have hterm_eq : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
-          2 ^ (52 * i.val) * carry1.val := by
-        calc 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52)
-          _ = 2 ^ (52 * i.val) * (i5.val + 2 ^ 52 * (carry1.val / 2 ^ 52)) := by ring
-          _ = 2 ^ (52 * i.val) * carry1.val := by rw [hcarry1_split]
-      -- And: 2^(52*i) * carry1 = 2^(52*i) * (carry/2^52 + self[i])
-      have hterm_eq2 : 2 ^ (52 * i.val) * carry1.val =
-          2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val := by
-        rw [hcarry1_simp]; ring
-      -- Substitute into hres_inv
+      simp only [hc0, U8_zero_ne_one, reduceIte] at hres_inv ⊢
+      have : addend.val = 0 := by simp [*]
+      have : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
+          2 ^ (52 * i.val) * carry1.val := by grind
+      have : 2 ^ (52 * i.val) * carry1.val = 2 ^ (52 * i.val) * (carry.val / 2 ^ 52) +
+          2 ^ (52 * i.val) * self[i.val]!.val := by grind
       rw [hself1_nat, hpow_split] at hres_inv
-      -- Combine hterm_eq and hterm_eq2:
-      have hcombined : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
-          2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val := by
-        rw [hterm_eq, hterm_eq2]
-      -- Bound for self[i] term in self_nat
       have hself_nat_bound : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
-        unfold Scalar52_as_Nat
-        simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+        simp only [Scalar52_as_Nat, Finset.sum_range_succ]
         interval_cases i.val <;> omega
       omega
     | inr hc1 =>
-      simp only [hc1, ↓reduceIte] at hres_inv ⊢
-      have haddend_L : addend.val = constants.L[i.val]!.val := by simp [haddend_eq, hc1]
-      rw [hsum_at_i] at hres_inv
-      rw [hself1_nat, hpow_split] at hres_inv
-      have hcarry1_simp : carry1.val = carry.val / 2 ^ 52 + self[i.val]!.val + constants.L[i.val]!.val := by
-        rw [hcarry1_expand, haddend_L]
-      have hself_bound : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
-      -- Key: 2^(52*i) * i5 + 2^(52*i) * 2^52 * (carry1/2^52) = 2^(52*i) * carry1
-      have hterm_eq : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
-          2 ^ (52 * i.val) * carry1.val := by
-        calc 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52)
-          _ = 2 ^ (52 * i.val) * (i5.val + 2 ^ 52 * (carry1.val / 2 ^ 52)) := by ring
-          _ = 2 ^ (52 * i.val) * carry1.val := by rw [hcarry1_split]
-      -- And: 2^(52*i) * carry1 = 2^(52*i) * (carry/2^52 + self[i] + L[i])
-      have hterm_eq2 : 2 ^ (52 * i.val) * carry1.val =
+      simp only [hc1, reduceIte] at hres_inv ⊢
+      rw [hpow_split] at hres_inv
+      have : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
+          2 ^ (52 * i.val) * carry1.val := by grind
+      have : 2 ^ (52 * i.val) * carry1.val =
           2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val +
-          2 ^ (52 * i.val) * constants.L[i.val]!.val := by
-        rw [hcarry1_simp]; ring
-      -- Combine:
-      have hcombined : 2 ^ (52 * i.val) * i5.val + 2 ^ (52 * i.val) * 2 ^ 52 * (carry1.val / 2 ^ 52) =
-          2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val +
-          2 ^ (52 * i.val) * constants.L[i.val]!.val := by
-        rw [hterm_eq, hterm_eq2]
-      -- Bounds
-      have hself_nat_bound : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
-        unfold Scalar52_as_Nat
-        simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+          2 ^ (52 * i.val) * constants.L[i.val]!.val := by grind
+      have : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
+        simp only [Scalar52_as_Nat, Finset.sum_range_succ]
         interval_cases i.val <;> omega
-      have hsum_bound : ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val +
-          2 ^ (52 * i.val) * constants.L[i.val]!.val ≤ Scalar52_as_Nat constants.L := by
-        have hL_nat : Scalar52_as_Nat constants.L = L := constants.L_spec
-        rw [hL_nat]
-        unfold L
-        interval_cases i.val <;> unfold constants.L <;>
-          simp only [Finset.Ico_self, Finset.sum_empty, zero_add,
-                     Finset.sum_Ico_succ_top (Nat.zero_le _)] <;> decide
       omega
   case isFalse hge =>
     -- i >= 5 case: return (carry, self)
@@ -330,24 +248,14 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     use (carry, self)
     refine ⟨rfl, ?_, ?_⟩
     · assumption
-    · -- invariant at i = 5
-      simp only [hi5]
-      -- At i = 5: carry / 2^52 * 2^260 = carry / 2^52 * 2^260
-      -- and the sum over Ico 0 5 equals Scalar52_as_Nat constants.L
-      have hsum_L : ∑ j ∈ Finset.Ico 0 5, 2 ^ (52 * j) * constants.L[j]!.val =
-                    Scalar52_as_Nat constants.L := by
-        unfold Scalar52_as_Nat
-        simp only [Finset.range_eq_Ico]
-      rw [hsum_L, constants.L_spec]
-      -- Now we have: Scalar52_as_Nat self + 2^260 * (carry / 2^52) =
-      --              Scalar52_as_Nat self + (if cond then L else 0) + 2^260 * (carry / 2^52) -
-      --              (if cond then L else 0)
+    · simp only [hi5]
+      have : ∑ j ∈ Finset.Ico 0 5, 2 ^ (52 * j) * constants.L[j]!.val =
+          Scalar52_as_Nat constants.L := by
+        simp [Scalar52_as_Nat]
+      rw [this, constants.L_spec]
       cases Choice.val_cases condition with
-      | inl hc0 =>
-        simp only [hc0, U8_zero_ne_one, ↓reduceIte, add_zero, Nat.sub_zero]
-      | inr hc1 =>
-        simp only [hc1, ↓reduceIte]
-        omega
+      | inl => simp [*]
+      | inr => grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
