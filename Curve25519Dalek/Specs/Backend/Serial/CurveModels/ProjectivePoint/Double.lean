@@ -83,7 +83,12 @@ theorem double_spec (q : ProjectivePoint)
     X' % p = (2 * X * Y) % p ∧
     Y' % p = (Y^2 + X^2) % p ∧
     (Z' + X^2) % p = Y^2 % p ∧
-    (T' + Z') % p = (2 * Z^2) % p := by
+    (T' + Z') % p = (2 * Z^2) % p ∧
+    -- Output bounds: X, Z, T have tight bounds; Y has looser bounds from add_assign
+    (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
+    (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, c.T[i]!.val < 2 ^ 52) := by
   unfold double
   progress*
   · -- BEGIN TASK
@@ -149,8 +154,8 @@ theorem double_spec (q : ProjectivePoint)
     scalar_tac
     -- END TASK
   unfold Field51_as_Nat at *
-  refine ⟨?_, ?_, ?_, ?_⟩
-  · -- BEGIN TASK
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · -- BEGIN TASK: X' % p = (2 * X * Y) % p
     have : (∑ i ∈ Finset.range 5, 2^(51 * i) * (X_plus_Y[i]!).val) =
         (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.X[i]!).val) +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * (q.Y[i]!).val) := by
@@ -169,14 +174,16 @@ theorem double_spec (q : ProjectivePoint)
         (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
-      apply Nat.ModEq.add; grind; grind
+      apply Nat.ModEq.add
+      · grind
+      · grind
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *
     rw [← Nat.ModEq] at fe_post_2
     apply Nat.ModEq.trans fe_post_2
     exact X_plus_Y_sq_post_1
     -- END TASK
-  · -- BEGIN TASK
+  · -- BEGIN TASK: Y' % p = (Y^2 + X^2) % p
     rw [← Nat.ModEq] at *
     have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
         (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
@@ -189,16 +196,32 @@ theorem double_spec (q : ProjectivePoint)
     · grind
     · grind
     -- END TASK
-  · -- BEGIN TASK
+  · -- BEGIN TASK: (Z' + X^2) % p = Y^2 % p
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post_1.symm)
     apply Nat.ModEq.trans YY_minus_XX_post_2
     exact YY_post_1
     -- END TASK
-  · -- BEGIN TASK
+  · -- BEGIN TASK: (T' + Z') % p = (2 * Z^2) % p
     rw [← Nat.ModEq] at *;
     apply Nat.ModEq.trans fe1_post_2
     exact ZZ2_post_1
+    -- END TASK
+  · -- BEGIN TASK: c.X bounds < 2^52
+    intro i hi
+    exact fe_post_1 i hi
+    -- END TASK
+  · -- BEGIN TASK: c.Y bounds < 2^54
+    intro i hi
+    exact YY_plus_XX_post_2 i hi
+    -- END TASK
+  · -- BEGIN TASK: c.Z bounds < 2^52
+    intro i hi
+    exact YY_minus_XX_post_1 i hi
+    -- END TASK
+  · -- BEGIN TASK: c.T bounds < 2^52
+    intro i hi
+    exact fe1_post_1 i hi
     -- END TASK
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
@@ -233,8 +256,9 @@ theorem double_spec'
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52 := hq_valid.Y_valid
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52 := hq_valid.Z_valid
 
-  -- Use the existing double_spec to get the arithmetic properties
-  obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith⟩ :=
+  -- Use the existing double_spec to get the arithmetic properties and bounds
+  obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
+          hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     ProjectivePoint.double_spec q h_qX_bounds h_qY_bounds h_qZ_bounds
 
   use c
@@ -247,6 +271,7 @@ theorem double_spec'
   -- - hY_arith : Field51_as_Nat c.Y % p = (Y^2 + X^2) % p
   -- - hZ_arith : (Field51_as_Nat c.Z + X^2) % p = Y^2 % p
   -- - hT_arith : (Field51_as_Nat c.T + c.Z) % p = (2 * Z^2) % p
+  -- - hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds : output limb bounds
 
   -- Lift to field equalities
   -- Note: toField is (Field51_as_Nat · : CurveField)
