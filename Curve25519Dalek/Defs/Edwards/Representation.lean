@@ -156,19 +156,18 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
   on_curve : let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
              Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
-open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for CompletedPoint.
     A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
-    Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y² -/
+    Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
+
+    Note: This predicate does NOT include bounds on limbs. The Rust operations
+    (like add_assign) may produce intermediate values with limbs > 2^52.
+    Use `CompletedPoint.InBounds` separately when bounds are needed. -/
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
-  /-- X, Y, Z, T are all valid field elements, i.e., limbs of each are bounded by 2^52. -/
-  X_valid : cp.X.IsValid
-  Y_valid : cp.Y.IsValid
-  Z_valid : cp.Z.IsValid
-  T_valid : cp.T.IsValid
-  /-- The Z and T coordinates are non-zero. -/
+  /-- The Z coordinate is non-zero. -/
   Z_ne_zero : cp.Z.toField ≠ 0
+  /-- The T coordinate is non-zero. -/
   T_ne_zero : cp.T.toField ≠ 0
   /-- The curve equation (cleared denominators). -/
   on_curve : let X := cp.X.toField; let Y := cp.Y.toField
@@ -190,24 +189,15 @@ instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable
     else isFalse fun h => hY h.Y_valid
   else isFalse fun h => hX h.X_valid
 
-open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
-  if hX : cp.X.IsValid then
-    if hY : cp.Y.IsValid then
-      if hZ : cp.Z.IsValid then
-        if hT : cp.T.IsValid then
-          if hZne : cp.Z.toField ≠ 0 then
-            if hTne : cp.T.toField ≠ 0 then
-              if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
-                        = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
-                isTrue ⟨hX, hY, hZ, hT, hZne, hTne, hcurve⟩
-              else isFalse fun h => hcurve h.on_curve
-            else isFalse fun h => hTne h.T_ne_zero
-          else isFalse fun h => hZne h.Z_ne_zero
-        else isFalse fun h => hT h.T_valid
-      else isFalse fun h => hZ h.Z_valid
-    else isFalse fun h => hY h.Y_valid
-  else isFalse fun h => hX h.X_valid
+  if hZne : cp.Z.toField ≠ 0 then
+    if hTne : cp.T.toField ≠ 0 then
+      if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
+                = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
+        isTrue ⟨hZne, hTne, hcurve⟩
+      else isFalse fun h => hcurve h.on_curve
+    else isFalse fun h => hTne h.T_ne_zero
+  else isFalse fun h => hZne h.Z_ne_zero
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/
