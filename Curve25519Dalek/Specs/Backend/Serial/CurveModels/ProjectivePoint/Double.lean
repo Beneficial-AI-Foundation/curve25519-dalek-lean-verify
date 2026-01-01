@@ -85,6 +85,11 @@ theorem double_spec_aux (q : ProjectivePoint)
     (Z' + X^2) % p = Y^2 % p ∧
     (T' + Z') % p = (2 * Z^2) % p ∧
     -- Output bounds: X, Z, T < 2^52 (from sub); Y < 2^53 (sum of two < 2^52 values)
+    -- TODO: Investigate if c.Y can achieve the tighter < 2^52 bound. Currently c.Y = YY + XX
+    -- where YY, XX < 2^52, giving Y < 2^53. Options to achieve < 2^52:
+    -- (1) The Rust code could reduce YY_plus_XX before storing in c.Y
+    -- (2) There may be algebraic properties that constrain Y more tightly
+    -- (3) The downstream consumer (to_projective) may not require the tight bound
     (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
