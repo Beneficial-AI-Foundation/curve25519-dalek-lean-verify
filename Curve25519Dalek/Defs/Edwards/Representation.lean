@@ -162,12 +162,12 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
     Note: The bounds on limbs vary by coordinate. Operations like `double` produce
-    X, Z, T with limbs < 2^52 (from sub), but Y with limbs < 2^54 (from add_assign). -/
+    X, Z, T with limbs < 2^52 (from sub), and Y with limbs < 2^53 (sum of two < 2^52 values). -/
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
   /-- X coordinate limbs are bounded by 2^52. -/
   X_bounds : ∀ i < 5, cp.X[i]!.val < 2 ^ 52
-  /-- Y coordinate limbs are bounded by 2^54 (looser due to add_assign). -/
-  Y_bounds : ∀ i < 5, cp.Y[i]!.val < 2 ^ 54
+  /-- Y coordinate limbs are bounded by 2^53 (sum of two values each < 2^52). -/
+  Y_bounds : ∀ i < 5, cp.Y[i]!.val < 2 ^ 53
   /-- Z coordinate limbs are bounded by 2^52. -/
   Z_bounds : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52
   /-- T coordinate limbs are bounded by 2^52. -/
@@ -198,7 +198,7 @@ instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable
 
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
   if hXb : ∀ i < 5, cp.X[i]!.val < 2 ^ 52 then
-    if hYb : ∀ i < 5, cp.Y[i]!.val < 2 ^ 54 then
+    if hYb : ∀ i < 5, cp.Y[i]!.val < 2 ^ 53 then
       if hZb : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52 then
         if hTb : ∀ i < 5, cp.T[i]!.val < 2 ^ 52 then
           if hZne : cp.Z.toField ≠ 0 then

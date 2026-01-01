@@ -84,9 +84,9 @@ theorem double_spec_aux (q : ProjectivePoint)
     Y' % p = (Y^2 + X^2) % p ∧
     (Z' + X^2) % p = Y^2 % p ∧
     (T' + Z') % p = (2 * Z^2) % p ∧
-    -- Output bounds: X, Z, T have tight bounds; Y has looser bounds from add_assign
+    -- Output bounds: X, Z, T < 2^52 (from sub); Y < 2^53 (sum of two < 2^52 values)
     (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
+    (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 52) := by
   unfold double
@@ -211,9 +211,14 @@ theorem double_spec_aux (q : ProjectivePoint)
     intro i hi
     exact fe_post_1 i hi
     -- END TASK
-  · -- BEGIN TASK: c.Y bounds < 2^54
+  · -- BEGIN TASK: c.Y bounds < 2^53
+    -- c.Y = YY_plus_XX = YY + XX where YY < 2^52 and XX < 2^52
+    -- So YY_plus_XX < 2^52 + 2^52 = 2^53
     intro i hi
-    exact YY_plus_XX_post_2 i hi
+    have h_eq := YY_plus_XX_post_1 i hi
+    have h_YY := YY_post_2 i hi
+    have h_XX := XX_post_2 i hi
+    omega
     -- END TASK
   · -- BEGIN TASK: c.Z bounds < 2^52
     intro i hi
