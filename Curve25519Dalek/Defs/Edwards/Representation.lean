@@ -161,10 +161,17 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
-    Note: This predicate does NOT include bounds on limbs. The Rust operations
-    (like add_assign) may produce intermediate values with limbs > 2^52.
-    Use `CompletedPoint.InBounds` separately when bounds are needed. -/
+    Note: The bounds on limbs vary by coordinate. Operations like `double` produce
+    X, Z, T with limbs < 2^52 (from sub), but Y with limbs < 2^54 (from add_assign). -/
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
+  /-- X coordinate limbs are bounded by 2^52. -/
+  X_bounds : ∀ i < 5, cp.X[i]!.val < 2 ^ 52
+  /-- Y coordinate limbs are bounded by 2^54 (looser due to add_assign). -/
+  Y_bounds : ∀ i < 5, cp.Y[i]!.val < 2 ^ 54
+  /-- Z coordinate limbs are bounded by 2^52. -/
+  Z_bounds : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52
+  /-- T coordinate limbs are bounded by 2^52. -/
+  T_bounds : ∀ i < 5, cp.T[i]!.val < 2 ^ 52
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : cp.Z.toField ≠ 0
   /-- The T coordinate is non-zero. -/
@@ -190,14 +197,22 @@ instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable
   else isFalse fun h => hX h.X_valid
 
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
-  if hZne : cp.Z.toField ≠ 0 then
-    if hTne : cp.T.toField ≠ 0 then
-      if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
-                = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
-        isTrue ⟨hZne, hTne, hcurve⟩
-      else isFalse fun h => hcurve h.on_curve
-    else isFalse fun h => hTne h.T_ne_zero
-  else isFalse fun h => hZne h.Z_ne_zero
+  if hXb : ∀ i < 5, cp.X[i]!.val < 2 ^ 52 then
+    if hYb : ∀ i < 5, cp.Y[i]!.val < 2 ^ 54 then
+      if hZb : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52 then
+        if hTb : ∀ i < 5, cp.T[i]!.val < 2 ^ 52 then
+          if hZne : cp.Z.toField ≠ 0 then
+            if hTne : cp.T.toField ≠ 0 then
+              if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
+                        = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
+                isTrue ⟨hXb, hYb, hZb, hTb, hZne, hTne, hcurve⟩
+              else isFalse fun h => hcurve h.on_curve
+            else isFalse fun h => hTne h.T_ne_zero
+          else isFalse fun h => hZne h.Z_ne_zero
+        else isFalse fun h => hTb h.T_bounds
+      else isFalse fun h => hZb h.Z_bounds
+    else isFalse fun h => hYb h.Y_bounds
+  else isFalse fun h => hXb h.X_bounds
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/

@@ -68,7 +68,7 @@ These formulas implement Edwards curve point doubling, computing P + P
 (elliptic curve point addition) where P = (X:Y:Z).
 -/
 @[progress]
-theorem double_spec (q : ProjectivePoint)
+theorem double_spec_aux (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52) :
@@ -228,7 +228,7 @@ end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
 /-! ## Mathematical Verification
 
-This section proves that the geometric implementation `double_spec` corresponds to the
+This section proves that the geometric implementation `double_spec_aux` corresponds to the
 mathematical operation of point doubling on the Edwards curve.
 
 The proof bridges low-level Rust implementation to high-level mathematics using the
@@ -247,7 +247,7 @@ Verification of the `double` function.
 The theorem states that the Rust implementation of point doubling corresponds
 exactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.
 -/
-theorem double_spec'
+theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :
     ∃ c, ProjectivePoint.double q = ok c ∧
     c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
@@ -256,10 +256,10 @@ theorem double_spec'
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52 := hq_valid.Y_valid
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52 := hq_valid.Z_valid
 
-  -- Use the existing double_spec to get the arithmetic properties and bounds
+  -- Use double_spec_aux to get the arithmetic properties and bounds
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
           hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
-    ProjectivePoint.double_spec q h_qX_bounds h_qY_bounds h_qZ_bounds
+    ProjectivePoint.double_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds
 
   use c
   constructor
@@ -367,36 +367,33 @@ theorem double_spec'
     ring
 
   constructor
-  · -- Prove c.IsValid (Z_ne_zero, T_ne_zero, on_curve)
-    constructor
-    · -- Z_ne_zero: c.Z.toField = Y² - X² ≠ 0
-      rw [hZ_F, h_YX_factor, h_yx_sq]
-      apply mul_ne_zero hz2 h_denom_plus
-
-    · -- T_ne_zero: c.T.toField = 2*Z² - (Y² - X²) ≠ 0
-      rw [hT_F, hZ_F, h_denom_factor]
-      apply mul_ne_zero hz2 h_denom_minus
-
-    · -- on_curve: the curve equation for CompletedPoint
-      -- We need: -1 * cX² * cT² + cY² * cZ² = cZ² * cT² + d * cX² * cY²
-      -- where cX = 2XY, cY = Y² + X², cZ = Y² - X², cT = 2Z² - (Y² - X²)
-      simp only [hX_F, hY_F, hZ_F, hT_F]
-      simp only [Ed25519] at h_curve_field ⊢
-      -- The goal is a polynomial identity in X, Y, Z, d.
-      -- It follows from h_curve_field: -X²Z² + Y²Z² = Z⁴ + d*X²*Y²
-      -- Using coefficient 4*(Y² + X²)² on h_curve_field
-      linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
-
-  · -- Prove c.toPoint = q.toPoint + q.toPoint
-    have h_c_valid : c.IsValid := by
-      constructor
-      · rw [hZ_F, h_YX_factor, h_yx_sq]
-        apply mul_ne_zero hz2 h_denom_plus
-      · rw [hT_F, hZ_F, h_denom_factor]
-        apply mul_ne_zero hz2 h_denom_minus
-      · simp only [hX_F, hY_F, hZ_F, hT_F]
+  · -- Prove c.IsValid (bounds, Z_ne_zero, T_ne_zero, on_curve)
+    exact {
+      X_bounds := hcX_bounds
+      Y_bounds := hcY_bounds
+      Z_bounds := hcZ_bounds
+      T_bounds := hcT_bounds
+      Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
+      T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
+      on_curve := by
+        simp only [hX_F, hY_F, hZ_F, hT_F]
         simp only [Ed25519] at h_curve_field ⊢
         linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
+    }
+
+  · -- Prove c.toPoint = q.toPoint + q.toPoint
+    have h_c_valid : c.IsValid := {
+      X_bounds := hcX_bounds
+      Y_bounds := hcY_bounds
+      Z_bounds := hcZ_bounds
+      T_bounds := hcT_bounds
+      Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
+      T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
+      on_curve := by
+        simp only [hX_F, hY_F, hZ_F, hT_F]
+        simp only [Ed25519] at h_curve_field ⊢
+        linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
+    }
 
     -- Unfold toPoint for c and q
     have ⟨h_cx, h_cy⟩ := CompletedPoint.toPoint_of_isValid h_c_valid
@@ -461,7 +458,7 @@ theorem double_spec'
   -- rw [h_q_eq_P]
 
   -- -- 2. Run the Aeneas specification
-  -- have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec q
+  -- have ⟨out, h_run, h_arith⟩ := ProjectivePoint.double_spec_aux q
   --   (fun i h => hq_bounds.1 i h)
   --   (fun i h => hq_bounds.2.1 i h)
   --   (fun i h => hq_bounds.2.2 i h)
