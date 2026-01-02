@@ -165,14 +165,14 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- Clear intermediate accumulators from Rows 0-4
   -- Keep: a, limbs*, carry*, n*, L*, and their bounds
   -- =========================================================
-  try clear n1_partial product1 sum1
-  try clear h_n1_partial h_product1 h_sum1
-  try clear n2_partial prod2_0 n2_accum prod2_1 sum2
-  try clear h_n2_partial h_n2_accum h_prod2_1 h_sum2
-  try clear n3_partial prod3_1 n3_accum prod3_2 sum3
-  try clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
-  try clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3 sum4
-  try clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
+  clear h_n1_partial h_product1 h_sum1
+  clear n1_partial product1
+  clear h_n2_partial h_n2_accum h_prod2_1 h_sum2 h_prod2_0
+  clear n2_partial prod2_0 n2_accum prod2_1
+  clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
+  clear n3_partial prod3_1 n3_accum prod3_2
+  clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
+  clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3
 
   -- === ROW 5: Compute Result Limb 0 (r0) ===
   -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
@@ -186,8 +186,9 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
   progress as ⟨n5, r0, h_n5, h_r0, h_n5_bounds, h_r0_bound⟩
 
-  try clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3 sum5
-  try clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
+  clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
+  clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3
+
 
   -- === ROW 6: Compute Result Limb 1 (r1) ===
   -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
@@ -199,8 +200,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
   progress as ⟨n6, r1, h_n6, h_r1, h_n6_bound, h_r1_bound⟩
 
-  try clear n6_partial prod6_1 n6_accum1 prod6_2 sum6
-  try clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
+  clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
+  clear n6_partial prod6_1 n6_accum1 prod6_2
 
   -- === ROW 7: Compute Result Limb 2 (r2) ===
   -- Formula: S7 = n6 + a[7] + carry3 * L4
@@ -220,7 +221,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
   -- Reduction Part 2 -> Returns (carry_out, result_limb)
   -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
-  progress as ⟨r4_u128, r3, h_r4_u128, h_r3, h_r4_u128_bound, h_r3_bound⟩
+  progress as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
 
   -- =========================================================
   -- FINAL STEPS: Cast and Conditional Subtraction
@@ -231,34 +232,62 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   -- Call the 'sub' function
   progress as ⟨m, h_sub, h_mod, h_bound⟩
-  · --
+  · -- Case ha: Prove input limbs are < 2^52
     intro i hi
-    interval_cases i -- <;> try simp_all [constants.L]
-    <;> try simp only [Array.make, Array.index_usize]
-    · --
+    interval_cases i
+    <;> simp only [
+      Array.make, Array.getElem!_Nat_eq,
+      List.length_cons, List.length_nil,
+      List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
+      zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
+      Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
+    ]
+    <;> try scalar_tac
+    · have h_r4_tight : ↑r4 < (2 : Nat) ^ 52 := by
+        sorry
+      exact h_r4_tight
 
-      sorry
-    · --
-      sorry
-    · --
-      sorry
-    · --
-      sorry
-    · --
-      sorry
-  · --
+  · -- Case hb: constants.L are valid
     intro i hi
-
+    interval_cases i <;> assumption
+  · -- Case ha': Input < 2 * L
+    have h_red_bound : Scalar52_as_Nat (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) < 2 * L := by
+       sorry
+    apply lt_of_lt_of_le h_red_bound
+    simp only [Scalar52_as_Nat, constants.L]
+    try scalar_tac
     sorry
   · --
-
+    simp only [Scalar52_as_Nat, constants.L]
+    try scalar_tac
     sorry
-  · --
+  · -- Post-conditions
+    refine ⟨?_,h_bound,?_⟩
+    · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
 
-    sorry
-  · --
+      -- clear h_limbs8 h_n8_partial h_limbs7 h_n7_partial h_limbs6 h_limbs5 h_limbs4 h_limbs3 h_limbs2 h_limbs1
+      -- clear h_carry1 h_n1 h_limbs0 h_carry0 h_n0
+      -- clear h_carry3 h_n3 h_carry2 h_n2 h_carry4 h_n4 h_n5 h_r0 h_n6 h_r1 h_sum8 h_r3
+      -- clear h_prod8_1 h_sum7 h_n7 h_prod7_1
 
-    sorry
+      have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
+        (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
+        sorry
+      have h_m_subst : (Scalar52_as_Nat m) * R % L = (Scalar52_as_Nat
+        (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4)) * R % L := by
+        apply Nat.ModEq.mul_right R at h_m_equiv
+        simp [Nat.ModEq] at h_m_equiv
+        exact h_m_equiv
+
+      rw [h_m_subst]
+      unfold Scalar52_wide_as_Nat Scalar52_as_Nat
+      
+      sorry
+    · -- Post-cond: m < 2 ^ 259
+      unfold L at h_mod
+      apply lt_of_lt_of_le h_mod
+      try decide
+
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
