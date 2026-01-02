@@ -80,7 +80,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 4000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 3000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -232,7 +232,23 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- Call the 'sub' function
   progress as ⟨m, h_sub, h_mod, h_bound⟩
   · --
-    
+    intro i hi
+    interval_cases i -- <;> try simp_all [constants.L]
+    <;> try simp only [Array.make, Array.index_usize]
+    · --
+
+      sorry
+    · --
+      sorry
+    · --
+      sorry
+    · --
+      sorry
+    · --
+      sorry
+  · --
+    intro i hi
+
     sorry
   · --
 
@@ -243,8 +259,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   · --
 
     sorry
-
-  sorry
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
