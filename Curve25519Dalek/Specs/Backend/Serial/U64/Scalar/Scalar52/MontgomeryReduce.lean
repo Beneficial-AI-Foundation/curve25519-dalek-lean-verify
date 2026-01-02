@@ -8,6 +8,7 @@ import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 
 /-! # Spec Theorem for `Scalar52::montgomery_reduce`
 
@@ -79,7 +80,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 2000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 4000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -125,7 +126,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
   progress as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
   progress as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
-  -- 6. Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
+  -- Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
   progress as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
 
   -- === ROW 2: Compute n2 ===
@@ -174,7 +175,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   try clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
 
   -- === ROW 5: Compute Result Limb 0 (r0) ===
-  -- Formula: S5 = n4 + a[5] + carry1*L4 + carry3*L2 + carry4*L1
+  -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
   progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
   progress as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
   progress as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
@@ -183,14 +184,13 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
   progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
   progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
-  -- 9. Reduction Part 2: Returns (carry_out, result_limb)
   progress as ⟨n5, r0, h_n5, h_r0, h_n5_bounds, h_r0_bound⟩
 
   try clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3 sum5
   try clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
 
   -- === ROW 6: Compute Result Limb 1 (r1) ===
-  -- Formula: S6 = n5 + a[6] + carry2*L4 + carry4*L2
+  -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
   progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
   progress as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
   progress as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
@@ -202,198 +202,49 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   try clear n6_partial prod6_1 n6_accum1 prod6_2 sum6
   try clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
 
-  
+  -- === ROW 7: Compute Result Limb 2 (r2) ===
+  -- Formula: S7 = n6 + a[7] + carry3 * L4
+  progress as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
+  progress as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
+  progress as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
+  progress as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
+  -- Reduction Part 2 -> Returns (carry_out, result_limb)
+  -- The carry is 'n7' and the result 'r2'.
+  progress as ⟨n7, r2, h_n7, h_r2, h_n7_bound, h_r2_bound⟩
+
+  -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
+  -- Formula: S8 = n7 + a[8] + carry4 * L4
+  progress as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
+  progress as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
+  progress as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
+  progress as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
+  -- Reduction Part 2 -> Returns (carry_out, result_limb)
+  -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
+  progress as ⟨r4_u128, r3, h_r4_u128, h_r3, h_r4_u128_bound, h_r3_bound⟩
+
+  -- =========================================================
+  -- FINAL STEPS: Cast and Conditional Subtraction
+  -- =========================================================
+
+  -- Cast the final limb (r4_u128) to U64
+  progress as ⟨r4, h_r4⟩
+
+  -- Call the 'sub' function
+  progress as ⟨m, h_sub, h_mod, h_bound⟩
+  · --
+    
+    sorry
+  · --
+
+    sorry
+  · --
+
+    sorry
+  · --
+
+    sorry
+
   sorry
-
-  -- -- === ROW 5: Compute r0 (Division starts) ===
-  -- -- Operations: + m(n1, L[4]) + m(n3, L[2]) + m(n4, L[1])
-  -- set_option maxHeartbeats 4000000 in
-  -- (
-  --  progress -- m(n1, L[4])
-  --  progress -- +
-  --  progress -- m(n3, L[2])
-  --  progress -- +
-  --  progress -- m(n4, L[1])
-  --  progress -- +
-  --  progress as ⟨carry5, r0⟩ -- part2 call
-  -- )
-
-  -- -- === ROW 6: Compute r1 ===
-  -- -- Operations: + m(n2, L[4]) + m(n4, L[2])
-  -- set_option maxHeartbeats 4000000 in
-  -- (
-  --  progress -- m(n2, L[4])
-  --  progress -- +
-  --  progress -- m(n4, L[2])
-  --  progress -- +
-  --  progress as ⟨carry6, r1⟩ -- part2 call
-  -- )
-
-
-
-
-
-
-
-
-  -- -- === ROW 7: Compute r2 ===
-  -- -- Operations: + m(n3, L[4])
-  -- progress -- m(n3, L[4])
-  -- progress -- +
-  -- progress as ⟨carry7, r2⟩ -- part2 call
-
-  -- -- === ROW 8: Compute r3 ===
-  -- -- Operations: + m(n4, L[4])
-  -- progress -- m(n4, L[4])
-  -- progress -- +
-  -- progress as ⟨carry8, r3⟩ -- part2 call
-
-  -- -- === Final Subtraction ===
-  -- progress -- cast carry to r4
-  -- progress as ⟨m_final⟩ -- Scalar52::sub
-
-  -- -- === Post-Conditions ===
-  -- split_ands
-  -- · sorry -- 1. Returns ok
-  -- · sorry -- 2. Modular arithmetic correctness
-  -- · sorry -- 3. Limb bounds (Scalar52::sub output spec)
-  -- · sorry -- 4. Total bound (Scalar52_as_Nat m < 2^259)
-
-
-
-
-
-/- OLD ATTEMPT
-
-@[progress]
-theorem montgomery_reduce_spec (a : Array U128 9#usize)
-    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
-    ∃ m,
-    montgomery_reduce a = ok m ∧
-    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
-    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat m < 2 ^ 259)
-    := by
-  -- 1. Instantiate ALL array bounds explicitly.
-  have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
-  have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
-  have ha2 : a[2]!.val < 2^127 := h_bounds 2 (by decide)
-  have ha3 : a[3]!.val < 2^127 := h_bounds 3 (by decide)
-  have ha4 : a[4]!.val < 2^127 := h_bounds 4 (by decide)
-  have ha5 : a[5]!.val < 2^127 := h_bounds 5 (by decide)
-  have ha6 : a[6]!.val < 2^127 := h_bounds 6 (by decide)
-  have ha7 : a[7]!.val < 2^127 := h_bounds 7 (by decide)
-  have ha8 : a[8]!.val < 2^127 := h_bounds 8 (by decide)
-
-  -- 2. Instantiate L bounds
-  have hL0 : (constants.L[0]!).val < 2 ^ 52 := constants.L_limbs_spec 0#usize (by decide)
-  have hL1 : (constants.L[1]!).val < 2 ^ 52 := constants.L_limbs_spec 1#usize (by decide)
-  have hL2 : (constants.L[2]!).val < 2 ^ 52 := constants.L_limbs_spec 2#usize (by decide)
-  have hL3 : (constants.L[3]!).val < 2 ^ 52 := constants.L_limbs_spec 3#usize (by decide)
-  have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
-
-  unfold montgomery_reduce
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-
-  progress as ⟨i0, hi₀⟩; progress as ⟨b1, i1, h_b₁, h_i₁, h_i1_bound⟩;
-
-  generalize h_b1_val : ((↑a)[0]!).val * constants.LFACTOR.val % 2 ^ 52 = b1_val
-  generalize h_i1_val : ( ((↑a)[0]!).val + b1_val * ((constants.L)[0]!).val ) / 2 ^ 52 = i1_val
-  have h_b1_bound : b1_val < 2^52 := by
-      rw [← h_b1_val]; apply Nat.mod_lt; norm_num
-  have h_i1_bound : i1_val < 2^76 := by
-    rw [← h_i1_val]; apply Nat.div_lt_of_lt_mul; try scalar_tac -- Solves (a[0] + b1*L[0]) < 2^128
-
-  progress as ⟨i2, h_i₂⟩; progress as ⟨i3, h_i₃⟩; progress as ⟨i4, h_i₄⟩; progress as ⟨i5, h_i₅⟩;
-
-  progress as ⟨i6, h_i₆⟩
-  <;> try (
-    simp only [h_i₅, h_i₃, h_b₁, hi₀, h_i₁]
-    simp only [Array.getElem!_Nat_eq] at *
-
-    generalize h_carry : ( _ / 2^52 ) = carry
-
-    have h_mod_bound : ((↑a)[0]!).val * constants.LFACTOR.val % 2 ^ 52 < 2 ^ 52 := by
-        apply Nat.mod_lt
-        norm_num
-
-    have h_carry_bound : carry < 2^76 := by
-      rw [← h_carry]
-      apply Nat.div_lt_of_lt_mul
-      try scalar_tac
-
-    try scalar_tac
-    )
-
-  progress as ⟨i7, i8 , h_i₇, h_i₈⟩;
-
-  -- generalize h_i7 : _ * constants.LFACTOR.val % 2 ^ 52 = i7_val
-  -- have h_i7_bound : i7_val < 2^52 := by
-  --     rw [← h_i7]; apply Nat.mod_lt; norm_num
-
-  progress as ⟨i9, h_i₉⟩; progress as ⟨i10, h_i₁₀⟩;
-  progress as ⟨i11, h_i₁₁⟩; progress as ⟨i12, h_i₁₂⟩;
-
-  progress as ⟨i13, h_i₁₃⟩
-  · --
-
-    sorry
-  · --
-    sorry
-
--/
-
-
-  -- <;> try (
-  --   simp only [h_i₁₂, h_i₁₀, h_i₈, h_i₉, h_i₁₁, h_i₇, h_i₆, h_i₅, h_i₃, h_i₁, hi₀, h_b₁, h_i₂, h_i₄]
-  --   simp only [Array.getElem!_Nat_eq] at *
-
-  --   generalize h_carry : ( _ / 2^52 ) = carry
-
-  --   have h_mod_bound : i6.val * constants.LFACTOR.val % 2 ^ 52 < 2 ^ 52 := by
-  --     apply Nat.mod_lt
-  --     norm_num
-
-  --   have h_carry_bound : carry < 2^76 := by
-  --     rw [← h_carry]
-  --     apply Nat.div_lt_of_lt_mul
-  --     try scalar_tac
-
-  --   try scalar_tac
-  --   )
-
-  -- progress as ⟨i14, h_i₁₄⟩; progress as ⟨i15, h_i₁₅⟩;
-  -- · -- Solve subgoal for i13 + i14
-  --   simp only [h_i₁₃, h_i₁₄, h_i₁₀, h_i₁₂, h_i₉, h_i₈, h_i₇,h_i₆, h_i₅, h_i₃, h_b₁, h_i₁₁, h_i₄,
-  --               h_i₂, h_i₁, hi₀]
-  --   simp only [Array.getElem!_Nat_eq] at *
-
-  --   generalize h_i8_val : _ / 2^52 = i8_val
-
-  --   -- Bound i8 (< 2^76)
-  --   have h_i8_bound : i8_val < 2^76 := by
-  --     rw [← h_i8_val]
-  --     apply Nat.div_lt_of_lt_mul
-  --     try scalar_tac
-
-  --   try scalar_tac
-  --   sorry
-  -- · --
-  --   sorry
-
-
-
-
-  -- progress as ⟨i16, i17, h_i₁₆, h_i₁₇⟩
-  -- progress as ⟨i18, h_i₁₈⟩; progress as ⟨i19, h_i₁₉⟩; progress as ⟨i20, h_i₂₀⟩;
-  -- progress as ⟨i21, h_i₂₁⟩; progress as ⟨i22, h_i₂₂⟩; progress as ⟨i23, h_i₂₃⟩;
-  -- progress as ⟨i24, i25, h_i₂₄, h_i₂₅⟩; progress as ⟨i26, h_i₂₆⟩; progress as ⟨i27, h_i₂₇⟩
-  -- progress as ⟨i28, h_i₂₈⟩; progress as ⟨i29, h_i₂₉⟩;
-
-  -- progress as ⟨i30, h_i₃₀⟩ <;> try (subst h_i₁₈ h_i₂₆ h_i₂₈; try scalar_tac)
-  -- -- progress as ⟨i31, h_i₃₁⟩; -- progress as ⟨i32, h_i₃₂⟩
-
-  -- progress as ⟨i31, h_i₃₁⟩
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
