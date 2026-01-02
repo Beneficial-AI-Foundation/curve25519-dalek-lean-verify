@@ -3,6 +3,7 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
+-- import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
@@ -80,7 +81,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 3000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 4000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -165,14 +166,14 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- Clear intermediate accumulators from Rows 0-4
   -- Keep: a, limbs*, carry*, n*, L*, and their bounds
   -- =========================================================
-  clear h_n1_partial h_product1 h_sum1
-  clear n1_partial product1
-  clear h_n2_partial h_n2_accum h_prod2_1 h_sum2 h_prod2_0
-  clear n2_partial prod2_0 n2_accum prod2_1
-  clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
-  clear n3_partial prod3_1 n3_accum prod3_2
-  clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
-  clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3
+  -- clear h_n1_partial h_product1 h_sum1
+  -- clear n1_partial product1
+  -- clear h_n2_partial h_n2_accum h_prod2_1 h_sum2 h_prod2_0
+  -- clear n2_partial prod2_0 n2_accum prod2_1
+  -- clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
+  -- clear n3_partial prod3_1 n3_accum prod3_2
+  -- clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
+  -- clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3
 
   -- === ROW 5: Compute Result Limb 0 (r0) ===
   -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
@@ -186,9 +187,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
   progress as ⟨n5, r0, h_n5, h_r0, h_n5_bounds, h_r0_bound⟩
 
-  clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
-  clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3
-
+  -- clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
+  -- clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3
 
   -- === ROW 6: Compute Result Limb 1 (r1) ===
   -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
@@ -200,8 +200,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
   progress as ⟨n6, r1, h_n6, h_r1, h_n6_bound, h_r1_bound⟩
 
-  clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
-  clear n6_partial prod6_1 n6_accum1 prod6_2
+  -- clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
+  -- clear n6_partial prod6_1 n6_accum1 prod6_2
 
   -- === ROW 7: Compute Result Limb 2 (r2) ===
   -- Formula: S7 = n6 + a[7] + carry3 * L4
@@ -244,6 +244,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     ]
     <;> try scalar_tac
     · have h_r4_tight : ↑r4 < (2 : Nat) ^ 52 := by
+        -- use this from Aux.lean : theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
+        -- (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by sorry
         sorry
       exact h_r4_tight
 
@@ -264,12 +266,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   · -- Post-conditions
     refine ⟨?_,h_bound,?_⟩
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
-
-      -- clear h_limbs8 h_n8_partial h_limbs7 h_n7_partial h_limbs6 h_limbs5 h_limbs4 h_limbs3 h_limbs2 h_limbs1
-      -- clear h_carry1 h_n1 h_limbs0 h_carry0 h_n0
-      -- clear h_carry3 h_n3 h_carry2 h_n2 h_carry4 h_n4 h_n5 h_r0 h_n6 h_r1 h_sum8 h_r3
-      -- clear h_prod8_1 h_sum7 h_n7 h_prod7_1
-
       have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
         (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
         sorry
@@ -280,7 +276,17 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         exact h_m_equiv
 
       rw [h_m_subst]
-      unfold Scalar52_wide_as_Nat Scalar52_as_Nat
+      simp only [
+        Scalar52_as_Nat,
+        Scalar52_wide_as_Nat,
+        Scalar52_partial_as_Nat,
+        Finset.sum_range_succ, -- Recursive expansion of sums
+        Finset.sum_range_zero, -- Base case of sums
+        zero_add, add_zero, pow_zero, mul_one -- Arithmetic cleanup
+      ]
+      norm_num
+      try scalar_tac
+      --unfold Scalar52_wide_as_Nat Scalar52_as_Nat
       
       sorry
     · -- Post-cond: m < 2 ^ 259
