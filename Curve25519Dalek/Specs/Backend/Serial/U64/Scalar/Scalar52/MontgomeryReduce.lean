@@ -81,7 +81,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 4000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -253,7 +253,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     intro i hi
     interval_cases i <;> assumption
   · -- Case ha': Input < 2 * L
-    have h_red_bound : Scalar52_as_Nat (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) < 2 * L := by
+    have h_red_bound : Scalar52_as_Nat
+      (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) < 2 * L := by
        sorry
     apply lt_of_lt_of_le h_red_bound
     simp only [Scalar52_as_Nat, constants.L]
@@ -266,6 +267,29 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   · -- Post-conditions
     refine ⟨?_,h_bound,?_⟩
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
+      zify
+      -- Total Montgomery factor N
+      let N := ↑carry0 + ↑carry1 * (2^52) + ↑carry2 * (2^104) + ↑carry3 * (2^156) + ↑carry4 * (2^208)
+
+      have h_core : ↑(Scalar52_wide_as_Nat a) + N * ↑(Scalar52_as_Nat constants.L) = ↑(Scalar52_as_Nat m) * R := by
+        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Scalar52_partial_as_Nat,
+                 constants.R, constants.L, constants.LFACTOR]
+        simp only [h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
+                 h_L1, h_L2, h_L4,
+                 h_n0, h_n1, h_n2, h_n3, h_n4, h_n5, h_n6, h_n7, -- The 'division' results
+                 h_carry0, h_carry1, h_carry2, h_carry3, h_carry4, -- The 'mod' results
+                 h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
+                 h_product1, h_n1_partial, h_n2_partial, h_prod2_0, h_n2_accum, h_prod2_1,
+                 h_n3_partial, h_prod3_1, h_n3_accum, h_prod3_2,
+                 h_n4_partial, h_prod4_0, h_n4_accum1, h_prod4_2, h_n4_accum2, h_prod4_3,
+                 h_n5_partial, h_prod5_1, h_n5_accum1, h_prod5_2, h_n5_accum2, h_prod5_3,
+                 h_n6_partial, h_prod6_1, h_n6_accum1, h_prod6_2,
+                 h_n7_partial, h_prod7_1,
+                 h_n8_partial, h_prod8_1,
+                 h_r0, h_r1, h_r2, h_r3, h_r4]
+        
+        sorry
+
       have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
         (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
         sorry
@@ -276,6 +300,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         exact h_m_equiv
 
       rw [h_m_subst]
+
       simp only [
         Scalar52_as_Nat,
         Scalar52_wide_as_Nat,
@@ -284,10 +309,19 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         Finset.sum_range_zero, -- Base case of sums
         zero_add, add_zero, pow_zero, mul_one -- Arithmetic cleanup
       ]
-      norm_num
+      simp only [
+      Array.make, Array.getElem!_Nat_eq,
+      List.length_cons, List.length_nil,
+      List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
+      zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
+      Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
+      ]
+
+      --norm_num
+
       try scalar_tac
       --unfold Scalar52_wide_as_Nat Scalar52_as_Nat
-      
+
       sorry
     · -- Post-cond: m < 2 ^ 259
       unfold L at h_mod
