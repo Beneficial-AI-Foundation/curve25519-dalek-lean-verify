@@ -112,6 +112,7 @@ end curve25519_dalek.edwards.affine
 -- === Validity Predicates ===
 
 namespace curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.u64.field Edwards
 
 def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
   let X := Field51_as_Nat e.X
@@ -121,6 +122,26 @@ def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
   ¬(Z ≡ 0 [MOD p]) ∧
   X * Y ≡ T * Z [MOD p] ∧
   Y ^ 2 ≡ X ^ 2 + Z ^ 2 + d * T ^ 2 [MOD p]
+
+/-- Validity predicate for EdwardsPoint with bounds.
+    An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
+    Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
+structure EdwardsPoint.IsBounded (e : EdwardsPoint) : Prop where
+  /-- X coordinate limbs are bounded by 2^53. -/
+  X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
+  /-- Y coordinate limbs are bounded by 2^53. -/
+  Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53
+  /-- Z coordinate limbs are bounded by 2^53. -/
+  Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53
+  /-- T coordinate limbs are bounded by 2^53. -/
+  T_bounds : ∀ i < 5, e.T[i]!.val < 2 ^ 53
+  /-- The Z coordinate is non-zero in the field. -/
+  Z_ne_zero : e.Z.toField ≠ 0
+  /-- Extended coordinate relation: T = XY/Z, i.e., XY = TZ. -/
+  T_relation : e.X.toField * e.Y.toField = e.T.toField * e.Z.toField
+  /-- The curve equation (twisted Edwards). -/
+  on_curve : let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
+             Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
 end curve25519_dalek.edwards
 
@@ -201,6 +222,22 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
   on_curve : let X := cp.X.toField; let Y := cp.Y.toField
              let Z := cp.Z.toField; let T := cp.T.toField
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
+
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for ProjectiveNielsPoint.
+    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents precomputed values
+    for mixed addition: Y+X, Y-X, Z, and 2dT where (X, Y, Z, T) is an EdwardsPoint.
+
+    Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
+  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
+  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
+  /-- Z coordinate limbs are bounded by 2^53. -/
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  /-- T2d coordinate limbs are bounded by 2^53. -/
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
 
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
   if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
