@@ -69,9 +69,9 @@ These formulas implement Edwards curve point doubling, computing P + P
 -/
 @[progress]
 theorem double_spec_aux (q : ProjectivePoint)
-    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52)
-    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52)
-    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52) :
+    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 52)
+    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 52)
+    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 52) :
     ∃ c, double q = ok c ∧
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
@@ -261,10 +261,10 @@ theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :
     ∃ c, ProjectivePoint.double q = ok c ∧
     c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
-  -- Extract bounds from validity
-  have h_qX_bounds : ∀ i < 5, (q.X[i]!).val ≤ 2 ^ 52 := hq_valid.X_valid
-  have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val ≤ 2 ^ 52 := hq_valid.Y_valid
-  have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val ≤ 2 ^ 52 := hq_valid.Z_valid
+  -- Extract bounds from validity (< 2^52)
+  have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 52 := hq_valid.X_bounds
+  have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 52 := hq_valid.Y_bounds
+  have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 52 := hq_valid.Z_bounds
 
   -- Use double_spec_aux to get the arithmetic properties and bounds
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
@@ -376,13 +376,19 @@ theorem double_spec
     rw [h_YX_factor, h_yx_sq]
     ring
 
+  -- Convert specific bounds to IsValid (< 2^54)
+  have hcX_valid : c.X.IsValid := fun i hi => Nat.lt_trans (hcX_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcY_valid : c.Y.IsValid := fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
+  have hcZ_valid : c.Z.IsValid := fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcT_valid : c.T.IsValid := fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
+
   constructor
   · -- Prove c.IsValid (bounds, Z_ne_zero, T_ne_zero, on_curve)
     exact {
-      X_bounds := hcX_bounds
-      Y_bounds := hcY_bounds
-      Z_bounds := hcZ_bounds
-      T_bounds := hcT_bounds
+      X_valid := hcX_valid
+      Y_valid := hcY_valid
+      Z_valid := hcZ_valid
+      T_valid := hcT_valid
       Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
       T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
       on_curve := by
@@ -393,10 +399,10 @@ theorem double_spec
 
   · -- Prove c.toPoint = q.toPoint + q.toPoint
     have h_c_valid : c.IsValid := {
-      X_bounds := hcX_bounds
-      Y_bounds := hcY_bounds
-      Z_bounds := hcZ_bounds
-      T_bounds := hcT_bounds
+      X_valid := hcX_valid
+      Y_valid := hcY_valid
+      Z_valid := hcZ_valid
+      T_valid := hcT_valid
       Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
       T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
       on_curve := by

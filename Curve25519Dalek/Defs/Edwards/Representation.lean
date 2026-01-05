@@ -68,13 +68,26 @@ open Edwards FieldElement51
 def FieldElement51.toField (fe : FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
--- To do: move to the file where this belongs
-/-- A FieldElement51 is valid when all 5 limbs are bounded by 2^52. -/
+/-! ## FieldElement51 Validity
+
+From the Rust source (field.rs):
+> "In the 64-bit implementation, a `FieldElement` is represented in radix 2^51 as five u64s;
+> the coefficients are allowed to grow up to 2^54 between reductions modulo p."
+
+The bound `< 2^54` is the universal validity condition that:
+- Is accepted as input by all field operations (mul, square, pow2k, sub)
+- Encompasses all intermediate values between reductions
+- Allows `as_projective` and `as_extended` conversions to work correctly
+-/
+
+/-- A FieldElement51 is valid when all 5 limbs are bounded by 2^54.
+    This is the bound accepted as input by field operations and encompasses
+    all valid intermediate values between reductions. -/
 def FieldElement51.IsValid (fe : FieldElement51) : Prop :=
-  ∀ i < 5, fe[i]!.val ≤ 2^52
+  ∀ i < 5, fe[i]!.val < 2^54
 
 instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
-  show Decidable (∀ i < 5, fe[i]!.val ≤ 2^52) from inferInstance
+  show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
 
 end curve25519_dalek.backend.serial.u64.field
 
@@ -144,34 +157,42 @@ open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for ProjectivePoint.
     A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
-    Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y² -/
+    Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
+
+    Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
+    because operations like `double` compute X + Y, which must be < 2^54 for subsequent
+    squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
 structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
-  /-- X, Y, Z are all valid field elements, i.e., limbs of each are bounded by 2^52. -/
-  X_valid : pp.X.IsValid
-  Y_valid : pp.Y.IsValid
-  Z_valid : pp.Z.IsValid
+  /-- X coordinate limbs are bounded by 2^52 (needed for X + Y < 2^54 in double). -/
+  X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
+  /-- Y coordinate limbs are bounded by 2^52 (needed for X + Y < 2^54 in double). -/
+  Y_bounds : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52
+  /-- Z coordinate limbs are bounded by 2^52. -/
+  Z_bounds : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : pp.Z.toField ≠ 0
   /-- The curve equation (cleared denominators). -/
   on_curve : let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
              Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
+open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for CompletedPoint.
     A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
-    Note: The bounds on limbs vary by coordinate. Operations like `double` produce
-    X, Z, T with limbs < 2^52 (from sub), and Y with limbs < 2^53 (sum of two < 2^52 values). -/
+    All coordinates use the universal bound < 2^54, which:
+    - Covers outputs from all operations (double, add) where bounds vary
+    - Is sufficient for `as_projective` since mul accepts inputs < 2^54 -/
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
-  /-- X coordinate limbs are bounded by 2^52. -/
-  X_bounds : ∀ i < 5, cp.X[i]!.val < 2 ^ 52
-  /-- Y coordinate limbs are bounded by 2^53 (sum of two values each < 2^52). -/
-  Y_bounds : ∀ i < 5, cp.Y[i]!.val < 2 ^ 53
-  /-- Z coordinate limbs are bounded by 2^52. -/
-  Z_bounds : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52
-  /-- T coordinate limbs are bounded by 2^52. -/
-  T_bounds : ∀ i < 5, cp.T[i]!.val < 2 ^ 52
+  /-- X coordinate is valid (limbs < 2^54). -/
+  X_valid : cp.X.IsValid
+  /-- Y coordinate is valid (limbs < 2^54). -/
+  Y_valid : cp.Y.IsValid
+  /-- Z coordinate is valid (limbs < 2^54). -/
+  Z_valid : cp.Z.IsValid
+  /-- T coordinate is valid (limbs < 2^54). -/
+  T_valid : cp.T.IsValid
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : cp.Z.toField ≠ 0
   /-- The T coordinate is non-zero. -/
@@ -181,38 +202,38 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
              let Z := cp.Z.toField; let T := cp.T.toField
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
-open curve25519_dalek.backend.serial.u64.field in
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
-  if hX : pp.X.IsValid then
-    if hY : pp.Y.IsValid then
-      if hZ : pp.Z.IsValid then
+  if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
+    if hY : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52 then
+      if hZ : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52 then
         if hZne : pp.Z.toField ≠ 0 then
           if hcurve : Ed25519.a * pp.X.toField^2 * pp.Z.toField^2 + pp.Y.toField^2 * pp.Z.toField^2
                     = pp.Z.toField^4 + Ed25519.d * pp.X.toField^2 * pp.Y.toField^2 then
             isTrue ⟨hX, hY, hZ, hZne, hcurve⟩
           else isFalse fun h => hcurve h.on_curve
         else isFalse fun h => hZne h.Z_ne_zero
-      else isFalse fun h => hZ h.Z_valid
-    else isFalse fun h => hY h.Y_valid
-  else isFalse fun h => hX h.X_valid
+      else isFalse fun h => hZ h.Z_bounds
+    else isFalse fun h => hY h.Y_bounds
+  else isFalse fun h => hX h.X_bounds
 
+open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
-  if hXb : ∀ i < 5, cp.X[i]!.val < 2 ^ 52 then
-    if hYb : ∀ i < 5, cp.Y[i]!.val < 2 ^ 53 then
-      if hZb : ∀ i < 5, cp.Z[i]!.val < 2 ^ 52 then
-        if hTb : ∀ i < 5, cp.T[i]!.val < 2 ^ 52 then
+  if hX : cp.X.IsValid then
+    if hY : cp.Y.IsValid then
+      if hZ : cp.Z.IsValid then
+        if hT : cp.T.IsValid then
           if hZne : cp.Z.toField ≠ 0 then
             if hTne : cp.T.toField ≠ 0 then
               if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
                         = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
-                isTrue ⟨hXb, hYb, hZb, hTb, hZne, hTne, hcurve⟩
+                isTrue ⟨hX, hY, hZ, hT, hZne, hTne, hcurve⟩
               else isFalse fun h => hcurve h.on_curve
             else isFalse fun h => hTne h.T_ne_zero
           else isFalse fun h => hZne h.Z_ne_zero
-        else isFalse fun h => hTb h.T_bounds
-      else isFalse fun h => hZb h.Z_bounds
-    else isFalse fun h => hYb h.Y_bounds
-  else isFalse fun h => hXb h.X_bounds
+        else isFalse fun h => hT h.T_valid
+      else isFalse fun h => hZ h.Z_valid
+    else isFalse fun h => hY h.Y_valid
+  else isFalse fun h => hX h.X_valid
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/
