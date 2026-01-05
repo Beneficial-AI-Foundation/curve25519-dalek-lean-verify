@@ -66,12 +66,15 @@ satisfies the point doubling formulas modulo p:
 where p = 2^255 - 19
 These formulas implement Edwards curve point doubling, computing P + P
 (elliptic curve point addition) where P = (X:Y:Z).
+
+Input bounds: X, Y limbs < 2^53 (for X + Y < 2^54), Z limbs < 2^54.
+Output bounds: X', Z', T' limbs < 2^52, Y' limbs < 2^53.
 -/
 @[progress]
 theorem double_spec_aux (q : ProjectivePoint)
-    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 52)
-    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 52)
-    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 52) :
+    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
+    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
+    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54) :
     ∃ c, double q = ok c ∧
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
@@ -106,30 +109,17 @@ theorem double_spec_aux (q : ProjectivePoint)
     have := h_qY_bounds i hi
     scalar_tac
     -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := h_qZ_bounds i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
+  · -- BEGIN TASK: X_plus_Y bounds for squaring (X < 2^53, Y < 2^53 → X+Y < 2^54)
     intro i hi
     have := h_qX_bounds i hi
     have := h_qY_bounds i hi
+    have : ∀ i < 5, YY[i]!.val < 2 ^ 52 := by grind
+    have := this i (by grind)
     scalar_tac
     -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := h_qX_bounds i hi
-    have := h_qY_bounds i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
+  · -- BEGIN TASK: YY_plus_XX = add YY XX bounds (YY, XX < 2^52 → output < 2^54 for sub)
     intro i hi
     have := YY_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
     have := XX_post_2 i hi
     scalar_tac
     -- END TASK
@@ -144,18 +134,23 @@ theorem double_spec_aux (q : ProjectivePoint)
     scalar_tac
     -- END TASK
   · -- BEGIN TASK
+    intro i hi
+    have : ∀ i < 5, X_plus_Y_sq[i]!.val < 2 ^ 52 := by grind
+    have := this i (by grind)
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK
+    intro i hi
+    have := XX_post_2 i hi
+    have : ∀ i < 5, ZZ2[i]!.val < 2 ^ 53 := by grind
+    have := this i (by grind)
+    scalar_tac
+    -- END TASK
+  · -- BEGIN TASK: X_plus_Y_sq input to sub (< 2^63 first arg bound)
     intro i hi
     have := X_plus_Y_sq_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := ZZ2_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := YY_minus_XX_post_1 i hi
+    have : ∀ i < 5, YY_minus_XX[i]!.val < 2 ^ 52 := by grind
+    have := this i (by grind)
     scalar_tac
     -- END TASK
   unfold Field51_as_Nat at *
@@ -261,10 +256,13 @@ theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :
     ∃ c, ProjectivePoint.double q = ok c ∧
     c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
-  -- Extract bounds from validity (< 2^52)
-  have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 52 := hq_valid.X_bounds
-  have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 52 := hq_valid.Y_bounds
-  have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 52 := hq_valid.Z_bounds
+  -- Extract bounds from validity (< 2^52) and lift to double_spec_aux requirements
+  have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53 :=
+    fun i hi => Nat.lt_trans (hq_valid.X_bounds i hi) (by norm_num : 2^52 < 2^53)
+  have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53 :=
+    fun i hi => Nat.lt_trans (hq_valid.Y_bounds i hi) (by norm_num : 2^52 < 2^53)
+  have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 :=
+    fun i hi => Nat.lt_trans (hq_valid.Z_bounds i hi) (by norm_num : 2^52 < 2^54)
 
   -- Use double_spec_aux to get the arithmetic properties and bounds
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
