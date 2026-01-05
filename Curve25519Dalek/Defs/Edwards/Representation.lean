@@ -256,6 +256,53 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
              let Z := cp.Z.toField; let T := cp.T.toField
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
+/-- Algebraic validity predicate for CompletedPoint (no bounds).
+    This is used when the arithmetic produces values exceeding 2^54 bounds
+    but the point is still mathematically valid on the curve. -/
+structure CompletedPoint.IsValidAlg (cp : CompletedPoint) : Prop where
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : cp.Z.toField ≠ 0
+  /-- The T coordinate is non-zero. -/
+  T_ne_zero : cp.T.toField ≠ 0
+  /-- The curve equation (cleared denominators). -/
+  on_curve : let X := cp.X.toField; let Y := cp.Y.toField
+             let Z := cp.Z.toField; let T := cp.T.toField
+             Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
+
+/-- Convert a CompletedPoint to the affine point it represents, using algebraic validity only.
+    This version doesn't require bounds on coordinates. -/
+noncomputable def CompletedPoint.toPointAlg (cp : CompletedPoint) (h : cp.IsValidAlg) : Point Ed25519 :=
+  let X := cp.X.toField
+  let Y := cp.Y.toField
+  let Z := cp.Z.toField
+  let T := cp.T.toField
+  { x := X / Z
+    y := Y / T
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have ht : T ≠ 0 := h.T_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
+      have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, ht2]
+      linear_combination hcurve }
+
+/-- When IsValid holds, IsValidAlg also holds. -/
+theorem CompletedPoint.isValid_to_isValidAlg {cp : CompletedPoint} (h : cp.IsValid) : cp.IsValidAlg :=
+  ⟨h.Z_ne_zero, h.T_ne_zero, h.on_curve⟩
+
+instance CompletedPoint.instDecidableIsValidAlg (cp : CompletedPoint) : Decidable cp.IsValidAlg :=
+  if hZne : cp.Z.toField ≠ 0 then
+    if hTne : cp.T.toField ≠ 0 then
+      if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
+                = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
+        isTrue ⟨hZne, hTne, hcurve⟩
+      else isFalse fun h => hcurve h.on_curve
+    else isFalse fun h => hTne h.T_ne_zero
+  else isFalse fun h => hZne h.Z_ne_zero
+
 open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for ProjectiveNielsPoint (bounds only).
     A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents precomputed values
@@ -278,6 +325,7 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     - X = (Y_plus_X - Y_minus_X) / 2
     - Y = (Y_plus_X + Y_minus_X) / 2
     - The affine point (X/Z, Y/Z) is on Ed25519
+    - T2d = 2*d*x*y*Z where x, y are the affine coordinates
 
     The curve equation in these coordinates (multiplied by 4 to avoid divisions):
     4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
@@ -297,6 +345,10 @@ structure ProjectiveNielsPoint.IsBounded (pn : ProjectiveNielsPoint) : Prop wher
   on_curve : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
              4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
                16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z), or equivalently 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+                 let Z := pn.Z.toField; let T2d := pn.T2d.toField
+                 2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
