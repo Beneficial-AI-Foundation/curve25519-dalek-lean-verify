@@ -143,6 +143,39 @@ structure EdwardsPoint.IsBounded (e : EdwardsPoint) : Prop where
   on_curve : let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
              Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
+/-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
+    Requires a proof that the point is bounded. -/
+noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsBounded) : Point Ed25519 :=
+  let X := e.X.toField
+  let Y := e.Y.toField
+  let Z := e.Z.toField
+  { x := X / Z
+    y := Y / Z
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, hz4]
+      linear_combination hcurve }
+
+open Classical in
+/-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
+    Returns 0 if the point is not bounded (valid). -/
+noncomputable def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
+  if h : e.IsBounded then e.toPoint' h else 0
+
+/-- Unfolding lemma: when an EdwardsPoint is bounded, toPoint computes (X/Z, Y/Z). -/
+theorem EdwardsPoint.toPoint_of_isBounded {e : EdwardsPoint} (h : e.IsBounded) :
+    (e.toPoint).x = e.X.toField / e.Z.toField ∧
+    (e.toPoint).y = e.Y.toField / e.Z.toField := by
+  unfold toPoint
+  rw [dif_pos h]
+  simp only [toPoint']
+  trivial
+
 end curve25519_dalek.edwards
 
 
@@ -224,11 +257,12 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
 open curve25519_dalek.backend.serial.u64.field in
-/-- Validity predicate for ProjectiveNielsPoint.
+/-- Validity predicate for ProjectiveNielsPoint (bounds only).
     A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents precomputed values
     for mixed addition: Y+X, Y-X, Z, and 2dT where (X, Y, Z, T) is an EdwardsPoint.
 
-    Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+    Bounds: all coordinates < 2^53 (needed for mixed addition operations).
+    This predicate only checks bounds; use IsBounded for full validity with curve equation. -/
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
   /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
   Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
@@ -238,6 +272,69 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
   Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
   /-- T2d coordinate limbs are bounded by 2^53. -/
   T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
+
+/-- Full validity predicate for ProjectiveNielsPoint including curve equation.
+    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
+    - X = (Y_plus_X - Y_minus_X) / 2
+    - Y = (Y_plus_X + Y_minus_X) / 2
+    - The affine point (X/Z, Y/Z) is on Ed25519
+
+    The curve equation in these coordinates (multiplied by 4 to avoid divisions):
+    4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
+      16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)² -/
+structure ProjectiveNielsPoint.IsBounded (pn : ProjectiveNielsPoint) : Prop where
+  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
+  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
+  /-- Z coordinate limbs are bounded by 2^53. -/
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  /-- T2d coordinate limbs are bounded by 2^53. -/
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : pn.Z.toField ≠ 0
+  /-- The curve equation (scaled by 4 to avoid 1/2). -/
+  on_curve : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
+             4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
+               16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsBounded) :
+    Point Ed25519 :=
+  let YpX := pn.Y_plus_X.toField
+  let YmX := pn.Y_minus_X.toField
+  let Z := pn.Z.toField
+  { x := (YpX - YmX) / (2 * Z)
+    y := (YpX + YmX) / (2 * Z)
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have h2 : (2 : CurveField) ≠ 0 := by decide
+      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
+      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
+      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
+      have hcurve := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [h2z2, h2z4]
+      ring_nf
+      ring_nf at hcurve
+      linear_combination hcurve }
+
+open Classical in
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    Returns 0 if the point is not bounded (valid). -/
+noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
+  if h : pn.IsBounded then pn.toPoint' h else 0
+
+/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+theorem ProjectiveNielsPoint.toPoint_of_isBounded {pn : ProjectiveNielsPoint} (h : pn.IsBounded) :
+    (pn.toPoint).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
+    (pn.toPoint).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
+  unfold toPoint
+  rw [dif_pos h]
+  simp only [toPoint']
+  trivial
 
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
   if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
