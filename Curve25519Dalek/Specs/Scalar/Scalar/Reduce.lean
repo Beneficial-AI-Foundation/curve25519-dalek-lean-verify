@@ -65,12 +65,12 @@ theorem reduce_spec (s : Scalar) :
   · unfold constants.R; decide
   simp[res_post_2]
   rw[← x_post_1]
-  rw[← Nat.ModEq] at x_mod_l_post
-  rw[xR_post] at x_mod_l_post
+  rw[← Nat.ModEq] at x_mod_l_post_1
+  rw[xR_post_1] at x_mod_l_post_1
   have Rs := constants.R_spec
   rw[← Nat.ModEq] at Rs
   have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
-  have := Nat.ModEq.trans x_mod_l_post this
+  have := Nat.ModEq.trans x_mod_l_post_1 this
   apply cancelR
   apply Nat.ModEq.trans (Nat.ModEq.mul_right R res_post_1) this
 

@@ -46,10 +46,12 @@ natural language specs:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_reduce_spec (a : Array U128 9#usize) :
+theorem montgomery_reduce_spec (a : Array U128 9#usize)
+    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
     ∃ m,
     montgomery_reduce a = ok m ∧
-    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L
+    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
+    (∀ i < 5, m[i]!.val < 2 ^ 62)
     := by
   sorry
 
