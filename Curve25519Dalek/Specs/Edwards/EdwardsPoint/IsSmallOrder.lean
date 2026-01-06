@@ -44,8 +44,8 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     ∃ b e8 id eq_choice,
     is_small_order e = ok b ∧
     mul_by_cofactor e = ok e8 ∧
-    Identitycurve25519_dalekedwardsEdwardsPoint.identity = ok id ∧
-    ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq e8 id = ok eq_choice ∧
+    edwards.IdentityEdwardsPoint.identity = ok id ∧
+    edwards.ConstantTimeEqEdwardsPoint.ct_eq e8 id = ok eq_choice ∧
     (b = true ↔ eq_choice = Choice.one) := by
     sorry
 

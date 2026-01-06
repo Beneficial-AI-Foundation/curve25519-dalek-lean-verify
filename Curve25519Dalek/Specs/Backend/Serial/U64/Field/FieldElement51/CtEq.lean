@@ -16,7 +16,7 @@ Source: curve25519-dalek/src/field.rs (lines 96:4-98:5)
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
+namespace curve25519_dalek.field.ConstantTimeEqFieldElement51
 
 /-!
 Natural language description:
@@ -35,16 +35,15 @@ Spec:
 -/
 
 
-/-- **Spec for `field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq`**:
+/-- **Spec for `field.ConstantTimeEqFieldElement51.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` iff the canonical encodings (32-byte LE) are equal
 -/
 @[progress]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
-    ∃ c,
-      ct_eq a b = ok c ∧
-      (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by
-  unfold ct_eq
+    ∃ c, ct_eq a b = ok c ∧
+    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by
+  unfold field.ConstantTimeEqFieldElement51.ct_eq
   progress as ⟨a_bytes, ha_bytes⟩
   progress as ⟨sa, h_sa⟩
   progress as ⟨b_bytes, hb_bytes⟩
@@ -58,4 +57,4 @@ theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
     exact Subtype.eq this
   · grind
 
-end curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
+end curve25519_dalek.field.ConstantTimeEqFieldElement51

@@ -87,8 +87,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -
       (if condition.val = 1#u8 then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val else 0)) := by
   unfold conditional_add_l_loop
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-  unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
   split
   case isTrue hlt =>
     -- i < 5 case: process one limb and recurse

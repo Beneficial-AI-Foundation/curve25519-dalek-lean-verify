@@ -16,7 +16,7 @@ This function computes the product of two field elements.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul
+namespace curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
 
 /-
 natural language description:
@@ -1075,4 +1075,4 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         simp
         -- END TASK
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul
+end curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51

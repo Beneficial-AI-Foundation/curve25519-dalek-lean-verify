@@ -11,83 +11,79 @@ set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
-/- Trait implementation: [core::slice::index::private_slice_index::{core::slice::index::private_slice_index::Sealed for core::ops::range::RangeFull}]
+/-- Trait implementation: [core::slice::index::private_slice_index::{core::slice::index::private_slice_index::Sealed for core::ops::range::RangeFull}]
    Source: '/rustc/library/core/src/slice/index.rs', lines 120:4-120:34
    Name pattern: [core::slice::index::private_slice_index::Sealed<core::ops::range::RangeFull>] -/
 @[reducible, rust_trait_impl
   "core::slice::index::private_slice_index::Sealed<core::ops::range::RangeFull>"]
-def core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull :
+def core.slice.index.private_slice_index.SealedRangeFull :
   core.slice.index.private_slice_index.Sealed core.ops.range.RangeFull := {
 }
 
-/- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
+/-- Trait implementation: [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}]
    Source: '/rustc/library/core/src/slice/index.rs', lines 631:0-631:55
    Name pattern: [core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>] -/
 @[reducible, rust_trait_impl
   "core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>"]
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice (T : Type) :
+noncomputable def core.slice.index.SliceIndexRangeFullSliceSlice (T : Type) :
   core.slice.index.SliceIndex core.ops.range.RangeFull (Slice T) (Slice T) := {
-  sealedInst :=
-    core.slice.index.private_slice_index.SealedcoreopsrangeRangeFull
-  get := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get
-  get_mut := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_mut
-  get_unchecked :=
-    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked
+  sealedInst := core.slice.index.private_slice_index.SealedRangeFull
+  get := core.slice.index.SliceIndexRangeFullSliceSlice.get
+  get_mut := core.slice.index.SliceIndexRangeFullSliceSlice.get_mut
+  get_unchecked := core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked
   get_unchecked_mut :=
-    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked_mut
-  index := core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index
-  index_mut :=
-    core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
+    core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked_mut
+  index := core.slice.index.SliceIndexRangeFullSliceSlice.index
+  index_mut := core.slice.index.SliceIndexRangeFullSliceSlice.index_mut
 }
 
-/- Trait implementation: [subtle::{core::convert::From<subtle::Choice> for bool}]
+/-- Trait implementation: [subtle::{core::convert::From<subtle::Choice> for bool}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 138:0-138:26
    Name pattern: [core::convert::From<bool, subtle::Choice>] -/
 @[reducible, rust_trait_impl "core::convert::From<bool, subtle::Choice>"]
-def core.convert.FromBoolsubtleChoice : core.convert.From Bool subtle.Choice
-  := {
-  from_ := subtle.FromBoolsubtleChoice.from
+def core.convert.FromBoolChoice : core.convert.From Bool subtle.Choice := {
+  from_ := subtle.FromBoolChoice.from
 }
 
-/- Trait implementation: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}]
+/-- Trait implementation: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 159:0-159:22
    Name pattern: [core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>] -/
 @[reducible, rust_trait_impl
   "core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>"]
-def core.ops.bit.BitAndsubtleChoicesubtleChoicesubtleChoice :
-  core.ops.bit.BitAnd subtle.Choice subtle.Choice subtle.Choice := {
-  bitand := subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand
+def core.ops.bit.BitAndChoiceChoiceChoice : core.ops.bit.BitAnd subtle.Choice
+  subtle.Choice subtle.Choice := {
+  bitand := subtle.BitAndChoiceChoiceChoice.bitand
 }
 
-/- Trait implementation: [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}]
+/-- Trait implementation: [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 174:0-174:21
    Name pattern: [core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>] -/
 @[reducible, rust_trait_impl
   "core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>"]
-def core.ops.bit.BitOrsubtleChoicesubtleChoicesubtleChoice : core.ops.bit.BitOr
-  subtle.Choice subtle.Choice subtle.Choice := {
-  bitor := subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor
+def core.ops.bit.BitOrChoiceChoiceChoice : core.ops.bit.BitOr subtle.Choice
+  subtle.Choice subtle.Choice := {
+  bitor := subtle.BitOrChoiceChoiceChoice.bitor
 }
 
-/- Trait implementation: [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}]
+/-- Trait implementation: [subtle::{core::ops::bit::Not<subtle::Choice> for subtle::Choice}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 204:0-204:19
    Name pattern: [core::ops::bit::Not<subtle::Choice, subtle::Choice>] -/
 @[reducible, rust_trait_impl
   "core::ops::bit::Not<subtle::Choice, subtle::Choice>"]
-def core.ops.bit.NotsubtleChoicesubtleChoice : core.ops.bit.Not subtle.Choice
-  subtle.Choice := {
-  not := subtle.NotsubtleChoicesubtleChoice.not
+def core.ops.bit.NotChoiceChoice : core.ops.bit.Not subtle.Choice subtle.Choice
+  := {
+  not := subtle.NotChoiceChoice.not
 }
 
-/- Trait implementation: [subtle::{core::convert::From<u8> for subtle::Choice}]
+/-- Trait implementation: [subtle::{core::convert::From<u8> for subtle::Choice}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 236:0-236:24
    Name pattern: [core::convert::From<subtle::Choice, u8>] -/
 @[reducible, rust_trait_impl "core::convert::From<subtle::Choice, u8>"]
-def core.convert.FromsubtleChoiceU8 : core.convert.From subtle.Choice U8 := {
-  from_ := subtle.FromsubtleChoiceU8.from
+def core.convert.FromChoiceU8 : core.convert.From subtle.Choice U8 := {
+  from_ := subtle.FromChoiceU8.from
 }
 
-/- Trait implementation: [subtle::{subtle::ConstantTimeEq for @Slice<T>}]
+/-- Trait implementation: [subtle::{subtle::ConstantTimeEq for @Slice<T>}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 289:0-289:46
    Name pattern: [subtle::ConstantTimeEq<[@T]>] -/
 @[reducible, rust_trait_impl "subtle::ConstantTimeEq<[@T]>"]
@@ -96,7 +92,7 @@ noncomputable def subtle.ConstantTimeEqSlice {T : Type} (ConstantTimeEqInst :
   ct_eq := subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst
 }
 
-/- Trait implementation: [subtle::{subtle::ConstantTimeEq for u8}]
+/-- Trait implementation: [subtle::{subtle::ConstantTimeEq for u8}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 346:8-346:36
    Name pattern: [subtle::ConstantTimeEq<u8>] -/
 @[reducible, rust_trait_impl "subtle::ConstantTimeEq<u8>"]
@@ -104,538 +100,130 @@ def subtle.ConstantTimeEqU8 : subtle.ConstantTimeEq U8 := {
   ct_eq := subtle.ConstantTimeEqU8.ct_eq
 }
 
-/- Trait implementation: [subtle::{subtle::ConditionallySelectable for u64}]
+/-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u64}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u64>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallySelectable<u64>"]
-def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
+noncomputable def subtle.ConditionallySelectableU64 : subtle.ConditionallySelectable U64 := {
   coremarkerCopyInst := core.marker.CopyU64
   conditional_select := subtle.ConditionallySelectableU64.conditional_select
   conditional_assign := subtle.ConditionallySelectableU64.conditional_assign
   conditional_swap := subtle.ConditionallySelectableU64.conditional_swap
 }
 
-/- Trait implementation: [subtle::{subtle::ConditionallyNegatable for T}]
+/-- Trait implementation: [subtle::{subtle::ConditionallyNegatable for T}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 614:0-617:35
    Name pattern: [subtle::ConditionallyNegatable<@T>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallyNegatable<@T>"]
 def subtle.ConditionallyNegatable.Blanket {T : Type}
   (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-  (coreopsarithNeg_TTInst : core.ops.arith.Neg T T) :
+  (coreopsarithNegSharedTTInst : core.ops.arith.Neg T T) :
   subtle.ConditionallyNegatable T := {
   conditional_negate :=
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-    ConditionallySelectableInst coreopsarithNeg_TTInst
+    ConditionallySelectableInst coreopsarithNegSharedTTInst
 }
 
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 121:8-121:66 -/
-def
-  backend.serial.u64.field.FieldElement51.Mul.mul.m
-  (x : U64) (y : U64) : Result U128 := do
-  let i ← (↑(UScalar.cast .U128 x) : Result U128)
-  let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
-  i * i1
+/-- Trait implementation: [zeroize::{zeroize::Zeroize for Z}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 297:0-299:23
+   Name pattern: [zeroize::Zeroize<@Z>] -/
+@[reducible, rust_trait_impl "zeroize::Zeroize<@Z>"]
+noncomputable def zeroize.Zeroize.Blanket {Z : Type} (DefaultIsZeroesInst :
+  zeroize.DefaultIsZeroes Z) : zeroize.Zeroize Z := {
+  zeroize := zeroize.Zeroize.Blanket.zeroize DefaultIsZeroesInst
+}
 
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::LOW_51_BIT_MASK]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 174:8-174:54 -/
-@[global_simps]
-def
-  backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK_body
-  : Result U64 := do
-  let i ← 1#u64 <<< 51#i32
-  i - 1#u64
-@[global_simps, irreducible]
-def
-  backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK
-  : U64 :=
-  eval_global
-    backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK_body
+/-- Trait implementation: [zeroize::{zeroize::DefaultIsZeroes for u64}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 309:10-309:40
+   Name pattern: [zeroize::DefaultIsZeroes<u64>] -/
+@[reducible, rust_trait_impl "zeroize::DefaultIsZeroes<u64>"]
+def zeroize.DefaultIsZeroesU64 : zeroize.DefaultIsZeroes U64 := {
+  coremarkerCopyInst := core.marker.CopyU64
+  coredefaultDefaultInst := core.default.DefaultU64
+}
 
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 117:4-215:5 -/
-def
-  backend.serial.u64.field.FieldElement51.Mul.mul
-  (self : backend.serial.u64.field.FieldElement51)
-  (_rhs : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← Array.index_usize _rhs 1#usize
-  let b1_19 ← i * 19#u64
-  let i1 ← Array.index_usize _rhs 2#usize
-  let b2_19 ← i1 * 19#u64
-  let i2 ← Array.index_usize _rhs 3#usize
-  let b3_19 ← i2 * 19#u64
-  let i3 ← Array.index_usize _rhs 4#usize
-  let b4_19 ← i3 * 19#u64
-  let i4 ← Array.index_usize self 0#usize
-  let i5 ← Array.index_usize _rhs 0#usize
-  let i6 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i4 i5
-  let i7 ← Array.index_usize self 4#usize
-  let i8 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i7 b1_19
-  let i9 ← i6 + i8
-  let i10 ← Array.index_usize self 3#usize
-  let i11 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i10 b2_19
-  let i12 ← i9 + i11
-  let i13 ← Array.index_usize self 2#usize
-  let i14 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i13 b3_19
-  let i15 ← i12 + i14
-  let i16 ← Array.index_usize self 1#usize
-  let i17 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i16 b4_19
-  let c0 ← i15 + i17
-  let i18 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i16 i5
-  let i19 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i4 i
-  let i20 ← i18 + i19
-  let i21 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i7 b2_19
-  let i22 ← i20 + i21
-  let i23 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i10 b3_19
-  let i24 ← i22 + i23
-  let i25 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i13 b4_19
-  let c1 ← i24 + i25
-  let i26 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i13 i5
-  let i27 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i16 i
-  let i28 ← i26 + i27
-  let i29 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i4 i1
-  let i30 ← i28 + i29
-  let i31 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i7 b3_19
-  let i32 ← i30 + i31
-  let i33 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i10 b4_19
-  let c2 ← i32 + i33
-  let i34 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i10 i5
-  let i35 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i13 i
-  let i36 ← i34 + i35
-  let i37 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i16 i1
-  let i38 ← i36 + i37
-  let i39 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i4 i2
-  let i40 ← i38 + i39
-  let i41 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i7 b4_19
-  let c3 ← i40 + i41
-  let i42 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i7 i5
-  let i43 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i10 i
-  let i44 ← i42 + i43
-  let i45 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i13 i1
-  let i46 ← i44 + i45
-  let i47 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i16 i2
-  let i48 ← i46 + i47
-  let i49 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul.m
-      i4 i3
-  let c4 ← i48 + i49
-  let i50 ← 1#u64 <<< 54#i32
-  massert (i4 < i50)
-  massert (i5 < i50)
-  massert (i16 < i50)
-  massert (i < i50)
-  massert (i13 < i50)
-  massert (i1 < i50)
-  massert (i10 < i50)
-  massert (i2 < i50)
-  massert (i7 < i50)
-  massert (i3 < i50)
-  let out := Array.repeat 5#usize 0#u64
-  let i51 ← c0 >>> 51#i32
-  let i52 ← (↑(UScalar.cast .U64 i51) : Result U64)
-  let i53 ← (↑(UScalar.cast .U128 i52) : Result U128)
-  let c11 ← c1 + i53
-  let i54 ← (↑(UScalar.cast .U64 c0) : Result U64)
-  let i55 ←
-    (↑(i54 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out1 ← Array.update out 0#usize i55
-  let i56 ← c11 >>> 51#i32
-  let i57 ← (↑(UScalar.cast .U64 i56) : Result U64)
-  let i58 ← (↑(UScalar.cast .U128 i57) : Result U128)
-  let c21 ← c2 + i58
-  let i59 ← (↑(UScalar.cast .U64 c11) : Result U64)
-  let i60 ←
-    (↑(i59 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out2 ← Array.update out1 1#usize i60
-  let i61 ← c21 >>> 51#i32
-  let i62 ← (↑(UScalar.cast .U64 i61) : Result U64)
-  let i63 ← (↑(UScalar.cast .U128 i62) : Result U128)
-  let c31 ← c3 + i63
-  let i64 ← (↑(UScalar.cast .U64 c21) : Result U64)
-  let i65 ←
-    (↑(i64 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out3 ← Array.update out2 2#usize i65
-  let i66 ← c31 >>> 51#i32
-  let i67 ← (↑(UScalar.cast .U64 i66) : Result U64)
-  let i68 ← (↑(UScalar.cast .U128 i67) : Result U128)
-  let c41 ← c4 + i68
-  let i69 ← (↑(UScalar.cast .U64 c31) : Result U64)
-  let i70 ←
-    (↑(i69 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out4 ← Array.update out3 3#usize i70
-  let i71 ← c41 >>> 51#i32
-  let carry ← (↑(UScalar.cast .U64 i71) : Result U64)
-  let i72 ← (↑(UScalar.cast .U64 c41) : Result U64)
-  let i73 ←
-    (↑(i72 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out5 ← Array.update out4 4#usize i73
-  let i74 ← carry * 19#u64
-  let i75 ← Array.index_usize out5 0#usize
-  let i76 ← i75 + i74
-  let out6 ← Array.update out5 0#usize i76
-  let i77 ← Array.index_usize out6 0#usize
-  let i78 ← i77 >>> 51#i32
-  let i79 ← Array.index_usize out6 1#usize
-  let i80 ← i79 + i78
-  let out7 ← Array.update out6 1#usize i80
-  let i81 ← Array.index_usize out7 0#usize
-  let i82 ←
-    (↑(i81 &&&
-      backend.serial.u64.field.FieldElement51.Mul.mul.LOW_51_BIT_MASK)
-      : Result U64)
-  let out8 ← Array.update out7 0#usize i82
-  ok out8
+/-- Trait implementation: [zeroize::{zeroize::Zeroize for @Array<Z, N>}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 369:0-371:15
+   Name pattern: [zeroize::Zeroize<[@Z; @N]>] -/
+@[reducible, rust_trait_impl "zeroize::Zeroize<[@Z; @N]>"]
+noncomputable def zeroize.ZeroizeArray {Z : Type} (N : Usize) (ZeroizeInst : zeroize.Zeroize
+  Z) : zeroize.Zeroize (Array Z N) := {
+  zeroize := zeroize.ZeroizeArray.zeroize ZeroizeInst
+}
 
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::m]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 468:8-470:9 -/
-def backend.serial.u64.field.FieldElement51.pow2k.m
-  (x : U64) (y : U64) : Result U128 := do
-  let i ← (↑(UScalar.cast .U128 x) : Result U128)
-  let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
-  i * i1
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 519:12-519:58 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
-  : Result U64 := do
-  let i ← 1#u64 <<< 51#i32
-  i - 1#u64
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK : U64 :=
-  eval_global
-    backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 488:16-500:86 -/
-def backend.serial.u64.field.FieldElement51.pow2k_loop
-  (k : U32) (a : Array U64 5#usize) : Result (Array U64 5#usize) := do
-  let i ← Array.index_usize a 3#usize
-  let a3_19 ← 19#u64 * i
-  let i1 ← Array.index_usize a 4#usize
-  let a4_19 ← 19#u64 * i1
-  let i2 ← Array.index_usize a 0#usize
-  let i3 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i2
-  let i4 ← Array.index_usize a 1#usize
-  let i5 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 a4_19
-  let i6 ← Array.index_usize a 2#usize
-  let i7 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 a3_19
-  let i8 ← i5 + i7
-  let i9 ← 2#u128 * i8
-  let c0 ← i3 + i9
-  let i10 ← backend.serial.u64.field.FieldElement51.pow2k.m i a3_19
-  let i11 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i4
-  let i12 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 a4_19
-  let i13 ← i11 + i12
-  let i14 ← 2#u128 * i13
-  let c1 ← i10 + i14
-  let i15 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i4
-  let i16 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i6
-  let i17 ← backend.serial.u64.field.FieldElement51.pow2k.m i1 a3_19
-  let i18 ← i16 + i17
-  let i19 ← 2#u128 * i18
-  let c2 ← i15 + i19
-  let i20 ← backend.serial.u64.field.FieldElement51.pow2k.m i1 a4_19
-  let i21 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i
-  let i22 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i6
-  let i23 ← i21 + i22
-  let i24 ← 2#u128 * i23
-  let c3 ← i20 + i24
-  let i25 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 i6
-  let i26 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i1
-  let i27 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i
-  let i28 ← i26 + i27
-  let i29 ← 2#u128 * i28
-  let c4 ← i25 + i29
-  let i30 ← 1#u64 <<< 54#i32
-  if i2 < i30
-  then
-    if i4 < i30
-    then
-      if i6 < i30
-      then
-        if i < i30
-        then
-          if i1 < i30
-          then
-            let i31 ← c0 >>> 51#i32
-            let i32 ← (↑(UScalar.cast .U64 i31) : Result U64)
-            let i33 ← (↑(UScalar.cast .U128 i32) : Result U128)
-            let c11 ← c1 + i33
-            let i34 ← (↑(UScalar.cast .U64 c0) : Result U64)
-            let i35 ←
-              (↑(i34 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let a1 ← Array.update a 0#usize i35
-            let i36 ← c11 >>> 51#i32
-            let i37 ← (↑(UScalar.cast .U64 i36) : Result U64)
-            let i38 ← (↑(UScalar.cast .U128 i37) : Result U128)
-            let c21 ← c2 + i38
-            let i39 ← (↑(UScalar.cast .U64 c11) : Result U64)
-            let i40 ←
-              (↑(i39 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let a2 ← Array.update a1 1#usize i40
-            let i41 ← c21 >>> 51#i32
-            let i42 ← (↑(UScalar.cast .U64 i41) : Result U64)
-            let i43 ← (↑(UScalar.cast .U128 i42) : Result U128)
-            let c31 ← c3 + i43
-            let i44 ← (↑(UScalar.cast .U64 c21) : Result U64)
-            let i45 ←
-              (↑(i44 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let a3 ← Array.update a2 2#usize i45
-            let i46 ← c31 >>> 51#i32
-            let i47 ← (↑(UScalar.cast .U64 i46) : Result U64)
-            let i48 ← (↑(UScalar.cast .U128 i47) : Result U128)
-            let c41 ← c4 + i48
-            let i49 ← (↑(UScalar.cast .U64 c31) : Result U64)
-            let i50 ←
-              (↑(i49 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let a4 ← Array.update a3 3#usize i50
-            let i51 ← c41 >>> 51#i32
-            let carry ← (↑(UScalar.cast .U64 i51) : Result U64)
-            let i52 ← (↑(UScalar.cast .U64 c41) : Result U64)
-            let i53 ←
-              (↑(i52 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let a5 ← Array.update a4 4#usize i53
-            let i54 ← carry * 19#u64
-            let i55 ← Array.index_usize a5 0#usize
-            let i56 ← i55 + i54
-            let a6 ← Array.update a5 0#usize i56
-            let i57 ← Array.index_usize a6 0#usize
-            let i58 ← i57 >>> 51#i32
-            let i59 ← Array.index_usize a6 1#usize
-            let i60 ← i59 + i58
-            let a7 ← Array.update a6 1#usize i60
-            let i61 ← Array.index_usize a7 0#usize
-            let i62 ←
-              (↑(i61 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result U64)
-            let (_, index_mut_back) ← Array.index_mut_usize a7 0#usize
-            let k1 ← k - 1#u32
-            if k1 = 0#u32
-            then ok (index_mut_back i62)
-            else
-              let a8 := index_mut_back i62
-              backend.serial.u64.field.FieldElement51.pow2k_loop k1 a8
-          else fail panic
-        else fail panic
-      else fail panic
-    else fail panic
-  else fail panic
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 462:4-567:5 -/
-def backend.serial.u64.field.FieldElement51.pow2k
-  (self : backend.serial.u64.field.FieldElement51) (k : U32) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  massert (k > 0#u32)
-  let a ← backend.serial.u64.field.FieldElement51.pow2k_loop k self
-  ok a
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 570:4-572:5 -/
-def backend.serial.u64.field.FieldElement51.square
-  (self : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  backend.serial.u64.field.FieldElement51.pow2k self 1#u32
-
-/- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 338:4-345:5 -/
-def backend.serial.curve_models.ProjectivePoint.as_extended
+/-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::clone]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:15-153:20 -/
+def backend.serial.curve_models.CloneProjectivePoint.clone
   (self : backend.serial.curve_models.ProjectivePoint) :
-  Result edwards.EdwardsPoint
-  := do
-  let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.X self.Z
-  let fe1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Y self.Z
-  let fe2 ← backend.serial.u64.field.FieldElement51.square self.Z
-  let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.X self.Y
-  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
-
-/- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 353:4-359:5 -/
-def backend.serial.curve_models.CompletedPoint.as_projective
-  (self : backend.serial.curve_models.CompletedPoint) :
   Result backend.serial.curve_models.ProjectivePoint
   := do
-  let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.X self.T
-  let fe1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Y self.Z
-  let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Z self.T
-  ok { X := fe, Y := fe1, Z := fe2 }
+  ok self
 
-/- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 365:4-372:5 -/
-def backend.serial.curve_models.CompletedPoint.as_extended
-  (self : backend.serial.curve_models.CompletedPoint) :
-  Result edwards.EdwardsPoint
-  := do
-  let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.X self.T
-  let fe1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Y self.Z
-  let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Z self.T
-  let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.X self.Y
-  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 578:8-581:9 -/
-def backend.serial.u64.field.FieldElement51.square2_loop
-  (square : backend.serial.u64.field.FieldElement51) (i : Usize) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  if i < 5#usize
-  then
-    let i1 ← Array.index_usize square i
-    let i2 ← i1 * 2#u64
-    let a ← Array.update square i i2
-    let i3 ← i + 1#usize
-    backend.serial.u64.field.FieldElement51.square2_loop a i3
-  else ok square
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 575:4-584:5 -/
-def backend.serial.u64.field.FieldElement51.square2
-  (self : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let square ← backend.serial.u64.field.FieldElement51.pow2k self 1#u32
-  backend.serial.u64.field.FieldElement51.square2_loop square 0#usize
-
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 61:8-64:9 -/
-def
-  backend.serial.u64.field.FieldElement51.AddAssign.add_assign_loop
-  (self : backend.serial.u64.field.FieldElement51)
-  (_rhs : backend.serial.u64.field.FieldElement51) (i : Usize) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  if i < 5#usize
-  then
-    let i1 ← Array.index_usize _rhs i
-    let i2 ← Array.index_usize self i
-    let i3 ← i2 + i1
-    let a ← Array.update self i i3
-    let i4 ← i + 1#usize
-    backend.serial.u64.field.FieldElement51.AddAssign.add_assign_loop
-      a _rhs i4
-  else ok self
-partial_fixpoint
-
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 59:4-65:5 -/
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:15-153:20 -/
 @[reducible]
-def
-  backend.serial.u64.field.FieldElement51.AddAssign.add_assign
-  (self : backend.serial.u64.field.FieldElement51)
-  (_rhs : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  backend.serial.u64.field.FieldElement51.AddAssign.add_assign_loop
-    self _rhs 0#usize
+def core.clone.CloneProjectivePoint : core.clone.Clone
+  backend.serial.curve_models.ProjectivePoint := {
+  clone := backend.serial.curve_models.CloneProjectivePoint.clone
+}
 
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 70:4-74:5 -/
-def
-  backend.serial.u64.field.FieldElement51.Add.add
-  (self : backend.serial.u64.field.FieldElement51)
-  (_rhs : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  backend.serial.u64.field.FieldElement51.AddAssign.add_assign
-    self _rhs
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:9-153:13 -/
+@[reducible]
+def core.marker.CopyProjectivePoint : core.marker.Copy
+  backend.serial.curve_models.ProjectivePoint := {
+  cloneInst := core.clone.CloneProjectivePoint
+}
 
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce::LOW_51_BIT_MASK]
+/-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::CompletedPoint}::clone]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 167:15-167:20 -/
+def backend.serial.curve_models.CloneCompletedPoint.clone
+  (self : backend.serial.curve_models.CompletedPoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::CompletedPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 167:15-167:20 -/
+@[reducible]
+def core.clone.CloneCompletedPoint : core.clone.Clone
+  backend.serial.curve_models.CompletedPoint := {
+  clone := backend.serial.curve_models.CloneCompletedPoint.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::Copy for curve25519_dalek::backend::serial::curve_models::CompletedPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 167:9-167:13 -/
+@[reducible]
+def core.marker.CopyCompletedPoint : core.marker.Copy
+  backend.serial.curve_models.CompletedPoint := {
+  cloneInst := core.clone.CloneCompletedPoint
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::clone]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:15-182:20 -/
+def backend.serial.curve_models.CloneAffineNielsPoint.clone
+  (self : backend.serial.curve_models.AffineNielsPoint) :
+  Result backend.serial.curve_models.AffineNielsPoint
+  := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:15-182:20 -/
+@[reducible]
+def core.clone.CloneAffineNielsPoint : core.clone.Clone
+  backend.serial.curve_models.AffineNielsPoint := {
+  clone := backend.serial.curve_models.CloneAffineNielsPoint.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::Copy for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:9-182:13 -/
+@[reducible]
+def core.marker.CopyAffineNielsPoint : core.marker.Copy
+  backend.serial.curve_models.AffineNielsPoint := {
+  cloneInst := core.clone.CloneAffineNielsPoint
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce::LOW_51_BIT_MASK]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 293:8-293:54 -/
 @[global_simps]
 def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
@@ -647,7 +235,7 @@ def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK : U64 :=
   eval_global
     backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
 
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce]:
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 292:4-325:5 -/
 def backend.serial.u64.field.FieldElement51.reduce
   (limbs : Array U64 5#usize) :
@@ -707,645 +295,7 @@ def backend.serial.u64.field.FieldElement51.reduce
   let limbs10 ← Array.update limbs9 4#usize i24
   ok limbs10
 
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 86:4-103:5 -/
-def
-  backend.serial.u64.field.FieldElement51.Sub.sub
-  (self : backend.serial.u64.field.FieldElement51)
-  (_rhs : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← Array.index_usize self 0#usize
-  let i1 ← i + 36028797018963664#u64
-  let i2 ← Array.index_usize _rhs 0#usize
-  let i3 ← i1 - i2
-  let i4 ← Array.index_usize self 1#usize
-  let i5 ← i4 + 36028797018963952#u64
-  let i6 ← Array.index_usize _rhs 1#usize
-  let i7 ← i5 - i6
-  let i8 ← Array.index_usize self 2#usize
-  let i9 ← i8 + 36028797018963952#u64
-  let i10 ← Array.index_usize _rhs 2#usize
-  let i11 ← i9 - i10
-  let i12 ← Array.index_usize self 3#usize
-  let i13 ← i12 + 36028797018963952#u64
-  let i14 ← Array.index_usize _rhs 3#usize
-  let i15 ← i13 - i14
-  let i16 ← Array.index_usize self 4#usize
-  let i17 ← i16 + 36028797018963952#u64
-  let i18 ← Array.index_usize _rhs 4#usize
-  let i19 ← i17 - i18
-  backend.serial.u64.field.FieldElement51.reduce
-    (Array.make 5#usize [ i3, i7, i11, i15, i19 ])
-
-/- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 381:4-397:5 -/
-def backend.serial.curve_models.ProjectivePoint.double
-  (self : backend.serial.curve_models.ProjectivePoint) :
-  Result backend.serial.curve_models.CompletedPoint
-  := do
-  let XX ← backend.serial.u64.field.FieldElement51.square self.X
-  let YY ← backend.serial.u64.field.FieldElement51.square self.Y
-  let ZZ2 ← backend.serial.u64.field.FieldElement51.square2 self.Z
-  let X_plus_Y ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      self.X self.Y
-  let X_plus_Y_sq ← backend.serial.u64.field.FieldElement51.square X_plus_Y
-  let YY_plus_XX ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      YY XX
-  let YY_minus_XX ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      YY XX
-  let fe ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      X_plus_Y_sq YY_plus_XX
-  let fe1 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      ZZ2 YY_minus_XX
-  ok { X := fe, Y := YY_plus_XX, Z := YY_minus_XX, T := fe1 }
-
-/- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 414:4-429:5 -/
-def
-  backend.serial.curve_models.CompletedPoint.add
-  (self : edwards.EdwardsPoint)
-  (other : backend.serial.curve_models.ProjectiveNielsPoint) :
-  Result backend.serial.curve_models.CompletedPoint
-  := do
-  let Y_plus_X ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      self.Y self.X
-  let Y_minus_X ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      self.Y self.X
-  let PP ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      Y_plus_X other.Y_plus_X
-  let MM ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      Y_minus_X other.Y_minus_X
-  let TT2d ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.T other.T2d
-  let ZZ ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
-      self.Z other.Z
-  let ZZ2 ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      ZZ ZZ
-  let fe ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      PP MM
-  let fe1 ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      PP MM
-  let fe2 ←
-    backend.serial.u64.field.FieldElement51.Add.add
-      ZZ2 TT2d
-  let fe3 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
-      ZZ2 TT2d
-  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
-
-/- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 411:0-430:1 -/
-@[reducible]
-def
-  core.ops.arith.CompletedPoint
-  : core.ops.arith.Add edwards.EdwardsPoint
-  backend.serial.curve_models.ProjectiveNielsPoint
-  backend.serial.curve_models.CompletedPoint := {
-  add :=
-    backend.serial.curve_models.CompletedPoint.add
-}
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 260:4-262:5 -/
-def backend.serial.u64.field.FieldElement51.from_limbs
-  (limbs : Array U64 5#usize) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  ok limbs
-
-/- [curve25519_dalek::backend::serial::u64::constants::MINUS_ONE]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 26:0-32:3 -/
-@[global_simps]
-def backend.serial.u64.constants.MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
-      2251799813685247#u64, 2251799813685247#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.MINUS_ONE_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 45:0-51:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      929955233495203#u64, 466365720129213#u64, 1662059464998953#u64,
-      2033849074728123#u64, 1442794654840575#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 54:0-60:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D2_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      1859910466990425#u64, 932731440258426#u64, 1072319116312658#u64,
-      1815898335770999#u64, 633789495995903#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D2
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D2_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 63:0-69:3 -/
-@[global_simps]
-def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      1136626929484150#u64, 1998550399581263#u64, 496427632559748#u64,
-      118527312129759#u64, 45110755273534#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 72:0-78:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      1507062230895904#u64, 1572317787530805#u64, 683053064812840#u64,
-      317374165784489#u64, 1572899562415810#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 81:0-87:3 -/
-@[global_simps]
-def backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      2241493124984347#u64, 425987919032274#u64, 2207028919301688#u64,
-      1220490630685848#u64, 974799131293748#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.SQRT_AD_MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 90:0-96:3 -/
-@[global_simps]
-def backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      278908739862762#u64, 821645201101625#u64, 8113234426968#u64,
-      1777959178193151#u64, 2118520810568447#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.INVSQRT_A_MINUS_D
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::SQRT_M1]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 99:0-105:3 -/
-@[global_simps]
-def backend.serial.u64.constants.SQRT_M1_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
-      2117202627021982#u64, 765476049583133#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.SQRT_M1
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.SQRT_M1_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::L]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 127:0-133:3 -/
-@[global_simps]
-def backend.serial.u64.constants.L_body
-  : Result backend.serial.u64.scalar.Scalar52 := do
-  ok
-    (Array.make 5#usize [
-      671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
-      17592186044416#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
-  eval_global backend.serial.u64.constants.L_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::LFACTOR]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 136:0-136:48 -/
-@[global_simps]
-def backend.serial.u64.constants.LFACTOR_body : Result U64 := do
-  ok 1439961107955227#u64
-@[global_simps, irreducible]
-def backend.serial.u64.constants.LFACTOR : U64 :=
-  eval_global backend.serial.u64.constants.LFACTOR_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::R]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 139:0-145:3 -/
-@[global_simps]
-def backend.serial.u64.constants.R_body
-  : Result backend.serial.u64.scalar.Scalar52 := do
-  ok
-    (Array.make 5#usize [
-      4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
-      4503599627370495#u64, 17592186044415#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
-  eval_global backend.serial.u64.constants.R_body
-
-/- [curve25519_dalek::backend::serial::u64::constants::RR]
-   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 148:0-154:3 -/
-@[global_simps]
-def backend.serial.u64.constants.RR_body
-  : Result backend.serial.u64.scalar.Scalar52 := do
-  ok
-    (Array.make 5#usize [
-      2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
-      1087343033131391#u64, 10175238647962#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
-  eval_global backend.serial.u64.constants.RR_body
-
-/- [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
-def
-  backend.serial.u64.field.Clonecurve25519_dalekbackendserialu64fieldFieldElement51.clone
-  (self : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  ok self
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
-@[reducible]
-def core.clone.Clonecurve25519_dalekbackendserialu64fieldFieldElement51 :
-  core.clone.Clone backend.serial.u64.field.FieldElement51 := {
-  clone :=
-    backend.serial.u64.field.Clonecurve25519_dalekbackendserialu64fieldFieldElement51.clone
-}
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::marker::Copy for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:9-42:13 -/
-@[reducible]
-def core.marker.Copycurve25519_dalekbackendserialu64fieldFieldElement51 :
-  core.marker.Copy backend.serial.u64.field.FieldElement51 := {
-  cloneInst :=
-    core.clone.Clonecurve25519_dalekbackendserialu64fieldFieldElement51
-}
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 58:0-66:1 -/
-@[reducible]
-def
-  core.ops.arith.FieldElement51.AddAssign
-  : core.ops.arith.AddAssign backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51 := {
-  add_assign :=
-    backend.serial.u64.field.FieldElement51.AddAssign.add_assign
-}
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 68:0-75:1 -/
-@[reducible]
-def
-  core.ops.arith.FieldElement51.Add
-  : core.ops.arith.Add backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51 := {
-  add :=
-    backend.serial.u64.field.FieldElement51.Add.add
-}
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 84:0-104:1 -/
-@[reducible]
-def
-  core.ops.arith.FieldElement51.Sub
-  : core.ops.arith.Sub backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51 := {
-  sub :=
-    backend.serial.u64.field.FieldElement51.Sub.sub
-}
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 113:0-216:1 -/
-@[reducible]
-def
-  core.ops.arith.FieldElement51.Mul
-  : core.ops.arith.Mul backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51 := {
-  mul :=
-    backend.serial.u64.field.FieldElement51.Mul.mul
-}
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 278:4-288:5 -/
-def backend.serial.u64.field.FieldElement51.negate
-  (self : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← Array.index_usize self 0#usize
-  let i1 ← 36028797018963664#u64 - i
-  let i2 ← Array.index_usize self 1#usize
-  let i3 ← 36028797018963952#u64 - i2
-  let i4 ← Array.index_usize self 2#usize
-  let i5 ← 36028797018963952#u64 - i4
-  let i6 ← Array.index_usize self 3#usize
-  let i7 ← 36028797018963952#u64 - i6
-  let i8 ← Array.index_usize self 4#usize
-  let i9 ← 36028797018963952#u64 - i8
-  let neg ←
-    backend.serial.u64.field.FieldElement51.reduce
-      (Array.make 5#usize [ i1, i3, i5, i7, i9 ])
-  ok neg
-
-/- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 220:4-224:5 -/
-def
-  backend.serial.u64.field.FieldElement51.neg
-  (self : backend.serial.u64.field.FieldElement51) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  backend.serial.u64.field.FieldElement51.negate self
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 218:0-225:1 -/
-@[reducible]
-def
-  core.ops.arith.FieldElement51
-  : core.ops.arith.Neg backend.serial.u64.field.FieldElement51
-  backend.serial.u64.field.FieldElement51 := {
-  neg :=
-    backend.serial.u64.field.FieldElement51.neg
-}
-
-/- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5 -/
-def
-  backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
-  (a : backend.serial.u64.field.FieldElement51)
-  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← Array.index_usize a 0#usize
-  let i1 ← Array.index_usize b 0#usize
-  let i2 ← subtle.ConditionallySelectableU64.conditional_select i i1 choice
-  let i3 ← Array.index_usize a 1#usize
-  let i4 ← Array.index_usize b 1#usize
-  let i5 ← subtle.ConditionallySelectableU64.conditional_select i3 i4 choice
-  let i6 ← Array.index_usize a 2#usize
-  let i7 ← Array.index_usize b 2#usize
-  let i8 ← subtle.ConditionallySelectableU64.conditional_select i6 i7 choice
-  let i9 ← Array.index_usize a 3#usize
-  let i10 ← Array.index_usize b 3#usize
-  let i11 ←
-    subtle.ConditionallySelectableU64.conditional_select i9 i10 choice
-  let i12 ← Array.index_usize a 4#usize
-  let i13 ← Array.index_usize b 4#usize
-  let i14 ←
-    subtle.ConditionallySelectableU64.conditional_select i12 i13 choice
-  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
-
-/- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 250:4-256:5 -/
-def
-  backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
-  (self : backend.serial.u64.field.FieldElement51)
-  (other : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let (i, index_mut_back) ← Array.index_mut_usize self 0#usize
-  let i1 ← Array.index_usize other 0#usize
-  let i2 ← subtle.ConditionallySelectableU64.conditional_assign i i1 choice
-  let a := index_mut_back i2
-  let (i3, index_mut_back1) ← Array.index_mut_usize a 1#usize
-  let i4 ← Array.index_usize other 1#usize
-  let i5 ← subtle.ConditionallySelectableU64.conditional_assign i3 i4 choice
-  let a1 := index_mut_back1 i5
-  let (i6, index_mut_back2) ← Array.index_mut_usize a1 2#usize
-  let i7 ← Array.index_usize other 2#usize
-  let i8 ← subtle.ConditionallySelectableU64.conditional_assign i6 i7 choice
-  let a2 := index_mut_back2 i8
-  let (i9, index_mut_back3) ← Array.index_mut_usize a2 3#usize
-  let i10 ← Array.index_usize other 3#usize
-  let i11 ←
-    subtle.ConditionallySelectableU64.conditional_assign i9 i10 choice
-  let a3 := index_mut_back3 i11
-  let (i12, index_mut_back4) ← Array.index_mut_usize a3 4#usize
-  let i13 ← Array.index_usize other 4#usize
-  let i14 ←
-    subtle.ConditionallySelectableU64.conditional_assign i12 i13 choice
-  let a4 := index_mut_back4 i14
-  ok a4
-
-/- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 242:4-248:5 -/
-def
-  backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_swap
-  (a : backend.serial.u64.field.FieldElement51)
-  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
-  Result (backend.serial.u64.field.FieldElement51 ×
-    backend.serial.u64.field.FieldElement51)
-  := do
-  let (i, index_mut_back) ← Array.index_mut_usize a 0#usize
-  let (i1, index_mut_back1) ← Array.index_mut_usize b 0#usize
-  let (i2, i3) ←
-    subtle.ConditionallySelectableU64.conditional_swap i i1 choice
-  let a1 := index_mut_back i2
-  let (i4, index_mut_back2) ← Array.index_mut_usize a1 1#usize
-  let a2 := index_mut_back1 i3
-  let (i5, index_mut_back3) ← Array.index_mut_usize a2 1#usize
-  let (i6, i7) ←
-    subtle.ConditionallySelectableU64.conditional_swap i4 i5 choice
-  let a3 := index_mut_back2 i6
-  let (i8, index_mut_back4) ← Array.index_mut_usize a3 2#usize
-  let a4 := index_mut_back3 i7
-  let (i9, index_mut_back5) ← Array.index_mut_usize a4 2#usize
-  let (i10, i11) ←
-    subtle.ConditionallySelectableU64.conditional_swap i8 i9 choice
-  let a5 := index_mut_back4 i10
-  let (i12, index_mut_back6) ← Array.index_mut_usize a5 3#usize
-  let a6 := index_mut_back5 i11
-  let (i13, index_mut_back7) ← Array.index_mut_usize a6 3#usize
-  let (i14, i15) ←
-    subtle.ConditionallySelectableU64.conditional_swap i12 i13 choice
-  let a7 := index_mut_back6 i14
-  let (i16, index_mut_back8) ← Array.index_mut_usize a7 4#usize
-  let a8 := index_mut_back7 i15
-  let (i17, index_mut_back9) ← Array.index_mut_usize a8 4#usize
-  let (i18, i19) ←
-    subtle.ConditionallySelectableU64.conditional_swap i16 i17 choice
-  let a9 := index_mut_back8 i18
-  let a10 := index_mut_back9 i19
-  ok (a9, a10)
-
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 227:0-257:1 -/
-@[reducible]
-def
-  subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-  : subtle.ConditionallySelectable backend.serial.u64.field.FieldElement51 := {
-  coremarkerCopyInst :=
-    core.marker.Copycurve25519_dalekbackendserialu64fieldFieldElement51
-  conditional_select :=
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select
-  conditional_assign :=
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
-  conditional_swap :=
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_swap
-}
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 265:4-265:81 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.ZERO_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  let a := Array.repeat 5#usize 0#u64
-  backend.serial.u64.field.FieldElement51.from_limbs a
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.ZERO
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.ZERO_body
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 267:4-267:80 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.ONE_body
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::MINUS_ONE]
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 269:4-275:7 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [
-      2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
-      2251799813685247#u64, 2251799813685247#u64
-      ])
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.MINUS_ONE_body
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes::load8_at]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 341:8-350:9 -/
-def backend.serial.u64.field.FieldElement51.from_bytes.load8_at
-  (input : Slice U8) (i : Usize) : Result U64 := do
-  let i1 ← Slice.index_usize input i
-  let i2 ← (↑(UScalar.cast .U64 i1) : Result U64)
-  let i3 ← i + 1#usize
-  let i4 ← Slice.index_usize input i3
-  let i5 ← (↑(UScalar.cast .U64 i4) : Result U64)
-  let i6 ← i5 <<< 8#i32
-  let i7 ← (↑(i2 ||| i6) : Result U64)
-  let i8 ← i + 2#usize
-  let i9 ← Slice.index_usize input i8
-  let i10 ← (↑(UScalar.cast .U64 i9) : Result U64)
-  let i11 ← i10 <<< 16#i32
-  let i12 ← (↑(i7 ||| i11) : Result U64)
-  let i13 ← i + 3#usize
-  let i14 ← Slice.index_usize input i13
-  let i15 ← (↑(UScalar.cast .U64 i14) : Result U64)
-  let i16 ← i15 <<< 24#i32
-  let i17 ← (↑(i12 ||| i16) : Result U64)
-  let i18 ← i + 4#usize
-  let i19 ← Slice.index_usize input i18
-  let i20 ← (↑(UScalar.cast .U64 i19) : Result U64)
-  let i21 ← i20 <<< 32#i32
-  let i22 ← (↑(i17 ||| i21) : Result U64)
-  let i23 ← i + 5#usize
-  let i24 ← Slice.index_usize input i23
-  let i25 ← (↑(UScalar.cast .U64 i24) : Result U64)
-  let i26 ← i25 <<< 40#i32
-  let i27 ← (↑(i22 ||| i26) : Result U64)
-  let i28 ← i + 6#usize
-  let i29 ← Slice.index_usize input i28
-  let i30 ← (↑(UScalar.cast .U64 i29) : Result U64)
-  let i31 ← i30 <<< 48#i32
-  let i32 ← (↑(i27 ||| i31) : Result U64)
-  let i33 ← i + 7#usize
-  let i34 ← Slice.index_usize input i33
-  let i35 ← (↑(UScalar.cast .U64 i34) : Result U64)
-  let i36 ← i35 <<< 56#i32
-  ok (i32 ||| i36)
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 340:4-365:5 -/
-def backend.serial.u64.field.FieldElement51.from_bytes
-  (bytes : Array U8 32#usize) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← 1#u64 <<< 51#i32
-  let low_51_bit_mask ← i - 1#u64
-  let s ← (↑(Array.to_slice bytes) : Result (Slice U8))
-  let i1 ←
-    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s 0#usize
-  let i2 ← (↑(i1 &&& low_51_bit_mask) : Result U64)
-  let s1 ← (↑(Array.to_slice bytes) : Result (Slice U8))
-  let i3 ←
-    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s1 6#usize
-  let i4 ← i3 >>> 3#i32
-  let i5 ← (↑(i4 &&& low_51_bit_mask) : Result U64)
-  let s2 ← (↑(Array.to_slice bytes) : Result (Slice U8))
-  let i6 ←
-    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s2 12#usize
-  let i7 ← i6 >>> 6#i32
-  let i8 ← (↑(i7 &&& low_51_bit_mask) : Result U64)
-  let s3 ← (↑(Array.to_slice bytes) : Result (Slice U8))
-  let i9 ←
-    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s3 19#usize
-  let i10 ← i9 >>> 1#i32
-  let i11 ← (↑(i10 &&& low_51_bit_mask) : Result U64)
-  let s4 ← (↑(Array.to_slice bytes) : Result (Slice U8))
-  let i12 ←
-    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
-  let i13 ← i12 >>> 12#i32
-  let i14 ← (↑(i13 &&& low_51_bit_mask) : Result U64)
-  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
-
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
 def backend.serial.u64.field.FieldElement51.to_bytes
   (self : backend.serial.u64.field.FieldElement51) :
@@ -1521,7 +471,1741 @@ def backend.serial.u64.field.FieldElement51.to_bytes
   massert (i116 = 0#u8)
   ok s32
 
-/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes]:
+/-- [curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq]:
+   Source: 'curve25519-dalek/src/field.rs', lines 96:4-98:5 -/
+noncomputable def field.ConstantTimeEqFieldElement51.ct_eq
+  (self : backend.serial.u64.field.FieldElement51)
+  (other : backend.serial.u64.field.FieldElement51) :
+  Result subtle.Choice
+  := do
+  let a ← backend.serial.u64.field.FieldElement51.to_bytes self
+  let s ← (↑(Array.to_slice a) : Result (Slice U8))
+  let a1 ← backend.serial.u64.field.FieldElement51.to_bytes other
+  let s1 ← (↑(Array.to_slice a1) : Result (Slice U8))
+  subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
+
+/-- [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq]:
+   Source: 'curve25519-dalek/src/field.rs', lines 87:4-89:5 -/
+noncomputable def field.PartialEqFieldElement51FieldElement51.eq
+  (self : backend.serial.u64.field.FieldElement51)
+  (other : backend.serial.u64.field.FieldElement51) :
+  Result Bool
+  := do
+  let c ← field.ConstantTimeEqFieldElement51.ct_eq self other
+  core.convert.IntoFrom.into core.convert.FromBoolChoice c
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:26-182:35 -/
+noncomputable def backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+  (self : backend.serial.curve_models.AffineNielsPoint)
+  (other : backend.serial.curve_models.AffineNielsPoint) :
+  Result Bool
+  := do
+  let b ←
+    field.PartialEqFieldElement51FieldElement51.eq self.y_plus_x other.y_plus_x
+  if b
+  then
+    let b1 ←
+      field.PartialEqFieldElement51FieldElement51.eq self.y_minus_x
+        other.y_minus_x
+    if b1
+    then field.PartialEqFieldElement51FieldElement51.eq self.xy2d other.xy2d
+    else ok false
+  else ok false
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:26-182:35 -/
+@[reducible]
+noncomputable def core.cmp.PartialEqAffineNielsPointAffineNielsPoint : core.cmp.PartialEq
+  backend.serial.curve_models.AffineNielsPoint
+  backend.serial.curve_models.AffineNielsPoint := {
+  eq :=
+    backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:22-182:24 -/
+def backend.serial.curve_models.EqAffineNielsPoint.assert_receiver_is_total_eq
+  (self : backend.serial.curve_models.AffineNielsPoint) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:22-182:24 -/
+@[reducible]
+noncomputable def core.cmp.EqAffineNielsPoint : core.cmp.Eq
+  backend.serial.curve_models.AffineNielsPoint := {
+  partialEqInst := core.cmp.PartialEqAffineNielsPointAffineNielsPoint
+  assert_receiver_is_total_eq :=
+    backend.serial.curve_models.EqAffineNielsPoint.assert_receiver_is_total_eq
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::StructuralPartialEq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:26-182:35 -/
+@[reducible]
+def core.marker.StructuralPartialEqAffineNielsPoint :
+  core.marker.StructuralPartialEq backend.serial.curve_models.AffineNielsPoint
+  := {
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}::zeroize]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 53:4-55:5 -/
+noncomputable def backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let a ←
+    zeroize.ZeroizeArray.zeroize (zeroize.Zeroize.Blanket
+      zeroize.DefaultIsZeroesU64) self
+  ok a
+
+/-- [curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::zeroize]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 192:4-196:5 -/
+noncomputable def backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+  (self : backend.serial.curve_models.AffineNielsPoint) :
+  Result backend.serial.curve_models.AffineNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.y_plus_x
+  let fe1 ←
+    backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.y_minus_x
+  let fe2 ← backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.xy2d
+  ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 191:0-197:1 -/
+@[reducible]
+noncomputable def zeroize.ZeroizeAffineNielsPoint : zeroize.Zeroize
+  backend.serial.curve_models.AffineNielsPoint := {
+  zeroize := backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::clone]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 204:15-204:20 -/
+def backend.serial.curve_models.CloneProjectiveNielsPoint.clone
+  (self : backend.serial.curve_models.ProjectiveNielsPoint) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 204:15-204:20 -/
+@[reducible]
+def core.clone.CloneProjectiveNielsPoint : core.clone.Clone
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  clone := backend.serial.curve_models.CloneProjectiveNielsPoint.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 204:9-204:13 -/
+@[reducible]
+def core.marker.CopyProjectiveNielsPoint : core.marker.Copy
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  cloneInst := core.clone.CloneProjectiveNielsPoint
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::zeroize]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 215:4-220:5 -/
+noncomputable def backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+  (self : backend.serial.curve_models.ProjectiveNielsPoint) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.Y_plus_X
+  let fe1 ←
+    backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.Y_minus_X
+  let fe2 ← backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.Z
+  let fe3 ← backend.serial.u64.field.ZeroizeFieldElement51.zeroize self.T2d
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 214:0-221:1 -/
+@[reducible]
+noncomputable def zeroize.ZeroizeProjectiveNielsPoint : zeroize.Zeroize
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  zeroize := backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 260:4-262:5 -/
+def backend.serial.u64.field.FieldElement51.from_limbs
+  (limbs : Array U64 5#usize) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  ok limbs
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 265:4-265:81 -/
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.ZERO_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  let a := Array.repeat 5#usize 0#u64
+  backend.serial.u64.field.FieldElement51.from_limbs a
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.ZERO
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.field.FieldElement51.ZERO_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 267:4-267:80 -/
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.ONE_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.field.FieldElement51.ONE_body
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 230:4-236:5 -/
+def backend.serial.curve_models.IdentityProjectivePoint.identity
+  : Result backend.serial.curve_models.ProjectivePoint := do
+  ok
+    {
+      X := backend.serial.u64.field.FieldElement51.ZERO,
+      Y := backend.serial.u64.field.FieldElement51.ONE,
+      Z := backend.serial.u64.field.FieldElement51.ONE
+    }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 229:0-237:1 -/
+@[reducible]
+def traits.IdentityProjectivePoint : traits.Identity
+  backend.serial.curve_models.ProjectivePoint := {
+  identity := backend.serial.curve_models.IdentityProjectivePoint.identity
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 240:4-247:5 -/
+def backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
+  : Result backend.serial.curve_models.ProjectiveNielsPoint := do
+  ok
+    {
+      Y_plus_X := backend.serial.u64.field.FieldElement51.ONE,
+      Y_minus_X := backend.serial.u64.field.FieldElement51.ONE,
+      Z := backend.serial.u64.field.FieldElement51.ONE,
+      T2d := backend.serial.u64.field.FieldElement51.ZERO
+    }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 239:0-248:1 -/
+@[reducible]
+def traits.IdentityProjectiveNielsPoint : traits.Identity
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  identity := backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::default]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 251:4-253:5 -/
+def backend.serial.curve_models.DefaultProjectiveNielsPoint.default
+  : Result backend.serial.curve_models.ProjectiveNielsPoint := do
+  backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 250:0-254:1 -/
+@[reducible]
+def core.default.DefaultProjectiveNielsPoint : core.default.Default
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  default := backend.serial.curve_models.DefaultProjectiveNielsPoint.default
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 257:4-263:5 -/
+def backend.serial.curve_models.IdentityAffineNielsPoint.identity
+  : Result backend.serial.curve_models.AffineNielsPoint := do
+  ok
+    {
+      y_plus_x := backend.serial.u64.field.FieldElement51.ONE,
+      y_minus_x := backend.serial.u64.field.FieldElement51.ONE,
+      xy2d := backend.serial.u64.field.FieldElement51.ZERO
+    }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 256:0-264:1 -/
+@[reducible]
+def traits.IdentityAffineNielsPoint : traits.Identity
+  backend.serial.curve_models.AffineNielsPoint := {
+  identity := backend.serial.curve_models.IdentityAffineNielsPoint.identity
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::default]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 267:4-269:5 -/
+def backend.serial.curve_models.DefaultAffineNielsPoint.default
+  : Result backend.serial.curve_models.AffineNielsPoint := do
+  backend.serial.curve_models.IdentityAffineNielsPoint.identity
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 266:0-270:1 -/
+@[reducible]
+def core.default.DefaultAffineNielsPoint : core.default.Default
+  backend.serial.curve_models.AffineNielsPoint := {
+  default := backend.serial.curve_models.DefaultAffineNielsPoint.default
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::m]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 468:8-470:9 -/
+def backend.serial.u64.field.FieldElement51.pow2k.m
+  (x : U64) (y : U64) : Result U128 := do
+  let i ← (↑(UScalar.cast .U128 x) : Result U128)
+  let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
+  i * i1
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 519:12-519:58 -/
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
+  : Result U64 := do
+  let i ← 1#u64 <<< 51#i32
+  i - 1#u64
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK : U64 :=
+  eval_global
+    backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 488:16-500:86 -/
+def backend.serial.u64.field.FieldElement51.pow2k_loop
+  (k : U32) (a : Array U64 5#usize) : Result (Array U64 5#usize) := do
+  let i ← Array.index_usize a 3#usize
+  let a3_19 ← 19#u64 * i
+  let i1 ← Array.index_usize a 4#usize
+  let a4_19 ← 19#u64 * i1
+  let i2 ← Array.index_usize a 0#usize
+  let i3 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i2
+  let i4 ← Array.index_usize a 1#usize
+  let i5 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 a4_19
+  let i6 ← Array.index_usize a 2#usize
+  let i7 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 a3_19
+  let i8 ← i5 + i7
+  let i9 ← 2#u128 * i8
+  let c0 ← i3 + i9
+  let i10 ← backend.serial.u64.field.FieldElement51.pow2k.m i a3_19
+  let i11 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i4
+  let i12 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 a4_19
+  let i13 ← i11 + i12
+  let i14 ← 2#u128 * i13
+  let c1 ← i10 + i14
+  let i15 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i4
+  let i16 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i6
+  let i17 ← backend.serial.u64.field.FieldElement51.pow2k.m i1 a3_19
+  let i18 ← i16 + i17
+  let i19 ← 2#u128 * i18
+  let c2 ← i15 + i19
+  let i20 ← backend.serial.u64.field.FieldElement51.pow2k.m i1 a4_19
+  let i21 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i
+  let i22 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i6
+  let i23 ← i21 + i22
+  let i24 ← 2#u128 * i23
+  let c3 ← i20 + i24
+  let i25 ← backend.serial.u64.field.FieldElement51.pow2k.m i6 i6
+  let i26 ← backend.serial.u64.field.FieldElement51.pow2k.m i2 i1
+  let i27 ← backend.serial.u64.field.FieldElement51.pow2k.m i4 i
+  let i28 ← i26 + i27
+  let i29 ← 2#u128 * i28
+  let c4 ← i25 + i29
+  let i30 ← 1#u64 <<< 54#i32
+  if i2 < i30
+  then
+    if i4 < i30
+    then
+      if i6 < i30
+      then
+        if i < i30
+        then
+          if i1 < i30
+          then
+            let i31 ← c0 >>> 51#i32
+            let i32 ← (↑(UScalar.cast .U64 i31) : Result U64)
+            let i33 ← (↑(UScalar.cast .U128 i32) : Result U128)
+            let c11 ← c1 + i33
+            let i34 ← (↑(UScalar.cast .U64 c0) : Result U64)
+            let i35 ←
+              (↑(i34 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let a1 ← Array.update a 0#usize i35
+            let i36 ← c11 >>> 51#i32
+            let i37 ← (↑(UScalar.cast .U64 i36) : Result U64)
+            let i38 ← (↑(UScalar.cast .U128 i37) : Result U128)
+            let c21 ← c2 + i38
+            let i39 ← (↑(UScalar.cast .U64 c11) : Result U64)
+            let i40 ←
+              (↑(i39 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let a2 ← Array.update a1 1#usize i40
+            let i41 ← c21 >>> 51#i32
+            let i42 ← (↑(UScalar.cast .U64 i41) : Result U64)
+            let i43 ← (↑(UScalar.cast .U128 i42) : Result U128)
+            let c31 ← c3 + i43
+            let i44 ← (↑(UScalar.cast .U64 c21) : Result U64)
+            let i45 ←
+              (↑(i44 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let a3 ← Array.update a2 2#usize i45
+            let i46 ← c31 >>> 51#i32
+            let i47 ← (↑(UScalar.cast .U64 i46) : Result U64)
+            let i48 ← (↑(UScalar.cast .U128 i47) : Result U128)
+            let c41 ← c4 + i48
+            let i49 ← (↑(UScalar.cast .U64 c31) : Result U64)
+            let i50 ←
+              (↑(i49 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let a4 ← Array.update a3 3#usize i50
+            let i51 ← c41 >>> 51#i32
+            let carry ← (↑(UScalar.cast .U64 i51) : Result U64)
+            let i52 ← (↑(UScalar.cast .U64 c41) : Result U64)
+            let i53 ←
+              (↑(i52 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let a5 ← Array.update a4 4#usize i53
+            let i54 ← carry * 19#u64
+            let i55 ← Array.index_usize a5 0#usize
+            let i56 ← i55 + i54
+            let a6 ← Array.update a5 0#usize i56
+            let i57 ← Array.index_usize a6 0#usize
+            let i58 ← i57 >>> 51#i32
+            let i59 ← Array.index_usize a6 1#usize
+            let i60 ← i59 + i58
+            let a7 ← Array.update a6 1#usize i60
+            let i61 ← Array.index_usize a7 0#usize
+            let i62 ←
+              (↑(i61 &&&
+                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
+                : Result U64)
+            let (_, index_mut_back) ← Array.index_mut_usize a7 0#usize
+            let k1 ← k - 1#u32
+            if k1 = 0#u32
+            then ok (index_mut_back i62)
+            else
+              let a8 := index_mut_back i62
+              backend.serial.u64.field.FieldElement51.pow2k_loop k1 a8
+          else fail panic
+        else fail panic
+      else fail panic
+    else fail panic
+  else fail panic
+partial_fixpoint
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 462:4-567:5 -/
+def backend.serial.u64.field.FieldElement51.pow2k
+  (self : backend.serial.u64.field.FieldElement51) (k : U32) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  massert (k > 0#u32)
+  let a ← backend.serial.u64.field.FieldElement51.pow2k_loop k self
+  ok a
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 570:4-572:5 -/
+def backend.serial.u64.field.FieldElement51.square
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  backend.serial.u64.field.FieldElement51.pow2k self 1#u32
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 86:4-103:5 -/
+def
+  backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← Array.index_usize self 0#usize
+  let i1 ← i + 36028797018963664#u64
+  let i2 ← Array.index_usize _rhs 0#usize
+  let i3 ← i1 - i2
+  let i4 ← Array.index_usize self 1#usize
+  let i5 ← i4 + 36028797018963952#u64
+  let i6 ← Array.index_usize _rhs 1#usize
+  let i7 ← i5 - i6
+  let i8 ← Array.index_usize self 2#usize
+  let i9 ← i8 + 36028797018963952#u64
+  let i10 ← Array.index_usize _rhs 2#usize
+  let i11 ← i9 - i10
+  let i12 ← Array.index_usize self 3#usize
+  let i13 ← i12 + 36028797018963952#u64
+  let i14 ← Array.index_usize _rhs 3#usize
+  let i15 ← i13 - i14
+  let i16 ← Array.index_usize self 4#usize
+  let i17 ← i16 + 36028797018963952#u64
+  let i18 ← Array.index_usize _rhs 4#usize
+  let i19 ← i17 - i18
+  backend.serial.u64.field.FieldElement51.reduce
+    (Array.make 5#usize [ i3, i7, i11, i15, i19 ])
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 121:8-121:66 -/
+def
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+  (x : U64) (y : U64) : Result U128 := do
+  let i ← (↑(UScalar.cast .U128 x) : Result U128)
+  let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
+  i * i1
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::LOW_51_BIT_MASK]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 174:8-174:54 -/
+@[global_simps]
+def
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body
+  : Result U64 := do
+  let i ← 1#u64 <<< 51#i32
+  i - 1#u64
+@[global_simps, irreducible]
+def
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK
+  : U64 :=
+  eval_global
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 117:4-215:5 -/
+def
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← Array.index_usize _rhs 1#usize
+  let b1_19 ← i * 19#u64
+  let i1 ← Array.index_usize _rhs 2#usize
+  let b2_19 ← i1 * 19#u64
+  let i2 ← Array.index_usize _rhs 3#usize
+  let b3_19 ← i2 * 19#u64
+  let i3 ← Array.index_usize _rhs 4#usize
+  let b4_19 ← i3 * 19#u64
+  let i4 ← Array.index_usize self 0#usize
+  let i5 ← Array.index_usize _rhs 0#usize
+  let i6 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i4 i5
+  let i7 ← Array.index_usize self 4#usize
+  let i8 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i7 b1_19
+  let i9 ← i6 + i8
+  let i10 ← Array.index_usize self 3#usize
+  let i11 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i10 b2_19
+  let i12 ← i9 + i11
+  let i13 ← Array.index_usize self 2#usize
+  let i14 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i13 b3_19
+  let i15 ← i12 + i14
+  let i16 ← Array.index_usize self 1#usize
+  let i17 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i16 b4_19
+  let c0 ← i15 + i17
+  let i18 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i16 i5
+  let i19 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i4 i
+  let i20 ← i18 + i19
+  let i21 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i7 b2_19
+  let i22 ← i20 + i21
+  let i23 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i10 b3_19
+  let i24 ← i22 + i23
+  let i25 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i13 b4_19
+  let c1 ← i24 + i25
+  let i26 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i13 i5
+  let i27 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i16 i
+  let i28 ← i26 + i27
+  let i29 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i4 i1
+  let i30 ← i28 + i29
+  let i31 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i7 b3_19
+  let i32 ← i30 + i31
+  let i33 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i10 b4_19
+  let c2 ← i32 + i33
+  let i34 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i10 i5
+  let i35 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i13 i
+  let i36 ← i34 + i35
+  let i37 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i16 i1
+  let i38 ← i36 + i37
+  let i39 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i4 i2
+  let i40 ← i38 + i39
+  let i41 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i7 b4_19
+  let c3 ← i40 + i41
+  let i42 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i7 i5
+  let i43 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i10 i
+  let i44 ← i42 + i43
+  let i45 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i13 i1
+  let i46 ← i44 + i45
+  let i47 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i16 i2
+  let i48 ← i46 + i47
+  let i49 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
+      i4 i3
+  let c4 ← i48 + i49
+  let i50 ← 1#u64 <<< 54#i32
+  massert (i4 < i50)
+  massert (i5 < i50)
+  massert (i16 < i50)
+  massert (i < i50)
+  massert (i13 < i50)
+  massert (i1 < i50)
+  massert (i10 < i50)
+  massert (i2 < i50)
+  massert (i7 < i50)
+  massert (i3 < i50)
+  let out := Array.repeat 5#usize 0#u64
+  let i51 ← c0 >>> 51#i32
+  let i52 ← (↑(UScalar.cast .U64 i51) : Result U64)
+  let i53 ← (↑(UScalar.cast .U128 i52) : Result U128)
+  let c11 ← c1 + i53
+  let i54 ← (↑(UScalar.cast .U64 c0) : Result U64)
+  let i55 ←
+    (↑(i54 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out1 ← Array.update out 0#usize i55
+  let i56 ← c11 >>> 51#i32
+  let i57 ← (↑(UScalar.cast .U64 i56) : Result U64)
+  let i58 ← (↑(UScalar.cast .U128 i57) : Result U128)
+  let c21 ← c2 + i58
+  let i59 ← (↑(UScalar.cast .U64 c11) : Result U64)
+  let i60 ←
+    (↑(i59 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out2 ← Array.update out1 1#usize i60
+  let i61 ← c21 >>> 51#i32
+  let i62 ← (↑(UScalar.cast .U64 i61) : Result U64)
+  let i63 ← (↑(UScalar.cast .U128 i62) : Result U128)
+  let c31 ← c3 + i63
+  let i64 ← (↑(UScalar.cast .U64 c21) : Result U64)
+  let i65 ←
+    (↑(i64 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out3 ← Array.update out2 2#usize i65
+  let i66 ← c31 >>> 51#i32
+  let i67 ← (↑(UScalar.cast .U64 i66) : Result U64)
+  let i68 ← (↑(UScalar.cast .U128 i67) : Result U128)
+  let c41 ← c4 + i68
+  let i69 ← (↑(UScalar.cast .U64 c31) : Result U64)
+  let i70 ←
+    (↑(i69 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out4 ← Array.update out3 3#usize i70
+  let i71 ← c41 >>> 51#i32
+  let carry ← (↑(UScalar.cast .U64 i71) : Result U64)
+  let i72 ← (↑(UScalar.cast .U64 c41) : Result U64)
+  let i73 ←
+    (↑(i72 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out5 ← Array.update out4 4#usize i73
+  let i74 ← carry * 19#u64
+  let i75 ← Array.index_usize out5 0#usize
+  let i76 ← i75 + i74
+  let out6 ← Array.update out5 0#usize i76
+  let i77 ← Array.index_usize out6 0#usize
+  let i78 ← i77 >>> 51#i32
+  let i79 ← Array.index_usize out6 1#usize
+  let i80 ← i79 + i78
+  let out7 ← Array.update out6 1#usize i80
+  let i81 ← Array.index_usize out7 0#usize
+  let i82 ←
+    (↑(i81 &&&
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
+      : Result U64)
+  let out8 ← Array.update out7 0#usize i82
+  ok out8
+
+/-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 45:0-51:3 -/
+@[global_simps]
+def backend.serial.u64.constants.EDWARDS_D_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      929955233495203#u64, 466365720129213#u64, 1662059464998953#u64,
+      2033849074728123#u64, 1442794654840575#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.EDWARDS_D_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 61:8-64:9 -/
+def
+  backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) (i : Usize) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  if i < 5#usize
+  then
+    let i1 ← Array.index_usize _rhs i
+    let i2 ← Array.index_usize self i
+    let i3 ← i2 + i1
+    let a ← Array.update self i i3
+    let i4 ← i + 1#usize
+    backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop
+      a _rhs i4
+  else ok self
+partial_fixpoint
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 59:4-65:5 -/
+@[reducible]
+def
+  backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop
+    self _rhs 0#usize
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 70:4-74:5 -/
+def
+  backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign
+    self _rhs
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 277:4-288:5 -/
+noncomputable def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+  (self : backend.serial.curve_models.ProjectivePoint) : Result Bool := do
+  let XX ← backend.serial.u64.field.FieldElement51.square self.X
+  let YY ← backend.serial.u64.field.FieldElement51.square self.Y
+  let ZZ ← backend.serial.u64.field.FieldElement51.square self.Z
+  let ZZZZ ← backend.serial.u64.field.FieldElement51.square ZZ
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      YY XX
+  let lhs ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      fe ZZ
+  let fe1 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      XX YY
+  let fe2 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      backend.serial.u64.constants.EDWARDS_D fe1
+  let rhs ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      ZZZZ fe2
+  field.PartialEqFieldElement51FieldElement51.eq lhs rhs
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 276:0-289:1 -/
+@[reducible]
+noncomputable def traits.ValidityCheckProjectivePoint : traits.ValidityCheck
+  backend.serial.curve_models.ProjectivePoint := {
+  is_valid := backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5 -/
+def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+  (a : backend.serial.u64.field.FieldElement51)
+  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize b 0#usize
+  let i2 ← subtle.ConditionallySelectableU64.conditional_select i i1 choice
+  let i3 ← Array.index_usize a 1#usize
+  let i4 ← Array.index_usize b 1#usize
+  let i5 ← subtle.ConditionallySelectableU64.conditional_select i3 i4 choice
+  let i6 ← Array.index_usize a 2#usize
+  let i7 ← Array.index_usize b 2#usize
+  let i8 ← subtle.ConditionallySelectableU64.conditional_select i6 i7 choice
+  let i9 ← Array.index_usize a 3#usize
+  let i10 ← Array.index_usize b 3#usize
+  let i11 ←
+    subtle.ConditionallySelectableU64.conditional_select i9 i10 choice
+  let i12 ← Array.index_usize a 4#usize
+  let i13 ← Array.index_usize b 4#usize
+  let i14 ←
+    subtle.ConditionallySelectableU64.conditional_select i12 i13 choice
+  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:4-303:5 -/
+def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_select
+  (a : backend.serial.curve_models.ProjectiveNielsPoint)
+  (b : backend.serial.curve_models.ProjectiveNielsPoint)
+  (choice : subtle.Choice) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.Y_plus_X b.Y_plus_X choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.Y_minus_X b.Y_minus_X choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.Z b.Z choice
+  let fe3 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.T2d b.T2d choice
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
+
+/-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 250:4-256:5 -/
+noncomputable def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+  (self : backend.serial.u64.field.FieldElement51)
+  (other : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let (i, index_mut_back) ← Array.index_mut_usize self 0#usize
+  let i1 ← Array.index_usize other 0#usize
+  let i2 ← subtle.ConditionallySelectableU64.conditional_assign i i1 choice
+  let a := index_mut_back i2
+  let (i3, index_mut_back1) ← Array.index_mut_usize a 1#usize
+  let i4 ← Array.index_usize other 1#usize
+  let i5 ← subtle.ConditionallySelectableU64.conditional_assign i3 i4 choice
+  let a1 := index_mut_back1 i5
+  let (i6, index_mut_back2) ← Array.index_mut_usize a1 2#usize
+  let i7 ← Array.index_usize other 2#usize
+  let i8 ← subtle.ConditionallySelectableU64.conditional_assign i6 i7 choice
+  let a2 := index_mut_back2 i8
+  let (i9, index_mut_back3) ← Array.index_mut_usize a2 3#usize
+  let i10 ← Array.index_usize other 3#usize
+  let i11 ←
+    subtle.ConditionallySelectableU64.conditional_assign i9 i10 choice
+  let a3 := index_mut_back3 i11
+  let (i12, index_mut_back4) ← Array.index_mut_usize a3 4#usize
+  let i13 ← Array.index_usize other 4#usize
+  let i14 ←
+    subtle.ConditionallySelectableU64.conditional_assign i12 i13 choice
+  let a4 := index_mut_back4 i14
+  ok a4
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 305:4-310:5 -/
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+  (self : backend.serial.curve_models.ProjectiveNielsPoint)
+  (other : backend.serial.curve_models.ProjectiveNielsPoint)
+  (choice : subtle.Choice) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.Y_plus_X other.Y_plus_X choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.Y_minus_X other.Y_minus_X choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.Z other.Z choice
+  let fe3 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.T2d other.T2d choice
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 295:0-311:1 -/
+@[reducible]
+noncomputable def subtle.ConditionallySelectableProjectiveNielsPoint :
+  subtle.ConditionallySelectable
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  coremarkerCopyInst := core.marker.CopyProjectiveNielsPoint
+  conditional_select :=
+    backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_select
+  conditional_assign :=
+    backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+  conditional_swap :=
+    backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_swap
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:4-320:5 -/
+def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_select
+  (a : backend.serial.curve_models.AffineNielsPoint)
+  (b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice) :
+  Result backend.serial.curve_models.AffineNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.y_plus_x b.y_plus_x choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.y_minus_x b.y_minus_x choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.xy2d b.xy2d choice
+  ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 322:4-326:5 -/
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+  (self : backend.serial.curve_models.AffineNielsPoint)
+  (other : backend.serial.curve_models.AffineNielsPoint)
+  (choice : subtle.Choice) :
+  Result backend.serial.curve_models.AffineNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.y_plus_x other.y_plus_x choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.y_minus_x other.y_minus_x choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+      self.xy2d other.xy2d choice
+  ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 313:0-327:1 -/
+@[reducible]
+noncomputable def subtle.ConditionallySelectableAffineNielsPoint :
+  subtle.ConditionallySelectable backend.serial.curve_models.AffineNielsPoint
+  := {
+  coremarkerCopyInst := core.marker.CopyAffineNielsPoint
+  conditional_select :=
+    backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_select
+  conditional_assign :=
+    backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+  conditional_swap :=
+    backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_swap
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 338:4-345:5 -/
+def backend.serial.curve_models.ProjectivePoint.as_extended
+  (self : backend.serial.curve_models.ProjectivePoint) :
+  Result edwards.EdwardsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.X self.Z
+  let fe1 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Y self.Z
+  let fe2 ← backend.serial.u64.field.FieldElement51.square self.Z
+  let fe3 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.X self.Y
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 353:4-359:5 -/
+def backend.serial.curve_models.CompletedPoint.as_projective
+  (self : backend.serial.curve_models.CompletedPoint) :
+  Result backend.serial.curve_models.ProjectivePoint
+  := do
+  let fe ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.X self.T
+  let fe1 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Y self.Z
+  let fe2 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Z self.T
+  ok { X := fe, Y := fe1, Z := fe2 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 365:4-372:5 -/
+def backend.serial.curve_models.CompletedPoint.as_extended
+  (self : backend.serial.curve_models.CompletedPoint) :
+  Result edwards.EdwardsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.X self.T
+  let fe1 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Y self.Z
+  let fe2 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Z self.T
+  let fe3 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.X self.Y
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]: loop 0:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 578:8-581:9 -/
+def backend.serial.u64.field.FieldElement51.square2_loop
+  (square : backend.serial.u64.field.FieldElement51) (i : Usize) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  if i < 5#usize
+  then
+    let i1 ← Array.index_usize square i
+    let i2 ← i1 * 2#u64
+    let a ← Array.update square i i2
+    let i3 ← i + 1#usize
+    backend.serial.u64.field.FieldElement51.square2_loop a i3
+  else ok square
+partial_fixpoint
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 575:4-584:5 -/
+def backend.serial.u64.field.FieldElement51.square2
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let square ← backend.serial.u64.field.FieldElement51.pow2k self 1#u32
+  backend.serial.u64.field.FieldElement51.square2_loop square 0#usize
+
+/-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 381:4-397:5 -/
+def backend.serial.curve_models.ProjectivePoint.double
+  (self : backend.serial.curve_models.ProjectivePoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  let XX ← backend.serial.u64.field.FieldElement51.square self.X
+  let YY ← backend.serial.u64.field.FieldElement51.square self.Y
+  let ZZ2 ← backend.serial.u64.field.FieldElement51.square2 self.Z
+  let X_plus_Y ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.X self.Y
+  let X_plus_Y_sq ← backend.serial.u64.field.FieldElement51.square X_plus_Y
+  let YY_plus_XX ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      YY XX
+  let YY_minus_XX ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      YY XX
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      X_plus_Y_sq YY_plus_XX
+  let fe1 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      ZZ2 YY_minus_XX
+  ok { X := fe, Y := YY_plus_XX, Z := YY_minus_XX, T := fe1 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 414:4-429:5 -/
+def
+  backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
+  (self : edwards.EdwardsPoint)
+  (other : backend.serial.curve_models.ProjectiveNielsPoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  let Y_plus_X ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Y self.X
+  let Y_minus_X ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      self.Y self.X
+  let PP ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_plus_X other.Y_plus_X
+  let MM ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_minus_X other.Y_minus_X
+  let TT2d ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.T other.T2d
+  let ZZ ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Z other.Z
+  let ZZ2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      ZZ ZZ
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      PP MM
+  let fe1 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      PP MM
+  let fe2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      ZZ2 TT2d
+  let fe3 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      ZZ2 TT2d
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 411:0-430:1 -/
+@[reducible]
+def
+  core.ops.arith.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
+  : core.ops.arith.Add edwards.EdwardsPoint
+  backend.serial.curve_models.ProjectiveNielsPoint
+  backend.serial.curve_models.CompletedPoint := {
+  add :=
+    backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 436:4-451:5 -/
+def
+  backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.sub
+  (self : edwards.EdwardsPoint)
+  (other : backend.serial.curve_models.ProjectiveNielsPoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  let Y_plus_X ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Y self.X
+  let Y_minus_X ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      self.Y self.X
+  let PM ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_plus_X other.Y_minus_X
+  let MP ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_minus_X other.Y_plus_X
+  let TT2d ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.T other.T2d
+  let ZZ ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.Z other.Z
+  let ZZ2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      ZZ ZZ
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      PM MP
+  let fe1 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      PM MP
+  let fe2 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      ZZ2 TT2d
+  let fe3 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      ZZ2 TT2d
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 433:0-452:1 -/
+@[reducible]
+def
+  core.ops.arith.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
+  : core.ops.arith.Sub edwards.EdwardsPoint
+  backend.serial.curve_models.ProjectiveNielsPoint
+  backend.serial.curve_models.CompletedPoint := {
+  sub :=
+    backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.sub
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 458:4-472:5 -/
+def
+  backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.add
+  (self : edwards.EdwardsPoint)
+  (other : backend.serial.curve_models.AffineNielsPoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  let Y_plus_X ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Y self.X
+  let Y_minus_X ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      self.Y self.X
+  let PP ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_plus_X other.y_plus_x
+  let MM ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_minus_X other.y_minus_x
+  let Txy2d ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.T other.xy2d
+  let Z2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Z self.Z
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      PP MM
+  let fe1 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      PP MM
+  let fe2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      Z2 Txy2d
+  let fe3 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      Z2 Txy2d
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 455:0-473:1 -/
+@[reducible]
+def core.ops.arith.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
+  : core.ops.arith.Add edwards.EdwardsPoint
+  backend.serial.curve_models.AffineNielsPoint
+  backend.serial.curve_models.CompletedPoint := {
+  add :=
+    backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.add
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 479:4-493:5 -/
+def
+  backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.sub
+  (self : edwards.EdwardsPoint)
+  (other : backend.serial.curve_models.AffineNielsPoint) :
+  Result backend.serial.curve_models.CompletedPoint
+  := do
+  let Y_plus_X ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Y self.X
+  let Y_minus_X ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      self.Y self.X
+  let PM ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_plus_X other.y_minus_x
+  let MP ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      Y_minus_X other.y_plus_x
+  let Txy2d ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.T other.xy2d
+  let Z2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      self.Z self.Z
+  let fe ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      PM MP
+  let fe1 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      PM MP
+  let fe2 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      Z2 Txy2d
+  let fe3 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      Z2 Txy2d
+  ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 476:0-494:1 -/
+@[reducible]
+def core.ops.arith.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
+  : core.ops.arith.Sub edwards.EdwardsPoint
+  backend.serial.curve_models.AffineNielsPoint
+  backend.serial.curve_models.CompletedPoint := {
+  sub :=
+    backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.sub
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 278:4-288:5 -/
+def backend.serial.u64.field.FieldElement51.negate
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← Array.index_usize self 0#usize
+  let i1 ← 36028797018963664#u64 - i
+  let i2 ← Array.index_usize self 1#usize
+  let i3 ← 36028797018963952#u64 - i2
+  let i4 ← Array.index_usize self 2#usize
+  let i5 ← 36028797018963952#u64 - i4
+  let i6 ← Array.index_usize self 3#usize
+  let i7 ← 36028797018963952#u64 - i6
+  let i8 ← Array.index_usize self 4#usize
+  let i9 ← 36028797018963952#u64 - i8
+  let neg ←
+    backend.serial.u64.field.FieldElement51.reduce
+      (Array.make 5#usize [ i1, i3, i5, i7, i9 ])
+  ok neg
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 220:4-224:5 -/
+def backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  backend.serial.u64.field.FieldElement51.negate self
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 503:4-510:5 -/
+def
+  backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
+  (self : backend.serial.curve_models.ProjectiveNielsPoint) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
+      self.T2d
+  ok
+    {
+      self
+        with
+        Y_plus_X := self.Y_minus_X, Y_minus_X := self.Y_plus_X, T2d := fe
+    }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 500:0-511:1 -/
+@[reducible]
+def core.ops.arith.NegShared0ProjectiveNielsPointProjectiveNielsPoint :
+  core.ops.arith.Neg backend.serial.curve_models.ProjectiveNielsPoint
+  backend.serial.curve_models.ProjectiveNielsPoint := {
+  neg :=
+    backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
+}
+
+/-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 516:4-522:5 -/
+def backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint.neg
+  (self : backend.serial.curve_models.AffineNielsPoint) :
+  Result backend.serial.curve_models.AffineNielsPoint
+  := do
+  let fe ←
+    backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
+      self.xy2d
+  ok { y_plus_x := self.y_minus_x, y_minus_x := self.y_plus_x, xy2d := fe }
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 513:0-523:1 -/
+@[reducible]
+def core.ops.arith.NegShared0AffineNielsPointAffineNielsPoint :
+  core.ops.arith.Neg backend.serial.curve_models.AffineNielsPoint
+  backend.serial.curve_models.AffineNielsPoint := {
+  neg :=
+    backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint.neg
+}
+
+/-- [curve25519_dalek::backend::serial::u64::constants::MINUS_ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 26:0-32:3 -/
+@[global_simps]
+def backend.serial.u64.constants.MINUS_ONE_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
+      2251799813685247#u64, 2251799813685247#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MINUS_ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.MINUS_ONE_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 54:0-60:3 -/
+@[global_simps]
+def backend.serial.u64.constants.EDWARDS_D2_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1859910466990425#u64, 932731440258426#u64, 1072319116312658#u64,
+      1815898335770999#u64, 633789495995903#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D2
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.EDWARDS_D2_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 63:0-69:3 -/
+@[global_simps]
+def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1136626929484150#u64, 1998550399581263#u64, 496427632559748#u64,
+      118527312129759#u64, 45110755273534#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 72:0-78:3 -/
+@[global_simps]
+def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1507062230895904#u64, 1572317787530805#u64, 683053064812840#u64,
+      317374165784489#u64, 1572899562415810#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 81:0-87:3 -/
+@[global_simps]
+def backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2241493124984347#u64, 425987919032274#u64, 2207028919301688#u64,
+      1220490630685848#u64, 974799131293748#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 90:0-96:3 -/
+@[global_simps]
+def backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      278908739862762#u64, 821645201101625#u64, 8113234426968#u64,
+      1777959178193151#u64, 2118520810568447#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.INVSQRT_A_MINUS_D
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::SQRT_M1]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 99:0-105:3 -/
+@[global_simps]
+def backend.serial.u64.constants.SQRT_M1_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
+      2117202627021982#u64, 765476049583133#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.SQRT_M1
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.SQRT_M1_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::L]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 127:0-133:3 -/
+@[global_simps]
+def backend.serial.u64.constants.L_body
+  : Result backend.serial.u64.scalar.Scalar52 := do
+  ok
+    (Array.make 5#usize [
+      671914833335277#u64, 3916664325105025#u64, 1367801#u64, 0#u64,
+      17592186044416#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.L : backend.serial.u64.scalar.Scalar52 :=
+  eval_global backend.serial.u64.constants.L_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::LFACTOR]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 136:0-136:48 -/
+@[global_simps]
+def backend.serial.u64.constants.LFACTOR_body : Result U64 := do
+  ok 1439961107955227#u64
+@[global_simps, irreducible]
+def backend.serial.u64.constants.LFACTOR : U64 :=
+  eval_global backend.serial.u64.constants.LFACTOR_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::R]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 139:0-145:3 -/
+@[global_simps]
+def backend.serial.u64.constants.R_body
+  : Result backend.serial.u64.scalar.Scalar52 := do
+  ok
+    (Array.make 5#usize [
+      4302102966953709#u64, 1049714374468698#u64, 4503599278581019#u64,
+      4503599627370495#u64, 17592186044415#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.R : backend.serial.u64.scalar.Scalar52 :=
+  eval_global backend.serial.u64.constants.R_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::RR]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 148:0-154:3 -/
+@[global_simps]
+def backend.serial.u64.constants.RR_body
+  : Result backend.serial.u64.scalar.Scalar52 := do
+  ok
+    (Array.make 5#usize [
+      2764609938444603#u64, 3768881411696287#u64, 1616719297148420#u64,
+      1087343033131391#u64, 10175238647962#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
+  eval_global backend.serial.u64.constants.RR_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
+def backend.serial.u64.field.CloneFieldElement51.clone
+  (self : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
+@[reducible]
+def core.clone.CloneFieldElement51 : core.clone.Clone
+  backend.serial.u64.field.FieldElement51 := {
+  clone := backend.serial.u64.field.CloneFieldElement51.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::marker::Copy for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:9-42:13 -/
+@[reducible]
+def core.marker.CopyFieldElement51 : core.marker.Copy
+  backend.serial.u64.field.FieldElement51 := {
+  cloneInst := core.clone.CloneFieldElement51
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 52:0-56:1 -/
+@[reducible]
+noncomputable def zeroize.ZeroizeFieldElement51 : zeroize.Zeroize
+  backend.serial.u64.field.FieldElement51 := {
+  zeroize := backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 58:0-66:1 -/
+@[reducible]
+def core.ops.arith.AddAssignFieldElement51SharedAFieldElement51 :
+  core.ops.arith.AddAssign backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  add_assign :=
+    backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 68:0-75:1 -/
+@[reducible]
+def core.ops.arith.AddShared0FieldElement51SharedAFieldElement51FieldElement51
+  : core.ops.arith.Add backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  add :=
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 84:0-104:1 -/
+@[reducible]
+def core.ops.arith.SubShared0FieldElement51SharedAFieldElement51FieldElement51
+  : core.ops.arith.Sub backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  sub :=
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 113:0-216:1 -/
+@[reducible]
+def core.ops.arith.MulShared0FieldElement51SharedAFieldElement51FieldElement51
+  : core.ops.arith.Mul backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  mul :=
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+}
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 218:0-225:1 -/
+@[reducible]
+def core.ops.arith.NegShared0FieldElement51FieldElement51 : core.ops.arith.Neg
+  backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  neg := backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 242:4-248:5 -/
+def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_swap
+  (a : backend.serial.u64.field.FieldElement51)
+  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
+  Result (backend.serial.u64.field.FieldElement51 ×
+    backend.serial.u64.field.FieldElement51)
+  := do
+  let (i, index_mut_back) ← Array.index_mut_usize a 0#usize
+  let (i1, index_mut_back1) ← Array.index_mut_usize b 0#usize
+  let (i2, i3) ←
+    subtle.ConditionallySelectableU64.conditional_swap i i1 choice
+  let a1 := index_mut_back i2
+  let (i4, index_mut_back2) ← Array.index_mut_usize a1 1#usize
+  let a2 := index_mut_back1 i3
+  let (i5, index_mut_back3) ← Array.index_mut_usize a2 1#usize
+  let (i6, i7) ←
+    subtle.ConditionallySelectableU64.conditional_swap i4 i5 choice
+  let a3 := index_mut_back2 i6
+  let (i8, index_mut_back4) ← Array.index_mut_usize a3 2#usize
+  let a4 := index_mut_back3 i7
+  let (i9, index_mut_back5) ← Array.index_mut_usize a4 2#usize
+  let (i10, i11) ←
+    subtle.ConditionallySelectableU64.conditional_swap i8 i9 choice
+  let a5 := index_mut_back4 i10
+  let (i12, index_mut_back6) ← Array.index_mut_usize a5 3#usize
+  let a6 := index_mut_back5 i11
+  let (i13, index_mut_back7) ← Array.index_mut_usize a6 3#usize
+  let (i14, i15) ←
+    subtle.ConditionallySelectableU64.conditional_swap i12 i13 choice
+  let a7 := index_mut_back6 i14
+  let (i16, index_mut_back8) ← Array.index_mut_usize a7 4#usize
+  let a8 := index_mut_back7 i15
+  let (i17, index_mut_back9) ← Array.index_mut_usize a8 4#usize
+  let (i18, i19) ←
+    subtle.ConditionallySelectableU64.conditional_swap i16 i17 choice
+  let a9 := index_mut_back8 i18
+  let a10 := index_mut_back9 i19
+  ok (a9, a10)
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 227:0-257:1 -/
+@[reducible]
+noncomputable def subtle.ConditionallySelectableFieldElement51 :
+  subtle.ConditionallySelectable backend.serial.u64.field.FieldElement51 := {
+  coremarkerCopyInst := core.marker.CopyFieldElement51
+  conditional_select :=
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+  conditional_assign :=
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+  conditional_swap :=
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_swap
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::MINUS_ONE]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 269:4-275:7 -/
+@[global_simps]
+def backend.serial.u64.field.FieldElement51.MINUS_ONE_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
+      2251799813685247#u64, 2251799813685247#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.MINUS_ONE
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.field.FieldElement51.MINUS_ONE_body
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes::load8_at]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 341:8-350:9 -/
+def backend.serial.u64.field.FieldElement51.from_bytes.load8_at
+  (input : Slice U8) (i : Usize) : Result U64 := do
+  let i1 ← Slice.index_usize input i
+  let i2 ← (↑(UScalar.cast .U64 i1) : Result U64)
+  let i3 ← i + 1#usize
+  let i4 ← Slice.index_usize input i3
+  let i5 ← (↑(UScalar.cast .U64 i4) : Result U64)
+  let i6 ← i5 <<< 8#i32
+  let i7 ← (↑(i2 ||| i6) : Result U64)
+  let i8 ← i + 2#usize
+  let i9 ← Slice.index_usize input i8
+  let i10 ← (↑(UScalar.cast .U64 i9) : Result U64)
+  let i11 ← i10 <<< 16#i32
+  let i12 ← (↑(i7 ||| i11) : Result U64)
+  let i13 ← i + 3#usize
+  let i14 ← Slice.index_usize input i13
+  let i15 ← (↑(UScalar.cast .U64 i14) : Result U64)
+  let i16 ← i15 <<< 24#i32
+  let i17 ← (↑(i12 ||| i16) : Result U64)
+  let i18 ← i + 4#usize
+  let i19 ← Slice.index_usize input i18
+  let i20 ← (↑(UScalar.cast .U64 i19) : Result U64)
+  let i21 ← i20 <<< 32#i32
+  let i22 ← (↑(i17 ||| i21) : Result U64)
+  let i23 ← i + 5#usize
+  let i24 ← Slice.index_usize input i23
+  let i25 ← (↑(UScalar.cast .U64 i24) : Result U64)
+  let i26 ← i25 <<< 40#i32
+  let i27 ← (↑(i22 ||| i26) : Result U64)
+  let i28 ← i + 6#usize
+  let i29 ← Slice.index_usize input i28
+  let i30 ← (↑(UScalar.cast .U64 i29) : Result U64)
+  let i31 ← i30 <<< 48#i32
+  let i32 ← (↑(i27 ||| i31) : Result U64)
+  let i33 ← i + 7#usize
+  let i34 ← Slice.index_usize input i33
+  let i35 ← (↑(UScalar.cast .U64 i34) : Result U64)
+  let i36 ← i35 <<< 56#i32
+  ok (i32 ||| i36)
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 340:4-365:5 -/
+def backend.serial.u64.field.FieldElement51.from_bytes
+  (bytes : Array U8 32#usize) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← 1#u64 <<< 51#i32
+  let low_51_bit_mask ← i - 1#u64
+  let s ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i1 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s 0#usize
+  let i2 ← (↑(i1 &&& low_51_bit_mask) : Result U64)
+  let s1 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i3 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s1 6#usize
+  let i4 ← i3 >>> 3#i32
+  let i5 ← (↑(i4 &&& low_51_bit_mask) : Result U64)
+  let s2 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i6 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s2 12#usize
+  let i7 ← i6 >>> 6#i32
+  let i8 ← (↑(i7 &&& low_51_bit_mask) : Result U64)
+  let s3 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i9 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s3 19#usize
+  let i10 ← i9 >>> 1#i32
+  let i11 ← (↑(i10 &&& low_51_bit_mask) : Result U64)
+  let s4 ← (↑(Array.to_slice bytes) : Result (Slice U8))
+  let i12 ←
+    backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
+  let i13 ← i12 >>> 12#i32
+  let i14 ← (↑(i13 &&& low_51_bit_mask) : Result U64)
+  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
+
+/-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 369:4-371:5 -/
 def backend.serial.u64.field.FieldElement51.as_bytes
   (self : backend.serial.u64.field.FieldElement51) :
@@ -1529,28 +2213,25 @@ def backend.serial.u64.field.FieldElement51.as_bytes
   := do
   backend.serial.u64.field.FieldElement51.to_bytes self
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 43:4-45:5 -/
-def
-  backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+def backend.serial.u64.scalar.IndexScalar52UsizeU64.index
   (self : backend.serial.u64.scalar.Scalar52) (_index : Usize) :
   Result U64
   := do
   Array.index_usize self _index
 
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 41:0-46:1 -/
 @[reducible]
-def core.ops.index.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64
-  : core.ops.index.Index backend.serial.u64.scalar.Scalar52 Usize U64 := {
-  index :=
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+def core.ops.index.IndexScalar52UsizeU64 : core.ops.index.Index
+  backend.serial.u64.scalar.Scalar52 Usize U64 := {
+  index := backend.serial.u64.scalar.IndexScalar52UsizeU64.index
 }
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 49:4-51:5 -/
-def
-  backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+def backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
   (self : backend.serial.u64.scalar.Scalar52) (_index : Usize) :
   Result (U64 × (U64 → backend.serial.u64.scalar.Scalar52))
   := do
@@ -1559,26 +2240,23 @@ def
                          a
   ok (i, back)
 
-/- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 48:0-52:1 -/
 @[reducible]
-def
-  core.ops.index.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64
-  : core.ops.index.IndexMut backend.serial.u64.scalar.Scalar52 Usize U64 := {
-  indexInst :=
-    core.ops.index.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64
-  index_mut :=
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+def core.ops.index.IndexMutScalar52UsizeU64 : core.ops.index.IndexMut
+  backend.serial.u64.scalar.Scalar52 Usize U64 := {
+  indexInst := core.ops.index.IndexScalar52UsizeU64
+  index_mut := backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
 }
 
-/- [curve25519_dalek::backend::serial::u64::scalar::m]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::m]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 56:0-58:1 -/
 def backend.serial.u64.scalar.m (x : U64) (y : U64) : Result U128 := do
   let i ← (↑(UScalar.cast .U128 x) : Result U128)
   let i1 ← (↑(UScalar.cast .U128 y) : Result U128)
   i * i1
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::ZERO]
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::ZERO]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 62:4-62:57 -/
 @[global_simps]
 def backend.serial.u64.scalar.Scalar52.ZERO_body
@@ -1590,7 +2268,7 @@ def backend.serial.u64.scalar.Scalar52.ZERO
   : backend.serial.u64.scalar.Scalar52 :=
   eval_global backend.serial.u64.scalar.Scalar52.ZERO_body
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 69:8-80:9 -/
 def backend.serial.u64.scalar.Scalar52.from_bytes_loop
   (bytes : Array U8 32#usize) (words : Array U64 4#usize) (i : Usize) :
@@ -1642,7 +2320,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_loop
   else ok words
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 66:4-93:5 -/
 def backend.serial.u64.scalar.Scalar52.from_bytes
   (bytes : Array U8 32#usize) : Result backend.serial.u64.scalar.Scalar52 := do
@@ -1655,7 +2333,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let top_mask ← i1 - 1#u64
   let i2 ← Array.index_usize words1 0#usize
   let (_, index_mut_back) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
       backend.serial.u64.scalar.Scalar52.ZERO 0#usize
   let i3 ← (↑(i2 &&& mask) : Result U64)
   let i4 ← i2 >>> 52#i32
@@ -1664,8 +2342,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let i7 ← (↑(i4 ||| i6) : Result U64)
   let s := index_mut_back i3
   let (_, index_mut_back1) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      s 1#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut s 1#usize
   let i8 ← (↑(i7 &&& mask) : Result U64)
   let i9 ← i5 >>> 40#i32
   let i10 ← Array.index_usize words1 2#usize
@@ -1673,8 +2350,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let i12 ← (↑(i9 ||| i11) : Result U64)
   let s1 := index_mut_back1 i8
   let (_, index_mut_back2) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      s1 2#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut s1 2#usize
   let i13 ← (↑(i12 &&& mask) : Result U64)
   let i14 ← i10 >>> 28#i32
   let i15 ← Array.index_usize words1 3#usize
@@ -1682,18 +2358,16 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let i17 ← (↑(i14 ||| i16) : Result U64)
   let s2 := index_mut_back2 i13
   let (_, index_mut_back3) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      s2 3#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut s2 3#usize
   let i18 ← (↑(i17 &&& mask) : Result U64)
   let i19 ← i15 >>> 16#i32
   let s3 := index_mut_back3 i18
   let (_, index_mut_back4) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      s3 4#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut s3 4#usize
   let i20 ← (↑(i19 &&& top_mask) : Result U64)
   ok (index_mut_back4 i20)
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 231:4-245:5 -/
 def backend.serial.u64.scalar.Scalar52.mul_internal
   (a : backend.serial.u64.scalar.Scalar52)
@@ -1701,53 +2375,35 @@ def backend.serial.u64.scalar.Scalar52.mul_internal
   Result (Array U128 9#usize)
   := do
   let z := Array.repeat 9#usize 0#u128
-  let i ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 0#usize
-  let i1 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 0#usize
+  let i ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 0#usize
+  let i1 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b 0#usize
   let i2 ← backend.serial.u64.scalar.m i i1
   let z1 ← Array.update z 0#usize i2
-  let i3 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 1#usize
+  let i3 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b 1#usize
   let i4 ← backend.serial.u64.scalar.m i i3
-  let i5 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 1#usize
+  let i5 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 1#usize
   let i6 ← backend.serial.u64.scalar.m i5 i1
   let i7 ← i4 + i6
   let z2 ← Array.update z1 1#usize i7
-  let i8 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 2#usize
+  let i8 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b 2#usize
   let i9 ← backend.serial.u64.scalar.m i i8
   let i10 ← backend.serial.u64.scalar.m i5 i3
   let i11 ← i9 + i10
-  let i12 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 2#usize
+  let i12 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 2#usize
   let i13 ← backend.serial.u64.scalar.m i12 i1
   let i14 ← i11 + i13
   let z3 ← Array.update z2 2#usize i14
-  let i15 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 3#usize
+  let i15 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b 3#usize
   let i16 ← backend.serial.u64.scalar.m i i15
   let i17 ← backend.serial.u64.scalar.m i5 i8
   let i18 ← i16 + i17
   let i19 ← backend.serial.u64.scalar.m i12 i3
   let i20 ← i18 + i19
-  let i21 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 3#usize
+  let i21 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 3#usize
   let i22 ← backend.serial.u64.scalar.m i21 i1
   let i23 ← i20 + i22
   let z4 ← Array.update z3 3#usize i23
-  let i24 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      b 4#usize
+  let i24 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b 4#usize
   let i25 ← backend.serial.u64.scalar.m i i24
   let i26 ← backend.serial.u64.scalar.m i5 i15
   let i27 ← i25 + i26
@@ -1755,9 +2411,7 @@ def backend.serial.u64.scalar.Scalar52.mul_internal
   let i29 ← i27 + i28
   let i30 ← backend.serial.u64.scalar.m i21 i3
   let i31 ← i29 + i30
-  let i32 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 4#usize
+  let i32 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 4#usize
   let i33 ← backend.serial.u64.scalar.m i32 i1
   let i34 ← i31 + i33
   let z5 ← Array.update z4 4#usize i34
@@ -1782,7 +2436,7 @@ def backend.serial.u64.scalar.Scalar52.mul_internal
   let i50 ← backend.serial.u64.scalar.m i32 i24
   Array.update z8 8#usize i50
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 277:8-280:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
   (sum : U128) : Result (U128 × U64) := do
@@ -1794,14 +2448,14 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
   let i3 ← i2 - 1#u64
   let p ← (↑(i1 &&& i3) : Result U64)
   let i4 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+    backend.serial.u64.scalar.IndexScalar52UsizeU64.index
       backend.serial.u64.constants.L 0#usize
   let i5 ← backend.serial.u64.scalar.m p i4
   let i6 ← sum + i5
   let i7 ← i6 >>> 52#i32
   ok (i7, p)
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 283:8-286:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   (sum : U128) : Result (U128 × U64) := do
@@ -1812,7 +2466,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   let i3 ← sum >>> 52#i32
   ok (i3, w)
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:14-218:19 -/
 def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
@@ -1822,19 +2476,16 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   if i < 5#usize
   then
     let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+      backend.serial.u64.scalar.IndexScalar52UsizeU64.index
         backend.serial.u64.constants.L i
     let addend ←
       subtle.ConditionallySelectableU64.conditional_select 0#u64 i1 condition
     let i2 ← carry >>> 52#i32
-    let i3 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        self i
+    let i3 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index self i
     let i4 ← i2 + i3
     let carry1 ← i4 + addend
     let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        self i
+      backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut self i
     let i5 ← (↑(carry1 &&& mask) : Result U64)
     let i6 ← i + 1#usize
     let self1 := index_mut_back i5
@@ -1843,7 +2494,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   else ok (carry, self)
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 213:4-226:5 -/
 def backend.serial.u64.scalar.Scalar52.conditional_add_l
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice) :
@@ -1854,7 +2505,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l
   backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self condition
     0#u64 mask 0#usize
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 202:8-206:9 -/
 def backend.serial.u64.scalar.Scalar52.sub_loop
   (a : backend.serial.u64.scalar.Scalar52)
@@ -1865,18 +2516,13 @@ def backend.serial.u64.scalar.Scalar52.sub_loop
   := do
   if i < 5#usize
   then
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        a i
-    let i2 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        b i
+    let i1 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a i
+    let i2 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b i
     let i3 ← borrow >>> 63#i32
     let i4 ← i2 + i3
     let borrow1 ← (↑(core.num.U64.wrapping_sub i1 i4) : Result U64)
     let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        difference i
+      backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut difference i
     let i5 ← (↑(borrow1 &&& mask) : Result U64)
     let i6 ← i + 1#usize
     let difference1 := index_mut_back i5
@@ -1884,7 +2530,7 @@ def backend.serial.u64.scalar.Scalar52.sub_loop
   else ok (difference, borrow)
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 195:4-211:5 -/
 def backend.serial.u64.scalar.Scalar52.sub
   (a : backend.serial.u64.scalar.Scalar52)
@@ -1898,12 +2544,12 @@ def backend.serial.u64.scalar.Scalar52.sub
       backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
   let i1 ← borrow >>> 63#i32
   let i2 ← (↑(UScalar.cast .U8 i1) : Result U8)
-  let c ← subtle.FromsubtleChoiceU8.from i2
+  let c ← subtle.FromChoiceU8.from i2
   let (_, difference1) ←
     backend.serial.u64.scalar.Scalar52.conditional_add_l difference c
   ok difference1
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 274:4-307:5 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   (limbs : Array U128 9#usize) :
@@ -1915,7 +2561,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   let i1 ← Array.index_usize limbs 1#usize
   let i2 ← carry + i1
   let i3 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+    backend.serial.u64.scalar.IndexScalar52UsizeU64.index
       backend.serial.u64.constants.L 1#usize
   let i4 ← backend.serial.u64.scalar.m n0 i3
   let i5 ← i2 + i4
@@ -1924,7 +2570,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   let i6 ← Array.index_usize limbs 2#usize
   let i7 ← carry1 + i6
   let i8 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+    backend.serial.u64.scalar.IndexScalar52UsizeU64.index
       backend.serial.u64.constants.L 2#usize
   let i9 ← backend.serial.u64.scalar.m n0 i8
   let i10 ← i7 + i9
@@ -1943,7 +2589,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   let i19 ← Array.index_usize limbs 4#usize
   let i20 ← carry3 + i19
   let i21 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+    backend.serial.u64.scalar.IndexScalar52UsizeU64.index
       backend.serial.u64.constants.L 4#usize
   let i22 ← backend.serial.u64.scalar.m n0 i21
   let i23 ← i20 + i22
@@ -1987,7 +2633,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   backend.serial.u64.scalar.Scalar52.sub
     (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 326:4-328:5 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_mul
   (a : backend.serial.u64.scalar.Scalar52)
@@ -1997,7 +2643,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_mul
   let a1 ← backend.serial.u64.scalar.Scalar52.mul_internal a b
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a1
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 184:8-188:9 -/
 def backend.serial.u64.scalar.Scalar52.add_loop
   (a : backend.serial.u64.scalar.Scalar52)
@@ -2008,18 +2654,13 @@ def backend.serial.u64.scalar.Scalar52.add_loop
   := do
   if i < 5#usize
   then
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        a i
-    let i2 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        b i
+    let i1 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a i
+    let i2 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index b i
     let i3 ← i1 + i2
     let i4 ← carry >>> 52#i32
     let carry1 ← i3 + i4
     let (_, index_mut_back) ←
-      backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-        sum i
+      backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut sum i
     let i5 ← (↑(carry1 &&& mask) : Result U64)
     let i6 ← i + 1#usize
     let sum1 := index_mut_back i5
@@ -2027,7 +2668,7 @@ def backend.serial.u64.scalar.Scalar52.add_loop
   else ok sum
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 177:4-192:5 -/
 def backend.serial.u64.scalar.Scalar52.add
   (a : backend.serial.u64.scalar.Scalar52)
@@ -2041,7 +2682,7 @@ def backend.serial.u64.scalar.Scalar52.add
       backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
   backend.serial.u64.scalar.Scalar52.sub sum backend.serial.u64.constants.L
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 100:8-111:9 -/
 def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
   (bytes : Array U8 64#usize) (words : Array U64 8#usize) (i : Usize) :
@@ -2116,7 +2757,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
   else ok words
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 97:4-132:5 -/
 def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   (bytes : Array U8 64#usize) : Result backend.serial.u64.scalar.Scalar52 := do
@@ -2127,7 +2768,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let mask ← i - 1#u64
   let i1 ← Array.index_usize words1 0#usize
   let (_, index_mut_back) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
       backend.serial.u64.scalar.Scalar52.ZERO 0#usize
   let i2 ← (↑(i1 &&& mask) : Result U64)
   let i3 ← i1 >>> 52#i32
@@ -2136,8 +2777,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i6 ← (↑(i3 ||| i5) : Result U64)
   let lo := index_mut_back i2
   let (_, index_mut_back1) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      lo 1#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut lo 1#usize
   let i7 ← (↑(i6 &&& mask) : Result U64)
   let i8 ← i4 >>> 40#i32
   let i9 ← Array.index_usize words1 2#usize
@@ -2145,8 +2785,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i11 ← (↑(i8 ||| i10) : Result U64)
   let lo1 := index_mut_back1 i7
   let (_, index_mut_back2) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      lo1 2#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut lo1 2#usize
   let i12 ← (↑(i11 &&& mask) : Result U64)
   let i13 ← i9 >>> 28#i32
   let i14 ← Array.index_usize words1 3#usize
@@ -2154,8 +2793,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i16 ← (↑(i13 ||| i15) : Result U64)
   let lo2 := index_mut_back2 i12
   let (_, index_mut_back3) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      lo2 3#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut lo2 3#usize
   let i17 ← (↑(i16 &&& mask) : Result U64)
   let i18 ← i14 >>> 16#i32
   let i19 ← Array.index_usize words1 4#usize
@@ -2163,8 +2801,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i21 ← (↑(i18 ||| i20) : Result U64)
   let lo3 := index_mut_back3 i17
   let (_, index_mut_back4) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      lo3 4#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut lo3 4#usize
   let i22 ← (↑(i21 &&& mask) : Result U64)
   let i23 ← i19 >>> 4#i32
   let i24 ← (↑(i23 &&& mask) : Result U64)
@@ -2174,8 +2811,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i28 ← (↑(i25 ||| i27) : Result U64)
   let hi := index_mut_back i24
   let (_, index_mut_back5) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      hi 1#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut hi 1#usize
   let i29 ← (↑(i28 &&& mask) : Result U64)
   let i30 ← i26 >>> 44#i32
   let i31 ← Array.index_usize words1 6#usize
@@ -2183,8 +2819,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i33 ← (↑(i30 ||| i32) : Result U64)
   let hi1 := index_mut_back5 i29
   let (_, index_mut_back6) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      hi1 2#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut hi1 2#usize
   let i34 ← (↑(i33 &&& mask) : Result U64)
   let i35 ← i31 >>> 32#i32
   let i36 ← Array.index_usize words1 7#usize
@@ -2192,15 +2827,13 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let i38 ← (↑(i35 ||| i37) : Result U64)
   let hi2 := index_mut_back6 i34
   let (_, index_mut_back7) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      hi2 3#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut hi2 3#usize
   let i39 ← (↑(i38 &&& mask) : Result U64)
   let i40 ← (↑(IScalar.hcast .U32 20#i32) : Result U32)
   massert (i40 < 64#u32)
   let hi3 := index_mut_back7 i39
   let (_, index_mut_back8) ←
-    backend.serial.u64.scalar.IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
-      hi3 4#usize
+    backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut hi3 4#usize
   let i41 ← (i36 >>> 20#i32 : Result U64)
   let lo4 := index_mut_back4 i22
   let lo5 ←
@@ -2212,7 +2845,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
       backend.serial.u64.constants.RR
   backend.serial.u64.scalar.Scalar52.add hi5 lo5
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 137:4-174:5 -/
 def backend.serial.u64.scalar.Scalar52.to_bytes
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -2325,25 +2958,17 @@ def backend.serial.u64.scalar.Scalar52.to_bytes
   let i72 ← (↑(UScalar.cast .U8 i71) : Result U8)
   Array.update s31 31#usize i72
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 250:4-269:5 -/
 def backend.serial.u64.scalar.Scalar52.square_internal
   (a : backend.serial.u64.scalar.Scalar52) : Result (Array U128 9#usize) := do
-  let i ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 0#usize
+  let i ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 0#usize
   let i1 ← i * 2#u64
-  let i2 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 1#usize
+  let i2 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 1#usize
   let i3 ← i2 * 2#u64
-  let i4 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 2#usize
+  let i4 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 2#usize
   let i5 ← i4 * 2#u64
-  let i6 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 3#usize
+  let i6 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 3#usize
   let i7 ← i6 * 2#u64
   let i8 ← backend.serial.u64.scalar.m i i
   let i9 ← Array.index_usize (Array.make 4#usize [ i1, i3, i5, i7 ]) 0#usize
@@ -2355,9 +2980,7 @@ def backend.serial.u64.scalar.Scalar52.square_internal
   let i15 ← Array.index_usize (Array.make 4#usize [ i1, i3, i5, i7 ]) 1#usize
   let i16 ← backend.serial.u64.scalar.m i15 i4
   let i17 ← i14 + i16
-  let i18 ←
-    backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-      a 4#usize
+  let i18 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index a 4#usize
   let i19 ← backend.serial.u64.scalar.m i9 i18
   let i20 ← backend.serial.u64.scalar.m i15 i6
   let i21 ← i19 + i20
@@ -2375,7 +2998,7 @@ def backend.serial.u64.scalar.Scalar52.square_internal
   let i33 ← backend.serial.u64.scalar.m i18 i18
   ok (Array.make 9#usize [ i8, i10, i13, i17, i23, i27, i30, i32, i33 ])
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 332:4-334:5 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_square
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -2384,7 +3007,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_square
   let a ← backend.serial.u64.scalar.Scalar52.square_internal self
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 338:4-340:5 -/
 def backend.serial.u64.scalar.Scalar52.as_montgomery
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -2393,7 +3016,7 @@ def backend.serial.u64.scalar.Scalar52.as_montgomery
   backend.serial.u64.scalar.Scalar52.montgomery_mul self
     backend.serial.u64.constants.RR
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]: loop 0:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 348:8-351:9 -/
 def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
   (self : backend.serial.u64.scalar.Scalar52) (limbs : Array U128 9#usize)
@@ -2402,9 +3025,7 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
   := do
   if i < 5#usize
   then
-    let i1 ←
-      backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-        self i
+    let i1 ← backend.serial.u64.scalar.IndexScalar52UsizeU64.index self i
     let i2 ← (↑(UScalar.cast .U128 i1) : Result U128)
     let a ← Array.update limbs i i2
     let i3 ← i + 1#usize
@@ -2412,7 +3033,7 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
   else ok limbs
 partial_fixpoint
 
-/- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]:
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 345:4-353:5 -/
 def backend.serial.u64.scalar.Scalar52.from_montgomery
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -2423,16 +3044,16 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery
     backend.serial.u64.scalar.Scalar52.from_montgomery_loop self limbs 0#usize
   backend.serial.u64.scalar.Scalar52.montgomery_reduce limbs1
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative]:
    Source: 'curve25519-dalek/src/field.rs', lines 150:4-153:5 -/
 def field.FieldElement51.is_negative
   (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice := do
   let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
   let i ← Array.index_usize bytes 0#usize
   let i1 ← (↑(i &&& 1#u8) : Result U8)
-  core.convert.IntoFrom.into core.convert.FromsubtleChoiceU8 i1
+  core.convert.IntoFrom.into core.convert.FromChoiceU8 i1
 
-/- [curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress]:
+/-- [curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 71:4-75:5 -/
 def edwards.affine.AffinePoint.compress
   (self : edwards.affine.AffinePoint) : Result edwards.CompressedEdwardsY := do
@@ -2445,13 +3066,13 @@ def edwards.affine.AffinePoint.compress
   let s1 ← Array.update s 31#usize i3
   ok s1
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 189:4-191:5 -/
 def edwards.CompressedEdwardsY.as_bytes
   (self : edwards.CompressedEdwardsY) : Result (Array U8 32#usize) := do
   ok self
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501]:
    Source: 'curve25519-dalek/src/field.rs', lines 170:4-204:5 -/
 def field.FieldElement51.pow22501
   (self : backend.serial.u64.field.FieldElement51) :
@@ -2462,46 +3083,46 @@ def field.FieldElement51.pow22501
   let fe ← backend.serial.u64.field.FieldElement51.square t0
   let t1 ← backend.serial.u64.field.FieldElement51.square fe
   let t2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self t1
   let t3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t0 t2
   let t4 ← backend.serial.u64.field.FieldElement51.square t3
   let t5 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t2 t4
   let t6 ← backend.serial.u64.field.FieldElement51.pow2k t5 5#u32
   let t7 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t6 t5
   let t8 ← backend.serial.u64.field.FieldElement51.pow2k t7 10#u32
   let t9 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t8 t7
   let t10 ← backend.serial.u64.field.FieldElement51.pow2k t9 20#u32
   let t11 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t10 t9
   let t12 ← backend.serial.u64.field.FieldElement51.pow2k t11 10#u32
   let t13 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t12 t7
   let t14 ← backend.serial.u64.field.FieldElement51.pow2k t13 50#u32
   let t15 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t14 t13
   let t16 ← backend.serial.u64.field.FieldElement51.pow2k t15 100#u32
   let t17 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t16 t15
   let t18 ← backend.serial.u64.field.FieldElement51.pow2k t17 50#u32
   let t19 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       t18 t13
   ok (t19, t3)
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58]:
    Source: 'curve25519-dalek/src/field.rs', lines 269:4-278:5 -/
 def field.FieldElement51.pow_p58
   (self : backend.serial.u64.field.FieldElement51) :
@@ -2509,24 +3130,10 @@ def field.FieldElement51.pow_p58
   := do
   let (t19, _) ← field.FieldElement51.pow22501 self
   let t20 ← backend.serial.u64.field.FieldElement51.pow2k t19 2#u32
-  backend.serial.u64.field.FieldElement51.Mul.mul
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
     self t20
 
-/- [curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq]:
-   Source: 'curve25519-dalek/src/field.rs', lines 96:4-98:5 -/
-noncomputable def
-  field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-  (self : backend.serial.u64.field.FieldElement51)
-  (other : backend.serial.u64.field.FieldElement51) :
-  Result subtle.Choice
-  := do
-  let a ← backend.serial.u64.field.FieldElement51.to_bytes self
-  let s ← (↑(Array.to_slice a) : Result (Slice U8))
-  let a1 ← backend.serial.u64.field.FieldElement51.to_bytes other
-  let s1 ← (↑(Array.to_slice a1) : Result (Slice U8))
-  subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
-
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i]:
    Source: 'curve25519-dalek/src/field.rs', lines 292:4-338:5 -/
 noncomputable def field.FieldElement51.sqrt_ratio_i
   (u : backend.serial.u64.field.FieldElement51)
@@ -2535,62 +3142,53 @@ noncomputable def field.FieldElement51.sqrt_ratio_i
   := do
   let fe ← backend.serial.u64.field.FieldElement51.square v
   let v3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe v
   let fe1 ← backend.serial.u64.field.FieldElement51.square v3
   let v7 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe1 v
   let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       u v3
   let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       u v7
   let fe4 ← field.FieldElement51.pow_p58 fe3
   let r ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe2 fe4
   let fe5 ← backend.serial.u64.field.FieldElement51.square r
   let check ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       v fe5
-  let correct_sign_sqrt ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      check u
+  let correct_sign_sqrt ← field.ConstantTimeEqFieldElement51.ct_eq check u
   let fe6 ←
-    backend.serial.u64.field.FieldElement51.neg
-      u
-  let flipped_sign_sqrt ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      check fe6
+    backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg u
+  let flipped_sign_sqrt ← field.ConstantTimeEqFieldElement51.ct_eq check fe6
   let fe7 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe6 backend.serial.u64.constants.SQRT_M1
   let flipped_sign_sqrt_i ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      check fe7
+    field.ConstantTimeEqFieldElement51.ct_eq check fe7
   let r_prime ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       backend.serial.u64.constants.SQRT_M1 r
   let c ←
-    subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor flipped_sign_sqrt
-      flipped_sign_sqrt_i
+    subtle.BitOrChoiceChoiceChoice.bitor flipped_sign_sqrt flipped_sign_sqrt_i
   let r1 ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       r r_prime c
   let r_is_negative ← field.FieldElement51.is_negative r1
   let r2 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      r1 r_is_negative
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 r1 r_is_negative
   let was_nonzero_square ←
-    subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor correct_sign_sqrt
-      flipped_sign_sqrt
+    subtle.BitOrChoiceChoiceChoice.bitor correct_sign_sqrt flipped_sign_sqrt
   ok (was_nonzero_square, r2)
 
-/- [curve25519_dalek::edwards::decompress::step_1]:
+/-- [curve25519_dalek::edwards::decompress::step_1]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 217:4-228:5 -/
 noncomputable def edwards.decompress.step_1
   (repr : edwards.CompressedEdwardsY) :
@@ -2602,20 +3200,20 @@ noncomputable def edwards.decompress.step_1
   let Y ← backend.serial.u64.field.FieldElement51.from_bytes a
   let YY ← backend.serial.u64.field.FieldElement51.square Y
   let u ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       YY backend.serial.u64.field.FieldElement51.ONE
   let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       YY backend.serial.u64.constants.EDWARDS_D
   let v ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       fe backend.serial.u64.field.FieldElement51.ONE
   let (is_valid_y_coord, X) ← field.FieldElement51.sqrt_ratio_i u v
   ok (is_valid_y_coord, X, Y, backend.serial.u64.field.FieldElement51.ONE)
 
-/- [curve25519_dalek::edwards::decompress::step_2]:
+/-- [curve25519_dalek::edwards::decompress::step_2]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 231:4-248:5 -/
-def edwards.decompress.step_2
+noncomputable def edwards.decompress.step_2
   (repr : edwards.CompressedEdwardsY)
   (X : backend.serial.u64.field.FieldElement51)
   (Y : backend.serial.u64.field.FieldElement51)
@@ -2625,18 +3223,18 @@ def edwards.decompress.step_2
   let a ← edwards.CompressedEdwardsY.as_bytes repr
   let i ← Array.index_usize a 31#usize
   let i1 ← i >>> 7#i32
-  let compressed_sign_bit ← subtle.FromsubtleChoiceU8.from i1
+  let compressed_sign_bit ← subtle.FromChoiceU8.from i1
   let X1 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      X compressed_sign_bit
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 X
+      compressed_sign_bit
   let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       X1 Y
   ok { X := X1, Y, Z, T := fe }
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 202:4-210:5 -/
 noncomputable def edwards.CompressedEdwardsY.decompress
   (self : edwards.CompressedEdwardsY) :
@@ -2644,17 +3242,15 @@ noncomputable def edwards.CompressedEdwardsY.decompress
   := do
   let (is_valid_y_coord, X, Y, Z) ← edwards.decompress.step_1 self
   let b ←
-    core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice
-      is_valid_y_coord
+    core.convert.IntoFrom.into core.convert.FromBoolChoice is_valid_y_coord
   if b
   then let ep ← edwards.decompress.step_2 self X Y Z
        ok (some ep)
   else ok none
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 420:4-427:5 -/
-def edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity
-  : Result edwards.EdwardsPoint := do
+def edwards.IdentityEdwardsPoint.identity : Result edwards.EdwardsPoint := do
   ok
     {
       X := backend.serial.u64.field.FieldElement51.ZERO,
@@ -2663,66 +3259,61 @@ def edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity
       T := backend.serial.u64.field.FieldElement51.ZERO
     }
 
-/- Trait implementation: [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}]
+/-- Trait implementation: [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}]
    Source: 'curve25519-dalek/src/edwards.rs', lines 419:0-428:1 -/
 @[reducible]
-def traits.Identitycurve25519_dalekedwardsEdwardsPoint : traits.Identity
-  edwards.EdwardsPoint := {
-  identity := edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity
+def traits.IdentityEdwardsPoint : traits.Identity edwards.EdwardsPoint := {
+  identity := edwards.IdentityEdwardsPoint.identity
 }
 
-/- [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq]:
+/-- [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 493:4-502:5 -/
-noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+noncomputable def edwards.ConstantTimeEqEdwardsPoint.ct_eq
   (self : edwards.EdwardsPoint) (other : edwards.EdwardsPoint) :
   Result subtle.Choice
   := do
   let fe ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.X other.Z
   let fe1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       other.X self.Z
-  let c ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      fe fe1
+  let c ← field.ConstantTimeEqFieldElement51.ct_eq fe fe1
   let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.Y other.Z
   let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       other.Y self.Z
-  let c1 ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      fe2 fe3
-  subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand c c1
+  let c1 ← field.ConstantTimeEqFieldElement51.ct_eq fe2 fe3
+  subtle.BitAndChoiceChoiceChoice.bitand c c1
 
-/- Trait implementation: [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}]
+/-- Trait implementation: [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}]
    Source: 'curve25519-dalek/src/edwards.rs', lines 492:0-503:1 -/
 @[reducible]
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint :
-  subtle.ConstantTimeEq edwards.EdwardsPoint := {
-  ct_eq := edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+noncomputable def subtle.ConstantTimeEqEdwardsPoint : subtle.ConstantTimeEq
+  edwards.EdwardsPoint := {
+  ct_eq := edwards.ConstantTimeEqEdwardsPoint.ct_eq
 }
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 519:4-526:5 -/
 def edwards.EdwardsPoint.as_projective_niels
   (self : edwards.EdwardsPoint) :
   Result backend.serial.curve_models.ProjectiveNielsPoint
   := do
   let fe ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       self.Y self.X
   let fe1 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       self.Y self.X
   let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.T backend.serial.u64.constants.EDWARDS_D2
   ok { Y_plus_X := fe, Y_minus_X := fe1, Z := self.Z, T2d := fe2 }
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 532:4-538:5 -/
 def edwards.EdwardsPoint.as_projective
   (self : edwards.EdwardsPoint) :
@@ -2730,7 +3321,7 @@ def edwards.EdwardsPoint.as_projective
   := do
   ok { X := self.X, Y := self.Y, Z := self.Z }
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert]:
    Source: 'curve25519-dalek/src/field.rs', lines 255:4-264:5 -/
 def field.FieldElement51.invert
   (self : backend.serial.u64.field.FieldElement51) :
@@ -2738,47 +3329,47 @@ def field.FieldElement51.invert
   := do
   let (t19, t3) ← field.FieldElement51.pow22501 self
   let t20 ← backend.serial.u64.field.FieldElement51.pow2k t19 5#u32
-  backend.serial.u64.field.FieldElement51.Mul.mul
+  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
     t20 t3
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 555:4-560:5 -/
 def edwards.EdwardsPoint.to_affine
   (self : edwards.EdwardsPoint) : Result edwards.affine.AffinePoint := do
   let recip ← field.FieldElement51.invert self.Z
   let x ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.X recip
   let y ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.Y recip
   ok { x, y }
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 571:4-581:5 -/
 def edwards.EdwardsPoint.to_montgomery
   (self : edwards.EdwardsPoint) : Result montgomery.MontgomeryPoint := do
   let U ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       self.Z self.Y
   let W ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       self.Z self.Y
   let fe ← field.FieldElement51.invert W
   let u ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       U fe
   let a ← backend.serial.u64.field.FieldElement51.to_bytes u
   ok a
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 606:4-608:5 -/
 def edwards.EdwardsPoint.compress
   (self : edwards.EdwardsPoint) : Result edwards.CompressedEdwardsY := do
   let ap ← edwards.EdwardsPoint.to_affine self
   edwards.affine.AffinePoint.compress ap
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 744:4-746:5 -/
 def edwards.EdwardsPoint.double
   (self : edwards.EdwardsPoint) : Result edwards.EdwardsPoint := do
@@ -2786,31 +3377,28 @@ def edwards.EdwardsPoint.double
   let cp ← backend.serial.curve_models.ProjectivePoint.double pp
   backend.serial.curve_models.CompletedPoint.as_extended cp
 
-/- [curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
+/-- [curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 755:4-757:5 -/
-def
-  edwards.EdwardsPoint.add
+def edwards.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint.add
   (self : edwards.EdwardsPoint) (other : edwards.EdwardsPoint) :
   Result edwards.EdwardsPoint
   := do
   let pnp ← edwards.EdwardsPoint.as_projective_niels other
   let cp ←
-    backend.serial.curve_models.CompletedPoint.add
+    backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
       self pnp
   backend.serial.curve_models.CompletedPoint.as_extended cp
 
-/- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
+/-- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
    Source: 'curve25519-dalek/src/edwards.rs', lines 753:0-758:1 -/
 @[reducible]
-def
-  core.ops.arith.EdwardsPoint
-  : core.ops.arith.Add edwards.EdwardsPoint edwards.EdwardsPoint
+def core.ops.arith.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint :
+  core.ops.arith.Add edwards.EdwardsPoint edwards.EdwardsPoint
   edwards.EdwardsPoint := {
-  add :=
-    edwards.EdwardsPoint.add
+  add := edwards.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint.add
 }
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]: loop 0:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]: loop 0:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1333:8-1337:9 -/
 def edwards.EdwardsPoint.mul_by_pow_2_loop
   (k : U32) (s : backend.serial.curve_models.ProjectivePoint) (i : U32) :
@@ -2826,7 +3414,7 @@ def edwards.EdwardsPoint.mul_by_pow_2_loop
   else ok s
 partial_fixpoint
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1328:4-1340:5 -/
 def edwards.EdwardsPoint.mul_by_pow_2
   (self : edwards.EdwardsPoint) (k : U32) : Result edwards.EdwardsPoint := do
@@ -2836,13 +3424,13 @@ def edwards.EdwardsPoint.mul_by_pow_2
   let cp ← backend.serial.curve_models.ProjectivePoint.double s1
   backend.serial.curve_models.CompletedPoint.as_extended cp
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1323:4-1325:5 -/
 def edwards.EdwardsPoint.mul_by_cofactor
   (self : edwards.EdwardsPoint) : Result edwards.EdwardsPoint := do
   edwards.EdwardsPoint.mul_by_pow_2 self 3#u32
 
-/- [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}::is_identity]:
+/-- [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}::is_identity]:
    Source: 'curve25519-dalek/src/traits.rs', lines 45:4-47:5 -/
 def traits.IsIdentity.Blanket.is_identity
   {T : Type} (subtleConstantTimeEqInst : subtle.ConstantTimeEq T) (IdentityInst
@@ -2851,51 +3439,34 @@ def traits.IsIdentity.Blanket.is_identity
   := do
   let t ← IdentityInst.identity
   let c ← subtleConstantTimeEqInst.ct_eq self t
-  core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c
+  core.convert.IntoFrom.into core.convert.FromBoolChoice c
 
-/- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order]:
+/-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1365:4-1367:5 -/
 noncomputable def edwards.EdwardsPoint.is_small_order
   (self : edwards.EdwardsPoint) : Result Bool := do
   let ep ← edwards.EdwardsPoint.mul_by_cofactor self
-  traits.IsIdentity.Blanket.is_identity
-    subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
-    traits.Identitycurve25519_dalekedwardsEdwardsPoint ep
+  traits.IsIdentity.Blanket.is_identity subtle.ConstantTimeEqEdwardsPoint
+    traits.IdentityEdwardsPoint ep
 
-/- [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq]:
-   Source: 'curve25519-dalek/src/field.rs', lines 87:4-89:5 -/
-noncomputable def
-  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
-  (self : backend.serial.u64.field.FieldElement51)
-  (other : backend.serial.u64.field.FieldElement51) :
-  Result Bool
-  := do
-  let c ←
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
-      self other
-  core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c
-
-/- Trait implementation: [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+/-- Trait implementation: [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
    Source: 'curve25519-dalek/src/field.rs', lines 86:0-90:1 -/
 @[reducible]
-noncomputable def
-  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
-  : core.cmp.PartialEq backend.serial.u64.field.FieldElement51
+noncomputable def core.cmp.PartialEqFieldElement51FieldElement51 : core.cmp.PartialEq
+  backend.serial.u64.field.FieldElement51
   backend.serial.u64.field.FieldElement51 := {
-  eq :=
-    field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+  eq := field.PartialEqFieldElement51FieldElement51.eq
 }
 
-/- Trait implementation: [curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+/-- Trait implementation: [curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
    Source: 'curve25519-dalek/src/field.rs', lines 92:0-99:1 -/
 @[reducible]
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51 :
-  subtle.ConstantTimeEq backend.serial.u64.field.FieldElement51 := {
-  ct_eq :=
-    field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
+noncomputable def subtle.ConstantTimeEqFieldElement51 : subtle.ConstantTimeEq
+  backend.serial.u64.field.FieldElement51 := {
+  ct_eq := field.ConstantTimeEqFieldElement51.ct_eq
 }
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero]:
    Source: 'curve25519-dalek/src/field.rs', lines 160:4-165:5 -/
 noncomputable def field.FieldElement51.is_zero
   (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice := do
@@ -2905,7 +3476,7 @@ noncomputable def field.FieldElement51.is_zero
   let s1 ← (↑(Array.to_slice zero) : Result (Slice U8))
   subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
 
-/- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt]:
+/-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt]:
    Source: 'curve25519-dalek/src/field.rs', lines 352:4-354:5 -/
 noncomputable def field.FieldElement51.invsqrt
   (self : backend.serial.u64.field.FieldElement51) :
@@ -2914,61 +3485,50 @@ noncomputable def field.FieldElement51.invsqrt
   field.FieldElement51.sqrt_ratio_i backend.serial.u64.field.FieldElement51.ONE
     self
 
-/- [curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add]:
+/-- [curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add]:
    Source: 'curve25519-dalek/src/macros.rs', lines 33:12-35:13 -/
-def
-  edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add
+def edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add
   (self : edwards.EdwardsPoint) (rhs : edwards.EdwardsPoint) :
   Result edwards.EdwardsPoint
   := do
-  edwards.EdwardsPoint.add
-    self rhs
+  edwards.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint.add self rhs
 
-/- [curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add]:
+/-- [curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 854:4-856:5 -/
-def
-  ristretto.RistrettoPoint.add
+def ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add
   (self : ristretto.RistrettoPoint) (other : ristretto.RistrettoPoint) :
   Result ristretto.RistrettoPoint
   := do
-  let ep ←
-    edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add
-      self other
+  let ep ← edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add self other
   ok ep
 
-/- [curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::add]:
+/-- [curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::add]:
    Source: 'curve25519-dalek/src/macros.rs', lines 33:12-35:13 -/
-def
-  ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add
+def ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add
   (self : ristretto.RistrettoPoint) (rhs : ristretto.RistrettoPoint) :
   Result ristretto.RistrettoPoint
   := do
-  ristretto.RistrettoPoint.add
+  ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add
     self rhs
 
-/- Trait implementation: [curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}]
+/-- Trait implementation: [curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}]
    Source: 'curve25519-dalek/src/macros.rs', lines 31:8-36:9 -/
 @[reducible]
-def
-  core.ops.arith.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint
-  : core.ops.arith.Add ristretto.RistrettoPoint ristretto.RistrettoPoint
+def core.ops.arith.AddRistrettoPointRistrettoPointRistrettoPoint :
+  core.ops.arith.Add ristretto.RistrettoPoint ristretto.RistrettoPoint
   ristretto.RistrettoPoint := {
-  add :=
-    ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add
+  add := ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add
 }
 
-/- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}]
+/-- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}]
    Source: 'curve25519-dalek/src/macros.rs', lines 31:8-36:9 -/
 @[reducible]
-def
-  core.ops.arith.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint
-  : core.ops.arith.Add edwards.EdwardsPoint edwards.EdwardsPoint
-  edwards.EdwardsPoint := {
-  add :=
-    edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add
+def core.ops.arith.AddEdwardsPointEdwardsPointEdwardsPoint : core.ops.arith.Add
+  edwards.EdwardsPoint edwards.EdwardsPoint edwards.EdwardsPoint := {
+  add := edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add
 }
 
-/- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards]:
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 223:4-252:5 -/
 noncomputable def montgomery.MontgomeryPoint.to_edwards
   (self : montgomery.MontgomeryPoint) (sign : U8) :
@@ -2976,20 +3536,20 @@ noncomputable def montgomery.MontgomeryPoint.to_edwards
   := do
   let u ← backend.serial.u64.field.FieldElement51.from_bytes self
   let b ←
-    field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
-      u backend.serial.u64.field.FieldElement51.MINUS_ONE
+    field.PartialEqFieldElement51FieldElement51.eq u
+      backend.serial.u64.field.FieldElement51.MINUS_ONE
   if b
   then ok none
   else
     let fe ←
-      backend.serial.u64.field.FieldElement51.Sub.sub
+      backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
         u backend.serial.u64.field.FieldElement51.ONE
     let fe1 ←
-      backend.serial.u64.field.FieldElement51.Add.add
+      backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
         u backend.serial.u64.field.FieldElement51.ONE
     let fe2 ← field.FieldElement51.invert fe1
     let y ←
-      backend.serial.u64.field.FieldElement51.Mul.mul
+      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
         fe fe2
     let y_bytes ← backend.serial.u64.field.FieldElement51.to_bytes y
     let i ← sign <<< 7#i32
@@ -2998,19 +3558,19 @@ noncomputable def montgomery.MontgomeryPoint.to_edwards
     let y_bytes1 ← Array.update y_bytes 31#usize i2
     edwards.CompressedEdwardsY.decompress y_bytes1
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 229:4-231:5 -/
 def ristretto.CompressedRistretto.to_bytes
   (self : ristretto.CompressedRistretto) : Result (Array U8 32#usize) := do
   ok self
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 234:4-236:5 -/
 def ristretto.CompressedRistretto.as_bytes
   (self : ristretto.CompressedRistretto) : Result (Array U8 32#usize) := do
   ok self
 
-/- [curve25519_dalek::ristretto::decompress::step_1]:
+/-- [curve25519_dalek::ristretto::decompress::step_1]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 275:4-293:5 -/
 noncomputable def ristretto.decompress.step_1
   (repr : ristretto.CompressedRistretto) :
@@ -3022,15 +3582,14 @@ noncomputable def ristretto.decompress.step_1
   let s_bytes_check ← backend.serial.u64.field.FieldElement51.to_bytes s
   let s1 ←
     core.array.Array.index (core.ops.index.IndexSlice
-      (core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice U8))
-      s_bytes_check ()
+      (core.slice.index.SliceIndexRangeFullSliceSlice U8)) s_bytes_check ()
   let s2 ← (↑(Array.to_slice a) : Result (Slice U8))
   let s_encoding_is_canonical ←
     subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s1 s2
   let s_is_negative ← field.FieldElement51.is_negative s
   ok (s_encoding_is_canonical, s_is_negative, s)
 
-/- [curve25519_dalek::ristretto::decompress::step_2]:
+/-- [curve25519_dalek::ristretto::decompress::step_2]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 295:4-333:5 -/
 noncomputable def ristretto.decompress.step_2
   (s : backend.serial.u64.field.FieldElement51) :
@@ -3039,52 +3598,51 @@ noncomputable def ristretto.decompress.step_2
   := do
   let ss ← backend.serial.u64.field.FieldElement51.square s
   let u1 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       backend.serial.u64.field.FieldElement51.ONE ss
   let u2 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       backend.serial.u64.field.FieldElement51.ONE ss
   let u2_sqr ← backend.serial.u64.field.FieldElement51.square u2
   let fe ←
-    backend.serial.u64.field.FieldElement51.neg
+    backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
       backend.serial.u64.constants.EDWARDS_D
   let fe1 ← backend.serial.u64.field.FieldElement51.square u1
   let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe fe1
   let v ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       fe2 u2_sqr
   let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       v u2_sqr
   let (ok1, I) ← field.FieldElement51.invsqrt fe3
   let Dx ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       I u2
   let fe4 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       Dx v
   let Dy ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       I fe4
   let fe5 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       s s
   let x ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe5 Dx
   let x_neg ← field.FieldElement51.is_negative x
   let x1 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      x x_neg
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 x x_neg
   let y ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       u1 Dy
   let t ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       x1 y
   let c ← field.FieldElement51.is_negative t
   let c1 ← field.FieldElement51.is_zero y
@@ -3092,7 +3650,7 @@ noncomputable def ristretto.decompress.step_2
     { X := x1, Y := y, Z := backend.serial.u64.field.FieldElement51.ONE, T := t
     })
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 255:4-269:5 -/
 noncomputable def ristretto.CompressedRistretto.decompress
   (self : ristretto.CompressedRistretto) :
@@ -3100,106 +3658,101 @@ noncomputable def ristretto.CompressedRistretto.decompress
   := do
   let (s_encoding_is_canonical, s_is_negative, s) ←
     ristretto.decompress.step_1 self
-  let c ← subtle.NotsubtleChoicesubtleChoice.not s_encoding_is_canonical
-  let c1 ←
-    subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c s_is_negative
-  let b ← core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c1
+  let c ← subtle.NotChoiceChoice.not s_encoding_is_canonical
+  let c1 ← subtle.BitOrChoiceChoiceChoice.bitor c s_is_negative
+  let b ← core.convert.IntoFrom.into core.convert.FromBoolChoice c1
   if b
   then ok none
   else
     let (ok1, t_is_negative, y_is_zero, res) ← ristretto.decompress.step_2 s
-    let c2 ← subtle.NotsubtleChoicesubtleChoice.not ok1
-    let c3 ←
-      subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c2 t_is_negative
-    let c4 ←
-      subtle.BitOrsubtleChoicesubtleChoicesubtleChoice.bitor c3 y_is_zero
-    let b1 ← core.convert.IntoFrom.into core.convert.FromBoolsubtleChoice c4
+    let c2 ← subtle.NotChoiceChoice.not ok1
+    let c3 ← subtle.BitOrChoiceChoiceChoice.bitor c2 t_is_negative
+    let c4 ← subtle.BitOrChoiceChoiceChoice.bitor c3 y_is_zero
+    let b1 ← core.convert.IntoFrom.into core.convert.FromBoolChoice c4
     if b1
     then ok none
     else ok (some res)
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 489:4-522:5 -/
 noncomputable def ristretto.RistrettoPoint.compress
   (self : ristretto.RistrettoPoint) :
   Result ristretto.CompressedRistretto
   := do
   let fe ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       self.Z self.Y
   let fe1 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       self.Z self.Y
   let u1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe fe1
   let u2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.X self.Y
   let fe2 ← backend.serial.u64.field.FieldElement51.square u2
   let fe3 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       u1 fe2
   let (_, invsqrt) ← field.FieldElement51.invsqrt fe3
   let i1 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       invsqrt u1
   let i2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       invsqrt u2
   let fe4 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       i2 self.T
   let z_inv ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       i1 fe4
   let iX ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.X backend.serial.u64.constants.SQRT_M1
   let iY ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.Y backend.serial.u64.constants.SQRT_M1
   let enchanted_denominator ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       i1 backend.serial.u64.constants.INVSQRT_A_MINUS_D
   let fe5 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       self.T z_inv
   let rotate ← field.FieldElement51.is_negative fe5
   let X ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       self.X iY rotate
   let Y ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       self.Y iX rotate
   let i21 ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       i2 enchanted_denominator rotate
   let fe6 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       X z_inv
   let c ← field.FieldElement51.is_negative fe6
   let Y1 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      Y c
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 Y c
   let fe7 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       self.Z Y1
   let s ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       i21 fe7
   let s_is_negative ← field.FieldElement51.is_negative s
   let s1 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      s s_is_negative
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 s s_is_negative
   let a ← backend.serial.u64.field.FieldElement51.to_bytes s1
   ok a
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 656:4-692:5 -/
 noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   (r_0 : backend.serial.u64.field.FieldElement51) :
@@ -3207,78 +3760,78 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   := do
   let fe ← backend.serial.u64.field.FieldElement51.square r_0
   let r ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       backend.serial.u64.constants.SQRT_M1 fe
   let fe1 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       r backend.serial.u64.field.FieldElement51.ONE
   let N_s ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe1 backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
   let fe2 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       backend.serial.u64.constants.EDWARDS_D r
   let fe3 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       backend.serial.u64.constants.MINUS_ONE fe2
   let fe4 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       r backend.serial.u64.constants.EDWARDS_D
   let D ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe3 fe4
   let (Ns_D_is_sq, s) ← field.FieldElement51.sqrt_ratio_i N_s D
   let s_prime ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       s r_0
   let c ← field.FieldElement51.is_negative s_prime
-  let s_prime_is_pos ← subtle.NotsubtleChoicesubtleChoice.not c
+  let s_prime_is_pos ← subtle.NotChoiceChoice.not c
   let s_prime1 ←
     subtle.ConditionallyNegatable.Blanket.conditional_negate
-      subtle.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
-      core.ops.arith.FieldElement51
-      s_prime s_prime_is_pos
-  let c1 ← subtle.NotsubtleChoicesubtleChoice.not Ns_D_is_sq
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 s_prime
+      s_prime_is_pos
+  let c1 ← subtle.NotChoiceChoice.not Ns_D_is_sq
   let s1 ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       s s_prime1 c1
   let c2 ←
-    backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
       backend.serial.u64.constants.MINUS_ONE r c1
   let fe5 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       r backend.serial.u64.field.FieldElement51.ONE
   let fe6 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       c2 fe5
   let fe7 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe6 backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
   let N_t ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       fe7 D
   let s_sq ← backend.serial.u64.field.FieldElement51.square s1
   let fe8 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       s1 s1
   let fe9 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       fe8 D
   let fe10 ←
-    backend.serial.u64.field.FieldElement51.Mul.mul
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
       N_t backend.serial.u64.constants.SQRT_AD_MINUS_ONE
   let fe11 ←
-    backend.serial.u64.field.FieldElement51.Sub.sub
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
       backend.serial.u64.field.FieldElement51.ONE s_sq
   let fe12 ←
-    backend.serial.u64.field.FieldElement51.Add.add
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
       backend.serial.u64.field.FieldElement51.ONE s_sq
   let ep ←
     backend.serial.curve_models.CompletedPoint.as_extended
       { X := fe9, Y := fe11, Z := fe10, T := fe12 }
   ok ep
 
-/- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes]:
+/-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 787:4-803:5 -/
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
   (bytes : Array U8 64#usize) : Result ristretto.RistrettoPoint := do
@@ -3306,34 +3859,32 @@ noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
   let r_2_bytes1 := to_slice_mut_back1 s5
   let r_2 ← backend.serial.u64.field.FieldElement51.from_bytes r_2_bytes1
   let R_2 ← ristretto.RistrettoPoint.elligator_ristretto_flavor r_2
-  ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add
-    R_1 R_2
+  ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add R_1 R_2
 
-/- Trait implementation: [curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}]
+/-- Trait implementation: [curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 851:0-857:1 -/
 @[reducible]
-def
-  core.ops.arith.RistrettoPoint
+def core.ops.arith.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
   : core.ops.arith.Add ristretto.RistrettoPoint ristretto.RistrettoPoint
   ristretto.RistrettoPoint := {
   add :=
-    ristretto.RistrettoPoint.add
+    ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add
 }
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1119:4-1121:5 -/
 def scalar.Scalar.unpack
   (self : scalar.Scalar) : Result backend.serial.u64.scalar.Scalar52 := do
   backend.serial.u64.scalar.Scalar52.from_bytes self.bytes
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1141:4-1145:5 -/
 def scalar.Scalar52.pack
   (self : backend.serial.u64.scalar.Scalar52) : Result scalar.Scalar := do
   let a ← backend.serial.u64.scalar.Scalar52.to_bytes self
   ok { bytes := a }
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1125:4-1130:5 -/
 def scalar.Scalar.reduce (self : scalar.Scalar) : Result scalar.Scalar := do
   let x ← scalar.Scalar.unpack self
@@ -3343,46 +3894,46 @@ def scalar.Scalar.reduce (self : scalar.Scalar) : Result scalar.Scalar := do
   let x_mod_l ← backend.serial.u64.scalar.Scalar52.montgomery_reduce xR
   scalar.Scalar52.pack x_mod_l
 
-/- [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index]:
+/-- [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 310:4-312:5 -/
-def scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index
+def scalar.IndexScalarUsizeU8.index
   (self : scalar.Scalar) (_index : Usize) : Result U8 := do
   Array.index_usize self.bytes _index
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 237:4-246:5 -/
 def scalar.Scalar.from_bytes_mod_order
   (bytes : Array U8 32#usize) : Result scalar.Scalar := do
   let s ← scalar.Scalar.reduce { bytes }
-  let i ← scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index s 31#usize
+  let i ← scalar.IndexScalarUsizeU8.index s 31#usize
   let right_val ← i >>> 7#i32
   if 0#u8 = right_val
   then ok s
   else fail panic
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 250:4-252:5 -/
 def scalar.Scalar.from_bytes_mod_order_wide
   (input : Array U8 64#usize) : Result scalar.Scalar := do
   let s ← backend.serial.u64.scalar.Scalar52.from_bytes_wide input
   scalar.Scalar52.pack s
 
-/- [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq]:
+/-- [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 301:4-303:5 -/
-noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+noncomputable def scalar.ConstantTimeEqScalar.ct_eq
   (self : scalar.Scalar) (other : scalar.Scalar) : Result subtle.Choice := do
   let s ← (↑(Array.to_slice self.bytes) : Result (Slice U8))
   let s1 ← (↑(Array.to_slice other.bytes) : Result (Slice U8))
   subtle.ConstantTimeEqSlice.ct_eq subtle.ConstantTimeEqU8 s s1
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1134:4-1136:5 -/
 noncomputable def scalar.Scalar.is_canonical
   (self : scalar.Scalar) : Result subtle.Choice := do
   let s ← scalar.Scalar.reduce self
-  scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq self s
+  scalar.ConstantTimeEqScalar.ct_eq self s
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 261:4-265:5 -/
 noncomputable def scalar.Scalar.from_canonical_bytes
   (bytes : Array U8 32#usize) : Result (subtle.CtOption scalar.Scalar) := do
@@ -3390,27 +3941,25 @@ noncomputable def scalar.Scalar.from_canonical_bytes
   let i1 ← i >>> 7#i32
   let high_bit_unset ← subtle.ConstantTimeEqU8.ct_eq i1 0#u8
   let c ← scalar.Scalar.is_canonical { bytes }
-  let c1 ←
-    subtle.BitAndsubtleChoicesubtleChoicesubtleChoice.bitand high_bit_unset c
+  let c1 ← subtle.BitAndChoiceChoiceChoice.bitand high_bit_unset c
   subtle.CtOption.new ({ bytes } : scalar.Scalar) c1
 
-/- Trait implementation: [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}]
+/-- Trait implementation: [curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 300:0-304:1 -/
 @[reducible]
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar : subtle.ConstantTimeEq
-  scalar.Scalar := {
-  ct_eq := scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+noncomputable def subtle.ConstantTimeEqScalar : subtle.ConstantTimeEq scalar.Scalar := {
+  ct_eq := scalar.ConstantTimeEqScalar.ct_eq
 }
 
-/- Trait implementation: [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}]
+/-- Trait implementation: [curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 306:0-313:1 -/
 @[reducible]
-def core.ops.index.Indexcurve25519_dalekscalarScalarUsizeU8 :
-  core.ops.index.Index scalar.Scalar Usize U8 := {
-  index := scalar.Indexcurve25519_dalekscalarScalarUsizeU8.index
+def core.ops.index.IndexScalarUsizeU8 : core.ops.index.Index scalar.Scalar
+  Usize U8 := {
+  index := scalar.IndexScalarUsizeU8.index
 }
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO]
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO]
    Source: 'curve25519-dalek/src/scalar.rs', lines 564:4-564:53 -/
 @[global_simps]
 def scalar.Scalar.ZERO_body : Result scalar.Scalar := do
@@ -3419,7 +3968,7 @@ def scalar.Scalar.ZERO_body : Result scalar.Scalar := do
 @[global_simps, irreducible]
 def scalar.Scalar.ZERO : scalar.Scalar := eval_global scalar.Scalar.ZERO_body
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ONE]
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ONE]
    Source: 'curve25519-dalek/src/scalar.rs', lines 567:4-572:6 -/
 @[global_simps]
 def scalar.Scalar.ONE_body : Result scalar.Scalar := do
@@ -3435,19 +3984,19 @@ def scalar.Scalar.ONE_body : Result scalar.Scalar := do
 @[global_simps, irreducible]
 def scalar.Scalar.ONE : scalar.Scalar := eval_global scalar.Scalar.ONE_body
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 691:4-693:5 -/
 def scalar.Scalar.to_bytes
   (self : scalar.Scalar) : Result (Array U8 32#usize) := do
   ok self.bytes
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 706:4-708:5 -/
 def scalar.Scalar.as_bytes
   (self : scalar.Scalar) : Result (Array U8 32#usize) := do
   ok self.bytes
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]: loop 0:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1169:12-1172:13 -/
 def scalar.Scalar52.montgomery_invert.square_multiply_loop
   (y : backend.serial.u64.scalar.Scalar52) (squarings : Usize) (i : Usize) :
@@ -3461,7 +4010,7 @@ def scalar.Scalar52.montgomery_invert.square_multiply_loop
   else ok y
 partial_fixpoint
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1167:8-1174:9 -/
 def scalar.Scalar52.montgomery_invert.square_multiply
   (y : backend.serial.u64.scalar.Scalar52) (squarings : Usize)
@@ -3472,7 +4021,7 @@ def scalar.Scalar52.montgomery_invert.square_multiply
     scalar.Scalar52.montgomery_invert.square_multiply_loop y squarings 0#usize
   backend.serial.u64.scalar.Scalar52.montgomery_mul y1 x
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1150:4-1205:5 -/
 def scalar.Scalar52.montgomery_invert
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -3527,7 +4076,7 @@ def scalar.Scalar52.montgomery_invert
   let i9 ← 1#usize + 2#usize
   scalar.Scalar52.montgomery_invert.square_multiply y26 i9 _11
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1208:4-1210:5 -/
 def scalar.Scalar52.invert
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -3537,14 +4086,14 @@ def scalar.Scalar52.invert
   let s1 ← scalar.Scalar52.montgomery_invert s
   backend.serial.u64.scalar.Scalar52.from_montgomery s1
 
-/- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert]:
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 747:4-749:5 -/
 def scalar.Scalar.invert (self : scalar.Scalar) : Result scalar.Scalar := do
   let s ← scalar.Scalar.unpack self
   let s1 ← scalar.Scalar52.invert s
   scalar.Scalar52.pack s1
 
-/- [curve25519_dalek::scalar::read_le_u64_into]: loop 0:
+/-- [curve25519_dalek::scalar::read_le_u64_into]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1355:4-1368:5 -/
 def scalar.read_le_u64_into_loop
   (src : Slice U8) (dst : Slice U64) (i : Usize) : Result (Slice U64) := do
@@ -3577,7 +4126,7 @@ def scalar.read_le_u64_into_loop
   else ok dst
 partial_fixpoint
 
-/- [curve25519_dalek::scalar::read_le_u64_into]:
+/-- [curve25519_dalek::scalar::read_le_u64_into]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1352:0-1369:1 -/
 def scalar.read_le_u64_into
   (src : Slice U8) (dst : Slice U64) : Result (Slice U64) := do
@@ -3587,7 +4136,7 @@ def scalar.read_le_u64_into
   massert (i = i2)
   scalar.read_le_u64_into_loop src dst 0#usize
 
-/- [curve25519_dalek::scalar::clamp_integer]:
+/-- [curve25519_dalek::scalar::clamp_integer]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1391:0-1396:1 -/
 def scalar.clamp_integer
   (bytes : Array U8 32#usize) : Result (Array U8 32#usize) := do
@@ -3601,7 +4150,7 @@ def scalar.clamp_integer
   let i5 ← (↑(i4 ||| 64#u8) : Result U8)
   Array.update bytes2 31#usize i5
 
-/- Trait implementation: [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}]
+/-- Trait implementation: [curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}]
    Source: 'curve25519-dalek/src/traits.rs', lines 41:0-48:1 -/
 @[reducible]
 def traits.IsIdentity.Blanket {T : Type} (subtleConstantTimeEqInst :

@@ -37,7 +37,7 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧
     (∀ i < 9, result[i]!.val < 2 ^ 127) := by
   unfold mul_internal
-  unfold backend.serial.u64.scalar.Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
   progress*
   · -- BEGIN TASK
     expand ha with 5; expand hb with 5; simp [*]; scalar_tac

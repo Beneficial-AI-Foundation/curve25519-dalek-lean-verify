@@ -5,9 +5,9 @@ Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 
-/-! # Spec Theorem for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`
+/-! # Spec Theorem for `ConstantTimeEqScalar.ct_eq`
 
-Specification and proof for `ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`.
+Specification and proof for `ConstantTimeEqScalar.ct_eq`.
 
 This function performs constant-time equality comparison.
 
@@ -15,7 +15,7 @@ Source: curve25519-dalek/src/scalar.rs
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar
+namespace curve25519_dalek.scalar.ConstantTimeEqScalar
 
 /-
 natural language description:
@@ -29,7 +29,7 @@ natural language specs:
     • s.bytes = s'.bytes \iff Choice = True
 -/
 
-/-- **Spec and proof concerning `scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq`**:
+/-- **Spec and proof concerning `scalar.ConstantTimeEqScalar.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice` representing equality in constant time
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
@@ -51,4 +51,4 @@ theorem ct_eq_spec (s s' : Scalar) :
     grind
     -- END TASK
 
-end curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar
+end curve25519_dalek.scalar.ConstantTimeEqScalar

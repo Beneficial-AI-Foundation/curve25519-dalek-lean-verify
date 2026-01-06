@@ -98,9 +98,9 @@ set_option linter.style.commandStart false
 # Add `noncomputable` when required
 
 ===FIND===
-def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+def scalar.ConstantTimeEqScalar.ct_eq
 ===REPLACE===
-noncomputable def scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq
+noncomputable def scalar.ConstantTimeEqScalar.ct_eq
 
 ===FIND===
 def scalar.Scalar.is_canonical
@@ -113,16 +113,14 @@ def scalar.Scalar.from_canonical_bytes
 noncomputable def scalar.Scalar.from_canonical_bytes
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
+def subtle.ConstantTimeEqScalar
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekscalarScalar
+noncomputable def subtle.ConstantTimeEqScalar
 
 ===FIND===
-def
-  field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
+def field.ConstantTimeEqFieldElement51.ct_eq
 ===REPLACE===
-noncomputable def
-  field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq
+noncomputable def field.ConstantTimeEqFieldElement51.ct_eq
 
 ===FIND===
 def field.FieldElement51.sqrt_ratio_i
@@ -140,6 +138,11 @@ def edwards.decompress.step_1
 noncomputable def edwards.decompress.step_1
 
 ===FIND===
+def edwards.decompress.step_2
+===REPLACE===
+noncomputable def edwards.decompress.step_2
+
+===FIND===
 def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
 ===REPLACE===
 noncomputable def subtle.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51
@@ -150,9 +153,9 @@ def subtle.ConstantTimeEqSlice
 noncomputable def subtle.ConstantTimeEqSlice
 
 ===FIND===
-def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+def subtle.ConstantTimeEqEdwardsPoint
 ===REPLACE===
-noncomputable def subtle.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint
+noncomputable def subtle.ConstantTimeEqEdwardsPoint
 
 ===FIND===
 def edwards.EdwardsPoint.is_small_order
@@ -160,23 +163,19 @@ def edwards.EdwardsPoint.is_small_order
 noncomputable def edwards.EdwardsPoint.is_small_order
 
 ===FIND===
-def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+def edwards.ConstantTimeEqEdwardsPoint.ct_eq
 ===REPLACE===
-noncomputable def edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq
+noncomputable def edwards.ConstantTimeEqEdwardsPoint.ct_eq
 
 ===FIND===
-def
-  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+def field.PartialEqFieldElement51FieldElement51.eq
 ===REPLACE===
-noncomputable def
-  field.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51.eq
+noncomputable def field.PartialEqFieldElement51FieldElement51.eq
 
 ===FIND===
-def
-  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+def core.cmp.PartialEqFieldElement51FieldElement51
 ===REPLACE===
-noncomputable def
-  core.cmp.PartialEqcurve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51
+noncomputable def core.cmp.PartialEqFieldElement51FieldElement51
 
 ===FIND===
 def montgomery.MontgomeryPoint.to_edwards
@@ -222,5 +221,141 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
 def ristretto.RistrettoPoint.from_uniform_bytes
 ===REPLACE===
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
+
+===FIND===
+def core.slice.index.SliceIndexRangeFullSliceSlice
+===REPLACE===
+noncomputable def core.slice.index.SliceIndexRangeFullSliceSlice
+
+===FIND===
+def subtle.ConditionallySelectableU64
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableU64
+
+===FIND===
+def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+===REPLACE===
+noncomputable def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
+
+===FIND===
+def subtle.ConditionallySelectableFieldElement51
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableFieldElement51
+
+===FIND===
+def subtle.ConstantTimeEqFieldElement51
+===REPLACE===
+noncomputable def subtle.ConstantTimeEqFieldElement51
+
+===FIND===
+def zeroize.Zeroize.Blanket
+===REPLACE===
+noncomputable def zeroize.Zeroize.Blanket
+
+===FIND===
+def backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+===REPLACE===
+noncomputable def backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq
+
+===FIND===
+def core.cmp.PartialEqAffineNielsPointAffineNielsPoint
+===REPLACE===
+noncomputable def core.cmp.PartialEqAffineNielsPointAffineNielsPoint
+
+===FIND===
+def core.cmp.EqAffineNielsPoint
+===REPLACE===
+noncomputable def core.cmp.EqAffineNielsPoint
+
+===FIND===
+def backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+===REPLACE===
+noncomputable def backend.serial.u64.field.ZeroizeFieldElement51.zeroize
+
+===FIND===
+def backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+===REPLACE===
+noncomputable def backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize
+
+===FIND===
+def zeroize.ZeroizeAffineNielsPoint
+===REPLACE===
+noncomputable def zeroize.ZeroizeAffineNielsPoint
+
+===FIND===
+def backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+===REPLACE===
+noncomputable def backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize
+
+===FIND===
+def zeroize.ZeroizeProjectiveNielsPoint
+===REPLACE===
+noncomputable def zeroize.ZeroizeProjectiveNielsPoint
+
+===FIND===
+def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+===REPLACE===
+noncomputable def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
+
+===FIND===
+def traits.ValidityCheckProjectivePoint
+===REPLACE===
+noncomputable def traits.ValidityCheckProjectivePoint
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
+===FIND===
+def subtle.ConditionallySelectableProjectiveNielsPoint
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableProjectiveNielsPoint
+
+===FIND===
+def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+
+===FIND===
+def subtle.ConditionallySelectableAffineNielsPoint
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableAffineNielsPoint
+
+===FIND===
+def zeroize.ZeroizeFieldElement51
+===REPLACE===
+noncomputable def zeroize.ZeroizeFieldElement51
+
+===FIND===
+def zeroize.ZeroizeArray
+===REPLACE===
+noncomputable def zeroize.ZeroizeArray
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
+===FIND===
+def backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
+
+===FIND===
+def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+===REPLACE===
+noncomputable def
+  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
+
+===FIND===
+/-
+===REPLACE===
+/--
 
 

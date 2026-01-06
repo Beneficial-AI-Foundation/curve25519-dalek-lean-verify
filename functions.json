@@ -1,319 +1,787 @@
-{
-  "functions": [
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.L"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.R"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.RR"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_assign"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51.conditional_select"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Add.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.AddAssign.add_assign"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Mul.mul"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub.sub"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.neg"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.Addcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.ConstantTimeEqcurve25519_dalekedwardsEdwardsPoint.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.double"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_affine"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.Identitycurve25519_dalekedwardsEdwardsPoint.identity"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.decompress.step_1"
-    },
-    {
-      "lean_name": "curve25519_dalek.edwards.decompress.step_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.ConstantTimeEqcurve25519_dalekbackendserialu64fieldFieldElement51.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.invsqrt"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.is_negative"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.is_zero"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.pow22501"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.pow_p58"
-    },
-    {
-      "lean_name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"
-    },
-    {
-      "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.Addcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.add"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.compress"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.decompress.step_1"
-    },
-    {
-      "lean_name": "curve25519_dalek.ristretto.decompress.step_2"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.ConstantTimeEqcurve25519_dalekscalarScalar.ct_eq"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.ONE"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.ZERO"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.as_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.is_canonical"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.reduce"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.to_bytes"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar.unpack"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.montgomery_invert"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.Scalar52.pack"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.clamp_integer"
-    },
-    {
-      "lean_name": "curve25519_dalek.scalar.read_le_u64_into"
-    }
-  ]
-}
+{"functions":
+ [{"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
+   "lines": "L458-L472",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.add"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
+   "lines": "L414-L429",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::clone",
+   "lines": "L182-L182",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CloneAffineNielsPoint.clone"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::CompletedPoint}::clone",
+   "lines": "L167-L167",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CloneCompletedPoint.clone"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::clone",
+   "lines": "L204-L204",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CloneProjectiveNielsPoint.clone"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::clone",
+   "lines": "L153-L153",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CloneProjectivePoint.clone"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
+   "lines": "L365-L372",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
+   "lines": "L353-L359",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
+   "lines": "L322-L326",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select",
+   "lines": "L314-L320",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_select"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
+   "lines": "L305-L310",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
+   "lines": "L296-L303",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_select"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::default",
+   "lines": "L267-L269",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.DefaultAffineNielsPoint.default"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::default",
+   "lines": "L251-L253",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.DefaultProjectiveNielsPoint.default"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq",
+   "lines": "L182-L182",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.EqAffineNielsPoint.assert_receiver_is_total_eq"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity",
+   "lines": "L257-L263",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.IdentityAffineNielsPoint.identity"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
+   "lines": "L240-L247",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint.identity"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity",
+   "lines": "L230-L236",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.IdentityProjectivePoint.identity"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg",
+   "lines": "L516-L522",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint.neg"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
+   "lines": "L503-L510",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq",
+   "lines": "L182-L182",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.eq"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended",
+   "lines": "L338-L345",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
+   "lines": "L381-L397",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
+   "lines": "L479-L493",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.sub"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
+   "lines": "L436-L451",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.sub"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid",
+   "lines": "L277-L288",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::zeroize",
+   "lines": "L192-L196",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::zeroize",
+   "lines": "L215-L220",
+   "lean_name":
+   "curve25519_dalek.backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.L"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.R"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.RR"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign",
+   "lines": "L59-L65",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add",
+   "lines": "L70-L74",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone",
+   "lines": "L42-L42",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.CloneFieldElement51.clone"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
+   "lines": "L250-L256",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
+   "lines": "L228-L240",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap",
+   "lines": "L242-L248",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_swap"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes",
+   "lines": "L369-L371",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes",
+   "lines": "L340-L365",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs",
+   "lines": "L260-L262",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate",
+   "lines": "L278-L288",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
+   "lines": "L462-L567",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop.match_1"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
+   "lines": "L292-L325",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
+   "lines": "L570-L572",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
+   "lines": "L575-L584",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
+   "lines": "L376-L458",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul",
+   "lines": "L117-L215",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg",
+   "lines": "L220-L224",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub",
+   "lines": "L86-L103",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}::zeroize",
+   "lines": "L53-L55",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.field.ZeroizeFieldElement51.zeroize"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut",
+   "lines": "L49-L51",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index",
+   "lines": "L43-L45",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.IndexScalar52UsizeU64.index"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
+   "lines": "L177-L192",
+   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
+   "lines": "L338-L340",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
+   "lines": "L213-L226",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
+   "lines": "L66-L93",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
+   "lines": "L97-L132",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
+   "lines": "L345-L353",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
+   "lines": "L326-L328",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
+   "lines": "L274-L307",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
+   "lines": "L332-L334",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
+   "lines": "L231-L245",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
+   "lines": "L250-L269",
+   "lean_name":
+   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
+   "lines": "L195-L211",
+   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
+   "lines": "L137-L174",
+   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
+   "rust_name": "curve25519_dalek::backend::serial::u64::scalar::m",
+   "lines": "L56-L58",
+   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m"},
+  {"source": "curve25519-dalek/src/macros.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add",
+   "lines": "L33-L35",
+   "lean_name":
+   "curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
+   "lines": "L755-L757",
+   "lean_name":
+   "curve25519_dalek.edwards.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint.add"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes",
+   "lines": "L189-L191",
+   "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress",
+   "lines": "L202-L210",
+   "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq",
+   "lines": "L493-L502",
+   "lean_name": "curve25519_dalek.edwards.ConstantTimeEqEdwardsPoint.ct_eq"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective",
+   "lines": "L532-L538",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels",
+   "lines": "L519-L526",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress",
+   "lines": "L606-L608",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.compress"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
+   "lines": "L744-L746",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.double"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order",
+   "lines": "L1365-L1367",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor",
+   "lines": "L1323-L1325",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2",
+   "lines": "L1328-L1340",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine",
+   "lines": "L555-L560",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_affine"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery",
+   "lines": "L571-L581",
+   "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity",
+   "lines": "L420-L427",
+   "lean_name": "curve25519_dalek.edwards.IdentityEdwardsPoint.identity"},
+  {"source": "curve25519-dalek/src/edwards/affine.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress",
+   "lines": "L71-L75",
+   "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name": "curve25519_dalek::edwards::decompress::step_1",
+   "lines": "L217-L228",
+   "lean_name": "curve25519_dalek.edwards.decompress.step_1"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name": "curve25519_dalek::edwards::decompress::step_2",
+   "lines": "L231-L248",
+   "lean_name": "curve25519_dalek.edwards.decompress.step_2"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq",
+   "lines": "L96-L98",
+   "lean_name": "curve25519_dalek.field.ConstantTimeEqFieldElement51.ct_eq"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert",
+   "lines": "L255-L264",
+   "lean_name": "curve25519_dalek.field.FieldElement51.invert"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
+   "lines": "L352-L354",
+   "lean_name": "curve25519_dalek.field.FieldElement51.invsqrt"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative",
+   "lines": "L150-L153",
+   "lean_name": "curve25519_dalek.field.FieldElement51.is_negative"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero",
+   "lines": "L160-L165",
+   "lean_name": "curve25519_dalek.field.FieldElement51.is_zero"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501",
+   "lines": "L170-L204",
+   "lean_name": "curve25519_dalek.field.FieldElement51.pow22501"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
+   "lines": "L269-L278",
+   "lean_name": "curve25519_dalek.field.FieldElement51.pow_p58"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i",
+   "lines": "L292-L338",
+   "lean_name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"},
+  {"source": "curve25519-dalek/src/field.rs",
+   "rust_name":
+   "curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq",
+   "lines": "L87-L89",
+   "lean_name":
+   "curve25519_dalek.field.PartialEqFieldElement51FieldElement51.eq"},
+  {"source": "curve25519-dalek/src/montgomery.rs",
+   "rust_name":
+   "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards",
+   "lines": "L223-L252",
+   "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards"},
+  {"source": "curve25519-dalek/src/macros.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::add",
+   "lines": "L33-L35",
+   "lean_name":
+   "curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
+   "lines": "L854-L856",
+   "lean_name":
+   "curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes",
+   "lines": "L234-L236",
+   "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress",
+   "lines": "L255-L269",
+   "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes",
+   "lines": "L229-L231",
+   "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress",
+   "lines": "L489-L522",
+   "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.compress"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
+   "lines": "L656-L692",
+   "lean_name":
+   "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name":
+   "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
+   "lines": "L787-L803",
+   "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
+   "lines": "L275-L293",
+   "lean_name": "curve25519_dalek.ristretto.decompress.step_1"},
+  {"source": "curve25519-dalek/src/ristretto.rs",
+   "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
+   "lines": "L295-L333",
+   "lean_name": "curve25519_dalek.ristretto.decompress.step_2"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq",
+   "lines": "L301-L303",
+   "lean_name": "curve25519_dalek.scalar.ConstantTimeEqScalar.ct_eq"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index",
+   "lines": "L310-L312",
+   "lean_name": "curve25519_dalek.scalar.IndexScalarUsizeU8.index"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.scalar.Scalar.ONE"},
+  {"source": null,
+   "rust_name": null,
+   "lines": null,
+   "lean_name": "curve25519_dalek.scalar.Scalar.ZERO"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes",
+   "lines": "L706-L708",
+   "lean_name": "curve25519_dalek.scalar.Scalar.as_bytes"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order",
+   "lines": "L237-L246",
+   "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide",
+   "lines": "L250-L252",
+   "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes",
+   "lines": "L261-L265",
+   "lean_name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert",
+   "lines": "L747-L749",
+   "lean_name": "curve25519_dalek.scalar.Scalar.invert"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical",
+   "lines": "L1134-L1136",
+   "lean_name": "curve25519_dalek.scalar.Scalar.is_canonical"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce",
+   "lines": "L1125-L1130",
+   "lean_name": "curve25519_dalek.scalar.Scalar.reduce"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes",
+   "lines": "L691-L693",
+   "lean_name": "curve25519_dalek.scalar.Scalar.to_bytes"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack",
+   "lines": "L1119-L1121",
+   "lean_name": "curve25519_dalek.scalar.Scalar.unpack"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
+   "lines": "L1208-L1210",
+   "lean_name": "curve25519_dalek.scalar.Scalar52.invert"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert",
+   "lines": "L1150-L1205",
+   "lean_name": "curve25519_dalek.scalar.Scalar52.montgomery_invert"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name":
+   "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack",
+   "lines": "L1141-L1145",
+   "lean_name": "curve25519_dalek.scalar.Scalar52.pack"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name": "curve25519_dalek::scalar::clamp_integer",
+   "lines": "L1391-L1396",
+   "lean_name": "curve25519_dalek.scalar.clamp_integer"},
+  {"source": "curve25519-dalek/src/scalar.rs",
+   "rust_name": "curve25519_dalek::scalar::read_le_u64_into",
+   "lines": "L1352-L1369",
+   "lean_name": "curve25519_dalek.scalar.read_le_u64_into"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}",
+   "lines": "L256-L264",
+   "lean_name": "curve25519_dalek.traits.IdentityAffineNielsPoint"},
+  {"source": "curve25519-dalek/src/edwards.rs",
+   "rust_name":
+   "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}",
+   "lines": "L419-L428",
+   "lean_name": "curve25519_dalek.traits.IdentityEdwardsPoint"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}",
+   "lines": "L239-L248",
+   "lean_name": "curve25519_dalek.traits.IdentityProjectiveNielsPoint"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}",
+   "lines": "L229-L237",
+   "lean_name": "curve25519_dalek.traits.IdentityProjectivePoint"},
+  {"source": "curve25519-dalek/src/traits.rs",
+   "rust_name":
+   "curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}",
+   "lines": "L41-L48",
+   "lean_name": "curve25519_dalek.traits.IsIdentity.Blanket"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}",
+   "lines": "L276-L289",
+   "lean_name": "curve25519_dalek.traits.ValidityCheckProjectivePoint"},
+  {"source":
+   "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
+   "rust_name": "zeroize::{zeroize::DefaultIsZeroes for u64}",
+   "lines": "L309-L309",
+   "lean_name": "curve25519_dalek.zeroize.DefaultIsZeroesU64"},
+  {"source":
+   "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
+   "rust_name": "zeroize::{zeroize::Zeroize for Z}",
+   "lines": "L297-L299",
+   "lean_name": "curve25519_dalek.zeroize.Zeroize.Blanket"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}",
+   "lines": "L191-L197",
+   "lean_name": "curve25519_dalek.zeroize.ZeroizeAffineNielsPoint"},
+  {"source":
+   "/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs",
+   "rust_name": "zeroize::{zeroize::Zeroize for @Array<Z, N>}",
+   "lines": "L369-L371",
+   "lean_name": "curve25519_dalek.zeroize.ZeroizeArray"},
+  {"source": "curve25519-dalek/src/backend/serial/u64/field.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}",
+   "lines": "L52-L56",
+   "lean_name": "curve25519_dalek.zeroize.ZeroizeFieldElement51"},
+  {"source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
+   "rust_name":
+   "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}",
+   "lines": "L214-L221",
+   "lean_name": "curve25519_dalek.zeroize.ZeroizeProjectiveNielsPoint"}]}

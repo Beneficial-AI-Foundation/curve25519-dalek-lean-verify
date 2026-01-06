@@ -62,7 +62,7 @@ theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize)
     (∀ j < 9, 5 ≤ j → result[j]! = limbs[j]!) ∧
     (∀ j < i.val, result[j]! = limbs[j]!) := by
   unfold from_montgomery_loop
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
   split
   · progress*
     refine ⟨fun j hj hij ↦ ?_, fun j hj hj' ↦ ?_, ?_⟩

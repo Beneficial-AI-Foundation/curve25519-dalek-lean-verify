@@ -94,8 +94,8 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
      Scalar52_as_Nat b + Scalar52_as_Nat result.1) := by
   unfold sub_loop
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
-  unfold IndexMutcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
   split
   case isTrue hlt =>
     have hi' : i.val < 5 := by scalar_tac
@@ -312,7 +312,7 @@ theorem sub_spec (a b : Array U64 5#usize)
     Scalar52_as_Nat result < L ∧
     (∀ i < 5, result[i]!.val < 2 ^ 52) := by
   unfold sub
-  unfold subtle.FromsubtleChoiceU8.from
+  unfold subtle.FromChoiceU8.from
   -- First, progress through mask computation (two steps: shift then subtract)
   progress  -- 1 <<< 52
   progress  -- mask = i - 1
@@ -345,7 +345,7 @@ theorem sub_spec (a b : Array U64 5#usize)
   have hChoice_one_val : Choice.one.val.val = 1 := by rfl
   -- Helper: Choice.zero.val = 0
   have hChoice_zero_val : Choice.zero.val.val = 0 := by rfl
-  -- Now split on whether i2 = 0 or i2 = 1 (for FromsubtleChoiceU8.from)
+  -- Now split on whether i2 = 0 or i2 = 1 (for FromChoiceU8.from)
   split
   case isTrue hi2_zero =>
     -- i2 = 0, so no borrow, A >= B

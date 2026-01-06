@@ -20,7 +20,8 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
+namespace curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
 natural language description:
@@ -271,4 +272,4 @@ theorem sub_spec (a b : Array U64 5#usize)
     exact final
     -- END TASK
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Sub
+end curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51

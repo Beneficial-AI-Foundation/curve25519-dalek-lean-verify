@@ -68,7 +68,7 @@ theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i
     ∃ result, square_internal a = ok (result) ∧
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
     (∀ i < 9, result[i]!.val < 2 ^ 127) := by
-  unfold square_internal Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+  unfold square_internal backend.serial.u64.scalar.IndexScalar52UsizeU64.index
   progress*
 
   all_goals try (subst_vars; expand ha with 5; scalar_tac)

@@ -40,6 +40,8 @@ The concrete formulas are:
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.u64.field
+open curve25519_dalek.backend.serial.curve_models
+open AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -77,10 +79,10 @@ returning the result in completed coordinates.
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 55) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi hi0
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:=by
@@ -89,7 +91,7 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
       _  < 2 ^ 54 + 2 ^ 52 := add_lt_add_left  (hb i hi) _
     apply le_trans (le_of_lt this)
     scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp[hw_ok]
   constructor
   · simp_all
@@ -104,10 +106,10 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^55) := by
-  unfold FieldElement51.Add.add;
+  unfold AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
   obtain ⟨w, hw_ok, hw, hw0 ⟩:= add_assign_spec' a b ha hb
   simp_all
 
@@ -115,17 +117,17 @@ theorem add_spec' {a b : Array U64 5#usize}
 theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 53) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 52 + 2 ^ 52 := by
       calc (a[i]!).val + (b[i]!).val < 2 ^ 52 + (b[i]!).val := add_lt_add_right (ha i hi) _
            _ < 2 ^ 52 + 2 ^ 52 := add_lt_add_left (hb i hi) _
     apply le_trans (le_of_lt this); scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp [hw_ok]
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by scalar_tac)
@@ -138,17 +140,17 @@ theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
 theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 54) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 53 + 2 ^ 52 := by
       calc (a[i]!).val + (b[i]!).val < 2 ^ 53 + (b[i]!).val := add_lt_add_right (ha i hi) _
            _ < 2 ^ 53 + 2 ^ 52 := add_lt_add_left (hb i hi) _
     apply le_trans (le_of_lt this); scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp [hw_ok]
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by scalar_tac)
@@ -160,20 +162,20 @@ theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
 /-- Tighter add spec using Add.add: (< 2^52) + (< 2^52) → < 2^53 -/
 theorem add_spec_52_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^53) := by
-  unfold FieldElement51.Add.add
+  unfold AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_52_52 a b ha hb
   simp_all
 
 /-- Tighter add spec using Add.add: (< 2^53) + (< 2^52) → < 2^54 -/
 theorem add_spec_53_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) := by
-  unfold FieldElement51.Add.add
+  unfold AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_53_52 a b ha hb
   simp_all
 
