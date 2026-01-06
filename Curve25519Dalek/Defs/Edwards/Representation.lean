@@ -1,35 +1,44 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo
+Authors: Alessandro D'Angelo, Oliver Butterley
 -/
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Types
 import Curve25519Dalek.Defs.Edwards.Curve
-
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.Tactic.MkIffOfInductiveProp
 
 /-!
 # Bridge Infrastructure for Edwards Curve Representations
 
-This file provides the bridge between low-level Rust implementation types
-(ProjectivePoint, CompletedPoint, AffinePoint) and high-level mathematical
-objects (Point Ed25519).
-
-## Contents
-
-1. **field_from_limbs**: Converts 5-limb FieldElement51 arrays to CurveField
-2. **IsValid Predicates**: Link low-level representations to mathematical points
-3. **Total Conversion Functions**: toPoint' with Classical choice for invalid inputs
-4. **Coercions**: Enable natural syntax like `↑q` for conversions
-5. **InBounds**: Hardware bounds checking predicates
-
-## Architecture Note
+This file bridges Rust implementation types to the mathematical `Point Ed25519`.
+For each representation, we define `IsValid` predicates and `toPoint` conversions.
 
 This file imports `Funs.lean` and `Types.lean` to access Rust implementation types.
 It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
+
+## Point Representations
+
+The Rust code uses 9 structures for representing points on the elliptic curve:
+
+- edwards.EdwardsPoint
+- ristretto.RistrettoPoint (TODO: add IsValid details and toPoint)
+- ristretto.CompressedRistretto (TODO: add IsValid details and toPoint)
+- backend.serial.curve_models.ProjectivePoint
+- backend.serial.curve_models.CompletedPoint
+- backend.serial.curve_models.ProjectiveNielsPoint
+- edwards.affine.AffinePoint (TODO: add IsValid and toPoint)
+- edwards.CompressedEdwardsY (TODO: add IsValid and toPoint)
+- montgomery.MontgomeryPoint (TODO: add IsValid and toPoint)
+
+The Rust code is designed so that the constructors and the various operations guarantee that the
+data held by any of these is always a valid combination of coordinates. To track this we introduce
+Lean predicates for each of these represenations.
 -/
+
+/-! ## Field Element Conversions -/
 
 namespace Edwards
 
@@ -42,41 +51,96 @@ def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField
 
 end Edwards
 
+/-! ## FieldElement51 Validity and Casting -/
 
-namespace curve25519_dalek.edwards.affine
-open Edwards
+namespace curve25519_dalek.backend.serial.u64.field
+open Edwards FieldElement51
 
-/-- Validity predicate linking low-level AffinePoint to mathematical Point. -/
-def AffinePoint.IsValid (low : AffinePoint) (high : Point Ed25519) : Prop :=
-    field_from_limbs low.x = high.x ∧ field_from_limbs low.y = high.y
+/-- Convert a FieldElement51 to the mathematical field element in ZMod p.
+    This is the same as `field_from_limbs` but with dot notation support. -/
+def FieldElement51.toField (fe : FieldElement51) : CurveField :=
+  (Field51_as_Nat fe : CurveField)
 
-noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P) : Point Ed25519 :=
- { x := field_from_limbs p.x,
-    y := field_from_limbs p.y,
-    h_on_curve := by
-      have ⟨P, hP⟩ := h; rw [AffinePoint.IsValid] at hP; rw [hP.1, hP.2]; exact P.h_on_curve }
+/-! From the Rust source (field.rs):
+> "In the 64-bit implementation, a `FieldElement` is represented in radix 2^51 as five u64s;
+> the coefficients are allowed to grow up to 2^54 between reductions modulo p."
 
-end curve25519_dalek.edwards.affine
+The bound `< 2^54` is the universal validity condition that:
+- Is accepted as input by all field operations (mul, square, pow2k, sub)
+-/
 
+/-- A FieldElement51 is valid when all 5 limbs are bounded by 2^54.
+    This is the bound accepted as input by field operations and encompasses
+    all valid intermediate values between reductions. -/
+def FieldElement51.IsValid (fe : FieldElement51) : Prop := ∀ i < 5, fe[i]!.val < 2^54
 
+instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
+  show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
 
--- === Validity Predicates ===
+end curve25519_dalek.backend.serial.u64.field
+
+/-! ## EdwardsPoint validity and casting -/
 
 namespace curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.u64.field Edwards
 
-def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
-  let X := Field51_as_Nat e.X
-  let Y := Field51_as_Nat e.Y
-  let Z := Field51_as_Nat e.Z
-  let T := Field51_as_Nat e.T
-  ¬(Z ≡ 0 [MOD p]) ∧
-  X * Y ≡ T * Z [MOD p] ∧
-  Y ^ 2 ≡ X ^ 2 + Z ^ 2 + d * T ^ 2 [MOD p]
+/-- Validity predicate for EdwardsPoint.
+    An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
+    Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
+@[mk_iff]
+structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
+  /-- All coordinate limbs are bounded by 2^53. -/
+  X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
+  Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53
+  Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53
+  T_bounds : ∀ i < 5, e.T[i]!.val < 2 ^ 53
+  /-- The Z coordinate is non-zero in the field. -/
+  Z_ne_zero : e.Z.toField ≠ 0
+  /-- Extended coordinate relation: T = XY/Z, i.e., XY = TZ. -/
+  T_relation : e.X.toField * e.Y.toField = e.T.toField * e.Z.toField
+  /-- The curve equation (twisted Edwards). -/
+  on_curve :
+    let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
+    Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
+
+instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsValid :=
+  decidable_of_iff _ (isValid_iff e).symm
+
+/-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
+    Requires a proof that the point is valid. -/
+noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
+  let X := e.X.toField
+  let Y := e.Y.toField
+  let Z := e.Z.toField
+  { x := X / Z
+    y := Y / Z
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, hz4]
+      linear_combination hcurve }
+
+/-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
+    Returns 0 if the point is not valid. -/
+noncomputable def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
+  if h : e.IsValid then e.toPoint' h else 0
+
+/-- Unfolding lemma: when an EdwardsPoint is valid, toPoint computes (X/Z, Y/Z). -/
+theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
+    (e.toPoint).x = e.X.toField / e.Z.toField ∧
+    (e.toPoint).y = e.Y.toField / e.Z.toField := by
+  unfold toPoint
+  rw [dif_pos h]
+  simp only [toPoint']
+  trivial
 
 end curve25519_dalek.edwards
 
-
-
+/-! ## RistrettoPoint Validity -/
 
 namespace curve25519_dalek.ristretto
 open curve25519_dalek.edwards
@@ -97,103 +161,210 @@ def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
 
 end curve25519_dalek.ristretto
 
+/-! ## ProjectivePoint Validity and Casting -/
 
-
-
--- Attach Projective/Completed definitions to their native namespace
 namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
-/-- Existential validity predicate for ProjectivePoint. -/
-def ProjectivePoint.IsValid (p : ProjectivePoint) : Prop :=
-  ∃ P : Point Ed25519,
-    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y; let Z := field_from_limbs p.Z
-    Z ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * Z
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for ProjectivePoint.
+    A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
+    For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
+    Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
 
-/-- Existential validity predicate for CompletedPoint. -/
-def CompletedPoint.IsValid (p : CompletedPoint) : Prop :=
-  ∃ P : Point Ed25519,
-    let X := field_from_limbs p.X; let Y := field_from_limbs p.Y
-    let Z := field_from_limbs p.Z; let T := field_from_limbs p.T
-    Z ≠ 0 ∧ T ≠ 0 ∧ X = P.x * Z ∧ Y = P.y * T
+    Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
+    because operations like `double` compute X + Y, which must be < 2^54 for subsequent
+    squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
+@[mk_iff]
+structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
+  /-- All coordinate limbs are bounded by 2^52. -/
+  X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
+  Y_bounds : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52
+  Z_bounds : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : pp.Z.toField ≠ 0
+  /-- The curve equation (cleared denominators). -/
+  on_curve :
+    let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
+    Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
-/-- Relational validity predicate linking low-level ProjectivePoint to mathematical Point. -/
-def ProjectivePoint.IsValid' (low : ProjectivePoint) (high : Point Ed25519) : Prop :=
-    let X := field_from_limbs low.X; let Y := field_from_limbs low.Y; let Z := field_from_limbs low.Z
-    Z ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * Z
+instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
+  decidable_of_iff _ (isValid_iff pp).symm
 
-/-- Relational validity predicate linking low-level CompletedPoint to mathematical Point. -/
-def CompletedPoint.IsValid' (low : CompletedPoint) (high : Point Ed25519) : Prop :=
-  let X := field_from_limbs low.X; let Y := field_from_limbs low.Y
-  let Z := field_from_limbs low.Z; let T := field_from_limbs low.T
-  Z ≠ 0 ∧ T ≠ 0 ∧ X = high.x * Z ∧ Y = high.y * T
+/-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
+    Returns 0 if the point is not valid. -/
+noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
+  if h : pp.IsValid then
+    let X := pp.X.toField
+    let Y := pp.Y.toField
+    let Z := pp.Z.toField
+    { x := X / Z
+      y := Y / Z
+      on_curve := by
+        have hz : Z ≠ 0 := h.Z_ne_zero
+        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+        have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+        have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        simp only [Ed25519] at hcurve ⊢
+        simp only [div_pow]
+        field_simp [hz2, hz4]
+        linear_combination hcurve }
+  else 0
 
-/--
-Total conversion function for ProjectivePoint.
-If the point is valid, returns the unique `Point Ed25519` it represents.
-If invalid, returns the neutral element `0`.
--/
-noncomputable def ProjectivePoint.toPoint' (p : ProjectivePoint) : Point Ed25519 := by
-  classical
-  exact if h : p.IsValid then Classical.choose h else 0
+/-- Unfolding lemma: when a ProjectivePoint is valid, toPoint computes (X/Z, Y/Z). -/
+theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsValid) :
+    (pp.toPoint).x = pp.X.toField / pp.Z.toField ∧
+    (pp.toPoint).y = pp.Y.toField / pp.Z.toField := by
+  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
 
-/-- Total conversion function for CompletedPoint. -/
-noncomputable def CompletedPoint.toPoint' (p : CompletedPoint) : Point Ed25519 := by
-  classical
-  exact if h : p.IsValid then Classical.choose h else 0
+/-! ## CompletedPoint Validity and Casting -/
 
-/-- Bridge Lemma: If a ProjectivePoint is valid, `toPoint'` returns the correct mathematical point. -/
-theorem ProjectivePoint.toPoint'_eq_of_isValid {p : ProjectivePoint} {P : Point Ed25519}
-    (h : p.IsValid' P) : p.toPoint' = P := by
-  rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
-    intro P' h'
-    unfold IsValid' at h h'
-    rcases h with ⟨hz, hx, hy⟩
-    rcases h' with ⟨_, hx', hy'⟩
-    ext
-    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
-    · apply mul_right_cancel₀ hz (Eq.trans hy'.symm hy)
-  apply h_uniq
-  exact Classical.choose_spec ⟨P, h⟩
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for CompletedPoint.
+    A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
+    For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
+    Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
-/-- Bridge Lemma: If a CompletedPoint is valid, `toPoint'` returns the correct mathematical point. -/
-theorem CompletedPoint.toPoint'_eq_of_isValid {p : CompletedPoint} {P : Point Ed25519}
-    (h : p.IsValid' P) : p.toPoint' = P := by
-  rw [toPoint', dif_pos ⟨P, h⟩]
-  have h_uniq : ∀ P' : Point Ed25519, p.IsValid' P' → P' = P := by
-    intro P' h'
-    unfold IsValid' at h h'
-    rcases h with ⟨hz, ht, hx, hy⟩
-    rcases h' with ⟨_, _, hx', hy'⟩
-    ext
-    · apply mul_right_cancel₀ hz (Eq.trans hx'.symm hx)
-    · apply mul_right_cancel₀ ht (Eq.trans hy'.symm hy)
-  apply h_uniq
-  exact Classical.choose_spec ⟨P, h⟩
+    All coordinates use the universal bound < 2^54. -/
+@[mk_iff]
+structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
+  /-- All coordinate limbs are bounded by 2^54. -/
+  X_valid : cp.X.IsValid
+  Y_valid : cp.Y.IsValid
+  Z_valid : cp.Z.IsValid
+  T_valid : cp.T.IsValid
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : cp.Z.toField ≠ 0
+  /-- The T coordinate is non-zero. -/
+  T_ne_zero : cp.T.toField ≠ 0
+  /-- The curve equation (cleared denominators). -/
+  on_curve :
+    let X := cp.X.toField; let Y := cp.Y.toField
+    let Z := cp.Z.toField; let T := cp.T.toField
+    Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
--- === Coercions ===
--- These allow using low-level types in high-level equations
+open curve25519_dalek.backend.serial.u64.field in
+instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
+  decidable_of_iff _ (isValid_iff cp).symm
+
+/-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
+    Returns 0 if the point is not valid. -/
+noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :=
+  if h : cp.IsValid then
+    let X := cp.X.toField
+    let Y := cp.Y.toField
+    let Z := cp.Z.toField
+    let T := cp.T.toField
+    { x := X / Z
+      y := Y / T
+      on_curve := by
+        have hz : Z ≠ 0 := h.Z_ne_zero
+        have ht : T ≠ 0 := h.T_ne_zero
+        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+        have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
+        have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        simp only [Ed25519] at hcurve ⊢
+        simp only [div_pow]
+        field_simp [hz2, ht2]
+        linear_combination hcurve }
+  else 0
+
+/-- Unfolding lemma: when a CompletedPoint is valid, toPoint computes (X/Z, Y/T). -/
+theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid) :
+    (cp.toPoint).x = cp.X.toField / cp.Z.toField ∧
+    (cp.toPoint).y = cp.Y.toField / cp.T.toField := by
+  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
+
+/-! ## ProjectiveNielsPoint Validity and Casting -/
+
+/-- Validity predicate for ProjectiveNielsPoint.
+    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
+    - X = (Y_plus_X - Y_minus_X) / 2
+    - Y = (Y_plus_X + Y_minus_X) / 2
+    - The affine point (X/Z, Y/Z) is on Ed25519
+    - T2d = 2*d*x*y*Z where x, y are the affine coordinates
+
+    The curve equation in these coordinates (multiplied by 4 to avoid divisions):
+    4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
+      16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
+
+    Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+@[mk_iff]
+structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
+  /-- All coordinate limbs are bounded by 2^53. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : pn.Z.toField ≠ 0
+  /-- The curve equation (scaled by 4 to avoid 1/2). -/
+  on_curve :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
+    4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
+      16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z) i.e., 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+    let Z := pn.Z.toField; let T2d := pn.T2d.toField
+    2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
+
+instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
+  decidable_of_iff _ (isValid_iff pn).symm
+
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsValid) :
+    Point Ed25519 :=
+  let YpX := pn.Y_plus_X.toField
+  let YmX := pn.Y_minus_X.toField
+  let Z := pn.Z.toField
+  { x := (YpX - YmX) / (2 * Z)
+    y := (YpX + YmX) / (2 * Z)
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have h2 : (2 : CurveField) ≠ 0 := by decide
+      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
+      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
+      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
+      have hcurve := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [h2z2, h2z4]
+      ring_nf
+      ring_nf at hcurve
+      linear_combination hcurve }
+
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    Returns 0 if the point is not valid. -/
+noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
+  if h : pn.IsValid then pn.toPoint' h else 0
+
+/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h : pn.IsValid) :
+    (pn.toPoint).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
+    (pn.toPoint).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
+  unfold toPoint
+  rw [dif_pos h]
+  simp only [toPoint']
+  trivial
+
+/-! ## Coercions -/
 
 /-- Coercion allowing `q + q` syntax where `q` is a ProjectivePoint. -/
 noncomputable instance : Coe ProjectivePoint (Point Ed25519) where
-  coe p := p.toPoint'
+  coe p := p.toPoint
 
 /-- Coercion allowing comparison of `CompletedPoint` results with mathematical points. -/
 noncomputable instance : Coe CompletedPoint (Point Ed25519) where
-  coe p := p.toPoint'
+  coe p := p.toPoint
 
 @[simp]
-theorem ProjectivePoint.toPoint'_eq_coe (p : ProjectivePoint) :
-  p.toPoint' = ↑p := rfl
+theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
+  p.toPoint = ↑p := rfl
 
 @[simp]
-theorem CompletedPoint.toPoint'_eq_coe (p : CompletedPoint) :
-  p.toPoint' = ↑p := rfl
-
-def ProjectivePoint.InBounds (p : ProjectivePoint) : Prop :=
-  (∀ i < 5, p.X[i]!.val ≤ 2^52) ∧
-  (∀ i < 5, p.Y[i]!.val ≤ 2^52) ∧
-  (∀ i < 5, p.Z[i]!.val ≤ 2^52)
+theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
+  p.toPoint = ↑p := rfl
 
 end curve25519_dalek.backend.serial.curve_models

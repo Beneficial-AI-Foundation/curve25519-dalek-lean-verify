@@ -204,6 +204,14 @@ def subtle.ConditionallySelectableU64.conditional_select
   if choice.val = 1#u8 then ok b
   else ok a
 
+/-- Progress spec for ConditionallySelectableU64.conditional_select -/
+@[progress]
+theorem conditional_select_U64_spec (a b : U64) (choice : subtle.Choice) :
+    ∃ res, subtle.ConditionallySelectableU64.conditional_select a b choice = ok res ∧
+    res = if choice.val = 1#u8 then b else a := by
+  unfold subtle.ConditionallySelectableU64.conditional_select
+  split <;> simp_all
+
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74
    Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_assign]

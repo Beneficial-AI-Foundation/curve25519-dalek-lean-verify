@@ -89,13 +89,35 @@ decreasing_by scalar_decr_tac
 - The result represents the input scalar divided by the Montgomery constant R = 2^260, modulo L
 -/
 @[progress]
-theorem from_montgomery_spec (m : Scalar52) :
-    ∃ u, from_montgomery m = ok u ∧
-    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat m % L := by
+theorem from_montgomery_spec (self : Scalar52)
+    (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :
+    ∃ u, from_montgomery self = ok u ∧
+    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L := by
   unfold from_montgomery
   progress*
-  rw [res_post]
-  simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]
-  simp [-Nat.reducePow, *, zero_array]
+  · -- Bounds
+    intro i hi
+    by_cases h_lt : i < 5
+    · -- Case 1: Indices 0-4
+      rw [limbs1_post_2 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp [*];
+      scalar_tac
+    · -- Case 2: Indices 5-8
+      have h_ge : 5 ≤ i := by scalar_tac
+      rw [limbs1_post_1 i hi h_ge]
+      simp only [Array.repeat] at ⊢
+      simp only [getElem!]
+      simp only [List.getElem?_replicate]
+      try simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
+        IsEmpty.forall_iff,not_lt, UScalar.ofNat_val_eq, ↓reduceIte, Nat.ofNat_pos]
+
+  · -- Main equality
+    rw [res_post_1]
+    simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]
+    simp [-Nat.reducePow, *, zero_array]
+
+
+
+
+
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
