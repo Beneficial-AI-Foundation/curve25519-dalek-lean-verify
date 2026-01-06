@@ -115,17 +115,17 @@ theorem add_spec' {a b : Array U64 5#usize}
 theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 53) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 52 + 2 ^ 52 := by
       calc (a[i]!).val + (b[i]!).val < 2 ^ 52 + (b[i]!).val := add_lt_add_right (ha i hi) _
            _ < 2 ^ 52 + 2 ^ 52 := add_lt_add_left (hb i hi) _
     apply le_trans (le_of_lt this); scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp [hw_ok]
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by scalar_tac)
@@ -138,17 +138,17 @@ theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
 theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.AddAssign.add_assign a b = ok result ∧
+    ∃ result, AddAssignFieldElement51SharedAFieldElement51.add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 54) := by
-  unfold FieldElement51.AddAssign.add_assign
+  unfold AddAssignFieldElement51SharedAFieldElement51.add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 53 + 2 ^ 52 := by
       calc (a[i]!).val + (b[i]!).val < 2 ^ 53 + (b[i]!).val := add_lt_add_right (ha i hi) _
            _ < 2 ^ 53 + 2 ^ 52 := add_lt_add_left (hb i hi) _
     apply le_trans (le_of_lt this); scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := FieldElement51.AddAssign.add_assign_loop_spec a b 0#usize (by simp) add_lt
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := AddAssignFieldElement51SharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt
   simp [hw_ok]
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by scalar_tac)
@@ -160,20 +160,20 @@ theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
 /-- Tighter add spec using Add.add: (< 2^52) + (< 2^52) → < 2^53 -/
 theorem add_spec_52_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^53) := by
-  unfold FieldElement51.Add.add
+  unfold AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_52_52 a b ha hb
   simp_all
 
 /-- Tighter add spec using Add.add: (< 2^53) + (< 2^52) → < 2^54 -/
 theorem add_spec_53_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, FieldElement51.Add.add a b = ok result ∧
+    ∃ result, AddShared0FieldElement51SharedAFieldElement51FieldElement51.add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) := by
-  unfold FieldElement51.Add.add
+  unfold AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_53_52 a b ha hb
   simp_all
 
@@ -201,7 +201,7 @@ theorem add_spec_aux
     (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 53)
     (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)
     (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :
-    ∃ c, add self other = ok c ∧
+    ∃ c, AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add self other = ok c ∧
     let X := Field51_as_Nat self.X
     let Y := Field51_as_Nat self.Y
     let Z := Field51_as_Nat self.Z
@@ -223,7 +223,7 @@ theorem add_spec_aux
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) := by
-  unfold add
+  unfold AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
   · intro i hi
@@ -407,7 +407,7 @@ The theorem states that adding a bounded EdwardsPoint with a valid ProjectiveNie
 theorem add_spec_bounds
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
-    ∃ c, add self other = ok c ∧
+    ∃ c, AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add self other = ok c ∧
     let X := Field51_as_Nat self.X
     let Y := Field51_as_Nat self.Y
     let Z := Field51_as_Nat self.Z
@@ -443,7 +443,7 @@ The mixed addition formulas implement elliptic curve point addition on twisted E
 theorem add_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
-    ∃ c, add self other = ok c ∧
+    ∃ c, AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add self other = ok c ∧
     c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint := by
   obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     add_spec_bounds self hself other hother
