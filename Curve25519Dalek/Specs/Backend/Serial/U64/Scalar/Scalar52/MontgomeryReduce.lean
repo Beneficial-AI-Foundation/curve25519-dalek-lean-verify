@@ -11,6 +11,10 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 
+import Mathlib.Data.Nat.ModEq
+import Mathlib.Data.Int.ModEq
+import Mathlib.Data.ZMod.Basic
+
 /-! # Spec Theorem for `Scalar52::montgomery_reduce`
 
 Specification and proof for `Scalar52::montgomery_reduce`.
@@ -46,6 +50,60 @@ natural language specs:
       - The function returns a Scalar52 m such that:
         Scalar52_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)
 -/
+
+-- Bridge lemma: converts the existing LFACTOR_spec (on Nat) to the form needed for Int arithmetic
+private lemma LFACTOR_prop :
+  (↑constants.LFACTOR.val * ↑constants.L[0]!.val : Int) % (2 ^ 52) = (2 ^ 52) - 1 := by
+
+  have h_nat := constants.LFACTOR_spec
+  obtain ⟨h_mod_zero, _, _⟩ := h_nat
+
+  have h_cong : (constants.L[0]!.val : Int) % (2^52) = (_root_.L : Int) % (2^52) := by
+    rw [← constants.L_spec]; unfold Scalar52_as_Nat
+    rw [Finset.sum_range_succ']; zify at h_mod_zero ⊢; simp only [mul_zero, pow_zero, one_mul]
+    rw [Int.add_emod]
+
+    have h_tail_div : (∑ x ∈ Finset.range 4, (2:Int)^(52 * (x + 1)) *
+      (constants.L[x.succ]!).val) % 2^52 = 0 := by
+      apply Int.emod_eq_zero_of_dvd
+      use (∑ x ∈ Finset.range 4, (2:Int)^(52 * x) * (constants.L[x.succ]!).val)
+      rw [Finset.mul_sum]
+      apply Finset.sum_congr rfl
+      intro i _
+      try ring
+
+    rw [h_tail_div, zero_add, Int.emod_emod]
+
+  rw [mul_comm, Int.mul_emod, h_cong, ← Int.mul_emod]
+  rw [← Int.add_sub_cancel (_root_.L * ↑constants.LFACTOR.val : Int) 1, Int.sub_emod]; norm_cast;
+  rw [h_mod_zero]; exact rfl
+
+/-- The "Montgomery Step": Proves that adding the reduction factor clears the lower 52 bits. -/
+private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
+    (hp : p = (x * ↑constants.LFACTOR.val) % (2 ^ 52))
+    (hcarry : carry_out = (x + p * ↑constants.L[0]!.val) / (2 ^ 52)) :
+    x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) := by
+
+  have h_div : x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
+    rw [hcarry]
+    rw [mul_comm ((x + p * ↑constants.L[0]!.val) / 2 ^ 52)]
+    rw [Int.mul_ediv_add_emod]
+
+  have h_mod_zero : (x + p * ↑constants.L[0]!.val) % (2 ^ 52) = 0 := by
+    rw [hp, Int.add_emod, Int.mul_emod, Int.emod_emod, ← Int.mul_emod, mul_assoc, Int.mul_emod]
+    rw [LFACTOR_prop]
+    have h_neg : (2  ^ 52 - 1) % 2 ^ 52 = -1 % 2 ^ 52 := by ring;
+    rw [← Int.zero_emod (2 ^52)]
+    have h_cast : (2 : Int) ^ 52 = ((2 ^ 52 : Nat) : Int) := by norm_cast;
+    rw [h_cast]
+    apply (ZMod.intCast_eq_intCast_iff' _ _ (2^52)).mp
+    simp only [Int.cast_add, ZMod.intCast_mod, Int.cast_mul, Int.cast_sub]
+    simp only [Nat.reducePow, Nat.cast_ofNat, Int.cast_ofNat, Aeneas.ReduceZMod.reduceZMod,
+      Int.cast_one, zero_sub, mul_neg, mul_one, add_neg_cancel, Int.cast_zero]
+
+  rw [h_div, h_mod_zero, add_zero]
+
+
 
 @[progress]
 private theorem part1_spec (sum : U128) :
@@ -257,77 +315,67 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) < 2 * L := by
        sorry
     apply lt_of_lt_of_le h_red_bound
-    simp only [Scalar52_as_Nat, constants.L]
-    try scalar_tac
-    sorry
-  · --
-    simp only [Scalar52_as_Nat, constants.L]
-    try scalar_tac
-    sorry
+    rw [constants.L_spec, Nat.two_mul]
+  · -- Case hb': L ≤ L
+    rw [constants.L_spec]
   · -- Post-conditions
     refine ⟨?_,h_bound,?_⟩
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
       zify
       -- Total Montgomery factor N
-      let N := ↑carry0 + ↑carry1 * (2^52) + ↑carry2 * (2^104) + ↑carry3 * (2^156) + ↑carry4 * (2^208)
+      let N : Int := (carry0.val : Int) +
+                 (carry1.val : Int) * (2^52 : Int) +
+                 (carry2.val : Int) * (2^104 : Int) +
+                 (carry3.val : Int) * (2^156 : Int) +
+                 (carry4.val : Int) * (2^208 : Int)
 
-      have h_core : ↑(Scalar52_wide_as_Nat a) + N * ↑(Scalar52_as_Nat constants.L) = ↑(Scalar52_as_Nat m) * R := by
-        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Scalar52_partial_as_Nat,
-                 constants.R, constants.L, constants.LFACTOR]
-        simp only [h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
-                 h_L1, h_L2, h_L4,
-                 h_n0, h_n1, h_n2, h_n3, h_n4, h_n5, h_n6, h_n7, -- The 'division' results
-                 h_carry0, h_carry1, h_carry2, h_carry3, h_carry4, -- The 'mod' results
-                 h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
-                 h_product1, h_n1_partial, h_n2_partial, h_prod2_0, h_n2_accum, h_prod2_1,
-                 h_n3_partial, h_prod3_1, h_n3_accum, h_prod3_2,
-                 h_n4_partial, h_prod4_0, h_n4_accum1, h_prod4_2, h_n4_accum2, h_prod4_3,
-                 h_n5_partial, h_prod5_1, h_n5_accum1, h_prod5_2, h_n5_accum2, h_prod5_3,
-                 h_n6_partial, h_prod6_1, h_n6_accum1, h_prod6_2,
-                 h_n7_partial, h_prod7_1,
-                 h_n8_partial, h_prod8_1,
-                 h_r0, h_r1, h_r2, h_r3, h_r4]
+      let res := Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4
+      have h_core : ↑(Scalar52_wide_as_Nat a) + N * L =
+                    ↑(Scalar52_as_Nat res) * R := by
+        sorry
+
+      have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
+        sorry
         
-        sorry
+      rw [Int.ModEq.mul_right R h_equiv_int]
+      rw [← h_core]
+      rw [Int.add_mul_emod_self_right]
 
-      have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
-        (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
-        sorry
-      have h_m_subst : (Scalar52_as_Nat m) * R % L = (Scalar52_as_Nat
-        (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4)) * R % L := by
-        apply Nat.ModEq.mul_right R at h_m_equiv
-        simp [Nat.ModEq] at h_m_equiv
-        exact h_m_equiv
-
-      rw [h_m_subst]
-
-      simp only [
-        Scalar52_as_Nat,
-        Scalar52_wide_as_Nat,
-        Scalar52_partial_as_Nat,
-        Finset.sum_range_succ, -- Recursive expansion of sums
-        Finset.sum_range_zero, -- Base case of sums
-        zero_add, add_zero, pow_zero, mul_one -- Arithmetic cleanup
-      ]
-      simp only [
-      Array.make, Array.getElem!_Nat_eq,
-      List.length_cons, List.length_nil,
-      List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
-      zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
-      Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
-      ]
-
-      --norm_num
-
-      try scalar_tac
-      --unfold Scalar52_wide_as_Nat Scalar52_as_Nat
-
-      sorry
     · -- Post-cond: m < 2 ^ 259
       unfold L at h_mod
       apply lt_of_lt_of_le h_mod
       try decide
 
+      -- have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
+      --   (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
+      --   sorry
+      -- have h_m_subst : (Scalar52_as_Nat m) * R % L = (Scalar52_as_Nat
+      --   res) * R % L := by
+      --   apply Nat.ModEq.mul_right R at h_m_equiv
+      --   simp [Nat.ModEq] at h_m_equiv
+      --   exact h_m_equiv
 
+      -- rw [h_m_subst]
+
+      -- simp only [
+      --   Scalar52_as_Nat,
+      --   Scalar52_wide_as_Nat,
+      --   Scalar52_partial_as_Nat,
+      --   Finset.sum_range_succ, -- Recursive expansion of sums
+      --   Finset.sum_range_zero, -- Base case of sums
+      --   zero_add, add_zero, pow_zero, mul_one -- Arithmetic cleanup
+      -- ]
+      -- simp only [
+      -- Array.make, Array.getElem!_Nat_eq,
+      -- List.length_cons, List.length_nil,
+      -- List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
+      -- zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
+      -- Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
+      -- ]
+
+      -- --norm_num
+
+      -- try scalar_tac
+      -- --unfold Scalar52_wide_as_Nat Scalar52_as_Nat
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
