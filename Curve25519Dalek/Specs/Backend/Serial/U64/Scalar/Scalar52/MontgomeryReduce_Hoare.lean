@@ -5,6 +5,7 @@ Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Std.Do
 import Curve25519Dalek.mvcgen
 open Std.Do
@@ -49,12 +50,15 @@ natural language specs:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[spec]
-theorem montgomery_reduce_hoare_spec (a : Array U128 9#usize) :
+theorem montgomery_reduce_hoare_spec (a : Array U128 9#usize)
+    (h_bounds : ∀ i, i < 9 → (a[i]!).val < 2 ^ 127) :
 ⦃⌜True⌝⦄
 montgomery_reduce a
 ⦃⇓ m => ⌜(Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L⌝⦄
   := by
-  sorry
+  mvcgen
+  rcases montgomery_reduce_spec a h_bounds with ⟨m, hres, hmod, _hbounds⟩
+  simp [Std.Do.wp, PostCond.noThrow, hres, hmod]
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
