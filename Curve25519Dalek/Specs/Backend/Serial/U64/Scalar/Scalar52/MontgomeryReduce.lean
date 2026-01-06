@@ -332,11 +332,48 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       let res := Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4
       have h_core : ↑(Scalar52_wide_as_Nat a) + N * L =
                     ↑(Scalar52_as_Nat res) * R := by
+        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Scalar52_partial_as_Nat, R]
+        repeat rw [Finset.sum_range_succ]
+        simp only [Finset.sum_range_zero, add_zero, zero_add, mul_zero, pow_zero, mul_one, pow_one]
+        simp only [res, Array.make, Array.getElem!_Nat_eq, List.length_cons, List.length_nil,
+          List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
+          Nat.reduceAdd]
+
+        zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
+        zify at h_n5 h_r0 h_n6 h_r1 h_n7 h_r2 h_r4_u128 h_r3
+
+        have eq0 := mont_step ↑limbs0 ↑carry0 ↑n0 h_carry0 h_n0
+        have eq1 := mont_step ↑sum1 ↑carry1 ↑n1 h_carry1 h_n1
+        have eq2 := mont_step ↑sum2 ↑carry2 ↑n2 h_carry2 h_n2
+        have eq3 := mont_step ↑sum3 ↑carry3 ↑n3 h_carry3 h_n3
+        have eq4 := mont_step ↑sum4 ↑carry4 ↑n4 h_carry4 h_n4
+
+        have eq5 : ↑sum5 = ↑n5 * (2^52 : Int) + ↑r0 := by
+          rw [h_n5, h_r0, mul_comm, Int.mul_ediv_add_emod]
+        have eq6 : ↑sum6 = ↑n6 * (2^52 : Int) + ↑r1 := by
+          rw [h_n6, h_r1, mul_comm, Int.mul_ediv_add_emod]
+        have eq7 : ↑sum7 = ↑n7 * (2^52 : Int) + ↑r2 := by
+          rw [h_n7, h_r2, mul_comm, Int.mul_ediv_add_emod]
+        have eq8 : ↑sum8 = ↑r4_u128 * (2^52 : Int) + ↑r3 := by
+          rw [h_r4_u128, h_r3, mul_comm, Int.mul_ediv_add_emod]
+
+        simp only [pow_mul]
+        generalize hB : (2 ^ 52) = B
+        have hN_B : N = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
+          simp only [N]
+          rw [←hB]
+          have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
+          have h3 : (2:Int)^156 = (2^52)^3 := by rw [←pow_mul];
+          have h4 : (2:Int)^208 = (2^52)^4 := by rw [←pow_mul];
+          rw [h2, h3, h4]; simp only [Nat.cast_pow]; rfl
+
+        
+
         sorry
 
       have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
         sorry
-        
+
       rw [Int.ModEq.mul_right R h_equiv_int]
       rw [← h_core]
       rw [Int.add_mul_emod_self_right]
