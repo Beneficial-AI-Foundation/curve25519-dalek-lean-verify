@@ -1,13 +1,12 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo
+Authors: Alessandro D'Angelo, Oliver Butterley
 -/
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Types
 import Curve25519Dalek.Defs.Edwards.Curve
-
 import Mathlib.Algebra.Field.ZMod
 
 /-!
@@ -49,6 +48,8 @@ data held by any of these is always a valid combination of coordinates. To track
 Lean predicates for each of these represenations.
 -/
 
+/-! ## Field Element Conversions -/
+
 namespace Edwards
 
 open curve25519_dalek CategoryTheory curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -60,6 +61,8 @@ def field_from_limbs (fe : backend.serial.u64.field.FieldElement51) : CurveField
 
 end Edwards
 
+/-! ## FieldElement51 Validity and Casting -/
+
 namespace curve25519_dalek.backend.serial.u64.field
 open Edwards FieldElement51
 
@@ -68,65 +71,33 @@ open Edwards FieldElement51
 def FieldElement51.toField (fe : FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
-/-! ## FieldElement51 Validity
-
-From the Rust source (field.rs):
+/-! From the Rust source (field.rs):
 > "In the 64-bit implementation, a `FieldElement` is represented in radix 2^51 as five u64s;
 > the coefficients are allowed to grow up to 2^54 between reductions modulo p."
 
 The bound `< 2^54` is the universal validity condition that:
 - Is accepted as input by all field operations (mul, square, pow2k, sub)
-- Encompasses all intermediate values between reductions
-- Allows `as_projective` and `as_extended` conversions to work correctly
 -/
 
 /-- A FieldElement51 is valid when all 5 limbs are bounded by 2^54.
     This is the bound accepted as input by field operations and encompasses
     all valid intermediate values between reductions. -/
-def FieldElement51.IsValid (fe : FieldElement51) : Prop :=
-  ∀ i < 5, fe[i]!.val < 2^54
+def FieldElement51.IsValid (fe : FieldElement51) : Prop := ∀ i < 5, fe[i]!.val < 2^54
 
 instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
   show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
 
 end curve25519_dalek.backend.serial.u64.field
 
-
-namespace curve25519_dalek.edwards.affine
-open Edwards
-
-/-- Validity predicate linking low-level AffinePoint to mathematical Point. -/
-def AffinePoint.IsValid (low : AffinePoint) (high : Point Ed25519) : Prop :=
-    field_from_limbs low.x = high.x ∧ field_from_limbs low.y = high.y
-
-noncomputable def AffinePoint.toPoint (p : AffinePoint) (h : ∃ P, p.IsValid P) : Point Ed25519 :=
- { x := field_from_limbs p.x,
-    y := field_from_limbs p.y,
-    on_curve := by
-      have ⟨P, hP⟩ := h; rw [AffinePoint.IsValid] at hP; rw [hP.1, hP.2]; exact P.on_curve }
-
-end curve25519_dalek.edwards.affine
-
-
-
--- === Validity Predicates ===
+/-! ## EdwardsPoint validity and casting -/
 
 namespace curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64.field Edwards
 
-def EdwardsPoint.IsValid (e : EdwardsPoint) : Prop :=
-  let X := Field51_as_Nat e.X
-  let Y := Field51_as_Nat e.Y
-  let Z := Field51_as_Nat e.Z
-  let T := Field51_as_Nat e.T
-  ¬(Z ≡ 0 [MOD p]) ∧
-  X * Y ≡ T * Z [MOD p] ∧
-  Y ^ 2 ≡ X ^ 2 + Z ^ 2 + d * T ^ 2 [MOD p]
-
-/-- Validity predicate for EdwardsPoint with bounds.
+/-- Validity predicate for EdwardsPoint.
     An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
     Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
-structure EdwardsPoint.IsBounded (e : EdwardsPoint) : Prop where
+structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
   /-- X coordinate limbs are bounded by 2^53. -/
   X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
   /-- Y coordinate limbs are bounded by 2^53. -/
@@ -140,12 +111,13 @@ structure EdwardsPoint.IsBounded (e : EdwardsPoint) : Prop where
   /-- Extended coordinate relation: T = XY/Z, i.e., XY = TZ. -/
   T_relation : e.X.toField * e.Y.toField = e.T.toField * e.Z.toField
   /-- The curve equation (twisted Edwards). -/
-  on_curve : let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
-             Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
+  on_curve :
+    let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
+    Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
-    Requires a proof that the point is bounded. -/
-noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsBounded) : Point Ed25519 :=
+    Requires a proof that the point is valid. -/
+noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
   let X := e.X.toField
   let Y := e.Y.toField
   let Z := e.Z.toField
@@ -163,12 +135,12 @@ noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsBounded) : P
 
 open Classical in
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
-    Returns 0 if the point is not bounded (valid). -/
+    Returns 0 if the point is not valid. -/
 noncomputable def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
-  if h : e.IsBounded then e.toPoint' h else 0
+  if h : e.IsValid then e.toPoint' h else 0
 
-/-- Unfolding lemma: when an EdwardsPoint is bounded, toPoint computes (X/Z, Y/Z). -/
-theorem EdwardsPoint.toPoint_of_isBounded {e : EdwardsPoint} (h : e.IsBounded) :
+/-- Unfolding lemma: when an EdwardsPoint is valid, toPoint computes (X/Z, Y/Z). -/
+theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
     (e.toPoint).x = e.X.toField / e.Z.toField ∧
     (e.toPoint).y = e.Y.toField / e.Z.toField := by
   unfold toPoint
@@ -178,8 +150,7 @@ theorem EdwardsPoint.toPoint_of_isBounded {e : EdwardsPoint} (h : e.IsBounded) :
 
 end curve25519_dalek.edwards
 
-
-
+/-! ## RistrettoPoint Validity -/
 
 namespace curve25519_dalek.ristretto
 open curve25519_dalek.edwards
@@ -200,10 +171,8 @@ def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
 
 end curve25519_dalek.ristretto
 
+/-! ## ProjectivePoint Validity and Casting -/
 
-
-
--- Attach Projective/Completed definitions to their native namespace
 namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
@@ -228,6 +197,48 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
   /-- The curve equation (cleared denominators). -/
   on_curve : let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
              Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
+
+instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
+  if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
+    if hY : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52 then
+      if hZ : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52 then
+        if hZne : pp.Z.toField ≠ 0 then
+          if hcurve : Ed25519.a * pp.X.toField^2 * pp.Z.toField^2 + pp.Y.toField^2 * pp.Z.toField^2
+                    = pp.Z.toField^4 + Ed25519.d * pp.X.toField^2 * pp.Y.toField^2 then
+            isTrue ⟨hX, hY, hZ, hZne, hcurve⟩
+          else isFalse fun h => hcurve h.on_curve
+        else isFalse fun h => hZne h.Z_ne_zero
+      else isFalse fun h => hZ h.Z_bounds
+    else isFalse fun h => hY h.Y_bounds
+  else isFalse fun h => hX h.X_bounds
+
+/-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
+    Returns 0 if the point is not valid. -/
+noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
+  if h : pp.IsValid then
+    let X := pp.X.toField
+    let Y := pp.Y.toField
+    let Z := pp.Z.toField
+    { x := X / Z
+      y := Y / Z
+      on_curve := by
+        have hz : Z ≠ 0 := h.Z_ne_zero
+        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+        have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+        have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        simp only [Ed25519] at hcurve ⊢
+        simp only [div_pow]
+        field_simp [hz2, hz4]
+        linear_combination hcurve }
+  else 0
+
+/-- Unfolding lemma: when a ProjectivePoint is valid, toPoint computes (X/Z, Y/Z). -/
+theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsValid) :
+    (pp.toPoint).x = pp.X.toField / pp.Z.toField ∧
+    (pp.toPoint).y = pp.Y.toField / pp.Z.toField := by
+  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
+
+/-! ## CompletedPoint Validity and Casting -/
 
 open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for CompletedPoint.
@@ -257,105 +268,6 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
              Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
 open curve25519_dalek.backend.serial.u64.field in
-/-- Validity predicate for ProjectiveNielsPoint (bounds only).
-    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents precomputed values
-    for mixed addition: Y+X, Y-X, Z, and 2dT where (X, Y, Z, T) is an EdwardsPoint.
-
-    Bounds: all coordinates < 2^53 (needed for mixed addition operations).
-    This predicate only checks bounds; use IsBounded for full validity with curve equation. -/
-structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
-  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
-  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
-  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
-  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
-  /-- Z coordinate limbs are bounded by 2^53. -/
-  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
-  /-- T2d coordinate limbs are bounded by 2^53. -/
-  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
-
-/-- Full validity predicate for ProjectiveNielsPoint including curve equation.
-    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
-    - X = (Y_plus_X - Y_minus_X) / 2
-    - Y = (Y_plus_X + Y_minus_X) / 2
-    - The affine point (X/Z, Y/Z) is on Ed25519
-    - T2d = 2*d*x*y*Z where x, y are the affine coordinates
-
-    The curve equation in these coordinates (multiplied by 4 to avoid divisions):
-    4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
-      16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)² -/
-structure ProjectiveNielsPoint.IsBounded (pn : ProjectiveNielsPoint) : Prop where
-  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
-  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
-  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
-  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
-  /-- Z coordinate limbs are bounded by 2^53. -/
-  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
-  /-- T2d coordinate limbs are bounded by 2^53. -/
-  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
-  /-- The Z coordinate is non-zero. -/
-  Z_ne_zero : pn.Z.toField ≠ 0
-  /-- The curve equation (scaled by 4 to avoid 1/2). -/
-  on_curve : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
-             4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
-               16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
-  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z), or equivalently 2*Z*T2d = d*(YpX² - YmX²). -/
-  T2d_relation : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
-                 let Z := pn.Z.toField; let T2d := pn.T2d.toField
-                 2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
-
-/-- Convert a ProjectiveNielsPoint to the affine point it represents.
-    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
-noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsBounded) :
-    Point Ed25519 :=
-  let YpX := pn.Y_plus_X.toField
-  let YmX := pn.Y_minus_X.toField
-  let Z := pn.Z.toField
-  { x := (YpX - YmX) / (2 * Z)
-    y := (YpX + YmX) / (2 * Z)
-    on_curve := by
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have h2 : (2 : CurveField) ≠ 0 := by decide
-      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
-      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
-      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
-      have hcurve := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [h2z2, h2z4]
-      ring_nf
-      ring_nf at hcurve
-      linear_combination hcurve }
-
-open Classical in
-/-- Convert a ProjectiveNielsPoint to the affine point it represents.
-    Returns 0 if the point is not bounded (valid). -/
-noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
-  if h : pn.IsBounded then pn.toPoint' h else 0
-
-/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
-theorem ProjectiveNielsPoint.toPoint_of_isBounded {pn : ProjectiveNielsPoint} (h : pn.IsBounded) :
-    (pn.toPoint).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
-    (pn.toPoint).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
-  unfold toPoint
-  rw [dif_pos h]
-  simp only [toPoint']
-  trivial
-
-instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
-  if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
-    if hY : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52 then
-      if hZ : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52 then
-        if hZne : pp.Z.toField ≠ 0 then
-          if hcurve : Ed25519.a * pp.X.toField^2 * pp.Z.toField^2 + pp.Y.toField^2 * pp.Z.toField^2
-                    = pp.Z.toField^4 + Ed25519.d * pp.X.toField^2 * pp.Y.toField^2 then
-            isTrue ⟨hX, hY, hZ, hZne, hcurve⟩
-          else isFalse fun h => hcurve h.on_curve
-        else isFalse fun h => hZne h.Z_ne_zero
-      else isFalse fun h => hZ h.Z_bounds
-    else isFalse fun h => hY h.Y_bounds
-  else isFalse fun h => hX h.X_bounds
-
-open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
   if hX : cp.X.IsValid then
     if hY : cp.Y.IsValid then
@@ -373,26 +285,6 @@ instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable c
       else isFalse fun h => hZ h.Z_valid
     else isFalse fun h => hY h.Y_valid
   else isFalse fun h => hX h.X_valid
-
-/-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
-    Returns 0 if the point is not valid. -/
-noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
-  if h : pp.IsValid then
-    let X := pp.X.toField
-    let Y := pp.Y.toField
-    let Z := pp.Z.toField
-    { x := X / Z
-      y := Y / Z
-      on_curve := by
-        have hz : Z ≠ 0 := h.Z_ne_zero
-        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-        have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
-        have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
-        simp only [Ed25519] at hcurve ⊢
-        simp only [div_pow]
-        field_simp [hz2, hz4]
-        linear_combination hcurve }
-  else 0
 
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
     Returns 0 if the point is not valid. -/
@@ -416,20 +308,85 @@ noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :
         linear_combination hcurve }
   else 0
 
-/-- Unfolding lemma: when a ProjectivePoint is valid, toPoint computes (X/Z, Y/Z). -/
-theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsValid) :
-    (pp.toPoint).x = pp.X.toField / pp.Z.toField ∧
-    (pp.toPoint).y = pp.Y.toField / pp.Z.toField := by
-  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
-
 /-- Unfolding lemma: when a CompletedPoint is valid, toPoint computes (X/Z, Y/T). -/
 theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid) :
     (cp.toPoint).x = cp.X.toField / cp.Z.toField ∧
     (cp.toPoint).y = cp.Y.toField / cp.T.toField := by
   unfold toPoint; rw [dif_pos h]; constructor <;> rfl
 
--- === Coercions ===
--- These allow using low-level types in high-level equations
+/-! ## ProjectiveNielsPoint Validity and Casting -/
+
+/-- Validity predicate for ProjectiveNielsPoint.
+    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
+    - X = (Y_plus_X - Y_minus_X) / 2
+    - Y = (Y_plus_X + Y_minus_X) / 2
+    - The affine point (X/Z, Y/Z) is on Ed25519
+    - T2d = 2*d*x*y*Z where x, y are the affine coordinates
+
+    The curve equation in these coordinates (multiplied by 4 to avoid divisions):
+    4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
+      16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
+
+    Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
+  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
+  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
+  /-- Z coordinate limbs are bounded by 2^53. -/
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  /-- T2d coordinate limbs are bounded by 2^53. -/
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : pn.Z.toField ≠ 0
+  /-- The curve equation (scaled by 4 to avoid 1/2). -/
+  on_curve : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
+             4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
+               16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z), or equivalently 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+                 let Z := pn.Z.toField; let T2d := pn.T2d.toField
+                 2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
+
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsValid) :
+    Point Ed25519 :=
+  let YpX := pn.Y_plus_X.toField
+  let YmX := pn.Y_minus_X.toField
+  let Z := pn.Z.toField
+  { x := (YpX - YmX) / (2 * Z)
+    y := (YpX + YmX) / (2 * Z)
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have h2 : (2 : CurveField) ≠ 0 := by decide
+      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
+      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
+      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
+      have hcurve := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [h2z2, h2z4]
+      ring_nf
+      ring_nf at hcurve
+      linear_combination hcurve }
+
+open Classical in
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    Returns 0 if the point is not valid. -/
+noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
+  if h : pn.IsValid then pn.toPoint' h else 0
+
+/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h : pn.IsValid) :
+    (pn.toPoint).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
+    (pn.toPoint).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
+  unfold toPoint
+  rw [dif_pos h]
+  simp only [toPoint']
+  trivial
+
+/-! ## Coercions -/
 
 /-- Coercion allowing `q + q` syntax where `q` is a ProjectivePoint. -/
 noncomputable instance : Coe ProjectivePoint (Point Ed25519) where
@@ -446,16 +403,5 @@ theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
 @[simp]
 theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
   p.toPoint = ↑p := rfl
-
-open curve25519_dalek.backend.serial.u64.field in
-/-- A ProjectivePoint has all coordinates in bounds. -/
-def ProjectivePoint.InBounds (p : ProjectivePoint) : Prop :=
-  FieldElement51.IsValid p.X ∧ FieldElement51.IsValid p.Y ∧ FieldElement51.IsValid p.Z
-
-open curve25519_dalek.backend.serial.u64.field in
-/-- A CompletedPoint has all coordinates in bounds. -/
-def CompletedPoint.InBounds (p : CompletedPoint) : Prop :=
-  FieldElement51.IsValid p.X ∧ FieldElement51.IsValid p.Y ∧
-  FieldElement51.IsValid p.Z ∧ FieldElement51.IsValid p.T
 
 end curve25519_dalek.backend.serial.curve_models
