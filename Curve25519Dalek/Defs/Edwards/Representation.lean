@@ -87,13 +87,10 @@ open curve25519_dalek.backend.serial.u64.field Edwards
     An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
     Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
 structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
-  /-- X coordinate limbs are bounded by 2^53. -/
+  /-- All coordinate limbs are bounded by 2^53. -/
   X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
-  /-- Y coordinate limbs are bounded by 2^53. -/
   Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53
-  /-- Z coordinate limbs are bounded by 2^53. -/
   Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53
-  /-- T coordinate limbs are bounded by 2^53. -/
   T_bounds : ∀ i < 5, e.T[i]!.val < 2 ^ 53
   /-- The Z coordinate is non-zero in the field. -/
   Z_ne_zero : e.Z.toField ≠ 0
@@ -192,11 +189,9 @@ open curve25519_dalek.backend.serial.u64.field in
     because operations like `double` compute X + Y, which must be < 2^54 for subsequent
     squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
 structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
-  /-- X coordinate limbs are bounded by 2^52 (needed for X + Y < 2^54 in double). -/
+  /-- All coordinate limbs are bounded by 2^52. -/
   X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
-  /-- Y coordinate limbs are bounded by 2^52 (needed for X + Y < 2^54 in double). -/
   Y_bounds : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52
-  /-- Z coordinate limbs are bounded by 2^52. -/
   Z_bounds : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : pp.Z.toField ≠ 0
@@ -253,17 +248,12 @@ open curve25519_dalek.backend.serial.u64.field in
     For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
-    All coordinates use the universal bound < 2^54, which:
-    - Covers outputs from all operations (double, add) where bounds vary
-    - Is sufficient for `as_projective` since mul accepts inputs < 2^54 -/
+    All coordinates use the universal bound < 2^54. -/
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
-  /-- X coordinate is valid (limbs < 2^54). -/
+  /-- All coordinate limbs are bounded by 2^54. -/
   X_valid : cp.X.IsValid
-  /-- Y coordinate is valid (limbs < 2^54). -/
   Y_valid : cp.Y.IsValid
-  /-- Z coordinate is valid (limbs < 2^54). -/
   Z_valid : cp.Z.IsValid
-  /-- T coordinate is valid (limbs < 2^54). -/
   T_valid : cp.T.IsValid
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : cp.Z.toField ≠ 0
@@ -337,24 +327,23 @@ theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid)
 
     Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
-  /-- Y_plus_X coordinate limbs are bounded by 2^53. -/
+  /-- All coordinate limbs are bounded by 2^53. -/
   Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
-  /-- Y_minus_X coordinate limbs are bounded by 2^53. -/
   Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53
-  /-- Z coordinate limbs are bounded by 2^53. -/
   Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
-  /-- T2d coordinate limbs are bounded by 2^53. -/
   T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : pn.Z.toField ≠ 0
   /-- The curve equation (scaled by 4 to avoid 1/2). -/
-  on_curve : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
-             4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
-               16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
-  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z), or equivalently 2*Z*T2d = d*(YpX² - YmX²). -/
-  T2d_relation : let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
-                 let Z := pn.Z.toField; let T2d := pn.T2d.toField
-                 2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
+  on_curve :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
+    4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
+      16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z) i.e., 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+    let Z := pn.Z.toField; let T2d := pn.T2d.toField
+    2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
   if hYpX : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53 then
