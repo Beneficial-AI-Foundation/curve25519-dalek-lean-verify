@@ -6,6 +6,7 @@ Authors: Liao Zhang
 
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Mathlib
 import Curve25519Dalek.mvcgen
 import Std.Do
@@ -28,21 +29,6 @@ open reduce
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
-/-! ## Spec for LOW_51_BIT_MASK -/
-
-theorem LOW_51_BIT_MASK_val_eq : LOW_51_BIT_MASK.val = 2^51 - 1 := by
-  unfold LOW_51_BIT_MASK; decide
-
-/-- Bitwise AND with (2^51 - 1) keeps only the lower 51 bits so bounded ≤ 2^51 - 1 < 2^51. -/
-theorem and_LOW_51_BIT_MASK_lt (a : U64) : (a &&& LOW_51_BIT_MASK).val < 2^51 := by
-  simp [LOW_51_BIT_MASK_val_eq]; omega
-
-
-
-/- The `scalar_tac_simps` is important in particular for `scalar_tac` to know
-   about this constant (otherwise it treats it as an opaque definition). -/
-attribute [simp, scalar_tac_simps] LOW_51_BIT_MASK_val_eq
-
 /- Using the specs with bit-vectors -/
 attribute [-progress] U64.add_spec U64.mul_spec
 attribute [local progress] U64.add_bv_spec U64.mul_bv_spec
@@ -60,4 +46,8 @@ theorem reduce_hoare_spec (limbs : Array U64 5#usize) :
 ⦃⌜True⌝⦄
 reduce limbs
 ⦃⇓result => ⌜(∀ i, i < 5 → (result[i]!).val ≤ 2^51 + (2^13 - 1) * 19) ∧ Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]⌝⦄ := by
-sorry
+  mvcgen
+  rcases reduce_spec limbs with ⟨result, hres, hbounds, hmod⟩
+  simp [Std.Do.wp, PostCond.noThrow, hres, hmod]
+  intro i hi
+  simpa [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using hbounds i hi
