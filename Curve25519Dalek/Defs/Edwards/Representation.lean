@@ -8,6 +8,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Types
 import Curve25519Dalek.Defs.Edwards.Curve
 import Mathlib.Algebra.Field.ZMod
+import Mathlib.Tactic.MkIffOfInductiveProp
 
 /-!
 # Bridge Infrastructure for Edwards Curve Representations
@@ -86,6 +87,7 @@ open curve25519_dalek.backend.serial.u64.field Edwards
 /-- Validity predicate for EdwardsPoint.
     An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
     Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
+@[mk_iff]
 structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^53. -/
   X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
@@ -102,22 +104,7 @@ structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
     Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
 instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsValid :=
-  if hX : ∀ i < 5, e.X[i]!.val < 2 ^ 53 then
-    if hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 53 then
-      if hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 53 then
-        if hT : ∀ i < 5, e.T[i]!.val < 2 ^ 53 then
-          if hZne : e.Z.toField ≠ 0 then
-            if hTrel : e.X.toField * e.Y.toField = e.T.toField * e.Z.toField then
-              if hcurve : Ed25519.a * e.X.toField^2 * e.Z.toField^2 + e.Y.toField^2 * e.Z.toField^2
-                        = e.Z.toField^4 + Ed25519.d * e.X.toField^2 * e.Y.toField^2 then
-                isTrue ⟨hX, hY, hZ, hT, hZne, hTrel, hcurve⟩
-              else isFalse fun h => hcurve h.on_curve
-            else isFalse fun h => hTrel h.T_relation
-          else isFalse fun h => hZne h.Z_ne_zero
-        else isFalse fun h => hT h.T_bounds
-      else isFalse fun h => hZ h.Z_bounds
-    else isFalse fun h => hY h.Y_bounds
-  else isFalse fun h => hX h.X_bounds
+  decidable_of_iff _ (isValid_iff e).symm
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
     Requires a proof that the point is valid. -/
@@ -188,6 +175,7 @@ open curve25519_dalek.backend.serial.u64.field in
     Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
     because operations like `double` compute X + Y, which must be < 2^54 for subsequent
     squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
+@[mk_iff]
 structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
   /-- All coordinate limbs are bounded by 2^52. -/
   X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
@@ -201,18 +189,7 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
     Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
-  if hX : ∀ i < 5, pp.X[i]!.val < 2 ^ 52 then
-    if hY : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52 then
-      if hZ : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52 then
-        if hZne : pp.Z.toField ≠ 0 then
-          if hcurve : Ed25519.a * pp.X.toField^2 * pp.Z.toField^2 + pp.Y.toField^2 * pp.Z.toField^2
-                    = pp.Z.toField^4 + Ed25519.d * pp.X.toField^2 * pp.Y.toField^2 then
-            isTrue ⟨hX, hY, hZ, hZne, hcurve⟩
-          else isFalse fun h => hcurve h.on_curve
-        else isFalse fun h => hZne h.Z_ne_zero
-      else isFalse fun h => hZ h.Z_bounds
-    else isFalse fun h => hY h.Y_bounds
-  else isFalse fun h => hX h.X_bounds
+  decidable_of_iff _ (isValid_iff pp).symm
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/
@@ -249,6 +226,7 @@ open curve25519_dalek.backend.serial.u64.field in
     Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
     All coordinates use the universal bound < 2^54. -/
+@[mk_iff]
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^54. -/
   X_valid : cp.X.IsValid
@@ -267,22 +245,7 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
 
 open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
-  if hX : cp.X.IsValid then
-    if hY : cp.Y.IsValid then
-      if hZ : cp.Z.IsValid then
-        if hT : cp.T.IsValid then
-          if hZne : cp.Z.toField ≠ 0 then
-            if hTne : cp.T.toField ≠ 0 then
-              if hcurve : Ed25519.a * cp.X.toField^2 * cp.T.toField^2 + cp.Y.toField^2 * cp.Z.toField^2
-                        = cp.Z.toField^2 * cp.T.toField^2 + Ed25519.d * cp.X.toField^2 * cp.Y.toField^2 then
-                isTrue ⟨hX, hY, hZ, hT, hZne, hTne, hcurve⟩
-              else isFalse fun h => hcurve h.on_curve
-            else isFalse fun h => hTne h.T_ne_zero
-          else isFalse fun h => hZne h.Z_ne_zero
-        else isFalse fun h => hT h.T_valid
-      else isFalse fun h => hZ h.Z_valid
-    else isFalse fun h => hY h.Y_valid
-  else isFalse fun h => hX h.X_valid
+  decidable_of_iff _ (isValid_iff cp).symm
 
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
     Returns 0 if the point is not valid. -/
@@ -326,6 +289,7 @@ theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid)
       16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
 
     Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+@[mk_iff]
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^53. -/
   Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53
@@ -346,25 +310,7 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
-  if hYpX : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 53 then
-    if hYmX : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 53 then
-      if hZ : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53 then
-        if hT2d : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 53 then
-          if hZne : pn.Z.toField ≠ 0 then
-            if hcurve : 4 * Ed25519.a * (pn.Y_plus_X.toField - pn.Y_minus_X.toField)^2 * pn.Z.toField^2 +
-                        4 * (pn.Y_plus_X.toField + pn.Y_minus_X.toField)^2 * pn.Z.toField^2 =
-                        16 * pn.Z.toField^4 + Ed25519.d * (pn.Y_plus_X.toField - pn.Y_minus_X.toField)^2 *
-                        (pn.Y_plus_X.toField + pn.Y_minus_X.toField)^2 then
-              if hT2drel : 2 * pn.Z.toField * pn.T2d.toField =
-                           Ed25519.d * (pn.Y_plus_X.toField^2 - pn.Y_minus_X.toField^2) then
-                isTrue ⟨hYpX, hYmX, hZ, hT2d, hZne, hcurve, hT2drel⟩
-              else isFalse fun h => hT2drel h.T2d_relation
-            else isFalse fun h => hcurve h.on_curve
-          else isFalse fun h => hZne h.Z_ne_zero
-        else isFalse fun h => hT2d h.T2d_bounds
-      else isFalse fun h => hZ h.Z_bounds
-    else isFalse fun h => hYmX h.Y_minus_X_bounds
-  else isFalse fun h => hYpX h.Y_plus_X_bounds
+  decidable_of_iff _ (isValid_iff pn).symm
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
