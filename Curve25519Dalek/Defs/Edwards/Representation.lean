@@ -12,36 +12,25 @@ import Mathlib.Algebra.Field.ZMod
 /-!
 # Bridge Infrastructure for Edwards Curve Representations
 
-This file provides the bridge between low-level Rust implementation types
-(ProjectivePoint, CompletedPoint, AffinePoint) and high-level mathematical
-objects (Point Ed25519).
-
-## Contents
-
-1. **field_from_limbs**: Converts 5-limb FieldElement51 arrays to CurveField
-2. **IsValid Predicates**: Link low-level representations to mathematical points
-3. **Total Conversion Functions**: toPoint' with Classical choice for invalid inputs
-4. **Coercions**: Enable natural syntax like `↑q` for conversions
-5. **InBounds**: Hardware bounds checking predicates
-
-## Architecture Note
+This file bridges Rust implementation types to the mathematical `Point Ed25519`.
+For each representation, we define `IsValid` predicates and `toPoint` conversions.
 
 This file imports `Funs.lean` and `Types.lean` to access Rust implementation types.
 It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
 
-## Validity Predicates
+## Point Representations
 
-The Rust code uses 9 different Rust structures for representing points on the elliptic curve:
+The Rust code uses 9 structures for representing points on the elliptic curve:
 
+- edwards.EdwardsPoint
+- ristretto.RistrettoPoint (TODO: add IsValid details and toPoint)
+- ristretto.CompressedRistretto (TODO: add IsValid details and toPoint)
 - backend.serial.curve_models.ProjectivePoint
 - backend.serial.curve_models.CompletedPoint
 - backend.serial.curve_models.ProjectiveNielsPoint
-- edwards.EdwardsPoint
-- edwards.affine.AffinePoint
-- edwards.CompressedEdwardsY
-- montgomery.MontgomeryPoint
-- ristretto.RistrettoPoint
-- ristretto.CompressedRistretto
+- edwards.affine.AffinePoint (TODO: add IsValid and toPoint)
+- edwards.CompressedEdwardsY (TODO: add IsValid and toPoint)
+- montgomery.MontgomeryPoint (TODO: add IsValid and toPoint)
 
 The Rust code is designed so that the constructors and the various operations guarantee that the
 data held by any of these is always a valid combination of coordinates. To track this we introduce
