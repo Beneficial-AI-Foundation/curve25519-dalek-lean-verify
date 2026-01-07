@@ -201,7 +201,7 @@ fn reduce(mut limbs: [u64; 5]) -> (r: FieldElement51)
 - **Output**: Different expressions but related (Lean: ~2^51.0000000001, Verus: 2^52)
 - Both specify correctness mod p
 
-**Match**: ⚠️ **Similar** - Same correctness property, different bound expressions (Lean more precise, Verus simpler)
+**Match**: ⚠️ **Different** - Same correctness property, different bound expressions (Lean more precise, Verus simpler)
 
 ---
 
@@ -353,42 +353,3 @@ fn add(self, _rhs: &'a FieldElement51) -> (output: FieldElement51)
 - Both specify correctness
 
 **Match**: ❌ **Different** - Different input requirement styles and different output bounds
-
----
-
-## Summary of 5 Functions
-
-| Function | Input Bounds Match | Output Bounds Match | Overall Match |
-|----------|-------------------|---------------------|---------------|
-| `as_bytes` | ✅ Both none | ✅ Both < p (canonical) | ✅ **Similar** |
-| `neg` | ❌ Lean: 2^54, Verus: 2^51 | ❌ Lean: ~2^51.0000000001, Verus: 2^52 | ❌ **Different** |
-| `reduce` | ✅ Both none | ⚠️ Lean: ~2^51.0000000001, Verus: 2^52 | ⚠️ **Similar** |
-| `sub` | ❌ Different | ❌ Lean: 2^52, Verus: 2^54 | ❌ **Different** |
-| `add` | ❌ Different styles | ❌ Different | ❌ **Different** |
-
-## Key Findings
-
-1. **`as_bytes`**: The comparison document incorrectly extracted `as_bytes self = ok result` as a "bound" - this is just the existence statement. The actual bound is `U8x32_as_Nat result < p`.
-
-2. **Bound Precision**: Lean often uses more precise bounds (e.g., `2^51 + (2^13 - 1) * 19`) while Verus uses simpler powers of 2 (e.g., `2^52`).
-
-3. **Input Requirements**: Lean and Verus often have different input bound requirements, reflecting different proof strategies.
-
-4. **Correctness Properties**: Both systems specify correctness (modular arithmetic, field operations), but the bound specifications differ.
-
-5. **Extraction Issues**: The comparison document sometimes extracts:
-   - Existence statements as "bounds" (e.g., `as_bytes self = ok result`)
-   - Internal computation bounds as output bounds (e.g., "limbs bounded by 2^52" in as_bytes proof)
-   - Comments as bounds (e.g., "canonical encoding")
-
-## Recommendations
-
-1. **Improve Bounds Extraction**: The comparison should distinguish between:
-   - Existence statements (`f x = ok result`)
-   - Correctness properties (`result ≡ input [MOD p]`)
-   - Actual bounds (`result < p` or `limbs[i] < 2^52`)
-
-2. **Compare Equivalent Bounds**: When comparing bounds like `2^51 + (2^13 - 1) * 19` vs `2^52`, note that they're approximately equal but the first is more precise.
-
-3. **Document Input Requirements**: Both systems have different input requirements - document why (different proof strategies, different safety margins).
-
