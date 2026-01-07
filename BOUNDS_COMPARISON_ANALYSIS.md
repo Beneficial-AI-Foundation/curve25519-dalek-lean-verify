@@ -2,6 +2,48 @@
 
 This document provides a detailed LLM-style analysis comparing the actual bounds specifications between Lean and Verus implementations, based on reading the source files directly.
 
+## Executive Summary
+
+This analysis compares bounds specifications for 5 FieldElement51 functions between Lean and Verus verification efforts. **Key findings**:
+
+### Key Differences Identified
+
+#### 1. **Input Bound**
+
+| Function | Lean Input Bound | Verus Input Bound | Difference |
+|----------|------------------|-------------------|------------|
+| `as_bytes` | None | None | ✅ Same |
+| `neg` | `< 2^54` | `< 2^51` (via negate) | ❌ Lean more permissive |
+| `reduce` | None | None (conditional for < 2^51) | ⚠️ Similar |
+| `sub` | `a < 2^63`, `b < 2^54` | Both `< 2^54` | ❌ Lean allows larger minuend |
+| `add` | Both `< 2^53` | Overflow-based (sum ≤ u64::MAX) | ⚠️ Different style |
+
+**Notable**: Lean's `sub` allows extremely large first operand (`2^63`) because it adds `16*p` to avoid underflow - this reflects implementation strategy.
+
+#### 2. **Output Bound**
+
+| Function | Lean Output Bound | Verus Output Bound | Relationship |
+|----------|-------------------|---------------------|--------------|
+| `as_bytes` | `< p` (explicit) | `< p` (implicit via `% p()`) | ✅ Equivalent |
+| `neg` | `≤ 2^51 + (2^13 - 1) * 19` | `< 2^52` | Lean tighter |
+| `reduce` | `≤ 2^51 + (2^13 - 1) * 19` | `< 2^52` (+ `u64_5_as_nat < 2*p`) | Lean tighter; Verus has extra property |
+| `sub` | `< 2^52` | `< 2^54` | Lean tighter |
+| `add` | `< 2^54` (unconditional) | `< 2^52` (conditional on inputs < 2^51) | Different guarantees |
+
+**Pattern**: Lean tends to provide tighter or unconditional output bounds; Verus sometimes uses conditional bounds based on input quality.
+
+### Function-by-Function Match Status
+
+1. **`as_bytes`**: ✅ **Similar** - Both specify canonical encoding < p
+2. **`neg`**: ❌ **Different** - Input (2^54 vs 2^51) and output bounds differ
+3. **`reduce`**: ⚠️ **Different** - Same correctness, different bound expressions
+4. **`sub`**: ❌ **Different** - Different input requirements and output bounds
+5. **`add`**: ❌ **Different** - Different input requirement styles and output bounds
+
+**Summary**: 1/5 similar, 4/5 different.
+
+---
+
 ## Analysis Method
 
 For each function, I read:
