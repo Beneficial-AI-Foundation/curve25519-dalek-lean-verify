@@ -35,20 +35,43 @@ set_option exponentiation.threshold 262
 /-
 natural language description:
 
-    • Takes as input a 9-limb array of u128 values (representing a product in polynomial form)
-      and performs Montgomery reduction to produce an UnpackedScalar in Montgomery form.
+    • **Motivation**: The Montgomery form `M(x) := x * R`, where `R = 2^{260} = 2^{5*52}`,
+      is used to optimize chains of modular arithmetic operations (like elliptic curve scalar
+      multiplication). The isomorphism induced by `* R` changes the multiplication to:
+      `MontMul(x,y) := M(x) * M(y) * R⁻¹`. Therefore, instead of computing standard reduction
+      (`x % L`) which requires complex division logic, one needs to compute `x * R⁻¹ (mod L)`.
+      Montgomery reduction refers to the algorithm that computes this `x * R⁻¹` using efficient
+      bitwise shifts.
 
-    • Montgomery reduction is the core operation that reduces a product (m * m') back to
-      Montgomery form by computing (product * R⁻¹) mod L, where R = 2^260.
+    • **Mechanism**: The algorithm avoids division by adding multiples of `L` to the input `x`
+      until the result is exactly divisible by `R = 2^{260}` (i.e., the lower 260 bits are all zero).
+      Since `R = 2^{260}` and limbs are 52 bits, we perform 5 "zeroing" steps (`part1`)
+      followed by 4 "result assembly" steps (`part2`).
 
-    • This is used after polynomial multiplication (mul_internal or square_internal) to
-      complete Montgomery multiplication or squaring operations.
+    • **Part 1: The Zeroing Strategy**
+      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen multiple of `L`.
+      The helper `part1` calculates a "zeroing factor" `p` using the precomputed `LFACTOR`
+      (where `LFACTOR * L ≡ -1 (mod 2⁵²)`).
+
+      - **Limb 0 (First part1)**:
+        * **Problem**: `limbs[0]` is non-zero. We cannot shift yet.
+        * **Action**: Calculate `p` such that `limbs[0] + p * L ≡ 0 (mod 2⁵²)`.
+        * **Result**: The sum's lowest 52 bits become 0.
+        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²). The carry flows to the next limb.
+
+      *This repeats 5 times (using updated carries) until the entire lower 260 bits are zero.*
+
+    • **Part 2: Result Reconstruction**
+      After 5 reductions, the number is divisible by `R`. The helper `part2` extracts the quotient.
+      It takes the high-order accumulated bits, slices off the lower 52 bits as a result limb (`w`),
+      and passes the remaining upper bits (`carry`) to the next position. This reassembles
+      the final 256-bit result (`r0` through `r4`).
 
 natural language specs:
 
-    • For any 9-limb array a of u128 values:
-      - The function returns a Scalar52 m such that:
-        Scalar52_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)
+    • For any 9-limb array `a` of u128 values (representing a 512-bit integer):
+      - The function returns a `Scalar52` `m` such that:
+        `Scalar52_as_Nat(m) * R ≡ U128x9_as_Nat(a) (mod L)`
 -/
 
 -- Bridge lemma: converts the existing LFACTOR_spec (on Nat) to the form needed for Int arithmetic
@@ -367,8 +390,52 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           have h4 : (2:Int)^208 = (2^52)^4 := by rw [←pow_mul];
           rw [h2, h3, h4]; simp only [Nat.cast_pow]; rfl
 
-        
+        have hR_B : ↑(2 ^ 260) = B^5 := by rw [←hB, ←pow_mul]
 
+        have h_L_expand : ↑(Scalar52_as_Nat constants.L) =
+          1 * (constants.L[0]!) +
+          B * (constants.L[1]!)+
+          B^2 * (constants.L[2]!) +
+          B^3 * (constants.L[3]!) +
+          B^4 * (constants.L[4]!) := by
+          unfold Scalar52_as_Nat
+          rw [←hB]
+          repeat rw [Finset.sum_range_succ]
+          rw [Finset.sum_range_zero, zero_add]
+          simp only [mul_zero, pow_zero, mul_one, pow_mul]
+
+        rw [hN_B, hR_B, ← constants.L_spec, h_L_expand]
+        simp only [
+          h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
+          h_L1, h_L2, h_L4,
+          h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
+          h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
+          h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
+          h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2, h_n5_accum1, h_n5_accum2, h_n6_accum1,
+          h_r4
+        ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+
+        clear h_bounds ha0 ha1 ha2 ha3 ha4 ha5 ha6 ha7 ha8
+        clear hL0 hL1 hL2 hL3 hL4
+        clear h_n0_bound h_carry0_bound h_n1_bound h_carry1_bound h_n2_bound h_carry2_bound
+        clear h_n3_bound h_carry3_bound h_n4_bound h_carry4_bound
+        clear h_n5_bounds h_r0_bound h_n6_bound h_r1_bound h_n7_bound h_r2_bound
+        clear h_r3_bound
+
+        simp only [one_mul]
+
+        norm_cast at *
+
+        rw [hB] at *
+        rw [← h_r4]
+        simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
+          Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
+          List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
+        have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
+          rw [h_r4]
+           -- use h_r4_128_bound
+          sorry
+        
         sorry
 
       have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
@@ -383,36 +450,5 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       apply lt_of_lt_of_le h_mod
       try decide
 
-      -- have h_m_equiv : Scalar52_as_Nat m ≡ Scalar52_as_Nat
-      --   (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) [MOD L] := by
-      --   sorry
-      -- have h_m_subst : (Scalar52_as_Nat m) * R % L = (Scalar52_as_Nat
-      --   res) * R % L := by
-      --   apply Nat.ModEq.mul_right R at h_m_equiv
-      --   simp [Nat.ModEq] at h_m_equiv
-      --   exact h_m_equiv
-
-      -- rw [h_m_subst]
-
-      -- simp only [
-      --   Scalar52_as_Nat,
-      --   Scalar52_wide_as_Nat,
-      --   Scalar52_partial_as_Nat,
-      --   Finset.sum_range_succ, -- Recursive expansion of sums
-      --   Finset.sum_range_zero, -- Base case of sums
-      --   zero_add, add_zero, pow_zero, mul_one -- Arithmetic cleanup
-      -- ]
-      -- simp only [
-      -- Array.make, Array.getElem!_Nat_eq,
-      -- List.length_cons, List.length_nil,
-      -- List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
-      -- zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
-      -- Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
-      -- ]
-
-      -- --norm_num
-
-      -- try scalar_tac
-      -- --unfold Scalar52_wide_as_Nat Scalar52_as_Nat
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
