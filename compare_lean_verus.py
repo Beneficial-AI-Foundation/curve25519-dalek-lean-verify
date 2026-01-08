@@ -15,6 +15,10 @@ def normalize_function_name(name):
     # Remove possible whitespace and special characters
     return name.strip()
 
+def is_constant(func_name):
+    """Check if a function is a constant (to be ignored in Lean verification)"""
+    return '::constants::' in func_name
+
 def get_module(func_name):
     """Extract module name from function name"""
     parts = func_name.split('::')
@@ -23,7 +27,7 @@ def get_module(func_name):
     return 'unknown'
 
 def load_lean_verified(status_file):
-    """Load verified functions from status.csv for Lean"""
+    """Load verified functions from status.csv for Lean, excluding constants"""
     lean_verified = set()
     lean_data = {}  # Store additional information
     with open(status_file, 'r', encoding='utf-8') as f:
@@ -31,16 +35,18 @@ def load_lean_verified(status_file):
         for row in reader:
             if row.get('verified', '').strip() == 'verified':
                 func_name = normalize_function_name(row['function'])
-                lean_verified.add(func_name)
-                lean_data[func_name] = {
-                    'source': row.get('source', ''),
-                    'spec_theorem': row.get('spec_theorem', ''),
-                    'status': 'verified'
-                }
+                # Skip constants
+                if not is_constant(func_name):
+                    lean_verified.add(func_name)
+                    lean_data[func_name] = {
+                        'source': row.get('source', ''),
+                        'spec_theorem': row.get('spec_theorem', ''),
+                        'status': 'verified'
+                    }
     return lean_verified, lean_data
 
 def load_lean_specified(status_file):
-    """Load specified functions (specified or verified) from status.csv for Lean"""
+    """Load specified functions (specified or verified) from status.csv for Lean, excluding constants"""
     lean_specified = set()
     lean_spec_data = {}  # Store additional information
     with open(status_file, 'r', encoding='utf-8') as f:
@@ -49,12 +55,14 @@ def load_lean_specified(status_file):
             verified_status = row.get('verified', '').strip()
             if verified_status in ['verified', 'specified']:
                 func_name = normalize_function_name(row['function'])
-                lean_specified.add(func_name)
-                lean_spec_data[func_name] = {
-                    'source': row.get('source', ''),
-                    'spec_theorem': row.get('spec_theorem', ''),
-                    'status': verified_status
-                }
+                # Skip constants
+                if not is_constant(func_name):
+                    lean_specified.add(func_name)
+                    lean_spec_data[func_name] = {
+                        'source': row.get('source', ''),
+                        'spec_theorem': row.get('spec_theorem', ''),
+                        'status': verified_status
+                    }
     return lean_specified, lean_spec_data
 
 def load_verus_verified(verus_file):
@@ -124,6 +132,7 @@ def main():
     # Group by module
     lean_only_by_module = group_by_module(lean_only)
     verus_only_by_module = group_by_module(verus_only)
+    both_verified_by_module = group_by_module(both_verified)
     lean_spec_only_by_module = group_by_module(lean_spec_only)
     verus_spec_only_by_module = group_by_module(verus_spec_only)
 
@@ -137,7 +146,7 @@ def main():
     print(f"\nFunctions verified in Lean but not Verus: {len(lean_only)}")
     print(f"Functions verified in Verus but not Lean: {len(verus_only)}")
 
-    print(f"\nTotal Lean specified functions (specified/verified): {len(lean_specified)}")
+    print(f"\nTotal Lean specified functions: {len(lean_specified)}")
     print(f"Total Verus specified functions (has_spec=yes): {len(verus_specified)}")
     print(f"Functions specified in both: {len(both_specified)}")
     print(f"\nFunctions specified in Lean but not Verus: {len(lean_spec_only)}")
@@ -160,6 +169,21 @@ def main():
         print(f"\n{module} ({len(funcs)} functions):")
         for func in funcs:
             print(f"  - {func}")
+
+    print("\n" + "=" * 80)
+    print("Functions Verified in Both Lean and Verus (by module):")
+    print("=" * 80)
+    for module in sorted(both_verified_by_module.keys()):
+        funcs = sorted(both_verified_by_module[module])
+        print(f"\n{module} ({len(funcs)} functions):")
+        for func in funcs:
+            spec_theorem = lean_data.get(func, {}).get('spec_theorem', '')
+            verus_link = verus_data.get(func, {}).get('link', '')
+            print(f"  - {func}")
+            if spec_theorem:
+                print(f"    Lean spec: {spec_theorem}")
+            if verus_link:
+                print(f"    Verus link: {verus_link}")
 
     print("\n" + "=" * 80)
     print("Functions Specified in Lean but Not Verus (by module):")
@@ -218,6 +242,22 @@ def main():
             f.write(f"Total: {len(funcs)} functions:\n\n")
             for func in funcs:
                 f.write(f"- `{func}`\n")
+            f.write("\n")
+
+        f.write("## Functions Verified in Both Lean and Verus\n\n")
+        f.write(f"Total: {len(both_verified)} functions\n\n")
+        for module in sorted(both_verified_by_module.keys()):
+            funcs = sorted(both_verified_by_module[module])
+            f.write(f"### {module}\n\n")
+            f.write(f"Total: {len(funcs)} functions:\n\n")
+            for func in funcs:
+                spec_theorem = lean_data.get(func, {}).get('spec_theorem', '')
+                verus_link = verus_data.get(func, {}).get('link', '')
+                f.write(f"- `{func}`\n")
+                if spec_theorem:
+                    f.write(f"  - Lean spec: `{spec_theorem}`\n")
+                if verus_link:
+                    f.write(f"  - Verus: {verus_link}\n")
             f.write("\n")
 
         f.write("## Functions Specified in Lean but Not Verus\n\n")

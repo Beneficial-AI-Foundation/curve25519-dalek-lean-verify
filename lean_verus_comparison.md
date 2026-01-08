@@ -2,21 +2,21 @@
 
 ## Summary Statistics
 
-- **Total Lean verified functions**: 75
+- **Total Lean verified functions**: 67
 - **Total Verus verified functions**: 91
-- **Functions verified in both**: 31
-- **Functions verified in Lean but not Verus**: 44
-- **Functions verified in Verus but not Lean**: 60
+- **Functions verified in both**: 32
+- **Functions verified in Lean but not Verus**: 35
+- **Functions verified in Verus but not Lean**: 59
 
-- **Total Lean specified functions (specified/verified)**: 97
+- **Total Lean specified functions**: 85
 - **Total Verus specified functions (has_spec=yes)**: 163
 - **Functions specified in both**: 52
-- **Functions specified in Lean but not Verus**: 45
+- **Functions specified in Lean but not Verus**: 33
 - **Functions specified in Verus but not Lean**: 111
 
 ## Functions Verified in Lean but Not Verus
 
-Total: 44 functions
+Total: 35 functions
 
 ### curve25519_dalek::backend::serial::curve_models::CompletedPoint
 
@@ -33,26 +33,9 @@ Total: 2 functions:
 - `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::as_extended`
 - `curve25519_dalek::backend::serial::curve_models::ProjectivePoint::double`
 
-### curve25519_dalek::backend::serial::u64::constants
-
-Total: 12 functions:
-
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D`
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2`
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`
-- `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`
-- `curve25519_dalek::backend::serial::u64::constants::L`
-- `curve25519_dalek::backend::serial::u64::constants::LFACTOR`
-- `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`
-- `curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED`
-- `curve25519_dalek::backend::serial::u64::constants::R`
-- `curve25519_dalek::backend::serial::u64::constants::RR`
-- `curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE`
-- `curve25519_dalek::backend::serial::u64::constants::SQRT_M1`
-
 ### curve25519_dalek::backend::serial::u64::field::FieldElement51
 
-Total: 7 functions:
+Total: 8 functions:
 
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::MINUS_ONE`
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::ONE`
@@ -60,6 +43,7 @@ Total: 7 functions:
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_select`
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::ct_eq`
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes`
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::mul`
 - `curve25519_dalek::backend::serial::u64::field::FieldElement51::pow2k`
 
 ### curve25519_dalek::backend::serial::u64::scalar
@@ -70,10 +54,12 @@ Total: 1 functions:
 
 ### curve25519_dalek::backend::serial::u64::scalar::Scalar52
 
-Total: 2 functions:
+Total: 4 functions:
 
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO`
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l`
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert`
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_invert`
 
 ### curve25519_dalek::edwards::EdwardsPoint
 
@@ -124,7 +110,7 @@ Total: 1 functions:
 
 ## Functions Verified in Verus but Not Lean
 
-Total: 60 functions
+Total: 59 functions
 
 ### curve25519_dalek::backend::serial::curve_models::AffineNielsPoint
 
@@ -155,7 +141,7 @@ Total: 1 functions:
 
 ### curve25519_dalek::backend::serial::u64::scalar::Scalar52
 
-Total: 9 functions:
+Total: 8 functions:
 
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_bytes`
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_bytes`
@@ -164,7 +150,6 @@ Total: 9 functions:
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::m`
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul`
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square`
-- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::zeroize`
 
 ### curve25519_dalek::edwards::CompressedEdwardsY
@@ -276,32 +261,140 @@ Total: 1 functions:
 
 - `curve25519_dalek::window::NafLookupTable8<ProjectiveNielsPoint>::select`
 
+## Functions Verified in Both Lean and Verus
+
+Total: 32 functions
+
+### curve25519_dalek::backend::serial::u64::field::FieldElement51
+
+Total: 11 functions:
+
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::add`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L225
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::add_assign`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L168
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::as_bytes`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L992
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::conditional_assign`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L730
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::from_limbs`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L766
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::neg`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L644
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::negate`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L789
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L845
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::square`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L1288
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::square2`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L1309
+- `curve25519_dalek::backend::serial::u64::field::FieldElement51::sub`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/field.rs#L339
+
+### curve25519_dalek::backend::serial::u64::scalar::Scalar52
+
+Total: 8 functions:
+
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::add`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L497
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::as_montgomery`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L1179
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::from_montgomery`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L1212
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_mul`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L1152
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_square`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L1166
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::mul_internal`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L843
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::square_internal`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L904
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub`
+  - Lean spec: `Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/backend/serial/u64/scalar.rs#L686
+
+### curve25519_dalek::edwards::CompressedEdwardsY
+
+Total: 1 functions:
+
+- `curve25519_dalek::edwards::CompressedEdwardsY::as_bytes`
+  - Lean spec: `Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/edwards.rs#L212
+
+### curve25519_dalek::edwards::EdwardsPoint
+
+Total: 2 functions:
+
+- `curve25519_dalek::edwards::EdwardsPoint::as_projective`
+  - Lean spec: `Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/edwards.rs#L1034
+- `curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor`
+  - Lean spec: `Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/edwards.rs#L2260
+
+### curve25519_dalek::scalar::Scalar
+
+Total: 10 functions:
+
+- `curve25519_dalek::scalar::Scalar::as_bytes`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L1563
+- `curve25519_dalek::scalar::Scalar::ct_eq`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L435
+- `curve25519_dalek::scalar::Scalar::from_bytes_mod_order`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L247
+- `curve25519_dalek::scalar::Scalar::from_bytes_mod_order_wide`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L276
+- `curve25519_dalek::scalar::Scalar::from_canonical_bytes`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L327
+- `curve25519_dalek::scalar::Scalar::invert`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L1611
+- `curve25519_dalek::scalar::Scalar::is_canonical`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L2684
+- `curve25519_dalek::scalar::Scalar::reduce`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L2616
+- `curve25519_dalek::scalar::Scalar::to_bytes`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L1544
+- `curve25519_dalek::scalar::Scalar::unpack`
+  - Lean spec: `Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean`
+  - Verus: https://github.com/Beneficial-AI-Foundation/dalek-lite/blob/main/curve25519-dalek/src/scalar.rs#L2603
+
 ## Functions Specified in Lean but Not Verus
 
-Total: 45 functions
+Total: 33 functions
 
 ### curve25519_dalek::backend::serial::curve_models::CompletedPoint
 
 Total: 1 functions:
 
 - `curve25519_dalek::backend::serial::curve_models::CompletedPoint::add` (status: verified)
-
-### curve25519_dalek::backend::serial::u64::constants
-
-Total: 12 functions:
-
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::L` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::LFACTOR` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::R` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::RR` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE` (status: verified)
-- `curve25519_dalek::backend::serial::u64::constants::SQRT_M1` (status: verified)
 
 ### curve25519_dalek::backend::serial::u64::field::FieldElement51
 
@@ -326,9 +419,9 @@ Total: 1 functions:
 Total: 5 functions:
 
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::ZERO` (status: verified)
-- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l` (status: specified)
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::conditional_add_l` (status: verified)
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::invert` (status: verified)
-- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_invert` (status: specified)
+- `curve25519_dalek::backend::serial::u64::scalar::Scalar52::montgomery_invert` (status: verified)
 - `curve25519_dalek::backend::serial::u64::scalar::Scalar52::to_bytes` (status: specified)
 
 ### curve25519_dalek::edwards::EdwardsPoint
