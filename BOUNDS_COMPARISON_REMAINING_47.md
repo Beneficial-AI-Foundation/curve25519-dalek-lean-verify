@@ -380,9 +380,9 @@ pub fn square(&self) -> (r: FieldElement51)
 **Output Bounds**:
 - **Lean**: `r[i] < 2^52`
 - **Verus**: `r.limbs[i] < 2^52` (also < 2^54)
-- **Match**: Different since Verus requires tighter bounds
+- **Match**: ✅ Identical
 
-**Match**: ✅ **Different** - Verus require tighter bounds.
+**Match**: ✅ **Similar** - Both specify identical input and output bounds
 
 ---
 
@@ -1057,4 +1057,1664 @@ pub(crate) fn mul_internal(a: &Scalar52, b: &Scalar52) -> (z: [u128; 9])
 - Scalar: 10 functions
 - plus 2 more from Scalar52 list
 
-(Analysis continues...)
+---
+
+## FieldElement51 Functions (4 remaining functions: Functions 24-27)
+
+### Function 24: `FieldElement51::as_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean`
+
+**Theorem**: `as_bytes_spec` (lines 35-38)
+```lean
+theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
+    ∃ result, as_bytes self = ok result ∧
+    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
+    U8x32_as_Nat result < p
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (no precondition on limb values)
+- **Output bounds**: None (returns byte array, not field element limbs)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/field.rs` (lines 992-996)
+
+**Function**: `as_bytes`
+```rust
+pub fn as_bytes(self) -> (r: [u8; 32])
+    ensures
+        u8_32_as_nat(&r) == u64_5_as_nat(self.limbs) % p(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (returns byte array)
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds
+**Output Bounds**: Both have no output bounds (conversion function)
+
+**Match**: ✅ **Similar** - Both specify functional conversion to bytes without explicit bounds
+
+---
+
+### Function 25: `FieldElement51::neg`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean`
+
+**Theorem**: `neg_spec` (lines 30-34)
+```lean
+theorem neg_spec (r : backend.serial.u64.field.FieldElement51)
+    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
+    ∃ r_inv, neg r = ok r_inv ∧
+    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
+    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19)
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `r[i] < 2^54` for all limbs
+- **Output bounds**: `r_inv[i] ≤ 2^51 + 155629 ≈ 2^51.000074` for all limbs
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/field.rs` (lines 644-647)
+
+**Function**: `neg`
+```rust
+fn neg(self) -> (output: FieldElement51)
+    ensures
+        spec_field_element(&output) == math_field_neg(spec_field_element(self)),
+        forall|i: int| 0 <= i < 5 ==> output.limbs[i] < (1u64 << 52),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None explicitly stated
+- **Output bounds**: `output.limbs[i] < 2^52` for all limbs
+
+**Note**: The `neg` function delegates to `negate`, which has input bound `< 2^51` (see Function 10 in earlier analysis)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: `r[i] < 2^54`
+- **Verus**: No explicit bound in `neg`, but `negate` requires `< 2^51`
+- **Difference**: Lean allows larger inputs
+
+**Output Bounds**:
+- **Lean**: `r_inv[i] ≤ 2^51 + 155629 ≈ 2^51.000074` (very precise)
+- **Verus**: `output.limbs[i] < 2^52` (simpler, looser bound)
+- **Relationship**: Lean's bound is tighter
+
+**Match**: ❌ **Different** - Different input requirements and output bounds
+
+---
+
+### Function 26: `FieldElement51::reduce`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean`
+
+**Theorem**: `reduce_spec` (lines 50-53)
+```lean
+theorem reduce_spec (limbs : Array U64 5#usize) :
+    ∃ result, reduce limbs = ok result ∧
+    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
+    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (accepts any U64 array)
+- **Output bounds**: `result[i] ≤ 2^51 + 155629 ≈ 2^51.000074` for all limbs
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/field.rs` (lines 845-852)
+
+**Function**: `reduce`
+```rust
+fn reduce(mut limbs: [u64; 5]) -> (r: FieldElement51)
+    ensures
+        r.limbs == spec_reduce(limbs),
+        forall|i: int| 0 <= i < 5 ==> r.limbs[i] < (1u64 << 52),
+        (forall|i: int| 0 <= i < 5 ==> limbs[i] < (1u64 << 51)) ==> (r.limbs =~= limbs),
+        u64_5_as_nat(r.limbs) == u64_5_as_nat(limbs) - p() * (limbs[4] >> 51),
+        u64_5_as_nat(r.limbs) % p() == u64_5_as_nat(limbs) % p(),
+        u64_5_as_nat(r.limbs) < 2 * p(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (accepts any u64 array)
+- **Output bounds**: `r.limbs[i] < 2^52` for all limbs
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds (reduction operation accepts any values)
+**Output Bounds**:
+- **Lean**: `result[i] ≤ 2^51 + 155629 ≈ 2^51.000074`
+- **Verus**: `r.limbs[i] < 2^52`
+- **Relationship**: Lean's bound is tighter and more precise
+
+**Match**: ❌ **Different** - Same input (none), but different output bounds
+
+---
+
+### Function 27: `FieldElement51::sub`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean`
+
+**Theorem**: `sub_spec` (lines 60-65)
+```lean
+theorem sub_spec (a b : Array U64 5#usize)
+    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
+    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
+    ∃ d, sub a b = ok d ∧
+    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
+    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p
+```
+
+**Extracted Bounds**:
+- **Input bounds**:
+  - `a[i] < 2^63` for all limbs
+  - `b[i] < 2^54` for all limbs
+- **Output bounds**: `d[i] < 2^52` for all limbs
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/field.rs` (lines 339-349)
+
+**Function**: `sub`
+```rust
+fn sub(self, _rhs: &'a FieldElement51) -> (output: FieldElement51)
+    ensures
+        output == spec_sub_limbs(self, _rhs),
+        spec_field_element(&output) == math_field_sub(
+            spec_field_element(self),
+            spec_field_element(_rhs),
+        ),
+        fe51_limbs_bounded(&output, 54),
+```
+
+**Note**: The preconditions are in `sub_req` and the implementation comment mentions both operands should be `< 2^54`
+
+**Extracted Bounds**:
+- **Input bounds**: Both operands should have limbs `< 2^54`
+- **Output bounds**: `output.limbs[i] < 2^54` for all limbs
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: `a[i] < 2^63`, `b[i] < 2^54` (asymmetric)
+- **Verus**: Both `< 2^54` (symmetric)
+- **Difference**: Lean allows larger values for first operand
+
+**Output Bounds**:
+- **Lean**: `d[i] < 2^52`
+- **Verus**: `output.limbs[i] < 2^54`
+- **Difference**: Lean has tighter output bound
+
+**Match**: ❌ **Different** - Different input and output bounds
+
+---
+
+## Summary: FieldElement51 Functions 24-27 (4 new)
+
+| Function | Input Bounds Match | Output Bounds Match | Overall |
+|----------|-------------------|---------------------|---------|
+| as_bytes | Same (none) | Same (none, byte output) | ✅ Similar |
+| neg | Different (2^54 vs implicit 2^51) | Different (2^51.000074 vs 2^52) | ❌ Different |
+| reduce | Same (none) | Different (2^51.000074 vs 2^52) | ❌ Different |
+| sub | Different (asymmetric vs symmetric) | Different (2^52 vs 2^54) | ❌ Different |
+
+**FieldElement51 Summary (new 4)**: 1/4 Similar, 3/4 Different
+
+**Combined FieldElement51 (Functions 6-13 + 24-27, total 12)**: 6/12 Similar (50%), 6/12 Different (50%)
+
+---
+
+## Scalar52 Functions (5 remaining functions: Functions 28-32)
+
+### Function 28: `Scalar52::from_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean`
+
+**Theorem**: `from_bytes_spec` (lines 40-44)
+```lean
+theorem from_bytes_spec (b : Array U8 32#usize) :
+    ∃ u,
+    from_bytes b = ok u ∧
+    Scalar52_as_Nat u = U8x32_as_Nat b ∧
+    ∀ i < 5, u[i]!.val < 2 ^ 52
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array input)
+- **Output bounds**: `u[i] < 2^52` for all limbs
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/scalar.rs` (lines 143-146)
+
+**Function**: `from_bytes`
+```rust
+pub fn from_bytes(bytes: &[u8; 32]) -> (s: Scalar52)
+    ensures
+        bytes_to_nat(bytes) == to_nat(&s.limbs),
+        limbs_bounded(&s),
+```
+
+**Note**: `limbs_bounded` means `< 2^52`
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array input)
+- **Output bounds**: `s.limbs[i] < 2^52` for all limbs
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds (byte array)
+**Output Bounds**:
+- **Lean**: `u[i] < 2^52`
+- **Verus**: `s.limbs[i] < 2^52` (via `limbs_bounded`)
+- **Match**: ✅ Identical
+
+**Match**: ✅ **Similar** - Same bounds for conversion function
+
+---
+
+### Function 29: `Scalar52::from_bytes_wide`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean`
+
+**Theorem**: `from_bytes_wide_spec` (lines 39-42)
+```lean
+theorem from_bytes_wide_spec (b : Array U8 64#usize) :
+    ∃ u, from_bytes_wide b = ok u ∧
+    Scalar52_as_Nat u = U8x64_as_Nat b % L
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array input)
+- **Output bounds**: None explicitly stated (but canonical form implied by mod L)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/scalar.rs` (lines 212-217)
+
+**Function**: `from_bytes_wide`
+```rust
+pub fn from_bytes_wide(bytes: &[u8; 64]) -> (s: Scalar52)
+    ensures
+        limbs_bounded(&s),
+        to_nat(&s.limbs) % group_order() == bytes_wide_to_nat(bytes) % group_order(),
+        to_nat(&s.limbs) < group_order(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: `s.limbs[i] < 2^52` (via `limbs_bounded`) and canonical `< group_order()`
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds
+**Output Bounds**:
+- **Lean**: No explicit limb bounds, but canonical (mod L)
+- **Verus**: `limbs_bounded` (`< 2^52`) and canonical `< group_order()`
+- **Difference**: Verus explicitly states limb bounds
+
+**Match**: ⚠️ **Partially Similar** - Same concept (canonical), but Verus more explicit
+
+---
+
+### Function 30: `Scalar52::montgomery_reduce`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean`
+
+**Theorem**: `montgomery_reduce_spec` (lines 49-54)
+```lean
+theorem montgomery_reduce_spec (a : Array U128 9#usize)
+    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
+    ∃ m,
+    montgomery_reduce a = ok m ∧
+    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
+    (∀ i < 5, m[i]!.val < 2 ^ 62)
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `a[i] < 2^127` for all 9 limbs (u128 values)
+- **Output bounds**: `m[i] < 2^62` for all 5 limbs
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/scalar.rs` (lines 937-955)
+
+**Function**: `montgomery_reduce`
+```rust
+pub(crate) fn montgomery_reduce(limbs: &[u128; 9]) -> (result: Scalar52)
+    ensures
+        (exists|bounded1: &Scalar52, bounded2: &Scalar52|
+            limbs_bounded(bounded1) && limbs_bounded(bounded2) &&
+            spec_mul_internal(bounded1, bounded2,) == limbs) ==>
+        ((to_nat(&result.limbs) * montgomery_radix()) % group_order()
+            == slice128_to_nat(limbs) % group_order() && limbs_bounded(&result)),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Conditional - if input is product of two bounded scalars
+- **Output bounds**: `result.limbs[i] < 2^52` (via `limbs_bounded`)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Explicit `a[i] < 2^127` for all limbs
+- **Verus**: Conditional (if product of bounded scalars)
+- **Difference**: Lean is more direct; Verus uses existential precondition
+
+**Output Bounds**:
+- **Lean**: `m[i] < 2^62`
+- **Verus**: `result.limbs[i] < 2^52`
+- **Difference**: Lean allows larger output limbs (2^62 vs 2^52)
+
+**Match**: ❌ **Different** - Different input style and output bounds
+
+---
+
+### Function 31: `Scalar52::square_internal`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean`
+
+**Theorem**: `square_internal_spec` (lines 67-70)
+```lean
+theorem square_internal_spec (a : Array U64 5#usize)
+    (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
+    ∃ result, square_internal a = ok (result) ∧
+    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
+    (∀ i < 9, result[i]!.val < 2 ^ 127)
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `a[i] < 2^62` for all 5 limbs
+- **Output bounds**: `result[i] < 2^127` for all 9 limbs (u128 values)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/scalar.rs` (lines 904-909)
+
+**Function**: `square_internal`
+```rust
+pub(crate) fn square_internal(a: &Scalar52) -> (z: [u128; 9])
+    requires
+        limbs_bounded(a),
+    ensures
+        slice128_to_nat(&z) == to_nat(&a.limbs) * to_nat(&a.limbs),
+        spec_mul_internal(a, a) == z,
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `a.limbs[i] < 2^52` (via `limbs_bounded`)
+- **Output bounds**: No explicit bound (implicit in u128 type)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: `a[i] < 2^62`
+- **Verus**: `a.limbs[i] < 2^52`
+- **Difference**: Lean allows larger inputs (2^62 vs 2^52)
+
+**Output Bounds**:
+- **Lean**: Explicit `result[i] < 2^127`
+- **Verus**: No explicit bound (u128 implicit)
+- **Difference**: Lean provides explicit guarantee
+
+**Match**: ❌ **Different** - Different input bounds and output specification
+
+---
+
+### Function 32: `Scalar52::sub`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean`
+
+**Theorem**: `sub_spec` (lines 305-313)
+```lean
+theorem sub_spec (a b : Array U64 5#usize)
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
+    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
+    (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
+    (hb' : Scalar52_as_Nat b ≤ L) :
+    ∃ result, sub a b = ok result ∧
+    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
+    Scalar52_as_Nat result < L ∧
+    (∀ i < 5, result[i]!.val < 2 ^ 52)
+```
+
+**Extracted Bounds**:
+- **Input bounds**:
+  - `a[i] < 2^52`, `b[i] < 2^52` for all limbs
+  - Additional: `a < b + L` and `b ≤ L` (value constraints)
+- **Output bounds**: `result[i] < 2^52` and `result < L` (canonical)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/backend/serial/u64/scalar.rs` (lines 686-699)
+
+**Function**: `sub`
+```rust
+pub fn sub(a: &Scalar52, b: &Scalar52) -> (s: Scalar52)
+    requires
+        limbs_bounded(a),
+        limbs_bounded(b),
+        -group_order() <= to_nat(&a.limbs) - to_nat(&b.limbs) < group_order(),
+    ensures
+        to_nat(&s.limbs) == (to_nat(&a.limbs) - to_nat(&b.limbs)) % (group_order() as int),
+        limbs_bounded(&s),
+        to_nat(&s.limbs) < group_order(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**:
+  - `a.limbs[i] < 2^52`, `b.limbs[i] < 2^52` (via `limbs_bounded`)
+  - Additional: `-L < a - b < L` (value constraint)
+- **Output bounds**: `s.limbs[i] < 2^52` and `s < group_order()` (canonical)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Limbs `< 2^52`, plus `a < b + L` and `b ≤ L`
+- **Verus**: Limbs `< 2^52`, plus `-L < a - b < L`
+- **Similarity**: Both require bounded limbs and value constraints
+- **Difference**: Different formulations of the value constraint
+
+**Output Bounds**:
+- **Lean**: Limbs `< 2^52`, canonical `< L`
+- **Verus**: Limbs `< 2^52`, canonical `< group_order()`
+- **Match**: ✅ Identical (assuming L = group_order())
+
+**Match**: ✅ **Similar** - Same limb bounds and canonical output, slightly different precondition formulation
+
+---
+
+## Summary: Scalar52 Functions 28-32 (5 new)
+
+| Function | Input Bounds Match | Output Bounds Match | Overall |
+|----------|-------------------|---------------------|---------|
+| from_bytes | Same (none on bytes) | Same (2^52) | ✅ Similar |
+| from_bytes_wide | Same (none) | Partially (canonical) | ⚠️ Partial |
+| montgomery_reduce | Different (explicit vs conditional) | Different (2^62 vs 2^52) | ❌ Different |
+| square_internal | Different (2^62 vs 2^52) | Different (explicit vs implicit) | ❌ Different |
+| sub | Similar (2^52 + constraints) | Same (2^52 + canonical) | ✅ Similar |
+
+**Scalar52 Summary (new 5)**: 2/5 Similar, 1/5 Partial, 2/5 Different
+
+**Combined Scalar52 (Functions 18-23 + 28-32, total 11)**: 4/11 Similar (36%), 1/11 Partial (9%), 6/11 Different (55%)
+
+---
+
+## CompressedEdwardsY Functions (2 functions: Functions 33-34)
+
+### Function 33: `CompressedEdwardsY::as_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean`
+
+**Theorem**: `as_bytes_spec` (lines 28-31)
+```lean
+theorem as_bytes_spec
+    (self : edwards.CompressedEdwardsY) :
+    ∃ result, as_bytes self = ok result ∧
+    result = self
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (no preconditions on byte values)
+- **Output bounds**: None (returns byte array reference, not field element limbs)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 212-217)
+
+**Function**: `as_bytes`
+```rust
+pub const fn as_bytes(&self) -> (result: &[u8; 32])
+    ensures
+        result == self.0,
+{
+    &self.0
+}
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (simple accessor returning internal byte array)
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds
+**Output Bounds**: Both have no output bounds
+
+**Match**: ✅ **Similar** - Both specify simple accessor function returning byte array, no bounds
+
+---
+
+### Function 34: `CompressedEdwardsY::decompress`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean`
+
+**Theorem**: `decompress_spec` (lines 57-78)
+```lean
+theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
+    ∃ result, edwards.CompressedEdwardsY.decompress cey = ok result ∧
+
+      (∀ ep, result = some ep →
+        let y_encoded := (U8x32_as_Nat cey) % (2^255)
+        let x_sign_bit := cey[31]!.val.testBit 7
+
+        (∃ Z_inv x_val y_val x_is_neg,
+          field.FieldElement51.invert ep.Z = ok Z_inv ∧
+          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧
+          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧
+          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧
+
+          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧
+
+          y_val % p = y_encoded % p ∧
+
+          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧
+
+          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p)))
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array)
+- **Output bounds**: No explicit limb bounds, but resulting EdwardsPoint satisfies curve equation and validity predicates
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 231-250)
+
+**Function**: `decompress`
+```rust
+pub fn decompress(&self) -> (result: Option<EdwardsPoint>)
+    ensures
+        math_is_valid_y_coordinate(spec_field_element_from_bytes(&self.0))
+            ==> result.is_some()
+         && spec_field_element(&result.unwrap().Y) == spec_field_element_from_bytes(&self.0)
+         && is_valid_edwards_point(result.unwrap())
+         && spec_field_element_sign_bit(&result.unwrap().X) == (self.0[31] >> 7),
+        !math_is_valid_y_coordinate(spec_field_element_from_bytes(&self.0))
+            <==> result.is_none(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array)
+- **Output bounds**: No explicit limb bounds, but resulting EdwardsPoint satisfies validity predicates and curve properties
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds (byte array input)
+**Output Bounds**: Both use validity predicates rather than explicit limb bounds
+
+**Match**: ✅ **Similar** - Both specify decompression with curve equation and validity checks, no explicit bounds
+
+---
+
+## EdwardsPoint Functions (11 functions: Functions 35-45)
+
+### Function 35: `EdwardsPoint::add`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean`
+
+**Theorem**: `add_spec` (lines 43-88)
+```lean
+theorem add_spec (self other : EdwardsPoint)
+    (h_self_bounds : ∀ i < 5,
+      self.X[i]!.val < 2 ^ 53 ∧
+      self.Y[i]!.val < 2 ^ 53 ∧
+      self.Z[i]!.val < 2 ^ 53 ∧
+      self.T[i]!.val < 2 ^ 53)
+    (h_other_bounds : ∀ i < 5,
+      other.X[i]!.val < 2 ^ 53 ∧
+      other.Y[i]!.val < 2 ^ 53 ∧
+      other.Z[i]!.val < 2 ^ 53 ∧
+      other.T[i]!.val < 2 ^ 53)
+    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)
+    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :
+    ∃ result,
+    add self other = ok result ∧
+    (∀ i < 5,
+      result.X[i]!.val < 2 ^ 54  ∧
+      result.Y[i]!.val < 2 ^ 54  ∧
+      result.Z[i]!.val < 2 ^ 54  ∧
+      result.T[i]!.val < 2 ^ 54) ∧
+    [twisted Edwards addition formulas]
+```
+
+**Extracted Bounds**:
+- **Input bounds**:
+  - All coordinates of `self`: limbs `< 2^53`
+  - All coordinates of `other`: limbs `< 2^53`
+  - Non-zero Z coordinates (mod p)
+- **Output bounds**:
+  - All coordinates of `result`: limbs `< 2^54`
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 894-913)
+
+**Function**: `add`
+```rust
+fn add(self, _rhs: &EdwardsPoint) -> (result: EdwardsPoint)
+    requires
+        is_well_formed_edwards_point(*self),
+        is_well_formed_edwards_point(*_rhs),
+    ensures
+        is_valid_edwards_point(result),
+        is_well_formed_edwards_point(result),
+        spec_edwards_point(result) == math_edwards_add(
+            spec_edwards_point(*self),
+            spec_edwards_point(*_rhs)
+        ),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Validity predicates (`is_well_formed_edwards_point`)
+- **Output bounds**: Validity predicates (`is_valid_edwards_point`, `is_well_formed_edwards_point`)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Explicit limb bounds (all coordinates `< 2^53`) plus non-zero Z
+- **Verus**: Validity predicates (no explicit limb bounds)
+- **Difference**: Lean uses explicit bit bounds; Verus uses abstract predicates
+
+**Output Bounds**:
+- **Lean**: Explicit limb bounds (all coordinates `< 2^54`)
+- **Verus**: Validity predicates
+- **Note**: Both specify correctness via Edwards addition formulas
+
+**Match**: ✅ **Similar** - Both specify Edwards point addition with appropriate validity constraints, though Lean is more explicit with bounds
+
+---
+
+### Function 36: `EdwardsPoint::as_projective`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean`
+
+**Theorem**: `as_projective_spec`
+```lean
+theorem as_projective_spec (e : EdwardsPoint) :
+    ∃ q, edwards.EdwardsPoint.as_projective e = ok q ∧
+    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (no precondition)
+- **Output bounds**: None (simple projection/copy operation)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1002-1013)
+
+**Function**: `as_projective`
+```rust
+pub const fn as_projective(&self) -> (result: ProjectivePoint)
+    ensures
+        result.X == self.X,
+        result.Y == self.Y,
+        result.Z == self.Z,
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (structural equivalence)
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds
+**Output Bounds**: Both have no output bounds (simple copy)
+
+**Match**: ✅ **Similar** - Both specify simple coordinate copy from Edwards to Projective
+
+---
+
+### Function 37: `EdwardsPoint::as_projective_niels`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean`
+
+**Theorem**: `as_projective_niels_spec` (lines 57-71)
+```lean
+theorem as_projective_niels_spec (e : EdwardsPoint)
+    (h_X : ∀ i < 5, e.X[i]!.val < 2 ^ 53)
+    (h_Y : ∀ i < 5, e.Y[i]!.val < 2 ^ 53)
+    (h_Z : ∀ i < 5, e.Z[i]!.val < 2 ^ 53)
+    (h_T : ∀ i < 5, e.T[i]!.val < 2 ^ 53) :
+    ∃ pn, as_projective_niels e = ok pn ∧
+    [correctness conditions for Y+X, Y-X, Z, 2dT]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: All coordinates `< 2^53`
+- **Output bounds**: Implicit from field operations (sub/add produce `< 2^54`)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1023-1032)
+
+**Function**: `as_projective_niels`
+```rust
+pub fn as_projective_niels(&self) -> (result: ProjectiveNielsPoint)
+    requires
+        edwards_point_limbs_bounded(*self),
+    ensures
+        projective_niels_corresponds_to_edwards(result, *self),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `edwards_point_limbs_bounded` (coordinates bounded)
+- **Output bounds**: Via validity predicate
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Explicit `< 2^53` for all coordinates
+- **Verus**: `edwards_point_limbs_bounded` predicate
+- **Similarity**: Both require bounded coordinates
+
+**Output Bounds**:
+- **Lean**: Implicit from field ops
+- **Verus**: Via correspondence predicate
+- **Similarity**: Both rely on underlying operations
+
+**Match**: ✅ **Similar** - Both specify conversion with appropriate bounds
+
+---
+
+### Function 38: `EdwardsPoint::compress`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean`
+
+**Theorem**: `compress_spec` (lines 47-71)
+```lean
+theorem compress_spec (self : edwards.EdwardsPoint)
+    (h_X : ∀ i < 5, self.X[i]!.val < 2 ^ 54)
+    (h_Y : ∀ i < 5, self.Y[i]!.val < 2 ^ 54)
+    (h_Z : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)
+    (h_T : ∀ i < 5, self.T[i]!.val < 2 ^ 54) :
+    ∃ result, compress self = ok result ∧
+    [affine y-coordinate encoding + sign bit]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: All coordinates `< 2^54`
+- **Output bounds**: None (byte array output)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1133-1138)
+
+**Function**: `compress`
+```rust
+pub fn compress(&self) -> (result: CompressedEdwardsY)
+    requires
+        edwards_point_limbs_bounded(*self),
+    ensures
+        compressed_edwards_y_corresponds_to_edwards(result, *self),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `edwards_point_limbs_bounded`
+- **Output bounds**: None (byte array via correspondence)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Explicit `< 2^54`
+- **Verus**: Bounded predicate
+- **Similarity**: Both require bounded coordinates
+
+**Output Bounds**: Both return byte arrays with no limb bounds
+
+**Match**: ✅ **Similar** - Both specify point compression with bounded inputs
+
+---
+
+### Function 39: `EdwardsPoint::ct_eq`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean`
+
+**Theorem**: `ct_eq_spec` (lines 77-97)
+```lean
+theorem ct_eq_spec (e1 e2 : edwards.EdwardsPoint)
+    (h_e1 : ∀ i < 5,
+      e1.X[i]!.val ≤ 2 ^ 53 ∧ e1.Y[i]!.val ≤ 2 ^ 53 ∧
+      e1.Z[i]!.val ≤ 2 ^ 53 ∧ e1.T[i]!.val ≤ 2 ^ 53)
+    (h_e2 : ∀ i < 5,
+      e2.X[i]!.val ≤ 2 ^ 53 ∧ e2.Y[i]!.val ≤ 2 ^ 53 ∧
+      e2.Z[i]!.val ≤ 2 ^ 53 ∧ e2.T[i]!.val ≤ 2 ^ 53) :
+    ∃ c, ct_eq e1 e2 = ok c ∧
+    [constant-time equality check]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: All coordinates `≤ 2^53`
+- **Output bounds**: None (boolean output)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1046-1051)
+
+**Function**: `ct_eq`
+```rust
+fn ct_eq(&self, other: &EdwardsPoint) -> (result: Choice)
+    requires
+        self.ct_eq_req(other),
+    ensures
+        choice_is_true(result) == (edwards_point_as_affine(*self) == edwards_point_as_affine(*other)),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Via `ct_eq_req` predicate
+- **Output bounds**: None (boolean)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Explicit `≤ 2^53`
+- **Verus**: Via requirement predicate
+- **Similarity**: Both require bounded inputs
+
+**Output Bounds**: Both return boolean, no bounds
+
+**Match**: ✅ **Similar** - Both specify constant-time equality comparison
+
+---
+
+### Function 40: `EdwardsPoint::double`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean`
+
+**Theorem**: `double_spec`
+```lean
+theorem double_spec (e : edwards.EdwardsPoint) :
+    ∃ e_double, double e = ok e_double ∧
+    [doubling formula specification]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None explicitly (relies on validity)
+- **Output bounds**: None explicitly (validity predicates)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 926-936)
+
+**Function**: `double`
+```rust
+fn double(&self) -> (result: EdwardsPoint)
+    requires
+        is_valid_edwards_point(*self),
+    ensures
+        is_valid_edwards_point(result),
+        spec_edwards_point(result) == math_edwards_double(spec_edwards_point(*self)),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Validity predicate
+- **Output bounds**: Validity predicate
+
+#### Comparison Analysis
+
+**Input Bounds**: Both use validity predicates
+**Output Bounds**: Both use validity predicates
+
+**Match**: ✅ **Similar** - Both specify point doubling with validity constraints
+
+---
+
+### Function 41: `EdwardsPoint::identity`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean`
+
+**Theorem**: `identity_spec`
+```lean
+theorem identity_spec :
+    ∃ q, identity = ok q ∧
+    [identity point specification: (0, 1, 1, 0)]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: N/A (constant function)
+- **Output bounds**: N/A (specific constant values)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 728-732)
+
+**Function**: `identity`
+```rust
+fn identity() -> (result: EdwardsPoint)
+    ensures
+        is_identity_edwards_point(result),
+        is_well_formed_edwards_point(result),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: N/A
+- **Output bounds**: N/A (identity predicate)
+
+#### Comparison Analysis
+
+**Input Bounds**: N/A for both (constant)
+**Output Bounds**: N/A for both (specific values/predicate)
+
+**Match**: ✅ **Similar** - Both specify identity element
+
+---
+
+### Function 42: `EdwardsPoint::is_small_order`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean`
+
+**Theorem**: `is_small_order_spec`
+```lean
+theorem is_small_order_spec (e : edwards.EdwardsPoint) :
+    ∃ b, is_small_order e = ok b ∧
+    [specification for [8]P = O check]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None explicitly
+- **Output bounds**: None (boolean output)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1181-1187)
+
+**Function**: `is_small_order`
+```rust
+pub fn is_small_order(&self) -> (result: bool)
+    requires
+        edwards_point_limbs_bounded(*self),
+    ensures
+        result == (spec_edwards_mul_by_cofactor(*self) == spec_edwards_identity()),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `edwards_point_limbs_bounded`
+- **Output bounds**: None (boolean)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: None explicit
+- **Verus**: Bounded predicate
+- **Difference**: Verus more explicit
+
+**Output Bounds**: Both return boolean
+
+**Match**: ✅ **Similar** - Both check small order property
+
+---
+
+### Function 43: `EdwardsPoint::mul_by_cofactor`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean`
+
+**Theorem**: `mul_by_cofactor_spec`
+```lean
+theorem mul_by_cofactor_spec (e : edwards.EdwardsPoint) :
+    ∃ e_result, mul_by_cofactor e = ok e_result ∧
+    [specification for [8]P computation]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None explicitly
+- **Output bounds**: None explicitly (validity via operations)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1202-1210)
+
+**Function**: `mul_by_cofactor`
+```rust
+pub fn mul_by_cofactor(&self) -> (result: EdwardsPoint)
+    requires
+        edwards_point_limbs_bounded(*self),
+    ensures
+        is_well_formed_edwards_point(result),
+        spec_edwards_point(result) == spec_edwards_mul_by_cofactor(*self),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Bounded predicate
+- **Output bounds**: Well-formed predicate
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: None explicit
+- **Verus**: Bounded predicate
+
+**Output Bounds**: Both use validity/well-formedness
+
+**Match**: ✅ **Similar** - Both specify cofactor multiplication
+
+---
+
+### Function 44: `EdwardsPoint::mul_by_pow_2`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean`
+
+**Theorem**: `mul_by_pow_2_spec`
+```lean
+theorem mul_by_pow_2_spec (e : edwards.EdwardsPoint) (k : U32)
+    (hk : 0 < k.val) :
+    ∃ e_result, mul_by_pow_2 e k = ok e_result ∧
+    [specification for repeated doubling]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `k > 0` (parameter constraint)
+- **Output bounds**: None explicitly
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1226-1235)
+
+**Function**: `mul_by_pow_2`
+```rust
+pub fn mul_by_pow_2(&self, k: u32) -> (result: EdwardsPoint)
+    requires
+        k > 0,
+        edwards_point_limbs_bounded(*self),
+    ensures
+        is_well_formed_edwards_point(result),
+        spec_edwards_point(result) == spec_edwards_mul_by_pow_2(*self, k as nat),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: `k > 0` and bounded point
+- **Output bounds**: Well-formed predicate
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: `k > 0`
+- **Verus**: `k > 0` and bounded point
+- **Similarity**: Both require positive k
+
+**Output Bounds**: Both use validity predicates
+
+**Match**: ✅ **Similar** - Both specify repeated doubling
+
+---
+
+### Function 45: `EdwardsPoint::to_montgomery`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean`
+
+**Theorem**: `to_montgomery_spec` (lines 57-66)
+```lean
+theorem to_montgomery_spec (e : EdwardsPoint)
+    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53)
+    (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
+    ∃ mp, to_montgomery e = ok mp ∧
+    [birational map u = (Z+Y)/(Z-Y)]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Y, Z coordinates `< 2^53`
+- **Output bounds**: None (byte array)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/edwards.rs` (lines 1089-1095)
+
+**Function**: `to_montgomery`
+```rust
+pub fn to_montgomery(&self) -> (result: MontgomeryPoint)
+    requires
+        fe51_limbs_bounded(&self.Y, 51),
+        fe51_limbs_bounded(&self.Z, 51),
+    ensures
+        montgomery_corresponds_to_edwards(result, *self),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Y, Z coordinates `< 2^51`
+- **Output bounds**: None (byte array via correspondence)
+
+#### Comparison Analysis
+
+**Input Bounds**:
+- **Lean**: Y, Z `< 2^53`
+- **Verus**: Y, Z `< 2^51`
+- **Difference**: Lean allows 4× larger inputs (2^53 vs 2^51)
+
+**Output Bounds**: Both return byte arrays
+
+**Match**: ❌ **Different** - Input bounds differ (2^53 vs 2^51)
+
+---
+
+## MontgomeryPoint Function (1 function: Function 46)
+
+### Function 46: `MontgomeryPoint::to_edwards`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean`
+
+**Theorem**: `to_edwards_spec` (lines 57-74)
+```lean
+theorem to_edwards_spec (mp : montgomery.MontgomeryPoint) (sign : U8) :
+    ∃ opt_e, to_edwards mp sign = ok opt_e ∧
+    [birational map y = (u-1)/(u+1) with exceptional case]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array input)
+- **Output bounds**: None (via validity if Some)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/montgomery.rs` (lines 490-543)
+
+**Function**: `to_edwards`
+```rust
+pub fn to_edwards(&self, sign: u8) -> (result: Option<EdwardsPoint>)
+    ensures
+        match result {
+            Some(ep) => edwards_corresponds_to_montgomery(ep, *self, sign),
+            None => true,
+        },
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Via correspondence if Some
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds (byte array)
+**Output Bounds**: Both use correspondence/validity predicates
+
+**Match**: ✅ **Similar** - Both specify Montgomery to Edwards conversion
+
+---
+
+## Scalar Functions (10 functions: Functions 47-56)
+
+### Function 47: `Scalar::as_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean`
+
+**Theorem**: `as_bytes_spec`
+```lean
+theorem as_bytes_spec (s : scalar.Scalar) :
+    ∃ b, as_bytes s = ok b ∧ b = s.bytes
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (accessor)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2564-2567)
+
+**Function**: `as_bytes`
+```rust
+pub const fn as_bytes(&self) -> (result: &[u8; 32])
+    ensures
+        result == &self.bytes,
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify simple accessor
+
+---
+
+### Function 48: `Scalar::ct_eq`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean`
+
+**Theorem**: `ct_eq_spec`
+```lean
+theorem ct_eq_spec (s s' : scalar.Scalar) :
+    ∃ c, ct_eq s s' = ok c ∧
+    [constant-time equality specification]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (boolean)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2732-2736)
+
+**Function**: `ct_eq`
+```rust
+fn ct_eq(&self, other: &Scalar) -> (result: Choice)
+    ensures
+        choice_is_true(result) == (self.bytes == other.bytes),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify constant-time equality
+
+---
+
+### Function 49: `Scalar::from_bytes_mod_order`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean`
+
+**Theorem**: `from_bytes_mod_order_spec`
+```lean
+theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
+    ∃ s, from_bytes_mod_order b = ok s ∧
+    U8x32_as_Nat s.bytes = U8x32_as_Nat b % L
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (byte array)
+- **Output bounds**: Canonical `< L`
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2366-2371)
+
+**Function**: `from_bytes_mod_order`
+```rust
+pub fn from_bytes_mod_order(bytes: [u8; 32]) -> (result: Scalar)
+    ensures
+        is_canonical_scalar(result),
+        bytes_to_nat(&result.bytes) % group_order() == bytes_to_nat(&bytes) % group_order(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Canonical `< group_order()`
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify modular reduction to canonical form
+
+---
+
+### Function 50: `Scalar::from_bytes_mod_order_wide`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean`
+
+**Theorem**: `from_bytes_mod_order_wide_spec`
+```lean
+theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :
+    ∃ s, from_bytes_mod_order_wide b = ok s ∧
+    U8x32_as_Nat s.bytes = U8x64_as_Nat b % L
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (64-byte array)
+- **Output bounds**: Canonical `< L`
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2384-2390)
+
+**Function**: `from_bytes_mod_order_wide`
+```rust
+pub fn from_bytes_mod_order_wide(bytes: &[u8; 64]) -> (result: Scalar)
+    ensures
+        is_canonical_scalar(result),
+        bytes_to_nat(&result.bytes) % group_order() == bytes_wide_to_nat(bytes) % group_order(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Canonical `< group_order()`
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify wide reduction to canonical form
+
+---
+
+### Function 51: `Scalar::from_canonical_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean`
+
+**Theorem**: `from_canonical_bytes_spec`
+```lean
+theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
+    ∃ s, from_canonical_bytes b = ok s ∧
+    [conditional construction based on canonicity]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None (conditional on canonical check)
+- **Output bounds**: Conditional (Some if canonical)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2409-2415)
+
+**Function**: `from_canonical_bytes`
+```rust
+pub fn from_canonical_bytes(bytes: [u8; 32]) -> (result: CtOption<Scalar>)
+    ensures
+        bytes_to_nat(&bytes) < group_order() ==> ct_option_has_value(result),
+        ct_option_has_value(result) ==> is_canonical_scalar(ct_option_unwrap(result)),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Conditional
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify conditional construction
+
+---
+
+### Function 52: `Scalar::invert`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean`
+
+**Theorem**: `invert_spec`
+```lean
+theorem invert_spec (s : scalar.Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
+    ∃ s', invert s = ok s' ∧
+    (U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes) % L = 1
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Non-zero (mod L)
+- **Output bounds**: Canonical (inverse)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2467-2477)
+
+**Function**: `invert`
+```rust
+pub fn invert(&self) -> (result: Scalar)
+    requires
+        is_canonical_scalar(self),
+    ensures
+        is_canonical_scalar(result),
+        (bytes_to_nat(&self.bytes) * bytes_to_nat(&result.bytes)) % group_order() == 1,
+```
+
+**Extracted Bounds**:
+- **Input bounds**: Canonical (implies non-zero for inversion)
+- **Output bounds**: Canonical
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify modular inversion
+
+---
+
+### Function 53: `Scalar::is_canonical`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean`
+
+**Theorem**: `is_canonical_spec`
+```lean
+theorem is_canonical_spec (s : scalar.Scalar) :
+    ∃ c, is_canonical s = ok c ∧
+    [check if s.bytes < L]
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None (boolean)
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2619-2623)
+
+**Function**: `is_canonical`
+```rust
+pub fn is_canonical(&self) -> (result: Choice)
+    ensures
+        choice_is_true(result) == is_canonical_scalar(*self),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both check canonicity
+
+---
+
+### Function 54: `Scalar::reduce`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean`
+
+**Theorem**: `reduce_spec`
+```lean
+theorem reduce_spec (s : scalar.Scalar) :
+    ∃ s', reduce s = ok s' ∧
+    U8x32_as_Nat s'.bytes = U8x32_as_Nat s.bytes % L
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Canonical `< L`
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2635-2640)
+
+**Function**: `reduce`
+```rust
+pub fn reduce(&self) -> (result: Scalar)
+    ensures
+        is_canonical_scalar(result),
+        bytes_to_nat(&result.bytes) % group_order() == bytes_to_nat(&self.bytes) % group_order(),
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Canonical
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify reduction to canonical form
+
+---
+
+### Function 55: `Scalar::to_bytes`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean`
+
+**Theorem**: `to_bytes_spec`
+```lean
+theorem to_bytes_spec (s : scalar.Scalar) :
+    ∃ a, to_bytes s = ok a ∧ a = s.bytes
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2580-2583)
+
+**Function**: `to_bytes`
+```rust
+pub const fn to_bytes(&self) -> (result: [u8; 32])
+    ensures
+        result == self.bytes,
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: None
+
+#### Comparison Analysis
+
+**Match**: ✅ **Similar** - Both specify accessor
+
+---
+
+### Function 56: `Scalar::unpack`
+
+#### Lean Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean`
+
+**Theorem**: `unpack_spec` (lines 40-43)
+```lean
+theorem unpack_spec (s : Scalar) :
+    ∃ u, unpack s = ok u ∧
+    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧
+    (∀ i < 5, u[i]!.val < 2 ^ 62)
+```
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Limbs `< 2^62`
+
+#### Verus Specification
+**File**: `/home/zhang-liao/curve25519-dalek-lean-verify/dalek-lite/curve25519-dalek/src/scalar.rs` (lines 2603-2609)
+
+**Function**: `unpack`
+```rust
+pub fn unpack(&self) -> (result: UnpackedScalar)
+    ensures
+        limbs_bounded(&result),
+        to_nat(&result.limbs) == bytes_to_nat(&self.bytes),
+```
+
+**Note**: `limbs_bounded` means `< 2^52`
+
+**Extracted Bounds**:
+- **Input bounds**: None
+- **Output bounds**: Limbs `< 2^52`
+
+#### Comparison Analysis
+
+**Input Bounds**: Both have no input bounds
+**Output Bounds**:
+- **Lean**: Limbs `< 2^62`
+- **Verus**: Limbs `< 2^52`
+- **Difference**: Lean allows 1024× larger output limbs (2^62 vs 2^52)
+
+**Match**: ❌ **Different** - Output bounds differ significantly (2^62 vs 2^52)
+
+---
+
+## Summary: Functions 35-56 (22 functions)
+
+### By Module
+
+| Module | Functions | Similar | Different | % Similar |
+|--------|-----------|---------|-----------|-----------|
+| EdwardsPoint | 11 | 10 | 1 | 91% |
+| MontgomeryPoint | 1 | 1 | 0 | 100% |
+| Scalar | 10 | 9 | 1 | 90% |
+| **TOTAL** | **22** | **20** | **2** | **91%** |
+
+### Match Status
+
+**EdwardsPoint Functions**:
+1. add - ✅ Similar
+2. as_projective - ✅ Similar
+3. as_projective_niels - ✅ Similar
+4. compress - ✅ Similar
+5. ct_eq - ✅ Similar
+6. double - ✅ Similar
+7. identity - ✅ Similar
+8. is_small_order - ✅ Similar
+9. mul_by_cofactor - ✅ Similar
+10. mul_by_pow_2 - ✅ Similar
+11. **to_montgomery - ❌ Different** (input bounds: Lean 2^53 vs Verus 2^51)
+
+**MontgomeryPoint Function**:
+12. to_edwards - ✅ Similar
+
+**Scalar Functions**:
+13. as_bytes - ✅ Similar
+14. ct_eq - ✅ Similar
+15. from_bytes_mod_order - ✅ Similar
+16. from_bytes_mod_order_wide - ✅ Similar
+17. from_canonical_bytes - ✅ Similar
+18. invert - ✅ Similar
+19. is_canonical - ✅ Similar
+20. reduce - ✅ Similar
+21. to_bytes - ✅ Similar
+22. **unpack - ❌ Different** (output bounds: Lean 2^62 vs Verus 2^52)
+
+### Key Findings
+
+1. **High-Level Alignment** (91% similar): Functions at the point and scalar wrapper level show very strong alignment
+   - Both use validity predicates over explicit limb bounds at this abstraction level
+   - Functional correctness specified via mathematical relationships
+
+2. **Two Notable Differences**:
+   - **EdwardsPoint::to_montgomery** (Function 45): Input bounds differ (Lean: Y,Z `< 2^53`; Verus: Y,Z `< 2^51`)
+   - **Scalar::unpack** (Function 56): Output limbs differ (Lean: `< 2^62`; Verus: `< 2^52`)
+
+3. **Abstraction Benefits**: Higher-level operations mask low-level bound differences
+   - EdwardsPoint and Scalar layers achieve ~90-100% alignment despite FieldElement51/Scalar52 divergence
+   - Validity predicates provide abstraction over precise bit-level bounds
+
+4. **Consistency Pattern**: Within each module, specifications are remarkably consistent
+   - EdwardsPoint: 10/11 functions use validity predicates similarly
+   - Scalar: 9/10 wrapper functions aligned on canonicity and functional specs
+
+---
+
+## Updated Final Summary: All Functions
+
+### Statistics by Module
+
+| Module | Total | Similar | Partial | Different | % Similar |
+|--------|-------|---------|---------|-----------|-----------|
+| FieldElement51 | 12 | 6 | 0 | 6 | 50% |
+| Scalar52 | 11 | 4 | 1 | 6 | 36% |
+| curve_models | 4 | 3 | 0 | 1 | 75% |
+| CompressedEdwardsY | 2 | 2 | 0 | 0 | 100% |
+| EdwardsPoint | 11 | 10 | 0 | 1 | 91% |
+| MontgomeryPoint | 1 | 1 | 0 | 0 | 100% |
+| Scalar | 10 | 9 | 0 | 1 | 90% |
+| **TOTAL** | **51** | **35** | **1** | **15** | **69%** |
+
+### Overall Results
+
+- **✅ Similar**: 35 functions (69%)
+- **⚠️ Partially Similar**: 1 function (2%)
+- **❌ Different**: 15 functions (29%)
+
+### Key Findings
+
+1. **Low-Level Divergence**: Differences concentrated in FieldElement51 and Scalar52 Montgomery operations
+   - Lean often provides more precise bounds (e.g., `2^51 + ε` vs `2^52`)
+   - Montgomery domain operations show systematic difference (Lean: `2^62`, Verus: `2^52`)
+
+2. **High-Level Alignment**: EdwardsPoint (91%), Scalar wrappers (90%), and conversion functions show high similarity
+   - These inherit bounds from lower-level operations
+   - Most differences at field/scalar level don't propagate to high-level APIs
+   - EdwardsPoint::to_montgomery and Scalar::unpack show input/output bound differences
+
+3. **Bounds Philosophy**:
+   - **Lean**: More precise, tighter bounds where possible
+   - **Verus**: Simpler, uniform bounds (often powers of 2)
+
+4. **Trust Implications**: Both verification efforts are substantially aligned (69%), with differences primarily in implementation details rather than fundamental correctness properties
+
+---
+
+*Analysis completed: 2026-01-09*
