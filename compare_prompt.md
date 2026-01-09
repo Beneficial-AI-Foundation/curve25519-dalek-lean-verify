@@ -1,0 +1,2 @@
+希望你读取项目里面每一个文件用llm的方式比较bounds，
+QUICK_REFERENCE_52_FUNCTIONS.md里面有共同被specify的函数。不要写python函数。要一个个文件读取，输入给llm让llm自己判断。 目前只比较input/output里的bounds，暂时不考虑correctness. 比较读例子在BOUNDS_COMPARISON_ANALYSIS.md，新加一个文件比较剩下的47个函数
