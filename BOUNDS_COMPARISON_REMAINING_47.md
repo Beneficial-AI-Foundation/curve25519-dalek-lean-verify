@@ -10,59 +10,59 @@ This document provides LLM-style analysis comparing bounds specifications betwee
 
 ## Summary Table: Bounds Comparison for All Functions
 
-| # | Module | Function | Lean Input Bounds | Lean Output Bounds | Verus Input Bounds | Verus Output Bounds | Match |
-|---|--------|----------|-------------------|-------------------|-------------------|-------------------|-------|
-| 6 | FieldElement51 | add_assign | a,b[i] < 2^53 | result[i] < 2^54 | overflow-based (a[i]+b[i] ≤ u64::MAX) | none | ❌ Different |
-| 7 | FieldElement51 | conditional_assign | none | none | none | none | ✅ Similar |
-| 8 | FieldElement51 | from_limbs | none | none (identity) | none | none (identity) | ✅ Similar |
-| 9 | FieldElement51 | mul | lhs,rhs[i] < 2^54 | r[i] < 2^52 | self,rhs[i] < 2^54 | output[i] < 2^52 | ✅ Similar |
-| 10 | FieldElement51 | negate | r[i] < 2^54 | r_inv[i] ≤ 2^51+155629 | limbs[i] < 2^51 | limbs[i] < 2^52 | ❌ Different |
-| 11 | FieldElement51 | pow2k | a[i] < 2^54, k>0 | r[i] < 2^52 | limbs[i] < 2^54, k>0 | r[i] < 2^52 | ✅ Similar |
-| 12 | FieldElement51 | square | a[i] < 2^54 | r[i] < 2^52 | limbs[i] < 2^54 | r[i] < 2^52 | ✅ Similar |
-| 13 | FieldElement51 | square2 | a[i] < 2^54 | r[i] < 2^53 | limbs[i] < 2^54 | none | ❌ Different |
-| 24 | FieldElement51 | as_bytes | none | none (byte array) | none | none (byte array) | ✅ Similar |
-| 25 | FieldElement51 | neg | r[i] < 2^54 | r_inv[i] ≤ 2^51+155629 | implicit 2^51 (via negate) | output[i] < 2^52 | ❌ Different |
-| 26 | FieldElement51 | reduce | none | result[i] ≤ 2^51+155629 | none | r[i] < 2^52 | ❌ Different |
-| 27 | FieldElement51 | sub | a[i] < 2^63, b[i] < 2^54 | d[i] < 2^52 | both < 2^54 | output[i] < 2^54 | ❌ Different |
-| 14 | curve_models | CompletedPoint::as_extended | X,Y,Z,T[i] < 2^54 | implicit < 2^52 (from mul) | X,Y,Z,T[i] < 2^54 | via validity predicate | ✅ Similar |
-| 15 | curve_models | CompletedPoint::as_projective | X,Y,Z,T[i] < 2^54 | X,Y,Z[i] < 2^52 | X,Y,Z,T[i] < 2^54 | X,Y,Z[i] < 2^54 | ❌ Different |
-| 16 | curve_models | ProjectivePoint::as_extended | X,Y,Z[i] < 2^54 | implicit < 2^52 (from mul) | X,Y,Z[i] < 2^54 | via validity predicate | ✅ Similar |
-| 17 | curve_models | ProjectivePoint::double | X,Y[i] < 2^53, Z[i] < 2^54 | X,Z,T[i] < 2^52, Y[i] < 2^53 | all < 2^54 + overflow constraint | all < 2^54 | ❌ Different |
-| 18 | Scalar52 | add | a,b[i] < 2^52 | result[i] < 2^52 | a,b[i] < 2^52 + canonical | result[i] < 2^52 + canonical | ✅ Similar |
-| 19 | Scalar52 | as_montgomery | u[i] < 2^62 | m[i] < 2^62 | limbs[i] < 2^52 | result[i] < 2^52 | ❌ Different |
-| 20 | Scalar52 | from_montgomery | context suggests < 2^62 | canonical (from montgomery_reduce) | limbs[i] < 2^52 | result[i] < 2^52, canonical | ⚠️ Partial |
-| 21 | Scalar52 | montgomery_mul | m,m'[i] < 2^62 | w[i] < 2^62 | a,b[i] < 2^52 | result[i] < 2^52 | ❌ Different |
-| 22 | Scalar52 | montgomery_square | m[i] < 2^62 | w[i] < 2^62 | limbs[i] < 2^52 | result[i] < 2^52 | ❌ Different |
-| 23 | Scalar52 | mul_internal | a,b[i] < 2^62 | result[9 limbs] < 2^127 | a,b[i] < 2^52 | implicit u128 (< 2^128) | ❌ Different |
-| 28 | Scalar52 | from_bytes | none (byte array) | u[i] < 2^52 | none (byte array) | s[i] < 2^52 | ✅ Similar |
-| 29 | Scalar52 | from_bytes_wide | none (byte array) | canonical (mod L) | none (byte array) | s[i] < 2^52, canonical | ⚠️ Partial |
-| 30 | Scalar52 | montgomery_reduce | a[9 limbs] < 2^127 | m[i] < 2^62 | conditional (product of bounded scalars) | result[i] < 2^52 | ❌ Different |
-| 31 | Scalar52 | square_internal | a[i] < 2^62 | result[9 limbs] < 2^127 | a[i] < 2^52 | implicit u128 | ❌ Different |
-| 32 | Scalar52 | sub | a,b[i] < 2^52 + constraints | result[i] < 2^52, canonical | a,b[i] < 2^52 + constraints | s[i] < 2^52, canonical | ✅ Similar |
-| 33 | CompressedEdwardsY | as_bytes | none | none (byte array) | none | none (byte array) | ✅ Similar |
-| 34 | CompressedEdwardsY | decompress | none (byte array) | via validity predicates | none (byte array) | via validity predicates | ✅ Similar |
-| 35 | EdwardsPoint | add | all coords < 2^53 + Z≠0 | all coords < 2^54 | via validity predicates | via validity predicates | ✅ Similar |
-| 36 | EdwardsPoint | as_projective | none | none (copy) | none | none (copy) | ✅ Similar |
-| 37 | EdwardsPoint | as_projective_niels | all coords < 2^53 | implicit < 2^54 | via bounded predicate | via validity predicate | ✅ Similar |
-| 38 | EdwardsPoint | compress | all coords < 2^54 | none (byte array) | via bounded predicate | none (byte array) | ✅ Similar |
-| 39 | EdwardsPoint | ct_eq | all coords ≤ 2^53 | none (boolean) | via requirement predicate | none (boolean) | ✅ Similar |
-| 40 | EdwardsPoint | double | via validity | via validity | via validity predicate | via validity predicate | ✅ Similar |
-| 41 | EdwardsPoint | identity | N/A (constant) | N/A (constant values) | N/A | N/A (identity predicate) | ✅ Similar |
-| 42 | EdwardsPoint | is_small_order | none explicit | none (boolean) | via bounded predicate | none (boolean) | ✅ Similar |
-| 43 | EdwardsPoint | mul_by_cofactor | none explicit | via validity | via bounded predicate | via well-formed predicate | ✅ Similar |
-| 44 | EdwardsPoint | mul_by_pow_2 | k > 0 | via validity | k > 0 + bounded point | via well-formed predicate | ✅ Similar |
-| 45 | EdwardsPoint | to_montgomery | Y,Z[i] < 2^53 | none (byte array) | Y,Z[i] < 2^51 | none (byte array) | ❌ Different |
-| 46 | MontgomeryPoint | to_edwards | none (byte array) | via validity if Some | none (byte array) | via correspondence if Some | ✅ Similar |
-| 47 | Scalar | as_bytes | none | none (accessor) | none | none (accessor) | ✅ Similar |
-| 48 | Scalar | ct_eq | none | none (boolean) | none | none (boolean) | ✅ Similar |
-| 49 | Scalar | from_bytes_mod_order | none (byte array) | canonical < L | none (byte array) | canonical < group_order() | ✅ Similar |
-| 50 | Scalar | from_bytes_mod_order_wide | none (64-byte array) | canonical < L | none (64-byte array) | canonical < group_order() | ✅ Similar |
-| 51 | Scalar | from_canonical_bytes | none (conditional) | conditional (Some if canonical) | none | conditional | ✅ Similar |
-| 52 | Scalar | invert | non-zero (mod L) | canonical (inverse) | canonical (implies non-zero) | canonical | ✅ Similar |
-| 53 | Scalar | is_canonical | none | none (boolean) | none | none (boolean) | ✅ Similar |
-| 54 | Scalar | reduce | none | canonical < L | none | canonical | ✅ Similar |
-| 55 | Scalar | to_bytes | none | none (accessor) | none | none (accessor) | ✅ Similar |
-| 56 | Scalar | unpack | none | u[i] < 2^62 | none | result[i] < 2^52 | ❌ Different |
+| # | Module | Function | Lean Input Bounds | Lean Output Bounds | Verus Input Bounds | Verus Output Bounds | Match | Potential Issue |
+|---|--------|----------|-------------------|-------------------|-------------------|-------------------|-------|-----------------|
+| 6 | FieldElement51 | add_assign | a,b[i] < 2^53 | result[i] < 2^54 | overflow-based (a[i]+b[i] ≤ u64::MAX) | none | ❌ Different | ⚠️ Lean input tighter (2^53 vs 2^64) but output still loose (2^54) |
+| 7 | FieldElement51 | conditional_assign | none | none | none | none | ✅ Similar | - |
+| 8 | FieldElement51 | from_limbs | none | none (identity) | none | none (identity) | ✅ Similar | - |
+| 9 | FieldElement51 | mul | lhs,rhs[i] < 2^54 | r[i] < 2^52 | self,rhs[i] < 2^54 | output[i] < 2^52 | ✅ Similar | - |
+| 10 | FieldElement51 | negate | r[i] < 2^54 | r_inv[i] ≤ 2^51+155629 | limbs[i] < 2^51 | limbs[i] < 2^52 | ❌ Different | - (Lean looser input + tighter output) |
+| 11 | FieldElement51 | pow2k | a[i] < 2^54, k>0 | r[i] < 2^52 | limbs[i] < 2^54, k>0 | r[i] < 2^52 | ✅ Similar | - |
+| 12 | FieldElement51 | square | a[i] < 2^54 | r[i] < 2^52 | limbs[i] < 2^54 | r[i] < 2^52 | ✅ Similar | - |
+| 13 | FieldElement51 | square2 | a[i] < 2^54 | r[i] < 2^53 | limbs[i] < 2^54 | none | ❌ Different | - |
+| 24 | FieldElement51 | as_bytes | none | none (byte array) | none | none (byte array) | ✅ Similar | - |
+| 25 | FieldElement51 | neg | r[i] < 2^54 | r_inv[i] ≤ 2^51+155629 | implicit 2^51 (via negate) | output[i] < 2^52 | ❌ Different | - (Lean looser input + tighter output) |
+| 26 | FieldElement51 | reduce | none | result[i] ≤ 2^51+155629 | none | r[i] < 2^52 | ❌ Different | - |
+| 27 | FieldElement51 | sub | a[i] < 2^63, b[i] < 2^54 | d[i] < 2^52 | both < 2^54 | output[i] < 2^54 | ❌ Different | - (Lean looser input a[i] + tighter output) |
+| 14 | curve_models | CompletedPoint::as_extended | X,Y,Z,T[i] < 2^54 | implicit < 2^52 (from mul) | X,Y,Z,T[i] < 2^54 | via validity predicate | ✅ Similar | - |
+| 15 | curve_models | CompletedPoint::as_projective | X,Y,Z,T[i] < 2^54 | X,Y,Z[i] < 2^52 | X,Y,Z,T[i] < 2^54 | X,Y,Z[i] < 2^54 | ❌ Different | - |
+| 16 | curve_models | ProjectivePoint::as_extended | X,Y,Z[i] < 2^54 | implicit < 2^52 (from mul) | X,Y,Z[i] < 2^54 | via validity predicate | ✅ Similar | - |
+| 17 | curve_models | ProjectivePoint::double | X,Y[i] < 2^53, Z[i] < 2^54 | X,Z,T[i] < 2^52, Y[i] < 2^53 | all < 2^54 + overflow constraint | all < 2^54 | ❌ Different | - (Lean tighter input X,Y + tighter outputs) |
+| 18 | Scalar52 | add | a,b[i] < 2^52 | result[i] < 2^52 | a,b[i] < 2^52 + canonical | result[i] < 2^52 + canonical | ✅ Similar | - |
+| 19 | Scalar52 | as_montgomery | u[i] < 2^62 | m[i] < 2^62 | limbs[i] < 2^52 | result[i] < 2^52 | ❌ Different | ⚠️ Lean input/output looser (2^62 vs 2^52) |
+| 20 | Scalar52 | from_montgomery | context suggests < 2^62 | canonical (from montgomery_reduce) | limbs[i] < 2^52 | result[i] < 2^52, canonical | ⚠️ Partial | ⚠️ Lean input looser (2^62 vs 2^52) |
+| 21 | Scalar52 | montgomery_mul | m,m'[i] < 2^62 | w[i] < 2^62 | a,b[i] < 2^52 | result[i] < 2^52 | ❌ Different | ⚠️ Lean input/output looser (2^62 vs 2^52) |
+| 22 | Scalar52 | montgomery_square | m[i] < 2^62 | w[i] < 2^62 | limbs[i] < 2^52 | result[i] < 2^52 | ❌ Different | ⚠️ Lean input/output looser (2^62 vs 2^52) |
+| 23 | Scalar52 | mul_internal | a,b[i] < 2^62 | result[9 limbs] < 2^127 | a,b[i] < 2^52 | implicit u128 (< 2^128) | ❌ Different | ⚠️ Lean input looser (2^62 vs 2^52) |
+| 28 | Scalar52 | from_bytes | none (byte array) | u[i] < 2^52 | none (byte array) | s[i] < 2^52 | ✅ Similar | - |
+| 29 | Scalar52 | from_bytes_wide | none (byte array) | canonical (mod L) | none (byte array) | s[i] < 2^52, canonical | ⚠️ Partial | - |
+| 30 | Scalar52 | montgomery_reduce | a[9 limbs] < 2^127 | m[i] < 2^62 | conditional (product of bounded scalars) | result[i] < 2^52 | ❌ Different | ⚠️ Lean output looser (2^62 vs 2^52) |
+| 31 | Scalar52 | square_internal | a[i] < 2^62 | result[9 limbs] < 2^127 | a[i] < 2^52 | implicit u128 | ❌ Different | ⚠️ Lean input looser (2^62 vs 2^52) |
+| 32 | Scalar52 | sub | a,b[i] < 2^52 + constraints | result[i] < 2^52, canonical | a,b[i] < 2^52 + constraints | s[i] < 2^52, canonical | ✅ Similar | - |
+| 33 | CompressedEdwardsY | as_bytes | none | none (byte array) | none | none (byte array) | ✅ Similar | - |
+| 34 | CompressedEdwardsY | decompress | none (byte array) | via validity predicates | none (byte array) | via validity predicates | ✅ Similar | - |
+| 35 | EdwardsPoint | add | all coords < 2^53 + Z≠0 | all coords < 2^54 | via validity predicates | via validity predicates | ✅ Similar | - |
+| 36 | EdwardsPoint | as_projective | none | none (copy) | none | none (copy) | ✅ Similar | - |
+| 37 | EdwardsPoint | as_projective_niels | all coords < 2^53 | implicit < 2^54 | via bounded predicate | via validity predicate | ✅ Similar | - |
+| 38 | EdwardsPoint | compress | all coords < 2^54 | none (byte array) | via bounded predicate | none (byte array) | ✅ Similar | - |
+| 39 | EdwardsPoint | ct_eq | all coords ≤ 2^53 | none (boolean) | via requirement predicate | none (boolean) | ✅ Similar | - |
+| 40 | EdwardsPoint | double | via validity | via validity | via validity predicate | via validity predicate | ✅ Similar | - |
+| 41 | EdwardsPoint | identity | N/A (constant) | N/A (constant values) | N/A | N/A (identity predicate) | ✅ Similar | - |
+| 42 | EdwardsPoint | is_small_order | none explicit | none (boolean) | via bounded predicate | none (boolean) | ✅ Similar | - |
+| 43 | EdwardsPoint | mul_by_cofactor | none explicit | via validity | via bounded predicate | via well-formed predicate | ✅ Similar | - |
+| 44 | EdwardsPoint | mul_by_pow_2 | k > 0 | via validity | k > 0 + bounded point | via well-formed predicate | ✅ Similar | - |
+| 45 | EdwardsPoint | to_montgomery | Y,Z[i] < 2^53 | none (byte array) | Y,Z[i] < 2^51 | none (byte array) | ❌ Different | - (Lean looser input + no output issue) |
+| 46 | MontgomeryPoint | to_edwards | none (byte array) | via validity if Some | none (byte array) | via correspondence if Some | ✅ Similar | - |
+| 47 | Scalar | as_bytes | none | none (accessor) | none | none (accessor) | ✅ Similar | - |
+| 48 | Scalar | ct_eq | none | none (boolean) | none | none (boolean) | ✅ Similar | - |
+| 49 | Scalar | from_bytes_mod_order | none (byte array) | canonical < L | none (byte array) | canonical < group_order() | ✅ Similar | - |
+| 50 | Scalar | from_bytes_mod_order_wide | none (64-byte array) | canonical < L | none (64-byte array) | canonical < group_order() | ✅ Similar | - |
+| 51 | Scalar | from_canonical_bytes | none (conditional) | conditional (Some if canonical) | none | conditional | ✅ Similar | - |
+| 52 | Scalar | invert | non-zero (mod L) | canonical (inverse) | canonical (implies non-zero) | canonical | ✅ Similar | - |
+| 53 | Scalar | is_canonical | none | none (boolean) | none | none (boolean) | ✅ Similar | - |
+| 54 | Scalar | reduce | none | canonical < L | none | canonical | ✅ Similar | - |
+| 55 | Scalar | to_bytes | none | none (accessor) | none | none (accessor) | ✅ Similar | - |
+| 56 | Scalar | unpack | none | u[i] < 2^62 | none | result[i] < 2^52 | ❌ Different | ⚠️ Lean output looser (2^62 vs 2^52) |
 
 ### Summary Statistics
 
@@ -70,6 +70,23 @@ This document provides LLM-style analysis comparing bounds specifications betwee
 - **✅ Similar**: 35 functions (69%)
 - **⚠️ Partially Similar**: 1 function (2%)
 - **❌ Different**: 15 functions (29%)
+
+### Potential Issues Analysis
+
+⚠️ **Functions with Potential Bounds Issues**: 9 functions (18%)
+
+These functions have Lean bounds that may be problematic:
+1. **FieldElement51::add_assign** (#6): Lean input tighter (2^53 vs 2^64 overflow-based) but output still loose (2^54)
+2. **Scalar52::as_montgomery** (#19): Lean input/output looser (2^62 vs 2^52)
+3. **Scalar52::from_montgomery** (#20): Lean input looser (2^62 vs 2^52)
+4. **Scalar52::montgomery_mul** (#21): Lean input/output looser (2^62 vs 2^52)
+5. **Scalar52::montgomery_square** (#22): Lean input/output looser (2^62 vs 2^52)
+6. **Scalar52::mul_internal** (#23): Lean input looser (2^62 vs 2^52)
+7. **Scalar52::montgomery_reduce** (#30): Lean output looser (2^62 vs 2^52)
+8. **Scalar52::square_internal** (#31): Lean input looser (2^62 vs 2^52)
+9. **Scalar::unpack** (#56): Lean output looser (2^62 vs 2^52)
+
+**Note**: Most issues are concentrated in Scalar52 Montgomery operations, where Lean uses 2^62 bounds while Verus uses 2^52. This suggests Lean tracks wider intermediate values in the Montgomery domain, which may be intentional for intermediate calculations but could be a concern if these bounds propagate to external APIs.
 
 ### Key Patterns
 
