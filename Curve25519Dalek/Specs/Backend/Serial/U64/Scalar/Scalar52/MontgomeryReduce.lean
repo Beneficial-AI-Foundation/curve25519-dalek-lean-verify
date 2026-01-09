@@ -408,6 +408,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         simp only [
           h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
           h_L1, h_L2, h_L4,
+          h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
           h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
           h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
           h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
@@ -431,11 +432,31 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
           Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
           List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
+
+        have h_len_a : (↑a : List U128).length = 9 := by sorry
+        have h_len_L : (↑constants.L : List U64).length = 5 := by sorry
+
         have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
           rw [h_r4]
            -- use h_r4_128_bound
           sorry
-        
+
+        norm_cast at eq8 h_cast_r4
+        rw [← h_cast_r4] at eq8
+
+        simp only [← getElem!_pos, h_len_a, h_len_L]
+
+        generalize hBz : (B : ℤ) = Bz
+        rw [hBz] at *
+        clear hB hBz
+
+        norm_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        -- Ensure B^k matches (↑B)^k everywhere
+        simp only [Nat.cast_pow] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+
+        -- linear_combination eq0 + B * eq1 + B^2 * eq2 + B^3 * eq3 + B^4 * eq4 +
+        --                    B^5 * eq5 + B^6 * eq6 + B^7 * eq7 + B^8 * eq8
+
         sorry
 
       have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
