@@ -11,6 +11,11 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 
+import Mathlib.Algebra.Polynomial.Eval.Algebra
+import Mathlib.Algebra.Polynomial.Eval.Coeff
+import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.Eval.Degree
+
 import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
 import Mathlib.Data.ZMod.Basic
@@ -28,6 +33,7 @@ This function performs Montgomery reduction.
 -/
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64
+open Polynomial
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option exponentiation.threshold 262
@@ -426,8 +432,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         simp only [one_mul]
 
         norm_cast at *
-
         rw [hB] at *
+
         rw [← h_r4]
         simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
           Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
@@ -444,15 +450,61 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         norm_cast at eq8 h_cast_r4
         rw [← h_cast_r4] at eq8
 
-        simp only [← getElem!_pos, h_len_a, h_len_L]
+        simp only [← getElem!_pos]
 
         generalize hBz : (B : ℤ) = Bz
         rw [hBz] at *
-        clear hB hBz
 
-        norm_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-        -- Ensure B^k matches (↑B)^k everywhere
-        simp only [Nat.cast_pow] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        clear hB
+        -- norm_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        -- ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+
+        let a_coeffs : List ℤ := (↑a : List U128).map (fun x => ↑x)
+        let poly_a : Polynomial ℤ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
+
+        let N_coeffs : List ℤ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
+        let poly_N : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (N_coeffs.getD i 0)
+
+        let L_coeffs : List ℤ := constants.L.val.map (fun x => ↑x.val)
+        let poly_L : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
+
+        let poly_lhs := poly_a + poly_N * poly_L
+
+        let res_coeffs : List ℤ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
+        let poly_res : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
+
+        let poly_rhs := poly_res * monomial 5 1
+
+        /-
+
+        -- 3. Rewrite the LHS
+        trans poly_lhs.eval B
+        · -- Proof that the messy LHS equals poly_lhs
+          rw [poly_lhs]
+          simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial]
+          simp [poly_a, poly_N, poly_L, a_coeffs, N_coeffs, L_coeffs]
+          -- if not too heavy try ring
+          sorry
+
+        -- 4. Rewrite the RHS
+        trans poly_rhs.eval B
+        · -- Proof that the clean polynomial equals the clean RHS target
+          try congr
+          sorry
+
+        · -- Proof that the messy RHS equals your polynomial target
+          rw [poly_rhs_target]
+          simp only [Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial]
+          simp [poly_res, res_coeffs]
+          -- if not too heavy try ring
+          sorry
+
+        -- NOW THE GOAL SHOULD LOOK LIKE:
+        -- ⊢ poly_lhs.eval B = poly_rhs.eval B
+        -/
+
+        -- ring_nf at eq0 ⊢
+        -- ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
         -- linear_combination eq0 + B * eq1 + B^2 * eq2 + B^3 * eq3 + B^4 * eq4 +
         --                    B^5 * eq5 + B^6 * eq6 + B^7 * eq7 + B^8 * eq8
