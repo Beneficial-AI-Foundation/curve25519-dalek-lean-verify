@@ -106,6 +106,10 @@ generate_llbc() {
         --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::backend::serial::u64::scalar::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::montgomery::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::montgomery::{impl core::hash::Hash for _}'
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}'
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}'
         --exclude 'curve25519_dalek::scalar::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::scalar::{impl core::hash::Hash for _}'
     )

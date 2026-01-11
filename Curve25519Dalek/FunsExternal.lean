@@ -473,4 +473,72 @@ axiom scalar.ConditionallySelectableScalar.conditional_swap
   scalar.Scalar → scalar.Scalar → subtle.Choice → Result (scalar.Scalar
     × scalar.Scalar)
 
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_select]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 581:4-581:69
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select"]
+axiom subtle.ConditionallySelectableArray.conditional_select
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result (Array T N)
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 587:4-587:66
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
+axiom subtle.ConditionallySelectableArray.conditional_assign
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result (Array T N)
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
+axiom subtle.ConditionallySelectableArray.conditional_swap
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result ((Array T N) × (Array T N))
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+axiom montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+  :
+  montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
+    → Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint)
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
+  :
+  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+    → Result montgomery.MontgomeryPoint
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+  :
+  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+    → Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint)
+
+/- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
+axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+  : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
+
+/- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
+axiom montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
+  : montgomery.MontgomeryPoint → Result Unit
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+axiom montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  :
+  montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
+    → Result montgomery.ProjectivePoint
+
 end curve25519_dalek

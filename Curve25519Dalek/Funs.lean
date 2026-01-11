@@ -11,6 +11,23 @@ set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
+/-- Trait implementation: [core::array::{core::marker::Copy for @Array<T, N>}]
+   Source: '/rustc/library/core/src/array/mod.rs', lines 440:0-440:45
+   Name pattern: [core::marker::Copy<[@T; @N]>] -/
+@[reducible, rust_trait_impl "core::marker::Copy<[@T; @N]>"]
+def core.marker.CopyArray {T : Type} (N : Usize) (markerCopyInst :
+  core.marker.Copy T) : core.marker.Copy (Array T N) := {
+  cloneInst := core.clone.CloneArray N markerCopyInst.cloneInst
+}
+
+/-- Trait implementation: [core::default::{core::default::Default for bool}]
+   Source: '/rustc/library/core/src/default.rs', lines 154:8-154:33
+   Name pattern: [core::default::Default<bool>] -/
+@[reducible, rust_trait_impl "core::default::Default<bool>"]
+def core.default.DefaultBool : core.default.Default Bool := {
+  default := core.default.DefaultBool.default
+}
+
 /-- Trait implementation: [core::iter::range::{core::iter::range::Step for usize}]
    Source: '/rustc/library/core/src/iter/range.rs', lines 258:12-258:37
    Name pattern: [core::iter::range::Step<usize>] -/
@@ -166,6 +183,23 @@ noncomputable def subtle.ConditionallySelectableU64 : subtle.ConditionallySelect
   conditional_swap := subtle.ConditionallySelectableU64.conditional_swap
 }
 
+/-- Trait implementation: [subtle::{subtle::ConditionallySelectable for @Array<T, N>}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
+   Name pattern: [subtle::ConditionallySelectable<[@T; @N]>] -/
+@[reducible, rust_trait_impl "subtle::ConditionallySelectable<[@T; @N]>"]
+noncomputable def subtle.ConditionallySelectableArray {T : Type} (N : Usize)
+  (ConditionallySelectableInst : subtle.ConditionallySelectable T) :
+  subtle.ConditionallySelectable (Array T N) := {
+  coremarkerCopyInst := core.marker.CopyArray N
+    ConditionallySelectableInst.coremarkerCopyInst
+  conditional_select := subtle.ConditionallySelectableArray.conditional_select
+    ConditionallySelectableInst
+  conditional_assign := subtle.ConditionallySelectableArray.conditional_assign
+    ConditionallySelectableInst
+  conditional_swap := subtle.ConditionallySelectableArray.conditional_swap
+    ConditionallySelectableInst
+}
+
 /-- Trait implementation: [subtle::{subtle::ConditionallyNegatable for T}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 614:0-617:35
    Name pattern: [subtle::ConditionallyNegatable<@T>] -/
@@ -195,6 +229,15 @@ noncomputable def zeroize.Zeroize.Blanket {Z : Type} (DefaultIsZeroesInst :
 def zeroize.DefaultIsZeroesU8 : zeroize.DefaultIsZeroes U8 := {
   coremarkerCopyInst := core.marker.CopyU8
   coredefaultDefaultInst := core.default.DefaultU8
+}
+
+/-- Trait implementation: [zeroize::{zeroize::DefaultIsZeroes for bool}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 309:10-309:40
+   Name pattern: [zeroize::DefaultIsZeroes<bool>] -/
+@[reducible, rust_trait_impl "zeroize::DefaultIsZeroes<bool>"]
+def zeroize.DefaultIsZeroesBool : zeroize.DefaultIsZeroes Bool := {
+  coremarkerCopyInst := core.core.marker.CopyBool
+  coredefaultDefaultInst := core.default.DefaultBool
 }
 
 /-- Trait implementation: [zeroize::{zeroize::DefaultIsZeroes for u64}]
@@ -634,7 +677,7 @@ def edwards.EdwardsPoint.as_projective_niels
   ok { Y_plus_X := fe, Y_minus_X := fe1, Z := self.Z, T2d := fe2 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 414:4-429:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 415:4-430:5 -/
 def
   backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.add
   (self : edwards.EdwardsPoint)
@@ -677,7 +720,7 @@ def
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 365:4-372:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 366:4-373:5 -/
 def backend.serial.curve_models.CompletedPoint.as_extended
   (self : backend.serial.curve_models.CompletedPoint) :
   Result edwards.EdwardsPoint
@@ -897,7 +940,7 @@ noncomputable def window.LookupTable.select
   subtleConditionallyNegatableInst.conditional_negate t1 neg_mask
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 240:4-247:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 241:4-248:5 -/
 def backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
   : Result backend.serial.curve_models.ProjectiveNielsPoint := do
   ok
@@ -909,7 +952,7 @@ def backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
     }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 239:0-248:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 240:0-249:1 -/
 @[reducible]
 def traits.IdentityProjectiveNielsPoint : traits.Identity
   backend.serial.curve_models.ProjectiveNielsPoint := {
@@ -968,7 +1011,7 @@ def
   ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:4-303:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 297:4-304:5 -/
 def
   backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_select
   (a : backend.serial.curve_models.ProjectiveNielsPoint)
@@ -1023,7 +1066,7 @@ noncomputable def
   ok a4
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 305:4-310:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 306:4-311:5 -/
 noncomputable def
   backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
   (self : backend.serial.curve_models.ProjectiveNielsPoint)
@@ -1046,7 +1089,7 @@ noncomputable def
   ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 295:0-311:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:0-312:1 -/
 @[reducible]
 noncomputable def subtle.ConditionallySelectableProjectiveNielsPoint :
   subtle.ConditionallySelectable
@@ -1090,7 +1133,7 @@ def backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
   backend.serial.u64.field.FieldElement51.negate self
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 503:4-510:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 504:4-511:5 -/
 def
   backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
   (self : backend.serial.curve_models.ProjectiveNielsPoint) :
@@ -1107,7 +1150,7 @@ def
     }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 500:0-511:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 501:0-512:1 -/
 @[reducible]
 def core.ops.arith.NegShared0ProjectiveNielsPointProjectiveNielsPoint :
   core.ops.arith.Neg backend.serial.curve_models.ProjectiveNielsPoint
@@ -1117,7 +1160,7 @@ def core.ops.arith.NegShared0ProjectiveNielsPointProjectiveNielsPoint :
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 353:4-359:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 354:4-360:5 -/
 def backend.serial.curve_models.CompletedPoint.as_projective
   (self : backend.serial.curve_models.CompletedPoint) :
   Result backend.serial.curve_models.ProjectivePoint
@@ -1325,7 +1368,7 @@ def backend.serial.u64.field.FieldElement51.square2
   backend.serial.u64.field.FieldElement51.square2_loop square 0#usize
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 381:4-397:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 382:4-398:5 -/
 def backend.serial.curve_models.ProjectivePoint.double
   (self : backend.serial.curve_models.ProjectivePoint) :
   Result backend.serial.curve_models.CompletedPoint
@@ -1425,30 +1468,6 @@ noncomputable def backend.variable_base_mul
   := do
   let _ ← backend.get_selected_backend
   backend.serial.scalar_mul.variable_base.mul point scalar
-
-/-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::clone]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:15-153:20 -/
-def backend.serial.curve_models.CloneProjectivePoint.clone
-  (self : backend.serial.curve_models.ProjectivePoint) :
-  Result backend.serial.curve_models.ProjectivePoint
-  := do
-  ok self
-
-/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:15-153:20 -/
-@[reducible]
-def core.clone.CloneProjectivePoint : core.clone.Clone
-  backend.serial.curve_models.ProjectivePoint := {
-  clone := backend.serial.curve_models.CloneProjectivePoint.clone
-}
-
-/-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 153:9-153:13 -/
-@[reducible]
-def core.marker.CopyProjectivePoint : core.marker.Copy
-  backend.serial.curve_models.ProjectivePoint := {
-  cloneInst := core.clone.CloneProjectivePoint
-}
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::CompletedPoint}::clone]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 167:15-167:20 -/
@@ -1807,7 +1826,7 @@ noncomputable def zeroize.ZeroizeProjectiveNielsPoint : zeroize.Zeroize
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 230:4-236:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 231:4-237:5 -/
 def backend.serial.curve_models.IdentityProjectivePoint.identity
   : Result backend.serial.curve_models.ProjectivePoint := do
   ok
@@ -1818,21 +1837,21 @@ def backend.serial.curve_models.IdentityProjectivePoint.identity
     }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 229:0-237:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 230:0-238:1 -/
 @[reducible]
-def traits.IdentityProjectivePoint : traits.Identity
+def IdentityCurveModelsProjectivePoint : traits.Identity
   backend.serial.curve_models.ProjectivePoint := {
   identity := backend.serial.curve_models.IdentityProjectivePoint.identity
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::default]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 251:4-253:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 252:4-254:5 -/
 def backend.serial.curve_models.DefaultProjectiveNielsPoint.default
   : Result backend.serial.curve_models.ProjectiveNielsPoint := do
   backend.serial.curve_models.IdentityProjectiveNielsPoint.identity
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 250:0-254:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 251:0-255:1 -/
 @[reducible]
 def core.default.DefaultProjectiveNielsPoint : core.default.Default
   backend.serial.curve_models.ProjectiveNielsPoint := {
@@ -1840,7 +1859,7 @@ def core.default.DefaultProjectiveNielsPoint : core.default.Default
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 257:4-263:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 258:4-264:5 -/
 def backend.serial.curve_models.IdentityAffineNielsPoint.identity
   : Result backend.serial.curve_models.AffineNielsPoint := do
   ok
@@ -1851,7 +1870,7 @@ def backend.serial.curve_models.IdentityAffineNielsPoint.identity
     }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 256:0-264:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 257:0-265:1 -/
 @[reducible]
 def traits.IdentityAffineNielsPoint : traits.Identity
   backend.serial.curve_models.AffineNielsPoint := {
@@ -1859,13 +1878,13 @@ def traits.IdentityAffineNielsPoint : traits.Identity
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::default]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 267:4-269:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 268:4-270:5 -/
 def backend.serial.curve_models.DefaultAffineNielsPoint.default
   : Result backend.serial.curve_models.AffineNielsPoint := do
   backend.serial.curve_models.IdentityAffineNielsPoint.identity
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 266:0-270:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 267:0-271:1 -/
 @[reducible]
 def core.default.DefaultAffineNielsPoint : core.default.Default
   backend.serial.curve_models.AffineNielsPoint := {
@@ -1888,7 +1907,7 @@ def backend.serial.u64.constants.EDWARDS_D
   eval_global backend.serial.u64.constants.EDWARDS_D_body
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 277:4-288:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 278:4-289:5 -/
 noncomputable def backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid
   (self : backend.serial.curve_models.ProjectivePoint) : Result Bool := do
   let XX ← backend.serial.u64.field.FieldElement51.square self.X
@@ -1913,7 +1932,7 @@ noncomputable def backend.serial.curve_models.ValidityCheckProjectivePoint.is_va
   field.PartialEqFieldElement51FieldElement51.eq lhs rhs
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 276:0-289:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 277:0-290:1 -/
 @[reducible]
 noncomputable def traits.ValidityCheckProjectivePoint : traits.ValidityCheck
   backend.serial.curve_models.ProjectivePoint := {
@@ -1921,7 +1940,7 @@ noncomputable def traits.ValidityCheckProjectivePoint : traits.ValidityCheck
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:4-320:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 315:4-321:5 -/
 def
   backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_select
   (a : backend.serial.curve_models.AffineNielsPoint)
@@ -1940,7 +1959,7 @@ def
   ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 322:4-326:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 323:4-327:5 -/
 noncomputable def
   backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign
   (self : backend.serial.curve_models.AffineNielsPoint)
@@ -1960,7 +1979,7 @@ noncomputable def
   ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 313:0-327:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1 -/
 @[reducible]
 noncomputable def subtle.ConditionallySelectableAffineNielsPoint :
   subtle.ConditionallySelectable backend.serial.curve_models.AffineNielsPoint
@@ -1975,7 +1994,7 @@ noncomputable def subtle.ConditionallySelectableAffineNielsPoint :
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 338:4-345:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 339:4-346:5 -/
 def backend.serial.curve_models.ProjectivePoint.as_extended
   (self : backend.serial.curve_models.ProjectivePoint) :
   Result edwards.EdwardsPoint
@@ -1993,7 +2012,7 @@ def backend.serial.curve_models.ProjectivePoint.as_extended
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 411:0-430:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 412:0-431:1 -/
 @[reducible]
 def
   core.ops.arith.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
@@ -2005,7 +2024,7 @@ def
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 436:4-451:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 437:4-452:5 -/
 def
   backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint.sub
   (self : edwards.EdwardsPoint)
@@ -2048,7 +2067,7 @@ def
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 433:0-452:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 434:0-453:1 -/
 @[reducible]
 def
   core.ops.arith.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
@@ -2060,7 +2079,7 @@ def
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 458:4-472:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 459:4-473:5 -/
 def
   backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.add
   (self : edwards.EdwardsPoint)
@@ -2100,7 +2119,7 @@ def
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 455:0-473:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 456:0-474:1 -/
 @[reducible]
 def core.ops.arith.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
   : core.ops.arith.Add edwards.EdwardsPoint
@@ -2111,7 +2130,7 @@ def core.ops.arith.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 479:4-493:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 480:4-494:5 -/
 def
   backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.sub
   (self : edwards.EdwardsPoint)
@@ -2151,7 +2170,7 @@ def
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 476:0-494:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 477:0-495:1 -/
 @[reducible]
 def core.ops.arith.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
   : core.ops.arith.Sub edwards.EdwardsPoint
@@ -2162,7 +2181,7 @@ def core.ops.arith.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 516:4-522:5 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 517:4-523:5 -/
 def backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint.neg
   (self : backend.serial.curve_models.AffineNielsPoint) :
   Result backend.serial.curve_models.AffineNielsPoint
@@ -2173,7 +2192,7 @@ def backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint.neg
   ok { y_plus_x := self.y_minus_x, y_minus_x := self.y_plus_x, xy2d := fe }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 513:0-523:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 514:0-524:1 -/
 @[reducible]
 def core.ops.arith.NegShared0AffineNielsPointAffineNielsPoint :
   core.ops.arith.Neg backend.serial.curve_models.AffineNielsPoint
@@ -2271,6 +2290,18 @@ def backend.serial.u64.constants.SQRT_M1_body
 def backend.serial.u64.constants.SQRT_M1
   : backend.serial.u64.field.FieldElement51 :=
   eval_global backend.serial.u64.constants.SQRT_M1_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 108:0-109:53 -/
+@[global_simps]
+def backend.serial.u64.constants.APLUS2_OVER_FOUR_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 121666#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.APLUS2_OVER_FOUR
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.APLUS2_OVER_FOUR_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 114:0-114:97 -/
@@ -4473,6 +4504,186 @@ def core.ops.arith.MulScalarSharedBScalarScalar : core.ops.arith.Mul
   mul := scalar.MulScalarSharedBScalarScalar.mul
 }
 
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}::identity]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 296:4-301:5 -/
+def montgomery.IdentityProjectivePoint.identity
+  : Result montgomery.ProjectivePoint := do
+  ok
+    {
+      U := backend.serial.u64.field.FieldElement51.ONE,
+      W := backend.serial.u64.field.FieldElement51.ZERO
+    }
+
+/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 708:4-710:5 -/
+def scalar.Scalar.as_bytes
+  (self : scalar.Scalar) : Result (Array U8 32#usize) := do
+  ok self.bytes
+
+/-- [curve25519_dalek::montgomery::differential_add_and_double]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 351:0-389:1 -/
+def montgomery.differential_add_and_double
+  (P : montgomery.ProjectivePoint) (Q : montgomery.ProjectivePoint)
+  (affine_PmQ : backend.serial.u64.field.FieldElement51) :
+  Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint)
+  := do
+  let t0 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      P.U P.W
+  let t1 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      P.U P.W
+  let t2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      Q.U Q.W
+  let t3 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      Q.U Q.W
+  let t4 ← backend.serial.u64.field.FieldElement51.square t0
+  let t5 ← backend.serial.u64.field.FieldElement51.square t1
+  let t6 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      t4 t5
+  let t7 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      t0 t3
+  let t8 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      t1 t2
+  let t9 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      t7 t8
+  let t10 ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      t7 t8
+  let t11 ← backend.serial.u64.field.FieldElement51.square t9
+  let t12 ← backend.serial.u64.field.FieldElement51.square t10
+  let t13 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      backend.serial.u64.constants.APLUS2_OVER_FOUR t6
+  let t14 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      t4 t5
+  let t15 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      t13 t5
+  let t16 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      t6 t15
+  let t17 ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      affine_PmQ t12
+  ok ({ U := t14, W := t16 }, { U := t11, W := t17 })
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::ProjectivePoint}::as_affine]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 330:4-333:5 -/
+def montgomery.ProjectivePoint.as_affine
+  (self : montgomery.ProjectivePoint) : Result montgomery.MontgomeryPoint := do
+  let fe ← field.FieldElement51.invert self.W
+  let u ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self.U fe
+  let a ← backend.serial.u64.field.FieldElement51.to_bytes u
+  ok a
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul]: loop 0:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 428:14-433:56 -/
+noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
+  (affine_u : backend.serial.u64.field.FieldElement51)
+  (x0 : montgomery.ProjectivePoint) (x1 : montgomery.ProjectivePoint)
+  (scalar_bytes : Array U8 32#usize) (prev_bit : Bool) (i : Isize) :
+  Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint × Bool)
+  := do
+  if i >= 0#isize
+  then
+    let i1 ← i >>> 3#i32
+    let byte_idx ← (↑(IScalar.hcast .Usize i1) : Result Usize)
+    let i2 ← (↑(i &&& 7#isize) : Result Isize)
+    let bit_idx ← (↑(IScalar.hcast .Usize i2) : Result Usize)
+    let i3 ← Array.index_usize scalar_bytes byte_idx
+    let i4 ← i3 >>> bit_idx
+    let i5 ← (↑(i4 &&& 1#u8) : Result U8)
+    let choice ←
+      (↑(UScalar.cast_fromBool .U8 (prev_bit != (i5 = 1#u8))) : Result U8)
+    if choice = 0#u8
+    then ok ()
+    else massert (choice = 1#u8)
+    let c ← core.convert.IntoFrom.into core.convert.FromChoiceU8 choice
+    let (x01, x11) ←
+      montgomery.ConditionallySelectableProjectivePoint.conditional_swap x0 x1
+        c
+    let (x02, x12) ← montgomery.differential_add_and_double x01 x11 affine_u
+    let i6 ← i - 1#isize
+    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
+      affine_u x02 x12 scalar_bytes (i5 = 1#u8) i6
+  else ok (x0, x1, prev_bit)
+partial_fixpoint
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 413:4-450:5 -/
+noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (sc : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
+  let x0 ← montgomery.IdentityProjectivePoint.identity
+  let scalar_bytes ← scalar.Scalar.as_bytes sc
+  let (x01, x1, prev_bit) ←
+    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
+      affine_u x0
+      { U := affine_u, W := backend.serial.u64.field.FieldElement51.ONE }
+      scalar_bytes false 254#isize
+  let i ← (↑(UScalar.cast_fromBool .U8 prev_bit) : Result U8)
+  let c ← subtle.FromChoiceU8.from i
+  let (x02, _) ←
+    montgomery.ConditionallySelectableProjectivePoint.conditional_swap x01 x1 c
+  let _ ←
+    zeroize.Zeroize.Blanket.zeroize zeroize.DefaultIsZeroesBool prev_bit
+  montgomery.ProjectivePoint.as_affine x02
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 93:12-95:13 -/
+noncomputable def montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (rhs : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 91:8-96:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulMontgomeryPointSharedBScalarMontgomeryPoint :
+  core.ops.arith.Mul montgomery.MontgomeryPoint scalar.Scalar
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul
+}
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 462:4-464:5 -/
+noncomputable def montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul
+  (self : scalar.Scalar) (point : montgomery.MontgomeryPoint) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul point
+    self
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 93:12-95:13 -/
+noncomputable def montgomery.MulScalarSharedBMontgomeryPointMontgomeryPoint.mul
+  (self : scalar.Scalar) (rhs : montgomery.MontgomeryPoint) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 91:8-96:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulScalarSharedBMontgomeryPointMontgomeryPoint :
+  core.ops.arith.Mul scalar.Scalar montgomery.MontgomeryPoint
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulScalarSharedBMontgomeryPointMontgomeryPoint.mul
+}
+
 /-- [curve25519_dalek::scalar::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for &'a (curve25519_dalek::scalar::Scalar)}::mul]:
    Source: 'curve25519-dalek/src/macros.rs', lines 100:12-102:13 -/
 def scalar.MulSharedAScalarScalarScalar.mul
@@ -4485,6 +4696,40 @@ def scalar.MulSharedAScalarScalarScalar.mul
 def core.ops.arith.MulSharedAScalarScalarScalar : core.ops.arith.Mul
   scalar.Scalar scalar.Scalar scalar.Scalar := {
   mul := scalar.MulSharedAScalarScalarScalar.mul
+}
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::montgomery::MontgomeryPoint)}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 100:12-102:13 -/
+noncomputable def montgomery.MulSharedAMontgomeryPointScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (rhs : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::montgomery::MontgomeryPoint)}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 98:8-103:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAMontgomeryPointScalarMontgomeryPoint :
+  core.ops.arith.Mul montgomery.MontgomeryPoint scalar.Scalar
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulSharedAMontgomeryPointScalarMontgomeryPoint.mul
+}
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::scalar::Scalar)}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 100:12-102:13 -/
+noncomputable def montgomery.MulSharedAScalarMontgomeryPointMontgomeryPoint.mul
+  (self : scalar.Scalar) (rhs : montgomery.MontgomeryPoint) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::scalar::Scalar)}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 98:8-103:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarMontgomeryPointMontgomeryPoint :
+  core.ops.arith.Mul scalar.Scalar montgomery.MontgomeryPoint
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulSharedAScalarMontgomeryPointMontgomeryPoint.mul
 }
 
 /-- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for &'a (curve25519_dalek::scalar::Scalar)}]
@@ -4545,6 +4790,38 @@ def core.ops.arith.MulScalarScalarScalar : core.ops.arith.Mul scalar.Scalar
   mul := scalar.MulScalarScalarScalar.mul
 }
 
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 107:12-109:13 -/
+noncomputable def montgomery.MulMontgomeryPointScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (rhs : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 105:8-110:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulMontgomeryPointScalarMontgomeryPoint : core.ops.arith.Mul
+  montgomery.MontgomeryPoint scalar.Scalar montgomery.MontgomeryPoint := {
+  mul := montgomery.MulMontgomeryPointScalarMontgomeryPoint.mul
+}
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}::mul]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 107:12-109:13 -/
+noncomputable def montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul
+  (self : scalar.Scalar) (rhs : montgomery.MontgomeryPoint) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 105:8-110:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulScalarMontgomeryPointMontgomeryPoint : core.ops.arith.Mul
+  scalar.Scalar montgomery.MontgomeryPoint montgomery.MontgomeryPoint := {
+  mul := montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul
+}
+
 /-- Trait implementation: [curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/macros.rs', lines 105:8-110:9 -/
 @[reducible]
@@ -4576,12 +4853,186 @@ def core.ops.arith.MulAssignScalarScalar : core.ops.arith.MulAssign
   mul_assign := scalar.MulAssignScalarScalar.mul_assign
 }
 
+/-- [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 454:4-456:5 -/
+noncomputable def montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign
+  (self : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self
+    scalar
+
+/-- [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign]:
+   Source: 'curve25519-dalek/src/macros.rs', lines 118:12-120:13 -/
+noncomputable def montgomery.MulAssignMontgomeryPointScalar.mul_assign
+  (self : montgomery.MontgomeryPoint) (rhs : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign self rhs
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/macros.rs', lines 117:8-121:9 -/
+@[reducible]
+noncomputable def core.ops.arith.MulAssignMontgomeryPointScalar : core.ops.arith.MulAssign
+  montgomery.MontgomeryPoint scalar.Scalar := {
+  mul_assign := montgomery.MulAssignMontgomeryPointScalar.mul_assign
+}
+
+/-- [curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::MontgomeryPoint}::clone]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 73:15-73:20 -/
+def montgomery.CloneMontgomeryPoint.clone
+  (self : montgomery.MontgomeryPoint) : Result montgomery.MontgomeryPoint := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 73:15-73:20 -/
+@[reducible]
+def core.clone.CloneMontgomeryPoint : core.clone.Clone
+  montgomery.MontgomeryPoint := {
+  clone := montgomery.CloneMontgomeryPoint.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::marker::Copy for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 73:9-73:13 -/
+@[reducible]
+def core.marker.CopyMontgomeryPoint : core.marker.Copy
+  montgomery.MontgomeryPoint := {
+  cloneInst := core.clone.CloneMontgomeryPoint
+}
+
+/-- [curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::MontgomeryPoint}::default]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 73:29-73:36 -/
+def montgomery.DefaultMontgomeryPoint.default
+  : Result montgomery.MontgomeryPoint := do
+  let a ← core.default.DefaultArray.default 32#usize core.default.DefaultU8
+  ok a
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 73:29-73:36 -/
+@[reducible]
+def core.default.DefaultMontgomeryPoint : core.default.Default
+  montgomery.MontgomeryPoint := {
+  default := montgomery.DefaultMontgomeryPoint.default
+}
+
+/-- [curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 79:4-84:5 -/
+noncomputable def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
+  (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+  Result subtle.Choice
+  := do
+  let self_fe ← backend.serial.u64.field.FieldElement51.from_bytes self
+  let other_fe ← backend.serial.u64.field.FieldElement51.from_bytes other
+  field.ConstantTimeEqFieldElement51.ct_eq self_fe other_fe
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 78:0-85:1 -/
+@[reducible]
+noncomputable def subtle.ConstantTimeEqMontgomeryPoint : subtle.ConstantTimeEq
+  montgomery.MontgomeryPoint := {
+  ct_eq := montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
+}
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5 -/
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
+  (choice : subtle.Choice) :
+  Result montgomery.MontgomeryPoint
+  := do
+  let a1 ←
+    subtle.ConditionallySelectableArray.conditional_select
+      subtle.ConditionallySelectableU8 a b choice
+  ok a1
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+@[reducible]
+noncomputable def subtle.ConditionallySelectableMontgomeryPoint :
+  subtle.ConditionallySelectable montgomery.MontgomeryPoint := {
+  coremarkerCopyInst := core.marker.CopyMontgomeryPoint
+  conditional_select :=
+    montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+  conditional_assign :=
+    montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
+  conditional_swap :=
+    montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+}
+
+/-- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::eq]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 94:4-96:5 -/
+noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
+  (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+  Result Bool
+  := do
+  let c ← montgomery.ConstantTimeEqMontgomeryPoint.ct_eq self other
+  core.convert.IntoFrom.into core.convert.FromBoolChoice c
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
+@[reducible]
+noncomputable def core.cmp.PartialEqMontgomeryPointMontgomeryPoint : core.cmp.PartialEq
+  montgomery.MontgomeryPoint montgomery.MontgomeryPoint := {
+  eq := montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
+  ne := montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
+@[reducible]
+noncomputable def core.cmp.EqMontgomeryPoint : core.cmp.Eq montgomery.MontgomeryPoint := {
+  partialEqInst := core.cmp.PartialEqMontgomeryPointMontgomeryPoint
+  assert_receiver_is_total_eq :=
+    montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
+}
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 114:4-116:5 -/
+def montgomery.IdentityMontgomeryPoint.identity
+  : Result montgomery.MontgomeryPoint := do
+  let a := Array.repeat 32#usize 0#u8
+  ok a
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 112:0-117:1 -/
+@[reducible]
+def traits.IdentityMontgomeryPoint : traits.Identity montgomery.MontgomeryPoint
+  := {
+  identity := montgomery.IdentityMontgomeryPoint.identity
+}
+
+/-- [curve25519_dalek::montgomery::{zeroize::Zeroize for curve25519_dalek::montgomery::MontgomeryPoint}::zeroize]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 121:4-123:5 -/
+noncomputable def montgomery.ZeroizeMontgomeryPoint.zeroize
+  (self : montgomery.MontgomeryPoint) : Result montgomery.MontgomeryPoint := do
+  let a ←
+    zeroize.ZeroizeArray.zeroize (zeroize.Zeroize.Blanket
+      zeroize.DefaultIsZeroesU8) self
+  ok a
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{zeroize::Zeroize for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 120:0-124:1 -/
+@[reducible]
+noncomputable def zeroize.ZeroizeMontgomeryPoint : zeroize.Zeroize montgomery.MontgomeryPoint
+  := {
+  zeroize := montgomery.ZeroizeMontgomeryPoint.zeroize
+}
+
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 128:4-130:5 -/
 noncomputable def montgomery.MontgomeryPoint.mul_base
   (scalar : scalar.Scalar) : Result montgomery.MontgomeryPoint := do
   let ep ← edwards.EdwardsPoint.mul_base scalar
   edwards.EdwardsPoint.to_montgomery ep
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_clamped]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 134:4-146:5 -/
+noncomputable def montgomery.MontgomeryPoint.mul_clamped
+  (self : montgomery.MontgomeryPoint) (bytes : Array U8 32#usize) :
+  Result montgomery.MontgomeryPoint
+  := do
+  let a ← scalar.clamp_integer bytes
+  montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul { bytes := a } self
 
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 150:4-158:5 -/
@@ -4677,6 +5128,105 @@ noncomputable def montgomery.elligator_encode
       core.ops.arith.NegShared0FieldElement51FieldElement51 u c
   let a ← backend.serial.u64.field.FieldElement51.to_bytes u1
   ok (a, eps_is_sq)
+
+/-- [curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::ProjectivePoint}::clone]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 288:15-288:20 -/
+def montgomery.CloneProjectivePoint.clone
+  (self : montgomery.ProjectivePoint) : Result montgomery.ProjectivePoint := do
+  ok self
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 288:15-288:20 -/
+@[reducible]
+def core.clone.CloneProjectivePoint : core.clone.Clone
+  montgomery.ProjectivePoint := {
+  clone := montgomery.CloneProjectivePoint.clone
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::marker::Copy for curve25519_dalek::montgomery::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 288:9-288:13 -/
+@[reducible]
+def core.marker.CopyProjectivePoint : core.marker.Copy
+  montgomery.ProjectivePoint := {
+  cloneInst := core.clone.CloneProjectivePoint
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 295:0-302:1 -/
+@[reducible]
+def IdentityMontgomeryProjectivePoint : traits.Identity
+  montgomery.ProjectivePoint := {
+  identity := montgomery.IdentityProjectivePoint.identity
+}
+
+/-- [curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::ProjectivePoint}::default]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 305:4-307:5 -/
+def montgomery.DefaultProjectivePoint.default
+  : Result montgomery.ProjectivePoint := do
+  montgomery.IdentityProjectivePoint.identity
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 304:0-308:1 -/
+@[reducible]
+def core.default.DefaultProjectivePoint : core.default.Default
+  montgomery.ProjectivePoint := {
+  default := montgomery.DefaultProjectivePoint.default
+}
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5 -/
+def montgomery.ConditionallySelectableProjectivePoint.conditional_select
+  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
+  (choice : subtle.Choice) :
+  Result montgomery.ProjectivePoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.U b.U choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.W b.W choice
+  ok { U := fe, W := fe1 }
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+@[reducible]
+noncomputable def subtle.ConditionallySelectableProjectivePoint :
+  subtle.ConditionallySelectable montgomery.ProjectivePoint := {
+  coremarkerCopyInst := core.marker.CopyProjectivePoint
+  conditional_select :=
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select
+  conditional_assign :=
+    montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  conditional_swap :=
+    montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 409:0-451:1 -/
+@[reducible]
+noncomputable def core.ops.arith.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint :
+  core.ops.arith.Mul montgomery.MontgomeryPoint scalar.Scalar
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 453:0-457:1 -/
+@[reducible]
+noncomputable def core.ops.arith.MulAssignMontgomeryPointShared0Scalar :
+  core.ops.arith.MulAssign montgomery.MontgomeryPoint scalar.Scalar := {
+  mul_assign := montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign
+}
+
+/-- Trait implementation: [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 459:0-465:1 -/
+@[reducible]
+noncomputable def core.ops.arith.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint :
+  core.ops.arith.Mul scalar.Scalar montgomery.MontgomeryPoint
+  montgomery.MontgomeryPoint := {
+  mul := montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul
+}
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 231:4-233:5 -/
@@ -5432,12 +5982,6 @@ def scalar.Scalar.ONE : scalar.Scalar := eval_global scalar.Scalar.ONE_body
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 693:4-695:5 -/
 def scalar.Scalar.to_bytes
-  (self : scalar.Scalar) : Result (Array U8 32#usize) := do
-  ok self.bytes
-
-/-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 708:4-710:5 -/
-def scalar.Scalar.as_bytes
   (self : scalar.Scalar) : Result (Array U8 32#usize) := do
   ok self.bytes
 

@@ -177,7 +177,7 @@ impl MontgomeryPoint {
         // Go through the bits from most to least significant, using a sliding window of 2
         let mut prev_bit = false;
         for cur_bit in bits {
-            let choice: u8 = (prev_bit ^ cur_bit) as u8;
+            let choice: u8 = (prev_bit != cur_bit) as u8;
 
             debug_assert!(choice == 0 || choice == 1);
 
@@ -291,6 +291,7 @@ struct ProjectivePoint {
     pub W: FieldElement,
 }
 
+#[cfg_attr(verify, aeneas::rename("IdentityMontgomeryProjectivePoint"))]
 impl Identity for ProjectivePoint {
     fn identity() -> ProjectivePoint {
         ProjectivePoint {
@@ -429,7 +430,7 @@ impl Mul<&Scalar> for &MontgomeryPoint {
             let bit_idx = (i & 7) as usize; // i % 8
             let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
 
-            let choice: u8 = (prev_bit ^ cur_bit) as u8;
+            let choice: u8 = (prev_bit != cur_bit) as u8;
 
             debug_assert!(choice == 0 || choice == 1);
 

@@ -314,6 +314,12 @@ def edwards.CompressedEdwardsY := Array U8 32#usize
 @[reducible]
 def montgomery.MontgomeryPoint := Array U8 32#usize
 
+/-- [curve25519_dalek::montgomery::ProjectivePoint]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 289:0-292:1 -/
+structure montgomery.ProjectivePoint where
+  U : backend.serial.u64.field.FieldElement51
+  W : backend.serial.u64.field.FieldElement51
+
 /-- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
 @[reducible]

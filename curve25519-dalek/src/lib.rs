@@ -10,6 +10,8 @@
 // - Henry de Valence <hdevalence@hdevalence.ca>
 
 #![no_std]
+#![cfg_attr(verify, feature(register_tool))]
+#![cfg_attr(verify, register_tool(aeneas))]
 #![cfg_attr(docsrs, feature(doc_auto_cfg, doc_cfg, doc_cfg_hide))]
 #![cfg_attr(docsrs, doc(cfg_hide(docsrs)))]
 //------------------------------------------------------------------------

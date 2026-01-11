@@ -56,6 +56,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/mod.rs b/curve25519-d
  #[allow(non_snake_case)]
  pub fn vartime_double_base_mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
      match get_selected_backend() {
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
+--- a/curve25519-dalek/src/backend/serial/curve_models/mod.rs
++++ b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
+@@ -226,6 +226,7 @@
+ 
+ use crate::traits::Identity;
+ 
++#[cfg_attr(verify, aeneas::rename("IdentityCurveModelsProjectivePoint"))]
+ impl Identity for ProjectivePoint {
+     fn identity() -> ProjectivePoint {
+         ProjectivePoint {
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
@@ -479,6 +490,18 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          }
          // Unroll last iteration so we can go directly as_extended()
          s.double().as_extended()
+diff -Naur --no-dereference a/curve25519-dalek/src/lib.rs b/curve25519-dalek/src/lib.rs
+--- a/curve25519-dalek/src/lib.rs
++++ b/curve25519-dalek/src/lib.rs
+@@ -10,6 +10,8 @@
+ // - Henry de Valence <hdevalence@hdevalence.ca>
+ 
+ #![no_std]
++#![cfg_attr(verify, feature(register_tool))]
++#![cfg_attr(verify, register_tool(aeneas))]
+ #![cfg_attr(docsrs, feature(doc_auto_cfg, doc_cfg, doc_cfg_hide))]
+ #![cfg_attr(docsrs, doc(cfg_hide(docsrs)))]
+ //------------------------------------------------------------------------
 diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-dalek/src/montgomery.rs
 --- a/curve25519-dalek/src/montgomery.rs
 +++ b/curve25519-dalek/src/montgomery.rs
@@ -490,7 +513,24 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
      pub fn mul_bits_be(&self, bits: impl Iterator<Item = bool>) -> MontgomeryPoint {
          // Algorithm 8 of Costello-Smith 2017
          let affine_u = FieldElement::from_bytes(&self.0);
-@@ -400,14 +401,51 @@
+@@ -176,7 +177,7 @@
+         // Go through the bits from most to least significant, using a sliding window of 2
+         let mut prev_bit = false;
+         for cur_bit in bits {
+-            let choice: u8 = (prev_bit ^ cur_bit) as u8;
++            let choice: u8 = (prev_bit != cur_bit) as u8;
+ 
+             debug_assert!(choice == 0 || choice == 1);
+ 
+@@ -290,6 +291,7 @@
+     pub W: FieldElement,
+ }
+ 
++#[cfg_attr(verify, aeneas::rename("IdentityMontgomeryProjectivePoint"))]
+ impl Identity for ProjectivePoint {
+     fn identity() -> ProjectivePoint {
+         ProjectivePoint {
+@@ -400,14 +402,51 @@
  );
  
  /// Multiply this `MontgomeryPoint` by a `Scalar`.
@@ -524,7 +564,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
 +            let bit_idx = (i & 7) as usize; // i % 8
 +            let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
 +
-+            let choice: u8 = (prev_bit ^ cur_bit) as u8;
++            let choice: u8 = (prev_bit != cur_bit) as u8;
 +
 +            debug_assert!(choice == 0 || choice == 1);
 +
