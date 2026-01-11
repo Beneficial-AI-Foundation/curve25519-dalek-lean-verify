@@ -114,6 +114,12 @@ generate_llbc() {
         # Product/Sum impls: pull in mutually recursive iterator traits
         --exclude 'curve25519_dalek::scalar::{impl core::iter::Product<_> for _}'
         --exclude 'curve25519_dalek::scalar::{impl core::iter::Sum<_> for _}'
+        # Hash traits: not needed for cryptographic verification, causes Aeneas syntax issues
+        --exclude 'core::hash::Hash'
+        --exclude 'core::hash::Hasher'
+        --exclude 'core::array::{impl core::hash::Hash for _}'
+        --exclude 'core::hash::impls::{impl core::hash::Hash for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::hash::Hash for _}'
     )
     OPAQUE_ARGS=(
         # non_adjacent_form/as_radix_2w: dynamic array indexing causes Aeneas internal error

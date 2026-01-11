@@ -358,4 +358,88 @@ noncomputable def
 ===REPLACE===
 /--
 
+===FIND===
+def core.iter.range.StepUsize
+===REPLACE===
+noncomputable def core.iter.range.StepUsize
+
+===FIND===
+def core.iter.traits.iterator.IteratorRangeA
+===REPLACE===
+noncomputable def core.iter.traits.iterator.IteratorRangeA
+
+===FIND===
+def core.iter.traits.collect.IntoIterator.Blanket
+===REPLACE===
+noncomputable def core.iter.traits.collect.IntoIterator.Blanket
+
+===FIND===
+def subtle.ConditionallySelectableU8
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableU8
+
+===FIND===
+def zeroize.ZeroizeVec
+===REPLACE===
+noncomputable def zeroize.ZeroizeVec
+
+===FIND===
+def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
+===REPLACE===
+noncomputable def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
+
+===FIND===
+def zeroize.ZeroizeScalar52 :
+===REPLACE===
+noncomputable def zeroize.ZeroizeScalar52 :
+
+===FIND===
+def scalar.PartialEqScalarScalar.eq
+===REPLACE===
+noncomputable def scalar.PartialEqScalarScalar.eq
+
+===FIND===
+def core.cmp.PartialEqScalarScalar
+===REPLACE===
+noncomputable def core.cmp.PartialEqScalarScalar
+
+===FIND===
+def core.cmp.EqScalar
+===REPLACE===
+noncomputable def core.cmp.EqScalar
+
+===FIND===
+def scalar.ConditionallySelectableScalar.conditional_select_loop
+===REPLACE===
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select_loop
+
+===FIND===
+def scalar.ConditionallySelectableScalar.conditional_select
+  (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice) :
+===REPLACE===
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select
+  (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice) :
+
+===FIND===
+def subtle.ConditionallySelectableScalar
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableScalar
+
+===FIND===
+def scalar.ZeroizeScalar.zeroize
+===REPLACE===
+noncomputable def scalar.ZeroizeScalar.zeroize
+
+===FIND===
+def zeroize.ZeroizeScalar :
+===REPLACE===
+noncomputable def zeroize.ZeroizeScalar :
+
+===FIND===
+def scalar.Scalar.batch_invert
+  (inputs :
+===REPLACE===
+noncomputable def scalar.Scalar.batch_invert
+  (inputs :
+
 

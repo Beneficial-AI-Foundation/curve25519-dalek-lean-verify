@@ -11,30 +11,11 @@ set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
-/-- Trait implementation: [core::array::{core::hash::Hash for @Array<T, N>}]
-   Source: '/rustc/library/core/src/array/mod.rs', lines 346:0-346:45
-   Name pattern: [core::hash::Hash<[@T; @N]>] -/
-@[reducible, rust_trait_impl "core::hash::Hash<[@T; @N]>"]
-def core.hash.HashArray {T : Type} (N : Usize) (hashHashInst : core.hash.Hash
-  T) : core.hash.Hash (Array T N) := {
-  hash := : forall (H : Type) (hashHasherInst : core.hash.Hasher H),
-    core.array.HashArray.hash hashHashInst hashHasherInst
-}
-
-/-- Trait implementation: [core::hash::impls::{core::hash::Hash for u8}]
-   Source: '/rustc/library/core/src/hash/mod.rs', lines 810:12-810:29
-   Name pattern: [core::hash::Hash<u8>] -/
-@[reducible, rust_trait_impl "core::hash::Hash<u8>"]
-def core.hash.HashU8 : core.hash.Hash U8 := {
-  hash := : forall (H : Type) (HasherInst : core.hash.Hasher H),
-    core.hash.impls.HashU8.hash HasherInst
-}
-
 /-- Trait implementation: [core::iter::range::{core::iter::range::Step for usize}]
    Source: '/rustc/library/core/src/iter/range.rs', lines 258:12-258:37
    Name pattern: [core::iter::range::Step<usize>] -/
 @[reducible, rust_trait_impl "core::iter::range::Step<usize>"]
-def core.iter.range.StepUsize : core.iter.range.Step Usize := {
+noncomputable def core.iter.range.StepUsize : core.iter.range.Step Usize := {
   cloneCloneInst := core.clone.CloneUsize
   cmpPartialOrdInst := core.cmp.PartialOrdUsize
   steps_between := core.iter.range.StepUsize.steps_between
@@ -47,7 +28,7 @@ def core.iter.range.StepUsize : core.iter.range.Step Usize := {
    Name pattern: [core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>] -/
 @[reducible, rust_trait_impl
   "core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>"]
-def core.iter.traits.iterator.IteratorRangeA {A : Type} (StepInst :
+noncomputable def core.iter.traits.iterator.IteratorRangeA {A : Type} (StepInst :
   core.iter.range.Step A) : core.iter.traits.iterator.Iterator
   (core.ops.range.Range A) A := {
   next := core.iter.range.IteratorRangeA.next StepInst
@@ -58,7 +39,7 @@ def core.iter.traits.iterator.IteratorRangeA {A : Type} (StepInst :
    Name pattern: [core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>] -/
 @[reducible, rust_trait_impl
   "core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>"]
-def core.iter.traits.collect.IntoIterator.Blanket {I : Type} {Clause0_Item :
+noncomputable def core.iter.traits.collect.IntoIterator.Blanket {I : Type} {Clause0_Item :
   Type} (iteratorIteratorInst : core.iter.traits.iterator.Iterator I
   Clause0_Item) : core.iter.traits.collect.IntoIterator I Clause0_Item I := {
   iteratorIteratorInst := iteratorIteratorInst
@@ -159,7 +140,7 @@ def subtle.ConstantTimeEqU8 : subtle.ConstantTimeEq U8 := {
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u8>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallySelectable<u8>"]
-def subtle.ConditionallySelectableU8 : subtle.ConditionallySelectable U8 := {
+noncomputable def subtle.ConditionallySelectableU8 : subtle.ConditionallySelectable U8 := {
   coremarkerCopyInst := core.marker.CopyU8
   conditional_select := subtle.ConditionallySelectableU8.conditional_select
   conditional_assign := subtle.ConditionallySelectableU8.conditional_assign
@@ -230,7 +211,7 @@ noncomputable def zeroize.ZeroizeArray {Z : Type} (N : Usize) (ZeroizeInst : zer
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 543:0-545:15
    Name pattern: [zeroize::Zeroize<alloc::vec::Vec<@Z>>] -/
 @[reducible, rust_trait_impl "zeroize::Zeroize<alloc::vec::Vec<@Z>>"]
-def zeroize.ZeroizeVec {Z : Type} (ZeroizeInst : zeroize.Zeroize Z) :
+noncomputable def zeroize.ZeroizeVec {Z : Type} (ZeroizeInst : zeroize.Zeroize Z) :
   zeroize.Zeroize (alloc.vec.Vec Z) := {
   zeroize := zeroize.ZeroizeVec.zeroize ZeroizeInst
 }
@@ -2317,7 +2298,7 @@ def core.clone.CloneScalar52 : core.clone.Clone
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::zeroize]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 36:4-38:5 -/
-def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
+noncomputable def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
   (self : backend.serial.u64.scalar.Scalar52) :
   Result backend.serial.u64.scalar.Scalar52
   := do
@@ -2329,7 +2310,7 @@ def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
 /-- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 35:0-39:1 -/
 @[reducible]
-def zeroize.ZeroizeScalar52 : zeroize.Zeroize
+noncomputable def zeroize.ZeroizeScalar52 : zeroize.Zeroize
   backend.serial.u64.scalar.Scalar52 := {
   zeroize := backend.serial.u64.scalar.ZeroizeScalar52.zeroize
 }
@@ -4256,24 +4237,6 @@ def core.marker.CopyScalar : core.marker.Copy scalar.Scalar := {
   cloneInst := core.clone.CloneScalar
 }
 
-/-- [curve25519_dalek::scalar::{core::hash::Hash for curve25519_dalek::scalar::Scalar}::hash]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 194:22-194:26 -/
-def scalar.HashScalar.hash
-  {__H : Type} (corehashHasherInst : core.hash.Hasher __H)
-  (self : scalar.Scalar) (state : __H) :
-  Result __H
-  := do
-  core.array.HashArray.hash core.hash.HashU8 corehashHasherInst self.bytes
-    state
-
-/-- Trait implementation: [curve25519_dalek::scalar::{core::hash::Hash for curve25519_dalek::scalar::Scalar}]
-   Source: 'curve25519-dalek/src/scalar.rs', lines 194:22-194:26 -/
-@[reducible]
-def core.hash.HashScalar : core.hash.Hash scalar.Scalar := {
-  hash := : forall (__H : Type) (corehashHasherInst : core.hash.Hasher __H),
-    scalar.HashScalar.hash corehashHasherInst
-}
-
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1141:4-1146:5 -/
 def scalar.Scalar.reduce (self : scalar.Scalar) : Result scalar.Scalar := do
@@ -4336,7 +4299,7 @@ noncomputable def scalar.Scalar.from_canonical_bytes
 
 /-- [curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::eq]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 295:4-297:5 -/
-def scalar.PartialEqScalarScalar.eq
+noncomputable def scalar.PartialEqScalarScalar.eq
   (self : scalar.Scalar) (other : scalar.Scalar) : Result Bool := do
   let c ← scalar.ConstantTimeEqScalar.ct_eq self other
   core.convert.IntoFrom.into core.convert.FromBoolChoice c
@@ -4344,7 +4307,7 @@ def scalar.PartialEqScalarScalar.eq
 /-- Trait implementation: [curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1 -/
 @[reducible]
-def core.cmp.PartialEqScalarScalar : core.cmp.PartialEq scalar.Scalar
+noncomputable def core.cmp.PartialEqScalarScalar : core.cmp.PartialEq scalar.Scalar
   scalar.Scalar := {
   eq := scalar.PartialEqScalarScalar.eq
   ne := scalar.PartialEqScalarScalar.ne
@@ -4353,7 +4316,7 @@ def core.cmp.PartialEqScalarScalar : core.cmp.PartialEq scalar.Scalar
 /-- Trait implementation: [curve25519_dalek::scalar::{core::cmp::Eq for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
 @[reducible]
-def core.cmp.EqScalar : core.cmp.Eq scalar.Scalar := {
+noncomputable def core.cmp.EqScalar : core.cmp.Eq scalar.Scalar := {
   partialEqInst := core.cmp.PartialEqScalarScalar
   assert_receiver_is_total_eq := scalar.EqScalar.assert_receiver_is_total_eq
 }
@@ -4460,7 +4423,7 @@ def core.ops.arith.NegScalarScalar : core.ops.arith.Neg scalar.Scalar
 
 /-- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 393:8-395:9 -/
-def scalar.ConditionallySelectableScalar.conditional_select_loop
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select_loop
   (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice)
   (bytes : Array U8 32#usize) (iter : core.ops.range.Range Usize) :
   Result (Array U8 32#usize)
@@ -4480,7 +4443,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 390:4-397:5 -/
-def scalar.ConditionallySelectableScalar.conditional_select
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select
   (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice) :
   Result scalar.Scalar
   := do
@@ -4497,7 +4460,7 @@ def scalar.ConditionallySelectableScalar.conditional_select
 /-- Trait implementation: [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
 @[reducible]
-def subtle.ConditionallySelectableScalar : subtle.ConditionallySelectable
+noncomputable def subtle.ConditionallySelectableScalar : subtle.ConditionallySelectable
   scalar.Scalar := {
   coremarkerCopyInst := core.marker.CopyScalar
   conditional_select := scalar.ConditionallySelectableScalar.conditional_select
@@ -4635,7 +4598,7 @@ def core.convert.FromScalarU128 : core.convert.From scalar.Scalar U128 := {
 
 /-- [curve25519_dalek::scalar::{zeroize::Zeroize for curve25519_dalek::scalar::Scalar}::zeroize]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 559:4-561:5 -/
-def scalar.ZeroizeScalar.zeroize
+noncomputable def scalar.ZeroizeScalar.zeroize
   (self : scalar.Scalar) : Result scalar.Scalar := do
   let a ←
     zeroize.ZeroizeArray.zeroize (zeroize.Zeroize.Blanket
@@ -4645,7 +4608,7 @@ def scalar.ZeroizeScalar.zeroize
 /-- Trait implementation: [curve25519_dalek::scalar::{zeroize::Zeroize for curve25519_dalek::scalar::Scalar}]
    Source: 'curve25519-dalek/src/scalar.rs', lines 558:0-562:1 -/
 @[reducible]
-def zeroize.ZeroizeScalar : zeroize.Zeroize scalar.Scalar := {
+noncomputable def zeroize.ZeroizeScalar : zeroize.Zeroize scalar.Scalar := {
   zeroize := scalar.ZeroizeScalar.zeroize
 }
 
@@ -4827,7 +4790,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 790:4-847:5 -/
-def scalar.Scalar.batch_invert
+noncomputable def scalar.Scalar.batch_invert
   (inputs : Slice scalar.Scalar) :
   Result (scalar.Scalar × (Slice scalar.Scalar))
   := do
