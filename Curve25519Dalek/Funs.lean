@@ -2342,6 +2342,14 @@ def core.clone.CloneScalar52 : core.clone.Clone
   clone := backend.serial.u64.scalar.CloneScalar52.clone
 }
 
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::scalar::{core::marker::Copy for curve25519_dalek::backend::serial::u64::scalar::Scalar52}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 25:9-25:13 -/
+@[reducible]
+def core.marker.CopyScalar52 : core.marker.Copy
+  backend.serial.u64.scalar.Scalar52 := {
+  cloneInst := core.clone.CloneScalar52
+}
+
 /-- [curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::zeroize]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 36:4-38:5 -/
 noncomputable def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
@@ -2615,7 +2623,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   ok (i3, w)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 0:0-223:9 -/
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:14-218:19 -/
 def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
   (carry : U64) (mask : U64) (i : Usize) :
@@ -3159,6 +3167,19 @@ def backend.serial.u64.scalar.Scalar52.mul
     backend.serial.u64.scalar.Scalar52.mul_internal ab
       backend.serial.u64.constants.RR
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a2
+
+/-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 319:4-322:5 -/
+def backend.serial.u64.scalar.Scalar52.square
+  (self : backend.serial.u64.scalar.Scalar52) :
+  Result backend.serial.u64.scalar.Scalar52
+  := do
+  let a ← backend.serial.u64.scalar.Scalar52.square_internal self
+  let aa ← backend.serial.u64.scalar.Scalar52.montgomery_reduce a
+  let a1 ←
+    backend.serial.u64.scalar.Scalar52.mul_internal aa
+      backend.serial.u64.constants.RR
+  backend.serial.u64.scalar.Scalar52.montgomery_reduce a1
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 332:4-334:5 -/
