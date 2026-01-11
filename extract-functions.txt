@@ -22,6 +22,11 @@ curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2
 curve25519_dalek::edwards::EdwardsPoint::mul_clamped
 curve25519_dalek::edwards::EdwardsPoint::to_montgomery
+curve25519_dalek::field::FieldElement::invert
+curve25519_dalek::field::FieldElement::invsqrt
+curve25519_dalek::field::FieldElement::is_negative
+curve25519_dalek::field::FieldElement::is_zero
+curve25519_dalek::field::FieldElement::sqrt_ratio_i
 curve25519_dalek::montgomery
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes
 curve25519_dalek::ristretto::CompressedRistretto::decompress
@@ -32,3 +37,4 @@ curve25519_dalek::ristretto::RistrettoPoint::elligator_ristretto_flavor
 curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes
 curve25519_dalek::ristretto::RistrettoPoint::mul_base
 curve25519_dalek::scalar
+

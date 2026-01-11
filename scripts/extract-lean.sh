@@ -112,6 +112,11 @@ generate_llbc() {
         --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}'
         --exclude 'curve25519_dalek::scalar::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::scalar::{impl core::hash::Hash for _}'
+        # Exclude Sum/Product impls that require Iterator/IntoIterator traits
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Sum<_> for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}'
+        --exclude 'curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}'
     )
     OPAQUE_ARGS=(
         # --opaque 'curve25519_dalek::something::somename'
