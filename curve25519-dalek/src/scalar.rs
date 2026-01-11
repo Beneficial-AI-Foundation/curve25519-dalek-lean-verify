@@ -848,6 +848,7 @@ impl Scalar {
 
     /// Get the bits of the scalar, in little-endian order
     #[cfg(not(verify))]
+    #[allow(dead_code)]
     pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
         (0..256).map(|i| {
             // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
@@ -1034,7 +1035,10 @@ impl Scalar {
 
     /// Returns a size hint indicating how many entries of the return
     /// value of `to_radix_2w` are nonzero.
-    #[cfg(all(any(feature = "alloc", all(test, feature = "precomputed-tables")), not(verify)))]
+    #[cfg(all(
+        any(feature = "alloc", all(test, feature = "precomputed-tables")),
+        not(verify)
+    ))]
     pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
