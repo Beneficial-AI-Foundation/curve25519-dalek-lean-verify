@@ -104,6 +104,7 @@ generate_llbc() {
     # --opaque: keep signature but no body
     EXCLUDE_ARGS=(
         --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::scalar::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::scalar::{impl core::hash::Hash for _}'
     )

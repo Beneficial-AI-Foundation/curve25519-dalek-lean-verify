@@ -2095,6 +2095,29 @@ def core.ops.arith.AddShared0FieldElement51SharedAFieldElement51FieldElement51
     backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
 }
 
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 78:4-81:5 -/
+def
+  backend.serial.u64.field.SubAssignFieldElement51SharedAFieldElement51.sub_assign
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let result ←
+    backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+      self _rhs
+  ok result
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 77:0-82:1 -/
+@[reducible]
+def core.ops.arith.SubAssignFieldElement51SharedAFieldElement51 :
+  core.ops.arith.SubAssign backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  sub_assign :=
+    backend.serial.u64.field.SubAssignFieldElement51SharedAFieldElement51.sub_assign
+}
+
 /-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 84:0-104:1 -/
 @[reducible]
@@ -2104,6 +2127,29 @@ def core.ops.arith.SubShared0FieldElement51SharedAFieldElement51FieldElement51
   backend.serial.u64.field.FieldElement51 := {
   sub :=
     backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub
+}
+
+/-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::MulAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::mul_assign]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 107:4-110:5 -/
+def
+  backend.serial.u64.field.MulAssignFieldElement51SharedAFieldElement51.mul_assign
+  (self : backend.serial.u64.field.FieldElement51)
+  (_rhs : backend.serial.u64.field.FieldElement51) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let result ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      self _rhs
+  ok result
+
+/-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::MulAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}]
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 106:0-111:1 -/
+@[reducible]
+def core.ops.arith.MulAssignFieldElement51SharedAFieldElement51 :
+  core.ops.arith.MulAssign backend.serial.u64.field.FieldElement51
+  backend.serial.u64.field.FieldElement51 := {
+  mul_assign :=
+    backend.serial.u64.field.MulAssignFieldElement51SharedAFieldElement51.mul_assign
 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}]
@@ -2569,7 +2615,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   ok (i3, w)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
-   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:14-218:19 -/
+   Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 0:0-223:9 -/
 def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
   (carry : U64) (mask : U64) (i : Usize) :
