@@ -293,6 +293,11 @@ structure traits.ValidityCheck (Self : Type) where
 @[reducible]
 def backend.serial.u64.scalar.Scalar52 := Array U64 5#usize
 
+/-- [curve25519_dalek::ristretto::RistrettoPoint]
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 487:0-487:51 -/
+@[reducible]
+def ristretto.RistrettoPoint := edwards.EdwardsPoint
+
 /-- [curve25519_dalek::edwards::affine::AffinePoint]
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
 structure edwards.affine.AffinePoint where
@@ -308,11 +313,6 @@ def edwards.CompressedEdwardsY := Array U8 32#usize
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible]
 def montgomery.MontgomeryPoint := Array U8 32#usize
-
-/-- [curve25519_dalek::ristretto::RistrettoPoint]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 487:0-487:51 -/
-@[reducible]
-def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
 /-- [curve25519_dalek::ristretto::CompressedRistretto]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/

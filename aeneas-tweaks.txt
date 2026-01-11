@@ -578,4 +578,50 @@ def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
 @[reducible]
 noncomputable def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
 
+# Ristretto Mul impls need noncomputable
+
+===FIND===
+def ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul
+===REPLACE===
+noncomputable def ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul
+
+===FIND===
+def ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul
+===REPLACE===
+noncomputable def ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAScalarRistrettoPointRistrettoPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarRistrettoPointRistrettoPoint
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared0ScalarSharedARistrettoPointRistrettoPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared0ScalarSharedARistrettoPointRistrettoPoint
+
+===FIND===
+def ristretto.RistrettoPoint.mul_base
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.mul_base
+
+# Rename CompressedRistretto constructor to avoid conflict with type
+
+===FIND===
+/-- [curve25519_dalek::ristretto::CompressedRistretto]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
+def ristretto.CompressedRistretto
+  (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
+  ok a
+===REPLACE===
+/-- [curve25519_dalek::ristretto::CompressedRistretto]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
+def ristretto.CompressedRistretto.mk
+  (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
+  ok a
+
 
