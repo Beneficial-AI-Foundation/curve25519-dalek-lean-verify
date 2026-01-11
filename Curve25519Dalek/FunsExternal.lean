@@ -129,6 +129,12 @@ def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
   else
     ok Choice.one
 
+/- [subtle::{subtle::ConstantTimeEq for u16}::ct_eq]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 348:12-348:51
+   Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq] -/
+@[rust_fun "subtle::{subtle::ConstantTimeEq<u16>}::ct_eq"]
+axiom subtle.ConstantTimeEqU16.ct_eq : U16 → U16 → Result subtle.Choice
+
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
    Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]

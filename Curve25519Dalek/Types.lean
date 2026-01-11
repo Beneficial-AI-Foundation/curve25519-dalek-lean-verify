@@ -219,10 +219,42 @@ structure zeroize.DefaultIsZeroes (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   coredefaultDefaultInst : core.default.Default Self
 
+/-- [curve25519_dalek::backend::BackendKind]
+   Source: 'curve25519-dalek/src/backend/mod.rs', lines 46:0-52:1 -/
+@[discriminant]
+inductive backend.BackendKind where
+| Serial : backend.BackendKind
+
 /-- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
 @[reducible]
 def backend.serial.u64.field.FieldElement51 := Array U64 5#usize
+
+/-- [curve25519_dalek::edwards::EdwardsPoint]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
+structure edwards.EdwardsPoint where
+  X : backend.serial.u64.field.FieldElement51
+  Y : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T : backend.serial.u64.field.FieldElement51
+
+/-- [curve25519_dalek::scalar::Scalar]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
+structure scalar.Scalar where
+  bytes : Array U8 32#usize
+
+/-- [curve25519_dalek::window::LookupTable]
+   Source: 'curve25519-dalek/src/window.rs', lines 47:8-47:51 -/
+@[reducible]
+def window.LookupTable (T : Type) := Array T 8#usize
+
+/-- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
+structure backend.serial.curve_models.ProjectiveNielsPoint where
+  Y_plus_X : backend.serial.u64.field.FieldElement51
+  Y_minus_X : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T2d : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
@@ -239,6 +271,11 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
+/-- Trait declaration: [curve25519_dalek::traits::Identity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
+structure traits.Identity (Self : Type) where
+  identity : Result Self
+
 /-- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 184:0-188:1 -/
 structure backend.serial.curve_models.AffineNielsPoint where
@@ -246,31 +283,10 @@ structure backend.serial.curve_models.AffineNielsPoint where
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
 
-/-- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
-structure backend.serial.curve_models.ProjectiveNielsPoint where
-  Y_plus_X : backend.serial.u64.field.FieldElement51
-  Y_minus_X : backend.serial.u64.field.FieldElement51
-  Z : backend.serial.u64.field.FieldElement51
-  T2d : backend.serial.u64.field.FieldElement51
-
-/-- Trait declaration: [curve25519_dalek::traits::Identity]
-   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
-structure traits.Identity (Self : Type) where
-  identity : Result Self
-
 /-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
 structure traits.ValidityCheck (Self : Type) where
   is_valid : Self → Result Bool
-
-/-- [curve25519_dalek::edwards::EdwardsPoint]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
-structure edwards.EdwardsPoint where
-  X : backend.serial.u64.field.FieldElement51
-  Y : backend.serial.u64.field.FieldElement51
-  Z : backend.serial.u64.field.FieldElement51
-  T : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
@@ -292,11 +308,6 @@ def edwards.CompressedEdwardsY := Array U8 32#usize
    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41 -/
 @[reducible]
 def montgomery.MontgomeryPoint := Array U8 32#usize
-
-/-- [curve25519_dalek::scalar::Scalar]
-   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
-structure scalar.Scalar where
-  bytes : Array U8 32#usize
 
 /-- [curve25519_dalek::ristretto::RistrettoPoint]
    Source: 'curve25519-dalek/src/ristretto.rs', lines 487:0-487:51 -/

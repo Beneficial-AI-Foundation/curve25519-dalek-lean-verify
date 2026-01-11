@@ -442,4 +442,140 @@ def scalar.Scalar.batch_invert
 noncomputable def scalar.Scalar.batch_invert
   (inputs :
 
+===FIND===
+def core.convert.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint
+===REPLACE===
+noncomputable def core.convert.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint
+
+===FIND===
+def backend.serial.scalar_mul.variable_base.mul_loop
+===REPLACE===
+noncomputable def backend.serial.scalar_mul.variable_base.mul_loop
+
+===FIND===
+def backend.serial.scalar_mul.variable_base.mul
+  (point : edwards.EdwardsPoint) (scalar : scalar.Scalar) :
+  Result edwards.EdwardsPoint
+  := do
+  let lookup_table ←
+    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
+  let scalar_digits ← scalar.Scalar.as_radix_16 scalar
+===REPLACE===
+noncomputable def backend.serial.scalar_mul.variable_base.mul
+  (point : edwards.EdwardsPoint) (sc : scalar.Scalar) :
+  Result edwards.EdwardsPoint
+  := do
+  let lookup_table ←
+    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
+  let scalar_digits ← scalar.Scalar.as_radix_16 sc
+
+===FIND===
+def backend.variable_base_mul
+===REPLACE===
+noncomputable def backend.variable_base_mul
+
+===FIND===
+def edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul
+
+===FIND===
+def edwards.MulSharedAEdwardsPointScalarEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulSharedAEdwardsPointScalarEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.is_torsion_free
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.is_torsion_free
+
+===FIND===
+def core.ops.arith.MulShared0EdwardsPointSharedAScalarEdwardsPoint
+===REPLACE===
+noncomputable def core.ops.arith.MulShared0EdwardsPointSharedAScalarEdwardsPoint
+
+===FIND===
+def core.ops.arith.MulSharedAEdwardsPointScalarEdwardsPoint
+===REPLACE===
+noncomputable def core.ops.arith.MulSharedAEdwardsPointScalarEdwardsPoint
+
+===FIND===
+@[reducible, rust_trait_impl "subtle::ConstantTimeEq<u16>"]
+def subtle.ConstantTimeEqU16
+===REPLACE===
+@[rust_trait_impl "subtle::ConstantTimeEq<u16>"]
+noncomputable def subtle.ConstantTimeEqU16
+
+===FIND===
+def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from_loop
+===REPLACE===
+noncomputable def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from_loop
+
+===FIND===
+def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from
+  (P : edwards.EdwardsPoint) :
+===REPLACE===
+noncomputable def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from
+  (P : edwards.EdwardsPoint) :
+
+===FIND===
+def window.LookupTable.select_loop
+  {T : Type}
+===REPLACE===
+noncomputable def window.LookupTable.select_loop
+  {T : Type}
+
+===FIND===
+def window.LookupTable.select
+  {T : Type}
+===REPLACE===
+noncomputable def window.LookupTable.select
+  {T : Type}
+
+===FIND===
+def edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared0ScalarSharedAEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared0ScalarSharedAEdwardsPointEdwardsPoint
+
+===FIND===
+def edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.mul_base
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.mul_base
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAScalarEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarEdwardsPointEdwardsPoint
+
+===FIND===
+def edwards.MulScalarEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulScalarEdwardsPointEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.mul_clamped
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.mul_clamped
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
+
 
