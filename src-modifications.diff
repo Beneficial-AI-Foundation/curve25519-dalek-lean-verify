@@ -9,10 +9,98 @@ and the modified version used in this verification project.
 
 ---
 
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/mod.rs b/curve25519-dalek/src/backend/mod.rs
+--- a/curve25519-dalek/src/backend/mod.rs
++++ b/curve25519-dalek/src/backend/mod.rs
+@@ -75,7 +75,7 @@
+ }
+ 
+ #[allow(missing_docs)]
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ pub fn pippenger_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
+ where
+     I: IntoIterator,
+@@ -96,7 +96,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ pub(crate) enum VartimePrecomputedStraus {
+     #[cfg(curve25519_dalek_backend = "simd")]
+     Avx2(vector::scalar_mul::precomputed_straus::spec_avx2::VartimePrecomputedStraus),
+@@ -107,7 +107,7 @@
+     Scalar(serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus),
+ }
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ impl VartimePrecomputedStraus {
+     pub fn new<I>(static_points: I) -> Self
+     where
+@@ -220,7 +220,7 @@
+ }
+ 
+ #[allow(missing_docs)]
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ pub fn straus_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
+ where
+     I: IntoIterator,
+@@ -263,6 +263,7 @@
+ }
+ 
+ /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
++#[cfg(not(verify))]
+ #[allow(non_snake_case)]
+ pub fn vartime_double_base_mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
+     match get_selected_backend() {
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
+--- a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
++++ b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
+@@ -61,6 +61,7 @@
+ /// This algorithm is adapted from section 4 of <https://eprint.iacr.org/2012/549.pdf>.
+ pub struct Pippenger;
+ 
++#[cfg(not(verify))]
+ impl VartimeMultiscalarMul for Pippenger {
+     type Point = EdwardsPoint;
+ 
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/precomputed_straus.rs b/curve25519-dalek/src/backend/serial/scalar_mul/precomputed_straus.rs
+--- a/curve25519-dalek/src/backend/serial/scalar_mul/precomputed_straus.rs
++++ b/curve25519-dalek/src/backend/serial/scalar_mul/precomputed_straus.rs
+@@ -30,6 +30,7 @@
+     static_lookup_tables: Vec<NafLookupTable8<AffineNielsPoint>>,
+ }
+ 
++#[cfg(not(verify))]
+ impl VartimePrecomputedMultiscalarMul for VartimePrecomputedStraus {
+     type Point = EdwardsPoint;
+ 
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/straus.rs b/curve25519-dalek/src/backend/serial/scalar_mul/straus.rs
+--- a/curve25519-dalek/src/backend/serial/scalar_mul/straus.rs
++++ b/curve25519-dalek/src/backend/serial/scalar_mul/straus.rs
+@@ -144,6 +144,7 @@
+     }
+ }
+ 
++#[cfg(not(verify))]
+ impl VartimeMultiscalarMul for Straus {
+     type Point = EdwardsPoint;
+ 
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
-@@ -30,7 +30,9 @@
+@@ -20,6 +20,7 @@
+ use crate::window::NafLookupTable5;
+ 
+ /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
++#[cfg(not(verify))]
+ pub fn mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
+     let a_naf = a.non_adjacent_form(5);
+ 
+@@ -30,7 +31,9 @@
  
      // Find starting index
      let mut i: usize = 255;
@@ -23,6 +111,71 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/var
          i = j;
          if a_naf[i] != 0 || b_naf[i] != 0 {
              break;
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u32/constants.rs b/curve25519-dalek/src/backend/serial/u32/constants.rs
+--- a/curve25519-dalek/src/backend/serial/u32/constants.rs
++++ b/curve25519-dalek/src/backend/serial/u32/constants.rs
+@@ -17,7 +17,7 @@
+ use super::scalar::Scalar29;
+ use crate::edwards::EdwardsPoint;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::{
+     backend::serial::curve_models::AffineNielsPoint,
+     edwards::EdwardsBasepointTable,
+@@ -246,13 +246,13 @@
+ ];
+ 
+ /// Table containing precomputed multiples of the Ed25519 basepoint \\(B = (x, 4/5)\\).
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ pub static ED25519_BASEPOINT_TABLE: &'static EdwardsBasepointTable =
+     &ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN;
+ 
+ /// Inner constant, used to avoid filling the docs with precomputed points.
+ #[doc(hidden)]
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ static ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN: EdwardsBasepointTable = EdwardsBasepointTable([
+     LookupTable([
+         AffineNielsPoint {
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/constants.rs b/curve25519-dalek/src/backend/serial/u64/constants.rs
+--- a/curve25519-dalek/src/backend/serial/u64/constants.rs
++++ b/curve25519-dalek/src/backend/serial/u64/constants.rs
+@@ -15,7 +15,7 @@
+ use super::scalar::Scalar52;
+ use crate::edwards::EdwardsPoint;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::{
+     backend::serial::curve_models::AffineNielsPoint,
+     edwards::EdwardsBasepointTable,
+@@ -337,13 +337,13 @@
+ ];
+ 
+ /// Table containing precomputed multiples of the Ed25519 basepoint \\(B = (x, 4/5)\\).
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ pub static ED25519_BASEPOINT_TABLE: &EdwardsBasepointTable =
+     &ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN;
+ 
+ /// Inner constant, used to avoid filling the docs with precomputed points.
+ #[doc(hidden)]
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ static ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN: EdwardsBasepointTable = EdwardsBasepointTable([
+     LookupTable([
+         AffineNielsPoint {
+@@ -6300,7 +6300,7 @@
+ ]);
+ 
+ /// Odd multiples of the basepoint `[B, 3B, 5B, 7B, 9B, 11B, 13B, 15B, ..., 127B]`.
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ #[allow(dead_code)]
+ pub(crate) const AFFINE_ODD_MULTIPLES_OF_BASEPOINT: NafLookupTable8<AffineNielsPoint> =
+     NafLookupTable8([
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/field.rs b/curve25519-dalek/src/backend/serial/u64/field.rs
 --- a/curve25519-dalek/src/backend/serial/u64/field.rs
 +++ b/curve25519-dalek/src/backend/serial/u64/field.rs
@@ -163,10 +316,142 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs 
          }
          Scalar52::montgomery_reduce(&limbs)
      }
+diff -Naur --no-dereference a/curve25519-dalek/src/constants.rs b/curve25519-dalek/src/constants.rs
+--- a/curve25519-dalek/src/constants.rs
++++ b/curve25519-dalek/src/constants.rs
+@@ -19,7 +19,7 @@
+ use crate::ristretto::{CompressedRistretto, RistrettoPoint};
+ use crate::scalar::Scalar;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::edwards::EdwardsBasepointTable;
+ 
+ cfg_if! {
+@@ -80,11 +80,11 @@
+     ],
+ };
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::ristretto::RistrettoBasepointTable;
+ 
+ /// The Ristretto basepoint, as a `RistrettoBasepointTable` for scalar multiplication.
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ pub static RISTRETTO_BASEPOINT_TABLE: &RistrettoBasepointTable = unsafe {
+     // SAFETY: `RistrettoBasepointTable` is a `#[repr(transparent)]` newtype of
+     // `EdwardsBasepointTable`
 diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek/src/edwards.rs
 --- a/curve25519-dalek/src/edwards.rs
 +++ b/curve25519-dalek/src/edwards.rs
-@@ -1329,9 +1329,11 @@
+@@ -139,13 +139,13 @@
+ use crate::backend::serial::curve_models::ProjectiveNielsPoint;
+ use crate::backend::serial::curve_models::ProjectivePoint;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::window::{
+     LookupTableRadix128, LookupTableRadix16, LookupTableRadix256, LookupTableRadix32,
+     LookupTableRadix64,
+ };
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::traits::BasepointTable;
+ 
+ use crate::traits::ValidityCheck;
+@@ -155,7 +155,7 @@
+ 
+ #[cfg(feature = "alloc")]
+ use crate::traits::MultiscalarMul;
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+ #[cfg(feature = "alloc")]
+ use alloc::vec::Vec;
+@@ -874,12 +874,12 @@
+     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
+     /// is enabled, trading off increased code size for ~4x better performance.
+     pub fn mul_base(scalar: &Scalar) -> Self {
+-        #[cfg(not(feature = "precomputed-tables"))]
++        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+         {
+             scalar * constants::ED25519_BASEPOINT_POINT
+         }
+ 
+-        #[cfg(feature = "precomputed-tables")]
++        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+         {
+             scalar * constants::ED25519_BASEPOINT_TABLE
+         }
+@@ -953,7 +953,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ impl VartimeMultiscalarMul for EdwardsPoint {
+     type Point = EdwardsPoint;
+ 
+@@ -992,10 +992,10 @@
+ // This wraps the inner implementation in a facade type so that we can
+ // decouple stability of the inner type from the stability of the
+ // outer type.
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ pub struct VartimeEdwardsPrecomputation(crate::backend::VartimePrecomputedStraus);
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
+     type Point = EdwardsPoint;
+ 
+@@ -1033,6 +1033,7 @@
+     }
+ }
+ 
++#[cfg(not(verify))]
+ impl EdwardsPoint {
+     /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
+     pub fn vartime_double_scalar_mul_basepoint(
+@@ -1044,7 +1045,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ macro_rules! impl_basepoint_table {
+     (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
+         /// A precomputed table of multiples of a basepoint, for accelerating
+@@ -1202,7 +1203,7 @@
+ 
+ // The number of additions required is ceil(256/w) where w is the radix representation.
+ cfg_if! {
+-    if #[cfg(feature = "precomputed-tables")] {
++    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+         impl_basepoint_table! {
+             Name = EdwardsBasepointTable,
+             LookupTable = LookupTableRadix16,
+@@ -1249,7 +1250,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ macro_rules! impl_basepoint_table_conversions {
+     (LHS = $lhs:ty, RHS = $rhs:ty) => {
+         impl<'a> From<&'a $lhs> for $rhs {
+@@ -1267,7 +1268,7 @@
+ }
+ 
+ cfg_if! {
+-    if #[cfg(feature = "precomputed-tables")] {
++    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+         // Conversions from radix 16
+         impl_basepoint_table_conversions! {
+             LHS = EdwardsBasepointTableRadix16,
+@@ -1329,9 +1330,11 @@
          debug_assert!(k > 0);
          let mut r: CompletedPoint;
          let mut s = self.as_projective();
@@ -179,10 +464,292 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          }
          // Unroll last iteration so we can go directly as_extended()
          s.double().as_extended()
+diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-dalek/src/montgomery.rs
+--- a/curve25519-dalek/src/montgomery.rs
++++ b/curve25519-dalek/src/montgomery.rs
+@@ -164,6 +164,7 @@
+     /// Curve25519 uses _clamped multiplication_, explained
+     /// [here](https://neilmadden.blog/2020/05/28/whats-the-curve25519-clamping-all-about/).
+     /// When in doubt, use [`Self::mul_clamped`].
++    #[cfg(not(verify))]
+     pub fn mul_bits_be(&self, bits: impl Iterator<Item = bool>) -> MontgomeryPoint {
+         // Algorithm 8 of Costello-Smith 2017
+         let affine_u = FieldElement::from_bytes(&self.0);
+@@ -400,14 +401,51 @@
+ );
+ 
+ /// Multiply this `MontgomeryPoint` by a `Scalar`.
++///
++/// NOTE: This implementation avoids using Scalar::bits_le() and iterator adapters
++/// (.rev(), .skip()) because Charon/Aeneas cannot extract the Iterator trait machinery.
++/// Instead, we inline the bit iteration using a while loop.
+ impl Mul<&Scalar> for &MontgomeryPoint {
+     type Output = MontgomeryPoint;
+ 
+     /// Given `self` \\( = u\_0(P) \\), and a `Scalar` \\(n\\), return \\( u\_0(\[n\]P) \\)
+     fn mul(self, scalar: &Scalar) -> MontgomeryPoint {
++        // Algorithm 8 of Costello-Smith 2017 (inlined from mul_bits_be)
++        let affine_u = FieldElement::from_bytes(&self.0);
++        let mut x0 = ProjectivePoint::identity();
++        let mut x1 = ProjectivePoint {
++            U: affine_u,
++            W: FieldElement::ONE,
++        };
++
++        // Go through the bits from most to least significant, using a sliding window of 2.
+         // We multiply by the integer representation of the given Scalar. By scalar invariant #1,
+-        // the MSB is 0, so we can skip it.
+-        self.mul_bits_be(scalar.bits_le().rev().skip(1))
++        // the MSB (bit 255) is 0, so we can skip it and start from bit 254.
++        let scalar_bytes = scalar.as_bytes();
++        let mut prev_bit = false;
++        let mut i: isize = 254;
++        while i >= 0 {
++            let byte_idx = (i >> 3) as usize;  // i / 8
++            let bit_idx = (i & 7) as usize;    // i % 8
++            let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
++
++            let choice: u8 = (prev_bit ^ cur_bit) as u8;
++
++            debug_assert!(choice == 0 || choice == 1);
++
++            ProjectivePoint::conditional_swap(&mut x0, &mut x1, choice.into());
++            differential_add_and_double(&mut x0, &mut x1, &affine_u);
++
++            prev_bit = cur_bit;
++            i -= 1;
++        }
++        // The final value of prev_bit above is scalar.bits()[0], i.e., the LSB of scalar
++        ProjectivePoint::conditional_swap(&mut x0, &mut x1, Choice::from(prev_bit as u8));
++        // Don't leave the bit in the stack
++        #[cfg(feature = "zeroize")]
++        prev_bit.zeroize();
++
++        x0.as_affine()
+     }
+ }
+ 
+diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dalek/src/ristretto.rs
+--- a/curve25519-dalek/src/ristretto.rs
++++ b/curve25519-dalek/src/ristretto.rs
+@@ -195,17 +195,19 @@
+ #[cfg(feature = "zeroize")]
+ use zeroize::Zeroize;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::edwards::EdwardsBasepointTable;
+ use crate::edwards::EdwardsPoint;
+ 
+ use crate::scalar::Scalar;
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ use crate::traits::BasepointTable;
+ use crate::traits::Identity;
+ #[cfg(feature = "alloc")]
+-use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
++use crate::traits::MultiscalarMul;
++#[cfg(all(feature = "alloc", not(verify)))]
++use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+ 
+ // ------------------------------------------------------------------------
+ // Compressed points
+@@ -950,12 +952,12 @@
+     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
+     /// is enabled, trading off increased code size for ~4x better performance.
+     pub fn mul_base(scalar: &Scalar) -> Self {
+-        #[cfg(not(feature = "precomputed-tables"))]
++        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+         {
+             scalar * constants::RISTRETTO_BASEPOINT_POINT
+         }
+ 
+-        #[cfg(feature = "precomputed-tables")]
++        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+         {
+             scalar * constants::RISTRETTO_BASEPOINT_TABLE
+         }
+@@ -990,7 +992,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ impl VartimeMultiscalarMul for RistrettoPoint {
+     type Point = RistrettoPoint;
+ 
+@@ -1013,10 +1015,10 @@
+ // This wraps the inner implementation in a facade type so that we can
+ // decouple stability of the inner type from the stability of the
+ // outer type.
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ pub struct VartimeRistrettoPrecomputation(crate::backend::VartimePrecomputedStraus);
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
+     type Point = RistrettoPoint;
+ 
+@@ -1061,6 +1063,7 @@
+     }
+ }
+ 
++#[cfg(not(verify))]
+ impl RistrettoPoint {
+     /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the
+     /// Ristretto basepoint.
+@@ -1087,12 +1090,12 @@
+ /// let a = Scalar::from(87329482u64);
+ /// let P = &a * RISTRETTO_BASEPOINT_TABLE;
+ /// ```
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ #[derive(Clone)]
+ #[repr(transparent)]
+ pub struct RistrettoBasepointTable(pub(crate) EdwardsBasepointTable);
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
+     type Output = RistrettoPoint;
+ 
+@@ -1101,7 +1104,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
+     type Output = RistrettoPoint;
+ 
+@@ -1110,7 +1113,7 @@
+     }
+ }
+ 
+-#[cfg(feature = "precomputed-tables")]
++#[cfg(all(feature = "precomputed-tables", not(verify)))]
+ impl RistrettoBasepointTable {
+     /// Create a precomputed table of multiples of the given `basepoint`.
+     pub fn create(basepoint: &RistrettoPoint) -> RistrettoBasepointTable {
 diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/src/scalar.rs
 --- a/curve25519-dalek/src/scalar.rs
 +++ b/curve25519-dalek/src/scalar.rs
-@@ -1165,8 +1165,10 @@
+@@ -457,6 +457,7 @@
+     }
+ }
+ 
++#[cfg(not(verify))]
+ impl<T> Product<T> for Scalar
+ where
+     T: Borrow<Scalar>,
+@@ -469,6 +470,7 @@
+     }
+ }
+ 
++#[cfg(not(verify))]
+ impl<T> Sum<T> for Scalar
+ where
+     T: Borrow<Scalar>,
+@@ -803,14 +805,18 @@
+ 
+         // Pass through the input vector, recording the previous
+         // products in the scratch space
+-        for (input, scratch) in inputs.iter_mut().zip(scratch.iter_mut()) {
+-            *scratch = acc;
++        // (using while loop to avoid iter_mut().zip() which pulls in Iterator traits)
++        let mut i = 0;
++        while i < n {
++            let input = &mut inputs[i];
++            scratch[i] = acc;
+ 
+             // Avoid unnecessary Montgomery multiplication in second pass by
+             // keeping inputs in Montgomery form
+             let tmp = input.unpack().as_montgomery();
+             *input = tmp.pack();
+             acc = UnpackedScalar::montgomery_mul(&acc, &tmp);
++            i += 1;
+         }
+ 
+         // acc is nonzero iff all inputs are nonzero
+@@ -823,10 +829,14 @@
+         let ret = acc.pack();
+ 
+         // Pass through the vector backwards to compute the inverses
+-        // in place
+-        for (input, scratch) in inputs.iter_mut().rev().zip(scratch.iter().rev()) {
++        // in place (using while loop to avoid .rev() which causes Charon trait mismatch)
++        let mut i = n;
++        while i > 0 {
++            i -= 1;
++            let input = &mut inputs[i];
++            let scratch_val = &scratch[i];
+             let tmp = UnpackedScalar::montgomery_mul(&acc, &input.unpack());
+-            *input = UnpackedScalar::montgomery_mul(&acc, scratch).pack();
++            *input = UnpackedScalar::montgomery_mul(&acc, scratch_val).pack();
+             acc = tmp;
+         }
+ 
+@@ -837,6 +847,7 @@
+     }
+ 
+     /// Get the bits of the scalar, in little-endian order
++    #[cfg(not(verify))]
+     pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
+         (0..256).map(|i| {
+             // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
+@@ -918,6 +929,7 @@
+     /// If \\( k \mod 2^w\\) is even, we emit \\(0\\), advance 1 bit
+     /// and reindex.  In fact, by setting all digits to \\(0\\)
+     /// initially, we don't need to emit anything.
++    #[cfg(not(verify))]
+     pub(crate) fn non_adjacent_form(&self, w: usize) -> [i8; 256] {
+         // required by the NAF definition
+         debug_assert!(w >= 2);
+@@ -998,17 +1010,21 @@
+             (x >> 4) & 15
+         }
+ 
+-        for i in 0..32 {
++        let mut i = 0;
++        while i < 32 {
+             output[2 * i] = bot_half(self[i]) as i8;
+             output[2 * i + 1] = top_half(self[i]) as i8;
++            i += 1;
+         }
+         // Precondition note: since self[31] <= 127, output[63] <= 7
+ 
+         // Step 2: recenter coefficients from [0,16) to [-8,8)
+-        for i in 0..63 {
++        let mut i = 0;
++        while i < 63 {
+             let carry = (output[i] + 8) >> 4;
+             output[i] -= carry << 4;
+             output[i + 1] += carry;
++            i += 1;
+         }
+         // Precondition note: output[63] is not recentered.  It
+         // increases by carry <= 1.  Thus output[63] <= 8.
+@@ -1018,7 +1034,7 @@
+ 
+     /// Returns a size hint indicating how many entries of the return
+     /// value of `to_radix_2w` are nonzero.
+-    #[cfg(any(feature = "alloc", all(test, feature = "precomputed-tables")))]
++    #[cfg(all(any(feature = "alloc", all(test, feature = "precomputed-tables")), not(verify)))]
+     pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
+         debug_assert!(w >= 4);
+         debug_assert!(w <= 8);
+@@ -1055,7 +1071,7 @@
+     /// $$
+     /// with \\(-2\^w/2 \leq a_i < 2\^w/2\\) for \\(0 \leq i < (n-1)\\) and \\(-2\^w/2 \leq a_{n-1} \leq 2\^w/2\\).
+     ///
+-    #[cfg(any(feature = "alloc", feature = "precomputed-tables"))]
++    #[cfg(all(any(feature = "alloc", feature = "precomputed-tables"), not(verify)))]
+     pub(crate) fn as_radix_2w(&self, w: usize) -> [i8; 64] {
+         debug_assert!(w >= 4);
+         debug_assert!(w <= 8);
+@@ -1165,8 +1181,10 @@
  
          #[inline]
          fn square_multiply(y: &mut UnpackedScalar, squarings: usize, x: &UnpackedScalar) {
@@ -194,7 +761,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              }
              *y = UnpackedScalar::montgomery_mul(y, x);
          }
-@@ -1348,18 +1350,21 @@
+@@ -1348,18 +1366,21 @@
  /// ## Panics
  /// Panics if `src.len() != 8 * dst.len()`.
  fn read_le_u64_into(src: &[u8], dst: &mut [u64]) {
