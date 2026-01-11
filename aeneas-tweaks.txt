@@ -624,4 +624,23 @@ def ristretto.CompressedRistretto.mk
   (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
   ok a
 
+# Montgomery functions need noncomputable
+
+===FIND===
+def montgomery.MontgomeryPoint.mul_base
+  (scalar : scalar.Scalar)
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.mul_base
+  (scalar : scalar.Scalar)
+
+===FIND===
+def montgomery.MontgomeryPoint.mul_base_clamped
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.mul_base_clamped
+
+===FIND===
+def montgomery.elligator_encode
+===REPLACE===
+noncomputable def montgomery.elligator_encode
+
 

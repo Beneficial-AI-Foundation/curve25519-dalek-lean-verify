@@ -2272,6 +2272,33 @@ def backend.serial.u64.constants.SQRT_M1
   : backend.serial.u64.field.FieldElement51 :=
   eval_global backend.serial.u64.constants.SQRT_M1_body
 
+/-- [curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 114:0-114:97 -/
+@[global_simps]
+def backend.serial.u64.constants.MONTGOMERY_A_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 486662#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MONTGOMERY_A
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.MONTGOMERY_A_body
+
+/-- [curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG]
+   Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 118:0-124:3 -/
+@[global_simps]
+def backend.serial.u64.constants.MONTGOMERY_A_NEG_body
+  : Result backend.serial.u64.field.FieldElement51 := do
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [
+      2251799813198567#u64, 2251799813685247#u64, 2251799813685247#u64,
+      2251799813685247#u64, 2251799813685247#u64
+      ])
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MONTGOMERY_A_NEG
+  : backend.serial.u64.field.FieldElement51 :=
+  eval_global backend.serial.u64.constants.MONTGOMERY_A_NEG_body
+
 /-- [curve25519_dalek::backend::serial::u64::constants::L]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 127:0-133:3 -/
 @[global_simps]
@@ -4549,6 +4576,32 @@ def core.ops.arith.MulAssignScalarScalar : core.ops.arith.MulAssign
   mul_assign := scalar.MulAssignScalarScalar.mul_assign
 }
 
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 128:4-130:5 -/
+noncomputable def montgomery.MontgomeryPoint.mul_base
+  (scalar : scalar.Scalar) : Result montgomery.MontgomeryPoint := do
+  let ep ← edwards.EdwardsPoint.mul_base scalar
+  edwards.EdwardsPoint.to_montgomery ep
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 150:4-158:5 -/
+noncomputable def montgomery.MontgomeryPoint.mul_base_clamped
+  (bytes : Array U8 32#usize) : Result montgomery.MontgomeryPoint := do
+  let a ← scalar.clamp_integer bytes
+  montgomery.MontgomeryPoint.mul_base { bytes := a }
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::as_bytes]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 199:4-201:5 -/
+def montgomery.MontgomeryPoint.as_bytes
+  (self : montgomery.MontgomeryPoint) : Result (Array U8 32#usize) := do
+  ok self
+
+/-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_bytes]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 204:4-206:5 -/
+def montgomery.MontgomeryPoint.to_bytes
+  (self : montgomery.MontgomeryPoint) : Result (Array U8 32#usize) := do
+  ok self
+
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 224:4-253:5 -/
 noncomputable def montgomery.MontgomeryPoint.to_edwards
@@ -4578,6 +4631,52 @@ noncomputable def montgomery.MontgomeryPoint.to_edwards
     let i2 ← (↑(i1 ^^^ i) : Result U8)
     let y_bytes1 ← Array.update y_bytes 31#usize i2
     edwards.CompressedEdwardsY.decompress y_bytes1
+
+/-- [curve25519_dalek::montgomery::elligator_encode]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 263:0-283:1 -/
+noncomputable def montgomery.elligator_encode
+  (r_0 : backend.serial.u64.field.FieldElement51) :
+  Result (montgomery.MontgomeryPoint × subtle.Choice)
+  := do
+  let fe ← backend.serial.u64.field.FieldElement51.square2 r_0
+  let d_1 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      backend.serial.u64.field.FieldElement51.ONE fe
+  let fe1 ← field.FieldElement51.invert d_1
+  let d ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      backend.serial.u64.constants.MONTGOMERY_A_NEG fe1
+  let d_sq ← backend.serial.u64.field.FieldElement51.square d
+  let au ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      backend.serial.u64.constants.MONTGOMERY_A d
+  let fe2 ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      d_sq au
+  let inner ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      fe2 backend.serial.u64.field.FieldElement51.ONE
+  let eps ←
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul
+      d inner
+  let p ←
+    field.FieldElement51.sqrt_ratio_i eps
+      backend.serial.u64.field.FieldElement51.ONE
+  let (eps_is_sq, _) := p
+  let Atemp ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      backend.serial.u64.constants.MONTGOMERY_A
+      backend.serial.u64.field.FieldElement51.ZERO eps_is_sq
+  let u ←
+    backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add
+      d Atemp
+  let c ← subtle.NotChoiceChoice.not eps_is_sq
+  let u1 ←
+    subtle.ConditionallyNegatable.Blanket.conditional_negate
+      subtle.ConditionallySelectableFieldElement51
+      core.ops.arith.NegShared0FieldElement51FieldElement51 u c
+  let a ← backend.serial.u64.field.FieldElement51.to_bytes u1
+  ok (a, eps_is_sq)
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 231:4-233:5 -/

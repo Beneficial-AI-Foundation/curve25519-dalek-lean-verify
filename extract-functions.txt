@@ -22,6 +22,11 @@ curve25519_dalek::edwards::EdwardsPoint::mul_by_cofactor
 curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2
 curve25519_dalek::edwards::EdwardsPoint::mul_clamped
 curve25519_dalek::edwards::EdwardsPoint::to_montgomery
+curve25519_dalek::montgomery::elligator_encode
+curve25519_dalek::montgomery::MontgomeryPoint::as_bytes
+curve25519_dalek::montgomery::MontgomeryPoint::mul_base
+curve25519_dalek::montgomery::MontgomeryPoint::mul_base_clamped
+curve25519_dalek::montgomery::MontgomeryPoint::to_bytes
 curve25519_dalek::montgomery::MontgomeryPoint::to_edwards
 curve25519_dalek::ristretto::CompressedRistretto::as_bytes
 curve25519_dalek::ristretto::CompressedRistretto::decompress
