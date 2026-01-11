@@ -11,13 +11,19 @@
 
 #![allow(non_snake_case)]
 
+#[cfg(not(verify))]
 use alloc::vec::Vec;
 
+#[cfg(not(verify))]
 use core::borrow::Borrow;
+#[cfg(not(verify))]
 use core::cmp::Ordering;
 
+#[cfg(not(verify))]
 use crate::edwards::EdwardsPoint;
+#[cfg(not(verify))]
 use crate::scalar::Scalar;
+#[cfg(not(verify))]
 use crate::traits::VartimeMultiscalarMul;
 
 /// Implements a version of Pippenger's algorithm.
@@ -61,6 +67,7 @@ use crate::traits::VartimeMultiscalarMul;
 /// This algorithm is adapted from section 4 of <https://eprint.iacr.org/2012/549.pdf>.
 pub struct Pippenger;
 
+#[cfg(not(verify))]
 impl VartimeMultiscalarMul for Pippenger {
     type Point = EdwardsPoint;
 

@@ -4,11 +4,26 @@
 # Empty lines are also ignored
 
 curve25519_dalek::backend::serial::u64::field::FieldElement51::reduce
+curve25519_dalek::scalar
 curve25519_dalek::scalar::clamp_integer
+curve25519_dalek::scalar::Scalar
 curve25519_dalek::scalar::Scalar::ZERO
 curve25519_dalek::scalar::Scalar::ONE
 curve25519_dalek::scalar::Scalar::to_bytes
 curve25519_dalek::scalar::Scalar::as_bytes
+# Trait impls need special syntax - these direct paths don't exist:
+# curve25519_dalek::scalar::Scalar::add/sub/mul/neg/index/from/zeroize (trait impls)
+# curve25519_dalek::scalar::Scalar::add_assign/sub_assign/mul_assign (trait impls)
+# These cause Aeneas internal errors (complex array indexing):
+# curve25519_dalek::scalar::Scalar::non_adjacent_form
+# curve25519_dalek::scalar::Scalar::as_radix_2w
+# These internal helpers have different paths or don't exist as public items:
+# curve25519_dalek::scalar::bot_half/top_half/square_multiply
+# curve25519_dalek::scalar::Scalar::from_hash/hash_from_bytes (crypto deps)
+# Working scalar functions:
+curve25519_dalek::scalar::Scalar::as_radix_16
+curve25519_dalek::scalar::Scalar::to_radix_2w_size_hint
+# SKIP: batch_invert, bits_le, product, sum - these have problematic patterns
 curve25519_dalek::backend::serial::u64::field::FieldElement51::to_bytes
 curve25519_dalek::backend::serial::u64::scalar::Scalar52::sub
 curve25519_dalek::backend::serial::u64::field::FieldElement51::from_bytes

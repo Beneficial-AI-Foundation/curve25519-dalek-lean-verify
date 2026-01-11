@@ -100,10 +100,31 @@ generate_llbc() {
         START_FROM_ARGS+=(--start-from "$item")
     done
 
-    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p $CRATE_DIR"
+    # Items that Charon/Aeneas cannot fully handle:
+    # --exclude: completely remove (for items we don't need)
+    # --opaque: keep signature but no body (for items that crash but may be referenced)
+    EXCLUDE_ARGS=(
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::fmt::Debug for _}'
+        # bits_le: uses iterator .map() which pulls in mutually recursive traits
+        # NOTE: Montgomery scalar multiplication was rewritten to avoid this, so bits_le is now unused
+        --exclude 'curve25519_dalek::scalar::Scalar::bits_le'
+        # batch_invert: pulls in Vec/slice iterator machinery
+        --exclude 'curve25519_dalek::scalar::Scalar::batch_invert'
+        # Product/Sum impls: pull in mutually recursive iterator traits
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::Product<_> for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::Sum<_> for _}'
+    )
+    OPAQUE_ARGS=(
+        # non_adjacent_form/as_radix_2w: dynamic array indexing causes Aeneas internal error
+        --opaque 'curve25519_dalek::scalar::Scalar::non_adjacent_form'
+        --opaque 'curve25519_dalek::scalar::Scalar::as_radix_2w'
+    )
+
+    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
     echo "Logging output to $ROOT/.logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"

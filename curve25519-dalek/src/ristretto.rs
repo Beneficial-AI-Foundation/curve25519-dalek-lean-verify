@@ -195,17 +195,19 @@ use subtle::ConstantTimeEq;
 #[cfg(feature = "zeroize")]
 use zeroize::Zeroize;
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 use crate::edwards::EdwardsBasepointTable;
 use crate::edwards::EdwardsPoint;
 
 use crate::scalar::Scalar;
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 use crate::traits::BasepointTable;
 use crate::traits::Identity;
 #[cfg(feature = "alloc")]
-use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+use crate::traits::MultiscalarMul;
+#[cfg(all(feature = "alloc", not(verify)))]
+use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 
 // ------------------------------------------------------------------------
 // Compressed points
@@ -950,12 +952,12 @@ impl RistrettoPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(not(feature = "precomputed-tables"))]
+        #[cfg(any(not(feature = "precomputed-tables"), verify))]
         {
             scalar * constants::RISTRETTO_BASEPOINT_POINT
         }
 
-        #[cfg(feature = "precomputed-tables")]
+        #[cfg(all(feature = "precomputed-tables", not(verify)))]
         {
             scalar * constants::RISTRETTO_BASEPOINT_TABLE
         }
@@ -990,7 +992,7 @@ impl MultiscalarMul for RistrettoPoint {
     }
 }
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 impl VartimeMultiscalarMul for RistrettoPoint {
     type Point = RistrettoPoint;
 
@@ -1013,10 +1015,10 @@ impl VartimeMultiscalarMul for RistrettoPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 pub struct VartimeRistrettoPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
     type Point = RistrettoPoint;
 
@@ -1061,6 +1063,7 @@ impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
     }
 }
 
+#[cfg(not(verify))]
 impl RistrettoPoint {
     /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the
     /// Ristretto basepoint.
@@ -1087,12 +1090,12 @@ impl RistrettoPoint {
 /// let a = Scalar::from(87329482u64);
 /// let P = &a * RISTRETTO_BASEPOINT_TABLE;
 /// ```
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 #[derive(Clone)]
 #[repr(transparent)]
 pub struct RistrettoBasepointTable(pub(crate) EdwardsBasepointTable);
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     type Output = RistrettoPoint;
 
@@ -1101,7 +1104,7 @@ impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     }
 }
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     type Output = RistrettoPoint;
 
@@ -1110,7 +1113,7 @@ impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     }
 }
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 impl RistrettoBasepointTable {
     /// Create a precomputed table of multiples of the given `basepoint`.
     pub fn create(basepoint: &RistrettoPoint) -> RistrettoBasepointTable {

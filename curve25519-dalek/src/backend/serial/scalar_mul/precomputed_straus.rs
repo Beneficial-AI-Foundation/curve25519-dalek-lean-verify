@@ -13,23 +13,32 @@
 
 use alloc::vec::Vec;
 
+#[cfg(not(verify))]
 use core::borrow::Borrow;
+#[cfg(not(verify))]
 use core::cmp::Ordering;
 
-use crate::backend::serial::curve_models::{
-    AffineNielsPoint, CompletedPoint, ProjectiveNielsPoint, ProjectivePoint,
-};
+use crate::backend::serial::curve_models::AffineNielsPoint;
+#[cfg(not(verify))]
+use crate::backend::serial::curve_models::{CompletedPoint, ProjectiveNielsPoint, ProjectivePoint};
+#[cfg(not(verify))]
 use crate::edwards::EdwardsPoint;
+#[cfg(not(verify))]
 use crate::scalar::Scalar;
+#[cfg(not(verify))]
 use crate::traits::Identity;
+#[cfg(not(verify))]
 use crate::traits::VartimePrecomputedMultiscalarMul;
-use crate::window::{NafLookupTable5, NafLookupTable8};
+#[cfg(not(verify))]
+use crate::window::NafLookupTable5;
+use crate::window::NafLookupTable8;
 
 #[allow(missing_docs)]
 pub struct VartimePrecomputedStraus {
     static_lookup_tables: Vec<NafLookupTable8<AffineNielsPoint>>,
 }
 
+#[cfg(not(verify))]
 impl VartimePrecomputedMultiscalarMul for VartimePrecomputedStraus {
     type Point = EdwardsPoint;
 

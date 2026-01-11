@@ -16,11 +16,13 @@
 use alloc::vec::Vec;
 
 use core::borrow::Borrow;
+#[cfg(not(verify))]
 use core::cmp::Ordering;
 
 use crate::edwards::EdwardsPoint;
 use crate::scalar::Scalar;
 use crate::traits::MultiscalarMul;
+#[cfg(not(verify))]
 use crate::traits::VartimeMultiscalarMul;
 
 /// Perform multiscalar multiplication by the interleaved window
@@ -144,6 +146,7 @@ impl MultiscalarMul for Straus {
     }
 }
 
+#[cfg(not(verify))]
 impl VartimeMultiscalarMul for Straus {
     type Point = EdwardsPoint;
 

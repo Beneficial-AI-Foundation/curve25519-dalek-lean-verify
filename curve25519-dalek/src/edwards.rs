@@ -139,13 +139,13 @@ use crate::backend::serial::curve_models::CompletedPoint;
 use crate::backend::serial::curve_models::ProjectiveNielsPoint;
 use crate::backend::serial::curve_models::ProjectivePoint;
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 use crate::window::{
     LookupTableRadix128, LookupTableRadix16, LookupTableRadix256, LookupTableRadix32,
     LookupTableRadix64,
 };
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 use crate::traits::BasepointTable;
 
 use crate::traits::ValidityCheck;
@@ -155,7 +155,7 @@ use affine::AffinePoint;
 
 #[cfg(feature = "alloc")]
 use crate::traits::MultiscalarMul;
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
@@ -874,12 +874,12 @@ impl EdwardsPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(not(feature = "precomputed-tables"))]
+        #[cfg(any(not(feature = "precomputed-tables"), verify))]
         {
             scalar * constants::ED25519_BASEPOINT_POINT
         }
 
-        #[cfg(feature = "precomputed-tables")]
+        #[cfg(all(feature = "precomputed-tables", not(verify)))]
         {
             scalar * constants::ED25519_BASEPOINT_TABLE
         }
@@ -953,7 +953,7 @@ impl MultiscalarMul for EdwardsPoint {
     }
 }
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 impl VartimeMultiscalarMul for EdwardsPoint {
     type Point = EdwardsPoint;
 
@@ -992,10 +992,10 @@ impl VartimeMultiscalarMul for EdwardsPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 pub struct VartimeEdwardsPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
     type Point = EdwardsPoint;
 
@@ -1033,6 +1033,7 @@ impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
     }
 }
 
+#[cfg(not(verify))]
 impl EdwardsPoint {
     /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
     pub fn vartime_double_scalar_mul_basepoint(
@@ -1044,7 +1045,7 @@ impl EdwardsPoint {
     }
 }
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 macro_rules! impl_basepoint_table {
     (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
         /// A precomputed table of multiples of a basepoint, for accelerating
@@ -1202,7 +1203,7 @@ macro_rules! impl_basepoint_table {
 
 // The number of additions required is ceil(256/w) where w is the radix representation.
 cfg_if! {
-    if #[cfg(feature = "precomputed-tables")] {
+    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
         impl_basepoint_table! {
             Name = EdwardsBasepointTable,
             LookupTable = LookupTableRadix16,
@@ -1249,7 +1250,7 @@ cfg_if! {
     }
 }
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 macro_rules! impl_basepoint_table_conversions {
     (LHS = $lhs:ty, RHS = $rhs:ty) => {
         impl<'a> From<&'a $lhs> for $rhs {
@@ -1267,7 +1268,7 @@ macro_rules! impl_basepoint_table_conversions {
 }
 
 cfg_if! {
-    if #[cfg(feature = "precomputed-tables")] {
+    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
         // Conversions from radix 16
         impl_basepoint_table_conversions! {
             LHS = EdwardsBasepointTableRadix16,
