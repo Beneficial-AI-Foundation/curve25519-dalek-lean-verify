@@ -11,19 +11,13 @@
 
 #![allow(non_snake_case)]
 
-#[cfg(not(verify))]
 use alloc::vec::Vec;
 
-#[cfg(not(verify))]
 use core::borrow::Borrow;
-#[cfg(not(verify))]
 use core::cmp::Ordering;
 
-#[cfg(not(verify))]
 use crate::edwards::EdwardsPoint;
-#[cfg(not(verify))]
 use crate::scalar::Scalar;
-#[cfg(not(verify))]
 use crate::traits::VartimeMultiscalarMul;
 
 /// Implements a version of Pippenger's algorithm.

@@ -294,7 +294,7 @@ def edwards.CompressedEdwardsY := Array U8 32#usize
 def montgomery.MontgomeryPoint := Array U8 32#usize
 
 /-- [curve25519_dalek::scalar::Scalar]
-   Source: 'curve25519-dalek/src/scalar.rs', lines 197:0-234:1 -/
+   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
 structure scalar.Scalar where
   bytes : Array U8 32#usize
 

@@ -111,10 +111,8 @@
 //! reduces a \\(512\\)-bit integer, if the optional `digest` feature
 //! has been enabled.
 
-#[cfg(not(verify))]
 use core::borrow::Borrow;
 use core::fmt::Debug;
-#[cfg(not(verify))]
 use core::iter::{Product, Sum};
 use core::ops::Index;
 use core::ops::Neg;

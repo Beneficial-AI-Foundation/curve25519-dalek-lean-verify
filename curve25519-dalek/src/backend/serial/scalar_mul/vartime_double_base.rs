@@ -10,20 +10,13 @@
 // - Henry de Valence <hdevalence@hdevalence.ca>
 #![allow(non_snake_case)]
 
-#[cfg(not(verify))]
 use core::cmp::Ordering;
 
-#[cfg(not(verify))]
 use crate::backend::serial::curve_models::{ProjectiveNielsPoint, ProjectivePoint};
-#[cfg(not(verify))]
 use crate::constants;
-#[cfg(not(verify))]
 use crate::edwards::EdwardsPoint;
-#[cfg(not(verify))]
 use crate::scalar::Scalar;
-#[cfg(not(verify))]
 use crate::traits::Identity;
-#[cfg(not(verify))]
 use crate::window::NafLookupTable5;
 
 /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
