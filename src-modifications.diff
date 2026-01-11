@@ -505,8 +505,8 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
 +        let mut prev_bit = false;
 +        let mut i: isize = 254;
 +        while i >= 0 {
-+            let byte_idx = (i >> 3) as usize;  // i / 8
-+            let bit_idx = (i & 7) as usize;    // i % 8
++            let byte_idx = (i >> 3) as usize; // i / 8
++            let bit_idx = (i & 7) as usize; // i % 8
 +            let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
 +
 +            let choice: u8 = (prev_bit ^ cur_bit) as u8;
@@ -691,15 +691,16 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              acc = tmp;
          }
  
-@@ -837,6 +847,7 @@
+@@ -837,6 +847,8 @@
      }
  
      /// Get the bits of the scalar, in little-endian order
 +    #[cfg(not(verify))]
++    #[allow(dead_code)]
      pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
          (0..256).map(|i| {
              // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
-@@ -918,6 +929,7 @@
+@@ -918,6 +930,7 @@
      /// If \\( k \mod 2^w\\) is even, we emit \\(0\\), advance 1 bit
      /// and reindex.  In fact, by setting all digits to \\(0\\)
      /// initially, we don't need to emit anything.
@@ -707,7 +708,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
      pub(crate) fn non_adjacent_form(&self, w: usize) -> [i8; 256] {
          // required by the NAF definition
          debug_assert!(w >= 2);
-@@ -998,17 +1010,21 @@
+@@ -998,17 +1011,21 @@
              (x >> 4) & 15
          }
  
@@ -731,16 +732,19 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
          }
          // Precondition note: output[63] is not recentered.  It
          // increases by carry <= 1.  Thus output[63] <= 8.
-@@ -1018,7 +1034,7 @@
+@@ -1018,7 +1035,10 @@
  
      /// Returns a size hint indicating how many entries of the return
      /// value of `to_radix_2w` are nonzero.
 -    #[cfg(any(feature = "alloc", all(test, feature = "precomputed-tables")))]
-+    #[cfg(all(any(feature = "alloc", all(test, feature = "precomputed-tables")), not(verify)))]
++    #[cfg(all(
++        any(feature = "alloc", all(test, feature = "precomputed-tables")),
++        not(verify)
++    ))]
      pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
          debug_assert!(w >= 4);
          debug_assert!(w <= 8);
-@@ -1055,7 +1071,7 @@
+@@ -1055,7 +1075,7 @@
      /// $$
      /// with \\(-2\^w/2 \leq a_i < 2\^w/2\\) for \\(0 \leq i < (n-1)\\) and \\(-2\^w/2 \leq a_{n-1} \leq 2\^w/2\\).
      ///
@@ -749,7 +753,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
      pub(crate) fn as_radix_2w(&self, w: usize) -> [i8; 64] {
          debug_assert!(w >= 4);
          debug_assert!(w <= 8);
-@@ -1165,8 +1181,10 @@
+@@ -1165,8 +1185,10 @@
  
          #[inline]
          fn square_multiply(y: &mut UnpackedScalar, squarings: usize, x: &UnpackedScalar) {
@@ -761,7 +765,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              }
              *y = UnpackedScalar::montgomery_mul(y, x);
          }
-@@ -1348,18 +1366,21 @@
+@@ -1348,18 +1370,21 @@
  /// ## Panics
  /// Panics if `src.len() != 8 * dst.len()`.
  fn read_le_u64_into(src: &[u8], dst: &mut [u64]) {
