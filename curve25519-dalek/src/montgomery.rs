@@ -425,8 +425,8 @@ impl Mul<&Scalar> for &MontgomeryPoint {
         let mut prev_bit = false;
         let mut i: isize = 254;
         while i >= 0 {
-            let byte_idx = (i >> 3) as usize;  // i / 8
-            let bit_idx = (i & 7) as usize;    // i % 8
+            let byte_idx = (i >> 3) as usize; // i / 8
+            let bit_idx = (i & 7) as usize; // i % 8
             let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
 
             let choice: u8 = (prev_bit ^ cur_bit) as u8;
