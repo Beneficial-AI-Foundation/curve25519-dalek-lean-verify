@@ -1,27 +1,34 @@
 import fs from 'fs'
 import path from 'path'
 
-export interface FunctionDep {
+export interface FunctionRecord {
   lean_name: string
+  rust_name: string | null
+  source: string | null
+  lines: string | null
   dependencies: string[]
+  nested_children: string[]
+  is_relevant: boolean
   specified: boolean
   verified: boolean
   fully_verified: boolean
+  spec_docstring: string | null
+  spec_statement: string | null
 }
 
-export interface DepsData {
-  functions: FunctionDep[]
+export interface FunctionsData {
+  functions: FunctionRecord[]
 }
 
-declare const data: DepsData
+declare const data: FunctionsData
 export { data }
 
 export default {
-  watch: ['../../../deps.json'],
-  load(): DepsData {
-    const depsPath = path.join(process.cwd(), 'deps.json')
-    const content = fs.readFileSync(depsPath, 'utf-8')
-    const parsed = JSON.parse(content) as DepsData
+  watch: ['../../../functions.json'],
+  load(): FunctionsData {
+    const functionsPath = path.join(process.cwd(), 'functions.json')
+    const content = fs.readFileSync(functionsPath, 'utf-8')
+    const parsed = JSON.parse(content) as FunctionsData
     return parsed
   }
 }

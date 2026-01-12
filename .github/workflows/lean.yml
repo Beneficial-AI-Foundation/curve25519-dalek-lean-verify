@@ -8,6 +8,7 @@ on:
     branches: [ '**' ]
     paths:
       - 'Curve25519Dalek/**'
+      - 'Utils/**'
       - 'lakefile.toml'
       - 'lean-toolchain'
       - '.github/workflows/lean.yml'
@@ -15,6 +16,7 @@ on:
     branches: [ '**' ]
     # paths:
     #   - 'Curve25519Dalek/**'
+    #   - 'Utils/**'
     #   - 'lakefile.toml'
     #   - 'lean-toolchain'
     #   - '.github/workflows/lean.yml'
@@ -48,7 +50,7 @@ jobs:
           path: |
             .lake
             build
-          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean') }}
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
           restore-keys: |
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
@@ -60,15 +62,22 @@ jobs:
       - name: Build Lean project
         run: lake build
 
-      - name: Check for sorries in proofs
+      - name: Check functions.json is up to date
         run: |
-          echo "Checking for incomplete proofs (sorries)..."
-          if grep -r "sorry" Curve25519Dalek/Proofs --include="*.lean"; then
-            echo ""
-            echo "⚠️  Warning: Found 'sorry' in proof files above."
-            echo "These represent incomplete proofs that need to be finished."
+          echo "Regenerating functions.json..."
+          lake exe listfuns functions.json.new
+          if diff -q functions.json functions.json.new > /dev/null 2>&1; then
+            echo "✓ functions.json is up to date!"
+            rm functions.json.new
           else
-            echo "✓ No sorries found - all proofs are complete!"
+            echo "❌ functions.json is out of date!"
+            echo ""
+            echo "Please regenerate functions.json and commit the changes:"
+            echo ""
+            echo "  lake exe listfuns functions.json"
+            echo ""
+            rm functions.json.new
+            exit 1
           fi
 
       - name: Verify build success
