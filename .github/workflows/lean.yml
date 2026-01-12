@@ -66,8 +66,8 @@ jobs:
         run: |
           echo "Regenerating functions.json..."
           lake exe listfuns functions.json.new
-          # Compare ignoring whitespace differences (safe for JSON)
-          if diff -qw functions.json functions.json.new > /dev/null 2>&1; then
+          # Compare using jq -S to normalize JSON (sorts keys, consistent formatting)
+          if diff <(jq -S . functions.json) <(jq -S . functions.json.new) > /dev/null; then
             echo "✓ functions.json is up to date!"
             rm functions.json.new
           else
