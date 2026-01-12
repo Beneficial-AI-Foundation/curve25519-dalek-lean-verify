@@ -47,14 +47,19 @@ def hasExcludedPrefix (name : Name) : Bool :=
   excludedNamespacePrefixes.any fun pfx =>
     pfx.toName.isPrefixOf name
 
-/-- Check if a name ends with an excluded suffix -/
-def hasExcludedSuffix (name : Name) : Bool :=
+/-- Check if a name is an extraction artifact (ends with _body, _loop, etc.) -/
+def isExtractionArtifactName (name : Name) : Bool :=
   let str := name.toString
-  excludedSuffixes.any fun sfx => str.endsWith sfx
+  extractionArtifactSuffixes.any fun sfx => str.endsWith sfx
 
-/-- Check if a name passes basic filters (prefix and suffix) -/
+/-- Check if a name is in the hidden functions list -/
+def isHiddenFunction (name : Name) : Bool :=
+  let str := name.toString
+  hiddenFunctions.any fun hidden => str == hidden
+
+/-- Check if a name passes basic filters (prefix only, not suffix) -/
 def passesBasicFilters (name : Name) : Bool :=
-  !hasExcludedPrefix name && !hasExcludedSuffix name
+  !hasExcludedPrefix name
 
 /-- Check if name B is a nested child of name A (A is a proper prefix of B) -/
 def isNestedChild (parent child : Name) : Bool :=
@@ -93,20 +98,37 @@ def getModuleDefinitions (env : Environment) (moduleName : Name) : Array Name :=
         result := result.push name
   return result
 
+/-- Get the corresponding _body name for a function -/
+def getBodyName (name : Name) : Name :=
+  name.appendAfter "_body"
+
 /-- Intermediate record with raw data before filtering -/
 structure RawFunctionData where
   name : Name
   docInfo : DocstringInfo
   rawDeps : Array Name
+  isExtractionArtifact : Bool
+  isHidden : Bool
   deriving Repr
 
-/-- Gather raw data for a function -/
+/-- Gather raw data for a function, inheriting docstring from _body if needed -/
 def gatherRawData (env : Environment) (name : Name) : IO RawFunctionData := do
-  let docInfo ← getDocstringInfo env name
+  let isArtifact := isExtractionArtifactName name
+  let hidden := isHiddenFunction name
+  let mut docInfo ← getDocstringInfo env name
+
+  -- If no docstring and this isn't a _body itself, try to inherit from _body
+  if docInfo.rustName.isNone && !name.toString.endsWith "_body" then
+    let bodyName := getBodyName name
+    if env.find? bodyName |>.isSome then
+      let bodyDocInfo ← getDocstringInfo env bodyName
+      -- Inherit docstring info from _body
+      docInfo := bodyDocInfo
+
   let rawDeps := match getDirectDeps env name with
     | .ok deps => deps
     | .error _ => #[]
-  return { name, docInfo, rawDeps }
+  return { name, docInfo, rawDeps, isExtractionArtifact := isArtifact, isHidden := hidden }
 
 /-- Find all nested children for each function in a list -/
 def computeNestedChildren (names : Array Name) : Std.HashMap Name (Array Name) := Id.run do
@@ -153,6 +175,8 @@ def buildFunctionRecord
     dependencies := filteredDeps
     nestedChildren := nestedChildren
     isRelevant := isRelevant
+    isExtractionArtifact := rawData.isExtractionArtifact
+    isHidden := rawData.isHidden
     isSpecified := hasSpecTheorem env rawData.name
     isVerified := isVerified env rawData.name
     isFullyVerified := isFullyVerified env relevantNames rawData.name
@@ -169,7 +193,7 @@ def buildFunctionRecords
   -- Step 1: Get all definitions from the module
   let allDefs := getModuleDefinitions env moduleName
 
-  -- Step 2: Apply basic filters (prefix, suffix)
+  -- Step 2: Apply basic filters (prefix only, extraction artifacts are kept)
   let basicFiltered := allDefs.filter passesBasicFilters
 
   -- Step 3: Compute nested relationships before filtering them out

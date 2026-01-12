@@ -37,6 +37,10 @@ structure FunctionRecord where
   nestedChildren : Array Name := #[]
   /-- True if source is from the target crate (not /rustc/, /cargo/registry/, etc.) -/
   isRelevant : Bool := false
+  /-- True if this is an Aeneas extraction artifact (_body, _loop, etc.) -/
+  isExtractionArtifact : Bool := false
+  /-- True if this function is explicitly hidden via Config.hiddenFunctions -/
+  isHidden : Bool := false
   /-- True if a `{leanName}_spec` theorem exists -/
   isSpecified : Bool := false
   /-- True if specified AND the spec proof contains no `sorry` -/
@@ -64,6 +68,8 @@ structure FunctionOutput where
   dependencies : Array String := #[]
   nested_children : Array String := #[]
   is_relevant : Bool := false
+  is_extraction_artifact : Bool := false
+  is_hidden : Bool := false
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
@@ -83,6 +89,8 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     dependencies := rec.dependencies.map (·.toString)
     nested_children := rec.nestedChildren.map (·.toString)
     is_relevant := rec.isRelevant
+    is_extraction_artifact := rec.isExtractionArtifact
+    is_hidden := rec.isHidden
     specified := rec.isSpecified
     verified := rec.isVerified
     fully_verified := rec.isFullyVerified

@@ -9,6 +9,8 @@ export interface FunctionRecord {
   dependencies: string[]
   nested_children: string[]
   is_relevant: boolean
+  is_extraction_artifact: boolean
+  is_hidden: boolean
   specified: boolean
   verified: boolean
   fully_verified: boolean
