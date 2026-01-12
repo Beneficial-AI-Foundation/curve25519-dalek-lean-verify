@@ -16,7 +16,7 @@ import Lean
 
 open Lean
 
-namespace Utils.StatusCsv
+namespace Utils.Lib.StatusCsv
 
 /-- A row in status.csv -/
 structure StatusRow where
@@ -128,4 +128,4 @@ def StatusFile.addRow (file : StatusFile) (row : StatusRow) : StatusFile :=
 def StatusFile.hasLeanName (file : StatusFile) (leanName : String) : Bool :=
   file.rows.any (·.lean_name == leanName)
 
-end Utils.StatusCsv
+end Utils.Lib.StatusCsv

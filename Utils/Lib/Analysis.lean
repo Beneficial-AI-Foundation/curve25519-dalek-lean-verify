@@ -1,12 +1,23 @@
 /-
   Analysis: Core dependency analysis logic.
+
+  This module provides functions for analyzing Lean constants to determine:
+  - Their dependencies on other constants
+  - Whether they have a specification theorem (`{name}_spec`)
+  - Whether that specification is fully proven (no `sorry`)
+  - Whether all transitive dependencies are also verified
+
+  TODO: The suffix-based exclusion of `_loop`, `_body` etc. in ListFuns.lean is a workaround.
+  The proper fix is to make the verification checker understand that verifying a function
+  like `foo` should consider `foo_loop` as part of `foo`'s implementation, not as a separate
+  function requiring its own spec. This requires understanding Aeneas extraction patterns better.
 -/
 import Lean
 import Std.Data.HashSet
 
 open Lean
 
-namespace Utils.Analysis
+namespace Utils.Lib.Analysis
 
 /-- Suffix appended to function names to form spec theorem names.
     Convention: for function `foo`, the spec theorem is `foo_spec`. -/
@@ -84,8 +95,34 @@ def resolveConstantName (env : Environment) (nameStr : String) : Option Name :=
   let name := nameStr.toName
   if env.find? name |>.isSome then some name else none
 
-/-- Compute transitive dependencies within a set of known functions -/
+/-- Compute transitive dependencies within a set of known functions.
+    Returns the set of all reachable dependencies and a list of any errors encountered. -/
+partial def getTransitiveDepsWithErrors (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
+    (visited : Std.HashSet Name := {}) (errors : Array String := #[]) : Std.HashSet Name × Array String :=
+  if visited.contains name then (visited, errors)
+  else
+    let visited := visited.insert name
+    match getDirectDeps env name with
+    | .error msg =>
+      -- Record error but continue traversal
+      (visited, errors.push s!"Warning: {msg}")
+    | .ok deps =>
+      let filteredDeps := filterToKnownFunctions knownNames deps
+      filteredDeps.foldl
+        (fun (acc, errs) dep => getTransitiveDepsWithErrors env knownNames dep acc errs)
+        (visited, errors)
+
+/-- Compute transitive dependencies within a set of known functions.
+    Logs warnings to stderr for any errors encountered during traversal. -/
 partial def getTransitiveDeps (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
+    (visited : Std.HashSet Name := {}) : IO (Std.HashSet Name) := do
+  let (result, errors) := getTransitiveDepsWithErrors env knownNames name visited
+  for err in errors do
+    IO.eprintln err
+  return result
+
+/-- Pure version that silently ignores errors (for backwards compatibility) -/
+partial def getTransitiveDeps' (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
     (visited : Std.HashSet Name := {}) : Std.HashSet Name :=
   if visited.contains name then visited
   else
@@ -94,7 +131,7 @@ partial def getTransitiveDeps (env : Environment) (knownNames : Std.HashSet Name
     | .error _ => visited
     | .ok deps =>
       let filteredDeps := filterToKnownFunctions knownNames deps
-      filteredDeps.foldl (fun acc dep => getTransitiveDeps env knownNames dep acc) visited
+      filteredDeps.foldl (fun acc dep => getTransitiveDeps' env knownNames dep acc) visited
 
 /-- Check if a function and all its transitive dependencies are verified -/
 def isFullyVerified (env : Environment) (knownNames : Std.HashSet Name) (name : Name) : Bool :=
@@ -102,9 +139,9 @@ def isFullyVerified (env : Environment) (knownNames : Std.HashSet Name) (name : 
   if !isVerified env name then false
   else
     -- Get all transitive dependencies (excluding the function itself)
-    let allDeps := getTransitiveDeps env knownNames name
+    let allDeps := getTransitiveDeps' env knownNames name
     let transitiveDeps := allDeps.erase name
     -- Check if all transitive dependencies are verified
     transitiveDeps.all (isVerified env)
 
-end Utils.Analysis
+end Utils.Lib.Analysis

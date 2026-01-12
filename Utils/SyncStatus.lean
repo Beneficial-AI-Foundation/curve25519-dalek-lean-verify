@@ -1,38 +1,23 @@
 /-
   SyncStatus: Synchronize status.csv with functions from Funs.lean.
-
-  This tool:
-  1. Reads the current status.csv
-  2. Extracts all function definitions from Funs.lean
-  3. Identifies functions not yet in status.csv
-  4. Adds new rows for missing functions
-
-  Usage:
-    lake exe syncstatus [status.csv]
-
-  If no path is specified, uses "status.csv" in the current directory.
 -/
-import Utils.ListFuns
-import Utils.StatusCsv
+import Cli
 import Std.Data.HashSet
+import Utils.Config
+import Utils.Lib.ListFuns
+import Utils.Lib.StatusCsv
 
-open Utils.StatusCsv
+open Cli
+open Utils.Config
+open Utils.Lib.StatusCsv
+open Utils.Lib.ListFuns
 
-/-- Print usage information -/
-def printUsage : IO Unit := do
-  IO.println "Usage: lake exe syncstatus [status.csv]"
-  IO.println ""
-  IO.println "Synchronizes status.csv with functions from Funs.lean."
-  IO.println ""
-  IO.println "Arguments:"
-  IO.println "  [status.csv]  Path to status file (default: status.csv)"
-  IO.println ""
-  IO.println "This tool adds new rows for any functions in Funs.lean"
-  IO.println "that are not already present in status.csv."
-
-/-- Main entry point -/
-def main (args : List String) : IO UInt32 := do
-  let csvPath : System.FilePath := args.head?.getD "status.csv"
+/-- Run the syncstatus command -/
+def runSyncStatus (p : Parsed) : IO UInt32 := do
+  let csvPathStr : String := match p.variableArgsAs? String with
+    | some args => args[0]?.getD "status.csv"
+    | none => "status.csv"
+  let csvPath : System.FilePath := csvPathStr
 
   -- Read current status.csv
   IO.eprintln s!"Reading {csvPath}..."
@@ -40,11 +25,11 @@ def main (args : List String) : IO UInt32 := do
   IO.eprintln s!"Found {statusFile.rows.size} existing entries"
 
   -- Load Lean environment and get functions
-  IO.eprintln "Loading Curve25519Dalek module..."
-  let env ← Utils.ListFuns.loadEnvironment
+  IO.eprintln s!"Loading {mainModule} module..."
+  let env ← loadEnvironment
   IO.eprintln "Module loaded successfully"
 
-  let funNames ← Utils.ListFuns.getFunsDefinitionsAsStrings env
+  let funNames ← getFunsDefinitionsAsStrings env
   IO.eprintln s!"Found {funNames.size} functions in Funs.lean"
 
   -- Find functions not in status.csv
@@ -72,3 +57,16 @@ def main (args : List String) : IO UInt32 := do
   IO.println s!"Total entries: {updatedFile.rows.size}"
 
   return 0
+
+/-- The syncstatus command definition -/
+def syncstatusCmd : Cmd := `[Cli|
+  syncstatus VIA runSyncStatus; ["0.1.0"]
+  "Synchronize status.csv with functions from Funs.lean."
+
+  ARGS:
+    ...path : String; "Path to status.csv (default: status.csv)"
+]
+
+/-- Main entry point -/
+def main (args : List String) : IO UInt32 :=
+  syncstatusCmd.validate args
