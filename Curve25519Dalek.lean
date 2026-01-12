@@ -72,6 +72,8 @@ import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step1
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjectiveNiels
