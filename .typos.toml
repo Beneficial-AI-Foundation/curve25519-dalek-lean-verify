@@ -4,7 +4,8 @@ extend-exclude = [
     ".git/",
     "*.svg",
     "TESTVECTORS",
-    "*.lean" # Allow in lean anything since identifies are often false positives
+    "*.lean", # Allow in lean anything since identifies are often false positives
+    "functions.json", # Auto-generated file with many identifiers
 ]
 
 [default]
