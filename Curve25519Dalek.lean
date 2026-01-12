@@ -4,9 +4,11 @@ import Curve25519Dalek.Defs.Edwards.Curve
 import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
