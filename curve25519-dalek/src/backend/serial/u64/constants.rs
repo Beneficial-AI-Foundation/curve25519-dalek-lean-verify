@@ -15,7 +15,7 @@ use super::field::FieldElement51;
 use super::scalar::Scalar52;
 use crate::edwards::EdwardsPoint;
 
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 use crate::{
     backend::serial::curve_models::AffineNielsPoint,
     edwards::EdwardsBasepointTable,
@@ -337,13 +337,13 @@ pub const EIGHT_TORSION_INNER_DOC_HIDDEN: [EdwardsPoint; 8] = [
 ];
 
 /// Table containing precomputed multiples of the Ed25519 basepoint \\(B = (x, 4/5)\\).
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 pub static ED25519_BASEPOINT_TABLE: &EdwardsBasepointTable =
     &ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN;
 
 /// Inner constant, used to avoid filling the docs with precomputed points.
 #[doc(hidden)]
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 static ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN: EdwardsBasepointTable = EdwardsBasepointTable([
     LookupTable([
         AffineNielsPoint {
@@ -6300,7 +6300,7 @@ static ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN: EdwardsBasepointTable = Edwards
 ]);
 
 /// Odd multiples of the basepoint `[B, 3B, 5B, 7B, 9B, 11B, 13B, 15B, ..., 127B]`.
-#[cfg(feature = "precomputed-tables")]
+#[cfg(all(feature = "precomputed-tables", not(verify)))]
 #[allow(dead_code)]
 pub(crate) const AFFINE_ODD_MULTIPLES_OF_BASEPOINT: NafLookupTable8<AffineNielsPoint> =
     NafLookupTable8([

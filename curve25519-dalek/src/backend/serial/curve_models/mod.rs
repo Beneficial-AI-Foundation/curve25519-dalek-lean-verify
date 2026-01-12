@@ -226,6 +226,7 @@ impl Zeroize for ProjectiveNielsPoint {
 
 use crate::traits::Identity;
 
+#[cfg_attr(verify, aeneas::rename("IdentityCurveModelsProjectivePoint"))]
 impl Identity for ProjectivePoint {
     fn identity() -> ProjectivePoint {
         ProjectivePoint {

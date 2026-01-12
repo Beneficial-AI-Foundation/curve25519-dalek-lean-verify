@@ -100,10 +100,32 @@ generate_llbc() {
         START_FROM_ARGS+=(--start-from "$item")
     done
 
-    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p $CRATE_DIR"
+    # --exclude: completely remove
+    # --opaque: keep signature but no body
+    EXCLUDE_ARGS=(
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::backend::serial::u64::scalar::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::montgomery::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::montgomery::{impl core::hash::Hash for _}'
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}'
+        --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}'
+        --exclude 'curve25519_dalek::scalar::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::hash::Hash for _}'
+        # Exclude Sum/Product impls that require Iterator/IntoIterator traits
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Sum<_> for _}'
+        --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}'
+        --exclude 'curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}'
+    )
+    OPAQUE_ARGS=(
+        # --opaque 'curve25519_dalek::something::somename'
+    )
+
+    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
     echo "Logging output to $ROOT/.logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}' -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"
@@ -156,13 +178,15 @@ apply_tweaks() {
 
     echo "Applying tweaks from $tweaks_file to $input_file..."
 
-    # Validate that tweaks file ends with a blank line
-    # File should end with two newlines (visible as one blank line in editor)
-    local last_two_bytes=$(tail -c 2 "$tweaks_file" | xxd -p)
-    if [[ "$last_two_bytes" != "0a0a" ]]; then
-        echo "⚠ Warning: $tweaks_file does not end with two blank lines!"
+    # Validate that tweaks file ends with at least two blank lines
+    # (needed so the last substitution block is processed correctly)
+    # Note: We append 'x' to prevent command substitution from stripping trailing newlines
+    local ending=$(tail -c 2 "$tweaks_file"; echo x)
+    ending=${ending%x}
+    if [[ "$ending" != $'\n\n' ]]; then
+        echo "⚠ Warning: $tweaks_file does not end with at least two blank lines!"
         echo "  The last substitution may not be processed correctly."
-        echo "  Please ensure there are two blank lines at the end of the file."
+        echo "  Please ensure there are at least two blank lines at the end of the file."
     fi
 
     local content=$(cat "$input_file")

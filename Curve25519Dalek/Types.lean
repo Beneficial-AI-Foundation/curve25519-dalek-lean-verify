@@ -10,6 +10,101 @@ set_option linter.style.commandStart false
 
 namespace curve25519_dalek
 
+/-- Trait declaration: [core::iter::adapters::zip::TrustedRandomAccessNoCoerce]
+   Source: '/rustc/library/core/src/iter/adapters/zip.rs', lines 585:0-585:51
+   Name pattern: [core::iter::adapters::zip::TrustedRandomAccessNoCoerce] -/
+@[rust_trait "core::iter::adapters::zip::TrustedRandomAccessNoCoerce"
+  (consts := ["MAY_HAVE_SIDE_EFFECT"])]
+structure core.iter.adapters.zip.TrustedRandomAccessNoCoerce (Self : Type)
+  where
+  MAY_HAVE_SIDE_EFFECT : Bool
+
+/-- Trait declaration: [core::iter::range::Step]
+   Source: '/rustc/library/core/src/iter/range.rs', lines 25:0-25:42
+   Name pattern: [core::iter::range::Step] -/
+@[rust_trait "core::iter::range::Step"
+  (parentClauses := ["cloneCloneInst", "cmpPartialOrdInst"])]
+structure core.iter.range.Step (Self : Type) where
+  cloneCloneInst : core.clone.Clone Self
+  cmpPartialOrdInst : core.cmp.PartialOrd Self Self
+  steps_between : Self → Self → Result (Usize × (Option Usize))
+  forward_checked : Self → Usize → Result (Option Self)
+  backward_checked : Self → Usize → Result (Option Self)
+
+/-- Trait declaration: [core::iter::traits::iterator::Iterator]
+   Source: '/rustc/library/core/src/iter/traits/iterator.rs', lines 40:0-40:18
+   Name pattern: [core::iter::traits::iterator::Iterator] -/
+@[rust_trait "core::iter::traits::iterator::Iterator"]
+structure core.iter.traits.iterator.Iterator (Self : Type) (Self_Item : Type)
+  where
+  next : Self → Result ((Option Self_Item) × Self)
+
+/-- Trait declaration: [core::iter::traits::accum::Sum]
+   Source: '/rustc/library/core/src/iter/traits/accum.rs', lines 17:0-17:30
+   Name pattern: [core::iter::traits::accum::Sum] -/
+@[rust_trait "core::iter::traits::accum::Sum"]
+structure core.iter.traits.accum.Sum (Self : Type) (A : Type) where
+  sum : forall {I : Type} (iteratorIteratorInst :
+    core.iter.traits.iterator.Iterator I A), I → Result Self
+
+/-- Trait declaration: [core::iter::traits::accum::Product]
+   Source: '/rustc/library/core/src/iter/traits/accum.rs', lines 38:0-38:34
+   Name pattern: [core::iter::traits::accum::Product] -/
+@[rust_trait "core::iter::traits::accum::Product"]
+structure core.iter.traits.accum.Product (Self : Type) (A : Type) where
+  product : forall {I : Type} (iteratorIteratorInst :
+    core.iter.traits.iterator.Iterator I A), I → Result Self
+
+/-- Trait declaration: [core::iter::traits::collect::IntoIterator]
+   Source: '/rustc/library/core/src/iter/traits/collect.rs', lines 282:0-282:22
+   Name pattern: [core::iter::traits::collect::IntoIterator] -/
+@[rust_trait "core::iter::traits::collect::IntoIterator"
+  (parentClauses := ["iteratorIteratorInst"])]
+structure core.iter.traits.collect.IntoIterator (Self : Type) (Self_Item :
+  Type) (Self_IntoIter : Type) where
+  iteratorIteratorInst : core.iter.traits.iterator.Iterator Self_IntoIter
+    Self_Item
+  into_iter : Self → Result Self_IntoIter
+
+/-- Trait declaration: [core::iter::traits::collect::FromIterator]
+   Source: '/rustc/library/core/src/iter/traits/collect.rs', lines 134:0-134:32
+   Name pattern: [core::iter::traits::collect::FromIterator] -/
+@[rust_trait "core::iter::traits::collect::FromIterator"]
+structure core.iter.traits.collect.FromIterator (Self : Type) (A : Type) where
+  from_iter : forall {T : Type} {Clause0_IntoIter : Type} (IntoIteratorInst :
+    core.iter.traits.collect.IntoIterator T A Clause0_IntoIter), T → Result
+    Self
+
+/-- Trait declaration: [core::iter::traits::collect::Extend]
+   Source: '/rustc/library/core/src/iter/traits/collect.rs', lines 394:0-394:19
+   Name pattern: [core::iter::traits::collect::Extend] -/
+@[rust_trait "core::iter::traits::collect::Extend"]
+structure core.iter.traits.collect.Extend (Self : Type) (A : Type) where
+  extend : forall {T : Type} {Clause0_IntoIter : Type} (IntoIteratorInst :
+    core.iter.traits.collect.IntoIterator T A Clause0_IntoIter), Self → T →
+    Result Self
+
+/-- Trait declaration: [core::iter::traits::double_ended::DoubleEndedIterator]
+   Source: '/rustc/library/core/src/iter/traits/double_ended.rs', lines 41:0-41:39
+   Name pattern: [core::iter::traits::double_ended::DoubleEndedIterator] -/
+@[rust_trait "core::iter::traits::double_ended::DoubleEndedIterator"
+  (parentClauses := ["iteratorIteratorInst"])]
+structure core.iter.traits.double_ended.DoubleEndedIterator (Self : Type)
+  (Self_Clause0_Item : Type) where
+  iteratorIteratorInst : core.iter.traits.iterator.Iterator Self
+    Self_Clause0_Item
+  next_back : Self → Result ((Option Self_Clause0_Item) × Self)
+
+/-- Trait declaration: [core::iter::traits::exact_size::ExactSizeIterator]
+   Source: '/rustc/library/core/src/iter/traits/exact_size.rs', lines 86:0-86:37
+   Name pattern: [core::iter::traits::exact_size::ExactSizeIterator] -/
+@[rust_trait "core::iter::traits::exact_size::ExactSizeIterator"
+  (parentClauses := ["iteratorIteratorInst"])]
+structure core.iter.traits.exact_size.ExactSizeIterator (Self : Type)
+  (Self_Clause0_Item : Type) where
+  iteratorIteratorInst : core.iter.traits.iterator.Iterator Self
+    Self_Clause0_Item
+
 /-- Trait declaration: [core::ops::arith::Add]
    Source: '/rustc/library/core/src/ops/arith.rs', lines 77:0-77:31
    Name pattern: [core::ops::arith::Add] -/
@@ -47,6 +142,20 @@ structure core.ops.arith.Neg (Self : Type) (Self_Output : Type) where
 @[rust_trait "core::ops::arith::AddAssign"]
 structure core.ops.arith.AddAssign (Self : Type) (Rhs : Type) where
   add_assign : Self → Rhs → Result Self
+
+/-- Trait declaration: [core::ops::arith::SubAssign]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 840:0-840:37
+   Name pattern: [core::ops::arith::SubAssign] -/
+@[rust_trait "core::ops::arith::SubAssign"]
+structure core.ops.arith.SubAssign (Self : Type) (Rhs : Type) where
+  sub_assign : Self → Rhs → Result Self
+
+/-- Trait declaration: [core::ops::arith::MulAssign]
+   Source: '/rustc/library/core/src/ops/arith.rs', lines 902:0-902:37
+   Name pattern: [core::ops::arith::MulAssign] -/
+@[rust_trait "core::ops::arith::MulAssign"]
+structure core.ops.arith.MulAssign (Self : Type) (Rhs : Type) where
+  mul_assign : Self → Rhs → Result Self
 
 /-- Trait declaration: [core::ops::bit::Not]
    Source: '/rustc/library/core/src/ops/bit.rs', lines 35:0-35:19
@@ -110,10 +219,42 @@ structure zeroize.DefaultIsZeroes (Self : Type) where
   coremarkerCopyInst : core.marker.Copy Self
   coredefaultDefaultInst : core.default.Default Self
 
+/-- [curve25519_dalek::backend::BackendKind]
+   Source: 'curve25519-dalek/src/backend/mod.rs', lines 46:0-52:1 -/
+@[discriminant]
+inductive backend.BackendKind where
+| Serial : backend.BackendKind
+
 /-- [curve25519_dalek::backend::serial::u64::field::FieldElement51]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 43:0-43:47 -/
 @[reducible]
 def backend.serial.u64.field.FieldElement51 := Array U64 5#usize
+
+/-- [curve25519_dalek::edwards::EdwardsPoint]
+   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
+structure edwards.EdwardsPoint where
+  X : backend.serial.u64.field.FieldElement51
+  Y : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T : backend.serial.u64.field.FieldElement51
+
+/-- [curve25519_dalek::scalar::Scalar]
+   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
+structure scalar.Scalar where
+  bytes : Array U8 32#usize
+
+/-- [curve25519_dalek::window::LookupTable]
+   Source: 'curve25519-dalek/src/window.rs', lines 47:8-47:51 -/
+@[reducible]
+def window.LookupTable (T : Type) := Array T 8#usize
+
+/-- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
+structure backend.serial.curve_models.ProjectiveNielsPoint where
+  Y_plus_X : backend.serial.u64.field.FieldElement51
+  Y_minus_X : backend.serial.u64.field.FieldElement51
+  Z : backend.serial.u64.field.FieldElement51
+  T2d : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::backend::serial::curve_models::ProjectivePoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 154:0-158:1 -/
@@ -130,6 +271,11 @@ structure backend.serial.curve_models.CompletedPoint where
   Z : backend.serial.u64.field.FieldElement51
   T : backend.serial.u64.field.FieldElement51
 
+/-- Trait declaration: [curve25519_dalek::traits::Identity]
+   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
+structure traits.Identity (Self : Type) where
+  identity : Result Self
+
 /-- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 184:0-188:1 -/
 structure backend.serial.curve_models.AffineNielsPoint where
@@ -137,36 +283,20 @@ structure backend.serial.curve_models.AffineNielsPoint where
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
 
-/-- [curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint]
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 206:0-211:1 -/
-structure backend.serial.curve_models.ProjectiveNielsPoint where
-  Y_plus_X : backend.serial.u64.field.FieldElement51
-  Y_minus_X : backend.serial.u64.field.FieldElement51
-  Z : backend.serial.u64.field.FieldElement51
-  T2d : backend.serial.u64.field.FieldElement51
-
-/-- Trait declaration: [curve25519_dalek::traits::Identity]
-   Source: 'curve25519-dalek/src/traits.rs', lines 26:0-30:1 -/
-structure traits.Identity (Self : Type) where
-  identity : Result Self
-
 /-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
 structure traits.ValidityCheck (Self : Type) where
   is_valid : Self → Result Bool
 
-/-- [curve25519_dalek::edwards::EdwardsPoint]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
-structure edwards.EdwardsPoint where
-  X : backend.serial.u64.field.FieldElement51
-  Y : backend.serial.u64.field.FieldElement51
-  Z : backend.serial.u64.field.FieldElement51
-  T : backend.serial.u64.field.FieldElement51
-
 /-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34 -/
 @[reducible]
 def backend.serial.u64.scalar.Scalar52 := Array U64 5#usize
+
+/-- [curve25519_dalek::ristretto::RistrettoPoint]
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 487:0-487:51 -/
+@[reducible]
+def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
 /-- [curve25519_dalek::edwards::affine::AffinePoint]
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 12:0-15:1 -/
@@ -184,20 +314,16 @@ def edwards.CompressedEdwardsY := Array U8 32#usize
 @[reducible]
 def montgomery.MontgomeryPoint := Array U8 32#usize
 
-/-- [curve25519_dalek::ristretto::RistrettoPoint]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 485:0-485:51 -/
-@[reducible]
-def ristretto.RistrettoPoint := edwards.EdwardsPoint
+/-- [curve25519_dalek::montgomery::ProjectivePoint]
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 289:0-292:1 -/
+structure montgomery.ProjectivePoint where
+  U : backend.serial.u64.field.FieldElement51
+  W : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::ristretto::CompressedRistretto]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 219:0-219:45 -/
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
 @[reducible]
 def ristretto.CompressedRistretto := Array U8 32#usize
-
-/-- [curve25519_dalek::scalar::Scalar]
-   Source: 'curve25519-dalek/src/scalar.rs', lines 195:0-232:1 -/
-structure scalar.Scalar where
-  bytes : Array U8 32#usize
 
 /-- Trait declaration: [curve25519_dalek::traits::IsIdentity]
    Source: 'curve25519-dalek/src/traits.rs', lines 33:0-36:1 -/
