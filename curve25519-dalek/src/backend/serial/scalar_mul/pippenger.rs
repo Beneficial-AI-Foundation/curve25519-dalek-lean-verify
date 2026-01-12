@@ -61,6 +61,7 @@ use crate::traits::VartimeMultiscalarMul;
 /// This algorithm is adapted from section 4 of <https://eprint.iacr.org/2012/549.pdf>.
 pub struct Pippenger;
 
+#[cfg(not(verify))]
 impl VartimeMultiscalarMul for Pippenger {
     type Point = EdwardsPoint;
 

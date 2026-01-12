@@ -358,4 +358,503 @@ noncomputable def
 ===REPLACE===
 /--
 
+===FIND===
+def core.iter.range.StepUsize
+===REPLACE===
+noncomputable def core.iter.range.StepUsize
+
+===FIND===
+def core.iter.traits.iterator.IteratorRangeA
+===REPLACE===
+noncomputable def core.iter.traits.iterator.IteratorRangeA
+
+===FIND===
+def core.iter.traits.collect.IntoIterator.Blanket
+===REPLACE===
+noncomputable def core.iter.traits.collect.IntoIterator.Blanket
+
+===FIND===
+def subtle.ConditionallySelectableU8
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableU8
+
+===FIND===
+def zeroize.ZeroizeVec
+===REPLACE===
+noncomputable def zeroize.ZeroizeVec
+
+===FIND===
+def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
+===REPLACE===
+noncomputable def backend.serial.u64.scalar.ZeroizeScalar52.zeroize
+
+===FIND===
+def zeroize.ZeroizeScalar52 :
+===REPLACE===
+noncomputable def zeroize.ZeroizeScalar52 :
+
+===FIND===
+def scalar.PartialEqScalarScalar.eq
+===REPLACE===
+noncomputable def scalar.PartialEqScalarScalar.eq
+
+===FIND===
+def core.cmp.PartialEqScalarScalar
+===REPLACE===
+noncomputable def core.cmp.PartialEqScalarScalar
+
+===FIND===
+def core.cmp.EqScalar
+===REPLACE===
+noncomputable def core.cmp.EqScalar
+
+===FIND===
+def scalar.ConditionallySelectableScalar.conditional_select_loop
+===REPLACE===
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select_loop
+
+===FIND===
+def scalar.ConditionallySelectableScalar.conditional_select
+  (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice) :
+===REPLACE===
+noncomputable def scalar.ConditionallySelectableScalar.conditional_select
+  (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice) :
+
+===FIND===
+def subtle.ConditionallySelectableScalar
+===REPLACE===
+noncomputable def subtle.ConditionallySelectableScalar
+
+===FIND===
+def scalar.ZeroizeScalar.zeroize
+===REPLACE===
+noncomputable def scalar.ZeroizeScalar.zeroize
+
+===FIND===
+def zeroize.ZeroizeScalar :
+===REPLACE===
+noncomputable def zeroize.ZeroizeScalar :
+
+===FIND===
+def scalar.Scalar.batch_invert
+  (inputs :
+===REPLACE===
+noncomputable def scalar.Scalar.batch_invert
+  (inputs :
+
+===FIND===
+def core.convert.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint
+===REPLACE===
+noncomputable def core.convert.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint
+
+===FIND===
+def backend.serial.scalar_mul.variable_base.mul_loop
+===REPLACE===
+noncomputable def backend.serial.scalar_mul.variable_base.mul_loop
+
+===FIND===
+def backend.serial.scalar_mul.variable_base.mul
+  (point : edwards.EdwardsPoint) (scalar : scalar.Scalar) :
+  Result edwards.EdwardsPoint
+  := do
+  let lookup_table ←
+    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
+  let scalar_digits ← scalar.Scalar.as_radix_16 scalar
+===REPLACE===
+noncomputable def backend.serial.scalar_mul.variable_base.mul
+  (point : edwards.EdwardsPoint) (sc : scalar.Scalar) :
+  Result edwards.EdwardsPoint
+  := do
+  let lookup_table ←
+    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
+  let scalar_digits ← scalar.Scalar.as_radix_16 sc
+
+===FIND===
+def backend.variable_base_mul
+===REPLACE===
+noncomputable def backend.variable_base_mul
+
+===FIND===
+def edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul
+
+===FIND===
+def edwards.MulSharedAEdwardsPointScalarEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulSharedAEdwardsPointScalarEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.is_torsion_free
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.is_torsion_free
+
+===FIND===
+def core.ops.arith.MulShared0EdwardsPointSharedAScalarEdwardsPoint
+===REPLACE===
+noncomputable def core.ops.arith.MulShared0EdwardsPointSharedAScalarEdwardsPoint
+
+===FIND===
+def core.ops.arith.MulSharedAEdwardsPointScalarEdwardsPoint
+===REPLACE===
+noncomputable def core.ops.arith.MulSharedAEdwardsPointScalarEdwardsPoint
+
+===FIND===
+@[reducible, rust_trait_impl "subtle::ConstantTimeEq<u16>"]
+def subtle.ConstantTimeEqU16
+===REPLACE===
+@[rust_trait_impl "subtle::ConstantTimeEq<u16>"]
+noncomputable def subtle.ConstantTimeEqU16
+
+===FIND===
+def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from_loop
+===REPLACE===
+noncomputable def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from_loop
+
+===FIND===
+def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from
+  (P : edwards.EdwardsPoint) :
+===REPLACE===
+noncomputable def window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from
+  (P : edwards.EdwardsPoint) :
+
+===FIND===
+def window.LookupTable.select_loop
+  {T : Type}
+===REPLACE===
+noncomputable def window.LookupTable.select_loop
+  {T : Type}
+
+===FIND===
+def window.LookupTable.select
+  {T : Type}
+===REPLACE===
+noncomputable def window.LookupTable.select
+  {T : Type}
+
+===FIND===
+def edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared0ScalarSharedAEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared0ScalarSharedAEdwardsPointEdwardsPoint
+
+===FIND===
+def edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.mul_base
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.mul_base
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAScalarEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarEdwardsPointEdwardsPoint
+
+===FIND===
+def edwards.MulScalarEdwardsPointEdwardsPoint.mul
+===REPLACE===
+noncomputable def edwards.MulScalarEdwardsPointEdwardsPoint.mul
+
+===FIND===
+def edwards.EdwardsPoint.mul_clamped
+===REPLACE===
+noncomputable def edwards.EdwardsPoint.mul_clamped
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulScalarEdwardsPointEdwardsPoint
+
+# Ristretto Mul impls need noncomputable
+
+===FIND===
+def ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul
+===REPLACE===
+noncomputable def ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul
+
+===FIND===
+def ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul
+===REPLACE===
+noncomputable def ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAScalarRistrettoPointRistrettoPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarRistrettoPointRistrettoPoint
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared0ScalarSharedARistrettoPointRistrettoPoint
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared0ScalarSharedARistrettoPointRistrettoPoint
+
+===FIND===
+def ristretto.RistrettoPoint.mul_base
+===REPLACE===
+noncomputable def ristretto.RistrettoPoint.mul_base
+
+# Rename CompressedRistretto constructor to avoid conflict with type
+
+===FIND===
+/-- [curve25519_dalek::ristretto::CompressedRistretto]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
+def ristretto.CompressedRistretto
+  (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
+  ok a
+===REPLACE===
+/-- [curve25519_dalek::ristretto::CompressedRistretto]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
+def ristretto.CompressedRistretto.mk
+  (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
+  ok a
+
+# Montgomery functions need noncomputable
+
+===FIND===
+def montgomery.MontgomeryPoint.mul_base
+  (scalar : scalar.Scalar)
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.mul_base
+  (scalar : scalar.Scalar)
+
+===FIND===
+def montgomery.MontgomeryPoint.mul_base_clamped
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.mul_base_clamped
+
+===FIND===
+def montgomery.elligator_encode
+===REPLACE===
+noncomputable def montgomery.elligator_encode
+
+# Montgomery ConditionallySelectable and related
+
+===FIND===
+@[reducible, rust_trait_impl "subtle::ConditionallySelectable<[@T; @N]>"]
+def subtle.ConditionallySelectableArray
+===REPLACE===
+@[reducible, rust_trait_impl "subtle::ConditionallySelectable<[@T; @N]>"]
+noncomputable def subtle.ConditionallySelectableArray
+
+===FIND===
+def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
+===REPLACE===
+noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
+
+# Fix parameter name shadowing (scalar shadows namespace) and add noncomputable
+===FIND===
+def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
+  let x0 ← montgomery.IdentityProjectivePoint.identity
+  let scalar_bytes ← scalar.Scalar.as_bytes scalar
+===REPLACE===
+noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
+  (self : montgomery.MontgomeryPoint) (sc : scalar.Scalar) :
+  Result montgomery.MontgomeryPoint
+  := do
+  let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
+  let x0 ← montgomery.IdentityProjectivePoint.identity
+  let scalar_bytes ← scalar.Scalar.as_bytes sc
+
+===FIND===
+def montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulMontgomeryPointSharedBScalarMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulMontgomeryPointSharedBScalarMontgomeryPoint :
+
+===FIND===
+def montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul
+
+===FIND===
+def montgomery.MulScalarSharedBMontgomeryPointMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulScalarSharedBMontgomeryPointMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulScalarSharedBMontgomeryPointMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulScalarSharedBMontgomeryPointMontgomeryPoint :
+
+===FIND===
+def montgomery.MulSharedAMontgomeryPointScalarMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulSharedAMontgomeryPointScalarMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAMontgomeryPointScalarMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAMontgomeryPointScalarMontgomeryPoint :
+
+===FIND===
+def montgomery.MulSharedAScalarMontgomeryPointMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulSharedAScalarMontgomeryPointMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulSharedAScalarMontgomeryPointMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulSharedAScalarMontgomeryPointMontgomeryPoint :
+
+===FIND===
+def montgomery.MulMontgomeryPointScalarMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulMontgomeryPointScalarMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulMontgomeryPointScalarMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulMontgomeryPointScalarMontgomeryPoint :
+
+===FIND===
+def montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul
+===REPLACE===
+noncomputable def montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulScalarMontgomeryPointMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulScalarMontgomeryPointMontgomeryPoint :
+
+===FIND===
+def montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign
+===REPLACE===
+noncomputable def montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign
+
+===FIND===
+def montgomery.MulAssignMontgomeryPointScalar.mul_assign
+===REPLACE===
+noncomputable def montgomery.MulAssignMontgomeryPointScalar.mul_assign
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulAssignMontgomeryPointScalar :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulAssignMontgomeryPointScalar :
+
+===FIND===
+def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
+===REPLACE===
+noncomputable def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
+
+===FIND===
+@[reducible]
+def subtle.ConstantTimeEqMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def subtle.ConstantTimeEqMontgomeryPoint :
+
+===FIND===
+def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+===REPLACE===
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+
+===FIND===
+@[reducible]
+def subtle.ConditionallySelectableMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def subtle.ConditionallySelectableMontgomeryPoint :
+
+===FIND===
+def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
+===REPLACE===
+noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
+
+===FIND===
+@[reducible]
+def core.cmp.PartialEqMontgomeryPointMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.cmp.PartialEqMontgomeryPointMontgomeryPoint :
+
+===FIND===
+@[reducible]
+def core.cmp.EqMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.cmp.EqMontgomeryPoint :
+
+===FIND===
+def montgomery.ZeroizeMontgomeryPoint.zeroize
+===REPLACE===
+noncomputable def montgomery.ZeroizeMontgomeryPoint.zeroize
+
+===FIND===
+@[reducible]
+def zeroize.ZeroizeMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def zeroize.ZeroizeMontgomeryPoint :
+
+===FIND===
+def montgomery.MontgomeryPoint.mul_clamped
+===REPLACE===
+noncomputable def montgomery.MontgomeryPoint.mul_clamped
+
+===FIND===
+@[reducible]
+def subtle.ConditionallySelectableProjectivePoint :
+===REPLACE===
+@[reducible]
+noncomputable def subtle.ConditionallySelectableProjectivePoint :
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint :
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulAssignMontgomeryPointShared0Scalar :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulAssignMontgomeryPointShared0Scalar :
+
+===FIND===
+@[reducible]
+def core.ops.arith.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint :
+===REPLACE===
+@[reducible]
+noncomputable def core.ops.arith.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint :
+
 

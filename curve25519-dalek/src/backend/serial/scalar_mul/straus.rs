@@ -144,6 +144,7 @@ impl MultiscalarMul for Straus {
     }
 }
 
+#[cfg(not(verify))]
 impl VartimeMultiscalarMul for Straus {
     type Point = EdwardsPoint;
 

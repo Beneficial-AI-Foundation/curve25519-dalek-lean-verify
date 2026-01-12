@@ -4,4 +4,5 @@
 rustflags = [
     "--cfg", "curve25519_dalek_backend=\"serial\"",
     "--cfg", "curve25519_dalek_bits=\"64\"",
+    "--cfg", "verify",
 ]

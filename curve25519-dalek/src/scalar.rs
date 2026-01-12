@@ -457,6 +457,7 @@ impl<'de> Deserialize<'de> for Scalar {
     }
 }
 
+#[cfg(not(verify))]
 impl<T> Product<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -469,6 +470,7 @@ where
     }
 }
 
+#[cfg(not(verify))]
 impl<T> Sum<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -803,14 +805,18 @@ impl Scalar {
 
         // Pass through the input vector, recording the previous
         // products in the scratch space
-        for (input, scratch) in inputs.iter_mut().zip(scratch.iter_mut()) {
-            *scratch = acc;
+        // (using while loop to avoid iter_mut().zip() which pulls in Iterator traits)
+        let mut i = 0;
+        while i < n {
+            let input = &mut inputs[i];
+            scratch[i] = acc;
 
             // Avoid unnecessary Montgomery multiplication in second pass by
             // keeping inputs in Montgomery form
             let tmp = input.unpack().as_montgomery();
             *input = tmp.pack();
             acc = UnpackedScalar::montgomery_mul(&acc, &tmp);
+            i += 1;
         }
 
         // acc is nonzero iff all inputs are nonzero
@@ -823,10 +829,14 @@ impl Scalar {
         let ret = acc.pack();
 
         // Pass through the vector backwards to compute the inverses
-        // in place
-        for (input, scratch) in inputs.iter_mut().rev().zip(scratch.iter().rev()) {
+        // in place (using while loop to avoid .rev() which causes Charon trait mismatch)
+        let mut i = n;
+        while i > 0 {
+            i -= 1;
+            let input = &mut inputs[i];
+            let scratch_val = &scratch[i];
             let tmp = UnpackedScalar::montgomery_mul(&acc, &input.unpack());
-            *input = UnpackedScalar::montgomery_mul(&acc, scratch).pack();
+            *input = UnpackedScalar::montgomery_mul(&acc, scratch_val).pack();
             acc = tmp;
         }
 
@@ -837,6 +847,8 @@ impl Scalar {
     }
 
     /// Get the bits of the scalar, in little-endian order
+    #[cfg(not(verify))]
+    #[allow(dead_code)]
     pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
         (0..256).map(|i| {
             // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
@@ -918,6 +930,7 @@ impl Scalar {
     /// If \\( k \mod 2^w\\) is even, we emit \\(0\\), advance 1 bit
     /// and reindex.  In fact, by setting all digits to \\(0\\)
     /// initially, we don't need to emit anything.
+    #[cfg(not(verify))]
     pub(crate) fn non_adjacent_form(&self, w: usize) -> [i8; 256] {
         // required by the NAF definition
         debug_assert!(w >= 2);
@@ -998,17 +1011,21 @@ impl Scalar {
             (x >> 4) & 15
         }
 
-        for i in 0..32 {
+        let mut i = 0;
+        while i < 32 {
             output[2 * i] = bot_half(self[i]) as i8;
             output[2 * i + 1] = top_half(self[i]) as i8;
+            i += 1;
         }
         // Precondition note: since self[31] <= 127, output[63] <= 7
 
         // Step 2: recenter coefficients from [0,16) to [-8,8)
-        for i in 0..63 {
+        let mut i = 0;
+        while i < 63 {
             let carry = (output[i] + 8) >> 4;
             output[i] -= carry << 4;
             output[i + 1] += carry;
+            i += 1;
         }
         // Precondition note: output[63] is not recentered.  It
         // increases by carry <= 1.  Thus output[63] <= 8.
@@ -1018,7 +1035,10 @@ impl Scalar {
 
     /// Returns a size hint indicating how many entries of the return
     /// value of `to_radix_2w` are nonzero.
-    #[cfg(any(feature = "alloc", all(test, feature = "precomputed-tables")))]
+    #[cfg(all(
+        any(feature = "alloc", all(test, feature = "precomputed-tables")),
+        not(verify)
+    ))]
     pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
@@ -1055,7 +1075,7 @@ impl Scalar {
     /// $$
     /// with \\(-2\^w/2 \leq a_i < 2\^w/2\\) for \\(0 \leq i < (n-1)\\) and \\(-2\^w/2 \leq a_{n-1} \leq 2\^w/2\\).
     ///
-    #[cfg(any(feature = "alloc", feature = "precomputed-tables"))]
+    #[cfg(all(any(feature = "alloc", feature = "precomputed-tables"), not(verify)))]
     pub(crate) fn as_radix_2w(&self, w: usize) -> [i8; 64] {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);

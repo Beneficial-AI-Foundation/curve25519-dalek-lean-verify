@@ -129,6 +129,12 @@ def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
   else
     ok Choice.one
 
+/- [subtle::{subtle::ConstantTimeEq for u16}::ct_eq]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 348:12-348:51
+   Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq] -/
+@[rust_fun "subtle::{subtle::ConstantTimeEq<u16>}::ct_eq"]
+axiom subtle.ConstantTimeEqU16.ct_eq : U16 → U16 → Result subtle.Choice
+
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
    Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
@@ -358,5 +364,181 @@ axiom
     backend.serial.curve_models.AffineNielsPoint → subtle.Choice → Result
     (backend.serial.curve_models.AffineNielsPoint ×
     backend.serial.curve_models.AffineNielsPoint)
+
+/- [core::iter::range::{core::iter::range::Step for usize}::steps_between]:
+   Source: '/rustc/library/core/src/iter/range.rs', lines 263:16-263:84
+   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::steps_between] -/
+@[rust_fun
+  "core::iter::range::{core::iter::range::Step<usize>}::steps_between"]
+axiom core.iter.range.StepUsize.steps_between
+  : Usize → Usize → Result (Usize × (Option Usize))
+
+/- [core::iter::range::{core::iter::range::Step for usize}::forward_checked]:
+   Source: '/rustc/library/core/src/iter/range.rs', lines 274:16-274:73
+   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::forward_checked] -/
+@[rust_fun
+  "core::iter::range::{core::iter::range::Step<usize>}::forward_checked"]
+axiom core.iter.range.StepUsize.forward_checked
+  : Usize → Usize → Result (Option Usize)
+
+/- [core::iter::range::{core::iter::range::Step for usize}::backward_checked]:
+   Source: '/rustc/library/core/src/iter/range.rs', lines 282:16-282:74
+   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::backward_checked] -/
+@[rust_fun
+  "core::iter::range::{core::iter::range::Step<usize>}::backward_checked"]
+axiom core.iter.range.StepUsize.backward_checked
+  : Usize → Usize → Result (Option Usize)
+
+/- [core::iter::range::{core::iter::traits::iterator::Iterator<A> for core::ops::range::Range<A>}::next]:
+   Source: '/rustc/library/core/src/iter/range.rs', lines 849:4-849:35
+   Name pattern: [core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::next] -/
+@[rust_fun
+  "core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::next"]
+axiom core.iter.range.IteratorRangeA.next
+  {A : Type} (StepInst : core.iter.range.Step A) :
+  core.ops.range.Range A → Result ((Option A) × (core.ops.range.Range A))
+
+/- [core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<Clause0_Item, I> for I}::into_iter]:
+   Source: '/rustc/library/core/src/iter/traits/collect.rs', lines 319:4-319:27
+   Name pattern: [core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>}::into_iter] -/
+@[rust_fun
+  "core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>}::into_iter"]
+axiom core.iter.traits.collect.IntoIterator.Blanket.into_iter
+  {I : Type} {Clause0_Item : Type} (iteratorIteratorInst :
+  core.iter.traits.iterator.Iterator I Clause0_Item) :
+  I → Result I
+
+/- [subtle::{subtle::ConditionallySelectable for u8}::conditional_select]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select] -/
+@[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_select"]
+axiom subtle.ConditionallySelectableU8.conditional_select
+  : U8 → U8 → subtle.Choice → Result U8
+
+/- [subtle::{subtle::ConditionallySelectable for u8}::conditional_assign]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign] -/
+@[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign"]
+axiom subtle.ConditionallySelectableU8.conditional_assign
+  : U8 → U8 → subtle.Choice → Result U8
+
+/- [subtle::{subtle::ConditionallySelectable for u8}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap] -/
+@[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap"]
+axiom subtle.ConditionallySelectableU8.conditional_swap
+  : U8 → U8 → subtle.Choice → Result (U8 × U8)
+
+/- [zeroize::{zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 551:4-551:25
+   Name pattern: [zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize] -/
+@[rust_fun "zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize"]
+axiom zeroize.ZeroizeVec.zeroize
+  {Z : Type} (ZeroizeInst : zeroize.Zeroize Z) :
+  alloc.vec.Vec Z → Result (alloc.vec.Vec Z)
+
+/- [curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::ne]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:26-182:35 -/
+axiom backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.ne
+  :
+  backend.serial.curve_models.AffineNielsPoint →
+    backend.serial.curve_models.AffineNielsPoint → Result Bool
+
+/- [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ne]:
+   Source: 'curve25519-dalek/src/field.rs', lines 86:0-90:1 -/
+axiom field.PartialEqFieldElement51FieldElement51.ne
+  :
+  backend.serial.u64.field.FieldElement51 →
+    backend.serial.u64.field.FieldElement51 → Result Bool
+
+/- [curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::ne]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1 -/
+axiom scalar.PartialEqScalarScalar.ne
+  : scalar.Scalar → scalar.Scalar → Result Bool
+
+/- [curve25519_dalek::scalar::{core::cmp::Eq for curve25519_dalek::scalar::Scalar}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
+axiom scalar.EqScalar.assert_receiver_is_total_eq
+  : scalar.Scalar → Result Unit
+
+/- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_assign]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
+axiom scalar.ConditionallySelectableScalar.conditional_assign
+  : scalar.Scalar → scalar.Scalar → subtle.Choice → Result scalar.Scalar
+
+/- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_swap]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
+axiom scalar.ConditionallySelectableScalar.conditional_swap
+  :
+  scalar.Scalar → scalar.Scalar → subtle.Choice → Result (scalar.Scalar
+    × scalar.Scalar)
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_select]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 581:4-581:69
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select"]
+axiom subtle.ConditionallySelectableArray.conditional_select
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result (Array T N)
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 587:4-587:66
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
+axiom subtle.ConditionallySelectableArray.conditional_assign
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result (Array T N)
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap] -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
+axiom subtle.ConditionallySelectableArray.conditional_swap
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T) :
+  Array T N → Array T N → subtle.Choice → Result ((Array T N) × (Array T N))
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+axiom montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+  :
+  montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
+    → Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint)
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
+  :
+  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+    → Result montgomery.MontgomeryPoint
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+  :
+  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+    → Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint)
+
+/- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
+axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+  : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
+
+/- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
+axiom montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
+  : montgomery.MontgomeryPoint → Result Unit
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+axiom montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  :
+  montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
+    → Result montgomery.ProjectivePoint
 
 end curve25519_dalek

@@ -164,6 +164,7 @@ impl MontgomeryPoint {
     /// Curve25519 uses _clamped multiplication_, explained
     /// [here](https://neilmadden.blog/2020/05/28/whats-the-curve25519-clamping-all-about/).
     /// When in doubt, use [`Self::mul_clamped`].
+    #[cfg(not(verify))]
     pub fn mul_bits_be(&self, bits: impl Iterator<Item = bool>) -> MontgomeryPoint {
         // Algorithm 8 of Costello-Smith 2017
         let affine_u = FieldElement::from_bytes(&self.0);
@@ -176,7 +177,7 @@ impl MontgomeryPoint {
         // Go through the bits from most to least significant, using a sliding window of 2
         let mut prev_bit = false;
         for cur_bit in bits {
-            let choice: u8 = (prev_bit ^ cur_bit) as u8;
+            let choice: u8 = (prev_bit != cur_bit) as u8;
 
             debug_assert!(choice == 0 || choice == 1);
 
@@ -290,6 +291,7 @@ struct ProjectivePoint {
     pub W: FieldElement,
 }
 
+#[cfg_attr(verify, aeneas::rename("IdentityMontgomeryProjectivePoint"))]
 impl Identity for ProjectivePoint {
     fn identity() -> ProjectivePoint {
         ProjectivePoint {
@@ -400,14 +402,51 @@ define_mul_variants!(
 );
 
 /// Multiply this `MontgomeryPoint` by a `Scalar`.
+///
+/// NOTE: This implementation avoids using Scalar::bits_le() and iterator adapters
+/// (.rev(), .skip()) because Charon/Aeneas cannot extract the Iterator trait machinery.
+/// Instead, we inline the bit iteration using a while loop.
 impl Mul<&Scalar> for &MontgomeryPoint {
     type Output = MontgomeryPoint;
 
     /// Given `self` \\( = u\_0(P) \\), and a `Scalar` \\(n\\), return \\( u\_0(\[n\]P) \\)
     fn mul(self, scalar: &Scalar) -> MontgomeryPoint {
+        // Algorithm 8 of Costello-Smith 2017 (inlined from mul_bits_be)
+        let affine_u = FieldElement::from_bytes(&self.0);
+        let mut x0 = ProjectivePoint::identity();
+        let mut x1 = ProjectivePoint {
+            U: affine_u,
+            W: FieldElement::ONE,
+        };
+
+        // Go through the bits from most to least significant, using a sliding window of 2.
         // We multiply by the integer representation of the given Scalar. By scalar invariant #1,
-        // the MSB is 0, so we can skip it.
-        self.mul_bits_be(scalar.bits_le().rev().skip(1))
+        // the MSB (bit 255) is 0, so we can skip it and start from bit 254.
+        let scalar_bytes = scalar.as_bytes();
+        let mut prev_bit = false;
+        let mut i: isize = 254;
+        while i >= 0 {
+            let byte_idx = (i >> 3) as usize; // i / 8
+            let bit_idx = (i & 7) as usize; // i % 8
+            let cur_bit = ((scalar_bytes[byte_idx] >> bit_idx) & 1u8) == 1u8;
+
+            let choice: u8 = (prev_bit != cur_bit) as u8;
+
+            debug_assert!(choice == 0 || choice == 1);
+
+            ProjectivePoint::conditional_swap(&mut x0, &mut x1, choice.into());
+            differential_add_and_double(&mut x0, &mut x1, &affine_u);
+
+            prev_bit = cur_bit;
+            i -= 1;
+        }
+        // The final value of prev_bit above is scalar.bits()[0], i.e., the LSB of scalar
+        ProjectivePoint::conditional_swap(&mut x0, &mut x1, Choice::from(prev_bit as u8));
+        // Don't leave the bit in the stack
+        #[cfg(feature = "zeroize")]
+        prev_bit.zeroize();
+
+        x0.as_affine()
     }
 }
 
