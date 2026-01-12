@@ -1,7 +1,8 @@
 import fs from 'fs'
 import path from 'path'
 
-export interface FunctionRecord {
+// Raw record as stored in functions.json
+interface RawFunctionRecord {
   lean_name: string
   rust_name: string | null
   source: string | null
@@ -18,6 +19,11 @@ export interface FunctionRecord {
   spec_statement: string | null
 }
 
+// Extended record with computed dependents field
+export interface FunctionRecord extends RawFunctionRecord {
+  dependents: string[]  // functions that depend on this one
+}
+
 export interface FunctionsData {
   functions: FunctionRecord[]
 }
@@ -30,7 +36,26 @@ export default {
   load(): FunctionsData {
     const functionsPath = path.join(process.cwd(), 'functions.json')
     const content = fs.readFileSync(functionsPath, 'utf-8')
-    const parsed = JSON.parse(content) as FunctionsData
-    return parsed
+    const parsed = JSON.parse(content) as { functions: RawFunctionRecord[] }
+
+    // Build reverse dependency map: for each function, who uses it?
+    const dependentsMap = new Map<string, string[]>()
+
+    for (const fn of parsed.functions) {
+      for (const dep of fn.dependencies) {
+        if (!dependentsMap.has(dep)) {
+          dependentsMap.set(dep, [])
+        }
+        dependentsMap.get(dep)!.push(fn.lean_name)
+      }
+    }
+
+    // Add dependents field to each function
+    const functions: FunctionRecord[] = parsed.functions.map(fn => ({
+      ...fn,
+      dependents: dependentsMap.get(fn.lean_name) ?? []
+    }))
+
+    return { functions }
   }
 }

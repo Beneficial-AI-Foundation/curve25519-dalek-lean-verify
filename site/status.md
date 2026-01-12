@@ -4,10 +4,14 @@ layout: home
 ---
 
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
 import { data } from './.vitepress/data/status.data'
 import { data as githubData } from './.vitepress/data/github.data'
-import StatusTable from './.vitepress/components/StatusTable.vue'
 import { useGitHubMatching } from './.vitepress/composables/useGitHubMatching'
+
+const StatusTable = defineAsyncComponent(() =>
+  import('./.vitepress/components/StatusTable.vue')
+)
 
 const { entries } = data
 const { findItemsForFunction } = useGitHubMatching()
