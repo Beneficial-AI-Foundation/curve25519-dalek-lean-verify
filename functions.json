@@ -64,10 +64,12 @@
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    ∃ c, add self other = ok c ∧\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint := by ...",
+   "spec_docstring":
+   "/-- Spec for `add`.\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -78,7 +80,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
@@ -150,10 +152,12 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem as_projective_spec\n    (q : CompletedPoint) (hq_valid : q.IsValid) :\n    ∃ proj, as_projective q = ok proj ∧\n    proj.IsValid ∧ proj.toPoint = q.toPoint := by ...",
+   "spec_docstring":
+   "/--\nVerification of the `as_projective` function.\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
@@ -164,7 +168,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
@@ -410,10 +414,12 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem double_spec\n    (q : ProjectivePoint) (hq_valid : q.IsValid) :\n    ∃ c, ProjectivePoint.double q = ok c ∧\n    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by ...",
+   "spec_docstring":
+   "/--\nVerification of the `double` function.\nThe theorem states that the Rust implementation of point doubling corresponds\nexactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -424,7 +430,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -1237,10 +1243,12 @@
    "is_extraction_artifact": false,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_assign_spec\n    (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    ∃ res,\n      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign\n        self other choice = ok res ∧\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) := by ...",
+   "spec_docstring":
+   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_assign`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `other[i]` when `choice = 1`,\n  and equals `self[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `other`;\n  when `choice = Choice.zero`, the result equals `self`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
@@ -1252,12 +1260,14 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    ∃ res,\n      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select\n        a b choice = ok res ∧\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by ...",
+   "spec_docstring":
+   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_select`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
@@ -1268,7 +1278,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": false,
