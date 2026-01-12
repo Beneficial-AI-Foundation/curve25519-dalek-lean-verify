@@ -52,13 +52,7 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
   + 2 ^ 40 * (limb.val >>> 40 % 2 ^ 8)
   + 2 ^ 48 * (limb.val >>> 48 % 2 ^ 8)
   := by
-  bvify 64 at *
-  bv_decide
-
-
--- TODO: move to standard library
-attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
-
+  bv_tac 64
 
 -- We also need something like this
 theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
@@ -71,30 +65,14 @@ theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
   + 2 ^ 48 * (limb.val >>> 44 % 2 ^ 8) =
   2 ^ 4 * limb.val
   := by
-  bvify 64 at *
-  /- Small trick when bvify doesn't work: we can prove the property we
-     want about bit-vectors, then convert it back to natural numbers with
-     `natify` and `simp_scalar`. In particular, `simp_scalar` is good at simplifying
-     things like `x % 2 ^ 32` when `x < 2^32`, etc. -/
-  have : BitVec.ofNat 64 (limb.val <<< 4) = limb.bv <<< 4 := by
-    natify
-    simp_scalar
-  simp [this]
-  bv_decide
+  bv_tac 64
 
-
--- This is specific to the problem below
 theorem decompose_or_limbs (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
-  ((limb0.val >>> 48 ||| limb1.val <<< 4 % U64.size) % 2 ^ 8) =
-  (limb0.val >>> 48 % 2 ^ 8) +
-  ((limb1.val <<< 4) % 2 ^ 8) := by
-  bvify 64 at *
-  -- The idea is to do something similar to the proof above
-
-  sorry
+  ((limb0.val >>> 48 ||| limb1.val <<< 4) % 2 ^ 8) =
+  (limb0.val >>> 48 % 2 ^ 8) + ((limb1.val <<< 4) % 2 ^ 8) := by
+  bv_tac 64
 
 /-! ## Spec for `to_bytes` -/
-
 
 /-- Byte-by-byte specification for `to_bytes` -/
 theorem to_bytes_spec' (limbs : Array U64 5#usize) :
@@ -135,6 +113,15 @@ theorem to_bytes_spec' (limbs : Array U64 5#usize) :
       | _  => 0
     := by
   unfold to_bytes
+  progress
+  progress
+  rename_i h_bounds _ _ _
+  have h_bound0 := h_bounds 0
+  have h_bound1 := h_bounds 1
+  have h_bound2 := h_bounds 2
+  have h_bound3 := h_bounds 3
+  have h_bound4 := h_bounds 4
+  -- Calling progress* here takes a long time.
   sorry
 
 
