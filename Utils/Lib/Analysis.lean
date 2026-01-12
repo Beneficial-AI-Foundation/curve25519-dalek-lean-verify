@@ -39,6 +39,9 @@ instance : MonadEnv EnvM where
     Convention: for function `foo`, the spec theorem is `foo_spec`. -/
 def specSuffix : String := "_spec"
 
+/-- Get the spec theorem name for a function -/
+def getSpecName (name : Name) : Name := name.appendAfter specSuffix
+
 /-- Get direct dependencies of a constant from its value expression -/
 def getDirectDeps (env : Environment) (name : Name) : Except String (Array Name) := do
   let some constInfo := env.find? name
@@ -53,8 +56,7 @@ def filterToKnownFunctions (knownNames : Std.HashSet Name) (deps : Array Name) :
 
 /-- Check if a spec theorem exists for the given function name -/
 def hasSpecTheorem (env : Environment) (name : Name) : Bool :=
-  let specName := name.appendAfter specSuffix
-  env.find? specName |>.isSome
+  env.find? (getSpecName name) |>.isSome
 
 /-- Check if a proof directly contains sorry (sorryAx) -/
 def proofContainsSorry (env : Environment) (name : Name) : Bool :=
@@ -67,7 +69,7 @@ def proofContainsSorry (env : Environment) (name : Name) : Bool :=
 
 /-- Check if a function is verified (has spec theorem without direct sorry) -/
 def isVerified (env : Environment) (name : Name) : Bool :=
-  let specName := name.appendAfter specSuffix
+  let specName := getSpecName name
   match env.find? specName with
   | some _ => !proofContainsSorry env specName
   | none => false
@@ -75,7 +77,7 @@ def isVerified (env : Environment) (name : Name) : Bool :=
 /-- Get the spec theorem statement as a pretty-printed string.
     Returns the theorem type (the proposition being proved). -/
 def getSpecStatement (env : Environment) (name : Name) : IO (Option String) := do
-  let specName := name.appendAfter specSuffix
+  let specName := getSpecName name
   match env.find? specName with
   | none => return none
   | some constInfo =>
@@ -92,10 +94,71 @@ structure SpecParts where
   statement : Option String := none
   deriving Repr, Inhabited
 
+/-- Result of processing a statement line: the processed line and whether it ends the statement -/
+structure StatementLineResult where
+  line : String
+  isEnd : Bool
+
+/-- Process a line that may be part of a theorem statement.
+    Truncates at `:= by` or `:=` and marks as end of statement. -/
+def processStatementLine (line : String) : StatementLineResult :=
+  let parts := line.splitOn ":= by"
+  if parts.length > 1 then
+    { line := parts[0]!.trimRight ++ " := by ...", isEnd := true }
+  else if line.trimRight.endsWith ":=" then
+    { line := line.trimRight ++ " ...", isEnd := true }
+  else
+    { line := line, isEnd := false }
+
+/-- Parse source lines into docstring and statement components -/
+def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
+  let mut docstringLines : Array String := #[]
+  let mut statementLines : Array String := #[]
+  let mut inDocstring := false
+  let mut docstringDone := false
+
+  for line in relevantLines do
+    if !docstringDone then
+      -- Check for docstring start
+      if line.trimLeft.startsWith "/-" then
+        inDocstring := true
+        docstringLines := docstringLines.push line
+      else if inDocstring then
+        docstringLines := docstringLines.push line
+        if (line.splitOn "-/").length > 1 then
+          inDocstring := false
+          docstringDone := true
+      else if line.trimLeft.startsWith "@[" then
+        -- Skip attribute declarations (e.g., @[progress], @[simp])
+        docstringDone := true
+        continue
+      else if line.trimLeft.startsWith "theorem" then
+        docstringDone := true
+        let result := processStatementLine line
+        statementLines := statementLines.push result.line
+        if result.isEnd then
+          break
+      else
+        continue
+    else
+      -- Processing statement (skip attribute lines)
+      if line.trimLeft.startsWith "@[" then
+        continue
+      let result := processStatementLine line
+      statementLines := statementLines.push result.line
+      if result.isEnd then
+        break
+
+  let docstring := if docstringLines.isEmpty then none
+    else some (String.intercalate "\n" docstringLines.toList)
+  let statement := if statementLines.isEmpty then none
+    else some (String.intercalate "\n" statementLines.toList)
+  return { docstring, statement }
+
 /-- Get the spec theorem docstring and statement from the source file.
     Returns (docstring, statement) where statement excludes the proof. -/
 def getSpecParts (env : Environment) (name : Name) : IO SpecParts := do
-  let specName := name.appendAfter specSuffix
+  let specName := getSpecName name
   -- Check if the theorem exists
   if env.find? specName |>.isNone then return {}
   -- Get declaration ranges using the EnvM reader monad
@@ -106,72 +169,18 @@ def getSpecParts (env : Environment) (name : Name) : IO SpecParts := do
     -- Get the module that contains this declaration
     let some modIdx := env.getModuleIdxFor? specName | return {}
     let moduleName := env.allImportedModuleNames[modIdx.toNat]!
-    -- Convert module name to file path (e.g., Curve25519Dalek.Specs.Foo -> Curve25519Dalek/Specs/Foo.lean)
+    -- Convert module name to file path
     let filePath : System.FilePath := moduleName.toString.replace "." "/" ++ ".lean"
-    -- Check if file exists
     if !(← filePath.pathExists) then return {}
-    -- Read the source file
+    -- Read and parse the source file
     let contents ← IO.FS.readFile filePath
     let lines := contents.splitOn "\n"
-    -- Extract lines from start to end (1-indexed in Lean positions)
     let range := ranges.range
     let startLine := range.pos.line
     let endLine := range.endPos.line
     if startLine == 0 || endLine == 0 then return {}
     let relevantLines := lines.toArray.extract (startLine - 1) endLine
-    -- Separate docstring from statement
-    let mut docstringLines : Array String := #[]
-    let mut statementLines : Array String := #[]
-    let mut inDocstring := false
-    let mut docstringDone := false
-    for line in relevantLines do
-      if !docstringDone then
-        -- Check for docstring start
-        if line.trimLeft.startsWith "/-" then
-          inDocstring := true
-          docstringLines := docstringLines.push line
-        else if inDocstring then
-          docstringLines := docstringLines.push line
-          if (line.splitOn "-/").length > 1 then
-            inDocstring := false
-            docstringDone := true
-        else if line.trimLeft.startsWith "@[" then
-          -- Skip attribute declarations (e.g., @[progress], @[simp])
-          -- Mark docstring as done so we continue looking for theorem
-          docstringDone := true
-          continue
-        else if line.trimLeft.startsWith "theorem" then
-          -- Start of statement
-          docstringDone := true
-          -- Check if this line contains `:= by`
-          let parts := line.splitOn ":= by"
-          if parts.length > 1 then
-            statementLines := statementLines.push (parts[0]!.trimRight ++ " := by ...")
-          else if line.trimRight.endsWith ":=" then
-            statementLines := statementLines.push (line.trimRight ++ " ...")
-          else
-            statementLines := statementLines.push line
-        else
-          -- Skip empty lines or other content before docstring/statement
-          continue
-      else
-        -- Processing statement (skip any remaining attribute lines)
-        if line.trimLeft.startsWith "@[" then
-          continue
-        let parts := line.splitOn ":= by"
-        if parts.length > 1 then
-          statementLines := statementLines.push (parts[0]!.trimRight ++ " := by ...")
-          break
-        else if line.trimRight.endsWith ":=" then
-          statementLines := statementLines.push (line.trimRight ++ " ...")
-          break
-        else
-          statementLines := statementLines.push line
-    let docstring := if docstringLines.isEmpty then none
-      else some (String.intercalate "\n" docstringLines.toList)
-    let statement := if statementLines.isEmpty then none
-      else some (String.intercalate "\n" statementLines.toList)
-    return { docstring, statement }
+    return parseSpecSource relevantLines
 
 /-- Result of analyzing a single function -/
 structure AnalysisResult where
@@ -238,25 +247,13 @@ partial def getTransitiveDeps (env : Environment) (knownNames : Std.HashSet Name
     IO.eprintln err
   return result
 
-/-- Pure version that silently ignores errors (for backwards compatibility) -/
-partial def getTransitiveDeps' (env : Environment) (knownNames : Std.HashSet Name) (name : Name)
-    (visited : Std.HashSet Name := {}) : Std.HashSet Name :=
-  if visited.contains name then visited
-  else
-    let visited := visited.insert name
-    match getDirectDeps env name with
-    | .error _ => visited
-    | .ok deps =>
-      let filteredDeps := filterToKnownFunctions knownNames deps
-      filteredDeps.foldl (fun acc dep => getTransitiveDeps' env knownNames dep acc) visited
-
 /-- Check if a function and all its transitive dependencies are verified -/
 def isFullyVerified (env : Environment) (knownNames : Std.HashSet Name) (name : Name) : Bool :=
   -- First check if the function itself is verified
   if !isVerified env name then false
   else
     -- Get all transitive dependencies (excluding the function itself)
-    let allDeps := getTransitiveDeps' env knownNames name
+    let (allDeps, _) := getTransitiveDepsWithErrors env knownNames name
     let transitiveDeps := allDeps.erase name
     -- Check if all transitive dependencies are verified
     transitiveDeps.all (isVerified env)

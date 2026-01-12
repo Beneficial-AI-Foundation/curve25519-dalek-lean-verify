@@ -28,12 +28,8 @@ open Utils.Config
 ## Helper Functions
 -/
 
-/-- Check if string `s` ends with suffix `sfx` -/
-def String.endsWith' (s sfx : String) : Bool :=
-  s.length >= sfx.length && s.drop (s.length - sfx.length) == sfx
-
 /-- Check if string `s` contains substring `sub` -/
-def String.containsSubstr' (s sub : String) : Bool :=
+def containsSubstr (s sub : String) : Bool :=
   (s.splitOn sub).length > 1
 
 /-!
@@ -54,7 +50,7 @@ def hasExcludedPrefix (name : Name) : Bool :=
 /-- Check if a name ends with an excluded suffix -/
 def hasExcludedSuffix (name : Name) : Bool :=
   let str := name.toString
-  excludedSuffixes.any fun sfx => String.endsWith' str sfx
+  excludedSuffixes.any fun sfx => str.endsWith sfx
 
 /-- Check if a name passes basic filters (prefix and suffix) -/
 def passesBasicFilters (name : Name) : Bool :=
@@ -72,14 +68,14 @@ not from external sources like /rustc/ (stdlib) or /cargo/registry/ (deps).
 -/
 
 /-- Check if a source path indicates a relevant (crate-internal) function -/
-def isRelevantSource (source : Option String) (crateName : String) : Bool :=
+def isRelevantSource (source : Option String) (crate : String) : Bool :=
   match source with
   | none => false  -- No source info -> not relevant
   | some s =>
     -- Must contain crate name and not be from external sources
-    String.containsSubstr' s crateName &&
+    containsSubstr s crate &&
     !s.startsWith "/" &&  -- External paths start with /rustc/ or /cargo/
-    !String.containsSubstr' s "/cargo/registry/"
+    !containsSubstr s "/cargo/registry/"
 
 /-!
 ## Pipeline Implementation
@@ -117,14 +113,21 @@ def computeNestedChildren (names : Array Name) : Std.HashMap Name (Array Name) :
   let mut result : Std.HashMap Name (Array Name) := {}
   for parent in names do
     let children := names.filter fun child => isNestedChild parent child
-    if children.size > 0 then
+    if !children.isEmpty then
       result := result.insert parent children
   return result
 
-/-- Filter out nested children from a list, keeping only top-level functions -/
-def filterOutNestedChildren (names : Array Name) : Array Name :=
-  names.filter fun name =>
-    !names.any fun other => isNestedChild other name
+/-- Filter out nested children from a list, keeping only top-level functions.
+    A name is kept if no other name in the list is a proper prefix of it. -/
+def filterOutNestedChildren (names : Array Name) : Array Name := Id.run do
+  -- Build set of all names that are children of some other name
+  let mut childSet : Std.HashSet Name := {}
+  for parent in names do
+    for child in names do
+      if isNestedChild parent child then
+        childSet := childSet.insert child
+  -- Keep only names not in the child set
+  return names.filter (!childSet.contains ·)
 
 /-- Build a complete FunctionRecord from raw data -/
 def buildFunctionRecord
@@ -132,7 +135,7 @@ def buildFunctionRecord
     (rawData : RawFunctionData)
     (relevantNames : Std.HashSet Name)
     (nestedChildrenMap : Std.HashMap Name (Array Name))
-    (crateName : String)
+    (crate : String)
     : IO FunctionRecord := do
   let docInfo := rawData.docInfo
   let lineRange := match docInfo.lineStart, docInfo.lineEnd with
@@ -140,7 +143,7 @@ def buildFunctionRecord
     | _, _ => none
   let filteredDeps := rawData.rawDeps.filter (relevantNames.contains ·)
   let nestedChildren := nestedChildrenMap.getD rawData.name #[]
-  let isRelevant := isRelevantSource docInfo.source crateName
+  let isRelevant := isRelevantSource docInfo.source crate
   let specParts ← getSpecParts env rawData.name
   return {
     leanName := rawData.name
@@ -161,7 +164,7 @@ def buildFunctionRecord
 def buildFunctionRecords
     (env : Environment)
     (moduleName : Name := funsModule)
-    (crateName' : String := crateName)
+    (crate : String := crateName)
     : IO (Array FunctionRecord) := do
   -- Step 1: Get all definitions from the module
   let allDefs := getModuleDefinitions env moduleName
@@ -182,12 +185,12 @@ def buildFunctionRecords
   -- (functions whose source is from the crate)
   let mut relevantNames : Std.HashSet Name := {}
   for rawData in rawDataArray do
-    if isRelevantSource rawData.docInfo.source crateName' then
+    if isRelevantSource rawData.docInfo.source crate then
       relevantNames := relevantNames.insert rawData.name
 
   -- Step 7: Build FunctionRecords (deps filtered to relevant set)
   let records ← rawDataArray.mapM fun rawData =>
-    buildFunctionRecord env rawData relevantNames nestedChildrenMap crateName'
+    buildFunctionRecord env rawData relevantNames nestedChildrenMap crate
 
   -- Step 8: Sort alphabetically
   return records.qsort (·.leanName.toString < ·.leanName.toString)
@@ -196,9 +199,9 @@ def buildFunctionRecords
 def getRelevantFunctions
     (env : Environment)
     (moduleName : Name := funsModule)
-    (crateName' : String := crateName)
+    (crate : String := crateName)
     : IO (Array FunctionRecord) := do
-  let all ← buildFunctionRecords env moduleName crateName'
+  let all ← buildFunctionRecords env moduleName crate
   return all.filter (·.isRelevant)
 
 /-!
@@ -210,18 +213,9 @@ def loadEnvironment : IO Environment := do
   Lean.initSearchPath (← Lean.findSysroot)
   importModules #[{ module := mainModule }] {}
 
-/-!
-## Legacy API (for backwards compatibility)
--/
-
-/-- Get all function names as strings (legacy API) -/
+/-- Get all function names as strings (used by SyncStatus) -/
 def getFunsDefinitionsAsStrings (env : Environment) : IO (Array String) := do
   let records ← getRelevantFunctions env
   return records.map (·.leanName.toString)
-
-/-- Get all function definitions (legacy API, returns Names) -/
-def getFunsDefinitions (env : Environment) : IO (Array Name) := do
-  let records ← getRelevantFunctions env
-  return records.map (·.leanName)
 
 end Utils.Lib.ListFuns
