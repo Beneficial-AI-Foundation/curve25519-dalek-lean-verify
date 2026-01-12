@@ -133,7 +133,7 @@ def buildFunctionRecord
     (relevantNames : Std.HashSet Name)
     (nestedChildrenMap : Std.HashMap Name (Array Name))
     (crateName : String)
-    : FunctionRecord :=
+    : IO FunctionRecord := do
   let docInfo := rawData.docInfo
   let lineRange := match docInfo.lineStart, docInfo.lineEnd with
     | some s, some e => some (s, e)
@@ -141,7 +141,9 @@ def buildFunctionRecord
   let filteredDeps := rawData.rawDeps.filter (relevantNames.contains ·)
   let nestedChildren := nestedChildrenMap.getD rawData.name #[]
   let isRelevant := isRelevantSource docInfo.source crateName
-  { leanName := rawData.name
+  let specParts ← getSpecParts env rawData.name
+  return {
+    leanName := rawData.name
     rustName := docInfo.rustName
     source := docInfo.source
     lineRange := lineRange
@@ -150,7 +152,10 @@ def buildFunctionRecord
     isRelevant := isRelevant
     isSpecified := hasSpecTheorem env rawData.name
     isVerified := isVerified env rawData.name
-    isFullyVerified := isFullyVerified env relevantNames rawData.name }
+    isFullyVerified := isFullyVerified env relevantNames rawData.name
+    specDocstring := specParts.docstring
+    specStatement := specParts.statement
+  }
 
 /-- Main pipeline: build all FunctionRecords from a module -/
 def buildFunctionRecords
@@ -181,7 +186,7 @@ def buildFunctionRecords
       relevantNames := relevantNames.insert rawData.name
 
   -- Step 7: Build FunctionRecords (deps filtered to relevant set)
-  let records := rawDataArray.map fun rawData =>
+  let records ← rawDataArray.mapM fun rawData =>
     buildFunctionRecord env rawData relevantNames nestedChildrenMap crateName'
 
   -- Step 8: Sort alphabetically

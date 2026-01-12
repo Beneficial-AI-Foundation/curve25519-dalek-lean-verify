@@ -1,6 +1,8 @@
 {"functions":
  [{"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}",
@@ -13,6 +15,8 @@
    ["curve25519_dalek.backend.serial.curve_models.IdentityProjectivePoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}",
@@ -25,6 +29,8 @@
    ["curve25519_dalek.montgomery.IdentityProjectivePoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/mod.rs",
    "rust_name": "curve25519_dalek::backend::get_selected_backend",
    "nested_children": [],
@@ -35,6 +41,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -50,6 +58,8 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -65,6 +75,8 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::clone",
@@ -77,6 +89,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::CompletedPoint}::clone",
@@ -89,6 +103,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::clone",
@@ -101,6 +117,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\n∃ e,\nas_extended q = ok e ∧\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -114,6 +134,8 @@
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
@@ -127,6 +149,8 @@
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
@@ -140,6 +164,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select",
@@ -153,6 +179,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
@@ -166,6 +194,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
@@ -179,6 +209,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::default",
@@ -192,6 +224,8 @@
    ["curve25519_dalek.backend.serial.curve_models.IdentityAffineNielsPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::default",
@@ -205,6 +239,8 @@
    ["curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq",
@@ -217,6 +253,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity",
@@ -229,6 +267,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
@@ -241,6 +281,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity",
@@ -253,6 +295,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg",
@@ -266,6 +310,8 @@
    ["curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
@@ -279,6 +325,8 @@
    ["curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq",
@@ -292,6 +340,10 @@
    ["curve25519_dalek.field.PartialEqFieldElement51FieldElement51.eq"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_extended_spec (q : ProjectivePoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :\n∃ e,\nas_extended q = ok e ∧\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * Z) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z^2) % p ∧\nT' % p = (X * Y) % p\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·Z (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z² (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the (division-free) conversion from projective ℙ² coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended",
@@ -306,6 +358,8 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -322,6 +376,8 @@
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -337,6 +393,8 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -352,6 +410,8 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid",
@@ -369,6 +429,8 @@
     "curve25519_dalek.field.PartialEqFieldElement51FieldElement51.eq"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::zeroize",
@@ -382,6 +444,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ZeroizeFieldElement51.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::zeroize",
@@ -395,6 +459,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ZeroizeFieldElement51.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
@@ -413,6 +479,10 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem add_assign_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    ∃ result, add_assign a b = ok result ∧\n    (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 54) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign`**:\n- Does not overflow when limb sums don't exceed `U64.max`\n- Returns a field element where each limb is the sum of corresponding input limbs\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54 -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign",
@@ -425,6 +495,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem add_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    ∃ result, add a b = ok result ∧\n    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧\n    (∀ i < 5, result[i]!.val < 2^54) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add`**:\n- Does not overflow when limb sums don't exceed U64.max\n- Returns a field element where each limb is the sum of corresponding input limbs\n- This is element-wise addition, not modular field addition (use reduce for that)\n- Input bounds: both inputs have limbs < 2^53\n- Output bounds: output has limbs < 2^54\n- Simply wraps add_assign -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add",
@@ -438,6 +512,8 @@
    ["curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone",
@@ -450,6 +526,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
@@ -463,6 +541,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
@@ -475,6 +555,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap",
@@ -488,6 +570,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    ∃ result, as_bytes self = ok result ∧\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.FieldElement51.as_bytes`**:\n\nFunction was deprecated since 4.1.4 and renamed to `to_bytes`. Simply calls the other function. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes",
@@ -501,6 +587,9 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    ∃ result, from_bytes bytes = ok result ∧\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes",
@@ -514,6 +603,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_limbs_spec (a : Array U64 5#usize) :\n    ∃ r, from_limbs a = ok r ∧\n    r = a ∧ Field51_as_Nat r = Field51_as_Nat a := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.from_limbs`**:\n- No panic (always returns successfully)\n- The result is identical to the input limbs array\n- The natural number representation of the result equals that of the input\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs",
@@ -526,6 +619,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    ∃ r_inv, negate r = ok r_inv ∧\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:\n- No panic (always returns successfully)\n- The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,\n  Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- Requires that input limbs of r are bounded to avoid underflow:\n  - Limb 0 must be ≤ 36028797018963664\n  - Limbs 1-4 must be ≤ 36028797018963952\n  To make the theorem more readable we use a single bound for all limbs. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate",
@@ -539,6 +636,10 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "\n\ntheorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    ∃ r, pow2k a k = ok r ∧\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52)\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.pow2k`**:\n- No panic (always returns successfully) when k > 0\n- The result, when converted to a natural number, is congruent to the input raised to the (2^k)-th power modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
@@ -553,6 +654,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    ∃ result, reduce limbs = ok result ∧\n    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧\n    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- Does not overflow and hence returns a result\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
@@ -566,6 +671,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    ∃ r, square a = ok r ∧\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2 ^ 52) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square`**:\n- No panic (always returns successfully)\n- The result, when converted to a natural number, is congruent to the square of the input modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^52\n- Note: this implements the `pow2k` function with k=1\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
@@ -579,6 +688,10 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    ∃ r, square2 a = ok r ∧\n    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:\n- No panic (always returns successfully)\n- The result, when converted to a natural number, is congruent to twice the square of the input modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^53\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
@@ -592,6 +705,10 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    ∃ result, to_bytes self = ok result ∧\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:\n\nThis function converts a field element to its canonical 32-byte little-endian representation.\nThe implementation performs reduction modulo p = 2^255-19 to ensure the result is in\ncanonical form.\n\nThe algorithm:\n1. Reduces the field element using `reduce` to ensure all limbs are within bounds\n2. Performs a final conditional reduction to ensure the result is < p\n3. Packs the 5 limbs (each 51 bits) into 32 bytes in little-endian format\n\nSpecification:\n- The function succeeds (no panic)\n- The natural number interpretation of the byte array is congruent to the field element value modulo p\n- The byte array represents the unique canonical form (0 ≤ value < p)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
@@ -605,6 +722,8 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::MulAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::mul_assign",
@@ -618,6 +737,9 @@
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem mul_spec (lhs rhs : Array U64 5#usize)\n    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :\n    ∃ r, mul lhs rhs = ok r ∧\n    Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52) := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul",
@@ -632,6 +754,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem neg_spec (r : backend.serial.u64.field.FieldElement51)\n    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    ∃ r_inv, backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg r = ok r_inv ∧\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.FieldElement51.neg`**:\n- No panic (always returns successfully under standard bounds)\n- Delegates to `negate`, hence returns the additive inverse modulo p\n- Input bound assumption: all limbs of the input are < 2^54 (as in `negate_spec`)\n- Output bound matches `negate_spec` -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg",
@@ -645,6 +771,8 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign",
@@ -658,6 +786,10 @@
    ["curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem sub_spec (a b : Array U64 5#usize)\n    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)\n    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    ∃ d, sub a b = ok d ∧\n    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:\n- No panic (always returns successfully when bounds are satisfied)\n- The result d satisfies the field subtraction property:\n\n  Field51_as_Nat(d) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently\n  Field51_as_Nat(d) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)\n\n- Requires that input limbs are bounded:\n  - For a: limbs must allow addition with 16*p without U64 overflow\n    - a[0] must be ≤ 18410715276690587951 (= 2^64 - 1 - 36028797018963664)\n    - a[1..4] must be ≤ 18410715276690587663 (= 2^64 - 1 - 36028797018963952)\n  - For b: limbs must be ≤ the constants (representing 16*p) to avoid underflow\n    - b[0] must be ≤ 36028797018963664\n    - b[1..4] must be ≤ 36028797018963952\n  To make the theorem more easily readable and provable, we\n  replace these precise bounds with the slightly looser bounds\n  a[i] < 2^63  and b[i] < 2^54\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub",
@@ -671,6 +803,8 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}::zeroize",
@@ -683,6 +817,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{core::clone::Clone for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::clone",
@@ -695,6 +831,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut",
@@ -707,6 +845,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index<usize, u64> for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index",
@@ -719,6 +859,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem add_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :\n    ∃ v, add a b = ok v ∧\n    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧\n    Scalar52_as_Nat v < L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.add`**:\n- Requires the input values to be bounded by  2 ^ 259\n- The result represents the sum of the two input scalars modulo L\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
@@ -730,6 +874,10 @@
    "dependencies": ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    ∃ m, as_montgomery u = ok m ∧\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 62) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.as_montgomery`**:\n- No panic (always returns successfully)\n- The result represents the input scalar multiplied by the Montgomery constant R = 2^260, modulo L\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
@@ -743,6 +891,10 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)\n    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)\n    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :\n    ∃ result, conditional_add_l self condition = ok result ∧\n    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 < L) ∧\n    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧\n    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n- Carry value not specified (not used by sub)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
@@ -755,6 +907,10 @@
    "dependencies": []},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem from_bytes_spec (b : Array U8 32#usize) :\n    ∃ u,\n    from_bytes b = ok u ∧\n    Scalar52_as_Nat u = U8x32_as_Nat b ∧\n    ∀ i < 5, u[i]!.val < 2 ^ 52\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:\n- No panic (always returns successfully)\n- The result represents the same number as the input byte array\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
@@ -769,6 +925,10 @@
    ["curve25519_dalek.backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    ∃ u, from_bytes_wide b = ok u ∧\n    Scalar52_as_Nat u = U8x64_as_Nat b % L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:\n- No panic (always returns successfully)\n- The result represents the input byte array reduced modulo L (canonical form) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -784,6 +944,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_montgomery_spec (self : Scalar52)\n    (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    ∃ u, from_montgomery self = ok u ∧\n    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.from_montgomery`**:\n- No panic (always returns successfully)\n- The result represents the input scalar divided by the Montgomery constant R = 2^260, modulo L\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
@@ -797,6 +961,10 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :\n    ∃ w, montgomery_mul m m' = ok w ∧\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_mul`**:\n- No panic (always returns successfully)\n- The result w satisfies the Montgomery multiplication property:\n  (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
@@ -811,6 +979,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem montgomery_reduce_spec (a : Array U128 9#usize)\n    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :\n    ∃ m,\n    montgomery_reduce a = ok m ∧\n    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 62)\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
@@ -829,6 +1001,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :\n    ∃ w,\n    montgomery_square m = ok w ∧\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62)\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_square`**:\n- No panic (always returns successfully)\n- The result w satisfies the Montgomery squaring property:\n  (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
@@ -843,6 +1019,8 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
@@ -856,6 +1034,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem mul_internal_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    ∃ result, mul_internal a b = ok (result) ∧\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:\n- Does not error and hence returns a result\n- The result represents the product of the two input field elements\n- Requires that each input limb is at most 62 bits to prevent overflow -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
@@ -870,6 +1052,8 @@
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
@@ -884,6 +1068,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :\n    ∃ result, square_internal a = ok (result) ∧\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `square_internal`**:\n- Does not error and hence returns a result\n- The result represents the square of the input field element\n- Requires each limb to be less than 62 bits to prevent overflow\n(The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
@@ -898,6 +1086,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem sub_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)\n    (hb' : Scalar52_as_Nat b ≤ L) :\n    ∃ result, sub a b = ok result ∧\n    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧\n    Scalar52_as_Nat result < L ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 52) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:\n- Requires bounded limbs for both inputs\n- Requires both inputs to be bounded from above\n- The result represents (a - b) mod L\n- The result has bounded limbs and is canonical -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
@@ -912,6 +1104,10 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (u : Scalar52) :\n    ∃ b, to_bytes u = ok b ∧\n    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat b < L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- No panic (always returns successfully)\n- The result byte array represents the same number as the input unpacked scalar modulo L\n- The result is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
@@ -923,6 +1119,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::zeroize",
@@ -935,6 +1133,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem m_spec (x y : U64) :\n    ∃ result, m x y = ok (result) ∧\n    result.val = x.val * y.val := by ...",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.scalar.m`**:\n- Does not overflow and hence returns a result\n- The result equals the product of the two input values -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::scalar::m",
    "nested_children": [],
@@ -945,6 +1147,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/mod.rs",
    "rust_name": "curve25519_dalek::backend::variable_base_mul",
    "nested_children": [],
@@ -957,6 +1161,10 @@
     "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem add_spec (self other : EdwardsPoint)\n\n    (h_self_bounds : ∀ i < 5,\n      self.X[i]!.val < 2 ^ 53 ∧\n      self.Y[i]!.val < 2 ^ 53 ∧\n      self.Z[i]!.val < 2 ^ 53 ∧\n      self.T[i]!.val < 2 ^ 53)\n\n    (h_other_bounds : ∀ i < 5,\n      other.X[i]!.val < 2 ^ 53 ∧\n      other.Y[i]!.val < 2 ^ 53 ∧\n      other.Z[i]!.val < 2 ^ 53 ∧\n      other.T[i]!.val < 2 ^ 53)\n\n    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)\n    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :\n\n    ∃ result, add self other = ok result ∧\n\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    let X₁ := Field51_as_Nat self.X\n    let Y₁ := Field51_as_Nat self.Y\n    let Z₁ := Field51_as_Nat self.Z\n    let T₁ := Field51_as_Nat self.T\n\n    let X₂ := Field51_as_Nat other.X\n    let Y₂ := Field51_as_Nat other.Y\n    let Z₂ := Field51_as_Nat other.Z\n    let T₂ := Field51_as_Nat other.T\n\n    let X₃ := Field51_as_Nat result.X\n    let Y₃ := Field51_as_Nat result.Y\n    let Z₃ := Field51_as_Nat result.Z\n    let T₃ := Field51_as_Nat result.T\n\n    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧\n    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧\n    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.add`**:\n- No panic (always returns successfully)\n- Returns the sum P + Q (in elliptic curve addition) where P = self and Q = other\n- The resulting point's coordinates satisfy the twisted Edwards addition formulas modulo\n (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)\n-/",
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add",
@@ -970,6 +1178,8 @@
    ["curve25519_dalek.edwards.AddShared0EdwardsPointSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -985,6 +1195,10 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec\n    (self : edwards.CompressedEdwardsY) :\n    ∃ result, as_bytes self = ok result ∧\n    result = self := by ...",
+   "spec_docstring":
+   "/-- **Spec for `edwards.CompressedEdwardsY.as_bytes`**:\n- The function succeeds (always returns `ok`)\n- The result is exactly the internal byte array representation.\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes",
@@ -996,6 +1210,10 @@
    "dependencies": []},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    ∃ result, edwards.CompressedEdwardsY.decompress cey = ok result ∧\n\n      (∀ ep, result = some ep →\n        let y_encoded := (U8x32_as_Nat cey) % (2^255)\n        let x_sign_bit := cey[31]!.val.testBit 7\n\n        (∃ Z_inv x_val y_val x_is_neg,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧\n          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧\n          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧\n\n          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧\n\n          y_val % p = y_encoded % p ∧\n\n          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧\n\n          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.decompress`**:\n- No panic (always returns successfully)\n- If the function returns Some(ep) with ep = (X, Y, Z, T), then:\n  - The affine coordinates (x,y) where x = X/Z and y = Y/Z satisfy the curve equation\n    ax² + y² = 1 + dx²y² (mod p)\n  - y equals the y-coordinate encoded in the input byte array (bytes 0-30 and low 7 bits of byte 31)\n  - The sign (parity) of x matches the high bit of byte 31 in the input byte array\n  - T = X * Y (mod p)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress",
@@ -1010,6 +1228,8 @@
     "curve25519_dalek.edwards.decompress.step_2"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::to_bytes",
@@ -1021,6 +1241,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "\ntheorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ∃ c,\n  ct_eq e1 e2 = ok c ∧\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq",
@@ -1034,6 +1258,8 @@
     "curve25519_dalek.field.ConstantTimeEqFieldElement51.ct_eq"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_affine_niels",
@@ -1049,6 +1275,10 @@
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_projective_spec (e : EdwardsPoint) :\n    ∃ q, edwards.EdwardsPoint.as_projective e = ok q ∧\n    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.as_projective`**:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint coordinates match the EdwardsPoint coordinates (X, Y, Z)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective",
@@ -1060,6 +1290,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    ∃ pn, as_projective_niels e = ok pn ∧\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let T := Field51_as_Nat e.T\n    let A := Field51_as_Nat pn.Y_plus_X\n    let B := Field51_as_Nat pn.Y_minus_X\n    let Z' := Field51_as_Nat pn.Z\n    let C := Field51_as_Nat pn.T2d\n    let d2 := Field51_as_Nat EDWARDS_D2\n    A % p = (Y + X) % p ∧\n    (B + X) % p = Y % p ∧\n    Z' % p = Z % p ∧\n    C % p = (T * d2) % p := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.as_projective_niels`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting ProjectiveNielsPoint has coordinates:\n  - A ≡ Y + X (mod p)\n  - B ≡ Y - X (mod p)\n  - Z' = Z\n  - C ≡ T * 2 * d (mod p)\nwhere p = 2^255 - 19\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels",
@@ -1074,6 +1308,10 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)\n      (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)\n      -- (hself : self.IsValid)\n      :\n    ∃ result, compress self = ok result -- ∧\n    -- result.IsValid ∧ result.toPoint = self.toPoint\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.compress`**:\n- No panic when Z is invertible / not zero (always returns successfully)\n- On success, returns a CompressedEdwardsY (U8x32 byte array) where:\n  - Bytes 0-30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian\n  - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress",
@@ -1087,6 +1325,10 @@
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem double_spec (e : EdwardsPoint) :\n    ∃ e_double e_plus_e eq_choice,\n    double e = ok e_double ∧\n    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add e e = ok e_plus_e ∧\n    edwards.ConstantTimeEqEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧\n    eq_choice = Choice.one := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
@@ -1101,6 +1343,9 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result : Bool, is_small_order self = ok result ∧\n    (result ↔ 8 • self.toPoint = 0) := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order",
@@ -1114,6 +1359,8 @@
     "curve25519_dalek.traits.IdentityEdwardsPoint"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_torsion_free",
@@ -1127,6 +1374,8 @@
     "curve25519_dalek.traits.IdentityEdwardsPoint"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base",
@@ -1139,6 +1388,8 @@
    ["curve25519_dalek.edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped",
@@ -1152,6 +1403,10 @@
     "curve25519_dalek.edwards.EdwardsPoint.mul_base"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem mul_by_cofactor_spec (e : EdwardsPoint) :\n    ∃ e_result,\n    mul_by_cofactor e = ok e_result ∧\n    ok e_result = mul_by_pow_2 e 3#u32 := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_cofactor`**:\n- No panic (always returns successfully)\n- Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor",
@@ -1163,6 +1418,10 @@
    "dependencies": ["curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :\n    ∃ e_result,\n    mul_by_pow_2 e k = ok e_result ∧\n\n    (k = 1#u32 →\n      ∃ e_double eq_choice,\n      double e = ok e_double ∧\n      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_double = ok eq_choice ∧\n      eq_choice = Choice.one) ∧\n\n    (k.val > 1 →\n      ∃ km1 e_km1 e_km1_double eq_choice,\n      k - 1#u32 = ok km1 ∧\n      mul_by_pow_2 e km1 = ok e_km1 ∧\n      double e_km1 = ok e_km1_double ∧\n      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_km1_double = ok eq_choice ∧\n      eq_choice = Choice.one) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_pow_2`**:\n- For k = 1, returns the doubled point 2e for the input point e\n- For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2",
@@ -1177,6 +1436,8 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped",
@@ -1190,6 +1451,10 @@
     "curve25519_dalek.edwards.MulScalarEdwardsPointEdwardsPoint.mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    ∃ ap,\n    to_affine e = ok ap ∧\n\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let x := Field51_as_Nat ap.x\n    let y := Field51_as_Nat ap.y\n\n    (if Z % p = 0 then\n      x % p = 0 ∧ y % p = 0\n    else\n      (x * Z) % p = X % p ∧\n      (y * Z) % p = Y % p) ∧\n      (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_affine`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting AffinePoint has coordinates:\n  - If Z ≢ 0 (mod p): x * Z ≡ X (mod p) and y * Z ≡ Y (mod p)\n  - If Z ≡ 0 (mod p): x ≡ 0 (mod p) and y ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine",
@@ -1203,6 +1468,10 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    ∃ mp, to_montgomery e = ok mp ∧\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_montgomery`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting MontgomeryPoint has u-coordinate:\n  - If Z ≢ Y (mod p): u ≡ (Z+Y) * (Z-Y)^(-1) (mod p)\n  - If Z ≡ Y (mod p): u ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery",
@@ -1219,6 +1488,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    ∃ q, identity = ok q ∧\n    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.IdentityEdwardsPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity",
@@ -1230,6 +1503,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -1243,6 +1518,8 @@
    ["curve25519_dalek.edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::mul",
@@ -1255,6 +1532,8 @@
    "dependencies": ["curve25519_dalek.backend.variable_base_mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1268,6 +1547,8 @@
    ["curve25519_dalek.edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::edwards::EdwardsPoint> for &'a (curve25519_dalek::edwards::EdwardsPoint)}::mul",
@@ -1281,6 +1562,8 @@
    ["curve25519_dalek.edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for &'a (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1294,6 +1577,10 @@
    ["curve25519_dalek.edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)\n    (h : Field51_as_Nat self.y < 2 ^ 255) :\n    ∃ result, compress self = ok result -- ∧\n    -- result.IsValid ∧ result.toPoint = self.toPoint\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:\n- Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero\n- Returns a CompressedEdwardsY equal to the input AffinePoint\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress",
@@ -1307,6 +1594,8 @@
     "curve25519_dalek.field.FieldElement51.is_negative"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name": "curve25519_dalek::edwards::decompress::step_1",
    "nested_children": ["curve25519_dalek.edwards.decompress.step_1.match_1"],
@@ -1324,6 +1613,8 @@
     "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name": "curve25519_dalek::edwards::decompress::step_2",
    "nested_children": [],
@@ -1336,6 +1627,10 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :\n    ∃ c, ct_eq a b = ok c ∧\n    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by ...",
+   "spec_docstring":
+   "/-- **Spec for `field.ConstantTimeEqFieldElement51.ct_eq`**:\n- No panic (always returns successfully)\n- Returns `Choice.one` iff the canonical encodings (32-byte LE) are equal\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq",
@@ -1348,6 +1643,9 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    ∃ r', invert r = ok r' ∧\n    let r_nat := Field51_as_Nat r % p\n    let r'_nat := Field51_as_Nat r' % p\n    (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n    (r_nat = 0 → r'_nat = 0) ∧\n    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52)\n := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert",
@@ -1362,6 +1660,10 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)\n    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :\n    ∃ res, invsqrt v = ok res ∧\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →\n      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
@@ -1373,6 +1675,9 @@
    "dependencies": ["curve25519_dalek.field.FieldElement51.sqrt_ratio_i"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :\n    ∃ c, is_negative r = ok c ∧\n    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative",
@@ -1385,6 +1690,9 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :\n    ∃ c, is_zero r = ok c ∧\n    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero",
@@ -1397,6 +1705,10 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    ∃ r1 r2, pow22501 r = ok (r1, r2) ∧\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52)\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `field.FieldElement51.pow22501`**:\n- No panic (always returns (r1, r2) successfully)\n- Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)\n  Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501",
@@ -1411,6 +1723,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    ∃ r', pow_p58 r = ok r' ∧\n    Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1)\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
@@ -1425,6 +1741,10 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem sqrt_ratio_i_spec\n\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 51 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1) :\n\n    ∃ c r, sqrt_ratio_i u v = ok (c, r) ∧\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat r % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n\n    -- Case 1: u is zero\n    (u_nat = 0 →\n    c.val = 1#u8 ∧ r_nat = 0) ∧\n\n    -- Case 2: u is nonzero and v is zero\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n    c.val = 0#u8 ∧ r_nat = 0) ∧\n\n    -- Case 3: u and v are nonzero and u/v is a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = u_nat) ∧\n\n    -- Case 4: u and v are nonzero and u/v is not a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = (i_nat * u_nat) % p)\n\n := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `field.FieldElement51.sqrt_ratio_i`**:\n- No panic for field element inputs u and v (always returns (c, r) successfully)\n- The result satisfies exactly one of four mutually exclusive cases:\n  1. If u ≡ 0 (mod p), then c.val = 1 and r ≡ 0 (mod p)\n  2. If u ≢ 0 (mod p) and v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  3. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 1 and r^2 ≡ u * v^(-1) (mod p)\n  4. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 0 and r^2 ≡ SQRT_M1 * u * v^(-1) (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i",
@@ -1443,6 +1763,8 @@
     "curve25519_dalek.field.FieldElement51.is_negative"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq",
@@ -1456,6 +1778,8 @@
    ["curve25519_dalek.field.ConstantTimeEqFieldElement51.ct_eq"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::MontgomeryPoint}::clone",
@@ -1467,6 +1791,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::clone::Clone for curve25519_dalek::montgomery::ProjectivePoint}::clone",
@@ -1478,6 +1804,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select",
@@ -1490,6 +1818,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select",
@@ -1503,6 +1833,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq",
@@ -1517,6 +1849,8 @@
     "curve25519_dalek.field.ConstantTimeEqFieldElement51.ct_eq"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::MontgomeryPoint}::default",
@@ -1528,6 +1862,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::ProjectivePoint}::default",
@@ -1540,6 +1876,8 @@
    ["curve25519_dalek.montgomery.IdentityProjectivePoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity",
@@ -1551,6 +1889,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}::identity",
@@ -1562,6 +1902,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::as_bytes",
@@ -1573,6 +1915,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base",
@@ -1586,6 +1930,8 @@
     "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped",
@@ -1599,6 +1945,8 @@
     "curve25519_dalek.montgomery.MontgomeryPoint.mul_base"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_clamped",
@@ -1612,6 +1960,8 @@
     "curve25519_dalek.montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_bytes",
@@ -1623,6 +1973,10 @@
    "dependencies": []},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    ∃ opt_e,\n    to_edwards mp sign = ok opt_e ∧\n    let u := U8x32_as_Nat mp\n\n    ((u + 1) % p = 0 → opt_e = none) ∧\n\n    ((u + 1) % p ≠ 0 →\n      (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point\n       ∃ e x_sign,\n       opt_e = some e ∧\n       field.FieldElement51.is_negative e.X = ok x_sign ∧\n       let y := Field51_as_Nat e.Y\n\n       y * (u + 1) % p = (u - 1) % p ∧\n       (x_sign.val = 1#u8 ↔ sign.val.testBit 0))) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.to_edwards`**:\n- Returns None if u ≡ -1 (mod p)\n- Returns None if the y-coordinate cannot be decompressed to a valid Edwards point\n- Otherwise, returns Some(EdwardsPoint) where:\n  - The y-coordinate satisfies: y * (u + 1) ≡ (u-1) (mod p)\n  - The sign of x matches the input sign parameter\nwhere p = 2^255 - 19\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards",
@@ -1642,6 +1996,8 @@
     "curve25519_dalek.edwards.CompressedEdwardsY.decompress"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign",
@@ -1655,6 +2011,8 @@
    ["curve25519_dalek.montgomery.MulAssignMontgomeryPointShared0Scalar.mul_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign",
@@ -1668,6 +2026,8 @@
    ["curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul",
@@ -1681,6 +2041,8 @@
    ["curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul",
@@ -1694,6 +2056,8 @@
    ["curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -1707,6 +2071,8 @@
    ["curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -1720,6 +2086,8 @@
    ["curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul",
@@ -1737,6 +2105,8 @@
     "curve25519_dalek.montgomery.ProjectivePoint.as_affine"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1750,6 +2120,8 @@
    ["curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::montgomery::MontgomeryPoint)}::mul",
@@ -1763,6 +2135,8 @@
    ["curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for &'a (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1776,6 +2150,8 @@
    ["curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::eq",
@@ -1789,6 +2165,8 @@
    ["curve25519_dalek.montgomery.ConstantTimeEqMontgomeryPoint.ct_eq"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::ProjectivePoint}::as_affine",
@@ -1803,6 +2181,8 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{zeroize::Zeroize for curve25519_dalek::montgomery::MontgomeryPoint}::zeroize",
@@ -1814,6 +2194,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name": "curve25519_dalek::montgomery::differential_add_and_double",
    "nested_children": [],
@@ -1828,6 +2210,8 @@
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name": "curve25519_dalek::montgomery::elligator_encode",
    "nested_children": [],
@@ -1846,6 +2230,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem add_spec (self other : RistrettoPoint)\n\n    (h_self_bounds : ∀ i < 5,\n      self.X[i]!.val < 2 ^ 53 ∧\n      self.Y[i]!.val < 2 ^ 53 ∧\n      self.Z[i]!.val < 2 ^ 53 ∧\n      self.T[i]!.val < 2 ^ 53)\n\n    (h_other_bounds : ∀ i < 5,\n      other.X[i]!.val < 2 ^ 53 ∧\n      other.Y[i]!.val < 2 ^ 53 ∧\n      other.Z[i]!.val < 2 ^ 53 ∧\n      other.T[i]!.val < 2 ^ 53)\n\n    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)\n    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :\n\n    ∃ result, add self other = ok result ∧\n\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    let X₁ := Field51_as_Nat self.X\n    let Y₁ := Field51_as_Nat self.Y\n    let Z₁ := Field51_as_Nat self.Z\n    let T₁ := Field51_as_Nat self.T\n\n    let X₂ := Field51_as_Nat other.X\n    let Y₂ := Field51_as_Nat other.Y\n    let Z₂ := Field51_as_Nat other.Z\n    let T₂ := Field51_as_Nat other.T\n\n    let X₃ := Field51_as_Nat result.X\n    let Y₃ := Field51_as_Nat result.Y\n    let Z₃ := Field51_as_Nat result.Z\n    let T₃ := Field51_as_Nat result.T\n\n    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧\n    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧\n    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.add`**:\n- No panic (always returns successfully)\n- Returns the sum P + Q (in elliptic curve addition) where P = self and Q = other\n- The resulting point's coordinates satisfy the twisted Edwards addition formulas modulo p\n  (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)\n-/",
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::add",
@@ -1859,6 +2247,8 @@
    ["curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
@@ -1872,6 +2262,10 @@
    ["curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec (cr : CompressedRistretto) :\n    ∃ b, as_bytes cr = ok b ∧\n    b = cr := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.as_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the compressed Ristretto point\n- Since CompressedRistretto is defined as Array U8 32#usize, as_bytes is essentially the identity\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes",
@@ -1883,6 +2277,10 @@
    "dependencies": []},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem decompress_spec (comp : CompressedRistretto) :\n\n  ∃ result, decompress comp = ok result ∧\n\n  (¬comp.IsValid →\n    result = none) ∧\n\n  (comp.IsValid →\n    ∃ rist, result = some rist ∧ rist.IsValid) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:\n- The function always succeeds for all U8x32 input arrays (no panic)\n- If the input is not valid, then the output is none\n- If the input is valid, then the output is a valid Ristretto point, i.e.,\n  it fulfils the Edwards point curve equation\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress",
@@ -1898,6 +2296,10 @@
     "curve25519_dalek.ristretto.decompress.step_2"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (cr : CompressedRistretto) :\n    ∃ b, to_bytes cr = ok b ∧\n    b = cr := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.to_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the compressed Ristretto point\n- Since CompressedRistretto is defined as Array U8 32#usize, to_bytes is essentially the identity\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes",
@@ -1909,6 +2311,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1922,6 +2326,8 @@
    ["curve25519_dalek.edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for &'a (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1935,6 +2341,10 @@
    ["curve25519_dalek.ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem compress_spec\n  (rist1 rist2 : RistrettoPoint)\n  (h1_X_bounds : ∀ i, i < 5 → (rist1.X[i]!).val < 2 ^ 54)\n  (h1_Y_bounds : ∀ i, i < 5 → (rist1.Y[i]!).val < 2 ^ 53)\n  (h1_Z_bounds : ∀ i, i < 5 → (rist1.Z[i]!).val < 2 ^ 53)\n  (h1_T_bounds : ∀ i, i < 5 → (rist1.T[i]!).val < 2 ^ 54)\n  (h2_X_bounds : ∀ i, i < 5 → (rist2.X[i]!).val < 2 ^ 54)\n  (h2_Y_bounds : ∀ i, i < 5 → (rist2.Y[i]!).val < 2 ^ 53)\n  (h2_Z_bounds : ∀ i, i < 5 → (rist2.Z[i]!).val < 2 ^ 53)\n  (h2_T_bounds : ∀ i, i < 5 → (rist2.T[i]!).val < 2 ^ 54) :\n\n  ∃ c1,\n  ∃ c2,\n    compress rist1 = ok c1 ∧\n    compress rist2 = ok c2 ∧\n    ((∃ p1_times_8,\n      ∃ p2_times_8,\n      ∃ eq_choice,\n        edwards.EdwardsPoint.mul_by_cofactor rist1 = ok p1_times_8 ∧\n        edwards.EdwardsPoint.mul_by_cofactor rist2 = ok p2_times_8 ∧\n        edwards.ConstantTimeEqEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧\n        eq_choice = Choice.one) →\n      c1 = c2) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n\n1. The function always succeeds (no panic) for all valid RistrettoPoint inputs\n2. Canonicalization: If two RistrettoPoint representations are equivalent\n  (i.e., their cofactor multiples are equal as Edwards points), then they compress to\n  the same byte representation.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress",
@@ -1954,6 +2364,8 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4",
@@ -1966,6 +2378,10 @@
    ["curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "theorem elligator_ristretto_flavor_spec\n  (r_0 : backend.serial.u64.field.FieldElement51)\n  (h_r_0_bounds : ∀ i, i < 5 → (r_0[i]!).val < 2 ^ 54) :\n  ∃ rist,\n    elligator_ristretto_flavor r_0 = ok rist ∧\n    rist.IsValid := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all field element inputs\n• Given an input field element r₀, the output RistrettoPoint indeed lies on the Curve25519 Edwards curve, i.e.,\n  it indeed fulfils the curve equation.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
@@ -1986,6 +2402,10 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": false,
    "specified": true,
+   "spec_statement":
+   "\ntheorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    ∃ rist,\n    from_uniform_bytes bytes = ok rist ∧\n    rist.IsValid := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:\n- The function always succeeds (no panic)\n- The output is a mathematically valid Ristretto point\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
@@ -2001,6 +2421,8 @@
     "curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::mul_base",
@@ -2013,6 +2435,8 @@
    ["curve25519_dalek.ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
    "nested_children": [],
@@ -2027,6 +2451,8 @@
     "curve25519_dalek.field.FieldElement51.is_negative"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
    "nested_children": [],
@@ -2045,6 +2471,8 @@
     "curve25519_dalek.field.FieldElement51.is_zero"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::AddAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::add_assign",
@@ -2057,6 +2485,8 @@
    ["curve25519_dalek.scalar.AddAssignScalarSharedAScalar.add_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::AddAssign<&'a (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::add_assign",
@@ -2070,6 +2500,8 @@
    ["curve25519_dalek.scalar.AddScalarSharedBScalarScalar.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Add<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::add",
@@ -2082,6 +2514,8 @@
    ["curve25519_dalek.scalar.AddShared0ScalarSharedAScalarScalar.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Add<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::add",
@@ -2094,6 +2528,8 @@
    ["curve25519_dalek.scalar.AddShared0ScalarSharedAScalarScalar.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Add<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &1 (curve25519_dalek::scalar::Scalar)}::add",
@@ -2109,6 +2545,8 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Add<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for &'a (curve25519_dalek::scalar::Scalar)}::add",
@@ -2121,6 +2559,8 @@
    ["curve25519_dalek.scalar.AddShared0ScalarSharedAScalarScalar.add"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::clone::Clone for curve25519_dalek::scalar::Scalar}::clone",
@@ -2132,6 +2572,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select",
@@ -2144,6 +2586,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem ct_eq_spec (s s' : Scalar) :\n    ∃ c, ct_eq s s' = ok c ∧\n    (c = Choice.one ↔ s.bytes = s'.bytes) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.ConstantTimeEqScalar.ct_eq`**:\n- No panic (always returns successfully)\n- Returns `Choice` representing equality in constant time\n- The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq",
@@ -2155,6 +2601,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::default::Default for curve25519_dalek::scalar::Scalar}::default",
@@ -2166,6 +2614,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::convert::From<u128> for curve25519_dalek::scalar::Scalar}::from",
@@ -2177,6 +2627,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::convert::From<u16> for curve25519_dalek::scalar::Scalar}::from",
@@ -2188,6 +2640,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::convert::From<u32> for curve25519_dalek::scalar::Scalar}::from",
@@ -2199,6 +2653,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::convert::From<u64> for curve25519_dalek::scalar::Scalar}::from",
@@ -2210,6 +2666,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::convert::From<u8> for curve25519_dalek::scalar::Scalar}::from",
@@ -2221,6 +2679,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::index::Index<usize, u8> for curve25519_dalek::scalar::Scalar}::index",
@@ -2232,6 +2692,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::MulAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::mul_assign",
@@ -2244,6 +2706,8 @@
    ["curve25519_dalek.scalar.MulAssignScalarSharedAScalar.mul_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::MulAssign<&'a (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::mul_assign",
@@ -2259,6 +2723,8 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::mul",
@@ -2271,6 +2737,8 @@
    ["curve25519_dalek.scalar.MulShared0ScalarSharedAScalarScalar.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::mul",
@@ -2283,6 +2751,8 @@
    ["curve25519_dalek.scalar.MulShared0ScalarSharedAScalarScalar.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -2298,6 +2768,8 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for &'a (curve25519_dalek::scalar::Scalar)}::mul",
@@ -2310,6 +2782,8 @@
    ["curve25519_dalek.scalar.MulShared0ScalarSharedAScalarScalar.mul"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Neg<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::neg",
@@ -2321,6 +2795,8 @@
    "dependencies": ["curve25519_dalek.scalar.NegShared0ScalarScalar.neg"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Neg<curve25519_dalek::scalar::Scalar> for &0 (curve25519_dalek::scalar::Scalar)}::neg",
@@ -2337,6 +2813,8 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::eq",
@@ -2348,6 +2826,10 @@
    "dependencies": ["curve25519_dalek.scalar.ConstantTimeEqScalar.ct_eq"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec (s : Scalar) :\n    ∃ b, as_bytes s = ok b ∧\n    b = s.bytes ∧ mk b = s := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.as_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the scalar (s.bytes)\n- Converting the result back to a Scalar via the constructor yields the original scalar\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes",
@@ -2359,6 +2841,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16",
@@ -2375,6 +2859,8 @@
     "curve25519_dalek.scalar.Scalar.as_radix_16_loop1"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16",
@@ -2387,6 +2873,8 @@
    "dependencies": ["curve25519_dalek.scalar.IndexScalarUsizeU8.index"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16",
@@ -2399,6 +2887,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert",
@@ -2418,6 +2908,8 @@
     "curve25519_dalek.zeroize.ZeroizeScalar52"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert",
@@ -2433,6 +2925,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert",
@@ -2446,6 +2940,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :\n    ∃ s, from_bytes_mod_order b = ok s ∧\n    U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order`**:\n- No panic (always returns successfully)\n- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L\n- The result scalar s is less than L (the group order) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order",
@@ -2459,6 +2957,10 @@
     "curve25519_dalek.scalar.IndexScalarUsizeU8.index"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :\n    ∃ s, from_bytes_mod_order_wide b = ok s ∧\n    U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧\n    U8x32_as_Nat s.bytes < L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:\n- No panic (always returns successfully)\n- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L\n- The result scalar s is less than L (the group order) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide",
@@ -2472,6 +2974,10 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem from_canonical_bytes_spec (b : Array U8 32#usize) :\n    ∃ s, from_canonical_bytes b = ok s ∧\n    (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧\n    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.from_canonical_bytes`**:\n- No panic (always returns successfully)\n- When the input bytes represent a canonical value (< L), the function returns a CtOption Scalar\n  where is_some = Choice.one and the scalar's byte representation equals the input bytes\n- When the input bytes represent a non-canonical value (≥ L), the function returns a CtOption Scalar\n  where is_some = Choice.zero (i.e., None)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes",
@@ -2483,6 +2989,10 @@
    "dependencies": ["curve25519_dalek.scalar.Scalar.is_canonical"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    ∃ s', invert s = ok s' ∧\n    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.invert`**:\n- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result s' satisfies the multiplicative inverse property:\n  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert",
@@ -2497,6 +3007,10 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem is_canonical_spec (s : Scalar) :\n    ∃ c, is_canonical s = ok c ∧\n    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:\n- No panic (always returns successfully)\n- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical",
@@ -2510,6 +3024,9 @@
     "curve25519_dalek.scalar.ConstantTimeEqScalar.ct_eq"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem reduce_spec (s : Scalar) :\n    ∃ s',\n      reduce s = ok s' ∧\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L\n := by ...",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce",
@@ -2525,6 +3042,10 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (s : Scalar) :\n    ∃ a, to_bytes s = ok a ∧\n    a = s.bytes ∧ mk a = s := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.to_bytes`**:\n- No panic (always returns successfully)\n- The result array a is the byte array representation of the scalar (s.bytes)\n- Converting the result a back to a Scalar via the constructor yields the original scalar s\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes",
@@ -2536,6 +3057,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem unpack_spec (s : Scalar) :\n    ∃ u, unpack s = ok u ∧\n    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧\n    (∀ i < 5, u[i]!.val < 2 ^ 62) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.unpack`**:\n- No panic (always returns successfully)\n- Packing the result back yields the original scalar: pack(u) = s\n- Both the packed s and the unpacked u represent the same natural number\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack",
@@ -2548,6 +3073,10 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    ∃ u', invert u = ok u' ∧\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar u must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result u' satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
@@ -2562,6 +3091,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    ∃ u', montgomery_invert u = ok u' ∧\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:\n- Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)\n- No panic (always returns successfully for non-zero inputs)\n- The result u' satisfies the property that Montgomery multiplication of u and u'\n  yields R mod L (the Montgomery representation of 1)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert",
@@ -2576,6 +3109,10 @@
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"]},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :\n    ∃ s, pack u = ok s ∧\n    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat s.bytes < L := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.pack`**:\n- No panic (always returns successfully)\n- Both the unpacked r and the packed s represent the same natural number modulo L\n- The packed scalar is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack",
@@ -2588,6 +3125,8 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::SubAssign<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::sub_assign",
@@ -2600,6 +3139,8 @@
    ["curve25519_dalek.scalar.SubAssignScalarSharedAScalar.sub_assign"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::SubAssign<&'a (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::sub_assign",
@@ -2613,6 +3154,8 @@
    ["curve25519_dalek.scalar.SubScalarSharedBScalarScalar.sub"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Sub<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::sub",
@@ -2625,6 +3168,8 @@
    ["curve25519_dalek.scalar.SubShared0ScalarSharedAScalarScalar.sub"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Sub<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::sub",
@@ -2637,6 +3182,8 @@
    ["curve25519_dalek.scalar.SubShared0ScalarSharedAScalarScalar.sub"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Sub<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &1 (curve25519_dalek::scalar::Scalar)}::sub",
@@ -2652,6 +3199,8 @@
     "curve25519_dalek.scalar.Scalar52.pack"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Sub<curve25519_dalek::scalar::Scalar, curve25519_dalek::scalar::Scalar> for &'a (curve25519_dalek::scalar::Scalar)}::sub",
@@ -2664,6 +3213,8 @@
    ["curve25519_dalek.scalar.SubShared0ScalarSharedAScalarScalar.sub"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{zeroize::Zeroize for curve25519_dalek::scalar::Scalar}::zeroize",
@@ -2675,6 +3226,10 @@
    "dependencies": []},
   {"verified": true,
    "specified": true,
+   "spec_statement":
+   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    ∃ result, clamp_integer bytes = ok (result) ∧\n    h ∣ U8x32_as_Nat result ∧\n    U8x32_as_Nat result < 2^255 ∧\n    2^254 ≤ U8x32_as_Nat result := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.clamp_integer`**:\n- No panic\n- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)\n- as_nat_32_u8 result < 2^255\n- 2^254 ≤ as_nat_32_u8 result\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name": "curve25519_dalek::scalar::clamp_integer",
    "nested_children": [],
@@ -2685,6 +3240,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name": "curve25519_dalek::scalar::read_le_u64_into",
    "nested_children": [],
@@ -2695,6 +3252,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}",
@@ -2707,6 +3266,8 @@
    ["curve25519_dalek.backend.serial.curve_models.IdentityAffineNielsPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}",
@@ -2718,6 +3279,8 @@
    "dependencies": ["curve25519_dalek.edwards.IdentityEdwardsPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}",
@@ -2730,6 +3293,8 @@
    ["curve25519_dalek.montgomery.IdentityMontgomeryPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}",
@@ -2742,6 +3307,8 @@
    ["curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint.identity"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/traits.rs",
    "rust_name":
    "curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T}",
@@ -2754,6 +3321,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}",
@@ -2766,6 +3335,8 @@
    ["curve25519_dalek.backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from",
@@ -2779,6 +3350,8 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select",
@@ -2790,6 +3363,8 @@
    "dependencies": []},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}",
@@ -2802,6 +3377,8 @@
    ["curve25519_dalek.backend.serial.curve_models.ZeroizeAffineNielsPoint.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}",
@@ -2814,6 +3391,8 @@
    ["curve25519_dalek.backend.serial.u64.field.ZeroizeFieldElement51.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{zeroize::Zeroize for curve25519_dalek::montgomery::MontgomeryPoint}",
@@ -2826,6 +3405,8 @@
    ["curve25519_dalek.montgomery.ZeroizeMontgomeryPoint.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}",
@@ -2838,6 +3419,8 @@
    ["curve25519_dalek.backend.serial.curve_models.ZeroizeProjectiveNielsPoint.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{zeroize::Zeroize for curve25519_dalek::scalar::Scalar}",
@@ -2849,6 +3432,8 @@
    "dependencies": ["curve25519_dalek.scalar.ZeroizeScalar.zeroize"]},
   {"verified": false,
    "specified": false,
+   "spec_statement": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}",

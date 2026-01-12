@@ -13,11 +13,27 @@
   function requiring its own spec. This requires understanding Aeneas extraction patterns better.
 -/
 import Lean
+import Lean.PrettyPrinter
 import Std.Data.HashSet
 
 open Lean
+open Lean.Meta
+open Lean.PrettyPrinter
 
 namespace Utils.Lib.Analysis
+
+/-!
+## Environment Reader Monad
+
+A simple reader monad for functions that need MonadEnv.
+-/
+
+/-- Simple reader monad over Environment for pure MonadEnv operations -/
+abbrev EnvM := ReaderT Environment Id
+
+instance : MonadEnv EnvM where
+  getEnv := read
+  modifyEnv _ := pure ()
 
 /-- Suffix appended to function names to form spec theorem names.
     Convention: for function `foo`, the spec theorem is `foo_spec`. -/
@@ -55,6 +71,107 @@ def isVerified (env : Environment) (name : Name) : Bool :=
   match env.find? specName with
   | some _ => !proofContainsSorry env specName
   | none => false
+
+/-- Get the spec theorem statement as a pretty-printed string.
+    Returns the theorem type (the proposition being proved). -/
+def getSpecStatement (env : Environment) (name : Name) : IO (Option String) := do
+  let specName := name.appendAfter specSuffix
+  match env.find? specName with
+  | none => return none
+  | some constInfo =>
+    let type := constInfo.type
+    -- Run MetaM to pretty-print the expression
+    let (fmt, _) ← (Meta.ppExpr type).run'.toIO
+      { fileName := "", fileMap := default }
+      { env := env }
+    return some (Format.pretty fmt)
+
+/-- Result of extracting spec theorem parts from source -/
+structure SpecParts where
+  docstring : Option String := none
+  statement : Option String := none
+  deriving Repr, Inhabited
+
+/-- Get the spec theorem docstring and statement from the source file.
+    Returns (docstring, statement) where statement excludes the proof. -/
+def getSpecParts (env : Environment) (name : Name) : IO SpecParts := do
+  let specName := name.appendAfter specSuffix
+  -- Check if the theorem exists
+  if env.find? specName |>.isNone then return {}
+  -- Get declaration ranges using the EnvM reader monad
+  let rangesOpt : Option DeclarationRanges := (findDeclarationRangesCore? specName : EnvM _).run env
+  match rangesOpt with
+  | none => return {}
+  | some ranges =>
+    -- Get the module that contains this declaration
+    let some modIdx := env.getModuleIdxFor? specName | return {}
+    let moduleName := env.allImportedModuleNames[modIdx.toNat]!
+    -- Convert module name to file path (e.g., Curve25519Dalek.Specs.Foo -> Curve25519Dalek/Specs/Foo.lean)
+    let filePath : System.FilePath := moduleName.toString.replace "." "/" ++ ".lean"
+    -- Check if file exists
+    if !(← filePath.pathExists) then return {}
+    -- Read the source file
+    let contents ← IO.FS.readFile filePath
+    let lines := contents.splitOn "\n"
+    -- Extract lines from start to end (1-indexed in Lean positions)
+    let range := ranges.range
+    let startLine := range.pos.line
+    let endLine := range.endPos.line
+    if startLine == 0 || endLine == 0 then return {}
+    let relevantLines := lines.toArray.extract (startLine - 1) endLine
+    -- Separate docstring from statement
+    let mut docstringLines : Array String := #[]
+    let mut statementLines : Array String := #[]
+    let mut inDocstring := false
+    let mut docstringDone := false
+    for line in relevantLines do
+      if !docstringDone then
+        -- Check for docstring start
+        if line.trimLeft.startsWith "/-" then
+          inDocstring := true
+          docstringLines := docstringLines.push line
+        else if inDocstring then
+          docstringLines := docstringLines.push line
+          if (line.splitOn "-/").length > 1 then
+            inDocstring := false
+            docstringDone := true
+        else if line.trimLeft.startsWith "@[" then
+          -- Skip attribute declarations (e.g., @[progress], @[simp])
+          -- Mark docstring as done so we continue looking for theorem
+          docstringDone := true
+          continue
+        else if line.trimLeft.startsWith "theorem" then
+          -- Start of statement
+          docstringDone := true
+          -- Check if this line contains `:= by`
+          let parts := line.splitOn ":= by"
+          if parts.length > 1 then
+            statementLines := statementLines.push (parts[0]!.trimRight ++ " := by ...")
+          else if line.trimRight.endsWith ":=" then
+            statementLines := statementLines.push (line.trimRight ++ " ...")
+          else
+            statementLines := statementLines.push line
+        else
+          -- Skip empty lines or other content before docstring/statement
+          continue
+      else
+        -- Processing statement (skip any remaining attribute lines)
+        if line.trimLeft.startsWith "@[" then
+          continue
+        let parts := line.splitOn ":= by"
+        if parts.length > 1 then
+          statementLines := statementLines.push (parts[0]!.trimRight ++ " := by ...")
+          break
+        else if line.trimRight.endsWith ":=" then
+          statementLines := statementLines.push (line.trimRight ++ " ...")
+          break
+        else
+          statementLines := statementLines.push line
+    let docstring := if docstringLines.isEmpty then none
+      else some (String.intercalate "\n" docstringLines.toList)
+    let statement := if statementLines.isEmpty then none
+      else some (String.intercalate "\n" statementLines.toList)
+    return { docstring, statement }
 
 /-- Result of analyzing a single function -/
 structure AnalysisResult where

@@ -43,6 +43,10 @@ structure FunctionRecord where
   isVerified : Bool := false
   /-- True if verified AND all transitive dependencies are verified -/
   isFullyVerified : Bool := false
+  /-- The spec theorem docstring, if one exists -/
+  specDocstring : Option String := none
+  /-- The spec theorem statement (without proof), if one exists -/
+  specStatement : Option String := none
   deriving Repr, Inhabited
 
 /-!
@@ -63,6 +67,8 @@ structure FunctionOutput where
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
+  spec_docstring : Option String := none
+  spec_statement : Option String := none
   deriving ToJson, FromJson, Repr
 
 /-- Convert a FunctionRecord to JSON-serializable output -/
@@ -79,7 +85,9 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     is_relevant := rec.isRelevant
     specified := rec.isSpecified
     verified := rec.isVerified
-    fully_verified := rec.isFullyVerified }
+    fully_verified := rec.isFullyVerified
+    spec_docstring := rec.specDocstring
+    spec_statement := rec.specStatement }
 
 /-- Output structure for list of functions -/
 structure FunctionListOutput where
