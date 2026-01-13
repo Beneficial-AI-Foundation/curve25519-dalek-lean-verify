@@ -248,20 +248,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
   progress as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
 
-  -- =========================================================
-  -- CLEANUP STEP
-  -- Clear intermediate accumulators from Rows 0-4
-  -- Keep: a, limbs*, carry*, n*, L*, and their bounds
-  -- =========================================================
-  -- clear h_n1_partial h_product1 h_sum1
-  -- clear n1_partial product1
-  -- clear h_n2_partial h_n2_accum h_prod2_1 h_sum2 h_prod2_0
-  -- clear n2_partial prod2_0 n2_accum prod2_1
-  -- clear h_n3_partial h_prod3_1 h_n3_accum h_prod3_2 h_sum3
-  -- clear n3_partial prod3_1 n3_accum prod3_2
-  -- clear h_n4_partial h_prod4_0 h_n4_accum1 h_prod4_2 h_n4_accum2 h_prod4_3 h_sum4
-  -- clear n4_partial prod4_0 n4_accum1 prod4_2 n4_accum2 prod4_3
-
   -- === ROW 5: Compute Result Limb 0 (r0) ===
   -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
   progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
@@ -274,9 +260,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
   progress as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
 
-  -- clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
-  -- clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3
-
   -- === ROW 6: Compute Result Limb 1 (r1) ===
   -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
   progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
@@ -286,9 +269,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
   progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
   progress as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
-
-  -- clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
-  -- clear n6_partial prod6_1 n6_accum1 prod6_2
 
   -- === ROW 7: Compute Result Limb 2 (r2) ===
   -- Formula: S7 = n6 + a[7] + carry3 * L4
@@ -336,12 +316,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         -- (h : Scalar52_as_Nat r < 2 ^ 259) : r[4]!.val < 2 ^ 51 := by sorry
         sorry
       exact h_r4_tight
-
   · -- Case hb: constants.L are valid
     intro i hi
     interval_cases i <;> assumption
   · -- Case ha': Input < 2 * L
-
     have h_red_bound : Scalar52_as_Nat
       (Array.make 5#usize [r0, r1, r2, r3, r4]
       field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
@@ -451,15 +429,11 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
         norm_cast at eq8 h_cast_r4
         rw [← h_cast_r4] at eq8
-
         simp only [← getElem!_pos]
 
         generalize hBz : (B : ℤ) = Bz
         rw [hBz] at *
-
         clear hB
-        -- norm_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-        -- ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
         let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
                                   ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
@@ -503,28 +477,40 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         simp only [List.getD_cons_zero, List.getD_cons_succ]
 
         zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-        have h_align0 : (↑(constants.L[0#usize]!) : ℤ) = ↑(constants.L.val[0]!) := by
-          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+
+        have h_align0 : (↑(constants.L[0]!) : ℤ) = ↑(constants.L.val[0]!) := by
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
-        have h_align1 : (↑(constants.L[1#usize]!) : ℤ) = ↑(constants.L.val[1]!) := by
-          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+        have h_align1 : (↑(constants.L[1]!) : ℤ) = ↑(constants.L.val[1]!) := by
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
-        have h_align2 : (↑(constants.L[2#usize]!) : ℤ) = ↑(constants.L.val[2]!) := by
-          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+        have h_align2 : (↑(constants.L[2]!) : ℤ) = ↑(constants.L.val[2]!) := by
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
-        have h_align3 : (↑(constants.L[3#usize]!) : ℤ) = ↑(constants.L.val[3]!) := by
-          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+        have h_align3 : (↑(constants.L[3]!) : ℤ) = ↑(constants.L.val[3]!) := by
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
-        have h_align4 : (↑(constants.L[4#usize]!) : ℤ) = ↑(constants.L.val[4]!) := by
-          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+        have h_align4 : (↑(constants.L[4]!) : ℤ) = ↑(constants.L.val[4]!) := by
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
 
-        -- linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
-        --                    + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
+        simp only [h_align0, h_align1, h_align2, h_align3, h_align4] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
 
-        sorry
+        have h_L3_zero : ↑(constants.L.val[3]!) = (0 : ℤ) := by
+          unfold constants.L
+          decide
+
+        simp only [h_L3_zero, mul_zero, zero_mul, add_zero, zero_add, sub_zero]
+
+        linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
+                           + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
 
       have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
+        -- use h_sub
+        rw [constants.L_spec] at h_sub
+        change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
+        apply Int.natCast_modEq_iff at h_sub
+        
         sorry
 
       rw [Int.ModEq.mul_right R h_equiv_int]
