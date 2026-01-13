@@ -13,8 +13,10 @@
   - ai-proveable: AI proveability notes
 -/
 import Lean
+import Utils.Lib.Types
 
 open Lean
+open Utils.Lib.Types
 
 namespace Utils.Lib.StatusCsv
 
@@ -40,14 +42,61 @@ structure StatusFile where
 /-- Default path to status.csv -/
 def defaultPath : System.FilePath := "status.csv"
 
-/-- Split a CSV line into fields, handling basic cases -/
-def splitCsvLine (line : String) : Array String :=
-  -- Simple CSV parsing (assumes no quoted fields with commas)
-  (line.splitOn ",").toArray
+/-- Check if string contains a substring -/
+private def containsSubstr (s sub : String) : Bool :=
+  (s.splitOn sub).length > 1
 
-/-- Join fields into a CSV line -/
+/-- Escape a field for CSV output: quote if contains comma, quote, or newline -/
+def escapeField (s : String) : String :=
+  if containsSubstr s "," || containsSubstr s "\"" || containsSubstr s "\n" then
+    -- Escape quotes by doubling them, then wrap in quotes
+    "\"" ++ s.replace "\"" "\"\"" ++ "\""
+  else
+    s
+
+/-- Parse a single CSV field, handling quoted fields -/
+private def parseField (s : String) : String :=
+  let trimmed := s.trim
+  if trimmed.startsWith "\"" && trimmed.endsWith "\"" && trimmed.length >= 2 then
+    -- Remove surrounding quotes and unescape doubled quotes
+    let inner := trimmed.drop 1 |>.dropRight 1
+    inner.replace "\"\"" "\""
+  else
+    s
+
+/-- Split a CSV line into fields, handling quoted fields with commas -/
+def splitCsvLine (line : String) : Array String := Id.run do
+  let mut fields : Array String := #[]
+  let mut current := ""
+  let mut inQuotes := false
+  let mut i := 0
+  let chars := line.toList
+
+  while i < chars.length do
+    let c := chars[i]!
+    if c == '"' then
+      if inQuotes && i + 1 < chars.length && chars[i + 1]! == '"' then
+        -- Escaped quote
+        current := current.push '"'
+        i := i + 1
+      else
+        -- Toggle quote state
+        inQuotes := !inQuotes
+    else if c == ',' && !inQuotes then
+      -- End of field
+      fields := fields.push current
+      current := ""
+    else
+      current := current.push c
+    i := i + 1
+
+  -- Don't forget the last field
+  fields := fields.push current
+  return fields
+
+/-- Join fields into a CSV line with proper escaping -/
 def joinCsvLine (fields : Array String) : String :=
-  ",".intercalate fields.toList
+  ",".intercalate (fields.map escapeField).toList
 
 /-- Parse a CSV line into a StatusRow -/
 def parseRow (line : String) : Option StatusRow :=
@@ -108,17 +157,45 @@ def writeStatusFile (file : StatusFile) (path : System.FilePath := defaultPath) 
 def StatusFile.getLeanNames (file : StatusFile) : Array String :=
   file.rows.map (·.lean_name)
 
-/-- Create a new StatusRow with just the lean_name (other fields empty) -/
-def StatusRow.fromLeanName (leanName : String) : StatusRow :=
-  { function := ""
-    lean_name := leanName
-    source := ""
-    lines := ""
-    spec_theorem := ""
-    extracted := ""
-    verified := ""
+/-- Create a new StatusRow from a FunctionOutput -/
+def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
+  let verifiedStr := if fn.verified then "verified"
+                     else if fn.specified then "specified"
+                     else ""
+  let extractedStr := if fn.is_relevant then "extracted" else ""
+  { function := fn.rust_name.getD ""
+    lean_name := fn.lean_name
+    source := fn.source.getD ""
+    lines := fn.lines.getD ""
+    spec_theorem := fn.spec_file.getD ""
+    extracted := extractedStr
+    verified := verifiedStr
     notes := ""
     ai_proveable := "" }
+
+/-- Check if two StatusRows have the same updatable fields -/
+def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
+  a.function == b.function &&
+  a.source == b.source &&
+  a.lines == b.lines &&
+  a.spec_theorem == b.spec_theorem &&
+  a.extracted == b.extracted &&
+  a.verified == b.verified
+
+/-- Update an existing StatusRow with data from FunctionOutput.
+    Preserves: notes, ai_proveable -/
+def StatusRow.updateFrom (row : StatusRow) (fn : FunctionOutput) : StatusRow :=
+  let verifiedStr := if fn.verified then "verified"
+                     else if fn.specified then "specified"
+                     else ""
+  let extractedStr := if fn.is_relevant then "extracted" else ""
+  { row with
+    function := fn.rust_name.getD row.function
+    source := fn.source.getD row.source
+    lines := fn.lines.getD row.lines
+    spec_theorem := fn.spec_file.getD row.spec_theorem
+    extracted := extractedStr
+    verified := verifiedStr }
 
 /-- Add a new row to the StatusFile -/
 def StatusFile.addRow (file : StatusFile) (row : StatusRow) : StatusFile :=
@@ -127,5 +204,21 @@ def StatusFile.addRow (file : StatusFile) (row : StatusRow) : StatusFile :=
 /-- Check if a lean_name exists in the StatusFile -/
 def StatusFile.hasLeanName (file : StatusFile) (leanName : String) : Bool :=
   file.rows.any (·.lean_name == leanName)
+
+/-- Find a row by lean_name -/
+def StatusFile.findByLeanName (file : StatusFile) (leanName : String) : Option StatusRow :=
+  file.rows.find? (·.lean_name == leanName)
+
+/-- Update or add a row based on FunctionOutput -/
+def StatusFile.upsertFromFunction (file : StatusFile) (fn : FunctionOutput) : StatusFile :=
+  let idx := file.rows.findIdx? (·.lean_name == fn.lean_name)
+  match idx with
+  | some i =>
+    -- Update existing row
+    let updatedRow := file.rows[i]!.updateFrom fn
+    { file with rows := file.rows.set! i updatedRow }
+  | none =>
+    -- Add new row
+    file.addRow (StatusRow.fromFunctionOutput fn)
 
 end Utils.Lib.StatusCsv
