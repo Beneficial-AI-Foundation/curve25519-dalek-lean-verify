@@ -354,7 +354,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     refine ⟨?_,h_bound,?_⟩
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
       zify
-      -- Total Montgomery factor N
+      -- Total Montgomery factor C
       let C : Int := (carry0.val : Int) +
                  (carry1.val : Int) * (2^52 : Int) +
                  (carry2.val : Int) * (2^104 : Int) +
@@ -483,28 +483,41 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           · -- LHS
             simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
               Polynomial.eval_finset_sum, Polynomial.eval_monomial]
-            simp only [Finset.sum_range_succ, Finset.sum_range_zero, add_zero, zero_add, mul_zero,
-              pow_zero, pow_one]
+            simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one]
             simp [a_coeffs, C_coeffs, L_coeffs]
             ring_nf
           · -- RHS
             simp only [poly_rhs, poly_res, Polynomial.eval_mul, Polynomial.eval_monomial,
               Polynomial.eval_finset_sum]
             repeat rw [Finset.sum_range_succ]
-            simp only [Finset.sum_range_zero, add_zero, zero_add, mul_zero, pow_zero, pow_one]
-            simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ, List.getD_nil]
+            simp only [Finset.sum_range_zero, zero_add, pow_zero, pow_one]
+            simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ]
             ring_nf
 
         zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
         simp only [poly_lhs, poly_rhs, poly_a, poly_C, poly_L, poly_res, Polynomial.eval_add,
-                  Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial,
-                  Finset.sum_range_succ, Finset.sum_range_zero, add_zero, zero_add, mul_zero,
+                  Polynomial.eval_mul, Polynomial.eval_monomial,
+                  Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
                   pow_zero, pow_one]
         simp only [a_coeffs, C_coeffs, L_coeffs, res_coeffs]
-        simp only [List.getD_cons_zero, List.getD_cons_succ, List.getD_nil]
+        simp only [List.getD_cons_zero, List.getD_cons_succ]
 
         zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-        ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        have h_align0 : (↑(constants.L[0#usize]!) : ℤ) = ↑(constants.L.val[0]!) := by
+          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+            Nat.ofNat_pos, getElem!_pos]
+        have h_align1 : (↑(constants.L[1#usize]!) : ℤ) = ↑(constants.L.val[1]!) := by
+          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+            Nat.ofNat_pos, getElem!_pos]
+        have h_align2 : (↑(constants.L[2#usize]!) : ℤ) = ↑(constants.L.val[2]!) := by
+          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+            Nat.ofNat_pos, getElem!_pos]
+        have h_align3 : (↑(constants.L[3#usize]!) : ℤ) = ↑(constants.L.val[3]!) := by
+          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+            Nat.ofNat_pos, getElem!_pos]
+        have h_align4 : (↑(constants.L[4#usize]!) : ℤ) = ↑(constants.L.val[4]!) := by
+          simp only [Array.getElem!_Usize_eq, UScalar.ofNat_val_eq, List.Vector.length_val,
+            Nat.ofNat_pos, getElem!_pos]
 
         -- linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
         --                    + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
