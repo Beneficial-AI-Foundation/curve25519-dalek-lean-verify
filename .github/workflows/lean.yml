@@ -62,26 +62,43 @@ jobs:
       - name: Build Lean project
         run: lake build
 
-      - name: Check functions.json is up to date
+      - name: Check functions.json and status.csv are up to date
         run: |
-          echo "Regenerating functions.json..."
-          lake exe listfuns functions.json.new
-          # Compare using jq -S to normalize JSON (sorts keys, consistent formatting)
-          DIFF_OUTPUT=$(diff <(jq -S . functions.json) <(jq -S . functions.json.new) || true)
-          if [ -z "$DIFF_OUTPUT" ]; then
-            echo "✓ functions.json is up to date!"
-            rm functions.json.new
-          else
+          echo "Running syncstatus to regenerate functions.json and status.csv..."
+          lake exe syncstatus
+
+          # Check functions.json
+          FUNC_DIFF=$(git diff functions.json || true)
+          if [ -n "$FUNC_DIFF" ]; then
             echo "❌ functions.json is out of date!"
             echo ""
-            echo "Diff output:"
-            echo "$DIFF_OUTPUT"
+            echo "Diff:"
+            echo "$FUNC_DIFF"
             echo ""
-            echo "Please regenerate functions.json and commit the changes:"
+            FUNC_OUTDATED=1
+          else
+            echo "✓ functions.json is up to date!"
+            FUNC_OUTDATED=0
+          fi
+
+          # Check status.csv
+          STATUS_DIFF=$(git diff status.csv || true)
+          if [ -n "$STATUS_DIFF" ]; then
+            echo "❌ status.csv is out of date!"
             echo ""
-            echo "  lake exe listfuns functions.json"
+            echo "Diff:"
+            echo "$STATUS_DIFF"
             echo ""
-            rm functions.json.new
+            STATUS_OUTDATED=1
+          else
+            echo "✓ status.csv is up to date!"
+            STATUS_OUTDATED=0
+          fi
+
+          # Fail if either is outdated
+          if [ "$FUNC_OUTDATED" = "1" ] || [ "$STATUS_OUTDATED" = "1" ]; then
+            echo ""
+            echo "Please run 'lake exe syncstatus' and commit the changes."
             exit 1
           fi
 
