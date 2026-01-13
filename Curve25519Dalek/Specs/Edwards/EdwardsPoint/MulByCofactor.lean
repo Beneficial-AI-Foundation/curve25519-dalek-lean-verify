@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::mul_by_cofactor`
 
@@ -36,16 +37,17 @@ natural language specs:
 - Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e
 -/
 @[progress]
-theorem mul_by_cofactor_spec (e : EdwardsPoint) :
-    ∃ e_result,
-    mul_by_cofactor e = ok e_result ∧
-    ok e_result = mul_by_pow_2 e 3#u32 := by
+theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :
+    ∃ result,
+    mul_by_cofactor self = ok result ∧
+    result.IsValid ∧
+    result.toPoint = 8 • self.toPoint:= by
     -- TO DO: this line needs to be adjusted, we can't have another `ok` in the spec statement
     -- this should use the mathematical notion of edwards curve and multiplication by 8
-  obtain ⟨e_result, h', _⟩ := mul_by_pow_2_spec e 3#u32 (by decide)
-  use e_result
-  constructor
-  · exact h'
-  · exact h'.symm
-
+  -- obtain ⟨e_result, h', _⟩ := mul_by_pow_2_spec self 3#u32 (by decide)
+  -- use e_result
+  -- constructor
+  -- · exact h'
+  -- · exact h'.symm
+  sorry
 end curve25519_dalek.edwards.EdwardsPoint
