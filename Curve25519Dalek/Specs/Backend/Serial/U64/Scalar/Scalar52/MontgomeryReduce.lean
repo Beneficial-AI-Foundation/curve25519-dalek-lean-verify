@@ -202,7 +202,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
 
   unfold montgomery_reduce
-  unfold Indexcurve25519_dalekbackendserialu64scalarScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
 
   -- === ROW 0: Compute n0 ===
   progress as ⟨limbs0, h_limbs0⟩         -- Read a[0]
@@ -272,7 +272,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
   progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
   progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
-  progress as ⟨n5, r0, h_n5, h_r0, h_n5_bounds, h_r0_bound⟩
+  progress as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
 
   -- clear h_n5_partial h_prod5_1 h_n5_accum1 h_prod5_2 h_n5_accum2 h_prod5_3 h_sum5
   -- clear n5_partial prod5_1 n5_accum1 prod5_2 n5_accum2 prod5_3
@@ -285,7 +285,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
   progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
   progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
-  progress as ⟨n6, r1, h_n6, h_r1, h_n6_bound, h_r1_bound⟩
+  progress as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
 
   -- clear h_n6_partial h_prod6_1 h_n6_accum1 h_prod6_2 h_sum6
   -- clear n6_partial prod6_1 n6_accum1 prod6_2
@@ -298,7 +298,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   progress as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
   -- Reduction Part 2 -> Returns (carry_out, result_limb)
   -- The carry is 'n7' and the result 'r2'.
-  progress as ⟨n7, r2, h_n7, h_r2, h_n7_bound, h_r2_bound⟩
+  progress as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
 
   -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
   -- Formula: S8 = n7 + a[8] + carry4 * L4
@@ -330,9 +330,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
     ]
     <;> try scalar_tac
-    · have h_r4_tight : ↑r4 < (2 : Nat) ^ 52 := by
-        -- use this from Aux.lean : theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
-        -- (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by sorry
+    · -- Bounds on r4 < 2 ^ 52
+      have h_r4_tight : ↑r4 < (2 : Nat) ^ 52 := by
+        -- use this from Aux.lean : theorem Scalar52_top_limb_lt_of_as_Nat_lt (r : Array U64 5#usize)
+        -- (h : Scalar52_as_Nat r < 2 ^ 259) : r[4]!.val < 2 ^ 51 := by sorry
         sorry
       exact h_r4_tight
 
@@ -340,9 +341,11 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     intro i hi
     interval_cases i <;> assumption
   · -- Case ha': Input < 2 * L
+
     have h_red_bound : Scalar52_as_Nat
-      (Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4) < 2 * L := by
-       sorry
+      (Array.make 5#usize [r0, r1, r2, r3, r4]
+      field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
+      sorry
     apply lt_of_lt_of_le h_red_bound
     rw [constants.L_spec, Nat.two_mul]
   · -- Case hb': L ≤ L
@@ -352,21 +355,20 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
       zify
       -- Total Montgomery factor N
-      let N : Int := (carry0.val : Int) +
+      let C : Int := (carry0.val : Int) +
                  (carry1.val : Int) * (2^52 : Int) +
                  (carry2.val : Int) * (2^104 : Int) +
                  (carry3.val : Int) * (2^156 : Int) +
                  (carry4.val : Int) * (2^208 : Int)
 
-      let res := Array.make 5#usize [r0, r1, r2, r3, r4] field.FieldElement51.Sub.sub._proof_4
-      have h_core : ↑(Scalar52_wide_as_Nat a) + N * L =
+      let res := Array.make 5#usize [r0, r1, r2, r3, r4]
+        field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4
+      have h_core : ↑(Scalar52_wide_as_Nat a) + C * L =
                     ↑(Scalar52_as_Nat res) * R := by
-        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Scalar52_partial_as_Nat, R]
+        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, R]
         repeat rw [Finset.sum_range_succ]
         simp only [Finset.sum_range_zero, add_zero, zero_add, mul_zero, pow_zero, mul_one, pow_one]
-        simp only [res, Array.make, Array.getElem!_Nat_eq, List.length_cons, List.length_nil,
-          List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
-          Nat.reduceAdd]
+        simp only [res, Array.make, Array.getElem!_Nat_eq]
 
         zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
         zify at h_n5 h_r0 h_n6 h_r1 h_n7 h_r2 h_r4_u128 h_r3
@@ -388,8 +390,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
         simp only [pow_mul]
         generalize hB : (2 ^ 52) = B
-        have hN_B : N = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
-          simp only [N]
+        have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
+          simp only [C]
           rw [←hB]
           have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
           have h3 : (2:Int)^156 = (2^52)^3 := by rw [←pow_mul];
@@ -410,7 +412,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           rw [Finset.sum_range_zero, zero_add]
           simp only [mul_zero, pow_zero, mul_one, pow_mul]
 
-        rw [hN_B, hR_B, ← constants.L_spec, h_L_expand]
+        rw [hC_B, hR_B, ← constants.L_spec, h_L_expand]
         simp only [
           h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
           h_L1, h_L2, h_L4,
@@ -459,55 +461,53 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         -- norm_cast at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
         -- ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
-        let a_coeffs : List ℤ := (↑a : List U128).map (fun x => ↑x)
-        let poly_a : Polynomial ℤ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
+        let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
+                                  ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
+        let poly_a : Polynomial ℕ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
 
-        let N_coeffs : List ℤ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
-        let poly_N : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (N_coeffs.getD i 0)
+        let C_coeffs : List ℕ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
+        let poly_C : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (C_coeffs.getD i 0)
 
-        let L_coeffs : List ℤ := constants.L.val.map (fun x => ↑x.val)
-        let poly_L : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
+        let L_coeffs : List ℕ := [↑(constants.L.val[0]!), ↑(constants.L.val[1]!),
+                                  ↑(constants.L.val[2]!), ↑(constants.L.val[3]!),
+                                  ↑(constants.L.val[4]!)]
+        let poly_L : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
 
-        let poly_lhs := poly_a + poly_N * poly_L
-
-        let res_coeffs : List ℤ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
-        let poly_res : Polynomial ℤ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
-
+        let poly_lhs := poly_a + poly_C * poly_L
+        let res_coeffs : List ℕ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
+        let poly_res : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
         let poly_rhs := poly_res * monomial 5 1
 
-        /-
+        suffices h_clean : poly_lhs.eval B = poly_rhs.eval B by
+          convert h_clean using 1
+          · -- LHS
+            simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
+              Polynomial.eval_finset_sum, Polynomial.eval_monomial]
+            simp only [Finset.sum_range_succ, Finset.sum_range_zero, add_zero, zero_add, mul_zero,
+              pow_zero, pow_one]
+            simp [a_coeffs, C_coeffs, L_coeffs]
+            ring_nf
+          · -- RHS
+            simp only [poly_rhs, poly_res, Polynomial.eval_mul, Polynomial.eval_monomial,
+              Polynomial.eval_finset_sum]
+            repeat rw [Finset.sum_range_succ]
+            simp only [Finset.sum_range_zero, add_zero, zero_add, mul_zero, pow_zero, pow_one]
+            simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ, List.getD_nil]
+            ring_nf
 
-        -- 3. Rewrite the LHS
-        trans poly_lhs.eval B
-        · -- Proof that the messy LHS equals poly_lhs
-          rw [poly_lhs]
-          simp only [Polynomial.eval_add, Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial]
-          simp [poly_a, poly_N, poly_L, a_coeffs, N_coeffs, L_coeffs]
-          -- if not too heavy try ring
-          sorry
+        zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        simp only [poly_lhs, poly_rhs, poly_a, poly_C, poly_L, poly_res, Polynomial.eval_add,
+                  Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial,
+                  Finset.sum_range_succ, Finset.sum_range_zero, add_zero, zero_add, mul_zero,
+                  pow_zero, pow_one]
+        simp only [a_coeffs, C_coeffs, L_coeffs, res_coeffs]
+        simp only [List.getD_cons_zero, List.getD_cons_succ, List.getD_nil]
 
-        -- 4. Rewrite the RHS
-        trans poly_rhs.eval B
-        · -- Proof that the clean polynomial equals the clean RHS target
-          try congr
-          sorry
+        zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+        ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
-        · -- Proof that the messy RHS equals your polynomial target
-          rw [poly_rhs_target]
-          simp only [Polynomial.eval_mul, Polynomial.eval_finset_sum, Polynomial.eval_monomial]
-          simp [poly_res, res_coeffs]
-          -- if not too heavy try ring
-          sorry
-
-        -- NOW THE GOAL SHOULD LOOK LIKE:
-        -- ⊢ poly_lhs.eval B = poly_rhs.eval B
-        -/
-
-        -- ring_nf at eq0 ⊢
-        -- ring_nf at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-
-        -- linear_combination eq0 + B * eq1 + B^2 * eq2 + B^3 * eq3 + B^4 * eq4 +
-        --                    B^5 * eq5 + B^6 * eq6 + B^7 * eq7 + B^8 * eq8
+        -- linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
+        --                    + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
 
         sorry
 
