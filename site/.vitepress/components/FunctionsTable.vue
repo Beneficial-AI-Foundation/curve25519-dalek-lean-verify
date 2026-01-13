@@ -1,6 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type { FunctionRecord } from '../data/deps.data'
+import { useStatusFormatting } from '../composables/useStatusFormatting'
+import { useCodeHighlight } from '../composables/useCodeHighlight'
+
+const { getVerifiedStatus } = useStatusFormatting()
+const { highlightedCode: highlightedSpec, highlight: highlightSpec } = useCodeHighlight()
+const { highlightedCode: highlightedDocstring, highlight: highlightDocstring } = useCodeHighlight()
 
 const props = defineProps<{
   functions: FunctionRecord[]
@@ -18,10 +24,13 @@ const sortDirection = ref<'asc' | 'desc'>('asc')
 
 // Pagination state
 const currentPage = ref(1)
-const pageSize = ref(50)
+const pageSize = ref(300)
 
 // Modal state
 const selectedFunction = ref<FunctionRecord | null>(null)
+
+// Copy state
+const copySuccess = ref(false)
 
 // Filtered and sorted data
 const filteredFunctions = computed(() => {
@@ -125,11 +134,11 @@ function getSortIndicator(key: typeof sortKey.value) {
   return sortDirection.value === 'asc' ? ' ▲' : ' ▼'
 }
 
-function getStatusBadge(fn: FunctionRecord) {
-  if (fn.fully_verified) return { class: 'badge-fully-verified', text: 'Fully Verified' }
-  if (fn.verified) return { class: 'badge-verified', text: 'Verified' }
-  if (fn.specified) return { class: 'badge-specified', text: 'Specified' }
-  return { class: 'badge-none', text: 'Unspecified' }
+// Map FunctionRecord status to the format expected by useStatusFormatting
+function getStatusString(fn: FunctionRecord): string {
+  if (fn.verified) return 'verified'
+  if (fn.specified) return 'specified'
+  return ''
 }
 
 // Helper function to extract function name from full path (matches StatusTable)
@@ -157,6 +166,30 @@ function openDetails(fn: FunctionRecord) {
 function closeModal() {
   selectedFunction.value = null
 }
+
+// Copy rust name to clipboard
+async function copyRustName() {
+  if (!selectedFunction.value?.rust_name) return
+  try {
+    await navigator.clipboard.writeText(selectedFunction.value.rust_name)
+    copySuccess.value = true
+    setTimeout(() => {
+      copySuccess.value = false
+    }, 2000)
+  } catch (err) {
+    console.error('Failed to copy:', err)
+  }
+}
+
+// Highlight spec statement and docstring when modal opens
+watch(selectedFunction, async (fn) => {
+  if (fn?.spec_statement) {
+    await highlightSpec(fn.spec_statement, 'lean4')
+  }
+  if (fn?.spec_docstring) {
+    await highlightDocstring(fn.spec_docstring, 'lean4')
+  }
+})
 </script>
 
 <template>
@@ -212,33 +245,31 @@ function closeModal() {
             <th @click="toggleSort('source')" class="sortable">
               Source{{ getSortIndicator('source') }}
             </th>
-            <th @click="toggleSort('verified')" class="sortable">
+            <th @click="toggleSort('verified')" class="sortable status-col">
               Status{{ getSortIndicator('verified') }}
             </th>
             <th>Deps</th>
-            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="fn in paginatedFunctions" :key="fn.lean_name" :class="{ 'row-hidden': fn.is_hidden, 'row-artifact': fn.is_extraction_artifact }">
             <td class="cell-name">
-              <span class="name-short" :title="fn.lean_name">{{ getFunctionName(fn.lean_name) }}</span>
+              <button @click="openDetails(fn)" class="function-button" :title="fn.lean_name">
+                <code>{{ getFunctionName(fn.lean_name) }}</code>
+              </button>
               <span v-if="fn.is_hidden" class="tag tag-hidden">hidden</span>
               <span v-if="fn.is_extraction_artifact" class="tag tag-artifact">artifact</span>
             </td>
             <td class="cell-source">
-              <span :title="fn.source ?? ''">{{ formatSource(fn) }}</span>
+              <span class="source-link" :title="fn.source ?? ''">{{ formatSource(fn) }}</span>
             </td>
-            <td class="cell-status">
-              <span :class="['badge', getStatusBadge(fn).class]">
-                {{ getStatusBadge(fn).text }}
+            <td class="cell-status status-col">
+              <span :class="['status-icon', getVerifiedStatus(getStatusString(fn)).cssClass]">
+                {{ getVerifiedStatus(getStatusString(fn)).icon }}
               </span>
             </td>
             <td class="cell-deps">
               {{ fn.dependencies.length }}
-            </td>
-            <td class="cell-actions">
-              <button @click="openDetails(fn)" class="btn-details">Details</button>
             </td>
           </tr>
         </tbody>
@@ -246,12 +277,24 @@ function closeModal() {
     </div>
 
     <!-- Pagination -->
-    <div class="pagination" v-if="totalPages > 1">
-      <button @click="currentPage = 1" :disabled="currentPage === 1">First</button>
-      <button @click="currentPage--" :disabled="currentPage === 1">Prev</button>
-      <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
-      <button @click="currentPage = totalPages" :disabled="currentPage === totalPages">Last</button>
+    <div class="pagination">
+      <div class="pagination-controls" v-if="totalPages > 1">
+        <button @click="currentPage = 1" :disabled="currentPage === 1">First</button>
+        <button @click="currentPage--" :disabled="currentPage === 1">Prev</button>
+        <span class="page-info">Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="currentPage++" :disabled="currentPage === totalPages">Next</button>
+        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages">Last</button>
+      </div>
+      <div class="page-size-selector">
+        <label>Per page:</label>
+        <select v-model.number="pageSize" @change="currentPage = 1">
+          <option :value="50">50</option>
+          <option :value="100">100</option>
+          <option :value="200">200</option>
+          <option :value="300">300</option>
+          <option :value="500">500</option>
+        </select>
+      </div>
     </div>
 
     <!-- Details Modal -->
@@ -260,9 +303,25 @@ function closeModal() {
         <button class="modal-close" @click="closeModal">&times;</button>
         <h3>{{ selectedFunction.lean_name }}</h3>
 
-        <div class="detail-section">
+        <div class="detail-section" v-if="selectedFunction.rust_name">
           <h4>Rust Name</h4>
-          <p class="detail-value">{{ selectedFunction.rust_name ?? '-' }}</p>
+          <div class="code-block-wrapper">
+            <code class="full-name">{{ selectedFunction.rust_name }}</code>
+            <button
+              @click="copyRustName"
+              class="copy-icon-button"
+              :class="{ copied: copySuccess }"
+              :title="copySuccess ? 'Copied!' : 'Copy to clipboard'"
+            >
+              <span v-if="copySuccess">✓</span>
+              <span v-else>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+              </span>
+            </button>
+          </div>
         </div>
 
         <div class="detail-section">
@@ -273,33 +332,41 @@ function closeModal() {
         <div class="detail-section">
           <h4>Verification Status</h4>
           <p>
-            <span :class="['badge', getStatusBadge(selectedFunction).class]">
-              {{ getStatusBadge(selectedFunction).text }}
+            <span :class="['status-icon', getVerifiedStatus(getStatusString(selectedFunction)).cssClass]">
+              {{ getVerifiedStatus(getStatusString(selectedFunction)).icon }}
             </span>
+            <span class="status-label">{{ getVerifiedStatus(getStatusString(selectedFunction)).label }}</span>
           </p>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.spec_statement">
           <h4>Spec Statement</h4>
-          <pre class="spec-code">{{ selectedFunction.spec_statement }}</pre>
+          <div class="spec-code-wrapper" v-html="highlightedSpec || `<pre><code>${selectedFunction.spec_statement}</code></pre>`"></div>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.spec_docstring">
           <h4>Spec Docstring</h4>
-          <p class="detail-value">{{ selectedFunction.spec_docstring }}</p>
+          <div class="spec-code-wrapper" v-html="highlightedDocstring || `<pre><code>${selectedFunction.spec_docstring}</code></pre>`"></div>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.dependencies.length > 0">
           <h4>Dependencies ({{ selectedFunction.dependencies.length }})</h4>
           <ul class="deps-list">
-            <li v-for="dep in selectedFunction.dependencies" :key="dep">{{ dep }}</li>
+            <li v-for="dep in selectedFunction.dependencies" :key="dep">{{ getFunctionName(dep) }}</li>
+          </ul>
+        </div>
+
+        <div class="detail-section" v-if="selectedFunction.dependents.length > 0">
+          <h4>Dependents ({{ selectedFunction.dependents.length }})</h4>
+          <ul class="deps-list">
+            <li v-for="dep in selectedFunction.dependents" :key="dep">{{ getFunctionName(dep) }}</li>
           </ul>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.nested_children.length > 0">
           <h4>Nested Children</h4>
           <ul class="deps-list">
-            <li v-for="child in selectedFunction.nested_children" :key="child">{{ child }}</li>
+            <li v-for="child in selectedFunction.nested_children" :key="child">{{ getFunctionName(child) }}</li>
           </ul>
         </div>
       </div>
@@ -412,9 +479,35 @@ function closeModal() {
   max-width: 300px;
 }
 
-.name-short {
-  font-family: var(--vp-font-family-mono);
+.function-button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.function-button:hover {
+  opacity: 0.8;
+}
+
+.function-button code {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  background: transparent;
+  padding: 0;
   font-size: 0.85rem;
+  color: var(--vp-c-brand-1);
+  cursor: pointer;
+}
+
+.function-button:hover code {
+  text-decoration: underline;
 }
 
 .tag {
@@ -437,7 +530,16 @@ function closeModal() {
 }
 
 .cell-source {
-  max-width: 200px;
+  max-width: 220px;
+}
+
+.source-link {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
   font-family: var(--vp-font-family-mono);
   font-size: 0.8rem;
   color: var(--vp-c-text-2);
@@ -447,32 +549,35 @@ function closeModal() {
   white-space: nowrap;
 }
 
-.badge {
-  display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+.status-col {
+  text-align: center;
+  width: 80px;
 }
 
-.badge-fully-verified {
-  background: var(--vp-c-green-soft);
-  color: var(--vp-c-green-darker);
+/* Status icon colors - matches StatusTable */
+.status-icon {
+  font-size: 1.2rem;
 }
 
-.badge-verified {
-  background: var(--vp-c-green-soft);
-  color: var(--vp-c-green-1);
+.status-icon.checked,
+.status-icon.verified {
+  color: #10b981;
 }
 
-.badge-specified {
-  background: var(--vp-c-yellow-soft);
-  color: var(--vp-c-yellow-darker);
+.status-icon.specified {
+  color: #3b82f6;
 }
 
-.badge-none {
-  background: var(--vp-c-bg-soft);
-  color: var(--vp-c-text-2);
+.status-icon.draft {
+  color: #f59e0b;
+}
+
+.status-icon.unchecked {
+  color: var(--vp-c-text-3);
+}
+
+.status-label {
+  margin-left: 0.5rem;
 }
 
 .cell-deps {
@@ -480,33 +585,22 @@ function closeModal() {
   color: var(--vp-c-text-2);
 }
 
-.cell-actions {
-  white-space: nowrap;
-}
-
-.btn-details {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.8rem;
-  border: 1px solid var(--vp-c-border);
-  border-radius: 4px;
-  background: var(--vp-c-bg);
-  color: var(--vp-c-text-1);
-  cursor: pointer;
-}
-
-.btn-details:hover {
-  background: var(--vp-c-bg-soft);
-}
-
 .pagination {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+  justify-content: space-between;
+  gap: 1rem;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
-.pagination button {
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-controls button {
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--vp-c-border);
   border-radius: 4px;
@@ -515,12 +609,12 @@ function closeModal() {
   cursor: pointer;
 }
 
-.pagination button:disabled {
+.pagination-controls button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
 }
 
-.pagination button:not(:disabled):hover {
+.pagination-controls button:not(:disabled):hover {
   background: var(--vp-c-bg-soft);
 }
 
@@ -528,6 +622,23 @@ function closeModal() {
   padding: 0 0.5rem;
   font-size: 0.9rem;
   color: var(--vp-c-text-2);
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--vp-c-text-2);
+}
+
+.page-size-selector select {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--vp-c-border);
+  border-radius: 4px;
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+  cursor: pointer;
 }
 
 /* Modal styles */
@@ -594,14 +705,81 @@ function closeModal() {
   word-break: break-all;
 }
 
-.spec-code {
-  background: var(--vp-c-bg-soft);
+.code-block-wrapper {
+  position: relative;
+}
+
+.full-name {
+  display: block;
   padding: 0.75rem;
+  padding-right: 3rem;
+  background: var(--vp-c-bg-soft);
+  border-radius: 6px;
+  word-break: break-all;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  user-select: all;
+}
+
+.copy-icon-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--vp-c-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.copy-icon-button:hover {
+  background: var(--vp-c-bg);
+  color: var(--vp-c-text-1);
+}
+
+.copy-icon-button.copied {
+  color: #10b981;
+}
+
+.copy-icon-button svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Shiki syntax highlighting wrapper */
+.spec-code-wrapper {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.spec-code-wrapper :deep(pre) {
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 6px;
   font-size: 0.8rem;
   overflow-x: auto;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+.spec-code-wrapper :deep(code) {
+  font-family: var(--vp-font-family-mono);
+}
+
+/* Fallback styling when Shiki hasn't loaded yet */
+.spec-code-wrapper > pre {
+  background: var(--vp-c-bg-soft);
+  margin: 0;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
 }
 
 .deps-list {
