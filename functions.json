@@ -171,10 +171,12 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    ∃ result, conditional_assign self other choice = ok result ∧\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\nthe output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
@@ -185,7 +187,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
@@ -205,10 +207,12 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    ∃ result, conditional_assign self other choice = ok result ∧\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_minus_X[i]!.val else self.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) := by ...",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\nthe output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
@@ -219,7 +223,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
