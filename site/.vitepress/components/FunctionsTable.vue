@@ -773,6 +773,13 @@ watch(selectedFunction, async (fn) => {
   font-family: var(--vp-font-family-mono);
 }
 
+/* Shiki dual theme support - use light theme colors by default */
+.spec-code-wrapper :deep(.shiki),
+.spec-code-wrapper :deep(.shiki span) {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+}
+
 /* Fallback styling when Shiki hasn't loaded yet */
 .spec-code-wrapper > pre {
   background: var(--vp-c-bg-soft);
@@ -792,5 +799,14 @@ watch(selectedFunction, async (fn) => {
 
 .deps-list li {
   margin-bottom: 0.25rem;
+}
+</style>
+
+<style>
+/* Global styles for Shiki dark mode support (must be non-scoped to access html.dark) */
+html.dark .spec-code-wrapper .shiki,
+html.dark .spec-code-wrapper .shiki span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
 }
 </style>
