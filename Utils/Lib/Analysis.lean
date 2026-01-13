@@ -74,6 +74,21 @@ def isVerified (env : Environment) (name : Name) : Bool :=
   | some _ => !proofContainsSorry env specName
   | none => false
 
+/-- Get the file path where the spec theorem is defined.
+    Returns the path relative to the project root (e.g., "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean"). -/
+def getSpecFilePath (env : Environment) (name : Name) : Option String :=
+  let specName := getSpecName name
+  -- Check if the theorem exists
+  if env.find? specName |>.isNone then none
+  else
+    -- Get the module that contains this declaration
+    match env.getModuleIdxFor? specName with
+    | none => none
+    | some modIdx =>
+      let moduleName := env.allImportedModuleNames[modIdx.toNat]!
+      -- Convert module name to file path
+      some (moduleName.toString.replace "." "/" ++ ".lean")
+
 /-- Get the spec theorem statement as a pretty-printed string.
     Returns the theorem type (the proposition being proved). -/
 def getSpecStatement (env : Environment) (name : Name) : IO (Option String) := do

@@ -47,6 +47,8 @@ structure FunctionRecord where
   isVerified : Bool := false
   /-- True if verified AND all transitive dependencies are verified -/
   isFullyVerified : Bool := false
+  /-- File path where the spec theorem is defined (e.g., "Curve25519Dalek/Specs/.../Add.lean") -/
+  specFilePath : Option String := none
   /-- The spec theorem docstring, if one exists -/
   specDocstring : Option String := none
   /-- The spec theorem statement (without proof), if one exists -/
@@ -73,6 +75,7 @@ structure FunctionOutput where
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
+  spec_file : Option String := none
   spec_docstring : Option String := none
   spec_statement : Option String := none
   deriving ToJson, FromJson, Repr
@@ -94,6 +97,7 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     specified := rec.isSpecified
     verified := rec.isVerified
     fully_verified := rec.isFullyVerified
+    spec_file := rec.specFilePath
     spec_docstring := rec.specDocstring
     spec_statement := rec.specStatement }
 
