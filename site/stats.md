@@ -4,13 +4,15 @@ layout: home
 ---
 
 <script setup lang="ts">
+import { defineAsyncComponent } from 'vue'
 import { data } from './.vitepress/data/status.data'
 import { data as progressData } from './.vitepress/data/progress.data'
-import { data as depsData } from './.vitepress/data/deps.data'
-import ProgressChart from './.vitepress/components/ProgressChart.vue'
-import DependencyGraph from './.vitepress/components/DependencyGraph.vue'
 
-const { stats, entries } = data
+const ProgressChart = defineAsyncComponent(() =>
+  import('./.vitepress/components/ProgressChart.vue')
+)
+
+const { stats } = data
 const { dataPoints } = progressData
 </script>
 
@@ -41,10 +43,6 @@ const { dataPoints } = progressData
 ## Verification Progress
 
 <ProgressChart :dataPoints="dataPoints" />
-
-## Dependency Graph
-
-<DependencyGraph :functions="depsData.functions" :statusEntries="entries" />
 
 <style scoped>
 .stats-grid {
