@@ -67,11 +67,15 @@ jobs:
           echo "Regenerating functions.json..."
           lake exe listfuns functions.json.new
           # Compare using jq -S to normalize JSON (sorts keys, consistent formatting)
-          if diff <(jq -S . functions.json) <(jq -S . functions.json.new) > /dev/null; then
+          DIFF_OUTPUT=$(diff <(jq -S . functions.json) <(jq -S . functions.json.new) || true)
+          if [ -z "$DIFF_OUTPUT" ]; then
             echo "✓ functions.json is up to date!"
             rm functions.json.new
           else
             echo "❌ functions.json is out of date!"
+            echo ""
+            echo "Diff output:"
+            echo "$DIFF_OUTPUT"
             echo ""
             echo "Please regenerate functions.json and commit the changes:"
             echo ""
