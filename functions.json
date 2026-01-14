@@ -68,14 +68,11 @@
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    ∃ c, add self other = ok c ∧\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
-   "spec_docstring":
-   "/-- Spec for `add`.\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -86,7 +83,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
@@ -163,14 +160,11 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem as_projective_spec\n    (q : CompletedPoint) (hq_valid : q.IsValid) :\n    ∃ proj, as_projective q = ok proj ∧\n    proj.IsValid ∧ proj.toPoint = q.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean",
-   "spec_docstring":
-   "/--\nVerification of the `as_projective` function.\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
@@ -181,7 +175,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
@@ -202,7 +196,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
@@ -241,7 +235,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
   {"verified": false,
@@ -448,14 +442,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem double_spec\n    (q : ProjectivePoint) (hq_valid : q.IsValid) :\n    ∃ c, ProjectivePoint.double q = ok c ∧\n    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean",
-   "spec_docstring":
-   "/--\nVerification of the `double` function.\nThe theorem states that the Rust implementation of point doubling corresponds\nexactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -466,7 +457,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -1338,14 +1329,11 @@
    "is_extraction_artifact": false,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem conditional_assign_spec\n    (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    ∃ res,\n      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign\n        self other choice = ok res ∧\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
-   "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_assign`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `other[i]` when `choice = 1`,\n  and equals `self[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `other`;\n  when `choice = Choice.zero`, the result equals `self`.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
@@ -1357,16 +1345,13 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies": []},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem conditional_select_spec\n    (a b : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    ∃ res,\n      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select\n        a b choice = ok res ∧\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
-   "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_select`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
@@ -1377,7 +1362,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -2720,8 +2705,7 @@
    "spec_statement":
    "theorem double_spec (e : EdwardsPoint) :\n    ∃ e_double e_plus_e eq_choice,\n    double e = ok e_double ∧\n    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add e e = ok e_plus_e ∧\n    edwards.ConstantTimeEqEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧\n    eq_choice = Choice.one := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
@@ -2739,7 +2723,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result : Bool, is_small_order self = ok result ∧\n    (result ↔ 8 • self.toPoint = 0) := by ...",
+   "theorem is_small_order_spec' (e : EdwardsPoint) :\n    ∃ b e8 id eq_choice,\n    is_small_order e = ok b ∧\n    mul_by_cofactor e = ok e8 ∧\n    edwards.IdentityEdwardsPoint.identity = ok id ∧\n    edwards.ConstantTimeEqEdwardsPoint.ct_eq e8 id = ok eq_choice ∧\n    (b = true ↔ eq_choice = Choice.one) := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
@@ -2810,10 +2794,10 @@
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.edwards.EdwardsPoint.mul_base"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_cofactor_spec (e : EdwardsPoint) :\n    ∃ e_result,\n    mul_by_cofactor e = ok e_result ∧\n    ok e_result = mul_by_pow_2 e 3#u32 := by ...",
+   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result,\n    mul_by_cofactor self = ok result ∧\n    result.IsValid ∧\n    result.toPoint = 8 • self.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_cofactor`**:\n- No panic (always returns successfully)\n- Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e\n-/",
