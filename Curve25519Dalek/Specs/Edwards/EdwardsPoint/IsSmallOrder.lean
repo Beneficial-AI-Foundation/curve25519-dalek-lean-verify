@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
@@ -40,7 +41,7 @@ natural language specs:
 - This is determined by checking if multiplying by the cofactor yields the identity element
 -/
 @[progress]
-theorem is_small_order_spec (e : EdwardsPoint) :
+theorem is_small_order_spec' (e : EdwardsPoint) :
     ∃ b e8 id eq_choice,
     is_small_order e = ok b ∧
     mul_by_cofactor e = ok e8 ∧
@@ -48,5 +49,10 @@ theorem is_small_order_spec (e : EdwardsPoint) :
     edwards.ConstantTimeEqEdwardsPoint.ct_eq e8 id = ok eq_choice ∧
     (b = true ↔ eq_choice = Choice.one) := by
     sorry
+
+theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
+    ∃ result : Bool, is_small_order self = ok result ∧
+    (result ↔ 8 • self.toPoint = 0) := by
+  sorry
 
 end curve25519_dalek.edwards.EdwardsPoint

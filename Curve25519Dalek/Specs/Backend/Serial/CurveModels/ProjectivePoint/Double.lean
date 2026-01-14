@@ -231,9 +231,9 @@ theorem double_spec_aux (q : ProjectivePoint)
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-namespace Edwards
+namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
-open curve25519_dalek.backend.serial.curve_models
+open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 
@@ -455,4 +455,4 @@ theorem double_spec
             (1 - Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y) := by
             rw [h_qx, h_qy]; simp only [Ed25519]; ring
 
-end Edwards
+end curve25519_dalek.backend.serial.curve_models.ProjectivePoint

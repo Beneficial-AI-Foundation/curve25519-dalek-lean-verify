@@ -8,6 +8,7 @@ on:
     branches: [ '**' ]
     paths:
       - 'Curve25519Dalek/**'
+      - 'Utils/**'
       - 'lakefile.toml'
       - 'lean-toolchain'
       - '.github/workflows/lean.yml'
@@ -15,6 +16,7 @@ on:
     branches: [ '**' ]
     # paths:
     #   - 'Curve25519Dalek/**'
+    #   - 'Utils/**'
     #   - 'lakefile.toml'
     #   - 'lean-toolchain'
     #   - '.github/workflows/lean.yml'
@@ -48,7 +50,7 @@ jobs:
           path: |
             .lake
             build
-          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean') }}
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
           restore-keys: |
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
             ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
@@ -60,15 +62,44 @@ jobs:
       - name: Build Lean project
         run: lake build
 
-      - name: Check for sorries in proofs
+      - name: Check functions.json and status.csv are up to date
         run: |
-          echo "Checking for incomplete proofs (sorries)..."
-          if grep -r "sorry" Curve25519Dalek/Proofs --include="*.lean"; then
+          echo "Running syncstatus to regenerate functions.json and status.csv..."
+          lake exe syncstatus
+
+          # Check functions.json
+          FUNC_DIFF=$(git diff functions.json || true)
+          if [ -n "$FUNC_DIFF" ]; then
+            echo "❌ functions.json is out of date!"
             echo ""
-            echo "⚠️  Warning: Found 'sorry' in proof files above."
-            echo "These represent incomplete proofs that need to be finished."
+            echo "Diff:"
+            echo "$FUNC_DIFF"
+            echo ""
+            FUNC_OUTDATED=1
           else
-            echo "✓ No sorries found - all proofs are complete!"
+            echo "✓ functions.json is up to date!"
+            FUNC_OUTDATED=0
+          fi
+
+          # Check status.csv
+          STATUS_DIFF=$(git diff status.csv || true)
+          if [ -n "$STATUS_DIFF" ]; then
+            echo "❌ status.csv is out of date!"
+            echo ""
+            echo "Diff:"
+            echo "$STATUS_DIFF"
+            echo ""
+            STATUS_OUTDATED=1
+          else
+            echo "✓ status.csv is up to date!"
+            STATUS_OUTDATED=0
+          fi
+
+          # Fail if either is outdated
+          if [ "$FUNC_OUTDATED" = "1" ] || [ "$STATUS_OUTDATED" = "1" ]; then
+            echo ""
+            echo "Please run 'lake exe syncstatus' and commit the changes."
+            exit 1
           fi
 
       - name: Verify build success

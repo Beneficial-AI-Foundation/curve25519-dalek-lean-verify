@@ -30,13 +30,8 @@ name = "Curve25519Dalek"
 name = "Utils"
 
 [[lean_exe]]
-name = "deps"
-root = "Utils.Deps"
-supportInterpreter = true
-
-[[lean_exe]]
 name = "listfuns"
-root = "Utils.ListFunsMain"
+root = "Utils.ListFuns"
 supportInterpreter = true
 
 [[lean_exe]]

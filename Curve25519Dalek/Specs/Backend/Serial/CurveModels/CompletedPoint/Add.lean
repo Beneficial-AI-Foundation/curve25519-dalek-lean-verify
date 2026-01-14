@@ -392,10 +392,10 @@ This section provides a cleaner interface using IsValid predicates for inputs.
 The output CompletedPoint satisfies CompletedPoint.IsValid (all coordinates < 2^54).
 -/
 
-namespace Edwards
+namespace curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
 
+open Edwards
 open curve25519_dalek.backend.serial.curve_models
-open curve25519_dalek.backend.serial.curve_models.CompletedPoint
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.edwards
 
@@ -431,7 +431,7 @@ theorem add_spec_bounds
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) := by
-  exact add_spec_aux self other
+  exact CompletedPoint.add_spec_aux self other
     hself.X_bounds hself.Y_bounds hself.Z_bounds hself.T_bounds
     hother.Y_plus_X_bounds hother.Y_minus_X_bounds hother.Z_bounds hother.T2d_bounds
 
@@ -754,4 +754,4 @@ theorem add_spec
       field_simp [h2, hZ1_ne, hZ2_ne, h_denom_minus]
       ring
 
-end Edwards
+end curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint

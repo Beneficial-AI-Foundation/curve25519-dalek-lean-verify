@@ -19,7 +19,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 250:4-256:5)
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
 
 /-! ## Spec for `conditional_assign` -/
 
@@ -51,4 +51,4 @@ theorem conditional_assign_spec
   · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
     progress*
 
-end curve25519_dalek.backend.serial.u64.field.ConditionallySelectablecurve25519_dalekbackendserialu64fieldFieldElement51
+end curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
