@@ -123,23 +123,100 @@ def add_coords (C : EdwardsCurve F) (p1 p2 : F × F) : F × F :=
   let lambda_val := C.d * x₁ * x₂ * y₁ * y₂
   ( (x₁ * y₂ + y₁ * x₂) / (1 + lambda_val), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lambda_val) )
 
-/-- **Closure of Twisted Edwards Addition**
 
+omit [NeZero (2 : F)] in
+/-- **Closure of Twisted Edwards Addition**
 The sum of two points on a twisted Edwards curve stays on the curve, provided the denominators in
 the addition formula are non-zero. -/
 theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
     (h : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
+
     let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
     C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
-  /- **Reference**: Bernstein, Birkner, Joye, Lange, Peters.
-  "Twisted Edwards Curves". AFRICACRYPT 2008.
-  https://eprint.iacr.org/2008/013.pdf, Section 6, Addition formulas.
 
-  This is a straightforward algebraic verification substituting the addition
-  formulas into the curve equation. -/
-  sorry
+    set x₁ := p1.x
+    set y₁ := p1.y
+    set x₂ := p2.x
+    set y₂ := p2.y
+
+    have h_on_curve_1 : C.a * x₁^2 + y₁^2 = 1 + C.d * x₁^2 * y₁^2 :=
+      p1.on_curve
+
+    have h_on_curve_2 : C.a * x₂^2 + y₂^2 = 1 + C.d * x₂^2 * y₂^2 :=
+      p2.on_curve
+
+    set A := C.a * x₁^2 + y₁^2 - (1 + C.d * x₁^2 * y₁^2)
+    set B := C.a * x₂^2 + y₂^2 - (1 + C.d * x₂^2 * y₂^2)
+
+    have h_on_curve_1' : A = 0 := by
+      linear_combination h_on_curve_1
+
+    have h_on_curve_2' : B = 0 := by
+      linear_combination h_on_curve_2
+
+    have h_denoms : (1 + C.d * x₁ * x₂ * y₁ * y₂ ≠ 0) ∧ (1 - C.d * x₁ * x₂ * y₁ * y₂ ≠ 0) :=
+      by simp [h]
+
+    have h_denoms_plus : (1 + x₁ * y₂ * y₁ * x₂ * C.d) ≠ 0 := by
+      simpa [mul_assoc, mul_comm, mul_left_comm] using h_denoms.1
+
+    have h_denoms_minus : (1 - x₁ * y₂ * y₁ * x₂ * C.d) ≠ 0 := by
+      simpa [mul_assoc, mul_comm, mul_left_comm] using h_denoms.2
+
+    unfold add_coords
+    field_simp [h_denoms_plus, h_denoms_minus]
+
+
+    set LHS :=
+     C.a * (x₁ * y₂ + y₁ * x₂) ^ 2 * (1 - x₁ * y₂ * y₁ * x₂ * C.d) ^ 2 +
+    (1 + x₁ * y₂ * y₁ * x₂ * C.d) ^ 2 * (y₂ * y₁ - C.a * x₁ * x₂) ^ 2
+
+    set RHS :=
+    (1 + x₁ * y₂ * y₁ * x₂ * C.d) ^ 2 * (1 - x₁ * y₂ * y₁ * x₂ * C.d) ^ 2 +
+    (x₁ * y₂ + y₁ * x₂) ^ 2 * C.d * (y₂ * y₁ - C.a * x₁ * x₂) ^ 2
+
+
+    set P :=
+          (C.a * x₂ ^ 2 + y₂ ^ 2) +
+          (- C.d * x₂ ^ 2 * y₂ ^ 2) +
+          (- C.d * x₂ ^ 2 * y₁ ^ 2 * y₂ ^ 2) +
+          (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d) +
+          (  x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 4 * C.d ^ 2) +
+          (- x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d ^ 2) +
+          (  C.a * x₁ ^ 2 * x₂ ^ 4 * y₁ ^ 2 * y₂ ^ 2 * C.d ^ 2)
+
+    set Q := 1 +
+          (- x₁ ^ 2 * y₁ ^ 2 * y₂ ^ 2 * C.d) +
+          (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₁ ^ 2 * C.d) +
+          (  x₁ ^ 4 * x₂ ^ 2 * y₁ ^ 4 * y₂ ^ 2 * C.d ^ 3)
+
+    have h_lhs_rhs_eq_PA_QB : LHS - RHS = P*A + Q*B := by
+      unfold LHS
+      unfold RHS
+      unfold P
+      unfold Q
+      unfold A
+      unfold B
+      ring_nf
+
+    have h_lhs_rhs_eq_zero : LHS - RHS = 0 := by
+      rw [h_lhs_rhs_eq_PA_QB, h_on_curve_1', h_on_curve_2']
+      simp only [mul_zero, add_zero]
+
+    exact (sub_eq_zero.mp h_lhs_rhs_eq_zero)
+
 
 end Completeness
+
+
+
+
+
+
+
+
+
+
 
 /-- The sum of two points on Ed25519 stays on the curve.
     For Ed25519, d is not a square, so the denominators are never zero (complete curve). -/
