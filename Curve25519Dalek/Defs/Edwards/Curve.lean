@@ -123,72 +123,49 @@ def add_coords (C : EdwardsCurve F) (p1 p2 : F × F) : F × F :=
   let lambda_val := C.d * x₁ * x₂ * y₁ * y₂
   ( (x₁ * y₂ + y₁ * x₂) / (1 + lambda_val), (y₁ * y₂ - C.a * x₁ * x₂) / (1 - lambda_val) )
 
-
 omit [NeZero (2 : F)] in
 /-- **Closure of Twisted Edwards Addition**
 The sum of two points on a twisted Edwards curve stays on the curve, provided the denominators in
 the addition formula are non-zero. -/
-theorem add_closure (C : EdwardsCurve F)
-                    (p1 p2 : Point C)
-                    (h_denoms : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
-
+theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
+    (h_denoms : let lam := C.d * p1.x * p2.x * p1.y * p2.y; (1 + lam ≠ 0) ∧ (1 - lam ≠ 0)) :
     let (x, y) := add_coords C (p1.x, p1.y) (p2.x, p2.y)
     C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by
-
-    set x₁ := p1.x
-    set y₁ := p1.y
-    set x₂ := p2.x
-    set y₂ := p2.y
-    unfold add_coords
-    field_simp [show 1 + x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 by
-                simpa [mul_assoc, mul_comm, mul_left_comm] using h_denoms.1,
-                show 1 - x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 by
-                simpa [mul_assoc, mul_comm, mul_left_comm] using h_denoms.2]
-    apply sub_eq_zero.1
-
-    /- We now go on to define appropriate polynomials A, B, P, Q such that the LHS of the
-    main goal can be written as a linear combination of the form LHS = P*A + Q*B.
-
-    A and B are chosen in such a way that the fact that p1 and p2 fulfil the curve
-    equation implies that A = B = 0 and thus LHS = 0, which proves the claim.
-
-    Given the pair (A, B), the coefficient polynomials P and Q are not unique, i.e.,
-    there are many different (often very complex) pairs of polynomials (P, Q) such that
-    LHS = P*A + Q*B. We determined an appropriate, comparatively simple choice for (P, Q) by
-    iterating with AI systems.-/
-
-    set A := C.a * x₁^2 + y₁^2 - (1 + C.d * x₁^2 * y₁^2) -- this vanishes because p1 is on the curve
-
-    set B := C.a * x₂^2 + y₂^2 - (1 + C.d * x₂^2 * y₂^2) -- this vanishes because p2 is on the curve
-
-    set P := (C.a * x₂ ^ 2 + y₂ ^ 2) +
-            (- C.d * x₂ ^ 2 * y₂ ^ 2) +
-            (- C.d * x₂ ^ 2 * y₁ ^ 2 * y₂ ^ 2) +
-            (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d) +
-            (  x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 4 * C.d ^ 2) +
-            (- x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d ^ 2) +
-            (  C.a * x₁ ^ 2 * x₂ ^ 4 * y₁ ^ 2 * y₂ ^ 2 * C.d ^ 2)
-
-    set Q := 1 + (- x₁ ^ 2 * y₁ ^ 2 * y₂ ^ 2 * C.d) +
-            (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₁ ^ 2 * C.d) +
-            (  x₁ ^ 4 * x₂ ^ 2 * y₁ ^ 4 * y₂ ^ 2 * C.d ^ 3)
-
-    calc _ = P*A + Q*B := by unfold P Q A B; ring
-         _ = P*0 + Q*0 := by rw [show A = 0 from by linear_combination p1.on_curve,
-                                 show B = 0 from by linear_combination p2.on_curve]
-         _ = 0 := by ring
+  set x₁ := p1.x
+  set y₁ := p1.y
+  set x₂ := p2.x
+  set y₂ := p2.y
+  unfold add_coords
+  field_simp [show 1 + x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 by grind,
+    show 1 - x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 by grind]
+  apply sub_eq_zero.1
+  /- We now go on to define appropriate polynomials A, B, P, Q such that the LHS of the
+  main goal can be written as a linear combination of the form LHS = P*A + Q*B.
+  A and B are chosen in such a way that the fact that p1 and p2 fulfil the curve
+  equation implies that A = B = 0 and thus LHS = 0, which proves the claim.
+  Given the pair (A, B), the coefficient polynomials P and Q are not unique, i.e.,
+  there are many different (often very complex) pairs of polynomials (P, Q) such that
+  LHS = P*A + Q*B. We determined an appropriate, comparatively simple choice for (P, Q) by
+  iterating with AI systems.-/
+  set A := C.a * x₁^2 + y₁^2 - (1 + C.d * x₁^2 * y₁^2) -- this vanishes because p1 is on the curve
+  set B := C.a * x₂^2 + y₂^2 - (1 + C.d * x₂^2 * y₂^2) -- this vanishes because p2 is on the curve
+  set P := (C.a * x₂ ^ 2 + y₂ ^ 2) +
+    (- C.d * x₂ ^ 2 * y₂ ^ 2) +
+    (- C.d * x₂ ^ 2 * y₁ ^ 2 * y₂ ^ 2) +
+    (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d) +
+    (  x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 4 * C.d ^ 2) +
+    (- x₁ ^ 2 * y₁ ^ 2 * x₂ ^ 2 * y₂ ^ 2 * C.d ^ 2) +
+    (  C.a * x₁ ^ 2 * x₂ ^ 4 * y₁ ^ 2 * y₂ ^ 2 * C.d ^ 2)
+  set Q := 1 + (- x₁ ^ 2 * y₁ ^ 2 * y₂ ^ 2 * C.d) +
+    (- C.a * x₁ ^ 2 * x₂ ^ 2 * y₁ ^ 2 * C.d) +
+    (  x₁ ^ 4 * x₂ ^ 2 * y₁ ^ 4 * y₂ ^ 2 * C.d ^ 3)
+  calc _ = P*A + Q*B := by grind
+    _ = P*0 + Q*0 := by
+      rw [show A = 0 from by linear_combination p1.on_curve,
+        show B = 0 from by linear_combination p2.on_curve]
+    _ = 0 := by ring
 
 end Completeness
-
-
-
-
-
-
-
-
-
-
 
 /-- The sum of two points on Ed25519 stays on the curve.
     For Ed25519, d is not a square, so the denominators are never zero (complete curve). -/
