@@ -2797,7 +2797,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result,\n    mul_by_cofactor self = ok result ∧\n    result.IsValid ∧\n    result.toPoint = 8 • self.toPoint := by ...",
+   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result,\n    mul_by_cofactor self = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (2 ^ 3) • self.toPoint\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_cofactor`**:\n- No panic (always returns successfully)\n- Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e\n-/",
