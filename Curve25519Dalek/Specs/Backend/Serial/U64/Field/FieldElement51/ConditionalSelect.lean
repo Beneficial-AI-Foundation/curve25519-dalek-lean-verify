@@ -18,7 +18,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 228:4-240:5)
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.ConditionalSelect
+namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
 
 /-! ## Spec for `conditional_select` -/
 
@@ -51,4 +51,4 @@ theorem conditional_select_spec
     intro i _
     interval_cases i; all_goals simp_all [Array.make]
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.ConditionalSelect
+end curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51

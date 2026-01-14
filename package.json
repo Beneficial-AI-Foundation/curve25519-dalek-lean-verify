@@ -8,7 +8,6 @@
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
     "docs:rust": "bash scripts/build-rust-docs.sh",
-    "docs:deps": "lake exe deps functions.json deps.json",
     "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {

@@ -79,10 +79,9 @@ end curve25519_dalek.backend.serial.curve_models.CompletedPoint
 This section proves that `as_projective` preserves validity and the represented point.
 -/
 
-namespace Edwards
+namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
-open curve25519_dalek.backend.serial.curve_models
-open curve25519_dalek.backend.serial.curve_models.CompletedPoint
+open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /--
@@ -185,4 +184,4 @@ theorem as_projective_spec
       rw [h_py, hY_F, hZ_F, h_qy]
       field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
 
-end Edwards
+end curve25519_dalek.backend.serial.curve_models.CompletedPoint
