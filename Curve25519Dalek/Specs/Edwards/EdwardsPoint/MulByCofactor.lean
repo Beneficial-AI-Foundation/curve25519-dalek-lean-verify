@@ -41,7 +41,7 @@ theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :
     ∃ result,
     mul_by_cofactor self = ok result ∧
     result.IsValid ∧
-    result.toPoint = (2 ^ 3) • self.toPoint
+    result.toPoint = h • self.toPoint
     := by
   sorry
 end curve25519_dalek.edwards.EdwardsPoint
