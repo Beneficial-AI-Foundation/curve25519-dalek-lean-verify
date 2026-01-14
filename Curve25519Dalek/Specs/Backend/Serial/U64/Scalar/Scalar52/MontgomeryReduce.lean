@@ -168,7 +168,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 6000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
