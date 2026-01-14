@@ -168,7 +168,7 @@ private theorem part2_spec (sum : U128) :
 
   sorry
 
-set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 6000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -345,7 +345,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
                     ↑(Scalar52_as_Nat res) * R := by
         simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, R]
         repeat rw [Finset.sum_range_succ]
-        simp only [Finset.sum_range_zero, add_zero, zero_add, mul_zero, pow_zero, mul_one, pow_one]
+        simp only [Finset.sum_range_zero, zero_add, mul_zero, pow_zero, mul_one]
         simp only [res, Array.make, Array.getElem!_Nat_eq]
 
         zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
@@ -419,9 +419,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
           List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
 
-        have h_len_a : (↑a : List U128).length = 9 := by sorry
-        have h_len_L : (↑constants.L : List U64).length = 5 := by sorry
-
         have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
           rw [h_r4]
            -- use h_r4_128_bound
@@ -485,11 +482,9 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
         have h_align2 : (↑(constants.L[2]!) : ℤ) = ↑(constants.L.val[2]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-            Nat.ofNat_pos, getElem!_pos]
+          simp only [Array.getElem!_Nat_eq, Nat.ofNat_pos, getElem!_pos]
         have h_align3 : (↑(constants.L[3]!) : ℤ) = ↑(constants.L.val[3]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-            Nat.ofNat_pos, getElem!_pos]
+          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq]
         have h_align4 : (↑(constants.L[4]!) : ℤ) = ↑(constants.L.val[4]!) := by
           simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
@@ -500,18 +495,15 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           unfold constants.L
           decide
 
-        simp only [h_L3_zero, mul_zero, zero_mul, add_zero, zero_add, sub_zero]
+        simp only [h_L3_zero, mul_zero, zero_mul, add_zero]
 
         linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
                            + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
 
       have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
-        -- use h_sub
-        rw [constants.L_spec] at h_sub
-        change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
-        apply Int.natCast_modEq_iff at h_sub
-        
-        sorry
+        rw [constants.L_spec] at h_sub; change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
+        rw [← Int.natCast_modEq_iff] at h_sub; push_cast at h_sub
+        simp only [Int.add_modulus_modEq_iff] at h_sub; exact h_sub
 
       rw [Int.ModEq.mul_right R h_equiv_int]
       rw [← h_core]
