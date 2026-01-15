@@ -38,7 +38,7 @@ natural language specs:
 - For k = 1, returns the doubled point 2e for the input point e
 - For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))
 -/
-theorem mul_by_pow_2_spec (self : EdwardsPoint) (hself : self.IsValid) (k : U32) (hk : k.val > 0) :
+theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32) (hself : self.IsValid) (hk : k.val > 0) :
     ∃ result : EdwardsPoint, mul_by_pow_2 self k = ok result ∧
     result.IsValid ∧
     result.toPoint = (2 ^ k.val) • self.toPoint := by

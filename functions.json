@@ -2811,10 +2811,10 @@
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.edwards.EdwardsPoint.mul_base"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result,\n    mul_by_cofactor self = ok result ∧\n    result.IsValid ∧\n    result.toPoint = h • self.toPoint\n := by ...",
+   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result, mul_by_cofactor self = ok result ∧\n    result.IsValid ∧\n    result.toPoint = h • self.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_cofactor`**:\n- No panic (always returns successfully)\n- Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e\n-/",
@@ -2832,7 +2832,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :\n    ∃ e_result,\n    mul_by_pow_2 e k = ok e_result ∧\n\n    (k = 1#u32 →\n      ∃ e_double eq_choice,\n      double e = ok e_double ∧\n      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_double = ok eq_choice ∧\n      eq_choice = Choice.one) ∧\n\n    (k.val > 1 →\n      ∃ km1 e_km1 e_km1_double eq_choice,\n      k - 1#u32 = ok km1 ∧\n      mul_by_pow_2 e km1 = ok e_km1 ∧\n      double e_km1 = ok e_km1_double ∧\n      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_km1_double = ok eq_choice ∧\n      eq_choice = Choice.one) := by ...",
+   "theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32) (hself : self.IsValid) (hk : k.val > 0) :\n    ∃ result : EdwardsPoint, mul_by_pow_2 self k = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (2 ^ k.val) • self.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_pow_2`**:\n- For k = 1, returns the doubled point 2e for the input point e\n- For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))\n-/",
