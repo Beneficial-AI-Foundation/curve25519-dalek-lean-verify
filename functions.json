@@ -2736,12 +2736,13 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result : Bool, is_small_order self = ok result ∧\n    (result ↔ 8 • self.toPoint = 0) := by ...",
+   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result : Bool, is_small_order self = ok result ∧\n    (result ↔ h • self.toPoint = 0) := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec for `edwards.EdwardsPoint.is_small_order`**:\n- Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])\n- This is determined by checking if multiplying by the cofactor yields the identity element\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order",
