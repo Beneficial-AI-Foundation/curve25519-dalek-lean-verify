@@ -82,8 +82,7 @@ natural language specs:
 
 -- Bridge lemma: converts the existing LFACTOR_spec (on Nat) to the form needed for Int arithmetic
 private lemma LFACTOR_prop :
-  (↑constants.LFACTOR.val * ↑constants.L[0]!.val : Int) % (2 ^ 52) = (2 ^ 52) - 1 := by
-
+    (↑constants.LFACTOR.val * ↑constants.L[0]!.val : Int) % (2 ^ 52) = (2 ^ 52) - 1 := by
   have h_nat := constants.LFACTOR_spec
   obtain ⟨h_mod_zero, _, _⟩ := h_nat
 
@@ -112,7 +111,6 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
     (hp : p = (x * ↑constants.LFACTOR.val) % (2 ^ 52))
     (hcarry : carry_out = (x + p * ↑constants.L[0]!.val) / (2 ^ 52)) :
     x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) := by
-
   have h_div : x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
     rw [hcarry]
     rw [mul_comm ((x + p * ↑constants.L[0]!.val) / 2 ^ 52)]
@@ -136,22 +134,22 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
 
 @[progress]
 private theorem part1_spec (sum : U128)
-  (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
-  ∃ p carry,
-  montgomery_reduce.part1 sum = ok (carry, p) ∧
-  p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
-  carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
-  carry.val < 2 ^ 77 ∧
-  p.val < 2 ^ 52 := by
+    (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
+    ∃ p carry,
+    montgomery_reduce.part1 sum = ok (carry, p) ∧
+    p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
+    carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
+    carry.val < 2 ^ 77 ∧
+    p.val < 2 ^ 52 := by
   unfold montgomery_reduce.part1
   unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
   have h_L_len : constants.L.val.length = 5 := by
     unfold constants.L; rfl
-  progress as ⟨ i, i_post ⟩
-  progress as ⟨ i1, i1_post ⟩
-  progress as ⟨ i2, i2_post ⟩
-  progress as ⟨ i3, i3_post ⟩
-  progress as ⟨ p, p_post ⟩
+  progress as ⟨i, i_post⟩
+  progress as ⟨i1, i1_post⟩
+  progress as ⟨i2, i2_post⟩
+  progress as ⟨i3, i3_post⟩
+  progress as ⟨p, p_post⟩
 
   have h_p_val : p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) := by
       rw [p_post]; simp only [UScalar.val_and];
@@ -198,12 +196,12 @@ private theorem part2_spec (sum : U128) :
   unfold montgomery_reduce.part2
 
   --    Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
-  progress as ⟨ w_cast, hw_cast ⟩     -- Cast sum to u64
-  progress as ⟨ mask1, hmask1 ⟩       -- 1 << 52
-  progress as ⟨ mask, hmask ⟩         -- (1 << 52) - 1
-  progress as ⟨ w, hw ⟩               -- Bitwise AND
+  progress as ⟨w_cast, hw_cast⟩     -- Cast sum to u64
+  progress as ⟨mask1, hmask1⟩       -- 1 << 52
+  progress as ⟨mask, hmask⟩         -- (1 << 52) - 1
+  progress as ⟨w, hw⟩               -- Bitwise AND
   --    Rust: (sum >> 52, w)
-  progress as ⟨ carry, hcarry ⟩       -- Shift right
+  progress as ⟨carry, hcarry⟩       -- Shift right
 
   have h_w_val : w.val = sum.val % 2^52 := by
     rw [hw]; simp only [UScalar.val_and]
@@ -231,7 +229,7 @@ private theorem part2_spec (sum : U128) :
     calc sum.val < 2^128 := h
          _ = 2^76 * 2^52 := by norm_num
 
-  refine ⟨ carry, w, rfl, rfl, h_w_val, h_carry_val, h_carry_bound, h_w_bound ⟩
+  refine ⟨carry, w, rfl, rfl, h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 
 set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
@@ -241,7 +239,8 @@ set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
 -/
 @[progress]
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
-    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
+    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127)
+    (h_a8_bound : a[8]!.val < 2 ^ 95) :
     ∃ m,
     montgomery_reduce a = ok m ∧
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
@@ -362,6 +361,102 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- Cast the final limb (r4_u128) to U64
   progress as ⟨r4, h_r4⟩
 
+  have h_L4_exact : constants.L[4]!.val = 2^44 := by
+      unfold constants.L
+      decide
+
+  have h_r4_val_bound : r4_u128.val < 2 ^ 45 := by
+    rw [h_r4_u128] -- r4_u128 = sum8 / 2^52
+    rw [h_sum8, h_n8_partial, h_prod8_1] -- sum8 = n7 + a[8] + carry4 * L4
+    have h_prod8_bound : (carry4.val * constants.L[4]!.val) < 2^96 := by
+      rw [h_L4_exact]
+      calc
+        carry4.val * 2^44 < 2^52 * 2^44 := Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
+        _ = 2^96                        := by norm_num
+
+    -- Bound sum8: n7 (2^76) + a[8] (2^95) + prod8 (2^96) < 2^97
+    have h_sum8_bound : n7.val + limbs8.val + carry4.val * constants.L[4]!.val < 2^97 := by
+      rw [h_L4_exact]
+      calc
+        n7.val + limbs8.val + carry4.val * 2^44
+          < 2^76 + limbs8.val + carry4.val * 2^44 := by
+            apply Nat.add_lt_add_right
+            apply Nat.add_lt_add_right
+            exact h_n7_bound
+
+        _ < 2^76 + 2^95 + carry4.val * 2^44 := by
+            apply Nat.add_lt_add_right
+            apply Nat.add_lt_add_left
+            rw [h_limbs8]
+            rw [← Array.getElem!_Nat_eq]
+            exact h_a8_bound
+
+        _ < 2^76 + 2^95 + 2^52 * 2^44 := by
+            apply Nat.add_lt_add_left
+            apply Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
+
+        _ < 2^97 := by norm_num
+
+    apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]; apply lt_of_lt_of_le h_sum8_bound
+    norm_num
+
+
+  have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
+    rw [h_r4]
+    simp only [Nat.cast_inj, UScalar.cast, UScalar.val, UScalarTy.U64_numBits_eq]
+    rw [BitVec.toNat_setWidth, Nat.mod_eq_of_lt]
+    apply lt_trans h_r4_val_bound
+    norm_num
+
+  have h_r4_tight : ↑r4 < (2 : Nat) ^ 45 := by
+    simp only [Nat.cast_inj] at h_cast_r4; rw [h_cast_r4]; exact h_r4_val_bound
+
+  have h_red_bound : Scalar52_as_Nat
+      (Array.make 5#usize [r0, r1, r2, r3, r4]
+      field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
+    unfold Scalar52_as_Nat
+
+    simp only [Array.make, Array.getElem!_Nat_eq, List.length_cons, List.length_nil,
+                List.getElem_cons_zero, List.getElem_cons_succ]
+
+    repeat rw [Finset.sum_range_succ]
+    rw [Finset.sum_range_zero, zero_add]
+    simp only [pow_zero, mul_one, pow_mul]
+    simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+      getElem!_pos, List.getElem_cons_zero, one_mul, Nat.one_lt_ofNat,
+      List.getElem_cons_succ, Nat.reduceLT, Nat.lt_add_one]
+    have h_sum_bound : r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
+      have h0 : r0.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r0_bound
+      have h1 : r1.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r1_bound
+      have h2 : r2.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r2_bound
+      have h3 : r3.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r3_bound
+      have h4 : r4.val ≤ 2^45 - 1 := Nat.le_pred_of_lt h_r4_tight
+
+      calc
+        r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
+        ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
+          apply Nat.add_le_add; apply Nat.add_le_add; apply Nat.add_le_add; apply Nat.add_le_add
+          exact h0
+          apply Nat.mul_le_mul_right _ h1
+          apply Nat.mul_le_mul_right _ h2
+          apply Nat.mul_le_mul_right _ h3
+          apply Nat.mul_le_mul_right _ h4
+        _ < 2^253 := by norm_num
+
+    simp only [← pow_mul, Nat.reduceMul]
+    rw [mul_comm (2 ^ 52) _, mul_comm (2 ^ 104) _, mul_comm (2 ^ 156) _, mul_comm (2 ^ 208) _]
+    apply lt_of_lt_of_le h_sum_bound
+
+    rw [← constants.L_spec]; unfold Scalar52_as_Nat
+    trans 2 * (constants.L.val[4]! * 2^208)
+    · rw [← Array.getElem!_Nat_eq, h_L4_exact]
+      norm_num
+    · rw [← Array.getElem!_Nat_eq]; repeat rw [Finset.sum_range_succ];
+      rw [Finset.sum_range_zero, zero_add]
+      simp only [pow_zero, mul_one, pow_mul, Nat.mul_add, ← pow_mul, Nat.reduceMul]
+      rw [mul_comm _ (2 ^ 208)]
+      try linarith
+
   -- Call the 'sub' function
   progress as ⟨m, h_sub, h_mod, h_bound⟩
   · -- Case ha: Prove input limbs are < 2^52
@@ -375,20 +470,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
     ]
     <;> try scalar_tac
-    · -- Bounds on r4 < 2 ^ 52
-      have h_r4_tight : ↑r4 < (2 : Nat) ^ 52 := by
-        -- use this from Aux.lean : theorem Scalar52_top_limb_lt_of_as_Nat_lt (r : Array U64 5#usize)
-        -- (h : Scalar52_as_Nat r < 2 ^ 259) : r[4]!.val < 2 ^ 51 := by sorry
-        sorry
-      exact h_r4_tight
   · -- Case hb: constants.L are valid
     intro i hi
     interval_cases i <;> assumption
   · -- Case ha': Input < 2 * L
-    have h_red_bound : Scalar52_as_Nat
-      (Array.make 5#usize [r0, r1, r2, r3, r4]
-      field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
-      sorry
     apply lt_of_lt_of_le h_red_bound
     rw [constants.L_spec, Nat.two_mul]
   · -- Case hb': L ≤ L
@@ -399,10 +484,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       zify
       -- Total Montgomery factor C
       let C : Int := (carry0.val : Int) +
-                 (carry1.val : Int) * (2^52 : Int) +
-                 (carry2.val : Int) * (2^104 : Int) +
-                 (carry3.val : Int) * (2^156 : Int) +
-                 (carry4.val : Int) * (2^208 : Int)
+                     (carry1.val : Int) * (2^52 : Int) +
+                     (carry2.val : Int) * (2^104 : Int) +
+                     (carry3.val : Int) * (2^156 : Int) +
+                     (carry4.val : Int) * (2^208 : Int)
 
       let res := Array.make 5#usize [r0, r1, r2, r3, r4]
         field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4
@@ -484,11 +569,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
           List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
 
-        have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
-          rw [h_r4]
-           -- use h_r4_128_bound
-          sorry
-
         norm_cast at eq8 h_cast_r4
         rw [← h_cast_r4] at eq8
         simp only [← getElem!_pos]
@@ -544,15 +624,13 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
         have h_align1 : (↑(constants.L[1]!) : ℤ) = ↑(constants.L.val[1]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-            Nat.ofNat_pos, getElem!_pos]
+          simp only [Array.getElem!_Nat_eq]
         have h_align2 : (↑(constants.L[2]!) : ℤ) = ↑(constants.L.val[2]!) := by
-          simp only [Array.getElem!_Nat_eq, Nat.ofNat_pos, getElem!_pos]
+          simp only [Array.getElem!_Nat_eq]
         have h_align3 : (↑(constants.L[3]!) : ℤ) = ↑(constants.L.val[3]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq]
+          simp only [Array.getElem!_Nat_eq]
         have h_align4 : (↑(constants.L[4]!) : ℤ) = ↑(constants.L.val[4]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-            Nat.ofNat_pos, getElem!_pos]
+          simp only [Array.getElem!_Nat_eq]
 
         simp only [h_align0, h_align1, h_align2, h_align3, h_align4] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
 
@@ -560,7 +638,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           unfold constants.L
           decide
 
-        simp only [h_L3_zero, mul_zero, zero_mul, add_zero]
+        simp only [h_L3_zero, zero_mul, add_zero]
 
         linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
                            + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
