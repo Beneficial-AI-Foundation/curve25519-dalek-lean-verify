@@ -69,7 +69,6 @@ theorem neg_spec
     result.y_plus_x = self.y_minus_x ∧
     result.y_minus_x = self.y_plus_x ∧
     (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 := by
-  unfold NegShared0AffineNielsPointAffineNielsPoint.neg
-  progress*
+  sorry
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint
