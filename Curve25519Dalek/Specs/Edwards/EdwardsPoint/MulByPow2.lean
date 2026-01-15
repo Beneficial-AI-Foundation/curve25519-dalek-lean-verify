@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::mul_by_pow_2`
 
@@ -37,24 +38,10 @@ natural language specs:
 - For k = 1, returns the doubled point 2e for the input point e
 - For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))
 -/
-theorem mul_by_pow_2_spec (e : EdwardsPoint) (k : U32) (hk : k.val > 0) :
-    ∃ e_result,
-    mul_by_pow_2 e k = ok e_result ∧
-
-    (k = 1#u32 →
-      ∃ e_double eq_choice,
-      double e = ok e_double ∧
-      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_double = ok eq_choice ∧
-      eq_choice = Choice.one) ∧
-
-    (k.val > 1 →
-      ∃ km1 e_km1 e_km1_double eq_choice,
-      k - 1#u32 = ok km1 ∧
-      mul_by_pow_2 e km1 = ok e_km1 ∧
-      double e_km1 = ok e_km1_double ∧
-      edwards.ConstantTimeEqEdwardsPoint.ct_eq e_result e_km1_double = ok eq_choice ∧
-      eq_choice = Choice.one) := by
-
-    sorry
+theorem mul_by_pow_2_spec (self : EdwardsPoint) (hself : self.IsValid) (k : U32) (hk : k.val > 0) :
+    ∃ result : EdwardsPoint, mul_by_pow_2 self k = ok result ∧
+    result.IsValid ∧
+    result.toPoint = (2 ^ k.val) • self.toPoint := by
+  sorry
 
 end curve25519_dalek.edwards.EdwardsPoint
