@@ -39,7 +39,6 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `edwards.EdwardsPoint.is_small_order`**:
-- No panic (always returns successfully)
 - Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
 - This is determined by checking if multiplying by the cofactor yields the identity element
 -/
@@ -48,22 +47,25 @@ theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
     ∃ result : Bool, is_small_order self = ok result ∧
     (result ↔ 8 • self.toPoint = 0) := by
     unfold is_small_order
-    -- Step 1: Apply mul_by_cofactor_spec to get that multiplying by 8 succeeds
-    obtain ⟨ep, hmul, hep_valid, hep_eq⟩ := mul_by_cofactor_spec self hself
+    unfold traits.IsIdentity.Blanket.is_identity subtle.ConstantTimeEqEdwardsPoint traits.IdentityEdwardsPoint
+    unfold core.convert.FromBoolChoice subtle.FromBoolChoice.from
+    /- Rust source:
+    pub fn is_small_order(&self) -> bool {
+        self.mul_by_cofactor().is_identity()
+    }
+    -/
     progress*
-    -- The proof proceeds as follows:
-    -- 1. is_small_order computes ep = mul_by_cofactor(self), which represents 8•self
-    -- 2. It then checks if ep equals the identity element using ct_eq
-    -- 3. This is equivalent to checking if 8•self.toPoint = 0 (the group identity)
-    --
-    -- To complete this proof, we need:
-    -- - A lemma showing that the identity element's toPoint equals 0
-    -- - The ct_eq_spec to connect constant-time equality to mathematical equality
-    -- - Lemmas about how toPoint behaves with respect to the group operation
-    --
-    -- These intermediate lemmas are not yet proven in the codebase, so we
-    -- admit this theorem for now.
-    sorry
-
+    · sorry
+    · sorry
+    · sorry
+    · sorry
+    · sorry
+    · sorry
+    · rw [decide_eq_true_eq]
+      constructor
+      · intro h
+        sorry
+      · intro h
+        sorry
 
 end curve25519_dalek.edwards.EdwardsPoint
