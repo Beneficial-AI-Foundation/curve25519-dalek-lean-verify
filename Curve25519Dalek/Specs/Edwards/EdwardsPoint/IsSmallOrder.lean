@@ -65,4 +65,5 @@ theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
     -- admit this theorem for now.
     sorry
 
+
 end curve25519_dalek.edwards.EdwardsPoint

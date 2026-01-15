@@ -60,33 +60,8 @@ jobs:
         with:
           toolchain: nightly-2025-07-20
 
-      - name: Install elan (Lean version manager)
-        run: |
-          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
-          echo "$HOME/.elan/bin" >> $GITHUB_PATH
-
-      - name: Cache Lean build
-        uses: actions/cache@v4
-        with:
-          path: |
-            .lake
-            build
-          key: ${{ runner.os }}-lean-docs-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}
-          restore-keys: |
-            ${{ runner.os }}-lean-docs-${{ hashFiles('lean-toolchain') }}-
-            ${{ runner.os }}-lean-docs-
-
-      - name: Download Lean dependency caches
-        run: lake exe cache get
-
-      - name: Build Lean project
-        run: lake build
-
       - name: Install dependencies
         run: npm ci
-
-      - name: Generate dependency analysis
-        run: npm run docs:deps
 
       - name: Build Rust docs
         run: npm run docs:rust
