@@ -5,6 +5,12 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Aux
+import Curve25519Dalek.Tactics
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 
 /-! # Spec Theorem for `Scalar52::montgomery_reduce`
 
@@ -20,6 +26,32 @@ This function performs Montgomery reduction.
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
+attribute [-simp] Int.reducePow Nat.reducePow
+
+/-! ## Specs for montgomery_reduce helpers -/
+
+@[progress]
+theorem montgomery_reduce_part1_spec (sum : U128) :
+    ∃ carry n,
+      montgomery_reduce.part1 sum = ok (carry, n) ∧
+      n.val < 2 ^ 52 ∧
+      carry.val = (sum.val + n.val * (backend.serial.u64.constants.L[0]!).val) / 2 ^ 52 := by
+  -- TODO: prove using mask/shift-right arithmetic and LFACTOR
+  sorry
+
+@[progress]
+theorem montgomery_reduce_part2_spec (sum : U128) :
+    ∃ carry w,
+      montgomery_reduce.part2 sum = ok (carry, w) ∧
+      w.val = sum.val % 2 ^ 52 ∧
+      carry.val = sum.val / 2 ^ 52 ∧
+      w.val < 2 ^ 52 := by
+  -- TODO: prove using mask/shift-right arithmetic
+  sorry
 
 /-
 natural language description:
@@ -53,6 +85,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
     (∀ i < 5, m[i]!.val < 2 ^ 62)
     := by
+  -- TODO: mvcgen proof; use part1/part2/sub_spec and L_spec
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

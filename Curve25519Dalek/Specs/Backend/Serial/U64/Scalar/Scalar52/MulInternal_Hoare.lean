@@ -5,6 +5,7 @@ Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Std.Do
 import Curve25519Dalek.mvcgen
 open Std.Do
@@ -37,6 +38,8 @@ theorem mul_internal_hoare_spec (a b : Array U64 5#usize)
 mul_internal a b
 ⦃⇓ result => ⌜Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b⌝⦄
   := by
-  sorry
+  mvcgen
+  rcases mul_internal_spec a b ha hb with ⟨result, hres, hmul, _hbounds⟩
+  simp [Std.Do.wp, PostCond.noThrow, hres, hmul]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -44,14 +44,18 @@ theorem index_usize_hoare_spec {α : Type u} {n : Usize} [Inhabited α] (v : Arr
     ⦃⌜True⌝⦄
     Array.index_usize v i
     ⦃⇓x => ⌜x = v.val[i.val]!⌝⦄ := by
-  sorry
+  mvcgen
+  rcases Array.index_usize_spec v i hbound with ⟨x, hx, hxval⟩
+  simp [Std.Do.wp, PostCond.noThrow, hx, hxval]
 
 @[spec]
 theorem sub_hoare_spec (x y : U64) (h : y.val ≤ x.val) :
     ⦃⌜True⌝⦄
     (x - y)
     ⦃⇓z => ⌜z.val = x.val - y.val ∧ y.val ≤ x.val ⌝⦄ := by
-  sorry
+  mvcgen
+  rcases U64.sub_spec h with ⟨z, hz, hzval, hzle⟩
+  simp [Std.Do.wp, PostCond.noThrow, hz, hzval, hzle]
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:
 - No panic (always returns successfully)
