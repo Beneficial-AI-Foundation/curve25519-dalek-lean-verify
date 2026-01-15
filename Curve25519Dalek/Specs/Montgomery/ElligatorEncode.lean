@@ -44,7 +44,7 @@ theorem elligator_encode_spec
   (r_0 : backend.serial.u64.field.FieldElement51)
   (h_r_0_bounds : ∀ i, i < 5 → (r_0[i]!).val < 2 ^ 54) :
   elligator_encode r_0 ⦃ mp choice =>
-    U8x32_as_Nat mp < p ∧ choice.valid ⦄ := by
+    U8x32_as_Nat mp < p ∧ (choice.val = 0#u8 ∨ choice.val = 1#u8) ⦄ := by
   sorry
 
 end curve25519_dalek.montgomery
