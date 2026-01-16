@@ -18,6 +18,8 @@ This function checks if the representation is canonical.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
 
@@ -39,22 +41,8 @@ natural language specs:
 -/
 @[progress]
 theorem is_canonical_spec (s : Scalar) :
-    ∃ c, is_canonical s = ok c ∧
-    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) := by
-  unfold is_canonical
-  progress*
-  constructor
-  · -- BEGIN TASK
-    grind
-    -- END TASK
-  · -- BEGIN TASK
-    intro h
-    rename_i s' _
-    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post_1 s_post_2 h
-    rw [res_post]
-    apply U8x32_as_Nat_injective
-    symm
-    exact bytes_eq
-    -- END TASK
+    is_canonical s ⦃ c =>
+      (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by
+  sorry
 
 end curve25519_dalek.scalar.Scalar

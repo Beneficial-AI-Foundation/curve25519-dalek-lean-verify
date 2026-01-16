@@ -22,6 +22,8 @@ given the defining equation $ax^2 + y^2 = 1 + dx^2y^2$ of the Edwards curve whic
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -56,10 +58,7 @@ theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 
       (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)
       -- (hself : self.IsValid)
       :
-    ∃ result, compress self = ok result -- ∧
-    -- result.IsValid ∧ result.toPoint = self.toPoint
-    := by
-  unfold compress
+    compress self ⦃ result => True ⦄ := by
   sorry
 
 

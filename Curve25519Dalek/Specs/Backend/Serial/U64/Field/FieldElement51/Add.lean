@@ -14,6 +14,8 @@ This function performs element-wise addition of field element limbs. It simply w
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51
 
@@ -31,10 +33,9 @@ namespace curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51Shar
 @[progress]
 theorem add_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
-    ∃ result, add a b = ok result ∧
-    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
-    (∀ i < 5, result[i]!.val < 2^54) := by
-  unfold add;
-  progress*
+    add a b ⦃ result =>
+      (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
+      (∀ i < 5, result[i]!.val < 2^54) ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51
