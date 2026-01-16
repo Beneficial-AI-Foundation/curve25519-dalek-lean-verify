@@ -5,7 +5,6 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 
 /-! # Spec Theorem for `ProjectiveNielsPoint::neg`
@@ -28,9 +27,7 @@ The concrete formulas are:
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field
-open curve25519_dalek.backend.serial.curve_models
-
+open curve25519_dalek.backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint
 namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint
 
 /-
@@ -67,16 +64,17 @@ where p = 2^255 - 19.
 This implements the negation of a point in projective Niels coordinates.
 -/
 theorem neg_spec
-    (self : backend.serial.curve_models.ProjectiveNielsPoint)
-    (self_bound : ∀ i < 5, self.T2d[i]!.val < 2 ^ 54) :
-    ∃ result, NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg self = ok result ∧
+    (self : ProjectiveNielsPoint)
+    (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :
+    ∃ result, neg self = ok result ∧
     result.Y_plus_X = self.Y_minus_X ∧
     result.Y_minus_X = self.Y_plus_X ∧
     result.Z = self.Z ∧
     (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 := by
   sorry
-  --unfold backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
-  --progress*
+
+
+
 
 
 
