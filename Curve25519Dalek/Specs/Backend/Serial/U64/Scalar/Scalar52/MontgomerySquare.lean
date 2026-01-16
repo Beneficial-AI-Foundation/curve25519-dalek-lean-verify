@@ -7,6 +7,12 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
+
+import Mathlib.Algebra.Polynomial.Eval.Algebra
+import Mathlib.Algebra.Polynomial.Eval.Coeff
+import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.Eval.Degree
+
 /-! # Spec Theorem for `Scalar52::montgomery_square`
 
 Specification and proof for `Scalar52::montgomery_square`.
@@ -42,7 +48,8 @@ natural language specs:
   (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :
+theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62)
+    (hm_4 : m[4]!.val < 2 ^ 47) :
     ∃ w,
     montgomery_square m = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
@@ -50,6 +57,8 @@ theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 6
     := by
   unfold montgomery_square
   progress*
+  · -- m^2[8] < 2 ^ 95
+    sorry
   refine ⟨by simpa [a_post_1, eq_comm] using res_post_1,
     fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
 
