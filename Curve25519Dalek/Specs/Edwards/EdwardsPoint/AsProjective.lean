@@ -15,6 +15,8 @@ This function converts to projective coordinates.
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -36,8 +38,8 @@ natural language specs:
 -/
 @[progress]
 theorem as_projective_spec (e : EdwardsPoint) :
-    ∃ q, edwards.EdwardsPoint.as_projective e = ok q ∧
-    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z := by
+    edwards.EdwardsPoint.as_projective e ⦃ q =>
+      q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z ⦄ := by
   unfold edwards.EdwardsPoint.as_projective
   simp
 

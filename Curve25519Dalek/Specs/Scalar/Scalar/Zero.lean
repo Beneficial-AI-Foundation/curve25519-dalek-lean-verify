@@ -15,6 +15,8 @@ This constant represents the scalar value 0.
 Source: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.scalar.Scalar
@@ -26,8 +28,7 @@ namespace curve25519_dalek.scalar.Scalar
 The ZERO constant represents the scalar 0.
 -/
 @[progress]
-theorem ZERO_spec : U8x32_as_Nat ZERO.bytes = 0 := by
-  unfold ZERO ZERO_body
-  decide
+theorem ZERO_spec : ok ZERO ⦃ s => U8x32_as_Nat s.bytes = 0 ⦄ := by
+  simp [ZERO, ZERO_body]
 
 end curve25519_dalek.scalar.Scalar
