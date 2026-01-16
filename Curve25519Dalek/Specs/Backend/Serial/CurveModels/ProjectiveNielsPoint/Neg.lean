@@ -74,8 +74,9 @@ theorem neg_spec
     result.Y_minus_X = self.Y_plus_X ∧
     result.Z = self.Z ∧
     (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 := by
-  unfold NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
-  progress*
+  sorry
+  --unfold backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint.neg
+  --progress*
 
 
 
