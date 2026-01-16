@@ -245,8 +245,13 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     montgomery_reduce a = ok m ∧
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat m < 2 ^ 259)
+    (Scalar52_as_Nat m < L)
     := by
+  -- -- ============================================================================================
+  -- -- INFO: Comment out the proof below to speed up build. You need to increase Heartbeats to
+  -- --     8000000 if you the proof is not commented, otherwise you'll get a deterministic timeout.
+  -- -- ============================================================================================
+
   -- 1. Instantiate ALL array bounds explicitly.
   have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
   have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
@@ -416,8 +421,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
     unfold Scalar52_as_Nat
 
-    simp only [Array.make, Array.getElem!_Nat_eq, List.length_cons, List.length_nil,
-                List.getElem_cons_zero, List.getElem_cons_succ]
+    simp only [Array.make, Array.getElem!_Nat_eq]
 
     repeat rw [Finset.sum_range_succ]
     rw [Finset.sum_range_zero, zero_add]
@@ -435,12 +439,12 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       calc
         r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
         ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
-          apply Nat.add_le_add; apply Nat.add_le_add; apply Nat.add_le_add; apply Nat.add_le_add
-          exact h0
-          apply Nat.mul_le_mul_right _ h1
-          apply Nat.mul_le_mul_right _ h2
-          apply Nat.mul_le_mul_right _ h3
-          apply Nat.mul_le_mul_right _ h4
+          refine Nat.add_le_add (Nat.add_le_add (Nat.add_le_add (Nat.add_le_add ?_ ?_) ?_) ?_) ?_
+          · exact h0
+          · apply Nat.mul_le_mul_right _ h1
+          · apply Nat.mul_le_mul_right _ h2
+          · apply Nat.mul_le_mul_right _ h3
+          · apply Nat.mul_le_mul_right _ h4
         _ < 2^253 := by norm_num
 
     simp only [← pow_mul, Nat.reduceMul]
@@ -453,12 +457,12 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       norm_num
     · rw [← Array.getElem!_Nat_eq]; repeat rw [Finset.sum_range_succ];
       rw [Finset.sum_range_zero, zero_add]
-      simp only [pow_zero, mul_one, pow_mul, Nat.mul_add, ← pow_mul, Nat.reduceMul]
+      simp only [pow_zero, mul_one, Nat.mul_add, Nat.reduceMul]
       rw [mul_comm _ (2 ^ 208)]
       try linarith
 
   -- Call the 'sub' function
-  progress as ⟨m, h_sub, h_mod, h_bound⟩
+  progress as ⟨m, h_sub, h_bound, h_mod⟩
   · -- Case ha: Prove input limbs are < 2^52
     intro i hi
     interval_cases i
@@ -479,7 +483,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   · -- Case hb': L ≤ L
     rw [constants.L_spec]
   · -- Post-conditions
-    refine ⟨?_,h_bound,?_⟩
+    refine ⟨?_,h_mod,h_bound⟩
     · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
       zify
       -- Total Montgomery factor C
@@ -569,7 +573,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
           List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
 
-        norm_cast at eq8 h_cast_r4
         rw [← h_cast_r4] at eq8
         simp only [← getElem!_pos]
 
@@ -623,16 +626,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         have h_align0 : (↑(constants.L[0]!) : ℤ) = ↑(constants.L.val[0]!) := by
           simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             Nat.ofNat_pos, getElem!_pos]
-        have h_align1 : (↑(constants.L[1]!) : ℤ) = ↑(constants.L.val[1]!) := by
-          simp only [Array.getElem!_Nat_eq]
-        have h_align2 : (↑(constants.L[2]!) : ℤ) = ↑(constants.L.val[2]!) := by
-          simp only [Array.getElem!_Nat_eq]
-        have h_align3 : (↑(constants.L[3]!) : ℤ) = ↑(constants.L.val[3]!) := by
-          simp only [Array.getElem!_Nat_eq]
-        have h_align4 : (↑(constants.L[4]!) : ℤ) = ↑(constants.L.val[4]!) := by
-          simp only [Array.getElem!_Nat_eq]
 
-        simp only [h_align0, h_align1, h_align2, h_align3, h_align4] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+        simp only [h_align0] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
 
         have h_L3_zero : ↑(constants.L.val[3]!) = (0 : ℤ) := by
           unfold constants.L
@@ -652,10 +647,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       rw [← h_core]
       rw [Int.add_mul_emod_self_right]
 
-    · -- Post-cond: m < 2 ^ 259
-      unfold L at h_mod
-      apply lt_of_lt_of_le h_mod
-      try decide
+
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
