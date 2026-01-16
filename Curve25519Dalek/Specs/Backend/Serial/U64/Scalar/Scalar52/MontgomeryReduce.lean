@@ -18,6 +18,8 @@ This function performs Montgomery reduction.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -48,11 +50,9 @@ natural language specs:
 @[progress]
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
-    ∃ m,
-    montgomery_reduce a = ok m ∧
-    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
-    (∀ i < 5, m[i]!.val < 2 ^ 62)
-    := by
+    montgomery_reduce a ⦃ m =>
+      (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
+      (∀ i < 5, m[i]!.val < 2 ^ 62) ⦄ := by
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

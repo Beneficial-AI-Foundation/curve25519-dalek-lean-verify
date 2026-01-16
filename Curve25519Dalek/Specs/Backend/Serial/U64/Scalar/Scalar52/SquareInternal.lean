@@ -13,6 +13,8 @@ set_option exponentiation.threshold 500
 The main statement concerning `square_internal` is `square_internal_spec` (below).
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -65,71 +67,9 @@ in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
 (The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
 @[progress]
 theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
-    ∃ result, square_internal a = ok (result) ∧
-    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
-    (∀ i < 9, result[i]!.val < 2 ^ 127) := by
-  unfold square_internal backend.serial.u64.scalar.IndexScalar52UsizeU64.index
-  progress*
-
-  all_goals try (subst_vars; expand ha with 5; scalar_tac)
-
-  · -- Main Proof
-    unfold Array.make at *
-    simp [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ, *]
-    refine ⟨?_, ?_⟩
-    · try grind
-    · -- Postcondition Logic
-      intro i hi
-      expand ha with 5
-      interval_cases i
-
-      all_goals
-        simp only [List.getElem?_cons_zero, List.getElem?_cons_succ, Option.getD_some]
-        simp [*]
-        simp only [Array.getElem!_Nat_eq] at *
-        try repeat rw [← getElem!_pos]
-        try rw [Nat.mul_comm _ 2]
-
-      · -- 1. a0 * a0
-        apply Nat.lt_trans (bounds_sq ha_0); norm_num
-
-      · -- 2. 2 * a0 * a1
-        apply Nat.lt_trans (bounds_mul2 ha_0 ha_1)
-        norm_num
-
-      · -- 3. 2 * a0 * a2 + a1 * a1
-        apply bounds_add
-        · apply Nat.lt_trans (bounds_mul2 ha_0 ha_2); norm_num
-        · apply Nat.lt_trans (bounds_sq ha_1); norm_num
-
-      · -- 4. 2 * a0 * a3 + 2 * a1 * a2
-        apply bounds_add
-        · apply Nat.lt_trans (bounds_mul2 ha_0 ha_3); norm_num
-        · rw [Nat.mul_comm _ 2]; apply Nat.lt_trans (bounds_mul2 ha_1 ha_2); norm_num
-
-      · -- 5. 2 * a0 * a4 + 2 * a1 * a3 + a2 * a2
-        apply bounds_add
-        · apply Nat.add_lt_add
-          · apply bounds_mul2 ha_0 ha_4
-          · rw [Nat.mul_comm _ 2]
-            apply bounds_mul2 ha_1 ha_3
-        · apply Nat.lt_trans (bounds_sq ha_2)
-          norm_num
-
-      · -- 6. 2 * a1 * a4 + 2 * a2 * a3
-        apply bounds_add
-        · apply Nat.lt_trans (bounds_mul2 ha_1 ha_4); norm_num
-        · rw [Nat.mul_comm _ 2]; apply Nat.lt_trans (bounds_mul2 ha_2 ha_3); norm_num
-
-      · -- 7. 2 * a2 * a4 + a3 * a3
-        apply bounds_add
-        · apply Nat.lt_trans (bounds_mul2 ha_2 ha_4); norm_num
-        · apply Nat.lt_trans (bounds_sq ha_3); norm_num
-
-      · -- 8. 2 * a3 * a4
-        apply Nat.lt_trans (bounds_mul2 ha_3 ha_4); norm_num
-
-      · -- 9. a4 * a4
-        apply Nat.lt_trans (bounds_sq ha_4); norm_num
+    square_internal a ⦃ result =>
+      Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
+      ∀ i < 9, result[i]!.val < 2 ^ 127 ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

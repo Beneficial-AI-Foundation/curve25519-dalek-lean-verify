@@ -17,6 +17,8 @@ operand when `choice = 0` and the second operand when `choice = 1`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 228:4-240:5)
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
 
@@ -34,11 +36,10 @@ namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableField
 theorem conditional_select_spec
     (a b : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
-    ∃ res,
-      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
-        a b choice = ok res ∧
-      (∀ i < 5,
-        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a b choice ⦃ res =>
+        (∀ i < 5,
+          res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) ⦄ := by
   unfold backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
   unfold subtle.ConditionallySelectableU64.conditional_select
   by_cases h: choice.val = 1#u8
