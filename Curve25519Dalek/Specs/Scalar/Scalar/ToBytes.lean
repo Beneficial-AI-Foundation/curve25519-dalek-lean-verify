@@ -17,6 +17,8 @@ This function converts the structure to a byte array.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
 
@@ -39,8 +41,7 @@ natural language specs:
 -/
 @[progress]
 theorem to_bytes_spec (s : Scalar) :
-    ∃ a, to_bytes s = ok a ∧
-    a = s.bytes ∧ mk a = s := by
+    to_bytes s ⦃ a => a = s.bytes ∧ mk a = s ⦄ := by
   unfold to_bytes
   simp
 

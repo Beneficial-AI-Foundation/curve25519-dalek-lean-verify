@@ -15,6 +15,8 @@ This constant represents the scalar value 1.
 Source: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.scalar.Scalar
@@ -26,8 +28,7 @@ namespace curve25519_dalek.scalar.Scalar
 The ONE constant represents the scalar 1.
 -/
 @[progress]
-theorem ONE_spec : U8x32_as_Nat ONE.bytes = 1 := by
-  unfold ONE ONE_body
-  decide
+theorem ONE_spec : ok ONE ⦃ s => U8x32_as_Nat s.bytes = 1 ⦄ := by
+  simp [ONE, ONE_body]
 
 end curve25519_dalek.scalar.Scalar
