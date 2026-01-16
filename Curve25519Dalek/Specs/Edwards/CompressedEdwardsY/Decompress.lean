@@ -21,6 +21,8 @@ and the sign (parity) of the x-coordinate in the high bit of byte 31. Decompress
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.CompressedEdwardsY
 
@@ -55,25 +57,19 @@ Natural language specs:
 -/
 @[progress]
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
-    ∃ result, edwards.CompressedEdwardsY.decompress cey = ok result ∧
-
+    edwards.CompressedEdwardsY.decompress cey ⦃ result =>
       (∀ ep, result = some ep →
-        let y_encoded := (U8x32_as_Nat cey) % (2^255)
-        let x_sign_bit := cey[31]!.val.testBit 7
-
+        let y_encoded := (U8x32_as_Nat cey) % (2^255);
+        let x_sign_bit := cey[31]!.val.testBit 7;
         (∃ Z_inv x_val y_val x_is_neg,
           field.FieldElement51.invert ep.Z = ok Z_inv ∧
           (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧
           (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧
           field.FieldElement51.is_negative ep.X = ok x_is_neg ∧
-
           (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧
-
           y_val % p = y_encoded % p ∧
-
           (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧
-
-          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) := by
+          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY
