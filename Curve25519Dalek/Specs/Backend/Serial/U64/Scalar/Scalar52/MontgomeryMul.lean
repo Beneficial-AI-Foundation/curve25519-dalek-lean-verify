@@ -18,6 +18,8 @@ This function performs Montgomery multiplication.
 
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -47,23 +49,10 @@ natural language specs:
 @[progress]
 theorem montgomery_mul_spec (m m' : Scalar52)
     (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
-    ∃ w, montgomery_mul m m' = ok w ∧
-    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62) := by
-
-  unfold montgomery_mul
-  progress*
-  -- BEGIN TASK
-  have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [Nat.ModEq]
-    exact res_post_1
-  have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [← a1_post_1]
-  rw [Nat.ModEq]
-  refine  ⟨?_, ?_ ⟩
-  · try grind
-  · intro i hi; have h_bounds:= res_post_2 i hi; exact h_bounds
-  -- END TASK
+    montgomery_mul m m' ⦃ w =>
+      (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
+      (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
+  sorry
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

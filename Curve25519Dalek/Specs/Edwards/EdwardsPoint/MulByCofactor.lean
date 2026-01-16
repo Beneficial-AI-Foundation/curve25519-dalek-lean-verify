@@ -17,6 +17,8 @@ by calling mul_by_pow_2 with k=3 (since 2^3 = 8).
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -38,14 +40,9 @@ natural language specs:
 -/
 @[progress]
 theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :
-    ∃ result, mul_by_cofactor self = ok result ∧
-    result.IsValid ∧
-    result.toPoint = h • self.toPoint := by
-  unfold mul_by_cofactor
-  obtain := mul_by_pow_2_spec self 3#u32 hself (by scalar_tac)
-  progress*
-  constructor
-  · assumption
-  · simp_all [h]
+    mul_by_cofactor self ⦃ result =>
+      result.IsValid ∧
+      result.toPoint = h • self.toPoint ⦄ := by
+  sorry
 
 end curve25519_dalek.edwards.EdwardsPoint

@@ -20,6 +20,8 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -53,9 +55,7 @@ natural language specs:
 
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
-    ∃ rist,
-    from_uniform_bytes bytes = ok rist ∧
-    rist.IsValid := by
-    sorry
+    from_uniform_bytes bytes ⦃ rist => rist.IsValid ⦄ := by
+  sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

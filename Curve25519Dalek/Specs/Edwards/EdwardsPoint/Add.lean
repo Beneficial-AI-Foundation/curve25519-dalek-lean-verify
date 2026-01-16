@@ -18,6 +18,8 @@ This function adds two Edwards points using elliptic curve point addition.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint
 
@@ -57,34 +59,28 @@ theorem add_spec (self other : EdwardsPoint)
 
     (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)
     (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :
-
-    ∃ result, add self other = ok result ∧
-
-    (∀ i < 5,
-      result.X[i]!.val < 2 ^ 54  ∧
-      result.Y[i]!.val < 2 ^ 54  ∧
-      result.Z[i]!.val < 2 ^ 54  ∧
-      result.T[i]!.val < 2 ^ 54) ∧
-
-    let X₁ := Field51_as_Nat self.X
-    let Y₁ := Field51_as_Nat self.Y
-    let Z₁ := Field51_as_Nat self.Z
-    let T₁ := Field51_as_Nat self.T
-
-    let X₂ := Field51_as_Nat other.X
-    let Y₂ := Field51_as_Nat other.Y
-    let Z₂ := Field51_as_Nat other.Z
-    let T₂ := Field51_as_Nat other.T
-
-    let X₃ := Field51_as_Nat result.X
-    let Y₃ := Field51_as_Nat result.Y
-    let Z₃ := Field51_as_Nat result.Z
-    let T₃ := Field51_as_Nat result.T
-
-    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧
-    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧
-    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧
-    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by
-    sorry
+    add self other ⦃ result =>
+      (∀ i < 5,
+        result.X[i]!.val < 2 ^ 54  ∧
+        result.Y[i]!.val < 2 ^ 54  ∧
+        result.Z[i]!.val < 2 ^ 54  ∧
+        result.T[i]!.val < 2 ^ 54) ∧
+      (let X₁ := Field51_as_Nat self.X;
+       let Y₁ := Field51_as_Nat self.Y;
+       let Z₁ := Field51_as_Nat self.Z;
+       let T₁ := Field51_as_Nat self.T;
+       let X₂ := Field51_as_Nat other.X;
+       let Y₂ := Field51_as_Nat other.Y;
+       let Z₂ := Field51_as_Nat other.Z;
+       let T₂ := Field51_as_Nat other.T;
+       let X₃ := Field51_as_Nat result.X;
+       let Y₃ := Field51_as_Nat result.Y;
+       let Z₃ := Field51_as_Nat result.Z;
+       let T₃ := Field51_as_Nat result.T;
+       X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧
+       Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧
+       T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧
+       Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p) ⦄ := by
+  sorry
 
 end curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint
