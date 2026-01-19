@@ -68,14 +68,11 @@
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    ∃ c, add self other = ok c ∧\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
-   "spec_docstring":
-   "/-- Spec for `add`.\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -86,7 +83,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
@@ -163,14 +160,11 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem as_projective_spec\n    (q : CompletedPoint) (hq_valid : q.IsValid) :\n    ∃ proj, as_projective q = ok proj ∧\n    proj.IsValid ∧ proj.toPoint = q.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean",
-   "spec_docstring":
-   "/--\nVerification of the `as_projective` function.\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
@@ -181,7 +175,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
@@ -205,10 +199,11 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalSelect.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -220,7 +215,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": true,
@@ -244,10 +239,11 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalSelect.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -259,7 +255,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": false,
@@ -298,11 +294,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem assert_receiver_is_total_eq_spec\n    (self : backend.serial.curve_models.AffineNielsPoint) :\n    ∃ result, assert_receiver_is_total_eq self = ok result ∧ result = () := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/AssertReceiverIsTotalEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `EqAffineNielsPoint.assert_receiver_is_total_eq`**:\n- No panic (always returns successfully)\n- The result is `()`\n- This is the `Eq`-trait totality assertion for `AffineNielsPoint`\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq",
@@ -313,12 +312,13 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Identity.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -334,10 +334,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Identity.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -353,10 +354,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -408,11 +410,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    ∃ b, eq self other = ok b ∧\n    (b = true ↔\n      field.PartialEqFieldElement51FieldElement51.eq self.y_plus_x other.y_plus_x = ok true ∧\n      field.PartialEqFieldElement51FieldElement51.eq self.y_minus_x other.y_minus_x = ok true ∧\n      field.PartialEqFieldElement51FieldElement51.eq self.xy2d other.xy2d = ok true) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Eq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `PartialEqAffineNielsPointAffineNielsPoint.eq`**:\n- No panic (always returns successfully)\n- Returns true iff all three coordinate comparisons return true\n- Short-circuits to false as soon as a comparison fails\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq",
@@ -448,14 +453,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem double_spec\n    (q : ProjectivePoint) (hq_valid : q.IsValid) :\n    ∃ c, ProjectivePoint.double q = ok c ∧\n    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean",
-   "spec_docstring":
-   "/--\nVerification of the `double` function.\nThe theorem states that the Rust implementation of point doubling corresponds\nexactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -466,7 +468,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -2736,7 +2738,7 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    ∃ result : Bool, is_small_order self = ok result ∧\n    (result ↔ h • self.toPoint = 0) := by ...",
