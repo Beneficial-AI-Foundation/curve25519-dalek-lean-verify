@@ -109,6 +109,7 @@ import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Coset4
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul_Base
 import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
