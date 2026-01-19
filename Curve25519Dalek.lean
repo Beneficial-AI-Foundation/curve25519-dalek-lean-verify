@@ -73,6 +73,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
+import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
