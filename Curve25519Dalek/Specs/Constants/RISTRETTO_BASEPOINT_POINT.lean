@@ -32,10 +32,12 @@ natural language specs:
 
     • constants.RISTRETTO_BASEPOINT_POINT equals backend.serial.u64.constants.ED25519_BASEPOINT_POINT
       when unwrapped from the RistrettoPoint type.
+    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point.
+
 -/
 
 /-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:
-- The Ristretto basepoint is equal to the Ed25519 basepoint
+- The Ristretto basepoint is a valid Ristretto point that is equal to the Ed25519 basepoint
 -/
 @[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
