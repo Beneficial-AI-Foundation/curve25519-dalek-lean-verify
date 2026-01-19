@@ -11,7 +11,7 @@ import Curve25519Dalek.Tactics
 
 Specification and proof for `FieldElement51::pow2k`.
 
-This function computes the 2^k-th power of the element.
+This function computes the 2^k-th power lof the element.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 
@@ -207,14 +207,6 @@ natural language specs:
 This mirrors the style used for other loop specifications (e.g. `square2_loop_spec`),
 but adapts the mathematical statement to repeated squaring.
 -/
-
-
-
-
-
-
-
-
 
 
 set_option maxHeartbeats 10000000000000 in

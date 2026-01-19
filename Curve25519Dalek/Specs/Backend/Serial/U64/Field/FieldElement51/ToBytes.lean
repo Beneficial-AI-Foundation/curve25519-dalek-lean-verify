@@ -81,7 +81,7 @@ theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
   have : BitVec.ofNat 64 (limb.val <<< 4) = limb.bv <<< 4 := by
     natify
     simp_scalar
-  simp [this]
+  simp
   bv_decide
 
 
@@ -91,6 +91,7 @@ theorem decompose_or_limbs (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
   (limb0.val >>> 48 % 2 ^ 8) +
   ((limb1.val <<< 4) % 2 ^ 8) := by
   bvify 64 at *
+  -- bv_decide
   -- The idea is to do something similar to the proof above
 
   sorry
