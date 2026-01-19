@@ -2718,7 +2718,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem double_spec (e : EdwardsPoint) :\n    ∃ e_double e_plus_e eq_choice,\n    double e = ok e_double ∧\n    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add e e = ok e_plus_e ∧\n    edwards.ConstantTimeEqEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧\n    eq_choice = Choice.one := by ...",
+   "theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid):\n    ∃ result, double e = ok result\n    ∧ result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",

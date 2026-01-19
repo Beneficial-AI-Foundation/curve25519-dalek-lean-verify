@@ -1,9 +1,10 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::double`
 
@@ -40,12 +41,9 @@ natural language specs:
 - Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint
 -/
 @[progress]
-theorem double_spec (e : EdwardsPoint) :
-    ∃ e_double e_plus_e eq_choice,
-    double e = ok e_double ∧
-    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add e e = ok e_plus_e ∧
-    edwards.ConstantTimeEqEdwardsPoint.ct_eq e_double e_plus_e = ok eq_choice ∧
-    eq_choice = Choice.one := by
+theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid):
+    ∃ result, double e = ok result
+    ∧ result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint := by
     sorry
 
 end curve25519_dalek.edwards.EdwardsPoint
