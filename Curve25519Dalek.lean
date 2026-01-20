@@ -103,6 +103,7 @@ import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
+import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step1
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
