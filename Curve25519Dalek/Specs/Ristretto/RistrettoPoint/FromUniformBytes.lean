@@ -50,7 +50,6 @@ natural language specs:
 - The function always succeeds (no panic)
 - The output is a mathematically valid Ristretto point
 -/
-
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     ∃ rist,
