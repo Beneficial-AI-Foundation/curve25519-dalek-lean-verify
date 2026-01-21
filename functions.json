@@ -48,10 +48,12 @@
    "is_extraction_artifact": false,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem add_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\n∃ c,\nadd self other = ok c ∧\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧\n(Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧\nZ' % p = ((2 * Z) + (T * XY2D)) % p ∧\n(T' + (T * XY2D)) % p = (2 * Z) % p\n := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Add.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -63,7 +65,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
@@ -244,11 +246,14 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    ∃ result, conditional_select a b choice = ok result ∧\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_minus_X[i]!.val else a.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\n  the output ProjectiveNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice)\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
@@ -259,7 +264,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": false,
@@ -298,11 +303,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem assert_receiver_is_total_eq_spec\n    (self : backend.serial.curve_models.AffineNielsPoint) :\n    ∃ result, assert_receiver_is_total_eq self = ok result ∧ result = () := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/AssertReceiverIsTotalEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `EqAffineNielsPoint.assert_receiver_is_total_eq`**:\n- No panic (always returns successfully)\n- The result is `()`\n- This is the `Eq`-trait totality assertion for `AffineNielsPoint`\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::Eq for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::assert_receiver_is_total_eq",
@@ -313,7 +321,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -372,10 +380,12 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :\n    ∃ result, neg self = ok result ∧\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -387,14 +397,17 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec\n    (self : ProjectiveNielsPoint)\n    (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :\n    ∃ result, neg self = ok result ∧\n    result.Y_plus_X = self.Y_minus_X ∧\n    result.Y_minus_X = self.Y_plus_X ∧\n    result.Z = self.Z ∧\n    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.neg`**:\n- No panic (always returns successfully)\n- Given input:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\nthe output ProjectiveNielsPoint computed by `neg self` has coordinates\n(Y_plus_X', Y_minus_X', Z', T2d') where:\n- Y_plus_X' = Y_minus_X (the coordinates are swapped)\n- Y_minus_X' = Y_plus_X (the coordinates are swapped)\n- Z' = Z (the Z coordinate is unchanged)\n- T2d' ≡ -T2d (mod p) (the T2d coordinate is negated modulo p)\n\nwhere p = 2^255 - 19.\n\nThis implements the negation of a point in projective Niels coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
@@ -405,14 +418,17 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    ∃ b, eq self other = ok b ∧\n    (b = true ↔\n      field.PartialEqFieldElement51FieldElement51.eq self.y_plus_x other.y_plus_x = ok true ∧\n      field.PartialEqFieldElement51FieldElement51.eq self.y_minus_x other.y_minus_x = ok true ∧\n      field.PartialEqFieldElement51FieldElement51.eq self.xy2d other.xy2d = ok true) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Eq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `PartialEqAffineNielsPointAffineNielsPoint.eq`**:\n- No panic (always returns successfully)\n- Returns true iff all three coordinate comparisons return true\n- Short-circuits to false as soon as a comparison fails\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq",
@@ -472,10 +488,12 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
     "curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\n∃ c, sub self other = ok c ∧\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * XY2D)) % p = (2 * Z) % p ∧\nT' % p = ((2 * Z) + (T * XY2D)) % p\n := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Sub.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -487,15 +505,17 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.ProjectiveNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.Y_plus_X[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 53)\n  (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)\n  (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :\n∃ c, sub self other = ok c ∧\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.Y_plus_X\nlet YmX := Field51_as_Nat other.Y_minus_X\nlet Z₀ := Field51_as_Nat other.Z\nlet T2d := Field51_as_Nat other.T2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * T2d) )% p = (2 * Z * Z₀)  % p ∧\nT' % p = ((2 * Z * Z₀) + (T * T2d)) % p\n := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
@@ -507,7 +527,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
