@@ -513,13 +513,10 @@
     "curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
-   "specified": true,
-   "spec_statement":
-   "theorem is_valid_spec (self : backend.serial.curve_models.ProjectivePoint)\n    (h_X_valid : self.X.IsValid)\n    (h_Y_valid : self.Y.IsValid)\n    (h_Z_valid : self.Z.IsValid) :\n    ∃ result, is_valid self = ok result ∧\n    (result = true ↔\n      let X := Field51_as_Nat self.X\n      let Y := Field51_as_Nat self.Y\n      let Z := Field51_as_Nat self.Z\n      ((Y^2 - X^2) * Z^2) % p = (Z^4 + d * X^2 * Y^2) % p) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/IsValid.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid`**:\n- No panic (always returns successfully)\n- Returns true iff the projective point (X:Y:Z) satisfies the twisted Edwards curve equation:\n    (Y² - X²)*Z² ≡ Z⁴ + d*X²*Y² (mod p)\n  where p = 2^255 - 19 and d is the Ed25519 curve parameter.\n\n-/",
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid",

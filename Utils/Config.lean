@@ -126,7 +126,8 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.window.LookupTable.select",
   "curve25519_dalek.backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid",
   "curve25519_dalek.traits.IsIdentity.Blanket",
-  "curve25519_dalek.traits.ValidityCheckProjectivePoint"
+  "curve25519_dalek.traits.ValidityCheckProjectivePoint",
+  "curve25519_dalek.backend.serial.curve_models.ValidityCheckProjectivePoint.is_valid"
 ]
 
 end Utils.Config
