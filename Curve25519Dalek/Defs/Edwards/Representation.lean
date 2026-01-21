@@ -38,6 +38,162 @@ data held by any of these is always a valid combination of coordinates. To track
 Lean predicates for each of these represenations.
 -/
 
+/-!
+## Mathematical Foundations for Ristretto
+Explicit formulas for the 2-isogeny between Jacobi Quartic and Twisted Edwards curves.
+References: https://ristretto.group/details/isogenies.html, https://www.shiftleft.org/papers/decaf/decaf.pdf.
+-/
+
+namespace curve25519_dalek.math
+
+open Edwards ZMod
+
+section Constants
+
+/-- SQRT_M1: The square root of -1 in the field (used for Elligator inverse sqrt).
+    Value: 19681161...84752 -/
+def sqrt_m1 : ZMod p :=
+  19681161376707505956807079304988542015446066515923890162744021073123829784752
+
+/-- INVSQRT_A_MINUS_D: Constant used in compression rotation.
+    Value: 544693...17578 -/
+def invsqrt_a_minus_d : ZMod p :=
+  54469307008909316920995813868745141605393597292927456921205312896311721017578
+
+/-- Edwards a constant (-1) cast to the field. -/
+def a_val : ZMod p := -1
+
+/-- Helper: "Is Negative" (LSB is 1).
+    Used for sign checks in Ristretto encoding. -/
+def is_negative (x : ZMod p) : Bool :=
+  x.val % 2 == 1
+
+/-- Helper: Absolute value in Ed25519 context (ensures non-negative / even LSB). -/
+def abs_edwards (x : ZMod p) : ZMod p :=
+  if is_negative x then -x else x
+
+/-- Helper: Inverse Square Root logic matching SQRT_RATIO_M1.
+    Returns (I, was_square) where I^2 = 1/u or I^2 = 1/(i*u). -/
+noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
+  if h : IsSquare x then
+    -- Case 1: x is a square. Pick the root 'y' such that y^2 = x.
+    let y := Classical.choose h
+    (abs_edwards y, true)
+  else
+    -- Case 2: x is not a square. Then i * x must be a square in this field.
+    -- We pick 'y' such that y^2 = i * x.
+    have h_ix : IsSquare (x * sqrt_m1) := by
+      -- TODO(proof): if x is nonsquare, x*i is square.
+      sorry
+    let y := Classical.choose h_ix
+    (abs_edwards y, false)
+
+/--
+Inverse Square Root spec.
+Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
+-/
+noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
+  let (root, was_square) := sqrt_checked u
+  (root⁻¹, was_square)
+
+end Constants
+
+section PureIsogeny
+
+/--
+**Pure Decompression**
+Deduces (x, y) from s using the isogeny inversion formulas:
+  - https://ristretto.group/details/isogenies.html
+  - https://ristretto.group/formulas/decoding.html
+In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
+t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
+Indeed:
+  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
+  - y := u1 * Dy = \frac{1+as²}{1-as²}
+Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
+where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
+for Ed25519). The relation to `J` parameters is:
+  - `a₁ = -a₂`
+  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
+Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
+-/
+noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
+  let s : ZMod p := s_int
+
+  -- 0. Initial Input Check
+  -- The integer must be < p and canonical sign must be 0
+  if s_int >= p || s_int % 2 != 0 then
+    none
+  else
+    -- 1. Algebraic setup
+    let u1 := 1 + a_val * s^2
+    let u2 := 1 - a_val * s^2
+    let v := a_val * d * u1^2 - u2^2
+
+    -- 2. Inverse Square Root (Elligator)
+    -- This returns (I, was_square)
+    let (I, was_square) := inv_sqrt_checked (v * u2^2)
+
+    -- 3. Recover denominators
+    let Dx := I * u2
+    let Dy := I * Dx * v
+
+    -- 4. Recover coordinates
+    let x := abs_edwards (2 * s * Dx)
+    let y := u1 * Dy
+
+    -- 5. Validation Checks
+    let t := x * y
+
+    -- (1) Square root must succeed
+    -- (2) t must be non-negative (even LSB=LeastSignificantByte)
+    -- (3) y must be non-zero
+    if !was_square || is_negative t || y = 0 then
+      none
+    else
+      some { x := x, y := y, on_curve := sorry }
+
+/--
+**Pure Mathematical Compression**
+Encodes a Point P into a scalar s (https://ristretto.group/formulas/encoding.html).
+Used to define the Canonical property.
+-/
+noncomputable def compress_pure (P : Point Ed25519) : Nat :=
+  let x := P.x
+  let y := P.y
+  let z := (1 : ZMod p)
+  let t := x * y
+
+  -- 1. Setup
+  let u1 := (z + y) * (z - y)
+  let u2 := x * y
+
+  -- 2. Inverse Sqrt
+  let (invsqrt, _was_square) := inv_sqrt_checked (u1 * u2^2)
+  let den1 := invsqrt * u1
+  let den2 := invsqrt * u2
+  let z_inv := den1 * den2 * t
+
+  -- 3. Rotation Decision
+  let rotate := is_negative (t * z_inv)
+
+  -- 4. Apply Rotation
+  let x_prime := if rotate then y * sqrt_m1 else x
+  let y_prime := if rotate then x * sqrt_m1 else y
+  let den_inv := if rotate then den1 * invsqrt_a_minus_d else den2
+
+  -- 5. Sign Adjustment
+  let y_final := if is_negative (x_prime * z_inv) then -y_prime else y_prime
+
+  -- 6. Final Calculation
+  let s := abs_edwards (den_inv * (z - y_final))
+
+  s.val
+
+end PureIsogeny
+
+end curve25519_dalek.math
+
 /-! ## Field Element Conversions -/
 
 namespace Edwards
@@ -108,7 +264,7 @@ instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsVa
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
     Requires a proof that the point is valid. -/
-noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
+def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
   let X := e.X.toField
   let Y := e.Y.toField
   let Z := e.Z.toField
@@ -126,7 +282,7 @@ noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Poi
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/
-noncomputable def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
+def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
   if h : e.IsValid then e.toPoint' h else 0
 
 /-- Unfolding lemma: when an EdwardsPoint is valid, toPoint computes (X/Z, Y/Z). -/
@@ -143,23 +299,58 @@ end curve25519_dalek.edwards
 /-! ## RistrettoPoint Validity -/
 
 namespace curve25519_dalek.ristretto
-open curve25519_dalek.edwards
+open curve25519_dalek.edwards Edwards
+open curve25519_dalek.math
 
+/-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
   EdwardsPoint.IsValid r
--- To do: potentially add extra information regarding canonical representation of Ristretto point
 
+/-- Conversion to mathematical Point.
+    Returns the internal Edwards point representative. -/
+def RistrettoPoint.toPoint (r : RistrettoPoint) : Point Ed25519 :=
+  EdwardsPoint.toPoint r
+
+/--
+A CompressedRistretto is valid if and only if the pure mathematical decompression
+succeeds (returning `some`). This implicitly checks (via decompress_pure):
+1. bytes < p
+2. sign bit = 0
+3. isogeny square root exists
+4. t >= 0
+5. y != 0
+-/
 def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
-  U8x32_as_Nat c < p ∧
-  U8x32_as_Nat c % 2 = 0
-  -- To do: this predicate is not complete yet, as some more complex
-  -- properties also need to be checked for the field element corresponding to c
-  -- to assure a valid compressed Ristretto point:
-  -- (1) The square root computation in step_2 must succeed (invsqrt returns Choice.one)
-  -- (2) The computed t coordinate must be non-negative (t.is_negative returns Choice.zero)
-  -- (3) The computed y coordinate must be nonzero (y.is_zero returns Choice.zero)
+  (decompress_pure (U8x32_as_Nat c)).isSome
+
+/--
+If valid, return the decompressed point.
+If invalid, return the neutral element (0).
+-/
+noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point Ed25519 :=
+  match decompress_pure (U8x32_as_Nat c) with
+  | some P => P
+  | none   => 0 
 
 end curve25519_dalek.ristretto
+
+/-!
+## Canonical Representation
+-/
+
+namespace Edwards
+
+open curve25519_dalek.math
+
+/--
+A Point P is the canonical representative of its Ristretto coset if
+decompress ∘ compress = Id on the point.
+-/
+def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
+  let s := compress_pure P
+  decompress_pure s = P
+
+end Edwards
 
 /-! ## ProjectivePoint Validity and Casting -/
 
