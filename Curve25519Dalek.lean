@@ -14,6 +14,7 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Neg
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended

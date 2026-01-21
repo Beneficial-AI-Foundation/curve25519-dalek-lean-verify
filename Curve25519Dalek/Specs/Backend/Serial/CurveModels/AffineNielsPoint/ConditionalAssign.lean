@@ -27,7 +27,7 @@ it updates `self` such that:
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models
+
 namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint
 
 /-

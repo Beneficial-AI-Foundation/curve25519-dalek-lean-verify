@@ -5,9 +5,6 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
 
@@ -41,12 +38,9 @@ The concrete formulas are:
 
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field
-open curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
-open curve25519_dalek.backend.serial.curve_models
 
 
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
 
 
 
@@ -101,7 +95,7 @@ let T' := Field51_as_Nat c.T
 (Z' + (T * XY2D)) % p = (2 * Z) % p ∧
 T' % p = ((2 * Z) + (T * XY2D)) % p
 := by
-  unfold SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.sub
+  unfold sub
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
   · grind
@@ -189,4 +183,4 @@ T' % p = ((2 * Z) + (T * XY2D)) % p
     simp[this, (by scalar_tac :∀ a, a + a = 2 * a)]
     apply Nat.ModEq.add_left _ h_Txy2d
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint
+end curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAAffineNielsPointCompletedPoint

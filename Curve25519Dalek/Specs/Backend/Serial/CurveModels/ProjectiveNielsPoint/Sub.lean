@@ -5,9 +5,6 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
 
@@ -39,11 +36,8 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field
-open curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
-open curve25519_dalek.backend.serial.curve_models
 
-namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
+namespace curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint
 
 
 
@@ -236,4 +230,4 @@ T' % p = ((2 * Z * Z₀) + (T * T2d)) % p
     apply Nat.ModEq.add_left
     exact h_TT2d
 
-end curve25519_dalek.backend.serial.curve_models.CompletedPoint
+end curve25519_dalek.backend.serial.curve_models.SubShared0EdwardsPointSharedAProjectiveNielsPointCompletedPoint

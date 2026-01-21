@@ -5,13 +5,7 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
-
-
-
 
 /-! # Spec Theorem for `CompletedPoint::add`
 
@@ -40,11 +34,8 @@ The concrete formulas are:
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field
-open curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
-open curve25519_dalek.backend.serial.curve_models
 
-namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
+namespace curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
 
 
 
@@ -189,4 +180,4 @@ Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
       scalar_tac
     rw[this, (by scalar_tac :∀ a, a + a = 2 * a)]
 
-end curve25519_dalek.backend.serial.curve_models.CompletedPoint
+end curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
