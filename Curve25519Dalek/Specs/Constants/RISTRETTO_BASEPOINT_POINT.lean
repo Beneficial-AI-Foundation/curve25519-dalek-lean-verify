@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `constants::RISTRETTO_BASEPOINT_POINT`
 
@@ -15,7 +15,7 @@ point for the Ristretto group.
 
 Source: curve25519-dalek/src/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Edwards
 namespace curve25519_dalek.constants
 
 /-
@@ -30,20 +30,34 @@ natural language description:
 
 natural language specs:
 
-    • constants.RISTRETTO_BASEPOINT_POINT equals backend.serial.u64.constants.ED25519_BASEPOINT_POINT
-      when unwrapped from the RistrettoPoint type.
-    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point.
+    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point (which implies that
+      it fulfills the curve equation)
+    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point
 
+  Note: As a consequence of Lagrange's theorem, every non-identity point in a
+  prime order group generates the entire group.
 -/
 
 /-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:
-- The Ristretto basepoint is a valid Ristretto point that is equal to the Ed25519 basepoint
+    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point (which amongst other things
+      implies that it fulfills the curve equation)
+    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point
 -/
 @[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
-  constants.RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT := by
-  unfold constants.RISTRETTO_BASEPOINT_POINT
-  unfold RISTRETTO_BASEPOINT_POINT_body
+
+  -- The point has the same representation as the Edwards basepoint
+  RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
+
+  -- The point is a valid Ristretto point
+  RISTRETTO_BASEPOINT_POINT.IsValid ∧
+
+  -- The point is not the identity point.
+  RISTRETTO_BASEPOINT_POINT.toPoint ≠ (0 : Point Ed25519) := by
+  -- Whether this condition in its current form really checks what it should depends on the (yet unfinished) implementation of .toPoint for Ristretto points and how it handles the ambiguity that one Ristretto point corresponds to several affine points on the Edwards curve.
+
   sorry
 
 end curve25519_dalek.constants
