@@ -55,9 +55,10 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
   RISTRETTO_BASEPOINT_POINT.IsValid ∧
 
   -- The point is not the identity point.
-  RISTRETTO_BASEPOINT_POINT.toPoint ≠ (0 : Point Ed25519) := by
-  -- Whether this condition in its current form really checks what it should depends on the (yet unfinished) implementation of .toPoint for Ristretto points and how it handles the ambiguity that one Ristretto point corresponds to several affine points on the Edwards curve.
+  math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by
 
   sorry
+
+
 
 end curve25519_dalek.constants
