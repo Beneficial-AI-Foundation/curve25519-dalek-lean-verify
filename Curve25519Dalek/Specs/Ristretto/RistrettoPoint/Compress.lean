@@ -14,14 +14,10 @@ RistrettoPoint to its canonical 32-byte representation. The function is defined 
 
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
 
-It takes a RistrettoPoint (which represents an equivalence class of 8 Edwards points)
+It takes a RistrettoPoint (which represents an equivalence class of Edwards points)
 and produces a unique, canonical byte representation.
 
 **Source**: curve25519-dalek/src/ristretto.rs
-
-## TODO
-- Write specification
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -33,6 +29,7 @@ natural language description:
 • Takes a RistrettoPoint (represented internally as an EdwardsPoint in extended coordinates
   (X, Y, Z, T)) and compresses it to a canonical 32-byte representation according to the
   Ristretto ENCODE function specified in:
+
   https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2
 
   Arithmetics are performed in the field 𝔽ₚ where p = 2^255 - 19.
@@ -40,26 +37,13 @@ natural language description:
 natural language specs:
 
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
-• Different Edwards point representations of the same Ristretto point
-  (which constitutes an equivalence class of 8 Edwards points)
-  result in the same output byte representation
-
-Note: To check whether two Edwards points e and e' mathematically represent the same Ristretto point, one can for example
-check whether
-mul_by_cofactor e = mul_by_cofactor e', since
-8e = 8e' is equivalent to
-8 (e - e') = 0, which is equivalent to
-e - e' being in the torsion subgroup E[8], which is equivalent to
-e and e' representing the same Ristretto point.
+• Different Edwards point representations of the same Ristretto point result in the same output byte representation
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
-
-1. The function always succeeds (no panic) for all valid RistrettoPoint inputs
-2. Canonicalization: If two RistrettoPoint representations are equivalent
-  (i.e., their cofactor multiples are equal as Edwards points), then they compress to
-  the same byte representation.
+ho
 -/
+@[progress]
 theorem compress_spec
   (rist1 rist2 : RistrettoPoint)
   (h1_X_bounds : ∀ i, i < 5 → (rist1.X[i]!).val < 2 ^ 54)
