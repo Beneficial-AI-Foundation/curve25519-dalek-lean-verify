@@ -42,20 +42,20 @@ theorem identity_spec :
     ∃ q, identity = ok q ∧
     (∀ i : Fin 32, q[i]! = 0#u8) ∧
     U8x32_as_Nat q = 0 := by
-  unfold identity
-  refine ⟨Array.repeat 32#usize 0#u8, rfl, ?_, ?_⟩
-  -- Prove all bytes are 0
+  use Array.repeat 32#usize 0#u8
+  constructor
+  · rfl
+  constructor
   · intro i
-    simp only [Array.repeat, getElem!]
-    simp only [List.getElem?_replicate]
+    -- Each byte of a zero-filled array is zero
+    simp only [Array.repeat, getElem!, List.getElem?_replicate]
     have h : i.val < 32 := i.isLt
     simp [h]
-  -- Prove U8x32_as_Nat equals 0
-  · unfold U8x32_as_Nat
+  · -- Sum of zeros is zero
+    unfold U8x32_as_Nat
     simp only [Finset.sum_eq_zero_iff, Finset.mem_range]
     intro i hi
-    simp only [Array.repeat, getElem!]
-    simp only [List.getElem?_replicate]
+    simp only [Array.repeat, getElem!,List.getElem?_replicate]
     simp [hi]
 
 end curve25519_dalek.montgomery.IdentityMontgomeryPoint
