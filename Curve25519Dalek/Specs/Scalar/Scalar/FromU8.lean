@@ -5,6 +5,7 @@ Authors: Alok Singh
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Aeneas.Std.WP
 
 /-! # Spec Theorem for `Scalar::from(u8)`
 
@@ -17,6 +18,7 @@ This function embeds a u8 into a Scalar by writing its little-endian bytes.
 
 open Aeneas
 open scoped Aeneas
+open scoped Aeneas.Std.WP
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.FromScalarU8
 
