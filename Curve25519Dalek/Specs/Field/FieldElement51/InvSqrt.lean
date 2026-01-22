@@ -67,7 +67,7 @@ Natural language specs:
 @[progress]
 theorem invsqrt_spec
     (v : backend.serial.u64.field.FieldElement51)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 51 - 1)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)
     (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
     ∃ res, invsqrt v = ok res ∧
     let v_nat := Field51_as_Nat v % p
@@ -89,11 +89,16 @@ theorem invsqrt_spec
     --- END TASK
   · refine ⟨fun h ↦ ?_, fun h ↦ ?_, fun h ↦ ?_⟩
     · -- BEGIN TASK
-      refine (res_1 ?_)
-      simp_all [ONE]; decide
+      rename_i res_1
+      have := res_1 ?_
+      · constructor
+        · simp[this]
+        · simp[this]
+      · simp_all[ONE]
+        decide
       --- END TASK
     · -- BEGIN TASK
-      have := res_2 ?_
+      have := res ?_
       · simp_all [ONE]; decide
       · refine ⟨?_, ?_, ?_⟩
         · simp [ONE_spec, show ¬p = 1 by decide]
