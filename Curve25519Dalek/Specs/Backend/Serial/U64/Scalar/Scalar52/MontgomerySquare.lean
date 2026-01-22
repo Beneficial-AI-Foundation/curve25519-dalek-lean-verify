@@ -57,8 +57,7 @@ theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 6
     := by
   unfold montgomery_square
   progress*
-  · -- m^2[8] < 2 ^ 95
-    sorry
+
   refine ⟨by simpa [a_post_1, eq_comm] using res_post_1,
     fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
 
