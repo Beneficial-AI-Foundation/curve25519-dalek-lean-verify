@@ -54,8 +54,6 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     (∀ i < 5, w[i]!.val < 2 ^ 62) := by
   unfold montgomery_mul
   progress*
-  · -- Bounds a[8]< 2^ 95
-    sorry
   -- BEGIN TASK
   have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
     rw [Nat.ModEq]

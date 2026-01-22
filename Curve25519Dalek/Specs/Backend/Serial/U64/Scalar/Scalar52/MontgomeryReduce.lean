@@ -254,11 +254,14 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- -- ============================================================================================
   -- -- INFO 2: The hypothesis h_a8_bound should be added to the signature, but since there are
   -- --         downstream dependencies that need to be changed, as a temporary fix we'll use this
-  -- --         hypothesis as an axiom/have block.
+  -- --         hypothesis as an axiom/have block. Files affected:
+  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
+  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
+  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
   -- -- ============================================================================================
   -- 0. See INFO 2
   have h_a8_bound : a[8]!.val < 2 ^ 95 := by sorry
-  
+
   -- 1. Instantiate ALL array bounds explicitly.
   have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
   have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
