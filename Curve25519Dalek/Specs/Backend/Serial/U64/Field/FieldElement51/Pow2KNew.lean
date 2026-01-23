@@ -143,6 +143,153 @@ theorem compute_square_limbs_spec (a : Array U64 5#usize)
 @[progress]
 theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     (hk : 0 < k) (eqk : k'.val = k)
+    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
+    ∃ r, pow2k_loop k' a = ok r ∧
+    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
+    (∀ i < 5, r[i]!.val < 2 ^ 52) := by
+  unfold pow2k_loop
+
+  -- Using `progress*?` in order to run progress until a certain point in the implementation
+  simp only [progress_simps]
+  let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
+  · have := ha 3 (by simp)
+    scalar_tac
+  let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  let* ⟨ a4_19, a4_19_post ⟩ ← U64.mul_spec
+  · have := ha 4 (by simp)
+    scalar_tac
+  let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i3, i3_post ⟩ ← pow2k.m_spec
+  let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i5, i5_post ⟩ ← pow2k.m_spec
+  let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i7, i7_post ⟩ ← pow2k.m_spec
+  let* ⟨ i8, i8_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
+  · sorry
+  let* ⟨ c0, c0_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i10, i10_post ⟩ ← pow2k.m_spec
+  let* ⟨ i11, i11_post ⟩ ← pow2k.m_spec
+  let* ⟨ i12, i12_post ⟩ ← pow2k.m_spec
+  let* ⟨ i13, i13_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i14, i14_post ⟩ ← U128.mul_spec
+  · sorry
+  let* ⟨ c1, c1_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i15, i15_post ⟩ ← pow2k.m_spec
+  let* ⟨ i16, i16_post ⟩ ← pow2k.m_spec
+  let* ⟨ i17, i17_post ⟩ ← pow2k.m_spec
+  let* ⟨ i18, i18_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i19, i19_post ⟩ ← U128.mul_spec
+  · sorry
+  let* ⟨ c2, c2_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i20, i20_post ⟩ ← pow2k.m_spec
+  let* ⟨ i21, i21_post ⟩ ← pow2k.m_spec
+  let* ⟨ i22, i22_post ⟩ ← pow2k.m_spec
+  let* ⟨ i23, i23_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i24, i24_post ⟩ ← U128.mul_spec
+  · sorry
+  let* ⟨ c3, c3_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i25, i25_post ⟩ ← pow2k.m_spec
+  let* ⟨ i26, i26_post ⟩ ← pow2k.m_spec
+  let* ⟨ i27, i27_post ⟩ ← pow2k.m_spec
+  let* ⟨ i28, i28_post ⟩ ← U128.add_spec
+  · sorry
+  let* ⟨ i29, i29_post ⟩ ← U128.mul_spec
+  · sorry
+  let* ⟨ c4, c4_post ⟩ ← U128.add_spec
+  · sorry
+
+  -- The 5 intermediate products (c0-c4) have been computed
+  have : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
+      ≡ (Field51_as_Nat a)^2 [MOD p] := by
+    have := ha 0 (by simp)
+    have := ha 1 (by simp)
+    have := ha 2 (by simp)
+    have := ha 3 (by simp)
+    have := ha 4 (by simp)
+    have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
+    simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
+
+  -- The split are due to 5 `debug_assert!(a[i] < (1 << 54))`
+  let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  split
+  . split
+    . split
+      . split
+        . split
+          . let* ⟨ i31, i31_post_1, i31_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+            let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ c11, c11_post ⟩ ← U128.add_spec
+            let* ⟨ i34, i34_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ a1, a1_post ⟩ ← Array.update_spec
+            let* ⟨ i36, i36_post_1, i36_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+            let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ c21, c21_post ⟩ ← U128.add_spec
+            let* ⟨ i39, i39_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ a2, a2_post ⟩ ← Array.update_spec
+            let* ⟨ i41, i41_post_1, i41_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+            let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ c31, c31_post ⟩ ← U128.add_spec
+            let* ⟨ i44, i44_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ a3, a3_post ⟩ ← Array.update_spec
+            let* ⟨ i46, i46_post_1, i46_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+            let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ c41, c41_post ⟩ ← U128.add_spec
+            let* ⟨ i49, i49_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ a4, a4_post ⟩ ← Array.update_spec
+            let* ⟨ i51, i51_post_1, i51_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+            let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
+            let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ a5, a5_post ⟩ ← Array.update_spec
+            let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
+            · sorry
+            let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
+            let* ⟨ i56, i56_post ⟩ ← U64.add_spec
+            · sorry
+            let* ⟨ a6, a6_post ⟩ ← Array.update_spec
+            let* ⟨ i57, i57_post ⟩ ← Array.index_usize_spec
+            let* ⟨ i58, i58_post_1, i58_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
+            let* ⟨ i59, i59_post ⟩ ← Array.index_usize_spec
+            let* ⟨ i60, i60_post ⟩ ← U64.add_spec
+            · sorry
+            let* ⟨ a7, a7_post ⟩ ← Array.update_spec
+            let* ⟨ i61, i61_post ⟩ ← Array.index_usize_spec
+            let* ⟨ i62, i62_post_1, i62_post_2 ⟩ ← UScalar.and_spec
+            let* ⟨ __discr, __discr_post ⟩ ← Array.index_mut_usize_spec
+            let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
+            split
+            . simp only [progress_simps]
+              sorry
+            . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
+              · sorry
+              sorry
+          . sorry
+        . sorry
+      . sorry
+    . sorry
+  . sorry
+
+@[progress]
+theorem pow2k_loop_spec' (k : ℕ) (k' : U32) (a : Array U64 5#usize)
+    (hk : 0 < k) (eqk : k'.val = k)
     (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     ∃ r, pow2k_loop k' a = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
