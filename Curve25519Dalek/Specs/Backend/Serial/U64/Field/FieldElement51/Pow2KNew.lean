@@ -226,6 +226,9 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
   rw [this]
 
+@[local simp]
+theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
+
 -- /-- The square limbs represent a² in radix-2^51 form modulo p.
 --     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 ≡ (Field51_as_Nat a)² [MOD p] -/
 -- @[progress]
@@ -384,19 +387,21 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
               sorry
             . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
               · sorry
-              · -- Main equality to prove, need to show that
-                -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p] ∧ ∀ i < 5, ↑res[i]! < 2 ^ 52`
-                sorry
-          . -- Debug assert branch: a[0] >= 1 << 54 - contradiction with bounds
-            simp_all only [not_lt]; omega
-        . -- Debug assert branch: a[1] >= 1 << 54 - contradiction with bounds
-          simp_all only [not_lt]; omega
-      . -- Debug assert branch: a[2] >= 1 << 54 - contradiction with bounds
-        simp_all only [not_lt]; omega
-    . -- Debug assert branch: a[3] >= 1 << 54 - contradiction with bounds
-      simp_all only [not_lt]; omega
-  . -- Debug assert branch: a[4] >= 1 << 54 - contradiction with bounds
-    simp_all only [not_lt]; omega
+              · constructor
+                · -- Main equality to prove, need to show that
+                  -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p] ∧ ∀ i < 5, ↑res[i]! < 2 ^ 52`
+                  sorry
+                · sorry
+          . have : 2^54 < a[4]!.val := by scalar_tac
+            grind
+        . have : 2^54 < a[3]!.val := by scalar_tac
+          grind
+      . have : 2^54 < a[2]!.val := by scalar_tac
+        grind
+    . have : 2^54 < a[1]!.val := by scalar_tac
+      grind
+  . have : 2^54 < a[0]!.val := by scalar_tac
+    grind
 
 -- @[progress]
 -- theorem pow2k_loop_spec' (k : ℕ) (k' : U32) (a : Array U64 5#usize)
