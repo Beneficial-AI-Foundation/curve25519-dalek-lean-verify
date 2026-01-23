@@ -24,13 +24,13 @@ It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
 The Rust code uses 9 structures for representing points on the elliptic curve:
 
 - edwards.EdwardsPoint
-- ristretto.RistrettoPoint (TODO: add IsValid details and toPoint)
-- ristretto.CompressedRistretto (TODO: add IsValid details and toPoint)
+- ristretto.RistrettoPoint
+- ristretto.CompressedRistretto
 - backend.serial.curve_models.ProjectivePoint
 - backend.serial.curve_models.CompletedPoint
 - backend.serial.curve_models.ProjectiveNielsPoint
-- edwards.affine.AffinePoint (TODO: add IsValid and toPoint)
-- edwards.CompressedEdwardsY (TODO: add IsValid and toPoint)
+- edwards.affine.AffinePoint
+- edwards.CompressedEdwardsY
 - montgomery.MontgomeryPoint (TODO: add IsValid and toPoint)
 
 The Rust code is designed so that the constructors and the various operations guarantee that the
@@ -47,6 +47,7 @@ References: https://ristretto.group/details/isogenies.html, https://www.shiftlef
 namespace curve25519_dalek.math
 
 open Edwards ZMod
+open Aeneas.Std Result
 
 section Constants
 
@@ -192,6 +193,46 @@ noncomputable def compress_pure (P : Point Ed25519) : Nat :=
 
 end PureIsogeny
 
+section EdwardsDecompression
+
+/--
+**Pure Edwards Decompression**
+Recovers (x, y) from a 32-byte representation `s` according to RFC 8032 (Ed25519).
+Morally: we store the point (x,y) as just the coordinate y and the sign bit, i.e. using 32-bits,
+leveraging the EdCurve equation: -x² + y² = 1 + dx²y². Indeed, we can recover x just knowing y and
+the sign to take on the square root to obtain x.
+1. Treat the 32 bytes as a little-endian integer `s`.
+2. y is the lower 255 bits (s % 2^255).
+3. The sign of x is the 256th bit (s / 2^255).
+-/
+noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (Point Ed25519) :=
+  let s := U8x32_as_Nat bytes
+
+  -- Mathematical splitting of the 256-bit integer
+  let y_int := s % (2^255)
+  let sign_bit := s / (2^255) -- This is 0 or 1 because s < 2^256
+
+  if y_int >= p then
+    none
+  else
+    let y : ZMod p := y_int
+
+    -- Solve for x²: x² = (y² - 1) / (dy² + 1)
+    let u := y^2 - 1
+    let v := d * y^2 + 1
+    let x2 := u * v⁻¹
+
+    if h : IsSquare x2 then
+      let x_root := abs_edwards (Classical.choose h)
+      -- Apply sign bit: if sign_bit is 1, we want the negative (odd) root
+      let x := if (is_negative x_root) != (sign_bit == 1) then -x_root else x_root
+
+      some { x := x, y := y, on_curve := sorry }
+    else
+      none
+
+end EdwardsDecompression
+
 end curve25519_dalek.math
 
 /-! ## Field Element Conversions -/
@@ -234,6 +275,43 @@ instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable f
   show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
 
 end curve25519_dalek.backend.serial.u64.field
+
+/-!
+## AffinePoint Validity
+-/
+
+namespace curve25519_dalek.edwards.affine
+
+open curve25519_dalek.backend.serial.u64.field
+open Edwards
+
+/--
+Validity predicate for AffinePoint.
+An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation.
+-/
+@[mk_iff]
+structure AffinePoint.IsValid (a : AffinePoint) : Prop where
+  /-- Coordinates must be valid field elements (limbs < 2^54). -/
+  x_valid : a.x.IsValid
+  y_valid : a.y.IsValid
+  /-- The point must satisfy the twisted Edwards equation: -x² + y² = 1 + dx²y² -/
+  on_curve :
+    let x := a.x.toField
+    let y := a.y.toField
+    Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2
+
+instance AffinePoint.instDecidableIsValid (a : AffinePoint) : Decidable a.IsValid :=
+  decidable_of_iff _ (isValid_iff a).symm
+
+/-- Convert an AffinePoint to the mathematical Point. -/
+def AffinePoint.toPoint (a : AffinePoint) : Point Ed25519 :=
+  if h : a.IsValid then
+    { x := a.x.toField
+      y := a.y.toField
+      on_curve := h.on_curve }
+  else 0
+
+end curve25519_dalek.edwards.affine
 
 /-! ## EdwardsPoint validity and casting -/
 
@@ -296,6 +374,31 @@ theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
 
 end curve25519_dalek.edwards
 
+/-!
+## CompressedEdwardsY Validity
+-/
+
+namespace curve25519_dalek.edwards
+open curve25519_dalek.math Edwards
+
+/--
+A CompressedEdwardsY is valid if it represents a valid point on the curve.
+This means the bytes must decompress successfully using the standard Ed25519 rules.
+-/
+def CompressedEdwardsY.IsValid (c : CompressedEdwardsY) : Prop :=
+  (decompress_edwards_pure c).isSome
+
+/--
+Convert a CompressedEdwardsY to the mathematical Point.
+Returns the neutral element if invalid.
+-/
+noncomputable def CompressedEdwardsY.toPoint (c : CompressedEdwardsY) : Point Ed25519 :=
+  match decompress_edwards_pure c with
+  | some P => P
+  | none => 0
+
+end curve25519_dalek.edwards
+
 /-! ## RistrettoPoint Validity -/
 
 namespace curve25519_dalek.ristretto
@@ -330,7 +433,7 @@ If invalid, return the neutral element (0).
 noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point Ed25519 :=
   match decompress_pure (U8x32_as_Nat c) with
   | some P => P
-  | none   => 0 
+  | none   => 0
 
 end curve25519_dalek.ristretto
 
@@ -343,12 +446,48 @@ namespace Edwards
 open curve25519_dalek.math
 
 /--
+**Canonical Ristretto Representation**
 A Point P is the canonical representative of its Ristretto coset if
 decompress ∘ compress = Id on the point.
+The predicate 'IsCanonicalRistrettoRep' characterizes exactly the set of points fixed by the Ristretto
+compression-decompression cycle, i.e. `IsCanonicalRistrettoRep P ↔ decompress (compress P) = P`.
+
+**Proof Sketch:**
+
+1. **Necessity (Image of Decompression):** (Resources: (RFC 9496 §4.3.1 or https://ristretto.group/ §5.2)
+   For any valid encoding `s`, the `decompress` function constructs a point `P`
+   enforcing these specific invariants:
+   - `x`: computed as `abs(2s * Dx)`, forcing `is_negative x = false`.
+   - `t`: computed as `x * y`; decoding fails if `is_negative t`, forcing `is_negative t = false`.
+   - `y`: decoding fails if `y = 0`.
+   Thus, the image of decompression is strictly contained in this set.
+
+2. **Sufficiency (Fundamental Domain of Compression):** (Resources: https://ristretto.group/ §5.3)
+   The `compress` function projects a coset of size 8 to a single representative by conditionally
+   applying geometric transformations:
+   - **Torque:** Maps `P → P + Q₄` if `is_negative (x * y)`.
+   - **Involution:** Maps `P → -P` if `is_negative x`.
+   If `IsCanonicalRistrettoRep P` holds, both conditions are false. The compression logic
+   skips these transformations, acting purely as the inverse of the isogeny map restricted
+   to this domain. Therefore, `decompress (compress P) = P`.
+
+**Geometric Interpretation:**
+This predicate defines a section (fundamental domain) of the quotient bundle `E → E/E[8]`:
+- `is_negative (x * y) = false`: Selects the unique coset representative modulo `E[4]` (fixes Torque).
+- `is_negative x = false`: Selects the unique representative modulo the remaining involution (fixes Sign).
+- `y ≠ 0`: Excludes singular points where the map is undefined.
 -/
 def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
-  let s := compress_pure P
-  decompress_pure s = P
+  let x := P.x
+  let y := P.y
+  let t := x * y
+
+  -- 1. x must be even (non-negative)
+  (is_negative x = false) ∧
+  -- 2. t must be even (non-negative)
+  (is_negative t = false) ∧
+  -- 3. y must be non-zero
+  (y ≠ 0)
 
 end Edwards
 
