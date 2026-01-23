@@ -364,14 +364,23 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
             let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
 
             have hcarry : 2^51 + 19 * carry.val < 2^64 := by
+              -- //
+              -- // c4 < a2^2 + 2*a0*a4 + 2*a1*a3 + (carry from c3)
+              -- //    < 2^(102 + 2*b + lg(5)) + 2^64.
+              -- //
+              -- // When b < 3 we get
+              -- //
+              -- // c4 < 2^110.33  so that carry < 2^59.33
+              -- //
+              -- // so that
+              -- //
+              -- // a[0] + carry * 19 < 2^51 + 19 * 2^59.33 < 2^63.58
               sorry
 
             let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
             let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ a5, a5_post ⟩ ← Array.update_spec
             let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
-            · -- 19 * carry must fit in U64
-              sorry
             let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
             let* ⟨ i56, i56_post ⟩ ← U64.add_spec
             · sorry
