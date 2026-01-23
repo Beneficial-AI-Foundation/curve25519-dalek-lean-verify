@@ -55,22 +55,17 @@ where p = 2^255 - 19
 -/
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
-    ∃ opt_e,
-    to_edwards mp sign = ok opt_e ∧
-    let u := U8x32_as_Nat mp
-
-    ((u + 1) % p = 0 → opt_e = none) ∧
-
-    ((u + 1) % p ≠ 0 →
-      (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point
-       ∃ e x_sign,
-       opt_e = some e ∧
-       field.FieldElement51.is_negative e.X = ok x_sign ∧
-       let y := Field51_as_Nat e.Y
-
-       y * (u + 1) % p = (u - 1) % p ∧
-       (x_sign.val = 1#u8 ↔ sign.val.testBit 0))) := by
-
-    sorry
+    to_edwards mp sign ⦃ opt_e =>
+      let u := U8x32_as_Nat mp;
+      ((u + 1) % p = 0 → opt_e = none) ∧
+      ((u + 1) % p ≠ 0 →
+        (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point
+         ∃ e x_sign,
+         opt_e = some e ∧
+         field.FieldElement51.is_negative e.X = ok x_sign ∧
+         let y := Field51_as_Nat e.Y;
+         y * (u + 1) % p = (u - 1) % p ∧
+         (x_sign.val = 1#u8 ↔ sign.val.testBit 0)) ⦄ := by
+  sorry
 
 end curve25519_dalek.montgomery.MontgomeryPoint

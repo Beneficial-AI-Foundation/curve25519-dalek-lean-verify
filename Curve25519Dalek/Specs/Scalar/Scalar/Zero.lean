@@ -29,6 +29,9 @@ The ZERO constant represents the scalar 0.
 -/
 @[progress]
 theorem ZERO_spec : ok ZERO ⦃ s => U8x32_as_Nat s.bytes = 0 ⦄ := by
-  simp [ZERO, ZERO_body]
+  have h : U8x32_as_Nat ZERO.bytes = 0 := by
+    unfold ZERO ZERO_body eval_global U8x32_as_Nat
+    decide
+  simpa [ZERO, ZERO_body, eval_global, U8x32_as_Nat] using h
 
 end curve25519_dalek.scalar.Scalar

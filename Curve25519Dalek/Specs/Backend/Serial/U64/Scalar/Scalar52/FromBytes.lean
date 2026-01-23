@@ -18,6 +18,8 @@ This function constructs an unpacked scalar from a byte array.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -38,11 +40,9 @@ natural language specs:
 -/
 @[progress]
 theorem from_bytes_spec (b : Array U8 32#usize) :
-    ∃ u,
-    from_bytes b = ok u ∧
-    Scalar52_as_Nat u = U8x32_as_Nat b ∧
-    ∀ i < 5, u[i]!.val < 2 ^ 52
-    := by
-    sorry
+    from_bytes b ⦃ u =>
+      Scalar52_as_Nat u = U8x32_as_Nat b ∧
+      ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

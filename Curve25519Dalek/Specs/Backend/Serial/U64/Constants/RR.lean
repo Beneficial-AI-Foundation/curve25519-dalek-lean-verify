@@ -17,6 +17,8 @@ and L is the group order. It is used in Montgomery form conversions.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants
 
@@ -35,8 +37,10 @@ natural language specs:
 - The value of constants.RR when converted to a natural number is congruent to R² modulo L
 -/
 @[progress]
-theorem RR_spec : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by
-  unfold RR
-  decide
+theorem RR_spec : ok RR ⦃ _ => Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L ⦄ := by
+  have h : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by
+    unfold RR
+    decide
+  simpa using h
 
 end curve25519_dalek.backend.serial.u64.constants

@@ -15,6 +15,8 @@ group order.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants
 
@@ -37,10 +39,16 @@ natural language specs:
 -/
 @[progress]
 theorem LFACTOR_spec :
-    (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧
-    0 ≤ LFACTOR.val ∧
-    LFACTOR.val < 2^52 := by
-  unfold LFACTOR
-  decide
+    ok LFACTOR ⦃ _ =>
+      (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧
+      0 ≤ LFACTOR.val ∧
+      LFACTOR.val < 2^52 ⦄ := by
+  have h :
+      (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧
+      0 ≤ LFACTOR.val ∧
+      LFACTOR.val < 2^52 := by
+    unfold LFACTOR
+    decide
+  simpa using h
 
 end curve25519_dalek.backend.serial.u64.constants
