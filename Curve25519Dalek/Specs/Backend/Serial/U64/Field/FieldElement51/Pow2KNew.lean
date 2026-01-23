@@ -20,10 +20,11 @@ open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 theorem pow2k.m_spec (x y : U64) :
-    ∃ prod, pow2k.m x y = ok prod ∧ prod.val = x.val * y.val := by
+    ∃ prod : U128, pow2k.m x y = ok prod ∧
+    prod.val = x.val * y.val := by
   unfold pow2k.m
   progress*
-  suffices h : x.val * y.val < 2^64 * 2^64 by scalar_tac
+  suffices x.val * y.val < 2^64 * 2^64 by scalar_tac
   apply Nat.mul_lt_mul''
   · scalar_tac
   · scalar_tac
