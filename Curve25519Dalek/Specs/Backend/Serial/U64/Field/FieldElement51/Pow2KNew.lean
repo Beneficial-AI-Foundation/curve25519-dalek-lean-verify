@@ -389,9 +389,11 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
               · sorry
               · constructor
                 · -- Main equality to prove, need to show that
-                  -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p] ∧ ∀ i < 5, ↑res[i]! < 2 ^ 52`
+                  -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p]`
                   sorry
-                · sorry
+                · -- Need to show that
+                  -- `∀ i < 5, ↑res[i]! < 2 ^ 52`
+                  sorry
           . have : 2^54 < a[4]!.val := by scalar_tac
             grind
         . have : 2^54 < a[3]!.val := by scalar_tac
