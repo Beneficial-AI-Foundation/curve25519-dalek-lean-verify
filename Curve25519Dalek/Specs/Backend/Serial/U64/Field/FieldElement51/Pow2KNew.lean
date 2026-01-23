@@ -81,6 +81,15 @@ theorem pow2k.m_spec (x y : U64) :
 --   let c4 ← t20 + t24
 --   ok (c0, c1, c2, c3, c4)
 
+/-- Bound for sum of two cross-products with 19x multipliers in squaring. -/
+lemma cross_product_bound (a1 a2 a3 a4 : ℕ)
+    (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * (19 * a4) + a2 * (19 * a3) ≤ U128.max := by
+  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (38 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
 /-- Decomposition lemma: squaring in radix-2^51 representation mod p.
     This is the key algebraic identity underlying field squaring. -/
 lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
@@ -150,17 +159,17 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
     (∀ i < 5, r[i]!.val < 2 ^ 52) := by
   unfold pow2k_loop
-
+  have := ha 0 (by simp)
+  have := ha 1 (by simp)
+  have := ha 2 (by simp)
+  have := ha 3 (by simp)
+  have := ha 4 (by simp)
   -- Using `progress*?` in order to run progress until a certain point in the implementation
   simp only [progress_simps]
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
-  · have := ha 3 (by simp)
-    scalar_tac
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ a4_19, a4_19_post ⟩ ← U64.mul_spec
-  · have := ha 4 (by simp)
-    scalar_tac
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ i3, i3_post ⟩ ← pow2k.m_spec
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
@@ -168,7 +177,8 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post ⟩ ← pow2k.m_spec
   let* ⟨ i8, i8_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only
+    apply cross_product_bound <;> simp_all
   let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
   · sorry
   let* ⟨ c0, c0_post ⟩ ← U128.add_spec
@@ -209,18 +219,11 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   · sorry
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
   · sorry
-
   -- The 5 intermediate products (c0-c4) have been computed
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
-    have := ha 0 (by simp)
-    have := ha 1 (by simp)
-    have := ha 2 (by simp)
-    have := ha 3 (by simp)
-    have := ha 4 (by simp)
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
-
   -- The splits are due to 5 `debug_assert!(a[i] < (1 << 54))`
   let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U64.ShiftLeft_IScalar_spec
   split
