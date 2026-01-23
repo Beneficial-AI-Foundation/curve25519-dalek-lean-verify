@@ -362,7 +362,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
             let* ⟨ a4, a4_post ⟩ ← Array.update_spec
             let* ⟨ i51, i51_post_1, i51_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
             let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
-
             have hcarry : 2^51 + 19 * carry.val < 2^64 := by
               -- //
               -- // c4 < a2^2 + 2*a0*a4 + 2*a1*a3 + (carry from c3)
@@ -376,7 +375,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
               -- //
               -- // a[0] + carry * 19 < 2^51 + 19 * 2^59.33 < 2^63.58
               sorry
-
             let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
             let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ a5, a5_post ⟩ ← Array.update_spec
@@ -404,9 +402,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
                 · -- Main equality to prove, need to show that
                   -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p]`
                   sorry
-                · -- Need to show that
-                  -- `∀ i < 5, ↑res[i]! < 2 ^ 52`
-                  sorry
+                · assumption
           . have : 2^54 < a[4]!.val := by scalar_tac
             grind
         . have : 2^54 < a[3]!.val := by scalar_tac
