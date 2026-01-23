@@ -90,6 +90,101 @@ lemma cross_product_bound (a1 a2 a3 a4 : ℕ)
   have : (38 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
   omega
 
+/-- Bound for 2 * (sum of two cross-products) -/
+lemma two_cross_product_bound (a1 a2 a3 a4 : ℕ)
+    (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    2 * (a1 * (19 * a4) + a2 * (19 * a3)) ≤ U128.max := by
+  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (76 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for c0 = a0² + 2*(cross products) -/
+lemma c0_bound (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) ≤ U128.max := by
+  have : a0 * a0 < 2 ^ 108 := by nlinarith
+  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (77 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for intermediate sum: a*b + c*(19*d) -/
+lemma intermediate_sum_bound (a b c d : ℕ)
+    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
+    a * b + c * (19 * d) ≤ U128.max := by
+  have : a * b < 2 ^ 108 := by nlinarith
+  have : c * (19 * d) < 19 * 2 ^ 108 := by nlinarith
+  have : (20 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for intermediate sum: a*b + c*d (no 19x factor) -/
+lemma intermediate_sum_bound' (a b c d : ℕ)
+    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
+    a * b + c * d ≤ U128.max := by
+  have : a * b < 2 ^ 108 := by nlinarith
+  have : c * d < 2 ^ 108 := by nlinarith
+  have : (2 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for 2 * intermediate sum: 2*(a*b + c*(19*d)) -/
+lemma two_intermediate_sum_bound (a b c d : ℕ)
+    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
+    2 * (a * b + c * (19 * d)) ≤ U128.max := by
+  have : a * b < 2 ^ 108 := by nlinarith
+  have : c * (19 * d) < 19 * 2 ^ 108 := by nlinarith
+  have : (40 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for 2 * intermediate sum: 2*(a*b + c*d) (no 19x factor) -/
+lemma two_intermediate_sum_bound' (a b c d : ℕ)
+    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
+    2 * (a * b + c * d) ≤ U128.max := by
+  have : a * b < 2 ^ 108 := by nlinarith
+  have : c * d < 2 ^ 108 := by nlinarith
+  have : (4 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for c1 = a3*(19*a3) + 2*(a0*a1 + a2*(19*a4)) -/
+lemma c1_bound (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) ≤ U128.max := by
+  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a1 < 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : (59 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for c2 = a1² + 2*(a0*a2 + a4*(19*a3)) -/
+lemma c2_bound (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) ≤ U128.max := by
+  have : a1 * a1 < 2 ^ 108 := by nlinarith
+  have : a0 * a2 < 2 ^ 108 := by nlinarith
+  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (41 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for c3 = a4*(19*a4) + 2*(a0*a3 + a1*a2) -/
+lemma c3_bound (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) ≤ U128.max := by
+  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a3 < 2 ^ 108 := by nlinarith
+  have : a1 * a2 < 2 ^ 108 := by nlinarith
+  have : (23 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
+/-- Bound for c4 = a2² + 2*(a0*a4 + a1*a3) -/
+lemma c4_bound (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a2 * a2 + 2 * (a0 * a4 + a1 * a3) ≤ U128.max := by
+  have : a2 * a2 < 2 ^ 108 := by nlinarith
+  have : a0 * a4 < 2 ^ 108 := by nlinarith
+  have : a1 * a3 < 2 ^ 108 := by nlinarith
+  have : (5 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
+  omega
+
 /-- Decomposition lemma: squaring in radix-2^51 representation mod p.
     This is the key algebraic identity underlying field squaring. -/
 lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
@@ -180,45 +275,47 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   · simp_all only
     apply cross_product_bound <;> simp_all
   let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
-  · sorry
+  · simp_all only
+    apply two_cross_product_bound <;> simp_all
   let* ⟨ c0, c0_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only
+    apply c0_bound <;> simp_all
   let* ⟨ i10, i10_post ⟩ ← pow2k.m_spec
   let* ⟨ i11, i11_post ⟩ ← pow2k.m_spec
   let* ⟨ i12, i12_post ⟩ ← pow2k.m_spec
   let* ⟨ i13, i13_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply intermediate_sum_bound <;> simp_all
   let* ⟨ i14, i14_post ⟩ ← U128.mul_spec
-  · sorry
+  · simp_all only; apply two_intermediate_sum_bound <;> simp_all
   let* ⟨ c1, c1_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply c1_bound <;> simp_all
   let* ⟨ i15, i15_post ⟩ ← pow2k.m_spec
   let* ⟨ i16, i16_post ⟩ ← pow2k.m_spec
   let* ⟨ i17, i17_post ⟩ ← pow2k.m_spec
   let* ⟨ i18, i18_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply intermediate_sum_bound <;> simp_all
   let* ⟨ i19, i19_post ⟩ ← U128.mul_spec
-  · sorry
+  · simp_all only; apply two_intermediate_sum_bound <;> simp_all
   let* ⟨ c2, c2_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply c2_bound <;> simp_all
   let* ⟨ i20, i20_post ⟩ ← pow2k.m_spec
   let* ⟨ i21, i21_post ⟩ ← pow2k.m_spec
   let* ⟨ i22, i22_post ⟩ ← pow2k.m_spec
   let* ⟨ i23, i23_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply intermediate_sum_bound' <;> simp_all
   let* ⟨ i24, i24_post ⟩ ← U128.mul_spec
-  · sorry
+  · simp_all only; apply two_intermediate_sum_bound' <;> simp_all
   let* ⟨ c3, c3_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply c3_bound <;> simp_all
   let* ⟨ i25, i25_post ⟩ ← pow2k.m_spec
   let* ⟨ i26, i26_post ⟩ ← pow2k.m_spec
   let* ⟨ i27, i27_post ⟩ ← pow2k.m_spec
   let* ⟨ i28, i28_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply intermediate_sum_bound' <;> simp_all
   let* ⟨ i29, i29_post ⟩ ← U128.mul_spec
-  · sorry
+  · simp_all only; apply two_intermediate_sum_bound' <;> simp_all
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
-  · sorry
+  · simp_all only; apply c4_bound <;> simp_all
   -- The 5 intermediate products (c0-c4) have been computed
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
@@ -265,7 +362,9 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
             let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ a5, a5_post ⟩ ← Array.update_spec
             let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
-            · sorry
+            · -- 19 * carry must fit in U64. Carry comes from c4 >> 51 after carry propagation.
+              -- First establish carry bound
+              sorry
             let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
             let* ⟨ i56, i56_post ⟩ ← U64.add_spec
             · sorry
@@ -288,11 +387,16 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
               · -- Main equality to prove, need to show that
                 -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p] ∧ ∀ i < 5, ↑res[i]! < 2 ^ 52`
                 sorry
-          . sorry
-        . sorry
-      . sorry
-    . sorry
-  . sorry
+          . -- Debug assert branch: a[0] >= 1 << 54 - contradiction with bounds
+            simp_all only [not_lt]; omega
+        . -- Debug assert branch: a[1] >= 1 << 54 - contradiction with bounds
+          simp_all only [not_lt]; omega
+      . -- Debug assert branch: a[2] >= 1 << 54 - contradiction with bounds
+        simp_all only [not_lt]; omega
+    . -- Debug assert branch: a[3] >= 1 << 54 - contradiction with bounds
+      simp_all only [not_lt]; omega
+  . -- Debug assert branch: a[4] >= 1 << 54 - contradiction with bounds
+    simp_all only [not_lt]; omega
 
 -- @[progress]
 -- theorem pow2k_loop_spec' (k : ℕ) (k' : U32) (a : Array U64 5#usize)
