@@ -17,6 +17,8 @@ is essentially the identity function wrapped in a `Result` type.
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -42,8 +44,7 @@ Natural language specs:
 -/
 @[progress]
 theorem from_limbs_spec (a : Array U64 5#usize) :
-    ∃ r, from_limbs a = ok r ∧
-    r = a ∧ Field51_as_Nat r = Field51_as_Nat a := by
+    from_limbs a ⦃ r => r = a ∧ Field51_as_Nat r = Field51_as_Nat a ⦄ := by
   simp [from_limbs]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

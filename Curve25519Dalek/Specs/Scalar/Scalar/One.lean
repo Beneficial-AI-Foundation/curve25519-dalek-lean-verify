@@ -29,6 +29,9 @@ The ONE constant represents the scalar 1.
 -/
 @[progress]
 theorem ONE_spec : ok ONE ⦃ s => U8x32_as_Nat s.bytes = 1 ⦄ := by
-  simp [ONE, ONE_body]
+  have h : U8x32_as_Nat ONE.bytes = 1 := by
+    unfold ONE ONE_body eval_global U8x32_as_Nat
+    decide
+  simpa [ONE, ONE_body, eval_global, U8x32_as_Nat] using h
 
 end curve25519_dalek.scalar.Scalar

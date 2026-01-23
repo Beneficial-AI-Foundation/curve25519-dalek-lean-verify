@@ -18,6 +18,8 @@ Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -39,9 +41,9 @@ natural language specs:
 - The result is in canonical form (less than L) -/
 @[progress]
 theorem to_bytes_spec (u : Scalar52) :
-    ∃ b, to_bytes u = ok b ∧
-    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat b < L := by
-    sorry
+    to_bytes u ⦃ b =>
+      U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧
+      U8x32_as_Nat b < L ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
