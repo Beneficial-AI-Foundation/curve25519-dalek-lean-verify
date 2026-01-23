@@ -105,7 +105,11 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Montgomery.ElligatorEncode
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsBytes
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToBytes
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
+import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.AsAffine
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
@@ -118,6 +122,11 @@ import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
+import Curve25519Dalek.Specs.Scalar.Scalar.FromU128
+import Curve25519Dalek.Specs.Scalar.Scalar.FromU16
+import Curve25519Dalek.Specs.Scalar.Scalar.FromU32
+import Curve25519Dalek.Specs.Scalar.Scalar.FromU64
+import Curve25519Dalek.Specs.Scalar.Scalar.FromU8
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrder
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrderWide
 import Curve25519Dalek.Specs.Scalar.Scalar.FromCanonicalBytes
