@@ -48,8 +48,7 @@ natural language specs:
   (m * m) ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
 @[progress]
-theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62)
-    (hm_4 : m[4]!.val < 2 ^ 47) :
+theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :
     ∃ w,
     montgomery_square m = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
