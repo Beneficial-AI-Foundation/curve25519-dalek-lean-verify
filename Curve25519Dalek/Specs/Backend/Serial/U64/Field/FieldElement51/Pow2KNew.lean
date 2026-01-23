@@ -79,6 +79,47 @@ def compute_square_limbs (a : Array U64 5#usize) : Result (U128 × U128 × U128 
   let c4 ← t20 + t24
   ok (c0, c1, c2, c3, c4)
 
+/-- Decomposition lemma: squaring in radix-2^51 representation mod p.
+    This is the key algebraic identity underlying field squaring. -/
+lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
+    (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2
+    ≡ a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) +
+      2^51 * (a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4))) +
+      2^102 * (a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3))) +
+      2^153 * (a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2)) +
+      2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3))
+    [MOD p] := by
+  have expand : (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2 =
+    a0^2 +
+    2^51 * (2 * a0 * a1) +
+    2^102 * (a1^2 + 2 * a0 * a2) +
+    2^153 * (2 * a0 * a3 + 2 * a1 * a2) +
+    2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3) +
+    2^255 * ((2 * a1 * a4 + 2 * a2 * a3) +
+      2^51 * (a3^2 + 2 * a2 * a4) +
+      2^102 * (2 * a3 * a4) +
+      2^153 * a4^2) := by ring
+  rw [expand]
+  have key : (2 : ℕ)^255 ≡ 19 [MOD p] := by unfold p; rw [Nat.ModEq]; norm_num
+  have := Nat.ModEq.mul_right ((2 * a1 * a4 + 2 * a2 * a3) +
+    2^51 * (a3^2 + 2 * a2 * a4) + 2^102 * (2 * a3 * a4) + 2^153 * a4^2) key
+  have := Nat.ModEq.add_left (a0^2 +
+    2^51 * (2 * a0 * a1) +
+    2^102 * (a1^2 + 2 * a0 * a2) +
+    2^153 * (2 * a0 * a3 + 2 * a1 * a2) +
+    2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3)) this
+  apply Nat.ModEq.trans this
+  have : a0^2 + 2^51 * (2 * a0 * a1) + 2^102 * (a1^2 + 2 * a0 * a2) +
+      2^153 * (2 * a0 * a3 + 2 * a1 * a2) + 2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3) +
+      19 * (2 * a1 * a4 + 2 * a2 * a3 + 2^51 * (a3^2 + 2 * a2 * a4) +
+        2^102 * (2 * a3 * a4) + 2^153 * a4^2) =
+    a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) +
+    2^51 * (a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4))) +
+    2^102 * (a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3))) +
+    2^153 * (a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2)) +
+    2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
+  rw [this]
+
 /-- The square limbs represent a² in radix-2^51 form modulo p.
     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 ≡ (Field51_as_Nat a)² [MOD p] -/
 @[progress]
@@ -88,43 +129,21 @@ theorem compute_square_limbs_spec (a : Array U64 5#usize)
     (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
   unfold compute_square_limbs
+  have h0 := ha 0 (by simp)
+  have h1 := ha 1 (by simp)
+  have h2 := ha 2 (by simp)
+  have h3 := ha 3 (by simp)
+  have h4 := ha 4 (by simp)
   progress*
-  · have := ha 3 (by simp)
-    scalar_tac
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
-  ·
-    sorry
+  -- Remaining goal: modular equivalence via decompose lemma
+  -- Need to use postconditions to show computed values match decompose formula
+  simp only [Field51_as_Nat]
+  have dec := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
+  -- The computed c0..c4 values match the RHS of decompose (after using postconditions)
+  use c0; use c1; use c2; use c3; use c4
+  refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
+
+  sorry
 
 @[progress]
 theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
