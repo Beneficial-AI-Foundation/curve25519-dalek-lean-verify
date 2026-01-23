@@ -258,7 +258,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
   -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
   -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
+  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
+  -- --  (MontSquare =>) - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
   -- -- ============================================================================================
+  
   -- 0. See INFO 2
   have h_a8_bound : a[8]!.val < 2 ^ 95 := by sorry
 
