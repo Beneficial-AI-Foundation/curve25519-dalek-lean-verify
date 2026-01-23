@@ -37,4 +37,13 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     (∀ i < 5, r[i]!.val < 2 ^ 52) := by
   sorry
 
+theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
+    (ha : ∀ i < 5, self[i]!.val < 2 ^ 54) :
+    ∃ result : FieldElement51, pow2k self k = ok result ∧
+    Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
+    (∀ i < 5, result[i]!.val < 2 ^ 52) := by
+  unfold pow2k
+
+  sorry
+
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
