@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -54,7 +54,7 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
   -- The point is a valid Ristretto point
   RISTRETTO_BASEPOINT_POINT.IsValid ∧
 
-  -- The point is not the identity point.
+  -- The point is not the identity point
   math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by
 
   sorry
