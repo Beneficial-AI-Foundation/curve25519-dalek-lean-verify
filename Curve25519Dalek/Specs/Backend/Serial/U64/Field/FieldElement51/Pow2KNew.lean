@@ -229,6 +229,7 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
 @[local simp]
 theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
 
+
 -- /-- The square limbs represent a² in radix-2^51 form modulo p.
 --     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 ≡ (Field51_as_Nat a)² [MOD p] -/
 -- @[progress]
@@ -361,12 +362,15 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
             let* ⟨ a4, a4_post ⟩ ← Array.update_spec
             let* ⟨ i51, i51_post_1, i51_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
             let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
+
+            have hcarry : 2^51 + 19 * carry.val < 2^64 := by
+              sorry
+
             let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
             let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ a5, a5_post ⟩ ← Array.update_spec
             let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
-            · -- 19 * carry must fit in U64. Carry comes from c4 >> 51 after carry propagation.
-              -- First establish carry bound
+            · -- 19 * carry must fit in U64
               sorry
             let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
             let* ⟨ i56, i56_post ⟩ ← U64.add_spec
