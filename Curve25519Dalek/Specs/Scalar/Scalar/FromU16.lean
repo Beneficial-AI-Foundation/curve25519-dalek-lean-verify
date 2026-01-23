@@ -22,6 +22,105 @@ open scoped Aeneas.Std.WP
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.FromScalarU16
 
+private lemma bitvec_split {n : Nat} (b : BitVec n) :
+    b.toNat = (BitVec.setWidth 8 b).toNat + 2^8 * (b >>> 8).toNat := by
+  have hmod : (BitVec.setWidth 8 b).toNat = b.toNat % 2^8 := by
+    simp [BitVec.toNat_setWidth]
+  have hsh : (b >>> 8).toNat = b.toNat >>> 8 := by
+    simp [BitVec.toNat_ushiftRight]
+  have hdiv : b.toNat >>> 8 = b.toNat / 2^8 := by
+    simp [Nat.shiftRight_eq_div_pow]
+  have hsplit : b.toNat = b.toNat % 2^8 + 2^8 * (b.toNat / 2^8) :=
+    (Nat.mod_add_div _ _).symm
+  calc
+    b.toNat = b.toNat % 2^8 + 2^8 * (b.toNat / 2^8) := hsplit
+    _ = (BitVec.setWidth 8 b).toNat + 2^8 * (b.toNat / 2^8) := by simp [hmod]
+    _ = (BitVec.setWidth 8 b).toNat + 2^8 * (b >>> 8).toNat := by simp [hsh, hdiv]
+
+private lemma bitvec_shiftRight_lt (b : BitVec 16) :
+    (b >>> 8).toNat < 2^8 := by
+  have hb : b.toNat < 2^16 := by simpa using b.isLt
+  have hpos : 0 < 2^8 := by decide
+  have hb' : b.toNat / 2^8 < 2^8 := by
+    apply (Nat.div_lt_iff_lt_mul (k := 2^8) (x := b.toNat) (y := 2^8) hpos).2
+    simpa [pow_add, Nat.mul_comm, Nat.mul_left_comm, Nat.mul_assoc] using hb
+  simpa [BitVec.toNat_ushiftRight, Nat.shiftRight_eq_div_pow] using hb'
+
+private lemma bitvec_setWidth_shiftRight_toNat (b : BitVec 16) :
+    (BitVec.setWidth 8 (b >>> 8)).toNat = (b >>> 8).toNat := by
+  have hlt : (b >>> 8).toNat < 2^8 := bitvec_shiftRight_lt b
+  calc
+    (BitVec.setWidth 8 (b >>> 8)).toNat = (b >>> 8).toNat % 2^8 := by
+      simp [-BitVec.toNat_ushiftRight, BitVec.toNat_setWidth]
+    _ = (b >>> 8).toNat := by
+      exact Nat.mod_eq_of_lt hlt
+
+private lemma u16_to_le_bytes_val (x : U16) :
+    x.val =
+      (core.num.U16.to_le_bytes x).val[0]!.val +
+        2^8 * (core.num.U16.to_le_bytes x).val[1]!.val := by
+  have hbytes : x.bv.toLEBytes =
+      BitVec.setWidth 8 x.bv :: BitVec.setWidth 8 (x.bv >>> 8) :: [] := by
+    simp [BitVec.toLEBytes.eq_1]
+  have hlist :
+      (core.num.U16.to_le_bytes x).val =
+        x.bv.toLEBytes.map (UScalar.mk (ty := UScalarTy.U8)) := by
+    simp [core.num.U16.to_le_bytes]
+  have h0 :
+      (core.num.U16.to_le_bytes x).val[0]!.val =
+        (BitVec.setWidth 8 x.bv).toNat := by
+    calc
+      (core.num.U16.to_le_bytes x).val[0]!.val
+          = ((x.bv.toLEBytes.map (UScalar.mk (ty := UScalarTy.U8)))[0]!).val := by
+            simp [hlist]
+      _ = (UScalar.mk (ty := UScalarTy.U8) (BitVec.setWidth 8 x.bv)).val := by
+            simp [hbytes]
+      _ = (BitVec.setWidth 8 x.bv).toNat := by rfl
+  have h1 :
+      (core.num.U16.to_le_bytes x).val[1]!.val =
+        (BitVec.setWidth 8 (x.bv >>> 8)).toNat := by
+    calc
+      (core.num.U16.to_le_bytes x).val[1]!.val
+          = ((x.bv.toLEBytes.map (UScalar.mk (ty := UScalarTy.U8)))[1]!).val := by
+            simp [hlist]
+      _ =
+          (UScalar.mk (ty := UScalarTy.U8)
+            (BitVec.setWidth 8 (x.bv >>> 8))).val := by
+            simp [hbytes]
+      _ = (BitVec.setWidth 8 (x.bv >>> 8)).toNat := by rfl
+  have hsplit :
+      x.bv.toNat =
+        (BitVec.setWidth 8 x.bv).toNat +
+          2^8 * (BitVec.setWidth 8 (x.bv >>> 8)).toNat := by
+    calc
+      x.bv.toNat =
+          (BitVec.setWidth 8 x.bv).toNat + 2^8 * (x.bv >>> 8).toNat :=
+        bitvec_split x.bv
+      _ =
+          (BitVec.setWidth 8 x.bv).toNat +
+            2^8 * (BitVec.setWidth 8 (x.bv >>> 8)).toNat := by
+          rw [bitvec_setWidth_shiftRight_toNat]
+  have hsplit' :
+      x.val =
+        (BitVec.setWidth 8 x.bv).toNat +
+          2^8 * (BitVec.setWidth 8 (x.bv >>> 8)).toNat := by
+    simpa using hsplit
+  calc
+    x.val =
+        (BitVec.setWidth 8 x.bv).toNat +
+          2^8 * (BitVec.setWidth 8 (x.bv >>> 8)).toNat := hsplit'
+    _ =
+        (core.num.U16.to_le_bytes x).val[0]!.val +
+          2^8 * (core.num.U16.to_le_bytes x).val[1]!.val := by
+      rw [← h0, ← h1]
+
+
+private lemma from_u16_eval (x : U16) :
+  «from» x =
+    ok { bytes := (Array.repeat 32#usize 0#u8).setSlice! 0 (core.num.U16.to_le_bytes x).val } := by
+  -- TODO: reduce the index_mut/copy_from_slice pipeline to setSlice!
+  sorry
+
 /-
 natural language description:
 
@@ -38,104 +137,12 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting Scalar encodes the value x
 -/
+
 @[progress]
-theorem from_spec (x : U16) :
-  «from» x ⦃ s => U8x32_as_Nat s.bytes = x.val ⦄ := by
-  unfold «from»
-  progress*
-  simp [core.array.Array.index_mut, Array.to_slice, Array.from_slice,
-    core.slice.Slice.copy_from_slice, Array.repeat, Slice.len]
-  classical
-  -- The resulting array is the zero array with the 2-byte little-endian encoding of x
-  -- written into the first two positions.
-  set bytes : Array U8 32#usize :=
-      (Array.repeat 32#usize 0#u8).setSlice! 0 (core.num.U16.to_le_bytes x).val
-    with hbytes
-  -- Reduce the goal to a sum over bytes.
-  unfold U8x32_as_Nat
-  let f : Nat → Nat := fun i => 2^(8 * i) * (bytes[i]!).val
-  have hzero : ∀ i ∈ Finset.range 32, 2 ≤ i → f i = 0 := by
-    intro i hi hi2
-    have hi32 : i < 32 := by simpa using hi
-    have hlen : (core.num.U16.to_le_bytes x).val.length = 2 := by simp
-    have hbytes' :
-        bytes[i]! = (Array.repeat 32#usize 0#u8)[i]! := by
-      -- i ≥ 2 so we are in the suffix of the slice update
-      have hle : 0 + (core.num.U16.to_le_bytes x).val.length ≤ i := by
-        simpa [hlen] using hi2
-      -- use Array.setSlice! suffix lemma
-      simpa [bytes] using
-        (Array.setSlice!_getElem!_suffix (s := Array.repeat 32#usize 0#u8)
-          (s' := (core.num.U16.to_le_bytes x).val) (i := 0) (j := i) hle)
-    have hrep : (Array.repeat 32#usize 0#u8)[i]! = 0#u8 := by
-      -- reduce to List.replicate
-      simpa [Array.repeat, Array.getElem!_Nat_eq] using
-        (List.getElem!_replicate (a := 0#u8) (n := 32) (i := i) hi32)
-    have hbytes0 : bytes[i]! = 0#u8 := by
-      simpa [hbytes'] using hrep
-    have hbytes0val : (bytes[i]!).val = 0 := by
-      simpa [hbytes0]
-    calc
-      f i = 2^(8 * i) * (bytes[i]!).val := rfl
-      _ = 2^(8 * i) * 0 := by
-        rw [hbytes0val]
-      _ = 0 := by simp
-  have hsum :
-      (∑ i ∈ Finset.range 32, f i) = ∑ i ∈ Finset.range 2, f i := by
-    classical
-    -- Sum over range 32 reduces to the first two indices since the rest are zero.
-    have hsubset : (Finset.range 2) ⊆ Finset.range 32 := by
-      intro i hi
-      have hi' : i < 32 := by
-        exact Nat.lt_trans (by simpa using hi) (by decide : (2:Nat) < 32)
-      simpa using hi'
-    -- Use sum_subset to drop zero terms.
-    symm
-    refine Finset.sum_subset hsubset ?_
-    intro i hi hnot
-    have hi2 : 2 ≤ i := by
-      exact Nat.le_of_not_lt (by
-        intro hi2'
-        exact hnot (by simpa using hi2'))
-    exact hzero i hi hi2
-  -- Now compute the remaining two terms.
-  have hlen : (core.num.U16.to_le_bytes x).val.length = 2 := by simp
-  have h0 : bytes[0]! = (core.num.U16.to_le_bytes x).val[0]! := by
-    have hmid : (0 ≤ 0 ∧ 0 - 0 < (core.num.U16.to_le_bytes x).val.length ∧
-        0 < (Array.repeat 32#usize 0#u8).length) := by
-      simp [hlen]
-    simpa [bytes] using
-      (Array.setSlice!_getElem!_middle (s := Array.repeat 32#usize 0#u8)
-        (s' := (core.num.U16.to_le_bytes x).val) (i := 0) (j := 0) hmid)
-  have h1 : bytes[1]! = (core.num.U16.to_le_bytes x).val[1]! := by
-    have hmid : (0 ≤ 1 ∧ 1 - 0 < (core.num.U16.to_le_bytes x).val.length ∧
-        1 < (Array.repeat 32#usize 0#u8).length) := by
-      simp [hlen]
-    simpa [bytes] using
-      (Array.setSlice!_getElem!_middle (s := Array.repeat 32#usize 0#u8)
-        (s' := (core.num.U16.to_le_bytes x).val) (i := 0) (j := 1) hmid)
-  -- Remaining arithmetic over the two bytes.
-  have hsum2 :
-      (∑ i ∈ Finset.range 2, f i) =
-        (bytes[0]!).val + 2^8 * (bytes[1]!).val := by
-    -- range 2 = {0,1}
-    have hsum2' : (∑ i ∈ Finset.range 2, f i) = f 0 + f 1 := by
-      -- sum over range 2
-      simp [Finset.sum_range_succ, f]
-    -- simplify f 0 and f 1 without expanding getElem!
-    rw [hsum2']
-    simp only [f, Nat.mul_zero, Nat.mul_one, Nat.pow_zero, Nat.one_mul]
-  -- TODO: relate the little-endian bytes to x.val
-  -- The goal is now a byte-level characterization of U16.to_le_bytes.
-  -- We keep this as a placeholder for a future bitvector lemma.
-  -- (bitvec lemma likely: x.val = (bytes[0]!).val + 2^8 * (bytes[1]!).val)
-  -- Use the computed reductions to rewrite the sum.
-  have hsum' : (∑ i ∈ Finset.range 32, f i) =
-      (bytes[0]!).val + 2^8 * (bytes[1]!).val := by
-    simpa [hsum, hsum2]
-  -- Finish once we prove the byte-level lemma for to_le_bytes.
-  -- For now, leave as sorry.
-  -- NOTE: This is the only remaining arithmetic/bitvector step.
+theorem from_spec (x_u16 : U16) :
+  «from» x_u16 ⦃ s => U8x32_as_Nat s.bytes = x_u16.val ⦄ := by
+  -- TODO: unfold `from`, rewrite via `from_u16_eval`, reduce `U8x32_as_Nat` to the
+  -- first two bytes, then use `u16_to_le_bytes_val`.
   sorry
 
 end curve25519_dalek.scalar.FromScalarU16
