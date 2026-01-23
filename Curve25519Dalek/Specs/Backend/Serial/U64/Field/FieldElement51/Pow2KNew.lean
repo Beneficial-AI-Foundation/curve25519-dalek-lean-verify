@@ -129,44 +129,16 @@ theorem compute_square_limbs_spec (a : Array U64 5#usize)
     (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
   unfold compute_square_limbs
-  have h0 := ha 0 (by simp)
-  have h1 := ha 1 (by simp)
-  have h2 := ha 2 (by simp)
-  have h3 := ha 3 (by simp)
-  have h4 := ha 4 (by simp)
+  have := ha 0 (by simp)
+  have := ha 1 (by simp)
+  have := ha 2 (by simp)
+  have := ha 3 (by simp)
+  have := ha 4 (by simp)
   progress*
-  -- Remaining goal: modular equivalence via decompose lemma
-  -- Need to use postconditions to show computed values match decompose formula
-  simp only [Field51_as_Nat]
-  have dec := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
-  -- The computed c0..c4 values match the RHS of decompose (after using postconditions)
+  have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
   use c0; use c1; use c2; use c3; use c4
   refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
-  -- Goal: (∑ i ∈ Finset.range 5, 2^(51*i) * ↑a[i]!)^2 ≡ ↑c0 + 2^51*↑c1 + ... [MOD p]
-  -- First, simplify the LHS sum to match decompose lemma's LHS
-  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-  -- Convert to match dec's form without evaluating the powers
-  have sum_eq : 2^(51*0) * a[0]!.val + 2^(51*1) * a[1]!.val + 2^(51*2) * a[2]!.val +
-                2^(51*3) * a[3]!.val + 2^(51*4) * a[4]!.val =
-                a[0]!.val + 2^51 * a[1]!.val + 2^102 * a[2]!.val +
-                2^153 * a[3]!.val + 2^204 * a[4]!.val := by ring
-  rw [sum_eq]
-  -- Show c values equal RHS of decompose, then use dec.symm
-  have c_eq : c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val =
-      a[0]!.val * a[0]!.val + 2 * (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) +
-      2^51 * (a[3]!.val * (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val))) +
-      2^102 * (a[1]!.val * a[1]!.val + 2 * (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val))) +
-      2^153 * (a[4]!.val * (19 * a[4]!.val) + 2 * (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val)) +
-      2^204 * (a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val)) := by
-    simp only [c0_post, c1_post, c2_post, c3_post, c4_post,
-               t0_post, t1_post, t2_post, t3_post, t4_post,
-               t5_post, t6_post, t7_post, t8_post, t9_post,
-               t10_post, t11_post, t12_post, t13_post, t14_post,
-               t15_post, t16_post, t17_post, t18_post, t19_post,
-               t20_post, t21_post, t22_post, t23_post, t24_post,
-               a3_19_post, a4_19_post]
-  rw [c_eq]
-  exact dec.symm
+  simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
 @[progress]
 theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
