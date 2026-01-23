@@ -15,7 +15,8 @@ mkdir -p "$OUTPUT_DIR"
 
 JSON_FILE="$OUTPUT_DIR/profile.json"
 RAW_DIR="$OUTPUT_DIR/raw"
-mkdir -p "$RAW_DIR"
+DETAILS_DIR="$OUTPUT_DIR/details"
+mkdir -p "$RAW_DIR" "$DETAILS_DIR"
 
 # Collect files to profile
 FILES=()
@@ -67,26 +68,29 @@ N=0
 for f in "${FILES[@]}"; do
     N=$((N+1))
 
-    # Raw output file
     SAFE_NAME=$(echo "$f" | tr '/' '_' | tr '.' '_')
     RAW_FILE="$RAW_DIR/${SAFE_NAME}.txt"
+    DETAILS_FILE="$DETAILS_DIR/${SAFE_NAME}.jsonl"
 
     echo "[$N/$COUNT] Profiling $f ..."
 
-    # Run lean --profile and capture ALL output
-    nice -n 19 lake env lean --profile "$f" > "$RAW_FILE" 2>&1 || true
+    # Run lean --profile --json and capture output
+    nice -n 19 lake env lean --profile --json "$f" > "$RAW_FILE" 2>&1 || true
 
-    # Parse cumulative times from end of output
-    IMPORT=$(grep -oP 'import \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    SIMP=$(grep -oP 'simp \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TYPECLASS=$(grep -oP 'typeclass inference \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    ELABORATION=$(grep -oP 'elaboration \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TACTIC=$(grep -oP 'tactic execution \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    GRIND=$(grep -oP 'grind \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    INTERP=$(grep -oP 'interpretation \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    PARSING=$(grep -oP 'parsing \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TYPE_CHECK=$(grep -oP 'type checking \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    INSTANTIATE=$(grep -oP 'instantiate metavars \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    # Extract per-definition JSON lines (for detailed analysis)
+    grep '^{' "$RAW_FILE" > "$DETAILS_FILE" 2>/dev/null || true
+
+    # Parse cumulative times from end of output (still text format)
+    IMPORT=$(grep -oP '^\s*import \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    SIMP=$(grep -oP '^\s*simp \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    TYPECLASS=$(grep -oP '^\s*typeclass inference \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    ELABORATION=$(grep -oP '^\s*elaboration \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    TACTIC=$(grep -oP '^\s*tactic execution \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    GRIND=$(grep -oP '^\s*grind \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    INTERP=$(grep -oP '^\s*interpretation \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    PARSING=$(grep -oP '^\s*parsing \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    TYPE_CHECK=$(grep -oP '^\s*type checking \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    INSTANTIATE=$(grep -oP '^\s*instantiate metavars \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
 
     # Write JSON entry
     if ! $FIRST; then echo "," >> "$JSON_FILE"; fi
@@ -115,7 +119,10 @@ echo "]" >> "$JSON_FILE"
 
 echo ""
 echo "=== DONE ==="
-echo "JSON: $JSON_FILE"
-echo "Raw:  $RAW_DIR/"
+echo "Output:"
+echo "  Overview: $JSON_FILE"
+echo "  Details:  $DETAILS_DIR/ (per-definition timing)"
+echo "  Raw:      $RAW_DIR/"
 echo ""
-echo "View results: ./scripts/bench/profile-report.sh $JSON_FILE"
+echo "View overview: ./scripts/bench/profile-report.sh $JSON_FILE"
+echo "View details:  cat $DETAILS_DIR/<file>.jsonl | jq"

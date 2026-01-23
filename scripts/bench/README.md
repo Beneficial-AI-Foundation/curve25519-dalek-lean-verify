@@ -44,8 +44,9 @@ Scripts for measuring compilation times and profiling Lean files.
 ```
 
 Output is saved to `benchmarks/profile-<timestamp>/`:
-- `profile.json` - structured data for analysis
-- `raw/` - raw `lean --profile` output per file
+- `profile.json` - cumulative timing per file (overview)
+- `details/` - per-definition JSON timing (for deep dives)
+- `raw/` - raw `lean --profile --json` output
 
 ### View Profile Results
 
@@ -102,8 +103,10 @@ All results are saved to the `benchmarks/` directory:
 ```
 benchmarks/
 ├── profile-20260121-143022/
-│   ├── profile.json          # structured profile data
-│   └── raw/                   # raw lean --profile output
+│   ├── profile.json          # cumulative timing per file (overview)
+│   ├── details/              # per-definition timing (deep dive)
+│   │   └── <file>.jsonl      # JSON lines with line/pos info
+│   └── raw/                   # raw lean --profile --json output
 ├── 20260121-150000/
 │   ├── times.txt             # per-file timing (ms filepath)
 │   ├── perf.txt              # perf stat output
@@ -122,9 +125,43 @@ benchmarks/
 | `elaboration_s` | Total elaboration time |
 | `tactic_execution_s` | Time executing tactics |
 
+## Workflow
+
+### Initial Baseline
+
+```bash
+# First time: profile entire project (can take hours)
+nice -n 19 ./scripts/bench/profile-lean.sh --all
+
+# Or profile in batches if needed
+nice -n 19 ./scripts/bench/profile-lean.sh Curve25519Dalek/Specs/
+nice -n 19 ./scripts/bench/profile-lean.sh Curve25519Dalek/Proofs/
+```
+
+### Per-PR Profiling
+
+```bash
+# Profile only changed files
+nice -n 19 ./scripts/bench/profile-lean.sh path/to/changed/File.lean
+
+# Compare with baseline
+./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json
+```
+
+### Deep Dive on Slow Files
+
+```bash
+# View per-definition timing for a slow file
+cat benchmarks/profile-*/details/_Curve25519Dalek_Specs_Field_Pow2K_lean.jsonl | jq
+
+# Shows which specific theorem/tactic calls are slow
+# {"data":"simp took 1700s\n","pos":{"line":42},...}
+```
+
 ## Tips
 
 - Always run benchmarks with `nice -n 19` to avoid system impact
 - Project must be built first (`lake build`) for profiling
 - Import times are dominated by loading mathlib; focus on simp/typeclass for optimization
 - Use `--by typeclass_inference_s` to find typeclass bottlenecks
+- Use `details/*.jsonl` files to pinpoint exact slow proof steps
