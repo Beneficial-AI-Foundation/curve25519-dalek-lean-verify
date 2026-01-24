@@ -229,6 +229,13 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
 @[local simp]
 theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
 
+/-- The final carry bound: if carry ≤ (2^64 - 2^51)/19 then 2^51 + 19*carry < 2^64. -/
+lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 19) :
+    2 ^ 51 + 19 * carry_val < 2 ^ 64 := by
+  have hle := Nat.mul_le_mul_right 19 h
+  have hdiv : 19 * ((2 ^ 64 - 2 ^ 51) / 19) ≤ 2 ^ 64 - 2 ^ 51 := Nat.mul_div_le _ _
+  omega
+
 
 -- /-- The square limbs represent a² in radix-2^51 form modulo p.
 --     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 ≡ (Field51_as_Nat a)² [MOD p] -/
@@ -363,45 +370,72 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
             let* ⟨ i51, i51_post_1, i51_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
             let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
             have hcarry : 2^51 + 19 * carry.val < 2^64 := by
-              -- //
-              -- // c4 < a2^2 + 2*a0*a4 + 2*a1*a3 + (carry from c3)
-              -- //    < 2^(102 + 2*b + lg(5)) + 2^64.
-              -- //
-              -- // When b < 3 we get
-              -- //
-              -- // c4 < 2^110.33  so that carry < 2^59.33
-              -- //
-              -- // so that
-              -- //
-              -- // a[0] + carry * 19 < 2^51 + 19 * 2^59.33 < 2^63.58
-              sorry
+              -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
+              -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
+              -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
+              -- Full proof tracks bounds through carry chain (see Pow2K.lean)
+              apply carry_mul_bound
+              simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
+                  i51_post_1, Nat.shiftRight_eq_div_pow]
+              sorry -- Requires detailed carry chain bound tracking
             let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
             let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ a5, a5_post ⟩ ← Array.update_spec
             let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
             let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
             let* ⟨ i56, i56_post ⟩ ← U64.add_spec
-            · sorry
+            · -- i55 < 2^51 (masked), i54 = 19*carry. By hcarry: sum < 2^64
+              sorry
             let* ⟨ a6, a6_post ⟩ ← Array.update_spec
             let* ⟨ i57, i57_post ⟩ ← Array.index_usize_spec
             let* ⟨ i58, i58_post_1, i58_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
             let* ⟨ i59, i59_post ⟩ ← Array.index_usize_spec
             let* ⟨ i60, i60_post ⟩ ← U64.add_spec
-            · sorry
+            · -- i59 < 2^51 (masked), i58 = i56 >> 51 < 2^13 (since i56 < 2^64)
+              sorry
             let* ⟨ a7, a7_post ⟩ ← Array.update_spec
             let* ⟨ i61, i61_post ⟩ ← Array.index_usize_spec
             let* ⟨ i62, i62_post_1, i62_post_2 ⟩ ← UScalar.and_spec
             let* ⟨ __discr, __discr_post ⟩ ← Array.index_mut_usize_spec
             let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
             split
-            . simp only [progress_simps]
-              sorry
-            . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
-              · sorry
-              · constructor
-                · -- Main equality to prove, need to show that
-                  -- `Field51_as_Nat res ≡ Field51_as_Nat a ^ 2 ^ k [MOD p]`
+            . -- Base case: k1 = 0 means k = 1, single squaring
+              simp only [progress_simps]
+              -- The result is a7.set 0 i62, representing a^2 mod p
+              -- Need: Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^1) [MOD p]
+              -- and bounds on result limbs
+              constructor
+              · -- Main equality for k=1: a^(2^1) = a^2
+                have hk1 : k = 1 := by
                   sorry
+                rw [hk1, Nat.pow_one]
+                -- The squaring result equals a^2 mod p
+                sorry
+              · -- Bounds: each limb < 2^52
+                intro i hi
+                sorry
+            . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
+              · -- Recursive call precondition: k-1 > 0
+                -- We're in the branch where k1 ≠ 0, i.e., k' - 1 ≠ 0
+                simp_all only [k1_post_1, ne_eq, not_true_eq_false, not_false_eq_true]
+                sorry
+              · constructor
+                · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
+                  -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a7')^(2^(k-1)) [MOD p]
+                  -- where a7' = a7.set 0 i62 is one squaring of a
+                  -- Need: (a^2)^(2^(k-1)) = a^(2^k)
+                  rw [eqk] at res_post_1
+                  -- First show: a7.set 0 i62 ≡ a^2 [MOD p]
+                  have hsq : Field51_as_Nat (a7.set 0#usize i62) ≡ (Field51_as_Nat a)^2 [MOD p] := by
+                    sorry
+                  have hpow := Nat.ModEq.pow (2^(k-1)) hsq
+                  apply Nat.ModEq.trans res_post_1 hpow |>.trans
+                  rw [← pow_mul]
+                  congr 1
+                  have : 2 * 2^(k-1) = 2^k := by
+                    have : k ≠ 0 := by sorry
+                    sorry
+                  grind
                 · assumption
           . have : 2^54 < a[4]!.val := by scalar_tac
             grind
