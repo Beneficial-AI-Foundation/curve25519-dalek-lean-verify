@@ -18,7 +18,8 @@ This function computes the 2^k-th power of the element.
 
 -/
 
-set_option maxHeartbeats 5000000
+set_option maxHeartbeats 10000000
+-- progress* and scalar_tac are heavy
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -406,18 +407,12 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
               -- and bounds on result limbs
               constructor
               · -- Main equality for k=1: a^(2^1) = a^2
-                have hk1 : k = 1 := by
-                  sorry
-                rw [hk1, Nat.pow_one]
-                -- The squaring result equals a^2 mod p
                 sorry
               · -- Bounds: each limb < 2^52
-                intro i hi
                 sorry
             . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
               · -- Recursive call precondition: k-1 > 0
                 -- We're in the branch where k1 ≠ 0, i.e., k' - 1 ≠ 0
-                simp_all only [k1_post_1, ne_eq, not_true_eq_false, not_false_eq_true]
                 sorry
               · constructor
                 · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
