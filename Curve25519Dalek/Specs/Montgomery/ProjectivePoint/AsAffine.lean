@@ -19,6 +19,7 @@ by computing U / W in the field and returning the canonical byte encoding.
 
 open Aeneas
 open scoped Aeneas
+open scoped Aeneas.Std.WP
 open Aeneas.Std Result
 namespace curve25519_dalek.montgomery.ProjectivePoint
 

@@ -17,6 +17,7 @@ This function maps a field element to a MontgomeryPoint using the Elligator map.
 
 open Aeneas
 open scoped Aeneas
+open scoped Aeneas.Std.WP
 open Aeneas.Std Result
 namespace curve25519_dalek.montgomery
 

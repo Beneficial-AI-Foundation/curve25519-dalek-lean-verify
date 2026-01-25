@@ -20,6 +20,9 @@ y = (u-1)/(u+1), followed by Edwards decompression with a specified sign bit giv
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
+open scoped Aeneas.Std.WP
 open Aeneas.Std Result
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
