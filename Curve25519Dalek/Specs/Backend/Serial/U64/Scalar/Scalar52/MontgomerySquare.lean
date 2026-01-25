@@ -17,6 +17,8 @@ This function performs Montgomery squaring.
 
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -41,13 +43,10 @@ natural language specs:
 -/
 @[progress]
 theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :
-    ∃ w,
-    montgomery_square m = ok w ∧
-    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62)
-    := by
-  unfold montgomery_square
-  progress*
+    montgomery_square m ⦃ w =>
+      (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
+      (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
+  sorry
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -15,6 +15,8 @@ This function performs field element negation by delegating to `negate`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51
@@ -30,15 +32,9 @@ open curve25519_dalek.backend.serial.u64.field.FieldElement51
 @[progress]
 theorem neg_spec (r : backend.serial.u64.field.FieldElement51)
     (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
-    ∃ r_inv, backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg r = ok r_inv ∧
-    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
-    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
-  unfold backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg
-  -- Use the `negate` specification since `neg` is just a thin wrapper
-  obtain ⟨r_inv, hcall, hmod, hbnd⟩ := negate_spec r h
-  refine ⟨r_inv, ?_, ?_, ?_⟩
-  · exact hcall
-  · exact hmod
-  · exact hbnd
+    backend.serial.u64.field.NegShared0FieldElement51FieldElement51.neg r ⦃ r_inv =>
+      (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
+      (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51

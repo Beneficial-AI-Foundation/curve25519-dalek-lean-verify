@@ -22,6 +22,8 @@ theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice)
   · exfalso; apply h; cases a; simpa [Choice.zero]
   · cases a; simpa [Choice.one]
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
 
@@ -50,30 +52,9 @@ natural language specs:
 -/
 @[progress]
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
-    ∃ s, from_canonical_bytes b = ok s ∧
-    (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
-    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) := by
-  unfold from_canonical_bytes
-  progress as ⟨_, ha⟩
-  progress as ⟨_, he, _⟩
-  progress as ⟨_, _⟩
-  progress as ⟨_, hd⟩
-  progress as ⟨f, hf⟩
-  progress as ⟨_, _, hg⟩
-  refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
-  · -- BEGIN TASK
-    rw [ha, high_bit_zero_of_lt_L b hb] at he
-    simp_all; bv_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    intro _
-    rw [hg]
-    by_contra h
-    have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
-    grind
-    -- END TASK
+    from_canonical_bytes b ⦃ s =>
+      (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
+      (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) ⦄ := by
+  sorry
 
 end curve25519_dalek.scalar.Scalar

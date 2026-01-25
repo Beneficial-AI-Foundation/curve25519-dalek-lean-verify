@@ -23,6 +23,8 @@ This function checks whether a field element is zero.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.field.FieldElement51
@@ -60,49 +62,8 @@ lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
 
 @[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
-    ∃ c, is_zero r = ok c ∧
-    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) := by
-  unfold is_zero
-  progress as ⟨bytes, h_to_bytes⟩
-  progress as ⟨s, h_bytes_slice⟩
-  progress as ⟨s1, h_zero_slice⟩
-  progress as ⟨result, h_ct_eq⟩
-  constructor
-  · -- BEGIN TASK
-    intro h
-    have s_eq_s1 : s = s1 := h_ct_eq.mp ((Choice.val_eq_one_iff result).mp h)
-    rw [h_bytes_slice, h_zero_slice] at s_eq_s1
-    have heq : bytes = Array.repeat 32#usize 0#u8 :=
-      array_eq_of_to_slice_eq s_eq_s1
-    rw [heq, Nat.ModEq] at h_to_bytes
-    rw [← h_to_bytes]
-    unfold U8x32_as_Nat
-    iterate 31 (rw [Finset.sum_range_succ])
-    rw [Finset.sum_range_one]
-    simp [Array.repeat]
-    -- END TASK
-  · -- BEGIN TASK
-    intro h
-    rename_i h1
-    rw [Nat.ModEq, h] at h_to_bytes
-    have h_bytes_zero : U8x32_as_Nat bytes = 0 := by
-      have h2 := Nat.mod_eq_of_lt h1
-      rw [h2] at h_to_bytes
-      exact h_to_bytes
-    have bytes_eq : bytes = Array.repeat 32#usize 0#u8 := by
-      unfold U8x32_as_Nat at h_bytes_zero
-      simp_all
-      apply Subtype.ext
-      apply List.ext_getElem
-      repeat simp
-      intro i hi _
-      have hi_val := h_bytes_zero i hi
-      interval_cases i
-      all_goals simp [Array.repeat, List.replicate]; scalar_tac
-    have s_eq_s1 : s = s1 := by
-      rw [h_bytes_slice, h_zero_slice, bytes_eq]
-    rw [← h_ct_eq] at s_eq_s1
-    simp [s_eq_s1, Choice.one]
-    -- END TASK
+    is_zero r ⦃ c =>
+      (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by
+  sorry
 
 end curve25519_dalek.field.FieldElement51

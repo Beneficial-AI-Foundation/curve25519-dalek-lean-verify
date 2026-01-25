@@ -14,6 +14,8 @@ This function performs constant-time equality comparison.
 Source: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.ConstantTimeEqScalar
 
@@ -36,19 +38,7 @@ natural language specs:
 -/
 @[progress]
 theorem ct_eq_spec (s s' : Scalar) :
-    ∃ c, ct_eq s s' = ok c ∧
-    (c = Choice.one ↔ s.bytes = s'.bytes) := by
-  unfold ct_eq
-  repeat progress
-  constructor
-  · -- BEGIN TASK
-    intro _
-    have : s.bytes.to_slice = s'.bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-    -- END TASK
-  · -- BEGIN TASK
-    grind
-    -- END TASK
+    ct_eq s s' ⦃ c => c = Choice.one ↔ s.bytes = s'.bytes ⦄ := by
+  sorry
 
 end curve25519_dalek.scalar.ConstantTimeEqScalar

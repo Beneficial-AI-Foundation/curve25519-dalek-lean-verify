@@ -15,6 +15,8 @@ This function converts the structure to its byte representation.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.ristretto.CompressedRistretto
 
@@ -38,8 +40,7 @@ natural language specs:
 -/
 @[progress]
 theorem as_bytes_spec (cr : CompressedRistretto) :
-    ∃ b, as_bytes cr = ok b ∧
-    b = cr := by
+    as_bytes cr ⦃ b => b = cr ⦄ := by
   unfold as_bytes
   simp
 

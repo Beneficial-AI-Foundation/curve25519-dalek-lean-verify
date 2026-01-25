@@ -14,6 +14,8 @@ This constant represents one of the square roots of -1 modulo p.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants
 
@@ -35,8 +37,10 @@ natural language specs:
 -/
 @[progress]
 theorem SQRT_M1_spec :
-    (Field51_as_Nat SQRT_M1)^2 % p = p - 1 := by
-  unfold SQRT_M1
-  decide
+    ok SQRT_M1 ⦃ _ => (Field51_as_Nat SQRT_M1)^2 % p = p - 1 ⦄ := by
+  have h : (Field51_as_Nat SQRT_M1)^2 % p = p - 1 := by
+    unfold SQRT_M1
+    decide
+  simpa using h
 
 end curve25519_dalek.backend.serial.u64.constants

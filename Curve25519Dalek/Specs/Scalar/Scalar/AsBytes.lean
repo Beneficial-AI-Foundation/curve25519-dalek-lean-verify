@@ -14,6 +14,8 @@ This function converts the structure to its byte representation.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.scalar.Scalar
 
@@ -36,8 +38,7 @@ natural language specs:
 -/
 @[progress]
 theorem as_bytes_spec (s : Scalar) :
-    ∃ b, as_bytes s = ok b ∧
-    b = s.bytes ∧ mk b = s := by
+    as_bytes s ⦃ b => b = s.bytes ∧ mk b = s ⦄ := by
   unfold as_bytes
   simp
 

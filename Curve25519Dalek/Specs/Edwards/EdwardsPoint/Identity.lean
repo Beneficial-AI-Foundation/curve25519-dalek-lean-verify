@@ -16,6 +16,8 @@ This function returns the identity element.
 **Source**: curve25519-dalek/src/edwards.rs:L409-L416
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.edwards.IdentityEdwardsPoint
@@ -37,8 +39,7 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    ∃ q, identity = ok q ∧
-    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO := by
+    identity ⦃ q => q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO ⦄ := by
   unfold identity
   simp
 

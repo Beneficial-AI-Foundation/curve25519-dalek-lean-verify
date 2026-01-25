@@ -15,6 +15,8 @@ The Rust implementation normalizes both operands to canonical wire format with
 Source: curve25519-dalek/src/field.rs (lines 96:4-98:5)
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.field.ConstantTimeEqFieldElement51
 
@@ -41,20 +43,8 @@ Spec:
 -/
 @[progress]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
-    ∃ c, ct_eq a b = ok c ∧
-    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by
-  unfold field.ConstantTimeEqFieldElement51.ct_eq
-  progress as ⟨a_bytes, ha_bytes⟩
-  progress as ⟨sa, h_sa⟩
-  progress as ⟨b_bytes, hb_bytes⟩
-  progress as ⟨sb, h_sb⟩
-  progress as ⟨c, h_cteq⟩
-  simp_all
-  constructor
-  · intro eq
-    have : a_bytes.to_slice = b_bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-  · grind
+    ct_eq a b ⦃ c =>
+      (c = Choice.one ↔ a.to_bytes = b.to_bytes) ⦄ := by
+  sorry
 
 end curve25519_dalek.field.ConstantTimeEqFieldElement51

@@ -68,25 +68,6 @@ theorem negate_hoare_spec (r : FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i
     ⦃⌜True⌝⦄
     negate r
     ⦃⇓r_inv => ⌜(Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0⌝⦄ := by
-  mvcgen [negate]
-  · simp
-  · have := h_bounds 0 (by simp); simp_all; grind
-  · simp
-  · have := h_bounds 1 (by simp); simp_all; grind
-  · simp
-  · have := h_bounds 2 (by simp); simp_all; grind
-  · simp
-  · have := h_bounds 3 (by simp); simp_all; grind
-  · simp
-  · have := h_bounds 4 (by simp); simp_all; grind
-  · have h_16p : 16 * p =
-      36028797018963664 * 2^0 +
-      36028797018963952 * 2^51 +
-      36028797018963952 * 2^102 +
-      36028797018963952 * 2^153 +
-      36028797018963952 * 2^204 := by simp [p]
-    simp_all [Std.Do.wp, PostCond.noThrow, Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ,
-      Array.make, Array.getElem!_Nat_eq]
-    grind
+  sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

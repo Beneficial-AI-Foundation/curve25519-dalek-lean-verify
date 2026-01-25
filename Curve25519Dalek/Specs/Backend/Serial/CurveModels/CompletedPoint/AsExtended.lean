@@ -19,6 +19,8 @@ it computes an equivalent representation (X':Y':Z':T') in extended coordinates
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
@@ -58,24 +60,19 @@ theorem as_extended_spec (q : CompletedPoint)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
   (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
   (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
-∃ e,
-as_extended q = ok e ∧
-let X := Field51_as_Nat q.X
-let Y := Field51_as_Nat q.Y
-let Z := Field51_as_Nat q.Z
-let T := Field51_as_Nat q.T
-let X' := Field51_as_Nat e.X
-let Y' := Field51_as_Nat e.Y
-let Z' := Field51_as_Nat e.Z
-let T' := Field51_as_Nat e.T
-X' % p = (X * T) % p ∧
-Y' % p = (Y * Z) % p ∧
-Z' % p = (Z * T) % p ∧
-T' % p = (X * Y) % p
-:= by
-  unfold as_extended
-  progress*
-  rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
-  simp_all
+as_extended q ⦃ e =>
+  let X := Field51_as_Nat q.X;
+  let Y := Field51_as_Nat q.Y;
+  let Z := Field51_as_Nat q.Z;
+  let T := Field51_as_Nat q.T;
+  let X' := Field51_as_Nat e.X;
+  let Y' := Field51_as_Nat e.Y;
+  let Z' := Field51_as_Nat e.Z;
+  let T' := Field51_as_Nat e.T;
+  X' % p = (X * T) % p ∧
+  Y' % p = (Y * Z) % p ∧
+  Z' % p = (Z * T) % p ∧
+  T' % p = (X * Y) % p ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

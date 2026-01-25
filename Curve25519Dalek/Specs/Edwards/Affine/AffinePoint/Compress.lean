@@ -20,6 +20,8 @@ storing the sign bit of x in the most significant bit of the last byte.
 - Complete proof
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.edwards.affine.AffinePoint
 
@@ -47,9 +49,7 @@ Natural language specs:
 @[progress]
 theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)
     (h : Field51_as_Nat self.y < 2 ^ 255) :
-    ∃ result, compress self = ok result -- ∧
-    -- result.IsValid ∧ result.toPoint = self.toPoint
-    := by
+    compress self ⦃ _result => True ⦄ := by
   sorry
 
 -- To do: update this when relevant definitions have been added.

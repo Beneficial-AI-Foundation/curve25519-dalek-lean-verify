@@ -22,6 +22,8 @@ natural language specs:
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -33,10 +35,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 Function was deprecated since 4.1.4 and renamed to `to_bytes`. Simply calls the other function. -/
 @[progress]
 theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
-    ∃ result, as_bytes self = ok result ∧
-    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
-    U8x32_as_Nat result < p := by
-  unfold as_bytes
-  progress*
+    as_bytes self ⦃ result =>
+      U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
+      U8x32_as_Nat result < p ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

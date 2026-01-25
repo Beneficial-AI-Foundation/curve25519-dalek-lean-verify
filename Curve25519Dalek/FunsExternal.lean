@@ -3,6 +3,8 @@ import Aeneas
 import Curve25519Dalek.Types
 import Mathlib
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek
@@ -101,8 +103,8 @@ def subtle.BitAndChoiceChoiceChoice.bitand
 -/
 @[progress]
 axiom subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
-    ∃ c, subtle.BitAndChoiceChoiceChoice.bitand a b = ok c ∧
-    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one)
+  subtle.BitAndChoiceChoiceChoice.bitand a b ⦃ c =>
+    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) ⦄
 
 /- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 177:4-177:41
@@ -165,8 +167,8 @@ axiom subtle.ConstantTimeEqSlice.ct_eq_spec
   (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
   (hb : b.length < 2 ^ UScalarTy.Usize.numBits)
   (h_eq_len : a.length = b.length) :
-  ∃ c, subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b ⦃ c =>
+    (c = Choice.one ↔ a = b) ⦄
 
 /- [subtle::{subtle::ConstantTimeEq for u8}::ct_eq]:
 Name pattern: [subtle::{subtle::ConstantTimeEq<u8>}::ct_eq]
@@ -181,8 +183,8 @@ def subtle.ConstantTimeEqU8.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
 -/
 @[progress]
 axiom subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
-  ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  subtle.ConstantTimeEqU8.ct_eq a b ⦃ c =>
+    (c = Choice.one ↔ a = b) ⦄
 
 /- [subtle::ConditionallySelectable::conditional_assign]:
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
@@ -213,8 +215,8 @@ def subtle.ConditionallySelectableU64.conditional_select
 /-- Progress spec for ConditionallySelectableU64.conditional_select -/
 @[progress]
 theorem conditional_select_U64_spec (a b : U64) (choice : subtle.Choice) :
-    ∃ res, subtle.ConditionallySelectableU64.conditional_select a b choice = ok res ∧
-    res = if choice.val = 1#u8 then b else a := by
+    subtle.ConditionallySelectableU64.conditional_select a b choice ⦃ res =>
+      res = if choice.val = 1#u8 then b else a ⦄ := by
   unfold subtle.ConditionallySelectableU64.conditional_select
   split <;> simp_all
 
@@ -263,8 +265,8 @@ def subtle.CtOption.new
 -/
 @[progress]
 axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
-  ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
-  opt.value = value ∧ opt.is_some = is_some
+  subtle.CtOption.new value is_some ⦃ opt =>
+    opt.value = value ∧ opt.is_some = is_some ⦄
 
 /- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25

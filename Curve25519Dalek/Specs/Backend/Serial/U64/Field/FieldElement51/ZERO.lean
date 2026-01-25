@@ -15,6 +15,8 @@ This constant represents the additive identity element (0) in the field.
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -34,8 +36,10 @@ natural language specs:
 - The constant, when converted to a natural number, equals 0
 -/
 @[progress]
-theorem ZERO_spec : Field51_as_Nat ZERO = 0 := by
+theorem ZERO_spec : ok ZERO ⦃ _ => Field51_as_Nat ZERO = 0 ⦄ := by
+  have h : Field51_as_Nat ZERO = 0 := by
     unfold ZERO
     decide
+  simpa using h
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

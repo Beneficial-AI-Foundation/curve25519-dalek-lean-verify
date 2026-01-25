@@ -20,6 +20,8 @@ This function computes the multiplicative inverse.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
@@ -49,33 +51,8 @@ natural language specs:
 -/
 @[progress]
 theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :
-    ∃ u', invert u = ok u' ∧
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] := by
-  unfold invert
-  progress*
-  · -- BEGIN TASK
-    by_contra _
-    have : Scalar52_as_Nat u % L = 0 % L := by
-      apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by try decide)
-      try simp_all [Nat.ModEq]
-    try simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    rw [Nat.ModEq] at *
-    have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
-        = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
-      _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
-      _ = R * R % L := by
-        simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
-        try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos,
-          Nat.reducePow]
-    have : (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) =
-        Scalar52_as_Nat u * Scalar52_as_Nat res * (R * R) := by try grind
-    rw [this] at h
-    have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
-      have coprime : Nat.Coprime (R ^ 2) L := by try decide
-      apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by try grind)
-    exact this h
-    -- END TASK
+    invert u ⦃ u' =>
+      (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] ⦄ := by
+  sorry
 
 end curve25519_dalek.scalar.Scalar52

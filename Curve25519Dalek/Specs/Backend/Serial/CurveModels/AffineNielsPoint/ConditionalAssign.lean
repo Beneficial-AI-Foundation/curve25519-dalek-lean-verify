@@ -26,6 +26,8 @@ it updates `self` such that:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 322:4-326:5
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 
 namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint
@@ -63,15 +65,13 @@ the output AffineNielsPoint computed by `conditional_assign self other choice` s
 theorem conditional_assign_spec
     (self other : backend.serial.curve_models.AffineNielsPoint)
     (choice : subtle.Choice) :
-    ∃ result, conditional_assign self other choice = ok result ∧
-    (∀ i < 5, result.y_plus_x[i]!.val =
-      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧
-    (∀ i < 5, result.y_minus_x[i]!.val =
-      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧
-    (∀ i < 5, result.xy2d[i]!.val =
-      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) := by
-  unfold conditional_assign
-  progress*
-  grind
+    conditional_assign self other choice ⦃ result =>
+      (∀ i < 5, result.y_plus_x[i]!.val =
+        if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧
+      (∀ i < 5, result.y_minus_x[i]!.val =
+        if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧
+      (∀ i < 5, result.xy2d[i]!.val =
+        if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by
+  sorry
 
 end curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint

@@ -15,6 +15,8 @@ representation (five u64 limbs).
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants
 
@@ -35,8 +37,10 @@ natural language specs:
   (the canonical representative of −1 modulo p in [0, p-1]).
 -/
 @[progress]
-theorem MINUS_ONE_spec : Field51_as_Nat MINUS_ONE = p - 1 := by
-  unfold MINUS_ONE
-  decide
+theorem MINUS_ONE_spec : ok MINUS_ONE ⦃ _ => Field51_as_Nat MINUS_ONE = p - 1 ⦄ := by
+  have h : Field51_as_Nat MINUS_ONE = p - 1 := by
+    unfold MINUS_ONE
+    decide
+  simpa using h
 
 end curve25519_dalek.backend.serial.u64.constants

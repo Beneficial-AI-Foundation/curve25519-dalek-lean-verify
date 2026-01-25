@@ -22,6 +22,8 @@ This function performs the initial decompression step which:
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
+open Aeneas
+open scoped Aeneas
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.u64.constants
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -73,23 +75,16 @@ Natural language specs:
 theorem step_1_spec (cey : edwards.CompressedEdwardsY)
   (bytes : Aeneas.Std.Array U8 32#usize)
   (h_byter : cey.as_bytes = ok bytes) :
-    ∃ result, edwards.decompress.step_1 cey = ok result ∧
-
-      let (is_valid_y_coord, X, Y, Z) := result
-
-      -- Z is always ONE
+    edwards.decompress.step_1 cey ⦃ result =>
+      let (is_valid_y_coord, X, Y, Z) := result;
       Z = ONE ∧
-
-      -- Y is extracted from the input bytes
       (from_bytes bytes = ok Y) ∧
-
-      -- The computation follows the curve equation
       (∃ YY u v fe,
         square Y = ok YY ∧
         sub YY ONE = ok u ∧
         mul YY EDWARDS_D = ok fe ∧
         add fe ONE = ok v ∧
-        sqrt_ratio_i u v = ok (is_valid_y_coord, X)) := by
+        sqrt_ratio_i u v = ok (is_valid_y_coord, X)) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY
