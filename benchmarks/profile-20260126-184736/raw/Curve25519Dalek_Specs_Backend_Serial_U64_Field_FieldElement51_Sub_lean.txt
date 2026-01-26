@@ -1,0 +1,41 @@
+import took 417s
+{"caption":"","data":"interpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 127ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 148ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 181ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 201ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 237ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 258ms\ninterpretation of Aeneas.ScalarTac._aux_Aeneas_ScalarTac_ScalarTac___elabRules_Aeneas_ScalarTac_tacticScalar_tac__1 took 295ms\ngrind took 177ms\ntactic execution of Lean.Parser.Tactic.refine took 125ms\ntactic execution of Lean.Parser.Tactic.rewriteSeq took 160ms\ntactic execution of Lean.Parser.Tactic.rewriteSeq took 162ms\ninstantiate metavars took 162ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":42},"severity":"information"}
+{"caption":"","data":"type checking took 132ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":36,"line":114},"severity":"information"}
+{"caption":"","data":"type checking took 159ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":36,"line":136},"severity":"information"}
+{"caption":"","data":"type checking took 185ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":36,"line":158},"severity":"information"}
+{"caption":"","data":"type checking took 225ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":36,"line":180},"severity":"information"}
+cumulative profiling times:
+	attribute application 0.0747ms
+	blocked 0.116ms
+	blocked (unaccounted) 0.157ms
+	compilation (IR) 0.298ms
+	compilation (LCNF base) 0.452ms
+	compilation (LCNF mono) 0.309ms
+	congr simp thm 167ms
+	elaboration 52.6ms
+	fix level params 0.904ms
+	grind 177ms
+	grind ac 0.00719ms
+	grind canon 32ms
+	grind cutsat 0.365ms
+	grind ematch 20.1ms
+	grind linarith 0.00614ms
+	grind mark subsingleton 28.7ms
+	grind ring 0.0277ms
+	grind simp 123ms
+	grind typeclass inference 115ms
+	import 417s
+	initialization 69.2ms
+	instantiate metavars 248ms
+	interpretation 4.11s
+	let-to-have transformation 0.0726ms
+	linting 36.3ms
+	norm_num 13ms
+	parsing 67.6ms
+	process pre-definitions 14.6ms
+	ring 92.7ms
+	share common exprs 13.6ms
+	simp 8.72s
+	tactic execution 1.17s
+	type checking 1.33s
+	typeclass inference 4.21s

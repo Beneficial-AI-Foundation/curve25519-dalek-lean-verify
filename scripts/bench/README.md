@@ -1,6 +1,6 @@
-# Lean Benchmarking & Profiling Tools
+# Lean Profiling Tools
 
-Scripts for measuring compilation times and profiling Lean files.
+Scripts for profiling Lean file compilation times.
 
 ## Quick Start
 
@@ -13,19 +13,20 @@ Scripts for measuring compilation times and profiling Lean files.
 
 # View results
 ./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json
+
+# Save report to file
+./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json -o report.txt
 ```
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `profile-lean.sh` | Profile files with `lean --profile`, outputs JSON |
-| `profile-report.sh` | Display profile results from JSON |
-| `benchmark-lean-fast.sh` | Fast per-file timing via wrapper (~1h) |
-| `benchmark-full.sh` | Comprehensive benchmark with perf stats |
+| `profile-lean.sh` | Profile files with `lean --profile --json`, outputs JSON |
+| `profile-report.sh` | Display/save profile results from JSON |
 | `count-heartbeats.sh` | Quick tech debt scan via maxHeartbeats |
 
-## Profiling (Detailed Analysis)
+## Profiling
 
 ### Profile Files or Folders
 
@@ -57,32 +58,13 @@ Output is saved to `benchmarks/profile-<timestamp>/`:
 # Top 10 by typeclass inference
 ./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json --top 10 --by typeclass_inference_s
 
+# Save to file
+./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json -o benchmarks/report.txt
+
 # Available metrics: simp_s, typeclass_inference_s, import_s, elaboration_s,
 #                    tactic_execution_s, grind_s, interpretation_s, parsing_s,
 #                    type_checking_s, instantiate_metavars_s
 ```
-
-## Benchmarking (Compilation Times)
-
-### Fast Benchmark
-
-Uses a lean wrapper during `lake build` to log per-file timing in a single pass.
-
-```bash
-nice -n 19 ./scripts/bench/benchmark-lean-fast.sh
-```
-
-Output: `benchmarks/benchmark-<timestamp>.txt`
-
-### Full Benchmark
-
-Includes perf stats (instructions, cache-misses) if available.
-
-```bash
-nice -n 19 ./scripts/bench/benchmark-full.sh
-```
-
-Output: `benchmarks/<timestamp>/` with `times.txt`, `perf.txt`, `summary.json`
 
 ## Tech Debt Detection
 
@@ -104,14 +86,10 @@ All results are saved to the `benchmarks/` directory:
 benchmarks/
 ├── profile-20260121-143022/
 │   ├── profile.json          # cumulative timing per file (overview)
+│   ├── report.txt            # saved report (optional)
 │   ├── details/              # per-definition timing (deep dive)
 │   │   └── <file>.jsonl      # JSON lines with line/pos info
-│   └── raw/                   # raw lean --profile --json output
-├── 20260121-150000/
-│   ├── times.txt             # per-file timing (ms filepath)
-│   ├── perf.txt              # perf stat output
-│   └── summary.json          # metadata
-└── benchmark-20260121.txt    # fast benchmark results
+│   └── raw/                  # raw lean --profile --json output
 ```
 
 ## Understanding Profile Metrics
@@ -160,8 +138,9 @@ cat benchmarks/profile-*/details/_Curve25519Dalek_Specs_Field_Pow2K_lean.jsonl |
 
 ## Tips
 
-- Always run benchmarks with `nice -n 19` to avoid system impact
+- Always run with `nice -n 19` to avoid system impact
 - Project must be built first (`lake build`) for profiling
-- Import times are dominated by loading mathlib; focus on simp/typeclass for optimization
+- For quick build timing, use `lake build -v` (no detailed breakdown)
+- Import times are dominated by mathlib; focus on simp/typeclass for optimization
 - Use `--by typeclass_inference_s` to find typeclass bottlenecks
 - Use `details/*.jsonl` files to pinpoint exact slow proof steps

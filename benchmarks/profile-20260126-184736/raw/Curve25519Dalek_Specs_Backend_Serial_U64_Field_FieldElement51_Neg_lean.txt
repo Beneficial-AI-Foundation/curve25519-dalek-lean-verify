@@ -1,0 +1,19 @@
+interpretation of Batteries.Tactic.Lint.initFn._lam_5._@.Batteries.Tactic.Lint.Basic.2042980606._hygCtx._hyg.2._boxed took 117ms
+import took 372s
+{"caption":"","data":"elaboration took 109ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":25},"severity":"information"}
+cumulative profiling times:
+	attribute application 0.122ms
+	elaboration 124ms
+	fix level params 0.131ms
+	import 372s
+	initialization 45ms
+	instantiate metavars 0.299ms
+	interpretation 2.19s
+	let-to-have transformation 1.77ms
+	linting 7.64ms
+	parsing 2.3ms
+	process pre-definitions 7.01ms
+	share common exprs 2.11ms
+	tactic execution 18.1ms
+	type checking 3.01ms
+	typeclass inference 174ms

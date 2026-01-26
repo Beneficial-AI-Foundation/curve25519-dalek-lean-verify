@@ -1,0 +1,40 @@
+interpretation of Batteries.Tactic.Lint.initFn._lam_5._@.Batteries.Tactic.Lint.Basic.2042980606._hygCtx._hyg.2._boxed took 103ms
+import took 301s
+{"caption":"","data":"declaration uses 'sorry'","endPos":{"column":30,"line":42},"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"hasSorry","pos":{"column":8,"line":42},"severity":"warning"}
+{"caption":"","data":"declaration uses 'sorry'","endPos":{"column":22,"line":50},"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"hasSorry","pos":{"column":8,"line":50},"severity":"warning"}
+{"caption":"","data":"The `mvcgen` tactic is experimental and still under development. Avoid using it in production projects.","endPos":{"column":17,"line":71},"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":2,"line":71},"severity":"warning"}
+{"caption":"","data":"tactic execution of Lean.Parser.Tactic.exact took 148ms\ntactic execution of Lean.Parser.Tactic.exact took 129ms\ntactic execution of Lean.Parser.Tactic.assumption took 1.35s\ntactic execution of Lean.Parser.Tactic.assumption took 191ms\ntactic execution of Lean.Parser.Tactic.mvcgen took 523ms\nsimp took 2.48s\nsimp took 421ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":56},"severity":"information"}
+{"caption":"","data":"type checking took 211ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":4,"line":90},"severity":"information"}
+{"caption":"","data":"type checking took 162ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":8,"line":67},"severity":"information"}
+cumulative profiling times:
+	attribute application 2ms
+	blocked (unaccounted) 12.3s
+	compilation (IR) 5.7ms
+	compilation (LCNF base) 19.4ms
+	compilation (LCNF mono) 1.88ms
+	congr simp thm 58.3ms
+	elaboration 30.3ms
+	fix level params 0.761ms
+	grind 200ms
+	grind ac 0.0459ms
+	grind canon 51.1ms
+	grind cutsat 0.573ms
+	grind ematch 3.91ms
+	grind linarith 0.0352ms
+	grind mark subsingleton 36.2ms
+	grind ring 0.0763ms
+	grind simp 264ms
+	grind typeclass inference 311ms
+	import 301s
+	initialization 74.1ms
+	instantiate metavars 48.8ms
+	interpretation 1.19s
+	let-to-have transformation 0.136ms
+	linting 15.3ms
+	parsing 4.12ms
+	process pre-definitions 10.2ms
+	share common exprs 8.38ms
+	simp 5.89s
+	tactic execution 3.2s
+	type checking 488ms
+	typeclass inference 2.17s
