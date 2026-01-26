@@ -405,9 +405,166 @@ namespace curve25519_dalek.ristretto
 open curve25519_dalek.edwards Edwards
 open curve25519_dalek.math
 
+/--
+**IsEven Predicate for Edwards Points**
+
+A point $P(x,y)$ on the Edwards curve is "even" if it lies in the image of the doubling map
+(i.e., $P \in 2\mathcal{E}$). For Curve25519, this subgroup has index 2.
+
+**Theorem**: An Edwards point $P(x,y)$ is even if and only if $(1 - y^2)$ is a quadratic residue.
+
+**Proof Sketch & Derivation**:
+1. **Montgomery Map**: Ed25519 is birationally equivalent to the Montgomery curve
+   $M: v^2 = u^3 + Au^2 + u$ via the map $u = \frac{1+y}{1-y}$.
+
+2. **Montgomery Group Structure**: On a Montgomery curve, a point $(u,v)$ is a "double"
+   (in $2\mathcal{M}$) if and only if the coordinate $u$ is a square in $\mathbb{F}_p$.
+   *(Reference: See 'KEY Theorem' below)*.
+
+3. **Substitution**: Substituting the Edwards map, $P$ is even iff $\frac{1+y}{1-y}$ is a square.
+
+4. **Simplification**:
+   Observe that $\frac{1+y}{1-y} = \frac{(1+y)^2}{1-y^2}$.
+   Since $(1+y)^2$ is always a square (for any field element), the squareness of the
+   fraction depends entirely on the denominator $(1-y^2)$.
+   Therefore: $P \in 2\mathcal{E} \iff \text{IsSquare}(1 - y^2)$.
+
+**Edge Cases**:
+- **Identity (0, 1)**: $y=1 \implies 1-y^2 = 0$. Since $0 = 0^2$, it is square.
+  (Correct: Identity is $2 \cdot \mathcal{O}$).
+- **2-Torsion (0, -1)**: $y=-1 \implies 1-y^2 = 0$. Square.
+  (Correct: $(0,-1) = 2 \cdot (i, 0)$).
+- **Other 2-Torsion $(\pm 1, 0)$**: $y=0 \implies 1-y^2 = 1$. Square.
+  (Correct: These are doubles of 4-torsion points).
+
+**KEY Theorem: Characterization of Even Points On Montgomery via Quadratic Residues**
+
+Let $K$ be a field of char $\ne 2$ where $A^2-4$ is not a square (e.g., $K=\mathbb{F}_p$ for Curve25519).
+Let $E$ be the Montgomery curve $y^2 = x^3 + Ax^2 + x$.
+Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
+
+**Proof Details:**
+
+1. **Definitions & Tools:**
+   Let $r(R) := y(R)/x(R)$ be a rational function on $E$.
+   Let $T = (0,0)$ be the unique non-trivial rational 2-torsion point.
+
+   *Lemma 1 (Translation by T):* For any $R$, $R+T = (1/x(R), -y(R)/x(R)^2)$.
+   **Proof:**
+
+    We use the standard chord formula for Weierstrass equations (with $a_1=a_3=0$).
+
+    1. **Slope ($\lambda$):**
+      The slope of the line through $R=(x,y)$ and $T=(0,0)$ is:
+      $$ \lambda = \frac{y-0}{x-0} = \frac{y}{x} $$
+
+    2. **x-coordinate:**
+      The formula for the new x-coordinate is $x(R+T) = \lambda^2 - A - x - 0$.
+      $$ x(R+T) = \frac{y^2}{x^2} - A - x $$
+      Using the curve equation $y^2 = x^3 + Ax^2 + x$, we expand the term $y^2/x^2$:
+      $$ \frac{y^2}{x^2} = \frac{x^3+Ax^2+x}{x^2} = x + A + \frac{1}{x} $$
+      Substituting this back:
+      $$ x(R+T) = \left(x + A + \frac{1}{x}\right) - A - x = \frac{1}{x} $$
+
+    3. **y-coordinate:**
+      The formula is $y(R+T) = -y + \lambda(x - x(R+T))$.
+      $$ y(R+T) = -y + \frac{y}{x}\left(x - \frac{1}{x}\right) $$
+      $$ y(R+T) = -y + y\left(1 - \frac{1}{x^2}\right) $$
+      $$ y(R+T) = -y + y - \frac{y}{x^2} = -\frac{y}{x^2} $$
+
+                                                                        QED
+
+   *Lemma 2 (Sign Flip):* It follows that $r(R+T) = -r(R)$.
+   *Lemma 3 (Doubling):* The Montgomery doubling formula for $P=2Q$ can be rewritten as:
+   $$x(P) = \frac{(x(Q) - 1/x(Q))^2}{4 \cdot r(Q)^2}$$
+    **Proof:**
+      The standard Montgomery doubling formula (for $B=1$) is:
+      $$ x(2Q) = \frac{(x^2 - 1)^2}{4x(x^2 + Ax + 1)} $$
+
+      Divide numerator and denominator by $x^2$:
+      $$ x(2Q) = \frac{(x - \frac{1}{x})^2}{4(x + A + \frac{1}{x})} $$
+
+      Recall the definition of $r(Q) = y/x$. Squaring it gives:
+      $$ r(Q)^2 = \frac{y^2}{x^2} $$
+      Using the curve equation $y^2 = x^3 + Ax^2 + x$, we substitute $y^2$:
+      $$ r(Q)^2 = \frac{x^3 + Ax^2 + x}{x^2} = x + A + \frac{1}{x} $$
+
+      Substituting $r(Q)^2$ into the denominator of the doubling formula yields:
+      $$ x(2Q) = \frac{(x - \frac{1}{x})^2}{4 r(Q)^2} $$. QED
+
+2. **Forward Implication ($\Rightarrow$):**
+   If $P=2Q$ for $Q \in E(K)$, the doubling formula shows $x(P)$ is a ratio of squares in $K$.
+   Thus $x(P)$ is a square.
+
+3. **Reverse Implication ($\Leftarrow$):**
+   Assume $x(P) = u^2 \in K$. Let $Q \in E(\bar K)$ be a point such that $2Q = P$.
+   We must show $Q \in E(K)$ (i.e., $Q$ is rational).
+
+   **Proof:**
+
+    1.  **Setup:**
+      Assume $x(P) = u \in K$ is a square (allowing $u=0$).
+      Pick some $Q \in E(\bar K)$ with $2Q = P$ (exists because $[2]$ is surjective on the algebraic closure).
+      Let $x = x(Q)$ and define $\alpha := r(Q) = y/x \in \bar K$.
+      By Lemma 3, we have the equation:
+      $$ (\star) \quad u = x(P) = \frac{(x - 1/x)^2}{4\alpha^2} $$
+
+    2.  **Galois Action:**
+      Since $P \in E(K)$, for any $\sigma \in \text{Gal}(\bar K/K)$:
+      $$ 2(\sigma Q) = \sigma(2Q) = \sigma(P) = P = 2Q $$
+      Thus $\sigma Q - Q \in E[2](\bar K) = \{O, T\}$.
+      This implies one of two cases for the action of $\sigma$:
+      $$ (\dagger) \quad \sigma Q = Q \quad \text{or} \quad \sigma Q = Q + T $$
+
+    3.  **Action on $\alpha$:**
+      Apply Lemma 2 to $\alpha = r(Q)$:
+      - If $\sigma Q = Q$, then $\sigma(\alpha) = \alpha$.
+      - If $\sigma Q = Q + T$, then $\sigma(\alpha) = r(Q+T) = -r(Q) = -\alpha$.
+
+      So for every $\sigma$:
+      $$ (\ddagger) \quad \sigma(\alpha) = \pm \alpha $$
+      In particular, $\sigma(\alpha^2) = (\pm \alpha)^2 = \alpha^2$, so $\alpha^2 \in K$.
+
+      Also by Lemma 1, if $\sigma Q = Q+T$ then $x \mapsto 1/x$, hence $(x - 1/x) \mapsto -(x - 1/x)$.
+      Therefore $(x - 1/x)^2 \in K$ as well.
+      (Note: The right-hand side of $(\star)$ is a quotient of two elements of $K$, consistent with $u \in K$).
+
+    4.  **Deduction of Rationality:**
+      Rearranging $(\star)$:
+      $$ \alpha^2 = \frac{(x - 1/x)^2}{4u} $$
+      The numerator $(x - 1/x)^2 \in K$, and $u \in K$ is a square.
+      This implies $\alpha^2$ is a square in $K$.
+      Let $\beta \in K$ with $\beta^2 = \alpha^2$.
+      In an algebraic closure, the solutions to $z^2 = \beta^2$ are $z = \pm \beta$.
+      Thus $\alpha = \pm \beta$, which implies $\alpha \in K$.
+
+    5.  **Conclusion:**
+      Return to $(\ddagger)$: since $\alpha \in K$, we have $\sigma(\alpha) = \alpha$ for all $\sigma$.
+      Therefore the "$-\alpha$" case cannot happen (unless $\alpha=0$, which implies $y=0 \implies P=O$, a trivial case).
+
+      So necessarily $\sigma Q = Q$ for all $\sigma$, which means $Q \in E(K)$.
+      Thus $P = 2Q$ with $Q \in E(K)$, so $P \in 2E(K)$.
+                                                                        QED
+
+**Application to Ed25519:**
+The map $u = (1+y)/(1-y)$ sends Ed25519 to Montgomery.
+$u = \frac{(1+y)^2}{1-y^2}$. Since $(1+y)^2$ is always square, $u \in (K^\times)^2 \iff 1-y^2 \in (K^\times)^2$.
+
+Note: In the implementation below, we use `EdwardsPoint.toPoint` which computes `Y/Z`.
+For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
+-/
+def IsEven (P : Point Ed25519) : Prop :=
+  IsSquare (1 - P.y^2)
+
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
-  EdwardsPoint.IsValid r
+  -- 1. Must be a valid curve point (satisfy -x² + y² = 1 + dx²y²)
+  EdwardsPoint.IsValid r ∧
+  -- 2. Must be an "Even" point (IsSquare (1 - y²))
+  -- Equation: 1 - (Y/Z)² = (Z² - Y²) / Z². Since Z² is square, we check Z² - Y².
+  let Y := r.Y.toField
+  let Z := r.Z.toField
+  IsSquare (Z^2 - Y^2)
 
 /-- Conversion to mathematical Point.
     Returns the internal Edwards point representative. -/
