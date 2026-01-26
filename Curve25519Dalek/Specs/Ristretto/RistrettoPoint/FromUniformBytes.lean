@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`
 
@@ -20,7 +21,8 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result core.ops.range
+
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -51,11 +53,56 @@ natural language specs:
 - The output is a mathematically valid Ristretto point
 -/
 
+def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array U8 32#usize) :=
+  let a1 := input.subslice (Range.mk 0#usize 32#usize)
+  let a2 := input.subslice (Range.mk 32#usize 64#usize)
+  match a1, a2 with
+  | ok s1, ok s2 => ok (Array.from_slice (Array.repeat 32#usize 0#u8) s1,
+                        Array.from_slice (Array.repeat 32#usize 0#u8) s2)
+  | _, _ => fail Error.panic
+
+@[progress]
+theorem split64to32_spec (input : Array U8 64#usize) :
+    ∃ a1 a2,
+      split64to32 input = ok (a1, a2) ∧
+      (∀ i : ℕ, i < 32 → a1.val[i]! = input.val[i]! ∧ a2.val[i]! = input.val[i + 32]!)
+:= by
+simp [split64to32]
+have h1 := Array.subslice_spec input (Range.mk 0#usize 32#usize)
+  (by scalar_tac) (by scalar_tac)
+have h2 := Array.subslice_spec input (Range.mk 32#usize 64#usize)
+  (by scalar_tac) (by scalar_tac)
+simp at h1 h2
+let ⟨s1, ha1, hs1, hget1⟩ := h1
+let ⟨s2, ha2, hs2, hget2⟩ := h2
+apply Exists.intro (Array.from_slice (Array.repeat 32#usize 0#u8) s1)
+apply Exists.intro (Array.from_slice (Array.repeat 32#usize 0#u8) s2)
+simp [ha1, ha2]
+intro i hi
+constructor
+· simp only [Array.from_slice, List.length_take, List.Vector.length_val, UScalar.ofNat_val_eq,
+  Nat.reduceLeDiff, inf_of_le_left, ↓reduceDIte, getElem?_pos, List.getElem_take, Option.getD_some,
+  hs1, hi]
+  simp_all only [ok.injEq, exists_eq_left', List.length_take, List.Vector.length_val, UScalar.ofNat_val_eq,
+  Nat.reduceLeDiff, inf_of_le_left, getElem?_pos, List.getElem_take, Option.getD_some, true_and, implies_true]
+· simp only [Array.from_slice, UScalar.ofNat_val_eq, List.Vector.length_val, getElem?_pos,
+  Option.getD_some, hs2, hi]
+  have hsl : s2.length = 32#usize := by scalar_tac
+  simp only [Slice.length, hs2, UScalar.ofNat_val_eq] at hsl
+  simp_all only [ok.injEq, exists_eq_left', List.length_take, List.Vector.length_val,
+    UScalar.ofNat_val_eq, Nat.reduceLeDiff, inf_of_le_left, getElem?_pos, List.getElem_take,
+    Option.getD_some, true_and, implies_true, ↓reduceDIte]
+  simp only [List.slice, Nat.reduceSub, List.getElem_take, List.getElem_drop]
+  simp only [Nat.add_comm 32 i]
+  grind only [→ List.getElem_of_getElem?, = Option.getD_some, = List.getElem?_eq_none, = getElem?_pos,
+    = getElem?_neg]
+
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     ∃ rist,
-    from_uniform_bytes bytes = ok rist ∧
-    rist.IsValid := by
-    sorry
+      from_uniform_bytes bytes = ok rist ∧
+      rist.IsValid :=
+by
+sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
