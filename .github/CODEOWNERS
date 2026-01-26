@@ -2,6 +2,6 @@
 # These users will be automatically requested for review when someone opens a pull request
 
 # Default owner for files in the repository
-* @oliver-butterley
+* @oliver-butterley @a-dangelo @truonghoangle
 
 /ai-benchmark/ @Zhang-Liao
