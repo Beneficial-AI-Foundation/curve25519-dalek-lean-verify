@@ -3428,11 +3428,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.IdentityProjectivePoint.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    ∃ q, identity = ok q ∧\n    (∀ i : Fin 32, q[i]! = 0#u8) ∧\n    U8x32_as_Nat q = 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `montgomery.IdentityMontgomeryPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting MontgomeryPoint is 32 zero bytes\n- Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity",
@@ -3442,7 +3445,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3903,10 +3906,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : RistrettoPoint)\n\n    -- Precondition: coordinates of self are bounded by 2⁵³\n    (h_self_bounds : ∀ i < 5,\n      self.X[i]!.val < 2 ^ 53 ∧\n      self.Y[i]!.val < 2 ^ 53 ∧\n      self.Z[i]!.val < 2 ^ 53 ∧\n      self.T[i]!.val < 2 ^ 53)\n\n    -- Precondition: coordinates of other are bounded by 2⁵³\n    (h_other_bounds : ∀ i < 5,\n      other.X[i]!.val < 2 ^ 53 ∧\n      other.Y[i]!.val < 2 ^ 53 ∧\n      other.Z[i]!.val < 2 ^ 53 ∧\n      other.T[i]!.val < 2 ^ 53)\n\n    -- Precondition: Z-coordinate of self is non-zero mod p (valid projective point)\n    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)\n\n    -- Precondition: Z-coordinate of other is non-zero mod p (valid projective point)\n    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :\n\n    -- Postcondition: function succeeds and returns a result\n    ∃ result, add self other = ok result ∧\n\n    -- Postcondition: coordinates of result are bounded by 2⁵⁴\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    -- Extract the mathematical values (as natural numbers mod p)\n    let X₁ := Field51_as_Nat self.X\n    let Y₁ := Field51_as_Nat self.Y\n    let Z₁ := Field51_as_Nat self.Z\n    let T₁ := Field51_as_Nat self.T\n\n    let X₂ := Field51_as_Nat other.X\n    let Y₂ := Field51_as_Nat other.Y\n    let Z₂ := Field51_as_Nat other.Z\n    let T₂ := Field51_as_Nat other.T\n\n    let X₃ := Field51_as_Nat result.X\n    let Y₃ := Field51_as_Nat result.Y\n    let Z₃ := Field51_as_Nat result.Z\n    let T₃ := Field51_as_Nat result.T\n\n    -- Postcondition: mathematical correctness (twisted Edwards addition formulas)\n    -- These formulas implement the complete addition law on the twisted Edwards curve\n    -- -x² + y² = 1 + dx²y² over F_p where p = 2²⁵⁵ - 19\n    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧\n    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧\n    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n\n    -- Postcondition: result is a valid projective point (non-zero Z-coordinate)\n    Z₃ % p ≠ 0\n\n := by ...",
+   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n\n    ∃ result, add self other = ok result ∧\n\n    result.IsValid ∧\n\n    result.toPoint = self.toPoint + other.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:\n- The function always succeeds (no panic) for valid inputs\n- The result satisfies the twisted Edwards addition formulas modulo p\n-/",
+   "/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
@@ -4148,7 +4151,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n\n    s.IsValid\n\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
