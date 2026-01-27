@@ -1,0 +1,1 @@
+{"caption":"","data":"declaration uses 'sorry'","endPos":{"column":25,"line":59},"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"hasSorry","pos":{"column":8,"line":59},"severity":"warning"}

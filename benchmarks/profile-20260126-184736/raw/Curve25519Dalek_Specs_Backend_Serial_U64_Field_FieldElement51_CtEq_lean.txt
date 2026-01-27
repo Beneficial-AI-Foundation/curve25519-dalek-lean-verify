@@ -1,0 +1,28 @@
+interpretation of Batteries.Tactic.command#help_Term+____ took 108ms
+interpretation of termℓ²(_,_) took 337ms
+interpretation of Batteries.Tactic.Lint.initFn._lam_5._@.Batteries.Tactic.Lint.Basic.2042980606._hygCtx._hyg.2._boxed took 103ms
+import took 269s
+cumulative profiling times:
+	attribute application 0.0643ms
+	congr simp thm 8.65ms
+	dsimp 0.737ms
+	elaboration 8.05ms
+	fix level params 0.208ms
+	grind 97.2ms
+	grind canon 8.55ms
+	grind mark subsingleton 2.45ms
+	grind simp 7.67ms
+	grind typeclass inference 107ms
+	import 269s
+	initialization 76.1ms
+	instantiate metavars 5.04ms
+	interpretation 1.62s
+	let-to-have transformation 0.053ms
+	linting 3.56ms
+	parsing 1.39ms
+	process pre-definitions 11.9ms
+	share common exprs 1.58ms
+	simp 348ms
+	tactic execution 15.4ms
+	type checking 64.9ms
+	typeclass inference 82.3ms

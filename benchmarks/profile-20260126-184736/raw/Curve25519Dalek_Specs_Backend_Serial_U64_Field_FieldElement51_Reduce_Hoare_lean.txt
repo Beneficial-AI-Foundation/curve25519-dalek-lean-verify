@@ -1,0 +1,21 @@
+import took 397s
+{"caption":"","data":"declaration uses 'sorry'","endPos":{"column":25,"line":59},"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce_Hoare.lean","isSilent":false,"keepFullRange":false,"kind":"hasSorry","pos":{"column":8,"line":59},"severity":"warning"}
+cumulative profiling times:
+	attribute application 2.93ms
+	blocked (unaccounted) 3.88ms
+	congr simp thm 2.23ms
+	elaboration 105ms
+	fix level params 0.215ms
+	import 397s
+	initialization 44.4ms
+	instantiate metavars 0.187ms
+	interpretation 2.7s
+	let-to-have transformation 1.4ms
+	linting 16ms
+	parsing 3.97ms
+	process pre-definitions 9.39ms
+	share common exprs 1.92ms
+	simp 73.7ms
+	tactic execution 65.1ms
+	type checking 45.5ms
+	typeclass inference 164ms

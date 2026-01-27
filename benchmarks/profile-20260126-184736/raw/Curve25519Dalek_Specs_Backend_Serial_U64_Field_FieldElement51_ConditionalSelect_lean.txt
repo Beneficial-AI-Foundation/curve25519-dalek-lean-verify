@@ -1,0 +1,26 @@
+interpretation of Batteries.Tactic.Lint.initFn._lam_5._@.Batteries.Tactic.Lint.Basic.2042980606._hygCtx._hyg.2._boxed took 101ms
+import took 256s
+{"caption":"","data":"interpretation of Aeneas.ProgressStar.evalProgressStarTac took 107ms\ninterpretation of Aeneas.ProgressStar.evalProgressStarTac took 111ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":25},"severity":"information"}
+{"caption":"","data":"simp took 176ms\ninterpretation of Aeneas.Async.wrapTactic._redArg._lam_1._boxed took 171ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":4,"line":46},"severity":"information"}
+{"caption":"","data":"simp took 206ms\ninterpretation of Aeneas.Async.wrapTactic._redArg._lam_1._boxed took 191ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":4,"line":50},"severity":"information"}
+cumulative profiling times:
+	attribute application 0.0719ms
+	blocked (unaccounted) 2.42s
+	congr simp thm 85.5ms
+	dsimp 1.68ms
+	elaboration 16.9ms
+	fix level params 0.679ms
+	import 256s
+	initialization 56.2ms
+	instantiate metavars 67.7ms
+	interpretation 1.58s
+	let-to-have transformation 0.0633ms
+	linting 3.61ms
+	norm_num 0.481ms
+	parsing 1.72ms
+	process pre-definitions 4ms
+	share common exprs 11ms
+	simp 6.04s
+	tactic execution 77.2ms
+	type checking 75.7ms
+	typeclass inference 1.14s

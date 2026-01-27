@@ -1,0 +1,2 @@
+{"caption":"","data":"interpretation of Aeneas.ProgressStar.evalProgressStarTac took 286ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":31},"severity":"information"}
+{"caption":"","data":"simp took 112ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":2,"line":43},"severity":"information"}

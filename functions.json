@@ -3428,11 +3428,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.IdentityProjectivePoint.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    ∃ q, identity = ok q ∧\n    (∀ i : Fin 32, q[i]! = 0#u8) ∧\n    U8x32_as_Nat q = 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `montgomery.IdentityMontgomeryPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting MontgomeryPoint is 32 zero bytes\n- Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity",
@@ -3442,7 +3445,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": false,
