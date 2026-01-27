@@ -47,12 +47,15 @@ natural language specs:
     • The function always succeeds (no panic) for any 32-byte input c
     • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p
     • s_is_negative is true if and only if (Field51_as_Nat s % p) % 2 = 1
+    • The output field element s is valid (i.e., its limbs are appropriately bounded)
+
 -/
 
 /-- **Spec and proof concerning `ristretto.decompress.step_1`**:
     • The function always succeeds (no panic) for any 32-byte input `c`
     • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p
     • s_is_negative is true if and only if s is negative (LSB = 1)
+    • The output field element s is valid (i.e., its limbs are appropriately bounded)
 -/
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
@@ -62,7 +65,9 @@ theorem step_1_spec (c : CompressedRistretto) :
 
     (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
 
-    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField)
+    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
+
+    s.IsValid
 
     := by
 
