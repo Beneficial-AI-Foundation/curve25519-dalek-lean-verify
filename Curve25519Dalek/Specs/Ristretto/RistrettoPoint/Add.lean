@@ -76,12 +76,12 @@ of the input RistrettoPoints (seen as equivalence classes), even though we are o
 of (fairly arbitrary) representatives.
 
 The fact that the addition of RistrettoPoints is indeed well-defined and does not depend on the chosen
-representatives follows from standard results in abstract algebra: in any quotient group G/N, the product
+representatives follows from standard results in abstract algebra: in any set of left cosets G/N, the product
 
 (aN)(bN)=(ab)N
 
-does not depend on the chosen representatives a, b iff N is normal; and in an Abelian group
-(our elliptic curve group is Abelian), every subgroup is normal.
+constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
+and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
 
 -/
 
