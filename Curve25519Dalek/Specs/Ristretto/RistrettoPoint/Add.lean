@@ -75,6 +75,14 @@ thus indeed implies that the output RistrettoPoint (seen as an equivalence class
 of the input RistrettoPoints (seen as equivalence classes), even though we are only working at the level
 of (fairly arbitrary) representatives.
 
+The fact that the addition of RistrettoPoints is indeed well-defined and does not depend on the chosen
+representatives follows from standard results in abstract algebra: in any quotient group G/N, the product
+
+(aN)(bN)=(ab)N
+
+does not depend on the chosen representatives a, b iff N is normal; and in an Abelian group
+(our elliptic curve group is Abelian), every subgroup is normal.
+
 -/
 
 end curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
