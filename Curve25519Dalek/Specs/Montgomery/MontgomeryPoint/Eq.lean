@@ -17,8 +17,6 @@ Choice into a Bool.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 94:4-96:5
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result

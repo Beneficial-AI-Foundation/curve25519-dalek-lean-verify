@@ -19,8 +19,7 @@ in the backend).
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 454:4-456:5
 
-## TODO
-- Complete proof
+
 -/
 
 open Aeneas.Std Result
@@ -53,7 +52,10 @@ theorem mul_assign_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)
     (h_is_valid : MontgomeryPoint.IsValid self) :
     ∃ result,
     mul_assign self scalar = ok result ∧
-    MontgomeryPoint.IsValid result:= by
+    MontgomeryPoint.IsValid result ∧
+    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self scalar =
+    mul_assign self scalar
+     := by
   unfold mul_assign
   progress*
 

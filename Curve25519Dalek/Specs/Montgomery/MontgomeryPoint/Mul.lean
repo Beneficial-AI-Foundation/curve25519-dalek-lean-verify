@@ -18,6 +18,8 @@ most significant to least significant.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 413:4-450:5
 
+## TODO
+- Complete proof
 --/
 
 open Aeneas.Std Result

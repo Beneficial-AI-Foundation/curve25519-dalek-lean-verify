@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -17,8 +17,6 @@ clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_b
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 150:4-158:5
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
@@ -54,7 +52,5 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     := by
    unfold mul_base_clamped  scalar.clamp_integer
    progress*
-
-
 
 end curve25519_dalek.montgomery.MontgomeryPoint
