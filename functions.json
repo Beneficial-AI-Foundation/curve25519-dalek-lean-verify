@@ -3428,14 +3428,11 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.IdentityProjectivePoint.identity"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem identity_spec :\n    ∃ q, identity = ok q ∧\n    (∀ i : Fin 32, q[i]! = 0#u8) ∧\n    U8x32_as_Nat q = 0 := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Identity.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.IdentityMontgomeryPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting MontgomeryPoint is 32 zero bytes\n- Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity",
@@ -3445,7 +3442,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4151,11 +4148,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField)\n\n := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_1`**:\n    • The function always succeeds (no panic) for any 32-byte input `c`\n    • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p\n    • s_is_negative is true if and only if s is negative (LSB = 1)\n-/",
+   "/-- **Spec and proof concerning `ristretto.decompress.step_1`**:\n    • The function always succeeds (no panic) for any 32-byte input `c`\n    • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p\n    • s_is_negative is true if and only if s is negative (LSB = 1)\n    • The output field element s is valid (i.e., its limbs are appropriately bounded)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
    "nested_children": [],
@@ -4173,11 +4170,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) :\n    ∃ (ok1 c c1 : subtle.Choice) (pt : ristretto.RistrettoPoint),\n\n    step_2 s = ok (ok1, c, c1, pt) ∧\n\n    (let ss := s.toField * s.toField\n     let u1 := 1 - ss\n     let u2 := 1 + ss\n     let d_field : Edwards.CurveField := d\n     let v := (-d_field) * u1 * u1 - u2 * u2\n\n     ok1.val = 1#u8 ↔ ∃ (w : Edwards.CurveField), w * w = (v * u2 * u2)⁻¹) ∧\n\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0)\n\n := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),\n\n    step_2 s = ok (ok1, c, c1, pt) ∧\n\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt)\n\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_2`**:\n    • The function always succeeds (no panic) for any field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative (LSB = 1)\n    • c1 is true if and only if y is zero\n-/",
+   "/-- **Spec and proof concerning `ristretto.decompress.step_2`**:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
    "nested_children": [],
