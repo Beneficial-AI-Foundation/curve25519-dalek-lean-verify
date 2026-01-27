@@ -1,0 +1,24 @@
+import took 440s
+{"caption":"","data":"elaboration took 129ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":24},"severity":"information"}
+{"caption":"","data":"interpretation of Aeneas.ProgressStar.evalProgressStarTac took 282ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":24},"severity":"information"}
+{"caption":"","data":"simp took 283ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":2,"line":38},"severity":"information"}
+cumulative profiling times:
+	attribute application 0.345ms
+	blocked (unaccounted) 557ms
+	congr simp thm 8.16ms
+	dsimp 0.102ms
+	elaboration 136ms
+	fix level params 0.266ms
+	import 440s
+	initialization 75.8ms
+	instantiate metavars 0.892ms
+	interpretation 2.73s
+	let-to-have transformation 1.23ms
+	linting 8.31ms
+	parsing 1.33ms
+	process pre-definitions 7.41ms
+	share common exprs 3.36ms
+	simp 452ms
+	tactic execution 5.48ms
+	type checking 18.5ms
+	typeclass inference 598ms

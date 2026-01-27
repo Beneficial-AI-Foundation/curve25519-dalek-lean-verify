@@ -1,0 +1,18 @@
+interpretation of Batteries.Tactic.Lint.initFn._lam_5._@.Batteries.Tactic.Lint.Basic.2042980606._hygCtx._hyg.2._boxed took 115ms
+import took 389s
+cumulative profiling times:
+	attribute application 0.111ms
+	elaboration 72.8ms
+	fix level params 0.108ms
+	import 389s
+	initialization 44.6ms
+	instantiate metavars 0.0549ms
+	interpretation 2.38s
+	let-to-have transformation 1.41ms
+	linting 4.71ms
+	parsing 0.669ms
+	process pre-definitions 6.38ms
+	share common exprs 1.97ms
+	tactic execution 15ms
+	type checking 8.44ms
+	typeclass inference 10.5ms

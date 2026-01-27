@@ -1,0 +1,324 @@
+[
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
+    "import_s": 440,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.73,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
+    "import_s": 274,
+    "simp_s": 9.69,
+    "typeclass_inference_s": 4.35,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.17,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean",
+    "import_s": 283,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 1.1,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
+    "import_s": 275,
+    "simp_s": 4.76,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 1.71,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
+    "import_s": 256,
+    "simp_s": 6.04,
+    "typeclass_inference_s": 1.14,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 1.58,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/CtEq.lean",
+    "import_s": 269,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 1.62,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
+    "import_s": 338,
+    "simp_s": 205,
+    "typeclass_inference_s": 107,
+    "elaboration_s": 1.58,
+    "tactic_execution_s": 60.2,
+    "grind_s": 7.57,
+    "interpretation_s": 47.7,
+    "parsing_s": 3.46,
+    "type_checking_s": 15.2,
+    "instantiate_metavars_s": 34
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean",
+    "import_s": 391,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.39,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean",
+    "import_s": 249,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 0,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
+    "import_s": 246,
+    "simp_s": 841,
+    "typeclass_inference_s": 57,
+    "elaboration_s": 0,
+    "tactic_execution_s": 21.5,
+    "grind_s": 5.72,
+    "interpretation_s": 127,
+    "parsing_s": 1.25,
+    "type_checking_s": 7.09,
+    "instantiate_metavars_s": 31.7
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
+    "import_s": 372,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.19,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean",
+    "import_s": 248,
+    "simp_s": 7.46,
+    "typeclass_inference_s": 2.32,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.76,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate_Hoare.lean",
+    "import_s": 301,
+    "simp_s": 5.89,
+    "typeclass_inference_s": 2.17,
+    "elaboration_s": 0,
+    "tactic_execution_s": 3.2,
+    "grind_s": 0,
+    "interpretation_s": 1.19,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean",
+    "import_s": 389,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.38,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
+    "import_s": 385,
+    "simp_s": 1.77e+03,
+    "typeclass_inference_s": 238,
+    "elaboration_s": 1.78,
+    "tactic_execution_s": 80.7,
+    "grind_s": 12.4,
+    "interpretation_s": 127,
+    "parsing_s": 4.84,
+    "type_checking_s": 12,
+    "instantiate_metavars_s": 107
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
+    "import_s": 444,
+    "simp_s": 43.7,
+    "typeclass_inference_s": 3.42,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 11.6,
+    "parsing_s": 0,
+    "type_checking_s": 3.62,
+    "instantiate_metavars_s": 1.03
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce_Hoare.lean",
+    "import_s": 397,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.7,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean",
+    "import_s": 429,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.45,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
+    "import_s": 436,
+    "simp_s": 8.18,
+    "typeclass_inference_s": 3.92,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 4.08,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
+    "import_s": 417,
+    "simp_s": 8.72,
+    "typeclass_inference_s": 4.21,
+    "elaboration_s": 0,
+    "tactic_execution_s": 1.17,
+    "grind_s": 0,
+    "interpretation_s": 4.11,
+    "parsing_s": 0,
+    "type_checking_s": 1.33,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
+    "import_s": 358,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 1.59,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
+    "import_s": 424,
+    "simp_s": 2.87,
+    "typeclass_inference_s": 3.1,
+    "elaboration_s": 0,
+    "tactic_execution_s": 2.31,
+    "grind_s": 0,
+    "interpretation_s": 3.43,
+    "parsing_s": 0,
+    "type_checking_s": 1.64,
+    "instantiate_metavars_s": 0
+  }
+,
+  {
+    "file": "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean",
+    "import_s": 424,
+    "simp_s": 0,
+    "typeclass_inference_s": 0,
+    "elaboration_s": 0,
+    "tactic_execution_s": 0,
+    "grind_s": 0,
+    "interpretation_s": 2.31,
+    "parsing_s": 0,
+    "type_checking_s": 0,
+    "instantiate_metavars_s": 0
+  }
+
+]

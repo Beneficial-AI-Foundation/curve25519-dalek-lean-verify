@@ -1,0 +1,34 @@
+import took 248s
+{"caption":"","data":"interpretation of Aeneas.ProgressStar.evalProgressStarTac took 1.58s\nsimp took 1.01s\nsimp took 551ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":0,"line":37},"severity":"information"}
+{"caption":"","data":"simp took 128ms\ninterpretation of Aeneas.Async.wrapTactic._redArg._lam_1._boxed took 169ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":2,"line":52},"severity":"information"}
+{"caption":"","data":"type checking took 163ms\n","endPos":null,"fileName":"Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean","isSilent":false,"keepFullRange":false,"kind":"[anonymous]","pos":{"column":4,"line":77},"severity":"information"}
+cumulative profiling times:
+	attribute application 0.068ms
+	blocked (unaccounted) 1.21s
+	congr simp thm 104ms
+	dsimp 0.912ms
+	elaboration 40.8ms
+	fix level params 0.795ms
+	grind 270ms
+	grind ac 0.0478ms
+	grind canon 49.3ms
+	grind cutsat 5.04ms
+	grind ematch 7.75ms
+	grind linarith 0.0363ms
+	grind mark subsingleton 33.5ms
+	grind ring 1.7ms
+	grind simp 237ms
+	grind typeclass inference 307ms
+	import 248s
+	initialization 56.2ms
+	instantiate metavars 83.8ms
+	interpretation 2.76s
+	let-to-have transformation 0.0703ms
+	linting 9.46ms
+	parsing 2.77ms
+	process pre-definitions 6.37ms
+	share common exprs 7.67ms
+	simp 7.46s
+	tactic execution 105ms
+	type checking 305ms
+	typeclass inference 2.32s
