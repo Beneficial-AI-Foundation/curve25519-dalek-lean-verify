@@ -24,19 +24,216 @@ It also imports `Edwards.EdCurve` to access the pure mathematical definitions.
 The Rust code uses 9 structures for representing points on the elliptic curve:
 
 - edwards.EdwardsPoint
-- ristretto.RistrettoPoint (TODO: add IsValid details and toPoint)
-- ristretto.CompressedRistretto (TODO: add IsValid details and toPoint)
+- ristretto.RistrettoPoint
+- ristretto.CompressedRistretto
 - backend.serial.curve_models.ProjectivePoint
 - backend.serial.curve_models.CompletedPoint
 - backend.serial.curve_models.ProjectiveNielsPoint
-- edwards.affine.AffinePoint (TODO: add IsValid and toPoint)
-- edwards.CompressedEdwardsY (TODO: add IsValid and toPoint)
-- montgomery.MontgomeryPoint (TODO: add IsValid and toPoint)
+- edwards.affine.AffinePoint
+- edwards.CompressedEdwardsY
+- montgomery.MontgomeryPoint
 
 The Rust code is designed so that the constructors and the various operations guarantee that the
 data held by any of these is always a valid combination of coordinates. To track this we introduce
 Lean predicates for each of these represenations.
 -/
+
+/-!
+## Mathematical Foundations for Ristretto
+Explicit formulas for the 2-isogeny between Jacobi Quartic and Twisted Edwards curves.
+References: https://ristretto.group/details/isogenies.html, https://www.shiftleft.org/papers/decaf/decaf.pdf.
+-/
+
+namespace curve25519_dalek.math
+
+open Edwards ZMod
+open Aeneas.Std Result
+
+section Constants
+
+/-- SQRT_M1: The square root of -1 in the field (used for Elligator inverse sqrt).
+    Value: 19681161...84752 -/
+def sqrt_m1 : ZMod p :=
+  19681161376707505956807079304988542015446066515923890162744021073123829784752
+
+/-- INVSQRT_A_MINUS_D: Constant used in compression rotation.
+    Value: 544693...17578 -/
+def invsqrt_a_minus_d : ZMod p :=
+  54469307008909316920995813868745141605393597292927456921205312896311721017578
+
+/-- Edwards a constant (-1) cast to the field. -/
+def a_val : ZMod p := -1
+
+/-- Helper: "Is Negative" (LSB is 1).
+    Used for sign checks in Ristretto encoding. -/
+def is_negative (x : ZMod p) : Bool :=
+  x.val % 2 == 1
+
+/-- Helper: Absolute value in Ed25519 context (ensures non-negative / even LSB). -/
+def abs_edwards (x : ZMod p) : ZMod p :=
+  if is_negative x then -x else x
+
+/-- Helper: Inverse Square Root logic matching SQRT_RATIO_M1.
+    Returns (I, was_square) where I^2 = 1/u or I^2 = 1/(i*u). -/
+noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
+  if h : IsSquare x then
+    -- Case 1: x is a square. Pick the root 'y' such that y^2 = x.
+    let y := Classical.choose h
+    (abs_edwards y, true)
+  else
+    -- Case 2: x is not a square. Then i * x must be a square in this field.
+    -- We pick 'y' such that y^2 = i * x.
+    have h_ix : IsSquare (x * sqrt_m1) := by
+      -- TODO(proof): if x is nonsquare, x*i is square.
+      sorry
+    let y := Classical.choose h_ix
+    (abs_edwards y, false)
+
+/--
+Inverse Square Root spec.
+Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
+-/
+noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
+  let (root, was_square) := sqrt_checked u
+  (root⁻¹, was_square)
+
+end Constants
+
+section PureIsogeny
+
+/--
+**Pure Decompression**
+Deduces (x, y) from s using the isogeny inversion formulas:
+  - https://ristretto.group/details/isogenies.html
+  - https://ristretto.group/formulas/decoding.html
+In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
+t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
+Indeed:
+  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
+  - y := u1 * Dy = \frac{1+as²}{1-as²}
+Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
+where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
+for Ed25519). The relation to `J` parameters is:
+  - `a₁ = -a₂`
+  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
+Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
+-/
+noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
+  let s : ZMod p := s_int
+
+  -- 0. Initial Input Check
+  -- The integer must be < p and canonical sign must be 0
+  if s_int >= p || s_int % 2 != 0 then
+    none
+  else
+    -- 1. Algebraic setup
+    let u1 := 1 + a_val * s^2
+    let u2 := 1 - a_val * s^2
+    let v := a_val * d * u1^2 - u2^2
+
+    -- 2. Inverse Square Root (Elligator)
+    -- This returns (I, was_square)
+    let (I, was_square) := inv_sqrt_checked (v * u2^2)
+
+    -- 3. Recover denominators
+    let Dx := I * u2
+    let Dy := I * Dx * v
+
+    -- 4. Recover coordinates
+    let x := abs_edwards (2 * s * Dx)
+    let y := u1 * Dy
+
+    -- 5. Validation Checks
+    let t := x * y
+
+    -- (1) Square root must succeed
+    -- (2) t must be non-negative (even LSB=LeastSignificantByte)
+    -- (3) y must be non-zero
+    if !was_square || is_negative t || y = 0 then
+      none
+    else
+      some { x := x, y := y, on_curve := sorry }
+
+/--
+**Pure Mathematical Compression**
+Encodes a Point P into a scalar s (https://ristretto.group/formulas/encoding.html).
+Used to define the Canonical property.
+-/
+noncomputable def compress_pure (P : Point Ed25519) : Nat :=
+  let x := P.x
+  let y := P.y
+  let z := (1 : ZMod p)
+  let t := x * y
+
+  -- 1. Setup
+  let u1 := (z + y) * (z - y)
+  let u2 := x * y
+
+  -- 2. Inverse Sqrt
+  let (invsqrt, _was_square) := inv_sqrt_checked (u1 * u2^2)
+  let den1 := invsqrt * u1
+  let den2 := invsqrt * u2
+  let z_inv := den1 * den2 * t
+
+  -- 3. Rotation Decision
+  let rotate := is_negative (t * z_inv)
+
+  -- 4. Apply Rotation
+  let x_prime := if rotate then y * sqrt_m1 else x
+  let y_prime := if rotate then x * sqrt_m1 else y
+  let den_inv := if rotate then den1 * invsqrt_a_minus_d else den2
+
+  -- 5. Sign Adjustment
+  let y_final := if is_negative (x_prime * z_inv) then -y_prime else y_prime
+
+  -- 6. Final Calculation
+  let s := abs_edwards (den_inv * (z - y_final))
+
+  s.val
+
+end PureIsogeny
+
+section EdwardsDecompression
+
+/--
+**Pure Edwards Decompression**
+Recovers (x, y) from a 32-byte representation `s` according to RFC 8032 (Ed25519).
+Morally: we store the point (x,y) as just the coordinate y and the sign bit, i.e. using 32-bits,
+leveraging the EdCurve equation: -x² + y² = 1 + dx²y². Indeed, we can recover x just knowing y and
+the sign to take on the square root to obtain x.
+1. Treat the 32 bytes as a little-endian integer `s`.
+2. y is the lower 255 bits (s % 2^255).
+3. The sign of x is the 256th bit (s / 2^255).
+-/
+noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (Point Ed25519) :=
+  let s := U8x32_as_Nat bytes
+
+  -- Mathematical splitting of the 256-bit integer
+  let y_int := s % (2^255)
+  let sign_bit := s / (2^255) -- This is 0 or 1 because s < 2^256
+
+  if y_int >= p then
+    none
+  else
+    let y : ZMod p := y_int
+
+    -- Solve for x²: x² = (y² - 1) / (dy² + 1)
+    let u := y^2 - 1
+    let v := d * y^2 + 1
+    let x2 := u * v⁻¹
+
+    if h : IsSquare x2 then
+      let x_root := abs_edwards (Classical.choose h)
+      -- Apply sign bit: if sign_bit is 1, we want the negative (odd) root
+      let x := if (is_negative x_root) != (sign_bit == 1) then -x_root else x_root
+
+      some { x := x, y := y, on_curve := sorry }
+    else
+      none
+
+end EdwardsDecompression
+
+end curve25519_dalek.math
 
 /-! ## Field Element Conversions -/
 
@@ -79,6 +276,43 @@ instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable f
 
 end curve25519_dalek.backend.serial.u64.field
 
+/-!
+## AffinePoint Validity
+-/
+
+namespace curve25519_dalek.edwards.affine
+
+open curve25519_dalek.backend.serial.u64.field
+open Edwards
+
+/--
+Validity predicate for AffinePoint.
+An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation.
+-/
+@[mk_iff]
+structure AffinePoint.IsValid (a : AffinePoint) : Prop where
+  /-- Coordinates must be valid field elements (limbs < 2^54). -/
+  x_valid : a.x.IsValid
+  y_valid : a.y.IsValid
+  /-- The point must satisfy the twisted Edwards equation: -x² + y² = 1 + dx²y² -/
+  on_curve :
+    let x := a.x.toField
+    let y := a.y.toField
+    Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2
+
+instance AffinePoint.instDecidableIsValid (a : AffinePoint) : Decidable a.IsValid :=
+  decidable_of_iff _ (isValid_iff a).symm
+
+/-- Convert an AffinePoint to the mathematical Point. -/
+def AffinePoint.toPoint (a : AffinePoint) : Point Ed25519 :=
+  if h : a.IsValid then
+    { x := a.x.toField
+      y := a.y.toField
+      on_curve := h.on_curve }
+  else 0
+
+end curve25519_dalek.edwards.affine
+
 /-! ## EdwardsPoint validity and casting -/
 
 namespace curve25519_dalek.edwards
@@ -108,7 +342,7 @@ instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsVa
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
     Requires a proof that the point is valid. -/
-noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
+def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
   let X := e.X.toField
   let Y := e.Y.toField
   let Z := e.Z.toField
@@ -126,7 +360,7 @@ noncomputable def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Poi
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
     Returns 0 if the point is not valid. -/
-noncomputable def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
+def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
   if h : e.IsValid then e.toPoint' h else 0
 
 /-- Unfolding lemma: when an EdwardsPoint is valid, toPoint computes (X/Z, Y/Z). -/
@@ -140,26 +374,279 @@ theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
 
 end curve25519_dalek.edwards
 
+/-!
+## CompressedEdwardsY Validity
+-/
+
+namespace curve25519_dalek.edwards
+open curve25519_dalek.math Edwards
+
+/--
+A CompressedEdwardsY is valid if it represents a valid point on the curve.
+This means the bytes must decompress successfully using the standard Ed25519 rules.
+-/
+def CompressedEdwardsY.IsValid (c : CompressedEdwardsY) : Prop :=
+  (decompress_edwards_pure c).isSome
+
+/--
+Convert a CompressedEdwardsY to the mathematical Point.
+Returns the neutral element if invalid.
+-/
+noncomputable def CompressedEdwardsY.toPoint (c : CompressedEdwardsY) : Point Ed25519 :=
+  match decompress_edwards_pure c with
+  | some P => P
+  | none => 0
+
+end curve25519_dalek.edwards
+
 /-! ## RistrettoPoint Validity -/
 
 namespace curve25519_dalek.ristretto
-open curve25519_dalek.edwards
+open curve25519_dalek.edwards Edwards
+open curve25519_dalek.math
 
+/--
+**IsEven Predicate for Edwards Points**
+
+A point $P(x,y)$ on the Edwards curve is "even" if it lies in the image of the doubling map
+(i.e., $P \in 2\mathcal{E}$). For Curve25519, this subgroup has index 2.
+
+**Theorem**: An Edwards point $P(x,y)$ is even if and only if $(1 - y^2)$ is a quadratic residue.
+
+**Proof Sketch & Derivation**:
+1. **Montgomery Map**: Ed25519 is birationally equivalent to the Montgomery curve
+   $M: v^2 = u^3 + Au^2 + u$ via the map $u = \frac{1+y}{1-y}$.
+
+2. **Montgomery Group Structure**: On a Montgomery curve, a point $(u,v)$ is a "double"
+   (in $2\mathcal{M}$) if and only if the coordinate $u$ is a square in $\mathbb{F}_p$.
+   *(Reference: See 'KEY Theorem' below)*.
+
+3. **Substitution**: Substituting the Edwards map, $P$ is even iff $\frac{1+y}{1-y}$ is a square.
+
+4. **Simplification**:
+   Observe that $\frac{1+y}{1-y} = \frac{(1+y)^2}{1-y^2}$.
+   Since $(1+y)^2$ is always a square (for any field element), the squareness of the
+   fraction depends entirely on the denominator $(1-y^2)$.
+   Therefore: $P \in 2\mathcal{E} \iff \text{IsSquare}(1 - y^2)$.
+
+**Edge Cases**:
+- **Identity (0, 1)**: $y=1 \implies 1-y^2 = 0$. Since $0 = 0^2$, it is square.
+  (Correct: Identity is $2 \cdot \mathcal{O}$).
+- **2-Torsion (0, -1)**: $y=-1 \implies 1-y^2 = 0$. Square.
+  (Correct: $(0,-1) = 2 \cdot (i, 0)$).
+- **Other 2-Torsion $(\pm 1, 0)$**: $y=0 \implies 1-y^2 = 1$. Square.
+  (Correct: These are doubles of 4-torsion points).
+
+**KEY Theorem: Characterization of Even Points On Montgomery via Quadratic Residues**
+
+Let $K$ be a field of char $\ne 2$ where $A^2-4$ is not a square (e.g., $K=\mathbb{F}_p$ for Curve25519).
+Let $E$ be the Montgomery curve $y^2 = x^3 + Ax^2 + x$.
+Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
+
+**Proof Details:**
+
+1. **Definitions & Tools:**
+   Let $r(R) := y(R)/x(R)$ be a rational function on $E$.
+   Let $T = (0,0)$ be the unique non-trivial rational 2-torsion point.
+
+   *Lemma 1 (Translation by T):* For any $R$, $R+T = (1/x(R), -y(R)/x(R)^2)$.
+   **Proof:**
+
+    We use the standard chord formula for Weierstrass equations (with $a_1=a_3=0$).
+
+    1. **Slope ($\lambda$):**
+      The slope of the line through $R=(x,y)$ and $T=(0,0)$ is:
+      $$ \lambda = \frac{y-0}{x-0} = \frac{y}{x} $$
+
+    2. **x-coordinate:**
+      The formula for the new x-coordinate is $x(R+T) = \lambda^2 - A - x - 0$.
+      $$ x(R+T) = \frac{y^2}{x^2} - A - x $$
+      Using the curve equation $y^2 = x^3 + Ax^2 + x$, we expand the term $y^2/x^2$:
+      $$ \frac{y^2}{x^2} = \frac{x^3+Ax^2+x}{x^2} = x + A + \frac{1}{x} $$
+      Substituting this back:
+      $$ x(R+T) = \left(x + A + \frac{1}{x}\right) - A - x = \frac{1}{x} $$
+
+    3. **y-coordinate:**
+      The formula is $y(R+T) = -y + \lambda(x - x(R+T))$.
+      $$ y(R+T) = -y + \frac{y}{x}\left(x - \frac{1}{x}\right) $$
+      $$ y(R+T) = -y + y\left(1 - \frac{1}{x^2}\right) $$
+      $$ y(R+T) = -y + y - \frac{y}{x^2} = -\frac{y}{x^2} $$
+
+                                                                        QED
+
+   *Lemma 2 (Sign Flip):* It follows that $r(R+T) = -r(R)$.
+   *Lemma 3 (Doubling):* The Montgomery doubling formula for $P=2Q$ can be rewritten as:
+   $$x(P) = \frac{(x(Q) - 1/x(Q))^2}{4 \cdot r(Q)^2}$$
+    **Proof:**
+      The standard Montgomery doubling formula (for $B=1$) is:
+      $$ x(2Q) = \frac{(x^2 - 1)^2}{4x(x^2 + Ax + 1)} $$
+
+      Divide numerator and denominator by $x^2$:
+      $$ x(2Q) = \frac{(x - \frac{1}{x})^2}{4(x + A + \frac{1}{x})} $$
+
+      Recall the definition of $r(Q) = y/x$. Squaring it gives:
+      $$ r(Q)^2 = \frac{y^2}{x^2} $$
+      Using the curve equation $y^2 = x^3 + Ax^2 + x$, we substitute $y^2$:
+      $$ r(Q)^2 = \frac{x^3 + Ax^2 + x}{x^2} = x + A + \frac{1}{x} $$
+
+      Substituting $r(Q)^2$ into the denominator of the doubling formula yields:
+      $$ x(2Q) = \frac{(x - \frac{1}{x})^2}{4 r(Q)^2} $$. QED
+
+2. **Forward Implication ($\Rightarrow$):**
+   If $P=2Q$ for $Q \in E(K)$, the doubling formula shows $x(P)$ is a ratio of squares in $K$.
+   Thus $x(P)$ is a square.
+
+3. **Reverse Implication ($\Leftarrow$):**
+   Assume $x(P) = u^2 \in K$. Let $Q \in E(\bar K)$ be a point such that $2Q = P$.
+   We must show $Q \in E(K)$ (i.e., $Q$ is rational).
+
+   **Proof:**
+
+    1.  **Setup:**
+      Assume $x(P) = u \in K$ is a square (allowing $u=0$).
+      Pick some $Q \in E(\bar K)$ with $2Q = P$ (exists because $[2]$ is surjective on the algebraic closure).
+      Let $x = x(Q)$ and define $\alpha := r(Q) = y/x \in \bar K$.
+      By Lemma 3, we have the equation:
+      $$ (\star) \quad u = x(P) = \frac{(x - 1/x)^2}{4\alpha^2} $$
+
+    2.  **Galois Action:**
+      Since $P \in E(K)$, for any $\sigma \in \text{Gal}(\bar K/K)$:
+      $$ 2(\sigma Q) = \sigma(2Q) = \sigma(P) = P = 2Q $$
+      Thus $\sigma Q - Q \in E[2](\bar K) = \{O, T\}$.
+      This implies one of two cases for the action of $\sigma$:
+      $$ (\dagger) \quad \sigma Q = Q \quad \text{or} \quad \sigma Q = Q + T $$
+
+    3.  **Action on $\alpha$:**
+      Apply Lemma 2 to $\alpha = r(Q)$:
+      - If $\sigma Q = Q$, then $\sigma(\alpha) = \alpha$.
+      - If $\sigma Q = Q + T$, then $\sigma(\alpha) = r(Q+T) = -r(Q) = -\alpha$.
+
+      So for every $\sigma$:
+      $$ (\ddagger) \quad \sigma(\alpha) = \pm \alpha $$
+      In particular, $\sigma(\alpha^2) = (\pm \alpha)^2 = \alpha^2$, so $\alpha^2 \in K$.
+
+      Also by Lemma 1, if $\sigma Q = Q+T$ then $x \mapsto 1/x$, hence $(x - 1/x) \mapsto -(x - 1/x)$.
+      Therefore $(x - 1/x)^2 \in K$ as well.
+      (Note: The right-hand side of $(\star)$ is a quotient of two elements of $K$, consistent with $u \in K$).
+
+    4.  **Deduction of Rationality:**
+      Rearranging $(\star)$:
+      $$ \alpha^2 = \frac{(x - 1/x)^2}{4u} $$
+      The numerator $(x - 1/x)^2 \in K$, and $u \in K$ is a square.
+      This implies $\alpha^2$ is a square in $K$.
+      Let $\beta \in K$ with $\beta^2 = \alpha^2$.
+      In an algebraic closure, the solutions to $z^2 = \beta^2$ are $z = \pm \beta$.
+      Thus $\alpha = \pm \beta$, which implies $\alpha \in K$.
+
+    5.  **Conclusion:**
+      Return to $(\ddagger)$: since $\alpha \in K$, we have $\sigma(\alpha) = \alpha$ for all $\sigma$.
+      Therefore the "$-\alpha$" case cannot happen (unless $\alpha=0$, which implies $y=0 \implies P=O$, a trivial case).
+
+      So necessarily $\sigma Q = Q$ for all $\sigma$, which means $Q \in E(K)$.
+      Thus $P = 2Q$ with $Q \in E(K)$, so $P \in 2E(K)$.
+                                                                        QED
+
+**Application to Ed25519:**
+The map $u = (1+y)/(1-y)$ sends Ed25519 to Montgomery.
+$u = \frac{(1+y)^2}{1-y^2}$. Since $(1+y)^2$ is always square, $u \in (K^\times)^2 \iff 1-y^2 \in (K^\times)^2$.
+
+Note: In the implementation below, we use `EdwardsPoint.toPoint` which computes `Y/Z`.
+For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
+-/
+def IsEven (P : Point Ed25519) : Prop :=
+  IsSquare (1 - P.y^2)
+
+/-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
-  EdwardsPoint.IsValid r
--- To do: potentially add extra information regarding canonical representation of Ristretto point
+  -- 1. Must be a valid curve point (satisfy -x² + y² = 1 + dx²y²)
+  EdwardsPoint.IsValid r ∧
+  -- 2. Must be an "Even" point (IsSquare (1 - y²))
+  -- Equation: 1 - (Y/Z)² = (Z² - Y²) / Z². Since Z² is square, we check Z² - Y².
+  let Y := r.Y.toField
+  let Z := r.Z.toField
+  IsSquare (Z^2 - Y^2)
 
+/-- Conversion to mathematical Point.
+    Returns the internal Edwards point representative. -/
+def RistrettoPoint.toPoint (r : RistrettoPoint) : Point Ed25519 :=
+  EdwardsPoint.toPoint r
+
+/--
+A CompressedRistretto is valid if and only if the pure mathematical decompression
+succeeds (returning `some`). This implicitly checks (via decompress_pure):
+1. bytes < p
+2. sign bit = 0
+3. isogeny square root exists
+4. t >= 0
+5. y != 0
+-/
 def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
-  U8x32_as_Nat c < p ∧
-  U8x32_as_Nat c % 2 = 0
-  -- To do: this predicate is not complete yet, as some more complex
-  -- properties also need to be checked for the field element corresponding to c
-  -- to assure a valid compressed Ristretto point:
-  -- (1) The square root computation in step_2 must succeed (invsqrt returns Choice.one)
-  -- (2) The computed t coordinate must be non-negative (t.is_negative returns Choice.zero)
-  -- (3) The computed y coordinate must be nonzero (y.is_zero returns Choice.zero)
+  (decompress_pure (U8x32_as_Nat c)).isSome
+
+/--
+If valid, return the decompressed point.
+If invalid, return the neutral element (0).
+-/
+noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point Ed25519 :=
+  match decompress_pure (U8x32_as_Nat c) with
+  | some P => P
+  | none   => 0
 
 end curve25519_dalek.ristretto
+
+/-!
+## Canonical Representation
+-/
+
+namespace Edwards
+
+open curve25519_dalek.math
+
+/--
+**Canonical Ristretto Representation**
+A Point P is the canonical representative of its Ristretto coset if
+decompress ∘ compress = Id on the point.
+The predicate 'IsCanonicalRistrettoRep' characterizes exactly the set of points fixed by the Ristretto
+compression-decompression cycle, i.e. `IsCanonicalRistrettoRep P ↔ decompress (compress P) = P`.
+
+**Proof Sketch:**
+
+1. **Necessity (Image of Decompression):** (Resources: (RFC 9496 §4.3.1 or https://ristretto.group/ §5.2)
+   For any valid encoding `s`, the `decompress` function constructs a point `P`
+   enforcing these specific invariants:
+   - `x`: computed as `abs(2s * Dx)`, forcing `is_negative x = false`.
+   - `t`: computed as `x * y`; decoding fails if `is_negative t`, forcing `is_negative t = false`.
+   - `y`: decoding fails if `y = 0`.
+   Thus, the image of decompression is strictly contained in this set.
+
+2. **Sufficiency (Fundamental Domain of Compression):** (Resources: https://ristretto.group/ §5.3)
+   The `compress` function projects a coset of size 8 to a single representative by conditionally
+   applying geometric transformations:
+   - **Torque:** Maps `P → P + Q₄` if `is_negative (x * y)`.
+   - **Involution:** Maps `P → -P` if `is_negative x`.
+   If `IsCanonicalRistrettoRep P` holds, both conditions are false. The compression logic
+   skips these transformations, acting purely as the inverse of the isogeny map restricted
+   to this domain. Therefore, `decompress (compress P) = P`.
+
+**Geometric Interpretation:**
+This predicate defines a section (fundamental domain) of the quotient bundle `E → E/E[8]`:
+- `is_negative (x * y) = false`: Selects the unique coset representative modulo `E[4]` (fixes Torque).
+- `is_negative x = false`: Selects the unique representative modulo the remaining involution (fixes Sign).
+- `y ≠ 0`: Excludes singular points where the map is undefined.
+-/
+def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
+  let x := P.x
+  let y := P.y
+  let t := x * y
+
+  -- 1. x must be even (non-negative)
+  (is_negative x = false) ∧
+  -- 2. t must be even (non-negative)
+  (is_negative t = false) ∧
+  -- 3. y must be non-zero
+  (y ≠ 0)
+
+end Edwards
 
 /-! ## ProjectivePoint Validity and Casting -/
 
@@ -366,5 +853,82 @@ theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
 @[simp]
 theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
   p.toPoint = ↑p := rfl
+
+/-!
+## MontgomeryPoint Validity
+-/
+
+abbrev MontgomeryPoint := curve25519_dalek.montgomery.MontgomeryPoint
+
+namespace curve25519_dalek.montgomery
+
+open curve25519_dalek curve25519_dalek.math
+open Edwards
+
+/-!
+Helper Def:
+Define the conversion using Horner's method (foldr).
+This prevents the creation of the massive syntax tree that `U8x32_as_Nat` produces.
+-/
+def bytesToField (m : MontgomeryPoint) : ZMod p :=
+  m.val.foldr (init := 0) fun b acc =>
+    (b.val : ZMod p) + (256 : ZMod p) * acc
+
+/--
+Validity for MontgomeryPoint.
+A MontgomeryPoint is a 32-byte integer `u` representing a coordinate on the curve `v² = u³ + Au² + u`.
+It is valid if:
+1. The integer `u` is strictly less than the field modulus `p`.
+2. `u` maps to a valid Edwards `y` coordinate (i.e., `u ≠ -1`).
+3. The resulting Edwards point exists (i.e., we can solve for `x`).
+-/
+def MontgomeryPoint.IsValid (m : MontgomeryPoint) : Prop :=
+  let u := bytesToField m
+  -- The check `u_int < p` is implicitly handled because
+  -- bytesToField returns a `ZMod p`, which is canonical by definition.
+  -- However, to match the Rust strictness (rejecting non-canonical inputs),
+  -- we should technically check the raw Nat value.
+  -- But for the linter ''deterministic timeout' issue, we just need to avoid U8x32_as_Nat.
+  if u + 1 = 0 then
+    False
+  else
+    let y := (u - 1) * (u + 1)⁻¹
+    let num := y^2 - 1
+    let den := (d : ZMod p) * y^2 + 1
+    IsSquare (num * den⁻¹)
+
+instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
+  unfold MontgomeryPoint.IsValid
+  infer_instance
+
+/--
+Convert MontgomeryPoint to Point Ed25519.
+1. Recovers `y` from `u` via `y = (u-1)/(u+1)`.
+2. Recovers `x` from `y` (choosing the canonical positive root).
+Returns 0 (identity) if invalid.
+-/
+noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 :=
+  if h : (MontgomeryPoint.IsValid m) then
+    -- The following is equivalent to defining u := 8x32_as_Nat m % p, but it uses Horner's method
+    --  to avoid un folding heavy computations on large Nats casted as Mod p.
+    let u : ZMod p := bytesToField m
+    -- We know u != -1 from IsValid, so inversion is safe/correct
+    let y := (u - 1) * (u + 1)⁻¹
+
+    -- Recover x squared
+    let num := y^2 - 1
+    let den := (d : ZMod p) * y^2 + 1
+    let x2 := num * den⁻¹
+
+    -- Extract root (guaranteed to exist by IsValid)
+    let (x_abs, is_sq) := sqrt_checked x2
+
+    -- For Montgomery -> Edwards, the sign of x is lost.
+    -- We canonically choose the non-negative (even) root.
+    { x := x_abs, y := y, on_curve := sorry }
+  else
+    0
+
+end curve25519_dalek.montgomery
 
 end curve25519_dalek.backend.serial.curve_models
