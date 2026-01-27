@@ -1,0 +1,60 @@
+/-
+Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Markus Dablander
+-/
+import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
+/-! # Spec Theorem for `MontgomeryPoint::mul_base_clamped`
+
+Specification and proof for
+`curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped`.
+
+This function performs scalar multiplication by the Montgomery basepoint after
+clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_base`.
+
+**Source**: curve25519-dalek/src/montgomery.rs, lines 150:4-158:5
+
+## TODO
+- Complete proof
+-/
+
+open Aeneas.Std Result
+open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+
+namespace curve25519_dalek.montgomery.MontgomeryPoint
+
+/-
+natural language description:
+
+• Clamps the 32-byte input to a valid scalar using `scalar.clamp_integer`.
+
+• Computes the Montgomery basepoint multiplication with the clamped scalar by
+  delegating to `MontgomeryPoint.mul_base`.
+
+natural language specs:
+
+• The function always succeeds (no panic)
+• The result is the Montgomery basepoint multiplication of the clamped scalar
+-/
+
+/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
+- No panic (always returns successfully)
+- Clamps input bytes with `scalar.clamp_integer`
+- Delegates to `montgomery.MontgomeryPoint.mul_base` with the clamped scalar
+- The returned MontgomeryPoint matches the basepoint multiplication result
+-/
+@[progress]
+theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
+    ∃ result,
+    mul_base_clamped bytes = ok result ∧
+    MontgomeryPoint.IsValid result
+    := by
+   unfold mul_base_clamped  scalar.clamp_integer
+   progress*
+
+
+
+end curve25519_dalek.montgomery.MontgomeryPoint
