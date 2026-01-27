@@ -3607,7 +3607,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul_assign self scalar = ok result ∧\n    MontgomeryPoint.IsValid result := by ...",
+   "theorem mul_assign_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul_assign self scalar = ok result ∧\n    MontgomeryPoint.IsValid result ∧\n    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self scalar =\n    mul_assign self scalar\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulAssign.lean",
    "spec_docstring":
