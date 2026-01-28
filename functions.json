@@ -4131,10 +4131,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar)\n\n    (h_scalar_bounds : ∀ i < 5,\n      scalar.bytes[i]!.val < 2 ^ 52) :\n\n    ∃ result, mul_base scalar = ok result ∧\n\n    -- The computation is equivalent to scalar * RISTRETTO_BASEPOINT_POINT\n    ∃ mul_result,\n      ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul\n        scalar constants.RISTRETTO_BASEPOINT_POINT = ok mul_result ∧\n      result = mul_result ∧\n\n    -- Bounds on the resulting point\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    -- The result Z coordinate is non-zero (valid projective point)\n    Field51_as_Nat result.Z % p ≠ 0 := by ...",
+   "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n\n    ∃ result, mul_base s = ok result ∧\n\n    result.IsValid ∧\n\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul_Base.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n- No panic (always returns successfully)\n- Returns [scalar]B where B = constants.RISTRETTO_BASEPOINT_POINT\n- The result equals the generic scalar multiplication: scalar * RISTRETTO_BASEPOINT_POINT\n- The resulting point's coordinates are bounded and represent a valid point on the curve\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n• The function always succeeds (no panic) for canonical input Scalars s\n• The result is a valid RistrettoPoint\n• The result = b + ... + b represents the Ristretto basepoint b added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::mul_base",
