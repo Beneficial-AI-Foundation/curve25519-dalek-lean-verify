@@ -20,6 +20,7 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ED25519_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQUARED
@@ -79,6 +80,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
+import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
@@ -109,12 +111,16 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Identity
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
+import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step1
+import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step2
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Coset4
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
-import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.MulBase
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul_Base
 import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
