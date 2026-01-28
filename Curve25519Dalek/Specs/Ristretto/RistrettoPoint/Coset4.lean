@@ -1,10 +1,10 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `RistrettoPoint::coset4`
 
@@ -14,98 +14,63 @@ This function returns the 4-element coset self + E[4], where E[4] is the 4-torsi
 subgroup of the Edwards curve. This is useful for debugging and understanding the
 internal structure of Ristretto points.
 
-A RistrettoPoint represents an equivalence class of 8 Edwards points that differ by
-8-torsion. The coset4 function returns 4 representatives from this equivalence class,
-specifically those that differ by the 4-torsion subgroup E[4] ⊆ E[8].
+If the Ristretto group is interpreted as the quotient 2E/E[4], then coset4 gives
+the set of all valid EdwardsPoint representatives of the input RistrettoPoint equivalence class.
 
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
 natural language description:
 
-• Takes a RistrettoPoint `self` (which is internally represented as an EdwardsPoint)
-  and returns an array of 4 EdwardsPoint elements representing the coset self + E[4]
+• Takes a RistrettoPoint `self` (which is internally represented as an even EdwardsPoint)
+  and returns an array of four even EdwardsPoints, constituting all four valid representatives
+  of the input Ristretto equivalence class given by self.
 
 • The 4 elements are computed as:
+
   - self + T₀ = self (where T₀ is the identity)
   - self + T₂ (where T₂ is EIGHT_TORSION[2])
   - self + T₄ (where T₄ is EIGHT_TORSION[4])
   - self + T₆ (where T₆ is EIGHT_TORSION[6])
 
-• The EIGHT_TORSION array contains the 8 torsion points E[8] of order dividing 8
-• By selecting elements at indices 2, 4, 6, we get representatives that generate
+• The EIGHT_TORSION array contains the eight torsion points contained in E[8] := {e in E | 8e = 0}
+• By selecting elements at indices 2, 4, 6, we get representatives belonging to the
   the 4-torsion subgroup E[4]
 
 natural language specs:
 
-• The function always succeeds (no panic) for valid RistrettoPoint inputs
-• Returns exactly 4 EdwardsPoint elements
-• All 4 returned points represent the same Ristretto element (same equivalence class)
+• The function always succeeds (no panic) for valid RistrettoPoint input self
+• The four output Edwards points are all valid and are given by
+
+  - self + T₀ = self (where T₀ is the identity)
+  - self + T₂ (where T₂ is EIGHT_TORSION[2])
+  - self + T₄ (where T₄ is EIGHT_TORSION[4])
+  - self + T₆ (where T₆ is EIGHT_TORSION[6])
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:
-• The function always succeeds (no panic) for valid RistrettoPoint inputs
-• Returns exactly 4 EdwardsPoint elements
-• All 4 returned points represent the same Ristretto element (same equivalence class)
+• The function always succeeds (no panic) for valid RistrettoPoint input self
+• The four output Edwards points are all valid and are given by
+
+  - self + T₀ = self (where T₀ is the identity)
+  - self + T₂ (where T₂ is EIGHT_TORSION[2])
+  - self + T₄ (where T₄ is EIGHT_TORSION[4])
+  - self + T₆ (where T₆ is EIGHT_TORSION[6])
 -/
 @[progress]
-theorem coset4_spec (self : RistrettoPoint)
-
-    (h_self_bounds : ∀ i < 5,
-      self.X[i]!.val < 2 ^ 53 ∧
-      self.Y[i]!.val < 2 ^ 53 ∧
-      self.Z[i]!.val < 2 ^ 53 ∧
-      self.T[i]!.val < 2 ^ 53)
-
-    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0) :
+theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :
 
     ∃ result, coset4 self = ok result ∧
 
-    ∃ (ep : edwards.EdwardsPoint)
-      (ep1 : edwards.EdwardsPoint)
-      (ep2 : edwards.EdwardsPoint)
-      (ep3 : edwards.EdwardsPoint)
-      (ep4 : edwards.EdwardsPoint)
-      (ep5 : edwards.EdwardsPoint),
+    ∀ (i : Fin 4), result.val[i].IsValid ∧
+                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint
 
-    -- The torsion point retrievals succeed
-    (backend.serial.u64.constants.EIGHT_TORSION.index_usize 2#usize = ok ep) ∧
-    (backend.serial.u64.constants.EIGHT_TORSION.index_usize 4#usize = ok ep2) ∧
-    (backend.serial.u64.constants.EIGHT_TORSION.index_usize 6#usize = ok ep4) ∧
+  := by
 
-    -- The additions succeed
-    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add self ep = ok ep1 ∧
-    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add self ep2 = ok ep3 ∧
-    edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add self ep4 = ok ep5 ∧
-
-    -- The result array contains the 4 coset elements
-    (∃ r0, result.index_usize 0#usize = ok r0 ∧ r0 = self) ∧
-    (∃ r1, result.index_usize 1#usize = ok r1 ∧ r1 = ep1) ∧
-    (∃ r2, result.index_usize 2#usize = ok r2 ∧ r2 = ep3) ∧
-    (∃ r3, result.index_usize 3#usize = ok r3 ∧ r3 = ep5) ∧
-
-    -- Bounds on the resulting points
-    (∀ i < 5,
-      ep1.X[i]!.val < 2 ^ 54  ∧
-      ep1.Y[i]!.val < 2 ^ 54  ∧
-      ep1.Z[i]!.val < 2 ^ 54  ∧
-      ep1.T[i]!.val < 2 ^ 54) ∧
-
-    (∀ i < 5,
-      ep3.X[i]!.val < 2 ^ 54  ∧
-      ep3.Y[i]!.val < 2 ^ 54  ∧
-      ep3.Z[i]!.val < 2 ^ 54  ∧
-      ep3.T[i]!.val < 2 ^ 54) ∧
-
-    (∀ i < 5,
-      ep5.X[i]!.val < 2 ^ 54  ∧
-      ep5.Y[i]!.val < 2 ^ 54  ∧
-      ep5.Z[i]!.val < 2 ^ 54  ∧
-      ep5.T[i]!.val < 2 ^ 54) := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
