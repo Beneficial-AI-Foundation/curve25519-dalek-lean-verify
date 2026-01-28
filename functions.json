@@ -3987,10 +3987,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self : scalar.Scalar) (point : ristretto.RistrettoPoint)\n\n    (h_scalar_bounds : ∀ i < 5,\n      self.bytes[i]!.val < 2 ^ 52)\n\n    (h_point_bounds : ∀ i < 5,\n      point.X[i]!.val < 2 ^ 53 ∧\n      point.Y[i]!.val < 2 ^ 53 ∧\n      point.Z[i]!.val < 2 ^ 53 ∧\n      point.T[i]!.val < 2 ^ 53)\n\n    (h_point_Z_nonzero : Field51_as_Nat point.Z % p ≠ 0) :\n\n    ∃ result, mul self point = ok result ∧\n\n    -- The computation delegates to Edwards point scalar multiplication\n    ∃ ep_result,\n      edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul self point = ok ep_result ∧\n      result = ep_result ∧\n\n    -- Bounds on the resulting point\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    -- The result Z coordinate is non-zero (valid projective point)\n    Field51_as_Nat result.Z % p ≠ 0 := by ...",
+   "theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n\n    ∃ result, mul s r = ok result ∧\n\n    result.IsValid ∧\n\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for valid scalar and point inputs\n• Returns a valid RistrettoPoint that is the result of adding the input point self times to itself via\n  elliptic curve addition\n-/",
+   "/-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
