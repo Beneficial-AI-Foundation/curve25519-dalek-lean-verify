@@ -15,7 +15,7 @@ This function adds two Ristretto points via elliptic curve addition by delegatin
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result Edwards
+open Aeneas.Std Result
 namespace curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
 
 /-
