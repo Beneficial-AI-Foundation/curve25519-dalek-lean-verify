@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 
-/-! # Spec Theorem for `Scalar * RistrettoPoint`
+/-! # Spec Theorem for `RistrettoPoint::mul`
 
 Specification and proof for scalar multiplication of Ristretto points.
 
@@ -31,46 +32,61 @@ natural language description:
 
 natural language specs:
 
-• The function always succeeds (no panic) for valid scalar and point inputs
-• Returns a valid RistrettoPoint that is the result of adding the input point self times to itself via
-  elliptic curve addition
+• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r
+• The result is a valid RistrettoPoint
+• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
+
 -/
 
 /-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:
-• The function always succeeds (no panic) for valid scalar and point inputs
-• Returns a valid RistrettoPoint that is the result of adding the input point self times to itself via
-  elliptic curve addition
+• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r
+• The result is a valid RistrettoPoint
+• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
 @[progress]
-theorem mul_spec (self : scalar.Scalar) (point : ristretto.RistrettoPoint)
+theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)
+    (h_s_canonical : U8x32_as_Nat s.bytes < L)
+    (h_rist_valid : r.IsValid) :
 
-    (h_scalar_bounds : ∀ i < 5,
-      self.bytes[i]!.val < 2 ^ 52)
+    ∃ result, mul s r = ok result ∧
 
-    (h_point_bounds : ∀ i < 5,
-      point.X[i]!.val < 2 ^ 53 ∧
-      point.Y[i]!.val < 2 ^ 53 ∧
-      point.Z[i]!.val < 2 ^ 53 ∧
-      point.T[i]!.val < 2 ^ 53)
+    result.IsValid ∧
 
-    (h_point_Z_nonzero : Field51_as_Nat point.Z % p ≠ 0) :
+    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by
 
-    ∃ result, mul self point = ok result ∧
-
-    -- The computation delegates to Edwards point scalar multiplication
-    ∃ ep_result,
-      edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul self point = ok ep_result ∧
-      result = ep_result ∧
-
-    -- Bounds on the resulting point
-    (∀ i < 5,
-      result.X[i]!.val < 2 ^ 54  ∧
-      result.Y[i]!.val < 2 ^ 54  ∧
-      result.Z[i]!.val < 2 ^ 54  ∧
-      result.T[i]!.val < 2 ^ 54) ∧
-
-    -- The result Z coordinate is non-zero (valid projective point)
-    Field51_as_Nat result.Z % p ≠ 0 := by
   sorry
+
+/-
+
+Note:
+
+One RistrettoPoint r corresponds to an equivalence class of several
+mathematical curve points.
+
+The command r.toPoint thus maps r to one of these concrete representatives on the curve (to the representative
+that currently just so happens to represent r).
+
+The equation
+
+result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint
+
+thus assures that the concrete representative of the input RistrettoPoints r on the curve sums up to
+the concrete representative of the output Ristretto point on the curve if mathematically added to itself s times.
+Since the addition on RistrettoPoints is mathematically well-defined (i.e., it does not depend on the choice of representatives), the condition
+
+result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint
+
+thus indeed implies that the output RistrettoPoint (seen as an equivalence class) is the mathematically correct sum
+of r + ... + r (s-times), even though we are only working at the level of (fairly arbitrary) representatives.
+
+The fact that the addition of RistrettoPoints is indeed well-defined and does not depend on the chosen
+representatives follows from standard results in abstract algebra: in any set of left cosets G/N, the product
+
+(aN)(bN)=(ab)N
+
+constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
+and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
+
+-/
 
 end curve25519_dalek.ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint
