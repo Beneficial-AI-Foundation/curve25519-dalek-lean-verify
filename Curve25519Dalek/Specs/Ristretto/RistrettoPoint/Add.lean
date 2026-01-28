@@ -31,8 +31,6 @@ natural language specs:
 • The function always succeeds (no panic) for valid input Ristretto points
 • The result is a valid Ristretto point
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
-
-
 -/
 
 /-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:
