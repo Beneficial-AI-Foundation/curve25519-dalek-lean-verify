@@ -84,8 +84,71 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
     -- Case 2: x is not a square. Then i * x must be a square in this field.
     -- We pick 'y' such that y^2 = i * x.
     have h_ix : IsSquare (x * sqrt_m1) := by
-      -- TODO(proof): if x is nonsquare, x*i is square.
-      sorry
+      have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
+        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char; norm_num [p] at h_char
+
+      have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
+      have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
+      have h_i_ne0 : sqrt_m1 ≠ 0 := by
+        unfold sqrt_m1; try decide
+
+      have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
+        FiniteField.isSquare_iff h_char_ne_2 hz
+      simp only [h_pow_card] at euler
+
+      have h_x_pow : x ^ (p / 2) = -1 := by
+        have dic := FiniteField.pow_dichotomy h_char_ne_2 hx_ne0
+        rw [h_pow_card] at dic
+        cases dic with
+        | inl h1 => rw [← euler hx_ne0] at h1; contradiction
+        | inr h_neg => exact h_neg
+
+      have not_sq_i : ¬ IsSquare sqrt_m1 := by
+        rintro ⟨y, hy⟩; rw [← pow_two] at hy;
+        have y4 : y^4 = -1 := by
+          rw [show 4 = 2 * 2 by rfl, pow_mul, ← hy]
+          rw [← sub_eq_zero, sub_neg_eq_add]
+          unfold sqrt_m1
+
+          change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
+          rw [intCast_zmod_eq_zero_iff_dvd]
+          try decide
+
+        have y8 : y^8 = 1 := by rw [show 8 = 4 * 2 by rfl, pow_mul, y4]; norm_num
+        -- We are arguing by contradiction using 'by absurd: sqrt_m1 is a square'
+        have order_div : 8 ∣ (p - 1) := by
+          have h_order : orderOf y = 8 := by
+            refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 fun q hprime hdvd => ?_
+            have hq_is_2 : q = 2 := by
+              rw [show 8 = 2^3 by rfl] at hdvd
+              exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
+            rw [hq_is_2, show 8 / 2 = 4 by rfl, y4]
+            try grind
+          rw [← h_order]
+          apply ZMod.orderOf_dvd_card_sub_one
+          try grind
+
+        have not_dvd : ¬ 8 ∣ (p - 1) := by
+          intro h
+          have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h
+          norm_num [p] at mod_zero
+
+        try grind
+
+
+      have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
+        have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
+        rw [h_pow_card] at dic
+        cases dic with
+        | inl h1 =>
+          rw [← euler h_i_ne0] at h1
+          grind
+        | inr h_neg => exact h_neg
+
+      rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
+      rw [mul_pow, h_x_pow, h_i_pow]
+      norm_num
+    
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 
