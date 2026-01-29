@@ -207,7 +207,8 @@ function handleBackgroundClick() {
 function handleFocusOn(nodeId: string) {
   setFocusedFunction(nodeId)
   setSubgraphMode('both')
-  canvasRef.value?.centerOnNode(nodeId, 1.5)
+  // Note: Don't call centerOnNode here - the subsequent layout will fitToView automatically
+  // which is better since it shows the entire filtered subgraph
 }
 
 function handleClearFocus() {

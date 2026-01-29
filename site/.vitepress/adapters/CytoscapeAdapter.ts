@@ -44,6 +44,9 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   // Event handler cleanup functions
   private cleanupFunctions: (() => void)[] = []
 
+  // Elastic drag state (only active in force-directed layout)
+  private elasticDragEnabled: boolean = true
+
   // ============ Lifecycle ============
 
   async initialize(container: HTMLElement, options?: Partial<InitOptions>): Promise<void> {
@@ -72,6 +75,95 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
       ],
       minZoom: this.options.minZoom,
       maxZoom: this.options.maxZoom
+    })
+
+    // Set up elastic drag behavior
+    this.setupElasticDrag()
+  }
+
+  /**
+   * Set up elastic drag behavior - connected nodes move proportionally when dragging.
+   * Only active in force-directed layout (cose-bilkent), not hierarchical (elk).
+   */
+  private setupElasticDrag(): void {
+    if (!this.cy || !this.elasticDragEnabled) return
+
+    let draggedNode: CytoscapeNode | null = null
+    // Map of nodeId -> { position, distance } where distance is graph distance (hops)
+    let connectedNodes: Map<string, { pos: { x: number; y: number }; hops: number }> = new Map()
+    let dragStartPos: { x: number; y: number } | null = null
+
+    const onGrab = (e: any) => {
+      // Only enable elastic drag in force-directed layout
+      if (this.currentLayoutType !== 'cose-bilkent') return
+
+      const node = e.target
+      if (!node.isNode() || node.data('isGroup')) return
+
+      draggedNode = node
+      dragStartPos = { ...node.position() }
+      connectedNodes.clear()
+
+      // Find connected nodes up to 2 hops away using BFS
+      const visited = new Set<string>([node.id()])
+      const queue: Array<{ node: CytoscapeNode; hops: number }> = [{ node, hops: 0 }]
+
+      while (queue.length > 0) {
+        const { node: currentNode, hops } = queue.shift()!
+        if (hops >= 2) continue  // Max 2 hops
+
+        // Get all neighbors (both incoming and outgoing edges)
+        const neighbors = currentNode.neighborhood('node[!isGroup]')
+        neighbors.forEach((neighbor: CytoscapeNode) => {
+          if (!visited.has(neighbor.id())) {
+            visited.add(neighbor.id())
+            const neighborHops = hops + 1
+            connectedNodes.set(neighbor.id(), {
+              pos: { ...neighbor.position() },
+              hops: neighborHops
+            })
+            queue.push({ node: neighbor, hops: neighborHops })
+          }
+        })
+      }
+    }
+
+    const onDrag = () => {
+      if (!draggedNode || !dragStartPos || this.currentLayoutType !== 'cose-bilkent') return
+
+      const currentPos = draggedNode.position()
+      const dx = currentPos.x - dragStartPos.x
+      const dy = currentPos.y - dragStartPos.y
+
+      // Move connected nodes based on graph distance (hops)
+      connectedNodes.forEach(({ pos, hops }, nodeId) => {
+        const node = this.cy!.getElementById(nodeId)
+        if (node.length === 0) return
+
+        // Influence decreases with hops: 1 hop = 0.5, 2 hops = 0.25
+        const influence = Math.pow(0.5, hops)
+
+        node.position({
+          x: pos.x + dx * influence,
+          y: pos.y + dy * influence
+        })
+      })
+    }
+
+    const onFree = () => {
+      draggedNode = null
+      dragStartPos = null
+      connectedNodes.clear()
+    }
+
+    this.cy.on('grab', 'node', onGrab)
+    this.cy.on('drag', 'node', onDrag)
+    this.cy.on('free', 'node', onFree)
+
+    this.cleanupFunctions.push(() => {
+      this.cy?.off('grab', 'node', onGrab)
+      this.cy?.off('drag', 'node', onDrag)
+      this.cy?.off('free', 'node', onFree)
     })
   }
 
@@ -123,9 +215,9 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   // ============ Data Management ============
 
   setData(nodes: GraphNode[], edges: GraphEdge[]): void {
-    if (!this.cy) return
+    if (!this.cy || !this.container) return
 
-    // Build cytoscape elements
+    // Build cytoscape elements (positions will be set by layout)
     const cyNodes = nodes.map(node => ({
       data: {
         id: node.id,
@@ -152,8 +244,99 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     this.cy.elements().remove()
     this.cy.add([...cyNodes, ...cyEdges])
 
-    // Run layout
-    this.runLayout()
+    // Run layout with scatter animation
+    this.runLayoutWithScatterAnimation()
+  }
+
+  /**
+   * Run layout, then scatter nodes and animate them back to final positions.
+   * This gives a nice "converge from chaos" effect.
+   */
+  private async runLayoutWithScatterAnimation(): Promise<void> {
+    if (!this.cy) return
+
+    // Lazy-load ELK if needed
+    if (this.currentLayoutType === 'elk') {
+      await this.ensureElkLoaded()
+    }
+
+    const baseConfig = getLayoutConfig(this.currentLayoutType)
+
+    // Update edge curve style based on layout type
+    this.updateEdgeCurveStyle()
+
+    // Step 1: Run layout instantly to compute final positions
+    const layoutConfig = {
+      ...baseConfig,
+      animate: false
+    }
+
+    await new Promise<void>((resolve) => {
+      const layout = this.cy!.layout(layoutConfig)
+      layout.on('layoutstop', () => resolve())
+      layout.run()
+    })
+
+    // Step 2: Store final positions and calculate final viewport
+    const finalPositions = new Map<string, { x: number; y: number }>()
+    const nonGroupNodes = this.cy.nodes('[!isGroup]')
+
+    nonGroupNodes.forEach((node: CytoscapeNode) => {
+      finalPositions.set(node.id(), { ...node.position() })
+    })
+
+    // Calculate the final viewport (what fitToView would set)
+    this.cy.fit(undefined, 30)
+    const finalZoom = this.cy.zoom()
+    const finalPan = { ...this.cy.pan() }
+
+    // Get the bounding box of the final layout
+    const bb = nonGroupNodes.boundingBox()
+    const width = bb.w || 800
+    const height = bb.h || 600
+    const centerX = (bb.x1 + bb.x2) / 2
+    const centerY = (bb.y1 + bb.y2) / 2
+
+    // Step 3: Scatter nodes randomly within the bounding box area
+    nonGroupNodes.forEach((node: CytoscapeNode) => {
+      node.position({
+        x: centerX + (Math.random() - 0.5) * width * 1.5,
+        y: centerY + (Math.random() - 0.5) * height * 1.5
+      })
+    })
+
+    // Fit to show scattered state
+    this.cy.fit(undefined, 30)
+
+    // Step 4: Animate nodes AND viewport together
+    const animationDuration = 800
+
+    // Animate viewport to final state
+    this.cy.animate({
+      zoom: finalZoom,
+      pan: finalPan
+    }, {
+      duration: animationDuration,
+      easing: 'ease-out-cubic'
+    })
+
+    // Animate each node to its final position
+    const nodeAnimations: Promise<void>[] = []
+    nonGroupNodes.forEach((node: CytoscapeNode) => {
+      const finalPos = finalPositions.get(node.id())
+      if (finalPos) {
+        nodeAnimations.push(
+          node.animation({
+            position: finalPos,
+            duration: animationDuration,
+            easing: 'ease-out-cubic'
+          }).play().promise()
+        )
+      }
+    })
+
+    // Wait for node animations to complete
+    await Promise.all(nodeAnimations)
   }
 
   private getEdgeColor(nodes: GraphNode[], targetId: string): string {
