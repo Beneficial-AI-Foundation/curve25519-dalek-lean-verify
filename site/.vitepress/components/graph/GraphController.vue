@@ -68,6 +68,7 @@ const layoutType = ref<LayoutType>('fcose')
 // Refs
 const canvasRef = ref<InstanceType<typeof GraphCanvas> | null>(null)
 const wrapperRef = ref<HTMLElement | null>(null)
+const graphMainRef = ref<HTMLElement | null>(null)
 
 // Tooltip state
 const tooltip = ref<{ visible: boolean; text: string; x: number; y: number }>({
@@ -77,48 +78,86 @@ const tooltip = ref<{ visible: boolean; text: string; x: number; y: number }>({
   y: 0
 })
 
-// Connector line state (links info panel to its node)
-const hoveredPanelNodeId = ref<string | null>(null)
-const connectorLine = ref<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
+// Connector lines state (links all info panels to their nodes)
+const connectorLines = ref<Array<{ nodeId: string; x1: number; y1: number; x2: number; y2: number }>>([])
 
-// Update connector line when panel is hovered
-function updateConnectorLine() {
-  if (!hoveredPanelNodeId.value) {
-    connectorLine.value = null
+// Store panel positions for continuous updates
+const currentPanelPositions = ref<Map<string, { x: number; y: number; width: number; height: number }>>(new Map())
+
+// Animation frame for updating connector lines
+let connectorAnimationFrame: number | null = null
+
+// Get node screen position (passed to InfoPanels)
+function getNodeScreenPosition(nodeId: string): { x: number; y: number } | null {
+  return canvasRef.value?.getNodeScreenPosition(nodeId) ?? null
+}
+
+// Update connector lines based on current node and panel positions
+function updateConnectorLines() {
+  if (!graphMainRef.value || currentPanelPositions.value.size === 0) {
+    connectorLines.value = []
     return
   }
 
-  // Get node position from cytoscape adapter
-  const nodePos = canvasRef.value?.getNodeScreenPosition(hoveredPanelNodeId.value)
-  if (!nodePos) {
-    connectorLine.value = null
-    return
+  const containerRect = graphMainRef.value.getBoundingClientRect()
+  const lines: Array<{ nodeId: string; x1: number; y1: number; x2: number; y2: number }> = []
+
+  for (const [nodeId, panelPos] of currentPanelPositions.value) {
+    const nodePos = canvasRef.value?.getNodeScreenPosition(nodeId)
+    if (!nodePos) continue
+
+    // Convert to container-relative coordinates
+    const nodeX = nodePos.x - containerRect.left
+    const nodeY = nodePos.y - containerRect.top
+
+    // Panel edge position (left edge, vertically centered) - already container-relative
+    const panelX = panelPos.x
+    const panelY = panelPos.y + panelPos.height / 2
+
+    lines.push({
+      nodeId,
+      x1: nodeX,
+      y1: nodeY,
+      x2: panelX,
+      y2: panelY
+    })
   }
 
-  // Find the hovered panel element to get its exact position
-  const panelElements = document.querySelectorAll('.info-panel')
-  const panelIndex = selectedNodesData.value.findIndex(n => n.id === hoveredPanelNodeId.value)
-  const panelEl = panelElements[panelIndex] as HTMLElement | undefined
+  connectorLines.value = lines
+}
 
-  if (!panelEl) {
-    connectorLine.value = null
-    return
+// Continuous update loop for connector lines (runs while panels are open)
+function startConnectorUpdate() {
+  if (connectorAnimationFrame !== null) return
+
+  function update() {
+    updateConnectorLines()
+    if (currentPanelPositions.value.size > 0) {
+      connectorAnimationFrame = requestAnimationFrame(update)
+    } else {
+      connectorAnimationFrame = null
+    }
   }
+  connectorAnimationFrame = requestAnimationFrame(update)
+}
 
-  const panelRect = panelEl.getBoundingClientRect()
-
-  // Draw line from node to left edge of panel, vertically centered on panel
-  connectorLine.value = {
-    x1: nodePos.x,
-    y1: nodePos.y,
-    x2: panelRect.left,
-    y2: panelRect.top + panelRect.height / 2
+function stopConnectorUpdate() {
+  if (connectorAnimationFrame !== null) {
+    cancelAnimationFrame(connectorAnimationFrame)
+    connectorAnimationFrame = null
   }
 }
 
-function handlePanelHover(nodeId: string | null) {
-  hoveredPanelNodeId.value = nodeId
-  updateConnectorLine()
+// Handle panel positions update from InfoPanels
+function handlePanelPositions(positions: Map<string, { x: number; y: number; width: number; height: number }>) {
+  currentPanelPositions.value = positions
+
+  if (positions.size > 0) {
+    startConnectorUpdate()
+  } else {
+    stopConnectorUpdate()
+    connectorLines.value = []
+  }
 }
 
 // Check if filters are active (affects whether we show stats on groups)
@@ -319,6 +358,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
+  stopConnectorUpdate()
 })
 </script>
 
@@ -350,7 +390,34 @@ onUnmounted(() => {
       @preload-elk="handlePreloadElk"
     />
 
-    <div class="graph-main">
+    <div ref="graphMainRef" class="graph-main">
+      <!-- Connector lines from info panels to nodes (behind everything) -->
+      <svg
+        v-if="connectorLines.length > 0"
+        class="connector-svg"
+      >
+        <g v-for="line in connectorLines" :key="line.nodeId">
+          <line
+            :x1="line.x1"
+            :y1="line.y1"
+            :x2="line.x2"
+            :y2="line.y2"
+            stroke="var(--vp-c-brand-1)"
+            stroke-width="1.5"
+            stroke-dasharray="4 3"
+            stroke-opacity="0.4"
+          />
+          <!-- Small circle at the node end -->
+          <circle
+            :cx="line.x1"
+            :cy="line.y1"
+            r="4"
+            fill="var(--vp-c-brand-1)"
+            fill-opacity="0.5"
+          />
+        </g>
+      </svg>
+
       <GraphCanvas
         ref="canvasRef"
         :nodes="filteredData.nodes"
@@ -366,10 +433,12 @@ onUnmounted(() => {
 
       <InfoPanels
         :selected-nodes="selectedNodesData"
+        :container-ref="graphMainRef"
+        :get-node-screen-position="getNodeScreenPosition"
         @deselect="handleDeselect"
         @focus-on="handleFocusOn"
         @close="handleCloseAllPanels"
-        @panel-hover="handlePanelHover"
+        @panel-positions="handlePanelPositions"
       />
 
       <!-- Tooltip -->
@@ -380,40 +449,6 @@ onUnmounted(() => {
       >
         {{ tooltip.text }}
       </div>
-
-      <!-- Connector line from info panel to node -->
-      <svg
-        v-if="connectorLine"
-        class="connector-svg"
-        :style="{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          pointerEvents: 'none',
-          zIndex: 40
-        }"
-      >
-        <line
-          :x1="connectorLine.x1"
-          :y1="connectorLine.y1"
-          :x2="connectorLine.x2"
-          :y2="connectorLine.y2"
-          stroke="var(--vp-c-brand-1)"
-          stroke-width="2"
-          stroke-dasharray="6 4"
-          stroke-opacity="0.6"
-        />
-        <!-- Small circle at the node end -->
-        <circle
-          :cx="connectorLine.x1"
-          :cy="connectorLine.y1"
-          r="5"
-          fill="var(--vp-c-brand-1)"
-          fill-opacity="0.7"
-        />
-      </svg>
     </div>
 
     <!-- Legend -->
@@ -455,6 +490,16 @@ onUnmounted(() => {
   margin: 0.5rem;
   border-radius: 4px;
   overflow: hidden;
+}
+
+.connector-svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .graph-tooltip {

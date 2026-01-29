@@ -184,7 +184,7 @@ function handleToggleShowGroups() {
               :checked="isFileEnabled(file)"
               @change="emit('toggleSourceFile', file)"
             />
-            <span class="file-name">{{ getFileName(file) }}</span>
+            <span class="file-name" :title="file">{{ getFileName(file) }}</span>
             <span class="file-stats" v-if="getFileStatsFor(file)">
               {{ getFileStatsFor(file)!.verified }}/{{ getFileStatsFor(file)!.total }}
             </span>
