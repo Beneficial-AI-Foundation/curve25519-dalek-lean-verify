@@ -122,12 +122,10 @@ function handlePanelHover(nodeId: string | null) {
 }
 
 // Check if filters are active (affects whether we show stats on groups)
+// Only focused function hides stats - file filtering still shows stats
 const hasActiveFilters = computed(() => {
-  // Check if a function is focused
-  if (filterState.focusedFunction) return true
-  // Check if not all source files are enabled
-  if (filterState.enabledSourceFiles.size !== processedData.value.sourceFiles.length) return true
-  return false
+  // Check if a function is focused (subgraph mode)
+  return !!filterState.focusedFunction
 })
 
 // Build file groups for compound nodes

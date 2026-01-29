@@ -1,4 +1,3 @@
-import type { FunctionDep } from '../types'
 import type { NodeStatus } from '../types/graph'
 
 // Node colors based on verification status
@@ -35,14 +34,6 @@ export const groupColors = [
   '#22c55e', // green-500
   '#eab308'  // yellow-500
 ]
-
-// Get color for a function based on its status (legacy, for FunctionDep)
-export function getNodeColor(func: FunctionDep): string {
-  if (func.fully_verified) return nodeColors.fully_verified
-  if (func.verified) return nodeColors.verified
-  if (func.specified) return nodeColors.specified
-  return nodeColors.nothing
-}
 
 // Get color by NodeStatus type (for adapter use)
 export function getNodeColorByStatus(status: NodeStatus): string {
@@ -105,14 +96,6 @@ export function createCytoscapeStyles(borderColor: string) {
         'target-arrow-shape': 'triangle',
         'curve-style': 'bezier',
         'arrow-scale': 0.8
-      }
-    },
-    {
-      // Transitive edges (created by collapsing hidden nodes)
-      selector: 'edge[?isTransitive]',
-      style: {
-        'line-style': 'dashed',
-        'line-dash-pattern': [6, 3]
       }
     },
     {
@@ -217,24 +200,6 @@ export const elkLayoutConfig = {
   padding: 50
 }
 
-// ELK Compact layout - tighter spacing for ungrouped view
-export const elkCompactLayoutConfig = {
-  name: 'elk',
-  elk: {
-    algorithm: 'layered',
-    'elk.direction': 'RIGHT',
-    'elk.spacing.nodeNode': 20,
-    'elk.layered.spacing.nodeNodeBetweenLayers': 80,
-    'elk.layered.spacing.edgeEdgeBetweenLayers': 15,
-    'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
-    'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
-    'elk.layered.compaction.postCompaction.strategy': 'EDGE_LENGTH'
-  },
-  animate: false,
-  fit: true,
-  padding: 30
-}
-
 // COSE-Bilkent layout - force-directed, creates organic clusters
 export const coseBilkentLayoutConfig = {
   name: 'cose-bilkent',
@@ -257,18 +222,6 @@ export const coseBilkentLayoutConfig = {
   gravityRangeCompound: 1.5,
   gravityCompound: 1.0,
   gravityRange: 4.5  // Increased range for gravity to affect distant nodes
-}
-
-// Dagre layout - hierarchical, more compact than ELK
-export const dagreLayoutConfig = {
-  name: 'dagre',
-  rankDir: 'LR',
-  nodeSep: 30,
-  rankSep: 100,
-  edgeSep: 20,
-  fit: true,
-  padding: 30,
-  animate: false
 }
 
 // Get layout config by type

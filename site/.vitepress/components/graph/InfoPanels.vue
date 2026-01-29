@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed, watch, type PropType } from 'vue'
+import { ref, watch, type PropType } from 'vue'
 import type { GraphNode } from '../../types/graph'
 import { useGitHubLinks } from '../../composables/useGitHubLinks'
-import { useCodeHighlight } from '../../composables/useCodeHighlight'
+import { highlightCode } from '../../composables/useCodeHighlight'
 
 const props = defineProps({
   selectedNodes: {
@@ -22,15 +22,13 @@ const { getSourceLink } = useGitHubLinks()
 
 // Cache of highlighted code per node
 const highlightedSpecs = ref<Map<string, string>>(new Map())
-const { highlight } = useCodeHighlight()
 
 // Highlight spec statements for selected nodes
 watch(() => props.selectedNodes, async (nodes) => {
   for (const node of nodes) {
     if (node.specStatement && !highlightedSpecs.value.has(node.id)) {
-      const { highlightedCode, highlight: doHighlight } = useCodeHighlight()
-      await doHighlight(node.specStatement, 'lean4')
-      highlightedSpecs.value.set(node.id, highlightedCode.value)
+      const html = await highlightCode(node.specStatement, 'lean4')
+      highlightedSpecs.value.set(node.id, html)
     }
   }
 }, { immediate: true, deep: true })
