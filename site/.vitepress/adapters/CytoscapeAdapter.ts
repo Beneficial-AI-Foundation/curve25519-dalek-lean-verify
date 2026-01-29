@@ -1,0 +1,603 @@
+import type {
+  IVisualizationAdapter,
+  InitOptions
+} from './types'
+import { defaultInitOptions } from './types'
+import type {
+  GraphNode,
+  GraphEdge,
+  FileGroup,
+  NodeStyle,
+  EdgeStyle,
+  GroupStyle,
+  LayoutOptions,
+  NodeClickEvent,
+  NodeHoverEvent
+} from '../types/graph'
+import {
+  nodeColors,
+  edgeColors,
+  getNodeColorByStatus,
+  createCytoscapeStyles,
+  createCompoundNodeStyles,
+  elkLayoutConfig
+} from '../config/cytoscapeConfig'
+
+type CytoscapeInstance = any
+type CytoscapeNode = any
+type CytoscapeEdge = any
+
+/**
+ * Cytoscape.js adapter implementing the IVisualizationAdapter interface.
+ * Provides graph visualization with ELK layout and compound nodes for file grouping.
+ */
+export class CytoscapeAdapter implements IVisualizationAdapter {
+  private cy: CytoscapeInstance | null = null
+  private container: HTMLElement | null = null
+  private options: InitOptions = defaultInitOptions
+  private groupsVisible: boolean = false
+  private currentTheme: 'light' | 'dark' = 'light'
+
+  // Event handler cleanup functions
+  private cleanupFunctions: (() => void)[] = []
+
+  // ============ Lifecycle ============
+
+  async initialize(container: HTMLElement, options?: Partial<InitOptions>): Promise<void> {
+    this.container = container
+    this.options = { ...defaultInitOptions, ...options }
+    this.currentTheme = this.options.theme
+
+    // Dynamic import - only load on client
+    const cytoscape = (await import('cytoscape')).default
+    // @ts-ignore - no types for cytoscape-elk
+    const elk = (await import('cytoscape-elk')).default
+
+    // Register ELK layout
+    cytoscape.use(elk)
+
+    // Create cytoscape instance
+    const borderColor = this.currentTheme === 'dark' ? '#ffffff' : '#374151'
+
+    this.cy = cytoscape({
+      container,
+      elements: [],
+      style: [
+        ...createCytoscapeStyles(borderColor),
+        ...createCompoundNodeStyles(borderColor)
+      ],
+      minZoom: this.options.minZoom,
+      maxZoom: this.options.maxZoom
+    })
+  }
+
+  destroy(): void {
+    // Clean up event handlers
+    this.cleanupFunctions.forEach(fn => fn())
+    this.cleanupFunctions = []
+
+    if (this.cy) {
+      this.cy.destroy()
+      this.cy = null
+    }
+    this.container = null
+  }
+
+  isInitialized(): boolean {
+    return this.cy !== null
+  }
+
+  // ============ Data Management ============
+
+  setData(nodes: GraphNode[], edges: GraphEdge[]): void {
+    if (!this.cy) return
+
+    // Build cytoscape elements
+    const cyNodes = nodes.map(node => ({
+      data: {
+        id: node.id,
+        label: node.label,
+        fullLabel: node.fullLabel,
+        color: getNodeColorByStatus(node.status),
+        status: node.status,
+        sourceFile: node.sourceFile,
+        isTransitive: node.isTransitiveTarget
+      }
+    }))
+
+    const cyEdges = edges.map(edge => ({
+      data: {
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        color: this.getEdgeColor(nodes, edge.target),
+        isTransitive: edge.isTransitive
+      }
+    }))
+
+    // Replace all elements
+    this.cy.elements().remove()
+    this.cy.add([...cyNodes, ...cyEdges])
+
+    // Run layout
+    this.runLayout()
+  }
+
+  private getEdgeColor(nodes: GraphNode[], targetId: string): string {
+    const target = nodes.find(n => n.id === targetId)
+    if (target && (target.status === 'verified' || target.status === 'fully_verified')) {
+      return edgeColors.verified
+    }
+    return edgeColors.default
+  }
+
+  updateNodes(nodes: GraphNode[]): void {
+    if (!this.cy) return
+
+    for (const node of nodes) {
+      const cyNode = this.cy.getElementById(node.id)
+      if (cyNode.length > 0) {
+        cyNode.data('label', node.label)
+        cyNode.data('fullLabel', node.fullLabel)
+        cyNode.data('color', getNodeColorByStatus(node.status))
+        cyNode.data('status', node.status)
+      }
+    }
+  }
+
+  setGroups(groups: FileGroup[]): void {
+    if (!this.cy) return
+
+    // Get current group IDs
+    const currentGroupIds = new Set<string>()
+    this.cy.nodes('[?isGroup]').forEach((node: CytoscapeNode) => {
+      currentGroupIds.add(node.id())
+    })
+
+    // If groups should be hidden or empty, remove all groups
+    if (!this.groupsVisible || groups.length === 0) {
+      // First, orphan all child nodes (remove parent reference)
+      this.cy.nodes().forEach((node: CytoscapeNode) => {
+        if (!node.data('isGroup') && node.parent().length > 0) {
+          node.move({ parent: null })
+        }
+      })
+      // Then remove group nodes
+      this.cy.nodes('[?isGroup]').remove()
+      return
+    }
+
+    // Build new group map
+    const newGroupMap = new Map<string, FileGroup>()
+    for (const group of groups) {
+      newGroupMap.set(`group-${group.id}`, group)
+    }
+
+    // Check if this is just a label update (same groups, same nodes)
+    const isLabelOnlyUpdate = currentGroupIds.size === groups.length &&
+      groups.every(g => currentGroupIds.has(`group-${g.id}`))
+
+    if (isLabelOnlyUpdate) {
+      // Just update labels for existing groups
+      for (const group of groups) {
+        const groupNode = this.cy.getElementById(`group-${group.id}`)
+        if (groupNode.length > 0) {
+          groupNode.data('label', group.label)
+          groupNode.data('color', group.color)
+          groupNode.data('stats', group.stats)
+        }
+      }
+      return
+    }
+
+    // Full rebuild needed - first orphan all children
+    this.cy.nodes().forEach((node: CytoscapeNode) => {
+      if (!node.data('isGroup') && node.parent().length > 0) {
+        node.move({ parent: null })
+      }
+    })
+
+    // Remove all existing groups
+    this.cy.nodes('[?isGroup]').remove()
+
+    // Add new parent nodes for each group
+    for (const group of groups) {
+      // Add parent node
+      this.cy.add({
+        data: {
+          id: `group-${group.id}`,
+          label: group.label,
+          isGroup: true,
+          color: group.color,
+          stats: group.stats
+        }
+      })
+
+      // Set parent for child nodes
+      for (const nodeId of group.nodeIds) {
+        const node = this.cy.getElementById(nodeId)
+        if (node.length > 0) {
+          node.move({ parent: `group-${group.id}` })
+        }
+      }
+    }
+
+    // Re-run layout to accommodate groups
+    this.runLayout()
+  }
+
+  setGroupsVisible(visible: boolean): void {
+    this.groupsVisible = visible
+    // Groups will be re-rendered on next setGroups call
+  }
+
+  // ============ Interaction Handlers ============
+
+  onNodeClick(handler: (event: NodeClickEvent) => void): () => void {
+    if (!this.cy) return () => {}
+
+    const listener = (e: any) => {
+      const node = e.target
+      if (node.isNode() && !node.data('isGroup')) {
+        handler({
+          nodeId: node.id(),
+          originalEvent: e.originalEvent,
+          isCtrlKey: e.originalEvent?.ctrlKey || e.originalEvent?.metaKey || false,
+          isShiftKey: e.originalEvent?.shiftKey || false
+        })
+      }
+    }
+
+    this.cy.on('tap', 'node', listener)
+
+    const cleanup = () => {
+      this.cy?.off('tap', 'node', listener)
+    }
+    this.cleanupFunctions.push(cleanup)
+    return cleanup
+  }
+
+  onNodeHover(handler: (event: NodeHoverEvent) => void): () => void {
+    if (!this.cy) return () => {}
+
+    const mouseoverListener = (e: any) => {
+      const node = e.target
+      if (node.isNode() && !node.data('isGroup')) {
+        handler({
+          nodeId: node.id(),
+          position: {
+            x: e.originalEvent?.clientX || 0,
+            y: e.originalEvent?.clientY || 0
+          }
+        })
+      }
+    }
+
+    const mouseoutListener = () => {
+      handler({ nodeId: null, position: null })
+    }
+
+    this.cy.on('mouseover', 'node', mouseoverListener)
+    this.cy.on('mouseout', 'node', mouseoutListener)
+
+    const cleanup = () => {
+      this.cy?.off('mouseover', 'node', mouseoverListener)
+      this.cy?.off('mouseout', 'node', mouseoutListener)
+    }
+    this.cleanupFunctions.push(cleanup)
+    return cleanup
+  }
+
+  onBackgroundClick(handler: () => void): () => void {
+    if (!this.cy) return () => {}
+
+    const listener = (e: any) => {
+      if (e.target === this.cy) {
+        handler()
+      }
+    }
+
+    this.cy.on('tap', listener)
+
+    const cleanup = () => {
+      this.cy?.off('tap', listener)
+    }
+    this.cleanupFunctions.push(cleanup)
+    return cleanup
+  }
+
+  onGroupClick(handler: (groupId: string) => void): () => void {
+    if (!this.cy) return () => {}
+
+    const listener = (e: any) => {
+      const node = e.target
+      if (node.isNode() && node.data('isGroup')) {
+        const groupId = node.id().replace('group-', '')
+        handler(groupId)
+      }
+    }
+
+    this.cy.on('tap', 'node[?isGroup]', listener)
+
+    const cleanup = () => {
+      this.cy?.off('tap', 'node[?isGroup]', listener)
+    }
+    this.cleanupFunctions.push(cleanup)
+    return cleanup
+  }
+
+  onNodeDoubleClick(handler: (event: NodeClickEvent) => void): () => void {
+    if (!this.cy) return () => {}
+
+    const listener = (e: any) => {
+      const node = e.target
+      if (node.isNode() && !node.data('isGroup')) {
+        handler({
+          nodeId: node.id(),
+          originalEvent: e.originalEvent,
+          isCtrlKey: e.originalEvent?.ctrlKey || e.originalEvent?.metaKey || false,
+          isShiftKey: e.originalEvent?.shiftKey || false
+        })
+      }
+    }
+
+    this.cy.on('dbltap', 'node', listener)
+
+    const cleanup = () => {
+      this.cy?.off('dbltap', 'node', listener)
+    }
+    this.cleanupFunctions.push(cleanup)
+    return cleanup
+  }
+
+  // ============ View Control ============
+
+  fitToView(padding: number = 30): void {
+    if (!this.cy) return
+    this.cy.fit(undefined, padding)
+  }
+
+  centerOnNode(nodeId: string, zoom?: number): void {
+    if (!this.cy) return
+
+    const node = this.cy.getElementById(nodeId)
+    if (node.length > 0) {
+      this.cy.animate({
+        center: { eles: node },
+        zoom: zoom ?? this.cy.zoom()
+      }, {
+        duration: 300
+      })
+    }
+  }
+
+  animateTo(options: { center?: string; zoom?: number; duration?: number }): void {
+    if (!this.cy) return
+
+    const animateOpts: any = {}
+    if (options.center) {
+      const node = this.cy.getElementById(options.center)
+      if (node.length > 0) {
+        animateOpts.center = { eles: node }
+      }
+    }
+    if (options.zoom !== undefined) {
+      animateOpts.zoom = options.zoom
+    }
+
+    this.cy.animate(animateOpts, { duration: options.duration ?? 300 })
+  }
+
+  getViewport(): { zoom: number; pan: { x: number; y: number } } {
+    if (!this.cy) return { zoom: 1, pan: { x: 0, y: 0 } }
+    return {
+      zoom: this.cy.zoom(),
+      pan: this.cy.pan()
+    }
+  }
+
+  setViewport(viewport: { zoom?: number; pan?: { x: number; y: number } }): void {
+    if (!this.cy) return
+    if (viewport.zoom !== undefined) {
+      this.cy.zoom(viewport.zoom)
+    }
+    if (viewport.pan) {
+      this.cy.pan(viewport.pan)
+    }
+  }
+
+  getNodeScreenPosition(nodeId: string): { x: number; y: number } | null {
+    if (!this.cy || !this.container) return null
+
+    const node = this.cy.getElementById(nodeId)
+    if (node.length === 0) return null
+
+    // Get node's rendered position (in model coordinates)
+    const pos = node.renderedPosition()
+
+    // Get container's bounding rect to convert to screen coordinates
+    const rect = this.container.getBoundingClientRect()
+
+    return {
+      x: rect.left + pos.x,
+      y: rect.top + pos.y
+    }
+  }
+
+  // ============ Highlighting ============
+
+  highlightNodes(nodeIds: string[]): void {
+    if (!this.cy) return
+
+    // Remove existing selection highlighting
+    this.cy.nodes().removeClass('selected')
+
+    // Add selection class to specified nodes
+    for (const id of nodeIds) {
+      const node = this.cy.getElementById(id)
+      if (node.length > 0) {
+        node.addClass('selected')
+      }
+    }
+  }
+
+  highlightConnections(nodeId: string): void {
+    if (!this.cy) return
+
+    const node = this.cy.getElementById(nodeId)
+    if (node.length === 0) return
+
+    // Get connected edges and nodes
+    const connectedEdges = node.connectedEdges()
+    const connectedNodes = connectedEdges.connectedNodes().add(node)
+
+    // Fade everything
+    this.cy.elements().addClass('faded')
+
+    // Highlight connected elements
+    connectedNodes.removeClass('faded').addClass('highlighted')
+    connectedEdges.removeClass('faded').addClass('highlighted')
+  }
+
+  fadeElements(excludeNodeIds: string[]): void {
+    if (!this.cy) return
+
+    const excludeSet = new Set(excludeNodeIds)
+
+    this.cy.nodes().forEach((node: CytoscapeNode) => {
+      if (!excludeSet.has(node.id())) {
+        node.addClass('faded')
+      }
+    })
+
+    this.cy.edges().forEach((edge: CytoscapeEdge) => {
+      const source = edge.source().id()
+      const target = edge.target().id()
+      if (!excludeSet.has(source) || !excludeSet.has(target)) {
+        edge.addClass('faded')
+      }
+    })
+  }
+
+  resetHighlight(): void {
+    if (!this.cy) return
+    this.cy.elements().removeClass('faded').removeClass('highlighted')
+  }
+
+  // ============ Layout ============
+
+  async runLayout(options?: Partial<LayoutOptions>): Promise<void> {
+    if (!this.cy) return
+
+    const layoutConfig = {
+      ...elkLayoutConfig,
+      elk: {
+        ...elkLayoutConfig.elk,
+        ...(options?.direction && { 'elk.direction': options.direction }),
+        ...(options?.nodeSpacing && { 'elk.spacing.nodeNode': options.nodeSpacing }),
+        ...(options?.layerSpacing && { 'elk.layered.spacing.nodeNodeBetweenLayers': options.layerSpacing })
+      },
+      animate: options?.animate ?? false
+    }
+
+    return new Promise((resolve) => {
+      const layout = this.cy!.layout(layoutConfig)
+      layout.on('layoutstop', () => {
+        this.fitToView()
+        resolve()
+      })
+      layout.run()
+    })
+  }
+
+  getAvailableLayouts(): string[] {
+    return ['elk', 'dagre', 'grid', 'circle', 'concentric', 'breadthfirst']
+  }
+
+  // ============ Styling ============
+
+  setTheme(dark: boolean): void {
+    if (!this.cy) return
+
+    this.currentTheme = dark ? 'dark' : 'light'
+    const borderColor = dark ? '#ffffff' : '#374151'
+
+    // Update styles
+    this.cy.style([
+      ...createCytoscapeStyles(borderColor),
+      ...createCompoundNodeStyles(borderColor)
+    ])
+  }
+
+  setNodeStyle(nodeId: string, style: Partial<NodeStyle>): void {
+    if (!this.cy) return
+
+    const node = this.cy.getElementById(nodeId)
+    if (node.length === 0) return
+
+    const cyStyle: any = {}
+    if (style.backgroundColor) cyStyle['background-color'] = style.backgroundColor
+    if (style.borderColor) cyStyle['border-color'] = style.borderColor
+    if (style.borderWidth) cyStyle['border-width'] = style.borderWidth
+    if (style.width) cyStyle['width'] = style.width
+    if (style.height) cyStyle['height'] = style.height
+    if (style.opacity !== undefined) cyStyle['opacity'] = style.opacity
+
+    node.style(cyStyle)
+  }
+
+  setEdgeStyle(edgeId: string, style: Partial<EdgeStyle>): void {
+    if (!this.cy) return
+
+    const edge = this.cy.getElementById(edgeId)
+    if (edge.length === 0) return
+
+    const cyStyle: any = {}
+    if (style.lineColor) {
+      cyStyle['line-color'] = style.lineColor
+      cyStyle['target-arrow-color'] = style.lineColor
+    }
+    if (style.width) cyStyle['width'] = style.width
+    if (style.opacity !== undefined) cyStyle['opacity'] = style.opacity
+    if (style.lineStyle) cyStyle['line-style'] = style.lineStyle
+    if (style.curveStyle) cyStyle['curve-style'] = style.curveStyle
+
+    edge.style(cyStyle)
+  }
+
+  setGroupStyle(groupId: string, style: Partial<GroupStyle>): void {
+    if (!this.cy) return
+
+    const group = this.cy.getElementById(`group-${groupId}`)
+    if (group.length === 0) return
+
+    const cyStyle: any = {}
+    if (style.backgroundColor) cyStyle['background-color'] = style.backgroundColor
+    if (style.borderColor) cyStyle['border-color'] = style.borderColor
+    if (style.borderWidth) cyStyle['border-width'] = style.borderWidth
+    if (style.padding) cyStyle['padding'] = style.padding
+
+    group.style(cyStyle)
+  }
+
+  // ============ Export ============
+
+  async exportPNG(options?: { scale?: number; backgroundColor?: string }): Promise<Blob> {
+    if (!this.cy) throw new Error('Adapter not initialized')
+
+    const dataUrl = this.cy.png({
+      scale: options?.scale ?? 2,
+      bg: options?.backgroundColor ?? '#ffffff',
+      full: true
+    })
+
+    // Convert data URL to Blob
+    const response = await fetch(dataUrl)
+    return response.blob()
+  }
+
+  exportSVG(): string {
+    if (!this.cy) throw new Error('Adapter not initialized')
+    return this.cy.svg({ full: true })
+  }
+}
