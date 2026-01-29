@@ -148,7 +148,7 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
       rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
       rw [mul_pow, h_x_pow, h_i_pow]
       norm_num
-    
+
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 
@@ -290,7 +290,55 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
       -- Apply sign bit: if sign_bit is 1, we want the negative (odd) root
       let x := if (is_negative x_root) != (sign_bit == 1) then -x_root else x_root
 
-      some { x := x, y := y, on_curve := sorry }
+      some { x := x, y := y, on_curve := by
+              have hx_sq : x^2 = x2 := by
+                simp only [x]
+                split_ifs
+                all_goals{
+                  try simp only [even_two, Even.neg_pow]
+                  dsimp [x_root, abs_edwards]
+                  split_ifs
+                  all_goals {
+                    try simp only [even_two, Even.neg_pow]
+                    have spec := Classical.choose_spec h
+                    rw [pow_two]
+                    rw [← spec]
+                  }
+                }
+              have hv_ne0 : v ≠ 0 := by
+                intro hv
+                dsimp only [v] at hv
+                have h_neg : (d : ZMod p) * y^2 = -1 := eq_neg_of_add_eq_zero_left hv
+
+                have rhs_sq : IsSquare (-1 : ZMod p) := by
+                  use sqrt_m1; rw [←pow_two, sqrt_m1]; rw [← sub_eq_zero]
+                  change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
+                  rw [intCast_zmod_eq_zero_iff_dvd]
+                  try decide
+
+                have lhs_not_sq : ¬ IsSquare ((d : ZMod p) * y^2) := by
+                  intro h_is_sq
+                  have h_d_not_sq : ¬ IsSquare (d : ZMod p) := by
+                    apply (legendreSym.eq_neg_one_iff' p).mp
+                    norm_num [d, p]
+
+                  apply h_d_not_sq
+                  by_cases hy : y = 0
+                  · simp only [hy, pow_two, mul_zero] at h_neg; try grind
+                  · rcases h_is_sq with ⟨k, hk⟩
+                    use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
+
+                rw [h_neg] at lhs_not_sq
+                try grind
+                
+              simp only [hx_sq]
+              dsimp [Ed25519, x2, u, v]
+              simp only [neg_mul, one_mul]
+              simp only [v] at hv_ne0
+              rw [mul_comm] at hv_ne0
+              field_simp [hv_ne0]
+              ring
+              }
     else
       none
 
