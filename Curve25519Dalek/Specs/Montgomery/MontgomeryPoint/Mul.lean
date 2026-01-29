@@ -24,6 +24,10 @@ most significant to least significant.
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.montgomery
+open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.backend.serial.u64
+
 namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
 /-
@@ -74,11 +78,14 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid self) :
-    ∃ result,
-    mul self scalar = ok result ∧
-    (MontgomeryPoint.IsValid result)
+theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
+    (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul P scalar = ok res ∧
+    (MontgomeryPoint.IsValid res) ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
+    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
+    bytesToField res =(1 + y) * (1 - y)⁻¹
      := by
   sorry
 
@@ -118,13 +125,14 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (point : MontgomeryPoint)
-     (h_is_valid : MontgomeryPoint.IsValid point) :
-    ∃ result,
-    mul scalar point = ok result ∧
-    (MontgomeryPoint.IsValid result) ∧
-    curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul point scalar =
-    mul scalar point
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
+     (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul scalar P = ok res ∧
+    (MontgomeryPoint.IsValid res) ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
+    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
+    bytesToField res =(1 + y) * (1 - y)⁻¹
     :=by
   unfold mul
   progress*
@@ -167,15 +175,16 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (self : MontgomeryPoint) (rhs : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid self) :
-    ∃ result,
-    mul self rhs = ok result ∧
-    (MontgomeryPoint.IsValid result)∧
-    curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul rhs self =
-    mul self rhs
-     := by
-  unfold mul  MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul
+theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar)
+    (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul P rhs = ok res ∧
+    (MontgomeryPoint.IsValid res) ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y ∧
+    let y : ZMod p  := ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y
+    bytesToField res =(1 + y) * (1 - y)⁻¹
+ := by
+  unfold mul
   progress*
 
 end curve25519_dalek.montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint
@@ -213,11 +222,15 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (point : MontgomeryPoint)
-    (h_is_valid : MontgomeryPoint.IsValid point) :
-    ∃ result,
-    mul scalar point = ok result ∧
-    (MontgomeryPoint.IsValid result) := by
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
+    (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul scalar P = ok res ∧
+    (MontgomeryPoint.IsValid res) ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
+    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
+    bytesToField res =(1 + y) * (1 - y)⁻¹
+ := by
   unfold mul
   progress*
 

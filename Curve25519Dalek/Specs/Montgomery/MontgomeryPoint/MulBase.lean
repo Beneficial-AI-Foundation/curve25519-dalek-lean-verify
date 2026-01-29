@@ -26,6 +26,8 @@ EdwardsPoint to a MontgomeryPoint.
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
 open curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.u64
+
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -53,16 +55,11 @@ natural language specs:
 theorem mul_base_spec (scalar : scalar.Scalar) :
     ∃ result,
     mul_base scalar = ok result ∧
-    MontgomeryPoint.IsValid result  := by
-    unfold mul_base MontgomeryPoint.IsValid
-    progress*
-    · have := ep_post.Y_bounds
-      grind
-    · have := ep_post.Z_bounds
-      grind
-    · have := ep_post.on_curve
-      sorry
-
+    MontgomeryPoint.IsValid result ∧
+    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y
+     := by
+    unfold mul_base
+    sorry
 
 
 end curve25519_dalek.montgomery.MontgomeryPoint

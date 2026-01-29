@@ -48,15 +48,19 @@ natural language specs:
 - The returned MontgomeryPoint equals the Montgomery ladder result for the given scalar and point
 -/
 @[progress]
-theorem mul_assign_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid self) :
-    ∃ result,
-    mul_assign self scalar = ok result ∧
-    MontgomeryPoint.IsValid result ∧
-    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self scalar =
-    mul_assign self scalar
+theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
+    (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul_assign P scalar = ok res ∧
+    MontgomeryPoint.IsValid res ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
+    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
+    bytesToField res =(1 + y) * (1 - y)⁻¹
      := by
   unfold mul_assign
   progress*
+
+
+
 
 end curve25519_dalek.montgomery.MulAssignMontgomeryPointShared0Scalar

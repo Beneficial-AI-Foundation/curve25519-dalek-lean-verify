@@ -24,6 +24,9 @@ scalar multiplication of the given point by the clamped scalar.
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.u64
+
 
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
@@ -48,12 +51,14 @@ natural language specs:
 - The returned MontgomeryPoint matches the clamped scalar multiplication result
 -/
 @[progress]
-theorem mul_clamped_spec (self : MontgomeryPoint) (bytes : Array U8 32#usize)
- (h_is_valid : MontgomeryPoint.IsValid self) :
-    ∃ result,
-    mul_clamped self bytes = ok result ∧
-    MontgomeryPoint.IsValid result := by
-      unfold  mul_clamped scalar.clamp_integer MulScalarMontgomeryPointMontgomeryPoint.mul
-      progress*
+theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
+ (h_is_valid : MontgomeryPoint.IsValid P) :
+    ∃ res,
+    mul_clamped P bytes = ok res ∧
+    MontgomeryPoint.IsValid res ∧
+    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat bytes) • MontgomeryPoint.toPoint P).y
+    := by
+      unfold  mul_clamped  MulScalarMontgomeryPointMontgomeryPoint.mul
+      sorry
 
 end curve25519_dalek.montgomery.MontgomeryPoint

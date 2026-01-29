@@ -23,7 +23,7 @@ scalar-point multiplication on the fixed basepoint.
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-
+open curve25519_dalek.backend.serial.u64
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -47,9 +47,10 @@ natural language specs:
 -/
 @[progress]
 theorem mul_base_spec (scalar : scalar.Scalar) :
-    ∃ result,
-    mul_base scalar = ok result ∧
-    EdwardsPoint.IsValid result  := by
+    ∃ res,
+    mul_base scalar = ok res ∧
+    EdwardsPoint.IsValid res ∧
+    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint := by
     sorry
 
 end curve25519_dalek.edwards.EdwardsPoint

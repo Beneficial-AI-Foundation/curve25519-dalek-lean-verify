@@ -21,6 +21,8 @@ clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_b
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.u64
 
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
@@ -48,9 +50,11 @@ natural language specs:
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     ∃ result,
     mul_base_clamped bytes = ok result ∧
-    MontgomeryPoint.IsValid result
+    MontgomeryPoint.IsValid result ∧
+    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y
     := by
-   unfold mul_base_clamped  scalar.clamp_integer
+   unfold mul_base_clamped scalar.clamp_integer
    progress*
+   sorry
 
 end curve25519_dalek.montgomery.MontgomeryPoint

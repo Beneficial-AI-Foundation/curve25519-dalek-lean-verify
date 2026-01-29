@@ -2798,7 +2798,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ result,\n    mul_base scalar = ok result ∧\n    EdwardsPoint.IsValid result := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ res,\n    mul_base scalar = ok res ∧\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to scalar multiplication with the Edwards basepoint constant\n- The returned EdwardsPoint equals the output of that scalar multiplication\n-/",
@@ -3482,7 +3482,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ result,\n    mul_base scalar = ok result ∧\n    MontgomeryPoint.IsValid result := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ result,\n    mul_base scalar = ok result ∧\n    MontgomeryPoint.IsValid result ∧\n    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -3499,10 +3499,10 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_base",
     "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    ∃ result,\n    mul_base_clamped bytes = ok result ∧\n    MontgomeryPoint.IsValid result\n := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    ∃ result,\n    mul_base_clamped bytes = ok result ∧\n    MontgomeryPoint.IsValid result ∧\n    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -3520,10 +3520,10 @@
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.montgomery.MontgomeryPoint.mul_base"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (self : MontgomeryPoint) (bytes : Array U8 32#usize)\n (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul_clamped self bytes = ok result ∧\n    MontgomeryPoint.IsValid result := by ...",
+   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)\n (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul_clamped P bytes = ok res ∧\n    MontgomeryPoint.IsValid res ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat bytes) • MontgomeryPoint.toPoint P).y\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulClamped.lean",
    "spec_docstring":
@@ -3607,7 +3607,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul_assign self scalar = ok result ∧\n    MontgomeryPoint.IsValid result ∧\n    montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul self scalar =\n    mul_assign self scalar\n := by ...",
+   "theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul_assign P scalar = ok res ∧\n    MontgomeryPoint.IsValid res ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧\n    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y\n    bytesToField res =(1 + y) * (1 - y)⁻¹\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulAssign.lean",
    "spec_docstring":
@@ -3646,7 +3646,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (self : MontgomeryPoint) (rhs : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul self rhs = ok result ∧\n    (MontgomeryPoint.IsValid result)∧\n    curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul rhs self =\n    mul self rhs\n := by ...",
+   "\ntheorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul P rhs = ok res ∧\n    (MontgomeryPoint.IsValid res) ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y ∧\n    let y : ZMod p  := ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y\n    bytesToField res =(1 + y) * (1 - y)⁻¹\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -3666,7 +3666,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : scalar.Scalar) (point : MontgomeryPoint)\n    (h_is_valid : MontgomeryPoint.IsValid point) :\n    ∃ result,\n    mul scalar point = ok result ∧\n    (MontgomeryPoint.IsValid result) := by ...",
+   "\ntheorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)\n    (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul scalar P = ok res ∧\n    (MontgomeryPoint.IsValid res) ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧\n    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y\n    bytesToField res =(1 + y) * (1 - y)⁻¹\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -3704,7 +3704,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (self : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid self) :\n    ∃ result,\n    mul self scalar = ok result ∧\n    (MontgomeryPoint.IsValid result)\n := by ...",
+   "\ntheorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)\n    (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul P scalar = ok res ∧\n    (MontgomeryPoint.IsValid res) ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧\n    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y\n    bytesToField res =(1 + y) * (1 - y)⁻¹\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements the Montgomery ladder for constant-time scalar multiplication\n- Processes scalar bits from bit 254 down to bit 0 using Algorithm 8 (Costello-Smith 2017)\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]P\n  * If P has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]P), the u-coordinate of the n-fold sum of P on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by P throughout the computation\n  * When the scalar is reduced modulo the group order L, the result corresponds to\n    scalar multiplication in the prime-order subgroup\n  * The result is computed via projective arithmetic and converted back to affine form\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n  * The computation maintains constant-time guarantees: the sequence of operations\n    executed is independent of the scalar bit values (only conditional swaps and\n    unconditional arithmetic operations are performed)\n-/",
@@ -3749,7 +3749,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : scalar.Scalar) (point : MontgomeryPoint)\n     (h_is_valid : MontgomeryPoint.IsValid point) :\n    ∃ result,\n    mul scalar point = ok result ∧\n    (MontgomeryPoint.IsValid result) ∧\n    curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul point scalar =\n    mul scalar point\n    :=by\n  unfold mul\n  progress*",
+   "\ntheorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)\n     (h_is_valid : MontgomeryPoint.IsValid P) :\n    ∃ res,\n    mul scalar P = ok res ∧\n    (MontgomeryPoint.IsValid res) ∧\n    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧\n    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y\n    bytesToField res =(1 + y) * (1 - y)⁻¹\n    :=by\n  unfold mul\n  progress*",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the reverse operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MontgomeryPoint::mul with swapped arguments\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
