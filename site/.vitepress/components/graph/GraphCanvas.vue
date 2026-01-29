@@ -97,6 +97,10 @@ async function initializeAdapter() {
 
   isLoading.value = false
   emit('initialized')
+
+  // Preload ELK layout in background during idle time
+  // This way it's ready when user switches to hierarchical layout
+  adapter.preloadElk?.()
 }
 
 // Watch for theme changes
@@ -158,6 +162,10 @@ function getNodeScreenPosition(nodeId: string): { x: number; y: number } | null 
   return adapter?.getNodeScreenPosition(nodeId) ?? null
 }
 
+function preloadElk() {
+  adapter?.preloadElk?.()
+}
+
 defineExpose({
   fitToView,
   centerOnNode,
@@ -165,7 +173,8 @@ defineExpose({
   resetHighlight,
   runLayout,
   setLayout,
-  getNodeScreenPosition
+  getNodeScreenPosition,
+  preloadElk
 })
 
 onMounted(() => {

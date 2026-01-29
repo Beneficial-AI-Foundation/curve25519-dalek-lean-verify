@@ -265,6 +265,10 @@ async function handleSetLayout(newLayout: LayoutType) {
   await canvasRef.value?.setLayout(newLayout)
 }
 
+function handlePreloadElk() {
+  canvasRef.value?.preloadElk()
+}
+
 async function handleToggleShowGroups() {
   showGroups.value = !showGroups.value
   // Auto-switch to hierarchical layout when enabling groups
@@ -342,6 +346,7 @@ onUnmounted(() => {
       @toggle-fullscreen="handleToggleFullscreen"
       @focus-on-function="handleFocusOn"
       @set-layout="handleSetLayout"
+      @preload-elk="handlePreloadElk"
     />
 
     <div class="graph-main">

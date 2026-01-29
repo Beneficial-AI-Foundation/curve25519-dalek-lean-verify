@@ -59,6 +59,7 @@ const emit = defineEmits<{
   (e: 'reset'): void
   (e: 'toggleFullscreen'): void
   (e: 'focusOnFunction', nodeId: string): void
+  (e: 'preloadElk'): void
 }>()
 
 const showFileDropdown = ref(false)
@@ -262,6 +263,7 @@ function handleToggleShowGroups() {
       <button
         class="control-btn"
         @click="showViewOptions = !showViewOptions"
+        @mouseenter="emit('preloadElk')"
         :class="{ active: showViewOptions }"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

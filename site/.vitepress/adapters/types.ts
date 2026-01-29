@@ -32,6 +32,12 @@ export interface IVisualizationAdapter {
    */
   isInitialized(): boolean
 
+  /**
+   * Preload heavy dependencies (like ELK layout) in the background.
+   * Call after initial render to have them ready when user needs them.
+   */
+  preloadElk?(): void
+
   // ============ Data Management ============
 
   /**

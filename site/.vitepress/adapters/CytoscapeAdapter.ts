@@ -33,11 +33,13 @@ type CytoscapeEdge = any
  */
 export class CytoscapeAdapter implements IVisualizationAdapter {
   private cy: CytoscapeInstance | null = null
+  private cytoscape: any = null  // Store cytoscape constructor for lazy extension registration
   private container: HTMLElement | null = null
   private options: InitOptions = defaultInitOptions
   private groupsVisible: boolean = false
   private currentTheme: 'light' | 'dark' = 'light'
   private currentLayoutType: LayoutType = 'cose-bilkent'
+  private elkLoaded: boolean = false  // Track if ELK extension is loaded
 
   // Event handler cleanup functions
   private cleanupFunctions: (() => void)[] = []
@@ -49,24 +51,19 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     this.options = { ...defaultInitOptions, ...options }
     this.currentTheme = this.options.theme
 
-    // Dynamic import - only load on client
-    const cytoscape = (await import('cytoscape')).default
-    // @ts-ignore - no types for cytoscape-elk
-    const elk = (await import('cytoscape-elk')).default
+    // Dynamic import - only load cytoscape core and the default layout
+    // ELK (~1.4MB) is loaded lazily when user switches to hierarchical layout
+    this.cytoscape = (await import('cytoscape')).default
     // @ts-ignore - no types for cytoscape-cose-bilkent
     const coseBilkent = (await import('cytoscape-cose-bilkent')).default
-    // @ts-ignore - no types for cytoscape-dagre
-    const dagre = (await import('cytoscape-dagre')).default
 
-    // Register layout extensions
-    cytoscape.use(elk)
-    cytoscape.use(coseBilkent)
-    cytoscape.use(dagre)
+    // Register only the default layout (cose-bilkent) on init
+    this.cytoscape.use(coseBilkent)
 
     // Create cytoscape instance
     const borderColor = this.currentTheme === 'dark' ? '#ffffff' : '#374151'
 
-    this.cy = cytoscape({
+    this.cy = this.cytoscape({
       container,
       elements: [],
       style: [
@@ -75,6 +72,35 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
       ],
       minZoom: this.options.minZoom,
       maxZoom: this.options.maxZoom
+    })
+  }
+
+  /**
+   * Lazily load the ELK layout extension when needed.
+   * ELK is ~1.4MB so we defer loading until user actually needs hierarchical layout.
+   */
+  private async ensureElkLoaded(): Promise<void> {
+    if (this.elkLoaded || !this.cytoscape) return
+
+    // @ts-ignore - no types for cytoscape-elk
+    const elk = (await import('cytoscape-elk')).default
+    this.cytoscape.use(elk)
+    this.elkLoaded = true
+  }
+
+  /**
+   * Preload ELK in the background during idle time.
+   * Call this after the graph is displayed to have ELK ready when user needs it.
+   */
+  preloadElk(): void {
+    if (this.elkLoaded || !this.cytoscape) return
+
+    // Use requestIdleCallback if available, otherwise setTimeout
+    const schedulePreload = (window as any).requestIdleCallback || ((cb: () => void) => setTimeout(cb, 1000))
+
+    schedulePreload(() => {
+      // Don't await - let it load in background
+      this.ensureElkLoaded()
     })
   }
 
@@ -497,6 +523,12 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     if (!this.cy) return
 
     this.currentLayoutType = layoutType as LayoutType
+
+    // Lazy-load ELK if needed (saves ~1.4MB on initial load)
+    if (this.currentLayoutType === 'elk') {
+      await this.ensureElkLoaded()
+    }
+
     const layoutConfig = getLayoutConfig(this.currentLayoutType)
 
     // Update edge curve style based on layout type
@@ -514,6 +546,11 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   async runLayout(options?: Partial<LayoutOptions>): Promise<void> {
     if (!this.cy) return
+
+    // Lazy-load ELK if needed
+    if (this.currentLayoutType === 'elk') {
+      await this.ensureElkLoaded()
+    }
 
     // Use current layout type's config
     const baseConfig = getLayoutConfig(this.currentLayoutType)
@@ -549,7 +586,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   }
 
   getAvailableLayouts(): string[] {
-    return ['elk', 'dagre', 'grid', 'circle', 'concentric', 'breadthfirst']
+    return ['cose-bilkent', 'elk']
   }
 
   // ============ Styling ============
