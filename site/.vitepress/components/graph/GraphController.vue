@@ -6,7 +6,7 @@ import { useGraphData } from '../../composables/useGraphData'
 import { useGraphFiltering } from '../../composables/useGraphFiltering'
 import { useGraphStats } from '../../composables/useGraphStats'
 import { useGraphSelection } from '../../composables/useGraphSelection'
-import { getGroupColor } from '../../config/cytoscapeConfig'
+import { getGroupColor, type LayoutType } from '../../config/cytoscapeConfig'
 import GraphCanvas from './GraphCanvas.vue'
 import GraphControls from './GraphControls.vue'
 import InfoPanels from './InfoPanels.vue'
@@ -62,8 +62,8 @@ const {
 
 // View state
 const showGroups = ref(false)
-const showStats = ref(true)
 const isFullscreen = ref(false)
+const layoutType = ref<LayoutType>('cose-bilkent')
 
 // Refs
 const canvasRef = ref<InstanceType<typeof GraphCanvas> | null>(null)
@@ -121,6 +121,15 @@ function handlePanelHover(nodeId: string | null) {
   updateConnectorLine()
 }
 
+// Check if filters are active (affects whether we show stats on groups)
+const hasActiveFilters = computed(() => {
+  // Check if a function is focused
+  if (filterState.focusedFunction) return true
+  // Check if not all source files are enabled
+  if (filterState.enabledSourceFiles.size !== processedData.value.sourceFiles.length) return true
+  return false
+})
+
 // Build file groups for compound nodes
 const fileGroups = computed<FileGroup[]>(() => {
   if (!showGroups.value) return []
@@ -137,7 +146,8 @@ const fileGroups = computed<FileGroup[]>(() => {
     nodesByFile.get(file)!.push(node.id)
   }
 
-  // Build groups
+  // Build groups - only show stats when no filters are active
+  const canShowStats = !hasActiveFilters.value
   let index = 0
   for (const [file, nodeIds] of nodesByFile) {
     const stats = globalStats.value.bySourceFile.get(file)
@@ -145,7 +155,7 @@ const fileGroups = computed<FileGroup[]>(() => {
       const pct = stats.total > 0 ? Math.round((stats.verified / stats.total) * 100) : 0
       groups.push({
         id: `file-${index}`,
-        label: getFileName(file) + (showStats.value ? ` (${stats.verified}/${stats.total}, ${pct}%)` : ''),
+        label: getFileName(file) + (canShowStats ? ` (${stats.verified}/${stats.total}, ${pct}%)` : ''),
         sourceFile: file,
         nodeIds,
         stats,
@@ -230,11 +240,12 @@ function handleReset() {
   setSubgraphMode('all')
   // Reset view options
   showGroups.value = false
-  showStats.value = true
+  layoutType.value = 'cose-bilkent'
   // Clear selection
   clearSelection()
-  // Fit to view
-  setTimeout(() => {
+  // Reset layout and fit to view
+  setTimeout(async () => {
+    await canvasRef.value?.setLayout('cose-bilkent')
     canvasRef.value?.fitToView(30)
   }, 100)
 }
@@ -249,6 +260,46 @@ function handleToggleFullscreen() {
   } else {
     document.exitFullscreen()
   }
+}
+
+async function handleSetLayout(newLayout: LayoutType) {
+  layoutType.value = newLayout
+  await canvasRef.value?.setLayout(newLayout)
+}
+
+async function handleToggleShowGroups() {
+  showGroups.value = !showGroups.value
+  // Auto-switch to hierarchical layout when enabling groups
+  if (showGroups.value && layoutType.value !== 'elk') {
+    layoutType.value = 'elk'
+    await canvasRef.value?.setLayout('elk')
+  }
+}
+
+// Helper to enable groups view with hierarchical layout
+async function enableGroupsView() {
+  if (!showGroups.value) {
+    showGroups.value = true
+    if (layoutType.value !== 'elk') {
+      layoutType.value = 'elk'
+      await canvasRef.value?.setLayout('elk')
+    }
+  }
+}
+
+// Wrapper handlers for source file filtering that auto-enable groups
+async function handleToggleSourceFile(file: string) {
+  toggleSourceFile(file)
+  // Check if we're now filtering (not all files enabled)
+  if (filterState.enabledSourceFiles.size !== processedData.value.sourceFiles.length) {
+    await enableGroupsView()
+  }
+}
+
+async function handleSoloSourceFile(file: string) {
+  soloSourceFile(file)
+  // Solo always results in filtering, so enable groups
+  await enableGroupsView()
 }
 
 function handleFullscreenChange() {
@@ -277,22 +328,22 @@ onUnmounted(() => {
       :focused-function="filterState.focusedFunction"
       :subgraph-mode="filterState.subgraphMode"
       :show-groups="showGroups"
-      :show-stats="showStats"
       :summary-text="filteredSummaryText"
       :is-fullscreen="isFullscreen"
       :all-nodes="processedData.nodes"
-      @toggle-source-file="toggleSourceFile"
+      :layout-type="layoutType"
+      @toggle-source-file="handleToggleSourceFile"
       @enable-all-source-files="enableAllSourceFiles"
-      @solo-source-file="soloSourceFile"
+      @solo-source-file="handleSoloSourceFile"
       @set-subgraph-mode="setSubgraphMode"
       @clear-focus="handleClearFocus"
-      @toggle-show-groups="showGroups = !showGroups"
-      @toggle-show-stats="showStats = !showStats"
+      @toggle-show-groups="handleToggleShowGroups"
       @fit-to-view="handleFitToView"
       @recenter="handleRecenter"
       @reset="handleReset"
       @toggle-fullscreen="handleToggleFullscreen"
       @focus-on-function="handleFocusOn"
+      @set-layout="handleSetLayout"
     />
 
     <div class="graph-main">

@@ -103,8 +103,7 @@ export function createCytoscapeStyles(borderColor: string) {
         'line-color': 'data(color)',
         'target-arrow-color': 'data(color)',
         'target-arrow-shape': 'triangle',
-        'curve-style': 'taxi',
-        'taxi-direction': 'rightward',
+        'curve-style': 'bezier',
         'arrow-scale': 0.8
       }
     },
@@ -197,7 +196,10 @@ export function createCompoundNodeStyles(borderColor: string) {
   ]
 }
 
-// ELK layout configuration - optimized for larger nodes and better spacing
+// Layout type for selection
+export type LayoutType = 'elk' | 'cose-bilkent'
+
+// ELK layout configuration - for grouped view (wider spacing for compound nodes)
 export const elkLayoutConfig = {
   name: 'elk',
   elk: {
@@ -214,6 +216,78 @@ export const elkLayoutConfig = {
   fit: true,
   padding: 50
 }
+
+// ELK Compact layout - tighter spacing for ungrouped view
+export const elkCompactLayoutConfig = {
+  name: 'elk',
+  elk: {
+    algorithm: 'layered',
+    'elk.direction': 'RIGHT',
+    'elk.spacing.nodeNode': 20,
+    'elk.layered.spacing.nodeNodeBetweenLayers': 80,
+    'elk.layered.spacing.edgeEdgeBetweenLayers': 15,
+    'elk.layered.crossingMinimization.strategy': 'LAYER_SWEEP',
+    'elk.layered.nodePlacement.strategy': 'NETWORK_SIMPLEX',
+    'elk.layered.compaction.postCompaction.strategy': 'EDGE_LENGTH'
+  },
+  animate: false,
+  fit: true,
+  padding: 30
+}
+
+// COSE-Bilkent layout - force-directed, creates organic clusters
+export const coseBilkentLayoutConfig = {
+  name: 'cose-bilkent',
+  quality: 'default',
+  nodeDimensionsIncludeLabels: true,
+  refresh: 30,
+  fit: true,
+  padding: 30,
+  randomize: true,  // Use random positions for consistent results when graph changes
+  nodeRepulsion: 6500,
+  idealEdgeLength: 80,
+  edgeElasticity: 0.45,
+  nestingFactor: 0.1,
+  gravity: 0.4,  // Increased to pull isolated nodes closer
+  numIter: 2500,
+  tile: true,
+  animate: false,
+  tilingPaddingVertical: 10,
+  tilingPaddingHorizontal: 10,
+  gravityRangeCompound: 1.5,
+  gravityCompound: 1.0,
+  gravityRange: 4.5  // Increased range for gravity to affect distant nodes
+}
+
+// Dagre layout - hierarchical, more compact than ELK
+export const dagreLayoutConfig = {
+  name: 'dagre',
+  rankDir: 'LR',
+  nodeSep: 30,
+  rankSep: 100,
+  edgeSep: 20,
+  fit: true,
+  padding: 30,
+  animate: false
+}
+
+// Get layout config by type
+export function getLayoutConfig(type: LayoutType) {
+  switch (type) {
+    case 'elk':
+      return elkLayoutConfig
+    case 'cose-bilkent':
+      return coseBilkentLayoutConfig
+    default:
+      return coseBilkentLayoutConfig
+  }
+}
+
+// Layout display names
+export const layoutOptions: { value: LayoutType; label: string }[] = [
+  { value: 'cose-bilkent', label: 'Force-Directed' },
+  { value: 'elk', label: 'Hierarchical' }
+]
 
 // Cytoscape instance options
 export const cytoscapeOptions = {

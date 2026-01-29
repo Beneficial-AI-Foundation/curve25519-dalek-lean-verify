@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, type PropType } from 'vue'
 import type { FileStats, SubgraphMode, GraphNode } from '../../types/graph'
+import { layoutOptions, type LayoutType } from '../../config/cytoscapeConfig'
 
 const props = defineProps({
   sourceFiles: {
@@ -27,10 +28,6 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
-  showStats: {
-    type: Boolean,
-    default: true
-  },
   summaryText: {
     type: String,
     default: ''
@@ -42,6 +39,10 @@ const props = defineProps({
   allNodes: {
     type: Array as PropType<GraphNode[]>,
     default: () => []
+  },
+  layoutType: {
+    type: String as PropType<LayoutType>,
+    default: 'cose-bilkent'
   }
 })
 
@@ -52,7 +53,7 @@ const emit = defineEmits<{
   (e: 'setSubgraphMode', mode: SubgraphMode): void
   (e: 'clearFocus'): void
   (e: 'toggleShowGroups'): void
-  (e: 'toggleShowStats'): void
+  (e: 'setLayout', layoutType: LayoutType): void
   (e: 'fitToView'): void
   (e: 'recenter'): void
   (e: 'reset'): void
@@ -126,6 +127,27 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
   { value: 'dependencies', label: 'Dependencies Only' },
   { value: 'dependents', label: 'Dependents Only' }
 ]
+
+// Handlers that auto-close menus
+function handleSelectAll() {
+  emit('enableAllSourceFiles')
+  showFileDropdown.value = false
+}
+
+function handleSoloFile(file: string) {
+  emit('soloSourceFile', file)
+  showFileDropdown.value = false
+}
+
+function handleSetLayout(layout: LayoutType) {
+  emit('setLayout', layout)
+  showViewOptions.value = false
+}
+
+function handleToggleShowGroups() {
+  emit('toggleShowGroups')
+  showViewOptions.value = false
+}
 </script>
 
 <template>
@@ -148,7 +170,7 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
 
       <div v-if="showFileDropdown" class="dropdown-menu file-dropdown">
         <div class="dropdown-header">
-          <button class="link-btn" @click="emit('enableAllSourceFiles')">Select All</button>
+          <button class="link-btn" @click="handleSelectAll">Select All</button>
         </div>
         <div class="dropdown-items">
           <label
@@ -167,7 +189,7 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
             </span>
             <button
               class="solo-btn"
-              @click.prevent.stop="emit('soloSourceFile', file)"
+              @click.prevent.stop="handleSoloFile(file)"
               title="Show only this file"
             >
               solo
@@ -211,10 +233,9 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
 
     <!-- Focus mode indicator -->
     <div v-if="focusedFunction" class="control-group">
-      <div class="control-btn focus-btn">
+      <div class="control-btn">
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="11" cy="11" r="8"/>
-          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
         </svg>
         <span class="focus-name">{{ focusedFunction.split('.').pop() }}</span>
         <select
@@ -251,21 +272,33 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
       </button>
 
       <div v-if="showViewOptions" class="dropdown-menu view-dropdown">
+        <div class="dropdown-section">
+          <span class="section-label">Layout</span>
+          <div class="layout-options">
+            <label
+              v-for="layout in layoutOptions"
+              :key="layout.value"
+              class="layout-option"
+              :class="{ active: layoutType === layout.value }"
+            >
+              <input
+                type="radio"
+                :value="layout.value"
+                :checked="layoutType === layout.value"
+                @change="handleSetLayout(layout.value)"
+              />
+              <span>{{ layout.label }}</span>
+            </label>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
         <label class="toggle-item">
           <input
             type="checkbox"
             :checked="showGroups"
-            @change="emit('toggleShowGroups')"
+            @change="handleToggleShowGroups"
           />
           <span>Group by file</span>
-        </label>
-        <label class="toggle-item">
-          <input
-            type="checkbox"
-            :checked="showStats"
-            @change="emit('toggleShowStats')"
-          />
-          <span>Show stats on groups</span>
         </label>
       </div>
     </div>
@@ -442,6 +475,56 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
 
 .view-dropdown {
   padding: 0.5rem;
+  min-width: 180px;
+}
+
+.dropdown-section {
+  margin-bottom: 0.25rem;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--vp-c-text-3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.5rem;
+}
+
+.layout-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.layout-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.375rem 0.5rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  border-radius: 4px;
+}
+
+.layout-option:hover {
+  background: var(--vp-c-bg-soft);
+}
+
+.layout-option.active {
+  background: var(--vp-c-brand-soft);
+  color: var(--vp-c-brand-1);
+}
+
+.layout-option input[type="radio"] {
+  margin: 0;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--vp-c-divider);
+  margin: 0.5rem 0;
 }
 
 .toggle-item {
@@ -462,14 +545,8 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
   margin: 0;
 }
 
-.focus-btn {
-  background: var(--vp-c-brand-soft);
-  border-color: var(--vp-c-brand-1);
-}
-
 .focus-name {
   font-weight: 600;
-  color: var(--vp-c-brand-1);
   max-width: 120px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -477,26 +554,27 @@ const subgraphModes: { value: SubgraphMode; label: string }[] = [
 }
 
 .mode-select {
-  padding: 0.25rem 0.375rem;
+  padding: 0 0.25rem;
   font-size: 0.75rem;
+  line-height: 1.2;
   border: 1px solid var(--vp-c-divider);
   border-radius: 4px;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
   cursor: pointer;
+  height: 1.25rem;
 }
 
 .clear-focus-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.125rem;
+  padding: 0;
   background: none;
   border: none;
   color: var(--vp-c-text-2);
   cursor: pointer;
   border-radius: 3px;
-  margin-left: 0.125rem;
 }
 
 .clear-focus-btn:hover {

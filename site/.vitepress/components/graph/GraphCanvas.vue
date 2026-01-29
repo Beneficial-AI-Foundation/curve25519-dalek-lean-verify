@@ -147,6 +147,10 @@ async function runLayout() {
   await adapter?.runLayout()
 }
 
+async function setLayout(layoutType: string) {
+  await adapter?.setLayout(layoutType)
+}
+
 function getNodeScreenPosition(nodeId: string): { x: number; y: number } | null {
   return adapter?.getNodeScreenPosition(nodeId) ?? null
 }
@@ -157,6 +161,7 @@ defineExpose({
   highlightConnections,
   resetHighlight,
   runLayout,
+  setLayout,
   getNodeScreenPosition
 })
 

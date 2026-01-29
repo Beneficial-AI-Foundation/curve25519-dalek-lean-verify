@@ -139,6 +139,11 @@ export interface IVisualizationAdapter {
   // ============ Layout ============
 
   /**
+   * Set and run a specific layout type
+   */
+  setLayout(layoutType: string): Promise<void>
+
+  /**
    * Run layout algorithm
    */
   runLayout(options?: Partial<LayoutOptions>): Promise<void>

@@ -15,12 +15,12 @@ import type {
   NodeHoverEvent
 } from '../types/graph'
 import {
-  nodeColors,
   edgeColors,
   getNodeColorByStatus,
   createCytoscapeStyles,
   createCompoundNodeStyles,
-  elkLayoutConfig
+  getLayoutConfig,
+  type LayoutType
 } from '../config/cytoscapeConfig'
 
 type CytoscapeInstance = any
@@ -37,6 +37,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   private options: InitOptions = defaultInitOptions
   private groupsVisible: boolean = false
   private currentTheme: 'light' | 'dark' = 'light'
+  private currentLayoutType: LayoutType = 'cose-bilkent'
 
   // Event handler cleanup functions
   private cleanupFunctions: (() => void)[] = []
@@ -52,9 +53,15 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     const cytoscape = (await import('cytoscape')).default
     // @ts-ignore - no types for cytoscape-elk
     const elk = (await import('cytoscape-elk')).default
+    // @ts-ignore - no types for cytoscape-cose-bilkent
+    const coseBilkent = (await import('cytoscape-cose-bilkent')).default
+    // @ts-ignore - no types for cytoscape-dagre
+    const dagre = (await import('cytoscape-dagre')).default
 
-    // Register ELK layout
+    // Register layout extensions
     cytoscape.use(elk)
+    cytoscape.use(coseBilkent)
+    cytoscape.use(dagre)
 
     // Create cytoscape instance
     const borderColor = this.currentTheme === 'dark' ? '#ffffff' : '#374151'
@@ -486,19 +493,14 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   // ============ Layout ============
 
-  async runLayout(options?: Partial<LayoutOptions>): Promise<void> {
+  async setLayout(layoutType: string): Promise<void> {
     if (!this.cy) return
 
-    const layoutConfig = {
-      ...elkLayoutConfig,
-      elk: {
-        ...elkLayoutConfig.elk,
-        ...(options?.direction && { 'elk.direction': options.direction }),
-        ...(options?.nodeSpacing && { 'elk.spacing.nodeNode': options.nodeSpacing }),
-        ...(options?.layerSpacing && { 'elk.layered.spacing.nodeNodeBetweenLayers': options.layerSpacing })
-      },
-      animate: options?.animate ?? false
-    }
+    this.currentLayoutType = layoutType as LayoutType
+    const layoutConfig = getLayoutConfig(this.currentLayoutType)
+
+    // Update edge curve style based on layout type
+    this.updateEdgeCurveStyle()
 
     return new Promise((resolve) => {
       const layout = this.cy!.layout(layoutConfig)
@@ -507,6 +509,42 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
         resolve()
       })
       layout.run()
+    })
+  }
+
+  async runLayout(options?: Partial<LayoutOptions>): Promise<void> {
+    if (!this.cy) return
+
+    // Use current layout type's config
+    const baseConfig = getLayoutConfig(this.currentLayoutType)
+    const layoutConfig = {
+      ...baseConfig,
+      animate: options?.animate ?? false
+    }
+
+    // Update edge curve style based on layout type
+    this.updateEdgeCurveStyle()
+
+    return new Promise((resolve) => {
+      const layout = this.cy!.layout(layoutConfig)
+      layout.on('layoutstop', () => {
+        this.fitToView()
+        resolve()
+      })
+      layout.run()
+    })
+  }
+
+  private updateEdgeCurveStyle(): void {
+    if (!this.cy) return
+
+    // Use bezier curves for force-directed, taxi for hierarchical
+    const curveStyle = this.currentLayoutType === 'cose-bilkent' ? 'bezier' : 'taxi'
+    const taxiDirection = this.currentLayoutType === 'cose-bilkent' ? undefined : 'rightward'
+
+    this.cy.edges().style({
+      'curve-style': curveStyle,
+      'taxi-direction': taxiDirection
     })
   }
 
