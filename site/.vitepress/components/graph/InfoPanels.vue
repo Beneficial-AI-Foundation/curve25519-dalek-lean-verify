@@ -189,7 +189,7 @@ async function copyToClipboard(text: string) {
 
         <!-- Expand hint -->
         <div class="expand-hint" @click="toggleExpanded(node.id)">
-          <span v-if="!isExpanded(node.id)">Tap for details</span>
+          <span v-if="!isExpanded(node.id)">Details</span>
           <span v-else>Hide details</span>
           <svg
             xmlns="http://www.w3.org/2000/svg"
