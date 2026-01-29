@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, type PropType } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, type PropType } from 'vue'
 import type { IVisualizationAdapter } from '../../adapters/types'
 import { createVisualizationAdapter, type AdapterType } from '../../adapters/types'
 import type { GraphNode, GraphEdge, FileGroup, NodeClickEvent, NodeHoverEvent } from '../../types/graph'
@@ -44,6 +44,9 @@ const emit = defineEmits<{
 const container = ref<HTMLElement | null>(null)
 const isLoading = ref(true)
 let adapter: IVisualizationAdapter | null = null
+
+// For loading indicator
+const nodeCount = computed(() => props.nodes.length)
 
 // Cleanup functions for event handlers
 const cleanupFns: (() => void)[] = []
@@ -181,7 +184,26 @@ onUnmounted(() => {
   <div class="graph-canvas-wrapper">
     <div ref="container" class="graph-canvas">
       <div v-if="isLoading" class="loading-overlay">
-        <span>Loading graph...</span>
+        <div class="loading-content">
+          <div class="loading-graph-animation">
+            <svg viewBox="0 0 120 80" class="loading-svg">
+              <!-- Nodes -->
+              <circle cx="20" cy="40" r="8" class="loading-node node-1" />
+              <circle cx="60" cy="20" r="8" class="loading-node node-2" />
+              <circle cx="60" cy="60" r="8" class="loading-node node-3" />
+              <circle cx="100" cy="40" r="8" class="loading-node node-4" />
+              <!-- Edges -->
+              <line x1="28" y1="37" x2="52" y2="23" class="loading-edge edge-1" />
+              <line x1="28" y1="43" x2="52" y2="57" class="loading-edge edge-2" />
+              <line x1="68" y1="23" x2="92" y2="37" class="loading-edge edge-3" />
+              <line x1="68" y1="57" x2="92" y2="43" class="loading-edge edge-4" />
+            </svg>
+          </div>
+          <div class="loading-text">
+            <span class="loading-title">Building dependency graph</span>
+            <span class="loading-subtitle">Preparing {{ nodeCount }} functions...</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -211,5 +233,81 @@ onUnmounted(() => {
   justify-content: center;
   background: var(--vp-c-bg);
   color: var(--vp-c-text-2);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.loading-graph-animation {
+  width: 160px;
+  height: 110px;
+}
+
+.loading-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.loading-node {
+  fill: var(--vp-c-brand-1);
+  opacity: 0.3;
+  animation: pulse-node 1.5s ease-in-out infinite;
+}
+
+.loading-node.node-1 { animation-delay: 0s; }
+.loading-node.node-2 { animation-delay: 0.2s; }
+.loading-node.node-3 { animation-delay: 0.4s; }
+.loading-node.node-4 { animation-delay: 0.6s; }
+
+.loading-edge {
+  stroke: var(--vp-c-text-3);
+  stroke-width: 2;
+  stroke-linecap: round;
+  opacity: 0.2;
+  animation: pulse-edge 1.5s ease-in-out infinite;
+}
+
+.loading-edge.edge-1 { animation-delay: 0.1s; }
+.loading-edge.edge-2 { animation-delay: 0.3s; }
+.loading-edge.edge-3 { animation-delay: 0.5s; }
+.loading-edge.edge-4 { animation-delay: 0.7s; }
+
+@keyframes pulse-node {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes pulse-edge {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.7; }
+}
+
+.loading-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.loading-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.loading-subtitle {
+  font-size: 0.875rem;
+  color: var(--vp-c-text-3);
+  font-family: var(--vp-font-family-mono);
 }
 </style>
