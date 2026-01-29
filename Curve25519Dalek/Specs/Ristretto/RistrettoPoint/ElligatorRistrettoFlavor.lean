@@ -50,7 +50,7 @@ theorem elligator_ristretto_flavor_spec
 
   ∃ rist, elligator_ristretto_flavor s = ok rist ∧
 
-  -- Note that validity here also implicitly guarantees the (correct but not entirely trivial) property that the elligator map only generates even Edwards points
+  -- Note that validity here also implicitly guarantees the (correct but not immediately obvious) property that the elligator map only generates even Edwards points
   rist.IsValid
 
   := by
@@ -58,7 +58,7 @@ theorem elligator_ristretto_flavor_spec
   sorry
 
   /-
-  Note: An optional but potentially desirable extension of this spec theorem may be to
+  Note: An optional, potentially desirable extension of this spec theorem may be to
   define a purely mathematical version f_ell of the elligator map in Representation.lean
   that maps mathematical field elements to even Edwards points and then subsequently
   show that f_ell(s.toField) = rist.toPoint.
