@@ -17,7 +17,7 @@ async function preloadCytoscapeCore(): Promise<void> {
     // These imports will be cached by the browser for when deps page loads
     await Promise.all([
       import('cytoscape'),
-      import('cytoscape-cose-bilkent')
+      import('cytoscape-fcose')
     ])
     cytoscapeLoaded = true
   } catch (e) {

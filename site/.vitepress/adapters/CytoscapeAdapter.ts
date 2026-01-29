@@ -38,7 +38,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   private options: InitOptions = defaultInitOptions
   private groupsVisible: boolean = false
   private currentTheme: 'light' | 'dark' = 'light'
-  private currentLayoutType: LayoutType = 'cose-bilkent'
+  private currentLayoutType: LayoutType = 'fcose'
   private elkLoaded: boolean = false  // Track if ELK extension is loaded
 
   // Event handler cleanup functions
@@ -46,6 +46,10 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   // Elastic drag state (only active in force-directed layout)
   private elasticDragEnabled: boolean = true
+
+  // Layout state - prevent concurrent layouts
+  private layoutRunning: boolean = false
+  private pendingLayoutResolve: (() => void) | null = null
 
   // ============ Lifecycle ============
 
@@ -57,11 +61,11 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     // Dynamic import - only load cytoscape core and the default layout
     // ELK (~1.4MB) is loaded lazily when user switches to hierarchical layout
     this.cytoscape = (await import('cytoscape')).default
-    // @ts-ignore - no types for cytoscape-cose-bilkent
-    const coseBilkent = (await import('cytoscape-cose-bilkent')).default
+    // @ts-ignore - no types for cytoscape-fcose
+    const fcose = (await import('cytoscape-fcose')).default
 
-    // Register only the default layout (cose-bilkent) on init
-    this.cytoscape.use(coseBilkent)
+    // Register only the default layout (fcose) on init
+    this.cytoscape.use(fcose)
 
     // Create cytoscape instance
     const borderColor = this.currentTheme === 'dark' ? '#ffffff' : '#374151'
@@ -83,7 +87,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   /**
    * Set up elastic drag behavior - connected nodes move proportionally when dragging.
-   * Only active in force-directed layout (cose-bilkent), not hierarchical (elk).
+   * Only active in force-directed layout (fcose), not hierarchical (elk).
    */
   private setupElasticDrag(): void {
     if (!this.cy || !this.elasticDragEnabled) return
@@ -95,7 +99,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
     const onGrab = (e: any) => {
       // Only enable elastic drag in force-directed layout
-      if (this.currentLayoutType !== 'cose-bilkent') return
+      if (this.currentLayoutType !== 'fcose') return
 
       const node = e.target
       if (!node.isNode() || node.data('isGroup')) return
@@ -129,7 +133,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     }
 
     const onDrag = () => {
-      if (!draggedNode || !dragStartPos || this.currentLayoutType !== 'cose-bilkent') return
+      if (!draggedNode || !dragStartPos || this.currentLayoutType !== 'fcose') return
 
       const currentPos = draggedNode.position()
       const dx = currentPos.x - dragStartPos.x
@@ -249,94 +253,92 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   }
 
   /**
-   * Run layout, then scatter nodes and animate them back to final positions.
-   * This gives a nice "converge from chaos" effect.
+   * Run initial layout with scatter-to-converge animation.
+   * We manually scatter nodes across the viewport first, then run fcose
+   * with randomize:false to animate from our scattered positions.
    */
   private async runLayoutWithScatterAnimation(): Promise<void> {
     if (!this.cy) return
+
+    // If a layout is already running, stop it first
+    if (this.layoutRunning) {
+      this.cy.stop()
+      if (this.pendingLayoutResolve) {
+        this.pendingLayoutResolve()
+        this.pendingLayoutResolve = null
+      }
+    }
+
+    this.layoutRunning = true
 
     // Lazy-load ELK if needed
     if (this.currentLayoutType === 'elk') {
       await this.ensureElkLoaded()
     }
 
-    const baseConfig = getLayoutConfig(this.currentLayoutType)
-
     // Update edge curve style based on layout type
     this.updateEdgeCurveStyle()
 
-    // Step 1: Run layout instantly to compute final positions
-    const layoutConfig = {
-      ...baseConfig,
-      animate: false
+    // Get layout config
+    const baseConfig = getLayoutConfig(this.currentLayoutType)
+
+    // For fcose: manually scatter nodes across viewport, then animate to final positions
+    if (this.currentLayoutType === 'fcose' && this.container) {
+      const rect = this.container.getBoundingClientRect()
+      const width = rect.width || 800
+      const height = rect.height || 600
+      const padding = 50
+
+      // Scatter nodes randomly across the viewport area
+      const nonGroupNodes = this.cy.nodes('[!isGroup]')
+      nonGroupNodes.forEach((node: CytoscapeNode) => {
+        node.position({
+          x: padding + Math.random() * (width - 2 * padding),
+          y: padding + Math.random() * (height - 2 * padding)
+        })
+      })
+
+      // Run fcose with randomize:false so it uses our scattered positions
+      // Disable fit to prevent viewport jump at end - we'll fit smoothly after
+      const layoutConfig = {
+        ...baseConfig,
+        randomize: false,  // Use our manually scattered positions
+        fit: false         // Don't snap viewport at end
+      }
+
+      return new Promise((resolve) => {
+        this.pendingLayoutResolve = resolve
+        const layout = this.cy!.layout(layoutConfig)
+        layout.on('layoutstop', () => {
+          this.layoutRunning = false
+          this.pendingLayoutResolve = null
+          // Smoothly animate to fit the final layout
+          this.cy!.animate({
+            fit: { eles: this.cy!.elements(), padding: 30 }
+          }, {
+            duration: 300,
+            easing: 'ease-out',
+            complete: () => resolve()
+          })
+        })
+        layout.run()
+      })
     }
 
-    await new Promise<void>((resolve) => {
-      const layout = this.cy!.layout(layoutConfig)
-      layout.on('layoutstop', () => resolve())
+    // For ELK or other layouts, run normally
+    return new Promise((resolve) => {
+      this.pendingLayoutResolve = resolve
+      const layout = this.cy!.layout(baseConfig)
+      layout.on('layoutstop', () => {
+        this.layoutRunning = false
+        this.pendingLayoutResolve = null
+        if (this.currentLayoutType === 'elk') {
+          this.fitToView()
+        }
+        resolve()
+      })
       layout.run()
     })
-
-    // Step 2: Store final positions and calculate final viewport
-    const finalPositions = new Map<string, { x: number; y: number }>()
-    const nonGroupNodes = this.cy.nodes('[!isGroup]')
-
-    nonGroupNodes.forEach((node: CytoscapeNode) => {
-      finalPositions.set(node.id(), { ...node.position() })
-    })
-
-    // Calculate the final viewport (what fitToView would set)
-    this.cy.fit(undefined, 30)
-    const finalZoom = this.cy.zoom()
-    const finalPan = { ...this.cy.pan() }
-
-    // Get the bounding box of the final layout
-    const bb = nonGroupNodes.boundingBox()
-    const width = bb.w || 800
-    const height = bb.h || 600
-    const centerX = (bb.x1 + bb.x2) / 2
-    const centerY = (bb.y1 + bb.y2) / 2
-
-    // Step 3: Scatter nodes randomly within the bounding box area
-    nonGroupNodes.forEach((node: CytoscapeNode) => {
-      node.position({
-        x: centerX + (Math.random() - 0.5) * width * 1.5,
-        y: centerY + (Math.random() - 0.5) * height * 1.5
-      })
-    })
-
-    // Fit to show scattered state
-    this.cy.fit(undefined, 30)
-
-    // Step 4: Animate nodes AND viewport together
-    const animationDuration = 800
-
-    // Animate viewport to final state
-    this.cy.animate({
-      zoom: finalZoom,
-      pan: finalPan
-    }, {
-      duration: animationDuration,
-      easing: 'ease-out-cubic'
-    })
-
-    // Animate each node to its final position
-    const nodeAnimations: Promise<void>[] = []
-    nonGroupNodes.forEach((node: CytoscapeNode) => {
-      const finalPos = finalPositions.get(node.id())
-      if (finalPos) {
-        nodeAnimations.push(
-          node.animation({
-            position: finalPos,
-            duration: animationDuration,
-            easing: 'ease-out-cubic'
-          }).play().promise()
-        )
-      }
-    })
-
-    // Wait for node animations to complete
-    await Promise.all(nodeAnimations)
   }
 
   private getEdgeColor(nodes: GraphNode[], targetId: string): string {
@@ -568,9 +570,18 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   // ============ View Control ============
 
-  fitToView(padding: number = 30): void {
+  fitToView(padding: number = 30, animate: boolean = false): void {
     if (!this.cy) return
-    this.cy.fit(undefined, padding)
+    if (animate) {
+      this.cy.animate({
+        fit: { eles: this.cy.elements(), padding }
+      }, {
+        duration: 300,
+        easing: 'ease-out'
+      })
+    } else {
+      this.cy.fit(undefined, padding)
+    }
   }
 
   centerOnNode(nodeId: string, zoom?: number): void {
@@ -702,10 +713,15 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   // ============ Layout ============
 
-  async setLayout(layoutType: string): Promise<void> {
+  async setLayout(layoutType: string, options?: { scatter?: boolean }): Promise<void> {
     if (!this.cy) return
 
     this.currentLayoutType = layoutType as LayoutType
+
+    // If scatter animation requested, use the scatter animation method
+    if (options?.scatter && this.currentLayoutType === 'fcose') {
+      return this.runLayoutWithScatterAnimation()
+    }
 
     // Lazy-load ELK if needed (saves ~1.4MB on initial load)
     if (this.currentLayoutType === 'elk') {
@@ -720,7 +736,10 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     return new Promise((resolve) => {
       const layout = this.cy!.layout(layoutConfig)
       layout.on('layoutstop', () => {
-        this.fitToView()
+        // fcose with fit:true already fits, only call for elk
+        if (this.currentLayoutType === 'elk') {
+          this.fitToView()
+        }
         resolve()
       })
       layout.run()
@@ -748,7 +767,10 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     return new Promise((resolve) => {
       const layout = this.cy!.layout(layoutConfig)
       layout.on('layoutstop', () => {
-        this.fitToView()
+        // fcose with fit:true already fits, only call for elk
+        if (this.currentLayoutType === 'elk') {
+          this.fitToView()
+        }
         resolve()
       })
       layout.run()
@@ -759,8 +781,8 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
     if (!this.cy) return
 
     // Use bezier curves for force-directed, taxi for hierarchical
-    const curveStyle = this.currentLayoutType === 'cose-bilkent' ? 'bezier' : 'taxi'
-    const taxiDirection = this.currentLayoutType === 'cose-bilkent' ? undefined : 'rightward'
+    const curveStyle = this.currentLayoutType === 'fcose' ? 'bezier' : 'taxi'
+    const taxiDirection = this.currentLayoutType === 'fcose' ? undefined : 'rightward'
 
     this.cy.edges().style({
       'curve-style': curveStyle,
@@ -769,7 +791,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
   }
 
   getAvailableLayouts(): string[] {
-    return ['cose-bilkent', 'elk']
+    return ['fcose', 'elk']
   }
 
   // ============ Styling ============

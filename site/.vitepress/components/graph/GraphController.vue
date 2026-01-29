@@ -63,7 +63,7 @@ const {
 // View state
 const showGroups = ref(false)
 const isFullscreen = ref(false)
-const layoutType = ref<LayoutType>('cose-bilkent')
+const layoutType = ref<LayoutType>('fcose')
 
 // Refs
 const canvasRef = ref<InstanceType<typeof GraphCanvas> | null>(null)
@@ -229,7 +229,7 @@ function handleFitToView() {
 }
 
 function handleRecenter() {
-  canvasRef.value?.fitToView(30)
+  canvasRef.value?.fitToView(30, true)
 }
 
 function handleReset() {
@@ -239,14 +239,14 @@ function handleReset() {
   setSubgraphMode('all')
   // Reset view options
   showGroups.value = false
-  layoutType.value = 'cose-bilkent'
+  layoutType.value = 'fcose'
   // Clear selection
   clearSelection()
-  // Reset layout and fit to view
+  // Run scatter animation - setLayout with scatter:true will skip the data watcher
+  // to prevent double animation from filter changes
   setTimeout(async () => {
-    await canvasRef.value?.setLayout('cose-bilkent')
-    canvasRef.value?.fitToView(30)
-  }, 100)
+    await canvasRef.value?.setLayout('fcose', { scatter: true })
+  }, 50)
 }
 
 function handleToggleFullscreen() {

@@ -45,6 +45,13 @@ const container = ref<HTMLElement | null>(null)
 const isLoading = ref(true)
 let adapter: IVisualizationAdapter | null = null
 
+// Track if we just initialized to skip first watcher trigger
+let justInitialized = false
+
+// Track if a scatter layout is being triggered externally (e.g., reset button)
+// to prevent watcher from also triggering setData
+let skipNextDataWatch = false
+
 // For loading indicator
 const nodeCount = computed(() => props.nodes.length)
 
@@ -98,6 +105,11 @@ async function initializeAdapter() {
   isLoading.value = false
   emit('initialized')
 
+  // Mark as just initialized - watchers will skip their first trigger
+  justInitialized = true
+  // Reset after a tick to allow watchers to see the flag
+  setTimeout(() => { justInitialized = false }, 0)
+
   // Preload ELK layout in background during idle time
   // This way it's ready when user switches to hierarchical layout
   adapter.preloadElk?.()
@@ -110,15 +122,21 @@ useThemeWatcher(() => {
   }
 })
 
-// Watch for data changes
+// Watch for data changes - skip if we just initialized or if scatter layout pending
 watch([() => props.nodes, () => props.edges], () => {
+  if (justInitialized) return
+  if (skipNextDataWatch) {
+    skipNextDataWatch = false
+    return
+  }
   if (adapter?.isInitialized()) {
     adapter.setData(props.nodes, props.edges)
   }
 }, { deep: true })
 
-// Watch for group changes
+// Watch for group changes - skip if we just initialized
 watch([() => props.groups, () => props.showGroups], () => {
+  if (justInitialized) return
   if (adapter?.isInitialized()) {
     adapter.setGroupsVisible(props.showGroups)
     // Always call setGroups - it handles hiding/showing internally
@@ -134,8 +152,8 @@ watch(() => props.selectedNodeIds, (newIds) => {
 }, { deep: true })
 
 // Expose adapter methods for parent component
-function fitToView(padding?: number) {
-  adapter?.fitToView(padding)
+function fitToView(padding?: number, animate?: boolean) {
+  adapter?.fitToView(padding, animate)
 }
 
 function centerOnNode(nodeId: string, zoom?: number) {
@@ -154,8 +172,12 @@ async function runLayout() {
   await adapter?.runLayout()
 }
 
-async function setLayout(layoutType: string) {
-  await adapter?.setLayout(layoutType)
+async function setLayout(layoutType: string, options?: { scatter?: boolean }) {
+  // If scatter is requested, skip the next data watch to prevent double animation
+  if (options?.scatter) {
+    skipNextDataWatch = true
+  }
+  await adapter?.setLayout(layoutType, options)
 }
 
 function getNodeScreenPosition(nodeId: string): { x: number; y: number } | null {

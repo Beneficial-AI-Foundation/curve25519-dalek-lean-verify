@@ -92,8 +92,9 @@ export interface IVisualizationAdapter {
 
   /**
    * Fit all visible elements in view
+   * @param animate - If true, smoothly animate to fit
    */
-  fitToView(padding?: number): void
+  fitToView(padding?: number, animate?: boolean): void
 
   /**
    * Center view on specific node
@@ -146,8 +147,9 @@ export interface IVisualizationAdapter {
 
   /**
    * Set and run a specific layout type
+   * @param options.scatter - If true, scatter nodes first then animate to final positions
    */
-  setLayout(layoutType: string): Promise<void>
+  setLayout(layoutType: string, options?: { scatter?: boolean }): Promise<void>
 
   /**
    * Run layout algorithm

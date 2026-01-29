@@ -180,7 +180,7 @@ export function createCompoundNodeStyles(borderColor: string) {
 }
 
 // Layout type for selection
-export type LayoutType = 'elk' | 'cose-bilkent'
+export type LayoutType = 'elk' | 'fcose'
 
 // ELK layout configuration - for grouped view (wider spacing for compound nodes)
 export const elkLayoutConfig = {
@@ -200,28 +200,31 @@ export const elkLayoutConfig = {
   padding: 50
 }
 
-// COSE-Bilkent layout - force-directed, creates organic clusters
-export const coseBilkentLayoutConfig = {
-  name: 'cose-bilkent',
+// fCoSE layout - fast force-directed with smooth animation support
+export const fcoseLayoutConfig = {
+  name: 'fcose',
   quality: 'default',
   nodeDimensionsIncludeLabels: true,
-  refresh: 30,
   fit: true,
   padding: 30,
-  randomize: true,  // Use random positions for consistent results when graph changes
+  // Animation settings - fcose has native support for smooth scatter → converge
+  randomize: true,
+  animate: true,
+  animationDuration: 800,
+  animationEasing: 'ease-out',
+  // Force-directed parameters
   nodeRepulsion: 6500,
   idealEdgeLength: 80,
   edgeElasticity: 0.45,
   nestingFactor: 0.1,
-  gravity: 0.4,  // Increased to pull isolated nodes closer
-  numIter: 2500,
-  tile: true,
-  animate: false,
-  tilingPaddingVertical: 10,
-  tilingPaddingHorizontal: 10,
+  gravity: 0.4,
+  gravityRange: 4.5,
   gravityRangeCompound: 1.5,
   gravityCompound: 1.0,
-  gravityRange: 4.5  // Increased range for gravity to affect distant nodes
+  numIter: 2500,
+  tile: true,
+  tilingPaddingVertical: 10,
+  tilingPaddingHorizontal: 10
 }
 
 // Get layout config by type
@@ -229,16 +232,16 @@ export function getLayoutConfig(type: LayoutType) {
   switch (type) {
     case 'elk':
       return elkLayoutConfig
-    case 'cose-bilkent':
-      return coseBilkentLayoutConfig
+    case 'fcose':
+      return fcoseLayoutConfig
     default:
-      return coseBilkentLayoutConfig
+      return fcoseLayoutConfig
   }
 }
 
 // Layout display names
 export const layoutOptions: { value: LayoutType; label: string }[] = [
-  { value: 'cose-bilkent', label: 'Force-Directed' },
+  { value: 'fcose', label: 'Force-Directed' },
   { value: 'elk', label: 'Hierarchical' }
 ]
 
