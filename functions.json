@@ -4073,11 +4073,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n  (r_0 : backend.serial.u64.field.FieldElement51)\n  (h_r_0_bounds : ∀ i, i < 5 → (r_0[i]!).val < 2 ^ 54) :\n  ∃ rist,\n    elligator_ristretto_flavor r_0 = ok rist ∧\n    rist.IsValid := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid)\n    (h_s_canonical : Field51_as_Nat s < p) :\n\n  ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n\n  -- Note that validity here also implicitly guarantees the (correct but not immediately obvious) property that the elligator map only generates even Edwards points\n  rist.IsValid\n\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all field element inputs\n• Given an input field element r₀, the output RistrettoPoint indeed lies on the Curve25519 Edwards curve, i.e.,\n  it indeed fulfils the curve equation.\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid, canonical field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
