@@ -47,7 +47,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2KNew
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
