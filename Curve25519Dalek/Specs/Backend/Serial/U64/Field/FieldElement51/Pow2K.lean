@@ -466,6 +466,16 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
 
   -- Stage 2: After carry propagation (l.532 of source code)
 
+  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0_bound
+  have hc11_bound : c11.val < 2 ^ 115 := by sorry
+  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
+  have hc21_bound : c21.val < 2 ^ 115 := by sorry
+  have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
+  have hc31_bound : c31.val < 2 ^ 115 := by sorry
+  have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
+  have hc41_bound : c41.val < 2 ^ 115 := by sorry
+  have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
+
   /-
   Define intermediate carry-propagated values:
   c1' = c1 + ⌈c0⌉₅₁
@@ -482,46 +492,26 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   carry = ⌈c4'⌉₅₁
   -/
 
-  -- The carries fit in U64 (no truncation in the casts) - follows from Stage 1 bounds
-  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0_bound
-
   -- c11 = c1 + carry from c0
   have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
     simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
       UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-
-  -- Bound on c11 (needed for next carry)
-  have hc11_bound : c11.val < 2 ^ 115 := by sorry
-
-  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
-
   -- c21 = c2 + carry from c11
   have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
     simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
       UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-
-  have hc21_bound : c21.val < 2 ^ 115 := by sorry
-  have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
-
   -- c31 = c3 + carry from c21
   have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
     simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
       UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-
-  have hc31_bound : c31.val < 2 ^ 115 := by sorry
-  have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
-
   -- c41 = c4 + carry from c31
   have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
     simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
       UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-
-  have hc41_bound : c41.val < 2 ^ 115 := by sorry
-  have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
 
   -- Array values after carry propagation
   have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
@@ -529,21 +519,10 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by sorry
   have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by sorry
   have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by sorry
-
   have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
     simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
       Nat.shiftRight_eq_div_pow]
     omega
-
-  have hcarry : 2^51 + 19 * carry.val < 2^64 := by
-    -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
-    -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
-    -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
-    -- apply carry_mul_bound
-    -- simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
-        -- i50_post_1, Nat.shiftRight_eq_div_pow]
-    sorry -- Requires detailed carry chain bound tracking
-
 
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
