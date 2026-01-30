@@ -271,8 +271,10 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   have := ha 2 (by simp)
   have := ha 3 (by simp)
   have := ha 4 (by simp)
-  -- Using `progress*?` in order to run progress until a certain point in the implementation
-  simp only [progress_simps]
+  -- The while loop condition `k > 0` is true since hk : 0 < k
+  have hk_gt : k' > 0#u32 := by scalar_tac
+  simp only [hk_gt, ↓reduceIte, progress_simps]
+  -- Now progress through the loop body
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
@@ -333,115 +335,103 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
-  -- The splits are due to 5 `debug_assert!(a[i] < (1 << 54))`
-  let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  split
-  . split
-    . split
-      . split
-        . split
-          . let* ⟨ i31, i31_post_1, i31_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-            let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ c11, c11_post ⟩ ← U128.add_spec
-            let* ⟨ i34, i34_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ a1, a1_post ⟩ ← Array.update_spec
-            let* ⟨ i36, i36_post_1, i36_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-            let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ c21, c21_post ⟩ ← U128.add_spec
-            let* ⟨ i39, i39_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ a2, a2_post ⟩ ← Array.update_spec
-            let* ⟨ i41, i41_post_1, i41_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-            let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ c31, c31_post ⟩ ← U128.add_spec
-            let* ⟨ i44, i44_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ a3, a3_post ⟩ ← Array.update_spec
-            let* ⟨ i46, i46_post_1, i46_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-            let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ c41, c41_post ⟩ ← U128.add_spec
-            let* ⟨ i49, i49_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ a4, a4_post ⟩ ← Array.update_spec
-            let* ⟨ i51, i51_post_1, i51_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-            let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
-            have hcarry : 2^51 + 19 * carry.val < 2^64 := by
-              -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
-              -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
-              -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
-              -- Full proof tracks bounds through carry chain (see Pow2K.lean)
-              apply carry_mul_bound
-              simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
-                  i51_post_1, Nat.shiftRight_eq_div_pow]
-              sorry -- Requires detailed carry chain bound tracking
-            let* ⟨ i52, i52_post ⟩ ← UScalar.cast.progress_spec
-            let* ⟨ i53, i53_post_1, i53_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ a5, a5_post ⟩ ← Array.update_spec
-            let* ⟨ i54, i54_post ⟩ ← U64.mul_spec
-            let* ⟨ i55, i55_post ⟩ ← Array.index_usize_spec
-            let* ⟨ i56, i56_post ⟩ ← U64.add_spec
-            · -- i55 < 2^51 (masked), i54 = 19*carry. By hcarry: sum < 2^64
-              sorry
-            let* ⟨ a6, a6_post ⟩ ← Array.update_spec
-            let* ⟨ i57, i57_post ⟩ ← Array.index_usize_spec
-            let* ⟨ i58, i58_post_1, i58_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
-            let* ⟨ i59, i59_post ⟩ ← Array.index_usize_spec
-            let* ⟨ i60, i60_post ⟩ ← U64.add_spec
-            · -- i59 < 2^51 (masked), i58 = i56 >> 51 < 2^13 (since i56 < 2^64)
-              sorry
-            let* ⟨ a7, a7_post ⟩ ← Array.update_spec
-            let* ⟨ i61, i61_post ⟩ ← Array.index_usize_spec
-            let* ⟨ i62, i62_post_1, i62_post_2 ⟩ ← UScalar.and_spec
-            let* ⟨ __discr, __discr_post ⟩ ← Array.index_mut_usize_spec
-            let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
-            split
-            . -- Base case: k1 = 0 means k = 1, single squaring
-              simp only [progress_simps]
-              -- The result is a7.set 0 i62, representing a^2 mod p
-              -- Need: Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^1) [MOD p]
-              -- and bounds on result limbs
-              constructor
-              · -- Main equality for k=1: a^(2^1) = a^2
-                sorry
-              · -- Bounds: each limb < 2^52
-                sorry
-            . let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
-              · -- Recursive call precondition: k-1 > 0
-                -- We're in the branch where k1 ≠ 0, i.e., k' - 1 ≠ 0
-                sorry
-              · constructor
-                · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
-                  -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a7')^(2^(k-1)) [MOD p]
-                  -- where a7' = a7.set 0 i62 is one squaring of a
-                  -- Need: (a^2)^(2^(k-1)) = a^(2^k)
-                  rw [eqk] at res_post_1
-                  -- First show: a7.set 0 i62 ≡ a^2 [MOD p]
-                  have hsq : Field51_as_Nat (a7.set 0#usize i62) ≡ (Field51_as_Nat a)^2 [MOD p] := by
-                    sorry
-                  have hpow := Nat.ModEq.pow (2^(k-1)) hsq
-                  apply Nat.ModEq.trans res_post_1 hpow |>.trans
-                  rw [← pow_mul]
-                  congr 1
-                  have : 2 * 2^(k-1) = 2^k := by
-                    have : k ≠ 0 := by sorry
-                    sorry
-                  grind
-                · assumption
-          . have : 2^54 < a[4]!.val := by scalar_tac
-            grind
-        . have : 2^54 < a[3]!.val := by scalar_tac
-          grind
-      . have : 2^54 < a[2]!.val := by scalar_tac
-        grind
-    . have : 2^54 < a[1]!.val := by scalar_tac
-      grind
-  . have : 2^54 < a[0]!.val := by scalar_tac
-    grind
+  -- Continue with carry propagation (no more debug_assert splits)
+  let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+  let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ c11, c11_post ⟩ ← U128.add_spec
+  · sorry -- c1 + carry < U128.max
+  let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a1, a1_post ⟩ ← Array.update_spec
+  let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+  let* ⟨ i36, i36_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ c21, c21_post ⟩ ← U128.add_spec
+  · sorry -- c2 + carry < U128.max
+  let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i39, i39_post_1, i39_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a2, a2_post ⟩ ← Array.update_spec
+  let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+  let* ⟨ i41, i41_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ c31, c31_post ⟩ ← U128.add_spec
+  · sorry -- c3 + carry < U128.max
+  let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i44, i44_post_1, i44_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a3, a3_post ⟩ ← Array.update_spec
+  let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+  let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ c41, c41_post ⟩ ← U128.add_spec
+  · sorry -- c4 + carry < U128.max
+  let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a4, a4_post ⟩ ← Array.update_spec
+  let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+  let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
+  have hcarry : 2^51 + 19 * carry.val < 2^64 := by
+    -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
+    -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
+    -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
+    apply carry_mul_bound
+    simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
+        i50_post_1, Nat.shiftRight_eq_div_pow]
+    sorry -- Requires detailed carry chain bound tracking
+  let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
+  let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a5, a5_post ⟩ ← Array.update_spec
+  let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
+  let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i55, i55_post ⟩ ← U64.add_spec
+  · -- i54 < 2^51 (masked), i53 = 19*carry. By hcarry: sum < 2^64
+    sorry
+  let* ⟨ a6, a6_post ⟩ ← Array.update_spec
+  let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i59, i59_post ⟩ ← U64.add_spec
+  · -- i58 < 2^51 (masked), i57 = i55 >> 51 < 2^13 (since i55 < 2^64)
+    sorry
+  let* ⟨ a7, a7_post ⟩ ← Array.update_spec
+  let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
+  let* ⟨ a8, a8_post ⟩ ← Array.update_spec
+  let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
+  -- Now handle the recursive call
+  -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
+  -- Base case (k=1): k1=0, next iteration returns immediately with ok a8
+  -- Recursive case (k>1): k1>0, continues squaring
+  by_cases hk1 : k = 1
+  · -- k = 1 case: k1 = 0, so recursive call returns immediately
+    subst hk1
+    have hk1_zero : ¬(k1 > 0#u32) := by scalar_tac
+    unfold pow2k_loop
+    simp only [hk1_zero, ↓reduceIte, progress_simps]
+    constructor
+    · -- Main equality for k=1: a8 ≡ a^2 [MOD p]
+      sorry
+    · -- Bounds: each limb < 2^52
+      sorry
+  · -- k > 1 case: k1 > 0, recursive call does more squaring
+    have hk1_pos : 0 < k - 1 := by omega
+    have ha8 : ∀ i < 5, a8[i]!.val < 2 ^ 54 := by sorry
+    let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
+    constructor
+    · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
+      -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a8)^(2^(k-1)) [MOD p]
+      -- a8 ≡ a^2 [MOD p], so res ≡ (a^2)^(2^(k-1)) = a^(2^k) [MOD p]
+      have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
+        sorry
+      simp only [eqk, k1_post_1] at res_post_1
+      have hpow := Nat.ModEq.pow (2^(k-1)) hsq
+      apply Nat.ModEq.trans res_post_1 hpow |>.trans
+      rw [← pow_mul]
+      have hk_pos : k ≥ 1 := by omega
+      have h2k : 2 * 2 ^ (k - 1) = 2 ^ k := by
+        conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
+      rw [h2k]
+    · assumption
 
 -- @[progress]
 -- theorem pow2k_loop_spec' (k : ℕ) (k' : U32) (a : Array U64 5#usize)
