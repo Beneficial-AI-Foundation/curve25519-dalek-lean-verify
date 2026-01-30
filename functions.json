@@ -3454,11 +3454,14 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    ∃ q, identity = ok q ∧\n    q.U = ONE ∧ q.W = ZERO := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `montgomery.IdentityProjectivePoint.identity`**:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint is the identity element with coordinates (U=1, W=0)\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}::identity",
