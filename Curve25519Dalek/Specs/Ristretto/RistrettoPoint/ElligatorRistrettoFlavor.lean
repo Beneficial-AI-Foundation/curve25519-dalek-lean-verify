@@ -35,18 +35,17 @@ natural language description:
 
 natural language specs:
 
-• The function always succeeds (no panic) for all valid, canonical field element inputs s
+• The function always succeeds (no panic) for all valid field element inputs s
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
-• The function always succeeds (no panic) for all valid, canonical field element inputs
+• The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
 -/
 theorem elligator_ristretto_flavor_spec
     (s : backend.serial.u64.field.FieldElement51)
-    (h_s_valid : s.IsValid)
-    (h_s_canonical : Field51_as_Nat s < p) :
+    (h_s_valid : s.IsValid) :
 
   ∃ rist, elligator_ristretto_flavor s = ok rist ∧
 
