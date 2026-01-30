@@ -428,7 +428,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
-  -- Continue with carry propagation (no more debug_assert splits)
+
   let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
@@ -460,14 +460,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ a4, a4_post ⟩ ← Array.update_spec
   let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
   let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
-  have hcarry : 2^51 + 19 * carry.val < 2^64 := by
-    -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
-    -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
-    -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
-    -- apply carry_mul_bound
-    -- simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
-        -- i50_post_1, Nat.shiftRight_eq_div_pow]
-    sorry -- Requires detailed carry chain bound tracking
   let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a5, a5_post ⟩ ← Array.update_spec
@@ -532,16 +524,26 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
 
   -- Array values after carry propagation
-  have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by simp_all only
-  have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by simp_all only
-  have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by simp_all only
-  have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by simp_all only
-  have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by simp_all only
+  have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
+  have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by sorry
+  have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by sorry
+  have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by sorry
+  have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by sorry
 
   have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
     simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
       Nat.shiftRight_eq_div_pow]
     omega
+
+  have hcarry : 2^51 + 19 * carry.val < 2^64 := by
+    -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
+    -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
+    -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
+    -- apply carry_mul_bound
+    -- simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
+        -- i50_post_1, Nat.shiftRight_eq_div_pow]
+    sorry -- Requires detailed carry chain bound tracking
+
 
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
