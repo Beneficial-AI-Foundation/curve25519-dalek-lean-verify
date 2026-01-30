@@ -8,6 +8,7 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Eq
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Neg
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
@@ -15,6 +16,7 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtende
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalSelect
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Neg
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
