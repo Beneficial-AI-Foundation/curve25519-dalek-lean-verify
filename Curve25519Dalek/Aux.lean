@@ -137,8 +137,53 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     exact UScalar.eq_of_val_eq h_congr
 
  lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
-    a &&& (2^n - 1) = a % 2^n := by
-  induction n generalizing a
-  · simp
-    scalar_tac
-  · simp
+      a &&& (2^n - 1) = a % 2^n := by
+    induction n generalizing a
+    · simp
+      scalar_tac
+    · simp
+
+/-! ## UScalar cast lemmas for carry propagation
+
+These lemmas capture the Nat interpretation of casting patterns used in
+field element carry propagation:
+- `((x >> 51) as u64) as u128` extracts carry: `(x / 2^51) % 2^64`
+- `(x as u64) & MASK` extracts remainder: `x % 2^51`
+-/
+
+/-- Casting U128 to U64 truncates to lower 64 bits -/
+@[simp]
+theorem U128_cast_U64_val (x : U128) : (UScalar.cast .U64 x).val = x.val % 2^64 := by
+  simp only [UScalar.cast_val_eq, UScalarTy.numBits]
+
+/-- Casting U64 to U128 preserves value (widening) -/
+@[simp]
+theorem U64_cast_U128_val (x : U64) : (UScalar.cast .U128 x).val = x.val := by
+  simp only [UScalar.cast_val_eq, UScalarTy.numBits]
+  have hx : x.val < 2^64 := x.hBounds
+  have h64_lt_128 : (64 : ℕ) ≤ 128 := by omega
+  have : 2^64 ≤ 2^128 := Nat.pow_le_pow_right (by omega) h64_lt_128
+  omega
+
+/-- The double-cast pattern `((x : U128).cast U64).cast U128` gives `x % 2^64` -/
+@[simp]
+theorem U128_cast_U64_cast_U128_val (x : U128) :
+    (UScalar.cast .U128 (UScalar.cast .U64 x)).val = x.val % 2^64 := by
+  simp only [U64_cast_U128_val, U128_cast_U64_val]
+
+/-- When `x < 2^115`, the carry `x / 2^51` fits in U64 without truncation -/
+theorem carry_fits_U64 (x : ℕ) (hx : x < 2 ^ 115) : x / 2 ^ 51 < 2 ^ 64 := by
+  have h1 : (2 : ℕ) ^ 115 / 2 ^ 51 = 2 ^ 64 := by decide
+  calc x / 2 ^ 51 ≤ (2 ^ 115 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
+    _ < 2 ^ 64 := by decide
+
+/-- When the shift result fits in U64, the double-cast preserves it exactly -/
+theorem double_cast_of_lt (x : ℕ) (hx : x < 2 ^ 64) :
+    x % 2 ^ 64 % 2 ^ 128 = x := by
+  have h1 : x % 2 ^ 64 = x := Nat.mod_eq_of_lt hx
+  have h2 : x < 2 ^ 128 := by omega
+  simp [h1, Nat.mod_eq_of_lt h2]
+
+/-- Key lemma: when `c < 2^115`, the carry extraction `(c / 2^51) % 2^64` equals `c / 2^51` -/
+theorem carry_mod_eq (c : ℕ) (hc : c < 2 ^ 115) : (c / 2 ^ 51) % 2 ^ 64 = c / 2 ^ 51 := by
+  exact Nat.mod_eq_of_lt (carry_fits_U64 c hc)
