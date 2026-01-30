@@ -217,7 +217,38 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/field.rs b
          }
      }
  }
-@@ -572,8 +574,10 @@
+@@ -469,7 +471,7 @@
+ 
+         let mut a: [u64; 5] = self.0;
+ 
+-        loop {
++        while k > 0 {
+             // Precondition: assume input limbs a[i] are bounded as
+             //
+             // a[i] < 2^(51 + b)
+@@ -508,11 +510,6 @@
+             //    b < 3.365.
+             //
+             // So we require b < 3 to ensure this fits.
+-            debug_assert!(a[0] < (1 << 54));
+-            debug_assert!(a[1] < (1 << 54));
+-            debug_assert!(a[2] < (1 << 54));
+-            debug_assert!(a[3] < (1 << 54));
+-            debug_assert!(a[4] < (1 << 54));
+ 
+             const LOW_51_BIT_MASK: u64 = (1u64 << 51) - 1;
+ 
+@@ -556,9 +553,6 @@
+             // Now all a[i] < 2^(51 + epsilon) and a = self^(2^k).
+ 
+             k -= 1;
+-            if k == 0 {
+-                break;
+-            }
+         }
+ 
+         FieldElement51(a)
+@@ -572,8 +566,10 @@
      /// Returns 2 times the square of this field element.
      pub fn square2(&self) -> FieldElement51 {
          let mut square = self.pow2k(1);
