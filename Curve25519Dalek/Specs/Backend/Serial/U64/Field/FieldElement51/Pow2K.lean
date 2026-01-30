@@ -5,6 +5,7 @@ Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
+import Curve25519Dalek.Aux
 
 #setup_aeneas_simps
 
@@ -186,6 +187,61 @@ lemma c4_bound (a0 a1 a2 a3 a4 : ℕ)
   have : (5 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
   omega
 
+/-! ### Bounds for carry chain (< 2^115)
+
+These bounds ensure that the carry from each intermediate value fits in U64
+without truncation, which is needed for the carry propagation to work correctly. -/
+
+/-- c0 < 77 * 2^108 < 2^115 -/
+lemma c0_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) < 2 ^ 115 := by
+  have : a0 * a0 < 2 ^ 108 := by nlinarith
+  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (77 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  omega
+
+/-- c1 < 59 * 2^108 < 2^115 -/
+lemma c1_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) < 2 ^ 115 := by
+  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a1 < 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : (59 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  omega
+
+/-- c2 < 41 * 2^108 < 2^115 -/
+lemma c2_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) < 2 ^ 115 := by
+  have : a1 * a1 < 2 ^ 108 := by nlinarith
+  have : a0 * a2 < 2 ^ 108 := by nlinarith
+  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (41 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  omega
+
+/-- c3 < 23 * 2^108 < 2^115 -/
+lemma c3_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) < 2 ^ 115 := by
+  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a3 < 2 ^ 108 := by nlinarith
+  have : a1 * a2 < 2 ^ 108 := by nlinarith
+  have : (23 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  omega
+
+/-- c4 < 5 * 2^108 < 2^115 -/
+lemma c4_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a2 * a2 + 2 * (a0 * a4 + a1 * a3) < 2 ^ 115 := by
+  have : a2 * a2 < 2 ^ 108 := by nlinarith
+  have : a0 * a4 < 2 ^ 108 := by nlinarith
+  have : a1 * a3 < 2 ^ 108 := by nlinarith
+  have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  omega
+
 /-- Decomposition lemma: squaring in radix-2^51 representation mod p.
     This is the key algebraic identity underlying field squaring. -/
 lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
@@ -361,6 +417,13 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by
     simp_all
 
+  -- Bounds on c0-c4
+  have hc0_bound : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> assumption
+  have hc1_bound : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> assumption
+  have hc2_bound : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> assumption
+  have hc3_bound : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> assumption
+  have hc4_bound : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> assumption
+
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
@@ -370,8 +433,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c11, c11_post ⟩ ← U128.add_spec
-  · simp [*]
-    sorry -- c1 + carry < U128.max
   let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a1, a1_post ⟩ ← Array.update_spec
@@ -379,7 +440,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i36, i36_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c21, c21_post ⟩ ← U128.add_spec
-  · sorry -- c2 + carry < U128.max
   let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i39, i39_post_1, i39_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a2, a2_post ⟩ ← Array.update_spec
@@ -387,7 +447,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i41, i41_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c31, c31_post ⟩ ← U128.add_spec
-  · sorry -- c3 + carry < U128.max
   let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i44, i44_post_1, i44_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a3, a3_post ⟩ ← Array.update_spec
@@ -430,6 +489,59 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   a[4] = ⌊c4'⌋₅₁
   carry = ⌈c4'⌉₅₁
   -/
+
+  -- The carries fit in U64 (no truncation in the casts) - follows from Stage 1 bounds
+  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0_bound
+
+  -- c11 = c1 + carry from c0
+  have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
+    simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
+      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+
+  -- Bound on c11 (needed for next carry)
+  have hc11_bound : c11.val < 2 ^ 115 := by sorry
+
+  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
+
+  -- c21 = c2 + carry from c11
+  have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
+    simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
+      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+
+  have hc21_bound : c21.val < 2 ^ 115 := by sorry
+  have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
+
+  -- c31 = c3 + carry from c21
+  have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
+    simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
+      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+
+  have hc31_bound : c31.val < 2 ^ 115 := by sorry
+  have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
+
+  -- c41 = c4 + carry from c31
+  have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
+    simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
+      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+
+  have hc41_bound : c41.val < 2 ^ 115 := by sorry
+  have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
+
+  -- Array values after carry propagation
+  have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by simp_all only
+  have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by simp_all only
+  have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by simp_all only
+  have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by simp_all only
+  have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by simp_all only
+
+  have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
+    simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
+      Nat.shiftRight_eq_div_pow]
+    omega
 
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
