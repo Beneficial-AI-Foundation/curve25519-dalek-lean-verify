@@ -6,6 +6,11 @@ export default defineConfig({
   description: "A project to formally verify curve25519-dalek",
   base: '/curve25519-dalek-lean-verify/',
   lastUpdated: true,
+  markdown: {
+    // Only load the languages we actually use to reduce bundle size
+    // Default Shiki loads ALL languages (~2.5MB+)
+    languages: ['lean4', 'rust', 'bash', 'toml', 'json']
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [

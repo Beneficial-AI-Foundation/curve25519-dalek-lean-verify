@@ -4,6 +4,7 @@ import FunctionDetailModal from './FunctionDetailModal.vue'
 import GitHubItemLink from './GitHubItemLink.vue'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
 import { useGitHubLinks } from '../composables/useGitHubLinks'
+import { getRustFunctionName, shortenSourcePath } from '../utils/labelUtils'
 
 const { getExtractedStatus, getVerifiedStatus } = useStatusFormatting()
 const { getSourceLink, getSpecLink } = useGitHubLinks()
@@ -30,17 +31,6 @@ function findRelatedItems(functionName) {
   if (!props.findIssuesForFunction) return []
 
   return props.findIssuesForFunction(functionName, props.issues)
-}
-
-// Helper function to extract function name from full path
-function getFunctionName(fullPath) {
-  const parts = fullPath.split('::')
-  return parts[parts.length - 1]
-}
-
-// Helper function to shorten source path
-function shortenSourcePath(source) {
-  return source.replace('curve25519-dalek/src/', '')
 }
 
 // Filter state
@@ -287,7 +277,7 @@ const stats = computed(() => ({
                 class="function-button"
                 :title="func.function"
               >
-                <code>{{ getFunctionName(func.function) }}</code>
+                <code>{{ getRustFunctionName(func.function) }}</code>
               </button>
             </td>
             <td v-if="visibleColumns.source" class="source-col">
