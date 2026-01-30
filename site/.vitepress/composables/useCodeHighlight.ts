@@ -14,6 +14,32 @@ async function getHighlighter(): Promise<Highlighter> {
   return highlighterPromise
 }
 
+/**
+ * Highlight code and return the HTML string directly (no reactive state)
+ * Use this when you want to cache results yourself
+ */
+export async function highlightCode(code: string, lang: string = 'lean4'): Promise<string> {
+  if (!code) return ''
+
+  try {
+    const highlighter = await getHighlighter()
+    return highlighter.codeToHtml(code, {
+      lang,
+      themes: {
+        light: 'github-light',
+        dark: 'github-dark'
+      }
+    })
+  } catch (err) {
+    console.error('Failed to highlight code:', err)
+    return `<pre><code>${escapeHtml(code)}</code></pre>`
+  }
+}
+
+/**
+ * Composable for reactive code highlighting with loading state
+ * Use this when you want reactive updates
+ */
 export function useCodeHighlight() {
   const highlightedCode = ref<string>('')
   const isLoading = ref(false)
@@ -26,18 +52,7 @@ export function useCodeHighlight() {
 
     isLoading.value = true
     try {
-      const highlighter = await getHighlighter()
-      highlightedCode.value = highlighter.codeToHtml(code, {
-        lang,
-        themes: {
-          light: 'github-light',
-          dark: 'github-dark'
-        }
-      })
-    } catch (err) {
-      console.error('Failed to highlight code:', err)
-      // Fallback to plain text
-      highlightedCode.value = `<pre><code>${escapeHtml(code)}</code></pre>`
+      highlightedCode.value = await highlightCode(code, lang)
     } finally {
       isLoading.value = false
     }
