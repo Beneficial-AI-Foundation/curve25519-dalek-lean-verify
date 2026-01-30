@@ -350,6 +350,17 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
   -/
 
+  have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 * (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by
+    simp_all
+  have hc1 : c1.val = a[3]!.val * (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by
+    simp_all
+  have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 * (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by
+    simp_all
+  have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 * (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by
+    simp_all
+  have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by
+    simp_all
+
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
@@ -384,7 +395,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c41, c41_post ⟩ ← U128.add_spec
-  · sorry -- c4 + carry < U128.max
+
   let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a4, a4_post ⟩ ← Array.update_spec
@@ -394,9 +405,9 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     -- carry = (c41 >> 51) % 2^64. With limbs < 2^54:
     -- c4 < 5*2^108, i48 < 2^64, so c41 < 5*2^108 + 2^64 < 2^111
     -- Thus carry = c41/2^51 < 2^60 < (2^64 - 2^51)/19
-    apply carry_mul_bound
-    simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
-        i50_post_1, Nat.shiftRight_eq_div_pow]
+    -- apply carry_mul_bound
+    -- simp only [carry_post, UScalar.cast_val_eq, UScalarTy.numBits,
+        -- i50_post_1, Nat.shiftRight_eq_div_pow]
     sorry -- Requires detailed carry chain bound tracking
   let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
