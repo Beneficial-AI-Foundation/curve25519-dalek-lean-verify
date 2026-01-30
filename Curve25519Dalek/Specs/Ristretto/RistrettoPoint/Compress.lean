@@ -1,9 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-! # Spec Theorem for `RistrettoPoint::compress`
 
@@ -14,8 +16,7 @@ RistrettoPoint to its canonical 32-byte representation. The function is defined 
 
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
 
-It takes a RistrettoPoint (which represents an equivalence class of Edwards points)
-and produces a unique, canonical byte representation.
+It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a unique, canonical byte representation.
 
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
@@ -26,7 +27,7 @@ namespace curve25519_dalek.ristretto.RistrettoPoint
 /-
 natural language description:
 
-• Takes a RistrettoPoint (represented internally as an EdwardsPoint in extended coordinates
+• Takes a RistrettoPoint (represented internally as an even EdwardsPoint in extended coordinates
   (X, Y, Z, T)) and compresses it to a canonical 32-byte representation according to the
   Ristretto ENCODE function specified in:
 
@@ -37,36 +38,26 @@ natural language description:
 natural language specs:
 
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
-• Different Edwards point representations of the same Ristretto point result in the same output byte representation
+• The output is a valid CompressedRistretto 32-byte representation
+• The output accurately reflects the output of the pure mathematical compression function
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
-ho
+• The function always succeeds (no panic) for all valid RistrettoPoint inputs
+• The output is a valid CompressedRistretto 32-byte representation
+• The output accurately reflects the output of the pure mathematical compression function
 -/
 @[progress]
-theorem compress_spec
-  (rist1 rist2 : RistrettoPoint)
-  (h1_X_bounds : ∀ i, i < 5 → (rist1.X[i]!).val < 2 ^ 54)
-  (h1_Y_bounds : ∀ i, i < 5 → (rist1.Y[i]!).val < 2 ^ 53)
-  (h1_Z_bounds : ∀ i, i < 5 → (rist1.Z[i]!).val < 2 ^ 53)
-  (h1_T_bounds : ∀ i, i < 5 → (rist1.T[i]!).val < 2 ^ 54)
-  (h2_X_bounds : ∀ i, i < 5 → (rist2.X[i]!).val < 2 ^ 54)
-  (h2_Y_bounds : ∀ i, i < 5 → (rist2.Y[i]!).val < 2 ^ 53)
-  (h2_Z_bounds : ∀ i, i < 5 → (rist2.Z[i]!).val < 2 ^ 53)
-  (h2_T_bounds : ∀ i, i < 5 → (rist2.T[i]!).val < 2 ^ 54) :
+theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
 
-  ∃ c1,
-  ∃ c2,
-    compress rist1 = ok c1 ∧
-    compress rist2 = ok c2 ∧
-    ((∃ p1_times_8,
-      ∃ p2_times_8,
-      ∃ eq_choice,
-        edwards.EdwardsPoint.mul_by_cofactor rist1 = ok p1_times_8 ∧
-        edwards.EdwardsPoint.mul_by_cofactor rist2 = ok p2_times_8 ∧
-        edwards.ConstantTimeEqEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧
-        eq_choice = Choice.one) →
-      c1 = c2) := by
+  ∃ result, compress rist = ok result ∧
+
+  result.IsValid ∧
+
+  math.compress_pure rist.toPoint = U8x32_as_Nat result
+
+  := by
+
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
