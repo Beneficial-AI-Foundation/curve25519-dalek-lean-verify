@@ -3979,11 +3979,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (comp : CompressedRistretto) :\n\n  ∃ result, decompress comp = ok result ∧\n\n  (¬comp.IsValid →\n    result = none) ∧\n\n  (comp.IsValid →\n      ∃ rist,\n      result = some rist ∧\n      RistrettoPoint.IsValid rist ∧\n      RistrettoPoint.compress rist = ok comp) := by ...",
+   "theorem decompress_spec (comp : CompressedRistretto) :\n\n    ∃ result, decompress comp = ok result ∧\n\n    (¬comp.IsValid →\n      result = none) ∧\n\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        math.decompress_pure (U8x32_as_Nat comp) = some rist.toPoint)\n\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:\n- The function always succeeds for all U8x32 input arrays (no panic)\n- If the input is not valid, then the output is none\n- If the input is valid, then the output is a valid Ristretto point that, when compressed again,\n  returns the original input.\n-/",
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:\n- The function always succeeds for all U8x32 input arrays (no panic)\n- If the input is not valid, then the output is none\n- If the input is valid, then the output is a valid Ristretto point that reflects the\n  output of the pure mathematical decompression function\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress",
@@ -4059,10 +4059,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec\n  (rist1 rist2 : RistrettoPoint)\n  (h1_X_bounds : ∀ i, i < 5 → (rist1.X[i]!).val < 2 ^ 54)\n  (h1_Y_bounds : ∀ i, i < 5 → (rist1.Y[i]!).val < 2 ^ 53)\n  (h1_Z_bounds : ∀ i, i < 5 → (rist1.Z[i]!).val < 2 ^ 53)\n  (h1_T_bounds : ∀ i, i < 5 → (rist1.T[i]!).val < 2 ^ 54)\n  (h2_X_bounds : ∀ i, i < 5 → (rist2.X[i]!).val < 2 ^ 54)\n  (h2_Y_bounds : ∀ i, i < 5 → (rist2.Y[i]!).val < 2 ^ 53)\n  (h2_Z_bounds : ∀ i, i < 5 → (rist2.Z[i]!).val < 2 ^ 53)\n  (h2_T_bounds : ∀ i, i < 5 → (rist2.T[i]!).val < 2 ^ 54) :\n\n  ∃ c1,\n  ∃ c2,\n    compress rist1 = ok c1 ∧\n    compress rist2 = ok c2 ∧\n    ((∃ p1_times_8,\n      ∃ p2_times_8,\n      ∃ eq_choice,\n        edwards.EdwardsPoint.mul_by_cofactor rist1 = ok p1_times_8 ∧\n        edwards.EdwardsPoint.mul_by_cofactor rist2 = ok p2_times_8 ∧\n        edwards.ConstantTimeEqEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧\n        eq_choice = Choice.one) →\n      c1 = c2) := by ...",
+   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n\n  ∃ result, compress rist = ok result ∧\n\n  result.IsValid ∧\n\n  math.compress_pure rist.toPoint = U8x32_as_Nat result\n\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\nho\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n• The function always succeeds (no panic) for all valid RistrettoPoint inputs\n• The output is a valid CompressedRistretto 32-byte representation\n• The output accurately reflects the output of the pure mathematical compression function\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress",
