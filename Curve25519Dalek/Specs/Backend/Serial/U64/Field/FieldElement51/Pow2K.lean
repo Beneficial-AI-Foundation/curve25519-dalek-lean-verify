@@ -552,6 +552,13 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   a[4] = a[4]₂
   -/
 
+  -- Array values after final reduction
+  have ha8_0 : a8[0]!.val = (a5[0]!.val + 19 * carry.val) % 2 ^ 51 := by sorry
+  have ha8_1 : a8[1]!.val = a5[1]!.val + (a5[0]!.val + 19 * carry.val) / 2 ^ 51 := by sorry
+  have ha8_2 : a8[2]!.val = a5[2]!.val := by sorry
+  have ha8_3 : a8[3]!.val = a5[3]!.val := by sorry
+  have ha8_4 : a8[4]!.val = a5[4]!.val := by sorry
+
   let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
   -- Now handle the recursive call
   -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
