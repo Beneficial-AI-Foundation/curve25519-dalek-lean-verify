@@ -262,7 +262,7 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
 theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     (hk : 0 < k) (eqk : k'.val = k)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    ∃ r, pow2k_loop k' a = ok r ∧
+    ∃ r : Array U64 5#usize, pow2k_loop k' a = ok r ∧
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
     (∀ i < 5, r[i]!.val < 2 ^ 52) := by
   unfold pow2k_loop
@@ -273,7 +273,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   have := ha 4 (by simp)
   -- The while loop condition `k > 0` is true since hk : 0 < k
   have hk_gt : k' > 0#u32 := by scalar_tac
-  simp only [hk_gt, ↓reduceIte, progress_simps]
+  simp only [hk_gt, reduceIte, progress_simps]
   -- Now progress through the loop body
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
@@ -330,7 +330,26 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   · simp_all only; apply two_intermediate_sum_bound' <;> simp_all
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
   · simp_all only; apply c4_bound <;> simp_all
-  -- The 5 intermediate products (c0-c4) have been computed
+
+  -- Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
+
+  /-
+  c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))
+    = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
+
+  c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))
+    = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
+
+  c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))
+    = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
+
+  c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])
+    = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
+
+  c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])
+    = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
+  -/
+
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
@@ -340,7 +359,8 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c11, c11_post ⟩ ← U128.add_spec
-  · sorry -- c1 + carry < U128.max
+  · simp [*]
+    sorry -- c1 + carry < U128.max
   let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a1, a1_post ⟩ ← Array.update_spec
@@ -381,6 +401,25 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a5, a5_post ⟩ ← Array.update_spec
+
+  -- Stage 2: After carry propagation (l.532 of source code)
+
+  /-
+  Define intermediate carry-propagated values:
+  c1' = c1 + ⌈c0⌉₅₁
+  c2' = c2 + ⌈c1'⌉₅₁
+  c3' = c3 + ⌈c2'⌉₅₁
+  c4' = c4 + ⌈c3'⌉₅₁
+
+  At this stage we have:
+  a[0] = ⌊c0⌋₅₁
+  a[1] = ⌊c1'⌋₅₁
+  a[2] = ⌊c2'⌋₅₁
+  a[3] = ⌊c3'⌋₅₁
+  a[4] = ⌊c4'⌋₅₁
+  carry = ⌈c4'⌉₅₁
+  -/
+
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
   let* ⟨ i55, i55_post ⟩ ← U64.add_spec
@@ -397,6 +436,18 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
   let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a8, a8_post ⟩ ← Array.update_spec
+
+  -- Stage 3: Final reduction (l.552 of source file)
+
+  /-
+  Let the values from stage 2 be denoted with subscript ₂. Now we have:
+  a[0] = ⌊a[0]₂ + 19·carry⌋₅₁
+  a[1] = a[1]₂ + ⌈a[0]₂ + 19·carry⌉₅₁
+  a[2] = a[2]₂
+  a[3] = a[3]₂
+  a[4] = a[4]₂
+  -/
+
   let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
   -- Now handle the recursive call
   -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
@@ -423,7 +474,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
       -- a8 ≡ a^2 [MOD p], so res ≡ (a^2)^(2^(k-1)) = a^(2^k) [MOD p]
       have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
         sorry
-      simp only [eqk, k1_post_1] at res_post_1
+      simp only [eqk] at res_post_1
       have hpow := Nat.ModEq.pow (2^(k-1)) hsq
       apply Nat.ModEq.trans res_post_1 hpow |>.trans
       rw [← pow_mul]
