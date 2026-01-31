@@ -207,11 +207,14 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    ∃ result, conditional_select a b choice = ok result ∧\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_plus_x[i]!.val else a.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_minus_x[i]!.val else a.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.conditional_select`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • AffineNielsPoint `a` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • AffineNielsPoint `b` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\n  the output AffineNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice)\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select",
@@ -222,7 +225,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": true,
@@ -1038,11 +1041,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem MONTGOMERY_A_spec : Field51_as_Nat MONTGOMERY_A = 486662 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A`**:\n- The value of constants.MONTGOMERY_A when converted to a natural number equals 486662\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A",
@@ -1055,11 +1061,14 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem MONTGOMERY_A_NEG_spec :\n    Field51_as_Nat MONTGOMERY_A_NEG + Field51_as_Nat MONTGOMERY_A= p := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A_NEG.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A_NEG`**:\n- The value of constants.MONTGOMERY_A_NEG when converted to a natural number equals\n  p - 486662 = 57896044618658097711785492504343953926634992332820282019728792003956564333287\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG",
