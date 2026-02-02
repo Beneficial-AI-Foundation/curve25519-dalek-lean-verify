@@ -686,7 +686,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem ED25519_BASEPOINT_POINT_spec :\n\n  -- The point is a valid Edwards point\n  ED25519_BASEPOINT_POINT.IsValid ∧\n\n  -- The point is of prime order L\n  _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0  ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0\n\n := by ...",
+   "theorem ED25519_BASEPOINT_POINT_spec :\n\n    -- The point is a valid Edwards point\n    ED25519_BASEPOINT_POINT.IsValid ∧\n\n    -- The point is of prime order L\n    _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0  ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0\n\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
    "spec_docstring":
