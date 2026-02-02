@@ -410,24 +410,41 @@ axiom core.iter.traits.collect.IntoIterator.Blanket.into_iter
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select]
+   Conditional select: returns a if choice(0), b if choice(1) -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_select"]
-axiom subtle.ConditionallySelectableU8.conditional_select
-  : U8 → U8 → subtle.Choice → Result U8
+def subtle.ConditionallySelectableU8.conditional_select
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
+  if choice.val = 1#u8 then ok b
+  else ok a
+
+/-- Progress spec for ConditionallySelectableU8.conditional_select -/
+@[progress]
+theorem conditional_select_U8_spec (a b : U8) (choice : subtle.Choice) :
+    ∃ res, subtle.ConditionallySelectableU8.conditional_select a b choice = ok res ∧
+    res = if choice.val = 1#u8 then b else a := by
+  unfold subtle.ConditionallySelectableU8.conditional_select
+  split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign]
+   Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign"]
-axiom subtle.ConditionallySelectableU8.conditional_assign
-  : U8 → U8 → subtle.Choice → Result U8
+def subtle.ConditionallySelectableU8.conditional_assign
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
+  subtle.ConditionallySelectableU8.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap]
+   Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap"]
-axiom subtle.ConditionallySelectableU8.conditional_swap
-  : U8 → U8 → subtle.Choice → Result (U8 × U8)
+def subtle.ConditionallySelectableU8.conditional_swap
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result (U8 × U8) := do
+  let a_new ← subtle.ConditionallySelectableU8.conditional_select a b choice
+  let b_new ← subtle.ConditionallySelectableU8.conditional_select b a choice
+  ok (a_new, b_new)
 
 /- [zeroize::{zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 551:4-551:25
@@ -475,33 +492,52 @@ axiom scalar.ConditionallySelectableScalar.conditional_swap
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 581:4-581:69
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select]
+   Conditional select for arrays: returns a if choice=0, b if choice=1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select"]
-axiom subtle.ConditionallySelectableArray.conditional_select
-  {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result (Array T N)
+def subtle.ConditionallySelectableArray.conditional_select
+  {T : Type} {N : Usize} (_ConditionallySelectableInst :
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
+  if choice.val = 1#u8 then ok b
+  else ok a
+
+/-- Progress spec for ConditionallySelectableArray.conditional_select -/
+@[progress]
+theorem conditional_select_Array_spec {T : Type} {N : Usize}
+    (inst : subtle.ConditionallySelectable T)
+    (a b : Array T N) (choice : subtle.Choice) :
+    ∃ res, subtle.ConditionallySelectableArray.conditional_select inst a b choice = ok res ∧
+    res = if choice.val = 1#u8 then b else a := by
+  unfold subtle.ConditionallySelectableArray.conditional_select
+  split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 587:4-587:66
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign]
+   Conditional assign for arrays: equivalent to conditional_select -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
-axiom subtle.ConditionallySelectableArray.conditional_assign
+def subtle.ConditionallySelectableArray.conditional_assign
   {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result (Array T N)
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
+  subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
+   Conditional swap for arrays: swaps a and b if choice is 1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
-axiom subtle.ConditionallySelectableArray.conditional_swap
+def subtle.ConditionallySelectableArray.conditional_swap
   {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result ((Array T N) × (Array T N))
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
+  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
+  ok (a_new, b_new)
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
