@@ -38,14 +38,41 @@ natural language specs:
 -/
 theorem ED25519_BASEPOINT_POINT_spec :
 
-  -- The point is a valid Edwards point
-  ED25519_BASEPOINT_POINT.IsValid ∧
+    -- The point is a valid Edwards point
+    ED25519_BASEPOINT_POINT.IsValid ∧
 
-  -- The point is of prime order L
-  _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0  ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0
+    -- The point is of prime order L
+    _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0  ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0
 
-  := by
+    := by
 
-  sorry
+  have h_valid : ED25519_BASEPOINT_POINT.IsValid := by
+      unfold ED25519_BASEPOINT_POINT
+      decide
+
+  constructor
+
+  · exact h_valid
+
+  constructor
+
+  · sorry
+
+  · intro h
+
+    have h_X_zero : ED25519_BASEPOINT_POINT.X.toField = 0 := by
+      have : ED25519_BASEPOINT_POINT.toPoint.x = 0 := by
+        rw [h]
+        rfl
+      rw [(edwards.EdwardsPoint.toPoint_of_isValid h_valid).1] at this
+      field_simp [h_valid.Z_ne_zero] at this
+      simp only [mul_zero] at this
+      exact this
+
+    have h_X_nonzero : ED25519_BASEPOINT_POINT.X.toField ≠ 0 := by
+      unfold ED25519_BASEPOINT_POINT
+      decide
+
+    exact h_X_nonzero h_X_zero
 
 end curve25519_dalek.backend.serial.u64.constants
