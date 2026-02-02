@@ -26,10 +26,8 @@ The concrete formulas are:
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field
-open curve25519_dalek.backend.serial.curve_models
 
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint
 
 /-
 natural language description:
@@ -48,7 +46,7 @@ natural language specs:
   - xy2d' ≡ -xy2d (mod p) (xy2d coordinate is negated)
 -/
 
-/-- **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.neg`**:
+/- **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.neg`**:
 - No panic (always returns successfully)
 - Given input:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
@@ -62,13 +60,16 @@ where p = 2^255 - 19.
 
 This implements the negation of a point in affine Niels coordinates.
 -/
+
 theorem neg_spec
     (self : backend.serial.curve_models.AffineNielsPoint)
     (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :
-    ∃ result, NegShared0AffineNielsPointAffineNielsPoint.neg self = ok result ∧
+    ∃ result, neg self = ok result ∧
     result.y_plus_x = self.y_minus_x ∧
     result.y_minus_x = self.y_plus_x ∧
     (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 := by
-  sorry
+  unfold neg
+  progress
+  grind
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint
+end curve25519_dalek.backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint

@@ -82,41 +82,12 @@ function countVerificationStatus(csvContent: string | null): {
       relax_column_count: true
     }) as StatusEntry[]
 
-    // let total = 0
-    // let verified = 0
-    // let specified = 0
-    // let draftSpec = 0
-    // let extracted = 0
-
-    // Calculate statistics
-    // const stats = {
-    let total = records.length
-    let extracted = records.filter(r => r.extracted === 'extracted').length
-    let draft_spec = records.filter(r => r.verified === 'draft spec').length
-    let specified = records.filter(r => r.verified === 'specified').length
-    let verified = records.filter(r => r.verified === 'verified').length
-    let ai_proveable = records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
-    // }
-
-    // for (const row of records) {
-    //   total++
-    //   const status = (row.verified || '').trim().toLowerCase()
-    //   const specTheorem = (row.spec_theorem || '').trim()
-    //   const extractedStatus = (row.extracted || '').trim().toLowerCase()
-
-    //   if (status === 'verified') {
-    //     verified++
-    //   } else if (status === 'specified') {
-    //     specified++
-    //   } else if (specTheorem) {
-    //     // Has spec_theorem but not verified/specified = draft
-    //     draftSpec++
-    //   }
-
-    //   if (extractedStatus === 'extracted') {
-    //     extracted++
-    //   }
-    // }
+    const total = records.length
+    const extracted = records.filter(r => r.extracted === 'extracted').length
+    const draft_spec = records.filter(r => r.verified === 'draft spec').length
+    const specified = records.filter(r => r.verified === 'specified').length
+    const verified = records.filter(r => r.verified === 'verified').length
+    const ai_proveable = records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
 
     return { total, verified, specified, draft_spec, extracted, ai_proveable }
   } catch (error) {
