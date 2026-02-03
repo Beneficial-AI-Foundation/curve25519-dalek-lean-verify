@@ -7,7 +7,9 @@ import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Eq
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Neg
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
@@ -15,10 +17,12 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtende
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalSelect
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Neg
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
@@ -27,6 +31,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A_NEG
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQUARED
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
@@ -93,6 +99,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Double
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity_Hoare
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
@@ -105,8 +112,17 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ConditionalSelect
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.CtEq
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Eq
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Identity
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulAssign
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBaseClamped
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
+import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
