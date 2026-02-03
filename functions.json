@@ -3355,11 +3355,14 @@
    "is_extraction_artifact": false,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : montgomery.MontgomeryPoint)\n    (choice : subtle.Choice) :\n    ∃ res,\n      conditional_select a b choice = ok res ∧\n      (∀ i < 32,\n        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_select`**:\n- No panic (always returns successfully)\n- For each byte i, the result byte equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one` (value 1), the whole result equals `b`;\n  when `choice = Choice.zero` (value 0), the result equals `a`.\n\nThis implements constant-time conditional selection for Montgomery curve points,\nwhere the points are represented as 32-byte arrays containing the u-coordinate.\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select",
@@ -3370,7 +3373,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": false,
