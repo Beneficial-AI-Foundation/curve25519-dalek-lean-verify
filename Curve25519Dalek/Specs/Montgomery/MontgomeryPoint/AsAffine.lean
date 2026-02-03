@@ -6,6 +6,9 @@ Authors: Liao Zhang
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Field.FieldElement51.Invert
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 
 /-! # Spec Theorem for `ProjectivePoint::as_affine`
 
@@ -52,12 +55,7 @@ Natural language specs:
 /-- Validity predicate for Montgomery projective points.
     A projective point (U : W) is valid if W is non-zero in the field. -/
 def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
-  pp.W.toField ≠ 0
-
-/-- Convert a valid projective point to its affine u-coordinate in the field. -/
-noncomputable def toAffineField (pp : montgomery.ProjectivePoint)
-    (_h : IsValid pp) : ZMod p :=
-  pp.U.toField / pp.W.toField
+  pp.W.toField ≠ 0 ∧ pp.U.toField / pp.W.toField ≠ -1
 
 /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
 - The function succeeds if and only if the W coordinate is non-zero in the field
@@ -71,19 +69,34 @@ noncomputable def toAffineField (pp : montgomery.ProjectivePoint)
   * The computation uses constant-time field arithmetic operations
 -/
 
+-- Helper lemma: bytesToField equals U8x32_as_Nat cast to ZMod p
+lemma bytesToField_eq_U8x32_as_Nat (m : montgomery.MontgomeryPoint) :
+    bytesToField m = (U8x32_as_Nat m : ZMod p) := by
+  sorry
+
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
+    (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
+    (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)
     (h_valid : IsValid self) :
     ∃ res,
     as_affine self = ok res ∧
     MontgomeryPoint.IsValid res ∧
     bytesToField res = self.U.toField  / self.W.toField := by
-  sorry
-
--- /-- Weaker spec: as_affine succeeds when W is non-zero -/
--- theorem as_affine_succeeds (self : montgomery.ProjectivePoint)
---     (h_W_nonzero : self.W.toField ≠ 0) :
---     ∃ res, as_affine self = ok res := by
---   sorry
+  unfold as_affine IsValid at *
+  -- Apply progress to handle the monad operations and get postconditions
+  progress*
+  -- Now build the final result
+  -- constructor
+  · -- Show MontgomeryPoint.IsValid res
+    grind
+  · -- Show bytesToField res = self.U.toField / self.W.toField
+    constructor
+    · unfold MontgomeryPoint.IsValid
+      simp
+      constructor
+      · sorry
+      · sorry
+    · sorry
 
 end curve25519_dalek.montgomery.ProjectivePoint
