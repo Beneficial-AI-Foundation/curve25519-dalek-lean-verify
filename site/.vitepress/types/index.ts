@@ -1,5 +1,8 @@
 // Shared types for the verification status site
 
+// Re-export graph visualization types
+export * from './graph'
+
 export interface FunctionDep {
   lean_name: string
   dependencies: string[]
