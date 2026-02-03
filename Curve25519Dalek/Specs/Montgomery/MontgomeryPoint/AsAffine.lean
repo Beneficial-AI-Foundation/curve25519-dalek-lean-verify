@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: [Author Name]
+Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
@@ -70,6 +70,7 @@ noncomputable def toAffineField (pp : montgomery.ProjectivePoint)
   * The result is a valid MontgomeryPoint (32-byte array with value reduced modulo 2^255-19)
   * The computation uses constant-time field arithmetic operations
 -/
+
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (h_valid : IsValid self) :
@@ -83,20 +84,6 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
 theorem as_affine_succeeds (self : montgomery.ProjectivePoint)
     (h_W_nonzero : self.W.toField ≠ 0) :
     ∃ res, as_affine self = ok res := by
-  sorry
-
-/-- Projective equivalence: scaling both coordinates produces the same affine result -/
-theorem as_affine_projective_equiv (self : montgomery.ProjectivePoint)
-    (lambda_scale : backend.serial.u64.field.FieldElement51)
-    (h_lambda_nonzero : lambda_scale.toField ≠ 0)
-    (h_valid : IsValid self) :
-    ∃ res₁ res₂,
-    as_affine self = ok res₁ ∧
-    (∃ U_scaled W_scaled,
-      U_scaled.toField = lambda_scale.toField * self.U.toField ∧
-      W_scaled.toField = lambda_scale.toField * self.W.toField ∧
-      as_affine ⟨U_scaled, W_scaled⟩ = ok res₂) ∧
-    res₁ = res₂ := by
   sorry
 
 end curve25519_dalek.montgomery.ProjectivePoint
