@@ -516,7 +516,7 @@ theorem conditional_select_Array_spec {T : Type} {N : Usize}
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 587:4-587:66
    Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign]
-   Conditional assign for arrays: equivalent to conditional_select -/
+   Conditional assign for arrays: assign a with the value of conditional_select(a, b, choice). -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
 def subtle.ConditionallySelectableArray.conditional_assign
