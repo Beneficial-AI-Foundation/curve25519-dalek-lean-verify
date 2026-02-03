@@ -77,13 +77,13 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     ∃ res,
     as_affine self = ok res ∧
     MontgomeryPoint.IsValid res ∧
-    bytesToField res = toAffineField self h_valid := by
+    bytesToField res = self.U.toField  / self.W.toField := by
   sorry
 
-/-- Weaker spec: as_affine succeeds when W is non-zero -/
-theorem as_affine_succeeds (self : montgomery.ProjectivePoint)
-    (h_W_nonzero : self.W.toField ≠ 0) :
-    ∃ res, as_affine self = ok res := by
-  sorry
+-- /-- Weaker spec: as_affine succeeds when W is non-zero -/
+-- theorem as_affine_succeeds (self : montgomery.ProjectivePoint)
+--     (h_W_nonzero : self.W.toField ≠ 0) :
+--     ∃ res, as_affine self = ok res := by
+--   sorry
 
 end curve25519_dalek.montgomery.ProjectivePoint
