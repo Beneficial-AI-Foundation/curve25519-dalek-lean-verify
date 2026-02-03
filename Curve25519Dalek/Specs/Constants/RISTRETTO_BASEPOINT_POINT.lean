@@ -32,21 +32,27 @@ natural language description:
 
 natural language specs:
 
-    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point (which implies that
+    • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which implies that
       it fulfills the curve equation)
     • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
-    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the
+      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
+      is equivalent to saying that the difference between both points is not in E[4])
 
   Note: As a consequence of Lagrange's theorem, every non-identity point in a
   prime order group generates the entire group.
 -/
 
 /-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:
-    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point (which amongst other things
+    • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things
       implies that it fulfills the curve equation)
     • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
-    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the
+      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
+      is equivalent to saying that the difference between both points is not in E[4])
 -/
+
+
 @[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
 
@@ -57,7 +63,8 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
     RISTRETTO_BASEPOINT_POINT.IsValid ∧
 
     -- The point is not the identity point
-    math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by
+    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by
+
 
   have h_eq : RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT := by
     simp only [global_simps]
@@ -73,8 +80,11 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
 
     · exact backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.1
 
-    · sorry
+    · use (34737626771194858627071295502606372355980995399692169211837275202373938891970 : CurveField)
+      unfold backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+      rfl
 
   · sorry
+
 
 end curve25519_dalek.constants
