@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ED25519_BASEPOINT_POINT
 
 /-! # Spec Theorem for `constants::RISTRETTO_BASEPOINT_POINT`
 
@@ -16,6 +17,7 @@ point for the Ristretto group.
 Source: curve25519-dalek/src/constants.rs -/
 
 open Aeneas.Std Result Edwards
+open curve25519_dalek.backend.serial.u64.field (FieldElement51.toField)
 namespace curve25519_dalek.constants
 
 /-
@@ -48,17 +50,31 @@ natural language specs:
 @[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
 
-  -- The point has the same representation as the Edwards basepoint
-  RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
+    -- The point has the same representation as the Edwards basepoint
+    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
 
-  -- The point is a valid Ristretto point
-  RISTRETTO_BASEPOINT_POINT.IsValid ∧
+    -- The point is a valid Ristretto point
+    RISTRETTO_BASEPOINT_POINT.IsValid ∧
 
-  -- The point is not the identity point
-  math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by
+    -- The point is not the identity point
+    math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by
 
-  sorry
+  have h_eq : RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT := by
+    simp only [global_simps]
 
+  constructor
 
+  · exact h_eq
+
+  constructor
+
+  · rw [h_eq]
+    constructor
+
+    · exact backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.1
+
+    · sorry
+
+  · sorry
 
 end curve25519_dalek.constants
