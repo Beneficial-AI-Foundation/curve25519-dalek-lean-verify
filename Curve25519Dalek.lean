@@ -7,6 +7,7 @@ import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Eq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Neg
@@ -31,6 +32,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A_NEG
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQUARED
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
@@ -111,6 +114,7 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.CtEq
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Eq
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Identity
