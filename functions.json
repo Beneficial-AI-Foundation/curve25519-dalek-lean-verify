@@ -2526,14 +2526,14 @@
    "is_extraction_artifact": true,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n\n  -- The point has the same representation as the Edwards basepoint\n  RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧\n\n  -- The point is a valid Ristretto point\n  RISTRETTO_BASEPOINT_POINT.IsValid ∧\n\n  -- The point is not the identity point\n  math.compress_pure RISTRETTO_BASEPOINT_POINT.toPoint ≠ math.compress_pure (0 : Point Ed25519) := by ...",
+   "\ntheorem RISTRETTO_BASEPOINT_POINT_spec :\n\n    -- The point has the same representation as the Edwards basepoint\n    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧\n\n    -- The point is a valid Ristretto point\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n\n    -- The point is not the identity point\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:\n    • constants.RISTRETTO_BASEPOINT_POINT is a valid Ristretto point (which amongst other things\n      implies that it fulfills the curve equation)\n    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint\n    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point\n-/",
+   "/-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:\n    • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things\n      implies that it fulfills the curve equation)\n    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint\n    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the\n      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which\n      is equivalent to saying that the difference between both points is not in E[4])\n-/",
    "source": "curve25519-dalek/src/constants.rs",
    "rust_name": "curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT",
    "nested_children": [],
