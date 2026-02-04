@@ -47,13 +47,9 @@ natural language specs:
 theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)
     (h_s_canonical : U8x32_as_Nat s.bytes < L)
     (h_rist_valid : r.IsValid) :
-
     ∃ result, mul s r = ok result ∧
-
     result.IsValid ∧
-
     result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by
-
   sorry
 
 /-

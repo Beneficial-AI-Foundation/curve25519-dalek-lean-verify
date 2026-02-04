@@ -63,14 +63,9 @@ natural language specs:
 -/
 @[progress]
 theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :
-
     ∃ result, coset4 self = ok result ∧
-
     ∀ (i : Fin 4), result.val[i].IsValid ∧
-                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint
-
-  := by
-
+                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

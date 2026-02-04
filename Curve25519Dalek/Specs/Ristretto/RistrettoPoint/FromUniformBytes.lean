@@ -47,12 +47,9 @@ natural language specs:
 -/
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
-
     ∃ rist, from_uniform_bytes bytes = ok rist ∧
-
-    rist.IsValid  := by
-
-    sorry
+    rist.IsValid := by
+  sorry
 
   /-
   Note: An optional, potentially desirable extension of this spec theorem may be to

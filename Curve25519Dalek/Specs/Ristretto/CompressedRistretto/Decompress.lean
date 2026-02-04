@@ -50,20 +50,14 @@ natural language specs:
   output of the pure mathematical decompression function
 -/
 theorem decompress_spec (comp : CompressedRistretto) :
-
     ∃ result, decompress comp = ok result ∧
-
     (¬comp.IsValid →
       result = none) ∧
-
     (comp.IsValid →
         ∃ rist,
         result = some rist ∧
         RistrettoPoint.IsValid rist ∧
-        math.decompress_pure (U8x32_as_Nat comp) = some rist.toPoint)
-
-        := by
-
+        math.decompress_pure (U8x32_as_Nat comp) = some rist.toPoint) := by
   sorry
 
 end curve25519_dalek.ristretto.CompressedRistretto

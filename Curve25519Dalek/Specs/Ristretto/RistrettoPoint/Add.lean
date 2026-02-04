@@ -40,13 +40,9 @@ natural language specs:
 -/
 @[progress]
 theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
-
     ∃ result, add self other = ok result ∧
-
     result.IsValid ∧
-
     result.toPoint = self.toPoint + other.toPoint := by
-
   sorry
 
 /-

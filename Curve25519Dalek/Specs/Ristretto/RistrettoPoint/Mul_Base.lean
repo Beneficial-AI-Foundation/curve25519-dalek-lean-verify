@@ -47,13 +47,9 @@ natural language specs:
 @[progress]
 theorem mul_base_spec (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < L) :
-
     ∃ result, mul_base s = ok result ∧
-
     result.IsValid ∧
-
     result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint := by
-
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

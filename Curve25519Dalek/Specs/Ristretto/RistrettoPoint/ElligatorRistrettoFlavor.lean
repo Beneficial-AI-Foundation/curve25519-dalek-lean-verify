@@ -41,18 +41,15 @@ natural language specs:
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
+
+Note that validity here also implicitly guarantees the (correct but not immediately obvious)
+property that the elligator map only generates even Edwards points.
 -/
 theorem elligator_ristretto_flavor_spec
     (s : backend.serial.u64.field.FieldElement51)
     (h_s_valid : s.IsValid) :
-
-  ∃ rist, elligator_ristretto_flavor s = ok rist ∧
-
-  -- Note that validity here also implicitly guarantees the (correct but not immediately obvious) property that the elligator map only generates even Edwards points
-  rist.IsValid
-
-  := by
-
+    ∃ rist, elligator_ristretto_flavor s = ok rist ∧
+    rist.IsValid := by
   sorry
 
   /-
