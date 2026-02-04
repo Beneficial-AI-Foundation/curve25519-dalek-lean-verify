@@ -124,6 +124,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBaseClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToBytes
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
+import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.ConditionalSelect
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress

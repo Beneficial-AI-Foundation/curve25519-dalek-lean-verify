@@ -3375,11 +3375,14 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : montgomery.ProjectivePoint)\n    (choice : subtle.Choice) :\n    ∃ res,\n      conditional_select a b choice = ok res ∧\n      (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧\n      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec for `montgomery.ConditionallySelectableProjectivePoint.conditional_select`**:\n- No panic (always returns successfully)\n- For both U and W coordinates:\n  - Each limb of the result equals the corresponding limb from `b` when `choice = 1`\n  - Each limb of the result equals the corresponding limb from `a` when `choice = 0`\n- Consequently, when `choice = Choice.one` (value 1), the whole result equals `b`;\n  when `choice = Choice.zero` (value 0), the result equals `a`.\n\nThis implements constant-time conditional selection for Montgomery curve points\nin projective coordinates (U:W).\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select",
@@ -3390,7 +3393,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": true,
