@@ -1,0 +1,28 @@
+{
+  "name": "rust-to-lean-spec",
+  "displayName": "Rust to Lean Specification Generator",
+  "description": "Generate Lean 4 specification skeleton from Rust function with sorry placeholders",
+  "version": "1.0.0",
+  "author": "Curve25519 Verification Team",
+  "category": "verification",
+  "keywords": ["lean", "rust", "verification", "formal-methods", "specification"],
+  "inputs": [
+    {
+      "name": "function_identifier",
+      "type": "string",
+      "description": "Rust function identifier (e.g., 'MontgomeryPoint::mul_base' or 'field::FieldElement51::add')",
+      "required": true
+    }
+  ],
+  "outputs": {
+    "type": "file",
+    "description": "Generated Lean specification file with sorry placeholders"
+  },
+  "permissions": [
+    "Bash(grep:*)",
+    "Bash(cat:*)",
+    "Bash(find:*)"
+  ],
+  "allowedTools": ["Read", "Write", "Grep", "Glob", "Bash"],
+  "timeout": 60000
+}
