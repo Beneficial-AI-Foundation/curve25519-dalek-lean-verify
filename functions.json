@@ -687,10 +687,13 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT.IsValid ∧\n    _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0 ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.ED25519_BASEPOINT_POINT`**:\n    • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)\n    • ED25519_BASEPOINT_POINT is of prime order L\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
@@ -2523,11 +2526,14 @@
    "is_extraction_artifact": true,
    "fully_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:\n    • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things\n      implies that it fulfills the curve equation)\n    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint\n    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the\n      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which\n      is equivalent to saying that the difference between both points is not in E[4])\n-/",
    "source": "curve25519-dalek/src/constants.rs",
    "rust_name": "curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT",
    "nested_children": [],
@@ -3936,12 +3942,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
-   "specified": true,
-   "spec_statement":
-   "theorem add_spec (self other : RistrettoPoint)\n\n    (h_self_bounds : ∀ i < 5,\n      self.X[i]!.val < 2 ^ 53 ∧\n      self.Y[i]!.val < 2 ^ 53 ∧\n      self.Z[i]!.val < 2 ^ 53 ∧\n      self.T[i]!.val < 2 ^ 53)\n\n    (h_other_bounds : ∀ i < 5,\n      other.X[i]!.val < 2 ^ 53 ∧\n      other.Y[i]!.val < 2 ^ 53 ∧\n      other.Z[i]!.val < 2 ^ 53 ∧\n      other.T[i]!.val < 2 ^ 53)\n\n    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)\n    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :\n\n    ∃ result, add self other = ok result ∧\n\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    let X₁ := Field51_as_Nat self.X\n    let Y₁ := Field51_as_Nat self.Y\n    let Z₁ := Field51_as_Nat self.Z\n    let T₁ := Field51_as_Nat self.T\n\n    let X₂ := Field51_as_Nat other.X\n    let Y₂ := Field51_as_Nat other.Y\n    let Z₂ := Field51_as_Nat other.Z\n    let T₂ := Field51_as_Nat other.T\n\n    let X₃ := Field51_as_Nat result.X\n    let Y₃ := Field51_as_Nat result.Y\n    let Z₃ := Field51_as_Nat result.Z\n    let T₃ := Field51_as_Nat result.T\n\n    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧\n    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧\n    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.add`**:\n- No panic (always returns successfully)\n- Returns the sum P + Q (in elliptic curve addition) where P = self and Q = other\n- The resulting point's coordinates satisfy the twisted Edwards addition formulas modulo p\n  (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)\n-/",
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<curve25519_dalek::ristretto::RistrettoPoint, curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::add",
@@ -3956,10 +3960,12 @@
    "dependencies":
    ["curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    ∃ result, add self other = ok result ∧\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
@@ -3980,7 +3986,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.as_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the compressed Ristretto point\n- Since CompressedRistretto is defined as Array U8 32#usize, as_bytes is essentially the identity\n-/",
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.as_bytes`**:\n    • The operation never panics (always returns successfully)\n    • as_bytes(cr) = cr, i.e., the function is the identity operation\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes",
@@ -3995,11 +4001,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (comp : CompressedRistretto) :\n\n  ∃ result, decompress comp = ok result ∧\n\n  (¬comp.IsValid →\n    result = none) ∧\n\n  (comp.IsValid →\n    ∃ rist, result = some rist ∧ rist.IsValid) := by ...",
+   "theorem decompress_spec (comp : CompressedRistretto) :\n    ∃ result, decompress comp = ok result ∧\n    (¬comp.IsValid →\n      result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        math.decompress_pure (U8x32_as_Nat comp) = some rist.toPoint) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:\n- The function always succeeds for all U8x32 input arrays (no panic)\n- If the input is not valid, then the output is none\n- If the input is valid, then the output is a valid Ristretto point, i.e.,\n  it fulfils the Edwards point curve equation\n-/",
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:\n- The function always succeeds for all U8x32 input arrays (no panic)\n- If the input is not valid, then the output is none\n- If the input is valid, then the output is a valid Ristretto point that reflects the\n  output of the pure mathematical decompression function\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress",
@@ -4022,7 +4028,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.to_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the compressed Ristretto point\n- Since CompressedRistretto is defined as Array U8 32#usize, to_bytes is essentially the identity\n-/",
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.to_bytes`**:\n    • The operation never panics (always returns successfully)\n    • to_bytes(cr) = cr, i.e., the function is the identity operation\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes",
@@ -4035,10 +4041,12 @@
    "fully_verified": true,
    "dependencies": []},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    ∃ result, mul s r = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -4073,10 +4081,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec\n  (rist1 rist2 : RistrettoPoint)\n  (h1_X_bounds : ∀ i, i < 5 → (rist1.X[i]!).val < 2 ^ 54)\n  (h1_Y_bounds : ∀ i, i < 5 → (rist1.Y[i]!).val < 2 ^ 53)\n  (h1_Z_bounds : ∀ i, i < 5 → (rist1.Z[i]!).val < 2 ^ 53)\n  (h1_T_bounds : ∀ i, i < 5 → (rist1.T[i]!).val < 2 ^ 54)\n  (h2_X_bounds : ∀ i, i < 5 → (rist2.X[i]!).val < 2 ^ 54)\n  (h2_Y_bounds : ∀ i, i < 5 → (rist2.Y[i]!).val < 2 ^ 53)\n  (h2_Z_bounds : ∀ i, i < 5 → (rist2.Z[i]!).val < 2 ^ 53)\n  (h2_T_bounds : ∀ i, i < 5 → (rist2.T[i]!).val < 2 ^ 54) :\n\n  ∃ c1,\n  ∃ c2,\n    compress rist1 = ok c1 ∧\n    compress rist2 = ok c2 ∧\n    ((∃ p1_times_8,\n      ∃ p2_times_8,\n      ∃ eq_choice,\n        edwards.EdwardsPoint.mul_by_cofactor rist1 = ok p1_times_8 ∧\n        edwards.EdwardsPoint.mul_by_cofactor rist2 = ok p2_times_8 ∧\n        edwards.ConstantTimeEqEdwardsPoint.ct_eq p1_times_8 p2_times_8 = ok eq_choice ∧\n        eq_choice = Choice.one) →\n      c1 = c2) := by ...",
+   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n    ∃ result, compress rist = ok result ∧\n    result.IsValid ∧\n    math.compress_pure rist.toPoint = U8x32_as_Nat result := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n\n1. The function always succeeds (no panic) for all valid RistrettoPoint inputs\n2. Canonicalization: If two RistrettoPoint representations are equivalent\n  (i.e., their cofactor multiples are equal as Edwards points), then they compress to\n  the same byte representation.\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n• The function always succeeds (no panic) for all valid RistrettoPoint inputs\n• The output is a valid CompressedRistretto 32-byte representation\n• The output accurately reflects the output of the pure mathematical compression function\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress",
@@ -4099,10 +4107,12 @@
     "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    ∃ result, coset4 self = ok result ∧\n    ∀ (i : Fin 4), result.val[i].IsValid ∧\n                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4",
@@ -4119,11 +4129,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n  (r_0 : backend.serial.u64.field.FieldElement51)\n  (h_r_0_bounds : ∀ i, i < 5 → (r_0[i]!).val < 2 ^ 54) :\n  ∃ rist,\n    elligator_ristretto_flavor r_0 = ok rist ∧\n    rist.IsValid := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all field element inputs\n• Given an input field element r₀, the output RistrettoPoint indeed lies on the Curve25519 Edwards curve, i.e.,\n  it indeed fulfils the curve equation.\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n\nNote that validity here also implicitly guarantees the (correct but not immediately obvious)\nproperty that the elligator map only generates even Edwards points.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
@@ -4174,10 +4184,12 @@
     "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
     "curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    ∃ result, mul_base s = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul_Base.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n• The function always succeeds (no panic) for canonical input Scalars s\n• The result is a valid RistrettoPoint\n• The result = b + ... + b represents the Ristretto basepoint b added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::mul_base",
@@ -4192,10 +4204,13 @@
    ["curve25519_dalek.ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul",
     "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    s.IsValid := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.decompress.step_1`**:\n    • The function always succeeds (no panic) for any 32-byte input `c`\n    • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p\n    • s_is_negative is true if and only if s is negative (LSB = 1)\n    • The output field element s is valid (i.e., its limbs are appropriately bounded)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
    "nested_children": [],
@@ -4211,10 +4226,13 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),\n    step_2 s = ok (ok1, c, c1, pt) ∧\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.decompress.step_2`**:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
    "nested_children": [],
