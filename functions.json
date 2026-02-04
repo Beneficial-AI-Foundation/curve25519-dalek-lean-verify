@@ -4154,11 +4154,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "\ntheorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    ∃ rist,\n    from_uniform_bytes bytes = ok rist ∧\n    rist.IsValid := by ...",
+   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    ∃ rist,\n      from_uniform_bytes bytes = ok rist ∧\n      rist.IsValid := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:\n- The function always succeeds (no panic)\n- The output is a mathematically valid Ristretto point\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
