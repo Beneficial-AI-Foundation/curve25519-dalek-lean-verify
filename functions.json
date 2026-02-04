@@ -3375,11 +3375,14 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : montgomery.ProjectivePoint)\n    (choice : subtle.Choice) :\n    ∃ res, conditional_select a b choice = ok res ∧\n      (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧\n      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec for `montgomery.ConditionallySelectableProjectivePoint.conditional_select`**:\n- No panic (always returns successfully)\n- For both U and W coordinates:\n  - Each limb of the result equals the corresponding limb from `b` when `choice = 1`\n  - Each limb of the result equals the corresponding limb from `a` when `choice = 0`\n- Consequently, when `choice = Choice.one` (value 1), the whole result equals `b`;\n  when `choice = Choice.zero` (value 0), the result equals `a`.\n\nThis implements constant-time conditional selection for Montgomery curve points\nin projective coordinates (U:W).\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select",
@@ -3390,7 +3393,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
   {"verified": true,
@@ -3487,11 +3490,13 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    ∃ result,\n    montgomery.MontgomeryPoint.as_bytes mp = ok result ∧\n    result = mp := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsBytes.lean",
+   "spec_docstring":
+   "/-- **Spec and proof for `montgomery.MontgomeryPoint.as_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, as_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::as_bytes",
@@ -3501,7 +3506,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -3565,11 +3570,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    ∃ result,\n    montgomery.MontgomeryPoint.to_bytes mp = ok result ∧\n    result = mp := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToBytes.lean",
+   "spec_docstring":
+   "/-- **Spec and proof for `montgomery.MontgomeryPoint.to_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, to_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_bytes",
@@ -3579,7 +3586,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": true,
