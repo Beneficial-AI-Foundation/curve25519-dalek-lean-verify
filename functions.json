@@ -3463,11 +3463,13 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    ∃ result,\n    montgomery.MontgomeryPoint.as_bytes mp = ok result ∧\n    result = mp := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsBytes.lean",
+   "spec_docstring":
+   "/-- **Spec and proof for `montgomery.MontgomeryPoint.as_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, as_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::as_bytes",
@@ -3477,7 +3479,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -3541,11 +3543,13 @@
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem to_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    ∃ result,\n    montgomery.MontgomeryPoint.to_bytes mp = ok result ∧\n    result = mp := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToBytes.lean",
+   "spec_docstring":
+   "/-- **Spec and proof for `montgomery.MontgomeryPoint.to_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, to_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_bytes",
@@ -3555,7 +3559,7 @@
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "dependencies": []},
   {"verified": false,
    "specified": true,
