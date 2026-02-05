@@ -4183,7 +4183,7 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
     "curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    ∃ result, mul_base s = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint := by ...",

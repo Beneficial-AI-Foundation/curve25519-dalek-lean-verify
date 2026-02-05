@@ -6,6 +6,8 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs
 import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
+import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 
 /-! # Spec Theorem for `RistrettoPoint::mul_base`
 
@@ -50,6 +52,8 @@ theorem mul_base_spec (s : scalar.Scalar)
     ∃ result, mul_base s = ok result ∧
     result.IsValid ∧
     result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint := by
-  sorry
+  unfold mul_base ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul
+  have h_basepoint_valid := constants.RISTRETTO_BASEPOINT_POINT_spec.2.1
+  progress*
 
 end curve25519_dalek.ristretto.RistrettoPoint
