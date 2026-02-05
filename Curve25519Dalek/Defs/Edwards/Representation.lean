@@ -191,7 +191,6 @@ theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
   I^2 * arg = 1 := by
   -- We treat this as an axiom/specification for now to avoid
   -- analyzing the massive bit-level recursion of the implementation.
-  intro h_call h_sq
   sorry
 
 end Constants
@@ -200,16 +199,24 @@ section PureIsogeny
 
 /-- Algebraic helper for Ed25519 point decompression.
     Proves that the recovered (x, y) satisfy the Edwards curve equation. -/
-lemma decompress_helper {F : Type*} [Field F] (a d s I : F)
-    (u1 := 1 + a * s ^ 2)
-    (u2 := 1 - a * s ^ 2)
-    (v := a * d * u1 ^ 2 - u2 ^ 2)
+lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
+    (ha : a = -1)
+    (hu1 : u1 = 1 + a * s ^ 2)
+    (hu2 : u2 = 1 - a * s ^ 2)
+    (hv : v = a * d * u1 ^ 2 - u2 ^ 2)
     (hI : I ^ 2 * (v * u2 ^ 2) = 1) :
     let x := 2 * s * (I * u2)
     let y := u1 * (I * (I * u2) * v)
     a * x^2 + y^2 = 1 + d * x^2 * y^2 := by
-
-  sorry
+  intro x y
+  have h_inv : I^2 = (v * u2^2)⁻¹ := eq_inv_of_mul_eq_one_left hI
+  dsimp only [x, y]; simp only [pow_two]; ring_nf
+  rw [show I^4 = (I^2)^2 by ring, show I^6 = (I^2)^3 by ring, h_inv]
+  have h_denom_nz : (v * u2^2) ≠ 0 := right_ne_zero_of_mul_eq_one hI
+  field_simp [h_denom_nz]; rw [div_eq_iff h_denom_nz]
+  simp only [add_mul, one_mul, div_mul_cancel₀ _ h_denom_nz]
+  rw [hv, hu1, hu2, ha];
+  try ring
 
 /--
 **Pure Decompression**
@@ -278,8 +285,9 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
               let x_raw := 2 * s * Dx
               have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
                 dsimp only [y, Dy, Dx, x_raw]
-                apply decompress_helper a_val d s I
-                dsimp [v, u1, u2] at h_I_sq_mul
+                apply decompress_helper a_val d s I u1 u2 v
+                <;> try rw [a_val];
+                <;> try rfl
                 exact h_I_sq_mul
 
               have h_x_sq : x^2 = x_raw^2 := by
