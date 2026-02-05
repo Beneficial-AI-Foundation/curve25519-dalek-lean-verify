@@ -73,6 +73,15 @@ def is_negative (x : ZMod p) : Bool :=
 def abs_edwards (x : ZMod p) : ZMod p :=
   if is_negative x then -x else x
 
+/--
+Square property of the absolute value function.
+Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
+-/
+lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
+  unfold abs_edwards
+  split_ifs <;> ring
+
+
 /-- Helper: Inverse Square Root logic matching SQRT_RATIO_M1.
     Returns (I, was_square) where I^2 = 1/u or I^2 = 1/(i*u). -/
 noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
@@ -86,15 +95,15 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
     have h_ix : IsSquare (x * sqrt_m1) := by
       have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
         intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
-        -- norm_num [p] at h_char
-        sorry
+        norm_num [p] at h_char
+
 
       have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
       have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
       have h_i_ne0 : sqrt_m1 ≠ 0 := by
         unfold sqrt_m1;
-        -- try decide
-        sorry
+        try decide
+
 
       have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
         FiniteField.isSquare_iff h_char_ne_2 hz
@@ -125,32 +134,29 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
 
         have y8 : y^8 = 1 := by
           rw [show 8 = 4 * 2 by rfl, pow_mul, y4];
-          -- norm_num
-          sorry
+          norm_num
+
         -- We are arguing by contradiction using 'by absurd: sqrt_m1 is a square'
         have order_div : 8 ∣ (p - 1) := by
           have h_order : orderOf y = 8 := by
-            refine orderOf_eq_of_pow_and_pow_div_prime (by sorry) y8 fun q hprime hdvd => ?_
+            refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 fun q hprime hdvd => ?_
             have hq_is_2 : q = 2 := by
               rw [show 8 = 2^3 by rfl] at hdvd
               exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
             rw [hq_is_2, show 8 / 2 = 4 by rfl, y4]
-            -- try grind
-            sorry
+            try grind
+
           rw [← h_order]
           apply ZMod.orderOf_dvd_card_sub_one
-          -- try grind
-          sorry
+          try grind
+
 
         have not_dvd : ¬ 8 ∣ (p - 1) := by
           intro h
           have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h
-          -- norm_num [p] at mod_zero
-          sorry
+          norm_num [p] at mod_zero
 
-        -- try grind
-        sorry
-
+        try grind
 
       have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
         have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
@@ -158,14 +164,12 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
         cases dic with
         | inl h1 =>
           rw [← euler h_i_ne0] at h1
-          -- grind
-          sorry
+          grind
         | inr h_neg => exact h_neg
 
       rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
       rw [mul_pow, h_x_pow, h_i_pow]
-      -- norm_num
-      sorry
+      norm_num
 
     let y := Classical.choose h_ix
     (abs_edwards y, false)
@@ -260,7 +264,7 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
       none
     else
       some { x := x, y := y, on_curve := by
-              -- 1. Unpack validity
+              -- Unpack validity
               replace h_invalid := Bool.eq_false_iff.mpr h_invalid
               rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
               obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
@@ -271,55 +275,20 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
                 · exact h_call
                 · exact h_sq_not
 
-
               let x_raw := 2 * s * Dx
               have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
-                sorry
+                dsimp only [y, Dy, Dx, x_raw]
+                apply decompress_helper a_val d s I
+                dsimp [v, u1, u2] at h_I_sq_mul
+                exact h_I_sq_mul
+
               have h_x_sq : x^2 = x_raw^2 := by
-                sorry
+                dsimp only [x]
+                exact abs_edwards_sq (2 * s * Dx)
 
               rw [h_x_sq]
-              
-              -- this actually ends the proof!
-              -- exact h_curve_raw
-
-
-              -- have h_y_nz : y ≠ 0 := by
-              --   intro h_zero
-              --   rw [h_zero] at h_y_eq_false
-              --   simp only [beq_self_eq_true] at h_y_eq_false; contradiction
-
-              -- have h_arg_def : v * u2^2 = arg := rfl
-
-              -- have h_arg_nz : arg ≠ 0 := by
-              --   intro h_zero
-              --   rw [← h_arg_def] at h_zero
-              --   have h_prod_zero : v * u2 = 0 := by
-              --     rcases eq_zero_or_eq_zero_of_mul_eq_zero h_zero with hv | hu2_sq
-              --     · rw [hv, zero_mul]
-              --     · rw [eq_zero_of_pow_eq_zero hu2_sq, mul_zero]
-
-              --   have h_y_struct : y = u1 * I^2 * u2 * v := by
-              --      dsimp only [y, Dy, Dx]; ring
-              --   rw [h_y_struct] at h_y_nz
-              --   rw [mul_assoc u1, mul_assoc, mul_assoc, mul_comm u2] at h_y_nz
-              --   rw [h_prod_zero] at h_y_nz
-              --   simp only [mul_zero] at h_y_nz; apply h_y_nz; rfl
-
-              -- have hv_nz : v ≠ 0 := by
-              --   intro h; apply h_arg_nz; rw [←h_arg_def, h, zero_mul]
-              -- have hu2_nz : u2 ≠ 0 := by
-              --   intro h; apply h_arg_nz; rw [←h_arg_def, h, zero_pow two_ne_zero, mul_zero]
-
-              -- have h_tuple_eq : (I, was_square) = inv_sqrt_checked arg := by
-              --   rw [←h_arg_def]
-
-              --   sorry
-
-
-              -- have h_I_sq : I^2 = arg⁻¹ := by
-              --   sorry
-              sorry }
+              exact h_curve_raw
+              }
 
 /--
 **Pure Mathematical Compression**
@@ -429,20 +398,17 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                   intro h_is_sq
                   have h_d_not_sq : ¬ IsSquare (d : ZMod p) := by
                     apply (legendreSym.eq_neg_one_iff' p).mp
-                    -- norm_num [d, p]
-                    sorry
+                    norm_num [d, p]
 
                   apply h_d_not_sq
                   by_cases hy : y = 0
                   · simp only [hy, pow_two, mul_zero] at h_neg;
-                    -- try grind
-                    sorry
+                    try grind
                   · rcases h_is_sq with ⟨k, hk⟩
                     use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
 
                 rw [h_neg] at lhs_not_sq
-                -- try grind
-                sorry
+                try grind
 
               simp only [hx_sq]
               dsimp [Ed25519, x2, u, v]
