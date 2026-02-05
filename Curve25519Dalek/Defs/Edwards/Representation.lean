@@ -117,6 +117,7 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
           -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
           -- kernel struggles with 78-digit number literals. Need to
           -- precompute these as top-level lemmas to avoid crashing the elaborator.
+
           -- change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
           -- rw [intCast_zmod_eq_zero_iff_dvd]
           -- try decide
@@ -177,9 +178,34 @@ noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   let (root, was_square) := sqrt_checked u
   (root⁻¹, was_square)
 
+/--
+Mathematical specification for `inv_sqrt_checked`.
+-/
+theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
+  inv_sqrt_checked arg = (I, was_square) →
+  was_square = true →
+  I^2 * arg = 1 := by
+  -- We treat this as an axiom/specification for now to avoid
+  -- analyzing the massive bit-level recursion of the implementation.
+  intro h_call h_sq
+  sorry
+
 end Constants
 
 section PureIsogeny
+
+/-- Algebraic helper for Ed25519 point decompression.
+    Proves that the recovered (x, y) satisfy the Edwards curve equation. -/
+lemma decompress_helper {F : Type*} [Field F] (a d s I : F)
+    (u1 := 1 + a * s ^ 2)
+    (u2 := 1 - a * s ^ 2)
+    (v := a * d * u1 ^ 2 - u2 ^ 2)
+    (hI : I ^ 2 * (v * u2 ^ 2) = 1) :
+    let x := 2 * s * (I * u2)
+    let y := u1 * (I * (I * u2) * v)
+    a * x^2 + y^2 = 1 + d * x^2 * y^2 := by
+
+  sorry
 
 /--
 **Pure Decompression**
@@ -212,8 +238,9 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
     let v := a_val * d * u1^2 - u2^2
 
     -- 2. Inverse Square Root (Elligator)
-    -- This returns (I, was_square)
-    let (I, was_square) := inv_sqrt_checked (v * u2^2)
+    let arg := v * u2^2
+    match h_call : inv_sqrt_checked arg with
+    | (I, was_square) => -- This binds I and was_square for the rest of the block
 
     -- 3. Recover denominators
     let Dx := I * u2
@@ -229,60 +256,69 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
     -- (1) Square root must succeed
     -- (2) t must be non-negative (even LSB=LeastSignificantByte)
     -- (3) y must be non-zero
-    if h_invalid : !was_square || is_negative t || y = 0 then
+    if h_invalid : !was_square || is_negative t || (y == 0) then
       none
     else
-
-      have h_valid : was_square = true ∧ is_negative t = false ∧ y ≠ 0 := by
-        simp only [Bool.not_eq_true, Bool.or_eq_true, not_or] at h_invalid
-        rcases h_invalid with ⟨⟨h_sq, h_neg⟩, h_y⟩
-        simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq
-        exact ⟨h_sq, h_neg, of_decide_eq_false h_y⟩
-
-
       some { x := x, y := y, on_curve := by
               -- 1. Unpack validity
-              obtain ⟨h_sq_true, _, h_y_nz⟩ := h_valid
+              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
+              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
+              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
+              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
 
-              have h_arg_nz : v * u2^2 ≠ 0 := by
-                intro h0
-                have h_prod_zero : v * u2 = 0 := by
-                  rcases eq_zero_or_eq_zero_of_mul_eq_zero h0 with hv | hu2_sq
-                  · -- Case 1: v = 0. Then u2 * 0 = 0.
-                    rw [hv, zero_mul]
-                  · -- Case 2: u2^2 = 0. Then u2 = 0.
-                    have hu2 : u2 = 0 := eq_zero_of_pow_eq_zero hu2_sq
-                    rw [hu2, mul_zero]
+              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
+                apply inv_sqrt_checked_spec arg
+                · exact h_call
+                · exact h_sq_not
 
-                dsimp only [y, Dy, Dx] at h_y_nz
-                repeat rw [mul_assoc] at h_y_nz
-                rw [mul_comm v] at h_prod_zero
-                rw [h_prod_zero] at h_y_nz
-                simp only [mul_zero] at h_y_nz
-                contradiction
 
-              rw [mul_comm] at h_arg_nz
-              have hv_nz : v ≠ 0 := right_ne_zero_of_mul h_arg_nz
-              have hu2_nz : u2 ≠ 0 := by
-                intro hu2
-                have hu2_sq : u2 ^ 2 ≠ 0:= left_ne_zero_of_mul h_arg_nz
-                rw [hu2, pow_two, mul_zero] at hu2_sq;
-                contradiction
-
-              have h_I_sq : I^2 = (v * u2^2)⁻¹ := by
-                let arg := v * u2^2
-                have h_arg_def : v * u2^2 = arg := rfl
-                rw [h_arg_def]
-                generalize h_call : inv_sqrt_checked arg = res
-                cases res with | mk root b =>
-                -- subst h_sq_true
-                have h_b_true : b = true := by
-                  
-
-                  sorry
-
+              let x_raw := 2 * s * Dx
+              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
+                sorry
+              have h_x_sq : x^2 = x_raw^2 := by
                 sorry
 
+              rw [h_x_sq]
+              
+              -- this actually ends the proof!
+              -- exact h_curve_raw
+
+
+              -- have h_y_nz : y ≠ 0 := by
+              --   intro h_zero
+              --   rw [h_zero] at h_y_eq_false
+              --   simp only [beq_self_eq_true] at h_y_eq_false; contradiction
+
+              -- have h_arg_def : v * u2^2 = arg := rfl
+
+              -- have h_arg_nz : arg ≠ 0 := by
+              --   intro h_zero
+              --   rw [← h_arg_def] at h_zero
+              --   have h_prod_zero : v * u2 = 0 := by
+              --     rcases eq_zero_or_eq_zero_of_mul_eq_zero h_zero with hv | hu2_sq
+              --     · rw [hv, zero_mul]
+              --     · rw [eq_zero_of_pow_eq_zero hu2_sq, mul_zero]
+
+              --   have h_y_struct : y = u1 * I^2 * u2 * v := by
+              --      dsimp only [y, Dy, Dx]; ring
+              --   rw [h_y_struct] at h_y_nz
+              --   rw [mul_assoc u1, mul_assoc, mul_assoc, mul_comm u2] at h_y_nz
+              --   rw [h_prod_zero] at h_y_nz
+              --   simp only [mul_zero] at h_y_nz; apply h_y_nz; rfl
+
+              -- have hv_nz : v ≠ 0 := by
+              --   intro h; apply h_arg_nz; rw [←h_arg_def, h, zero_mul]
+              -- have hu2_nz : u2 ≠ 0 := by
+              --   intro h; apply h_arg_nz; rw [←h_arg_def, h, zero_pow two_ne_zero, mul_zero]
+
+              -- have h_tuple_eq : (I, was_square) = inv_sqrt_checked arg := by
+              --   rw [←h_arg_def]
+
+              --   sorry
+
+
+              -- have h_I_sq : I^2 = arg⁻¹ := by
+              --   sorry
               sorry }
 
 /--
@@ -383,6 +419,7 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                   -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
                   -- kernel struggles with 78-digit number literals. Need to
                   -- precompute these as top-level lemmas to avoid crashing the elaborator.
+
                   -- change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
                   -- rw [intCast_zmod_eq_zero_iff_dvd]
                   -- try decide
