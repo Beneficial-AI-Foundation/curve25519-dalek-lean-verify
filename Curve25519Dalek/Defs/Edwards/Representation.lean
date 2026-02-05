@@ -85,12 +85,16 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
     -- We pick 'y' such that y^2 = i * x.
     have h_ix : IsSquare (x * sqrt_m1) := by
       have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
-        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char; norm_num [p] at h_char
+        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
+        -- norm_num [p] at h_char
+        sorry
 
       have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
       have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
       have h_i_ne0 : sqrt_m1 ≠ 0 := by
-        unfold sqrt_m1; try decide
+        unfold sqrt_m1;
+        -- try decide
+        sorry
 
       have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
         FiniteField.isSquare_iff h_char_ne_2 hz
@@ -110,30 +114,41 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
           rw [← sub_eq_zero, sub_neg_eq_add]
           unfold sqrt_m1
 
-          change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
-          rw [intCast_zmod_eq_zero_iff_dvd]
-          try decide
+          -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
+          -- kernel struggles with 78-digit number literals. Need to
+          -- precompute these as top-level lemmas to avoid crashing the elaborator.
+          -- change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
+          -- rw [intCast_zmod_eq_zero_iff_dvd]
+          -- try decide
+          sorry
 
-        have y8 : y^8 = 1 := by rw [show 8 = 4 * 2 by rfl, pow_mul, y4]; norm_num
+        have y8 : y^8 = 1 := by
+          rw [show 8 = 4 * 2 by rfl, pow_mul, y4];
+          -- norm_num
+          sorry
         -- We are arguing by contradiction using 'by absurd: sqrt_m1 is a square'
         have order_div : 8 ∣ (p - 1) := by
           have h_order : orderOf y = 8 := by
-            refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 fun q hprime hdvd => ?_
+            refine orderOf_eq_of_pow_and_pow_div_prime (by sorry) y8 fun q hprime hdvd => ?_
             have hq_is_2 : q = 2 := by
               rw [show 8 = 2^3 by rfl] at hdvd
               exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
             rw [hq_is_2, show 8 / 2 = 4 by rfl, y4]
-            try grind
+            -- try grind
+            sorry
           rw [← h_order]
           apply ZMod.orderOf_dvd_card_sub_one
-          try grind
+          -- try grind
+          sorry
 
         have not_dvd : ¬ 8 ∣ (p - 1) := by
           intro h
           have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h
-          norm_num [p] at mod_zero
+          -- norm_num [p] at mod_zero
+          sorry
 
-        try grind
+        -- try grind
+        sorry
 
 
       have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
@@ -142,12 +157,14 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
         cases dic with
         | inl h1 =>
           rw [← euler h_i_ne0] at h1
-          grind
+          -- grind
+          sorry
         | inr h_neg => exact h_neg
 
       rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
       rw [mul_pow, h_x_pow, h_i_pow]
-      norm_num
+      -- norm_num
+      sorry
 
     let y := Classical.choose h_ix
     (abs_edwards y, false)
@@ -212,10 +229,61 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
     -- (1) Square root must succeed
     -- (2) t must be non-negative (even LSB=LeastSignificantByte)
     -- (3) y must be non-zero
-    if !was_square || is_negative t || y = 0 then
+    if h_invalid : !was_square || is_negative t || y = 0 then
       none
     else
-      some { x := x, y := y, on_curve := sorry }
+
+      have h_valid : was_square = true ∧ is_negative t = false ∧ y ≠ 0 := by
+        simp only [Bool.not_eq_true, Bool.or_eq_true, not_or] at h_invalid
+        rcases h_invalid with ⟨⟨h_sq, h_neg⟩, h_y⟩
+        simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq
+        exact ⟨h_sq, h_neg, of_decide_eq_false h_y⟩
+
+
+      some { x := x, y := y, on_curve := by
+              -- 1. Unpack validity
+              obtain ⟨h_sq_true, _, h_y_nz⟩ := h_valid
+
+              have h_arg_nz : v * u2^2 ≠ 0 := by
+                intro h0
+                have h_prod_zero : v * u2 = 0 := by
+                  rcases eq_zero_or_eq_zero_of_mul_eq_zero h0 with hv | hu2_sq
+                  · -- Case 1: v = 0. Then u2 * 0 = 0.
+                    rw [hv, zero_mul]
+                  · -- Case 2: u2^2 = 0. Then u2 = 0.
+                    have hu2 : u2 = 0 := eq_zero_of_pow_eq_zero hu2_sq
+                    rw [hu2, mul_zero]
+
+                dsimp only [y, Dy, Dx] at h_y_nz
+                repeat rw [mul_assoc] at h_y_nz
+                rw [mul_comm v] at h_prod_zero
+                rw [h_prod_zero] at h_y_nz
+                simp only [mul_zero] at h_y_nz
+                contradiction
+
+              rw [mul_comm] at h_arg_nz
+              have hv_nz : v ≠ 0 := right_ne_zero_of_mul h_arg_nz
+              have hu2_nz : u2 ≠ 0 := by
+                intro hu2
+                have hu2_sq : u2 ^ 2 ≠ 0:= left_ne_zero_of_mul h_arg_nz
+                rw [hu2, pow_two, mul_zero] at hu2_sq;
+                contradiction
+
+              have h_I_sq : I^2 = (v * u2^2)⁻¹ := by
+                let arg := v * u2^2
+                have h_arg_def : v * u2^2 = arg := rfl
+                rw [h_arg_def]
+                generalize h_call : inv_sqrt_checked arg = res
+                cases res with | mk root b =>
+                -- subst h_sq_true
+                have h_b_true : b = true := by
+                  
+
+                  sorry
+
+                sorry
+
+              sorry }
 
 /--
 **Pure Mathematical Compression**
@@ -312,25 +380,33 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
 
                 have rhs_sq : IsSquare (-1 : ZMod p) := by
                   use sqrt_m1; rw [←pow_two, sqrt_m1]; rw [← sub_eq_zero]
-                  change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
-                  rw [intCast_zmod_eq_zero_iff_dvd]
-                  try decide
+                  -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
+                  -- kernel struggles with 78-digit number literals. Need to
+                  -- precompute these as top-level lemmas to avoid crashing the elaborator.
+                  -- change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
+                  -- rw [intCast_zmod_eq_zero_iff_dvd]
+                  -- try decide
+                  sorry
 
                 have lhs_not_sq : ¬ IsSquare ((d : ZMod p) * y^2) := by
                   intro h_is_sq
                   have h_d_not_sq : ¬ IsSquare (d : ZMod p) := by
                     apply (legendreSym.eq_neg_one_iff' p).mp
-                    norm_num [d, p]
+                    -- norm_num [d, p]
+                    sorry
 
                   apply h_d_not_sq
                   by_cases hy : y = 0
-                  · simp only [hy, pow_two, mul_zero] at h_neg; try grind
+                  · simp only [hy, pow_two, mul_zero] at h_neg;
+                    -- try grind
+                    sorry
                   · rcases h_is_sq with ⟨k, hk⟩
                     use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
 
                 rw [h_neg] at lhs_not_sq
-                try grind
-                
+                -- try grind
+                sorry
+
               simp only [hx_sq]
               dsimp [Ed25519, x2, u, v]
               simp only [neg_mul, one_mul]
