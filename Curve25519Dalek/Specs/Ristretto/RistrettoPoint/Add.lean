@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::add`
 
@@ -43,10 +44,29 @@ theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_
     ∃ result, add self other = ok result ∧
     result.IsValid ∧
     result.toPoint = self.toPoint + other.toPoint := by
-  sorry
+  unfold add
+  progress*
+  · exact h_self_valid.1
+  · exact h_other_valid.1
+  · constructor
+    · constructor
+      · exact ep_post_1
+      · have h_self_even : IsEven (self.toPoint) := by
+          unfold RistrettoPoint.toPoint
+          rw [← EdwardsPoint_IsSquare_iff_IsEven self h_self_valid.1]
+          exact h_self_valid.2
+        have h_other_even : IsEven (other.toPoint) := by
+          unfold RistrettoPoint.toPoint
+          rw [← EdwardsPoint_IsSquare_iff_IsEven other h_other_valid.1]
+          exact h_other_valid.2
+        have h_eq_points : ep.toPoint = self.toPoint + other.toPoint := by
+          unfold RistrettoPoint.toPoint
+          exact ep_post_2
+        rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post_1, h_eq_points]
+        exact even_add_closure_Ed25519 _ _ h_self_even h_other_even
+    · exact ep_post_2
 
 /-
-
 Note:
 
 One RistrettoPoint r corresponds to an equivalence class of several
@@ -76,7 +96,6 @@ representatives follows from standard results in abstract algebra: in any set of
 
 constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
 and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
-
 -/
 
 end curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
