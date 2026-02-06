@@ -1111,6 +1111,30 @@ instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
   unfold MontgomeryPoint.IsValid
   infer_instance
 
+/--
+The Edwards denominator is never zero.
+-/
+lemma edwards_denom_nonzero (y : ZMod p) : (Ed25519.d : ZMod p) * y ^ 2 + 1 ≠ 0 := by
+  intro h_zero
+  have h_eq : Ed25519.d * y^2 = -1 := eq_neg_of_add_eq_zero_left h_zero
+  by_cases hy : y = 0
+  · -- If y = 0, then 0 = -1, contradiction.
+    rw [hy, pow_two] at h_eq; simp only [mul_zero] at h_eq; contradiction
+  · -- y ≠ 0 case
+    have h_d_val : Ed25519.d = -1 * (y^2)⁻¹ := by
+      apply (eq_mul_inv_iff_mul_eq₀ (pow_ne_zero 2 hy)).mpr
+      exact h_eq
+
+    have h_d_sq : IsSquare (Ed25519.d : ZMod p) := by
+      rw [h_d_val]
+      apply IsSquare.mul
+      · exact Edwards.neg_one_is_square -- From Curve.lean
+      · rw [← inv_pow]; exact IsSquare.sq (y⁻¹)
+
+    exact Edwards.d_not_square h_d_sq
+
+
+
 lemma montgomery_helper {F : Type*} [Field F] (d y x_sq : F)
     (h_den : d * y ^ 2 + 1 ≠ 0)
     (h_x : x_sq = (y ^ 2 - 1) * (d * y ^ 2 + 1)⁻¹) :
@@ -1130,12 +1154,14 @@ noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 
     --  to avoid un folding heavy computations on large Nats casted as Mod p.
     let u : ZMod p := bytesToField m
     -- We know u != -1 from IsValid, so inversion is safe/correct
-    let y := (u - 1) * (u + 1)⁻¹
+    let one : ZMod p := 1
+    let y : ZMod p := (u - one) * (u + one)⁻¹
 
     -- Recover x squared
-    let num := y^2 - 1
-    let den := (d : ZMod p) * y^2 + 1
-    let x2 := num * den⁻¹
+    let num : ZMod p := y^2 - one
+    let den : ZMod p := (d : ZMod p) * y^2 + one
+
+    let x2 : ZMod p := num * den⁻¹
 
     -- Extract root (guaranteed to exist by IsValid)
     match h_sqrt : sqrt_checked x2 with
@@ -1143,19 +1169,30 @@ noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 
 
     -- For Montgomery -> Edwards, the sign of x is lost.
     -- We canonically choose the non-negative (even) root.
-    { x := x_abs, y := y, on_curve :=
-      have h_is_sq_true : is_sq = true := by
-        unfold MontgomeryPoint.IsValid at h
-        by_cases h_inv : u + 1 = 0
-        · rw [if_pos h_inv] at h; dsimp only [h_inv] at h
-        · rw [if_neg h_inv] at h; rw [sqrt_checked_iff_isSquare x2 h_sqrt]; convert h
+    { x := x_abs, y := y, on_curve := by
+        have h_is_sq_true : is_sq = true := by
+          unfold MontgomeryPoint.IsValid at h
+          by_cases h_inv : u + 1 = 0
+          · rw [if_pos h_inv] at h; dsimp only [h_inv] at h
+          · rw [if_neg h_inv] at h; rw [sqrt_checked_iff_isSquare x2 h_sqrt]; convert h
 
-      have h_x_sq : x_abs^2 = x2 := by
-        apply sqrt_checked_spec x2 h_sqrt h_is_sq_true
+        have h_x_sq : x_abs^2 = x2 := by
+          apply sqrt_checked_spec x2 h_sqrt h_is_sq_true
 
-      
-      sorry
-    }
+        have h_den_nz : den ≠ 0 := by
+          dsimp only [den, one]
+          apply edwards_denom_nonzero
+
+        have ha : Ed25519.a = -1 := rfl
+        have hd : (d : ZMod p) = Ed25519.d := rfl
+        rw [ha, h_x_sq]
+        dsimp only [x2, num, den, one] at ⊢ h_den_nz
+        apply (mul_right_inj' h_den_nz).mp
+        field_simp [h_den_nz]
+        simp only [neg_sub]
+        rw [← hd]
+        try ring
+      }
   else
     0
 
