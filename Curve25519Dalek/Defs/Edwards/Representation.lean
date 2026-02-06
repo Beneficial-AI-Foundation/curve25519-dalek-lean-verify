@@ -174,6 +174,18 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 
+/-- Spec: If `sqrt_checked` returns true, the result is a valid square root. -/
+theorem sqrt_checked_spec (u : ZMod p) {r : ZMod p} {b : Bool} :
+  sqrt_checked u = (r, b) → b = true → r^2 = u := by
+  intro h_call h_true
+  sorry -- Proof deferred
+
+/-- Spec: `sqrt_checked` returns true iff the input is a square. -/
+theorem sqrt_checked_iff_isSquare (u : ZMod p) {r : ZMod p} {b : Bool} :
+  sqrt_checked u = (r, b) → (b = true ↔ IsSquare u) := by
+  intro h_call
+  sorry -- Proof deferred
+
 /--
 Inverse Square Root spec.
 Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
@@ -1099,6 +1111,13 @@ instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
   unfold MontgomeryPoint.IsValid
   infer_instance
 
+lemma montgomery_helper {F : Type*} [Field F] (d y x_sq : F)
+    (h_den : d * y ^ 2 + 1 ≠ 0)
+    (h_x : x_sq = (y ^ 2 - 1) * (d * y ^ 2 + 1)⁻¹) :
+    -1 * x_sq + y ^ 2 = 1 + d * x_sq * y ^ 2 := by
+  rw [h_x]; apply (mul_right_inj' h_den).mp; field_simp [h_den]
+  try ring
+
 /--
 Convert MontgomeryPoint to Point Ed25519.
 1. Recovers `y` from `u` via `y = (u-1)/(u+1)`.
@@ -1119,11 +1138,24 @@ noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 
     let x2 := num * den⁻¹
 
     -- Extract root (guaranteed to exist by IsValid)
-    let (x_abs, is_sq) := sqrt_checked x2
+    match h_sqrt : sqrt_checked x2 with
+    | (x_abs, is_sq) =>
 
     -- For Montgomery -> Edwards, the sign of x is lost.
     -- We canonically choose the non-negative (even) root.
-    { x := x_abs, y := y, on_curve := sorry }
+    { x := x_abs, y := y, on_curve :=
+      have h_is_sq_true : is_sq = true := by
+        unfold MontgomeryPoint.IsValid at h
+        by_cases h_inv : u + 1 = 0
+        · rw [if_pos h_inv] at h; dsimp only [h_inv] at h
+        · rw [if_neg h_inv] at h; rw [sqrt_checked_iff_isSquare x2 h_sqrt]; convert h
+
+      have h_x_sq : x_abs^2 = x2 := by
+        apply sqrt_checked_spec x2 h_sqrt h_is_sq_true
+
+      
+      sorry
+    }
   else
     0
 
