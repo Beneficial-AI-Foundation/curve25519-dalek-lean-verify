@@ -52,8 +52,8 @@ Natural language specs:
     • The conversion is deterministic and well-defined for valid projective points
 -/
 
-/-- Validity predicate for Montgomery projective points.
-    A projective point (U : W) is valid if W is non-zero in the field. -/
+-- /-- Validity predicate for Montgomery projective points.
+--     A projective point (U : W) is valid if W is non-zero in the field. -/
 def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
   pp.W.toField ≠ 0 ∧ pp.U.toField / pp.W.toField ≠ -1
 
@@ -70,9 +70,12 @@ def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
 -/
 
 -- Helper lemma: bytesToField equals U8x32_as_Nat cast to ZMod p
-lemma bytesToField_eq_U8x32_as_Nat (m : montgomery.MontgomeryPoint) :
-    bytesToField m = (U8x32_as_Nat m : ZMod p) := by
-  sorry
+lemma invert_mul_eq_div
+  (U W x : backend.serial.u64.field.FieldElement51)
+  (hx : Field51_as_Nat x * Field51_as_Nat W ≡ 1 [MOD p]) :
+  Field51_as_Nat U * Field51_as_Nat x ≡ Field51_as_Nat U / Field51_as_Nat W [MOD p]
+:= by
+sorry
 
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
@@ -93,9 +96,10 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
   · -- Show bytesToField res = self.U.toField / self.W.toField
     constructor
     · unfold MontgomeryPoint.IsValid
-      simp
-      constructor
-      · sorry
+      intro u
+      by_cases h1 : u + 1 = 0
+      · simp
+        sorry
       · sorry
     · sorry
 
