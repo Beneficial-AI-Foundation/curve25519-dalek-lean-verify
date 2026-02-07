@@ -22,6 +22,7 @@ This function computes the multiplicative inverse using Montgomery form.
 
 -/
 
+-- Primality Certification for L := 2^252 + 27742317777372353535851937790883648493
 instance : Fact (Nat.Prime L) := by
   unfold L
   exact ⟨PrimeCert.prime_ed25519_order⟩
