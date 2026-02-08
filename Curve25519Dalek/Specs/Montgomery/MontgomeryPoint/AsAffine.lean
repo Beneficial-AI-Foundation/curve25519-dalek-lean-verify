@@ -114,8 +114,11 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
         have hu : u = -1 := by linear_combination h1
         -- Now show bytesToField a = self.U.toField / self.W.toField using invert_mul_eq_div
         have a_eq_div : bytesToField a = self.U.toField / self.W.toField := by
+          have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
+          rename_i x_inv _ x_inv_post _ _
           rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
-
+          have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
+            exact x_inv_post h_W_nat_nonzero
           sorry
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
         -- This contradicts h_valid.2
