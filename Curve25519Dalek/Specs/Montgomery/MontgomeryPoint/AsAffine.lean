@@ -88,6 +88,8 @@ lemma Field51_modP_ne_zero_of_toField_ne_zero
   exact Edwards.lift_mod_eq (Field51_as_Nat W) 0 (by
     simpa [Nat.zero_mod] using hmod)
 
+-- set_option maxHeartbeats 1200000 in
+-- Increased heartbeats due to complex field arithmetic calculations
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
@@ -127,7 +129,10 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
                     (Field51_as_Nat self.W % p)) % p := by
                       simp [Nat.mul_mod]
               _ = 1 := by simp [h_inv]
+          have h_inv3 : Field51_as_Nat self.U * Field51_as_Nat x_inv ≡ Field51_as_Nat self.U / Field51_as_Nat self.W [MOD p] := by
+            exact invert_mul_eq_div self.U self.W x_inv h_inv2
           sorry
+          -- exact Edwards.lift_mod_eq _ _ (Nat.ModEq.trans (Nat.ModEq.trans a_post_1 u_post_1) h_inv3)
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
         -- This contradicts h_valid.2
         have div_eq_neg_one : self.U.toField / self.W.toField = -1 := by
