@@ -77,6 +77,17 @@ lemma invert_mul_eq_div
 := by
 sorry
 
+/-- If a limb-representation is nonzero in `ZMod p`, its canonical representative mod `p` is nonzero. -/
+lemma Field51_modP_ne_zero_of_toField_ne_zero
+    (W : backend.serial.u64.field.FieldElement51)
+    (hW : W.toField ≠ 0) :
+    Field51_as_Nat W % p ≠ 0 := by
+  intro hmod
+  apply hW
+  unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
+  exact Edwards.lift_mod_eq (Field51_as_Nat W) 0 (by
+    simpa [Nat.zero_mod] using hmod)
+
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
@@ -98,8 +109,22 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     · unfold MontgomeryPoint.IsValid
       intro u
       by_cases h1 : u + 1 = 0
-      · simp
-        sorry
+      · simp [h1]
+        -- u + 1 = 0 means u = -1 in ZMod p
+        have hu : u = -1 := by linear_combination h1
+        -- Now show bytesToField a = self.U.toField / self.W.toField using invert_mul_eq_div
+        have a_eq_div : bytesToField a = self.U.toField / self.W.toField := by
+          rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
+
+          sorry
+        -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
+        -- This contradicts h_valid.2
+        have div_eq_neg_one : self.U.toField / self.W.toField = -1 := by
+          calc self.U.toField / self.W.toField
+              = bytesToField a := a_eq_div.symm
+            _ = u := rfl
+            _ = -1 := hu
+        exact absurd div_eq_neg_one h_valid.2
       · sorry
     · sorry
 
