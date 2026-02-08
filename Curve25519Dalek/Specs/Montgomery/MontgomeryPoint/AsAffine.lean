@@ -119,6 +119,14 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
           have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
             exact x_inv_post h_W_nat_nonzero
+          have h_inv2 : Field51_as_Nat x_inv * Field51_as_Nat self.W ≡ 1 [MOD p] := by
+            dsimp [Nat.ModEq]
+            calc
+              (Field51_as_Nat x_inv * Field51_as_Nat self.W) % p
+                  = (Field51_as_Nat x_inv % p *
+                    (Field51_as_Nat self.W % p)) % p := by
+                      simp [Nat.mul_mod]
+              _ = 1 := by simp [h_inv]
           sorry
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
         -- This contradicts h_valid.2
