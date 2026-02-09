@@ -2564,10 +2564,10 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : EdwardsPoint)\n\n    (h_self_bounds : ∀ i < 5,\n      self.X[i]!.val < 2 ^ 53 ∧\n      self.Y[i]!.val < 2 ^ 53 ∧\n      self.Z[i]!.val < 2 ^ 53 ∧\n      self.T[i]!.val < 2 ^ 53)\n\n    (h_other_bounds : ∀ i < 5,\n      other.X[i]!.val < 2 ^ 53 ∧\n      other.Y[i]!.val < 2 ^ 53 ∧\n      other.Z[i]!.val < 2 ^ 53 ∧\n      other.T[i]!.val < 2 ^ 53)\n\n    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)\n    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :\n\n    ∃ result, add self other = ok result ∧\n\n    (∀ i < 5,\n      result.X[i]!.val < 2 ^ 54  ∧\n      result.Y[i]!.val < 2 ^ 54  ∧\n      result.Z[i]!.val < 2 ^ 54  ∧\n      result.T[i]!.val < 2 ^ 54) ∧\n\n    let X₁ := Field51_as_Nat self.X\n    let Y₁ := Field51_as_Nat self.Y\n    let Z₁ := Field51_as_Nat self.Z\n    let T₁ := Field51_as_Nat self.T\n\n    let X₂ := Field51_as_Nat other.X\n    let Y₂ := Field51_as_Nat other.Y\n    let Z₂ := Field51_as_Nat other.Z\n    let T₂ := Field51_as_Nat other.T\n\n    let X₃ := Field51_as_Nat result.X\n    let Y₃ := Field51_as_Nat result.Y\n    let Z₃ := Field51_as_Nat result.Z\n    let T₃ := Field51_as_Nat result.T\n\n    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧\n    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧\n    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧\n    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by ...",
+   "theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    ∃ result, add self other = ok result ∧\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.add`**:\n- No panic (always returns successfully)\n- Returns the sum P + Q (in elliptic curve addition) where P = self and Q = other\n- The resulting point's coordinates satisfy the twisted Edwards addition formulas modulo\n (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)\n-/",
+   "/-- **Spec and proof concerning `edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Add<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add",
@@ -3959,7 +3959,7 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    ∃ result, add self other = ok result ∧\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint := by ...",
