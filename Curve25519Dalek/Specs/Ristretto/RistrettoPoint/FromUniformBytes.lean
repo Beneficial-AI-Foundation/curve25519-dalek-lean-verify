@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`

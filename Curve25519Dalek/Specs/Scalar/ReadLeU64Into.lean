@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # read_le_u64_into
 

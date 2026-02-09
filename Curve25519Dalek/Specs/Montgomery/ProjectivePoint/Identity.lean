@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 

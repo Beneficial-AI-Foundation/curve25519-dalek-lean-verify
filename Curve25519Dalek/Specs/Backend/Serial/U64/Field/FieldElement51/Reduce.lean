@@ -1,4 +1,4 @@
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
 import Mathlib
 

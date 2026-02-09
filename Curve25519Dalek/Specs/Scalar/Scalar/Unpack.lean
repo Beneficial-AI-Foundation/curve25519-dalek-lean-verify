@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 /-! # Spec Theorem for `Scalar::unpack`
