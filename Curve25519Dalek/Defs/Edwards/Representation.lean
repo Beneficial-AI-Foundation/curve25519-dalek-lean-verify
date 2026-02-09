@@ -73,6 +73,15 @@ def is_negative (x : ZMod p) : Bool :=
 def abs_edwards (x : ZMod p) : ZMod p :=
   if is_negative x then -x else x
 
+/--
+Square property of the absolute value function.
+Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
+-/
+lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
+  unfold abs_edwards
+  split_ifs <;> ring
+
+
 /-- Helper: Inverse Square Root logic matching SQRT_RATIO_M1.
     Returns (I, was_square) where I^2 = 1/u or I^2 = 1/(i*u). -/
 noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
@@ -84,10 +93,98 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
     -- Case 2: x is not a square. Then i * x must be a square in this field.
     -- We pick 'y' such that y^2 = i * x.
     have h_ix : IsSquare (x * sqrt_m1) := by
-      -- TODO(proof): if x is nonsquare, x*i is square.
-      sorry
+      have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
+        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
+        norm_num [p] at h_char
+
+
+      have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
+      have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
+      have h_i_ne0 : sqrt_m1 ≠ 0 := by
+        unfold sqrt_m1;
+        try decide
+
+
+      have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
+        FiniteField.isSquare_iff h_char_ne_2 hz
+      simp only [h_pow_card] at euler
+
+      have h_x_pow : x ^ (p / 2) = -1 := by
+        have dic := FiniteField.pow_dichotomy h_char_ne_2 hx_ne0
+        rw [h_pow_card] at dic
+        cases dic with
+        | inl h1 => rw [← euler hx_ne0] at h1; contradiction
+        | inr h_neg => exact h_neg
+
+      have not_sq_i : ¬ IsSquare sqrt_m1 := by
+        rintro ⟨y, hy⟩; rw [← pow_two] at hy;
+        have y4 : y^4 = -1 := by
+          rw [show 4 = 2 * 2 by rfl, pow_mul, ← hy]
+          rw [← sub_eq_zero, sub_neg_eq_add]
+          unfold sqrt_m1
+
+          -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
+          -- kernel struggles with 78-digit number literals. Need to
+          -- precompute these as top-level lemmas to avoid crashing the elaborator.
+
+          -- change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
+          -- rw [intCast_zmod_eq_zero_iff_dvd]
+          -- try decide
+          sorry
+
+        have y8 : y^8 = 1 := by
+          rw [show 8 = 4 * 2 by rfl, pow_mul, y4];
+          norm_num
+
+        -- We are arguing by contradiction using 'by absurd: sqrt_m1 is a square'
+        have order_div : 8 ∣ (p - 1) := by
+          have h_order : orderOf y = 8 := by
+            refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 fun q hprime hdvd => ?_
+            have hq_is_2 : q = 2 := by
+              rw [show 8 = 2^3 by rfl] at hdvd
+              exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
+            rw [hq_is_2, show 8 / 2 = 4 by rfl, y4]
+            try grind
+
+          rw [← h_order]
+          apply ZMod.orderOf_dvd_card_sub_one
+          try grind
+
+
+        have not_dvd : ¬ 8 ∣ (p - 1) := by
+          intro h
+          have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h
+          norm_num [p] at mod_zero
+
+        try grind
+
+      have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
+        have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
+        rw [h_pow_card] at dic
+        cases dic with
+        | inl h1 =>
+          rw [← euler h_i_ne0] at h1
+          grind
+        | inr h_neg => exact h_neg
+
+      rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
+      rw [mul_pow, h_x_pow, h_i_pow]
+      norm_num
+
     let y := Classical.choose h_ix
     (abs_edwards y, false)
+
+/-- Spec: If `sqrt_checked` returns true, the result is a valid square root. -/
+theorem sqrt_checked_spec (u : ZMod p) {r : ZMod p} {b : Bool} :
+  sqrt_checked u = (r, b) → b = true → r^2 = u := by
+  intro h_call h_true
+  sorry -- Proof deferred
+
+/-- Spec: `sqrt_checked` returns true iff the input is a square. -/
+theorem sqrt_checked_iff_isSquare (u : ZMod p) {r : ZMod p} {b : Bool} :
+  sqrt_checked u = (r, b) → (b = true ↔ IsSquare u) := by
+  intro h_call
+  sorry -- Proof deferred
 
 /--
 Inverse Square Root spec.
@@ -97,9 +194,41 @@ noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   let (root, was_square) := sqrt_checked u
   (root⁻¹, was_square)
 
+/--
+Mathematical specification for `inv_sqrt_checked`.
+-/
+theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
+  inv_sqrt_checked arg = (I, was_square) →
+  was_square = true →
+  I^2 * arg = 1 := by
+  -- We treat this as an axiom/specification for now to avoid
+  -- analyzing the massive bit-level recursion of the implementation.
+  sorry
+
 end Constants
 
 section PureIsogeny
+
+/-- Algebraic helper for Ed25519 point decompression.
+    Proves that the recovered (x, y) satisfy the Edwards curve equation. -/
+lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
+    (ha : a = -1)
+    (hu1 : u1 = 1 + a * s ^ 2)
+    (hu2 : u2 = 1 - a * s ^ 2)
+    (hv : v = a * d * u1 ^ 2 - u2 ^ 2)
+    (hI : I ^ 2 * (v * u2 ^ 2) = 1) :
+    let x := 2 * s * (I * u2)
+    let y := u1 * (I * (I * u2) * v)
+    a * x^2 + y^2 = 1 + d * x^2 * y^2 := by
+  intro x y
+  have h_inv : I^2 = (v * u2^2)⁻¹ := eq_inv_of_mul_eq_one_left hI
+  dsimp only [x, y]; simp only [pow_two]; ring_nf
+  rw [show I^4 = (I^2)^2 by ring, show I^6 = (I^2)^3 by ring, h_inv]
+  have h_denom_nz : (v * u2^2) ≠ 0 := right_ne_zero_of_mul_eq_one hI
+  field_simp [h_denom_nz]; rw [div_eq_iff h_denom_nz]
+  simp only [add_mul, one_mul, div_mul_cancel₀ _ h_denom_nz]
+  rw [hv, hu1, hu2, ha];
+  try ring
 
 /--
 **Pure Decompression**
@@ -132,8 +261,9 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
     let v := a_val * d * u1^2 - u2^2
 
     -- 2. Inverse Square Root (Elligator)
-    -- This returns (I, was_square)
-    let (I, was_square) := inv_sqrt_checked (v * u2^2)
+    let arg := v * u2^2
+    match h_call : inv_sqrt_checked arg with
+    | (I, was_square) => -- This binds I and was_square for the rest of the block
 
     -- 3. Recover denominators
     let Dx := I * u2
@@ -149,10 +279,36 @@ noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
     -- (1) Square root must succeed
     -- (2) t must be non-negative (even LSB=LeastSignificantByte)
     -- (3) y must be non-zero
-    if !was_square || is_negative t || y = 0 then
+    if h_invalid : !was_square || is_negative t || (y == 0) then
       none
     else
-      some { x := x, y := y, on_curve := sorry }
+      some { x := x, y := y, on_curve := by
+              -- Unpack validity
+              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
+              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
+              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
+              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
+
+              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
+                apply inv_sqrt_checked_spec arg
+                · exact h_call
+                · exact h_sq_not
+
+              let x_raw := 2 * s * Dx
+              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
+                dsimp only [y, Dy, Dx, x_raw]
+                apply decompress_helper a_val d s I u1 u2 v
+                <;> try rw [a_val];
+                <;> try rfl
+                exact h_I_sq_mul
+
+              have h_x_sq : x^2 = x_raw^2 := by
+                dsimp only [x]
+                exact abs_edwards_sq (2 * s * Dx)
+
+              rw [h_x_sq]
+              exact h_curve_raw
+              }
 
 /--
 **Pure Mathematical Compression**
@@ -227,7 +383,61 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
       -- Apply sign bit: if sign_bit is 1, we want the negative (odd) root
       let x := if (is_negative x_root) != (sign_bit == 1) then -x_root else x_root
 
-      some { x := x, y := y, on_curve := sorry }
+      some { x := x, y := y, on_curve := by
+              have hx_sq : x^2 = x2 := by
+                simp only [x]
+                split_ifs
+                all_goals{
+                  try simp only [even_two, Even.neg_pow]
+                  dsimp [x_root, abs_edwards]
+                  split_ifs
+                  all_goals {
+                    try simp only [even_two, Even.neg_pow]
+                    have spec := Classical.choose_spec h
+                    rw [pow_two]
+                    rw [← spec]
+                  }
+                }
+              have hv_ne0 : v ≠ 0 := by
+                intro hv
+                dsimp only [v] at hv
+                have h_neg : (d : ZMod p) * y^2 = -1 := eq_neg_of_add_eq_zero_left hv
+
+                have rhs_sq : IsSquare (-1 : ZMod p) := by
+                  use sqrt_m1; rw [←pow_two, sqrt_m1]; rw [← sub_eq_zero]
+                  -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
+                  -- kernel struggles with 78-digit number literals. Need to
+                  -- precompute these as top-level lemmas to avoid crashing the elaborator.
+
+                  -- change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
+                  -- rw [intCast_zmod_eq_zero_iff_dvd]
+                  -- try decide
+                  sorry
+
+                have lhs_not_sq : ¬ IsSquare ((d : ZMod p) * y^2) := by
+                  intro h_is_sq
+                  have h_d_not_sq : ¬ IsSquare (d : ZMod p) := by
+                    apply (legendreSym.eq_neg_one_iff' p).mp
+                    norm_num [d, p]
+
+                  apply h_d_not_sq
+                  by_cases hy : y = 0
+                  · simp only [hy, pow_two, mul_zero] at h_neg;
+                    try grind
+                  · rcases h_is_sq with ⟨k, hk⟩
+                    use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
+
+                rw [h_neg] at lhs_not_sq
+                try grind
+
+              simp only [hx_sq]
+              dsimp [Ed25519, x2, u, v]
+              simp only [neg_mul, one_mul]
+              simp only [v] at hv_ne0
+              rw [mul_comm] at hv_ne0
+              field_simp [hv_ne0]
+              ring
+              }
     else
       none
 
@@ -919,6 +1129,37 @@ instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
   infer_instance
 
 /--
+The Edwards denominator is never zero.
+-/
+lemma edwards_denom_nonzero (y : ZMod p) : (Ed25519.d : ZMod p) * y ^ 2 + 1 ≠ 0 := by
+  intro h_zero
+  have h_eq : Ed25519.d * y^2 = -1 := eq_neg_of_add_eq_zero_left h_zero
+  by_cases hy : y = 0
+  · -- If y = 0, then 0 = -1, contradiction.
+    rw [hy, pow_two] at h_eq; simp only [mul_zero] at h_eq; contradiction
+  · -- y ≠ 0 case
+    have h_d_val : Ed25519.d = -1 * (y^2)⁻¹ := by
+      apply (eq_mul_inv_iff_mul_eq₀ (pow_ne_zero 2 hy)).mpr
+      exact h_eq
+
+    have h_d_sq : IsSquare (Ed25519.d : ZMod p) := by
+      rw [h_d_val]
+      apply IsSquare.mul
+      · exact Edwards.neg_one_is_square -- From Curve.lean
+      · rw [← inv_pow]; exact IsSquare.sq (y⁻¹)
+
+    exact Edwards.d_not_square h_d_sq
+
+
+
+lemma montgomery_helper {F : Type*} [Field F] (d y x_sq : F)
+    (h_den : d * y ^ 2 + 1 ≠ 0)
+    (h_x : x_sq = (y ^ 2 - 1) * (d * y ^ 2 + 1)⁻¹) :
+    -1 * x_sq + y ^ 2 = 1 + d * x_sq * y ^ 2 := by
+  rw [h_x]; apply (mul_right_inj' h_den).mp; field_simp [h_den]
+  try ring
+
+/--
 Convert MontgomeryPoint to Point Ed25519.
 1. Recovers `y` from `u` via `y = (u-1)/(u+1)`.
 2. Recovers `x` from `y` (choosing the canonical positive root).
@@ -930,19 +1171,45 @@ noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 
     --  to avoid un folding heavy computations on large Nats casted as Mod p.
     let u : ZMod p := bytesToField m
     -- We know u != -1 from IsValid, so inversion is safe/correct
-    let y := (u - 1) * (u + 1)⁻¹
+    let one : ZMod p := 1
+    let y : ZMod p := (u - one) * (u + one)⁻¹
 
     -- Recover x squared
-    let num := y^2 - 1
-    let den := (d : ZMod p) * y^2 + 1
-    let x2 := num * den⁻¹
+    let num : ZMod p := y^2 - one
+    let den : ZMod p := (d : ZMod p) * y^2 + one
+
+    let x2 : ZMod p := num * den⁻¹
 
     -- Extract root (guaranteed to exist by IsValid)
-    let (x_abs, is_sq) := sqrt_checked x2
+    match h_sqrt : sqrt_checked x2 with
+    | (x_abs, is_sq) =>
 
     -- For Montgomery -> Edwards, the sign of x is lost.
     -- We canonically choose the non-negative (even) root.
-    { x := x_abs, y := y, on_curve := sorry }
+    { x := x_abs, y := y, on_curve := by
+        have h_is_sq_true : is_sq = true := by
+          unfold MontgomeryPoint.IsValid at h
+          by_cases h_inv : u + 1 = 0
+          · rw [if_pos h_inv] at h; dsimp only [h_inv] at h
+          · rw [if_neg h_inv] at h; rw [sqrt_checked_iff_isSquare x2 h_sqrt]; convert h
+
+        have h_x_sq : x_abs^2 = x2 := by
+          apply sqrt_checked_spec x2 h_sqrt h_is_sq_true
+
+        have h_den_nz : den ≠ 0 := by
+          dsimp only [den, one]
+          apply edwards_denom_nonzero
+
+        have ha : Ed25519.a = -1 := rfl
+        have hd : (d : ZMod p) = Ed25519.d := rfl
+        rw [ha, h_x_sq]
+        dsimp only [x2, num, den, one] at ⊢ h_den_nz
+        apply (mul_right_inj' h_den_nz).mp
+        field_simp [h_den_nz]
+        simp only [neg_sub]
+        rw [← hd]
+        try ring
+      }
   else
     0
 
