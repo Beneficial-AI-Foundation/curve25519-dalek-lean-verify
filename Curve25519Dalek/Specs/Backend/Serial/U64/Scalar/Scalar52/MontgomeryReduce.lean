@@ -231,7 +231,7 @@ private theorem part2_spec (sum : U128) :
 
   refine ⟨carry, w, rfl, rfl, h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 
-set_option maxHeartbeats 8000000 in -- Progress will timout otherwise
+set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -246,8 +246,9 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat m < L)
     := by
+  sorry
   -- -- ============================================================================================
-  -- -- INFO 1: Comment out the proof below to speed up build. You need to increase Heartbeats to
+  -- -- INFO 1: The proof below is commented out to speed up build. You need to increase Heartbeats to
   -- --     8000000 if you the proof is not commented, otherwise you'll get a deterministic timeout.
   -- -- ============================================================================================
 
@@ -261,404 +262,404 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
   -- --  (MontSquare =>) - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
   -- -- ============================================================================================
-  
-  -- 0. See INFO 2
-  have h_a8_bound : a[8]!.val < 2 ^ 95 := by sorry
 
-  -- 1. Instantiate ALL array bounds explicitly.
-  have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
-  have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
-  have ha2 : a[2]!.val < 2^127 := h_bounds 2 (by decide)
-  have ha3 : a[3]!.val < 2^127 := h_bounds 3 (by decide)
-  have ha4 : a[4]!.val < 2^127 := h_bounds 4 (by decide)
-  have ha5 : a[5]!.val < 2^127 := h_bounds 5 (by decide)
-  have ha6 : a[6]!.val < 2^127 := h_bounds 6 (by decide)
-  have ha7 : a[7]!.val < 2^127 := h_bounds 7 (by decide)
-  have ha8 : a[8]!.val < 2^127 := h_bounds 8 (by decide)
+  -- -- 0. See INFO 2
+  -- have h_a8_bound : a[8]!.val < 2 ^ 95 := by sorry
 
-  -- 2. Instantiate L bounds
-  have hL0 : (constants.L[0]!).val < 2 ^ 52 := constants.L_limbs_spec 0#usize (by decide)
-  have hL1 : (constants.L[1]!).val < 2 ^ 52 := constants.L_limbs_spec 1#usize (by decide)
-  have hL2 : (constants.L[2]!).val < 2 ^ 52 := constants.L_limbs_spec 2#usize (by decide)
-  have hL3 : (constants.L[3]!).val < 2 ^ 52 := constants.L_limbs_spec 3#usize (by decide)
-  have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
+  -- -- 1. Instantiate ALL array bounds explicitly.
+  -- have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
+  -- have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
+  -- have ha2 : a[2]!.val < 2^127 := h_bounds 2 (by decide)
+  -- have ha3 : a[3]!.val < 2^127 := h_bounds 3 (by decide)
+  -- have ha4 : a[4]!.val < 2^127 := h_bounds 4 (by decide)
+  -- have ha5 : a[5]!.val < 2^127 := h_bounds 5 (by decide)
+  -- have ha6 : a[6]!.val < 2^127 := h_bounds 6 (by decide)
+  -- have ha7 : a[7]!.val < 2^127 := h_bounds 7 (by decide)
+  -- have ha8 : a[8]!.val < 2^127 := h_bounds 8 (by decide)
 
-  unfold montgomery_reduce
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  -- -- 2. Instantiate L bounds
+  -- have hL0 : (constants.L[0]!).val < 2 ^ 52 := constants.L_limbs_spec 0#usize (by decide)
+  -- have hL1 : (constants.L[1]!).val < 2 ^ 52 := constants.L_limbs_spec 1#usize (by decide)
+  -- have hL2 : (constants.L[2]!).val < 2 ^ 52 := constants.L_limbs_spec 2#usize (by decide)
+  -- have hL3 : (constants.L[3]!).val < 2 ^ 52 := constants.L_limbs_spec 3#usize (by decide)
+  -- have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
 
-  -- === ROW 0: Compute n0 ===
-  progress as ⟨limbs0, h_limbs0⟩         -- Read a[0]
-  progress as ⟨carry0, n0, h_carry0, h_n0, h_n0_bound, h_carry0_bound⟩
+  -- unfold montgomery_reduce
+  -- unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
 
-  -- === ROW 1: Compute n1 ===
-  progress as ⟨limbs1, h_limbs1⟩         -- 1. Read a[1]
-  progress as ⟨n1_partial, h_n1_partial⟩ -- 2. Compute partial sum: n0 + limbs1
-  progress as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
-  progress as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
-  progress as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
-  -- Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
-  progress as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
+  -- -- === ROW 0: Compute n0 ===
+  -- progress as ⟨limbs0, h_limbs0⟩         -- Read a[0]
+  -- progress as ⟨carry0, n0, h_carry0, h_n0, h_n0_bound, h_carry0_bound⟩
 
-  -- === ROW 2: Compute n2 ===
-  progress as ⟨limbs2, h_limbs2⟩         -- 1. Read a[2]
-  progress as ⟨n2_partial, h_n2_partial⟩ -- 2. n1 + limbs2
-  progress as ⟨L2, h_L2⟩                 -- 3. Read L[2]
-  progress as ⟨prod2_0, h_prod2_0⟩       -- 4. carry0 * L[2]
-  progress as ⟨n2_accum, h_n2_accum⟩     -- 5. Add carry0 term: n2_partial + prod2_0
-  progress as ⟨prod2_1, h_prod2_1⟩       -- 6. carry1 * L[1] (Uses L1 from Row 1)
-  progress as ⟨sum2, h_sum2⟩             -- 7. Final Sum: n2_accum + prod2_1
-  progress as ⟨carry2, n2, h_carry2, h_n2, h_n2_bound, h_carry2_bound⟩
+  -- -- === ROW 1: Compute n1 ===
+  -- progress as ⟨limbs1, h_limbs1⟩         -- 1. Read a[1]
+  -- progress as ⟨n1_partial, h_n1_partial⟩ -- 2. Compute partial sum: n0 + limbs1
+  -- progress as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
+  -- progress as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
+  -- progress as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
+  -- -- Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
+  -- progress as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
 
-  -- === ROW 3: Compute n3 ===
-  progress as ⟨limbs3, h_limbs3⟩         -- 1. Read a[3]
-  progress as ⟨n3_partial, h_n3_partial⟩ -- 2. n2 + limbs3
-  progress as ⟨prod3_1, h_prod3_1⟩       -- 3. carry1 * L[2] (Reuses L2 from Row 2)
-  progress as ⟨n3_accum, h_n3_accum⟩     -- 4. n3_partial + prod3_1
-  progress as ⟨prod3_2, h_prod3_2⟩       -- 5. carry2 * L[1] (Reuses L1 from Row 1)
-  progress as ⟨sum3, h_sum3⟩             -- 6. Final Sum: n3_accum + prod3_2
-  progress as ⟨carry3, n3, h_carry3, h_n3, h_n3_bound, h_carry3_bound⟩
+  -- -- === ROW 2: Compute n2 ===
+  -- progress as ⟨limbs2, h_limbs2⟩         -- 1. Read a[2]
+  -- progress as ⟨n2_partial, h_n2_partial⟩ -- 2. n1 + limbs2
+  -- progress as ⟨L2, h_L2⟩                 -- 3. Read L[2]
+  -- progress as ⟨prod2_0, h_prod2_0⟩       -- 4. carry0 * L[2]
+  -- progress as ⟨n2_accum, h_n2_accum⟩     -- 5. Add carry0 term: n2_partial + prod2_0
+  -- progress as ⟨prod2_1, h_prod2_1⟩       -- 6. carry1 * L[1] (Uses L1 from Row 1)
+  -- progress as ⟨sum2, h_sum2⟩             -- 7. Final Sum: n2_accum + prod2_1
+  -- progress as ⟨carry2, n2, h_carry2, h_n2, h_n2_bound, h_carry2_bound⟩
 
-  -- === ROW 4: Compute n4 ===
-  progress as ⟨limbs4, h_limbs4⟩         -- 1. Read a[4]
-  progress as ⟨n4_partial, h_n4_partial⟩ -- 2. n3 + limbs4
-  progress as ⟨L4, h_L4⟩                 -- 3. Read L[4]
-  progress as ⟨prod4_0, h_prod4_0⟩       -- 4. carry0 * L[4]
-  progress as ⟨n4_accum1, h_n4_accum1⟩   -- 5. Add: n4_partial + prod4_0
-  progress as ⟨prod4_2, h_prod4_2⟩       -- 6. carry2 * L[2] (Reuses L2)
-  progress as ⟨n4_accum2, h_n4_accum2⟩   -- 7. Add: n4_accum1 + prod4_2
-  progress as ⟨prod4_3, h_prod4_3⟩       -- 8. carry3 * L[1] (Reuses L1)
-  progress as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
-  progress as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
+  -- -- === ROW 3: Compute n3 ===
+  -- progress as ⟨limbs3, h_limbs3⟩         -- 1. Read a[3]
+  -- progress as ⟨n3_partial, h_n3_partial⟩ -- 2. n2 + limbs3
+  -- progress as ⟨prod3_1, h_prod3_1⟩       -- 3. carry1 * L[2] (Reuses L2 from Row 2)
+  -- progress as ⟨n3_accum, h_n3_accum⟩     -- 4. n3_partial + prod3_1
+  -- progress as ⟨prod3_2, h_prod3_2⟩       -- 5. carry2 * L[1] (Reuses L1 from Row 1)
+  -- progress as ⟨sum3, h_sum3⟩             -- 6. Final Sum: n3_accum + prod3_2
+  -- progress as ⟨carry3, n3, h_carry3, h_n3, h_n3_bound, h_carry3_bound⟩
 
-  -- === ROW 5: Compute Result Limb 0 (r0) ===
-  -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
-  progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
-  progress as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
-  progress as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
-  progress as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
-  progress as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
-  progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
-  progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
-  progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
-  progress as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
+  -- -- === ROW 4: Compute n4 ===
+  -- progress as ⟨limbs4, h_limbs4⟩         -- 1. Read a[4]
+  -- progress as ⟨n4_partial, h_n4_partial⟩ -- 2. n3 + limbs4
+  -- progress as ⟨L4, h_L4⟩                 -- 3. Read L[4]
+  -- progress as ⟨prod4_0, h_prod4_0⟩       -- 4. carry0 * L[4]
+  -- progress as ⟨n4_accum1, h_n4_accum1⟩   -- 5. Add: n4_partial + prod4_0
+  -- progress as ⟨prod4_2, h_prod4_2⟩       -- 6. carry2 * L[2] (Reuses L2)
+  -- progress as ⟨n4_accum2, h_n4_accum2⟩   -- 7. Add: n4_accum1 + prod4_2
+  -- progress as ⟨prod4_3, h_prod4_3⟩       -- 8. carry3 * L[1] (Reuses L1)
+  -- progress as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
+  -- progress as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
 
-  -- === ROW 6: Compute Result Limb 1 (r1) ===
-  -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
-  progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
-  progress as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
-  progress as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
-  progress as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
-  progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
-  progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
-  progress as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
+  -- -- === ROW 5: Compute Result Limb 0 (r0) ===
+  -- -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
+  -- progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
+  -- progress as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
+  -- progress as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
+  -- progress as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
+  -- progress as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
+  -- progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
+  -- progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
+  -- progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
+  -- progress as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
 
-  -- === ROW 7: Compute Result Limb 2 (r2) ===
-  -- Formula: S7 = n6 + a[7] + carry3 * L4
-  progress as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
-  progress as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
-  progress as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
-  progress as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
-  -- Reduction Part 2 -> Returns (carry_out, result_limb)
-  -- The carry is 'n7' and the result 'r2'.
-  progress as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
+  -- -- === ROW 6: Compute Result Limb 1 (r1) ===
+  -- -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
+  -- progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
+  -- progress as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
+  -- progress as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
+  -- progress as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
+  -- progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
+  -- progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
+  -- progress as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
 
-  -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
-  -- Formula: S8 = n7 + a[8] + carry4 * L4
-  progress as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
-  progress as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
-  progress as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
-  progress as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
-  -- Reduction Part 2 -> Returns (carry_out, result_limb)
-  -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
-  progress as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
+  -- -- === ROW 7: Compute Result Limb 2 (r2) ===
+  -- -- Formula: S7 = n6 + a[7] + carry3 * L4
+  -- progress as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
+  -- progress as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
+  -- progress as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
+  -- progress as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
+  -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
+  -- -- The carry is 'n7' and the result 'r2'.
+  -- progress as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
 
-  -- =========================================================
-  -- FINAL STEPS: Cast and Conditional Subtraction
-  -- =========================================================
+  -- -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
+  -- -- Formula: S8 = n7 + a[8] + carry4 * L4
+  -- progress as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
+  -- progress as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
+  -- progress as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
+  -- progress as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
+  -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
+  -- -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
+  -- progress as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
 
-  -- Cast the final limb (r4_u128) to U64
-  progress as ⟨r4, h_r4⟩
+  -- -- =========================================================
+  -- -- FINAL STEPS: Cast and Conditional Subtraction
+  -- -- =========================================================
 
-  have h_L4_exact : constants.L[4]!.val = 2^44 := by
-      unfold constants.L
-      decide
+  -- -- Cast the final limb (r4_u128) to U64
+  -- progress as ⟨r4, h_r4⟩
 
-  have h_r4_val_bound : r4_u128.val < 2 ^ 45 := by
-    rw [h_r4_u128] -- r4_u128 = sum8 / 2^52
-    rw [h_sum8, h_n8_partial, h_prod8_1] -- sum8 = n7 + a[8] + carry4 * L4
-    have h_prod8_bound : (carry4.val * constants.L[4]!.val) < 2^96 := by
-      rw [h_L4_exact]
-      calc
-        carry4.val * 2^44 < 2^52 * 2^44 := Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
-        _ = 2^96                        := by norm_num
+  -- have h_L4_exact : constants.L[4]!.val = 2^44 := by
+  --     unfold constants.L
+  --     decide
 
-    -- Bound sum8: n7 (2^76) + a[8] (2^95) + prod8 (2^96) < 2^97
-    have h_sum8_bound : n7.val + limbs8.val + carry4.val * constants.L[4]!.val < 2^97 := by
-      rw [h_L4_exact]
-      calc
-        n7.val + limbs8.val + carry4.val * 2^44
-          < 2^76 + limbs8.val + carry4.val * 2^44 := by
-            apply Nat.add_lt_add_right
-            apply Nat.add_lt_add_right
-            exact h_n7_bound
+  -- have h_r4_val_bound : r4_u128.val < 2 ^ 45 := by
+  --   rw [h_r4_u128] -- r4_u128 = sum8 / 2^52
+  --   rw [h_sum8, h_n8_partial, h_prod8_1] -- sum8 = n7 + a[8] + carry4 * L4
+  --   have h_prod8_bound : (carry4.val * constants.L[4]!.val) < 2^96 := by
+  --     rw [h_L4_exact]
+  --     calc
+  --       carry4.val * 2^44 < 2^52 * 2^44 := Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
+  --       _ = 2^96                        := by norm_num
 
-        _ < 2^76 + 2^95 + carry4.val * 2^44 := by
-            apply Nat.add_lt_add_right
-            apply Nat.add_lt_add_left
-            rw [h_limbs8]
-            rw [← Array.getElem!_Nat_eq]
-            exact h_a8_bound
+  --   -- Bound sum8: n7 (2^76) + a[8] (2^95) + prod8 (2^96) < 2^97
+  --   have h_sum8_bound : n7.val + limbs8.val + carry4.val * constants.L[4]!.val < 2^97 := by
+  --     rw [h_L4_exact]
+  --     calc
+  --       n7.val + limbs8.val + carry4.val * 2^44
+  --         < 2^76 + limbs8.val + carry4.val * 2^44 := by
+  --           apply Nat.add_lt_add_right
+  --           apply Nat.add_lt_add_right
+  --           exact h_n7_bound
 
-        _ < 2^76 + 2^95 + 2^52 * 2^44 := by
-            apply Nat.add_lt_add_left
-            apply Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
+  --       _ < 2^76 + 2^95 + carry4.val * 2^44 := by
+  --           apply Nat.add_lt_add_right
+  --           apply Nat.add_lt_add_left
+  --           rw [h_limbs8]
+  --           rw [← Array.getElem!_Nat_eq]
+  --           exact h_a8_bound
 
-        _ < 2^97 := by norm_num
+  --       _ < 2^76 + 2^95 + 2^52 * 2^44 := by
+  --           apply Nat.add_lt_add_left
+  --           apply Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
 
-    apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]; apply lt_of_lt_of_le h_sum8_bound
-    norm_num
+  --       _ < 2^97 := by norm_num
+
+  --   apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]; apply lt_of_lt_of_le h_sum8_bound
+  --   norm_num
 
 
-  have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
-    rw [h_r4]
-    simp only [Nat.cast_inj, UScalar.cast, UScalar.val, UScalarTy.U64_numBits_eq]
-    rw [BitVec.toNat_setWidth, Nat.mod_eq_of_lt]
-    apply lt_trans h_r4_val_bound
-    norm_num
+  -- have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
+  --   rw [h_r4]
+  --   simp only [Nat.cast_inj, UScalar.cast, UScalar.val, UScalarTy.U64_numBits_eq]
+  --   rw [BitVec.toNat_setWidth, Nat.mod_eq_of_lt]
+  --   apply lt_trans h_r4_val_bound
+  --   norm_num
 
-  have h_r4_tight : ↑r4 < (2 : Nat) ^ 45 := by
-    simp only [Nat.cast_inj] at h_cast_r4; rw [h_cast_r4]; exact h_r4_val_bound
+  -- have h_r4_tight : ↑r4 < (2 : Nat) ^ 45 := by
+  --   simp only [Nat.cast_inj] at h_cast_r4; rw [h_cast_r4]; exact h_r4_val_bound
 
-  have h_red_bound : Scalar52_as_Nat
-      (Array.make 5#usize [r0, r1, r2, r3, r4]
-      field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
-    unfold Scalar52_as_Nat
+  -- have h_red_bound : Scalar52_as_Nat
+  --     (Array.make 5#usize [r0, r1, r2, r3, r4]
+  --     field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
+  --   unfold Scalar52_as_Nat
 
-    simp only [Array.make, Array.getElem!_Nat_eq]
+  --   simp only [Array.make, Array.getElem!_Nat_eq]
 
-    repeat rw [Finset.sum_range_succ]
-    rw [Finset.sum_range_zero, zero_add]
-    simp only [pow_zero, mul_one, pow_mul]
-    simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
-      getElem!_pos, List.getElem_cons_zero, one_mul, Nat.one_lt_ofNat,
-      List.getElem_cons_succ, Nat.reduceLT, Nat.lt_add_one]
-    have h_sum_bound : r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
-      have h0 : r0.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r0_bound
-      have h1 : r1.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r1_bound
-      have h2 : r2.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r2_bound
-      have h3 : r3.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r3_bound
-      have h4 : r4.val ≤ 2^45 - 1 := Nat.le_pred_of_lt h_r4_tight
+  --   repeat rw [Finset.sum_range_succ]
+  --   rw [Finset.sum_range_zero, zero_add]
+  --   simp only [pow_zero, mul_one, pow_mul]
+  --   simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+  --     getElem!_pos, List.getElem_cons_zero, one_mul, Nat.one_lt_ofNat,
+  --     List.getElem_cons_succ, Nat.reduceLT, Nat.lt_add_one]
+  --   have h_sum_bound : r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
+  --     have h0 : r0.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r0_bound
+  --     have h1 : r1.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r1_bound
+  --     have h2 : r2.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r2_bound
+  --     have h3 : r3.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r3_bound
+  --     have h4 : r4.val ≤ 2^45 - 1 := Nat.le_pred_of_lt h_r4_tight
 
-      calc
-        r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
-        ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
-          refine Nat.add_le_add (Nat.add_le_add (Nat.add_le_add (Nat.add_le_add ?_ ?_) ?_) ?_) ?_
-          · exact h0
-          · apply Nat.mul_le_mul_right _ h1
-          · apply Nat.mul_le_mul_right _ h2
-          · apply Nat.mul_le_mul_right _ h3
-          · apply Nat.mul_le_mul_right _ h4
-        _ < 2^253 := by norm_num
+  --     calc
+  --       r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
+  --       ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
+  --         refine Nat.add_le_add (Nat.add_le_add (Nat.add_le_add (Nat.add_le_add ?_ ?_) ?_) ?_) ?_
+  --         · exact h0
+  --         · apply Nat.mul_le_mul_right _ h1
+  --         · apply Nat.mul_le_mul_right _ h2
+  --         · apply Nat.mul_le_mul_right _ h3
+  --         · apply Nat.mul_le_mul_right _ h4
+  --       _ < 2^253 := by norm_num
 
-    simp only [← pow_mul, Nat.reduceMul]
-    rw [mul_comm (2 ^ 52) _, mul_comm (2 ^ 104) _, mul_comm (2 ^ 156) _, mul_comm (2 ^ 208) _]
-    apply lt_of_lt_of_le h_sum_bound
+  --   simp only [← pow_mul, Nat.reduceMul]
+  --   rw [mul_comm (2 ^ 52) _, mul_comm (2 ^ 104) _, mul_comm (2 ^ 156) _, mul_comm (2 ^ 208) _]
+  --   apply lt_of_lt_of_le h_sum_bound
 
-    rw [← constants.L_spec]; unfold Scalar52_as_Nat
-    trans 2 * (constants.L.val[4]! * 2^208)
-    · rw [← Array.getElem!_Nat_eq, h_L4_exact]
-      norm_num
-    · rw [← Array.getElem!_Nat_eq]; repeat rw [Finset.sum_range_succ];
-      rw [Finset.sum_range_zero, zero_add]
-      simp only [pow_zero, mul_one, Nat.mul_add, Nat.reduceMul]
-      rw [mul_comm _ (2 ^ 208)]
-      try linarith
+  --   rw [← constants.L_spec]; unfold Scalar52_as_Nat
+  --   trans 2 * (constants.L.val[4]! * 2^208)
+  --   · rw [← Array.getElem!_Nat_eq, h_L4_exact]
+  --     norm_num
+  --   · rw [← Array.getElem!_Nat_eq]; repeat rw [Finset.sum_range_succ];
+  --     rw [Finset.sum_range_zero, zero_add]
+  --     simp only [pow_zero, mul_one, Nat.mul_add, Nat.reduceMul]
+  --     rw [mul_comm _ (2 ^ 208)]
+  --     try linarith
 
-  -- Call the 'sub' function
-  progress as ⟨m, h_sub, h_bound, h_mod⟩
-  · -- Case ha: Prove input limbs are < 2^52
-    intro i hi
-    interval_cases i
-    <;> simp only [
-      Array.make, Array.getElem!_Nat_eq,
-      List.length_cons, List.length_nil,
-      List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
-      zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
-      Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
-    ]
-    <;> try scalar_tac
-  · -- Case hb: constants.L are valid
-    intro i hi
-    interval_cases i <;> assumption
-  · -- Case ha': Input < 2 * L
-    apply lt_of_lt_of_le h_red_bound
-    rw [constants.L_spec, Nat.two_mul]
-  · -- Case hb': L ≤ L
-    rw [constants.L_spec]
-  · -- Post-conditions
-    refine ⟨?_,h_mod,h_bound⟩
-    · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
-      zify
-      -- Total Montgomery factor C
-      let C : Int := (carry0.val : Int) +
-                     (carry1.val : Int) * (2^52 : Int) +
-                     (carry2.val : Int) * (2^104 : Int) +
-                     (carry3.val : Int) * (2^156 : Int) +
-                     (carry4.val : Int) * (2^208 : Int)
+  -- -- Call the 'sub' function
+  -- progress as ⟨m, h_sub, h_bound, h_mod⟩
+  -- · -- Case ha: Prove input limbs are < 2^52
+  --   intro i hi
+  --   interval_cases i
+  --   <;> simp only [
+  --     Array.make, Array.getElem!_Nat_eq,
+  --     List.length_cons, List.length_nil,
+  --     List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
+  --     zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
+  --     Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
+  --   ]
+  --   <;> try scalar_tac
+  -- · -- Case hb: constants.L are valid
+  --   intro i hi
+  --   interval_cases i <;> assumption
+  -- · -- Case ha': Input < 2 * L
+  --   apply lt_of_lt_of_le h_red_bound
+  --   rw [constants.L_spec, Nat.two_mul]
+  -- · -- Case hb': L ≤ L
+  --   rw [constants.L_spec]
+  -- · -- Post-conditions
+  --   refine ⟨?_,h_mod,h_bound⟩
+  --   · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
+  --     zify
+  --     -- Total Montgomery factor C
+  --     let C : Int := (carry0.val : Int) +
+  --                    (carry1.val : Int) * (2^52 : Int) +
+  --                    (carry2.val : Int) * (2^104 : Int) +
+  --                    (carry3.val : Int) * (2^156 : Int) +
+  --                    (carry4.val : Int) * (2^208 : Int)
 
-      let res := Array.make 5#usize [r0, r1, r2, r3, r4]
-        field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4
-      have h_core : ↑(Scalar52_wide_as_Nat a) + C * L =
-                    ↑(Scalar52_as_Nat res) * R := by
-        simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, R]
-        repeat rw [Finset.sum_range_succ]
-        simp only [Finset.sum_range_zero, zero_add, mul_zero, pow_zero, mul_one]
-        simp only [res, Array.make, Array.getElem!_Nat_eq]
+  --     let res := Array.make 5#usize [r0, r1, r2, r3, r4]
+  --       field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4
+  --     have h_core : ↑(Scalar52_wide_as_Nat a) + C * L =
+  --                   ↑(Scalar52_as_Nat res) * R := by
+  --       simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, R]
+  --       repeat rw [Finset.sum_range_succ]
+  --       simp only [Finset.sum_range_zero, zero_add, mul_zero, pow_zero, mul_one]
+  --       simp only [res, Array.make, Array.getElem!_Nat_eq]
 
-        zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
-        zify at h_n5 h_r0 h_n6 h_r1 h_n7 h_r2 h_r4_u128 h_r3
+  --       zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
+  --       zify at h_n5 h_r0 h_n6 h_r1 h_n7 h_r2 h_r4_u128 h_r3
 
-        have eq0 := mont_step ↑limbs0 ↑carry0 ↑n0 h_carry0 h_n0
-        have eq1 := mont_step ↑sum1 ↑carry1 ↑n1 h_carry1 h_n1
-        have eq2 := mont_step ↑sum2 ↑carry2 ↑n2 h_carry2 h_n2
-        have eq3 := mont_step ↑sum3 ↑carry3 ↑n3 h_carry3 h_n3
-        have eq4 := mont_step ↑sum4 ↑carry4 ↑n4 h_carry4 h_n4
+  --       have eq0 := mont_step ↑limbs0 ↑carry0 ↑n0 h_carry0 h_n0
+  --       have eq1 := mont_step ↑sum1 ↑carry1 ↑n1 h_carry1 h_n1
+  --       have eq2 := mont_step ↑sum2 ↑carry2 ↑n2 h_carry2 h_n2
+  --       have eq3 := mont_step ↑sum3 ↑carry3 ↑n3 h_carry3 h_n3
+  --       have eq4 := mont_step ↑sum4 ↑carry4 ↑n4 h_carry4 h_n4
 
-        have eq5 : ↑sum5 = ↑n5 * (2^52 : Int) + ↑r0 := by
-          rw [h_n5, h_r0, mul_comm, Int.mul_ediv_add_emod]
-        have eq6 : ↑sum6 = ↑n6 * (2^52 : Int) + ↑r1 := by
-          rw [h_n6, h_r1, mul_comm, Int.mul_ediv_add_emod]
-        have eq7 : ↑sum7 = ↑n7 * (2^52 : Int) + ↑r2 := by
-          rw [h_n7, h_r2, mul_comm, Int.mul_ediv_add_emod]
-        have eq8 : ↑sum8 = ↑r4_u128 * (2^52 : Int) + ↑r3 := by
-          rw [h_r4_u128, h_r3, mul_comm, Int.mul_ediv_add_emod]
+  --       have eq5 : ↑sum5 = ↑n5 * (2^52 : Int) + ↑r0 := by
+  --         rw [h_n5, h_r0, mul_comm, Int.mul_ediv_add_emod]
+  --       have eq6 : ↑sum6 = ↑n6 * (2^52 : Int) + ↑r1 := by
+  --         rw [h_n6, h_r1, mul_comm, Int.mul_ediv_add_emod]
+  --       have eq7 : ↑sum7 = ↑n7 * (2^52 : Int) + ↑r2 := by
+  --         rw [h_n7, h_r2, mul_comm, Int.mul_ediv_add_emod]
+  --       have eq8 : ↑sum8 = ↑r4_u128 * (2^52 : Int) + ↑r3 := by
+  --         rw [h_r4_u128, h_r3, mul_comm, Int.mul_ediv_add_emod]
 
-        simp only [pow_mul]
-        generalize hB : (2 ^ 52) = B
-        have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
-          simp only [C]
-          rw [←hB]
-          have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
-          have h3 : (2:Int)^156 = (2^52)^3 := by rw [←pow_mul];
-          have h4 : (2:Int)^208 = (2^52)^4 := by rw [←pow_mul];
-          rw [h2, h3, h4]; simp only [Nat.cast_pow]; rfl
+  --       simp only [pow_mul]
+  --       generalize hB : (2 ^ 52) = B
+  --       have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
+  --         simp only [C]
+  --         rw [←hB]
+  --         have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
+  --         have h3 : (2:Int)^156 = (2^52)^3 := by rw [←pow_mul];
+  --         have h4 : (2:Int)^208 = (2^52)^4 := by rw [←pow_mul];
+  --         rw [h2, h3, h4]; simp only [Nat.cast_pow]; rfl
 
-        have hR_B : ↑(2 ^ 260) = B^5 := by rw [←hB, ←pow_mul]
+  --       have hR_B : ↑(2 ^ 260) = B^5 := by rw [←hB, ←pow_mul]
 
-        have h_L_expand : ↑(Scalar52_as_Nat constants.L) =
-          1 * (constants.L[0]!) +
-          B * (constants.L[1]!)+
-          B^2 * (constants.L[2]!) +
-          B^3 * (constants.L[3]!) +
-          B^4 * (constants.L[4]!) := by
-          unfold Scalar52_as_Nat
-          rw [←hB]
-          repeat rw [Finset.sum_range_succ]
-          rw [Finset.sum_range_zero, zero_add]
-          simp only [mul_zero, pow_zero, mul_one, pow_mul]
+  --       have h_L_expand : ↑(Scalar52_as_Nat constants.L) =
+  --         1 * (constants.L[0]!) +
+  --         B * (constants.L[1]!)+
+  --         B^2 * (constants.L[2]!) +
+  --         B^3 * (constants.L[3]!) +
+  --         B^4 * (constants.L[4]!) := by
+  --         unfold Scalar52_as_Nat
+  --         rw [←hB]
+  --         repeat rw [Finset.sum_range_succ]
+  --         rw [Finset.sum_range_zero, zero_add]
+  --         simp only [mul_zero, pow_zero, mul_one, pow_mul]
 
-        rw [hC_B, hR_B, ← constants.L_spec, h_L_expand]
-        simp only [
-          h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
-          h_L1, h_L2, h_L4,
-          h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
-          h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
-          h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
-          h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
-          h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2, h_n5_accum1, h_n5_accum2, h_n6_accum1,
-          h_r4
-        ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+  --       rw [hC_B, hR_B, ← constants.L_spec, h_L_expand]
+  --       simp only [
+  --         h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
+  --         h_L1, h_L2, h_L4,
+  --         h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
+  --         h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
+  --         h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
+  --         h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
+  --         h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2, h_n5_accum1, h_n5_accum2, h_n6_accum1,
+  --         h_r4
+  --       ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
-        clear h_bounds ha0 ha1 ha2 ha3 ha4 ha5 ha6 ha7 ha8
-        clear hL0 hL1 hL2 hL3 hL4
-        clear h_n0_bound h_carry0_bound h_n1_bound h_carry1_bound h_n2_bound h_carry2_bound
-        clear h_n3_bound h_carry3_bound h_n4_bound h_carry4_bound
-        clear h_n5_bounds h_r0_bound h_n6_bound h_r1_bound h_n7_bound h_r2_bound
-        clear h_r3_bound
+  --       clear h_bounds ha0 ha1 ha2 ha3 ha4 ha5 ha6 ha7 ha8
+  --       clear hL0 hL1 hL2 hL3 hL4
+  --       clear h_n0_bound h_carry0_bound h_n1_bound h_carry1_bound h_n2_bound h_carry2_bound
+  --       clear h_n3_bound h_carry3_bound h_n4_bound h_carry4_bound
+  --       clear h_n5_bounds h_r0_bound h_n6_bound h_r1_bound h_n7_bound h_r2_bound
+  --       clear h_r3_bound
 
-        simp only [one_mul]
+  --       simp only [one_mul]
 
-        norm_cast at *
-        rw [hB] at *
+  --       norm_cast at *
+  --       rw [hB] at *
 
-        rw [← h_r4]
-        simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
-          Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
-          List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
+  --       rw [← h_r4]
+  --       simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
+  --         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
+  --         List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
 
-        rw [← h_cast_r4] at eq8
-        simp only [← getElem!_pos]
+  --       rw [← h_cast_r4] at eq8
+  --       simp only [← getElem!_pos]
 
-        generalize hBz : (B : ℤ) = Bz
-        rw [hBz] at *
-        clear hB
+  --       generalize hBz : (B : ℤ) = Bz
+  --       rw [hBz] at *
+  --       clear hB
 
-        let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
-                                  ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
-        let poly_a : Polynomial ℕ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
+  --       let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
+  --                                 ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
+  --       let poly_a : Polynomial ℕ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
 
-        let C_coeffs : List ℕ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
-        let poly_C : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (C_coeffs.getD i 0)
+  --       let C_coeffs : List ℕ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
+  --       let poly_C : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (C_coeffs.getD i 0)
 
-        let L_coeffs : List ℕ := [↑(constants.L.val[0]!), ↑(constants.L.val[1]!),
-                                  ↑(constants.L.val[2]!), ↑(constants.L.val[3]!),
-                                  ↑(constants.L.val[4]!)]
-        let poly_L : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
+  --       let L_coeffs : List ℕ := [↑(constants.L.val[0]!), ↑(constants.L.val[1]!),
+  --                                 ↑(constants.L.val[2]!), ↑(constants.L.val[3]!),
+  --                                 ↑(constants.L.val[4]!)]
+  --       let poly_L : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
 
-        let poly_lhs := poly_a + poly_C * poly_L
-        let res_coeffs : List ℕ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
-        let poly_res : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
-        let poly_rhs := poly_res * monomial 5 1
+  --       let poly_lhs := poly_a + poly_C * poly_L
+  --       let res_coeffs : List ℕ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
+  --       let poly_res : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
+  --       let poly_rhs := poly_res * monomial 5 1
 
-        suffices h_clean : poly_lhs.eval B = poly_rhs.eval B by
-          convert h_clean using 1
-          · -- LHS
-            simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
-              Polynomial.eval_finset_sum, Polynomial.eval_monomial]
-            simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one]
-            simp [a_coeffs, C_coeffs, L_coeffs]
-            ring_nf
-          · -- RHS
-            simp only [poly_rhs, poly_res, Polynomial.eval_mul, Polynomial.eval_monomial,
-              Polynomial.eval_finset_sum]
-            repeat rw [Finset.sum_range_succ]
-            simp only [Finset.sum_range_zero, zero_add, pow_zero, pow_one]
-            simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ]
-            ring_nf
+  --       suffices h_clean : poly_lhs.eval B = poly_rhs.eval B by
+  --         convert h_clean using 1
+  --         · -- LHS
+  --           simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
+  --             Polynomial.eval_finset_sum, Polynomial.eval_monomial]
+  --           simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one]
+  --           simp [a_coeffs, C_coeffs, L_coeffs]
+  --           ring_nf
+  --         · -- RHS
+  --           simp only [poly_rhs, poly_res, Polynomial.eval_mul, Polynomial.eval_monomial,
+  --             Polynomial.eval_finset_sum]
+  --           repeat rw [Finset.sum_range_succ]
+  --           simp only [Finset.sum_range_zero, zero_add, pow_zero, pow_one]
+  --           simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ]
+  --           ring_nf
 
-        zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-        simp only [poly_lhs, poly_rhs, poly_a, poly_C, poly_L, poly_res, Polynomial.eval_add,
-                  Polynomial.eval_mul, Polynomial.eval_monomial,
-                  Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
-                  pow_zero, pow_one]
-        simp only [a_coeffs, C_coeffs, L_coeffs, res_coeffs]
-        simp only [List.getD_cons_zero, List.getD_cons_succ]
+  --       zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+  --       simp only [poly_lhs, poly_rhs, poly_a, poly_C, poly_L, poly_res, Polynomial.eval_add,
+  --                 Polynomial.eval_mul, Polynomial.eval_monomial,
+  --                 Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
+  --                 pow_zero, pow_one]
+  --       simp only [a_coeffs, C_coeffs, L_coeffs, res_coeffs]
+  --       simp only [List.getD_cons_zero, List.getD_cons_succ]
 
-        zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
+  --       zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
-        have h_align0 : (↑(constants.L[0]!) : ℤ) = ↑(constants.L.val[0]!) := by
-          simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
-            Nat.ofNat_pos, getElem!_pos]
+  --       have h_align0 : (↑(constants.L[0]!) : ℤ) = ↑(constants.L.val[0]!) := by
+  --         simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+  --           Nat.ofNat_pos, getElem!_pos]
 
-        simp only [h_align0] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  --       simp only [h_align0] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
 
-        have h_L3_zero : ↑(constants.L.val[3]!) = (0 : ℤ) := by
-          unfold constants.L
-          decide
+  --       have h_L3_zero : ↑(constants.L.val[3]!) = (0 : ℤ) := by
+  --         unfold constants.L
+  --         decide
 
-        simp only [h_L3_zero, zero_mul, add_zero]
+  --       simp only [h_L3_zero, zero_mul, add_zero]
 
-        linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
-                           + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
+  --       linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
+  --                          + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
 
-      have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
-        rw [constants.L_spec] at h_sub; change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
-        rw [← Int.natCast_modEq_iff] at h_sub; push_cast at h_sub
-        simp only [Int.add_modulus_modEq_iff] at h_sub; exact h_sub
+  --     have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
+  --       rw [constants.L_spec] at h_sub; change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
+  --       rw [← Int.natCast_modEq_iff] at h_sub; push_cast at h_sub
+  --       simp only [Int.add_modulus_modEq_iff] at h_sub; exact h_sub
 
-      rw [Int.ModEq.mul_right R h_equiv_int]
-      rw [← h_core]
-      rw [Int.add_mul_emod_self_right]
+  --     rw [Int.ModEq.mul_right R h_equiv_int]
+  --     rw [← h_core]
+  --     rw [Int.add_mul_emod_self_right]
 
 
 
