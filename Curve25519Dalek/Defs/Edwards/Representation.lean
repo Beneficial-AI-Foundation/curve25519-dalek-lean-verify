@@ -766,6 +766,23 @@ For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
 def IsEven (P : Point Ed25519) : Prop :=
   IsSquare (1 - P.y^2)
 
+
+
+
+
+theorem even_add_closure_Ed25519 (P Q : Point Ed25519) (hP : IsEven P) (hQ : IsEven Q) :
+    IsEven (P + Q) := by
+  sorry
+
+theorem EdwardsPoint_IsSquare_iff_IsEven (e : EdwardsPoint) (h : e.IsValid) :
+    IsSquare (e.Z.toField^2 - e.Y.toField^2) ↔ IsEven (e.toPoint) := by
+  sorry
+
+
+
+
+
+
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
   -- 1. Must be a valid curve point (satisfy -x² + y² = 1 + dx²y²)
