@@ -233,14 +233,32 @@ def subtle.ConstantTimeEqU8.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
-/-- **Spec axiom for `subtle.ConstantTimeEqU8.ct_eq`**:
+/-- **Spec theorem for `subtle.ConstantTimeEqU8.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U8 values are equal
 -/
 @[progress]
-axiom subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
+theorem subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
   ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  (c = Choice.one ↔ a = b) := by
+  unfold subtle.ConstantTimeEqU8.ct_eq
+  split
+  · -- Case: a = b
+    rename_i h_eq
+    exists Choice.one
+    simp [h_eq]
+  · -- Case: a ≠ b
+    rename_i h_ne
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is a contradiction
+        cases h
+      · intro h
+        -- a = b but a ≠ b is a contradiction
+        contradiction
 
 /- [subtle::ConditionallySelectable::conditional_assign]:
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
