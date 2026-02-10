@@ -100,9 +100,57 @@ def subtle.BitAndChoiceChoiceChoice.bitand
 - Returns `Choice.one` if and only if both inputs are `Choice.one`
 -/
 @[progress]
-axiom subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
+theorem subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
     ∃ c, subtle.BitAndChoiceChoiceChoice.bitand a b = ok c ∧
-    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one)
+    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) := by
+  unfold subtle.BitAndChoiceChoiceChoice.bitand
+  split
+  · -- Case: a.val = 0 ∨ b.val = 0
+    rename_i h_or
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is impossible
+        cases h
+      · intro ⟨ha, hb⟩
+        -- a = Choice.one ∧ b = Choice.one, but a.val = 0 ∨ b.val = 0 is a contradiction
+        rw [ha, hb] at h_or
+        unfold Choice.one at h_or
+        simp at h_or
+  · -- Case: ¬(a.val = 0 ∨ b.val = 0)
+    rename_i h_not_or
+    exists Choice.one
+    constructor
+    · rfl
+    · constructor
+      · intro _
+        -- Need to show a = Choice.one ∧ b = Choice.one
+        constructor
+        · -- Show a = Choice.one
+          cases a with | mk val valid =>
+          cases valid with
+          | inl h =>
+            -- val = 0, but this contradicts h_not_or
+            simp [h] at h_not_or
+          | inr h =>
+            -- val = 1, so a = Choice.one
+            unfold Choice.one
+            simp [h]
+        · -- Show b = Choice.one
+          cases b with | mk val valid =>
+          cases valid with
+          | inl h =>
+            -- val = 0, but this contradicts h_not_or
+            simp [h] at h_not_or
+          | inr h =>
+            -- val = 1, so b = Choice.one
+            unfold Choice.one
+            simp [h]
+      · intro ⟨ha, hb⟩
+        -- a = Choice.one ∧ b = Choice.one, so we're done
+        rfl
 
 /- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 177:4-177:41
@@ -372,15 +420,17 @@ def subtle.CtOption.new
   {T : Type} (value : T) (is_some : subtle.Choice) : Result (subtle.CtOption T) :=
   ok { value := value, is_some := is_some }
 
-/-- **Spec axiom for `subtle.CtOption.new`**:
+/-- **Spec theorem for `subtle.CtOption.new`**:
 - No panic (always returns successfully)
 - Returns a CtOption with the given value and is_some flag
 - The returned CtOption's fields match the inputs exactly
 -/
 @[progress]
-axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
+theorem subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
   ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
-  opt.value = value ∧ opt.is_some = is_some
+  opt.value = value ∧ opt.is_some = is_some := by
+  unfold subtle.CtOption.new
+  exists { value := value, is_some := is_some }
 
 /- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
