@@ -4,10 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Math.Montgomery.Representation
+import Curve25519Dalek.Defs
+import Curve25519Dalek.Defs.Edwards.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
-
+import Curve25519Dalek.Defs.Montgomery.Curve
 /-! # Spec Theorem for `MontgomeryPoint::mul_clamped`
 
 Specification and proof for
@@ -23,11 +23,7 @@ scalar multiplication of the given point by the clamped scalar.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.montgomery
-open curve25519_dalek.edwards
-open curve25519_dalek.backend.serial.u64
-
-
+open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -51,14 +47,13 @@ natural language specs:
 - The returned MontgomeryPoint matches the clamped scalar multiplication result
 -/
 @[progress]
-theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
- (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     ∃ res,
     mul_clamped P bytes = ok res ∧
-    MontgomeryPoint.IsValid res ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat bytes) • MontgomeryPoint.toPoint P).y
-    := by
-      unfold  mul_clamped  MulScalarMontgomeryPointMontgomeryPoint.mul
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat bytes) • (MontgomeryPoint.toPoint P)    := by
+      unfold mul_clamped
       sorry
+
+
 
 end curve25519_dalek.montgomery.MontgomeryPoint

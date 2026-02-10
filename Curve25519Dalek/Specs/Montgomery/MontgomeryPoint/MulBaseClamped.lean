@@ -6,7 +6,12 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
+import Curve25519Dalek.Specs.Scalar.ClampInteger
+import Curve25519Dalek.Defs.Montgomery.Curve
 /-! # Spec Theorem for `MontgomeryPoint::mul_base_clamped`
 
 Specification and proof for
@@ -20,10 +25,9 @@ clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_b
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.montgomery
-open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
-
+open curve25519_dalek.edwards
+open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -40,21 +44,30 @@ natural language specs:
 • The result is the Montgomery basepoint multiplication of the clamped scalar
 -/
 
-/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
+/--
+**Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
 - No panic (always returns successfully)
 - Clamps input bytes with `scalar.clamp_integer`
 - Delegates to `montgomery.MontgomeryPoint.mul_base` with the clamped scalar
 - The returned MontgomeryPoint matches the basepoint multiplication result
 -/
+
 @[progress]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
-    ∃ result,
+    ∃ result clamped_scalar,
+    scalar.clamp_integer bytes = ok clamped_scalar ∧
     mul_base_clamped bytes = ok result ∧
-    MontgomeryPoint.IsValid result ∧
-    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y
-    := by
-   unfold mul_base_clamped scalar.clamp_integer
+    MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)    := by
+   unfold mul_base_clamped
    progress*
-   sorry
+   simp[← Montgomery.comm_mul_fromEdwards]
+   unfold mul_base
+   progress*
+   · exact ep_post_1.Y_bounds
+   · exact ep_post_1.Z_bounds
+   ·  simp_all
+      have := res_post_2 1
+      simp at this
+      rw[← this]
 
 end curve25519_dalek.montgomery.MontgomeryPoint

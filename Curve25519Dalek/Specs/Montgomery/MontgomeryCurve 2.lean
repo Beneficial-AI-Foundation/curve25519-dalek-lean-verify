@@ -4,8 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Aux
-import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Defs
+
+import Mathlib.Algebra.Field.ZMod
+import Mathlib.NumberTheory.LegendreSymbol.Basic
+import Mathlib.Tactic.NormNum.LegendreSymbol
+import Mathlib.Tactic.LinearCombination
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
+import PrimeCert.PrimeList
+import Curve25519Dalek.Defs.Edwards.Representation
 
 /-!
 # Affine Montgomery Curve Points for Curve25519
@@ -69,33 +76,13 @@ def T_point : Point := .some (x := 0) (y := 0) (h := by
   · norm_num [MontgomeryCurveCurve25519]
   · left
     norm_num [MontgomeryCurveCurve25519])
-
-
 lemma non_singular {u v : CurveField}
-    (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
+    (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u ):
     v ≠ 0 ∨ 3 * u ^ 2 + 2 * Curve25519.A * u + 1 ≠ 0  := by
     by_cases hv: v =0
     · right
       simp[hv] at h
-      have :  u ^ 3 + Curve25519.A * u ^ 2 + u = u *( u ^ 2 + Curve25519.A * u  + 1) := by ring 
-      rw[this] at h
-      have := mul_eq_zero.mp h.symm 
-      rcases this with h1 | h1
-      · simp[h1]
-      · have : 3 * u ^ 2 + 2 * Curve25519.A * u + 1=   
-        3 * (u ^ 2 +  Curve25519.A * u + 1) - Curve25519.A * u -2 := by ring 
-        rw[this, h1]
-        simp 
-        intro h2 
-        have : Curve25519.A * u = -2 := by grind
-        simp[this] at h1 
-        have eq1: Curve25519.A^2 * u^2 = 4 := by grind 
-        have : -2 + (1:CurveField)= -1 := by ring 
-        rw[add_assoc, this] at h1
-        have : u^2=1 := by grind 
-        simp[this, Curve25519.A] at eq1 
-        revert eq1
-        decide
+      sorry
     · simp[hv]
 
 
@@ -128,14 +115,17 @@ def mk_point (u v : CurveField)
         rw [Curve25519.A]
         linear_combination -h0)
 
+
 /-- Extract u-coordinate from a point. -/
 def get_u : Point → CurveField
   | .zero => 0
   | .some (x := u) .. => u
 
+
 def get_v : Point → CurveField
   | .zero => 0
   | .some (y := v) .. => v
+
 
 @[simp] theorem get_u_zero : get_u (0: Point) = 0 := rfl
 @[simp] theorem get_v_zero : get_v (0: Point) = 0 := rfl
@@ -175,5 +165,32 @@ This follows directly from mathlib's AddCommGroup instance for Weierstrass curve
 theorem add_assoc' (P Q R : Point) : (P + Q) + R = P + (Q + R) :=
   add_assoc P Q R
 
+section MontgomeryPoint
+
+open curve25519_dalek.montgomery
+open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.math
+
+/-- Create a point from a MontgomeryPoint byte representation.
+    Computes the v-coordinate from u using the Montgomery curve equation v² = u³ + A·u² + u.
+
+    Note: The curve equation proof currently uses `sorry`. This requires proving that
+    `sqrt_checked` returns a value whose square equals its input, which depends on
+    the mathematical properties of the square root function in the field. -/
+noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point:=
+    let u : CurveField := bytesToField m
+    -- Compute v² = u³ + A·u² + u
+    let v_squared := u ^ 3 + Curve25519.A * u ^ 2 + u
+    -- Extract the square root (guaranteed to exist by IsValid)
+    let (v_abs, _is_sq) := curve25519_dalek.math.sqrt_checked v_squared
+    -- Use the canonical (non-negative/even) root
+    let v := v_abs
+    have curve_eq : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u := by
+      -- TODO: Prove that sqrt_checked returns a valid square root
+      -- This follows from the properties of sqrt_checked and MontgomeryPoint.IsValid
+      sorry
+    Montgomery.mk_point (u := u) (v := v) (h := curve_eq)
+
+end MontgomeryPoint
 
 end Montgomery

@@ -23,8 +23,7 @@ most significant to least significant.
 --/
 
 open Aeneas.Std Result
-open curve25519_dalek.montgomery
-open curve25519_dalek.backend.serial.u64
+open Montgomery
 
 namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
@@ -56,6 +55,61 @@ Natural language specs:
     • The computation is constant-time with respect to the scalar value
     • The result represents the u-coordinate of [scalar]P on the Montgomery curve
 -/
+
+/-
+Natural language description for loop:
+
+    • The loop iterates from i = 254 down to i = 0 (inclusive)
+    • For each iteration:
+      - Extracts the i-th bit from the scalar_bytes array
+      - Compares current bit with previous bit to determine if swap is needed
+      - Conditionally swaps x0 and x1 based on bit transition
+      - Applies differential_add_and_double operation with affine_u
+      - Updates prev_bit for next iteration
+
+    • Loop invariant: x0 and x1 represent points such that x1 - x0 = P (the base point)
+    • This maintains the Montgomery ladder property throughout execution
+
+Natural language specs for loop:
+
+    • The loop always terminates when i reaches -1
+    • Maintains constant-time execution by performing operations independent of bit values
+    • Returns the final states of x0, x1, and prev_bit
+    • Preserves the differential property: x1 - x0 equals the original input point
+-/
+
+/-- **Spec and proof concerning the Montgomery ladder loop** (loop 0 in mul function):
+- No panic (always returns successfully given valid inputs)
+- Iterates through scalar bits from bit i down to bit 0
+- Mathematical properties:
+  * Loop invariant: At each step, x0 and x1 represent projective points on the Montgomery curve
+    such that the difference x1 - x0 (in affine coordinates) equals the input point P
+  * The loop processes bits in big-endian order (most significant to least significant)
+  * Conditional swaps ensure constant-time execution independent of scalar bit values
+  * The differential_add_and_double operation maintains the ladder invariant:
+    - Given x0 = [k]P and x1 = [k+1]P at iteration i
+    - After processing bit b_i, we have x0 = [2k+b_i]P and x1 = [2k+b_i+1]P
+  * Upon completion (when i = -1), x0 encodes the scalar multiple [n]P where n is
+    the integer value of bits [254:0] of the scalar
+  * The prev_bit output is the LSB (bit 0) of the scalar, needed for final swap
+-/
+
+@[progress]
+theorem mul_loop_spec (affine_u : backend.serial.u64.field.FieldElement51)
+    (x0 : ProjectivePoint) (x1 : ProjectivePoint)
+    (scalar_bytes : Array U8 32#usize) (prev_bit : Bool) (i : Isize) :
+    ∃ res_x0 res_x1 res_prev_bit,
+    mul_loop affine_u x0 x1 scalar_bytes prev_bit i =
+      ok (res_x0, res_x1, res_prev_bit) ∧
+    (i<= 0#isize →  res_x0 = x0 ∧ res_x1= x1 ∧ res_prev_bit = prev_bit) ∧
+    (i> 0#isize →
+      let P := MontgomeryPoint.u_affine_toPoint (Field51_as_Nat x0.U / Field51_as_Nat x0.W)
+      let P1 := MontgomeryPoint.u_affine_toPoint (Field51_as_Nat x1.U / Field51_as_Nat x1.W)
+      P=P1)
+    := by
+    sorry
+
+
 /-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
 - Implements the Montgomery ladder for constant-time scalar multiplication
@@ -76,16 +130,13 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     ∃ res,
     mul P scalar = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
      := by
-  sorry
+    sorry
+
 
 end curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
@@ -123,14 +174,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
-     (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
     ∃ res,
     mul scalar P = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
     :=by
   unfold mul
   progress*
@@ -173,14 +220,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
     ∃ res,
     mul P rhs = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)
  := by
   unfold mul
   progress*
@@ -220,14 +263,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
     ∃ res,
     mul scalar P = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
  := by
   unfold mul
   progress*
