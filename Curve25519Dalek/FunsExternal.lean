@@ -186,14 +186,32 @@ def subtle.ConstantTimeEqU16.ct_eq (a : U16) (b : U16) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
-/-- **Spec axiom for `subtle.ConstantTimeEqU16.ct_eq`**:
+/-- **Spec theorem for `subtle.ConstantTimeEqU16.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U16 values are equal
 -/
 @[progress]
-axiom subtle.ConstantTimeEqU16.ct_eq_spec (a b : U16) :
+theorem subtle.ConstantTimeEqU16.ct_eq_spec (a b : U16) :
   ∃ c, subtle.ConstantTimeEqU16.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  (c = Choice.one ↔ a = b) := by
+  unfold subtle.ConstantTimeEqU16.ct_eq
+  split
+  · -- Case: a = b
+    rename_i h_eq
+    exists Choice.one
+    simp [h_eq]
+  · -- Case: a ≠ b
+    rename_i h_ne
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is a contradiction
+        cases h
+      · intro h
+        -- a = b but a ≠ b is a contradiction
+        contradiction
 
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
@@ -320,17 +338,20 @@ def subtle.ConditionallySelectable.conditional_assign.default
   fun a b choice =>
     ConditionallySelectableInst.conditional_select a b choice
 
-/-- **Spec axiom for `subtle.ConditionallySelectable.conditional_assign.default`**:
+/-- **Spec theorem for `subtle.ConditionallySelectable.conditional_assign.default`**:
 - No panic (if conditional_select succeeds)
 - Returns the result of conditional_select(a, b, choice)
 -/
 @[progress]
-axiom subtle.ConditionallySelectable.conditional_assign.default_spec
+theorem subtle.ConditionallySelectable.conditional_assign.default_spec
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
   (a b : Self) (choice : subtle.Choice)
   (h : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res) :
   ∃ res, subtle.ConditionallySelectable.conditional_assign.default ConditionallySelectableInst a b choice = ok res ∧
-  ConditionallySelectableInst.conditional_select a b choice = ok res
+  ConditionallySelectableInst.conditional_select a b choice = ok res := by
+  unfold subtle.ConditionallySelectable.conditional_assign.default
+  obtain ⟨res, h_eq⟩ := h
+  exists res
 
 /- [subtle::ConditionallySelectable::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
@@ -346,7 +367,7 @@ def subtle.ConditionallySelectable.conditional_swap.default
     let b_new ← ConditionallySelectableInst.conditional_select b a choice
     ok (a_new, b_new)
 
-/-- **Spec axiom for `subtle.ConditionallySelectable.conditional_swap.default`**:
+/-- **Spec theorem for `subtle.ConditionallySelectable.conditional_swap.default`**:
 - No panic (if conditional_select succeeds)
 - Returns (a_new, b_new) where:
   - a_new = conditional_select(a, b, choice)
@@ -355,7 +376,7 @@ def subtle.ConditionallySelectable.conditional_swap.default
 - If choice = Choice.zero: leaves them unchanged
 -/
 @[progress]
-axiom subtle.ConditionallySelectable.conditional_swap.default_spec
+theorem subtle.ConditionallySelectable.conditional_swap.default_spec
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
   (a b : Self) (choice : subtle.Choice)
   (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
@@ -363,7 +384,12 @@ axiom subtle.ConditionallySelectable.conditional_swap.default_spec
   ∃ a_new b_new,
     subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice = ok (a_new, b_new) ∧
     ConditionallySelectableInst.conditional_select a b choice = ok a_new ∧
-    ConditionallySelectableInst.conditional_select b a choice = ok b_new
+    ConditionallySelectableInst.conditional_select b a choice = ok b_new := by
+  unfold subtle.ConditionallySelectable.conditional_swap.default
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  exists a_new, b_new
+  simp [h_a_eq, h_b_eq]
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
