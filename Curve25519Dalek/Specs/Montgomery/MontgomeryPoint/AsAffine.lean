@@ -75,7 +75,40 @@ lemma invert_mul_eq_div
   (hx : Field51_as_Nat x * Field51_as_Nat W ≡ 1 [MOD p]) :
   Field51_as_Nat U * Field51_as_Nat x ≡ Field51_as_Nat U / Field51_as_Nat W [MOD p]
 := by
-sorry
+  -- Key idea: Since x * W ≡ 1 (mod p), we have x ≡ W⁻¹ (mod p)
+  -- Therefore U * x ≡ U * W⁻¹ ≡ U / W (mod p)
+
+  -- Work via ZMod p where we have field operations
+  rw [Nat.ModEq] at hx ⊢
+
+  -- Show the equality holds modulo p by showing it in ZMod p
+  have h_eq_in_zmod : ((Field51_as_Nat U * Field51_as_Nat x) % p : ZMod p) =
+                      ((Field51_as_Nat U / Field51_as_Nat W) % p : ZMod p) := by
+    -- First establish x is inverse of W in ZMod p
+    have h_x_inv_W : (Field51_as_Nat x % p : ZMod p) = (Field51_as_Nat W % p : ZMod p)⁻¹ := by
+      -- apply eq_inv_of_mul_eq_one_left
+      -- simp [← Nat.cast_mul]
+      -- have : (Field51_as_Nat x * Field51_as_Nat W) % p = 1 % p := hx
+      -- simp [← ZMod.natCast_mod]
+      -- norm_num
+      sorry
+
+    -- Now compute U * x in ZMod p
+    calc ((Field51_as_Nat U * Field51_as_Nat x) % p : ZMod p)
+        = ((Field51_as_Nat U % p) * (Field51_as_Nat x % p) : ZMod p) := by
+            sorry
+            -- simp only [← ZMod.natCast_mod, Nat.mod_mod_of_dvd, dvd_refl]
+            -- norm_cast
+      _ = (Field51_as_Nat U % p : ZMod p) * (Field51_as_Nat W % p : ZMod p)⁻¹ := by
+            sorry
+            -- congr 1; exact h_x_inv_W
+      _ = (Field51_as_Nat U % p : ZMod p) / (Field51_as_Nat W % p : ZMod p) := by
+            rw [div_eq_mul_inv]
+      _ = ((Field51_as_Nat U / Field51_as_Nat W) % p : ZMod p) := by
+            sorry  -- This step needs more work
+
+  -- Convert ZMod equality to nat mod equality
+  sorry
 
 /-- If a limb-representation is nonzero in `ZMod p`, its canonical representative mod `p` is nonzero. -/
 lemma Field51_modP_ne_zero_of_toField_ne_zero
@@ -131,6 +164,12 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
               _ = 1 := by simp [h_inv]
           have h_inv3 : Field51_as_Nat self.U * Field51_as_Nat x_inv ≡ Field51_as_Nat self.U / Field51_as_Nat self.W [MOD p] := by
             exact invert_mul_eq_div self.U self.W x_inv h_inv2
+          have h_inv4: self.U.toField / self.W.toField = Field51_as_Nat self.U / Field51_as_Nat self.W := by
+            unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
+            simp
+          have h_inv5: (Field51_as_Nat self.U) / (Field51_as_Nat self.W) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
+
+            sorry
           sorry
           -- exact Edwards.lift_mod_eq _ _ (Nat.ModEq.trans (Nat.ModEq.trans a_post_1 u_post_1) h_inv3)
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
