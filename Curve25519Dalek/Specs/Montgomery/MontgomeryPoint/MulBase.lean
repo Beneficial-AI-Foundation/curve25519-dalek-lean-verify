@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery
 /-! # Spec Theorem for `MontgomeryPoint::mul_base`
@@ -24,7 +24,7 @@ EdwardsPoint to a MontgomeryPoint.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.montgomery
 open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
 

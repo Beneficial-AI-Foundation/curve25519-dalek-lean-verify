@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 
 /-! # Spec Theorem for `MontgomeryPoint::mul`
 
@@ -23,9 +23,7 @@ most significant to least significant.
 --/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
 open curve25519_dalek.montgomery
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
 open curve25519_dalek.backend.serial.u64
 
 namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
