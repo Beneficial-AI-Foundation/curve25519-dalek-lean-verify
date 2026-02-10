@@ -62,7 +62,7 @@ def MontgomeryPoint.IsValid (m : MontgomeryPoint) : Prop :=
     let den := (d : ZMod p) * y^2 + 1
     IsSquare (num * den⁻¹)
 
-instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
+noncomputable instance (m : MontgomeryPoint) : Decidable (MontgomeryPoint.IsValid m) := by
   unfold MontgomeryPoint.IsValid
   infer_instance
 
@@ -158,7 +158,6 @@ namespace Montgomery
 section MontgomeryPoint
 
 open curve25519_dalek.montgomery
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
 open curve25519_dalek.math
 
 /-- Create a point from a MontgomeryPoint byte representation.

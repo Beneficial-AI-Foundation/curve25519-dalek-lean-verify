@@ -41,11 +41,6 @@ open ZMod
 
 /-! ## Mathematical Foundations: Twisted Edwards Curves -/
 
-/-- The finite field F_p where p = 2^255 - 19. -/
-abbrev CurveField : Type := ZMod p
-
-instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
-
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
 
 /-- Helper lemma for modular arithmetic lifting -/

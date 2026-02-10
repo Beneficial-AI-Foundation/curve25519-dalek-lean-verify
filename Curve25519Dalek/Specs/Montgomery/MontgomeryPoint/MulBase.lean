@@ -24,7 +24,7 @@ EdwardsPoint to a MontgomeryPoint.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.montgomery
 open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
 

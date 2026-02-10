@@ -23,7 +23,7 @@ in the backend).
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.montgomery
 namespace curve25519_dalek.montgomery.MulAssignMontgomeryPointShared0Scalar
 
 /-

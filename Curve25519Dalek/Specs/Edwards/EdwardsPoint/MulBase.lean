@@ -22,7 +22,7 @@ scalar-point multiplication on the fixed basepoint.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open curve25519_dalek.montgomery
 open curve25519_dalek.backend.serial.u64
 namespace curve25519_dalek.edwards.EdwardsPoint
 
