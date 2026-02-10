@@ -178,19 +178,53 @@ def subtle.ConstantTimeEqSlice.ct_eq
       else
         ok Choice.zero
 
-/-- **Spec axiom for `subtle.ConstantTimeEqSlice.ct_eq`**:
+/-- **Spec theorem for `subtle.ConstantTimeEqSlice.ct_eq`**:
 - No panic (always returns successfully)
 - Returns Choice.one (true) if and only if all corresponding elements are equal
 - Requires equal-length slices with valid bounds
 -/
 @[progress]
-axiom subtle.ConstantTimeEqSlice.ct_eq_spec
+theorem subtle.ConstantTimeEqSlice.ct_eq_spec
   {T : Type} [DecidableEq T] (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
   (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
   (hb : b.length < 2 ^ UScalarTy.Usize.numBits)
   (h_eq_len : a.length = b.length) :
   ∃ c, subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  (c = Choice.one ↔ a = b) := by
+  unfold subtle.ConstantTimeEqSlice.ct_eq
+  simp [h_eq_len]
+  split
+  · -- Case: a.val = b.val
+    rename_i h_val_eq
+    exists Choice.one
+    constructor
+    · rfl
+    · constructor
+      · intro _
+        -- Show a = b from a.val = b.val
+        cases a; cases b
+        simp_all
+      · intro _
+        rfl
+  · -- Case: a.val ≠ b.val
+    rename_i h_val_ne
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is a contradiction
+        cases h
+      · intro h
+        -- a = b but a.val ≠ b.val is a contradiction
+        cases a with | mk val1 prop1 =>
+        cases b with | mk val2 prop2 =>
+        -- h says the Slices are equal, so their vals must be equal
+        have : val1 = val2 := by
+          cases h
+          rfl
+        -- But h_val_ne says they're not equal - contradiction
+        contradiction
 
 /- [subtle::{subtle::ConstantTimeEq for u8}::ct_eq]:
 Name pattern: [subtle::{subtle::ConstantTimeEq<u8>}::ct_eq]
