@@ -168,6 +168,7 @@ theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
   4 * get_u (2 • P) * get_u (P) * ((get_u P)^2 +  Curve25519.A * get_u P + 1) = ((get_u P) ^ 2 - 1)^2 := by
   sorry
 
+
 /-- Addition is associative for points.
 This follows directly from mathlib's AddCommGroup instance for Weierstrass curve points. -/
 theorem add_assoc' (P Q R : Point) : (P + Q) + R = P + (Q + R) :=
