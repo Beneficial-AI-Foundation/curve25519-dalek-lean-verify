@@ -3,7 +3,7 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Markus Dablander
 -/
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
@@ -40,11 +40,6 @@ namespace Edwards
 open ZMod
 
 /-! ## Mathematical Foundations: Twisted Edwards Curves -/
-
-/-- The finite field F_p where p = 2^255 - 19. -/
-abbrev CurveField : Type := ZMod p
-
-instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
 
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
 

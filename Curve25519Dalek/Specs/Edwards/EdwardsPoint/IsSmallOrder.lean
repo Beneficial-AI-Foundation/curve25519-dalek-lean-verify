@@ -4,11 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 

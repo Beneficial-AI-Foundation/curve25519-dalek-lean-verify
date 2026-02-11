@@ -5,7 +5,7 @@ Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::mul_by_cofactor`
 

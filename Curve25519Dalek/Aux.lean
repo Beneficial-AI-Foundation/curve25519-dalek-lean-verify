@@ -1,5 +1,5 @@
 import Aeneas
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Mathlib
 
 set_option linter.style.longLine false

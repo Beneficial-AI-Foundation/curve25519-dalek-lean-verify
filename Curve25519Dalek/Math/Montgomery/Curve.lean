@@ -4,9 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Aux
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Mathlib.AlgebraicGeometry.EllipticCurve.Affine.Point
-import Curve25519Dalek.Defs.Edwards.Representation
 
 /-!
 # Affine Montgomery Curve Points for Curve25519
@@ -156,32 +155,5 @@ This follows directly from mathlib's AddCommGroup instance for Weierstrass curve
 theorem add_assoc' (P Q R : Point) : (P + Q) + R = P + (Q + R) :=
   add_assoc P Q R
 
-section MontgomeryPoint
-
-open curve25519_dalek.montgomery
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-open curve25519_dalek.math
-
-/-- Create a point from a MontgomeryPoint byte representation.
-    Computes the v-coordinate from u using the Montgomery curve equation v² = u³ + A·u² + u.
-
-    Note: The curve equation proof currently uses `sorry`. This requires proving that
-    `sqrt_checked` returns a value whose square equals its input, which depends on
-    the mathematical properties of the square root function in the field. -/
-noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point:=
-    let u : CurveField := bytesToField m
-    -- Compute v² = u³ + A·u² + u
-    let v_squared := u ^ 3 + Curve25519.A * u ^ 2 + u
-    -- Extract the square root (guaranteed to exist by IsValid)
-    let (v_abs, _is_sq) := curve25519_dalek.math.sqrt_checked v_squared
-    -- Use the canonical (non-negative/even) root
-    let v := v_abs
-    have curve_eq : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u := by
-      -- TODO: Prove that sqrt_checked returns a valid square root
-      -- This follows from the properties of sqrt_checked and MontgomeryPoint.IsValid
-      sorry
-    Montgomery.mk_point (u := u) (v := v) (h := curve_eq)
-
-end MontgomeryPoint
 
 end Montgomery
