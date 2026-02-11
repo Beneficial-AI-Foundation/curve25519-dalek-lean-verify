@@ -57,86 +57,6 @@ lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
   try ring
 
 /--
-**Pure Decompression**
-Deduces (x, y) from s using the isogeny inversion formulas:
-  - https://ristretto.group/details/isogenies.html
-  - https://ristretto.group/formulas/decoding.html
-In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
-t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
-Indeed:
-  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
-  - y := u1 * Dy = \frac{1+as²}{1-as²}
-Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
-where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
-for Ed25519). The relation to `J` parameters is:
-  - `a₁ = -a₂`
-  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
-Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
--/
-noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
-  let s : ZMod p := s_int
-
-  -- 0. Initial Input Check
-  -- The integer must be < p and canonical sign must be 0
-  if s_int >= p || s_int % 2 != 0 then
-    none
-  else
-    -- 1. Algebraic setup
-    let u1 := 1 + a_val * s^2
-    let u2 := 1 - a_val * s^2
-    let v := a_val * d * u1^2 - u2^2
-
-    -- 2. Inverse Square Root (Elligator)
-    let arg := v * u2^2
-    match h_call : inv_sqrt_checked arg with
-    | (I, was_square) => -- This binds I and was_square for the rest of the block
-
-    -- 3. Recover denominators
-    let Dx := I * u2
-    let Dy := I * Dx * v
-
-    -- 4. Recover coordinates
-    let x := abs_edwards (2 * s * Dx)
-    let y := u1 * Dy
-
-    -- 5. Validation Checks
-    let t := x * y
-
-    -- (1) Square root must succeed
-    -- (2) t must be non-negative (even LSB=LeastSignificantByte)
-    -- (3) y must be non-zero
-    if h_invalid : !was_square || is_negative t || (y == 0) then
-      none
-    else
-      some { x := x, y := y, on_curve := by
-              -- Unpack validity
-              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
-              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
-              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
-              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
-
-              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
-                apply inv_sqrt_checked_spec arg
-                · exact h_call
-                · exact h_sq_not
-
-              let x_raw := 2 * s * Dx
-              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
-                dsimp only [y, Dy, Dx, x_raw]
-                apply decompress_helper a_val d s I u1 u2 v
-                <;> try rw [a_val];
-                <;> try rfl
-                exact h_I_sq_mul
-
-              have h_x_sq : x^2 = x_raw^2 := by
-                dsimp only [x]
-                exact abs_edwards_sq (2 * s * Dx)
-
-              rw [h_x_sq]
-              exact h_curve_raw
-              }
-
-/--
 **Pure Mathematical Compression**
 Encodes a Point P into a scalar s (https://ristretto.group/formulas/encoding.html).
 Used to define the Canonical property.
@@ -334,10 +254,6 @@ For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
 def IsEven (P : Point Ed25519) : Prop :=
   IsSquare (1 - P.y^2)
 
-
-
-
-
 theorem even_add_closure_Ed25519 (P Q : Point Ed25519) (hP : IsEven P) (hQ : IsEven Q) :
     IsEven (P + Q) := by
   sorry
@@ -345,10 +261,6 @@ theorem even_add_closure_Ed25519 (P Q : Point Ed25519) (hP : IsEven P) (hQ : IsE
 theorem EdwardsPoint_IsSquare_iff_IsEven (e : EdwardsPoint) (h : e.IsValid) :
     IsSquare (e.Z.toField^2 - e.Y.toField^2) ↔ IsEven (e.toPoint) := by
   sorry
-
-
-
-
 
 
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
@@ -367,6 +279,96 @@ def RistrettoPoint.toPoint (r : RistrettoPoint) : Point Ed25519 :=
   EdwardsPoint.toPoint r
 
 /--
+**Pure Decompression**
+Deduces (x, y) from s using the isogeny inversion formulas:
+  - https://ristretto.group/details/isogenies.html
+  - https://ristretto.group/formulas/decoding.html
+In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
+t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
+Indeed:
+  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
+  - y := u1 * Dy = \frac{1+as²}{1-as²}
+Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
+where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
+for Ed25519). The relation to `J` parameters is:
+  - `a₁ = -a₂`
+  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
+Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
+Namely the whole decompress is made of two steps:
+**Step 1**: Canonical Encoding & Parity Check
+Isolates the integer-level validation logic.
+Corresponds to the `if` block in the original `decompress_pure`.
+**Step 2**: Algebraic Lifting
+Isolates the field arithmetic and curve geometry.
+Corresponds to the `else` block (arithmetic) in the original `decompress_pure`.
+-/
+def decompress_step1 (c : CompressedRistretto) : Option (ZMod p) :=
+  let s_int := U8x32_as_Nat c
+  -- Check 1: Canonical encoding (s_int < p)
+  -- Check 2: Parity (least significant bit is 0)
+  if s_int >= p || s_int % 2 != 0 then 
+    none 
+  else 
+    some (s_int : ZMod p)
+
+noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
+  -- 1. Algebraic setup
+  let u1 := 1 + a_val * s^2
+  let u2 := 1 - a_val * s^2
+  let v := a_val * d * u1^2 - u2^2
+
+  -- 2. Inverse Square Root (Elligator)
+  let arg := v * u2^2
+  match h_call : inv_sqrt_checked arg with
+  | (I, was_square) => 
+
+    -- 3. Recover denominators
+    let Dx := I * u2
+    let Dy := I * Dx * v
+
+    -- 4. Recover coordinates
+    let x := abs_edwards (2 * s * Dx)
+    let y := u1 * Dy
+
+    -- 5. Validation Checks
+    let t := x * y
+    
+    if h_invalid : !was_square || is_negative t || (y == 0) then
+      none
+    else
+      -- 6. Construct Point with Proof
+      some { x := x, y := y, on_curve := by
+              -- Re-using your exact proof script
+              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
+              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
+              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
+              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
+
+              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
+                apply inv_sqrt_checked_spec arg
+                · exact h_call
+                · exact h_sq_not
+
+              let x_raw := 2 * s * Dx
+              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
+                dsimp only [y, Dy, Dx, x_raw]
+                apply decompress_helper a_val d s I u1 u2 v
+                <;> try rw [a_val];
+                <;> try rfl
+                exact h_I_sq_mul
+
+              have h_x_sq : x^2 = x_raw^2 := by
+                dsimp only [x]
+                exact abs_edwards_sq (2 * s * Dx)
+
+              rw [h_x_sq]
+              exact h_curve_raw
+           }
+
+noncomputable def decompress_pure (c : CompressedRistretto) : Option (Point Ed25519) :=
+  (decompress_step1 c).bind decompress_step2
+
+/--
 A CompressedRistretto is valid if and only if the pure mathematical decompression
 succeeds (returning `some`). This implicitly checks (via decompress_pure):
 1. bytes < p
@@ -375,17 +377,18 @@ succeeds (returning `some`). This implicitly checks (via decompress_pure):
 4. t >= 0
 5. y != 0
 -/
-def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
-  (decompress_pure (U8x32_as_Nat c)).isSome
+def IsValid (c : CompressedRistretto) : Prop :=
+  ∃ (s : ZMod p) (pt : Point Ed25519), 
+    decompress_pure c = some pt
 
 /--
 If valid, return the decompressed point.
 If invalid, return the neutral element (0).
 -/
 noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point Ed25519 :=
-  match decompress_pure (U8x32_as_Nat c) with
+  match decompress_pure c with
   | some P => P
-  | none   => 0
+  | none   => 0  -- Returns neutral element on failure
 
 end curve25519_dalek.ristretto
 
