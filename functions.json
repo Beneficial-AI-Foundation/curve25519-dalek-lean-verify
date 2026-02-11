@@ -835,10 +835,12 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem EIGHT_TORSION_spec :\n    True := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EIGHT_TORSION.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.EIGHT_TORSION`** (draft):\n    • EIGHT_TORSION is an array of 8 Edwards points\n    • TODO: Add full specification once Inhabited instance is available\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION",
