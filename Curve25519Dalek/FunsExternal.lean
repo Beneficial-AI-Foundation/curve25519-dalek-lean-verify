@@ -229,20 +229,9 @@ def subtle.FromChoiceU8.from (input : U8) : Result subtle.Choice :=
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
    Constant-time equality for slices -/
 @[rust_fun "subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq"]
-def subtle.ConstantTimeEqSlice.ct_eq
-  {T : Type} [DecidableEq T] (ConstantTimeEqInst : subtle.ConstantTimeEq T)
-  : Slice T → Slice T → Result subtle.Choice :=
-  fun a b =>
-    -- First check if lengths are equal
-    if a.length ≠ b.length then
-      ok Choice.zero
-    else
-      -- If lengths are equal, check if all elements are equal
-      -- Compare the underlying lists
-      if a.val = b.val then
-        ok Choice.one
-      else
-        ok Choice.zero
+axiom subtle.ConstantTimeEqSlice.ct_eq
+  {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T)
+  : Slice T → Slice T → Result subtle.Choice
 
 /-- **Spec theorem for `subtle.ConstantTimeEqSlice.ct_eq`**:
 - No panic (always returns successfully)
@@ -250,47 +239,13 @@ def subtle.ConstantTimeEqSlice.ct_eq
 - Requires equal-length slices with valid bounds
 -/
 @[progress]
-theorem subtle.ConstantTimeEqSlice.ct_eq_spec
-  {T : Type} [DecidableEq T] (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
+axiom subtle.ConstantTimeEqSlice.ct_eq_spec
+  {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
   (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
   (hb : b.length < 2 ^ UScalarTy.Usize.numBits)
   (h_eq_len : a.length = b.length) :
   ∃ c, subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b = ok c ∧
-  (c = Choice.one ↔ a = b) := by
-  unfold subtle.ConstantTimeEqSlice.ct_eq
-  simp [h_eq_len]
-  split
-  · -- Case: a.val = b.val
-    rename_i h_val_eq
-    exists Choice.one
-    constructor
-    · rfl
-    · constructor
-      · intro _
-        -- Show a = b from a.val = b.val
-        cases a; cases b
-        simp_all
-      · intro _
-        rfl
-  · -- Case: a.val ≠ b.val
-    rename_i h_val_ne
-    exists Choice.zero
-    constructor
-    · rfl
-    · constructor
-      · intro h
-        -- Choice.zero = Choice.one is a contradiction
-        cases h
-      · intro h
-        -- a = b but a.val ≠ b.val is a contradiction
-        cases a with | mk val1 prop1 =>
-        cases b with | mk val2 prop2 =>
-        -- h says the Slices are equal, so their vals must be equal
-        have : val1 = val2 := by
-          cases h
-          rfl
-        -- But h_val_ne says they're not equal - contradiction
-        contradiction
+  (c = Choice.one ↔ a = b)
 
 /- [subtle::{subtle::ConstantTimeEq for u8}::ct_eq]:
 Name pattern: [subtle::{subtle::ConstantTimeEq<u8>}::ct_eq]
