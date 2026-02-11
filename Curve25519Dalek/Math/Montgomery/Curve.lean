@@ -70,7 +70,7 @@ def T_point : Point := .some (x := 0) (y := 0) (h := by
   · left
     norm_num [MontgomeryCurveCurve25519])
 
-lemma non_singular {u v : CurveField}
+theorem non_singular {u v : CurveField}
     (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
     v ≠ 0 ∨ 3 * u ^ 2 + 2 * Curve25519.A * u + 1 ≠ 0  := by
     by_cases hv: v =0
@@ -91,9 +91,9 @@ lemma non_singular {u v : CurveField}
         have eq1: Curve25519.A^2 * u^2 = 4 := by grind
         have : -2 + (1:CurveField)= -1 := by ring
         rw[add_assoc, this] at h1
-        have : u^2=1 := by grind
-        simp[this, Curve25519.A] at eq1
-        revert eq1
+        have :  Curve25519.A ^ 2 * u^2 + Curve25519.A ^ 2* (-1) = 0  := by grind
+        rw[eq1, Curve25519.A] at this
+        revert this
         decide
     · simp[hv]
 
@@ -167,7 +167,6 @@ theorem uADD (P Q : Point)
 theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
   4 * get_u (2 • P) * get_u (P) * ((get_u P)^2 +  Curve25519.A * get_u P + 1) = ((get_u P) ^ 2 - 1)^2 := by
   sorry
-
 
 /-- Addition is associative for points.
 This follows directly from mathlib's AddCommGroup instance for Weierstrass curve points. -/
