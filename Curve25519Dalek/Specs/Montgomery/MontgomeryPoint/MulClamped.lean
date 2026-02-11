@@ -4,10 +4,10 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
-import Curve25519Dalek.Defs.Montgomery.Curve
+import Curve25519Dalek.Specs.Scalar.ClampInteger
 /-! # Spec Theorem for `MontgomeryPoint::mul_clamped`
 
 Specification and proof for
@@ -50,10 +50,10 @@ natural language specs:
 theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     ∃ res,
     mul_clamped P bytes = ok res ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat bytes) • (MontgomeryPoint.toPoint P)    := by
+    (∃ clamped_scalar,
+    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))    := by
       unfold mul_clamped
-      sorry
-
-
+      progress*
 
 end curve25519_dalek.montgomery.MontgomeryPoint

@@ -4,14 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
-import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
-import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
-import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Scalar.ClampInteger
-import Curve25519Dalek.Defs.Montgomery.Curve
 /-! # Spec Theorem for `MontgomeryPoint::mul_base_clamped`
 
 Specification and proof for
@@ -54,20 +51,12 @@ natural language specs:
 
 @[progress]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
-    ∃ result clamped_scalar,
-    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    ∃ result,
     mul_base_clamped bytes = ok result ∧
-    MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)    := by
+    (∃ clamped_scalar,
+    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))    := by
    unfold mul_base_clamped
    progress*
-   simp[← Montgomery.comm_mul_fromEdwards]
-   unfold mul_base
-   progress*
-   · exact ep_post_1.Y_bounds
-   · exact ep_post_1.Z_bounds
-   ·  simp_all
-      have := res_post_2 1
-      simp at this
-      rw[← this]
 
 end curve25519_dalek.montgomery.MontgomeryPoint
