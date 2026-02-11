@@ -4004,7 +4004,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (comp : CompressedRistretto) :\n    ∃ result, decompress comp = ok result ∧\n    (¬comp.IsValid →\n      result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        math.decompress_pure (U8x32_as_Nat comp) = some rist.toPoint) := by ...",
+   "theorem decompress_spec (comp : CompressedRistretto) :\n    ∃ result, decompress comp = ok result ∧\n    (¬comp.IsValid →\n      result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        decompress_pure comp = some rist.toPoint) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean",
    "spec_docstring":
