@@ -27,6 +27,35 @@ open Montgomery
 
 namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
+/-
+Natural language description:
+
+    • Interprets the MontgomeryPoint's 32-byte encoding as a field element u using
+      `FieldElement51.from_bytes`.
+
+    • Initializes two projective points:
+      - x0 = (1 : 0) representing the identity (point at infinity)
+      - x1 = (u : 1) representing the input point in projective coordinates
+
+    • Processes scalar bits from most significant (bit 254) to least significant (bit 0)
+      using the Montgomery ladder (Algorithm 8 from Costello-Smith 2017):
+      - By scalar invariant #1, the MSB (bit 255) is always 0, so we start from bit 254
+      - For each bit, conditionally swaps x0 and x1 based on bit transitions
+      - Applies differential add-and-double operation
+      - Maintains constant-time execution through conditional operations
+
+    • After processing all bits, performs a final conditional swap based on the LSB
+
+    • Converts the projective result x0 back to affine coordinates using `ProjectivePoint.as_affine`
+
+Natural language specs:
+
+    • The function always succeeds (no panic) given valid inputs
+    • Returns a 32-byte MontgomeryPoint encoding the scalar multiplication result
+    • The computation is constant-time with respect to the scalar value
+    • The result represents the u-coordinate of [scalar]P on the Montgomery curve
+-/
+
 
 /-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
