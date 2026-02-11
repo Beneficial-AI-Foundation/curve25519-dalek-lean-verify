@@ -70,6 +70,10 @@ def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
 -/
 
 -- Helper lemma: bytesToField equals U8x32_as_Nat cast to ZMod p
+lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
+    bytesToField a = (U8x32_as_Nat a : ZMod p) := by
+  sorry  -- TODO: Prove that Horner's method equals the sum representation mod p
+
 lemma invert_mul_eq_div
   (U W x : backend.serial.u64.field.FieldElement51)
   (hx : Field51_as_Nat x * Field51_as_Nat W ≡ 1 [MOD p]) :
@@ -188,8 +192,21 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
             simp
           have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
             exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
-          sorry
-          -- exact Edwards.lift_mod_eq _ _ (Nat.ModEq.trans (Nat.ModEq.trans a_post_1 u_post_1) h_inv3)
+          -- Chain the modular equalities
+          have h_chain := Nat.ModEq.trans (Nat.ModEq.trans a_post_1 u_post_1) h_inv3
+          -- Rewrite using h_inv4 and h_inv5
+          rw [h_inv4, h_inv5]
+          -- Now we need to show: bytesToField a = ↑(Field51_as_Nat self.U) * ↑(Field51_as_Nat x_inv)
+          -- We have: U8x32_as_Nat a ≡ Field51_as_Nat self.U * Field51_as_Nat x_inv [MOD p] from chaining a_post_1 and u_post_1
+          have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
+          have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
+          -- Convert to the right form using Nat.cast_mul
+          have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
+            rw [h_eq_zmod2, Nat.cast_mul]
+          -- bytesToField a = (U8x32_as_Nat a : ZMod p) by the helper lemma
+          calc bytesToField a
+              = (U8x32_as_Nat a : ZMod p) := bytesToField_eq_cast a
+            _ = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := h_eq_zmod3
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
         -- This contradicts h_valid.2
         have div_eq_neg_one : self.U.toField / self.W.toField = -1 := by
