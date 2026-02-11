@@ -377,8 +377,8 @@ succeeds (returning `some`). This implicitly checks (via decompress_pure):
 4. t >= 0
 5. y != 0
 -/
-def IsValid (c : CompressedRistretto) : Prop :=
-  ∃ (s : ZMod p) (pt : Point Ed25519), 
+def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
+  ∃ (pt : Point Ed25519),
     decompress_pure c = some pt
 
 /--
