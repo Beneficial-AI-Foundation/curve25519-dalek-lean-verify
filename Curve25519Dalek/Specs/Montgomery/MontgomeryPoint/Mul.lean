@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -23,8 +23,7 @@ most significant to least significant.
 --/
 
 open Aeneas.Std Result
-open curve25519_dalek.montgomery
-open curve25519_dalek.backend.serial.u64
+open Montgomery
 
 namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
@@ -56,6 +55,8 @@ Natural language specs:
     • The computation is constant-time with respect to the scalar value
     • The result represents the u-coordinate of [scalar]P on the Montgomery curve
 -/
+
+
 /-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
 - Implements the Montgomery ladder for constant-time scalar multiplication
@@ -76,16 +77,13 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     ∃ res,
     mul P scalar = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
      := by
-  sorry
+    sorry
+
 
 end curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
 
@@ -123,14 +121,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
-     (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
     ∃ res,
     mul scalar P = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
     :=by
   unfold mul
   progress*
@@ -173,14 +167,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
     ∃ res,
     mul P rhs = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)
  := by
   unfold mul
   progress*
@@ -220,14 +210,10 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
     ∃ res,
     mul scalar P = ok res ∧
-    (MontgomeryPoint.IsValid res) ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
  := by
   unfold mul
   progress*
