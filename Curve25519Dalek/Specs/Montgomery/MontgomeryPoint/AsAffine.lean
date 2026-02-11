@@ -121,6 +121,25 @@ lemma Field51_modP_ne_zero_of_toField_ne_zero
   exact Edwards.lift_mod_eq (Field51_as_Nat W) 0 (by
     simpa [Nat.zero_mod] using hmod)
 
+/-- Division in ZMod p equals multiplication by inverse when we have modular multiplicative inverse. -/
+lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv : x_inv * W ≡ 1 [MOD p]) :
+    (U : ZMod p) / (W : ZMod p) = (U : ZMod p) * (x_inv : ZMod p) := by
+  have h_mul : (x_inv : ZMod p) * (W : ZMod p) = 1 := by
+    rw [Nat.ModEq] at h_inv
+    calc (x_inv : ZMod p) * (W : ZMod p)
+        = (((x_inv * W) : Nat) : ZMod p) := by norm_cast
+      _ = (((x_inv * W) % p : Nat) : ZMod p) := by rw [ZMod.natCast_mod]
+      _ = ((1 % p : Nat) : ZMod p) := by rw [h_inv]
+      _ = (1 : ZMod p) := by norm_num
+  have hW_ne_zero : (W : ZMod p) ≠ 0 := by
+    intro h
+    rw [ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at h
+    exact hW_ne h
+  rw [div_eq_mul_inv]
+  congr 1
+  symm
+  exact (mul_eq_one_iff_eq_inv₀ hW_ne_zero).mp h_mul
+
 -- set_option maxHeartbeats 1200000 in
 -- Increased heartbeats due to complex field arithmetic calculations
 @[progress]
@@ -150,7 +169,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
         -- Now show bytesToField a = self.U.toField / self.W.toField using invert_mul_eq_div
         have a_eq_div : bytesToField a = self.U.toField / self.W.toField := by
           have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
-          rename_i x_inv _ x_inv_post _ _
+          rename_i x_inv _ x_inv_post u_inv _
           rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
           have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
             exact x_inv_post h_W_nat_nonzero
@@ -164,12 +183,11 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
               _ = 1 := by simp [h_inv]
           have h_inv3 : Field51_as_Nat self.U * Field51_as_Nat x_inv ≡ Field51_as_Nat self.U / Field51_as_Nat self.W [MOD p] := by
             exact invert_mul_eq_div self.U self.W x_inv h_inv2
-          have h_inv4: self.U.toField / self.W.toField = Field51_as_Nat self.U / Field51_as_Nat self.W := by
+          have h_inv4: self.U.toField / self.W.toField = (Field51_as_Nat self.U) / (Field51_as_Nat self.W) := by
             unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
             simp
-          have h_inv5: (Field51_as_Nat self.U) / (Field51_as_Nat self.W) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
-
-            sorry
+          have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
+            exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
           sorry
           -- exact Edwards.lift_mod_eq _ _ (Nat.ModEq.trans (Nat.ModEq.trans a_post_1 u_post_1) h_inv3)
         -- From a_eq_div and hu, we get self.U.toField / self.W.toField = -1
