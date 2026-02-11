@@ -154,7 +154,6 @@ noncomputable def MontgomeryPoint.toPoint (m : MontgomeryPoint) : Point Ed25519 
 end curve25519_dalek.montgomery
 
 namespace Montgomery
-
 section MontgomeryPoint
 
 open curve25519_dalek.montgomery
@@ -169,15 +168,10 @@ open curve25519_dalek.math
     the mathematical properties of the square root function in the field. -/
 
 noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
-    -- Compute v² = u³ + A·u² + u
     let v_squared := u ^ 3 + Curve25519.A * u ^ 2 + u
-    -- Extract the square root (guaranteed to exist by IsValid)
     let (v_abs, _is_sq) := curve25519_dalek.math.sqrt_checked v_squared
-    -- Use the canonical (non-negative/even) root
     let v := v_abs
     have curve_eq : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u := by
-      -- TODO: Prove that sqrt_checked returns a valid square root
-      -- This follows from the properties of sqrt_checked and MontgomeryPoint.IsValid
        sorry
     Montgomery.mk_point (u := u) (v := v) (h := curve_eq)
 
@@ -193,13 +187,11 @@ noncomputable def fromEdwards.toPoint : Edwards.Point Edwards.Ed25519 → Point
   | m =>
     Montgomery.mk_point (u := (1+m.y)/(1-m.y)) (v := (1+m.y)/((1-m.y)*m.x)) (h := by
         have := m.on_curve
-        sorry
- )
+        sorry)
 
 theorem comm_mul_fromEdwards (n : ℕ) (e : Edwards.Point Edwards.Ed25519) :
   fromEdwards.toPoint (n • e) = n •  (fromEdwards.toPoint e) := by
   sorry
-
 
 end fromEdwards
 
@@ -209,14 +201,12 @@ open curve25519_dalek.math
 theorem sqrt_checked_spec (u : ZMod p) {r : ZMod p} {b : Bool} :
   sqrt_checked u = (r, b) → b = true → r^2 = u := by
   intro h_call h_true
-  sorry -- Proof deferred
-
+  sorry
 
 noncomputable def toMontgomery.toPoint : Point → Edwards.Point Edwards.Ed25519
   | .zero => 0
   | .some (x := u) (y := v) (h:= h) =>
     { x := u * v⁻¹, y := (u - 1) * (u + 1)⁻¹, on_curve := (by
-
     have eq:=h.left
     rw [WeierstrassCurve.Affine.equation_iff] at eq
     simp [MontgomeryCurveCurve25519] at eq
@@ -225,5 +215,4 @@ noncomputable def toMontgomery.toPoint : Point → Edwards.Point Edwards.Ed25519
     sorry
     )
  }
-
 end toMontgomery

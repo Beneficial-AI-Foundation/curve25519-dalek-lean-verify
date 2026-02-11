@@ -4,7 +4,6 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
@@ -18,12 +17,10 @@ This function performs scalar multiplication by the Montgomery basepoint after
 clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_base`.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 150:4-158:5
-
 -/
 
 open Aeneas.Std Result
 open curve25519_dalek.backend.serial.u64
-open curve25519_dalek.edwards
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 

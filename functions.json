@@ -3768,12 +3768,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.montgomery.ProjectivePoint.as_affine"]},
   {"verified": false,
-   "specified": true,
-   "spec_statement":
-   "\ntheorem mul_loop_spec (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 : ProjectivePoint) (x1 : ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize) (prev_bit : Bool) (i : Isize) :\n    ∃ res_x0 res_x1 res_prev_bit,\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i =\n      ok (res_x0, res_x1, res_prev_bit) ∧\n    (i<= 0#isize →  res_x0 = x0 ∧ res_x1= x1 ∧ res_prev_bit = prev_bit) ∧\n    (i> 0#isize →\n      let P := MontgomeryPoint.u_affine_toPoint (Field51_as_Nat x0.U / Field51_as_Nat x0.W)\n      let P1 := MontgomeryPoint.u_affine_toPoint (Field51_as_Nat x1.U / Field51_as_Nat x1.W)\n      P=P1)\n := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning the Montgomery ladder loop** (loop 0 in mul function):\n- No panic (always returns successfully given valid inputs)\n- Iterates through scalar bits from bit i down to bit 0\n- Mathematical properties:\n  * Loop invariant: At each step, x0 and x1 represent projective points on the Montgomery curve\n    such that the difference x1 - x0 (in affine coordinates) equals the input point P\n  * The loop processes bits in big-endian order (most significant to least significant)\n  * Conditional swaps ensure constant-time execution independent of scalar bit values\n  * The differential_add_and_double operation maintains the ladder invariant:\n    - Given x0 = [k]P and x1 = [k+1]P at iteration i\n    - After processing bit b_i, we have x0 = [2k+b_i]P and x1 = [2k+b_i+1]P\n  * Upon completion (when i = -1), x0 encodes the scalar multiple [n]P where n is\n    the integer value of bits [254:0] of the scalar\n  * The prev_bit output is the LSB (bit 0) of the scalar, needed for final swap\n-/",
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul",
