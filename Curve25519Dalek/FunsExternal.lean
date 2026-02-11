@@ -336,14 +336,14 @@ theorem subtle.ConditionallySelectable.conditional_swap.default_spec
   (a b : Self) (choice : subtle.Choice)
   (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
   (h_b : ∃ res, ConditionallySelectableInst.conditional_select b a choice = ok res) :
-  ∃ a_new b_new,
-    subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice = ok (a_new, b_new) ∧
-    ConditionallySelectableInst.conditional_select a b choice = ok a_new ∧
-    ConditionallySelectableInst.conditional_select b a choice = ok b_new := by
+  ∃ c,
+    subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice = ok c ∧
+    ConditionallySelectableInst.conditional_select a b choice = ok c.1 ∧
+    ConditionallySelectableInst.conditional_select b a choice = ok c.2 := by
   unfold subtle.ConditionallySelectable.conditional_swap.default
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
-  exists a_new, b_new
+  exists (a_new, b_new)
   simp [h_a_eq, h_b_eq]
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
