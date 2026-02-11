@@ -70,9 +70,33 @@ def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
 -/
 
 -- Helper lemma: bytesToField equals U8x32_as_Nat cast to ZMod p
+-- Helper: prove equivalence for lists directly
+private lemma list_foldr_eq_ofDigits (l : List U8) :
+    List.foldr (fun b acc => (b.val : ZMod p) + (256 : ZMod p) * acc) 0 l =
+    Nat.ofDigits (256 : ZMod p) (l.map fun b => b.val) := by
+  induction l with
+  | nil => rfl
+  | cons h t ih =>
+    simp only [List.foldr, List.map, Nat.ofDigits, ih]
+
 lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
     bytesToField a = (U8x32_as_Nat a : ZMod p) := by
-  sorry  -- TODO: Prove that Horner's method equals the sum representation mod p
+  -- Use the fact that U8x32_as_Nat can be represented as Nat.ofDigits
+  rw [U8x32_as_Nat_is_NatofDigits]
+  -- Use Nat.coe_ofDigits to move the cast inside
+  rw [Nat.coe_ofDigits]
+  -- Simplify 2^8 = 256
+  norm_num
+  -- Use the helper lemma for list foldr
+  unfold bytesToField
+  convert list_foldr_eq_ofDigits a.val using 2
+  -- TODO: Complete this proof by showing that:
+  -- [↑(↑a)[0], ..., ↑(↑a)[31]] = List.map (fun b => ↑b) ↑a
+  -- This requires:
+  -- 1. Proving that array-to-list coercion preserves indexing
+  -- 2. Showing that List.ofFn matches the explicit list after norm_num expansion
+  -- 3. Element-wise equality for all 32 positions
+  sorry
 
 lemma invert_mul_eq_div
   (U W x : backend.serial.u64.field.FieldElement51)
