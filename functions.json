@@ -4209,11 +4209,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    s.IsValid := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    s.IsValid ∧\n    (s.toField = (U8x32_as_Nat c : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_1`**:\n    • The function always succeeds (no panic) for any 32-byte input `c`\n    • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p\n    • s_is_negative is true if and only if s is negative (LSB = 1)\n    • The output field element s is valid (i.e., its limbs are appropriately bounded)\n-/",
+   "/-- **Spec for `step_1`**\nReflects the Rust implementation:\n1.  Computes `s` from bytes.\n2.  Computes `s_encoding_is_canonical` (checks if bytes < p).\n3.  Computes `s_is_negative` (checks sign).\n\nIt proves two things:\n1.  **Low-Level Correctness**: The flags match the specific bitwise conditions (`< p`, `is_negative`).\n2.  **High-Level Correctness**: The function returns a valid result **iff** `decompress_step1` would return `some`.\n\nNamely:\n1. Existence: The function always succeeds\n2. Safety: The resulting field element has valid limb bounds\n3. Value Consistency: The field element `s` is the integer value of the bytes `c`\n4. Granular Flag Meanings\n5. The bridge that proves \"Passing the Rust checks\" iff \"decompress_step1 Succeeding\"\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
    "nested_children": [],
@@ -4231,11 +4231,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),\n    step_2 s = ok (ok1, c, c1, pt) ∧\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),\n    step_2 s = ok (ok1, c, c1, pt) ∧\n\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n\n     (ok1.val = 1#u8 ↔ IsSquare (v * u2 ^ 2)) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_2`**:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\n-/",
+   "/-- **Spec for `step_2`**\nReflects the Rust implementation:\n1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.\n2.  Computes validity flags `ok1` (square exists), `c` (non-negative T), `c1` (non-zero Y).\n\nIt proves:\n1.  **Low-Level Correctness**: The flags correspond exactly to their mathematical definitions.\n2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2` **iff** the flags indicate success.\n\nNamely:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\nMoreover if the high-level function returns `some P`, then:\na) The Rust flags must be set to success (1, 0, 0)\nb) The Rust point `pt` must match the mathematical point `P`\nAnd conversely.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
    "nested_children": [],
