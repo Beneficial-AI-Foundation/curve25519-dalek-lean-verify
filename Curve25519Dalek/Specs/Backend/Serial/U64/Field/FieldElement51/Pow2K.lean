@@ -429,6 +429,8 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
+  clear * - hc0 hc1 hc2 hc3 hc4 hc0_bound hc1_bound hc2_bound hc3_bound hc4_bound
+
   let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
