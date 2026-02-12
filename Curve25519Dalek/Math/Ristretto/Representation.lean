@@ -57,86 +57,6 @@ lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
   try ring
 
 /--
-**Pure Decompression**
-Deduces (x, y) from s using the isogeny inversion formulas:
-  - https://ristretto.group/details/isogenies.html
-  - https://ristretto.group/formulas/decoding.html
-In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
-t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
-Indeed:
-  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
-  - y := u1 * Dy = \frac{1+as²}{1-as²}
-Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
-where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
-for Ed25519). The relation to `J` parameters is:
-  - `a₁ = -a₂`
-  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
-Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
--/
-noncomputable def decompress_pure (s_int : Nat) : Option (Point Ed25519) :=
-  let s : ZMod p := s_int
-
-  -- 0. Initial Input Check
-  -- The integer must be < p and canonical sign must be 0
-  if s_int >= p || s_int % 2 != 0 then
-    none
-  else
-    -- 1. Algebraic setup
-    let u1 := 1 + a_val * s^2
-    let u2 := 1 - a_val * s^2
-    let v := a_val * d * u1^2 - u2^2
-
-    -- 2. Inverse Square Root (Elligator)
-    let arg := v * u2^2
-    match h_call : inv_sqrt_checked arg with
-    | (I, was_square) => -- This binds I and was_square for the rest of the block
-
-    -- 3. Recover denominators
-    let Dx := I * u2
-    let Dy := I * Dx * v
-
-    -- 4. Recover coordinates
-    let x := abs_edwards (2 * s * Dx)
-    let y := u1 * Dy
-
-    -- 5. Validation Checks
-    let t := x * y
-
-    -- (1) Square root must succeed
-    -- (2) t must be non-negative (even LSB=LeastSignificantByte)
-    -- (3) y must be non-zero
-    if h_invalid : !was_square || is_negative t || (y == 0) then
-      none
-    else
-      some { x := x, y := y, on_curve := by
-              -- Unpack validity
-              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
-              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
-              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
-              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
-
-              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
-                apply inv_sqrt_checked_spec arg
-                · exact h_call
-                · exact h_sq_not
-
-              let x_raw := 2 * s * Dx
-              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
-                dsimp only [y, Dy, Dx, x_raw]
-                apply decompress_helper a_val d s I u1 u2 v
-                <;> try rw [a_val];
-                <;> try rfl
-                exact h_I_sq_mul
-
-              have h_x_sq : x^2 = x_raw^2 := by
-                dsimp only [x]
-                exact abs_edwards_sq (2 * s * Dx)
-
-              rw [h_x_sq]
-              exact h_curve_raw
-              }
-
-/--
 **Pure Mathematical Compression**
 Encodes a Point P into a scalar s (https://ristretto.group/formulas/encoding.html).
 Used to define the Canonical property.
@@ -334,22 +254,146 @@ For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
 def IsEven (P : Point Ed25519) : Prop :=
   IsSquare (1 - P.y^2)
 
+/-- If a point is even, then it lies in the image of the doubling map. -/
+theorem IsEven_iff_in_doubling_image_right (P : Point Ed25519) :
+    IsEven P → ∃ Q : Point Ed25519, P = Q + Q := by
+  sorry
 
+/-- If a point lies in the image of the doubling map, then it is even. -/
+theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
+    (∃ Q : Point Ed25519, P = Q + Q) → IsEven P := by
+  intro ⟨Q, hP⟩
+  rw [hP]
+  unfold IsEven
+  have h_double_y : (Q + Q).y = (Q.y * Q.y - Ed25519.a * Q.x * Q.x) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) :=
+    add_y Q Q
+  have ha : Ed25519.a = -1 := rfl
+  rw [ha] at h_double_y
+  simp only [neg_mul, one_mul] at h_double_y
+  have h_double_y' : (Q + Q).y = (Q.y^2 + Q.x^2) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) := by
+    convert h_double_y using 2
+    ring
+  rw [h_double_y']
+  set x := Q.x
+  set y := Q.y
+  set lam := Ed25519.d * x * x * y * y with hlam
+  have hcurve : Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := Q.on_curve
+  rw [ha] at hcurve
+  simp only [neg_mul, one_mul] at hcurve
+  have h_yx : y^2 - x^2 = 1 + lam := by linear_combination hcurve
+  have h_denom_ne : 1 - lam ≠ 0 := by
+    have := Ed25519.denomsNeZero Q Q
+    convert this.2
+  have : 1 - ((y^2 + x^2) / (1 - lam))^2 = ((1 - lam)^2 - (y^2 + x^2)^2) / (1 - lam)^2 := by
+    field_simp [h_denom_ne]
+  rw [this]
+  have h_factor : (1 - lam)^2 - (y^2 + x^2)^2 = (1 - lam - y^2 - x^2) * (1 - lam + y^2 + x^2) := by
+    ring
+  have h_lam_eq : lam = y^2 - x^2 - 1 := by
+    have h : y^2 - x^2 - 1 - lam = 0 := by linear_combination h_yx
+    linear_combination -h
+  have h1mlam : 1 - lam = 2 + x^2 - y^2 := by
+    rw [h_lam_eq]
+    ring
+  have h_A : 1 - lam - y^2 - x^2 = 2 - 2*y^2 := by linear_combination h1mlam
+  have h_B : 1 - lam + y^2 + x^2 = 2 + 2*x^2 := by linear_combination h1mlam
+  rw [h_factor, h_A, h_B]
+  have h_factor_simp : (2 - 2*y^2) * (2 + 2*x^2) = 4 * (1 - y^2) * (1 + x^2) := by ring
+  rw [h_factor_simp]
+  have h_1my : 1 - y^2 = -lam - x^2 := by linear_combination -h_yx
+  rw [h_1my]
+  have h_sign : 4 * (-lam - x^2) * (1 + x^2) = -4 * (lam + x^2) * (1 + x^2) := by ring
+  rw [h_sign]
+  have h_neg1_sq : IsSquare (-1 : CurveField) := neg_one_is_square
+  have h_4_sq : IsSquare (4 : CurveField) := ⟨2, by ring⟩
+  have h_neg4_sq : IsSquare (-4 : CurveField) := IsSquare.mul h_neg1_sq h_4_sq
+  have h_lam_factor : lam + x^2 = x^2 * (Ed25519.d * y^2 + 1) := by
+    rw [hlam]
+    ring
+  rw [h_lam_factor]
+  have h_lam_x : lam + x^2 = y^2 - 1 := by linear_combination h_lam_eq
+  have h_x2_dy : x^2 * (Ed25519.d * y^2 + 1) = y^2 - 1 := by
+    calc x^2 * (Ed25519.d * y^2 + 1) = lam + x^2 := by rw [← h_lam_factor]
+         _ = y^2 - 1 := h_lam_x
+  rw [h_x2_dy]
+  rw [h1mlam]
+  have h_rw : (2 + x ^ 2 - y ^ 2) ^ 2 = (1 - lam) ^ 2 := by
+    congr 1
+    exact h1mlam.symm
+  rw [h_rw]
+  have h_num_sq : IsSquare (-4 * (y ^ 2 - 1) * (1 + x ^ 2)) := by
+    rw [← h_lam_x]
+    rw [h_lam_factor]
+    have h_rearrange : -4 * (x ^ 2 * (Ed25519.d * y ^ 2 + 1)) * (1 + x ^ 2) =
+                       -4 * (x ^ 2 * ((Ed25519.d * y ^ 2 + 1) * (1 + x ^ 2))) := by ring
+    rw [h_rearrange]
+    apply IsSquare.mul h_neg4_sq
+    apply IsSquare.mul
+    · exact ⟨x, pow_two x⟩
+    · have h_expand : (Ed25519.d * y^2 + 1) * (1 + x^2) = y^2 * (1 + Ed25519.d) := by
+        have h_dxy : Ed25519.d * x^2 * y^2 = y^2 - x^2 - 1 := by
+          calc Ed25519.d * x^2 * y^2 = (1 + Ed25519.d * x^2 * y^2) - 1 := by ring
+            _ = (-x^2 + y^2) - 1 := by rw [← hcurve]
+            _ = y^2 - x^2 - 1 := by ring
+        calc (Ed25519.d * y^2 + 1) * (1 + x^2)
+            = Ed25519.d * y^2 + Ed25519.d * y^2 * x^2 + 1 + x^2 := by ring
+          _ = Ed25519.d * y^2 + Ed25519.d * x^2 * y^2 + 1 + x^2 := by ring
+          _ = Ed25519.d * y^2 + (y^2 - x^2 - 1) + 1 + x^2 := by rw [h_dxy]
+          _ = Ed25519.d * y^2 + y^2 := by ring
+          _ = y^2 * (Ed25519.d + 1) := by ring
+          _ = y^2 * (1 + Ed25519.d) := by ring
+      rw [h_expand]
+      have h_one_add_d_sq : IsSquare (1 + Ed25519.d) := by
+        change IsSquare ((1 + d : ℕ) : CurveField)
+        have h_ne : ((1 + d : ℕ) : CurveField) ≠ 0 := by decide
+        rw [← legendreSym.eq_one_iff' p h_ne]
+        norm_num [d, p]
+      apply IsSquare.mul
+      · exact ⟨y, pow_two y⟩
+      · exact h_one_add_d_sq
+  obtain ⟨c, hc⟩ := h_num_sq
+  use c / (1 - lam)
+  field_simp [h_denom_ne, pow_ne_zero 2 h_denom_ne]
+  convert hc using 1
+  · ring
+  · exact pow_two c
 
+/-- A point is even if and only if it lies in the image of the doubling map. -/
+theorem IsEven_iff_in_doubling_image (P : Point Ed25519) :
+    IsEven P ↔ ∃ Q : Point Ed25519, P = Q + Q := by
+  constructor
+  · exact IsEven_iff_in_doubling_image_right P
+  · exact IsEven_iff_in_doubling_image_left P
 
-
+/-- The set of even points is closed under addition. -/
 theorem even_add_closure_Ed25519 (P Q : Point Ed25519) (hP : IsEven P) (hQ : IsEven Q) :
     IsEven (P + Q) := by
-  sorry
+  rw [IsEven_iff_in_doubling_image] at *
+  obtain ⟨P', rfl⟩ := hP
+  obtain ⟨Q', rfl⟩ := hQ
+  exact ⟨P' + Q', by abel⟩
 
+/-- For a valid Edwards point in projective coordinates, `Z² - Y²` is a square
+if and only if the corresponding affine point is even. -/
 theorem EdwardsPoint_IsSquare_iff_IsEven (e : EdwardsPoint) (h : e.IsValid) :
     IsSquare (e.Z.toField^2 - e.Y.toField^2) ↔ IsEven (e.toPoint) := by
-  sorry
-
-
-
-
-
+  unfold IsEven
+  obtain ⟨_, hy⟩ := EdwardsPoint.toPoint_of_isValid h
+  rw [hy]
+  have hz : e.Z.toField ≠ 0 := h.Z_ne_zero
+  have hz2 : e.Z.toField^2 ≠ 0 := pow_ne_zero 2 hz
+  have : 1 - (e.Y.toField / e.Z.toField)^2 = (e.Z.toField^2 - e.Y.toField^2) / e.Z.toField^2 := by
+    field_simp [hz2]
+  rw [this]
+  constructor
+  · intro ⟨w, hw⟩
+    use w / e.Z.toField
+    field_simp [hz2] at hw ⊢
+    convert hw using 1
+  · intro ⟨w, hw⟩
+    use w * e.Z.toField
+    field_simp [hz2] at hw ⊢
+    convert hw using 1
 
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
@@ -367,6 +411,96 @@ def RistrettoPoint.toPoint (r : RistrettoPoint) : Point Ed25519 :=
   EdwardsPoint.toPoint r
 
 /--
+**Pure Decompression**
+Deduces (x, y) from s using the isogeny inversion formulas:
+  - https://ristretto.group/details/isogenies.html
+  - https://ristretto.group/formulas/decoding.html
+In particular, the function below is an inverse of θ_a₂,d₂ and using the formula:
+t^2 = a_2^2 s^4 + 2(-a_2 \frac{a_2+d_2}{a_2-d_2}) s^2 + 1 (Eq ⋆)
+Indeed:
+  - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
+  - y := u1 * Dy = \frac{1+as²}{1-as²}
+Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
+where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
+for Ed25519). The relation to `J` parameters is:
+  - `a₁ = -a₂`
+  - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
+Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
+Namely the whole decompress is made of two steps:
+**Step 1**: Canonical Encoding & Parity Check
+Isolates the integer-level validation logic.
+Corresponds to the `if` block in the original `decompress_pure`.
+**Step 2**: Algebraic Lifting
+Isolates the field arithmetic and curve geometry.
+Corresponds to the `else` block (arithmetic) in the original `decompress_pure`.
+-/
+def decompress_step1 (c : CompressedRistretto) : Option (ZMod p) :=
+  let s_int := U8x32_as_Nat c
+  -- Check 1: Canonical encoding (s_int < p)
+  -- Check 2: Parity (least significant bit is 0)
+  if s_int >= p || s_int % 2 != 0 then 
+    none 
+  else 
+    some (s_int : ZMod p)
+
+noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
+  -- 1. Algebraic setup
+  let u1 := 1 + a_val * s^2
+  let u2 := 1 - a_val * s^2
+  let v := a_val * d * u1^2 - u2^2
+
+  -- 2. Inverse Square Root (Elligator)
+  let arg := v * u2^2
+  match h_call : inv_sqrt_checked arg with
+  | (I, was_square) => 
+
+    -- 3. Recover denominators
+    let Dx := I * u2
+    let Dy := I * Dx * v
+
+    -- 4. Recover coordinates
+    let x := abs_edwards (2 * s * Dx)
+    let y := u1 * Dy
+
+    -- 5. Validation Checks
+    let t := x * y
+    
+    if h_invalid : !was_square || is_negative t || (y == 0) then
+      none
+    else
+      -- 6. Construct Point with Proof
+      some { x := x, y := y, on_curve := by
+              -- Re-using your exact proof script
+              replace h_invalid := Bool.eq_false_iff.mpr h_invalid
+              rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
+              obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
+              simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
+
+              have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
+                apply inv_sqrt_checked_spec arg
+                · exact h_call
+                · exact h_sq_not
+
+              let x_raw := 2 * s * Dx
+              have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
+                dsimp only [y, Dy, Dx, x_raw]
+                apply decompress_helper a_val d s I u1 u2 v
+                <;> try rw [a_val];
+                <;> try rfl
+                exact h_I_sq_mul
+
+              have h_x_sq : x^2 = x_raw^2 := by
+                dsimp only [x]
+                exact abs_edwards_sq (2 * s * Dx)
+
+              rw [h_x_sq]
+              exact h_curve_raw
+           }
+
+noncomputable def decompress_pure (c : CompressedRistretto) : Option (Point Ed25519) :=
+  (decompress_step1 c).bind decompress_step2
+
+/--
 A CompressedRistretto is valid if and only if the pure mathematical decompression
 succeeds (returning `some`). This implicitly checks (via decompress_pure):
 1. bytes < p
@@ -376,16 +510,17 @@ succeeds (returning `some`). This implicitly checks (via decompress_pure):
 5. y != 0
 -/
 def CompressedRistretto.IsValid (c : CompressedRistretto) : Prop :=
-  (decompress_pure (U8x32_as_Nat c)).isSome
+  ∃ (pt : Point Ed25519),
+    decompress_pure c = some pt
 
 /--
 If valid, return the decompressed point.
 If invalid, return the neutral element (0).
 -/
 noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point Ed25519 :=
-  match decompress_pure (U8x32_as_Nat c) with
+  match decompress_pure c with
   | some P => P
-  | none   => 0
+  | none   => 0  -- Returns neutral element on failure
 
 end curve25519_dalek.ristretto
 

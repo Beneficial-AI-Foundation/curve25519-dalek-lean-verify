@@ -106,6 +106,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity_Hoare
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
