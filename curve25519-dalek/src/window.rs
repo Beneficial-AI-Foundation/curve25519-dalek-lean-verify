@@ -18,9 +18,10 @@ use core::fmt::Debug;
 use cfg_if::cfg_if;
 
 use subtle::Choice;
-use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
+
+use core::ops::Neg;
 
 use crate::traits::Identity;
 
@@ -48,7 +49,7 @@ macro_rules! impl_lookup_table {
 
         impl<T> $name<T>
         where
-            T: Identity + ConditionallySelectable + ConditionallyNegatable,
+            T: Identity + ConditionallySelectable + Copy + Neg<Output = T>,
         {
             /// Given \\(-8 \leq x \leq 8\\), return \\(xP\\) in constant time.
             pub fn select(&self, x: i8) -> T {
@@ -69,7 +70,8 @@ macro_rules! impl_lookup_table {
                 // Now t == |x| * P.
 
                 let neg_mask = Choice::from((xmask & 1) as u8);
-                t.conditional_negate(neg_mask);
+                let t_neg = -t;
+                t.conditional_assign(&t_neg, neg_mask);
                 // Now t == x * P.
 
                 t

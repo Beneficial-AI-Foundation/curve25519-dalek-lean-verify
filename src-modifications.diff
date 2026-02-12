@@ -67,6 +67,36 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/m
  impl Identity for ProjectivePoint {
      fn identity() -> ProjectivePoint {
          ProjectivePoint {
+@@ -510,6 +511,14 @@
+     }
+ }
+ 
++impl Neg for ProjectiveNielsPoint {
++    type Output = ProjectiveNielsPoint;
++
++    fn neg(self) -> ProjectiveNielsPoint {
++        -&self
++    }
++}
++
+ impl Neg for &AffineNielsPoint {
+     type Output = AffineNielsPoint;
+ 
+@@ -522,6 +531,14 @@
+     }
+ }
+ 
++impl Neg for AffineNielsPoint {
++    type Output = AffineNielsPoint;
++
++    fn neg(self) -> AffineNielsPoint {
++        -&self
++    }
++}
++
+ // ------------------------------------------------------------------------
+ // Debug traits
+ // ------------------------------------------------------------------------
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs
@@ -396,7 +426,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
  #[cfg(feature = "alloc")]
  use alloc::vec::Vec;
-@@ -874,12 +874,12 @@
+@@ -237,7 +237,8 @@
+          // FieldElement::sqrt_ratio_i always returns the nonnegative square root,
+          // so we negate according to the supplied sign bit.
+         let compressed_sign_bit = Choice::from(repr.as_bytes()[31] >> 7);
+-        X.conditional_negate(compressed_sign_bit);
++        let x_neg = -&X;
++        X.conditional_assign(&x_neg, compressed_sign_bit);
+ 
+         EdwardsPoint {
+             X,
+@@ -874,12 +875,12 @@
      /// Uses precomputed basepoint tables when the `precomputed-tables` feature
      /// is enabled, trading off increased code size for ~4x better performance.
      pub fn mul_base(scalar: &Scalar) -> Self {
@@ -411,7 +451,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          {
              scalar * constants::ED25519_BASEPOINT_TABLE
          }
-@@ -953,7 +953,7 @@
+@@ -953,7 +954,7 @@
      }
  }
  
@@ -420,7 +460,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl VartimeMultiscalarMul for EdwardsPoint {
      type Point = EdwardsPoint;
  
-@@ -992,10 +992,10 @@
+@@ -992,10 +993,10 @@
  // This wraps the inner implementation in a facade type so that we can
  // decouple stability of the inner type from the stability of the
  // outer type.
@@ -433,7 +473,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
      type Point = EdwardsPoint;
  
-@@ -1033,6 +1033,7 @@
+@@ -1033,6 +1034,7 @@
      }
  }
  
@@ -441,7 +481,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl EdwardsPoint {
      /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
      pub fn vartime_double_scalar_mul_basepoint(
-@@ -1044,7 +1045,7 @@
+@@ -1044,7 +1046,7 @@
      }
  }
  
@@ -450,7 +490,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  macro_rules! impl_basepoint_table {
      (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
          /// A precomputed table of multiples of a basepoint, for accelerating
-@@ -1202,7 +1203,7 @@
+@@ -1202,7 +1204,7 @@
  
  // The number of additions required is ceil(256/w) where w is the radix representation.
  cfg_if! {
@@ -459,7 +499,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          impl_basepoint_table! {
              Name = EdwardsBasepointTable,
              LookupTable = LookupTableRadix16,
-@@ -1249,7 +1250,7 @@
+@@ -1249,7 +1251,7 @@
      }
  }
  
@@ -468,7 +508,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  macro_rules! impl_basepoint_table_conversions {
      (LHS = $lhs:ty, RHS = $rhs:ty) => {
          impl<'a> From<&'a $lhs> for $rhs {
-@@ -1267,7 +1268,7 @@
+@@ -1267,7 +1269,7 @@
  }
  
  cfg_if! {
@@ -477,7 +517,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          // Conversions from radix 16
          impl_basepoint_table_conversions! {
              LHS = EdwardsBasepointTableRadix16,
-@@ -1329,9 +1330,11 @@
+@@ -1329,9 +1331,11 @@
          debug_assert!(k > 0);
          let mut r: CompletedPoint;
          let mut s = self.as_projective();
@@ -490,6 +530,19 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          }
          // Unroll last iteration so we can go directly as_extended()
          s.double().as_extended()
+diff -Naur --no-dereference a/curve25519-dalek/src/field.rs b/curve25519-dalek/src/field.rs
+--- a/curve25519-dalek/src/field.rs
++++ b/curve25519-dalek/src/field.rs
+@@ -330,7 +330,8 @@
+ 
+         // Choose the nonnegative square root.
+         let r_is_negative = r.is_negative();
+-        r.conditional_negate(r_is_negative);
++        let r_neg = -&r;
++        r.conditional_assign(&r_neg, r_is_negative);
+ 
+         let was_nonzero_square = correct_sign_sqrt | flipped_sign_sqrt;
+ 
 diff -Naur --no-dereference a/curve25519-dalek/src/lib.rs b/curve25519-dalek/src/lib.rs
 --- a/curve25519-dalek/src/lib.rs
 +++ b/curve25519-dalek/src/lib.rs
@@ -505,6 +558,15 @@ diff -Naur --no-dereference a/curve25519-dalek/src/lib.rs b/curve25519-dalek/src
 diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-dalek/src/montgomery.rs
 --- a/curve25519-dalek/src/montgomery.rs
 +++ b/curve25519-dalek/src/montgomery.rs
+@@ -63,7 +63,7 @@
+ 
+ use subtle::Choice;
+ use subtle::ConstantTimeEq;
+-use subtle::{ConditionallyNegatable, ConditionallySelectable};
++use subtle::ConditionallySelectable;
+ 
+ #[cfg(feature = "zeroize")]
+ use zeroize::Zeroize;
 @@ -164,6 +164,7 @@
      /// Curve25519 uses _clamped multiplication_, explained
      /// [here](https://neilmadden.blog/2020/05/28/whats-the-curve25519-clamping-all-about/).
@@ -522,7 +584,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
  
              debug_assert!(choice == 0 || choice == 1);
  
-@@ -290,6 +291,7 @@
+@@ -276,7 +277,8 @@
+     let zero = FieldElement::ZERO;
+     let Atemp = FieldElement::conditional_select(&MONTGOMERY_A, &zero, eps_is_sq); /* 0, or A if nonsquare*/
+     let mut u = &d + &Atemp; /* d, or d+A if nonsquare */
+-    u.conditional_negate(!eps_is_sq); /* d, or -d-A if nonsquare */
++    let u_neg = -&u;
++    u.conditional_assign(&u_neg, !eps_is_sq); /* d, or -d-A if nonsquare */
+ 
+     (MontgomeryPoint(u.to_bytes()), eps_is_sq)
+ }
+@@ -290,6 +292,7 @@
      pub W: FieldElement,
  }
  
@@ -530,7 +602,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
  impl Identity for ProjectivePoint {
      fn identity() -> ProjectivePoint {
          ProjectivePoint {
-@@ -400,14 +402,51 @@
+@@ -400,14 +403,51 @@
  );
  
  /// Multiply this `MontgomeryPoint` by a `Scalar`.
@@ -854,3 +926,38 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
      }
  }
  
+diff -Naur --no-dereference a/curve25519-dalek/src/window.rs b/curve25519-dalek/src/window.rs
+--- a/curve25519-dalek/src/window.rs
++++ b/curve25519-dalek/src/window.rs
+@@ -18,10 +18,11 @@
+ use cfg_if::cfg_if;
+ 
+ use subtle::Choice;
+-use subtle::ConditionallyNegatable;
+ use subtle::ConditionallySelectable;
+ use subtle::ConstantTimeEq;
+ 
++use core::ops::Neg;
++
+ use crate::traits::Identity;
+ 
+ use crate::backend::serial::curve_models::AffineNielsPoint;
+@@ -48,7 +49,7 @@
+ 
+         impl<T> $name<T>
+         where
+-            T: Identity + ConditionallySelectable + ConditionallyNegatable,
++            T: Identity + ConditionallySelectable + Copy + Neg<Output = T>,
+         {
+             /// Given \\(-8 \leq x \leq 8\\), return \\(xP\\) in constant time.
+             pub fn select(&self, x: i8) -> T {
+@@ -69,7 +70,8 @@
+                 // Now t == |x| * P.
+ 
+                 let neg_mask = Choice::from((xmask & 1) as u8);
+-                t.conditional_negate(neg_mask);
++                let t_neg = -t;
++                t.conditional_assign(&t_neg, neg_mask);
+                 // Now t == x * P.
+ 
+                 t

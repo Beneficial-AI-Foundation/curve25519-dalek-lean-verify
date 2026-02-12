@@ -237,7 +237,8 @@ mod decompress {
          // FieldElement::sqrt_ratio_i always returns the nonnegative square root,
          // so we negate according to the supplied sign bit.
         let compressed_sign_bit = Choice::from(repr.as_bytes()[31] >> 7);
-        X.conditional_negate(compressed_sign_bit);
+        let x_neg = -&X;
+        X.conditional_assign(&x_neg, compressed_sign_bit);
 
         EdwardsPoint {
             X,
