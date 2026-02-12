@@ -254,14 +254,146 @@ For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
 def IsEven (P : Point Ed25519) : Prop :=
   IsSquare (1 - P.y^2)
 
+/-- If a point is even, then it lies in the image of the doubling map. -/
+theorem IsEven_iff_in_doubling_image_right (P : Point Ed25519) :
+    IsEven P → ∃ Q : Point Ed25519, P = Q + Q := by
+  sorry
+
+/-- If a point lies in the image of the doubling map, then it is even. -/
+theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
+    (∃ Q : Point Ed25519, P = Q + Q) → IsEven P := by
+  intro ⟨Q, hP⟩
+  rw [hP]
+  unfold IsEven
+  have h_double_y : (Q + Q).y = (Q.y * Q.y - Ed25519.a * Q.x * Q.x) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) :=
+    add_y Q Q
+  have ha : Ed25519.a = -1 := rfl
+  rw [ha] at h_double_y
+  simp only [neg_mul, one_mul] at h_double_y
+  have h_double_y' : (Q + Q).y = (Q.y^2 + Q.x^2) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) := by
+    convert h_double_y using 2
+    ring
+  rw [h_double_y']
+  set x := Q.x
+  set y := Q.y
+  set lam := Ed25519.d * x * x * y * y with hlam
+  have hcurve : Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := Q.on_curve
+  rw [ha] at hcurve
+  simp only [neg_mul, one_mul] at hcurve
+  have h_yx : y^2 - x^2 = 1 + lam := by linear_combination hcurve
+  have h_denom_ne : 1 - lam ≠ 0 := by
+    have := Ed25519.denomsNeZero Q Q
+    convert this.2
+  have : 1 - ((y^2 + x^2) / (1 - lam))^2 = ((1 - lam)^2 - (y^2 + x^2)^2) / (1 - lam)^2 := by
+    field_simp [h_denom_ne]
+  rw [this]
+  have h_factor : (1 - lam)^2 - (y^2 + x^2)^2 = (1 - lam - y^2 - x^2) * (1 - lam + y^2 + x^2) := by
+    ring
+  have h_lam_eq : lam = y^2 - x^2 - 1 := by
+    have h : y^2 - x^2 - 1 - lam = 0 := by linear_combination h_yx
+    linear_combination -h
+  have h1mlam : 1 - lam = 2 + x^2 - y^2 := by
+    rw [h_lam_eq]
+    ring
+  have h_A : 1 - lam - y^2 - x^2 = 2 - 2*y^2 := by linear_combination h1mlam
+  have h_B : 1 - lam + y^2 + x^2 = 2 + 2*x^2 := by linear_combination h1mlam
+  rw [h_factor, h_A, h_B]
+  have h_factor_simp : (2 - 2*y^2) * (2 + 2*x^2) = 4 * (1 - y^2) * (1 + x^2) := by ring
+  rw [h_factor_simp]
+  have h_1my : 1 - y^2 = -lam - x^2 := by linear_combination -h_yx
+  rw [h_1my]
+  have h_sign : 4 * (-lam - x^2) * (1 + x^2) = -4 * (lam + x^2) * (1 + x^2) := by ring
+  rw [h_sign]
+  have h_neg1_sq : IsSquare (-1 : CurveField) := neg_one_is_square
+  have h_4_sq : IsSquare (4 : CurveField) := ⟨2, by ring⟩
+  have h_neg4_sq : IsSquare (-4 : CurveField) := IsSquare.mul h_neg1_sq h_4_sq
+  have h_lam_factor : lam + x^2 = x^2 * (Ed25519.d * y^2 + 1) := by
+    rw [hlam]
+    ring
+  rw [h_lam_factor]
+  have h_lam_x : lam + x^2 = y^2 - 1 := by linear_combination h_lam_eq
+  have h_x2_dy : x^2 * (Ed25519.d * y^2 + 1) = y^2 - 1 := by
+    calc x^2 * (Ed25519.d * y^2 + 1) = lam + x^2 := by rw [← h_lam_factor]
+         _ = y^2 - 1 := h_lam_x
+  rw [h_x2_dy]
+  rw [h1mlam]
+  have h_rw : (2 + x ^ 2 - y ^ 2) ^ 2 = (1 - lam) ^ 2 := by
+    congr 1
+    exact h1mlam.symm
+  rw [h_rw]
+  have h_num_sq : IsSquare (-4 * (y ^ 2 - 1) * (1 + x ^ 2)) := by
+    rw [← h_lam_x]
+    rw [h_lam_factor]
+    have h_rearrange : -4 * (x ^ 2 * (Ed25519.d * y ^ 2 + 1)) * (1 + x ^ 2) =
+                       -4 * (x ^ 2 * ((Ed25519.d * y ^ 2 + 1) * (1 + x ^ 2))) := by ring
+    rw [h_rearrange]
+    apply IsSquare.mul h_neg4_sq
+    apply IsSquare.mul
+    · exact ⟨x, pow_two x⟩
+    · have h_expand : (Ed25519.d * y^2 + 1) * (1 + x^2) = y^2 * (1 + Ed25519.d) := by
+        have h_dxy : Ed25519.d * x^2 * y^2 = y^2 - x^2 - 1 := by
+          calc Ed25519.d * x^2 * y^2 = (1 + Ed25519.d * x^2 * y^2) - 1 := by ring
+            _ = (-x^2 + y^2) - 1 := by rw [← hcurve]
+            _ = y^2 - x^2 - 1 := by ring
+        calc (Ed25519.d * y^2 + 1) * (1 + x^2)
+            = Ed25519.d * y^2 + Ed25519.d * y^2 * x^2 + 1 + x^2 := by ring
+          _ = Ed25519.d * y^2 + Ed25519.d * x^2 * y^2 + 1 + x^2 := by ring
+          _ = Ed25519.d * y^2 + (y^2 - x^2 - 1) + 1 + x^2 := by rw [h_dxy]
+          _ = Ed25519.d * y^2 + y^2 := by ring
+          _ = y^2 * (Ed25519.d + 1) := by ring
+          _ = y^2 * (1 + Ed25519.d) := by ring
+      rw [h_expand]
+      have h_one_add_d_sq : IsSquare (1 + Ed25519.d) := by
+        change IsSquare ((1 + d : ℕ) : CurveField)
+        have h_ne : ((1 + d : ℕ) : CurveField) ≠ 0 := by decide
+        rw [← legendreSym.eq_one_iff' p h_ne]
+        norm_num [d, p]
+      apply IsSquare.mul
+      · exact ⟨y, pow_two y⟩
+      · exact h_one_add_d_sq
+  obtain ⟨c, hc⟩ := h_num_sq
+  use c / (1 - lam)
+  field_simp [h_denom_ne, pow_ne_zero 2 h_denom_ne]
+  convert hc using 1
+  · ring
+  · exact pow_two c
+
+/-- A point is even if and only if it lies in the image of the doubling map. -/
+theorem IsEven_iff_in_doubling_image (P : Point Ed25519) :
+    IsEven P ↔ ∃ Q : Point Ed25519, P = Q + Q := by
+  constructor
+  · exact IsEven_iff_in_doubling_image_right P
+  · exact IsEven_iff_in_doubling_image_left P
+
+/-- The set of even points is closed under addition. -/
 theorem even_add_closure_Ed25519 (P Q : Point Ed25519) (hP : IsEven P) (hQ : IsEven Q) :
     IsEven (P + Q) := by
-  sorry
+  rw [IsEven_iff_in_doubling_image] at *
+  obtain ⟨P', rfl⟩ := hP
+  obtain ⟨Q', rfl⟩ := hQ
+  exact ⟨P' + Q', by abel⟩
 
+/-- For a valid Edwards point in projective coordinates, `Z² - Y²` is a square
+if and only if the corresponding affine point is even. -/
 theorem EdwardsPoint_IsSquare_iff_IsEven (e : EdwardsPoint) (h : e.IsValid) :
     IsSquare (e.Z.toField^2 - e.Y.toField^2) ↔ IsEven (e.toPoint) := by
-  sorry
-
+  unfold IsEven
+  obtain ⟨_, hy⟩ := EdwardsPoint.toPoint_of_isValid h
+  rw [hy]
+  have hz : e.Z.toField ≠ 0 := h.Z_ne_zero
+  have hz2 : e.Z.toField^2 ≠ 0 := pow_ne_zero 2 hz
+  have : 1 - (e.Y.toField / e.Z.toField)^2 = (e.Z.toField^2 - e.Y.toField^2) / e.Z.toField^2 := by
+    field_simp [hz2]
+  rw [this]
+  constructor
+  · intro ⟨w, hw⟩
+    use w / e.Z.toField
+    field_simp [hz2] at hw ⊢
+    convert hw using 1
+  · intro ⟨w, hw⟩
+    use w * e.Z.toField
+    field_simp [hz2] at hw ⊢
+    convert hw using 1
 
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
