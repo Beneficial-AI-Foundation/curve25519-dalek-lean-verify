@@ -54,6 +54,15 @@ theorem EIGHT_TORSION_spec :
     P.IsValid ∧
     (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧
     ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧ EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by
-  sorry
+  constructor
+  · sorry
+  constructor
+  · constructor
+    · sorry
+    · sorry
+  · intro i
+    constructor
+    · sorry
+    · sorry
 
 end curve25519_dalek.backend.serial.u64.constants
