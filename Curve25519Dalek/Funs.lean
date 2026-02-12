@@ -9,7 +9,7 @@ set_option linter.hashCommand false
 set_option linter.unusedVariables false
 set_option linter.style.commandStart false
 
-/-- You can remove the following line by using the CLI option `-all-computable`: -/
+-- You can remove the following line by using the CLI option `-all-computable`: 
 noncomputable section
 
 namespace curve25519_dalek
@@ -1304,7 +1304,7 @@ def backend.serial.scalar_mul.variable_base.mul
   let lookup_table ←
     window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from
       point
-  let scalar_digits ← scalar.Scalar.as_radix_16 scalar
+  let scalar_digits ← scalar.as_radix_16
   let tmp3 ←
     edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity
   let i ← Array.index_usize scalar_digits 63#usize
@@ -1383,6 +1383,7 @@ def backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerCopy :
     backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone
 }
 
+set_option maxRecDepth 4096 in
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
 def backend.serial.u64.field.FieldElement51.to_bytes
@@ -3266,7 +3267,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let (_, index_mut_back8) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       hi3 4#usize
-  let i41 ← (↑(U64.shr i36 20#i32) : Result Std.U64)
+  let i41 ← i36 >>> 20#i32
   let lo4 := index_mut_back4 i22
   let lo5 ←
     backend.serial.u64.scalar.Scalar52.montgomery_mul lo4
@@ -4058,7 +4059,7 @@ def
   := do
   let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
   let x0 ← IdentityMontgomeryProjectivePoint.identity
-  let scalar_bytes ← scalar.Scalar.as_bytes scalar
+  let scalar_bytes ← scalar.as_bytes
   let (x01, x1, prev_bit) ←
     Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop
       affine_u x0
