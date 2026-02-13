@@ -65,75 +65,78 @@ natural language specs:
 -/
 @[progress]
 theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :
-∃ result, coset4 self = ok result ∧
-result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧
-result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧
-result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧
-result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint := by
-
-
+    ∃ result, coset4 self = ok result ∧
+    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧
+    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧
+    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧
+    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint := by
   unfold coset4
-
   progress
-
   · exact ⟨EIGHT_TORSION.val[0]⟩
-
   · progress
-
-    · sorry
-
-    · sorry
-
+    · exact h_self_valid.1
+    · rename_i _ h
+      rw [h]
+      convert (EIGHT_TORSION_spec.2.2 2).1
+      norm_num
     · progress
-
-      · sorry
-
+      · exact ⟨EIGHT_TORSION.val[0]⟩
       · progress
-
-        · sorry
-
-        · sorry
-
+        · exact h_self_valid.1
+        · rename_i _ h
+          rw [h]
+          convert (EIGHT_TORSION_spec.2.2 4).1
+          norm_num
         · progress
-
-          · sorry
-
+          · exact ⟨EIGHT_TORSION.val[0]⟩
           · progress
-
-            · sorry
-
-            · sorry
-
+            · exact h_self_valid.1
+            · rename_i _ h
+              rw [h]
+              convert (EIGHT_TORSION_spec.2.2 6).1
+              norm_num
             · constructor
-
-              · sorry
-
+              · unfold Array.make
+                simp only [List.getElem_cons_zero]
+                exact h_self_valid.1
               · constructor
-
-                · sorry
-
+                · suffices h : (↑EIGHT_TORSION)[0].toPoint = 0 by
+                    change edwards.EdwardsPoint.toPoint self = self.toPoint + (↑EIGHT_TORSION)[0].toPoint
+                    rw [h, add_zero]
+                    rfl
+                  exact (EIGHT_TORSION_spec.2.2 0).2
                 · constructor
-
-                  · sorry
-
+                  · unfold Array.make
+                    simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                    assumption
                   · constructor
-
-                    · sorry
-
+                    · unfold Array.make
+                      simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                      rename_i t2 eq_t2 r1 _ eq_r1 _ _ _ _ _ _ _ _ _ _
+                      rw [eq_r1, eq_t2]
+                      congr 1
+                      simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem!_pos]
                     · constructor
-
-                      · sorry
-
+                      · unfold Array.make
+                        simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                        assumption
                       · constructor
-
-                        · sorry
-
+                        · unfold Array.make
+                          simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                          rename_i _ _ _ _ _ t4 eq_t4 r2 _ eq_r2 _ _ _ _ _
+                          rw [eq_r2, eq_t4]
+                          congr 1
+                          simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem!_pos]
                         · constructor
-
-                          · sorry
-
-                          · sorry
-
+                          · unfold Array.make
+                            simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                            assumption
+                          · unfold Array.make
+                            simp only [List.getElem_cons_succ, List.getElem_cons_zero]
+                            rename_i _ _ _ _ _ _ _ _ _ _ t6 eq_t6 r3 _ eq_r3
+                            rw [eq_r3, eq_t6]
+                            congr 1
+                            simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem!_pos]
 
 
 end curve25519_dalek.ristretto.RistrettoPoint
