@@ -5,6 +5,8 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EIGHT_TORSION
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::coset4`
 
@@ -63,9 +65,75 @@ natural language specs:
 -/
 @[progress]
 theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :
-    ∃ result, coset4 self = ok result ∧
-    ∀ (i : Fin 4), result.val[i].IsValid ∧
-                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint := by
-  sorry
+∃ result, coset4 self = ok result ∧
+result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧
+result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧
+result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧
+result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint := by
+
+
+  unfold coset4
+
+  progress
+
+  · exact ⟨EIGHT_TORSION.val[0]⟩
+
+  · progress
+
+    · sorry
+
+    · sorry
+
+    · progress
+
+      · sorry
+
+      · progress
+
+        · sorry
+
+        · sorry
+
+        · progress
+
+          · sorry
+
+          · progress
+
+            · sorry
+
+            · sorry
+
+            · constructor
+
+              · sorry
+
+              · constructor
+
+                · sorry
+
+                · constructor
+
+                  · sorry
+
+                  · constructor
+
+                    · sorry
+
+                    · constructor
+
+                      · sorry
+
+                      · constructor
+
+                        · sorry
+
+                        · constructor
+
+                          · sorry
+
+                          · sorry
+
+
 
 end curve25519_dalek.ristretto.RistrettoPoint
