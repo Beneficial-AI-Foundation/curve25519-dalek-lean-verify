@@ -23,7 +23,7 @@ generator of order eight. This implies that:
 **Source**: curve25519-dalek/src/backend/serial/u64/constants.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Edwards
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -55,14 +55,16 @@ theorem EIGHT_TORSION_spec :
     (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧
     ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧ EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by
   constructor
-  · sorry
+  · simp only [EIGHT_TORSION, EIGHT_TORSION_body, EIGHT_TORSION_INNER_DOC_HIDDEN]
+    decide
   constructor
   · constructor
     · sorry
     · sorry
   · intro i
     constructor
-    · sorry
-    · sorry
+    · simp only [EIGHT_TORSION, EIGHT_TORSION_body, EIGHT_TORSION_INNER_DOC_HIDDEN]
+      fin_cases i <;> decide
+    · fin_cases i <;> sorry
 
 end curve25519_dalek.backend.serial.u64.constants
