@@ -4132,11 +4132,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n\nNote that validity here also implicitly guarantees the (correct but not immediately obvious)\nproperty that the elligator map only generates even Edwards points.\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n• The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging\n  the implementation to the pure mathematical Elligator map defined in Representation.lean\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
