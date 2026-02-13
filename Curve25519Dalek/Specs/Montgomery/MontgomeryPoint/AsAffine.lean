@@ -48,11 +48,6 @@ Natural language specs:
     • The conversion is deterministic and well-defined for valid projective points
 -/
 
--- /-- Validity predicate for Montgomery projective points.
---     A projective point (U : W) is valid if W is non-zero in the field. -/
-def IsValid (pp : montgomery.ProjectivePoint) : Prop :=
-  pp.W.toField ≠ 0 ∧ pp.U.toField / pp.W.toField ≠ -1
-
 /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
 - The function succeeds if and only if the W coordinate is non-zero in the field
 - When successful, returns a MontgomeryPoint encoding the affine u-coordinate
@@ -103,12 +98,12 @@ lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv 
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
     (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)
-    (h_valid : IsValid self) :
+    (h_valid : self.W.toField ≠ 0 ∧ self.U.toField / self.W.toField ≠ -1) :
     ∃ res,
     as_affine self = ok res ∧
     MontgomeryPoint.IsValid res ∧
     bytesToField res = self.U.toField  / self.W.toField := by
-  unfold as_affine IsValid at *
+  unfold as_affine at *
   progress*
   · -- Show MontgomeryPoint.IsValid res
     grind
