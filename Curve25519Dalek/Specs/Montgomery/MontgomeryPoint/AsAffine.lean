@@ -112,7 +112,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     · unfold MontgomeryPoint.IsValid
       intro u
       by_cases h1 : u + 1 = 0
-      · simp [h1]
+      · simp only [h1]
         have hu : u = -1 := by linear_combination h1
         have a_eq_div : bytesToField a = self.U.toField / self.W.toField := by
           have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
@@ -147,8 +147,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
             _ = u := rfl
             _ = -1 := hu
         exact absurd div_eq_neg_one h_valid.2
-      · simp [h1]
-        sorry -- TODO: Do not complete the proof for since IsValid is still being modified
+      · sorry -- TODO: Do not complete the proof for since IsValid is still being modified
     · rw [bytesToField_eq_cast]
       rename_i x_inv _ x_inv_post _
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
