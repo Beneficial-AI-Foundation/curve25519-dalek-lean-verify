@@ -1,5 +1,5 @@
 import Aeneas
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Mathlib
 
 set_option linter.style.longLine false
@@ -136,7 +136,7 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
 
- lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
+lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
   · simp

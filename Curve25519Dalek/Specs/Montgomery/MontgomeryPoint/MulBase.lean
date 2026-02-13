@@ -1,11 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery
 /-! # Spec Theorem for `MontgomeryPoint::mul_base`
@@ -24,10 +24,8 @@ EdwardsPoint to a MontgomeryPoint.
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
-
+open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -55,11 +53,16 @@ natural language specs:
 theorem mul_base_spec (scalar : scalar.Scalar) :
     ∃ result,
     mul_base scalar = ok result ∧
-    MontgomeryPoint.IsValid result ∧
-    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)
      := by
     unfold mul_base
-    sorry
-
+    progress*
+    · exact ep_post_1.Y_bounds
+    · exact ep_post_1.Z_bounds
+    · simp_all
+      have := res_post_2 1
+      simp at this
+      rw[← this]
+      apply  Montgomery.comm_mul_fromEdwards
 
 end curve25519_dalek.montgomery.MontgomeryPoint

@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue'
 import type { FunctionRecord } from '../data/deps.data'
 import { useStatusFormatting } from '../composables/useStatusFormatting'
 import { useCodeHighlight } from '../composables/useCodeHighlight'
+import { getShortLabel, shortenSourcePath } from '../utils/labelUtils'
 
 const { getVerifiedStatus } = useStatusFormatting()
 const { highlightedCode: highlightedSpec, highlight: highlightSpec } = useCodeHighlight()
@@ -141,18 +142,6 @@ function getStatusString(fn: FunctionRecord): string {
   return ''
 }
 
-// Helper function to extract function name from full path (matches StatusTable)
-function getFunctionName(fullPath: string) {
-  const parts = fullPath.split('.')
-  return parts[parts.length - 1]
-}
-
-// Helper function to shorten source path (matches StatusTable)
-function shortenSourcePath(source: string | null) {
-  if (!source) return '-'
-  return source.replace('curve25519-dalek/src/', '')
-}
-
 function formatSource(fn: FunctionRecord) {
   if (!fn.source) return '-'
   const shortened = shortenSourcePath(fn.source)
@@ -255,7 +244,7 @@ watch(selectedFunction, async (fn) => {
           <tr v-for="fn in paginatedFunctions" :key="fn.lean_name" :class="{ 'row-hidden': fn.is_hidden, 'row-artifact': fn.is_extraction_artifact }">
             <td class="cell-name">
               <button @click="openDetails(fn)" class="function-button" :title="fn.lean_name">
-                <code>{{ getFunctionName(fn.lean_name) }}</code>
+                <code>{{ getShortLabel(fn.lean_name) }}</code>
               </button>
               <span v-if="fn.is_hidden" class="tag tag-hidden">hidden</span>
               <span v-if="fn.is_extraction_artifact" class="tag tag-artifact">artifact</span>
@@ -352,21 +341,21 @@ watch(selectedFunction, async (fn) => {
         <div class="detail-section" v-if="selectedFunction.dependencies.length > 0">
           <h4>Dependencies ({{ selectedFunction.dependencies.length }})</h4>
           <ul class="deps-list">
-            <li v-for="dep in selectedFunction.dependencies" :key="dep">{{ getFunctionName(dep) }}</li>
+            <li v-for="dep in selectedFunction.dependencies" :key="dep">{{ getShortLabel(dep) }}</li>
           </ul>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.dependents.length > 0">
           <h4>Dependents ({{ selectedFunction.dependents.length }})</h4>
           <ul class="deps-list">
-            <li v-for="dep in selectedFunction.dependents" :key="dep">{{ getFunctionName(dep) }}</li>
+            <li v-for="dep in selectedFunction.dependents" :key="dep">{{ getShortLabel(dep) }}</li>
           </ul>
         </div>
 
         <div class="detail-section" v-if="selectedFunction.nested_children.length > 0">
           <h4>Nested Children</h4>
           <ul class="deps-list">
-            <li v-for="child in selectedFunction.nested_children" :key="child">{{ getFunctionName(child) }}</li>
+            <li v-for="child in selectedFunction.nested_children" :key="child">{{ getShortLabel(child) }}</li>
           </ul>
         </div>
       </div>

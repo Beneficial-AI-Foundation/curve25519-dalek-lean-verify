@@ -1,91 +1,101 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::add`
 
-Specification and proof for `RistrettoPoint::add`.
+Specification and proof for the `add` trait implementation for Ristretto points.
 
-This function adds two Ristretto points by delegating to the underlying Edwards point addition.
+This function adds two Ristretto points via elliptic curve addition by delegating to the underlying Edwards point addition.
 
 **Source**: curve25519-dalek/src/ristretto.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
-namespace curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint
+namespace curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
 
 /-
 natural language description:
 
-• Takes two RistrettoPoints `self` and `other` and returns their sum via elliptic curve
-point addition (i.e., computes P + Q where P = self and Q = other)
+• Takes two RistrettoPoints `self` and `other`
+• Returns their sum as a RistrettoPoint via elliptic curve group addition
+• Implementation: unwraps both points to their underlying EdwardsPoint representations,
+  performs Edwards addition, and wraps the result back as a RistrettoPoint
 
 natural language specs:
 
-• The function always succeeds (no panic)
-• Since RistrettoPoint is a type alias for EdwardsPoint, this delegates to EdwardsPoint::add
-• The result is mathematically equivalent to the standard twisted Edwards addition formula
-  (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)
+• The function always succeeds (no panic) for valid input Ristretto points
+• The result is a valid Ristretto point
+• The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
 
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.add`**:
-- No panic (always returns successfully)
-- Returns the sum P + Q (in elliptic curve addition) where P = self and Q = other
-- The resulting point's coordinates satisfy the twisted Edwards addition formulas modulo p
-  (see Section 3.1 in https://www.iacr.org/archive/asiacrypt2008/53500329/53500329.pdf)
+/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:
+• The function always succeeds (no panic) for valid inputs
+• The result is a valid Ristretto point
+• The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
 @[progress]
-theorem add_spec (self other : RistrettoPoint)
-
-    (h_self_bounds : ∀ i < 5,
-      self.X[i]!.val < 2 ^ 53 ∧
-      self.Y[i]!.val < 2 ^ 53 ∧
-      self.Z[i]!.val < 2 ^ 53 ∧
-      self.T[i]!.val < 2 ^ 53)
-
-    (h_other_bounds : ∀ i < 5,
-      other.X[i]!.val < 2 ^ 53 ∧
-      other.Y[i]!.val < 2 ^ 53 ∧
-      other.Z[i]!.val < 2 ^ 53 ∧
-      other.T[i]!.val < 2 ^ 53)
-
-    (h_self_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0)
-    (h_other_Z_nonzero : Field51_as_Nat other.Z % p ≠ 0) :
-
+theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     ∃ result, add self other = ok result ∧
+    result.IsValid ∧
+    result.toPoint = self.toPoint + other.toPoint := by
+  unfold add
+  progress*
+  · exact h_self_valid.1
+  · exact h_other_valid.1
+  · constructor
+    · constructor
+      · exact ep_post_1
+      · have h_self_even : IsEven (self.toPoint) := by
+          unfold RistrettoPoint.toPoint
+          rw [← EdwardsPoint_IsSquare_iff_IsEven self h_self_valid.1]
+          exact h_self_valid.2
+        have h_other_even : IsEven (other.toPoint) := by
+          unfold RistrettoPoint.toPoint
+          rw [← EdwardsPoint_IsSquare_iff_IsEven other h_other_valid.1]
+          exact h_other_valid.2
+        have h_eq_points : ep.toPoint = self.toPoint + other.toPoint := by
+          unfold RistrettoPoint.toPoint
+          exact ep_post_2
+        rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post_1, h_eq_points]
+        exact even_add_closure_Ed25519 _ _ h_self_even h_other_even
+    · exact ep_post_2
 
-    (∀ i < 5,
-      result.X[i]!.val < 2 ^ 54  ∧
-      result.Y[i]!.val < 2 ^ 54  ∧
-      result.Z[i]!.val < 2 ^ 54  ∧
-      result.T[i]!.val < 2 ^ 54) ∧
+/-
+Note:
 
-    let X₁ := Field51_as_Nat self.X
-    let Y₁ := Field51_as_Nat self.Y
-    let Z₁ := Field51_as_Nat self.Z
-    let T₁ := Field51_as_Nat self.T
+One RistrettoPoint r corresponds to an equivalence class of several
+mathematical curve points.
 
-    let X₂ := Field51_as_Nat other.X
-    let Y₂ := Field51_as_Nat other.Y
-    let Z₂ := Field51_as_Nat other.Z
-    let T₂ := Field51_as_Nat other.T
+The command r.toPoint thus maps r to one of these concrete representatives on the curve (to the representative
+that currently just so happens to represent r).
 
-    let X₃ := Field51_as_Nat result.X
-    let Y₃ := Field51_as_Nat result.Y
-    let Z₃ := Field51_as_Nat result.Z
-    let T₃ := Field51_as_Nat result.T
+The equation
 
-    X₃ % p = ((X₁ * Y₂ + Y₁ * X₂) * (Z₁ * Z₂ - d * T₁ * T₂)) % p ∧
-    Y₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p ∧
-    T₃ % p = ((Y₁ * Y₂ - a * X₁ * X₂) * (X₁ * Y₂ + Y₁ * X₂)) % p ∧
-    Z₃ % p = ((Z₁ * Z₂ - d * T₁ * T₂) * (Z₁ * Z₂ + d * T₁ * T₂)) % p := by
-    sorry
+result.toPoint = self.toPoint + other.toPoint
 
-end curve25519_dalek.ristretto.AddRistrettoPointRistrettoPointRistrettoPoint
+thus assures that the concrete representatives of the input RistrettoPoints on the curve sum up to
+the concrete representative of the output Ristretto point on the curve. Since the addition on RistrettoPoints is
+mathematically well-defined (i.e., it does not depend on the choice of representatives), the condition
+
+result.toPoint = self.toPoint + other.toPoint
+
+thus indeed implies that the output RistrettoPoint (seen as an equivalence class) is the mathematically correct sum
+of the input RistrettoPoints (seen as equivalence classes), even though we are only working at the level
+of (fairly arbitrary) representatives.
+
+The fact that the addition of RistrettoPoints is indeed well-defined and does not depend on the chosen
+representatives follows from standard results in abstract algebra: in any set of left cosets G/N, the product
+
+(aN)(bN)=(ab)N
+
+constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
+and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
+-/
+
+end curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint

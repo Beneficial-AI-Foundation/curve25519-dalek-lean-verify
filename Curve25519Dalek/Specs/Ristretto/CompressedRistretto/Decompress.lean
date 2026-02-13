@@ -1,10 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Ristretto.Representation
 
 /-! # Spec Theorem for `CompressedRistretto::decompress`
 
@@ -15,17 +16,13 @@ decode a (valid) 32-byte representation back to a RistrettoPoint. The function i
 
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1).
 
-It takes a CompressedRistretto (a 32-byte array) and attempts to produce a RistrettoPoint,
+It takes a CompressedRistretto (a 32-byte array) and attempts to produce the associated RistrettoPoint,
 returning None if the input byte array is not a valid canonical encoding.
 
 **Source**: curve25519-dalek/src/ristretto.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models (ProjectivePoint)
 namespace curve25519_dalek.ristretto.CompressedRistretto
 
 /-
@@ -42,25 +39,25 @@ natural language specs:
 
 - The function always succeeds for all U8x32 input arrays (no panic)
 - If the input is not valid, then the output is none
-- If the input is valid, then the output is a valid Ristretto point, i.e., it fulfils the Edwards point curve equation
+- If the input is valid, then the output is a valid Ristretto point that reflects the
+  output of the pure mathematical decompression function
 -/
 
 /-- **Spec and proof concerning `ristretto.CompressedRistretto.decompress`**:
 - The function always succeeds for all U8x32 input arrays (no panic)
 - If the input is not valid, then the output is none
-- If the input is valid, then the output is a valid Ristretto point, i.e.,
-  it fulfils the Edwards point curve equation
+- If the input is valid, then the output is a valid Ristretto point that reflects the
+  output of the pure mathematical decompression function
 -/
 theorem decompress_spec (comp : CompressedRistretto) :
-
-  ∃ result, decompress comp = ok result ∧
-
-  (¬comp.IsValid →
-    result = none) ∧
-
-  (comp.IsValid →
-    ∃ rist, result = some rist ∧ rist.IsValid) := by
-
+    ∃ result, decompress comp = ok result ∧
+    (¬comp.IsValid →
+      result = none) ∧
+    (comp.IsValid →
+        ∃ rist,
+        result = some rist ∧
+        RistrettoPoint.IsValid rist ∧
+        decompress_pure comp = some rist.toPoint) := by
   sorry
 
 end curve25519_dalek.ristretto.CompressedRistretto

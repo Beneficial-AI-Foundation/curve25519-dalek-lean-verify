@@ -1,13 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
-
+import Curve25519Dalek.Specs.Scalar.ClampInteger
 /-! # Spec Theorem for `MontgomeryPoint::mul_clamped`
 
 Specification and proof for
@@ -17,17 +17,10 @@ This function clamps a 32-byte input to a scalar and performs Montgomery
 scalar multiplication of the given point by the clamped scalar.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 134:4-146:5
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-open curve25519_dalek.edwards
-open curve25519_dalek.backend.serial.u64
-
-
+open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -51,14 +44,13 @@ natural language specs:
 - The returned MontgomeryPoint matches the clamped scalar multiplication result
 -/
 @[progress]
-theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
- (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     ∃ res,
     mul_clamped P bytes = ok res ∧
-    MontgomeryPoint.IsValid res ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat bytes) • MontgomeryPoint.toPoint P).y
-    := by
-      unfold  mul_clamped  MulScalarMontgomeryPointMontgomeryPoint.mul
-      sorry
+    (∃ clamped_scalar,
+    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))    := by
+      unfold mul_clamped
+      progress*
 
 end curve25519_dalek.montgomery.MontgomeryPoint

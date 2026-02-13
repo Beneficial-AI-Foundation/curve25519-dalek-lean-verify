@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
+import Curve25519Dalek.Specs.Scalar.ClampInteger
 /-! # Spec Theorem for `MontgomeryPoint::mul_base_clamped`
 
 Specification and proof for
@@ -16,14 +17,11 @@ This function performs scalar multiplication by the Montgomery basepoint after
 clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_base`.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 150:4-158:5
-
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
-
+open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -40,21 +38,22 @@ natural language specs:
 • The result is the Montgomery basepoint multiplication of the clamped scalar
 -/
 
-/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
+/--
+**Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
 - No panic (always returns successfully)
 - Clamps input bytes with `scalar.clamp_integer`
 - Delegates to `montgomery.MontgomeryPoint.mul_base` with the clamped scalar
 - The returned MontgomeryPoint matches the basepoint multiplication result
 -/
+
 @[progress]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     ∃ result,
     mul_base_clamped bytes = ok result ∧
-    MontgomeryPoint.IsValid result ∧
-    (MontgomeryPoint.toPoint result).y = ((U8x32_as_Nat bytes) • constants.ED25519_BASEPOINT_POINT.toPoint).y
-    := by
-   unfold mul_base_clamped scalar.clamp_integer
+    (∃ clamped_scalar,
+    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))    := by
+   unfold mul_base_clamped
    progress*
-   sorry
 
 end curve25519_dalek.montgomery.MontgomeryPoint

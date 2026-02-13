@@ -100,9 +100,57 @@ def subtle.BitAndChoiceChoiceChoice.bitand
 - Returns `Choice.one` if and only if both inputs are `Choice.one`
 -/
 @[progress]
-axiom subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
+theorem subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
     ∃ c, subtle.BitAndChoiceChoiceChoice.bitand a b = ok c ∧
-    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one)
+    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) := by
+  unfold subtle.BitAndChoiceChoiceChoice.bitand
+  split
+  · -- Case: a.val = 0 ∨ b.val = 0
+    rename_i h_or
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is impossible
+        cases h
+      · intro ⟨ha, hb⟩
+        -- a = Choice.one ∧ b = Choice.one, but a.val = 0 ∨ b.val = 0 is a contradiction
+        rw [ha, hb] at h_or
+        unfold Choice.one at h_or
+        simp at h_or
+  · -- Case: ¬(a.val = 0 ∨ b.val = 0)
+    rename_i h_not_or
+    exists Choice.one
+    constructor
+    · rfl
+    · constructor
+      · intro _
+        -- Need to show a = Choice.one ∧ b = Choice.one
+        constructor
+        · -- Show a = Choice.one
+          cases a with | mk val valid =>
+          cases valid with
+          | inl h =>
+            -- val = 0, but this contradicts h_not_or
+            simp [h] at h_not_or
+          | inr h =>
+            -- val = 1, so a = Choice.one
+            unfold Choice.one
+            simp [h]
+        · -- Show b = Choice.one
+          cases b with | mk val valid =>
+          cases valid with
+          | inl h =>
+            -- val = 0, but this contradicts h_not_or
+            simp [h] at h_not_or
+          | inr h =>
+            -- val = 1, so b = Choice.one
+            unfold Choice.one
+            simp [h]
+      · intro ⟨ha, hb⟩
+        -- a = Choice.one ∧ b = Choice.one, so we're done
+        rfl
 
 /- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 177:4-177:41
@@ -131,9 +179,39 @@ def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
 
 /- [subtle::{subtle::ConstantTimeEq for u16}::ct_eq]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 348:12-348:51
-   Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq] -/
+   Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq]
+   Constant-time equality for U16 values -/
 @[rust_fun "subtle::{subtle::ConstantTimeEq<u16>}::ct_eq"]
-axiom subtle.ConstantTimeEqU16.ct_eq : U16 → U16 → Result subtle.Choice
+def subtle.ConstantTimeEqU16.ct_eq (a : U16) (b : U16) : Result subtle.Choice :=
+  if a = b then ok Choice.one
+  else ok Choice.zero
+
+/-- **Spec theorem for `subtle.ConstantTimeEqU16.ct_eq`**:
+- No panic (always returns successfully)
+- Returns `Choice.one` if and only if the two U16 values are equal
+-/
+@[progress]
+theorem subtle.ConstantTimeEqU16.ct_eq_spec (a b : U16) :
+  ∃ c, subtle.ConstantTimeEqU16.ct_eq a b = ok c ∧
+  (c = Choice.one ↔ a = b) := by
+  unfold subtle.ConstantTimeEqU16.ct_eq
+  split
+  · -- Case: a = b
+    rename_i h_eq
+    exists Choice.one
+    simp [h_eq]
+  · -- Case: a ≠ b
+    rename_i h_ne
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is a contradiction
+        cases h
+      · intro h
+        -- a = b but a ≠ b is a contradiction
+        contradiction
 
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
@@ -150,11 +228,12 @@ def subtle.FromChoiceU8.from (input : U8) : Result subtle.Choice :=
 /- [subtle::{subtle::ConstantTimeEq for @Slice<T>}::ct_eq]:
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
    Constant-time equality for slices -/
+@[rust_fun "subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq"]
 axiom subtle.ConstantTimeEqSlice.ct_eq
   {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T)
   : Slice T → Slice T → Result subtle.Choice
 
-/-- **Spec axiom for `subtle.ConstantTimeEqSlice.ct_eq`**:
+/-- **Spec theorem for `subtle.ConstantTimeEqSlice.ct_eq`**:
 - No panic (always returns successfully)
 - Returns Choice.one (true) if and only if all corresponding elements are equal
 - Requires equal-length slices with valid bounds
@@ -175,31 +254,97 @@ def subtle.ConstantTimeEqU8.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
-/-- **Spec axiom for `subtle.ConstantTimeEqU8.ct_eq`**:
+/-- **Spec theorem for `subtle.ConstantTimeEqU8.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U8 values are equal
 -/
 @[progress]
-axiom subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
+theorem subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
   ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  (c = Choice.one ↔ a = b) := by
+  unfold subtle.ConstantTimeEqU8.ct_eq
+  split
+  · -- Case: a = b
+    rename_i h_eq
+    exists Choice.one
+    simp [h_eq]
+  · -- Case: a ≠ b
+    rename_i h_ne
+    exists Choice.zero
+    constructor
+    · rfl
+    · constructor
+      · intro h
+        -- Choice.zero = Choice.one is a contradiction
+        cases h
+      · intro h
+        -- a = b but a ≠ b is a contradiction
+        contradiction
 
 /- [subtle::ConditionallySelectable::conditional_assign]:
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
-   Name pattern: [subtle::ConditionallySelectable::conditional_assign] -/
-axiom subtle.ConditionallySelectable.conditional_assign.default
+   Name pattern: [subtle::ConditionallySelectable::conditional_assign]
+   Conditionally assign: returns conditional_select(a, b, choice) -/
+@[rust_fun "subtle::ConditionallySelectable::conditional_assign"]
+def subtle.ConditionallySelectable.conditional_assign.default
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
   Self) :
-  Self → Self → subtle.Choice → Result Self
+  Self → Self → subtle.Choice → Result Self :=
+  fun a b choice =>
+    ConditionallySelectableInst.conditional_select a b choice
+
+/-- **Spec theorem for `subtle.ConditionallySelectable.conditional_assign.default`**:
+- No panic (if conditional_select succeeds)
+- Returns the result of conditional_select(a, b, choice)
+-/
+@[progress]
+theorem subtle.ConditionallySelectable.conditional_assign.default_spec
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
+  (a b : Self) (choice : subtle.Choice)
+  (h : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res) :
+  ∃ res, subtle.ConditionallySelectable.conditional_assign.default ConditionallySelectableInst a b choice = ok res ∧
+  ConditionallySelectableInst.conditional_select a b choice = ok res := by
+  unfold subtle.ConditionallySelectable.conditional_assign.default
+  obtain ⟨res, h_eq⟩ := h
+  exists res
 
 /- [subtle::ConditionallySelectable::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
-   Name pattern: [subtle::ConditionallySelectable::conditional_swap] -/
+   Name pattern: [subtle::ConditionallySelectable::conditional_swap]
+   Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
 @[rust_fun "subtle::ConditionallySelectable::conditional_swap"]
-axiom subtle.ConditionallySelectable.conditional_swap.default
+def subtle.ConditionallySelectable.conditional_swap.default
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable
   Self) :
-  Self → Self → subtle.Choice → Result (Self × Self)
+  Self → Self → subtle.Choice → Result (Self × Self) :=
+  fun a b choice => do
+    let a_new ← ConditionallySelectableInst.conditional_select a b choice
+    let b_new ← ConditionallySelectableInst.conditional_select b a choice
+    ok (a_new, b_new)
+
+/-- **Spec theorem for `subtle.ConditionallySelectable.conditional_swap.default`**:
+- No panic (if conditional_select succeeds)
+- Returns (a_new, b_new) where:
+  - a_new = conditional_select(a, b, choice)
+  - b_new = conditional_select(b, a, choice)
+- If choice = Choice.one: swaps a and b
+- If choice = Choice.zero: leaves them unchanged
+-/
+@[progress]
+theorem subtle.ConditionallySelectable.conditional_swap.default_spec
+  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
+  (a b : Self) (choice : subtle.Choice)
+  (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
+  (h_b : ∃ res, ConditionallySelectableInst.conditional_select b a choice = ok res) :
+  ∃ c,
+    subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice = ok c ∧
+    ConditionallySelectableInst.conditional_select a b choice = ok c.1 ∧
+    ConditionallySelectableInst.conditional_select b a choice = ok c.2 := by
+  unfold subtle.ConditionallySelectable.conditional_swap.default
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  exists (a_new, b_new)
+  simp [h_a_eq, h_b_eq]
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
@@ -256,15 +401,17 @@ def subtle.CtOption.new
   {T : Type} (value : T) (is_some : subtle.Choice) : Result (subtle.CtOption T) :=
   ok { value := value, is_some := is_some }
 
-/-- **Spec axiom for `subtle.CtOption.new`**:
+/-- **Spec theorem for `subtle.CtOption.new`**:
 - No panic (always returns successfully)
 - Returns a CtOption with the given value and is_some flag
 - The returned CtOption's fields match the inputs exactly
 -/
 @[progress]
-axiom subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
+theorem subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
   ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
-  opt.value = value ∧ opt.is_some = is_some
+  opt.value = value ∧ opt.is_some = is_some := by
+  unfold subtle.CtOption.new
+  exists { value := value, is_some := is_some }
 
 /- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
@@ -410,24 +557,41 @@ axiom core.iter.traits.collect.IntoIterator.Blanket.into_iter
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select]
+   Conditional select: returns a if choice(0), b if choice(1) -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_select"]
-axiom subtle.ConditionallySelectableU8.conditional_select
-  : U8 → U8 → subtle.Choice → Result U8
+def subtle.ConditionallySelectableU8.conditional_select
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
+  if choice.val = 1#u8 then ok b
+  else ok a
+
+/-- Progress spec for ConditionallySelectableU8.conditional_select -/
+@[progress]
+theorem conditional_select_U8_spec (a b : U8) (choice : subtle.Choice) :
+    ∃ res, subtle.ConditionallySelectableU8.conditional_select a b choice = ok res ∧
+    res = if choice.val = 1#u8 then b else a := by
+  unfold subtle.ConditionallySelectableU8.conditional_select
+  split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign]
+   Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign"]
-axiom subtle.ConditionallySelectableU8.conditional_assign
-  : U8 → U8 → subtle.Choice → Result U8
+def subtle.ConditionallySelectableU8.conditional_assign
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
+  subtle.ConditionallySelectableU8.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
-   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap]
+   Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap"]
-axiom subtle.ConditionallySelectableU8.conditional_swap
-  : U8 → U8 → subtle.Choice → Result (U8 × U8)
+def subtle.ConditionallySelectableU8.conditional_swap
+  (a : U8) (b : U8) (choice : subtle.Choice) : Result (U8 × U8) := do
+  let a_new ← subtle.ConditionallySelectableU8.conditional_select a b choice
+  let b_new ← subtle.ConditionallySelectableU8.conditional_select b a choice
+  ok (a_new, b_new)
 
 /- [zeroize::{zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 551:4-551:25
@@ -475,33 +639,52 @@ axiom scalar.ConditionallySelectableScalar.conditional_swap
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 581:4-581:69
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select]
+   Conditional select for arrays: returns a if choice=0, b if choice=1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select"]
-axiom subtle.ConditionallySelectableArray.conditional_select
-  {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result (Array T N)
+def subtle.ConditionallySelectableArray.conditional_select
+  {T : Type} {N : Usize} (_ConditionallySelectableInst :
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
+  if choice.val = 1#u8 then ok b
+  else ok a
+
+/-- Progress spec for ConditionallySelectableArray.conditional_select -/
+@[progress]
+theorem conditional_select_Array_spec {T : Type} {N : Usize}
+    (inst : subtle.ConditionallySelectable T)
+    (a b : Array T N) (choice : subtle.Choice) :
+    ∃ res, subtle.ConditionallySelectableArray.conditional_select inst a b choice = ok res ∧
+    res = if choice.val = 1#u8 then b else a := by
+  unfold subtle.ConditionallySelectableArray.conditional_select
+  split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 587:4-587:66
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign]
+   Conditional assign for arrays: assign a with the value of conditional_select(a, b, choice). -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
-axiom subtle.ConditionallySelectableArray.conditional_assign
+def subtle.ConditionallySelectableArray.conditional_assign
   {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result (Array T N)
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
+  subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap] -/
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
+   Conditional swap for arrays: swaps a and b if choice is 1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
-axiom subtle.ConditionallySelectableArray.conditional_swap
+def subtle.ConditionallySelectableArray.conditional_swap
   {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T) :
-  Array T N → Array T N → subtle.Choice → Result ((Array T N) × (Array T N))
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
+  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
+  ok (a_new, b_new)
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/

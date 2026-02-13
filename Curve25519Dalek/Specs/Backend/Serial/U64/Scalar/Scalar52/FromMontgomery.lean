@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
@@ -109,7 +109,6 @@ theorem from_montgomery_spec (self : Scalar52)
       simp only [List.getElem?_replicate]
       try simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
         IsEmpty.forall_iff,not_lt, UScalar.ofNat_val_eq, ↓reduceIte, Nat.ofNat_pos]
-
   · -- Main equality
     rw [res_post_1]
     simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]

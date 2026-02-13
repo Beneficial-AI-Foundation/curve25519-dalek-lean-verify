@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
+
 
 /-! # Spec Theorem for `MontgomeryPoint::mul_assign`
 
@@ -23,7 +24,7 @@ in the backend).
 -/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
+open Montgomery
 namespace curve25519_dalek.montgomery.MulAssignMontgomeryPointShared0Scalar
 
 /-
@@ -48,19 +49,12 @@ natural language specs:
 - The returned MontgomeryPoint equals the Montgomery ladder result for the given scalar and point
 -/
 @[progress]
-theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
-    (h_is_valid : MontgomeryPoint.IsValid P) :
+theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     ∃ res,
     mul_assign P scalar = ok res ∧
-    MontgomeryPoint.IsValid res ∧
-    (MontgomeryPoint.toPoint res).y = ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y ∧
-    let y : ZMod p  := ((U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)).y
-    bytesToField res =(1 + y) * (1 - y)⁻¹
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
      := by
   unfold mul_assign
   progress*
-
-
-
 
 end curve25519_dalek.montgomery.MulAssignMontgomeryPointShared0Scalar

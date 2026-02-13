@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
@@ -20,6 +20,8 @@ This function performs Montgomery multiplication.
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 262
 
 /-
 natural language description:
@@ -50,7 +52,6 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     ∃ w, montgomery_mul m m' = ok w ∧
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
     (∀ i < 5, w[i]!.val < 2 ^ 62) := by
-
   unfold montgomery_mul
   progress*
   -- BEGIN TASK
@@ -60,10 +61,7 @@ theorem montgomery_mul_spec (m m' : Scalar52)
   have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
     rw [← a1_post_1]
   rw [Nat.ModEq]
-  refine  ⟨?_, ?_ ⟩
-  · try grind
-  · intro i hi; have h_bounds:= res_post_2 i hi; exact h_bounds
+  refine ⟨by try grind , fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
   -- END TASK
-
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
