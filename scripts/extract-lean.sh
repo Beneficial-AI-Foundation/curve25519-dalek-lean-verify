@@ -117,6 +117,23 @@ generate_llbc() {
         --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}'
         --exclude 'curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}'
         --exclude 'curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}'
+        # Exclude ristretto Debug/Hash/Zeroize impls (pull in core library items Aeneas can't handle)
+        --exclude 'curve25519_dalek::ristretto::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl core::hash::Hash for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl zeroize::Zeroize for _}'
+        # Exclude edwards Debug/Zeroize impls
+        --exclude 'curve25519_dalek::edwards::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::edwards::affine::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::edwards::{impl zeroize::Zeroize for _}'
+        # Exclude edwards Hash impl
+        --exclude 'curve25519_dalek::edwards::{impl core::hash::Hash for _}'
+        # Exclude MultiscalarMul impls (use IntoIterator which Charon can't handle)
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        # Exclude functions that use iterators (Charon/Aeneas can't translate them)
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::ristretto::RistrettoPoint}::double_and_compress_batch'
+        --exclude 'curve25519_dalek::field::{impl curve25519_dalek::backend::serial::u64::field::FieldElement51}::batch_invert'
     )
     OPAQUE_ARGS=(
         # --opaque 'curve25519_dalek::something::somename'

@@ -206,7 +206,7 @@ impl FieldElement {
     /// Given a slice of pub(crate)lic `FieldElements`, replace each with its inverse.
     ///
     /// When an input `FieldElement` is zero, its value is unchanged.
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub(crate) fn batch_invert(inputs: &mut [FieldElement]) {
         // Montgomery’s Trick and Fast Implementation of Masked AES
         // Genelle, Prouff and Quisquater

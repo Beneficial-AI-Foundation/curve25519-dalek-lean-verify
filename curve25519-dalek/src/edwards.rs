@@ -413,7 +413,7 @@ impl CompressedEdwardsY {
     /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
     /// a length of 32.
     pub fn from_slice(bytes: &[u8]) -> Result<CompressedEdwardsY, TryFromSliceError> {
-        bytes.try_into().map(CompressedEdwardsY)
+        bytes.try_into().map(|b| CompressedEdwardsY(b))
     }
 }
 
@@ -583,7 +583,7 @@ impl EdwardsPoint {
 
     /// Converts a large batch of points to Edwards at once. This has the same
     /// behavior on identity elements as [`Self::to_montgomery`].
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub fn to_montgomery_batch(eds: &[Self]) -> Vec<MontgomeryPoint> {
         // Do the same thing as the above function. u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
         // We will do this in a batch, ie compute (Z-Y) for all the input
@@ -610,7 +610,7 @@ impl EdwardsPoint {
 
     /// Compress several `EdwardsPoint`s into `CompressedEdwardsY` format, using a batch inversion
     /// for a significant speedup.
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub fn compress_batch(inputs: &[EdwardsPoint]) -> Vec<CompressedEdwardsY> {
         let mut zs = inputs.iter().map(|input| input.Z).collect::<Vec<_>>();
         FieldElement::batch_invert(&mut zs);
