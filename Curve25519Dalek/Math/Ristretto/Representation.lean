@@ -438,9 +438,9 @@ def decompress_step1 (c : CompressedRistretto) : Option (ZMod p) :=
   let s_int := U8x32_as_Nat c
   -- Check 1: Canonical encoding (s_int < p)
   -- Check 2: Parity (least significant bit is 0)
-  if s_int >= p || s_int % 2 != 0 then 
-    none 
-  else 
+  if s_int >= p || s_int % 2 != 0 then
+    none
+  else
     some (s_int : ZMod p)
 
 noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
@@ -452,7 +452,7 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
   -- 2. Inverse Square Root (Elligator)
   let arg := v * u2^2
   match h_call : inv_sqrt_checked arg with
-  | (I, was_square) => 
+  | (I, was_square) =>
 
     -- 3. Recover denominators
     let Dx := I * u2
@@ -464,7 +464,7 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
 
     -- 5. Validation Checks
     let t := x * y
-    
+
     if h_invalid : !was_square || is_negative t || (y == 0) then
       none
     else
@@ -523,6 +523,71 @@ noncomputable def CompressedRistretto.toPoint (c : CompressedRistretto) : Point 
   | none   => 0  -- Returns neutral element on failure
 
 end curve25519_dalek.ristretto
+
+namespace curve25519_dalek.math
+
+open Edwards ZMod ristretto
+
+section ElligatorMap
+
+/--
+**Elligator Ristretto Map (Pure Spec)**
+Maps a field element `r0` to an Affine Point on the Ed25519 curve.
+Logic corresponds to [RFC 9496 Section 4.3.4].
+-/
+noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p) : Point Ed25519 :=
+  -- 1. Constants
+  let i := sqrt_m1
+  let d_val := d
+  let one := (1 : ZMod p)
+
+  -- 2. Compute r = i * r0^2
+  let r := i * r0^2
+
+  -- 3. Compute Elligator numerator and denominator
+  let N_s := (r + 1) * (1 - d_val^2)
+  let D_initial := -(1 + d_val * r) * (r + d_val)
+
+  -- 4. Check if N_s / D is a square
+  let ratio := N_s * D_initial⁻¹
+  let is_sq := IsSquare ratio
+
+  -- 5. Selection Logic
+  let (s, c, D_final) := if is_sq then
+      (sqrt ratio, -one, D_initial)
+    else
+      let s_prime := (sqrt (i * ratio)) * r0
+      (-abs_edwards s_prime, r, D_initial)
+
+  -- 6. Compute N_t
+  let N_t := c * (r - 1) * (d_val - 1)^2 - D_final
+
+  -- 7. Construct Affine Coordinates directly
+  --    We use the simplification:
+  --    x = X_ext / Z_ext = (2sD) / (Nt * sqrt_ad_minus_one)
+  --    y = Y_ext / Z_ext = (1 - s^2) / (1 + s^2)
+  let s_sq := s^2
+  {
+    x := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
+    y := (1 - s_sq) / (1 + s_sq)
+    on_curve := by
+       -- The proof that this point satisfies the curve equation
+       -- is much easier in Affine coordinates.
+       sorry
+  }
+
+/--
+**Validity Theorem**
+The Elligator map always produces a point that is "Even" (in the 2-torsion subgroup).
+This is the key Ristretto property.
+-/
+theorem elligator_pure_is_even (r0 : ZMod p) :
+  IsEven (elligator_ristretto_flavor_pure r0) := by
+  sorry
+
+end ElligatorMap
+
+end curve25519_dalek.math
 
 /-!
 ## Canonical Representation
