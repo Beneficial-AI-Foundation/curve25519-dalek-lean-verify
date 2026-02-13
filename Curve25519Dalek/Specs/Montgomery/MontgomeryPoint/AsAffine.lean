@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
@@ -25,10 +24,7 @@ by computing u = U/W and encoding it as a 32-byte MontgomeryPoint.
 --/
 
 open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64
-open curve25519_dalek
-open curve25519_dalek.backend.serial.curve_models.curve25519_dalek.montgomery
-
+open Montgomery
 namespace curve25519_dalek.montgomery.ProjectivePoint
 
 /-
