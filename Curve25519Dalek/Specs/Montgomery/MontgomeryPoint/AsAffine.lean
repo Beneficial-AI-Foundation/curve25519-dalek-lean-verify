@@ -48,9 +48,9 @@ Natural language specs:
     • The conversion is deterministic and well-defined for valid projective points
 -/
 
--- lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
---     bytesToField a = (U8x32_as_Nat a : ZMod p) := by
---   sorry
+lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
+    bytesToField a = (U8x32_as_Nat a : ZMod p) := by
+  sorry
 
 
 /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
@@ -151,7 +151,66 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           --   _ = u := rfl
           --   _ = -1 := hu
         exact absurd div_eq_neg_one h_valid.2
-      · sorry -- TODO: Do not complete the proof for since IsValid is still being modified
+      · -- neg case: u + 1 ≠ 0
+        simp only [h1, if_false]
+        -- Need to establish that u corresponds to a valid Montgomery point
+        have h_u_eq : u = self.U.toField / self.W.toField := by
+          -- u is defined as bytesToField a, need to connect to U/W
+          change bytesToField a = self.U.toField / self.W.toField
+          rw [bytesToField_eq_cast]
+          -- Similar proof to line 118-142, establishing a = U/W
+          have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 :=
+            Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
+          rename_i x_inv _ x_inv_post u_inv _
+          have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
+            exact x_inv_post h_W_nat_nonzero
+          have h_inv2 : Field51_as_Nat x_inv * Field51_as_Nat self.W ≡ 1 [MOD p] := by
+            dsimp [Nat.ModEq]
+            calc (Field51_as_Nat x_inv * Field51_as_Nat self.W) % p
+                = (Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p)) % p := by simp [Nat.mul_mod]
+              _ = 1 := by simp [h_inv]
+          have h_inv4: self.U.toField / self.W.toField =
+              (Field51_as_Nat self.U) / (Field51_as_Nat self.W) := by
+            unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
+            simp
+          have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) =
+              Field51_as_Nat self.U * Field51_as_Nat x_inv := by
+            exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W)
+              (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
+          rw [h_inv4, h_inv5]
+          have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
+          have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a)
+            (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
+          have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) =
+              (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
+            rw [h_eq_zmod2, Nat.cast_mul]
+          exact h_eq_zmod3
+        -- The goal is exactly the IsValid definition for Montgomery points!
+        -- Since u = bytesToField a, we can rewrite the goal
+        change IsSquare ((((bytesToField a - 1) * (bytesToField a + 1)⁻¹) ^ 2 - 1) *
+          (↑d * ((bytesToField a - 1) * (bytesToField a + 1)⁻¹) ^ 2 + 1)⁻¹)
+        -- Now this is exactly the IsValid condition for MontgomeryPoint a
+        have h_valid_montgomery : MontgomeryPoint.IsValid a := by
+          -- Need to prove: MontgomeryPoint.IsValid a
+          -- We have:
+          -- - h_valid.2 : self.U.toField / self.W.toField ≠ -1
+          -- - h_u_eq : u = self.U.toField / self.W.toField
+          -- - h1 : ¬u + 1 = 0 (which means bytesToField a + 1 ≠ 0)
+          -- - a_post_2 : U8x32_as_Nat a < p
+          --
+          -- This requires proving that the computation preserves validity:
+          -- If the input (U/W) is a valid Montgomery point (≠ -1),
+          -- then the output bytes `a` also encode a valid Montgomery point.
+          --
+          -- This may require a new lemma connecting:
+          -- 1. The mathematical u-coordinate (U/W)
+          -- 2. The byte representation (a)
+          -- 3. The IsValid property
+          sorry
+        unfold MontgomeryPoint.IsValid at h_valid_montgomery
+        rw [if_neg] at h_valid_montgomery
+        · exact h_valid_montgomery
+        · exact h1
     · rename_i x_inv _ x_inv_post _
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
       have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
