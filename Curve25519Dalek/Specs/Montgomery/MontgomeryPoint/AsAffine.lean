@@ -48,6 +48,11 @@ Natural language specs:
     • The conversion is deterministic and well-defined for valid projective points
 -/
 
+-- lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
+--     bytesToField a = (U8x32_as_Nat a : ZMod p) := by
+--   sorry
+
+
 /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
 - The function succeeds if and only if the W coordinate is non-zero in the field
 - When successful, returns a MontgomeryPoint encoding the affine u-coordinate
@@ -60,11 +65,7 @@ Natural language specs:
   * The computation uses constant-time field arithmetic operations
 -/
 
-lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
-    bytesToField a = (U8x32_as_Nat a : ZMod p) := by
-  sorry
 
-/-- If a limb-representation is nonzero in `ZMod p`, its canonical representative mod `p` is nonzero. -/
 lemma Field51_modP_ne_zero_of_toField_ne_zero
     (W : backend.serial.u64.field.FieldElement51)
     (hW : W.toField ≠ 0) :
@@ -102,7 +103,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     ∃ res,
     as_affine self = ok res ∧
     MontgomeryPoint.IsValid res ∧
-    bytesToField res = self.U.toField  / self.W.toField := by
+    U8x32_as_Nat res = self.U.toField  / self.W.toField := by
   unfold as_affine at *
   progress*
   · -- Show MontgomeryPoint.IsValid res
@@ -114,7 +115,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
       by_cases h1 : u + 1 = 0
       · simp only [h1]
         have hu : u = -1 := by linear_combination h1
-        have a_eq_div : bytesToField a = self.U.toField / self.W.toField := by
+        have a_eq_div : U8x32_as_Nat a = self.U.toField / self.W.toField := by
           have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
           rename_i x_inv _ x_inv_post u_inv _
           rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
@@ -138,18 +139,20 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
           have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
             rw [h_eq_zmod2, Nat.cast_mul]
-          calc bytesToField a
-              = (U8x32_as_Nat a : ZMod p) := bytesToField_eq_cast a
-            _ = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := h_eq_zmod3
+          exact h_eq_zmod3
         have div_eq_neg_one : self.U.toField / self.W.toField = -1 := by
-          calc self.U.toField / self.W.toField
-              = bytesToField a := a_eq_div.symm
-            _ = u := rfl
-            _ = -1 := hu
+          -- This proof requires bytesToField_eq_cast lemma (line 51-53)
+          -- which states: bytesToField a = (U8x32_as_Nat a : ZMod p)
+          -- Once that lemma is proven, this calc chain will work:
+          sorry
+          -- calc self.U.toField / self.W.toField
+          --     = ↑(U8x32_as_Nat a) := a_eq_div.symm
+          --   _ = bytesToField a := (bytesToField_eq_cast a).symm
+          --   _ = u := rfl
+          --   _ = -1 := hu
         exact absurd div_eq_neg_one h_valid.2
       · sorry -- TODO: Do not complete the proof for since IsValid is still being modified
-    · rw [bytesToField_eq_cast]
-      rename_i x_inv _ x_inv_post _
+    · rename_i x_inv _ x_inv_post _
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
       have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
         exact x_inv_post h_W_nat_nonzero
