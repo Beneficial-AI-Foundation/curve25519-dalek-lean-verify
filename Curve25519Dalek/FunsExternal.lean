@@ -724,4 +724,55 @@ axiom montgomery.ConditionallySelectableProjectivePoint.conditional_assign
   montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
     → Result montgomery.ProjectivePoint
 
+/-- Implementation of `montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign`:
+   Conditionally assign `b` to `a` if `choice.val = 1`; otherwise return `a`. -/
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl
+  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
+  (choice : subtle.Choice) :
+  Result montgomery.MontgomeryPoint :=
+  if choice.val = 1#u8 then ok b else ok a
+
+/-- **Progress spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl`**. -/
+@[progress]
+theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl_spec
+  (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
+  ∃ res,
+    montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl a b choice = ok res ∧
+    res = (if choice.val = 1#u8 then b else a) := by
+  refine ⟨if choice.val = 1#u8 then b else a, ?_, rfl⟩
+  unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl
+  by_cases h : choice.val = 1#u8 <;> simp [h]
+
+/-- Implementation of `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap`:
+   Returns `(b, a)` if `choice.val = 1`; otherwise `(a, b)`. -/
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl
+  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
+  (choice : subtle.Choice) :
+  Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) :=
+  if choice.val = 1#u8 then ok (b, a) else ok (a, b)
+
+/-- **Progress spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl`**. -/
+@[progress]
+theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl_spec
+  (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
+  ∃ res,
+    montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl a b choice = ok res ∧
+    res = (if choice.val = 1#u8 then (b, a) else (a, b)) := by
+  refine ⟨if choice.val = 1#u8 then (b, a) else (a, b), ?_, rfl⟩
+  unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl
+  by_cases h : choice.val = 1#u8 <;> simp [h]
+
+/-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
+   Returns Unit (no-op assertion that Eq is properly implemented). -/
+def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl
+  (_self : montgomery.MontgomeryPoint) : Result Unit :=
+  ok ()
+
+/-- **Progress spec for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl`**. -/
+@[progress]
+theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl_spec
+  (self : montgomery.MontgomeryPoint) :
+  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl self = ok () := by
+  rfl
+
 end curve25519_dalek
