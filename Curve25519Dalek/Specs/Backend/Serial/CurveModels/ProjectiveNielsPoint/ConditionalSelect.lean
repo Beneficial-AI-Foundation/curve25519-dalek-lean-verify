@@ -23,9 +23,9 @@ choice = 0, in constant time.
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 297:4-304:5
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
 
 /--
 **Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**:
@@ -42,7 +42,7 @@ namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectablePr
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.ProjectiveNielsPoint)
     (choice : subtle.Choice) :
-    ∃ result, conditional_select a b choice = ok result ∧
+    spec (conditional_select a b choice) (fun result =>
     (∀ i < 5, result.Y_plus_X[i]!.val =
       if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧
     (∀ i < 5, result.Y_minus_X[i]!.val =
@@ -50,9 +50,9 @@ theorem conditional_select_spec
     (∀ i < 5, result.Z[i]!.val =
       if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧
     (∀ i < 5, result.T2d[i]!.val =
-      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) := by
+      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val)) := by
   unfold conditional_select
   progress*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
