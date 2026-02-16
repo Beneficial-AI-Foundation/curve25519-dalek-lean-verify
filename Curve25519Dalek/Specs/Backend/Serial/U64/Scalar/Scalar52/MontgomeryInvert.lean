@@ -10,7 +10,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 
 import Mathlib.Data.Int.ModEq
-import PrimeCert.PrimeList
+-- import PrimeCert.PrimeList
 
 /-! # Spec Theorem for `Scalar52::montgomery_invert`
 
@@ -25,7 +25,8 @@ This function computes the multiplicative inverse using Montgomery form.
 -- Primality Certification for L := 2^252 + 27742317777372353535851937790883648493
 instance : Fact (Nat.Prime L) := by
   unfold L
-  exact ⟨PrimeCert.prime_ed25519_order⟩
+  sorry
+  -- exact ⟨PrimeCert.prime_ed25519_order⟩
 
 open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod

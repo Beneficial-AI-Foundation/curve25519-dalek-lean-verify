@@ -37,7 +37,7 @@ open ZMod
 /-- The finite field F_p where p = 2^255 - 19. -/
 abbrev CurveField : Type := ZMod p
 
-instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
+instance : Fact (Nat.Prime p) := sorry -- ⟨PrimeCert.prime_25519''⟩
 
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
 

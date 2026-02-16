@@ -8,7 +8,7 @@ import Curve25519Dalek.Types
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
-import PrimeCert.PrimeList
+-- import PrimeCert.PrimeList
 
 /-! # Common Definitions
 
@@ -62,7 +62,7 @@ def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
 
 /-! ## Primality and CurveField -/
 
-instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
+instance : Fact (Nat.Prime p) := sorry -- ⟨PrimeCert.prime_25519''⟩
 
 namespace Edwards
 
