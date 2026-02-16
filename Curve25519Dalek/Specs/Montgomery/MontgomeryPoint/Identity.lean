@@ -43,14 +43,16 @@ theorem identity_spec :
     (∀ i : Fin 32, q[i]! = 0#u8) ∧
     U8x32_as_Nat q = 0) := by
   unfold identity
-  simp
+  suffices (∀ (i : Fin 32), (Array.repeat 32#usize 0#u8)[i] = 0#u8) ∧
+    U8x32_as_Nat (Array.repeat 32#usize 0#u8) = 0 by simpa
   constructor
   · intro i
     fin_cases i <;> simp_all <;> decide
   · unfold U8x32_as_Nat
     simp only [Finset.sum_eq_zero_iff, Finset.mem_range]
     intro i hi
-    simp_all [getElem!, Array.repeat]
-    interval_cases i <;> simp
+    have : (Array.repeat 32#usize 0#u8 : List U8)[i]!.val = 0 := by
+      interval_cases i <;> simp [Array.repeat]
+    simpa [*]
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity
