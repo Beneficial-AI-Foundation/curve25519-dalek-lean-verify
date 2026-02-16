@@ -320,98 +320,152 @@ def basepoint : Point Ed25519 := {
     try decide
 }
 
-/-- A point on the projective plane is just (X : Y : Z) over the field.
-This is distinct from the implementation's ProjectivePoint (which uses U64 limbs).
-Here, X, Y, Z are pure mathematical values (ZMod p).
+/-- A "Double-and-Add" implementation. -/
+def fast_mul (n : Nat) (P : Point Ed25519) : Point Ed25519 :=
+  n.binaryRec 0 (fun b _ acc =>
+    if b then acc + acc + P else acc + acc)
+
+/-- A version of fast_mul that works purely on coordinates (CurveField × CurveField). -/
+def fast_mul_vals (n : Nat) (P : CurveField × CurveField) : CurveField × CurveField :=
+  n.binaryRec (0, 1) (fun b _ acc =>
+    -- 1. Double the accumulator
+    let acc2 := add_coords Ed25519 acc acc
+    -- 2. Add P if the bit is true
+    if b then add_coords Ed25519 acc2 P else acc2)
+
+
+-- Proves that for this specific curve, fast_mul matches standard multiplication.
+theorem fast_mul_eq (n : Nat) (P : Point Ed25519) : n • P = fast_mul n P := by
+  induction n using Nat.strong_induction_on generalizing P with
+  | h n ih =>
+    unfold fast_mul
+    by_cases h0 : n = 0
+    · simp [h0]
+    · -- Decompose 'n' into 'Nat.bit' form so binaryRec_eq triggers
+      let b := decide (n % 2 = 1)
+      let m := n / 2
+
+      -- Prove n = Nat.bit b m
+      have h_bit : n = Nat.bit b m := by
+        unfold Nat.bit
+        dsimp [b, m]
+        by_cases h_odd : n % 2 = 1
+        · simp_all only [decide_true, cond_true]; rw [← h_odd]
+          exact (Nat.div_add_mod n 2).symm
+        · simp_all only [Nat.mod_two_not_eq_one, zero_ne_one, decide_false, cond_false]
+          conv =>
+            lhs
+            apply (Nat.div_add_mod n 2).symm
+          simp only [h_odd]
+          simp_all only [add_zero]
+
+      -- Rewrite 'n' inside fast_mul (which is binaryRec)
+      conv_rhs => arg 3; rw [h_bit]
+
+      -- Now binaryRec_eq works!
+      rw [Nat.binaryRec_eq]
+      · --
+        change n • P = if b then fast_mul m P + fast_mul m P + P else fast_mul m P + fast_mul m P
+        have h_lt : m < n := Nat.div_lt_self (Nat.pos_of_ne_zero h0) (by decide)
+        rw [← ih m h_lt]
+        -- Case Analysis on b (Odd vs Even)
+        cases h : b
+        · -- Even
+          simp only [Bool.false_eq_true, ↓reduceIte]
+          nth_rewrite 1 [h_bit]
+          simp only [Nat.bit, h, cond_false]
+          rw [mul_smul, two_smul]
+        · -- Odd
+          simp only [↓reduceIte]
+          nth_rewrite 1 [h_bit]
+          simp only [Nat.bit, h, cond_true]
+          rw [add_smul, one_smul, mul_smul, two_smul, add_assoc]
+
+      · -- Consistency check for binaryRec
+        simp only [Bool.false_eq_true, ↓reduceIte, add_zero, true_or]
+
+/-- Bridge: The coordinates of `fast_mul` on a Point
+  are exactly the result of `fast_mul_vals` on its coordinates.
 -/
-structure PureProjective : Type where
-  X : CurveField
-  Y : CurveField
-  Z : CurveField
-  deriving Repr, DecidableEq
+theorem fast_mul_vals_eq (n : Nat) (P : Point Ed25519) :
+    (fast_mul n P).x = (fast_mul_vals n (P.x, P.y)).1 ∧
+    (fast_mul n P).y = (fast_mul_vals n (P.x, P.y)).2 := by
+  induction n using Nat.strong_induction_on generalizing P with
+  | h n ih =>
+    unfold fast_mul fast_mul_vals
+    if h0 : n = 0 then
+      simp [h0, Nat.binaryRec_zero]
+    else
+      let b := decide (n % 2 = 1)
+      let m := n / 2
+      have h_bit : n = Nat.bit b m := by
+        unfold Nat.bit; dsimp [b, m]
+        by_cases h_odd : n % 2 = 1
+        · --
+          simp_all only [decide_true, cond_true]
+          rw [← h_odd]
+          exact (Nat.div_add_mod n 2).symm
+        · have h_even : n % 2 = 0 := Nat.mod_two_eq_zero_or_one n |>.resolve_right h_odd
+          simp [h_odd];
+          conv =>
+            lhs
+            apply (Nat.div_add_mod n 2).symm
+          simp only [h_even, add_zero]
 
-/-- Convert pure projective back to affine coordinates (X/Z, Y/Z).
-    Returns raw values, not a Point structure. -/
-def to_affine_vals (P : PureProjective) : CurveField × CurveField :=
-  (P.X * P.Z⁻¹, P.Y * P.Z⁻¹)
+      rw [h_bit]
+      have h_fold :
+        (Nat.binaryRec 0 (fun b x acc ↦ if b = true then acc + acc + P else acc + acc) m) = fast_mul m P := rfl
+      have v_fold :
+        (Nat.binaryRec (0, 1) (fun b x acc ↦ let acc2 := add_coords Ed25519 acc acc; if b = true then add_coords Ed25519 acc2 (P.x, P.y) else acc2) m) = fast_mul_vals m (P.x, P.y) := rfl
+      rw [Nat.binaryRec_eq, Nat.binaryRec_eq]
+      · --
+        rw [h_fold, v_fold]
+        have h_lt : m < n := Nat.div_lt_self (Nat.pos_of_ne_zero h0) (by decide)
+        specialize ih m h_lt P
+        cases h_b : b
+        · -- Case: b = false
+          simp only [Bool.false_eq_true, ↓reduceIte]
+          refine ⟨?_, ?_⟩
+          · -- Prove X coordinates match
+            rw [(add_def _ _).1]
+            simp only [ih.1, ih.2]
+          · -- Prove Y coordinates match
+            rw [(add_def _ _).2]
+            simp only [ih.1, ih.2]
+        · -- Case: b = true
+          simp only [↓reduceIte]
+          refine ⟨?_, ?_⟩
+          · -- Prove X coordinates match
+            rw [(add_def (fast_mul m P + fast_mul m P) P).1]
+            rw [(add_def (fast_mul m P) (fast_mul m P)).1, (add_def (fast_mul m P) (fast_mul m P)).2]
+            simp only [ih.1, ih.2]
+          · -- Prove Y coordinates match
+            rw [(add_def (fast_mul m P + fast_mul m P) P).2]
+            rw [(add_def (fast_mul m P) (fast_mul m P)).1, (add_def (fast_mul m P) (fast_mul m P)).2]
+            simp only [ih.1, ih.2]
 
-/-- Projective Addition (Unified Formula, valid for ZMod p) -/
-def add_pure (p1 p2 : PureProjective) : PureProjective :=
-  let A := p1.Z * p2.Z
-  let B := A^2
-  let C := p1.X * p2.X
-  let D := p1.Y * p2.Y
-  let E := (d : CurveField) * C * D
-  let F := B - E
-  let G := B + E
-  let X3 := A * F * ((p1.X + p1.Y) * (p2.X + p2.Y) - C - D)
-  let Y3 := A * G * (D - (-1) * C) -- a = -1
-  let Z3 := F * G
-  { X := X3, Y := Y3, Z := Z3 }
+      · simp only [Bool.false_eq_true, ↓reduceIte]; left; unfold add_coords
+        simp only [mul_one, mul_zero, add_zero, div_one, sub_zero, ne_eq, one_ne_zero,
+          not_false_eq_true, div_self]
 
-/-- Generate the bits of L non-recursively.
-  L is a 253-bit number (bit 252 is the MSB).
-  We produce [Bit 0, Bit 1, ..., Bit 252].
--/
-def L_bits_fixed : List Bool :=
-  List.range 253 |>.map (fun i => (_root_.L / 2^i) % 2 == 1)
-
-/-- List-based fast multiplication.
-  Processes the list from right (MSB) to left (LSB).
--/
-def fast_mul_list (bits : List Bool) (P : PureProjective) : PureProjective :=
-  bits.foldr (fun b acc =>
-    let acc2 := add_pure acc acc
-    if b then add_pure acc2 P else acc2)
-  { X := 0, Y := 1, Z := 1 }
-
-/--
-  The Bridge Theorem:
-  Connects the abstract scalar multiplication to our explicit list-based one.
--/
-theorem pure_proj_list_eq (n : Nat) (P : Point Ed25519) :
-    (n • P).x = (to_affine_vals (fast_mul_list L_bits_fixed { X := P.x, Y := P.y, Z := 1 })).1 ∧
-    (n • P).y = (to_affine_vals (fast_mul_list L_bits_fixed { X := P.x, Y := P.y, Z := 1 })).2 := by
-  -- We admit the structural equivalence for this calculation check.
-  sorry
-
+      simp only [Bool.false_eq_true, ↓reduceIte, add_zero, true_or]
 
 
 theorem basepoint_order : _root_.L • basepoint = 0 := by
-  have h_bridge := pure_proj_list_eq _root_.L basepoint
-  -- Define the bits of L and the starting point
-  let P_pure : PureProjective := { X := basepoint_x, Y := basepoint_y, Z := 1 }
+  rw [fast_mul_eq]
   apply Point.ext
-  · -- Case X:
-    rw [h_bridge.1]
-    change (to_affine_vals (fast_mul_list L_bits_fixed P_pure)).1 = 0
-
-    conv in L_bits_fixed =>
-      unfold L_bits_fixed
-      -- This reduces the map and range into a concrete list of booleans.
-      norm_num
-
-    unfold to_affine_vals fast_mul_list add_pure P_pure basepoint_x basepoint_y
-    simp only [d]
-    let P_res := fast_mul_list L_bits_fixed P_pure
-
-    have h_calc : P_res.X = 0 ∧ P_res.Y = P_res.Z ∧ P_res.Z ≠ 0 := by
-      unfold P_res
-      conv in L_bits_fixed => reduce
-      dsimp only [P_pure, basepoint_x, basepoint_y, d, Ed25519]
-      refine ⟨?_, ?_, ?_⟩
-      · -- case a
-        
-        sorry
-      · -- case b
-        sorry
-      · -- case c
-        sorry
-
+  · -- Check X coordinate
+    rw [(fast_mul_vals_eq _ _).1]
+    unfold fast_mul_vals _root_.L basepoint
+    simp only [basepoint_x, basepoint_y, zero_x]
+    simp only [Nat.reducePow, Nat.reduceAdd]
     sorry
-  · --
+  · -- Check X coordinate
+    rw [(fast_mul_vals_eq _ _).2]
+    unfold fast_mul_vals _root_.L basepoint
+    simp only [basepoint_x, basepoint_y, zero_y]
+    simp only [Nat.reducePow, Nat.reduceAdd]
     sorry
-
 
 
 end Ed25519_Constants
