@@ -18,10 +18,10 @@ git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
 rev = "7bca497325725acad61a7dfd2df5042aaf6b4fc4"
 
-# [[require]]
-# name = "PrimeCert"
-# git = "https://github.com/kckennylau/PrimeCert.git"
-# rev = "3df9b66"
+[[require]]
+name = "PrimeCert"
+git = "https://github.com/oliver-butterley/PrimeCert.git"
+rev = "ef2148a816e1e8d534c8446dac7f2dafcb4b4888"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
