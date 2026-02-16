@@ -1,5 +1,6 @@
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Funs.FunsAdditions
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
