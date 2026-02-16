@@ -34,7 +34,7 @@ natural language specs:
 - The value of constants.EDWARDS_D2 when converted to a natural number equals
   the canonical (reduced) representation of 2*d (mod p) in [0, p-1].
 -/
-@[progress]
+@[simp]
 theorem EDWARDS_D2_spec : Field51_as_Nat EDWARDS_D2 =  (2 * d) % p := by
   unfold EDWARDS_D2
   decide

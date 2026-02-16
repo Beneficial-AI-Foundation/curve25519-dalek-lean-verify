@@ -32,7 +32,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.L`**:
 - The value of constants.L when converted to a natural number equals L
 -/
-@[progress]
+@[simp]
 theorem L_spec : Scalar52_as_Nat L = _root_.L := by
   unfold L
   decide
@@ -40,8 +40,7 @@ theorem L_spec : Scalar52_as_Nat L = _root_.L := by
 -- Helper lemma to bound the limbs of L without unfolding it everywhere
 lemma L_limbs_spec (i : Usize) (h : i.val < 5) :
     (constants.L[i.val]!).val < 2 ^ 52 := by
-  unfold constants.L constants.L_body
-  simp only [eval_global]
+  unfold constants.L
   rcases h_idx : i.val with _ | _ | _ | _ | _ | n <;> try decide
   rw [h_idx] at h
   contradiction
