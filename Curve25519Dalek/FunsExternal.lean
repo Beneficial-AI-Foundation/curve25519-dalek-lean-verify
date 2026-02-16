@@ -1,11 +1,79 @@
 -- [curve25519_dalek]: external functions.
 import Aeneas
 import Curve25519Dalek.Types
--- import Mathlib
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
 namespace curve25519_dalek
+
+/- [core::result::{core::result::Result<T, E>}::map]:
+   Source: '/rustc/library/core/src/result.rs', lines 831:4-833:53
+   Name pattern: [core::result::{core::result::Result<@T, @E>}::map] -/
+@[rust_fun "core::result::{core::result::Result<@T, @E>}::map"]
+axiom core.result.Result.map
+  {T : Type} {E : Type} {U : Type} {F : Type} (opsfunctionFnOnceFTupleTUInst :
+  core.ops.function.FnOnce F T U) :
+  core.result.Result T E → F → Result (core.result.Result U E)
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::index_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 660:4-660:51
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
+    Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::index]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:39
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
+axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index
+  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T)
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_unchecked_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked_mut
+  {T : Type} :
+  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
+    T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_unchecked]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked
+  {T : Type} :
+  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
+    (Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:57
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
+axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
+    (Option (Slice T) → Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:45
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
+axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result (Option (Slice T))
 
 /- Convenience definitions for Choice values -/
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
@@ -445,6 +513,12 @@ axiom backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement
   backend.serial.u64.field.FieldElement51 →
     backend.serial.u64.field.FieldElement51 → Result Bool
 
+/- [curve25519_dalek::field::{core::cmp::Eq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/field.rs', lines 84:0-84:27 -/
+axiom
+  backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : backend.serial.u64.field.FieldElement51 → Result Unit
+
 /- [curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::ne]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1 -/
 axiom scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne
@@ -553,5 +627,95 @@ axiom montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional
   :
   montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
     → Result montgomery.ProjectivePoint
+
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1 -/
+axiom
+  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  edwards.affine.AffinePoint → edwards.affine.AffinePoint → subtle.Choice
+    → Result (edwards.affine.AffinePoint × edwards.affine.AffinePoint)
+
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1 -/
+axiom
+  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  edwards.affine.AffinePoint → edwards.affine.AffinePoint → subtle.Choice
+    → Result edwards.affine.AffinePoint
+
+/- [curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::ne]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 47:0-51:1 -/
+axiom edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.ne
+  : edwards.affine.AffinePoint → edwards.affine.AffinePoint → Result Bool
+
+/- [curve25519_dalek::edwards::affine::{core::cmp::Eq for curve25519_dalek::edwards::affine::AffinePoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 53:0-53:26 -/
+axiom edwards.affine.AffinePoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : edwards.affine.AffinePoint → Result Unit
+
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::CompressedEdwardsY> for curve25519_dalek::edwards::CompressedEdwardsY}::ne]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 172:26-172:35 -/
+axiom edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.ne
+  : edwards.CompressedEdwardsY → edwards.CompressedEdwardsY → Result Bool
+
+/- [curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 478:0-487:1 -/
+axiom edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  edwards.EdwardsPoint → edwards.EdwardsPoint → subtle.Choice → Result
+    (edwards.EdwardsPoint × edwards.EdwardsPoint)
+
+/- [curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 478:0-487:1 -/
+axiom
+  edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  edwards.EdwardsPoint → edwards.EdwardsPoint → subtle.Choice → Result
+    edwards.EdwardsPoint
+
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::ne]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 506:0-510:1 -/
+axiom edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.ne
+  : edwards.EdwardsPoint → edwards.EdwardsPoint → Result Bool
+
+/- [curve25519_dalek::edwards::{core::cmp::Eq for curve25519_dalek::edwards::EdwardsPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 512:0-512:27 -/
+axiom edwards.EdwardsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : edwards.EdwardsPoint → Result Unit
+
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::CompressedRistretto> for curve25519_dalek::ristretto::CompressedRistretto}::ne]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 220:26-220:35 -/
+axiom
+  ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.ne
+  :
+  ristretto.CompressedRistretto → ristretto.CompressedRistretto → Result
+    Bool
+
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::ne]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 858:0-862:1 -/
+axiom ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.ne
+  : ristretto.RistrettoPoint → ristretto.RistrettoPoint → Result Bool
+
+/- [curve25519_dalek::ristretto::{core::cmp::Eq for curve25519_dalek::ristretto::RistrettoPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 881:0-881:29 -/
+axiom ristretto.RistrettoPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : ristretto.RistrettoPoint → Result Unit
+
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
+axiom
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
+    Result (ristretto.RistrettoPoint × ristretto.RistrettoPoint)
+
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
+axiom
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
+    Result ristretto.RistrettoPoint
 
 end curve25519_dalek
