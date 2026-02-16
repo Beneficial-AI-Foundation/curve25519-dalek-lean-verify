@@ -297,4 +297,177 @@ theorem add_def (p1 p2 : Point Ed25519) :
   (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
   exact Prod.mk_inj.mp rfl
 
+/-! ### Ed25519 Basepoint Definition & Order Proof -/
+
+section Ed25519_Constants
+open curve25519_dalek.edwards curve25519_dalek.backend.serial.u64.field
+open curve25519_dalek.backend.serial.curve_models
+
+-- Derived from RFC 8032
+def basepoint_x : F :=
+  15112221349535400772501151409588531511454012693041857206046113283949847762202
+
+-- Y = 4/5 mod p
+def basepoint_y : F :=
+  46316835694926478169428394003475163141307993866256225615783033603165251855960
+
+/-- The Standard Basepoint. -/
+def basepoint : Point Ed25519 := {
+  x := basepoint_x
+  y := basepoint_y
+  on_curve := by
+    unfold Ed25519
+    try decide
+}
+
+/-- A "Double-and-Add" implementation. -/
+def fast_mul (n : Nat) (P : Point Ed25519) : Point Ed25519 :=
+  n.binaryRec 0 (fun b _ acc =>
+    if b then acc + acc + P else acc + acc)
+
+/-- A version of fast_mul that works purely on coordinates (CurveField × CurveField). -/
+def fast_mul_vals (n : Nat) (P : CurveField × CurveField) : CurveField × CurveField :=
+  n.binaryRec (0, 1) (fun b _ acc =>
+    -- 1. Double the accumulator
+    let acc2 := add_coords Ed25519 acc acc
+    -- 2. Add P if the bit is true
+    if b then add_coords Ed25519 acc2 P else acc2)
+
+
+-- Proves that for this specific curve, fast_mul matches standard multiplication.
+theorem fast_mul_eq (n : Nat) (P : Point Ed25519) : n • P = fast_mul n P := by
+  induction n using Nat.strong_induction_on generalizing P with
+  | h n ih =>
+    unfold fast_mul
+    by_cases h0 : n = 0
+    · simp [h0]
+    · -- Decompose 'n' into 'Nat.bit' form so binaryRec_eq triggers
+      let b := decide (n % 2 = 1)
+      let m := n / 2
+
+      -- Prove n = Nat.bit b m
+      have h_bit : n = Nat.bit b m := by
+        unfold Nat.bit
+        dsimp [b, m]
+        by_cases h_odd : n % 2 = 1
+        · simp_all only [decide_true, cond_true]; rw [← h_odd]
+          exact (Nat.div_add_mod n 2).symm
+        · simp_all only [Nat.mod_two_not_eq_one, zero_ne_one, decide_false, cond_false]
+          conv =>
+            lhs
+            apply (Nat.div_add_mod n 2).symm
+          simp only [h_odd]
+          simp_all only [add_zero]
+
+      -- Rewrite 'n' inside fast_mul (which is binaryRec)
+      conv_rhs => arg 3; rw [h_bit]
+
+      -- Now binaryRec_eq works!
+      rw [Nat.binaryRec_eq]
+      · --
+        change n • P = if b then fast_mul m P + fast_mul m P + P else fast_mul m P + fast_mul m P
+        have h_lt : m < n := Nat.div_lt_self (Nat.pos_of_ne_zero h0) (by decide)
+        rw [← ih m h_lt]
+        -- Case Analysis on b (Odd vs Even)
+        cases h : b
+        · -- Even
+          simp only [Bool.false_eq_true, ↓reduceIte]
+          nth_rewrite 1 [h_bit]
+          simp only [Nat.bit, h, cond_false]
+          rw [mul_smul, two_smul]
+        · -- Odd
+          simp only [↓reduceIte]
+          nth_rewrite 1 [h_bit]
+          simp only [Nat.bit, h, cond_true]
+          rw [add_smul, one_smul, mul_smul, two_smul, add_assoc]
+
+      · -- Consistency check for binaryRec
+        simp only [Bool.false_eq_true, ↓reduceIte, add_zero, true_or]
+
+/-- Bridge: The coordinates of `fast_mul` on a Point
+  are exactly the result of `fast_mul_vals` on its coordinates.
+-/
+theorem fast_mul_vals_eq (n : Nat) (P : Point Ed25519) :
+    (fast_mul n P).x = (fast_mul_vals n (P.x, P.y)).1 ∧
+    (fast_mul n P).y = (fast_mul_vals n (P.x, P.y)).2 := by
+  induction n using Nat.strong_induction_on generalizing P with
+  | h n ih =>
+    unfold fast_mul fast_mul_vals
+    if h0 : n = 0 then
+      simp [h0, Nat.binaryRec_zero]
+    else
+      let b := decide (n % 2 = 1)
+      let m := n / 2
+      have h_bit : n = Nat.bit b m := by
+        unfold Nat.bit; dsimp [b, m]
+        by_cases h_odd : n % 2 = 1
+        · --
+          simp_all only [decide_true, cond_true]
+          rw [← h_odd]
+          exact (Nat.div_add_mod n 2).symm
+        · have h_even : n % 2 = 0 := Nat.mod_two_eq_zero_or_one n |>.resolve_right h_odd
+          simp [h_odd];
+          conv =>
+            lhs
+            apply (Nat.div_add_mod n 2).symm
+          simp only [h_even, add_zero]
+
+      rw [h_bit]
+      have h_fold :
+        (Nat.binaryRec 0 (fun b x acc ↦ if b = true then acc + acc + P else acc + acc) m) = fast_mul m P := rfl
+      have v_fold :
+        (Nat.binaryRec (0, 1) (fun b x acc ↦ let acc2 := add_coords Ed25519 acc acc; if b = true then add_coords Ed25519 acc2 (P.x, P.y) else acc2) m) = fast_mul_vals m (P.x, P.y) := rfl
+      rw [Nat.binaryRec_eq, Nat.binaryRec_eq]
+      · --
+        rw [h_fold, v_fold]
+        have h_lt : m < n := Nat.div_lt_self (Nat.pos_of_ne_zero h0) (by decide)
+        specialize ih m h_lt P
+        cases h_b : b
+        · -- Case: b = false
+          simp only [Bool.false_eq_true, ↓reduceIte]
+          refine ⟨?_, ?_⟩
+          · -- Prove X coordinates match
+            rw [(add_def _ _).1]
+            simp only [ih.1, ih.2]
+          · -- Prove Y coordinates match
+            rw [(add_def _ _).2]
+            simp only [ih.1, ih.2]
+        · -- Case: b = true
+          simp only [↓reduceIte]
+          refine ⟨?_, ?_⟩
+          · -- Prove X coordinates match
+            rw [(add_def (fast_mul m P + fast_mul m P) P).1]
+            rw [(add_def (fast_mul m P) (fast_mul m P)).1, (add_def (fast_mul m P) (fast_mul m P)).2]
+            simp only [ih.1, ih.2]
+          · -- Prove Y coordinates match
+            rw [(add_def (fast_mul m P + fast_mul m P) P).2]
+            rw [(add_def (fast_mul m P) (fast_mul m P)).1, (add_def (fast_mul m P) (fast_mul m P)).2]
+            simp only [ih.1, ih.2]
+
+      · simp only [Bool.false_eq_true, ↓reduceIte]; left; unfold add_coords
+        simp only [mul_one, mul_zero, add_zero, div_one, sub_zero, ne_eq, one_ne_zero,
+          not_false_eq_true, div_self]
+
+      simp only [Bool.false_eq_true, ↓reduceIte, add_zero, true_or]
+
+
+theorem basepoint_order : _root_.L • basepoint = 0 := by
+  rw [fast_mul_eq]
+  apply Point.ext
+  · -- Check X coordinate
+    rw [(fast_mul_vals_eq _ _).1]
+    unfold fast_mul_vals _root_.L basepoint
+    simp only [basepoint_x, basepoint_y, zero_x]
+    simp only [Nat.reducePow, Nat.reduceAdd]
+    sorry
+  · -- Check X coordinate
+    rw [(fast_mul_vals_eq _ _).2]
+    unfold fast_mul_vals _root_.L basepoint
+    simp only [basepoint_x, basepoint_y, zero_y]
+    simp only [Nat.reducePow, Nat.reduceAdd]
+    sorry
+
+
+end Ed25519_Constants
+
 end Edwards

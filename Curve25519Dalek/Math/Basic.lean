@@ -64,6 +64,9 @@ def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
 
+-- Primality of L = 2^252 + 27742317777372353535851937790883648493
+instance : Fact (Nat.Prime L) := ⟨PrimeCert.prime_ed25519_order⟩
+
 namespace Edwards
 
 /-- The finite field F_p where p = 2^255 - 19. -/

@@ -71,9 +71,7 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
     intro h_contra
     have h_L_mul := backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.2.1
     have h_ne_zero := backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.2.2
-    have h_L_prime : Nat.Prime L := by
-      unfold L
-      exact PrimeCert.prime_ed25519_order
+    have h_L_prime : Nat.Prime L := Fact.out
     have h_order_eq_L : addOrderOf (backend.serial.u64.constants.ED25519_BASEPOINT_POINT.toPoint) = L :=
       (h_L_prime.eq_one_or_self_of_dvd _ (addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_L_mul)).resolve_left
       (fun h => h_ne_zero (AddMonoid.addOrderOf_eq_one_iff.mp h))
