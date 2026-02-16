@@ -20,7 +20,7 @@ y = (u-1)/(u+1), followed by Edwards decompression with a specified sign bit giv
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-
@@ -55,8 +55,7 @@ where p = 2^255 - 19
 -/
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
-    ∃ opt_e,
-    to_edwards mp sign = ok opt_e ∧
+    spec (to_edwards mp sign) (fun opt_e =>
     let u := U8x32_as_Nat mp
 
     ((u + 1) % p = 0 → opt_e = none) ∧
@@ -69,7 +68,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
        let y := Field51_as_Nat e.Y
 
        y * (u + 1) % p = (u - 1) % p ∧
-       (x_sign.val = 1#u8 ↔ sign.val.testBit 0))) := by
+       (x_sign.val = 1#u8 ↔ sign.val.testBit 0)))) := by
 
     sorry
 

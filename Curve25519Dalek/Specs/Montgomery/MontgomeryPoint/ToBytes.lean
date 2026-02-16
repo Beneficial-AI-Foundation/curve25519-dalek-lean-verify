@@ -29,7 +29,7 @@ This function converts a MontgomeryPoint to its 32-byte array representation.
 • Mathematical property: bytesToField(result) = bytesToField(self)
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-- **Spec and proof for `montgomery.MontgomeryPoint.to_bytes`**:
@@ -43,10 +43,9 @@ Formal specification:
 -/
 @[progress]
 theorem to_bytes_spec (mp : montgomery.MontgomeryPoint) :
-    ∃ result,
-    montgomery.MontgomeryPoint.to_bytes mp = ok result ∧
-    result = mp := by
+    spec (montgomery.MontgomeryPoint.to_bytes mp) (fun result =>
+    result = mp) := by
   unfold montgomery.MontgomeryPoint.to_bytes
-  exists mp
+  simp
 
 end curve25519_dalek.montgomery.MontgomeryPoint

@@ -5,7 +5,7 @@ import Curve25519Dalek.Funs
 The main statement concerning `m` is `m_spec` (below).
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open backend.serial.u64.scalar
 
@@ -20,8 +20,8 @@ namespace curve25519_dalek.backend.serial.u64.scalar
 - The result equals the product of the two input values -/
 @[progress]
 theorem m_spec (x y : U64) :
-    ∃ result, m x y = ok (result) ∧
-    result.val = x.val * y.val := by
+    spec (m x y) (fun result =>
+    result.val = x.val * y.val) := by
   unfold m
   progress*
   -- BEGIN TASK
