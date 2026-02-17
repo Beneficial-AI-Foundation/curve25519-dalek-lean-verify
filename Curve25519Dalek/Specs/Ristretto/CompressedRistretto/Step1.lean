@@ -131,10 +131,75 @@ theorem step_1_spec (c : CompressedRistretto) :
       simp [U8x32_as_Nat_injective h_nat_eq]
   · simp only [math.is_negative, backend.serial.u64.field.FieldElement51.toField, beq_iff_eq]
     exact hneg
-  · -- goal: decompress_step1 a = some s.toField → ct_flag.val = 1#u8 ∧ neg_flag.val = 0#u8
-    
-    sorry
-  · -- goal: ct_flag.val = 1#u8 ∧ neg_flag.val = 0#u8 → decompress_step1 a = some s.toField
-    sorry
+  · -- forward bridge: decompress_step1 a = some s.toField → flags
+    intro h_dec
+    simp only [decompress_step1] at h_dec
+    split_ifs at h_dec with h_cond
+    -- pos case (none = some) auto-closed; neg case remains:
+    rw [Bool.or_eq_true, not_or] at h_cond
+    obtain ⟨h1, h2⟩ := h_cond
+    rw [decide_eq_true_eq, not_le] at h1
+    rw [bne_iff_ne, not_not] at h2
+    have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
+    have h_lt_255 : U8x32_as_Nat a < 2 ^ 255 := lt_trans h1 p_lt_pow255
+    have h_arr_eq : s_bytes = a := by
+      have h_cong : U8x32_as_Nat s_bytes ≡ U8x32_as_Nat a [MOD p] := by
+        have := hbc1.trans hs; rwa [Nat.mod_eq_of_lt h_lt_255] at this
+      have h_nat_eq : U8x32_as_Nat s_bytes = U8x32_as_Nat a := by
+        rw [Nat.ModEq, Nat.mod_eq_of_lt hbc2, Nat.mod_eq_of_lt h1] at h_cong; exact h_cong
+      exact U8x32_as_Nat_injective h_nat_eq
+    constructor
+    · -- ct_flag.val = 1#u8
+      have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by
+        cases ct_flag; simp [Choice.one]
+      rw [val_iff]; subst hs2; rw [hct, h_arr_eq]
+    · -- neg_flag.val = 0#u8
+      have h_mod_eq : Field51_as_Nat s % p = U8x32_as_Nat a := by
+        have : Field51_as_Nat s ≡ U8x32_as_Nat a [MOD p] := by
+          have := hs; rwa [Nat.mod_eq_of_lt h_lt_255] at this
+        rw [Nat.ModEq, Nat.mod_eq_of_lt h1] at this; exact this
+      have h_not_neg : ¬(neg_flag.val = 1#u8) := by
+        rw [hneg, h_mod_eq, h2]; decide
+      cases neg_flag.valid with
+      | inl h => exact h
+      | inr h => exact absurd h h_not_neg
+  · -- backward bridge: flags → decompress_step1 a = some s.toField
+    intro ⟨h_ct, h_neg⟩
+    -- Derive U8x32_as_Nat a < p from h_ct (via round-trip: ct_flag → s_bytes = a → hbc2)
+    have h_lt : U8x32_as_Nat a < p := by
+      have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by
+        cases ct_flag; simp [Choice.one]
+      subst hs2
+      have h_slice_eq := hct.mp (val_iff.mp h_ct)
+      have h_arr_eq : s_bytes = a := by
+        have h_lists : s_bytes.val = a.val := by
+          have := congrArg Subtype.val h_slice_eq
+          simp [Aeneas.Std.Array.to_slice] at this; exact this
+        exact Subtype.eq h_lists
+      rw [← h_arr_eq]; exact hbc2
+    have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
+    have h_lt_255 : U8x32_as_Nat a < 2 ^ 255 := lt_trans h_lt p_lt_pow255
+    -- Derive U8x32_as_Nat a % 2 = 0 from h_neg (via parity chain)
+    have h_even : U8x32_as_Nat a % 2 = 0 := by
+      have h_not_neg : ¬(neg_flag.val = 1#u8) := by rw [h_neg]; decide
+      have h_mod_eq : Field51_as_Nat s % p = U8x32_as_Nat a := by
+        have : Field51_as_Nat s ≡ U8x32_as_Nat a [MOD p] := by
+          have := hs; rwa [Nat.mod_eq_of_lt h_lt_255] at this
+        rw [Nat.ModEq, Nat.mod_eq_of_lt h_lt] at this; exact this
+      have h_parity_ne_1 : ¬(Field51_as_Nat s % p % 2 = 1) := mt hneg.mpr h_not_neg
+      rw [h_mod_eq] at h_parity_ne_1; omega
+    -- Show decompress_step1 a = some s.toField
+    simp only [decompress_step1]
+    split_ifs with h_cond
+    · exfalso
+      rw [Bool.or_eq_true] at h_cond
+      rcases h_cond with h | h
+      · rw [decide_eq_true_eq] at h; exact absurd h (not_le.mpr h_lt)
+      · rw [bne_iff_ne] at h; exact absurd h_even h
+    · -- value match: (↑(U8x32_as_Nat a) : ZMod p) = s.toField
+      have h_cong : Field51_as_Nat s ≡ U8x32_as_Nat a [MOD p] := by
+        have := hs; rwa [Nat.mod_eq_of_lt h_lt_255] at this
+      simp only [Option.some.injEq, backend.serial.u64.field.FieldElement51.toField]
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr h_cong.symm
 
 end curve25519_dalek.ristretto.decompress
