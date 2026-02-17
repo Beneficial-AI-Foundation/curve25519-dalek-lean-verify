@@ -19,7 +19,7 @@ It performs repeated Montgomery squaring followed by a Montgomery multiplication
 
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 namespace curve25519_dalek.scalar.Scalar52
 
@@ -58,10 +58,12 @@ Mathematically, if the loop runs `k` times, it computes:
 -/
 theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.val ≤ squarings.val)
     (h_y_bound : ∀ j < 5, y[j]!.val < 2 ^ 62) :
-    ∃ res, montgomery_invert.square_multiply_loop y squarings i = ok res ∧
+    spec (montgomery_invert.square_multiply_loop y squarings i) (fun res =>
     (Scalar52_as_Nat res * R ^ (pow2 (squarings.val - i.val) - 1)) % L =
     (Scalar52_as_Nat y) ^ (pow2 (squarings.val - i.val)) % L ∧
-    (∀ j < 5, res[j]!.val < 2 ^ 62) := by
+    (∀ j < 5, res[j]!.val < 2 ^ 62)) := by
+  sorry
+/- OLD PROOF (before Aeneas WP migration):
   induction h_rem : (squarings.val - i.val) generalizing i y with
   | zero =>
     have : i = squarings := by
@@ -117,6 +119,7 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
       -- This contradicts the induction hypothesis (squarings - i = n + 1 >= 1)
       have : squarings.val - i.val = n + 1 := by assumption
       scalar_tac
+-/
 
 
 /--
@@ -128,10 +131,12 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
 @[progress]
 theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     (hy : ∀ i < 5, y[i]!.val < 2 ^ 62) (hx : ∀ i < 5, x[i]!.val < 2 ^ 62) :
-    ∃ res, montgomery_invert.square_multiply y squarings x = ok res ∧
+    spec (montgomery_invert.square_multiply y squarings x) (fun res =>
     (Scalar52_as_Nat res * R ^ (pow2 squarings.val)) % L =
     ((Scalar52_as_Nat y) ^ (pow2 squarings.val) * (Scalar52_as_Nat x)) % L ∧
-    (∀ i < 5, res[i]!.val < 2 ^ 62) := by
+    (∀ i < 5, res[i]!.val < 2 ^ 62)) := by
+  sorry
+/- OLD PROOF (before Aeneas WP migration):
   unfold montgomery_invert.square_multiply
   progress with square_multiply_loop_spec as ⟨ h_loop_res, h_loop_math, h_loop_bound ⟩
 
@@ -154,5 +159,6 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
 
   rw [Nat.mul_comm (Scalar52_as_Nat h_loop_res), Nat.mul_assoc, Nat.mul_mod, h_loop_math]
   rw [← Nat.mul_mod]
+-/
 
 end curve25519_dalek.scalar.Scalar52

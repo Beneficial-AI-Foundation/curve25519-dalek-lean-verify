@@ -51,7 +51,6 @@ natural language specs:
       basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
       is equivalent to saying that the difference between both points is not in E[4])
 -/
-@[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
     RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
     RISTRETTO_BASEPOINT_POINT.IsValid ∧

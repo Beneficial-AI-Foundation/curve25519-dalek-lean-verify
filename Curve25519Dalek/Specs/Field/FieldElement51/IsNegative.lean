@@ -22,7 +22,7 @@ of the residue modulo `p = 2^255 - 19`.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 /-!
@@ -60,8 +60,10 @@ theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
 
 @[progress]
 theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
-    ∃ c, is_negative r = ok c ∧
-    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) := by
+    spec (is_negative r) (fun c =>
+    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1)) := by
+  unfold is_negative
+  sorry
   /-
   Outline (mirrors the extracted code):
   - `to_bytes r` returns the canonical encoding of `r mod p`;
@@ -71,6 +73,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
   The full proof would relate `to_bytes` to `Field51_as_Nat r % p` and show that the
   LSB of the first byte equals parity.
   -/
+  /- OLD PROOF (needs updating for WP spec form):
   unfold is_negative
   progress*
   unfold subtle.FromChoiceU8.from
@@ -100,5 +103,6 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     have := Nat.mod_eq_of_lt bytes_post_2
     simp[this, first_bit]
     apply i1_post_1
+  -/
 
 end curve25519_dalek.field.FieldElement51

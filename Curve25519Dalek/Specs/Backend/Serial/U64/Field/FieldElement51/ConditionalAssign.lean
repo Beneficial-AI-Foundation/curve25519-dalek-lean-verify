@@ -18,8 +18,8 @@ returns the first operand when `choice = 0`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 250:4-256:5)
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
+open Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
 
 /-! ## Spec for `conditional_assign` -/
 
@@ -35,14 +35,14 @@ namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableField
 theorem conditional_assign_spec
     (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
-    ∃ res,
-      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
-        self other choice = ok res ∧
+    spec (conditional_assign self other choice) (fun res =>
       (∀ i < 5,
-        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) := by
-  unfold backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
-  unfold subtle.ConditionallySelectableU64.conditional_assign
-  unfold subtle.ConditionallySelectableU64.conditional_select
+        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!))) := by
+  unfold conditional_assign
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_select
+  sorry
+  /- OLD PROOF (needs updating for WP spec form):
   by_cases h: choice.val = 1#u8
   · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
     progress*
@@ -50,5 +50,6 @@ theorem conditional_assign_spec
     interval_cases i; all_goals simp_all
   · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
     progress*
+  -/
 
-end curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable

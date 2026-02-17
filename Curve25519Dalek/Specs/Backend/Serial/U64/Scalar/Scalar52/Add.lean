@@ -25,7 +25,7 @@ set_option linter.hashCommand false
 #setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -56,15 +56,15 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (hcarry : ∀ i < 5, carry.val < 2 ^ 53)
     (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)
     (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
-    ∃ sum', add_loop a b sum mask carry i = ok sum' ∧
+    spec (add_loop a b sum mask carry i) (fun sum' =>
     (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
     ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
-      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) := by
+      2 ^ (52 * i.val) * (carry.val / 2 ^ 52)) := by
   unfold add_loop
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
-  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   progress*
   · -- BEGIN TASK
     have := ha i (by scalar_tac)
@@ -98,7 +98,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     · rw [hc]
       have := Array.set_of_eq sum i5 i (by scalar_tac)
       simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
-      simp [this, i5_post_1, hmask]
+      simp_all [i5_post_1, hmask]
       grind
     · have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
       have := hsum j (by scalar_tac)
@@ -170,9 +170,9 @@ decreasing_by scalar_decr_tac
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
-    ∃ v, add a b = ok v ∧
+    spec (add a b) (fun v =>
     Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
-    Scalar52_as_Nat v < L := by
+    Scalar52_as_Nat v < L) := by
   unfold add
   progress*
   · -- BEGIN TASK
@@ -204,9 +204,6 @@ theorem add_spec (a b : Scalar52)
       _ = ∑ i ∈ Finset.Ico 0 5, (2 ^ (52 * i) * a[i]!.val + 2 ^ (52 * i) * b[i]!.val) := by grind
       _ = _ := by simp [Scalar52_as_Nat, Finset.sum_add_distrib]
     omega
-    -- END TASK
-  · -- BEGIN TASK
-    rw [constants.L_spec]
     -- END TASK
   · constructor
     · -- BEGIN TASK

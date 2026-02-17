@@ -21,7 +21,7 @@ coordinates (i.e., with X'/Z' = x and Y'/Z' = y).
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -50,8 +50,7 @@ theorem as_projective_spec_aux (q : CompletedPoint)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
   (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
   (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
-∃ proj,
-as_projective q = ok proj ∧
+spec (as_projective q) (fun proj =>
 let X := Field51_as_Nat q.X
 let Y := Field51_as_Nat q.Y
 let Z := Field51_as_Nat q.Z
@@ -65,7 +64,7 @@ Z' % p = (Z * T) % p ∧
 -- Output bounds: mul produces < 2^52
 (∀ i < 5, proj.X[i]!.val < 2 ^ 52) ∧
 (∀ i < 5, proj.Y[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, proj.Z[i]!.val < 2 ^ 52)
+(∀ i < 5, proj.Z[i]!.val < 2 ^ 52))
 := by
   unfold as_projective
   progress*
@@ -103,7 +102,7 @@ theorem as_projective_spec
 
   -- Use auxiliary spec
   obtain ⟨proj, h_run, hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩ :=
-    as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds
+    spec_imp_exists (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
 
   use proj
   constructor

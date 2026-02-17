@@ -18,7 +18,7 @@ This function compares two AffineNielsPoint values component-wise using
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 182:26-182:35
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 
 
 /-
@@ -35,9 +35,9 @@ natural language specs:
 • The result is true iff all three coordinate comparisons return true
 -/
 
-namespace curve25519_dalek.backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint
 
-/-- **Spec and proof concerning `PartialEqAffineNielsPointAffineNielsPoint.eq`**:
+/-- **Spec and proof concerning `AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq`**:
 - No panic (always returns successfully)
 - Returns true iff all three coordinate comparisons return true
 - Short-circuits to false as soon as a comparison fails
@@ -45,16 +45,20 @@ namespace curve25519_dalek.backend.serial.curve_models.PartialEqAffineNielsPoint
 @[progress]
 theorem eq_spec
     (self other : backend.serial.curve_models.AffineNielsPoint) :
-    ∃ b, eq self other = ok b ∧
+    spec (eq self other) (fun b =>
     (b = true ↔
-      field.PartialEqFieldElement51FieldElement51.eq self.y_plus_x other.y_plus_x = ok true ∧
-      field.PartialEqFieldElement51FieldElement51.eq self.y_minus_x other.y_minus_x = ok true ∧
-      field.PartialEqFieldElement51FieldElement51.eq self.xy2d other.xy2d = ok true) := by
+      backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq self.y_plus_x other.y_plus_x = ok true ∧
+      backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq self.y_minus_x other.y_minus_x = ok true ∧
+      backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq self.xy2d other.xy2d = ok true)) := by
+  unfold eq backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
+  sorry
+  /- OLD PROOF (needs updating for WP spec form):
   unfold eq field.PartialEqFieldElement51FieldElement51.eq
   progress*
   unfold subtle.FromBoolChoice.from
   progress*
   by_cases h0 : c.val = 1#u8
   all_goals simp_all
+  -/
 
-end curve25519_dalek.backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint

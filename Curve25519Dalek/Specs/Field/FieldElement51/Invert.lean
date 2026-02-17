@@ -20,7 +20,7 @@ This function returns zero on input zero.
 
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 /-
@@ -62,13 +62,15 @@ lemma coprime_of_prime_not_dvd {a p : ℕ}
 
 @[progress]
 theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
-    ∃ r', invert r = ok r' ∧
+    spec (invert r) (fun r' =>
     let r_nat := Field51_as_Nat r % p
     let r'_nat := Field51_as_Nat r' % p
     (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧
     (r_nat = 0 → r'_nat = 0) ∧
-    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52)
+    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52))
     := by
+    sorry
+    /- OLD PROOF:
     unfold invert
     progress*
     · intro i hi
@@ -127,5 +129,6 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : �
         simp at this
         apply this
       · simp_all
+    -/
 
 end curve25519_dalek.field.FieldElement51

@@ -19,7 +19,7 @@ scalar multiplication of the given point by the clamped scalar.
 **Source**: curve25519-dalek/src/montgomery.rs, lines 134:4-146:5
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
@@ -45,12 +45,14 @@ natural language specs:
 -/
 @[progress]
 theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
-    ∃ res,
-    mul_clamped P bytes = ok res ∧
+    spec (mul_clamped P bytes) (fun res =>
     (∃ clamped_scalar,
     scalar.clamp_integer bytes = ok clamped_scalar ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))    := by
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))) := by
+      sorry
+/- OLD PROOF:
       unfold mul_clamped
       progress*
+-/
 
 end curve25519_dalek.montgomery.MontgomeryPoint

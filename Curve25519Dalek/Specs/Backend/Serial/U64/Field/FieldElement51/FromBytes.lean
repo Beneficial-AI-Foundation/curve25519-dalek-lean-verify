@@ -14,7 +14,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 set_option linter.style.induction false
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open scoped BigOperators
 
 /-! ## Spec for `load8_at` -/
@@ -49,9 +49,9 @@ set_option maxHeartbeats 100000000000 in
 @[progress]
 theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
-    ∃ result, from_bytes.load8_at input i = ok result ∧
+    spec (from_bytes.load8_at input i) (fun result =>
     ∀ (j : Nat), j < 64 →
-      result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8) := by
+      result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8)) := by
   unfold from_bytes.load8_at
   progress*
   intro j hj
@@ -733,9 +733,10 @@ lemma bytes_mod255 (bytes : Array U8 32#usize) :(U8x32_as_Nat bytes % 2^255) =
 
 lemma bytes_lt (n : Nat) (bytes : Array U8 32#usize) :
   ∑ i ∈ Finset.range n, 2^(8 * i) * (bytes[i]!).val < 2^(8 * n) := by
-  induction' n with n hn
-  · simp
-  · rw [Finset.sum_range_succ]
+  induction n with
+  | zero => simp
+  | succ n hn =>
+    rw [Finset.sum_range_succ]
     have hbyte : (bytes[n]!).val < 2^8 := by
       scalar_tac
     have hbyte' := Nat.le_pred_of_lt hbyte
@@ -801,8 +802,8 @@ set_option maxHeartbeats 100000000000 in
 
 @[progress]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
-    ∃ result, from_bytes bytes = ok result ∧
-    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by
+    spec (from_bytes bytes) (fun result =>
+    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p]) := by
   unfold from_bytes
   progress*
   rw[bytes_mod255_eq]

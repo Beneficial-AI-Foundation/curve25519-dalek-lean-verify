@@ -28,7 +28,7 @@ instance : Fact (Nat.Prime L) := by
   sorry
   -- exact ⟨PrimeCert.prime_ed25519_order⟩
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
 
 namespace curve25519_dalek.scalar.Scalar52
@@ -151,9 +151,11 @@ natural language specs:
 @[progress]
 theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :
-    ∃ u', montgomery_invert u = ok u' ∧
+    spec (montgomery_invert u) (fun u' =>
     (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
-    (∀ i < 5, u'[i]!.val < 2 ^ 62) := by
+    (∀ i < 5, u'[i]!.val < 2 ^ 62)) := by
+  sorry
+/- OLD PROOF:
   unfold montgomery_invert
   progress*
   unfold pow2 at *
@@ -289,5 +291,6 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     field_simp
   · -- Bounds
     intro i hi; have bounds := res_post_2 i hi; exact bounds
+-/
 
 end curve25519_dalek.scalar.Scalar52

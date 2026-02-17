@@ -15,8 +15,12 @@ This function computes the product of two field elements.
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
+open Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.backend.serial.u64.field.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+open _root_.curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+  (mul)
+open _root_.curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
+  (mul.m mul.LOW_51_BIT_MASK)
 
 /-
 natural language description:
@@ -39,8 +43,8 @@ natural language specs:
 -/
 @[progress]
 theorem m_spec (x y : U64) :
-    ∃ r, mul.m x y = ok r ∧
-    r.val = x.val * y.val := by
+    spec (mul.m x y) (fun r =>
+    r.val = x.val * y.val) := by
   unfold mul.m
   progress*
   have : x.val < 2 ^64 := by scalar_tac
@@ -155,9 +159,9 @@ set_option maxHeartbeats 10000000000 in
 @[progress]
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
-    ∃ r, mul lhs rhs = ok r ∧
+    spec (mul lhs rhs) (fun r =>
     Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52) := by
+    (∀ i < 5, r[i]!.val < 2 ^ 52)) := by
   unfold mul
   progress*
   · -- BEGIN TASK
@@ -579,16 +583,16 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
   · -- BEGIN TASK
     simp_all
     rw[ UScalar.cast_val_eq, UScalarTy.numBits]
-    suffices h: i71.val < (2^ 64-1)/19
+    suffices h: i71.val < (2^ 64-1)/19 by
     -- END TASK
-    · -- BEGIN TASK
-      have : i71.val < 2 ^ 64 := by scalar_tac
-      have := Nat.mod_eq_of_lt this
-      rw[this]
-      have := (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
-      apply le_trans (le_of_lt this)
-      scalar_tac
-      -- END TASK
+      · -- BEGIN TASK
+        have : i71.val < 2 ^ 64 := by scalar_tac
+        have := Nat.mod_eq_of_lt this
+        rw[this]
+        have := (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
+        apply le_trans (le_of_lt this)
+        scalar_tac
+        -- END TASK
     · -- BEGIN TASK
       simp_all
       rw[Nat.shiftRight_eq_div_pow]
@@ -613,17 +617,17 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     rw[ UScalar.cast_val_eq, UScalarTy.numBits, LOW_51_BIT_MASK_spec,
     land_pow_two_sub_one_eq_mod,
     UScalar.cast_val_eq, UScalarTy.numBits]
-    suffices h: i71.val < (2^ 64 - 1 - 2^ 51)/19
-    · -- BEGIN TASK
-      have : i71.val < 2 ^ 64 := by scalar_tac
-      have := Nat.mod_eq_of_lt this
-      rw[this]
-      have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
-      have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
-      have := Nat.add_lt_add this eq1
-      apply le_trans (le_of_lt this)
-      scalar_tac
-      -- END TASK
+    suffices h: i71.val < (2^ 64 - 1 - 2^ 51)/19 by
+      · -- BEGIN TASK
+        have : i71.val < 2 ^ 64 := by scalar_tac
+        have := Nat.mod_eq_of_lt this
+        rw[this]
+        have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
+        have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
+        have := Nat.add_lt_add this eq1
+        apply le_trans (le_of_lt this)
+        scalar_tac
+        -- END TASK
     · -- BEGIN TASK
       simp_all
       rw[Nat.shiftRight_eq_div_pow]
@@ -652,32 +656,32 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     land_pow_two_sub_one_eq_mod,
     UScalar.cast_val_eq, UScalarTy.numBits,
     Nat.shiftRight_eq_div_pow]
-    suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2^ 64 - 1 --2 ^ 51 * (2^ 64 - 1 - 2^ 51)
-    · -- BEGIN TASK
-      suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 64 - 1 - 2^ 51)
+    suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2^ 64 - 1 by --2 ^ 51 * (2^ 64 - 1 - 2^ 51)
       · -- BEGIN TASK
-        have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
-        have := Nat.div_lt_of_lt_mul h
-        have := Nat.add_lt_add eq1 this
-        apply le_trans (le_of_lt this)
-        scalar_tac
-        -- END TASK
-      ·-- BEGIN TASK
-        apply lt_trans h
-        simp
-        -- END TASK
+        suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 64 - 1 - 2^ 51) by
+          · -- BEGIN TASK
+            have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
+            have := Nat.div_lt_of_lt_mul h
+            have := Nat.add_lt_add eq1 this
+            apply le_trans (le_of_lt this)
+            scalar_tac
+            -- END TASK
+        ·-- BEGIN TASK
+          apply lt_trans h
+          simp
+          -- END TASK
     · -- BEGIN TASK
-      suffices h: i71.val < ( 2^ 64 -1 )/19 - 2 ^ 51
-      · -- BEGIN TASK
-        have : i71.val < 2 ^ 64 := by scalar_tac
-        have := Nat.mod_eq_of_lt this
-        rw[this]
-        have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
-        have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
-        have := Nat.add_lt_add  this  eq1
-        apply lt_trans this
-        scalar_tac
-        -- END TASK
+      suffices h: i71.val < ( 2^ 64 -1 )/19 - 2 ^ 51 by
+        · -- BEGIN TASK
+          have : i71.val < 2 ^ 64 := by scalar_tac
+          have := Nat.mod_eq_of_lt this
+          rw[this]
+          have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
+          have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
+          have := Nat.add_lt_add  this  eq1
+          apply lt_trans this
+          scalar_tac
+          -- END TASK
       · -- BEGIN TASK
         simp_all
         rw[Nat.shiftRight_eq_div_pow]
@@ -1005,33 +1009,33 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         land_pow_two_sub_one_eq_mod,
         UScalar.cast_val_eq, UScalarTy.numBits,
         Nat.shiftRight_eq_div_pow]
-        suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 64 -1
-        ·  -- BEGIN TASK
-           suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 52 - 1 - 2^ 51)
-           · -- BEGIN TASK
-             have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
-             have := Nat.div_lt_of_lt_mul h
-             have := Nat.add_lt_add eq1 this
-             apply lt_trans this
-             scalar_tac
+        suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 64 -1 by
+          ·  -- BEGIN TASK
+             suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 52 - 1 - 2^ 51) by
+               · -- BEGIN TASK
+                 have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
+                 have := Nat.div_lt_of_lt_mul h
+                 have := Nat.add_lt_add eq1 this
+                 apply lt_trans this
+                 scalar_tac
+                 -- END TASK
+             · -- BEGIN TASK
+               apply lt_trans h
+               scalar_tac
+               -- END TASK
              -- END TASK
-           · -- BEGIN TASK
-             apply lt_trans h
-             scalar_tac
-             -- END TASK
-           -- END TASK
         · -- BEGIN TASK
-          suffices h: i71.val < ( 2^ 64 -1 )/19 - 2 ^ 51
-          · -- BEGIN TASK
-            have : i71.val < 2 ^ 64 := by scalar_tac
-            have := Nat.mod_eq_of_lt this
-            rw[this]
-            have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
-            have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
-            have := Nat.add_lt_add  this  eq1
-            apply lt_trans this
-            scalar_tac
-            -- END TASK
+          suffices h: i71.val < ( 2^ 64 -1 )/19 - 2 ^ 51 by
+            · -- BEGIN TASK
+              have : i71.val < 2 ^ 64 := by scalar_tac
+              have := Nat.mod_eq_of_lt this
+              rw[this]
+              have eq1:= (Nat.mul_lt_mul_right (by simp : 0 < 19)).mpr h
+              have := Nat.mod_lt (c0.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
+              have := Nat.add_lt_add  this  eq1
+              apply lt_trans this
+              scalar_tac
+              -- END TASK
           · -- BEGIN TASK
             simp_all
             rw[Nat.shiftRight_eq_div_pow]
@@ -1075,4 +1079,4 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         simp
         -- END TASK
 
-end curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
+end curve25519_dalek.backend.serial.u64.field.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51

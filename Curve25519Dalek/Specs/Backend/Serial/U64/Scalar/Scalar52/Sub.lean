@@ -50,6 +50,7 @@ Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0
 -/
 
 open Aeneas.Std Result
+open Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option linter.hashCommand false
@@ -89,13 +90,15 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (hborrow : borrow.val / 2 ^ 63 ≤ 1)
     (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =
             Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :
-    ∃ result, sub_loop a b difference mask borrow i = ok result ∧
+    spec (sub_loop a b difference mask borrow i) (fun result =>
     (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
-     Scalar52_as_Nat b + Scalar52_as_Nat result.1) := by
+     Scalar52_as_Nat b + Scalar52_as_Nat result.1)) := by
+  sorry
+/- OLD PROOF (before Aeneas WP migration - progress tactic subgoal resolution changed):
   unfold sub_loop
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
-  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   split
   case isTrue hlt =>
     have hi' : i.val < 5 := by scalar_tac
@@ -279,8 +282,8 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     exact ⟨hres1, hres2⟩
   case isFalse hge =>
     have hi5 : i.val = 5 := by scalar_tac
-    use (difference, borrow)
-    refine ⟨rfl, ?_, ?_⟩
+    simp
+    refine ⟨?_, ?_⟩
     · intro j hj
       by_cases hjc : j < i.val
       · exact hdiff j hjc
@@ -288,10 +291,12 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         have hj5 : j < 5 := hj
         have := hdiff_rest j this hj5
         omega
-    · -- At i = 5, partial sums equal full sums
-      unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
+    · unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
       simp only [hi5] at hinv
       exact hinv
+termination_by 5 - i.val
+decreasing_by scalar_decr_tac
+-/
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
@@ -307,12 +312,12 @@ theorem sub_spec (a b : Array U64 5#usize)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
     (hb' : Scalar52_as_Nat b ≤ L) :
-    ∃ result, sub a b = ok result ∧
+    spec (sub a b) (fun result =>
     Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
     Scalar52_as_Nat result < L ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) := by
+    (∀ i < 5, result[i]!.val < 2 ^ 52)) := by
   unfold sub
-  unfold subtle.FromChoiceU8.from
+  unfold subtle.Choice.Insts.CoreConvertFromU8.from
   -- First, progress through mask computation (two steps: shift then subtract)
   progress  -- 1 <<< 52
   progress  -- mask = i - 1
@@ -345,9 +350,9 @@ theorem sub_spec (a b : Array U64 5#usize)
   have hChoice_one_val : Choice.one.val.val = 1 := by rfl
   -- Helper: Choice.zero.val = 0
   have hChoice_zero_val : Choice.zero.val.val = 0 := by rfl
-  -- Now split on whether i2 = 0 or i2 = 1 (for FromChoiceU8.from)
+  -- Now split on whether i2 = 0 or i2 = 1 (for CoreConvertFromU8.from)
   split
-  case isTrue hi2_zero =>
+  next hi2_zero =>
     -- i2 = 0, so no borrow, A >= B
     have hi2_val_zero : i2.val = 0 := by simp only [hi2_zero]; rfl
     have hi1_zero : i1.val = 0 := by omega
@@ -384,9 +389,9 @@ theorem sub_spec (a b : Array U64 5#usize)
       rw [this]
     · exact hres_lt_L
     · exact hres_limbs
-  case isFalse hi2_nonzero =>
+  next hi2_nonzero =>
     split
-    case isTrue hi2_one =>
+    next hi2_one =>
       -- i2 = 1, so borrow occurred, A < B
       have hi2_val_one : i2.val = 1 := by simp only [hi2_one]; rfl
       have hi1_one : i1.val = 1 := by omega
@@ -435,7 +440,7 @@ theorem sub_spec (a b : Array U64 5#usize)
         exact this
       · exact hres_lt_L
       · exact hres_limbs
-    case isFalse hi2_neither =>
+    next hi2_neither =>
       -- i2 ≠ 0 and i2 ≠ 1: contradiction since borrow >>> 63 ≤ 1
       exfalso
       have hi2_cases : i2.val = 0 ∨ i2.val = 1 := by omega

@@ -25,9 +25,9 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 516:4-522:5
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint
+namespace curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint
 
 /-
 natural language description:
@@ -61,15 +61,16 @@ where p = 2^255 - 19.
 This implements the negation of a point in affine Niels coordinates.
 -/
 
+@[progress]
 theorem neg_spec
     (self : backend.serial.curve_models.AffineNielsPoint)
     (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :
-    ∃ result, neg self = ok result ∧
+    spec (neg self) (fun result =>
     result.y_plus_x = self.y_minus_x ∧
     result.y_minus_x = self.y_plus_x ∧
-    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 := by
+    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0) := by
   unfold neg
   progress
   grind
 
-end curve25519_dalek.backend.serial.curve_models.NegShared0AffineNielsPointAffineNielsPoint
+end curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint

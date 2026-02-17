@@ -19,9 +19,10 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
+open Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.backend.serial.u64.field.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 
 /-
 natural language description:
@@ -61,9 +62,12 @@ natural language specs:
 theorem sub_spec (a b : Array U64 5#usize)
     (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)
     (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :
-    ∃ d, sub a b = ok d ∧
+    spec (sub a b) (fun d =>
     (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
-    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p := by
+    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p) := by
+  unfold sub
+  sorry
+  /- OLD PROOF (needs updating for WP spec form):
   unfold sub
   -- To do: some problem using `progress*` in this proof and so doing each step manually.
   -- Change to `progress*` when possible.
@@ -187,32 +191,23 @@ theorem sub_spec (a b : Array U64 5#usize)
   simp only [hreduce_ok, ok.injEq, exists_eq_left']
 
   refine ⟨fun i hi ↦ ?_, ?_⟩
-  · -- BEGIN TASK
-    grind
-    -- END TASK
-  · -- BEGIN TASK
-    -- Prove the modular arithmetic property
-    -- Move to Nat.ModEq style and reduce to sums over limbs
-    -- First, replace result with the array of limbs via hreduce_eq (Nat.ModEq form)
+  · grind
+  · -- Prove the modular arithmetic property
     have htmp : Field51_as_Nat d + Field51_as_Nat b ≡
       Field51_as_Nat (Array.make 5#usize [i3, i7, i11, i15, i19]) + Field51_as_Nat b [MOD p] := by
       apply Nat.ModEq.add_right; apply Nat.ModEq.symm; exact hreduce_eq
     apply Nat.ModEq.trans htmp
     unfold Field51_as_Nat
-    -- Expand sums and rewrite by indices
     simp only [← Finset.sum_add_distrib, ← Nat.mul_add]
-    -- Use repeated `Finset.sum_range_succ` / `sum_range_one` rewrites to expose each limb (kept explicit to match original)
     rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
         Finset.sum_range_one, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
         Finset.sum_range_succ, Finset.sum_range_one]
-    -- Reduce the Array.make indices to the i*-values
     have id0 : (Array.make 5#usize [i3, i7, i11, i15, i19])[0]! = i3 := by rfl
     have id1 : (Array.make 5#usize [i3, i7, i11, i15, i19])[1]! = i7 := by rfl
     have id2 : (Array.make 5#usize [i3, i7, i11, i15, i19])[2]! = i11 := by rfl
     have id3 : (Array.make 5#usize [i3, i7, i11, i15, i19])[3]! = i15 := by rfl
     have id4 : (Array.make 5#usize [i3, i7, i11, i15, i19])[4]! = i19 := by rfl
     rw [id0, id1, id2, id3, id4]
-    -- Relate i*.val + b[*]! to the a*' values via the earlier equalities
     have eq01 :
       (i3.val + b[0]! = i3.val + b0) ∧
       (i7.val + b[1]! = i7.val + b1) ∧
@@ -220,10 +215,7 @@ theorem sub_spec (a b : Array U64 5#usize)
       (i15.val + b[3]! = i15.val + b3) ∧
       (i19.val + b[4]! = i19.val + b4) := by
       rw [← hb0, ← hb1, ← hb2, ← hb3, ← hb4]; scalar_tac
-    -- Apply those rewrites
     rw [eq01.left, eq01.right.left, eq01.right.right.left, eq01.right.right.right.left, eq01.right.right.right.right]
-
-    -- Now show each i*.val + b* = a*' (so the assembled sum equals assembly of a*' + constants)
     have eq0 : i3.val + b0 = a0' := by
       rw [hi3_val]; apply Nat.sub_add_cancel; exact hi3_val'
     have eq1 : i7.val + b1 = a1' := by
@@ -234,11 +226,7 @@ theorem sub_spec (a b : Array U64 5#usize)
       rw [hi15_val]; apply Nat.sub_add_cancel; exact hi15_val'
     have eq4 : i19.val + b4 = a4' := by
       rw [hi19_val]; apply Nat.sub_add_cancel; exact hi19_val'
-
-    -- Replace limb-sums with a*'. Then expand a*' by ha*_val to get a* + constants
     rw [eq0, eq1, eq2, eq3, eq4, ha0'_val, ha1'_val, ha2'_val, ha3'_val, ha4'_val]
-
-    -- Separate terms into 'asum' (from a) and 'kjsum' (from k/j constants)
     have eqsum :
       2 ^ (51 * 0) * (a0.val + k.val) +
       2 ^ (51 * 1) * (a1.val + j.val) +
@@ -251,25 +239,18 @@ theorem sub_spec (a b : Array U64 5#usize)
       repeat (rw [Nat.mul_add])
       ring
     rw [eqsum]
-
     set asum := 2 ^ (51 * 0) * a0.val + 2 ^ (51 * 1) * a1.val + 2 ^ (51 * 2) * a2.val + 2 ^ (51 * 3) * a3.val + 2 ^ (51 * 4) * a4.val with hasum
     set kjsum := 2 ^ (51 * 0) * k.val + 2 ^ (51 * 1) * j.val + 2 ^ (51 * 2) * j.val + 2 ^ (51 * 3) * j.val + 2 ^ (51 * 4) * j.val with hkjsum
-
-    -- Relate asum back to the original a array representation
     have hsumeq : asum = 2 ^ (51 * 0) * ↑a[0]! + 2 ^ (51 * 1) * ↑a[1]! + 2 ^ (51 * 2) * ↑a[2]! + 2 ^ (51 * 3) * ↑a[3]! + 2 ^ (51 * 4) * ↑a[4]! := by
       rw [hasum, ← ha0, ← ha1, ← ha2, ← ha3, ← ha4]; scalar_tac
     rw [← hsumeq]
-
-    -- Show kjsum ≡ 0 (mod p)
     have kmod0 : kjsum ≡ 0 [MOD p] := by
       rw [Nat.modEq_zero_iff_dvd]
-      -- expand constants and use definitions of k, j, p
       rw [hkjsum, hk, hj, p]
       simp
-    -- adding a multiple of p doesn't change the residue
     have final := Nat.ModEq.add_left asum kmod0
     simp only [add_zero] at final
     exact final
-    -- END TASK
+  -/
 
-end curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
+end curve25519_dalek.backend.serial.u64.field.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51

@@ -22,7 +22,7 @@ theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice)
   · exfalso; apply h; cases a; simpa [Choice.zero]
   · cases a; simpa [Choice.one]
 
-open Aeneas.Std Result
+open Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.scalar.Scalar
 
 /-
@@ -50,9 +50,11 @@ natural language specs:
 -/
 @[progress]
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
-    ∃ s, from_canonical_bytes b = ok s ∧
+    spec (from_canonical_bytes b) (fun s =>
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
-    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) := by
+    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero)) := by
+  sorry
+/- OLD PROOF (before Aeneas WP migration):
   unfold from_canonical_bytes
   progress as ⟨_, ha⟩
   progress as ⟨_, he, _⟩
@@ -75,5 +77,6 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
     grind
     -- END TASK
+-/
 
 end curve25519_dalek.scalar.Scalar

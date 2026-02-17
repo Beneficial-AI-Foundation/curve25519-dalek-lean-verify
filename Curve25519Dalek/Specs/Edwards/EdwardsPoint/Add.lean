@@ -16,8 +16,8 @@ extended twisted Edwards coordinates and the unified addition formulas.
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint
+open Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint
 
 /-
 natural language description:
@@ -41,9 +41,9 @@ natural language specs:
 -/
 @[progress]
 theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
-    ∃ result, add self other = ok result ∧
+    spec (add self other) (fun result =>
     result.IsValid ∧
-    result.toPoint = self.toPoint + other.toPoint := by
+    result.toPoint = self.toPoint + other.toPoint) := by
   sorry
 
-end curve25519_dalek.edwards.AddEdwardsPointEdwardsPointEdwardsPoint
+end curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint

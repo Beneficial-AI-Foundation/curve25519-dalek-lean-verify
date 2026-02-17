@@ -17,7 +17,7 @@ the encoding and extracting the field element s from the compressed representati
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.decompress
 
 /-
@@ -59,11 +59,10 @@ natural language specs:
 -/
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
-    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),
-    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧
+    spec (step_1 c) (fun (s_encoding_is_canonical, s_is_negative, s) =>
     (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
     (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
-    s.IsValid := by
+    s.IsValid) := by
   sorry
 
 end curve25519_dalek.ristretto.decompress
