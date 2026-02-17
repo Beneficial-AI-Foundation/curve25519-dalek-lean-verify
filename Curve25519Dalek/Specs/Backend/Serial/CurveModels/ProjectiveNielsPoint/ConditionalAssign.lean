@@ -26,9 +26,9 @@ it updates `self` such that:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 305:4-310:5
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
 
 /-
 natural language description:
@@ -63,7 +63,7 @@ the output ProjectiveNielsPoint computed by `conditional_assign self other choic
 theorem conditional_assign_spec
     (self other : backend.serial.curve_models.ProjectiveNielsPoint)
     (choice : subtle.Choice) :
-    ∃ result, conditional_assign self other choice = ok result ∧
+    spec (conditional_assign self other choice) (fun result =>
     (∀ i < 5, result.Y_plus_X[i]!.val =
       if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧
     (∀ i < 5, result.Y_minus_X[i]!.val =
@@ -71,9 +71,9 @@ theorem conditional_assign_spec
     (∀ i < 5, result.Z[i]!.val =
       if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧
     (∀ i < 5, result.T2d[i]!.val =
-      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) := by
+      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val)) := by
   unfold conditional_assign
   progress*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable

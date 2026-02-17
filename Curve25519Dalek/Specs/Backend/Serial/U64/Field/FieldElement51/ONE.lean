@@ -33,7 +33,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ONE`**:
 - The constant, when converted to a natural number, equals 1
 -/
-@[progress]
+@[simp]
 theorem ONE_spec : Field51_as_Nat ONE = 1 := by
     unfold ONE
     decide

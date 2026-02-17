@@ -1,6 +1,6 @@
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
-import Mathlib
+import Mathlib.Tactic.IntervalCases
 
 set_option linter.style.longLine false
 set_option linter.style.setOption false
@@ -11,7 +11,7 @@ set_option maxHeartbeats 1000000
 The main statement concerning `reduce` is `reduce_spec` (below).
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 open reduce
@@ -48,9 +48,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 - The result is equal to the input mod p. -/
 @[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
-    ∃ result, reduce limbs = ok result ∧
+    spec (reduce limbs) (fun result =>
     (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
-    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] := by
+    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]) := by
   unfold reduce
   progress*
   · -- BEGIN TASK

@@ -33,7 +33,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:
 - The constant, when converted to a natural number, equals 0
 -/
-@[progress]
+@[simp]
 theorem ZERO_spec : Field51_as_Nat ZERO = 0 := by
     unfold ZERO
     decide

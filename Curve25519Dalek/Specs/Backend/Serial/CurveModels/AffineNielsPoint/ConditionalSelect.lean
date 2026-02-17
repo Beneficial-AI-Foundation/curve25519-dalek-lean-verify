@@ -23,9 +23,9 @@ choice = 0, in constant time.
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 315:4-321:5
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
 
 /--
 **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.conditional_select`**:
@@ -42,15 +42,15 @@ namespace curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAf
 theorem conditional_select_spec
     (a b : backend.serial.curve_models.AffineNielsPoint)
     (choice : subtle.Choice) :
-    ∃ result, conditional_select a b choice = ok result ∧
+    spec (conditional_select a b choice) (fun result =>
     (∀ i < 5, result.y_plus_x[i]!.val =
       if choice.val = 1#u8 then b.y_plus_x[i]!.val else a.y_plus_x[i]!.val) ∧
     (∀ i < 5, result.y_minus_x[i]!.val =
       if choice.val = 1#u8 then b.y_minus_x[i]!.val else a.y_minus_x[i]!.val) ∧
     (∀ i < 5, result.xy2d[i]!.val =
-      if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) := by
+      if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val)) := by
   unfold conditional_select
   progress*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.ConditionallySelectableAffineNielsPoint
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable

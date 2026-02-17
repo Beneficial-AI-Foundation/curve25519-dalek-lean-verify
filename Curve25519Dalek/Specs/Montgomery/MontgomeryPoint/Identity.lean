@@ -17,8 +17,8 @@ which is represented as 32 zero bytes.
 **Source**: curve25519-dalek/src/montgomery.rs:L112-L117
 -/
 
-open Aeneas.Std Result curve25519_dalek
-namespace curve25519_dalek.montgomery.IdentityMontgomeryPoint
+open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
+namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity
 
 /-
 natural language description:
@@ -32,30 +32,27 @@ natural language specs:
 • Interpreted as a natural number, the result equals 0
 -/
 
-/-- **Spec and proof concerning `montgomery.IdentityMontgomeryPoint.identity`**:
+/-- **Spec and proof concerning `montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
 - No panic (always returns successfully)
 - The resulting MontgomeryPoint is 32 zero bytes
 - Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0
 -/
 @[progress]
 theorem identity_spec :
-    ∃ q, identity = ok q ∧
+    spec identity (fun q =>
     (∀ i : Fin 32, q[i]! = 0#u8) ∧
-    U8x32_as_Nat q = 0 := by
-  use Array.repeat 32#usize 0#u8
-  constructor
-  · rfl
+    U8x32_as_Nat q = 0) := by
+  unfold identity
+  suffices (∀ (i : Fin 32), (Array.repeat 32#usize 0#u8)[i] = 0#u8) ∧
+    U8x32_as_Nat (Array.repeat 32#usize 0#u8) = 0 by simpa
   constructor
   · intro i
-    -- Each byte of a zero-filled array is zero
-    simp only [Array.repeat, getElem!, List.getElem?_replicate]
-    have h : i.val < 32 := i.isLt
-    simp [h]
-  · -- Sum of zeros is zero
-    unfold U8x32_as_Nat
+    fin_cases i <;> simp_all <;> decide
+  · unfold U8x32_as_Nat
     simp only [Finset.sum_eq_zero_iff, Finset.mem_range]
     intro i hi
-    simp only [Array.repeat, getElem!,List.getElem?_replicate]
-    simp [hi]
+    have : (Array.repeat 32#usize 0#u8 : List U8)[i]!.val = 0 := by
+      interval_cases i <;> simp [Array.repeat]
+    simpa [*]
 
-end curve25519_dalek.montgomery.IdentityMontgomeryPoint
+end curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity

@@ -1,6 +1,7 @@
 import Aeneas
 import Curve25519Dalek.Math.Basic
-import Mathlib
+import Mathlib.Data.Nat.Digits.Lemmas
+import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
 set_option linter.style.longLine false
 

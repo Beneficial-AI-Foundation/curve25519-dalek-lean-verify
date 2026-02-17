@@ -22,12 +22,12 @@ This function performs the initial decompression step which:
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.constants
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.field.FieldElement51
 namespace curve25519_dalek.edwards.CompressedEdwardsY
@@ -73,7 +73,7 @@ Natural language specs:
 theorem step_1_spec (cey : edwards.CompressedEdwardsY)
   (bytes : Aeneas.Std.Array U8 32#usize)
   (h_byter : cey.as_bytes = ok bytes) :
-    ∃ result, edwards.decompress.step_1 cey = ok result ∧
+    spec (edwards.decompress.step_1 cey) (fun result =>
 
       let (is_valid_y_coord, X, Y, Z) := result
 
@@ -89,7 +89,7 @@ theorem step_1_spec (cey : edwards.CompressedEdwardsY)
         sub YY ONE = ok u ∧
         mul YY EDWARDS_D = ok fe ∧
         add fe ONE = ok v ∧
-        sqrt_ratio_i u v = ok (is_valid_y_coord, X)) := by
+        sqrt_ratio_i u v = ok (is_valid_y_coord, X))) := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

@@ -19,9 +19,9 @@ This function returns the identity element of the Edwards curve in ProjectiveNie
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs:L241-L248
 -/
 
-open Aeneas.Std Result curve25519_dalek
+open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity
 
 /-
 natural language description:
@@ -50,9 +50,9 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    ∃ q, identity = ok q ∧
-    q.Y_plus_X = ONE ∧ q.Y_minus_X = ONE ∧ q.Z = ONE ∧ q.T2d = ZERO := by
+    spec identity (fun q =>
+    q.Y_plus_X = ONE ∧ q.Y_minus_X = ONE ∧ q.Z = ONE ∧ q.T2d = ZERO) := by
   unfold identity
   simp
 
-end curve25519_dalek.backend.serial.curve_models.IdentityProjectiveNielsPoint
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity

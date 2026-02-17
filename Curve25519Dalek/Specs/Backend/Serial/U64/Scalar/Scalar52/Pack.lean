@@ -16,7 +16,7 @@ This function packs the element into a compact representation.
 Source: curve25519-dalek/src/scalar.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar
+open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
 namespace curve25519_dalek.scalar.Scalar52
 
 /-
@@ -37,9 +37,9 @@ natural language specs:
 - The packed scalar is in canonical form (less than L) -/
 @[progress]
 theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :
-    ∃ s, pack u = ok s ∧
+    spec (pack u) (fun s =>
     U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat s.bytes < L := by
+    U8x32_as_Nat s.bytes < L) := by
   unfold pack
   progress
   grind

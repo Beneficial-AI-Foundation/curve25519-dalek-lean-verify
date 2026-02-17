@@ -33,7 +33,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.EDWARDS_D`**:
 - The value of constants.EDWARDS_D when converted to a natural number equals d
 -/
-@[progress]
+@[simp]
 theorem EDWARDS_D_spec : Field51_as_Nat EDWARDS_D = d := by
   unfold EDWARDS_D
   decide
