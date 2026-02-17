@@ -52,8 +52,16 @@ axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked_mut
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index] -/
 @[rust_fun
   "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.index
-  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T)
+def core.slice.index.SliceIndexRangeFullSliceSlice.index
+  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
+  fun _ s => ok s
+
+/-- RangeFull indexing (`s[..]`) is the identity on slices. -/
+@[progress]
+theorem core.slice.index.SliceIndexRangeFullSliceSlice.index_spec
+  {T : Type} (s : Slice T) :
+  core.slice.index.SliceIndexRangeFullSliceSlice.index () s = ok s := by
+  simp [core.slice.index.SliceIndexRangeFullSliceSlice.index]
 
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 660:4-660:51
