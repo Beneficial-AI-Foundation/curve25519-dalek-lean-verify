@@ -52,11 +52,8 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     spec (montgomery_mul m m') (fun w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
     (∀ i < 5, w[i]!.val < 2 ^ 62)) := by
-  sorry
-/- OLD PROOF (before Aeneas WP migration):
   unfold montgomery_mul
   progress*
-  -- BEGIN TASK
   have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
     rw [Nat.ModEq]
     exact res_post_1
@@ -64,7 +61,5 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     rw [← a1_post_1]
   rw [Nat.ModEq]
   refine ⟨by try grind , fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
-  -- END TASK
--/
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

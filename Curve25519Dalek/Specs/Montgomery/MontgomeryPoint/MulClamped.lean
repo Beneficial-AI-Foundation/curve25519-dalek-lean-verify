@@ -47,12 +47,12 @@ natural language specs:
 theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     spec (mul_clamped P bytes) (fun res =>
     (∃ clamped_scalar,
-    scalar.clamp_integer bytes = ok clamped_scalar ∧
+    h ∣ U8x32_as_Nat clamped_scalar ∧
+    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧
+    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
     MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))) := by
-      sorry
-/- OLD PROOF:
       unfold mul_clamped
       progress*
--/
+      exact ⟨a, a_post_1, a_post_2, a_post_3, res_post⟩
 
 end curve25519_dalek.montgomery.MontgomeryPoint

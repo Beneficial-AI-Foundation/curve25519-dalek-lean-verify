@@ -42,30 +42,20 @@ natural language specs:
 - Returns true iff the u-coordinates are equal modulo p
 - Implemented via constant-time equality followed by Choice-to-Bool conversion
 -/
-/- OLD PROOF
-@[progress]
-theorem eq_spec (u v : MontgomeryPoint) :
-    ∃ b,
-    eq u v = ok b ∧
-    (b = true ↔
-      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) := by
-    unfold eq
-    progress*
-    unfold subtle.FromBoolChoice.from
-    progress*
-    simp_all
-    rw[← c_post]
-    cases c with
-    | mk val valid =>
-      simp [Choice.one]
--/
-
 @[progress]
 theorem eq_spec (u v : MontgomeryPoint) :
     spec (eq u v) (fun b =>
     (b = true ↔
       (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by
     unfold eq
-    sorry
+    progress*
+    unfold Bool.Insts.CoreConvertFromChoice.from
+    simp only [spec, theta, wp_return]
+    have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by
+      cases c with
+      | mk val valid =>
+        simp [Choice.one]
+    rw [key]
+    exact c_post
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint
