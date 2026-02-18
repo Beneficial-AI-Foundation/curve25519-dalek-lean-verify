@@ -48,43 +48,6 @@ Natural language specs:
 - Choice.one is returned iff the u-coordinates match modulo p
 - The comparison proceeds via `FieldElement51.from_bytes` and constant-time equality
 -/
-
-/- OLD PROOF
-@[progress]
-theorem ct_eq_spec (u v : MontgomeryPoint) :
-    ∃ c,
-    ct_eq u v = ok c ∧
-    (c = Choice.one ↔
-      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) := by
-  unfold ct_eq
-  progress*
-  rw[res_post]
-  have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
-      x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
-    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := to_bytes_spec x
-    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := to_bytes_spec y
-    rw [hxb_eq, hyb_eq]
-    simp only [ok.injEq]
-    have h_x_canon : U8x32_as_Nat xb = Field51_as_Nat x % p := by
-      rw [← Nat.mod_eq_of_lt hxb_lt, hxb_mod]
-    have h_y_canon : U8x32_as_Nat yb = Field51_as_Nat y % p := by
-      rw [← Nat.mod_eq_of_lt hyb_lt, hyb_mod]
-    constructor
-    · intro h_bytes
-      rw [← h_x_canon, ← h_y_canon, h_bytes]
-    · intro h_mod
-      have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat yb := by
-        rw [h_x_canon, h_y_canon]; exact h_mod
-      exact U8x32_as_Nat_injective h_nat_eq
-  have := to_bytes_iff_mod self_fe   other_fe
-  rw[this, ← Nat.ModEq]
-  constructor
-  · intro h
-    exact (self_fe_post.symm.trans  h).trans other_fe_post
-  · intro h
-    exact (self_fe_post.trans h).trans other_fe_post.symm
--/
-
 @[progress]
 theorem ct_eq_spec (u v : MontgomeryPoint) :
     spec (ct_eq u v) (fun c =>
@@ -92,6 +55,27 @@ theorem ct_eq_spec (u v : MontgomeryPoint) :
       (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by
   unfold ct_eq
   progress*
-  sorry
+  have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
+      x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
+    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := spec_imp_exists (to_bytes_spec x)
+    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := spec_imp_exists (to_bytes_spec y)
+    rw [hxb_eq, hyb_eq]
+    simp only [ok.injEq]
+    have h_x_canon : U8x32_as_Nat xb = Field51_as_Nat x % p := by
+      rw [← Nat.mod_eq_of_lt hxb_lt]; exact hxb_mod
+    have h_y_canon : U8x32_as_Nat yb = Field51_as_Nat y % p := by
+      rw [← Nat.mod_eq_of_lt hyb_lt]; exact hyb_mod
+    constructor
+    · intro h_bytes
+      rw [← h_x_canon, ← h_y_canon, h_bytes]
+    · intro h_mod
+      have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat yb := by
+        rw [h_x_canon, h_y_canon]; exact h_mod
+      exact U8x32_as_Nat_injective h_nat_eq
+  have key := res_post.trans (to_bytes_iff_mod self_fe other_fe)
+  rw [key, ← Nat.ModEq]
+  constructor
+  · intro h; exact (self_fe_post.symm.trans h).trans other_fe_post
+  · intro h; exact (self_fe_post.trans h).trans other_fe_post.symm
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq
