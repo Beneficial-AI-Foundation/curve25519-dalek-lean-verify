@@ -5,6 +5,16 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
+import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
+import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 
 /-! # Spec Theorem for `ristretto.decompress.step_2`
 
@@ -80,7 +90,8 @@ b) The Rust point `pt` must match the mathematical point `P`
 And conversely.
 -/
 @[progress]
-theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :
+theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
+    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),
     step_2 s = ok (ok1, c, c1, pt) ∧
 
@@ -95,6 +106,28 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsVal
 
     (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
       (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) := by
-  sorry
+  unfold step_2 field.FieldElement51.invsqrt subtle.ConditionallyNegatable.Blanket.conditional_negate
+  progress
+  · intro i hi; have := h_s i hi; omega
+  · rename_i ss ss_mod ss_bound
+    progress as ⟨u1⟩
+    · unfold backend.serial.u64.field.FieldElement51.ONE; try decide
+    · intro i hi; have := ss_bound i hi; omega
+    rename_i u1_bounds u1_post
+    progress as ⟨ u2 , u2_post, u2_bounds ⟩
+    · unfold backend.serial.u64.field.FieldElement51.ONE; try decide
+    · intro i hi; have := ss_bound i hi; omega
+    progress as ⟨ u3 , u3_post, u3_bounds ⟩
+    progress as ⟨ u4 , u4_post, u4_bounds ⟩
+    · unfold backend.serial.u64.constants.EDWARDS_D; try decide
+    progress as ⟨u5, u5_post, u5_bounds⟩
+    · intro i hi; have := u1_bounds i hi; omega
+    
+    sorry
+
+
+
+
+
 
 end curve25519_dalek.ristretto.decompress
