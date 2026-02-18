@@ -63,46 +63,33 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     spec (is_negative r) (fun c =>
     (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1)) := by
   unfold is_negative
-  sorry
-  /-
-  Outline (mirrors the extracted code):
-  - `to_bytes r` returns the canonical encoding of `r mod p`;
-  - `is_negative` reads the first byte and ANDs with 1, then converts to Choice.
-  Therefore, `c = 1` iff the least significant bit of the canonical encoding is 1,
-  which is equivalent to `(Field51_as_Nat r % p) mod 2 = 1`.
-  The full proof would relate `to_bytes` to `Field51_as_Nat r % p` and show that the
-  LSB of the first byte equals parity.
-  -/
-  /- OLD PROOF (needs updating for WP spec form):
-  unfold is_negative
-  progress*
-  unfold subtle.FromChoiceU8.from
+  progress as ⟨bytes, h_mod, h_lt⟩
+  progress as ⟨b0⟩
+  progress as ⟨i1, h_i1⟩
+  unfold subtle.Choice.Insts.CoreConvertFromU8.from
   simp_all
-  have : i1.val<2:= by
-   rw[i1_post_1]
-   apply Nat.mod_lt
-   simp
+  have : i1.val < 2 := by
+    rw [h_i1]
+    apply Nat.mod_lt
+    simp
   have h01 : i1.val = 0 ∨ i1.val = 1 := by
-   have :=(Nat.lt_succ_iff.mp (by simpa using this))
-   interval_cases i1.val
-   all_goals simp
+    have := Nat.lt_succ_iff.mp (by simpa using this)
+    interval_cases i1.val
+    all_goals simp
   rcases h01 with zero | one
   · progress*
     simp_all
-    rename_i h
-    rw[Nat.ModEq] at bytes_post_1
-    rw[← bytes_post_1 ]
-    have := Nat.mod_eq_of_lt bytes_post_2
-    simp[this, first_bit]
-    apply i1_post_1
+    rw [Nat.ModEq] at h_mod
+    rw [← h_mod]
+    have := Nat.mod_eq_of_lt h_lt
+    simp [this, first_bit]
+    exact h_i1
   · progress*
     simp_all
-    rename_i h
-    rw[Nat.ModEq] at bytes_post_1
-    rw[← bytes_post_1 ]
-    have := Nat.mod_eq_of_lt bytes_post_2
-    simp[this, first_bit]
-    apply i1_post_1
-  -/
+    rw [Nat.ModEq] at h_mod
+    rw [← h_mod]
+    have := Nat.mod_eq_of_lt h_lt
+    simp [this, first_bit]
+    exact h_i1
 
 end curve25519_dalek.field.FieldElement51

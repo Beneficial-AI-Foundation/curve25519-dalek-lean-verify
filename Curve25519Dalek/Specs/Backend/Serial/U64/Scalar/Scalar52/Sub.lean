@@ -94,7 +94,180 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
      Scalar52_as_Nat b + Scalar52_as_Nat result.1)) := by
-  sorry
+  unfold sub_loop
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
+  split
+  case isTrue hlt =>
+    have hi' : i.val < 5 := by scalar_tac
+    have ha_i : a[i.val]!.val < 2 ^ 52 := ha i.val hi'
+    have hb_i : b[i.val]!.val < 2 ^ 52 := hb i.val hi'
+    have hborrow_bit : borrow.val >>> 63 ≤ 1 := by
+      have hbv : borrow.val < 2 ^ 64 := by scalar_tac
+      omega
+    -- Step through the operations manually
+    progress as ⟨i1, hi1⟩  -- a[i]
+    progress as ⟨i2, hi2⟩  -- b[i]
+    progress as ⟨i3, hi3_1, hi3_2⟩  -- borrow >>> 63
+    have hi3_bound : i3.val ≤ 1 := by simp [hi3_1]; exact hborrow_bit
+    have hi2_bound : i2.val < 2 ^ 52 := by simp only [hi2]; simp_all
+    have hi4_ok : i2.val + i3.val < 2 ^ 64 := by omega
+    progress as ⟨i4, hi4⟩  -- i2 + i3
+    progress as ⟨borrow1, hborrow1⟩  -- wrapping_sub
+    progress as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
+    progress as ⟨i5, hi5_1, hi5_2⟩  -- borrow1 &&& mask
+    progress as ⟨i6, hi6⟩  -- i + 1
+    -- Set up the recursive call hypotheses
+    have hborrow1_bound : borrow1.val / 2 ^ 63 ≤ 1 := by
+      have hb1 : borrow1.val < 2 ^ 64 := by scalar_tac
+      omega
+    -- i5 = borrow1 &&& mask = borrow1 % 2^52
+    have hi5_mod : i5.val = borrow1.val % 2 ^ 52 := by
+      have hi5_eq : i5.val = (borrow1 &&& mask).val := by simp [hi5_1]
+      rw [hi5_eq]
+      have hband : (borrow1 &&& mask).val = borrow1.val &&& mask.val := by
+        simp only [HAnd.hAnd, AndOp.and, UScalar.and, UScalar.val]
+        exact BitVec.toNat_and borrow1.bv mask.bv
+      rw [hband, hmask]
+      exact Nat.and_two_pow_sub_one_eq_mod borrow1.val 52
+    have hi5_bound : i5.val < 2 ^ 52 := by
+      rw [hi5_mod]
+      exact Nat.mod_lt borrow1.val (by decide : 2 ^ 52 > 0)
+    have hdiff1 : ∀ j < i6.val, (Aeneas.Std.Array.set difference i i5)[j]!.val < 2 ^ 52 := by
+      intro j hj
+      simp only [hi6] at hj
+      by_cases hjc : j = i.val
+      · rw [hjc]
+        have := Array.set_of_eq difference i5 i (by scalar_tac)
+        simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
+        simp only [this]
+        exact hi5_bound
+      · have hj' : j < i.val := by omega
+        have hne := Array.set_of_ne difference i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq] at hne ⊢
+        have hdiff_j := hdiff j hj'
+        simp only [Array.getElem!_Nat_eq] at hdiff_j
+        simp_all
+    have hdiff1_rest : ∀ j, i6.val ≤ j → j < 5 → (Aeneas.Std.Array.set difference i i5)[j]!.val = 0 := by
+      intro j hji hj5
+      simp only [hi6] at hji
+      have hne : j ≠ i.val := by omega
+      have := Array.set_of_ne' difference i5 j i (by scalar_tac) (by omega)
+      simp only [Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
+      have hr := hdiff_rest j (by omega) hj5
+      simp only [Array.getElem!_Nat_eq] at hr
+      simp_all
+    -- Main proof: the loop invariant is preserved
+    have hinv1 : Scalar52_partial_as_Nat a i6.val + borrow1.val / 2 ^ 63 * 2 ^ (52 * i6.val) =
+                 Scalar52_partial_as_Nat b i6.val + Scalar52_partial_as_Nat (Aeneas.Std.Array.set difference i i5) i6.val := by
+      have hws : borrow1.val = (i1.val + (2^64 - i4.val)) % 2^64 := by
+        simp only [hborrow1]
+        have := U64.wrapping_sub_val_eq i1 i4
+        simp only [UScalar.size] at this
+        exact this
+      have hi1_val : i1.val = a[i.val]!.val := by
+        simp only [hi1, UScalar.val, Array.getElem!_Nat_eq]
+      have hi2_val : i2.val = b[i.val]!.val := by
+        simp only [hi2, UScalar.val, Array.getElem!_Nat_eq]
+      have hi4_val : i4.val = b[i.val]!.val + i3.val := by
+        simp only [hi4, hi2_val]
+      have hi3_eq : i3.val = borrow.val / 2^63 := by
+        simp only [hi3_1, Nat.shiftRight_eq_div_pow]
+      have hi6_eq : i6.val = i.val + 1 := by simp [hi6]
+      simp only [hi6_eq, Scalar52_partial_as_Nat]
+      simp only [Finset.range_add_one, Finset.sum_insert (Finset.notMem_range_self)]
+      have hdiff'_lt : ∀ j < i.val,
+          (Aeneas.Std.Array.set difference i i5)[j]!.val = difference[j]!.val := by
+        intro j hj
+        have h := Array.set_of_ne difference i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+        grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val, UScalar.ofNat_val]
+      have hdiff'_eq : (Aeneas.Std.Array.set difference i i5)[i.val]!.val = i5.val := by
+        have h := Array.set_of_eq difference i5 i (by scalar_tac)
+        grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val, UScalar.ofNat_val]
+      have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) * (Aeneas.Std.Array.set difference i i5)[j]!.val
+                          = ∑ j ∈ Finset.range i.val, 2^(52*j) * difference[j]!.val := by
+        apply Finset.sum_congr rfl
+        intro j hj
+        simp only [Finset.mem_range] at hj
+        rw [hdiff'_lt j hj]
+      rw [hdiff'_partial, hdiff'_eq]
+      have hinv' := hinv
+      simp only [Scalar52_partial_as_Nat] at hinv'
+      have hold_borrow : borrow.val / 2^63 = i3.val := by omega
+      have ha_bound : i1.val < 2^52 := by rw [hi1_val]; exact ha_i
+      have hb_i_bound : b[i.val]!.val < 2^52 := hb_i
+      have hi3_le : i3.val ≤ 1 := hi3_bound
+      have hi4_bound : i4.val < 2^52 + 1 := by rw [hi4_val]; omega
+      set P := 2^(52*i.val) with hP_def
+      by_cases hcase : i1.val ≥ i4.val
+      · -- Case 1: No underflow
+        have hborrow1_val : borrow1.val = i1.val - i4.val := by
+          rw [hws]
+          have h1 : i1.val + (2^64 - i4.val) = 2^64 + (i1.val - i4.val) := by omega
+          rw [h1]
+          have h2 : i1.val - i4.val < 2^64 := by omega
+          omega
+        have hborrow1_lt : borrow1.val < 2^63 := by rw [hborrow1_val]; omega
+        have hnew_borrow : borrow1.val / 2^63 = 0 := by omega
+        have hi5_val : i5.val = borrow1.val := by
+          rw [hi5_mod, hborrow1_val]
+          have h : i1.val - i4.val < 2^52 := by omega
+          exact Nat.mod_eq_of_lt h
+        simp only [hnew_borrow, zero_mul, add_zero]
+        rw [hi5_val, hborrow1_val]
+        have hlimb : a[i.val]!.val = b[i.val]!.val + i3.val + (i1.val - i4.val) := by
+          rw [← hi1_val, hi4_val]; omega
+        grind
+      · -- Case 2: Underflow occurred
+        have hi1_lt_i4 : i1.val < i4.val := by omega
+        have hborrow1_val : borrow1.val = 2^64 + i1.val - i4.val := by rw [hws]; omega
+        have hborrow1_ge : borrow1.val ≥ 2^63 := by rw [hborrow1_val]; omega
+        have hborrow1_lt_264 : borrow1.val < 2^64 := by rw [hborrow1_val]; omega
+        have hnew_borrow : borrow1.val / 2^63 = 1 := by omega
+        have hi5_val : i5.val = 2^52 + i1.val - i4.val := by
+          rw [hi5_mod, hborrow1_val]
+          have hdiff_val : i4.val - i1.val ≤ 2^52 := by omega
+          have hdpos : 0 < i4.val - i1.val := by omega
+          have heq1 : 2^64 + i1.val - i4.val = 2^64 - (i4.val - i1.val) := by omega
+          rw [heq1]
+          have heq2 : 2^64 - (i4.val - i1.val) = (2^12 - 1) * 2^52 + (2^52 - (i4.val - i1.val)) := by
+            have h : (2:ℕ)^64 = (2:ℕ)^12 * (2:ℕ)^52 := by decide
+            omega
+          rw [heq2]
+          have heq3 : (2^12 - 1) * 2^52 + (2^52 - (i4.val - i1.val)) =
+                      (2^52 - (i4.val - i1.val)) + (2^12 - 1) * 2^52 := by ring
+          rw [heq3, Nat.add_mul_mod_self_right]
+          have hlt : 2^52 - (i4.val - i1.val) < 2^52 := by omega
+          rw [Nat.mod_eq_of_lt hlt]
+          omega
+        simp only [hnew_borrow, one_mul]
+        rw [hi5_val]
+        have hpow_succ : 2^(52*(i.val + 1)) = 2^52 * P := by
+          simp only [hP_def]
+          have : 52 * (i.val + 1) = 52 + 52 * i.val := by ring
+          rw [this, Nat.pow_add]
+        rw [hpow_succ]
+        have hlimb : a[i.val]!.val + 2^52 = b[i.val]!.val + i3.val + (2^52 + i1.val - i4.val) := by
+          rw [← hi1_val, hi4_val]; omega
+        grind
+    -- Rewrite hypotheses from Array.set form to index_mut_back form
+    rw [← h_imb] at hdiff1 hdiff1_rest hinv1
+    progress as ⟨result, hres1, hres2⟩
+    exact ⟨hres1, hres2⟩
+  case isFalse hge =>
+    have hi5 : i.val = 5 := by scalar_tac
+    simp only [Aeneas.Std.WP.spec]
+    refine ⟨?_, ?_⟩
+    · intro j hj
+      by_cases hjc : j < i.val
+      · exact hdiff j hjc
+      · have : i.val ≤ j := by omega
+        have hj5 : j < 5 := hj
+        have := hdiff_rest j this hj5
+        omega
+    · unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
+      simp only [hi5] at hinv
+      exact hinv
 /- OLD PROOF (before Aeneas WP migration - progress tactic subgoal resolution changed):
   unfold sub_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index

@@ -40,15 +40,10 @@ natural language specs:
 theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
     spec (from_bytes_mod_order b) (fun s =>
     U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L) := by
-  sorry
-/- OLD PROOF (before Aeneas WP migration):
-  unfold from_bytes_mod_order scalar.IndexScalarUsizeU8.index
+  unfold from_bytes_mod_order scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index
   progress*
-  -- BEGIN TASK
   have := high_bit_zero_of_lt_L s.bytes
   simp [*] at *
   grind
-  -- END TASK
--/
 
 end curve25519_dalek.scalar.Scalar

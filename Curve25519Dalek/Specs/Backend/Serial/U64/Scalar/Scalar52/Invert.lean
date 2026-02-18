@@ -51,19 +51,14 @@ natural language specs:
 theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :
     spec (invert u) (fun u' =>
     (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]) := by
-  sorry
-/- OLD PROOF (before Aeneas WP migration):
   unfold invert
   progress*
-  · -- BEGIN TASK
-    by_contra _
+  · by_contra _
     have : Scalar52_as_Nat u % L = 0 % L := by
       apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by try decide)
       try simp_all [Nat.ModEq]
     try simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    rw [Nat.ModEq] at *
+  · rw [Nat.ModEq] at *
     have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
         = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
       _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
@@ -78,7 +73,5 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
       have coprime : Nat.Coprime (R ^ 2) L := by try decide
       apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by try grind)
     exact this h
-    -- END TASK
--/
 
 end curve25519_dalek.scalar.Scalar52

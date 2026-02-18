@@ -53,8 +53,6 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     spec (from_canonical_bytes b) (fun s =>
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
     (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero)) := by
-  sorry
-/- OLD PROOF (before Aeneas WP migration):
   unfold from_canonical_bytes
   progress as ⟨_, ha⟩
   progress as ⟨_, he, _⟩
@@ -63,20 +61,13 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
   progress as ⟨f, hf⟩
   progress as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
-  · -- BEGIN TASK
-    rw [ha, high_bit_zero_of_lt_L b hb] at he
+  · rw [ha, high_bit_zero_of_lt_L b hb] at he
     simp_all; bv_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    intro _
+  · simp_all
+  · intro _
     rw [hg]
     by_contra h
     have := hd.mp (hf.mp (f.ne_zero_iff_eq_one h)).2
     grind
-    -- END TASK
--/
 
 end curve25519_dalek.scalar.Scalar

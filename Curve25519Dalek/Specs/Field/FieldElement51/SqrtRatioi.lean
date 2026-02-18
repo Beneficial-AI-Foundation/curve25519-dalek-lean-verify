@@ -441,7 +441,7 @@ Natural language specs:
   4. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 0 and r^2 ≡ SQRT_M1 * u * v^(-1) (mod p)
 -/
 
-set_option maxHeartbeats  1000000000000 in
+-- set_option maxHeartbeats  1000000000000 in
 -- progress heavy
 
 @[progress]
@@ -473,6 +473,13 @@ theorem sqrt_ratio_i_spec
     (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))
     ) := by
     sorry
+/- ATTEMPTED WP PROOF SKELETON (untested, reverted to sorry):
+    unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
+    progress* <;> try grind
+    · unfold constants.SQRT_M1; decide
+    · unfold constants.SQRT_M1; decide
+    · sorry  -- main mathematical proof (~1000 lines needed)
+-/
 /- OLD PROOF for sqrt_ratio_i_spec (before Aeneas WP migration):
    The proof (~1070 lines) was removed because it has extensive WP migration issues:
    - rcases on WP-style match expressions from to_bytes/invert calls

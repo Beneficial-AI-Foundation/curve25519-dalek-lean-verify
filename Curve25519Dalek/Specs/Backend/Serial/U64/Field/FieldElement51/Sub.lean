@@ -40,6 +40,8 @@ natural language specs:
       Field51_as_Nat(sub(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
 -/
 
+set_option maxHeartbeats 400000 in
+set_option maxRecDepth 4096 in
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:
 - No panic (always returns successfully when bounds are satisfied)
 - The result d satisfies the field subtraction property:
@@ -66,7 +68,85 @@ theorem sub_spec (a b : Array U64 5#usize)
     (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
     (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p) := by
   unfold sub
-  sorry
+  progress as ⟨i0, hi0⟩    -- a[0]
+  progress as ⟨i1, hi1⟩    -- a[0] + k
+  · have := h_bounds_a 0 (by simp); scalar_tac
+  progress as ⟨i2, hi2⟩    -- b[0]
+  progress as ⟨i3, hi3⟩    -- (a[0]+k) - b[0]
+  · have := h_bounds_b 0 (by simp); scalar_tac
+  progress as ⟨i4, hi4⟩    -- a[1]
+  progress as ⟨i5, hi5⟩    -- a[1] + j
+  · have := h_bounds_a 1 (by simp); scalar_tac
+  progress as ⟨i6, hi6⟩    -- b[1]
+  progress as ⟨i7, hi7⟩    -- (a[1]+j) - b[1]
+  · have := h_bounds_b 1 (by simp); scalar_tac
+  progress as ⟨i8, hi8⟩    -- a[2]
+  progress as ⟨i9, hi9⟩    -- a[2] + j
+  · have := h_bounds_a 2 (by simp); scalar_tac
+  progress as ⟨i10, hi10⟩  -- b[2]
+  progress as ⟨i11, hi11⟩  -- (a[2]+j) - b[2]
+  · have := h_bounds_b 2 (by simp); scalar_tac
+  progress as ⟨i12, hi12⟩  -- a[3]
+  progress as ⟨i13, hi13⟩  -- a[3] + j
+  · have := h_bounds_a 3 (by simp); scalar_tac
+  progress as ⟨i14, hi14⟩  -- b[3]
+  progress as ⟨i15, hi15⟩  -- (a[3]+j) - b[3]
+  · have := h_bounds_b 3 (by simp); scalar_tac
+  progress as ⟨i16, hi16⟩  -- a[4]
+  progress as ⟨i17, hi17⟩  -- a[4] + j
+  · have := h_bounds_a 4 (by simp); scalar_tac
+  progress as ⟨i18, hi18⟩  -- b[4]
+  progress as ⟨i19, hi19⟩  -- (a[4]+j) - b[4]
+  · have := h_bounds_b 4 (by simp); scalar_tac
+  progress as ⟨res, hres_bounds, hres_mod⟩  -- reduce
+  refine ⟨fun i hi => by have := hres_bounds i hi; omega, ?_⟩
+  -- modular arithmetic property
+  have htmp : Field51_as_Nat res + Field51_as_Nat b ≡
+    Field51_as_Nat (Array.make 5#usize [i3, i7, i11, i15, i19]) + Field51_as_Nat b [MOD p] := by
+    apply Nat.ModEq.add_right; apply Nat.ModEq.symm; exact hres_mod
+  apply Nat.ModEq.trans htmp
+  unfold Field51_as_Nat
+  simp only [← Finset.sum_add_distrib, ← Nat.mul_add]
+  rw [Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
+      Finset.sum_range_one, Finset.sum_range_succ, Finset.sum_range_succ, Finset.sum_range_succ,
+      Finset.sum_range_succ, Finset.sum_range_one]
+  simp only [Array.make, Array.getElem!_Nat_eq, Nat.reduceMul,
+             show ([i3, i7, i11, i15, i19] : List U64)[0]! = i3 from rfl,
+             show ([i3, i7, i11, i15, i19] : List U64)[1]! = i7 from rfl,
+             show ([i3, i7, i11, i15, i19] : List U64)[2]! = i11 from rfl,
+             show ([i3, i7, i11, i15, i19] : List U64)[3]! = i15 from rfl,
+             show ([i3, i7, i11, i15, i19] : List U64)[4]! = i19 from rfl]
+  have h0 : i3.val + b[0]!.val = a[0]!.val + 36028797018963664 := by scalar_tac
+  have h1 : i7.val + b[1]!.val = a[1]!.val + 36028797018963952 := by scalar_tac
+  have h2 : i11.val + b[2]!.val = a[2]!.val + 36028797018963952 := by scalar_tac
+  have h3 : i15.val + b[3]!.val = a[3]!.val + 36028797018963952 := by scalar_tac
+  have h4 : i19.val + b[4]!.val = a[4]!.val + 36028797018963952 := by scalar_tac
+  -- Normalize Array.getElem! to List.getElem! in hypotheses to match goal
+  simp only [Array.getElem!_Nat_eq] at h0 h1 h2 h3 h4
+  rw [h0, h1, h2, h3, h4]
+  -- Rearrange: ∑ 2^k*(a_k + c_k) = (∑ 2^k*a_k) + (∑ 2^k*c_k)
+  have hrearr : ∀ (x0 x1 x2 x3 x4 : ℕ),
+      2 ^ 0 * (x0 + 36028797018963664) + 2 ^ 51 * (x1 + 36028797018963952) +
+      2 ^ 102 * (x2 + 36028797018963952) + 2 ^ 153 * (x3 + 36028797018963952) +
+      2 ^ 204 * (x4 + 36028797018963952) =
+      (2 ^ 0 * x0 + 2 ^ 51 * x1 + 2 ^ 102 * x2 + 2 ^ 153 * x3 + 2 ^ 204 * x4) +
+      (2 ^ 0 * 36028797018963664 + 2 ^ 51 * 36028797018963952 +
+       2 ^ 102 * 36028797018963952 + 2 ^ 153 * 36028797018963952 +
+       2 ^ 204 * 36028797018963952) := by intro x0 x1 x2 x3 x4; ring
+  conv_lhs => rw [hrearr]
+  set kjsum := 2 ^ 0 * 36028797018963664 + 2 ^ 51 * 36028797018963952 +
+               2 ^ 102 * 36028797018963952 + 2 ^ 153 * 36028797018963952 +
+               2 ^ 204 * 36028797018963952
+  have kmod0 : kjsum ≡ 0 [MOD p] := by
+    rw [Nat.modEq_zero_iff_dvd, p]
+    simp only [kjsum]
+    native_decide
+  set asum := 2 ^ 0 * (↑(↑a : List U64)[0]! : ℕ) + 2 ^ 51 * (↑(↑a : List U64)[1]! : ℕ) +
+              2 ^ 102 * (↑(↑a : List U64)[2]! : ℕ) + 2 ^ 153 * (↑(↑a : List U64)[3]! : ℕ) +
+              2 ^ 204 * (↑(↑a : List U64)[4]! : ℕ)
+  have h := Nat.ModEq.add_left asum kmod0
+  simp only [add_zero] at h
+  exact h
   /- OLD PROOF (needs updating for WP spec form):
   unfold sub
   -- To do: some problem using `progress*` in this proof and so doing each step manually.

@@ -41,23 +41,16 @@ natural language specs:
 theorem is_canonical_spec (s : Scalar) :
     spec (is_canonical s) (fun c =>
     (c = Choice.one ↔ U8x32_as_Nat s.bytes < L)) := by
-  sorry
-/- OLD PROOF (before Aeneas WP migration):
   unfold is_canonical
   progress*
   constructor
-  · -- BEGIN TASK
-    grind
-    -- END TASK
-  · -- BEGIN TASK
-    intro h
+  · grind
+  · intro h
     rename_i s' _
     have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post_1 s_post_2 h
     rw [res_post]
     apply U8x32_as_Nat_injective
     symm
     exact bytes_eq
-    -- END TASK
--/
 
 end curve25519_dalek.scalar.Scalar
