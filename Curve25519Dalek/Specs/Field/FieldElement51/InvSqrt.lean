@@ -105,11 +105,11 @@ lemma square_iff_inv_square (v_nat : Nat) (hv : v_nat % p ≠ 0) :
       use (y : ZMod p)
       have h : (y : ZMod p)^2 * v = 1 := by
         have : (y^2 * v_nat) ≡ 1 [MOD p] := by
-          rw [Nat.ModEq, hy]; simp [Nat.mod_eq_of_lt (by decide : 1 < p)]
+          rw [Nat.ModEq, hy]; simp only [Nat.mod_eq_of_lt (by decide : 1 < p)]
         rw [← ZMod.natCast_eq_natCast_iff] at this
         calc (y : ZMod p)^2 * v
             = (y : ZMod p)^2 * (v_nat : ZMod p) := rfl
-          _ = (Nat.cast (y^2) : ZMod p) * (Nat.cast v_nat : ZMod p) := by simp
+          _ = (Nat.cast (y^2) : ZMod p) * (Nat.cast v_nat : ZMod p) := by simp only [Nat.cast_pow]
           _ = Nat.cast (y^2 * v_nat) := by rw [← Nat.cast_mul]
           _ = 1 := by simpa using this
       rw [← sq]
@@ -179,16 +179,24 @@ theorem invsqrt_spec
       rename_i res_1
       have := res_1 ?_
       · constructor
-        · simp[this]
-        · simp[this]
-      · simp_all[ONE]
-        decide
+        · simp only [this]
+        · simp only [this]
+      · simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos, Nat.reducePow,
+          Nat.add_one_sub_one, ONE, ne_eq, and_true, not_true_eq_false, mul_zero, Nat.zero_mod, Aeneas.ReduceNat.reduceNatEq,
+          exists_const, false_and, and_false, Nat.not_ofNat_le_one, Nat.sub_eq_zero_of_le, nonpos_iff_eq_zero,
+          not_isEmpty_of_nonempty, IsEmpty.forall_iff, Nat.not_eq, not_lt_zero', true_or, or_true,
+          UScalar.val_not_eq_imp_not_eq, Nat.mul_mod_mod, Nat.mod_mul_mod, true_and]; decide
       --- END TASK
     · -- BEGIN TASK
       have := res ?_
-      · simp_all [ONE]; decide
+      · simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos, Nat.reducePow,
+          Nat.add_one_sub_one, ONE, true_and, ne_eq, and_false, Nat.not_eq, one_ne_zero, not_true_eq_false, zero_ne_one,
+          not_lt_zero', zero_lt_one, or_self, UScalar.val_not_eq_imp_not_eq, Nat.not_ofNat_le_one, Nat.sub_eq_zero_of_le,
+          nonpos_iff_eq_zero, not_isEmpty_of_nonempty, IsEmpty.forall_iff, and_true, not_false_eq_true, Nat.mul_mod_mod,
+          and_imp, forall_exists_index, not_exists, or_true, Nat.mod_mul_mod, false_and, imp_false, not_and, not_forall,
+          Decidable.not_not, implies_true]; decide
       · refine ⟨?_, ?_, ?_⟩
-        · simp [ONE_spec, show ¬p = 1 by decide]
+        · simp only [ONE_spec, ne_eq, Nat.one_mod_eq_zero_iff, show ¬p = 1 by decide, not_false_eq_true]
         · grind
         · have v_nonzero : Field51_as_Nat v % p ≠ 0 := h.1
           rw [ONE_spec]
@@ -203,9 +211,14 @@ theorem invsqrt_spec
       --- END TASK
     · -- BEGIN TASK
       have := res_post ?_
-      · simp_all [ONE_spec]
+      · simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos, Nat.reducePow,
+          Nat.add_one_sub_one, ONE_spec, Nat.one_mod_eq_zero_iff, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
+          one_ne_zero, zero_lt_one, not_lt_zero', or_false, or_self, UScalar.val_not_eq_imp_not_eq, false_and, imp_false,
+          and_false, not_true_eq_false, Nat.mul_mod_mod, not_isEmpty_of_nonempty, IsEmpty.exists_iff, and_self,
+          Nat.not_ofNat_le_one, Nat.sub_eq_zero_of_le, nonpos_iff_eq_zero, IsEmpty.forall_iff, and_true, true_and, mul_one,
+          dvd_refl, Nat.mod_mod_of_dvd, not_exists, exists_const, forall_const, implies_true]
       · refine ⟨?_, ?_, ?_⟩
-        · simp [ONE_spec, show ¬p = 1 by decide]
+        · simp only [ONE_spec, ne_eq, Nat.one_mod_eq_zero_iff, show ¬p = 1 by decide, not_false_eq_true]
         · exact h.1
         · intro hx
           obtain ⟨x, hx⟩ := hx
@@ -214,7 +227,7 @@ theorem invsqrt_spec
             rw [square_iff_inv_square (Field51_as_Nat v) h.1]
             use x
             calc x ^ 2 * Field51_as_Nat v % p
-              = x ^ 2 * (Field51_as_Nat v % p) % p := by simp [Nat.mul_mod]
+              = x ^ 2 * (Field51_as_Nat v % p) % p := by simp only [Nat.mul_mod, dvd_refl, Nat.mod_mod_of_dvd]
             _ = 1 % p := hx
           exact h.2 z hz
       --- END TASK
