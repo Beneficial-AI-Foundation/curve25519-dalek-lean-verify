@@ -44,21 +44,11 @@ theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
     spec (ct_eq a b) (fun c =>
     (c = Choice.one ↔ a.to_bytes = b.to_bytes )) := by
   unfold ct_eq
-  sorry
-  /- OLD PROOF (needs updating for WP spec form):
-  unfold field.ConstantTimeEqFieldElement51.ct_eq
-  progress as ⟨a_bytes, ha_bytes⟩
-  progress as ⟨sa, h_sa⟩
-  progress as ⟨b_bytes, hb_bytes⟩
-  progress as ⟨sb, h_sb⟩
-  progress as ⟨c, h_cteq⟩
-  simp_all
-  constructor
-  · intro eq
-    have : a_bytes.to_slice = b_bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-  · grind
-  -/
+  have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
+  have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)
+  rw [ha_ok, hb_ok]
+  progress*
+  simp_all only [Array.to_slice, Slice.eq_iff]
+  exact ⟨fun h => Subtype.ext h, fun h => h ▸ rfl⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq
