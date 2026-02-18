@@ -1578,7 +1578,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    ∃ result, from_bytes bytes = ok result ∧\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    ∃ result, from_bytes bytes = ok result ∧\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -4209,10 +4209,10 @@
    "dependencies":
    ["curve25519_dalek.ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul",
     "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    s.IsValid ∧\n    (s.toField = (U8x32_as_Nat c : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":

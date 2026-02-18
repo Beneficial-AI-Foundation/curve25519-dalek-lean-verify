@@ -90,7 +90,7 @@ theorem step_1_spec (c : CompressedRistretto) :
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c
   subst ha
-  progress as ⟨s, hs⟩               -- from_bytes: hs : Field51_as_Nat s ≡ U8x32_as_Nat c % 2^255 [MOD p]
+  progress as ⟨s, hs, hsv⟩          -- from_bytes: hs : congruence, hsv : s.IsValid
   progress as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
   -- Simplify the SliceIndexRangeFullSliceSlice index chain (identity on slices)
   simp only [core.array.Array.index, core.ops.index.IndexSlice,
@@ -102,8 +102,8 @@ theorem step_1_spec (c : CompressedRistretto) :
   progress as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
   -- Provide existential witnesses and prove conjunction
   refine ⟨ct_flag, neg_flag, s, rfl, rfl, rfl, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · --
-    sorry -- s.IsValid: needs from_bytes to provide limb bounds (< 2^51 ≤ 2^54)
+  · -- s.IsValid from from_bytes_spec
+    exact hsv
   · exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hs
   · -- goal: ct_flag.val = 1#u8 ↔ U8x32_as_Nat a < p
     have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by

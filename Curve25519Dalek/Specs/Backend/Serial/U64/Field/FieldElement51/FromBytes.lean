@@ -802,9 +802,45 @@ set_option maxHeartbeats 100000000000 in
 @[progress]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     ∃ result, from_bytes bytes = ok result ∧
-    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by
+    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
+    result.IsValid := by
   unfold from_bytes
   progress*
+  refine ⟨?_, ?_⟩
+  swap
+  · -- IsValid: each limb is (value &&& low_51_bit_mask) so < 2^51 < 2^54
+    have h_mask_lt : (↑low_51_bit_mask : ℕ) < 2 ^ 54 := by
+      rw [low_51_bit_mask_post_1, i_post_1];
+      simp only [Nat.shiftLeft_eq, Nat.one_mul, U64.size_eq]
+      try scalar_tac
+
+    have and_mask_lt : ∀ (x : U64), (↑(x &&& low_51_bit_mask) : ℕ) < 2 ^ 54 := by
+      intro x
+      have : (↑(x &&& low_51_bit_mask) : ℕ) = ↑x &&& ↑low_51_bit_mask := by
+        simp only [UScalar.val_and]
+
+      rw [this]; exact lt_of_le_of_lt Nat.and_le_right h_mask_lt
+    simp only [FieldElement51.IsValid, Array.make]
+    intro j hj
+    interval_cases j
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+        Nat.ofNat_pos, getElem!_pos, List.getElem_cons_zero]
+      rw [i2_post_1];
+      exact and_mask_lt i1
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+        Nat.one_lt_ofNat, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i5_post_1]; exact and_mask_lt i4
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i8_post_1]; exact and_mask_lt i7
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i11_post_1]; exact and_mask_lt i10
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.lt_add_one, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i14_post_1]; exact and_mask_lt i13
+
+  -- Congruence proof (unchanged):
   rw[bytes_mod255_eq]
   simp_all[Field51_as_Nat, Finset.sum_range_succ,Array.make, U64.size, U64.numBits,]
   have := land_pow_two_sub_one_eq_mod i1 51
