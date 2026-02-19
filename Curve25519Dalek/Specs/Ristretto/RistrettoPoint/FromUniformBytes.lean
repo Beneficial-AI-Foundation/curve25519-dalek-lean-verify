@@ -4,8 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
+import Mathlib.Data.Nat.Bitwise
+import Init.Data.Nat.Bitwise.Basic
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`
 
@@ -18,7 +21,7 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result core.ops.range
+open Aeneas.Std Result core.ops.range curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -48,6 +51,7 @@ natural language specs:
 - The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
 -/
 
+-- Splits the 64-byte input into two 32-byte halves
 def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array U8 32#usize) :=
   let a1 := input.subslice (Range.mk 0#usize 32#usize)
   let a2 := input.subslice (Range.mk 32#usize 64#usize)
@@ -96,13 +100,41 @@ theorem split64to32_spec (input : Array U8 64#usize) :
         = getElem?_neg, = min_def, = List.drop_zero, = List.length_drop, = Nat.min_def,
         = List.getElem?_take]
 
+-- Considering little-endian encoding, the low 255 bits of a 32-byte array can be obtained by
+-- masking the last byte with 0x7f (127 in decimal) to clear the high bit, ensuring that the
+-- resulting value is less than p.
+def low255 (a : Array U8 32#usize) : Result (Array U8 32#usize) :=
+  a.update 31#usize (a[31#usize]! &&& 0x7f#u8)
+
+theorem low255_spec (a : Array U8 32#usize) :
+    ∃ r,
+      low255 a = ok r ∧
+      (∀ i : Fin 31, r[i] = a[i]) ∧
+      r[31].val &&& 0x80 = 0 := by
+  simp [low255]
+  progress with Array.update_spec
+  constructor
+  · intro r
+    subst_vars
+    apply List.getElem_set_ne
+    scalar_tac
+  · subst_vars
+    have h1 : ↑(a.set 31#usize ((a).val[31] &&& 127#u8))[31] = (a[31] &&& 127#u8) := by
+      have h2 (v : U8) : (a.set 31#usize v)[31] = v := by
+        apply List.getElem_set_self
+      exact h2 ((a).val[31] &&& 127#u8)
+    rw [h1]
+    have h' : (a[31] &&& 127#u8).val &&& 128#u8 = 0 := by
+      simp only [UScalar.val_and, UScalar.ofNat_val_eq]
+      grind only [= Nat.and_assoc, = Nat.and_zero, =_ Nat.and_assoc, = Nat.and_comm]
+    exact h'
+
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     ∃ rist,
       from_uniform_bytes bytes = ok rist ∧
       rist.IsValid := by
   sorry
-
 
 /-
 Note: An optional, potentially desirable extension of this spec theorem may be to
