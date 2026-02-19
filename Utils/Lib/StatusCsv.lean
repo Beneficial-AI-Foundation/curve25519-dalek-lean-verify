@@ -56,10 +56,10 @@ def escapeField (s : String) : String :=
 
 /-- Parse a single CSV field, handling quoted fields -/
 private def parseField (s : String) : String :=
-  let trimmed := s.trim
+  let trimmed := s.trimAscii.toString
   if trimmed.startsWith "\"" && trimmed.endsWith "\"" && trimmed.length >= 2 then
     -- Remove surrounding quotes and unescape doubled quotes
-    let inner := trimmed.drop 1 |>.dropRight 1
+    let inner := trimmed.drop 1 |>.dropEnd 1
     inner.replace "\"\"" "\""
   else
     s
@@ -137,7 +137,7 @@ def StatusRow.toCsvLine (row : StatusRow) : String :=
 /-- Read and parse status.csv -/
 def readStatusFile (path : System.FilePath := defaultPath) : IO StatusFile := do
   let content ← IO.FS.readFile path
-  let lines := content.splitOn "\n" |>.filter (·.trim != "")
+  let lines := content.splitOn "\n" |>.filter (·.trimAscii.toString != "")
   match lines with
   | [] => return { header := "", rows := #[] }
   | header :: dataLines =>
@@ -220,5 +220,9 @@ def StatusFile.upsertFromFunction (file : StatusFile) (fn : FunctionOutput) : St
   | none =>
     -- Add new row
     file.addRow (StatusRow.fromFunctionOutput fn)
+
+/-- Remove rows whose lean_name is in the given set -/
+def StatusFile.removeByLeanNames (file : StatusFile) (names : Std.HashSet String) : StatusFile :=
+  { file with rows := file.rows.filter fun row => !names.contains row.lean_name }
 
 end Utils.Lib.StatusCsv
