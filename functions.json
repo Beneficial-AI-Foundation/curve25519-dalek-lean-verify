@@ -835,10 +835,13 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem EIGHT_TORSION_spec :\n    let P := EIGHT_TORSION.val[1]\n    P.IsValid ∧\n    (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧\n    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧ EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EIGHT_TORSION.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.EIGHT_TORSION`**:\n• P := EIGHT_TORSION[1] is a valid EdwardsPoint\n• P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that the order of P divides 8)\n• For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION",
@@ -1575,7 +1578,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    ∃ result, from_bytes bytes = ok result ∧\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    ∃ result, from_bytes bytes = ok result ∧\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -4109,10 +4112,10 @@
     "curve25519_dalek.field.FieldElement51.is_negative",
     "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    ∃ result, coset4 self = ok result ∧\n    ∀ (i : Fin 4), result.val[i].IsValid ∧\n                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint := by ...",
+   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    ∃ result, coset4 self = ok result ∧\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
@@ -4206,10 +4209,10 @@
    "dependencies":
    ["curve25519_dalek.ristretto.MulSharedAScalarRistrettoPointRistrettoPoint.mul",
     "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    s.IsValid ∧\n    (s.toField = (U8x32_as_Nat c : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),\n    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
