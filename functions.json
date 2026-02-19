@@ -2963,7 +2963,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    ∃ mp, to_montgomery e = ok mp ∧\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards.toPoint (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))\n\n := by ...",
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    ∃ mp, to_montgomery e = ok mp ∧\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))\n\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_montgomery`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting MontgomeryPoint has u-coordinate:\n  - If Z ≢ Y (mod p): u ≡ (Z+Y) * (Z-Y)^(-1) (mod p)\n  - If Z ≡ Y (mod p): u ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -3523,7 +3523,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ result,\n    mul_base scalar = ok result ∧\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)\n := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    ∃ result,\n    mul_base scalar = ok result ∧\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -3543,7 +3543,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    ∃ result,\n    mul_base_clamped bytes = ok result ∧\n    (∃ clamped_scalar,\n    scalar.clamp_integer bytes = ok clamped_scalar ∧\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)) := by ...",
+   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    ∃ result,\n    mul_base_clamped bytes = ok result ∧\n    (∃ clamped_scalar,\n    scalar.clamp_integer bytes = ok clamped_scalar ∧\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
