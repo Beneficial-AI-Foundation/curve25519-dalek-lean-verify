@@ -194,9 +194,8 @@ noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
         ring
      )
 
-
 theorem MontgomeryPoint.u_affine_toPoint_spec (u v : CurveField)
-  (non: u ≠ 0)
+  (non : u ≠ 0)
   (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
   MontgomeryPoint.u_affine_toPoint (u : CurveField) = WeierstrassCurve.Affine.Point.some ((nonsingular_iff u v).mpr (by
         rw[WeierstrassCurve.Affine.equation_iff]
@@ -226,8 +225,6 @@ section fromEdwards
 open curve25519_dalek.montgomery
 open curve25519_dalek.edwards
 
-
-
 lemma d_eq : (Edwards.Ed25519.d : CurveField)= -121665/ 121666 := by
   have hd: Edwards.Ed25519.d = d := by decide
   rw[hd]
@@ -242,14 +239,12 @@ lemma a_plus_d : (Edwards.Ed25519.a : CurveField) + Edwards.Ed25519.d = - 243331
   field_simp[this]
   decide
 
-
 lemma a_sub_d : (Edwards.Ed25519.a : CurveField) - Edwards.Ed25519.d = - 1/121666 := by
   have ha: Edwards.Ed25519.a = -1 := by rfl
   rw[ha, d_eq]
   have : (121666 : CurveField)≠ 0 := by decide
   field_simp[this]
   decide
-
 
 lemma adA : 2 * ((Edwards.Ed25519.a : CurveField) + Edwards.Ed25519.d) /(Edwards.Ed25519.a - Edwards.Ed25519.d) = Curve25519.A := by
   rw[a_plus_d, a_sub_d]
@@ -262,7 +257,6 @@ lemma adB : (4 / ((Edwards.Ed25519.a : CurveField) - Edwards.Ed25519.d)) = - 486
   have : (121666 : CurveField)≠ 0 := by decide
   field_simp[this]
   decide
-
 
 lemma B_d_relation : IsSquare (4 / ((Edwards.Ed25519.a : CurveField) - Edwards.Ed25519.d)) := by
   rw[adB]
@@ -292,7 +286,6 @@ lemma roots_B_non_zero : ¬ Curve25519.roots_B = 0 := by
   rw[h, adB] at this
   revert this
   decide
-
 
 -- Prove that the Montgomery to Edwards conversion inverts the Edwards to Montgomery conversion
 lemma montgomery_edwards_inverse {y : CurveField} (hy1 : y ≠ 1) :    let u := (1 + y) / (1 - y)
@@ -324,7 +317,6 @@ lemma montgomery_edwards_inverse {y : CurveField} (hy1 : y ≠ 1) :    let u := 
           grind
         field_simp [h_u_plus_1]
         grind
-
 
 theorem on_curves_M (e : Edwards.Point Edwards.Ed25519)
  (hy : e.y ≠ 1)
@@ -390,9 +382,6 @@ theorem on_curves_M (e : Edwards.Point Edwards.Ed25519)
   rw[this]
   ring_nf
 
-
-
-
 theorem on_MontgomeryCurves (e : Edwards.Point Edwards.Ed25519)
  (hy : e.y ≠ 1)
  (hx : e.x ≠ 0) :
@@ -404,7 +393,6 @@ theorem on_MontgomeryCurves (e : Edwards.Point Edwards.Ed25519)
   rw[← this, ← pow2_roots_B]
   grind
 
-
 theorem nonsingular_on_curves_M (e : Edwards.Point Edwards.Ed25519) (hy : e.y ≠ 1)
  (hx : e.x ≠ 0) :
   let u := (1 + e.y) / (1 - e.y)
@@ -413,8 +401,6 @@ theorem nonsingular_on_curves_M (e : Edwards.Point Edwards.Ed25519) (hy : e.y �
   rw[Montgomery.nonsingular_iff, WeierstrassCurve.Affine.equation_iff, MontgomeryCurveCurve25519]
   have := on_MontgomeryCurves e hy hx
   simp_all
-
-
 
 noncomputable def fromEdwards : Edwards.Point Edwards.Ed25519 → Point
   | e =>
@@ -438,12 +424,9 @@ noncomputable def fromEdwards : Edwards.Point Edwards.Ed25519 → Point
         simp_all
        )
 
-
 theorem map_zero : fromEdwards 0 = 0 := by
   unfold fromEdwards
   simp
-
-
 
 theorem zeroY (e : Edwards.Point Edwards.Ed25519)
   (h : e.y = 1) :
@@ -518,7 +501,6 @@ theorem exceptEdwardsPoint {e : Edwards.Point Edwards.Ed25519}
     grind
   exact sq_eq_zero_iff.mp h_x_sq
 
-
 theorem neg_fromEdwards (e : Edwards.Point Edwards.Ed25519) :
   fromEdwards (-e) = - fromEdwards e := by
   by_cases h : e = 0
@@ -537,45 +519,22 @@ theorem neg_fromEdwards (e : Edwards.Point Edwards.Ed25519) :
       simp[MontgomeryCurveCurve25519]
       grind
 
-
-
-
-
-
-
-
-
 theorem condition_T_point (e₁ e₂ : Edwards.Point Edwards.Ed25519)
  (h : 1 + (e₁ + e₂).y = 0) (he₁ : 1 + e₁.y = 0) :
    e₂.y = 1 := by
-  -- From h, we have (e₁ + e₂).y = -1
   have hy_sum : (e₁ + e₂).y = -1 := by grind
-
-  -- Use the Edwards addition formula for y-coordinate
   rw [Edwards.add_y] at hy_sum
-
-  -- Recall Ed25519.a = -1
   have ha : Edwards.Ed25519.a = -1 := rfl
-
-  -- The addition formula gives:
-  -- (e₁.y * e₂.y + e₁.x * e₂.x) / (1 - d * e₁.x * e₂.x * e₁.y * e₂.y) = -1
   rw [ha] at hy_sum
-
-  -- The denominator is non-zero by completeness
   have h_denom : 1 - Edwards.Ed25519.d * e₁.x * e₂.x * e₁.y * e₂.y ≠ 0 :=
     (Edwards.Ed25519.denomsNeZero e₁ e₂).2
-
-  -- Clearing the denominator
   have h_cleared : e₁.y * e₂.y + e₁.x * e₂.x =
     -(1 - Edwards.Ed25519.d * e₁.x * e₂.x * e₁.y * e₂.y) := by
     field_simp [h_denom] at hy_sum
     grind
-
-  -- Simplify to: e₁.y * e₂.y + e₁.x * e₂.x + 1 = d * e₁.x * e₂.x * e₁.y * e₂.y
   have h_eq : e₁.y * e₂.y + e₁.x * e₂.x + 1 =
     Edwards.Ed25519.d * e₁.x * e₂.x * e₁.y * e₂.y := by
     grind
-
   have hy_e₁ : e₁.y = -1 := by grind
   have hx_sum:= exceptEdwardsPoint h
   have hx_e₁:= exceptEdwardsPoint he₁
@@ -590,10 +549,6 @@ theorem condition_T_point (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   simp[hx_e₁, hy_e₁] at h_cleared
   apply h_cleared
 
-
-
-
-
 theorem add_T_point (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (he₁ : 1 + e₁.y = 0) :
   e₂.x = -(e₁ + e₂).x  ∧ e₂.y = -(e₁ + e₂).y := by
@@ -607,8 +562,6 @@ theorem add_T_point (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   simp[hx_e₁, hy_e₁]
   rw [Edwards.add_x]
   simp[hx_e₁, hy_e₁]
-
-
 
 theorem add_T_point' (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (he₁ : 1 + e₂.y = 0) :
@@ -638,20 +591,20 @@ lemma condition_Neg (e₁ e₂ : Edwards.Point Edwards.Ed25519)
 ((1 + e₁.y) / (1 - e₁.y) = (1 + e₂.y) / (1 - e₂.y) ∧
         Curve25519.roots_B * (1 + e₁.y) / ((1 - e₁.y) * e₁.x) =
           -(Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₂.x))) := by
-          simp
-          intro ha
-          constructor
-          · intro hx
-            rw[hx]
-            field_simp[ha]
-            simp
-            field_simp[roots_B_non_zero ]
-            grind
-          · field_simp[roots_B_non_zero ]
-            field_simp at ha
-            rw[ha]
-            field_simp[hy1, hy3]
-            grind
+  simp
+  intro ha
+  constructor
+  · intro hx
+    rw[hx]
+    field_simp[ha]
+    simp
+    field_simp[roots_B_non_zero ]
+    grind
+  · field_simp[roots_B_non_zero ]
+    field_simp at ha
+    rw[ha]
+    field_simp[hy1, hy3]
+    grind
 
 lemma injective_fromEdwards {e₁ e₂ : Edwards.Point Edwards.Ed25519}
 (hy1 : 1 - e₂.y ≠ 0) (hy2 : 1 - e₁.y ≠ 0) :
@@ -675,19 +628,17 @@ lemma injective_fromEdwards {e₁ e₂ : Edwards.Point Edwards.Ed25519}
     rw[ha]
 
 lemma injective_Neg {e₁ e₂ : Edwards.Point Edwards.Ed25519}
-(hy1 : 1 - e₂.y ≠ 0) (hy2 : 1 - e₁.y ≠ 0) (hy3 : 1 + e₂.y ≠ 0)
-    (hx1 : e₁.x ≠ 0) (hx2 : e₂.x ≠ 0) :
-(e₁.y =e₂.y  ∧ e₁.x = - e₂.x) ↔
-((1 + e₁.y) / (1 - e₁.y) = (1 + e₂.y) / (1 - e₂.y) ∧
-        Curve25519.roots_B * (1 + e₁.y) / ((1 - e₁.y) * e₁.x) =
-          -(Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₂.x))) := by
-          rw[← injective_fromEdwards, condition_Neg]
-          all_goals simp_all
+  (hy1 : 1 - e₂.y ≠ 0) (hy2 : 1 - e₁.y ≠ 0) (hy3 : 1 + e₂.y ≠ 0)
+  (hx1 : e₁.x ≠ 0) (hx2 : e₂.x ≠ 0) :
+  (e₁.y =e₂.y  ∧ e₁.x = - e₂.x) ↔
+  ((1 + e₁.y) / (1 - e₁.y) = (1 + e₂.y) / (1 - e₂.y) ∧
+  Curve25519.roots_B * (1 + e₁.y) / ((1 - e₁.y) * e₁.x) =
+  -(Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₂.x))) := by
+  rw[← injective_fromEdwards, condition_Neg]
+  all_goals simp_all
 
 set_option maxHeartbeats 1000000 in
 -- heavy simp
-
-
 theorem add_fromEdwards_second (e₁ e₂ : Edwards.Point Edwards.Ed25519)
 (non_e1_x : e₁.x ≠ 0)
 (zero_e2_x : e₂.x = 0) :
@@ -701,8 +652,7 @@ theorem add_fromEdwards_second (e₁ e₂ : Edwards.Point Edwards.Ed25519)
       · simp_all
         simp[Edwards.add_y] at non_sum
         simp_all
-      ·
-        simp[Edwards.add_x]
+      · simp[Edwards.add_x]
         simp_all
         simp[Edwards.add_y] at non_sum
         simp[zero_e2_x, e2y] at non_sum
@@ -745,54 +695,7 @@ theorem add_fromEdwards_second (e₁ e₂ : Edwards.Point Edwards.Ed25519)
           have := e₁.on_curve
           sorry
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-theorem add_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
- :
+theorem add_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519) :
   fromEdwards (e₁ + e₂) = fromEdwards e₁ + fromEdwards e₂ := by
   sorry
 
@@ -893,47 +796,47 @@ theorem double_special_point {e : Edwards.Point Edwards.Ed25519}
   (hx : e.x ^ 2 = -1)
   (hy : e.y = 0) :
   (e + e).y = -1 ∧ (e + e).x = 0 ∧ ¬ e.x= 0 := by
-          constructor
-          · simp[Edwards.add_y]
-            simp[hy]
-            have : e.x * e.x =e.x ^ 2 := by ring
-            rw[mul_assoc,this,hx]
-            have : Edwards.Ed25519.a = -1 := rfl
-            rw[this]
-            simp
-          · constructor
-            · simp[Edwards.add_x]
-              simp[hy]
-            · intro h
-              simp_all
+  constructor
+  · simp[Edwards.add_y]
+    simp[hy]
+    have : e.x * e.x =e.x ^ 2 := by ring
+    rw[mul_assoc,this,hx]
+    have : Edwards.Ed25519.a = -1 := rfl
+    rw[this]
+    simp
+  · constructor
+    · simp[Edwards.add_x]
+      simp[hy]
+    · intro h
+      simp_all
 
 theorem double_fromEdwards_special_point (e : Edwards.Point Edwards.Ed25519)
   (hx : e.x ^ 2 = -1)
   (hy : e.y = 0) :
   fromEdwards (e + e) = (fromEdwards e) + (fromEdwards e) := by
-          have hy2:=( double_special_point hx hy).left
-          have non:=( double_special_point hx hy).right.left
-          have non_x:=( double_special_point hx hy).right.right
-          have : (-1)≠  (1:CurveField):=by decide
-          unfold fromEdwards
-          simp[hy2, non, this, hy, non_x]
-          simp[T_point]
-          simp only [WeierstrassCurve.Affine.Point.add_def, WeierstrassCurve.Affine.Point.add]
-          simp only[MontgomeryCurveCurve25519]
-          have : ¬ Curve25519.roots_B / e.x = -(Curve25519.roots_B / e.x) := by
-            intro h
-            have : Curve25519.roots_B =0 := by grind
-            apply  roots_B_non_zero this
-          simp[this,Curve25519.A]
-          set a:= Curve25519.roots_B / e.x with ha
-          have : a^2 = 486664:= by
-              rw[ha]
-              field_simp
-              rw[pow2_roots_B,adB,hx]
-              simp
-          constructor
-          · grind
-          · grind
+  have hy2:=( double_special_point hx hy).left
+  have non:=( double_special_point hx hy).right.left
+  have non_x:=( double_special_point hx hy).right.right
+  have : (-1)≠  (1:CurveField):=by decide
+  unfold fromEdwards
+  simp[hy2, non, this, hy, non_x]
+  simp[T_point]
+  simp only [WeierstrassCurve.Affine.Point.add_def, WeierstrassCurve.Affine.Point.add]
+  simp only[MontgomeryCurveCurve25519]
+  have : ¬ Curve25519.roots_B / e.x = -(Curve25519.roots_B / e.x) := by
+    intro h
+    have : Curve25519.roots_B =0 := by grind
+    apply  roots_B_non_zero this
+  simp[this,Curve25519.A]
+  set a:= Curve25519.roots_B / e.x with ha
+  have : a^2 = 486664:= by
+    rw[ha]
+    field_simp
+    rw[pow2_roots_B,adB,hx]
+    simp
+  constructor
+  · grind
+  · grind
 
 theorem double_fromEdwards_zero_x (e : Edwards.Point Edwards.Ed25519)
   (hx : (e + e).x = 0) :
@@ -966,7 +869,6 @@ theorem double_fromEdwards_zero_x (e : Edwards.Point Edwards.Ed25519)
       apply double_fromEdwards_special_point
       all_goals simp_all
 
-
 theorem comm_mul_fromEdwards {n : ℕ} (e : Edwards.Point Edwards.Ed25519) :
   fromEdwards (n • e) = n • (fromEdwards e) := by
   induction n
@@ -974,9 +876,6 @@ theorem comm_mul_fromEdwards {n : ℕ} (e : Edwards.Point Edwards.Ed25519) :
   · rename_i n hn
     simp[add_smul]
     rw[add_fromEdwards, hn]
-
-
-
 
 theorem fromEdwards_eq_MontgomeryPoint_toPoint (e : Edwards.Point Edwards.Ed25519)
   (m : MontgomeryPoint)
@@ -1031,11 +930,9 @@ noncomputable def toEdwards : Point → Option (Edwards.Point Edwards.Ed25519)
         simp [WeierstrassCurve.Affine.evalEval_polynomialY, WeierstrassCurve.Affine.evalEval_polynomialX, MontgomeryCurveCurve25519] at non
         have h_x_sq : x_abs^2 = x2 := by
           apply sqrt_checked_spec x2 h_call h_invalid
-
         have h_den_nz : den ≠ 0 := by
           dsimp only [den]
           apply edwards_denom_nonzero
-
         have ha : Edwards.Ed25519.a = -1 := rfl
         have hd : (d : ZMod p) = Edwards.Ed25519.d := rfl
         rw [ha, h_x_sq]
