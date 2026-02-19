@@ -183,9 +183,6 @@ theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
 
   · sorry
 
-  · sorry
-
-
   · constructor
 
     · sorry
