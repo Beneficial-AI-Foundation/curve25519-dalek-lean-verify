@@ -163,7 +163,7 @@ generate_lean() {
     # Run Aeneas to generate Lean files
     echo "Running: $AENEAS_BIN -backend lean -split-files -dest $OUTPUT_DIR $LLBC_FILE"
     echo "Logging output to $ROOT/.logs/aeneas.log"
-    "$AENEAS_BIN" -backend lean -all-computable -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
+    "$AENEAS_BIN" -backend lean -loops-to-rec -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
 
     echo "✓ Lean files generated in $OUTPUT_DIR"
     echo
