@@ -52,7 +52,7 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     mul_base_clamped bytes = ok result ∧
     (∃ clamped_scalar,
     scalar.clamp_integer bytes = ok clamped_scalar ∧
-    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))    := by
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))    := by
    unfold mul_base_clamped
    progress*
 
