@@ -1,10 +1,7 @@
 # TODO
 
-- Update to latest version of Aeneas to avoid the progress problem which is now patched.
-- Hide functions if required
-- Avoid the Opaque Default Trait Methods problem: these are the axioms we added to funsexternal. mostly these are not used in the rest of the code and are better excluded from extraction.
+- mend the problem of too many hidden functions (the hiding of children is not correct)
 - Remove all task markers
-- check that namespaces are correct so that all spec theorems are counted correctly
 
 ## Proofs replaced with `sorry`, have long build times
 
