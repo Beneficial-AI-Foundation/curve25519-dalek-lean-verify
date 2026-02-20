@@ -3022,10 +3022,12 @@
    "dependencies":
    ["curve25519_dalek.edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (e : EdwardsPoint) (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_e_valid : e.IsValid) :\n    ∃ result, mul e s = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.MulShared0EdwardsPointSharedAScalarEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::mul",
@@ -3038,11 +3040,13 @@
    "is_extraction_artifact": false,
    "fully_verified": false,
    "dependencies": ["curve25519_dalek.backend.variable_base_mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (s : scalar.Scalar) (e : EdwardsPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_e_valid : e.IsValid) :\n    ∃ result, mul s e = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint := ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.MulShared0ScalarSharedAEdwardsPointEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input EdwardsPoints e\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -4046,7 +4050,7 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    ∃ result, mul s r = ok result ∧\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by ...",
