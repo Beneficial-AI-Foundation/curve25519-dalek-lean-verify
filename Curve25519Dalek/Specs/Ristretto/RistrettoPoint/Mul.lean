@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
 
 /-! # Spec Theorem for `RistrettoPoint::mul`
 
@@ -35,7 +36,6 @@ natural language specs:
 • The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
-
 -/
 
 /-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:
@@ -50,10 +50,21 @@ theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)
     ∃ result, mul s r = ok result ∧
     result.IsValid ∧
     result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint := by
-  sorry
+  unfold mul
+  unfold edwards.MulSharedAScalarEdwardsPointEdwardsPoint.mul
+  progress*
+  · exact h_rist_valid.1
+  · constructor
+    · unfold RistrettoPoint.IsValid
+      refine ⟨ep_post_1, ?_⟩
+      rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post_1, ep_post_2]
+      have h_r_even := (EdwardsPoint_IsSquare_iff_IsEven r h_rist_valid.1).mp h_rist_valid.2
+      obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp h_r_even
+      exact (IsEven_iff_in_doubling_image _).mpr ⟨U8x32_as_Nat s.bytes • Q, by rw [hQ, nsmul_add]⟩
+    · simp only [RistrettoPoint.toPoint]
+      exact ep_post_2
 
 /-
-
 Note:
 
 One RistrettoPoint r corresponds to an equivalence class of several
@@ -82,7 +93,6 @@ representatives follows from standard results in abstract algebra: in any set of
 
 constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
 and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
-
 -/
 
 end curve25519_dalek.ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint
