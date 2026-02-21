@@ -1,11 +1,10 @@
 /-
 Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Oliver Butterley and Christiano Braga
 -/
-import Curve25519Dalek.Funs
-import Curve25519Dalek.Math.Ristretto.Representation
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`
 
@@ -19,6 +18,17 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 -/
 
 open Aeneas.Std Result core.ops.range
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+open Aeneas.Std Result curve25519_dalek.math
+
+@[progress]
+theorem from_bytes_spec' (bytes : Array U8 32#usize) :
+  ∃ result, from_bytes bytes = ok result ∧
+  Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
+  result.IsValid := by sorry
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -48,6 +58,7 @@ natural language specs:
 - The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
 -/
 
+-- Splits the 64-byte input into two 32-byte halves
 def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array U8 32#usize) :=
   let a1 := input.subslice (Range.mk 0#usize 32#usize)
   let a2 := input.subslice (Range.mk 32#usize 64#usize)
@@ -56,8 +67,7 @@ def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array
                         Array.from_slice (Array.repeat 32#usize 0#u8) s2)
   | _, _ => fail Error.panic
 
-@[progress]
-theorem split64to32_spec (input : Array U8 64#usize) :
+lemma split64to32_spec (input : Array U8 64#usize) :
     ∃ a1 a2,
         split64to32 input = ok (a1, a2) ∧
         (∀ i : ℕ, i < 32 → a1.val[i]! = input.val[i]! ∧ a2.val[i]! = input.val[i + 32]!) := by
@@ -96,13 +106,73 @@ theorem split64to32_spec (input : Array U8 64#usize) :
         = getElem?_neg, = min_def, = List.drop_zero, = List.length_drop, = Nat.min_def,
         = List.getElem?_take]
 
+-- Considering little-endian encoding, the low 255 bits of a 32-byte array can be obtained by
+-- masking the last byte with 0x7f (127 in decimal) to clear the high bit, ensuring that the
+-- resulting value is less than p.
+def low255 (a : Array U8 32#usize) : Result (Array U8 32#usize) :=
+  a.update 31#usize (a[31#usize]! &&& 0x7f#u8)
+
+lemma low255_spec (a : Array U8 32#usize) :
+    ∃ r,
+      low255 a = ok r ∧
+      (∀ i : Fin 31, r[i] = a[i]) ∧
+      r[31].val &&& 0x80 = 0 := by
+  simp [low255]
+  progress with Array.update_spec
+  constructor
+  · intro r
+    subst_vars
+    apply List.getElem_set_ne
+    scalar_tac
+  · subst_vars
+    have h1 : ↑(a.set 31#usize ((a).val[31] &&& 127#u8))[31] = (a[31] &&& 127#u8) := by
+      have h2 (v : U8) : (a.set 31#usize v)[31] = v := by
+        apply List.getElem_set_self
+      exact h2 ((a).val[31] &&& 127#u8)
+    rw [h1]
+    have h' : (a[31] &&& 127#u8).val &&& 128#u8 = 0 := by
+      simp only [UScalar.val_and, UScalar.ofNat_val_eq]
+      grind only [= Nat.and_assoc, = Nat.and_zero, =_ Nat.and_assoc, = Nat.and_comm]
+    exact h'
+
+-- Takes the low 255 bits of an Array U8 32 modulo p and converts to a FieldElement51 via `from_bytes`
+def low255_to_field_element (input : Array U8 32#usize) : Result (backend.serial.u64.field.FieldElement51) :=
+  let r_low255_input := low255 input
+  match r_low255_input with
+  | ok low255_input =>
+      backend.serial.u64.field.FieldElement51.from_bytes low255_input
+  | _ => fail Error.panic
+
+lemma low255_to_field_element_spec (input : Array U8 32#usize) :
+    ∃ fe,
+      low255_to_field_element input = ok fe ∧
+      fe.IsValid := by
+  simp [low255_to_field_element]
+  sorry
+
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     ∃ rist,
       from_uniform_bytes bytes = ok rist ∧
       rist.IsValid := by
-  sorry
-
+  unfold from_uniform_bytes
+  progress
+  unfold core.array.Array.index
+  unfold core.ops.index.IndexSlice
+  unfold core.slice.index.Slice.index
+  unfold core.slice.index.SliceIndexRangeUsizeSlice
+  unfold core.slice.index.private_slice_index.SealedRangeUsize
+  unfold core.slice.index.SliceIndexRangeUsizeSlice.index
+  simp only [UScalar.le_equiv, UScalar.ofNat_val_eq, zero_le, Slice.length, Array.val_to_slice,
+    List.Vector.length_val, Nat.reduceLeDiff, and_self, ↓reduceIte, List.slice_zero_j, le_refl,
+    bind_tc_ok]
+  progress
+  · simp_all [Array.to_slice_mut, Array.to_slice, Slice.length]
+  unfold AddRistrettoPointRistrettoPointRistrettoPoint.add
+  progress*
+  simp_all [Array.to_slice_mut, Array.to_slice, Slice.length]
+  simp_lists
+  simp_all only [UScalar.ofNat_val_eq, Nat.reduceSub, min_self]
 
 /-
 Note: An optional, potentially desirable extension of this spec theorem may be to
