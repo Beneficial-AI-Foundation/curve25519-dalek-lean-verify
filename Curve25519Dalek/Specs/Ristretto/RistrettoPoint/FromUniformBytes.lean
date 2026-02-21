@@ -1,15 +1,10 @@
 /-
 Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander and Christiano Braga
+Authors: Markus Dablander, Oliver Butterley and Christiano Braga
 -/
-import Curve25519Dalek.Funs
-import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Math.Ristretto.Representation
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
-import Curve25519Dalek.Types
-import Curve25519Dalek.Math.Basic
-
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`
 
@@ -23,6 +18,17 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 -/
 
 open Aeneas.Std Result core.ops.range
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+open Aeneas.Std Result curve25519_dalek.math
+
+@[progress]
+theorem from_bytes_spec' (bytes : Array U8 32#usize) :
+  ∃ result, from_bytes bytes = ok result ∧
+  Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
+  result.IsValid := by sorry
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -129,7 +135,7 @@ lemma low255_spec (a : Array U8 32#usize) :
       grind only [= Nat.and_assoc, = Nat.and_zero, =_ Nat.and_assoc, = Nat.and_comm]
     exact h'
 
--- Takes the low 255 bits of an Array U8 32 modulo p and converts to a ZMod p
+-- Takes the low 255 bits of an Array U8 32 modulo p and converts to a FieldElement51 via `from_bytes`
 def low255_to_field_element (input : Array U8 32#usize) : Result (backend.serial.u64.field.FieldElement51) :=
   let r_low255_input := low255 input
   match r_low255_input with
@@ -149,7 +155,24 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     ∃ rist,
       from_uniform_bytes bytes = ok rist ∧
       rist.IsValid := by
-  sorry
+  unfold from_uniform_bytes
+  progress
+  unfold core.array.Array.index
+  unfold core.ops.index.IndexSlice
+  unfold core.slice.index.Slice.index
+  unfold core.slice.index.SliceIndexRangeUsizeSlice
+  unfold core.slice.index.private_slice_index.SealedRangeUsize
+  unfold core.slice.index.SliceIndexRangeUsizeSlice.index
+  simp only [UScalar.le_equiv, UScalar.ofNat_val_eq, zero_le, Slice.length, Array.val_to_slice,
+    List.Vector.length_val, Nat.reduceLeDiff, and_self, ↓reduceIte, List.slice_zero_j, le_refl,
+    bind_tc_ok]
+  progress
+  · simp_all [Array.to_slice_mut, Array.to_slice, Slice.length]
+  unfold AddRistrettoPointRistrettoPointRistrettoPoint.add
+  progress*
+  simp_all [Array.to_slice_mut, Array.to_slice, Slice.length]
+  simp_lists
+  simp_all only [UScalar.ofNat_val_eq, Nat.reduceSub, min_self]
 
 /-
 Note: An optional, potentially desirable extension of this spec theorem may be to
