@@ -188,6 +188,8 @@ use {
 };
 
 use subtle::Choice;
+#[cfg(all(feature = "alloc", not(verify)))]
+use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
 
@@ -204,9 +206,7 @@ use crate::scalar::Scalar;
 use crate::traits::BasepointTable;
 use crate::traits::Identity;
 #[cfg(feature = "alloc")]
-use crate::traits::MultiscalarMul;
-#[cfg(all(feature = "alloc", not(verify)))]
-use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 
 // ------------------------------------------------------------------------
 // Compressed points
@@ -1025,7 +1025,7 @@ impl MultiscalarMul for RistrettoPoint {
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimeMultiscalarMul for RistrettoPoint {
     type Point = RistrettoPoint;
 
@@ -1048,10 +1048,10 @@ impl VartimeMultiscalarMul for RistrettoPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub struct VartimeRistrettoPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
     type Point = RistrettoPoint;
 

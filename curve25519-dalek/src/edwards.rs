@@ -120,6 +120,8 @@ use {
 use rand_core::RngCore;
 
 use subtle::Choice;
+#[cfg(feature = "digest")]
+use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
 
@@ -153,9 +155,7 @@ use crate::traits::{Identity, IsIdentity};
 use affine::AffinePoint;
 
 #[cfg(feature = "alloc")]
-use crate::traits::MultiscalarMul;
-#[cfg(all(feature = "alloc", not(verify)))]
-use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 #[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
@@ -953,7 +953,7 @@ impl MultiscalarMul for EdwardsPoint {
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimeMultiscalarMul for EdwardsPoint {
     type Point = EdwardsPoint;
 
@@ -992,10 +992,10 @@ impl VartimeMultiscalarMul for EdwardsPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub struct VartimeEdwardsPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
     type Point = EdwardsPoint;
 

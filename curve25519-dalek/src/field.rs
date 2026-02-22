@@ -413,6 +413,7 @@ impl FieldElement {
 #[cfg(test)]
 mod test {
     use crate::field::*;
+    use subtle::ConditionallyNegatable;
 
     /// Random element a of GF(2^255-19), from Sage
     /// a = 1070314506888354081329385823235218444233221\

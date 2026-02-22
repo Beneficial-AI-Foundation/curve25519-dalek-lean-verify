@@ -102,6 +102,14 @@ generate_llbc() {
 
     # --exclude: completely remove
     # --opaque: keep signature but no body
+    #
+    # NOTE: Charon's --exclude only works for:
+    #   - Free functions: 'crate::module::function'
+    #   - Trait impls: 'crate::module::{impl Trait for Type}'
+    #   - Types: 'crate::module::Type'
+    # It does NOT work for inherent impl methods (e.g. '{impl Type}::method')
+    # due to an unimplemented TODO in Charon's NameMatcher. For those, use
+    # #[cfg(not(verify))] in the Rust source instead.
     EXCLUDE_ARGS=(
         --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}'
@@ -131,9 +139,23 @@ generate_llbc() {
         --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}'
         --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}'
         --exclude 'curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::MultiscalarMul for _}'
-        # Exclude functions that use iterators (Charon/Aeneas can't translate them)
-        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::ristretto::RistrettoPoint}::double_and_compress_batch'
-        --exclude 'curve25519_dalek::field::{impl curve25519_dalek::backend::serial::u64::field::FieldElement51}::batch_invert'
+        # Exclude vartime free functions
+        --exclude 'curve25519_dalek::backend::vartime_double_base_mul'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul'
+        # Exclude VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul trait impls
+        --exclude 'curve25519_dalek::backend::pippenger_optional_multiscalar_mul'
+        --exclude 'curve25519_dalek::backend::straus_optional_multiscalar_mul'
+        --exclude 'curve25519_dalek::backend::VartimePrecomputedStraus'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::pippenger::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::edwards::VartimeEdwardsPrecomputation'
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::VartimeRistrettoPrecomputation'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
     )
     OPAQUE_ARGS=(
         # --opaque 'curve25519_dalek::something::somename'

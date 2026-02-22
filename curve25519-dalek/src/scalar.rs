@@ -457,7 +457,6 @@ impl<'de> Deserialize<'de> for Scalar {
     }
 }
 
-#[cfg(not(verify))]
 impl<T> Product<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -470,7 +469,6 @@ where
     }
 }
 
-#[cfg(not(verify))]
 impl<T> Sum<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -848,7 +846,6 @@ impl Scalar {
 
     /// Get the bits of the scalar, in little-endian order
     #[cfg(not(verify))]
-    #[allow(dead_code)]
     pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
         (0..256).map(|i| {
             // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
@@ -930,7 +927,6 @@ impl Scalar {
     /// If \\( k \mod 2^w\\) is even, we emit \\(0\\), advance 1 bit
     /// and reindex.  In fact, by setting all digits to \\(0\\)
     /// initially, we don't need to emit anything.
-    #[cfg(not(verify))]
     pub(crate) fn non_adjacent_form(&self, w: usize) -> [i8; 256] {
         // required by the NAF definition
         debug_assert!(w >= 2);
@@ -1035,10 +1031,7 @@ impl Scalar {
 
     /// Returns a size hint indicating how many entries of the return
     /// value of `to_radix_2w` are nonzero.
-    #[cfg(all(
-        any(feature = "alloc", all(test, feature = "precomputed-tables")),
-        not(verify)
-    ))]
+    #[cfg(any(feature = "alloc", all(test, feature = "precomputed-tables")))]
     pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
@@ -1075,7 +1068,7 @@ impl Scalar {
     /// $$
     /// with \\(-2\^w/2 \leq a_i < 2\^w/2\\) for \\(0 \leq i < (n-1)\\) and \\(-2\^w/2 \leq a_{n-1} \leq 2\^w/2\\).
     ///
-    #[cfg(all(any(feature = "alloc", feature = "precomputed-tables"), not(verify)))]
+    #[cfg(any(feature = "alloc", feature = "precomputed-tables"))]
     pub(crate) fn as_radix_2w(&self, w: usize) -> [i8; 64] {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);

@@ -75,7 +75,7 @@ fn get_selected_backend() -> BackendKind {
 }
 
 #[allow(missing_docs)]
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub fn pippenger_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
 where
     I: IntoIterator,
@@ -96,7 +96,7 @@ where
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub(crate) enum VartimePrecomputedStraus {
     #[cfg(curve25519_dalek_backend = "simd")]
     Avx2(vector::scalar_mul::precomputed_straus::spec_avx2::VartimePrecomputedStraus),
@@ -107,7 +107,7 @@ pub(crate) enum VartimePrecomputedStraus {
     Scalar(serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus),
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedStraus {
     pub fn new<I>(static_points: I) -> Self
     where
@@ -220,7 +220,7 @@ where
 }
 
 #[allow(missing_docs)]
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub fn straus_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
 where
     I: IntoIterator,
