@@ -119,7 +119,7 @@ structure scalar.Scalar where
 def backend.serial.u64.field.FieldElement51 := Array Std.U64 5#usize
 
 /-- [curve25519_dalek::edwards::EdwardsPoint]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 382:0-387:1 -/
+   Source: 'curve25519-dalek/src/edwards.rs', lines 381:0-386:1 -/
 structure edwards.EdwardsPoint where
   X : backend.serial.u64.field.FieldElement51
   Y : backend.serial.u64.field.FieldElement51
@@ -177,7 +177,7 @@ structure traits.ValidityCheck (Self : Type) where
 def backend.serial.u64.scalar.Scalar52 := Array Std.U64 5#usize
 
 /-- [curve25519_dalek::ristretto::RistrettoPoint]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 494:0-494:51 -/
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 493:0-493:51 -/
 @[reducible]
 def ristretto.RistrettoPoint := edwards.EdwardsPoint
 
@@ -188,12 +188,12 @@ structure edwards.affine.AffinePoint where
   y : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::edwards::CompressedEdwardsY]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 173:0-173:44 -/
+   Source: 'curve25519-dalek/src/edwards.rs', lines 172:0-172:44 -/
 @[reducible]
 def edwards.CompressedEdwardsY := Array Std.U8 32#usize
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::from_slice::closure]
-   Source: 'curve25519-dalek/src/edwards.rs', lines 416:29-416:54 -/
+   Source: 'curve25519-dalek/src/edwards.rs', lines 415:29-415:54 -/
 @[reducible]
 def edwards.CompressedEdwardsY.from_slice.closure := Unit
 
@@ -209,12 +209,12 @@ structure montgomery.ProjectivePoint where
   W : backend.serial.u64.field.FieldElement51
 
 /-- [curve25519_dalek::ristretto::CompressedRistretto]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 220:0-220:45 -/
 @[reducible]
 def ristretto.CompressedRistretto := Array Std.U8 32#usize
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::from_slice::closure]
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 247:29-247:55 -/
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 246:29-246:55 -/
 @[reducible]
 def ristretto.CompressedRistretto.from_slice.closure := Unit
 
