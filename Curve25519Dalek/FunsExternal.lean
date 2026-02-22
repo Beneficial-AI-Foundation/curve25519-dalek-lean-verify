@@ -748,7 +748,7 @@ theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
 
-def montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+noncomputable def montgomery.ConditionallySelectableProjectivePoint.conditional_assign
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result montgomery.ProjectivePoint :=
@@ -780,15 +780,15 @@ axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
 
 /-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
    Returns Unit (no-op assertion that Eq is properly implemented). -/
-def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl
+noncomputable def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
   (_self : montgomery.MontgomeryPoint) : Result Unit :=
   ok ()
 
 /-- **Progress spec for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl`**. -/
 @[progress]
-theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl_spec
+theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_spec
   (self : montgomery.MontgomeryPoint) :
-  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl self = ok () := by
+  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq self = ok () := by
   rfl
 
 
