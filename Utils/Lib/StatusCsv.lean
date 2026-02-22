@@ -225,4 +225,25 @@ def StatusFile.upsertFromFunction (file : StatusFile) (fn : FunctionOutput) : St
 def StatusFile.removeByLeanNames (file : StatusFile) (names : Std.HashSet String) : StatusFile :=
   { file with rows := file.rows.filter fun row => !names.contains row.lean_name }
 
+/-- Find duplicate lean_names in the StatusFile. Returns array of lean_names that appear more than once. -/
+def StatusFile.findDuplicateLeanNames (file : StatusFile) : Array String := Id.run do
+  let mut seen : Std.HashSet String := {}
+  let mut duplicates : Std.HashSet String := {}
+  for row in file.rows do
+    if seen.contains row.lean_name then
+      duplicates := duplicates.insert row.lean_name
+    else
+      seen := seen.insert row.lean_name
+  return duplicates.toArray.qsort (· < ·)
+
+/-- Remove duplicate rows by lean_name, keeping only the first occurrence. -/
+def StatusFile.deduplicate (file : StatusFile) : StatusFile := Id.run do
+  let mut seen : Std.HashSet String := {}
+  let mut uniqueRows : Array StatusRow := #[]
+  for row in file.rows do
+    if !seen.contains row.lean_name then
+      seen := seen.insert row.lean_name
+      uniqueRows := uniqueRows.push row
+  return { file with rows := uniqueRows }
+
 end Utils.Lib.StatusCsv

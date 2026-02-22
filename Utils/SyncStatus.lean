@@ -76,7 +76,21 @@ def runSyncStatus (p : Parsed) : IO UInt32 := do
       IO.eprintln s!"  Adding: {fn.lean_name}"
       updatedFile := updatedFile.upsertFromFunction fn
 
-  -- Step 6: Detect stale rows (in status.csv but not in current functions)
+  -- Step 6: Detect duplicate rows (same lean_name appearing more than once)
+  let duplicateNames := updatedFile.findDuplicateLeanNames
+  if duplicateNames.size > 0 then
+    if prune then
+      IO.eprintln s!"Removing {duplicateNames.size} duplicate lean_names (keeping first occurrence):"
+      for name in duplicateNames do
+        IO.eprintln s!"  Deduped: {name}"
+      updatedFile := updatedFile.deduplicate
+    else
+      IO.eprintln s!"Warning: {duplicateNames.size} duplicate lean_names in status.csv:"
+      for name in duplicateNames do
+        IO.eprintln s!"  Duplicate: {name}"
+      IO.eprintln "  Use --prune to remove duplicates."
+
+  -- Step 7: Detect stale rows (in status.csv but not in current functions)
   let currentLeanNames : Std.HashSet String :=
     csvOutputs.foldl (init := Std.HashSet.emptyWithCapacity csvOutputs.size)
       fun acc fn => acc.insert fn.lean_name
@@ -97,12 +111,14 @@ def runSyncStatus (p : Parsed) : IO UInt32 := do
         IO.eprintln s!"  Stale: {name}"
       IO.eprintln "  Use --prune to remove them."
 
-  -- Step 7: Write updated file
+  -- Step 8: Write updated file
   writeStatusFile updatedFile csvPath
 
   IO.println s!"Sync complete:"
   IO.println s!"  - {addedCount} new functions added"
   IO.println s!"  - {updatedCount} existing functions updated"
+  if prune && duplicateNames.size > 0 then
+    IO.println s!"  - {duplicateNames.size} duplicate lean_names deduplicated"
   if prune && staleNames.size > 0 then
     IO.println s!"  - {staleNames.size} stale rows removed"
   IO.println s!"  - Total entries: {updatedFile.rows.size}"
@@ -118,10 +134,11 @@ Updates functions.json and syncs status.csv:
 - Adds new functions not yet in status.csv
 - Updates existing rows with current: rust_name, source, lines, verified status
 - Preserves manual fields: spec_theorem, notes, ai_proveable
+- Detects duplicate rows with the same lean_name (use --prune to deduplicate)
 - Detects stale rows no longer in current functions (use --prune to remove)"
 
   FLAGS:
-    p, prune; "Remove stale rows from status.csv (rows whose lean_name is no longer in current functions)"
+    p, prune; "Remove duplicate and stale rows from status.csv"
 
   ARGS:
     ...path : String; "Path to status.csv (default: status.csv)"
