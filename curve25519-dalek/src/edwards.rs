@@ -120,7 +120,6 @@ use {
 use rand_core::RngCore;
 
 use subtle::Choice;
-use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
 

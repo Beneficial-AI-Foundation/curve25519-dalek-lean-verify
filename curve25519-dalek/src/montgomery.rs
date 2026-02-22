@@ -62,8 +62,8 @@ use crate::scalar::{clamp_integer, Scalar};
 use crate::traits::Identity;
 
 use subtle::Choice;
-use subtle::ConstantTimeEq;
 use subtle::ConditionallySelectable;
+use subtle::ConstantTimeEq;
 
 #[cfg(feature = "zeroize")]
 use zeroize::Zeroize;

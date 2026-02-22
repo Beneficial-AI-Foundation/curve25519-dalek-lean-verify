@@ -28,7 +28,6 @@
 use cfg_if::cfg_if;
 
 use subtle::Choice;
-use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
 
