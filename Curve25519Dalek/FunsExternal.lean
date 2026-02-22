@@ -747,10 +747,28 @@ theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
-axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
-  :
-  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
-    → Result montgomery.MontgomeryPoint
+
+def montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
+  (choice : subtle.Choice) :
+  Result montgomery.ProjectivePoint :=
+  montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
+
+
+/-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_assign`**:
+- No panic (if conditional_select succeeds)
+- Returns the result of conditional_select(a, b, choice)
+-/
+@[progress]
+theorem montgomery.ConditionallySelectableProjectivePoint.conditional_assign_spec
+  (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
+  (h : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res) :
+  ∃ res,
+    montgomery.ConditionallySelectableProjectivePoint.conditional_assign a b choice = ok res ∧
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res := by
+  unfold montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  obtain ⟨res, h_eq⟩ := h
+  use res
 
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
