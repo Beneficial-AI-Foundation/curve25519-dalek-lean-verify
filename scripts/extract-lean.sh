@@ -135,6 +135,11 @@ generate_llbc() {
         --exclude 'curve25519_dalek::edwards::{impl zeroize::Zeroize for _}'
         # Exclude edwards Hash impl
         --exclude 'curve25519_dalek::edwards::{impl core::hash::Hash for _}'
+        # Exclude MultiscalarMul / VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul
+        # trait declarations (default methods use Iterator::map which Aeneas can't model)
+        --exclude 'curve25519_dalek::traits::MultiscalarMul'
+        --exclude 'curve25519_dalek::traits::VartimeMultiscalarMul'
+        --exclude 'curve25519_dalek::traits::VartimePrecomputedMultiscalarMul'
         # Exclude MultiscalarMul impls (use IntoIterator which Charon can't handle)
         --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}'
         --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}'
