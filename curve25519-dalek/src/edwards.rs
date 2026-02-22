@@ -156,7 +156,7 @@ use affine::AffinePoint;
 
 #[cfg(feature = "alloc")]
 use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 use alloc::vec::Vec;
 
 // ------------------------------------------------------------------------
@@ -412,6 +412,7 @@ impl CompressedEdwardsY {
     /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
     /// a length of 32.
     pub fn from_slice(bytes: &[u8]) -> Result<CompressedEdwardsY, TryFromSliceError> {
+        #[allow(clippy::redundant_closure)]
         bytes.try_into().map(|b| CompressedEdwardsY(b))
     }
 }

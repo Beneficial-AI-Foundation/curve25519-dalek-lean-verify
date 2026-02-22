@@ -9,6 +9,17 @@ and the modified version used in this verification project.
 
 ---
 
+diff -Naur --no-dereference a/curve25519-dalek/src/backend/mod.rs b/curve25519-dalek/src/backend/mod.rs
+--- a/curve25519-dalek/src/backend/mod.rs
++++ b/curve25519-dalek/src/backend/mod.rs
+@@ -263,6 +263,7 @@
+ }
+ 
+ /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
++#[allow(dead_code)]
+ #[allow(non_snake_case)]
+ pub fn vartime_double_base_mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
+     match get_selected_backend() {
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/mod.rs b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
 --- a/curve25519-dalek/src/backend/serial/curve_models/mod.rs
 +++ b/curve25519-dalek/src/backend/serial/curve_models/mod.rs
@@ -68,7 +79,15 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/var
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs
-@@ -30,7 +30,9 @@
+@@ -20,6 +20,7 @@
+ use crate::window::NafLookupTable5;
+ 
+ /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
++#[allow(dead_code)]
+ pub fn mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
+     let a_naf = a.non_adjacent_form(5);
+ 
+@@ -30,7 +31,9 @@
  
      // Find starting index
      let mut i: usize = 255;
@@ -230,17 +249,19 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  use subtle::ConditionallyNegatable;
  use subtle::ConditionallySelectable;
  use subtle::ConstantTimeEq;
-@@ -154,9 +155,7 @@
+@@ -154,10 +155,8 @@
  use affine::AffinePoint;
  
  #[cfg(feature = "alloc")]
 -use crate::traits::MultiscalarMul;
 -#[cfg(feature = "alloc")]
 -use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+-#[cfg(feature = "alloc")]
 +use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
- #[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
  use alloc::vec::Vec;
  
+ // ------------------------------------------------------------------------
 @@ -237,7 +236,8 @@
           // FieldElement::sqrt_ratio_i always returns the nonnegative square root,
           // so we negate according to the supplied sign bit.
@@ -251,16 +272,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  
          EdwardsPoint {
              X,
-@@ -412,7 +412,7 @@
+@@ -412,7 +412,8 @@
      /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
      /// a length of 32.
      pub fn from_slice(bytes: &[u8]) -> Result<CompressedEdwardsY, TryFromSliceError> {
 -        bytes.try_into().map(CompressedEdwardsY)
++        #[allow(clippy::redundant_closure)]
 +        bytes.try_into().map(|b| CompressedEdwardsY(b))
      }
  }
  
-@@ -582,7 +582,7 @@
+@@ -582,7 +583,7 @@
  
      /// Converts a large batch of points to Edwards at once. This has the same
      /// behavior on identity elements as [`Self::to_montgomery`].
@@ -269,7 +291,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
      pub fn to_montgomery_batch(eds: &[Self]) -> Vec<MontgomeryPoint> {
          // Do the same thing as the above function. u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
          // We will do this in a batch, ie compute (Z-Y) for all the input
-@@ -609,7 +609,7 @@
+@@ -609,7 +610,7 @@
  
      /// Compress several `EdwardsPoint`s into `CompressedEdwardsY` format, using a batch inversion
      /// for a significant speedup.
@@ -278,7 +300,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
      pub fn compress_batch(inputs: &[EdwardsPoint]) -> Vec<CompressedEdwardsY> {
          let mut zs = inputs.iter().map(|input| input.Z).collect::<Vec<_>>();
          FieldElement::batch_invert(&mut zs);
-@@ -1033,6 +1033,7 @@
+@@ -1033,6 +1034,7 @@
      }
  }
  
@@ -286,7 +308,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl EdwardsPoint {
      /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
      pub fn vartime_double_scalar_mul_basepoint(
-@@ -1329,9 +1330,11 @@
+@@ -1329,9 +1331,11 @@
          debug_assert!(k > 0);
          let mut r: CompletedPoint;
          let mut s = self.as_projective();
@@ -454,6 +476,15 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
 diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dalek/src/ristretto.rs
 --- a/curve25519-dalek/src/ristretto.rs
 +++ b/curve25519-dalek/src/ristretto.rs
+@@ -158,7 +158,7 @@
+ //! [ristretto_main]:
+ //! https://ristretto.group/
+ 
+-#[cfg(feature = "alloc")]
++#[cfg(all(feature = "alloc", not(verify)))]
+ use alloc::vec::Vec;
+ 
+ use core::array::TryFromSliceError;
 @@ -188,6 +188,7 @@
  };
  
@@ -462,16 +493,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  use subtle::ConditionallyNegatable;
  use subtle::ConditionallySelectable;
  use subtle::ConstantTimeEq;
-@@ -242,7 +243,7 @@
+@@ -242,7 +243,8 @@
      /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
      /// a length of 32.
      pub fn from_slice(bytes: &[u8]) -> Result<CompressedRistretto, TryFromSliceError> {
 -        bytes.try_into().map(CompressedRistretto)
++        #[allow(clippy::redundant_closure)]
 +        bytes.try_into().map(|b| CompressedRistretto(b))
      }
  
      /// Attempt to decompress to an `RistrettoPoint`.
-@@ -301,17 +302,24 @@
+@@ -301,17 +303,24 @@
          let u2_sqr = u2.square(); // (1 - as²)²
  
          // v == ad(1+as²)² - (1-as²)²            where d=-121665/121666
@@ -501,7 +533,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  
          // y == (1-as²)/(1+as²)
          let y = &u1 * &Dy;
-@@ -492,13 +500,18 @@
+@@ -492,13 +501,18 @@
          let Z = &self.0.Z;
          let T = &self.0.T;
  
@@ -523,7 +555,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
          let mut den_inv = i2;
  
          let iX = &X * &constants::SQRT_M1;
-@@ -506,17 +519,23 @@
+@@ -506,17 +520,23 @@
          let ristretto_magic = &constants::INVSQRT_A_MINUS_D;
          let enchanted_denominator = &i1 * ristretto_magic;
  
@@ -551,7 +583,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  
          CompressedRistretto(s.to_bytes())
      }
-@@ -549,7 +568,7 @@
+@@ -549,7 +569,7 @@
      /// }
      /// # }
      /// ```
@@ -560,7 +592,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
      pub fn double_and_compress_batch<'a, I>(points: I) -> Vec<CompressedRistretto>
      where
          I: IntoIterator<Item = &'a RistrettoPoint>,
-@@ -662,30 +681,46 @@
+@@ -662,30 +682,46 @@
  
          let one = FieldElement::ONE;
  
@@ -580,12 +612,12 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
          let mut s_prime = &s * r_0;
          let s_prime_is_pos = !s_prime.is_negative();
 -        s_prime.conditional_negate(s_prime_is_pos);
+-
+-        s.conditional_assign(&s_prime, !Ns_D_is_sq);
+-        c.conditional_assign(&r, !Ns_D_is_sq);
 +        let s_prime_neg = -&s_prime;
 +        s_prime.conditional_assign(&s_prime_neg, s_prime_is_pos);
  
--        s.conditional_assign(&s_prime, !Ns_D_is_sq);
--        c.conditional_assign(&r, !Ns_D_is_sq);
--
 -        let N_t = &(&(&c * &(&r - &one)) * d_minus_one_sq) - &D;
 +        let not_sq = !Ns_D_is_sq;
 +        s.conditional_assign(&s_prime, not_sq);
@@ -619,7 +651,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
              }
              .as_extended(),
          )
-@@ -1061,6 +1096,7 @@
+@@ -1061,6 +1097,7 @@
      }
  }
  
@@ -669,15 +701,16 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              acc = tmp;
          }
  
-@@ -837,6 +845,7 @@
+@@ -837,6 +845,8 @@
      }
  
      /// Get the bits of the scalar, in little-endian order
 +    #[cfg(not(verify))]
++    #[allow(dead_code)]
      pub(crate) fn bits_le(&self) -> impl DoubleEndedIterator<Item = bool> + '_ {
          (0..256).map(|i| {
              // As i runs from 0..256, the bottom 3 bits index the bit, while the upper bits index
-@@ -998,17 +1007,21 @@
+@@ -998,17 +1008,21 @@
              (x >> 4) & 15
          }
  
@@ -701,7 +734,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
          }
          // Precondition note: output[63] is not recentered.  It
          // increases by carry <= 1.  Thus output[63] <= 8.
-@@ -1165,8 +1178,10 @@
+@@ -1165,8 +1179,10 @@
  
          #[inline]
          fn square_multiply(y: &mut UnpackedScalar, squarings: usize, x: &UnpackedScalar) {
@@ -713,7 +746,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              }
              *y = UnpackedScalar::montgomery_mul(y, x);
          }
-@@ -1348,18 +1363,21 @@
+@@ -1348,18 +1364,21 @@
  /// ## Panics
  /// Panics if `src.len() != 8 * dst.len()`.
  fn read_le_u64_into(src: &[u8], dst: &mut [u64]) {

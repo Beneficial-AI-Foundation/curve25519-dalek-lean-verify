@@ -158,7 +158,7 @@
 //! [ristretto_main]:
 //! https://ristretto.group/
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 use alloc::vec::Vec;
 
 use core::array::TryFromSliceError;
@@ -243,6 +243,7 @@ impl CompressedRistretto {
     /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
     /// a length of 32.
     pub fn from_slice(bytes: &[u8]) -> Result<CompressedRistretto, TryFromSliceError> {
+        #[allow(clippy::redundant_closure)]
         bytes.try_into().map(|b| CompressedRistretto(b))
     }
 
