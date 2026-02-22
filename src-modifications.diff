@@ -734,7 +734,46 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
          }
          // Precondition note: output[63] is not recentered.  It
          // increases by carry <= 1.  Thus output[63] <= 8.
-@@ -1165,8 +1179,10 @@
+@@ -1023,11 +1037,18 @@
+         debug_assert!(w >= 4);
+         debug_assert!(w <= 8);
+ 
+-        let digits_count = match w {
+-            4..=7 => (256 + w - 1) / w,
++        // TODO: upstream uses `match w { 4..=7 => ..., 8 => ... }` but Aeneas
++        // translates usize match arms as scalar patterns which fail Lean's
++        // dependent elimination for Usize (see FIXME in
++        // aeneas/backends/lean/Aeneas/Std/Scalar/Notations.lean:131-142).
++        // Using if/else avoids the issue.
++        let digits_count = if w <= 7 {
++            (256 + w - 1) / w
++        } else if w == 8 {
+             // See comment in to_radix_2w on handling the terminal carry.
+-            8 => (256 + w - 1) / w + 1_usize,
+-            _ => panic!("invalid radix parameter"),
++            (256 + w - 1) / w + 1_usize
++        } else {
++            panic!("invalid radix parameter")
+         };
+ 
+         debug_assert!(digits_count <= 64);
+@@ -1107,9 +1128,12 @@
+         // reduced scalars, but Scalar invariant #1 allows 255-bit scalars.
+         // To handle this, we expand the size_hint by 1 when w=8,
+         // and accumulate the final carry onto another digit.
+-        match w {
+-            8 => digits[digits_count] += carry as i8,
+-            _ => digits[digits_count - 1] += (carry << w) as i8,
++        // TODO: upstream uses `match w { 8 => ..., _ => ... }` — see
++        // TODO comment in to_radix_2w_size_hint for why we use if/else.
++        if w == 8 {
++            digits[digits_count] += carry as i8;
++        } else {
++            digits[digits_count - 1] += (carry << w) as i8;
+         }
+ 
+         digits
+@@ -1165,8 +1189,10 @@
  
          #[inline]
          fn square_multiply(y: &mut UnpackedScalar, squarings: usize, x: &UnpackedScalar) {
@@ -746,7 +785,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/scalar.rs b/curve25519-dalek/
              }
              *y = UnpackedScalar::montgomery_mul(y, x);
          }
-@@ -1348,18 +1364,21 @@
+@@ -1348,18 +1374,21 @@
  /// ## Panics
  /// Panics if `src.len() != 8 * dst.len()`.
  fn read_le_u64_into(src: &[u8], dst: &mut [u64]) {

@@ -1037,11 +1037,18 @@ impl Scalar {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
 
-        let digits_count = match w {
-            4..=7 => (256 + w - 1) / w,
+        // TODO: upstream uses `match w { 4..=7 => ..., 8 => ... }` but Aeneas
+        // translates usize match arms as scalar patterns which fail Lean's
+        // dependent elimination for Usize (see FIXME in
+        // aeneas/backends/lean/Aeneas/Std/Scalar/Notations.lean:131-142).
+        // Using if/else avoids the issue.
+        let digits_count = if w <= 7 {
+            (256 + w - 1) / w
+        } else if w == 8 {
             // See comment in to_radix_2w on handling the terminal carry.
-            8 => (256 + w - 1) / w + 1_usize,
-            _ => panic!("invalid radix parameter"),
+            (256 + w - 1) / w + 1_usize
+        } else {
+            panic!("invalid radix parameter")
         };
 
         debug_assert!(digits_count <= 64);
@@ -1121,9 +1128,12 @@ impl Scalar {
         // reduced scalars, but Scalar invariant #1 allows 255-bit scalars.
         // To handle this, we expand the size_hint by 1 when w=8,
         // and accumulate the final carry onto another digit.
-        match w {
-            8 => digits[digits_count] += carry as i8,
-            _ => digits[digits_count - 1] += (carry << w) as i8,
+        // TODO: upstream uses `match w { 8 => ..., _ => ... }` — see
+        // TODO comment in to_radix_2w_size_hint for why we use if/else.
+        if w == 8 {
+            digits[digits_count] += carry as i8;
+        } else {
+            digits[digits_count - 1] += (carry << w) as i8;
         }
 
         digits
