@@ -620,11 +620,6 @@ axiom field.PartialEqFieldElement51FieldElement51.ne
 axiom scalar.PartialEqScalarScalar.ne
   : scalar.Scalar → scalar.Scalar → Result Bool
 
-/- [curve25519_dalek::scalar::{core::cmp::Eq for curve25519_dalek::scalar::Scalar}::assert_receiver_is_total_eq]:
-   Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
-axiom scalar.EqScalar.assert_receiver_is_total_eq
-  : scalar.Scalar → Result Unit
-
 /- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_assign]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
 axiom scalar.ConditionallySelectableScalar.conditional_assign
@@ -735,6 +730,28 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
   let b_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice
   ok (a_new, b_new)
 
+@[progress]
+theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_spec
+  (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
+  (h_a : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res)
+  (h_b : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice = ok res) :
+  ∃ c,
+    montgomery.ConditionallySelectableProjectivePoint.conditional_swap a b choice = ok c ∧
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok c.1 ∧
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice = ok c.2 := by
+  unfold montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  use (a_new, b_new)
+  simp [h_a_eq, h_b_eq]
+
+/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
+  :
+  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+    → Result montgomery.MontgomeryPoint
+
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
 axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
@@ -742,8 +759,21 @@ axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
 
 /- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
-axiom montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
-  : montgomery.MontgomeryPoint → Result Unit
+
+/-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
+   Returns Unit (no-op assertion that Eq is properly implemented). -/
+def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl
+  (_self : montgomery.MontgomeryPoint) : Result Unit :=
+  ok ()
+
+/-- **Progress spec for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl`**. -/
+@[progress]
+theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl_spec
+  (self : montgomery.MontgomeryPoint) :
+  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl self = ok () := by
+  rfl
+
+
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
@@ -811,17 +841,5 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_spec
   unfold subtle.ConditionallySelectableArray.conditional_select
   split <;> simp_all
 
-/-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
-   Returns Unit (no-op assertion that Eq is properly implemented). -/
-def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl
-  (_self : montgomery.MontgomeryPoint) : Result Unit :=
-  ok ()
-
-/-- **Progress spec for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl`**. -/
-@[progress]
-theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl_spec
-  (self : montgomery.MontgomeryPoint) :
-  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl self = ok () := by
-  rfl
 
 end curve25519_dalek
