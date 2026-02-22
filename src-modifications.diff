@@ -401,7 +401,15 @@ diff -Naur --no-dereference a/curve25519-dalek/src/constants.rs b/curve25519-dal
 diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek/src/edwards.rs
 --- a/curve25519-dalek/src/edwards.rs
 +++ b/curve25519-dalek/src/edwards.rs
-@@ -139,13 +139,13 @@
+@@ -120,7 +120,6 @@
+ use rand_core::RngCore;
+ 
+ use subtle::Choice;
+-use subtle::ConditionallyNegatable;
+ use subtle::ConditionallySelectable;
+ use subtle::ConstantTimeEq;
+ 
+@@ -139,13 +138,13 @@
  use crate::backend::serial::curve_models::ProjectiveNielsPoint;
  use crate::backend::serial::curve_models::ProjectivePoint;
  
@@ -417,7 +425,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  use crate::traits::BasepointTable;
  
  use crate::traits::ValidityCheck;
-@@ -155,7 +155,7 @@
+@@ -155,7 +154,7 @@
  
  #[cfg(feature = "alloc")]
  use crate::traits::MultiscalarMul;
@@ -426,7 +434,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
  #[cfg(feature = "alloc")]
  use alloc::vec::Vec;
-@@ -237,7 +237,8 @@
+@@ -237,7 +236,8 @@
           // FieldElement::sqrt_ratio_i always returns the nonnegative square root,
           // so we negate according to the supplied sign bit.
          let compressed_sign_bit = Choice::from(repr.as_bytes()[31] >> 7);
@@ -436,7 +444,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  
          EdwardsPoint {
              X,
-@@ -412,7 +413,7 @@
+@@ -412,7 +412,7 @@
      /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
      /// a length of 32.
      pub fn from_slice(bytes: &[u8]) -> Result<CompressedEdwardsY, TryFromSliceError> {
@@ -445,7 +453,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
      }
  }
  
-@@ -582,7 +583,7 @@
+@@ -582,7 +582,7 @@
  
      /// Converts a large batch of points to Edwards at once. This has the same
      /// behavior on identity elements as [`Self::to_montgomery`].
@@ -454,7 +462,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
      pub fn to_montgomery_batch(eds: &[Self]) -> Vec<MontgomeryPoint> {
          // Do the same thing as the above function. u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
          // We will do this in a batch, ie compute (Z-Y) for all the input
-@@ -609,7 +610,7 @@
+@@ -609,7 +609,7 @@
  
      /// Compress several `EdwardsPoint`s into `CompressedEdwardsY` format, using a batch inversion
      /// for a significant speedup.
@@ -463,7 +471,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
      pub fn compress_batch(inputs: &[EdwardsPoint]) -> Vec<CompressedEdwardsY> {
          let mut zs = inputs.iter().map(|input| input.Z).collect::<Vec<_>>();
          FieldElement::batch_invert(&mut zs);
-@@ -874,12 +875,12 @@
+@@ -874,12 +874,12 @@
      /// Uses precomputed basepoint tables when the `precomputed-tables` feature
      /// is enabled, trading off increased code size for ~4x better performance.
      pub fn mul_base(scalar: &Scalar) -> Self {
@@ -478,7 +486,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          {
              scalar * constants::ED25519_BASEPOINT_TABLE
          }
-@@ -953,7 +954,7 @@
+@@ -953,7 +953,7 @@
      }
  }
  
@@ -487,7 +495,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl VartimeMultiscalarMul for EdwardsPoint {
      type Point = EdwardsPoint;
  
-@@ -992,10 +993,10 @@
+@@ -992,10 +992,10 @@
  // This wraps the inner implementation in a facade type so that we can
  // decouple stability of the inner type from the stability of the
  // outer type.
@@ -500,7 +508,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
      type Point = EdwardsPoint;
  
-@@ -1033,6 +1034,7 @@
+@@ -1033,6 +1033,7 @@
      }
  }
  
@@ -508,7 +516,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  impl EdwardsPoint {
      /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
      pub fn vartime_double_scalar_mul_basepoint(
-@@ -1044,7 +1046,7 @@
+@@ -1044,7 +1045,7 @@
      }
  }
  
@@ -517,7 +525,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  macro_rules! impl_basepoint_table {
      (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
          /// A precomputed table of multiples of a basepoint, for accelerating
-@@ -1202,7 +1204,7 @@
+@@ -1202,7 +1203,7 @@
  
  // The number of additions required is ceil(256/w) where w is the radix representation.
  cfg_if! {
@@ -526,7 +534,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          impl_basepoint_table! {
              Name = EdwardsBasepointTable,
              LookupTable = LookupTableRadix16,
-@@ -1249,7 +1251,7 @@
+@@ -1249,7 +1250,7 @@
      }
  }
  
@@ -535,7 +543,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
  macro_rules! impl_basepoint_table_conversions {
      (LHS = $lhs:ty, RHS = $rhs:ty) => {
          impl<'a> From<&'a $lhs> for $rhs {
-@@ -1267,7 +1269,7 @@
+@@ -1267,7 +1268,7 @@
  }
  
  cfg_if! {
@@ -544,7 +552,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
          // Conversions from radix 16
          impl_basepoint_table_conversions! {
              LHS = EdwardsBasepointTableRadix16,
-@@ -1329,9 +1331,11 @@
+@@ -1329,9 +1330,11 @@
          debug_assert!(k > 0);
          let mut r: CompletedPoint;
          let mut s = self.as_projective();
@@ -560,7 +568,15 @@ diff -Naur --no-dereference a/curve25519-dalek/src/edwards.rs b/curve25519-dalek
 diff -Naur --no-dereference a/curve25519-dalek/src/field.rs b/curve25519-dalek/src/field.rs
 --- a/curve25519-dalek/src/field.rs
 +++ b/curve25519-dalek/src/field.rs
-@@ -206,7 +206,7 @@
+@@ -28,7 +28,6 @@
+ use cfg_if::cfg_if;
+ 
+ use subtle::Choice;
+-use subtle::ConditionallyNegatable;
+ use subtle::ConditionallySelectable;
+ use subtle::ConstantTimeEq;
+ 
+@@ -206,7 +205,7 @@
      /// Given a slice of pub(crate)lic `FieldElements`, replace each with its inverse.
      ///
      /// When an input `FieldElement` is zero, its value is unchanged.
@@ -569,7 +585,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/field.rs b/curve25519-dalek/s
      pub(crate) fn batch_invert(inputs: &mut [FieldElement]) {
          // Montgomery’s Trick and Fast Implementation of Masked AES
          // Genelle, Prouff and Quisquater
-@@ -330,7 +330,8 @@
+@@ -330,7 +329,8 @@
  
          // Choose the nonnegative square root.
          let r_is_negative = r.is_negative();
@@ -594,12 +610,13 @@ diff -Naur --no-dereference a/curve25519-dalek/src/lib.rs b/curve25519-dalek/src
 diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-dalek/src/montgomery.rs
 --- a/curve25519-dalek/src/montgomery.rs
 +++ b/curve25519-dalek/src/montgomery.rs
-@@ -63,7 +63,7 @@
+@@ -62,8 +62,8 @@
+ use crate::traits::Identity;
  
  use subtle::Choice;
++use subtle::ConditionallySelectable;
  use subtle::ConstantTimeEq;
 -use subtle::{ConditionallyNegatable, ConditionallySelectable};
-+use subtle::ConditionallySelectable;
  
  #[cfg(feature = "zeroize")]
  use zeroize::Zeroize;
@@ -695,7 +712,14 @@ diff -Naur --no-dereference a/curve25519-dalek/src/montgomery.rs b/curve25519-da
 diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dalek/src/ristretto.rs
 --- a/curve25519-dalek/src/ristretto.rs
 +++ b/curve25519-dalek/src/ristretto.rs
-@@ -195,17 +195,19 @@
+@@ -188,24 +188,25 @@
+ };
+ 
+ use subtle::Choice;
+-use subtle::ConditionallyNegatable;
+ use subtle::ConditionallySelectable;
+ use subtle::ConstantTimeEq;
+ 
  #[cfg(feature = "zeroize")]
  use zeroize::Zeroize;
  
@@ -718,7 +742,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  
  // ------------------------------------------------------------------------
  // Compressed points
-@@ -242,7 +244,7 @@
+@@ -242,7 +243,7 @@
      /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
      /// a length of 32.
      pub fn from_slice(bytes: &[u8]) -> Result<CompressedRistretto, TryFromSliceError> {
@@ -727,7 +751,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
      }
  
      /// Attempt to decompress to an `RistrettoPoint`.
-@@ -301,17 +303,24 @@
+@@ -301,17 +302,24 @@
          let u2_sqr = u2.square(); // (1 - as²)²
  
          // v == ad(1+as²)² - (1-as²)²            where d=-121665/121666
@@ -757,7 +781,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  
          // y == (1-as²)/(1+as²)
          let y = &u1 * &Dy;
-@@ -492,13 +501,18 @@
+@@ -492,13 +500,18 @@
          let Z = &self.0.Z;
          let T = &self.0.T;
  
@@ -779,7 +803,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
          let mut den_inv = i2;
  
          let iX = &X * &constants::SQRT_M1;
-@@ -506,17 +520,23 @@
+@@ -506,17 +519,23 @@
          let ristretto_magic = &constants::INVSQRT_A_MINUS_D;
          let enchanted_denominator = &i1 * ristretto_magic;
  
@@ -807,7 +831,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  
          CompressedRistretto(s.to_bytes())
      }
-@@ -549,7 +569,7 @@
+@@ -549,7 +568,7 @@
      /// }
      /// # }
      /// ```
@@ -816,7 +840,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
      pub fn double_and_compress_batch<'a, I>(points: I) -> Vec<CompressedRistretto>
      where
          I: IntoIterator<Item = &'a RistrettoPoint>,
-@@ -662,30 +682,46 @@
+@@ -662,30 +681,46 @@
  
          let one = FieldElement::ONE;
  
@@ -875,7 +899,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
              }
              .as_extended(),
          )
-@@ -950,12 +986,12 @@
+@@ -950,12 +985,12 @@
      /// Uses precomputed basepoint tables when the `precomputed-tables` feature
      /// is enabled, trading off increased code size for ~4x better performance.
      pub fn mul_base(scalar: &Scalar) -> Self {
@@ -890,7 +914,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
          {
              scalar * constants::RISTRETTO_BASEPOINT_TABLE
          }
-@@ -990,7 +1026,7 @@
+@@ -990,7 +1025,7 @@
      }
  }
  
@@ -899,7 +923,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  impl VartimeMultiscalarMul for RistrettoPoint {
      type Point = RistrettoPoint;
  
-@@ -1013,10 +1049,10 @@
+@@ -1013,10 +1048,10 @@
  // This wraps the inner implementation in a facade type so that we can
  // decouple stability of the inner type from the stability of the
  // outer type.
@@ -912,7 +936,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
      type Point = RistrettoPoint;
  
-@@ -1061,6 +1097,7 @@
+@@ -1061,6 +1096,7 @@
      }
  }
  
@@ -920,7 +944,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  impl RistrettoPoint {
      /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the
      /// Ristretto basepoint.
-@@ -1087,12 +1124,12 @@
+@@ -1087,12 +1123,12 @@
  /// let a = Scalar::from(87329482u64);
  /// let P = &a * RISTRETTO_BASEPOINT_TABLE;
  /// ```
@@ -935,7 +959,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
      type Output = RistrettoPoint;
  
-@@ -1101,7 +1138,7 @@
+@@ -1101,7 +1137,7 @@
      }
  }
  
@@ -944,7 +968,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
  impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
      type Output = RistrettoPoint;
  
-@@ -1110,7 +1147,7 @@
+@@ -1110,7 +1146,7 @@
      }
  }
  
