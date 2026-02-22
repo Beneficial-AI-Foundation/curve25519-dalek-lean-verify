@@ -161,10 +161,16 @@ generate_llbc() {
         # --opaque 'curve25519_dalek::something::somename'
     )
 
-    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR"
+    # Build with --no-default-features to exclude precomputed-tables.
+    # This avoids extracting the large precomputed basepoint tables and their
+    # macro-generated impls (EdwardsBasepointTable, RistrettoBasepointTable, etc.)
+    # which Aeneas cannot handle.
+    CARGO_FEATURE_ARGS="--no-default-features --features alloc,zeroize"
+
+    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR $CARGO_FEATURE_ARGS"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
     echo "Logging output to $ROOT/.logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" $CARGO_FEATURE_ARGS 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"

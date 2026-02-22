@@ -196,13 +196,13 @@ use subtle::ConstantTimeEq;
 #[cfg(feature = "zeroize")]
 use zeroize::Zeroize;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::edwards::EdwardsBasepointTable;
 use crate::edwards::EdwardsPoint;
 
 use crate::scalar::Scalar;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::traits::BasepointTable;
 use crate::traits::Identity;
 #[cfg(feature = "alloc")]
@@ -985,12 +985,12 @@ impl RistrettoPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+        #[cfg(not(feature = "precomputed-tables"))]
         {
             scalar * constants::RISTRETTO_BASEPOINT_POINT
         }
 
-        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+        #[cfg(feature = "precomputed-tables")]
         {
             scalar * constants::RISTRETTO_BASEPOINT_TABLE
         }
@@ -1123,12 +1123,12 @@ impl RistrettoPoint {
 /// let a = Scalar::from(87329482u64);
 /// let P = &a * RISTRETTO_BASEPOINT_TABLE;
 /// ```
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 #[derive(Clone)]
 #[repr(transparent)]
 pub struct RistrettoBasepointTable(pub(crate) EdwardsBasepointTable);
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     type Output = RistrettoPoint;
 
@@ -1137,7 +1137,7 @@ impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     type Output = RistrettoPoint;
 
@@ -1146,7 +1146,7 @@ impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl RistrettoBasepointTable {
     /// Create a precomputed table of multiples of the given `basepoint`.
     pub fn create(basepoint: &RistrettoPoint) -> RistrettoBasepointTable {

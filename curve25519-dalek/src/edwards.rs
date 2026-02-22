@@ -140,13 +140,13 @@ use crate::backend::serial::curve_models::CompletedPoint;
 use crate::backend::serial::curve_models::ProjectiveNielsPoint;
 use crate::backend::serial::curve_models::ProjectivePoint;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::window::{
     LookupTableRadix128, LookupTableRadix16, LookupTableRadix256, LookupTableRadix32,
     LookupTableRadix64,
 };
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::traits::BasepointTable;
 
 use crate::traits::ValidityCheck;
@@ -874,12 +874,12 @@ impl EdwardsPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+        #[cfg(not(feature = "precomputed-tables"))]
         {
             scalar * constants::ED25519_BASEPOINT_POINT
         }
 
-        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+        #[cfg(feature = "precomputed-tables")]
         {
             scalar * constants::ED25519_BASEPOINT_TABLE
         }
@@ -1045,7 +1045,7 @@ impl EdwardsPoint {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 macro_rules! impl_basepoint_table {
     (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
         /// A precomputed table of multiples of a basepoint, for accelerating
@@ -1203,7 +1203,7 @@ macro_rules! impl_basepoint_table {
 
 // The number of additions required is ceil(256/w) where w is the radix representation.
 cfg_if! {
-    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+    if #[cfg(feature = "precomputed-tables")] {
         impl_basepoint_table! {
             Name = EdwardsBasepointTable,
             LookupTable = LookupTableRadix16,
@@ -1250,7 +1250,7 @@ cfg_if! {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 macro_rules! impl_basepoint_table_conversions {
     (LHS = $lhs:ty, RHS = $rhs:ty) => {
         impl<'a> From<&'a $lhs> for $rhs {
@@ -1268,7 +1268,7 @@ macro_rules! impl_basepoint_table_conversions {
 }
 
 cfg_if! {
-    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+    if #[cfg(feature = "precomputed-tables")] {
         // Conversions from radix 16
         impl_basepoint_table_conversions! {
             LHS = EdwardsBasepointTableRadix16,

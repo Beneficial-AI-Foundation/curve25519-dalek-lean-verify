@@ -20,7 +20,6 @@ use crate::traits::Identity;
 use crate::window::NafLookupTable5;
 
 /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
-#[cfg(not(verify))]
 pub fn mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
     let a_naf = a.non_adjacent_form(5);
 
