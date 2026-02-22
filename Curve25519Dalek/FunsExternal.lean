@@ -650,6 +650,20 @@ def subtle.ConditionallySelectableArray.conditional_select
   if choice.val = 1#u8 then ok b
   else ok a
 
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
+   Conditional swap for arrays: swaps a and b if choice is 1 -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
+def subtle.ConditionallySelectableArray.conditional_swap
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
+  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
+  ok (a_new, b_new)
+
 /-- Progress spec for ConditionallySelectableArray.conditional_select -/
 @[progress]
 theorem conditional_select_Array_spec {T : Type} {N : Usize}
@@ -672,26 +686,54 @@ def subtle.ConditionallySelectableArray.conditional_assign
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
   subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
 
-/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
-   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
-   Conditional swap for arrays: swaps a and b if choice is 1 -/
-@[rust_fun
-  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
-def subtle.ConditionallySelectableArray.conditional_swap
-  {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T)
-  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
-  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
-  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
-  ok (a_new, b_new)
 
-/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
-axiom montgomery.ConditionallySelectableProjectivePoint.conditional_swap
-  :
-  montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
-    → Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint)
+def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+  (a : backend.serial.u64.field.FieldElement51)
+  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
+  Result backend.serial.u64.field.FieldElement51
+  := do
+  let i ← Array.index_usize a 0#usize
+  let i1 ← Array.index_usize b 0#usize
+  let i2 ← subtle.ConditionallySelectableU64.conditional_select i i1 choice
+  let i3 ← Array.index_usize a 1#usize
+  let i4 ← Array.index_usize b 1#usize
+  let i5 ← subtle.ConditionallySelectableU64.conditional_select i3 i4 choice
+  let i6 ← Array.index_usize a 2#usize
+  let i7 ← Array.index_usize b 2#usize
+  let i8 ← subtle.ConditionallySelectableU64.conditional_select i6 i7 choice
+  let i9 ← Array.index_usize a 3#usize
+  let i10 ← Array.index_usize b 3#usize
+  let i11 ←
+    subtle.ConditionallySelectableU64.conditional_select i9 i10 choice
+  let i12 ← Array.index_usize a 4#usize
+  let i13 ← Array.index_usize b 4#usize
+  let i14 ←
+    subtle.ConditionallySelectableU64.conditional_select i12 i13 choice
+  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5 -/
+def montgomery.ConditionallySelectableProjectivePoint.conditional_select
+  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
+  (choice : subtle.Choice) :
+  Result montgomery.ProjectivePoint
+  := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.U b.U choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+      a.W b.W choice
+  ok { U := fe, W := fe1 }
+
+def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
+  (choice : subtle.Choice) :
+  Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) := do
+  let a_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
+  let b_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice
+  ok (a_new, b_new)
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
@@ -702,10 +744,10 @@ axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
-axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
-  :
-  montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
-    → Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint)
+-- axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+--   :
+--   montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
+--     → Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint)
 
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
@@ -743,24 +785,52 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_imp
   unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl
   by_cases h : choice.val = 1#u8 <;> simp [h]
 
-/-- Implementation of `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap`:
-   Returns `(b, a)` if `choice.val = 1`; otherwise `(a, b)`. -/
-noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl
+
+/-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u8}]
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
+   Name pattern: [subtle::ConditionallySelectable<u8>] -/
+@[reducible, rust_trait_impl "subtle::ConditionallySelectable<u8>"]
+noncomputable def subtle.ConditionallySelectableU8 : subtle.ConditionallySelectable U8 := {
+  coremarkerCopyInst := core.marker.CopyU8
+  conditional_select := subtle.ConditionallySelectableU8.conditional_select
+  conditional_assign := subtle.ConditionallySelectableU8.conditional_assign
+  conditional_swap := subtle.ConditionallySelectableU8.conditional_swap
+}
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5 -/
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
-  Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) :=
-  if choice.val = 1#u8 then ok (b, a) else ok (a, b)
+  Result montgomery.MontgomeryPoint
+  := do
+  let a1 ←
+    subtle.ConditionallySelectableArray.conditional_select
+      subtle.ConditionallySelectableU8 a b choice
+  ok a1
 
-/-- **Progress spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl`**. -/
-@[progress]
-theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl_spec
-  (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
-  ∃ res,
-    montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl a b choice = ok res ∧
-    res = (if choice.val = 1#u8 then (b, a) else (a, b)) := by
-  refine ⟨if choice.val = 1#u8 then (b, a) else (a, b), ?_, rfl⟩
-  unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl
-  by_cases h : choice.val = 1#u8 <;> simp [h]
+/-- Implementation of `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap`:
+   Returns `(b, a)` if `choice.val = 1`; otherwise `(a, b)`. -/
+
+noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
+  (choice : subtle.Choice) :
+  Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) := do
+  let a_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select a b choice
+  let b_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select b a choice
+  ok (a_new, b_new)
+
+-- /-- **Progress spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl`**. -/
+
+-- @[progress]
+-- theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl_spec
+--   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
+--   ∃ res,
+--     montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl a b choice = ok res ∧
+--     res = (if choice.val = 1#u8 then (b, a) else (a, b)) := by
+--   refine ⟨if choice.val = 1#u8 then (b, a) else (a, b), ?_, rfl⟩
+--   unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_impl
+--   by_cases h : choice.val = 1#u8 <;> simp [h]
 
 /-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
    Returns Unit (no-op assertion that Eq is properly implemented). -/
