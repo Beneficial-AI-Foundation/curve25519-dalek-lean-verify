@@ -53,7 +53,7 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     h ∣ clamped_scalar_nat ∧
     clamped_scalar_nat < 2 ^ 255 ∧
     2 ^ 254 ≤ clamped_scalar_nat ∧
-    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)))    := by
+    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)))    := by
    unfold mul_base_clamped
    progress*
    exact ⟨U8x32_as_Nat a, a_post_1, a_post_2, a_post_3, res_post⟩

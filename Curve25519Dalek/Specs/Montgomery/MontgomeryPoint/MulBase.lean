@@ -52,7 +52,7 @@ natural language specs:
 @[progress]
 theorem mul_base_spec (scalar : scalar.Scalar) :
     spec (mul_base scalar) (fun result =>
-    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))
      := by
     unfold mul_base
     progress*

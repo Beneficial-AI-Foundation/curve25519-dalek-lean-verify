@@ -59,12 +59,25 @@ natural language specs:
     • The output point pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0 (all checks pass)
 -/
 
-/-- **Spec and proof concerning `ristretto.decompress.step_2`**:
+/-- **Spec for `step_2`**
+Reflects the Rust implementation:
+1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.
+2.  Computes validity flags `ok1` (square exists), `c` (non-negative T), `c1` (non-zero Y).
+
+It proves:
+1.  **Low-Level Correctness**: The flags correspond exactly to their mathematical definitions.
+2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2` **iff** the flags indicate success.
+
+Namely:
     • The function always succeeds (no panic) for any valid field element `s`
     • ok1 is true if and only if the inverse square root of v · u2² exists
     • c is true if and only if t is negative
     • c1 is true if and only if y is zero
     • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0
+Moreover if the high-level function returns `some P`, then:
+a) The Rust flags must be set to success (1, 0, 0)
+b) The Rust point `pt` must match the mathematical point `P`
+And conversely.
 -/
 @[progress]
 theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :

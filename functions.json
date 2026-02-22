@@ -2492,10 +2492,13 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem EIGHT_TORSION_spec :\n    let P := EIGHT_TORSION.val[1]\n    P.IsValid ∧\n    (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧\n    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧\n    EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EIGHT_TORSION.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.constants.EIGHT_TORSION`**:\n• P := EIGHT_TORSION[1] is a valid EdwardsPoint\n• P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that the order of P divides 8)\n• For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION",
@@ -3371,7 +3374,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    spec (from_bytes bytes) (fun result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p]) := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    spec (from_bytes bytes) (fun result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -5833,7 +5836,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    spec (to_montgomery e) (fun mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards.toPoint (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))) := by ...",
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    spec (to_montgomery e) (fun mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))) := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_montgomery`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting MontgomeryPoint has u-coordinate:\n  - If Z ≢ Y (mod p): u ≡ (Z+Y) * (Z-Y)^(-1) (mod p)\n  - If Z ≡ Y (mod p): u ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -6761,7 +6764,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    spec (mul_base scalar) (fun result =>\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))\n := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    spec (mul_base scalar) (fun result =>\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -6780,7 +6783,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    spec (mul_base_clamped bytes) (fun result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint))) := by ...",
+   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    spec (mul_base_clamped bytes) (fun result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -8127,10 +8130,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    spec (coset4 self) (fun result =>\n    ∀ (i : Fin 4), result.val[i].IsValid ∧\n                   result.val[i].toPoint = self.toPoint + EIGHT_TORSION.val[2*i].toPoint) := by ...",
+   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    spec (coset4 self) (fun result =>\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint) := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
@@ -8149,11 +8152,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n\nNote that validity here also implicitly guarantees the (correct but not immediately obvious)\nproperty that the elligator map only generates even Edwards points.\n-/",
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n• The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging\n  the implementation to the pure mathematical Elligator map defined in Representation.lean\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
@@ -8220,14 +8223,14 @@
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul",
     "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    spec (step_1 c) (fun (s_encoding_is_canonical, s_is_negative, s) =>\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    s.IsValid) := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    spec (step_1 c) (fun (s_encoding_is_canonical, s_is_negative, s) =>\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8))) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_1`**:\n    • The function always succeeds (no panic) for any 32-byte input `c`\n    • s_encoding_is_canonical is true if and only if U8x32_as_Nat(c) < p\n    • s_is_negative is true if and only if s is negative (LSB = 1)\n    • The output field element s is valid (i.e., its limbs are appropriately bounded)\n-/",
+   "/-- **Spec for `step_1`**\nReflects the Rust implementation:\n1.  Computes `s` from bytes.\n2.  Computes `s_encoding_is_canonical` (checks if bytes < p).\n3.  Computes `s_is_negative` (checks sign).\n\nIt proves two things:\n1.  **Low-Level Correctness**: The flags match the specific bitwise conditions (`< p`, `is_negative`).\n2.  **High-Level Correctness**: The function returns a valid result **iff** `decompress_step1` would return `some`.\n\nNamely:\n1. Existence: The function always succeeds\n2. Safety: The resulting field element has valid limb bounds\n3. Value Consistency: The field element `s` is the integer value of the bytes `c`\n4. Granular Flag Meanings\n5. The bridge that proves \"Passing the Rust checks\" iff \"decompress_step1 Succeeding\"\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_1",
    "lines": "L277-L295",
@@ -8248,7 +8251,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.decompress.step_2`**:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\n-/",
+   "/-- **Spec for `step_2`**\nReflects the Rust implementation:\n1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.\n2.  Computes validity flags `ok1` (square exists), `c` (non-negative T), `c1` (non-zero Y).\n\nIt proves:\n1.  **Low-Level Correctness**: The flags correspond exactly to their mathematical definitions.\n2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2` **iff** the flags indicate success.\n\nNamely:\n    • The function always succeeds (no panic) for any valid field element `s`\n    • ok1 is true if and only if the inverse square root of v · u2² exists\n    • c is true if and only if t is negative\n    • c1 is true if and only if y is zero\n    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0\nMoreover if the high-level function returns `some P`, then:\na) The Rust flags must be set to success (1, 0, 0)\nb) The Rust point `pt` must match the mathematical point `P`\nAnd conversely.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name": "curve25519_dalek::ristretto::decompress::step_2",
    "lines": "L297-L342",

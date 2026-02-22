@@ -75,7 +75,7 @@ theorem ct_eq_spec (u v : MontgomeryPoint) :
   have key := res_post.trans (to_bytes_iff_mod self_fe other_fe)
   rw [key, ← Nat.ModEq]
   constructor
-  · intro h; exact (self_fe_post.symm.trans h).trans other_fe_post
-  · intro h; exact (self_fe_post.trans h).trans other_fe_post.symm
+  · intro h; exact (self_fe_post_1.symm.trans h).trans other_fe_post_1
+  · intro h; exact (self_fe_post_1.trans h).trans other_fe_post_1.symm
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq
