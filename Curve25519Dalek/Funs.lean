@@ -161,17 +161,6 @@ noncomputable def subtle.ConstantTimeEqU16 : subtle.ConstantTimeEq U16 := {
   ct_eq := subtle.ConstantTimeEqU16.ct_eq
 }
 
-/-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u8}]
-   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
-   Name pattern: [subtle::ConditionallySelectable<u8>] -/
-@[reducible, rust_trait_impl "subtle::ConditionallySelectable<u8>"]
-noncomputable def subtle.ConditionallySelectableU8 : subtle.ConditionallySelectable U8 := {
-  coremarkerCopyInst := core.marker.CopyU8
-  conditional_select := subtle.ConditionallySelectableU8.conditional_select
-  conditional_assign := subtle.ConditionallySelectableU8.conditional_assign
-  conditional_swap := subtle.ConditionallySelectableU8.conditional_swap
-}
-
 /-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u64}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u64>] -/
@@ -982,33 +971,6 @@ def core.marker.CopyProjectiveNielsPoint : core.marker.Copy
   backend.serial.curve_models.ProjectiveNielsPoint := {
   cloneInst := core.clone.CloneProjectiveNielsPoint
 }
-
-/-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
-   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5 -/
-def
-  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
-  (a : backend.serial.u64.field.FieldElement51)
-  (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
-  Result backend.serial.u64.field.FieldElement51
-  := do
-  let i ← Array.index_usize a 0#usize
-  let i1 ← Array.index_usize b 0#usize
-  let i2 ← subtle.ConditionallySelectableU64.conditional_select i i1 choice
-  let i3 ← Array.index_usize a 1#usize
-  let i4 ← Array.index_usize b 1#usize
-  let i5 ← subtle.ConditionallySelectableU64.conditional_select i3 i4 choice
-  let i6 ← Array.index_usize a 2#usize
-  let i7 ← Array.index_usize b 2#usize
-  let i8 ← subtle.ConditionallySelectableU64.conditional_select i6 i7 choice
-  let i9 ← Array.index_usize a 3#usize
-  let i10 ← Array.index_usize b 3#usize
-  let i11 ←
-    subtle.ConditionallySelectableU64.conditional_select i9 i10 choice
-  let i12 ← Array.index_usize a 4#usize
-  let i13 ← Array.index_usize b 4#usize
-  let i14 ←
-    subtle.ConditionallySelectableU64.conditional_select i12 i13 choice
-  ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 297:4-304:5 -/
@@ -4933,18 +4895,6 @@ noncomputable def subtle.ConstantTimeEqMontgomeryPoint : subtle.ConstantTimeEq
   ct_eq := montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
 }
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5 -/
-noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
-  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
-  (choice : subtle.Choice) :
-  Result montgomery.MontgomeryPoint
-  := do
-  let a1 ←
-    subtle.ConditionallySelectableArray.conditional_select
-      subtle.ConditionallySelectableU8 a b choice
-  ok a1
-
 /-- Trait implementation: [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
 @[reducible]
@@ -5172,21 +5122,6 @@ def core.default.DefaultProjectivePoint : core.default.Default
   montgomery.ProjectivePoint := {
   default := montgomery.DefaultProjectivePoint.default
 }
-
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5 -/
-def montgomery.ConditionallySelectableProjectivePoint.conditional_select
-  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
-  (choice : subtle.Choice) :
-  Result montgomery.ProjectivePoint
-  := do
-  let fe ←
-    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
-      a.U b.U choice
-  let fe1 ←
-    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
-      a.W b.W choice
-  ok { U := fe, W := fe1 }
 
 /-- Trait implementation: [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
