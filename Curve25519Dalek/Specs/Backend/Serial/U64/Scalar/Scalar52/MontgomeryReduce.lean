@@ -184,51 +184,6 @@ private theorem part1_spec (sum : U128)
      Array.getElem!_Nat_eq]
 
   · rw [i7_post_1, i6_post, i5_post, i4_post]; simp only [Nat.shiftRight_eq_div_pow]; scalar_tac
-/- OLD PROOF for part1_spec:
-  unfold montgomery_reduce.part1
-  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
-  have h_L_len : constants.L.val.length = 5 := by
-    unfold constants.L; rfl
-  progress as ⟨i, i_post⟩
-  progress as ⟨i1, i1_post⟩
-  progress as ⟨i2, i2_post⟩
-  progress as ⟨i3, i3_post⟩
-  progress as ⟨p, p_post⟩
-
-  have h_p_val : p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) := by
-      rw [p_post]; simp only [UScalar.val_and];
-      have h_mask : i3.val = 2^52 - 1 := by
-        simp only [i3_post, i2_post]; scalar_tac
-      rw [h_mask]; rw [i1_post, i_post];
-
-      rw [land_pow_two_sub_one_eq_mod]
-      simp only [UScalar.cast, UScalar.val, core.num.U64.wrapping_mul]
-      simp only [UScalarTy.U64_numBits_eq, UScalar.wrapping_mul_bv_eq, UScalar.bv_toNat,
-        Aeneas.Bvify.U64.UScalar_bv]
-      rw [BitVec.toNat_mul, BitVec.toNat_setWidth, UScalar.bv_toNat, Nat.mod_mul_mod]
-      rw [Nat.mod_mod_of_dvd _ (by norm_num : 2^52 ∣ 2^64)]
-      rfl
-
-  have h_p_bound : p.val < 2^52 := by
-      rw [h_p_val]; apply Nat.mod_lt; norm_num
-
-  have h_add_safe : sum.val + p.val * (constants.L[0]!).val ≤ U128.max := by
-      apply Nat.le_trans (m := sum.val + (2^52 - 1) * (constants.L[0]!).val)
-      · apply Nat.add_le_add_left; apply Nat.mul_le_mul_right; apply Nat.le_pred_of_lt h_p_bound
-      · exact h_bound
-
-  progress as ⟨i4, i4_post⟩
-  progress as ⟨i5, i5_post⟩
-  progress as ⟨i6, i6_post⟩
-  progress as ⟨i7, i7_post_1, i7_post_2⟩
-  refine ⟨h_p_val, ?_, ?_, h_p_bound⟩
-  · -- Main Equation 2
-    rw [i7_post_1, i6_post, i5_post, i4_post]; rw [Nat.shiftRight_eq_div_pow];
-    simp only [List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem!_pos,
-     Array.getElem!_Nat_eq]
-
-  · rw [i7_post_1, i6_post, i5_post, i4_post]; simp only [Nat.shiftRight_eq_div_pow]; scalar_tac
--/
 
 @[progress]
 private theorem part2_spec (sum : U128) :
@@ -275,45 +230,7 @@ private theorem part2_spec (sum : U128) :
          _ = 2^76 * 2^52 := by norm_num
 
   exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
-/- OLD PROOF for part2_spec:
-  unfold montgomery_reduce.part2
 
-  --    Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
-  progress as ⟨w_cast, hw_cast⟩     -- Cast sum to u64
-  progress as ⟨mask1, hmask1⟩       -- 1 << 52
-  progress as ⟨mask, hmask⟩         -- (1 << 52) - 1
-  progress as ⟨w, hw⟩               -- Bitwise AND
-  --    Rust: (sum >> 52, w)
-  progress as ⟨carry, hcarry⟩       -- Shift right
-
-  have h_w_val : w.val = sum.val % 2^52 := by
-    rw [hw]; simp only [UScalar.val_and]
-    have h_mask_val : mask.val = 2^52 - 1 := by
-      simp only [hmask, hmask1]; scalar_tac
-    rw [h_mask_val]; rw [land_pow_two_sub_one_eq_mod]; rw [hw_cast]
-    simp only [UScalar.cast, UScalarTy.U64_numBits_eq, BitVec.truncate_eq_setWidth]
-
-    change (BitVec.setWidth 64 sum.bv).toNat % 2^52 = _
-    rw [BitVec.toNat_setWidth]
-
-    change (sum.val % 2^64) % 2^52 = _
-    apply Nat.mod_mod_of_dvd; scalar_tac
-
-  have h_carry_val : carry.val = sum.val / 2^52 := by
-    rw [hcarry]
-    simp only [Nat.shiftRight_eq_div_pow]
-
-  have h_w_bound : w.val < 2^52 := by
-    rw [h_w_val]; apply Nat.mod_lt; norm_num
-
-  have h_carry_bound : carry.val < 2^76 := by
-    rw [h_carry_val]; apply Nat.div_lt_of_lt_mul
-    have h : sum.val < 2^128 := sum.hBounds
-    calc sum.val < 2^128 := h
-         _ = 2^76 * 2^52 := by norm_num
-
-  refine ⟨carry, w, rfl, rfl, h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
--/
 
 set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
