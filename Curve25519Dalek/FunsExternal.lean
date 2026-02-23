@@ -650,20 +650,6 @@ def subtle.ConditionallySelectableArray.conditional_select
   if choice.val = 1#u8 then ok b
   else ok a
 
-/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
-   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
-   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
-   Conditional swap for arrays: swaps a and b if choice is 1 -/
-@[rust_fun
-  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
-def subtle.ConditionallySelectableArray.conditional_swap
-  {T : Type} {N : Usize} (ConditionallySelectableInst :
-  subtle.ConditionallySelectable T)
-  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
-  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
-  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
-  ok (a_new, b_new)
-
 /-- Progress spec for ConditionallySelectableArray.conditional_select -/
 @[progress]
 theorem conditional_select_Array_spec {T : Type} {N : Usize}
@@ -685,6 +671,20 @@ def subtle.ConditionallySelectableArray.conditional_assign
   subtle.ConditionallySelectable T)
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
   subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+
+/- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
+   Name pattern: [subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap]
+   Conditional swap for arrays: swaps a and b if choice is 1 -/
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
+def subtle.ConditionallySelectableArray.conditional_swap
+  {T : Type} {N : Usize} (ConditionallySelectableInst :
+  subtle.ConditionallySelectable T)
+  (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
+  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
+  ok (a_new, b_new)
 
 /-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5
