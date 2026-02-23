@@ -131,18 +131,26 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar",
   -- Zeroize / DefaultIsZeroes
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize",
+  "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize",
+  "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.edwards.affine.AffinePoint.Insts.ZeroizeDefaultIsZeroes",
   "curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize",
+  "curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize",
+  "curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize.zeroize",
   "curve25519_dalek.Bool.Insts.ZeroizeDefaultIsZeroes",
   "curve25519_dalek.U8.Insts.ZeroizeDefaultIsZeroes",
   "curve25519_dalek.U64.Insts.ZeroizeDefaultIsZeroes",
-  -- ValidityCheck
+  -- ValidityCheck (debug-only)
   "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck",
+  "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
   "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck",
+  "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
   -- Default (struct literal + .default child that delegates to identity or returns zero)
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault",
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault.default",
@@ -167,6 +175,13 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.Bool.Insts.CoreDefaultDefault",
   -- Trait instance struct literals (wrapper only, child has the logic)
   "curve25519_dalek.Array.Insts.CoreConvertTryFromShared0SliceTryFromSliceError",
+  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError",
+  "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError",
+  "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
+  "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable",
+  "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
+  "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
+  "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable",
   "curve25519_dalek.Bool.Insts.CoreConvertFromChoice",
   "curve25519_dalek.subtle.Choice.Insts.CoreConvertFromU8",
   "curve25519_dalek.U8.Insts.SubtleConstantTimeEq",
@@ -203,6 +218,11 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexPrivate_slice_indexSealed",
   "curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice",
   -- Trivial delegating child methods (owned/borrow variants that just call canonical impl)
+  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from",
+  "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from",
+  "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul",
+  "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
   "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg",
   "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar.add",
   "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul",
@@ -365,7 +385,34 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar",
   "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar",
   "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar"
+  "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar",
+  -- Closures (trivial closure bodies inside from_slice)
+  "curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY",
+  "curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY.call_once",
+  "curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto",
+  "curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto.call_once",
+  -- Loop bodies (extracted from parent functions)
+  "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop.mutual",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop.mutual",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop.mutual",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop.mutual",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop.mutual",
+  "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop.mutual",
+  "curve25519_dalek.scalar.Scalar.batch_invert_loop0.mutual",
+  "curve25519_dalek.scalar.Scalar.batch_invert_loop1.mutual",
+  "curve25519_dalek.scalar.Scalar.non_adjacent_form_loop.mutual",
+  -- Inner constants and sub-helpers (not independently meaningful)
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK",
+  "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK",
+  "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2",
+  "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply",
+  "curve25519_dalek.scalar.Scalar.as_radix_16.bot_half",
+  "curve25519_dalek.scalar.Scalar.as_radix_16.top_half"
 ]
 
 end Utils.Config
