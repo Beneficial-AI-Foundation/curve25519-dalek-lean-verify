@@ -61,9 +61,6 @@ def isHiddenFunction (name : Name) : Bool :=
 def passesBasicFilters (name : Name) : Bool :=
   !hasExcludedPrefix name
 
-/-- Check if name B is a nested child of name A (A is a proper prefix of B) -/
-def isNestedChild (parent child : Name) : Bool :=
-  parent.isPrefixOf child && parent != child
 
 /-!
 ## Relevance Checking
@@ -130,33 +127,11 @@ def gatherRawData (env : Environment) (name : Name) : IO RawFunctionData := do
     | .error _ => #[]
   return { name, docInfo, rawDeps, isExtractionArtifact := isArtifact, isHidden := hidden }
 
-/-- Find all nested children for each function in a list -/
-def computeNestedChildren (names : Array Name) : Std.HashMap Name (Array Name) := Id.run do
-  let mut result : Std.HashMap Name (Array Name) := {}
-  for parent in names do
-    let children := names.filter fun child => isNestedChild parent child
-    if !children.isEmpty then
-      result := result.insert parent children
-  return result
-
-/-- Filter out nested children from a list, keeping only top-level functions.
-    A name is kept if no other name in the list is a proper prefix of it. -/
-def filterOutNestedChildren (names : Array Name) : Array Name := Id.run do
-  -- Build set of all names that are children of some other name
-  let mut childSet : Std.HashSet Name := {}
-  for parent in names do
-    for child in names do
-      if isNestedChild parent child then
-        childSet := childSet.insert child
-  -- Keep only names not in the child set
-  return names.filter (!childSet.contains ·)
-
 /-- Build a complete FunctionRecord from raw data -/
 def buildFunctionRecord
     (env : Environment)
     (rawData : RawFunctionData)
     (relevantNames : Std.HashSet Name)
-    (nestedChildrenMap : Std.HashMap Name (Array Name))
     (crate : String)
     : IO FunctionRecord := do
   let docInfo := rawData.docInfo
@@ -164,7 +139,6 @@ def buildFunctionRecord
     | some s, some e => some (s, e)
     | _, _ => none
   let filteredDeps := rawData.rawDeps.filter (relevantNames.contains ·)
-  let nestedChildren := nestedChildrenMap.getD rawData.name #[]
   let isRelevant := isRelevantSource docInfo.source crate
   let specParts ← getSpecParts env rawData.name
   return {
@@ -173,7 +147,6 @@ def buildFunctionRecord
     source := docInfo.source
     lineRange := lineRange
     dependencies := filteredDeps
-    nestedChildren := nestedChildren
     isRelevant := isRelevant
     isExtractionArtifact := rawData.isExtractionArtifact
     isHidden := rawData.isHidden
@@ -197,27 +170,21 @@ def buildFunctionRecords
   -- Step 2: Apply basic filters (prefix only, extraction artifacts are kept)
   let basicFiltered := allDefs.filter passesBasicFilters
 
-  -- Step 3: Compute nested relationships before filtering them out
-  let nestedChildrenMap := computeNestedChildren basicFiltered
+  -- Step 3: Gather raw data for all functions (including nested children)
+  let rawDataArray ← basicFiltered.mapM (gatherRawData env)
 
-  -- Step 4: Filter out nested children (keep only top-level)
-  let topLevel := filterOutNestedChildren basicFiltered
-
-  -- Step 5: Gather raw data for all top-level functions
-  let rawDataArray ← topLevel.mapM (gatherRawData env)
-
-  -- Step 6: Build set of relevant function names
+  -- Step 4: Build set of relevant function names
   -- (functions whose source is from the crate)
   let mut relevantNames : Std.HashSet Name := {}
   for rawData in rawDataArray do
     if isRelevantSource rawData.docInfo.source crate then
       relevantNames := relevantNames.insert rawData.name
 
-  -- Step 7: Build FunctionRecords (deps filtered to relevant set)
+  -- Step 5: Build FunctionRecords (deps filtered to relevant set)
   let records ← rawDataArray.mapM fun rawData =>
-    buildFunctionRecord env rawData relevantNames nestedChildrenMap crate
+    buildFunctionRecord env rawData relevantNames crate
 
-  -- Step 8: Sort alphabetically
+  -- Step 6: Sort alphabetically
   return records.qsort (·.leanName.toString < ·.leanName.toString)
 
 /-- Get only the relevant functions -/

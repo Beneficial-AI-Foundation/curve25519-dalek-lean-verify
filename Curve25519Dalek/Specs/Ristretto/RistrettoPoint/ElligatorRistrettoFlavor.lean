@@ -45,7 +45,6 @@ natural language specs:
 • The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging
   the implementation to the pure mathematical Elligator map defined in Representation.lean
 -/
-@[progress]
 theorem elligator_ristretto_flavor_spec
     (s : backend.serial.u64.field.FieldElement51)
     (h_s_valid : s.IsValid) :

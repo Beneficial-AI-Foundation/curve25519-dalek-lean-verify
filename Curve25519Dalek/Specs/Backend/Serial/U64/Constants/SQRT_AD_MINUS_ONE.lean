@@ -35,7 +35,7 @@ natural language specs:
 - Field51_as_Nat(constants.SQRT_AD_MINUS_ONE) is a square root of (a*d - 1) modulo p, i.e.
   `(Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p)`.
 -/
-@[progress]
+@[simp]
 theorem SQRT_AD_MINUS_ONE_spec :
     (Field51_as_Nat SQRT_AD_MINUS_ONE)^2 % p = (a * d - 1) % p := by
   unfold SQRT_AD_MINUS_ONE

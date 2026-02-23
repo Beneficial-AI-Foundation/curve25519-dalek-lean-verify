@@ -19,7 +19,7 @@ clamping the input bytes to a valid scalar, delegating to `MontgomeryPoint.mul_b
 **Source**: curve25519-dalek/src/montgomery.rs, lines 150:4-158:5
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
@@ -48,12 +48,14 @@ natural language specs:
 
 @[progress]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
-    ∃ result,
-    mul_base_clamped bytes = ok result ∧
-    (∃ clamped_scalar,
-    scalar.clamp_integer bytes = ok clamped_scalar ∧
-    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat clamped_scalar) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))    := by
+    mul_base_clamped bytes ⦃ result =>
+    (∃ clamped_scalar_nat,
+    h ∣ clamped_scalar_nat ∧
+    clamped_scalar_nat < 2 ^ 255 ∧
+    2 ^ 254 ≤ clamped_scalar_nat ∧
+    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄    := by
    unfold mul_base_clamped
    progress*
+   exact ⟨U8x32_as_Nat a, a_post_1, a_post_2, a_post_3, res_post⟩
 
 end curve25519_dalek.montgomery.MontgomeryPoint

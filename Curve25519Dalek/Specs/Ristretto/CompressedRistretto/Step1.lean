@@ -24,7 +24,7 @@ the encoding and extracting the field element s from the compressed representati
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.decompress
 
 /-
@@ -78,30 +78,29 @@ Namely:
 -/
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
-    ∃ (s_encoding_is_canonical s_is_negative : subtle.Choice) (s : backend.serial.u64.field.FieldElement51),
-    step_1 c = ok (s_encoding_is_canonical, s_is_negative, s) ∧
+    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>
     s.IsValid ∧
     (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧
     (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
     (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
     (ristretto.decompress_step1 c = some s.toField ↔
-      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) := by
+      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by
   unfold step_1
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c
-  subst ha
+  simp only [← ha]
   progress as ⟨s, hs, hsv⟩          -- from_bytes: hs : congruence, hsv : s.IsValid
   progress as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
   -- Simplify the SliceIndexRangeFullSliceSlice index chain (identity on slices)
   simp only [core.array.Array.index, core.ops.index.IndexSlice,
     core.slice.index.Slice.index,
-    core.slice.index.SliceIndexRangeFullSliceSlice.index]
+    core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index]
   -- Step through remaining do-block bindings
   progress as ⟨s2, hs2⟩             -- ↑(Array.to_slice c): s2 = c.to_slice
   progress as ⟨ct_flag, hct⟩        -- ct_eq: ct_flag = Choice.one ↔ s_bytes.to_slice = s2
   progress as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
-  -- Provide existential witnesses and prove conjunction
-  refine ⟨ct_flag, neg_flag, s, rfl, rfl, rfl, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  -- Prove conjunction
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- s.IsValid from from_bytes_spec
     exact hsv
   · exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hs

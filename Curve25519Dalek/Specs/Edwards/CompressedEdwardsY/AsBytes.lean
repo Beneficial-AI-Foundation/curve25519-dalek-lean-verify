@@ -14,7 +14,7 @@ This function returns a reference to the internal 32-byte array representation.
 Source: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 
 namespace curve25519_dalek.edwards.CompressedEdwardsY
 
@@ -27,8 +27,8 @@ namespace curve25519_dalek.edwards.CompressedEdwardsY
 @[progress]
 theorem as_bytes_spec
     (self : edwards.CompressedEdwardsY) :
-    ∃ result, as_bytes self = ok result ∧
-    result = self := by
+    as_bytes self ⦃ result =>
+    result = self ⦄ := by
   unfold as_bytes
   simp
 

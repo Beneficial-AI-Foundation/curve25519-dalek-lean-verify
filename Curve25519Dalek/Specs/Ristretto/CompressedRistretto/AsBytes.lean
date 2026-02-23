@@ -14,7 +14,7 @@ This function converts the CompressedRistretto type to its underlying byte repre
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.CompressedRistretto
 
 /-
@@ -36,8 +36,8 @@ natural language specs:
 -/
 @[progress]
 theorem as_bytes_spec (cr : CompressedRistretto) :
-    ∃ b, as_bytes cr = ok b ∧
-    b = cr := by
+    as_bytes cr ⦃ b =>
+    b = cr ⦄ := by
   unfold as_bytes
   simp
 

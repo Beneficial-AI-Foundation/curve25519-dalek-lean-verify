@@ -16,7 +16,7 @@ This function constructs a scalar from bytes, reducing modulo the group order.
 
 Source: curve25519-dalek/src/scalar.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.scalar.Scalar
 
 /-
@@ -38,14 +38,12 @@ natural language specs:
 - The result scalar s is less than L (the group order) -/
 @[progress]
 theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
-    ∃ s, from_bytes_mod_order b = ok s ∧
-    U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L := by
-  unfold from_bytes_mod_order scalar.IndexScalarUsizeU8.index
+    from_bytes_mod_order b ⦃ s =>
+    U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L ⦄ := by
+  unfold from_bytes_mod_order scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index
   progress*
-  -- BEGIN TASK
   have := high_bit_zero_of_lt_L s.bytes
   simp [*] at *
   grind
-  -- END TASK
 
 end curve25519_dalek.scalar.Scalar

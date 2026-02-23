@@ -17,11 +17,11 @@ operand when `choice = 0` and the second operand when `choice = 1`.
 **Source**: curve25519-dalek/src/montgomery.rs:L88-L90
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.montgomery.ConditionallySelectableMontgomeryPoint
+open Aeneas Aeneas.Std Result
+namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable
 
 /--
-**Spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_select`**:
+**Spec for `montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select`**:
 - No panic (always returns successfully)
 - For each byte i, the result byte equals `b[i]` when `choice = 1`,
   and equals `a[i]` when `choice = 0` (constant-time conditional select)
@@ -35,12 +35,11 @@ where the points are represented as 32-byte arrays containing the u-coordinate.
 theorem conditional_select_spec
     (a b : montgomery.MontgomeryPoint)
     (choice : subtle.Choice) :
-    ∃ res,
-      conditional_select a b choice = ok res ∧
-      (∀ i < 32,
-        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by
+    conditional_select a b choice ⦃ res =>
+      ∀ i < 32,
+        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!) ⦄ := by
   unfold conditional_select
   progress*
-  grind
+  by_cases h : choice.val = 1#u8 <;> simp_all
 
-end curve25519_dalek.montgomery.ConditionallySelectableMontgomeryPoint
+end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable

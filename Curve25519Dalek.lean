@@ -55,11 +55,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
@@ -76,12 +74,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
-import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal_Hoare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
@@ -103,7 +98,6 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Compress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Double
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
-import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity_Hoare
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
@@ -164,4 +158,3 @@ import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesAux
 import Curve25519Dalek.TypesExternal
-import Curve25519Dalek.mvcgen

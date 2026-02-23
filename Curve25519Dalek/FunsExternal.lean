@@ -1,77 +1,87 @@
 -- [curve25519_dalek]: external functions.
 import Aeneas
 import Curve25519Dalek.Types
-import Mathlib
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
 namespace curve25519_dalek
 
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:45
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get] -/
-@[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.get
-  {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result (Option (Slice T))
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_mut]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:57
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
-@[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_mut
-  {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
-    (Option (Slice T) → Slice T))
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked] -/
-@[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked
-  {T : Type} :
-  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
-    (Slice T))
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked_mut]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:66
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut] -/
-@[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.get_unchecked_mut
-  {T : Type} :
-  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
-    T))
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:39
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index] -/
-@[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
-def core.slice.index.SliceIndexRangeFullSliceSlice.index
-  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
-  fun _ s => ok s
-
-/-- RangeFull indexing (`s[..]`) is the identity on slices. -/
-@[progress]
-theorem core.slice.index.SliceIndexRangeFullSliceSlice.index_spec
-  {T : Type} (s : Slice T) :
-  core.slice.index.SliceIndexRangeFullSliceSlice.index () s = ok s := by
-  simp [core.slice.index.SliceIndexRangeFullSliceSlice.index]
+/- [core::result::{core::result::Result<T, E>}::map]:
+   Source: '/rustc/library/core/src/result.rs', lines 831:4-833:53
+   Name pattern: [core::result::{core::result::Result<@T, @E>}::map] -/
+@[rust_fun "core::result::{core::result::Result<@T, @E>}::map"]
+axiom core.result.Result.map
+  {T : Type} {E : Type} {U : Type} {F : Type} (opsfunctionFnOnceFTupleTUInst :
+  core.ops.function.FnOnce F T U) :
+  core.result.Result T E → F → Result (core.result.Result U E)
 
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 660:4-660:51
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut] -/
 @[rust_fun
   "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
-axiom core.slice.index.SliceIndexRangeFullSliceSlice.index_mut
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
     Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::index]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:39
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
+def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index
+  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
+  fun _ s => ok s
+
+/-- RangeFull indexing (`s[..]`) is the identity on slices. -/
+@[simp]
+theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_spec
+  {T : Type} (s : Slice T) :
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index () s = ok s := by
+  simp [core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index]
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_unchecked_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked_mut
+  {T : Type} :
+  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
+    T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_unchecked]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
+axiom
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked
+  {T : Type} :
+  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
+    (Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get_mut]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:57
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
+axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
+    (Option (Slice T) → Slice T))
+
+/- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get]:
+   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:45
+   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get] -/
+@[rust_fun
+  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
+axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
+  {T : Type} :
+  core.ops.range.RangeFull → Slice T → Result (Option (Slice T))
 
 /- Convenience definitions for Choice values -/
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
@@ -88,7 +98,7 @@ def subtle.Choice.unwrap_u8 (c : subtle.Choice) : Result U8 :=
    Name pattern: [subtle::{core::convert::From<bool, subtle::Choice>}::from]
    Converts Choice to bool: Choice.zero -> false, Choice.one -> true -/
 @[rust_fun "subtle::{core::convert::From<bool, subtle::Choice>}::from"]
-def subtle.FromBoolChoice.from (c : subtle.Choice) : Result Bool :=
+def Bool.Insts.CoreConvertFromChoice.from (c : subtle.Choice) : Result Bool :=
   ok (c.val = 1#u8)
 
 /- [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice> for subtle::Choice}::bitand]:
@@ -96,69 +106,65 @@ def subtle.FromBoolChoice.from (c : subtle.Choice) : Result Bool :=
    Name pattern: [subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand] -/
 @[rust_fun
   "subtle::{core::ops::bit::BitAnd<subtle::Choice, subtle::Choice, subtle::Choice>}::bitand"]
-def subtle.BitAndChoiceChoiceChoice.bitand
+def subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand
   (a : subtle.Choice) (b : subtle.Choice) : Result subtle.Choice :=
   if a.val = 0#u8 ∨ b.val = 0#u8 then
     ok Choice.zero
   else
     ok Choice.one
 
-/-- **Spec theorem for `subtle.BitAndChoiceChoiceChoice.bitand`**:
+/-- **Spec theorem for `subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if both inputs are `Choice.one`
 -/
 @[progress]
-theorem subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
-    ∃ c, subtle.BitAndChoiceChoiceChoice.bitand a b = ok c ∧
-    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) := by
-  unfold subtle.BitAndChoiceChoiceChoice.bitand
+theorem subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand_spec (a b : subtle.Choice) :
+    subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand a b ⦃ c =>
+    (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) ⦄ := by
+  unfold subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand
   split
   · -- Case: a.val = 0 ∨ b.val = 0
     rename_i h_or
-    exists Choice.zero
+    simp only [spec_ok]
     constructor
-    · rfl
-    · constructor
-      · intro h
-        -- Choice.zero = Choice.one is impossible
-        cases h
-      · intro ⟨ha, hb⟩
-        -- a = Choice.one ∧ b = Choice.one, but a.val = 0 ∨ b.val = 0 is a contradiction
-        rw [ha, hb] at h_or
-        unfold Choice.one at h_or
-        simp at h_or
+    · intro h
+      -- Choice.zero = Choice.one is impossible
+      cases h
+    · intro ⟨ha, hb⟩
+      -- a = Choice.one ∧ b = Choice.one, but a.val = 0 ∨ b.val = 0 is a contradiction
+      rw [ha, hb] at h_or
+      unfold Choice.one at h_or
+      simp at h_or
   · -- Case: ¬(a.val = 0 ∨ b.val = 0)
     rename_i h_not_or
-    exists Choice.one
+    simp only [spec_ok]
     constructor
-    · rfl
-    · constructor
-      · intro _
-        -- Need to show a = Choice.one ∧ b = Choice.one
-        constructor
-        · -- Show a = Choice.one
-          cases a with | mk val valid =>
-          cases valid with
-          | inl h =>
-            -- val = 0, but this contradicts h_not_or
-            simp [h] at h_not_or
-          | inr h =>
-            -- val = 1, so a = Choice.one
-            unfold Choice.one
-            simp [h]
-        · -- Show b = Choice.one
-          cases b with | mk val valid =>
-          cases valid with
-          | inl h =>
-            -- val = 0, but this contradicts h_not_or
-            simp [h] at h_not_or
-          | inr h =>
-            -- val = 1, so b = Choice.one
-            unfold Choice.one
-            simp [h]
-      · intro ⟨ha, hb⟩
-        -- a = Choice.one ∧ b = Choice.one, so we're done
-        rfl
+    · intro _
+      -- Need to show a = Choice.one ∧ b = Choice.one
+      constructor
+      · -- Show a = Choice.one
+        cases a with | mk val valid =>
+        cases valid with
+        | inl h =>
+          -- val = 0, but this contradicts h_not_or
+          simp [h] at h_not_or
+        | inr h =>
+          -- val = 1, so a = Choice.one
+          unfold Choice.one
+          simp [h]
+      · -- Show b = Choice.one
+        cases b with | mk val valid =>
+        cases valid with
+        | inl h =>
+          -- val = 0, but this contradicts h_not_or
+          simp [h] at h_not_or
+        | inr h =>
+          -- val = 1, so b = Choice.one
+          unfold Choice.one
+          simp [h]
+    · intro ⟨ha, hb⟩
+      -- a = Choice.one ∧ b = Choice.one, so we're done
+      trivial
 
 /- [subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice> for subtle::Choice}::bitor]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 177:4-177:41
@@ -166,7 +172,7 @@ theorem subtle.BitAndChoiceChoiceChoice.bitand_spec (a b : subtle.Choice) :
    Bitwise OR for Choice values (0 | 0 = 0, 0 | 1 = 1, 1 | 0 = 1, 1 | 1 = 1) -/
 @[rust_fun
   "subtle::{core::ops::bit::BitOr<subtle::Choice, subtle::Choice, subtle::Choice>}::bitor"]
-def subtle.BitOrChoiceChoiceChoice.bitor (a : subtle.Choice) (b : subtle.Choice) :
+def subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor (a : subtle.Choice) (b : subtle.Choice) :
     Result subtle.Choice :=
   if a.val = 1#u8 ∨ b.val = 1#u8 then
     ok Choice.one
@@ -179,7 +185,7 @@ def subtle.BitOrChoiceChoiceChoice.bitor (a : subtle.Choice) (b : subtle.Choice)
    Bitwise NOT for Choice values (NOT 0 = 1, NOT 1 = 0) -/
 @[rust_fun
   "subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not"]
-def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
+def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result subtle.Choice :=
   if c.val = 1#u8 then
     ok Choice.zero
   else
@@ -190,42 +196,41 @@ def subtle.NotChoiceChoice.not (c : subtle.Choice) : Result subtle.Choice :=
    Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq]
    Constant-time equality for U16 values -/
 @[rust_fun "subtle::{subtle::ConstantTimeEq<u16>}::ct_eq"]
-def subtle.ConstantTimeEqU16.ct_eq (a : U16) (b : U16) : Result subtle.Choice :=
+def U16.Insts.SubtleConstantTimeEq.ct_eq (a : U16) (b : U16) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
-/-- **Spec theorem for `subtle.ConstantTimeEqU16.ct_eq`**:
+/-- **Spec theorem for `U16.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U16 values are equal
 -/
 @[progress]
-theorem subtle.ConstantTimeEqU16.ct_eq_spec (a b : U16) :
-  ∃ c, subtle.ConstantTimeEqU16.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b) := by
-  unfold subtle.ConstantTimeEqU16.ct_eq
+theorem U16.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U16) :
+  U16.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
+  (c = Choice.one ↔ a = b) ⦄ := by
+  unfold U16.Insts.SubtleConstantTimeEq.ct_eq
   split
   · -- Case: a = b
     rename_i h_eq
-    exists Choice.one
+    simp only [spec_ok]
     simp [h_eq]
   · -- Case: a ≠ b
     rename_i h_ne
-    exists Choice.zero
+    simp only [spec_ok]
     constructor
-    · rfl
-    · constructor
-      · intro h
-        -- Choice.zero = Choice.one is a contradiction
-        cases h
-      · intro h
-        -- a = b but a ≠ b is a contradiction
-        contradiction
+    · intro h
+      -- Choice.zero = Choice.one is a contradiction
+      cases h
+    · intro h
+      -- a = b but a ≠ b is a contradiction
+      contradiction
 
 /- [subtle::{core::convert::From<u8> for subtle::Choice}::from]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 238:4-238:32
    Name pattern: [subtle::{core::convert::From<subtle::Choice, u8>}::from]
    Converts a u8 to a Choice. The input should be 0 or 1. -/
-def subtle.FromChoiceU8.from (input : U8) : Result subtle.Choice :=
+@[rust_fun "subtle::{core::convert::From<subtle::Choice, u8>}::from"]
+def subtle.Choice.Insts.CoreConvertFromU8.from (input : U8) : Result subtle.Choice :=
   if h : input = 0#u8 then
     ok { val := input, valid := Or.inl h }
   else if h' : input = 1#u8 then
@@ -237,57 +242,56 @@ def subtle.FromChoiceU8.from (input : U8) : Result subtle.Choice :=
    Name pattern: [subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq]
    Constant-time equality for slices -/
 @[rust_fun "subtle::{subtle::ConstantTimeEq<[@T]>}::ct_eq"]
-axiom subtle.ConstantTimeEqSlice.ct_eq
+axiom Slice.Insts.SubtleConstantTimeEq.ct_eq
   {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T)
   : Slice T → Slice T → Result subtle.Choice
 
-/-- **Spec theorem for `subtle.ConstantTimeEqSlice.ct_eq`**:
+/-- **Spec theorem for `Slice.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns Choice.one (true) if and only if all corresponding elements are equal
 - Requires equal-length slices with valid bounds
 -/
 @[progress]
-axiom subtle.ConstantTimeEqSlice.ct_eq_spec
+axiom Slice.Insts.SubtleConstantTimeEq.ct_eq_spec
   {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
   (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
   (hb : b.length < 2 ^ UScalarTy.Usize.numBits)
   (h_eq_len : a.length = b.length) :
-  ∃ c, subtle.ConstantTimeEqSlice.ct_eq ConstantTimeEqInst a b = ok c ∧
-  (c = Choice.one ↔ a = b)
+  Slice.Insts.SubtleConstantTimeEq.ct_eq ConstantTimeEqInst a b ⦃ c =>
+  (c = Choice.one ↔ a = b) ⦄
 
 /- [subtle::{subtle::ConstantTimeEq for u8}::ct_eq]:
 Name pattern: [subtle::{subtle::ConstantTimeEq<u8>}::ct_eq]
 Constant-time equality for U8 values -/
-def subtle.ConstantTimeEqU8.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
+@[rust_fun "subtle::{subtle::ConstantTimeEq<u8>}::ct_eq"]
+def U8.Insts.SubtleConstantTimeEq.ct_eq (a : U8) (b : U8) : Result subtle.Choice :=
   if a = b then ok Choice.one
   else ok Choice.zero
 
-/-- **Spec theorem for `subtle.ConstantTimeEqU8.ct_eq`**:
+/-- **Spec theorem for `U8.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U8 values are equal
 -/
 @[progress]
-theorem subtle.ConstantTimeEqU8.ct_eq_spec (a b : U8) :
-  ∃ c, subtle.ConstantTimeEqU8.ct_eq a b = ok c ∧
-  (c = Choice.one ↔ a = b) := by
-  unfold subtle.ConstantTimeEqU8.ct_eq
+theorem U8.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U8) :
+  U8.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
+  (c = Choice.one ↔ a = b) ⦄ := by
+  unfold U8.Insts.SubtleConstantTimeEq.ct_eq
   split
   · -- Case: a = b
     rename_i h_eq
-    exists Choice.one
+    simp only [spec_ok]
     simp [h_eq]
   · -- Case: a ≠ b
     rename_i h_ne
-    exists Choice.zero
+    simp only [spec_ok]
     constructor
-    · rfl
-    · constructor
-      · intro h
-        -- Choice.zero = Choice.one is a contradiction
-        cases h
-      · intro h
-        -- a = b but a ≠ b is a contradiction
-        contradiction
+    · intro h
+      -- Choice.zero = Choice.one is a contradiction
+      cases h
+    · intro h
+      -- a = b but a ≠ b is a contradiction
+      contradiction
 
 /- [subtle::ConditionallySelectable::conditional_assign]:
    Source: '/home/oliver/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 442:4-442:66
@@ -310,11 +314,11 @@ theorem subtle.ConditionallySelectable.conditional_assign.default_spec
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
   (a b : Self) (choice : subtle.Choice)
   (h : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res) :
-  ∃ res, subtle.ConditionallySelectable.conditional_assign.default ConditionallySelectableInst a b choice = ok res ∧
-  ConditionallySelectableInst.conditional_select a b choice = ok res := by
+  subtle.ConditionallySelectable.conditional_assign.default ConditionallySelectableInst a b choice ⦃ res =>
+  ConditionallySelectableInst.conditional_select a b choice = ok res ⦄ := by
   unfold subtle.ConditionallySelectable.conditional_assign.default
   obtain ⟨res, h_eq⟩ := h
-  exists res
+  simp only [h_eq, spec_ok]
 
 /- [subtle::ConditionallySelectable::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 469:4-469:67
@@ -344,31 +348,31 @@ theorem subtle.ConditionallySelectable.conditional_swap.default_spec
   (a b : Self) (choice : subtle.Choice)
   (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
   (h_b : ∃ res, ConditionallySelectableInst.conditional_select b a choice = ok res) :
-  ∃ c,
-    subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice = ok c ∧
+  subtle.ConditionallySelectable.conditional_swap.default ConditionallySelectableInst a b choice ⦃ c =>
     ConditionallySelectableInst.conditional_select a b choice = ok c.1 ∧
-    ConditionallySelectableInst.conditional_select b a choice = ok c.2 := by
+    ConditionallySelectableInst.conditional_select b a choice = ok c.2 ⦄ := by
   unfold subtle.ConditionallySelectable.conditional_swap.default
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
-  exists (a_new, b_new)
-  simp [h_a_eq, h_b_eq]
+  simp only [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
    Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_select]
 Conditional select: returns a if choice(0), b if choice(1) -/
-def subtle.ConditionallySelectableU64.conditional_select
+@[rust_fun
+  "subtle::{subtle::ConditionallySelectable<u64>}::conditional_select"]
+def U64.Insts.SubtleConditionallySelectable.conditional_select
   (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
   if choice.val = 1#u8 then ok b
   else ok a
 
-/-- Progress spec for ConditionallySelectableU64.conditional_select -/
+/-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
 @[progress]
-theorem conditional_select_U64_spec (a b : U64) (choice : subtle.Choice) :
-    ∃ res, subtle.ConditionallySelectableU64.conditional_select a b choice = ok res ∧
-    res = if choice.val = 1#u8 then b else a := by
-  unfold subtle.ConditionallySelectableU64.conditional_select
+theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec (a b : U64) (choice : subtle.Choice) :
+    U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ res =>
+    res = if choice.val = 1#u8 then b else a ⦄ := by
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_select
   split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_assign]:
@@ -377,19 +381,19 @@ theorem conditional_select_U64_spec (a b : U64) (choice : subtle.Choice) :
    Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<u64>}::conditional_assign"]
-def subtle.ConditionallySelectableU64.conditional_assign
+def U64.Insts.SubtleConditionallySelectable.conditional_assign
   (a : U64) (b : U64) (choice : subtle.Choice) : Result U64 :=
-  subtle.ConditionallySelectableU64.conditional_select a b choice
+  U64.Insts.SubtleConditionallySelectable.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
    Name pattern: [subtle::{subtle::ConditionallySelectable<u64>}::conditional_swap]
    Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u64>}::conditional_swap"]
-def subtle.ConditionallySelectableU64.conditional_swap
+def U64.Insts.SubtleConditionallySelectable.conditional_swap
   (a : U64) (b : U64) (choice : subtle.Choice) : Result (U64 × U64) := do
-  let a_new ← subtle.ConditionallySelectableU64.conditional_select a b choice
-  let b_new ← subtle.ConditionallySelectableU64.conditional_select b a choice
+  let a_new ← U64.Insts.SubtleConditionallySelectable.conditional_select a b choice
+  let b_new ← U64.Insts.SubtleConditionallySelectable.conditional_select b a choice
   ok (a_new, b_new)
 
 /- [subtle::{subtle::ConditionallyNegatable for T}::conditional_negate]:
@@ -405,6 +409,7 @@ def subtle.ConditionallyNegatable.Blanket.conditional_negate
 /- [subtle::{subtle::CtOption<T>}::new]:
 Name pattern: [subtle::{subtle::CtOption<@T>}::new]
 Create a new CtOption with a value and a Choice indicating if it's Some -/
+@[rust_fun "subtle::{subtle::CtOption<@T>}::new"]
 def subtle.CtOption.new
   {T : Type} (value : T) (is_some : subtle.Choice) : Result (subtle.CtOption T) :=
   ok { value := value, is_some := is_some }
@@ -416,10 +421,10 @@ def subtle.CtOption.new
 -/
 @[progress]
 theorem subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
-  ∃ opt, subtle.CtOption.new value is_some = ok opt ∧
-  opt.value = value ∧ opt.is_some = is_some := by
+  subtle.CtOption.new value is_some ⦃ opt =>
+  opt.value = value ∧ opt.is_some = is_some ⦄ := by
   unfold subtle.CtOption.new
-  exists { value := value, is_some := is_some }
+  simp [spec_ok]
 
 /- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
@@ -432,78 +437,14 @@ axiom zeroize.Zeroize.Blanket.zeroize
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 373:4-373:25
    Name pattern: [zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize] -/
 @[rust_fun "zeroize::{zeroize::Zeroize<[@Z; @N]>}::zeroize"]
-axiom zeroize.ZeroizeArray.zeroize
+axiom Array.Insts.ZeroizeZeroize.zeroize
   {Z : Type} {N : Usize} (ZeroizeInst : zeroize.Zeroize Z) :
   Array Z N → Result (Array Z N)
 
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 630:4-630:45
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get]
-   Returns the entire slice wrapped in Some (RangeFull .. always selects the whole slice) -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get
-  {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result (Option (Slice T)) :=
-  fun _ slice => ok (some slice)
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_mut]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:57
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut]
-   Returns the entire slice wrapped in Some and a back function for updating -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_mut
-  {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
-    (Option (Slice T) → Slice T)) :=
-  fun _ slice =>
-    let back := fun (opt : Option (Slice T)) =>
-      match opt with
-      | some s => s
-      | none => slice  -- fallback to original slice if None
-    ok (some slice, back)
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 640:4-640:66
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked]
-   Returns the pointer unchanged (RangeFull .. always selects the whole slice) -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked
-  {T : Type} :
-  core.ops.range.RangeFull → ConstRawPtr (Slice T) → Result (ConstRawPtr
-    (Slice T)) :=
-  fun _ ptr => ok ptr
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::get_unchecked_mut]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 645:4-645:66
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut]
-   Returns the mutable pointer unchanged (RangeFull .. always selects the whole slice) -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.get_unchecked_mut
-  {T : Type} :
-  core.ops.range.RangeFull → MutRawPtr (Slice T) → Result (MutRawPtr (Slice
-    T)) :=
-  fun _ ptr => ok ptr
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 650:4-650:39
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index]
-   Returns the entire slice unchanged (RangeFull .. always selects the whole slice) -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index
-  {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
-  fun _ slice => ok slice
-
-/- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
-   Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:51
-   Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut]
-   Returns the entire slice and a back function for updating -/
-def core.slice.index.SliceIndexcoreopsrangeRangeFullSliceSlice.index_mut
-  {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
-    Slice T)) :=
-  fun _ slice =>
-    let back := fun (s : Slice T) => s
-    ok (slice, back)
-
 /- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 295:0-311:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:0-312:1 -/
 axiom
-  backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_swap
+  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
   :
   backend.serial.curve_models.ProjectiveNielsPoint →
     backend.serial.curve_models.ProjectiveNielsPoint → subtle.Choice →
@@ -511,74 +452,31 @@ axiom
     backend.serial.curve_models.ProjectiveNielsPoint)
 
 /- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 313:0-327:1 -/
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1 -/
 axiom
-  backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_swap
+  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
   :
   backend.serial.curve_models.AffineNielsPoint →
     backend.serial.curve_models.AffineNielsPoint → subtle.Choice → Result
     (backend.serial.curve_models.AffineNielsPoint ×
     backend.serial.curve_models.AffineNielsPoint)
 
-/- [core::iter::range::{core::iter::range::Step for usize}::steps_between]:
-   Source: '/rustc/library/core/src/iter/range.rs', lines 263:16-263:84
-   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::steps_between] -/
-@[rust_fun
-  "core::iter::range::{core::iter::range::Step<usize>}::steps_between"]
-axiom core.iter.range.StepUsize.steps_between
-  : Usize → Usize → Result (Usize × (Option Usize))
-
-/- [core::iter::range::{core::iter::range::Step for usize}::forward_checked]:
-   Source: '/rustc/library/core/src/iter/range.rs', lines 274:16-274:73
-   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::forward_checked] -/
-@[rust_fun
-  "core::iter::range::{core::iter::range::Step<usize>}::forward_checked"]
-axiom core.iter.range.StepUsize.forward_checked
-  : Usize → Usize → Result (Option Usize)
-
-/- [core::iter::range::{core::iter::range::Step for usize}::backward_checked]:
-   Source: '/rustc/library/core/src/iter/range.rs', lines 282:16-282:74
-   Name pattern: [core::iter::range::{core::iter::range::Step<usize>}::backward_checked] -/
-@[rust_fun
-  "core::iter::range::{core::iter::range::Step<usize>}::backward_checked"]
-axiom core.iter.range.StepUsize.backward_checked
-  : Usize → Usize → Result (Option Usize)
-
-/- [core::iter::range::{core::iter::traits::iterator::Iterator<A> for core::ops::range::Range<A>}::next]:
-   Source: '/rustc/library/core/src/iter/range.rs', lines 849:4-849:35
-   Name pattern: [core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::next] -/
-@[rust_fun
-  "core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::next"]
-axiom core.iter.range.IteratorRangeA.next
-  {A : Type} (StepInst : core.iter.range.Step A) :
-  core.ops.range.Range A → Result ((Option A) × (core.ops.range.Range A))
-
-/- [core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<Clause0_Item, I> for I}::into_iter]:
-   Source: '/rustc/library/core/src/iter/traits/collect.rs', lines 319:4-319:27
-   Name pattern: [core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>}::into_iter] -/
-@[rust_fun
-  "core::iter::traits::collect::{core::iter::traits::collect::IntoIterator<@I, @Clause0_Item, @I>}::into_iter"]
-axiom core.iter.traits.collect.IntoIterator.Blanket.into_iter
-  {I : Type} {Clause0_Item : Type} (iteratorIteratorInst :
-  core.iter.traits.iterator.Iterator I Clause0_Item) :
-  I → Result I
-
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
    Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select]
    Conditional select: returns a if choice(0), b if choice(1) -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_select"]
-def subtle.ConditionallySelectableU8.conditional_select
+def U8.Insts.SubtleConditionallySelectable.conditional_select
   (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
   if choice.val = 1#u8 then ok b
   else ok a
 
-/-- Progress spec for ConditionallySelectableU8.conditional_select -/
+/-- Progress spec for U8.Insts.SubtleConditionallySelectable.conditional_select -/
 @[progress]
-theorem conditional_select_U8_spec (a b : U8) (choice : subtle.Choice) :
-    ∃ res, subtle.ConditionallySelectableU8.conditional_select a b choice = ok res ∧
-    res = if choice.val = 1#u8 then b else a := by
-  unfold subtle.ConditionallySelectableU8.conditional_select
+theorem U8.Insts.SubtleConditionallySelectable.conditional_select_spec (a b : U8) (choice : subtle.Choice) :
+    U8.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ res =>
+    res = if choice.val = 1#u8 then b else a ⦄ := by
+  unfold U8.Insts.SubtleConditionallySelectable.conditional_select
   split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_assign]:
@@ -586,61 +484,67 @@ theorem conditional_select_U8_spec (a b : U8) (choice : subtle.Choice) :
    Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign]
    Conditionally assign b to a if choice(1); otherwise leave a unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_assign"]
-def subtle.ConditionallySelectableU8.conditional_assign
+def U8.Insts.SubtleConditionallySelectable.conditional_assign
   (a : U8) (b : U8) (choice : subtle.Choice) : Result U8 :=
-  subtle.ConditionallySelectableU8.conditional_select a b choice
+  U8.Insts.SubtleConditionallySelectable.conditional_select a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 529:12-529:75
    Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap]
    Conditionally swap a and b if choice(1); otherwise leave them unchanged -/
 @[rust_fun "subtle::{subtle::ConditionallySelectable<u8>}::conditional_swap"]
-def subtle.ConditionallySelectableU8.conditional_swap
+def U8.Insts.SubtleConditionallySelectable.conditional_swap
   (a : U8) (b : U8) (choice : subtle.Choice) : Result (U8 × U8) := do
-  let a_new ← subtle.ConditionallySelectableU8.conditional_select a b choice
-  let b_new ← subtle.ConditionallySelectableU8.conditional_select b a choice
+  let a_new ← U8.Insts.SubtleConditionallySelectable.conditional_select a b choice
+  let b_new ← U8.Insts.SubtleConditionallySelectable.conditional_select b a choice
   ok (a_new, b_new)
 
 /- [zeroize::{zeroize::Zeroize for alloc::vec::Vec<Z>}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 551:4-551:25
    Name pattern: [zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize] -/
 @[rust_fun "zeroize::{zeroize::Zeroize<alloc::vec::Vec<@Z>>}::zeroize"]
-axiom zeroize.ZeroizeVec.zeroize
+axiom alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize
   {Z : Type} (ZeroizeInst : zeroize.Zeroize Z) :
   alloc.vec.Vec Z → Result (alloc.vec.Vec Z)
 
 /- [curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::ne]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 182:26-182:35 -/
-axiom backend.serial.curve_models.PartialEqAffineNielsPointAffineNielsPoint.ne
+axiom backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.ne
   :
   backend.serial.curve_models.AffineNielsPoint →
     backend.serial.curve_models.AffineNielsPoint → Result Bool
 
 /- [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ne]:
    Source: 'curve25519-dalek/src/field.rs', lines 86:0-90:1 -/
-axiom field.PartialEqFieldElement51FieldElement51.ne
+axiom backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.ne
   :
   backend.serial.u64.field.FieldElement51 →
     backend.serial.u64.field.FieldElement51 → Result Bool
 
+/- [curve25519_dalek::field::{core::cmp::Eq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/field.rs', lines 84:0-84:27 -/
+axiom
+  backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : backend.serial.u64.field.FieldElement51 → Result Unit
+
 /- [curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::ne]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 294:0-298:1 -/
-axiom scalar.PartialEqScalarScalar.ne
+axiom scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne
   : scalar.Scalar → scalar.Scalar → Result Bool
 
 /- [curve25519_dalek::scalar::{core::cmp::Eq for curve25519_dalek::scalar::Scalar}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
-axiom scalar.EqScalar.assert_receiver_is_total_eq
+axiom scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : scalar.Scalar → Result Unit
 
 /- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_assign]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
-axiom scalar.ConditionallySelectableScalar.conditional_assign
+axiom scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign
   : scalar.Scalar → scalar.Scalar → subtle.Choice → Result scalar.Scalar
 
 /- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_swap]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
-axiom scalar.ConditionallySelectableScalar.conditional_swap
+axiom scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap
   :
   scalar.Scalar → scalar.Scalar → subtle.Choice → Result (scalar.Scalar
     × scalar.Scalar)
@@ -651,21 +555,21 @@ axiom scalar.ConditionallySelectableScalar.conditional_swap
    Conditional select for arrays: returns a if choice=0, b if choice=1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_select"]
-def subtle.ConditionallySelectableArray.conditional_select
+def Array.Insts.SubtleConditionallySelectable.conditional_select
   {T : Type} {N : Usize} (_ConditionallySelectableInst :
   subtle.ConditionallySelectable T)
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
   if choice.val = 1#u8 then ok b
   else ok a
 
-/-- Progress spec for ConditionallySelectableArray.conditional_select -/
+/-- Progress spec for Array.Insts.SubtleConditionallySelectable.conditional_select -/
 @[progress]
-theorem conditional_select_Array_spec {T : Type} {N : Usize}
+theorem Array.Insts.SubtleConditionallySelectable.conditional_select_spec {T : Type} {N : Usize}
     (inst : subtle.ConditionallySelectable T)
     (a b : Array T N) (choice : subtle.Choice) :
-    ∃ res, subtle.ConditionallySelectableArray.conditional_select inst a b choice = ok res ∧
-    res = if choice.val = 1#u8 then b else a := by
-  unfold subtle.ConditionallySelectableArray.conditional_select
+    Array.Insts.SubtleConditionallySelectable.conditional_select inst a b choice ⦃ res =>
+    res = if choice.val = 1#u8 then b else a ⦄ := by
+  unfold Array.Insts.SubtleConditionallySelectable.conditional_select
   split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_assign]:
@@ -674,11 +578,11 @@ theorem conditional_select_Array_spec {T : Type} {N : Usize}
    Conditional assign for arrays: assign a with the value of conditional_select(a, b, choice). -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_assign"]
-def subtle.ConditionallySelectableArray.conditional_assign
+def Array.Insts.SubtleConditionallySelectable.conditional_assign
   {T : Type} {N : Usize} (ConditionallySelectableInst :
   subtle.ConditionallySelectable T)
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
-  subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
+  Array.Insts.SubtleConditionallySelectable.conditional_select ConditionallySelectableInst a b choice
 
 /- [subtle::{subtle::ConditionallySelectable for @Array<T, N>}::conditional_swap]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 576:0-578:31
@@ -686,50 +590,140 @@ def subtle.ConditionallySelectableArray.conditional_assign
    Conditional swap for arrays: swaps a and b if choice is 1 -/
 @[rust_fun
   "subtle::{subtle::ConditionallySelectable<[@T; @N]>}::conditional_swap"]
-def subtle.ConditionallySelectableArray.conditional_swap
+def Array.Insts.SubtleConditionallySelectable.conditional_swap
   {T : Type} {N : Usize} (ConditionallySelectableInst :
   subtle.ConditionallySelectable T)
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result ((Array T N) × (Array T N)) := do
-  let a_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
-  let b_new ← subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst b a choice
+  let a_new ← Array.Insts.SubtleConditionallySelectable.conditional_select ConditionallySelectableInst a b choice
+  let b_new ← Array.Insts.SubtleConditionallySelectable.conditional_select ConditionallySelectableInst b a choice
   ok (a_new, b_new)
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
-axiom montgomery.ConditionallySelectableProjectivePoint.conditional_swap
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:0-322:1 -/
+axiom montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   :
   montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
     → Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint)
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
-axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
+axiom montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
   :
   montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
     → Result montgomery.MontgomeryPoint
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
-axiom montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
+axiom montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap
   :
   montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → subtle.Choice
     → Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint)
 
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
-axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+axiom montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.ne
   : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
 
 /- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
-axiom montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
+axiom montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : montgomery.MontgomeryPoint → Result Unit
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
-axiom montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:0-322:1 -/
+axiom montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign
   :
   montgomery.ProjectivePoint → montgomery.ProjectivePoint → subtle.Choice
     → Result montgomery.ProjectivePoint
+
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1 -/
+axiom
+  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  edwards.affine.AffinePoint → edwards.affine.AffinePoint → subtle.Choice
+    → Result (edwards.affine.AffinePoint × edwards.affine.AffinePoint)
+
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1 -/
+axiom
+  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  edwards.affine.AffinePoint → edwards.affine.AffinePoint → subtle.Choice
+    → Result edwards.affine.AffinePoint
+
+/- [curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::ne]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 47:0-51:1 -/
+axiom edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.ne
+  : edwards.affine.AffinePoint → edwards.affine.AffinePoint → Result Bool
+
+/- [curve25519_dalek::edwards::affine::{core::cmp::Eq for curve25519_dalek::edwards::affine::AffinePoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/edwards/affine.rs', lines 53:0-53:26 -/
+axiom edwards.affine.AffinePoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : edwards.affine.AffinePoint → Result Unit
+
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::CompressedEdwardsY> for curve25519_dalek::edwards::CompressedEdwardsY}::ne]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 172:26-172:35 -/
+axiom edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.ne
+  : edwards.CompressedEdwardsY → edwards.CompressedEdwardsY → Result Bool
+
+/- [curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 478:0-487:1 -/
+axiom edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  edwards.EdwardsPoint → edwards.EdwardsPoint → subtle.Choice → Result
+    (edwards.EdwardsPoint × edwards.EdwardsPoint)
+
+/- [curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 478:0-487:1 -/
+axiom
+  edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  edwards.EdwardsPoint → edwards.EdwardsPoint → subtle.Choice → Result
+    edwards.EdwardsPoint
+
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::ne]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 506:0-510:1 -/
+axiom edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.ne
+  : edwards.EdwardsPoint → edwards.EdwardsPoint → Result Bool
+
+/- [curve25519_dalek::edwards::{core::cmp::Eq for curve25519_dalek::edwards::EdwardsPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/edwards.rs', lines 512:0-512:27 -/
+axiom edwards.EdwardsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : edwards.EdwardsPoint → Result Unit
+
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::CompressedRistretto> for curve25519_dalek::ristretto::CompressedRistretto}::ne]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 220:26-220:35 -/
+axiom
+  ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.ne
+  :
+  ristretto.CompressedRistretto → ristretto.CompressedRistretto → Result
+    Bool
+
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::ne]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 858:0-862:1 -/
+axiom ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.ne
+  : ristretto.RistrettoPoint → ristretto.RistrettoPoint → Result Bool
+
+/- [curve25519_dalek::ristretto::{core::cmp::Eq for curve25519_dalek::ristretto::RistrettoPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 881:0-881:29 -/
+axiom ristretto.RistrettoPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+  : ristretto.RistrettoPoint → Result Unit
+
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
+axiom
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  :
+  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
+    Result (ristretto.RistrettoPoint × ristretto.RistrettoPoint)
+
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
+axiom
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  :
+  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
+    Result ristretto.RistrettoPoint
 
 end curve25519_dalek

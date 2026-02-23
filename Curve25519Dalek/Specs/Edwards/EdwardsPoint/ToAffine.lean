@@ -21,7 +21,7 @@ to affine coordinates (x, y) by dehomogenizing: x = X/Z, y = Y/Z.
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -57,8 +57,7 @@ theorem to_affine_spec (e : EdwardsPoint)
     (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)
     (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)
     (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :
-    ∃ ap,
-    to_affine e = ok ap ∧
+    to_affine e ⦃ ap =>
 
     let X := Field51_as_Nat e.X
     let Y := Field51_as_Nat e.Y
@@ -72,55 +71,36 @@ theorem to_affine_spec (e : EdwardsPoint)
       (x * Z) % p = X % p ∧
       (y * Z) % p = Y % p) ∧
       (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧
-      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) := by
-
-      unfold to_affine
-      progress*
-
-      · intro i hi
-        have := recip_post i hi
-        omega
-
-      · intro i hi
-        have := recip_post i hi
-        omega
-
-      · rename_i Z_inv _ h_recip_nonzero _
+      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by
+    unfold to_affine
+    progress as ⟨Z_inv, h_inv_nonzero, h_inv_zero, h_inv_bounds⟩  -- invert e.Z
+    progress as ⟨x, hx_mod, hx_bounds⟩  -- mul e.X Z_inv
+    · intro i hi; have := h_inv_bounds i hi; omega
+    progress as ⟨y, hy_mod, hy_bounds⟩  -- mul e.Y Z_inv
+    · intro i hi; have := h_inv_bounds i hi; omega
+    constructor
+    · split_ifs with h_Z
+      · -- Z ≡ 0 case
+        have h_val : Field51_as_Nat Z_inv % p = 0 := h_inv_zero h_Z
+        rw [Nat.ModEq] at hx_mod hy_mod
         constructor
-
-        · split_ifs
-
-          · rename_i h_Z_zero
-            have h_inv_zero : Field51_as_Nat Z_inv % p = 0 := recip h_Z_zero
-            constructor
-
-            · rw [x_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
-
-            · rw [y_post_1, Nat.mul_mod, h_inv_zero, mul_zero, Nat.zero_mod]
-
-          · rename_i h_Z_nonzero
-            have h_inv_nonzero : Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p) % p = 1 := h_recip_nonzero h_Z_nonzero
-            rw [Nat.mul_mod] at h_inv_nonzero
-            constructor
-
-            · rw [Nat.mul_mod, x_post_1]
-              simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
-              simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_inv_nonzero
-              simp [Nat.mul_mod, h_inv_nonzero]
-
-            · rw [Nat.mul_mod, y_post_1]
-              simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
-              simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_inv_nonzero
-              simp [Nat.mul_mod, h_inv_nonzero]
-
-        · constructor
-
-          · intro i hi
-            have := x_post_2 i hi
-            omega
-
-          · intro i hi
-            have := y_post_2 i hi
-            omega
+        · rw [hx_mod, Nat.mul_mod, h_val, mul_zero, Nat.zero_mod]
+        · rw [hy_mod, Nat.mul_mod, h_val, mul_zero, Nat.zero_mod]
+      · -- Z ≢ 0 case
+        have h_val : (Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p)) % p = 1 := h_inv_nonzero h_Z
+        rw [Nat.mul_mod] at h_val
+        rw [Nat.ModEq] at hx_mod hy_mod
+        constructor
+        · rw [Nat.mul_mod, hx_mod]
+          simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
+          simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_val
+          simp [Nat.mul_mod, h_val]
+        · rw [Nat.mul_mod, hy_mod]
+          simp only [Nat.mul_mod_mod, Nat.mod_mul_mod, mul_assoc]
+          simp only [dvd_refl, Nat.mod_mod_of_dvd, Nat.mul_mod_mod, Nat.mod_mul_mod] at h_val
+          simp [Nat.mul_mod, h_val]
+    · constructor
+      · intro i hi; have := hx_bounds i hi; omega
+      · intro i hi; have := hy_bounds i hi; omega
 
 end curve25519_dalek.edwards.EdwardsPoint

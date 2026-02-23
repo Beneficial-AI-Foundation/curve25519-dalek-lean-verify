@@ -5,14 +5,16 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
-import Mathlib
+import Mathlib.Tactic.IntervalCases
+import Mathlib.Tactic.GCongr
+import Mathlib.Algebra.BigOperators.Ring.Finset
 
 set_option linter.style.setOption false
 set_option grind.warning false
 
 /-! # clamp_integer -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open scalar
 
@@ -36,16 +38,15 @@ namespace curve25519_dalek.scalar
 -/
 @[progress]
 theorem clamp_integer_spec (bytes : Array U8 32#usize) :
-    ∃ result, clamp_integer bytes = ok (result) ∧
+    clamp_integer bytes ⦃ result =>
     h ∣ U8x32_as_Nat result ∧
     U8x32_as_Nat result < 2^255 ∧
-    2^254 ≤ U8x32_as_Nat result := by
+    2^254 ≤ U8x32_as_Nat result ⦄ := by
   unfold clamp_integer h
   progress*
   unfold U8x32_as_Nat
   refine ⟨?_, ?_, ?_⟩
-  · -- BEGIN TASK
-    apply Finset.dvd_sum
+  · apply Finset.dvd_sum
     intro i hi
     by_cases hc : i = 0
     · subst_vars
@@ -53,9 +54,7 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
       simpa [*] using this _
     · have := List.mem_range.mp hi
       interval_cases i <;> omega
-    -- END TASK
-  · -- BEGIN TASK
-    subst_vars
+  · subst_vars
     simp [*]
     rw [Finset.sum_range_succ]
     simp [*]
@@ -66,12 +65,9 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
       _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) +
           2 ^ 248 * ((bytes : List U8)[31] &&& 127 ||| 64) := by gcongr; bv_tac
       _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) + 2 ^ 248 * 127 := by gcongr
-      _ < 2 ^ 255 := by bound
-    -- END TASK
-  · -- BEGIN TASK
-    have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
+      _ < 2 ^ 255 := by decide
+  · have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
     simp [Finset.sum_range_succ, *]
     scalar_tac
-    -- END TASK
 
 end curve25519_dalek.scalar

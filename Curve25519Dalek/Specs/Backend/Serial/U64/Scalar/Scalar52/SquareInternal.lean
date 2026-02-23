@@ -13,7 +13,7 @@ set_option exponentiation.threshold 500
 The main statement concerning `square_internal` is `square_internal_spec` (below).
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -65,10 +65,10 @@ in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
 (The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
 @[progress]
 theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
-    ∃ result, square_internal a = ok (result) ∧
+    square_internal a ⦃ result =>
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
-    (∀ i < 9, result[i]!.val < 2 ^ 127) := by
-  unfold square_internal backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+    (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
+  unfold square_internal backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   progress*
 
   all_goals try (subst_vars; expand ha with 5; scalar_tac)

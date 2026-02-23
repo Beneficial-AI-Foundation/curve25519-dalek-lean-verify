@@ -20,7 +20,7 @@ This function computes the multiplicative inverse.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
 set_option linter.style.commandStart false
@@ -49,19 +49,16 @@ natural language specs:
 -/
 @[progress]
 theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :
-    ∃ u', invert u = ok u' ∧
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] := by
+    invert u ⦃ u' =>
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] ⦄ := by
   unfold invert
   progress*
-  · -- BEGIN TASK
-    by_contra _
+  · by_contra _
     have : Scalar52_as_Nat u % L = 0 % L := by
       apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by try decide)
       try simp_all [Nat.ModEq]
     try simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    rw [Nat.ModEq] at *
+  · rw [Nat.ModEq] at *
     have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
         = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
       _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
@@ -76,6 +73,5 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
       have coprime : Nat.Coprime (R ^ 2) L := by try decide
       apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by try grind)
     exact this h
-    -- END TASK
 
 end curve25519_dalek.scalar.Scalar52

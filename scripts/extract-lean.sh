@@ -102,6 +102,14 @@ generate_llbc() {
 
     # --exclude: completely remove
     # --opaque: keep signature but no body
+    #
+    # NOTE: Charon's --exclude only works for:
+    #   - Free functions: 'crate::module::function'
+    #   - Trait impls: 'crate::module::{impl Trait for Type}'
+    #   - Types: 'crate::module::Type'
+    # It does NOT work for inherent impl methods (e.g. '{impl Type}::method')
+    # due to an unimplemented TODO in Charon's NameMatcher. For those, use
+    # #[cfg(not(verify))] in the Rust source instead.
     EXCLUDE_ARGS=(
         --exclude 'curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}'
         --exclude 'curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}'
@@ -117,15 +125,57 @@ generate_llbc() {
         --exclude 'curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}'
         --exclude 'curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}'
         --exclude 'curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}'
+        # Exclude ristretto Debug/Hash/Zeroize impls (pull in core library items Aeneas can't handle)
+        --exclude 'curve25519_dalek::ristretto::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl core::hash::Hash for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl zeroize::Zeroize for _}'
+        # Exclude edwards Debug/Zeroize impls
+        --exclude 'curve25519_dalek::edwards::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::edwards::affine::{impl core::fmt::Debug for _}'
+        --exclude 'curve25519_dalek::edwards::{impl zeroize::Zeroize for _}'
+        # Exclude edwards Hash impl
+        --exclude 'curve25519_dalek::edwards::{impl core::hash::Hash for _}'
+        # Exclude MultiscalarMul / VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul
+        # trait declarations (default methods use Iterator::map which Aeneas can't model)
+        --exclude 'curve25519_dalek::traits::MultiscalarMul'
+        --exclude 'curve25519_dalek::traits::VartimeMultiscalarMul'
+        --exclude 'curve25519_dalek::traits::VartimePrecomputedMultiscalarMul'
+        # Exclude MultiscalarMul impls (use IntoIterator which Charon can't handle)
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::MultiscalarMul for _}'
+        # Exclude vartime free functions
+        --exclude 'curve25519_dalek::backend::vartime_double_base_mul'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul'
+        # Exclude VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul trait impls
+        --exclude 'curve25519_dalek::backend::pippenger_optional_multiscalar_mul'
+        --exclude 'curve25519_dalek::backend::straus_optional_multiscalar_mul'
+        --exclude 'curve25519_dalek::backend::VartimePrecomputedStraus'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::pippenger::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::edwards::VartimeEdwardsPrecomputation'
+        --exclude 'curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::ristretto::VartimeRistrettoPrecomputation'
+        --exclude 'curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
+        --exclude 'curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}'
     )
     OPAQUE_ARGS=(
         # --opaque 'curve25519_dalek::something::somename'
     )
 
-    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR"
+    # Build with --no-default-features to exclude precomputed-tables.
+    # This avoids extracting the large precomputed basepoint tables and their
+    # macro-generated impls (EdwardsBasepointTable, RistrettoBasepointTable, etc.)
+    # which Aeneas cannot handle.
+    CARGO_FEATURE_ARGS="--no-default-features --features alloc,zeroize"
+
+    echo "Running: $CHARON_BIN cargo --preset=aeneas ${START_FROM_ARGS[*]} ${EXCLUDE_ARGS[*]} ${OPAQUE_ARGS[*]} -- -p $CRATE_DIR $CARGO_FEATURE_ARGS"
     echo "Extracting ${#START_FROM[@]} item(s) and their dependencies"
     echo "Logging output to $ROOT/.logs/charon.log"
-    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" 2>&1 | tee $ROOT/.logs/charon.log
+    "$CHARON_BIN" cargo --preset=aeneas "${START_FROM_ARGS[@]}" "${EXCLUDE_ARGS[@]}" "${OPAQUE_ARGS[@]}" -- -p "$CRATE_DIR" $CARGO_FEATURE_ARGS 2>&1 | tee $ROOT/.logs/charon.log
 
     if [ ! -f "$LLBC_FILE" ]; then
         echo "Error: Failed to generate $LLBC_FILE"
@@ -146,7 +196,7 @@ generate_lean() {
     # Run Aeneas to generate Lean files
     echo "Running: $AENEAS_BIN -backend lean -split-files -dest $OUTPUT_DIR $LLBC_FILE"
     echo "Logging output to $ROOT/.logs/aeneas.log"
-    "$AENEAS_BIN" -backend lean -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
+    "$AENEAS_BIN" -backend lean -loops-to-rec -split-files -dest "$OUTPUT_DIR" "$LLBC_FILE" 2>&1 | tee $ROOT/.logs/aeneas.log
 
     echo "✓ Lean files generated in $OUTPUT_DIR"
     echo

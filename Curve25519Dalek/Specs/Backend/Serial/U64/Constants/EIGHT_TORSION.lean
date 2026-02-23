@@ -53,9 +53,10 @@ theorem EIGHT_TORSION_spec :
     let P := EIGHT_TORSION.val[1]
     P.IsValid ∧
     (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧
-    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧ EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by
+    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧
+    EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by
   constructor
-  · simp only [EIGHT_TORSION, EIGHT_TORSION_body, EIGHT_TORSION_INNER_DOC_HIDDEN]
+  · simp only [EIGHT_TORSION, EIGHT_TORSION_INNER_DOC_HIDDEN]
     decide
   constructor
   · constructor
@@ -63,7 +64,7 @@ theorem EIGHT_TORSION_spec :
     · sorry
   · intro i
     constructor
-    · simp only [EIGHT_TORSION, EIGHT_TORSION_body, EIGHT_TORSION_INNER_DOC_HIDDEN]
+    · simp only [EIGHT_TORSION, EIGHT_TORSION_INNER_DOC_HIDDEN]
       fin_cases i <;> decide
     · fin_cases i <;> sorry
 
