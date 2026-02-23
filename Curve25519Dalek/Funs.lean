@@ -4924,13 +4924,13 @@ noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
   let eq_result ← montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other
   ok (!eq_result)
 
-/-- **Spec theorem for `montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl`**:
+/-- **Spec theorem for `montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne`**:
 - No panic (if eq succeeds)
 - Returns true if and only if the two MontgomeryPoint values are not equal
 - Equivalent to negation of eq
 -/
 @[progress]
-theorem montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl_spec
+theorem montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_spec
   (self other : montgomery.MontgomeryPoint)
   (h : ∃ res, montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other = ok res) :
   ∃ ne_res,
