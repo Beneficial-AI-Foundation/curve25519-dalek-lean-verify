@@ -33,7 +33,7 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
 
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
@@ -75,7 +75,7 @@ theorem add_spec
   (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)
   (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)
   (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :
-spec (Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other) (fun c =>
+Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other ⦃ c =>
 let X := Field51_as_Nat self.X
 let Y := Field51_as_Nat self.Y
 let Z := Field51_as_Nat self.Z
@@ -90,7 +90,7 @@ let T' := Field51_as_Nat c.T
 (X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧
 (Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧
 Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
-(T' + (T * XY2D)) % p = (2 * Z) % p)
+(T' + (T * XY2D)) % p = (2 * Z) % p ⦄
 := by
   unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩

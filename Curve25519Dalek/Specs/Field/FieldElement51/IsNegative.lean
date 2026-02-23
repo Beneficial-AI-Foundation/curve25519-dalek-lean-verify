@@ -22,7 +22,7 @@ of the residue modulo `p = 2^255 - 19`.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 /-!
@@ -60,8 +60,8 @@ theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
 
 @[progress]
 theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
-    spec (is_negative r) (fun c =>
-    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1)) := by
+    is_negative r ⦃ c =>
+    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by
   unfold is_negative
   progress as ⟨bytes, h_mod, h_lt⟩
   progress as ⟨b0⟩

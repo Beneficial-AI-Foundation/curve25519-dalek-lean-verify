@@ -28,7 +28,7 @@ elliptic curve addition).
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
@@ -75,7 +75,7 @@ theorem double_spec_aux (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54) :
-    spec (double q) (fun c =>
+    double q ⦃ c =>
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
     let Z := Field51_as_Nat q.Z
@@ -96,7 +96,7 @@ theorem double_spec_aux (q : ProjectivePoint)
     (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 52)) := by
+    (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
   progress*
   · -- BEGIN TASK

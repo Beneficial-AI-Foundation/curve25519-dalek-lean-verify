@@ -18,7 +18,7 @@ This function computes (r^(2^250-1), r^11) for a field element r in 𝔽_p where
 
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 set_option exponentiation.threshold 100000
@@ -44,13 +44,13 @@ Natural language specs:
 -/
 @[progress]
 theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
-    spec (pow22501 r) (fun result =>
+    pow22501 r ⦃ result =>
     let r1 := result.1
     let r2 := result.2
     Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧
     Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧
     (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
-    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52))
+    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄
     := by
     unfold pow22501
     sorry

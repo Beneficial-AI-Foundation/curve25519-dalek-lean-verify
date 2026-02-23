@@ -19,7 +19,7 @@ This function determines if an Edwards point is of small order (i.e., if it is i
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP Edwards
+open Aeneas Aeneas.Std Result Aeneas.Std.WP Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -43,8 +43,8 @@ natural language specs:
 -/
 @[progress]
 theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
-    spec (is_small_order self) (fun result =>
-    (result ↔ h • self.toPoint = 0)) := by
+    is_small_order self ⦃ result =>
+    (result ↔ h • self.toPoint = 0) ⦄ := by
   unfold is_small_order
   unfold traits.IsIdentity.Blanket.is_identity edwards.EdwardsPoint.Insts.SubtleConstantTimeEq
     edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity

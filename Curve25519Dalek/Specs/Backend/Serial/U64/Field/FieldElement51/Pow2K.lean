@@ -20,7 +20,7 @@ This function computes the 2^k-th power of the element.
 
 set_option diagnostics.threshold 100000000
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-! ## Decomposition Lemma for Squaring in Radix 2^51
@@ -102,7 +102,7 @@ as 128-bit numbers.
 -/
 @[progress]
 theorem pow2k_m_spec (x y : U64) :
-    spec (pow2k.m x y) (fun prod => prod.val = x.val * y.val) := by
+    pow2k.m x y ⦃ prod => prod.val = x.val * y.val ⦄ := by
   unfold pow2k.m
   progress*
   simp_all
@@ -234,9 +234,9 @@ set_option maxHeartbeats 10000000000000 in
 theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     (hk : 0 < k) (eqk : k'.val = k)
     (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    spec (pow2k_loop k' a) (fun r =>
+    pow2k_loop k' a ⦃ r =>
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52)) := by
+    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
 
   expand h_bounds with 5
   have a1423:= bound_two (a[1]!.val) (a[4]!.val) (a[2]!.val) (a[3]!.val) 54
@@ -1744,9 +1744,9 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
 @[progress]
 theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    spec (pow2k a k) (fun r =>
+    pow2k a k ⦃ r =>
     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52))
+    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄
     := by
   unfold pow2k
   sorry

@@ -49,7 +49,7 @@ When `A < B`, the difference array stores `2^260 + (A - B)` (the representation 
 Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result
 open Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -90,10 +90,10 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (hborrow : borrow.val / 2 ^ 63 ≤ 1)
     (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =
             Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :
-    spec (sub_loop a b difference mask borrow i) (fun result =>
+    sub_loop a b difference mask borrow i ⦃ result =>
     (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
-     Scalar52_as_Nat b + Scalar52_as_Nat result.1)) := by
+     Scalar52_as_Nat b + Scalar52_as_Nat result.1) ⦄ := by
   unfold sub_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
@@ -283,10 +283,10 @@ theorem sub_spec (a b : Array U64 5#usize)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
     (hb' : Scalar52_as_Nat b ≤ L) :
-    spec (sub a b) (fun result =>
+    sub a b ⦃ result =>
     Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
     Scalar52_as_Nat result < L ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52)) := by
+    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold sub
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
   -- First, progress through mask computation (two steps: shift then subtract)

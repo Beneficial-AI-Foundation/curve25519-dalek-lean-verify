@@ -21,7 +21,7 @@ and the sign (parity) of the x-coordinate in the high bit of byte 31. Decompress
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.CompressedEdwardsY
 
 /-
@@ -55,7 +55,7 @@ Natural language specs:
 -/
 @[progress]
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
-    spec (edwards.CompressedEdwardsY.decompress cey) (fun result =>
+    edwards.CompressedEdwardsY.decompress cey ⦃ result =>
 
       (∀ ep, result = some ep →
         let y_encoded := (U8x32_as_Nat cey) % (2^255)
@@ -73,7 +73,7 @@ theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
 
           (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧
 
-          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p)))) := by
+          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

@@ -22,7 +22,7 @@ u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -58,7 +58,7 @@ where p = 2^255 - 19
 @[progress]
 theorem to_montgomery_spec (e : EdwardsPoint)
     (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
-    spec (to_montgomery e) (fun mp =>
+    to_montgomery e ⦃ mp =>
     (let Y := Field51_as_Nat e.Y
     let Z := Field51_as_Nat e.Z
     let u := U8x32_as_Nat mp
@@ -66,7 +66,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
       u % p = 0
     else
       (u * Z) % p = (u * Y + (Z + Y)) % p) ∧
-    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))) := by
+    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp)) ⦄ := by
   unfold to_montgomery
   progress* <;> try grind
   · constructor

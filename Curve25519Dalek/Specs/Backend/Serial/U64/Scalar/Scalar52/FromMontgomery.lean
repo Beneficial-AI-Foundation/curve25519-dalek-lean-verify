@@ -17,7 +17,7 @@ This function converts from Montgomery form.
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 -/
 
-open Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -57,10 +57,10 @@ theorem zero_array (i : ℕ) (hi : i < 9) :
 @[progress]
 theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)
     (hi : i.val ≤ 5) :
-    spec (from_montgomery_loop self limbs i) (fun result =>
+    from_montgomery_loop self limbs i ⦃ result =>
     (∀ j < 5, i.val ≤ j → result[j]! = UScalar.cast .U128 self[j]!) ∧
     (∀ j < 9, 5 ≤ j → result[j]! = limbs[j]!) ∧
-    (∀ j < i.val, result[j]! = limbs[j]!)) := by
+    (∀ j < i.val, result[j]! = limbs[j]!) ⦄ := by
   unfold from_montgomery_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   split
@@ -91,8 +91,8 @@ decreasing_by scalar_decr_tac
 @[progress]
 theorem from_montgomery_spec (self : Scalar52)
     (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :
-    spec (from_montgomery self) (fun u =>
-    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L) := by
+    from_montgomery self ⦃ u =>
+    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L ⦄ := by
   unfold from_montgomery
   progress*
   · intro i hi

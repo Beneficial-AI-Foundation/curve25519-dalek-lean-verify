@@ -22,7 +22,7 @@ most significant to least significant.
 - Complete proof
 --/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 
 namespace curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
@@ -78,8 +78,8 @@ Natural language specs:
 
 @[progress]
 theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
-    spec (mul P scalar) (fun res =>
-    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))
+    mul P scalar ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
      := by
     sorry
 
@@ -121,8 +121,8 @@ Natural language specs:
 
 @[progress]
 theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :
-    spec (mul scalar P) (fun res =>
-    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))
+    mul scalar P ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
     := by
   unfold mul
   progress*
@@ -166,8 +166,8 @@ Natural language specs:
 
 @[progress]
 theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
-    spec (mul P rhs) (fun res =>
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P))
+    mul P rhs ⦃ res =>
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P) ⦄
  := by
   unfold mul
   progress*
@@ -208,8 +208,8 @@ Natural language specs:
 
 @[progress]
 theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :
-    spec (mul scalar P) (fun res =>
-    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))
+    mul scalar P ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
  := by
   unfold mul
   progress*

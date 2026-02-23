@@ -18,7 +18,7 @@ This function compares two AffineNielsPoint values component-wise using
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 182:26-182:35
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 
 /-
@@ -40,8 +40,8 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmp
 /-- Helper: the Bool `eq` returns true iff the canonical byte encodings are equal. -/
 @[progress]
 theorem eq_spec_aux (a b : backend.serial.u64.field.FieldElement51) :
-    spec (eq a b) (fun r =>
-    (r = true ↔ a.to_bytes = b.to_bytes)) := by
+    eq a b ⦃ r =>
+    (r = true ↔ a.to_bytes = b.to_bytes) ⦄ := by
   unfold eq
   progress*
   unfold Bool.Insts.CoreConvertFromChoice.from
@@ -63,11 +63,11 @@ namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Co
 @[progress]
 theorem eq_spec
     (self other : backend.serial.curve_models.AffineNielsPoint) :
-    spec (eq self other) (fun b =>
+    eq self other ⦃ b =>
     (b = true ↔
       self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧
       self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧
-      self.xy2d.to_bytes = other.xy2d.to_bytes)) := by
+      self.xy2d.to_bytes = other.xy2d.to_bytes) ⦄ := by
   unfold eq
   progress as ⟨b, b_post⟩
   split

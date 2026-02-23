@@ -38,7 +38,7 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
@@ -197,7 +197,7 @@ theorem add_spec_aux
     (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 53)
     (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)
     (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :
-    spec (add self other) (fun c =>
+    add self other ⦃ c =>
     let X := Field51_as_Nat self.X
     let Y := Field51_as_Nat self.Y
     let Z := Field51_as_Nat self.Z
@@ -218,7 +218,7 @@ theorem add_spec_aux
     (∀ i < 5, c.X[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 54)) := by
+    (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
   unfold add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩

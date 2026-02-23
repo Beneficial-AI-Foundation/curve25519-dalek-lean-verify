@@ -14,7 +14,7 @@ set_option grind.warning false
 
 /-! # clamp_integer -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open scalar
 
@@ -38,10 +38,10 @@ namespace curve25519_dalek.scalar
 -/
 @[progress]
 theorem clamp_integer_spec (bytes : Array U8 32#usize) :
-    spec (clamp_integer bytes) (fun result =>
+    clamp_integer bytes ⦃ result =>
     h ∣ U8x32_as_Nat result ∧
     U8x32_as_Nat result < 2^255 ∧
-    2^254 ≤ U8x32_as_Nat result) := by
+    2^254 ≤ U8x32_as_Nat result ⦄ := by
   unfold clamp_integer h
   progress*
   unfold U8x32_as_Nat

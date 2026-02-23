@@ -17,7 +17,7 @@ This function is the totality assertion required by Rust's `Eq` trait. For
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 182:22-182:24
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq
 
@@ -41,7 +41,7 @@ natural language specs:
 @[progress]
 theorem assert_receiver_is_total_eq_spec
     (self : backend.serial.curve_models.AffineNielsPoint) :
-    spec (assert_receiver_is_total_eq self) (fun result => result = ()) := by
+    assert_receiver_is_total_eq self ⦃ result => result = () ⦄ := by
   unfold assert_receiver_is_total_eq
   simp
 

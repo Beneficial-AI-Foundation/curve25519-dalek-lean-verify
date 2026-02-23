@@ -15,7 +15,7 @@ The Rust implementation normalizes both operands to canonical wire format with
 Source: curve25519-dalek/src/field.rs (lines 96:4-98:5)
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq
 
 /-!
@@ -41,8 +41,8 @@ Spec:
 -/
 @[progress]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
-    spec (ct_eq a b) (fun c =>
-    (c = Choice.one ↔ a.to_bytes = b.to_bytes )) := by
+    ct_eq a b ⦃ c =>
+    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) ⦄ := by
   unfold ct_eq
   have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
   have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)

@@ -15,7 +15,7 @@ This function computes the product of two field elements.
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
 open _root_.curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
   (mul)
@@ -43,8 +43,8 @@ natural language specs:
 -/
 @[progress]
 theorem m_spec (x y : U64) :
-    spec (mul.m x y) (fun r =>
-    r.val = x.val * y.val) := by
+    mul.m x y ⦃ r =>
+    r.val = x.val * y.val ⦄ := by
   unfold mul.m
   progress*
   have : x.val < 2 ^64 := by scalar_tac
@@ -159,9 +159,9 @@ set_option maxHeartbeats 10000000000 in
 @[progress]
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
-    spec (mul lhs rhs) (fun r =>
+    mul lhs rhs ⦃ r =>
     Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52)) := by
+    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
   progress*
   · -- BEGIN TASK

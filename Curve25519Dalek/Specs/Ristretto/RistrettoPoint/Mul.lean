@@ -19,7 +19,7 @@ The function delegates to the underlying Edwards point scalar multiplication.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint
 
 /-
@@ -47,9 +47,9 @@ natural language specs:
 theorem mul_spec (s : scalar.Scalar) (r : ristretto.RistrettoPoint)
     (h_s_canonical : U8x32_as_Nat s.bytes < L)
     (h_rist_valid : r.IsValid) :
-    spec (mul s r) (fun result =>
+    mul s r ⦃ result =>
     result.IsValid ∧
-    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint) := by
+    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by
   sorry
 
 /-

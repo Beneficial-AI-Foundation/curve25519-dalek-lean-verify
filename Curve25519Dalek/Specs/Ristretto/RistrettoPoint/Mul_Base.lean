@@ -22,7 +22,7 @@ the case where the point being multiplied is the standard Ristretto generator.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -49,9 +49,9 @@ natural language specs:
 @[progress]
 theorem mul_base_spec (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < L) :
-    spec (mul_base s) (fun result =>
+    mul_base s ⦃ result =>
     result.IsValid ∧
-    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint) := by
+    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint ⦄ := by
   unfold mul_base SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul
   have h_basepoint_valid := constants.RISTRETTO_BASEPOINT_POINT_spec.2.1
   progress*

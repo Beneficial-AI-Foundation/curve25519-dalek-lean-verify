@@ -24,7 +24,7 @@ delegating to FieldElement51 constant-time equality.
 
 --/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq
 
@@ -50,9 +50,9 @@ Natural language specs:
 -/
 @[progress]
 theorem ct_eq_spec (u v : MontgomeryPoint) :
-    spec (ct_eq u v) (fun c =>
+    ct_eq u v ⦃ c =>
     (c = Choice.one ↔
-      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by
+      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by
   unfold ct_eq
   progress*
   have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :

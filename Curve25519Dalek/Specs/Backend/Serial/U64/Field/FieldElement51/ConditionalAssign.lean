@@ -18,7 +18,7 @@ returns the first operand when `choice = 0`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 250:4-256:5)
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
 
 /-! ## Spec for `conditional_assign` -/
@@ -35,9 +35,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
 theorem conditional_assign_spec
     (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
-    spec (conditional_assign self other choice) (fun res =>
+    conditional_assign self other choice ⦃ res =>
       (∀ i < 5,
-        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!))) := by
+        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by
   unfold conditional_assign
   unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
   unfold U64.Insts.SubtleConditionallySelectable.conditional_select

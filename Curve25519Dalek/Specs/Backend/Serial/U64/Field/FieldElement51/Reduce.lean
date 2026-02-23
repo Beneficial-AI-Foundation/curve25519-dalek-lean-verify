@@ -11,7 +11,7 @@ set_option maxHeartbeats 1000000
 The main statement concerning `reduce` is `reduce_spec` (below).
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 open reduce
@@ -48,9 +48,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 - The result is equal to the input mod p. -/
 @[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
-    spec (reduce limbs) (fun result =>
+    reduce limbs ⦃ result =>
     (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧
-    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]) := by
+    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by
   unfold reduce
   progress*
   · -- BEGIN TASK

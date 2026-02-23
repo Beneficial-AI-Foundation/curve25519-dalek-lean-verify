@@ -29,7 +29,7 @@ of a MontgomeryPoint.
 • Mathematical property: bytesToField(result) = bytesToField(self)
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 /-- **Spec and proof for `montgomery.MontgomeryPoint.as_bytes`**:
@@ -43,8 +43,8 @@ Formal specification:
 -/
 @[progress]
 theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :
-    spec (montgomery.MontgomeryPoint.as_bytes mp) (fun result =>
-    result = mp) := by
+    montgomery.MontgomeryPoint.as_bytes mp ⦃ result =>
+    result = mp ⦄ := by
   unfold montgomery.MontgomeryPoint.as_bytes
   simp
 

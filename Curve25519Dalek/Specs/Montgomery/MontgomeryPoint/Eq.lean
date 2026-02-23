@@ -19,7 +19,7 @@ Choice into a Bool.
 
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint
 
 /-
@@ -44,9 +44,9 @@ natural language specs:
 -/
 @[progress]
 theorem eq_spec (u v : MontgomeryPoint) :
-    spec (eq u v) (fun b =>
+    eq u v ⦃ b =>
     (b = true ↔
-      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by
+      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by
     unfold eq
     progress*
     unfold Bool.Insts.CoreConvertFromChoice.from

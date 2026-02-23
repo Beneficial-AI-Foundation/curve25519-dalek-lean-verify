@@ -17,7 +17,7 @@ outputs extended Edwards coordinates (x, y, 1, xy)
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result Edwards Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Edwards Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.decompress
 
 /-
@@ -81,14 +81,14 @@ And conversely.
 -/
 @[progress]
 theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :
-    spec (step_2 s) (fun (ok1, c, c1, pt) =>
+    step_2 s ⦃ (ok1, c, c1, pt) =>
     (let u1 := 1 - s.toField ^ 2
      let u2 := 1 + s.toField ^ 2
      let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2
      ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧
     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
     (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧
-    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt)) := by
+    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.decompress

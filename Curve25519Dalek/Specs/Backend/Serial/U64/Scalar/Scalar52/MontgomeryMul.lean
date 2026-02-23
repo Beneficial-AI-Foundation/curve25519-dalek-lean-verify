@@ -18,7 +18,7 @@ This function performs Montgomery multiplication.
 
 -/
 
-open Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option exponentiation.threshold 262
@@ -49,9 +49,9 @@ natural language specs:
 @[progress]
 theorem montgomery_mul_spec (m m' : Scalar52)
     (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
-    spec (montgomery_mul m m') (fun w =>
+    montgomery_mul m m' ⦃ w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62)) := by
+    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_mul
   progress*
   have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by

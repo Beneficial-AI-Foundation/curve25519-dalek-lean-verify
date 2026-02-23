@@ -15,7 +15,7 @@ This function performs field element negation by delegating to `negate`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -30,9 +30,9 @@ open curve25519_dalek.backend.serial.u64.field.FieldElement51
 @[progress]
 theorem neg_spec (r : backend.serial.u64.field.FieldElement51)
     (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
-    spec (neg r) (fun r_inv =>
+    neg r ⦃ r_inv =>
     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
-    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19)) := by
+    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by
   unfold neg
   -- Use the `negate` specification since `neg` is just a thin wrapper
   progress

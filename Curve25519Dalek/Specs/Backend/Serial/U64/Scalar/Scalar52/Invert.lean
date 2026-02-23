@@ -20,7 +20,7 @@ This function computes the multiplicative inverse.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
-open Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar52
 
 set_option linter.style.commandStart false
@@ -49,8 +49,8 @@ natural language specs:
 -/
 @[progress]
 theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :
-    spec (invert u) (fun u' =>
-    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]) := by
+    invert u ⦃ u' =>
+    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] ⦄ := by
   unfold invert
   progress*
   · by_contra _

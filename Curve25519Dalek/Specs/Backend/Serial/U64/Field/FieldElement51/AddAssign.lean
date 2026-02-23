@@ -15,7 +15,7 @@ This function performs element-wise addition of field element limbs.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
@@ -30,9 +30,9 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOps
 @[progress]
 theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (hab : ∀ j < 5, i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :
-    spec (add_assign_loop a b i) (fun a' =>
+    add_assign_loop a b i ⦃ a' =>
     (∀ j < 5, i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧
-    (∀ j < 5, j < i.val → a'[j]! = a[j]!)) := by
+    (∀ j < 5, j < i.val → a'[j]! = a[j]!) ⦄ := by
   unfold add_assign_loop
   split
   · progress*
@@ -83,9 +83,9 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
 theorem add_assign_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
-    spec (add_assign a b) (fun result =>
+    add_assign a b ⦃ result =>
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 54)) := by
+    (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by
   unfold add_assign
   progress*
   · -- BEGIN TASK

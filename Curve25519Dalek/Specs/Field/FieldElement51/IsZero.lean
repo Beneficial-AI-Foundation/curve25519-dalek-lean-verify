@@ -22,7 +22,7 @@ This function checks whether a field element is zero.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.field.FieldElement51
 
@@ -76,8 +76,8 @@ private def Hold (P : Prop) : Prop := P
 
 @[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
-    spec (is_zero r) (fun c =>
-    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0)) := by
+    is_zero r ⦃ c =>
+    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by
   unfold is_zero
   progress as ⟨bytes, h_to_bytes_mod, h_to_bytes_lt⟩
   simp only [toResult, bind_tc_ok] at ⊢

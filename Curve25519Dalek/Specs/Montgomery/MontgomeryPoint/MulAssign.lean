@@ -23,7 +23,7 @@ in the backend).
 
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar
 
@@ -50,8 +50,8 @@ natural language specs:
 -/
 @[progress]
 theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
-    spec (mul_assign P scalar) (fun res =>
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P))
+    mul_assign P scalar ⦃ res =>
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P) ⦄
      := by
   unfold mul_assign
   progress*

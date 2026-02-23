@@ -17,7 +17,7 @@ This function constructs a scalar from a wide byte array, reducing modulo the gr
 Source: curve25519-dalek/src/scalar.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar
 
 /-
@@ -38,9 +38,9 @@ natural language specs:
 - The result scalar s is less than L (the group order) -/
 @[progress]
 theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :
-    spec (from_bytes_mod_order_wide b) (fun s =>
+    from_bytes_mod_order_wide b ⦃ s =>
     U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧
-    U8x32_as_Nat s.bytes < L) := by
+    U8x32_as_Nat s.bytes < L ⦄ := by
   unfold from_bytes_mod_order_wide
   progress*
   constructor

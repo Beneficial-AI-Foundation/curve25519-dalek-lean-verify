@@ -17,7 +17,7 @@ This function computes the square of the element and then doubles it.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
@@ -44,9 +44,9 @@ natural language specs:
 @[progress]
 theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :
-    spec (square2_loop square i) (fun r =>
+    square2_loop square i ⦃ r =>
     (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧
-    (∀ j < 5, j < i.val → r[j]! = square[j]!)) := by
+    (∀ j < 5, j < i.val → r[j]! = square[j]!) ⦄ := by
   unfold square2_loop
   split
   · progress*
@@ -88,8 +88,8 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 -/
 @[progress]
 theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    spec (square2 a) (fun r =>
-    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53)) := by
+    square2 a ⦃ r =>
+    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) ⦄ := by
   unfold square2
   progress*
   · -- BEGIN TASK

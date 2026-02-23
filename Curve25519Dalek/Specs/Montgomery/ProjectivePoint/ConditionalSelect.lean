@@ -18,7 +18,7 @@ and the second operand when `choice = 1`.
 **Source**: curve25519-dalek/src/montgomery.rs:L311-L320
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable
 
 /--
@@ -37,9 +37,9 @@ in projective coordinates (U:W).
 theorem conditional_select_spec
     (a b : montgomery.ProjectivePoint)
     (choice : subtle.Choice) :
-    spec (conditional_select a b choice) (fun res =>
+    conditional_select a b choice ⦃ res =>
       (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧
-      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!))) := by
+      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) ⦄ := by
   unfold conditional_select
   progress*
 

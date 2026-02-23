@@ -24,7 +24,7 @@ the encoding and extracting the field element s from the compressed representati
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.decompress
 
 /-
@@ -78,13 +78,13 @@ Namely:
 -/
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
-    spec (step_1 c) (fun (s_encoding_is_canonical, s_is_negative, s) =>
+    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>
     s.IsValid ∧
     (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧
     (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
     (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
     (ristretto.decompress_step1 c = some s.toField ↔
-      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8))) := by
+      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by
   unfold step_1
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c

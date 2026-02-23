@@ -30,7 +30,7 @@ returning a flag indicating which case occurred and handling zero inputs special
 
 
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.field.FieldElement51
@@ -450,7 +450,7 @@ theorem sqrt_ratio_i_spec
     (v : backend.serial.u64.field.FieldElement51)
     (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
-    spec (sqrt_ratio_i u v) (fun c =>
+    sqrt_ratio_i u v ⦃ c =>
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat c.2 % p
@@ -471,7 +471,7 @@ theorem sqrt_ratio_i_spec
     (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
     c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧
     (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))
-    ) := by
+     ⦄ := by
     sorry
 /- ATTEMPTED WP PROOF SKELETON (untested, reverted to sorry):
     unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor

@@ -17,7 +17,7 @@ This function unpacks the element from a compact representation.
 
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.scalar.Scalar52
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar
 
 /-
@@ -39,9 +39,9 @@ natural language specs:
 -/
 @[progress]
 theorem unpack_spec (s : Scalar) :
-    spec (unpack s) (fun u =>
+    unpack s ⦃ u =>
     Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧
-    (∀ i < 5, u[i]!.val < 2 ^ 62)) := by
+    (∀ i < 5, u[i]!.val < 2 ^ 62) ⦄ := by
   unfold unpack
   progress*
   constructor

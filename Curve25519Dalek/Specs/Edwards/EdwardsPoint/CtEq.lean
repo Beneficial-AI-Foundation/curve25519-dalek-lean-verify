@@ -22,7 +22,7 @@ This function performs constant-time equality comparison for Edwards points.
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 namespace curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq
@@ -57,10 +57,10 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)
   (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)
   (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :
-  spec (ct_eq e1 e2) (fun c =>
+  ct_eq e1 e2 ⦃ c =>
   (c = Choice.one ↔
     (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
-    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p])) := by
+    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ⦄ := by
   unfold ct_eq
   progress as ⟨h1, h2⟩
   · intro i hi; have := h_e1_X i hi; scalar_tac

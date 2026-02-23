@@ -18,7 +18,7 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result core.ops.range Aeneas.Std.WP
+open Aeneas Aeneas.Std Result core.ops.range Aeneas.Std.WP
 
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -58,8 +58,8 @@ def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array
 
 @[progress]
 theorem split64to32_spec (input : Array U8 64#usize) :
-    spec (split64to32 input) (fun (a1, a2) =>
-        (∀ i : ℕ, i < 32 → a1.val[i]! = input.val[i]! ∧ a2.val[i]! = input.val[i + 32]!)) := by
+    split64to32 input ⦃ (a1, a2) =>
+        (∀ i : ℕ, i < 32 → a1.val[i]! = input.val[i]! ∧ a2.val[i]! = input.val[i + 32]!) ⦄ := by
   simp [split64to32]
   have h1 :=
     Array.subslice_spec input (Range.mk 0#usize 32#usize)
@@ -92,8 +92,8 @@ theorem split64to32_spec (input : Array U8 64#usize) :
 
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
-    spec (from_uniform_bytes bytes) (fun rist =>
-      rist.IsValid) := by
+    from_uniform_bytes bytes ⦃ rist =>
+      rist.IsValid ⦄ := by
   sorry
 
 

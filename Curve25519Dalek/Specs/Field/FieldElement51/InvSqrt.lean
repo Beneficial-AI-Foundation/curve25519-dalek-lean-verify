@@ -25,7 +25,7 @@ Here i = sqrt(-1) = SQRT_M1 constant
 Source: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.field.FieldElement51
@@ -69,7 +69,7 @@ theorem invsqrt_spec
     (v : backend.serial.u64.field.FieldElement51)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)
     (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
-    spec (invsqrt v) (fun res =>
+    invsqrt v ⦃ res =>
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat res.snd % p
     let i_nat := Field51_as_Nat SQRT_M1 % p
@@ -79,7 +79,7 @@ theorem invsqrt_spec
     (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧
     -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
     (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →
-      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat)) := by
+      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) ⦄ := by
   unfold invsqrt
   progress*
   · intro i _; unfold ONE; interval_cases i; all_goals decide

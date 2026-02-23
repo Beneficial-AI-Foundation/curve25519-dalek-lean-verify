@@ -25,7 +25,7 @@ set_option linter.hashCommand false
 #setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -56,12 +56,12 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (hcarry : ∀ i < 5, carry.val < 2 ^ 53)
     (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)
     (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
-    spec (add_loop a b sum mask carry i) (fun sum' =>
+    add_loop a b sum mask carry i ⦃ sum' =>
     (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
     (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
     ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =
       ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
-      2 ^ (52 * i.val) * (carry.val / 2 ^ 52)) := by
+      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by
   unfold add_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
@@ -170,9 +170,9 @@ decreasing_by scalar_decr_tac
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
-    spec (add a b) (fun v =>
+    add a b ⦃ v =>
     Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
-    Scalar52_as_Nat v < L) := by
+    Scalar52_as_Nat v < L ⦄ := by
   unfold add
   progress*
   · -- BEGIN TASK

@@ -20,7 +20,7 @@ This function performs the final decompression step which:
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 namespace curve25519_dalek.edwards.CompressedEdwardsY
@@ -66,7 +66,7 @@ theorem step_2_spec
     (h_repr : repr.as_bytes = ok bytes)
     (h_byter : sign_bit = (bytes[31]!.val.testBit 7))
      :
-    spec (edwards.decompress.step_2 repr X Y Z) (fun result =>
+    edwards.decompress.step_2 repr X Y Z ⦃ result =>
       -- Y and Z are unchanged
       result.Y = Y ∧
       result.Z = Z ∧
@@ -79,7 +79,7 @@ theorem step_2_spec
           result.X = X) ∧
 
         -- T = X' * Y
-        (result.T = mul result.X Y )) := by
+        (result.T = mul result.X Y ) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

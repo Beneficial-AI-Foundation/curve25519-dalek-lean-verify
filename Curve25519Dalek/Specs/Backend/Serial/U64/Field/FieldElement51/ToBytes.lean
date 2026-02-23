@@ -28,7 +28,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 set_option linter.style.setOption false
 set_option maxHeartbeats 2000000
 
-open Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -156,9 +156,9 @@ Specification:
 -/
 @[progress]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
-    spec (to_bytes self) (fun result =>
+    to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
-    U8x32_as_Nat result < p) := by
+    U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
   sorry
   -- progress*
