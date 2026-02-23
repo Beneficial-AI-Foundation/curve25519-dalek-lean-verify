@@ -226,8 +226,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
+   "dependencies": []},
   {"verified": true,
    "specified": true,
    "spec_statement":
@@ -268,8 +267,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
+   "dependencies": []},
   {"verified": false,
    "specified": false,
    "spec_statement": null,
@@ -1395,26 +1393,6 @@
    "lines": "L250-L256",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign",
-   "is_relevant": true,
-   "is_hidden": false,
-   "is_extraction_artifact": false,
-   "fully_verified": true,
-   "dependencies": []},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem conditional_select_spec\n    (a b : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    ∃ res,\n      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select\n        a b choice = ok res ∧\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalSelect.lean",
-   "spec_docstring":
-   "/--\n**Spec for `backend.serial.u64.field.FieldElement51.conditional_select`**:\n- No panic (always returns successfully)\n- For each limb i, the result limb equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one`, the whole result equals `b`;\n  when `choice = Choice.zero`, the result equals `a`.\n-/",
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
-   "nested_children": [],
-   "lines": "L228-L240",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select",
    "is_relevant": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
@@ -3367,47 +3345,6 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : montgomery.MontgomeryPoint)\n    (choice : subtle.Choice) :\n    ∃ res,\n      conditional_select a b choice = ok res ∧\n      (∀ i < 32,\n        res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!)) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ConditionalSelect.lean",
-   "spec_docstring":
-   "/--\n**Spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_select`**:\n- No panic (always returns successfully)\n- For each byte i, the result byte equals `b[i]` when `choice = 1`,\n  and equals `a[i]` when `choice = 0` (constant-time conditional select)\n- Consequently, when `choice = Choice.one` (value 1), the whole result equals `b`;\n  when `choice = Choice.zero` (value 0), the result equals `a`.\n\nThis implements constant-time conditional selection for Montgomery curve points,\nwhere the points are represented as 32-byte arrays containing the u-coordinate.\n-/",
-   "source": "curve25519-dalek/src/montgomery.rs",
-   "rust_name":
-   "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select",
-   "nested_children": [],
-   "lines": "L88-L90",
-   "lean_name":
-   "curve25519_dalek.montgomery.ConditionallySelectableMontgomeryPoint.conditional_select",
-   "is_relevant": true,
-   "is_hidden": false,
-   "is_extraction_artifact": false,
-   "fully_verified": true,
-   "dependencies": []},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem conditional_select_spec\n    (a b : montgomery.ProjectivePoint)\n    (choice : subtle.Choice) :\n    ∃ res, conditional_select a b choice = ok res ∧\n      (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧\n      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/ConditionalSelect.lean",
-   "spec_docstring":
-   "/--\n**Spec for `montgomery.ConditionallySelectableProjectivePoint.conditional_select`**:\n- No panic (always returns successfully)\n- For both U and W coordinates:\n  - Each limb of the result equals the corresponding limb from `b` when `choice = 1`\n  - Each limb of the result equals the corresponding limb from `a` when `choice = 0`\n- Consequently, when `choice = Choice.one` (value 1), the whole result equals `b`;\n  when `choice = Choice.zero` (value 0), the result equals `a`.\n\nThis implements constant-time conditional selection for Montgomery curve points\nin projective coordinates (U:W).\n-/",
-   "source": "curve25519-dalek/src/montgomery.rs",
-   "rust_name":
-   "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select",
-   "nested_children": [],
-   "lines": "L311-L320",
-   "lean_name":
-   "curve25519_dalek.montgomery.ConditionallySelectableProjectivePoint.conditional_select",
-   "is_relevant": true,
-   "is_hidden": false,
-   "is_extraction_artifact": false,
-   "fully_verified": true,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
    "\ntheorem ct_eq_spec (u v : MontgomeryPoint) :\n    ∃ c,\n    ct_eq u v = ok c ∧\n    (c = Choice.one ↔\n      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/CtEq.lean",
    "spec_docstring":
@@ -3941,7 +3878,6 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A",
     "curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
-    "curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
