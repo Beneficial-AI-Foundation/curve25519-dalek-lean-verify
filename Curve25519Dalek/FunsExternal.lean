@@ -749,7 +749,7 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 -/
 @[progress]
-theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_spec
+theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
   (h_a : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res)
   (h_b : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice = ok res) :
@@ -780,7 +780,7 @@ noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_
 - Implements constant-time conditional assignment for MontgomeryPoint
 -/
 @[progress]
-theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl_spec
+theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
   ∃ res,
     montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign a b choice = ok res ∧

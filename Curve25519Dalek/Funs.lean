@@ -4878,7 +4878,10 @@ def core.default.DefaultMontgomeryPoint : core.default.Default
 }
 
 /-- [curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 79:4-84:5 -/
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 79:4-84:5
+
+   This definition remains in Funs.lean (rather than FunsExternal.lean) because it depends on
+   backend.serial.u64.field.FieldElement51.from_bytes, which is defined in this file. -/
 noncomputable def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
   Result subtle.Choice
@@ -4910,7 +4913,10 @@ noncomputable def subtle.ConditionallySelectableMontgomeryPoint :
 }
 
 /-- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::eq]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 94:4-96:5 -/
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 94:4-96:5
+
+   This definition remains in Funs.lean (rather than FunsExternal.lean) because it depends on
+   montgomery.ConstantTimeEqMontgomeryPoint.ct_eq, which is defined in this file. -/
 noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
   Result Bool
@@ -4919,7 +4925,10 @@ noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
   core.convert.IntoFrom.into core.convert.FromBoolChoice c
 
 /-- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1
+
+   Note: This function is listed as an axiom in the Curve25519Dalek/FunsExternal.lean, but has a concrete implementation here. It remains in Funs.lean (rather than FunsExternal.lean) because it depends on
+   montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq, which is defined in this file. -/
 noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
   Result Bool := do
