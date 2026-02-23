@@ -620,6 +620,11 @@ axiom field.PartialEqFieldElement51FieldElement51.ne
 axiom scalar.PartialEqScalarScalar.ne
   : scalar.Scalar → scalar.Scalar → Result Bool
 
+/- [curve25519_dalek::scalar::{core::cmp::Eq for curve25519_dalek::scalar::Scalar}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/scalar.rs', lines 293:0-293:21 -/
+axiom scalar.EqScalar.assert_receiver_is_total_eq
+  : scalar.Scalar → Result Unit
+
 /- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_assign]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 389:0-398:1 -/
 axiom scalar.ConditionallySelectableScalar.conditional_assign
@@ -772,8 +777,34 @@ theorem montgomery.ConditionallySelectableProjectivePoint.conditional_assign_spe
 
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
-axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
-  : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
+-- axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+--   : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
+
+
+-- /-- [curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq]:
+--    Source: 'curve25519-dalek/src/montgomery.rs', lines 79:4-84:5 -/
+-- noncomputable def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
+--   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+--   Result subtle.Choice
+--   := do
+--   let self_fe ← backend.serial.u64.field.FieldElement51.from_bytes self
+--   let other_fe ← backend.serial.u64.field.FieldElement51.from_bytes other
+--   field.ConstantTimeEqFieldElement51.ct_eq self_fe other_fe
+
+
+-- noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
+--   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+--   Result Bool
+--   := do
+--   let c ← montgomery.ConstantTimeEqMontgomeryPoint.ct_eq self other
+--   core.convert.IntoFrom.into core.convert.FromBoolChoice c
+
+
+-- noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl
+--   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+--   Result Bool := do
+--   let eq_result ← montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other
+--   ok (!eq_result)
 
 /- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
@@ -790,7 +821,6 @@ theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_spec
   (self : montgomery.MontgomeryPoint) :
   montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq self = ok () := by
   rfl
-
 
 
 /- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
