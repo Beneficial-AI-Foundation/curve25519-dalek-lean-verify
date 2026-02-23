@@ -686,7 +686,9 @@ def subtle.ConditionallySelectableArray.conditional_assign
   (a : Array T N) (b : Array T N) (choice : subtle.Choice) : Result (Array T N) :=
   subtle.ConditionallySelectableArray.conditional_select ConditionallySelectableInst a b choice
 
-
+/-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5
+It is in Funs.Lean previously, we move it here since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
 def
   backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
   (a : backend.serial.u64.field.FieldElement51)
@@ -713,7 +715,8 @@ def
   ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
 
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5 -/
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5
+  It is in Funs.Lean previously, we move it here since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
 def montgomery.ConditionallySelectableProjectivePoint.conditional_select
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
@@ -727,6 +730,11 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_select
       a.W b.W choice
   ok { U := fe, W := fe1 }
 
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1
+
+   Conditionally swaps two ProjectivePoint values in constant time.
+   If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
 def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
@@ -735,6 +743,11 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
   let b_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice
   ok (a_new, b_new)
 
+/-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_swap`**:
+- No panic (if both conditional_select operations succeed)
+- Conditionally swaps two ProjectivePoint values in constant time
+- Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
+-/
 @[progress]
 theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
@@ -750,88 +763,22 @@ theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_impl_
   use (a_new, b_new)
   simp [h_a_eq, h_b_eq]
 
-/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
 
-noncomputable def montgomery.ConditionallySelectableProjectivePoint.conditional_assign
-  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
-  (choice : subtle.Choice) :
-  Result montgomery.ProjectivePoint :=
-  montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
-
-
-/-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_assign`**:
-- No panic (if conditional_select succeeds)
-- Returns the result of conditional_select(a, b, choice)
--/
-@[progress]
-theorem montgomery.ConditionallySelectableProjectivePoint.conditional_assign_spec
-  (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
-  (h : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res) :
-  ∃ res,
-    montgomery.ConditionallySelectableProjectivePoint.conditional_assign a b choice = ok res ∧
-    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res := by
-  unfold montgomery.ConditionallySelectableProjectivePoint.conditional_assign
-  obtain ⟨res, h_eq⟩ := h
-  use res
-
-/- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
--- axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
---   : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
-
-
--- /-- [curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq]:
---    Source: 'curve25519-dalek/src/montgomery.rs', lines 79:4-84:5 -/
--- noncomputable def montgomery.ConstantTimeEqMontgomeryPoint.ct_eq
---   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
---   Result subtle.Choice
---   := do
---   let self_fe ← backend.serial.u64.field.FieldElement51.from_bytes self
---   let other_fe ← backend.serial.u64.field.FieldElement51.from_bytes other
---   field.ConstantTimeEqFieldElement51.ct_eq self_fe other_fe
-
-
--- noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
---   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
---   Result Bool
---   := do
---   let c ← montgomery.ConstantTimeEqMontgomeryPoint.ct_eq self other
---   core.convert.IntoFrom.into core.convert.FromBoolChoice c
-
-
--- noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl
---   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
---   Result Bool := do
---   let eq_result ← montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other
---   ok (!eq_result)
-
-/- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30 -/
-
-/-- Implementation of `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`:
-   Returns Unit (no-op assertion that Eq is properly implemented). -/
-noncomputable def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
-  (_self : montgomery.MontgomeryPoint) : Result Unit :=
-  ok ()
-
-/-- **Progress spec for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_impl`**. -/
-@[progress]
-theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_spec
-  (self : montgomery.MontgomeryPoint) :
-  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq self = ok () := by
-  rfl
-
-
-/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1 -/
+   Conditionally assigns b to a in constant time.
+   Returns b if choice.val = 1, otherwise returns a. -/
 noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint :=
   if choice.val = 1#u8 then ok b else ok a
 
-/-- **Progress spec for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl`**. -/
+/-- **Spec theorem for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign`**:
+- No panic (always succeeds)
+- Returns b if choice.val = 1#u8, otherwise returns a
+- Implements constant-time conditional assignment for MontgomeryPoint
+-/
 @[progress]
 theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_impl_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
@@ -866,8 +813,11 @@ noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_
       subtle.ConditionallySelectableU8 a b choice
   ok a1
 
-/- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1 -/
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
+
+   Conditionally swaps two MontgomeryPoint values in constant time.
+   If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
 noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
@@ -876,7 +826,12 @@ noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_
   let b_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select b a choice
   ok (a_new, b_new)
 
-
+/-- **Spec theorem for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap`**:
+- No panic (always succeeds)
+- Conditionally swaps two MontgomeryPoint values in constant time
+- Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
+- Implements constant-time conditional swap for MontgomeryPoint
+-/
 @[progress]
 theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
@@ -888,6 +843,54 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_spec
   unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
   unfold subtle.ConditionallySelectableArray.conditional_select
   split <;> simp_all
+
+/-- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30
+
+   Marker method required by the Eq trait to assert that the type has total equality.
+   This is a no-op for MontgomeryPoint, always returning Unit. -/
+noncomputable def montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq
+  (_self : montgomery.MontgomeryPoint) : Result Unit :=
+  ok ()
+
+/-- **Spec theorem for `montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq`**:
+- No panic (always succeeds)
+- Always returns ok ()
+- Marker method required by the Eq trait to assert total equality
+-/
+@[progress]
+theorem montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq_spec
+  (self : montgomery.MontgomeryPoint) :
+  montgomery.EqMontgomeryPoint.assert_receiver_is_total_eq self = ok () := by
+  rfl
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 310:0-321:1
+
+   Conditionally assigns b to a in constant time.
+   This is a wrapper around conditional_select. -/
+noncomputable def montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
+  (choice : subtle.Choice) :
+  Result montgomery.ProjectivePoint :=
+  montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
+
+/-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_assign`**:
+- No panic (if conditional_select succeeds)
+- Returns b if choice.val = 1, otherwise returns a
+- Equivalent to conditional_select(a, b, choice)
+- Implements constant-time conditional assignment for ProjectivePoint
+-/
+@[progress]
+theorem montgomery.ConditionallySelectableProjectivePoint.conditional_assign_spec
+  (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
+  (h : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res) :
+  ∃ res,
+    montgomery.ConditionallySelectableProjectivePoint.conditional_assign a b choice = ok res ∧
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res := by
+  unfold montgomery.ConditionallySelectableProjectivePoint.conditional_assign
+  obtain ⟨res, h_eq⟩ := h
+  use res
 
 
 end curve25519_dalek

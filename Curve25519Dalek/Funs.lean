@@ -4918,6 +4918,8 @@ noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
   let c ← montgomery.ConstantTimeEqMontgomeryPoint.ct_eq self other
   core.convert.IntoFrom.into core.convert.FromBoolChoice c
 
+/-- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
 noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
   Result Bool := do
