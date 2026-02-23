@@ -91,7 +91,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :\n    spec (neg self) (fun result =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0) := by ...",
+   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ result =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
    "spec_docstring": null,
@@ -127,7 +127,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nspec (Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other) (fun c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧\n(Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧\nZ' % p = ((2 * Z) + (T * XY2D)) % p ∧\n(T' + (T * XY2D)) % p = (2 * Z) % p)\n := by ...",
+   "theorem add_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nShared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other ⦃ c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧\n(Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧\nZ' % p = ((2 * Z) + (T * XY2D)) % p ∧\n(T' + (T * XY2D)) % p = (2 * Z) % p ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Add.lean",
    "spec_docstring": null,
@@ -307,7 +307,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nspec (Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub self other) (fun c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * XY2D)) % p = (2 * Z) % p ∧\nT' % p = ((2 * Z) + (T * XY2D)) % p)\n := by ...",
+   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nShared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub self other ⦃ c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * XY2D)) % p = (2 * Z) % p ∧\nT' % p = ((2 * Z) + (T * XY2D)) % p ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Sub.lean",
    "spec_docstring": null,
@@ -381,7 +381,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.ProjectiveNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.Y_plus_X[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 53)\n  (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)\n  (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :\nspec (Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other) (fun c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.Y_plus_X\nlet YmX := Field51_as_Nat other.Y_minus_X\nlet Z₀ := Field51_as_Nat other.Z\nlet T2d := Field51_as_Nat other.T2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * T2d) )% p = (2 * Z * Z₀)  % p ∧\nT' % p = ((2 * Z * Z₀) + (T * T2d)) % p)\n := by ...",
+   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.ProjectiveNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.Y_plus_X[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 53)\n  (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)\n  (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 53) :\nShared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.Y_plus_X\nlet YmX := Field51_as_Nat other.Y_minus_X\nlet Z₀ := Field51_as_Nat other.Z\nlet T2d := Field51_as_Nat other.T2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * T2d) )% p = (2 * Z * Z₀)  % p ∧\nT' % p = ((2 * Z * Z₀) + (T * T2d)) % p ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring": null,
@@ -419,7 +419,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    spec (add a b) (fun result =>\n    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧\n    (∀ i < 5, result[i]!.val < 2^54)) := by ...",
+   "theorem add_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    add a b ⦃ result =>\n    (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧\n    (∀ i < 5, result[i]!.val < 2^54) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Add.lean",
    "spec_docstring":
@@ -456,7 +456,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (lhs rhs : Array U64 5#usize)\n    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :\n    spec (mul lhs rhs) (fun r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52)) := by ...",
+   "theorem mul_spec (lhs rhs : Array U64 5#usize)\n    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :\n    mul lhs rhs ⦃ r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
    "spec_docstring": null,
@@ -493,7 +493,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec (r : backend.serial.u64.field.FieldElement51)\n    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    spec (neg r) (fun r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19)) := by ...",
+   "theorem neg_spec (r : backend.serial.u64.field.FieldElement51)\n    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    neg r ⦃ r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
    "spec_docstring":
@@ -530,7 +530,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec (a b : Array U64 5#usize)\n    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)\n    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    spec (sub a b) (fun d =>\n    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p) := by ...",
+   "theorem sub_spec (a b : Array U64 5#usize)\n    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)\n    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    sub a b ⦃ d =>\n    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
    "spec_docstring":
@@ -567,7 +567,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : backend.serial.curve_models.ProjectiveNielsPoint)\n    (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :\n    spec (neg self) (fun result =>\n    result.Y_plus_X = self.Y_minus_X ∧\n    result.Y_minus_X = self.Y_plus_X ∧\n    result.Z = self.Z ∧\n    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0) := by ...",
+   "theorem neg_spec\n    (self : backend.serial.curve_models.ProjectiveNielsPoint)\n    (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :\n    neg self ⦃ result =>\n    result.Y_plus_X = self.Y_minus_X ∧\n    result.Y_minus_X = self.Y_plus_X ∧\n    result.Z = self.Z ∧\n    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
@@ -604,7 +604,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    spec (add self other) (fun result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint) := by ...",
+   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
@@ -812,7 +812,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (s : scalar.Scalar) (r : ristretto.RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    spec (mul s r) (fun result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint) := by ...",
+   "theorem mul_spec (s : scalar.Scalar) (r : ristretto.RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul s r ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
@@ -959,7 +959,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    spec (mul P scalar) (fun res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))\n := by ...",
+   "\ntheorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul P scalar ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements the Montgomery ladder for constant-time scalar multiplication\n- Processes scalar bits from bit 254 down to bit 0 using Algorithm 8 (Costello-Smith 2017)\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]P\n  * If P has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]P), the u-coordinate of the n-fold sum of P on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by P throughout the computation\n  * When the scalar is reduced modulo the group order L, the result corresponds to\n    scalar multiplication in the prime-order subgroup\n  * The result is computed via projective arithmetic and converted back to affine form\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n  * The computation maintains constant-time guarantees: the sequence of operations\n    executed is independent of the scalar bit values (only conditional swaps and\n    unconditional arithmetic operations are performed)\n-/",
@@ -1033,7 +1033,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    spec (mul scalar P) (fun res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))\n := by ...",
+   "\ntheorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the reverse operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MontgomeryPoint::mul with swapped arguments\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -1559,7 +1559,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem assert_receiver_is_total_eq_spec\n    (self : backend.serial.curve_models.AffineNielsPoint) :\n    spec (assert_receiver_is_total_eq self) (fun result => result = ()) := by ...",
+   "theorem assert_receiver_is_total_eq_spec\n    (self : backend.serial.curve_models.AffineNielsPoint) :\n    assert_receiver_is_total_eq self ⦃ result => result = () ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/AssertReceiverIsTotalEq.lean",
    "spec_docstring":
@@ -1595,7 +1595,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    spec (eq self other) (fun b =>\n    (b = true ↔\n      self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧\n      self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧\n      self.xy2d.to_bytes = other.xy2d.to_bytes)) := by ...",
+   "theorem eq_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint) :\n    eq self other ⦃ b =>\n    (b = true ↔\n      self.y_plus_x.to_bytes = other.y_plus_x.to_bytes ∧\n      self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧\n      self.xy2d.to_bytes = other.xy2d.to_bytes) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Eq.lean",
    "spec_docstring":
@@ -1773,7 +1773,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    spec (conditional_assign self other choice) (fun result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val)) := by ...",
+   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
@@ -1793,7 +1793,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    spec (conditional_select a b choice) (fun result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_plus_x[i]!.val else a.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_minus_x[i]!.val else a.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val)) := by ...",
+   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_plus_x[i]!.val else a.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then b.y_minus_x[i]!.val else a.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalSelect.lean",
    "spec_docstring":
@@ -1897,7 +1897,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nspec (as_extended q) (fun e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p)\n := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
@@ -2112,7 +2112,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    spec (conditional_assign self other choice) (fun result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_minus_X[i]!.val else self.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val)) := by ...",
+   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_minus_X[i]!.val else self.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
@@ -2132,7 +2132,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    spec (conditional_select a b choice) (fun result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_minus_X[i]!.val else a.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val)) := by ...",
+   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_minus_X[i]!.val else a.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalSelect.lean",
    "spec_docstring":
@@ -2225,7 +2225,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : ProjectivePoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :\nspec (as_extended q) (fun e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * Z) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z^2) % p ∧\nT' % p = (X * Y) % p)\n := by ...",
+   "theorem as_extended_spec (q : ProjectivePoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * Z) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z^2) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean",
    "spec_docstring":
@@ -2979,7 +2979,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_assign_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    spec (add_assign a b) (fun result =>\n    (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 54)) := by ...",
+   "theorem add_assign_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    add_assign a b ⦃ result =>\n    (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
@@ -2999,7 +2999,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (hab : ∀ j < 5, i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :\n    spec (add_assign_loop a b i) (fun a' =>\n    (∀ j < 5, i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧\n    (∀ j < 5, j < i.val → a'[j]! = a[j]!)) := by ...",
+   "theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (hab : ∀ j < 5, i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :\n    add_assign_loop a b i ⦃ a' =>\n    (∀ j < 5, i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧\n    (∀ j < 5, j < i.val → a'[j]! = a[j]!) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
@@ -3123,7 +3123,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_assign_spec\n    (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    spec (conditional_assign self other choice) (fun res =>\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!))) := by ...",
+   "theorem conditional_assign_spec\n    (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ res =>\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
    "spec_docstring":
@@ -3194,7 +3194,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :\n    spec (ct_eq a b) (fun c =>\n    (c = Choice.one ↔ a.to_bytes = b.to_bytes )) := by ...",
+   "theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :\n    ct_eq a b ⦃ c =>\n    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/CtEq.lean",
    "spec_docstring":
@@ -3354,7 +3354,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    spec (as_bytes self) (fun result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p) := by ...",
+   "theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    as_bytes self ⦃ result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AsBytes.lean",
    "spec_docstring":
@@ -3374,7 +3374,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    spec (from_bytes bytes) (fun result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid) := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -3409,7 +3409,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_limbs_spec (a : Array U64 5#usize) :\n    spec (from_limbs a) (fun r =>\n    r = a ∧ Field51_as_Nat r = Field51_as_Nat a) := by ...",
+   "theorem from_limbs_spec (a : Array U64 5#usize) :\n    from_limbs a ⦃ r =>\n    r = a ∧ Field51_as_Nat r = Field51_as_Nat a ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromLimbs.lean",
    "spec_docstring":
@@ -3428,7 +3428,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    spec (negate r) (fun r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19)) := by ...",
+   "theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    negate r ⦃ r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean",
    "spec_docstring":
@@ -3448,7 +3448,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "\n\ntheorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    spec (pow2k a k) (fun r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52))\n := by ...",
+   "\n\ntheorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    pow2k a k ⦃ r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring":
@@ -3535,7 +3535,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    spec (reduce limbs) (fun result =>\n    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧\n    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]) := by ...",
+   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    reduce limbs ⦃ result =>\n    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧\n    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
@@ -3588,7 +3588,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    spec (square a) (fun r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2 ^ 52)) := by ...",
+   "theorem square_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    square a ⦃ r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^2 [MOD p] ∧ (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square.lean",
    "spec_docstring":
@@ -3608,7 +3608,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    spec (square2 a) (fun r =>\n    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53)) := by ...",
+   "theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    square2 a ⦃ r =>\n    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
@@ -3629,7 +3629,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :\n    spec (square2_loop square i) (fun r =>\n    (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧\n    (∀ j < 5, j < i.val → r[j]! = square[j]!)) := by ...",
+   "theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :\n    square2_loop square i ⦃ r =>\n    (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧\n    (∀ j < 5, j < i.val → r[j]! = square[j]!) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
@@ -3648,7 +3648,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    spec (to_bytes self) (fun result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p) := by ...",
+   "theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    to_bytes self ⦃ result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
    "spec_docstring":
@@ -3900,7 +3900,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :\n    spec (add a b) (fun v =>\n    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧\n    Scalar52_as_Nat v < L) := by ...",
+   "theorem add_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :\n    add a b ⦃ v =>\n    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧\n    Scalar52_as_Nat v < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "spec_docstring":
@@ -3922,7 +3922,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    spec (add_loop a b sum mask carry i) (fun sum' =>\n    (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n    (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52)) := by ...",
+   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop a b sum mask carry i ⦃ sum' =>\n    (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n    (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "spec_docstring":
@@ -3959,7 +3959,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    spec (as_montgomery u) (fun m =>\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 62)) := by ...",
+   "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    as_montgomery u ⦃ m =>\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
    "spec_docstring":
@@ -3980,7 +3980,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)\n    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)\n    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :\n    spec (conditional_add_l self condition) (fun result =>\n    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 < L) ∧\n    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧\n    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self)) := by ...",
+   "theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)\n    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)\n    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :\n    conditional_add_l self condition ⦃ result =>\n    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 < L) ∧\n    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧\n    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring":
@@ -4000,7 +4000,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)\n    (carry : U64) (mask : U64) (i : Usize)\n    (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : carry.val < 2 ^ 53) :\n    spec (conditional_add_l_loop self condition carry mask i) (fun result =>\n    (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =\n      Scalar52_as_Nat self + (if condition.val = 1#u8 then Scalar52_as_Nat constants.L else 0) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -\n      (if condition.val = 1#u8 then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val else 0))) := by ...",
+   "theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)\n    (carry : U64) (mask : U64) (i : Usize)\n    (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : carry.val < 2 ^ 53) :\n    conditional_add_l_loop self condition carry mask i ⦃ result =>\n    (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =\n      Scalar52_as_Nat self + (if condition.val = 1#u8 then Scalar52_as_Nat constants.L else 0) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -\n      (if condition.val = 1#u8 then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val else 0)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring": null,
@@ -4038,7 +4038,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (b : Array U8 32#usize) :\n    spec (from_bytes b) (fun u =>\n    Scalar52_as_Nat u = U8x32_as_Nat b ∧\n    ∀ i < 5, u[i]!.val < 2 ^ 52)\n := by ...",
+   "theorem from_bytes_spec (b : Array U8 32#usize) :\n    from_bytes b ⦃ u =>\n    Scalar52_as_Nat u = U8x32_as_Nat b ∧\n    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "spec_docstring":
@@ -4076,7 +4076,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    spec (from_bytes_wide b) (fun u =>\n    Scalar52_as_Nat u = U8x64_as_Nat b % L) := by ...",
+   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ u =>\n    Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "spec_docstring":
@@ -4118,7 +4118,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_montgomery_spec (self : Scalar52)\n    (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    spec (from_montgomery self) (fun u =>\n    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L) := by ...",
+   "theorem from_montgomery_spec (self : Scalar52)\n    (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    from_montgomery self ⦃ u =>\n    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "spec_docstring":
@@ -4139,7 +4139,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)\n    (hi : i.val ≤ 5) :\n    spec (from_montgomery_loop self limbs i) (fun result =>\n    (∀ j < 5, i.val ≤ j → result[j]! = UScalar.cast .U128 self[j]!) ∧\n    (∀ j < 9, 5 ≤ j → result[j]! = limbs[j]!) ∧\n    (∀ j < i.val, result[j]! = limbs[j]!)) := by ...",
+   "theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)\n    (hi : i.val ≤ 5) :\n    from_montgomery_loop self limbs i ⦃ result =>\n    (∀ j < 5, i.val ≤ j → result[j]! = UScalar.cast .U128 self[j]!) ∧\n    (∀ j < 9, 5 ≤ j → result[j]! = limbs[j]!) ∧\n    (∀ j < i.val, result[j]! = limbs[j]!) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromMontgomery.lean",
    "spec_docstring":
@@ -4159,7 +4159,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :\n    spec (montgomery_mul m m') (fun w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62)) := by ...",
+   "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :\n    montgomery_mul m m' ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean",
    "spec_docstring":
@@ -4180,7 +4180,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_reduce_spec (a : Array U128 9#usize)\n    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :\n    spec (montgomery_reduce a) (fun m =>\n    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat m < L))\n := by ...",
+   "theorem montgomery_reduce_spec (a : Array U128 9#usize)\n    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :\n    montgomery_reduce a ⦃ m =>\n    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat m < L) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
    "spec_docstring":
@@ -4241,7 +4241,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :\n    spec (montgomery_square m) (fun w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62)) := by ...",
+   "theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :\n    montgomery_square m ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean",
    "spec_docstring":
@@ -4280,7 +4280,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_internal_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    spec (mul_internal a b) (fun result =>\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127)) := by ...",
+   "theorem mul_internal_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul_internal a b ⦃ result =>\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean",
    "spec_docstring":
@@ -4320,7 +4320,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :\n    spec (square_internal a) (fun result =>\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127)) := by ...",
+   "theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :\n    square_internal a ⦃ result =>\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/SquareInternal.lean",
    "spec_docstring":
@@ -4341,7 +4341,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)\n    (hb' : Scalar52_as_Nat b ≤ L) :\n    spec (sub a b) (fun result =>\n    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧\n    Scalar52_as_Nat result < L ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 52)) := by ...",
+   "theorem sub_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)\n    (hb' : Scalar52_as_Nat b ≤ L) :\n    sub a b ⦃ result =>\n    Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧\n    Scalar52_as_Nat result < L ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "spec_docstring":
@@ -4362,7 +4362,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52)\n    (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (hdiff : ∀ j < i.val, difference[j]!.val < 2 ^ 52)\n    (hdiff_rest : ∀ j, i.val ≤ j → j < 5 → difference[j]!.val = 0)\n    (hmask : mask.val = 2 ^ 52 - 1)\n    (hi : i.val ≤ 5)\n    (hborrow : borrow.val / 2 ^ 63 ≤ 1)\n    (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =\n            Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :\n    spec (sub_loop a b difference mask borrow i) (fun result =>\n    (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =\n     Scalar52_as_Nat b + Scalar52_as_Nat result.1)) := by ...",
+   "theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52)\n    (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (hdiff : ∀ j < i.val, difference[j]!.val < 2 ^ 52)\n    (hdiff_rest : ∀ j, i.val ≤ j → j < 5 → difference[j]!.val = 0)\n    (hmask : mask.val = 2 ^ 52 - 1)\n    (hi : i.val ≤ 5)\n    (hborrow : borrow.val / 2 ^ 63 ≤ 1)\n    (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =\n            Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :\n    sub_loop a b difference mask borrow i ⦃ result =>\n    (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =\n     Scalar52_as_Nat b + Scalar52_as_Nat result.1) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Sub.lean",
    "spec_docstring":
@@ -4399,7 +4399,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (u : Scalar52) :\n    spec (to_bytes u) (fun b =>\n    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat b < L) := by ...",
+   "theorem to_bytes_spec (u : Scalar52) :\n    to_bytes u ⦃ b =>\n    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat b < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
    "spec_docstring":
@@ -4417,7 +4417,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem m_spec (x y : U64) :\n    spec (m x y) (fun result =>\n    result.val = x.val * y.val) := by ...",
+   "theorem m_spec (x y : U64) :\n    m x y ⦃ result =>\n    result.val = x.val * y.val ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean",
    "spec_docstring":
    "/-- **Spec for `backend.serial.u64.scalar.m`**:\n- Does not overflow and hence returns a result\n- The result equals the product of the two input values -/",
@@ -4744,7 +4744,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec\n    (self : edwards.CompressedEdwardsY) :\n    spec (as_bytes self) (fun result =>\n    result = self) := by ...",
+   "theorem as_bytes_spec\n    (self : edwards.CompressedEdwardsY) :\n    as_bytes self ⦃ result =>\n    result = self ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean",
    "spec_docstring":
    "/-- **Spec for `edwards.CompressedEdwardsY.as_bytes`**:\n- The function succeeds (always returns `ok`)\n- The result is exactly the internal byte array representation.\n-/",
@@ -4761,7 +4761,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    spec (edwards.CompressedEdwardsY.decompress cey) (fun result =>\n\n      (∀ ep, result = some ep →\n        let y_encoded := (U8x32_as_Nat cey) % (2^255)\n        let x_sign_bit := cey[31]!.val.testBit 7\n\n        (∃ Z_inv x_val y_val x_is_neg,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧\n          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧\n          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧\n\n          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧\n\n          y_val % p = y_encoded % p ∧\n\n          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧\n\n          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p)))) := by ...",
+   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n\n      (∀ ep, result = some ep →\n        let y_encoded := (U8x32_as_Nat cey) % (2^255)\n        let x_sign_bit := cey[31]!.val.testBit 7\n\n        (∃ Z_inv x_val y_val x_is_neg,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧\n          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧\n          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧\n\n          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧\n\n          y_val % p = y_encoded % p ∧\n\n          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧\n\n          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean",
    "spec_docstring":
@@ -5062,7 +5062,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    spec (add self other) (fun result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint) := by ...",
+   "theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
@@ -5547,7 +5547,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  spec (ct_eq e1 e2) (fun c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p])) := by ...",
+   "\ntheorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates\n-/",
@@ -5587,7 +5587,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_spec (e : EdwardsPoint) :\n    spec (edwards.EdwardsPoint.as_projective e) (fun q =>\n    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z) := by ...",
+   "theorem as_projective_spec (e : EdwardsPoint) :\n    edwards.EdwardsPoint.as_projective e ⦃ q =>\n    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjective.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.as_projective`**:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint coordinates match the EdwardsPoint coordinates (X, Y, Z)\n-/",
@@ -5604,7 +5604,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    spec (as_projective_niels e) (fun pn =>\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let T := Field51_as_Nat e.T\n    let A := Field51_as_Nat pn.Y_plus_X\n    let B := Field51_as_Nat pn.Y_minus_X\n    let Z' := Field51_as_Nat pn.Z\n    let C := Field51_as_Nat pn.T2d\n    let d2 := Field51_as_Nat EDWARDS_D2\n    A % p = (Y + X) % p ∧\n    (B + X) % p = Y % p ∧\n    Z' % p = Z % p ∧\n    C % p = (T * d2) % p) := by ...",
+   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    as_projective_niels e ⦃ pn =>\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let T := Field51_as_Nat e.T\n    let A := Field51_as_Nat pn.Y_plus_X\n    let B := Field51_as_Nat pn.Y_minus_X\n    let Z' := Field51_as_Nat pn.Z\n    let C := Field51_as_Nat pn.T2d\n    let d2 := Field51_as_Nat EDWARDS_D2\n    A % p = (Y + X) % p ∧\n    (B + X) % p = Y % p ∧\n    Z' % p = Z % p ∧\n    C % p = (T * d2) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean",
    "spec_docstring":
@@ -5626,7 +5626,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)\n      (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)\n      -- (hself : self.IsValid)\n      :\n    spec (compress self) (fun result => True) := by ...",
+   "theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)\n      (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)\n      -- (hself : self.IsValid)\n      :\n    compress self ⦃ result => True ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.compress`**:\n- No panic when Z is invertible / not zero (always returns successfully)\n- On success, returns a CompressedEdwardsY (U8x32 byte array) where:\n  - Bytes 0-30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian\n  - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate\n-/",
@@ -5645,7 +5645,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :\n    spec (double e) (fun result =>\n    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint) := by ...",
+   "theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :\n    double e ⦃ result =>\n    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",
@@ -5665,7 +5665,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    spec (is_small_order self) (fun result =>\n    (result ↔ h • self.toPoint = 0)) := by ...",
+   "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    is_small_order self ⦃ result =>\n    (result ↔ h • self.toPoint = 0) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean",
    "spec_docstring":
    "/-- **Spec for `edwards.EdwardsPoint.is_small_order`**:\n- Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])\n- This is determined by checking if multiplying by the cofactor yields the identity element\n-/",
@@ -5706,7 +5706,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    spec (mul_base scalar) (fun res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint) := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to scalar multiplication with the Edwards basepoint constant\n- The returned EdwardsPoint equals the output of that scalar multiplication\n-/",
@@ -5725,7 +5725,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    spec (mul_base_clamped bytes) (fun result =>\n    EdwardsPoint.IsValid result ∧\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    result.toPoint = ((U8x32_as_Nat clamped_scalar) • constants.ED25519_BASEPOINT_POINT.toPoint))) := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    EdwardsPoint.IsValid result ∧\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    result.toPoint = ((U8x32_as_Nat clamped_scalar) • constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -5745,7 +5745,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    spec (mul_by_cofactor self) (fun result =>\n    result.IsValid ∧\n    result.toPoint = h • self.toPoint) := by ...",
+   "theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    mul_by_cofactor self ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = h • self.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByCofactor.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_cofactor`**:\n- No panic (always returns successfully)\n- Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e\n-/",
@@ -5817,7 +5817,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    spec (to_affine e) (fun ap =>\n\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let x := Field51_as_Nat ap.x\n    let y := Field51_as_Nat ap.y\n\n    (if Z % p = 0 then\n      x % p = 0 ∧ y % p = 0\n    else\n      (x * Z) % p = X % p ∧\n      (y * Z) % p = Y % p) ∧\n      (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, ap.y[i]!.val < 2 ^ 52)) := by ...",
+   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    to_affine e ⦃ ap =>\n\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let x := Field51_as_Nat ap.x\n    let y := Field51_as_Nat ap.y\n\n    (if Z % p = 0 then\n      x % p = 0 ∧ y % p = 0\n    else\n      (x * Z) % p = X % p ∧\n      (y * Z) % p = Y % p) ∧\n      (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToAffine.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_affine`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting AffinePoint has coordinates:\n  - If Z ≢ 0 (mod p): x * Z ≡ X (mod p) and y * Z ≡ Y (mod p)\n  - If Z ≡ 0 (mod p): x ≡ 0 (mod p) and y ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -5836,7 +5836,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    spec (to_montgomery e) (fun mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))) := by ...",
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    to_montgomery e ⦃ mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_montgomery`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting MontgomeryPoint has u-coordinate:\n  - If Z ≢ Y (mod p): u ≡ (Z+Y) * (Z-Y)^(-1) (mod p)\n  - If Z ≡ Y (mod p): u ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -6114,7 +6114,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)\n    (h : Field51_as_Nat self.y < 2 ^ 255) :\n    spec (compress self) (fun result =>\n    True -- result.IsValid ∧ result.toPoint = self.toPoint\n    ) := by ...",
+   "theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)\n    (h : Field51_as_Nat self.y < 2 ^ 255) :\n    compress self ⦃ result =>\n    True -- result.IsValid ∧ result.toPoint = self.toPoint\n     ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Compress.lean",
    "spec_docstring":
@@ -6192,7 +6192,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    spec (invert r) (fun r' =>\n    let r_nat := Field51_as_Nat r % p\n    let r'_nat := Field51_as_Nat r' % p\n    (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n    (r_nat = 0 → r'_nat = 0) ∧\n    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52))\n := by ...",
+   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ r' =>\n    let r_nat := Field51_as_Nat r % p\n    let r'_nat := Field51_as_Nat r' % p\n    (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n    (r_nat = 0 → r'_nat = 0) ∧\n    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Invert.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -6211,7 +6211,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)\n    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :\n    spec (invsqrt v) (fun res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →\n      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat)) := by ...",
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)\n    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →\n      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
@@ -6230,7 +6230,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :\n    spec (is_negative r) (fun c =>\n    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1)) := by ...",
+   "theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :\n    is_negative r ⦃ c =>\n    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/IsNegative.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -6247,7 +6247,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :\n    spec (is_zero r) (fun c =>\n    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0)) := by ...",
+   "theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :\n    is_zero r ⦃ c =>\n    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/IsZero.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -6264,7 +6264,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    spec (pow22501 r) (fun result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52))\n := by ...",
+   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.pow22501`**:\n- No panic (always returns (r1, r2) successfully)\n- Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)\n  Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)\n-/",
@@ -6284,7 +6284,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    spec (pow_p58 r) (fun r' =>\n    Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1))\n := by ...",
+   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n    Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
@@ -6304,7 +6304,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    spec (sqrt_ratio_i u v) (fun c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    -- Case 1: u is zero\n    (u_nat = 0 →\n    c.1.val = 1#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 2: u is nonzero and v is zero\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n    c.1.val = 0#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 3: u and v are nonzero and u/v is a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 4: u and v are nonzero and u/v is not a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n    c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))\n    ) := by ...",
+   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    -- Case 1: u is zero\n    (u_nat = 0 →\n    c.1.val = 1#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 2: u is nonzero and v is zero\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n    c.1.val = 0#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 3: u and v are nonzero and u/v is a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 4: u and v are nonzero and u/v is not a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n    c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))\n     ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -6394,7 +6394,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec (u v : MontgomeryPoint) :\n    spec (eq u v) (fun b =>\n    (b = true ↔\n      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by ...",
+   "theorem eq_spec (u v : MontgomeryPoint) :\n    eq u v ⦃ b =>\n    (b = true ↔\n      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Eq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq`**:\n- No panic (always returns successfully)\n- Returns true iff the u-coordinates are equal modulo p\n- Implemented via constant-time equality followed by Choice-to-Bool conversion\n-/",
@@ -6514,7 +6514,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :\n    spec (mul_assign P scalar) (fun res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P))\n := by ...",
+   "theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul_assign P scalar ⦃ res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulAssign.lean",
    "spec_docstring":
@@ -6585,7 +6585,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    spec (mul P rhs) (fun res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P))\n := by ...",
+   "\ntheorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    mul P rhs ⦃ res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -6694,7 +6694,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (u v : MontgomeryPoint) :\n    spec (ct_eq u v) (fun c =>\n    (c = Choice.one ↔\n      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p])) := by ...",
+   "theorem ct_eq_spec (u v : MontgomeryPoint) :\n    ct_eq u v ⦃ c =>\n    (c = Choice.one ↔\n      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.ConstantTimeEqMontgomeryPoint.ct_eq`**:\n- No panic (always returns successfully)\n- Choice.one is returned iff the u-coordinates match modulo p\n- The comparison proceeds via `FieldElement51.from_bytes` and constant-time equality\n-/",
@@ -6747,7 +6747,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    spec (montgomery.MontgomeryPoint.as_bytes mp) (fun result =>\n    result = mp) := by ...",
+   "theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    montgomery.MontgomeryPoint.as_bytes mp ⦃ result =>\n    result = mp ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsBytes.lean",
    "spec_docstring":
    "/-- **Spec and proof for `montgomery.MontgomeryPoint.as_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, as_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
@@ -6764,7 +6764,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    spec (mul_base scalar) (fun result =>\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))\n := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -6783,7 +6783,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    spec (mul_base_clamped bytes) (fun result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint))) := by ...",
+   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -6803,7 +6803,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    spec (mul_clamped P bytes) (fun res =>\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P))) := by ...",
+   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    mul_clamped P bytes ⦃ res =>\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulClamped.lean",
    "spec_docstring":
@@ -6823,7 +6823,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    spec (montgomery.MontgomeryPoint.to_bytes mp) (fun result =>\n    result = mp) := by ...",
+   "theorem to_bytes_spec (mp : montgomery.MontgomeryPoint) :\n    montgomery.MontgomeryPoint.to_bytes mp ⦃ result =>\n    result = mp ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToBytes.lean",
    "spec_docstring":
    "/-- **Spec and proof for `montgomery.MontgomeryPoint.to_bytes`**:\n\nSince MontgomeryPoint is defined as Array U8 32 in Lean, to_bytes returns the input unchanged.\n\nFormal specification:\n- The function always succeeds\n- Returns the input unchanged (result = self)\n- Preserves the field element representation\n-/",
@@ -6840,7 +6840,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    spec (to_edwards mp sign) (fun opt_e =>\n    let u := U8x32_as_Nat mp\n\n    ((u + 1) % p = 0 → opt_e = none) ∧\n\n    ((u + 1) % p ≠ 0 →\n      (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point\n       ∃ e x_sign,\n       opt_e = some e ∧\n       field.FieldElement51.is_negative e.X = ok x_sign ∧\n       let y := Field51_as_Nat e.Y\n\n       y * (u + 1) % p = (u - 1) % p ∧\n       (x_sign.val = 1#u8 ↔ sign.val.testBit 0)))) := by ...",
+   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    to_edwards mp sign ⦃ opt_e =>\n    let u := U8x32_as_Nat mp\n\n    ((u + 1) % p = 0 → opt_e = none) ∧\n\n    ((u + 1) % p ≠ 0 →\n      (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point\n       ∃ e x_sign,\n       opt_e = some e ∧\n       field.FieldElement51.is_negative e.X = ok x_sign ∧\n       let y := Field51_as_Nat e.Y\n\n       y * (u + 1) % p = (u - 1) % p ∧\n       (x_sign.val = 1#u8 ↔ sign.val.testBit 0))) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean",
    "spec_docstring":
@@ -6970,7 +6970,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : montgomery.ProjectivePoint)\n    (choice : subtle.Choice) :\n    spec (conditional_select a b choice) (fun res =>\n      (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧\n      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!))) := by ...",
+   "theorem conditional_select_spec\n    (a b : montgomery.ProjectivePoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ res =>\n      (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧\n      (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/ConditionalSelect.lean",
    "spec_docstring":
@@ -7320,7 +7320,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec (cr : CompressedRistretto) :\n    spec (as_bytes cr) (fun b =>\n    b = cr) := by ...",
+   "theorem as_bytes_spec (cr : CompressedRistretto) :\n    as_bytes cr ⦃ b =>\n    b = cr ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/AsBytes.lean",
    "spec_docstring":
@@ -7407,7 +7407,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (cr : CompressedRistretto) :\n    spec (to_bytes cr) (fun b =>\n    b = cr) := by ...",
+   "theorem to_bytes_spec (cr : CompressedRistretto) :\n    to_bytes cr ⦃ b =>\n    b = cr ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/ToBytes.lean",
    "spec_docstring":
@@ -8105,7 +8105,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n    spec (compress rist) (fun result =>\n    result.IsValid ∧\n    math.compress_pure rist.toPoint = U8x32_as_Nat result) := by ...",
+   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n    compress rist ⦃ result =>\n    result.IsValid ∧\n    math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n• The function always succeeds (no panic) for all valid RistrettoPoint inputs\n• The output is a valid CompressedRistretto 32-byte representation\n• The output accurately reflects the output of the pure mathematical compression function\n-/",
@@ -8133,7 +8133,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    spec (coset4 self) (fun result =>\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint) := by ...",
+   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    coset4 self ⦃ result =>\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
@@ -8187,7 +8187,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    spec (from_uniform_bytes bytes) (fun rist =>\n      rist.IsValid) := by ...",
+   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ rist =>\n      rist.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean",
    "spec_docstring": null,
@@ -8207,7 +8207,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    spec (mul_base s) (fun result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint) := by ...",
+   "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    mul_base s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul_Base.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n• The function always succeeds (no panic) for canonical input Scalars s\n• The result is a valid RistrettoPoint\n• The result = b + ... + b represents the Ristretto basepoint b added to itself s-times\n-/",
@@ -8226,7 +8226,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    spec (step_1 c) (fun (s_encoding_is_canonical, s_is_negative, s) =>\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8))) := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
@@ -8247,7 +8247,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    spec (step_2 s) (fun (ok1, c, c1, pt) =>\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt)) := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
@@ -8848,7 +8848,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :\n    spec (mul scalar P) (fun res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P))\n := by ...",
+   "\ntheorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -9374,7 +9374,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (s s' : scalar.Scalar) :\n    spec (ct_eq s s') (fun c =>\n    c = Choice.one ↔ s.bytes = s'.bytes) := by ...",
+   "theorem ct_eq_spec (s s' : scalar.Scalar) :\n    ct_eq s s' ⦃ c =>\n    c = Choice.one ↔ s.bytes = s'.bytes ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- Returns `Choice` representing equality in constant time\n- The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)\n-/",
@@ -9471,7 +9471,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec (s : Scalar) :\n    spec (as_bytes s) (fun b =>\n    b = s.bytes ∧ mk b = s) := by ...",
+   "theorem as_bytes_spec (s : Scalar) :\n    as_bytes s ⦃ b =>\n    b = s.bytes ∧ mk b = s ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/AsBytes.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.as_bytes`**:\n- No panic (always returns successfully)\n- The result is the byte representation of the scalar (s.bytes)\n- Converting the result back to a Scalar via the constructor yields the original scalar\n-/",
@@ -9697,7 +9697,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :\n    spec (from_bytes_mod_order b) (fun s =>\n    U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L) := by ...",
+   "theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :\n    from_bytes_mod_order b ⦃ s =>\n    U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrder.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order`**:\n- No panic (always returns successfully)\n- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L\n- The result scalar s is less than L (the group order) -/",
@@ -9716,7 +9716,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :\n    spec (from_bytes_mod_order_wide b) (fun s =>\n    U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧\n    U8x32_as_Nat s.bytes < L) := by ...",
+   "theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :\n    from_bytes_mod_order_wide b ⦃ s =>\n    U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧\n    U8x32_as_Nat s.bytes < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean",
    "spec_docstring":
@@ -9736,7 +9736,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_canonical_bytes_spec (b : Array U8 32#usize) :\n    spec (from_canonical_bytes b) (fun s =>\n    (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧\n    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero)) := by ...",
+   "theorem from_canonical_bytes_spec (b : Array U8 32#usize) :\n    from_canonical_bytes b ⦃ s =>\n    (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧\n    (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/FromCanonicalBytes.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.from_canonical_bytes`**:\n- No panic (always returns successfully)\n- When the input bytes represent a canonical value (< L), the function returns a CtOption Scalar\n  where is_some = Choice.one and the scalar's byte representation equals the input bytes\n- When the input bytes represent a non-canonical value (≥ L), the function returns a CtOption Scalar\n  where is_some = Choice.zero (i.e., None)\n-/",
@@ -9753,7 +9753,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    spec (invert s) (fun s' =>\n    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L]) := by ...",
+   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    invert s ⦃ s' =>\n    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.invert`**:\n- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result s' satisfies the multiplicative inverse property:\n  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)\n-/",
@@ -9773,7 +9773,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_canonical_spec (s : Scalar) :\n    spec (is_canonical s) (fun c =>\n    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L)) := by ...",
+   "theorem is_canonical_spec (s : Scalar) :\n    is_canonical s ⦃ c =>\n    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:\n- No panic (always returns successfully)\n- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)\n-/",
@@ -9840,7 +9840,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem reduce_spec (s : Scalar) :\n    spec (reduce s) (fun s' =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L) := by ...",
+   "theorem reduce_spec (s : Scalar) :\n    reduce s ⦃ s' =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
@@ -9861,7 +9861,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (s : Scalar) :\n    spec (to_bytes s) (fun a =>\n    a = s.bytes ∧ mk a = s) := by ...",
+   "theorem to_bytes_spec (s : Scalar) :\n    to_bytes s ⦃ a =>\n    a = s.bytes ∧ mk a = s ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/ToBytes.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.to_bytes`**:\n- No panic (always returns successfully)\n- The result array a is the byte array representation of the scalar (s.bytes)\n- Converting the result a back to a Scalar via the constructor yields the original scalar s\n-/",
@@ -9893,7 +9893,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem unpack_spec (s : Scalar) :\n    spec (unpack s) (fun u =>\n    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧\n    (∀ i < 5, u[i]!.val < 2 ^ 62)) := by ...",
+   "theorem unpack_spec (s : Scalar) :\n    unpack s ⦃ u =>\n    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧\n    (∀ i < 5, u[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.unpack`**:\n- No panic (always returns successfully)\n- Packing the result back yields the original scalar: pack(u) = s\n- Both the packed s and the unpacked u represent the same natural number\n-/",
@@ -9911,7 +9911,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    spec (invert u) (fun u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L]) := by ...",
+   "theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "spec_docstring":
@@ -9932,7 +9932,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    spec (montgomery_invert u) (fun u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62)) := by ...",
+   "\ntheorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    montgomery_invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "spec_docstring":
@@ -10005,7 +10005,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :\n    spec (pack u) (fun s =>\n    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat s.bytes < L) := by ...",
+   "theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :\n    pack u ⦃ s =>\n    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat s.bytes < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean",
    "spec_docstring":
@@ -10024,7 +10024,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    spec (clamp_integer bytes) (fun result =>\n    h ∣ U8x32_as_Nat result ∧\n    U8x32_as_Nat result < 2^255 ∧\n    2^254 ≤ U8x32_as_Nat result) := by ...",
+   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ result =>\n    h ∣ U8x32_as_Nat result ∧\n    U8x32_as_Nat result < 2^255 ∧\n    2^254 ≤ U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/ClampInteger.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.clamp_integer`**:\n- No panic\n- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)\n- as_nat_32_u8 result < 2^255\n- 2^254 ≤ as_nat_32_u8 result\n-/",
