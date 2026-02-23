@@ -9,7 +9,6 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert.PrimeList
--- import PrimeCert.PrimeList
 
 /-! # Common Definitions
 
