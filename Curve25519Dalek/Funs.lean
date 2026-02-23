@@ -4918,6 +4918,32 @@ noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq
   let c ← montgomery.ConstantTimeEqMontgomeryPoint.ct_eq self other
   core.convert.IntoFrom.into core.convert.FromBoolChoice c
 
+noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+  (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+  Result Bool := do
+  let eq_result ← montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other
+  ok (!eq_result)
+
+/-- **Spec theorem for `montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl`**:
+- No panic (if eq succeeds)
+- Returns true if and only if the two MontgomeryPoint values are not equal
+- Equivalent to negation of eq
+-/
+@[progress]
+theorem montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_impl_spec
+  (self other : montgomery.MontgomeryPoint)
+  (h : ∃ res, montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other = ok res) :
+  ∃ ne_res,
+    montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne self other = ok ne_res ∧
+    ∃ eq_res, montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other = ok eq_res ∧
+    ne_res = !eq_res := by
+  unfold montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+  obtain ⟨eq_res, h_eq⟩ := h
+  use !eq_res
+  constructor
+  · simp [h_eq]
+  · use eq_res
+
 /-- Trait implementation: [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}]
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
 @[reducible]
