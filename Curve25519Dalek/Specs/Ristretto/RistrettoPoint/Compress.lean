@@ -21,7 +21,7 @@ It takes a RistrettoPoint (which represents an equivalence class of Edwards poin
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -49,9 +49,9 @@ natural language specs:
 -/
 @[progress]
 theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
-    ∃ result, compress rist = ok result ∧
+    compress rist ⦃ result =>
     result.IsValid ∧
-    math.compress_pure rist.toPoint = U8x32_as_Nat result := by
+    math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

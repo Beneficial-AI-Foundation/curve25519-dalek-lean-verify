@@ -49,7 +49,8 @@ When `A < B`, the difference array stores `2^260 + (A - B)` (the representation 
 Adding L causes wrap-around: `(2^260 + (A - B) + L) mod 2^260 = A - B + L ∈ (0, L)`.
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result
+open Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option linter.hashCommand false
@@ -89,13 +90,13 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     (hborrow : borrow.val / 2 ^ 63 ≤ 1)
     (hinv : Scalar52_partial_as_Nat a i.val + borrow.val / 2 ^ 63 * 2 ^ (52 * i.val) =
             Scalar52_partial_as_Nat b i.val + Scalar52_partial_as_Nat difference i.val) :
-    ∃ result, sub_loop a b difference mask borrow i = ok result ∧
+    sub_loop a b difference mask borrow i ⦃ result =>
     (∀ j < 5, result.1[j]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat a + result.2.val / 2 ^ 63 * 2 ^ 260 =
-     Scalar52_as_Nat b + Scalar52_as_Nat result.1) := by
+     Scalar52_as_Nat b + Scalar52_as_Nat result.1) ⦄ := by
   unfold sub_loop
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
-  unfold backend.serial.u64.scalar.IndexMutScalar52UsizeU64.index_mut
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   split
   case isTrue hlt =>
     have hi' : i.val < 5 := by scalar_tac
@@ -113,7 +114,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     have hi4_ok : i2.val + i3.val < 2 ^ 64 := by omega
     progress as ⟨i4, hi4⟩  -- i2 + i3
     progress as ⟨borrow1, hborrow1⟩  -- wrapping_sub
-    progress as ⟨x, index_mut_back⟩  -- index_mut
+    progress as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
     progress as ⟨i5, hi5_1, hi5_2⟩  -- borrow1 &&& mask
     progress as ⟨i6, hi6⟩  -- i + 1
     -- Set up the recursive call hypotheses
@@ -157,17 +158,13 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       simp only [Array.getElem!_Nat_eq] at hr
       simp_all
     -- Main proof: the loop invariant is preserved
-    -- Key equation: a[i] + new_borrow_bit * 2^52 = b[i] + old_borrow_bit + i5
-    -- This follows from wrapping_sub arithmetic with proper borrow handling
     have hinv1 : Scalar52_partial_as_Nat a i6.val + borrow1.val / 2 ^ 63 * 2 ^ (52 * i6.val) =
                  Scalar52_partial_as_Nat b i6.val + Scalar52_partial_as_Nat (Aeneas.Std.Array.set difference i i5) i6.val := by
-      -- Use wrapping_sub_val_eq to reason about borrow1
       have hws : borrow1.val = (i1.val + (2^64 - i4.val)) % 2^64 := by
         simp only [hborrow1]
         have := U64.wrapping_sub_val_eq i1 i4
         simp only [UScalar.size] at this
         exact this
-      -- Establish key value equalities
       have hi1_val : i1.val = a[i.val]!.val := by
         simp only [hi1, UScalar.val, Array.getElem!_Nat_eq]
       have hi2_val : i2.val = b[i.val]!.val := by
@@ -176,11 +173,9 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         simp only [hi4, hi2_val]
       have hi3_eq : i3.val = borrow.val / 2^63 := by
         simp only [hi3_1, Nat.shiftRight_eq_div_pow]
-      -- Expand partial sums at i+1
       have hi6_eq : i6.val = i.val + 1 := by simp [hi6]
       simp only [hi6_eq, Scalar52_partial_as_Nat]
       simp only [Finset.range_add_one, Finset.sum_insert (Finset.notMem_range_self)]
-      -- The new difference array: diff'[j] = diff[j] for j < i, diff'[i] = i5
       have hdiff'_lt : ∀ j < i.val,
           (Aeneas.Std.Array.set difference i i5)[j]!.val = difference[j]!.val := by
         intro j hj
@@ -189,7 +184,6 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       have hdiff'_eq : (Aeneas.Std.Array.set difference i i5)[i.val]!.val = i5.val := by
         have h := Array.set_of_eq difference i5 i (by scalar_tac)
         grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val, UScalar.ofNat_val]
-      -- Partial sum of diff' at i equals partial sum of diff at i
       have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) * (Aeneas.Std.Array.set difference i i5)[j]!.val
                           = ∑ j ∈ Finset.range i.val, 2^(52*j) * difference[j]!.val := by
         apply Finset.sum_congr rfl
@@ -197,20 +191,16 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         simp only [Finset.mem_range] at hj
         rw [hdiff'_lt j hj]
       rw [hdiff'_partial, hdiff'_eq]
-      -- From old invariant: partial_a(i) + old_borrow_bit * 2^(52*i) = partial_b(i) + partial_diff(i)
       have hinv' := hinv
       simp only [Scalar52_partial_as_Nat] at hinv'
-      -- Case split on whether a[i] >= b[i] + old_borrow
       have hold_borrow : borrow.val / 2^63 = i3.val := by omega
-      -- Key bounds for later
       have ha_bound : i1.val < 2^52 := by rw [hi1_val]; exact ha_i
       have hb_i_bound : b[i.val]!.val < 2^52 := hb_i
       have hi3_le : i3.val ≤ 1 := hi3_bound
       have hi4_bound : i4.val < 2^52 + 1 := by rw [hi4_val]; omega
-      -- Define P = 2^(52*i) for convenience
       set P := 2^(52*i.val) with hP_def
       by_cases hcase : i1.val ≥ i4.val
-      · -- Case 1: No underflow (a[i] >= b[i] + old_borrow_bit)
+      · -- Case 1: No underflow
         have hborrow1_val : borrow1.val = i1.val - i4.val := by
           rw [hws]
           have h1 : i1.val + (2^64 - i4.val) = 2^64 + (i1.val - i4.val) := by omega
@@ -223,32 +213,20 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
           rw [hi5_mod, hborrow1_val]
           have h : i1.val - i4.val < 2^52 := by omega
           exact Nat.mod_eq_of_lt h
-        -- Prove the equation
         simp only [hnew_borrow, zero_mul, add_zero]
         rw [hi5_val, hborrow1_val]
-        -- Limb-level: i1 = i4 + (i1 - i4) = b[i] + i3 + (i1 - i4)
-        -- Goal reduces to: sum_a + P * a[i] = sum_b + P * b[i] + sum_diff + P * (i1 - i4)
-        -- Using hinv': sum_a + i3 * P = sum_b + sum_diff
-        -- So: sum_a = sum_b + sum_diff - i3 * P
-        -- LHS = sum_b + sum_diff - i3 * P + P * i1
-        -- RHS = sum_b + P * b[i] + sum_diff + P * (i1 - i4)
-        --     = sum_b + P * b[i] + sum_diff + P * i1 - P * i4
-        --     = sum_b + P * b[i] + sum_diff + P * i1 - P * (b[i] + i3)
-        --     = sum_b + sum_diff + P * i1 - P * i3
-        -- So LHS = RHS ✓
         have hlimb : a[i.val]!.val = b[i.val]!.val + i3.val + (i1.val - i4.val) := by
           rw [← hi1_val, hi4_val]; omega
         grind
-      · -- Case 2: Underflow occurred (a[i] < b[i] + old_borrow_bit)
+      · -- Case 2: Underflow occurred
         have hi1_lt_i4 : i1.val < i4.val := by omega
         have hborrow1_val : borrow1.val = 2^64 + i1.val - i4.val := by rw [hws]; omega
         have hborrow1_ge : borrow1.val ≥ 2^63 := by rw [hborrow1_val]; omega
         have hborrow1_lt_264 : borrow1.val < 2^64 := by rw [hborrow1_val]; omega
         have hnew_borrow : borrow1.val / 2^63 = 1 := by omega
-        -- i5 = borrow1 % 2^52 = (2^64 + a[i] - b[i] - old) % 2^52 = 2^52 + a[i] - b[i] - old
         have hi5_val : i5.val = 2^52 + i1.val - i4.val := by
           rw [hi5_mod, hborrow1_val]
-          have hdiff : i4.val - i1.val ≤ 2^52 := by omega
+          have hdiff_val : i4.val - i1.val ≤ 2^52 := by omega
           have hdpos : 0 < i4.val - i1.val := by omega
           have heq1 : 2^64 + i1.val - i4.val = 2^64 - (i4.val - i1.val) := by omega
           rw [heq1]
@@ -256,14 +234,12 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
             have h : (2:ℕ)^64 = (2:ℕ)^12 * (2:ℕ)^52 := by decide
             omega
           rw [heq2]
-          -- Rewrite (k * m + r) as (r + k * m) for Nat.add_mul_mod_self_left
           have heq3 : (2^12 - 1) * 2^52 + (2^52 - (i4.val - i1.val)) =
                       (2^52 - (i4.val - i1.val)) + (2^12 - 1) * 2^52 := by ring
           rw [heq3, Nat.add_mul_mod_self_right]
           have hlt : 2^52 - (i4.val - i1.val) < 2^52 := by omega
           rw [Nat.mod_eq_of_lt hlt]
           omega
-        -- Prove the equation
         simp only [hnew_borrow, one_mul]
         rw [hi5_val]
         have hpow_succ : 2^(52*(i.val + 1)) = 2^52 * P := by
@@ -271,16 +247,17 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
           have : 52 * (i.val + 1) = 52 + 52 * i.val := by ring
           rw [this, Nat.pow_add]
         rw [hpow_succ]
-        -- Limb-level: a[i] + 2^52 = b[i] + i3 + (2^52 + i1 - i4)
         have hlimb : a[i.val]!.val + 2^52 = b[i.val]!.val + i3.val + (2^52 + i1.val - i4.val) := by
           rw [← hi1_val, hi4_val]; omega
         grind
+    -- Rewrite hypotheses from Array.set form to index_mut_back form
+    rw [← h_imb] at hdiff1 hdiff1_rest hinv1
     progress as ⟨result, hres1, hres2⟩
     exact ⟨hres1, hres2⟩
   case isFalse hge =>
     have hi5 : i.val = 5 := by scalar_tac
-    use (difference, borrow)
-    refine ⟨rfl, ?_, ?_⟩
+    simp only [Aeneas.Std.WP.spec]
+    refine ⟨?_, ?_⟩
     · intro j hj
       by_cases hjc : j < i.val
       · exact hdiff j hjc
@@ -288,8 +265,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         have hj5 : j < 5 := hj
         have := hdiff_rest j this hj5
         omega
-    · -- At i = 5, partial sums equal full sums
-      unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
+    · unfold Scalar52_partial_as_Nat Scalar52_as_Nat at *
       simp only [hi5] at hinv
       exact hinv
 termination_by 5 - i.val
@@ -307,12 +283,12 @@ theorem sub_spec (a b : Array U64 5#usize)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < Scalar52_as_Nat b + L)
     (hb' : Scalar52_as_Nat b ≤ L) :
-    ∃ result, sub a b = ok result ∧
+    sub a b ⦃ result =>
     Scalar52_as_Nat result + Scalar52_as_Nat b ≡ Scalar52_as_Nat a [MOD L] ∧
     Scalar52_as_Nat result < L ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) := by
+    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold sub
-  unfold subtle.FromChoiceU8.from
+  unfold subtle.Choice.Insts.CoreConvertFromU8.from
   -- First, progress through mask computation (two steps: shift then subtract)
   progress  -- 1 <<< 52
   progress  -- mask = i - 1
@@ -345,9 +321,9 @@ theorem sub_spec (a b : Array U64 5#usize)
   have hChoice_one_val : Choice.one.val.val = 1 := by rfl
   -- Helper: Choice.zero.val = 0
   have hChoice_zero_val : Choice.zero.val.val = 0 := by rfl
-  -- Now split on whether i2 = 0 or i2 = 1 (for FromChoiceU8.from)
+  -- Now split on whether i2 = 0 or i2 = 1 (for CoreConvertFromU8.from)
   split
-  case isTrue hi2_zero =>
+  next hi2_zero =>
     -- i2 = 0, so no borrow, A >= B
     have hi2_val_zero : i2.val = 0 := by simp only [hi2_zero]; rfl
     have hi1_zero : i1.val = 0 := by omega
@@ -384,9 +360,9 @@ theorem sub_spec (a b : Array U64 5#usize)
       rw [this]
     · exact hres_lt_L
     · exact hres_limbs
-  case isFalse hi2_nonzero =>
+  next hi2_nonzero =>
     split
-    case isTrue hi2_one =>
+    next hi2_one =>
       -- i2 = 1, so borrow occurred, A < B
       have hi2_val_one : i2.val = 1 := by simp only [hi2_one]; rfl
       have hi1_one : i1.val = 1 := by omega
@@ -435,7 +411,7 @@ theorem sub_spec (a b : Array U64 5#usize)
         exact this
       · exact hres_lt_L
       · exact hres_limbs
-    case isFalse hi2_neither =>
+    next hi2_neither =>
       -- i2 ≠ 0 and i2 ≠ 1: contradiction since borrow >>> 63 ≤ 1
       exfalso
       have hi2_cases : i2.val = 0 ∨ i2.val = 1 := by omega

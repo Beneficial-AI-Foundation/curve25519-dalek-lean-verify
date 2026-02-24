@@ -22,7 +22,7 @@ the set of all valid EdwardsPoint representatives of the input RistrettoPoint eq
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.constants
+open Aeneas Aeneas.Std Result curve25519_dalek.backend.serial.u64.constants Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -65,11 +65,11 @@ natural language specs:
 -/
 @[progress]
 theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :
-    ∃ result, coset4 self = ok result ∧
+    coset4 self ⦃ result =>
     result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧
     result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧
     result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧
-    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint := by
+    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint ⦄ := by
   unfold coset4
   progress
   · exact ⟨EIGHT_TORSION.val[0]⟩

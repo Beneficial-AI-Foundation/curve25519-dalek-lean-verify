@@ -24,9 +24,9 @@ delegating to FieldElement51 constant-time equality.
 
 --/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.montgomery.ConstantTimeEqMontgomeryPoint
+namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq
 
 /-
 Natural language description:
@@ -48,26 +48,23 @@ Natural language specs:
 - Choice.one is returned iff the u-coordinates match modulo p
 - The comparison proceeds via `FieldElement51.from_bytes` and constant-time equality
 -/
-
 @[progress]
 theorem ct_eq_spec (u v : MontgomeryPoint) :
-    ∃ c,
-    ct_eq u v = ok c ∧
+    ct_eq u v ⦃ c =>
     (c = Choice.one ↔
-      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) := by
+      (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by
   unfold ct_eq
   progress*
-  rw[res_post]
   have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
       x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
-    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := to_bytes_spec x
-    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := to_bytes_spec y
+    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := spec_imp_exists (to_bytes_spec x)
+    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := spec_imp_exists (to_bytes_spec y)
     rw [hxb_eq, hyb_eq]
     simp only [ok.injEq]
     have h_x_canon : U8x32_as_Nat xb = Field51_as_Nat x % p := by
-      rw [← Nat.mod_eq_of_lt hxb_lt, hxb_mod]
+      rw [← Nat.mod_eq_of_lt hxb_lt]; exact hxb_mod
     have h_y_canon : U8x32_as_Nat yb = Field51_as_Nat y % p := by
-      rw [← Nat.mod_eq_of_lt hyb_lt, hyb_mod]
+      rw [← Nat.mod_eq_of_lt hyb_lt]; exact hyb_mod
     constructor
     · intro h_bytes
       rw [← h_x_canon, ← h_y_canon, h_bytes]
@@ -75,13 +72,10 @@ theorem ct_eq_spec (u v : MontgomeryPoint) :
       have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat yb := by
         rw [h_x_canon, h_y_canon]; exact h_mod
       exact U8x32_as_Nat_injective h_nat_eq
-  have := to_bytes_iff_mod self_fe   other_fe
-  rw[this, ← Nat.ModEq]
+  have key := res_post.trans (to_bytes_iff_mod self_fe other_fe)
+  rw [key, ← Nat.ModEq]
   constructor
-  · intro h
-    exact (self_fe_post_1.symm.trans  h).trans other_fe_post_1
-  · intro h
-    exact (self_fe_post_1.trans h).trans other_fe_post_1.symm
+  · intro h; exact (self_fe_post_1.symm.trans h).trans other_fe_post_1
+  · intro h; exact (self_fe_post_1.trans h).trans other_fe_post_1.symm
 
-
-end curve25519_dalek.montgomery.ConstantTimeEqMontgomeryPoint
+end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq

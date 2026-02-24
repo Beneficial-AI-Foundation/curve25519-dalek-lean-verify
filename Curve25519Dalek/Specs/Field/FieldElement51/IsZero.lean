@@ -11,7 +11,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 
 set_option linter.style.longLine false
 set_option linter.style.setOption false
-set_option maxHeartbeats 10000000000000
 
 /-!
 # Spec Theorem for `FieldElement51::is_zero`
@@ -23,7 +22,7 @@ This function checks whether a field element is zero.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.field.FieldElement51
 
@@ -58,37 +57,54 @@ lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
   cases h
   rfl
 
+/-! ## Workaround for `progress` timeout
+
+The `progress` tactic runs `simp` on **all hypotheses** in the context. After `progress`
+processes `to_bytes`, the postconditions involving `U8x32_as_Nat` / `Field51_as_Nat` are
+expensive for `simp` to reduce (whnf timeout), causing any subsequent `progress` call to
+time out.
+
+Workaround:
+1. Use `simp only [toResult, bind_tc_ok] at ⊢` to reduce the pure `Array.to_slice` binds
+   without touching hypotheses (bypasses `progress` for those steps).
+2. Wrap the expensive hypotheses in `Hold` (opaque to `simp`) before calling `progress`
+   on `ct_eq`.
+3. Recover with `change ... at` afterwards (`Hold P` is defeq to `P`).
+-/
+
+private def Hold (P : Prop) : Prop := P
+
 @[progress]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
-    ∃ c, is_zero r = ok c ∧
-    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) := by
+    is_zero r ⦃ c =>
+    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by
   unfold is_zero
-  progress as ⟨bytes, h_to_bytes⟩
-  progress as ⟨s, h_bytes_slice⟩
-  progress as ⟨s1, h_zero_slice⟩
+  progress as ⟨bytes, h_to_bytes_mod, h_to_bytes_lt⟩
+  simp only [toResult, bind_tc_ok] at ⊢
+  have h_mod : Hold (U8x32_as_Nat bytes ≡ Field51_as_Nat r [MOD p]) := h_to_bytes_mod
+  have h_lt : Hold (U8x32_as_Nat bytes < p) := h_to_bytes_lt
+  clear h_to_bytes_mod h_to_bytes_lt
   progress as ⟨result, h_ct_eq⟩
+  change U8x32_as_Nat bytes ≡ Field51_as_Nat r [MOD p] at h_mod
+  change U8x32_as_Nat bytes < p at h_lt
+  -- Step 6: prove the iff
   constructor
-  · -- BEGIN TASK
-    intro h
-    have s_eq_s1 : s = s1 := h_ct_eq.mp ((Choice.val_eq_one_iff result).mp h)
-    rw [h_bytes_slice, h_zero_slice] at s_eq_s1
-    have heq : bytes = Array.repeat 32#usize 0#u8 :=
-      array_eq_of_to_slice_eq s_eq_s1
-    rw [heq, Nat.ModEq] at h_to_bytes
-    rw [← h_to_bytes]
+  · intro h
+    have h_eq : result = Choice.one := (Choice.val_eq_one_iff result).mp h
+    have h_slice_eq := h_ct_eq.mp h_eq
+    have heq : bytes = Array.repeat 32#usize 0#u8 := array_eq_of_to_slice_eq h_slice_eq
+    rw [heq, Nat.ModEq] at h_mod
+    rw [← h_mod]
     unfold U8x32_as_Nat
     iterate 31 (rw [Finset.sum_range_succ])
     rw [Finset.sum_range_one]
     simp [Array.repeat]
-    -- END TASK
-  · -- BEGIN TASK
-    intro h
-    rename_i h1
-    rw [Nat.ModEq, h] at h_to_bytes
+  · intro h
+    rw [Nat.ModEq, h] at h_mod
     have h_bytes_zero : U8x32_as_Nat bytes = 0 := by
-      have h2 := Nat.mod_eq_of_lt h1
-      rw [h2] at h_to_bytes
-      exact h_to_bytes
+      have h2 := Nat.mod_eq_of_lt h_lt
+      rw [h2] at h_mod
+      exact h_mod
     have bytes_eq : bytes = Array.repeat 32#usize 0#u8 := by
       unfold U8x32_as_Nat at h_bytes_zero
       simp_all
@@ -99,10 +115,8 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
       have hi_val := h_bytes_zero i hi
       interval_cases i
       all_goals simp [Array.repeat, List.replicate]; scalar_tac
-    have s_eq_s1 : s = s1 := by
-      rw [h_bytes_slice, h_zero_slice, bytes_eq]
-    rw [← h_ct_eq] at s_eq_s1
-    simp [s_eq_s1, Choice.one]
-    -- END TASK
+    have h_slice_eq : Array.to_slice bytes =
+        Array.to_slice (Array.repeat 32#usize 0#u8) := by rw [bytes_eq]
+    exact (Choice.val_eq_one_iff result).mpr (h_ct_eq.mpr h_slice_eq)
 
 end curve25519_dalek.field.FieldElement51

@@ -19,7 +19,7 @@ This function converts to Montgomery form.
 Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -43,21 +43,17 @@ theorem RR_lt : ∀ i < 5, constants.RR[i]!.val < 2 ^ 62 := by
 -/
 @[progress]
 theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :
-    ∃ m, as_montgomery u = ok m ∧
+    as_montgomery u ⦃ m =>
     Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧
-    (∀ i < 5, m[i]!.val < 2 ^ 62) := by
+    (∀ i < 5, m[i]!.val < 2 ^ 62) ⦄ := by
   unfold as_montgomery
   progress as ⟨m, pos, bounds⟩
-  · -- BEGIN TASK
-    exact RR_lt
-    -- END TASK
-  · -- BEGIN TASK
-    refine ⟨?_, bounds⟩
+  · exact RR_lt
+  · refine ⟨?_, bounds⟩
     suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
       exact Nat.ModEq.cancel_right_of_coprime (by decide) this
     have := Nat.ModEq.mul_left (Scalar52_as_Nat u) constants.RR_spec
     have := (Nat.ModEq.trans this.symm pos).symm
     grind
-    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

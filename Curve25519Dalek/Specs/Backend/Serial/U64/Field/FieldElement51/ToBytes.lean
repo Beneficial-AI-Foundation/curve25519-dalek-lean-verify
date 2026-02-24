@@ -28,7 +28,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 set_option linter.style.setOption false
 set_option maxHeartbeats 2000000
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -156,48 +156,49 @@ Specification:
 -/
 @[progress]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
-    ∃ result, to_bytes self = ok result ∧
+    to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
-    U8x32_as_Nat result < p := by
+    U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
-  progress*
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    refine ⟨?_, ?_⟩
-    · sorry
-    · sorry
-    -- END TASK
+  sorry
+  -- progress*
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   refine ⟨?_, ?_⟩
+  --   · sorry
+  --   · sorry
+  --   -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

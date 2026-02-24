@@ -23,7 +23,7 @@ This function performs modular reduction.
 set_option linter.style.commandStart false
 set_option exponentiation.threshold 260
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar
@@ -55,20 +55,18 @@ theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := b
 
 @[progress]
 theorem reduce_spec (s : Scalar) :
-    ∃ s',
-      reduce s = ok s' ∧
+    reduce s ⦃ s' =>
       U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧
-      U8x32_as_Nat s'.bytes < L
-    := by
+      U8x32_as_Nat s'.bytes < L ⦄ := by
   unfold reduce
   progress*
   · unfold constants.R; decide
-  simp[res_post_2]
-  rw[← x_post_1]
-  rw[← Nat.ModEq] at x_mod_l_post_1
-  rw[xR_post_1] at x_mod_l_post_1
+  simp [*]
+  rw [← x_post_1]
+  rw [← Nat.ModEq] at x_mod_l_post_1
+  rw [xR_post_1] at x_mod_l_post_1
   have Rs := constants.R_spec
-  rw[← Nat.ModEq] at Rs
+  rw [← Nat.ModEq] at Rs
   have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
   have := Nat.ModEq.trans x_mod_l_post_1 this
   apply cancelR

@@ -18,8 +18,8 @@ returns the first operand when `choice = 0`.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 250:4-256:5)
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
 
 /-! ## Spec for `conditional_assign` -/
 
@@ -35,20 +35,20 @@ namespace curve25519_dalek.backend.serial.u64.field.ConditionallySelectableField
 theorem conditional_assign_spec
     (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
-    ∃ res,
-      backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
-        self other choice = ok res ∧
+    conditional_assign self other choice ⦃ res =>
       (∀ i < 5,
-        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) := by
-  unfold backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_assign
-  unfold subtle.ConditionallySelectableU64.conditional_assign
-  unfold subtle.ConditionallySelectableU64.conditional_select
-  by_cases h: choice.val = 1#u8
-  · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
+        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by
+  unfold conditional_assign
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_select
+  by_cases h : choice.val = 1#u8
+  · simp only [h, ite_true, bind_tc_ok]
     progress*
-    intro i _
-    interval_cases i; all_goals simp_all
-  · simp only [h, reduceIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
+    intro i hi
+    subst_vars
+    simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
+    rcases i with _ | _ | _ | _ | _ | n <;> simp_all; omega
+  · simp only [h, ite_false, bind_tc_ok]
     progress*
 
-end curve25519_dalek.backend.serial.u64.field.ConditionallySelectableFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable

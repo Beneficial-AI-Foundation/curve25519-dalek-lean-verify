@@ -28,11 +28,11 @@ elliptic curve addition).
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
@@ -75,7 +75,7 @@ theorem double_spec_aux (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54) :
-    ∃ c, double q = ok c ∧
+    double q ⦃ c =>
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
     let Z := Field51_as_Nat q.Z
@@ -96,7 +96,7 @@ theorem double_spec_aux (q : ProjectivePoint)
     (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 52) := by
+    (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
   progress*
   · -- BEGIN TASK
@@ -237,7 +237,7 @@ open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 1600000 in
 /--
 Verification of the `double` function.
 The theorem states that the Rust implementation of point doubling corresponds
@@ -258,7 +258,7 @@ theorem double_spec
   -- Use double_spec_aux to get the arithmetic properties and bounds
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
           hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
-    ProjectivePoint.double_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds
+    spec_imp_exists (ProjectivePoint.double_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds)
 
   use c
   constructor

@@ -22,7 +22,7 @@ u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -58,7 +58,7 @@ where p = 2^255 - 19
 @[progress]
 theorem to_montgomery_spec (e : EdwardsPoint)
     (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
-    ∃ mp, to_montgomery e = ok mp ∧
+    to_montgomery e ⦃ mp =>
     (let Y := Field51_as_Nat e.Y
     let Z := Field51_as_Nat e.Z
     let u := U8x32_as_Nat mp
@@ -66,15 +66,9 @@ theorem to_montgomery_spec (e : EdwardsPoint)
       u % p = 0
     else
       (u * Z) % p = (u * Y + (Z + Y)) % p) ∧
-    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp))
-
-       := by
+    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp)) ⦄ := by
   unfold to_montgomery
-  progress*
-  · grind
-  · grind
-  · grind
-  · grind
+  progress* <;> try grind
   · constructor
     · split_ifs
       · rename_i h_zy
@@ -82,14 +76,14 @@ theorem to_montgomery_spec (e : EdwardsPoint)
           rw [h_zy, ← Nat.ModEq] at W_post_2
           conv_rhs at W_post_2 => rw [← Nat.zero_add (Field51_as_Nat e.Y)]
           exact Nat.ModEq.add_right_cancel' (Field51_as_Nat e.Y) W_post_2
-        rw [a_post_1, u_post_1, Nat.mul_mod, fe h_W_zero, mul_zero, Nat.zero_mod]
-
-      · rename_i W_inv _ h_W_impl _ h_zy
+        -- fe is the invert result — in WP mode, fe_post_2 is the zero case
+        rw [a_post_1, u_post_1, Nat.mul_mod, fe_post_2 h_W_zero, mul_zero, Nat.zero_mod]
+      · rename_i h_zy
         have h_W_neq_zero : Field51_as_Nat W % p ≠ 0 := by
           intro h_contra
           rw [Nat.add_mod, h_contra, Nat.zero_add, Nat.mod_mod] at W_post_2
           exact h_zy W_post_2.symm
-        have h_W_inv := h_W_impl h_W_neq_zero
+        have h_W_inv := fe_post_1 h_W_neq_zero
         simp at h_W_inv
         ring_nf at h_W_inv
         rw [Nat.mul_mod, ← W_post_2, Nat.add_mod, ← Nat.mul_mod, Nat.mul_add, ← Nat.ModEq]
@@ -105,11 +99,11 @@ theorem to_montgomery_spec (e : EdwardsPoint)
             U8x32_as_Nat a * Field51_as_Nat W ≡
                 Field51_as_Nat u * Field51_as_Nat W [MOD p] := by
                   simpa using a_post_1.mul_right (Field51_as_Nat W)
-            _ ≡ (Field51_as_Nat U * Field51_as_Nat W_inv) * Field51_as_Nat W [MOD p] := by
+            _ ≡ (Field51_as_Nat U * Field51_as_Nat fe) * Field51_as_Nat W [MOD p] := by
                   simpa using u_post_1.mul_right (Field51_as_Nat W)
             _ ≡ Field51_as_Nat U [MOD p] := by
                   rw [Nat.mul_assoc]
-                  simpa using @Nat.ModEq.mul_left p (Field51_as_Nat W_inv * Field51_as_Nat W) 1 (Field51_as_Nat U) h_W_inv
+                  simpa using @Nat.ModEq.mul_left p (Field51_as_Nat fe * Field51_as_Nat W) 1 (Field51_as_Nat U) h_W_inv
             _ ≡ Field51_as_Nat e.Y + Field51_as_Nat e.Z [MOD p] := by
                   have h_U_eq : Field51_as_Nat U = Field51_as_Nat e.Y + Field51_as_Nat e.Z := by
                     unfold Field51_as_Nat
@@ -123,10 +117,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
         have h_full := Nat.ModEq.add_left (U8x32_as_Nat a * Field51_as_Nat e.Y) (h_elim)
         grind
     · have :  fromEdwards e.toPoint =  MontgomeryPoint.toPoint a := by
-        apply fromEdwards_eq_MontgomeryPoint_toPoint
-        · sorry
-        · sorry
-        · sorry
+        sorry
       intro n
       rw[comm_mul_fromEdwards, this]
 

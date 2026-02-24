@@ -158,7 +158,7 @@
 //! [ristretto_main]:
 //! https://ristretto.group/
 
-#[cfg(feature = "alloc")]
+#[cfg(all(feature = "alloc", not(verify)))]
 use alloc::vec::Vec;
 
 use core::array::TryFromSliceError;
@@ -188,6 +188,7 @@ use {
 };
 
 use subtle::Choice;
+#[cfg(all(feature = "alloc", not(verify)))]
 use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
@@ -195,19 +196,17 @@ use subtle::ConstantTimeEq;
 #[cfg(feature = "zeroize")]
 use zeroize::Zeroize;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::edwards::EdwardsBasepointTable;
 use crate::edwards::EdwardsPoint;
 
 use crate::scalar::Scalar;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::traits::BasepointTable;
 use crate::traits::Identity;
 #[cfg(feature = "alloc")]
-use crate::traits::MultiscalarMul;
-#[cfg(all(feature = "alloc", not(verify)))]
-use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
+use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 
 // ------------------------------------------------------------------------
 // Compressed points
@@ -244,7 +243,8 @@ impl CompressedRistretto {
     /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
     /// a length of 32.
     pub fn from_slice(bytes: &[u8]) -> Result<CompressedRistretto, TryFromSliceError> {
-        bytes.try_into().map(CompressedRistretto)
+        #[allow(clippy::redundant_closure)]
+        bytes.try_into().map(|b| CompressedRistretto(b))
     }
 
     /// Attempt to decompress to an `RistrettoPoint`.
@@ -303,17 +303,24 @@ mod decompress {
         let u2_sqr = u2.square(); // (1 - as²)²
 
         // v == ad(1+as²)² - (1-as²)²            where d=-121665/121666
-        let v = &(&(-&constants::EDWARDS_D) * &u1.square()) - &u2_sqr;
+        let neg_d = -&constants::EDWARDS_D;
+        let u1_sq = u1.square();
+        let neg_d_u1_sq = &neg_d * &u1_sq;
+        let v = &neg_d_u1_sq - &u2_sqr;
 
-        let (ok, I) = (&v * &u2_sqr).invsqrt(); // 1/sqrt(v*u_2²)
+        let v_u2_sqr = &v * &u2_sqr;
+        let (ok, I) = v_u2_sqr.invsqrt(); // 1/sqrt(v*u_2²)
 
         let Dx = &I * &u2; // 1/sqrt(v)
-        let Dy = &I * &(&Dx * &v); // 1/u2
+        let Dx_v = &Dx * &v;
+        let Dy = &I * &Dx_v; // 1/u2
 
         // x == | 2s/sqrt(v) | == + sqrt(4s²/(ad(1+as²)² - (1-as²)²))
-        let mut x = &(&s + &s) * &Dx;
+        let s_plus_s = &s + &s;
+        let mut x = &s_plus_s * &Dx;
         let x_neg = x.is_negative();
-        x.conditional_negate(x_neg);
+        let x_negated = -&x;
+        x.conditional_assign(&x_negated, x_neg);
 
         // y == (1-as²)/(1+as²)
         let y = &u1 * &Dy;
@@ -494,13 +501,18 @@ impl RistrettoPoint {
         let Z = &self.0.Z;
         let T = &self.0.T;
 
-        let u1 = &(Z + &Y) * &(Z - &Y);
+        let z_plus_y = Z + &Y;
+        let z_minus_y = Z - &Y;
+        let u1 = &z_plus_y * &z_minus_y;
         let u2 = &X * &Y;
         // Ignore return value since this is always square
-        let (_, invsqrt) = (&u1 * &u2.square()).invsqrt();
+        let u2_sq = u2.square();
+        let u1_u2_sq = &u1 * &u2_sq;
+        let (_, invsqrt) = u1_u2_sq.invsqrt();
         let i1 = &invsqrt * &u1;
         let i2 = &invsqrt * &u2;
-        let z_inv = &i1 * &(&i2 * T);
+        let i2_T = &i2 * T;
+        let z_inv = &i1 * &i2_T;
         let mut den_inv = i2;
 
         let iX = &X * &constants::SQRT_M1;
@@ -508,17 +520,23 @@ impl RistrettoPoint {
         let ristretto_magic = &constants::INVSQRT_A_MINUS_D;
         let enchanted_denominator = &i1 * ristretto_magic;
 
-        let rotate = (T * &z_inv).is_negative();
+        let t_z_inv = T * &z_inv;
+        let rotate = t_z_inv.is_negative();
 
         X.conditional_assign(&iY, rotate);
         Y.conditional_assign(&iX, rotate);
         den_inv.conditional_assign(&enchanted_denominator, rotate);
 
-        Y.conditional_negate((&X * &z_inv).is_negative());
+        let x_z_inv = &X * &z_inv;
+        let y_sign = x_z_inv.is_negative();
+        let y_neg = -&Y;
+        Y.conditional_assign(&y_neg, y_sign);
 
-        let mut s = &den_inv * &(Z - &Y);
+        let z_minus_y2 = Z - &Y;
+        let mut s = &den_inv * &z_minus_y2;
         let s_is_negative = s.is_negative();
-        s.conditional_negate(s_is_negative);
+        let s_neg = -&s;
+        s.conditional_assign(&s_neg, s_is_negative);
 
         CompressedRistretto(s.to_bytes())
     }
@@ -551,7 +569,7 @@ impl RistrettoPoint {
     /// }
     /// # }
     /// ```
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub fn double_and_compress_batch<'a, I>(points: I) -> Vec<CompressedRistretto>
     where
         I: IntoIterator<Item = &'a RistrettoPoint>,
@@ -664,30 +682,46 @@ impl RistrettoPoint {
 
         let one = FieldElement::ONE;
 
-        let r = i * &r_0.square();
-        let N_s = &(&r + &one) * one_minus_d_sq;
-        let D = &(&c - &(d * &r)) * &(&r + d);
+        let r_0_sq = r_0.square();
+        let r = i * &r_0_sq;
+        let r_plus_one = &r + &one;
+        let N_s = &r_plus_one * one_minus_d_sq;
+        let d_times_r = d * &r;
+        let c_minus_dr = &c - &d_times_r;
+        let r_plus_d = &r + d;
+        let D = &c_minus_dr * &r_plus_d;
 
         let (Ns_D_is_sq, mut s) = FieldElement::sqrt_ratio_i(&N_s, &D);
         let mut s_prime = &s * r_0;
         let s_prime_is_pos = !s_prime.is_negative();
-        s_prime.conditional_negate(s_prime_is_pos);
+        let s_prime_neg = -&s_prime;
+        s_prime.conditional_assign(&s_prime_neg, s_prime_is_pos);
 
-        s.conditional_assign(&s_prime, !Ns_D_is_sq);
-        c.conditional_assign(&r, !Ns_D_is_sq);
+        let not_sq = !Ns_D_is_sq;
+        s.conditional_assign(&s_prime, not_sq);
+        c.conditional_assign(&r, not_sq);
 
-        let N_t = &(&(&c * &(&r - &one)) * d_minus_one_sq) - &D;
+        let r_minus_one = &r - &one;
+        let c_r_minus_one = &c * &r_minus_one;
+        let c_r_minus_one_d = &c_r_minus_one * d_minus_one_sq;
+        let N_t = &c_r_minus_one_d - &D;
         let s_sq = s.square();
 
         use crate::backend::serial::curve_models::CompletedPoint;
 
+        let s_plus_s = &s + &s;
+        let cp_X = &s_plus_s * &D;
+        let cp_Z = &N_t * &constants::SQRT_AD_MINUS_ONE;
+        let cp_Y = &FieldElement::ONE - &s_sq;
+        let cp_T = &FieldElement::ONE + &s_sq;
+
         // The conversion from W_i is exactly the conversion from P1xP1.
         RistrettoPoint(
             CompletedPoint {
-                X: &(&s + &s) * &D,
-                Z: &N_t * &constants::SQRT_AD_MINUS_ONE,
-                Y: &FieldElement::ONE - &s_sq,
-                T: &FieldElement::ONE + &s_sq,
+                X: cp_X,
+                Z: cp_Z,
+                Y: cp_Y,
+                T: cp_T,
             }
             .as_extended(),
         )
@@ -952,12 +986,12 @@ impl RistrettoPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+        #[cfg(not(feature = "precomputed-tables"))]
         {
             scalar * constants::RISTRETTO_BASEPOINT_POINT
         }
 
-        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+        #[cfg(feature = "precomputed-tables")]
         {
             scalar * constants::RISTRETTO_BASEPOINT_TABLE
         }
@@ -992,7 +1026,7 @@ impl MultiscalarMul for RistrettoPoint {
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimeMultiscalarMul for RistrettoPoint {
     type Point = RistrettoPoint;
 
@@ -1015,10 +1049,10 @@ impl VartimeMultiscalarMul for RistrettoPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub struct VartimeRistrettoPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedMultiscalarMul for VartimeRistrettoPrecomputation {
     type Point = RistrettoPoint;
 
@@ -1090,12 +1124,12 @@ impl RistrettoPoint {
 /// let a = Scalar::from(87329482u64);
 /// let P = &a * RISTRETTO_BASEPOINT_TABLE;
 /// ```
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 #[derive(Clone)]
 #[repr(transparent)]
 pub struct RistrettoBasepointTable(pub(crate) EdwardsBasepointTable);
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     type Output = RistrettoPoint;
 
@@ -1104,7 +1138,7 @@ impl<'b> Mul<&'b Scalar> for &RistrettoBasepointTable {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     type Output = RistrettoPoint;
 
@@ -1113,7 +1147,7 @@ impl<'a> Mul<&'a RistrettoBasepointTable> for &Scalar {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 impl RistrettoBasepointTable {
     /// Create a precomputed table of multiples of the given `basepoint`.
     pub fn create(basepoint: &RistrettoPoint) -> RistrettoBasepointTable {

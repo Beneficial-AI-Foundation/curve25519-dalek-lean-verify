@@ -19,7 +19,7 @@ representation optimized for point addition operations.
 Source: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64.field.FieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.field.FieldElement51
   curve25519_dalek.backend.serial.u64.constants
 namespace curve25519_dalek.edwards.EdwardsPoint
 
@@ -57,7 +57,7 @@ where p = 2^255 - 19
 theorem as_projective_niels_spec (e : EdwardsPoint)
     (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧
       e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :
-    ∃ pn, as_projective_niels e = ok pn ∧
+    as_projective_niels e ⦃ pn =>
     let X := Field51_as_Nat e.X
     let Y := Field51_as_Nat e.Y
     let Z := Field51_as_Nat e.Z
@@ -70,7 +70,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
     A % p = (Y + X) % p ∧
     (B + X) % p = Y % p ∧
     Z' % p = Z % p ∧
-    C % p = (T * d2) % p := by
+    C % p = (T * d2) % p ⦄ := by
   unfold as_projective_niels
   progress*
   · -- BEGIN TASK

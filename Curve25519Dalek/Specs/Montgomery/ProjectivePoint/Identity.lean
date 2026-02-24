@@ -19,9 +19,9 @@ This function returns the identity element of the Montgomery curve in projective
 **Source**: curve25519-dalek/src/montgomery.rs:L296-L301
 -/
 
-open Aeneas.Std Result curve25519_dalek
+open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.montgomery.IdentityProjectivePoint
+namespace curve25519_dalek.IdentityMontgomeryProjectivePoint
 
 /-
 natural language description:
@@ -47,9 +47,9 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    ∃ q, identity = ok q ∧
-    q.U = ONE ∧ q.W = ZERO := by
+    spec identity (fun q =>
+    q.U = ONE ∧ q.W = ZERO) := by
   unfold identity
   simp
 
-end curve25519_dalek.montgomery.IdentityProjectivePoint
+end curve25519_dalek.IdentityMontgomeryProjectivePoint

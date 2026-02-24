@@ -15,14 +15,14 @@ This function performs element-wise addition of field element limbs.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
 
 /-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
@@ -30,9 +30,9 @@ namespace curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51Share
 @[progress]
 theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (hab : ∀ j < 5, i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :
-    ∃ a', add_assign_loop a b i = ok a' ∧
+    add_assign_loop a b i ⦃ a' =>
     (∀ j < 5, i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧
-    (∀ j < 5, j < i.val → a'[j]! = a[j]!) := by
+    (∀ j < 5, j < i.val → a'[j]! = a[j]!) ⦄ := by
   unfold add_assign_loop
   split
   · progress*
@@ -61,12 +61,13 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
         have := res_post_2 j hj (by omega)
         simp_all
         -- END TASK
-  · use a
-    -- BEGIN TASK
-    simp only [implies_true, and_true, true_and]
-    intro j hj _
-    have : j = 5 := by scalar_tac
-    omega
+  · -- BEGIN TASK
+    simp only [spec_ok]
+    refine ⟨?_, ?_⟩
+    · intro j hj _
+      have : j = 5 := by scalar_tac
+      omega
+    · intros; trivial
     -- END TASK
   termination_by 5 - i.val
   decreasing_by scalar_decr_tac
@@ -82,9 +83,9 @@ theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val �
 theorem add_assign_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
-    ∃ result, add_assign a b = ok result ∧
+    add_assign a b ⦃ result =>
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 54) := by
+    (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by
   unfold add_assign
   progress*
   · -- BEGIN TASK
@@ -102,4 +103,4 @@ theorem add_assign_spec (a b : Array U64 5#usize)
       omega
       -- END TASK
 
-end curve25519_dalek.backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51

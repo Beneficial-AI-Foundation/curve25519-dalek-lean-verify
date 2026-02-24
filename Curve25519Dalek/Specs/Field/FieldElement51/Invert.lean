@@ -20,7 +20,7 @@ This function returns zero on input zero.
 
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 /-
@@ -62,13 +62,66 @@ lemma coprime_of_prime_not_dvd {a p : ℕ}
 
 @[progress]
 theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
-    ∃ r', invert r = ok r' ∧
+    invert r ⦃ r' =>
     let r_nat := Field51_as_Nat r % p
     let r'_nat := Field51_as_Nat r' % p
     (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧
     (r_nat = 0 → r'_nat = 0) ∧
-    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52)
+    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄
     := by
+    unfold invert
+    progress*
+    · intro i hi; have := __discr_post_3 i hi; omega
+    · intro i hi; have := t20_post_1 i hi; omega
+    · intro i hi; have := __discr_post_4 i hi; omega
+    constructor
+    · intro hne
+      have ht20m := Nat.ModEq.mul_right (Field51_as_Nat __discr.2) t20_post_2
+      have hres1 := Nat.ModEq.trans res_post_1  ht20m
+      rw[← Nat.ModEq] at __discr_post_2
+      have ht21m := Nat.ModEq.mul_left  (Field51_as_Nat __discr.1 ^ 32) __discr_post_2
+      have hres2 := Nat.ModEq.trans hres1 ht21m
+      rw[← Nat.ModEq] at __discr_post_1
+      have hp1p:= Nat.ModEq.pow 32 __discr_post_1
+      have ht21m := Nat.ModEq.mul_right (Field51_as_Nat r ^ 11) hp1p
+      have hres2 := Nat.ModEq.trans hres2 ht21m
+      rw[← pow_mul, ← pow_add, Nat.ModEq] at hres2
+      simp[hres2]
+      have one:= pow_one (Field51_as_Nat r)
+      have := pow_add (Field51_as_Nat r)  57896044618658097711785492504343953926634992332820282019728792003956564819947 1
+      rw[one] at this
+      simp[← this]
+      have : 57896044618658097711785492504343953926634992332820282019728792003956564819948 =p-1 := by
+       unfold p
+       simp
+      rw[this]
+      apply Nat.ModEq.pow_card_sub_one_eq_one prime_25519
+      apply coprime_of_prime_not_dvd prime_25519
+      intro hp
+      apply hne
+      apply Nat.dvd_iff_mod_eq_zero.mp
+      exact hp
+    · constructor
+      · intro h0
+        have ht20m := Nat.ModEq.mul_right (Field51_as_Nat __discr.2) t20_post_2
+        have hres1 := Nat.ModEq.trans res_post_1  ht20m
+        rw[← Nat.ModEq] at __discr_post_2
+        have ht21m := Nat.ModEq.mul_left  (Field51_as_Nat __discr.1 ^ 32) __discr_post_2
+        have hres2 := Nat.ModEq.trans hres1 ht21m
+        rw[← Nat.ModEq] at __discr_post_1
+        have hp1p:= Nat.ModEq.pow 32 __discr_post_1
+        have ht21m := Nat.ModEq.mul_right (Field51_as_Nat r ^ 11) hp1p
+        have hres2 := Nat.ModEq.trans hres2 ht21m
+        rw[← pow_mul,← pow_add, Nat.ModEq] at hres2
+        simp[hres2]
+        have : 0 = 0 %p:= by decide
+        rw[this, ← Nat.ModEq]
+        rw[this, ← Nat.ModEq] at h0
+        have := Nat.ModEq.pow 57896044618658097711785492504343953926634992332820282019728792003956564819947 h0
+        simp at this
+        apply this
+      · simp_all
+    /- OLD PROOF:
     unfold invert
     progress*
     · intro i hi
@@ -127,5 +180,6 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : �
         simp at this
         apply this
       · simp_all
+    -/
 
 end curve25519_dalek.field.FieldElement51

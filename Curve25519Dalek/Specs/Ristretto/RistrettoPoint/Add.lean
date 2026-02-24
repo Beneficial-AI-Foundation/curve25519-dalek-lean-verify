@@ -16,8 +16,9 @@ This function adds two Ristretto points via elliptic curve addition by delegatin
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.ristretto
+namespace curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint
 
 /-
 natural language description:
@@ -41,9 +42,9 @@ natural language specs:
 -/
 @[progress]
 theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
-    ∃ result, add self other = ok result ∧
+    add self other ⦃ result =>
     result.IsValid ∧
-    result.toPoint = self.toPoint + other.toPoint := by
+    result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
   progress*
   · exact h_self_valid.1
@@ -98,4 +99,4 @@ constitutes a well-defined operation that does not depend on the chosen represen
 and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
 -/
 
-end curve25519_dalek.ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint
+end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint
