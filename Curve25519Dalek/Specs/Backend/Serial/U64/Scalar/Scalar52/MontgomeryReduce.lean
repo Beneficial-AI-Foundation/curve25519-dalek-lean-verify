@@ -32,7 +32,7 @@ This function performs Montgomery reduction.
 - Complete proof
 -/
 
-open Aeneas.Std Result curve25519_dalek.backend.serial.u64
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64
 open Polynomial
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
@@ -135,14 +135,14 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
 @[progress]
 private theorem part1_spec (sum : U128)
     (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
-    ∃ p carry,
-    montgomery_reduce.part1 sum = ok (carry, p) ∧
+    montgomery_reduce.part1 sum ⦃ result =>
+    let (carry, p) := result
     p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
     carry.val = (sum.val + p.val * (constants.L[0]!).val) / (2 ^ 52) ∧
     carry.val < 2 ^ 77 ∧
-    p.val < 2 ^ 52 := by
+    p.val < 2 ^ 52 ⦄ := by
   unfold montgomery_reduce.part1
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   have h_L_len : constants.L.val.length = 5 := by
     unfold constants.L; rfl
   progress as ⟨i, i_post⟩
@@ -187,12 +187,12 @@ private theorem part1_spec (sum : U128)
 
 @[progress]
 private theorem part2_spec (sum : U128) :
-  ∃ carry w,
-  montgomery_reduce.part2 sum = ok (carry, w) ∧
+  montgomery_reduce.part2 sum ⦃ result =>
+  let (carry, w) := result
   w.val = sum.val % (2 ^ 52) ∧
   carry.val = sum.val / (2 ^ 52) ∧
   carry.val < 2 ^ 76 ∧
-  w.val < 2 ^ 52 := by -- 2^128 / 2^52 = 2^76
+  w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
   unfold montgomery_reduce.part2
 
   --    Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
@@ -229,7 +229,8 @@ private theorem part2_spec (sum : U128) :
     calc sum.val < 2^128 := h
          _ = 2^76 * 2^52 := by norm_num
 
-  refine ⟨carry, w, rfl, rfl, h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
+  exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
+
 
 set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
@@ -240,11 +241,10 @@ set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 @[progress]
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
-    ∃ m,
-    montgomery_reduce a = ok m ∧
+    montgomery_reduce a ⦃ m =>
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat m < L)
+    (Scalar52_as_Nat m < L) ⦄
     := by
   sorry
   -- -- ============================================================================================

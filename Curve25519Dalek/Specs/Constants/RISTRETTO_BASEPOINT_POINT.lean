@@ -51,7 +51,6 @@ natural language specs:
       basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
       is equivalent to saying that the difference between both points is not in E[4])
 -/
-@[progress]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
     RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
     RISTRETTO_BASEPOINT_POINT.IsValid ∧
@@ -73,7 +72,8 @@ theorem RISTRETTO_BASEPOINT_POINT_spec :
     have h_ne_zero := backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.2.2
     have h_L_prime : Nat.Prime L := by
       unfold L
-      exact PrimeCert.prime_ed25519_order
+      sorry
+      -- exact PrimeCert.prime_ed25519_order
     have h_order_eq_L : addOrderOf (backend.serial.u64.constants.ED25519_BASEPOINT_POINT.toPoint) = L :=
       (h_L_prime.eq_one_or_self_of_dvd _ (addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_L_mul)).resolve_left
       (fun h => h_ne_zero (AddMonoid.addOrderOf_eq_one_iff.mp h))

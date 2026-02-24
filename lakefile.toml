@@ -16,12 +16,12 @@ maxRecDepth = 10000
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
-rev = "43018824b03d3597900e8b22770376231b9e01cd"
+rev = "8725fce"
 
 [[require]]
 name = "PrimeCert"
-git = "https://github.com/kckennylau/PrimeCert.git"
-rev = "3df9b66"
+git = "https://github.com/oliver-butterley/PrimeCert.git"
+rev = "ef2148a816e1e8d534c8446dac7f2dafcb4b4888"
 
 [[lean_lib]]
 name = "Curve25519Dalek"

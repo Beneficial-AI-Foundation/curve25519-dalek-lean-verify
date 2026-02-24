@@ -20,7 +20,7 @@ It maps an arbitrary field element s to a valid Ristretto point.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas.Std Result curve25519_dalek.math
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -36,27 +36,21 @@ natural language specs:
 
 • The function always succeeds (no panic) for all valid field element inputs s
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
+• The output matches the pure mathematical Elligator map applied to the field value of s
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
-
-Note that validity here also implicitly guarantees the (correct but not immediately obvious)
-property that the elligator map only generates even Edwards points.
+• The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging
+  the implementation to the pure mathematical Elligator map defined in Representation.lean
 -/
 theorem elligator_ristretto_flavor_spec
     (s : backend.serial.u64.field.FieldElement51)
     (h_s_valid : s.IsValid) :
     ∃ rist, elligator_ristretto_flavor s = ok rist ∧
-    rist.IsValid := by
+    rist.IsValid ∧
+    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by
   sorry
-
-  /-
-  Note: An optional, potentially desirable extension of this spec theorem may be to
-  define a purely mathematical version f_ell of the elligator map in Representation.lean
-  that maps mathematical field elements to even Edwards points and then subsequently
-  show that f_ell(s.toField) = rist.toPoint.
-  -/
 
 end curve25519_dalek.ristretto.RistrettoPoint

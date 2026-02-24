@@ -20,7 +20,7 @@ This function computes the multiplicative inverse.
 Source: curve25519-dalek/src/scalar.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.scalar.Scalar
 
 /-
@@ -48,15 +48,13 @@ lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0 := b
 -/
 @[progress]
 theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
-    ∃ s', invert s = ok s' ∧
-    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] := by
+    invert s ⦃ s' =>
+    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by
   unfold invert
   progress*
-  -- BEGIN TASK
   rw [← s_post_1]
   have := Nat.ModEq.mul_left (Scalar52_as_Nat s) res_post_1
   exact Nat.ModEq.trans this s1_post
-  -- END TASK
 
 
 end curve25519_dalek.scalar.Scalar

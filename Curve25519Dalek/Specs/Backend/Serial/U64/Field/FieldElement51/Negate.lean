@@ -16,7 +16,7 @@ This function computes the additive inverse (negation) of a field element in �
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -45,9 +45,9 @@ Natural language specs:
   To make the theorem more readable we use a single bound for all limbs. -/
 @[progress]
 theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
-    ∃ r_inv, negate r = ok r_inv ∧
+    negate r ⦃ r_inv =>
     (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
-    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) := by
+    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by
   unfold negate
   progress*
   · -- BEGIN TASK

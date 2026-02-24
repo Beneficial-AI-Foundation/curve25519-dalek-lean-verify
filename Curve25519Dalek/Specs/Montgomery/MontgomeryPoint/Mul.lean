@@ -22,38 +22,38 @@ most significant to least significant.
 - Complete proof
 --/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 
-namespace curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
+namespace curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
 
 /-
 Natural language description:
 
-    • Interprets the MontgomeryPoint's 32-byte encoding as a field element u using
+    - Interprets the MontgomeryPoint's 32-byte encoding as a field element u using
       `FieldElement51.from_bytes`.
 
-    • Initializes two projective points:
+    - Initializes two projective points:
       - x0 = (1 : 0) representing the identity (point at infinity)
       - x1 = (u : 1) representing the input point in projective coordinates
 
-    • Processes scalar bits from most significant (bit 254) to least significant (bit 0)
+    - Processes scalar bits from most significant (bit 254) to least significant (bit 0)
       using the Montgomery ladder (Algorithm 8 from Costello-Smith 2017):
       - By scalar invariant #1, the MSB (bit 255) is always 0, so we start from bit 254
       - For each bit, conditionally swaps x0 and x1 based on bit transitions
       - Applies differential add-and-double operation
       - Maintains constant-time execution through conditional operations
 
-    • After processing all bits, performs a final conditional swap based on the LSB
+    - After processing all bits, performs a final conditional swap based on the LSB
 
-    • Converts the projective result x0 back to affine coordinates using `ProjectivePoint.as_affine`
+    - Converts the projective result x0 back to affine coordinates using `ProjectivePoint.as_affine`
 
 Natural language specs:
 
-    • The function always succeeds (no panic) given valid inputs
-    • Returns a 32-byte MontgomeryPoint encoding the scalar multiplication result
-    • The computation is constant-time with respect to the scalar value
-    • The result represents the u-coordinate of [scalar]P on the Montgomery curve
+    - The function always succeeds (no panic) given valid inputs
+    - Returns a 32-byte MontgomeryPoint encoding the scalar multiplication result
+    - The computation is constant-time with respect to the scalar value
+    - The result represents the u-coordinate of [scalar]P on the Montgomery curve
 -/
 
 
@@ -77,17 +77,16 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
-    ∃ res,
-    mul P scalar = ok res ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
+theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
+    mul P scalar ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
      := by
     sorry
 
 
-end curve25519_dalek.montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint
+end curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
 
-namespace curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint
+namespace curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint
 
 /- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 462:4-464:5
@@ -96,15 +95,15 @@ namespace curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMont
 /-
 Natural language description:
 
-    • This is the commutative variant of scalar multiplication: Scalar * MontgomeryPoint.
+    - This is the commutative variant of scalar multiplication: Scalar * MontgomeryPoint.
 
-    • Simply delegates to the MontgomeryPoint * Scalar implementation by swapping arguments.
+    - Simply delegates to the MontgomeryPoint * Scalar implementation by swapping arguments.
 
 Natural language specs:
 
-    • The function always succeeds (no panic) given valid inputs
-    • Returns the same result as the reverse multiplication (point * scalar)
-    • Inherits all mathematical properties from MontgomeryPoint::mul
+    - The function always succeeds (no panic) given valid inputs
+    - Returns the same result as the reverse multiplication (point * scalar)
+    - Inherits all mathematical properties from MontgomeryPoint::mul
 -/
 /-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
@@ -121,17 +120,16 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
-    ∃ res,
-    mul scalar P = ok res ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
-    :=by
+theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :
+    mul scalar P ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
+    := by
   unfold mul
   progress*
 
-end curve25519_dalek.montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint
+end curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint
 
-namespace curve25519_dalek.montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint
+namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint
 
 /- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul]:
    Source: 'curve25519-dalek/src/macros.rs', lines 93:12-95:13
@@ -140,15 +138,15 @@ namespace curve25519_dalek.montgomery.MulMontgomeryPointSharedBScalarMontgomeryP
 /-
 Natural language description:
 
-    • This is another variant of scalar multiplication: MontgomeryPoint * &'b Scalar.
+    - This is another variant of scalar multiplication: MontgomeryPoint * &'b Scalar.
 
-    • Delegates to the core MontgomeryPoint * Scalar implementation.
+    - Delegates to the core MontgomeryPoint * Scalar implementation.
 
 Natural language specs:
 
-    • The function always succeeds (no panic) given valid inputs
-    • Returns the same result as the underlying scalar multiplication
-    • Inherits all mathematical properties from MontgomeryPoint::mul
+    - The function always succeeds (no panic) given valid inputs
+    - Returns the same result as the underlying scalar multiplication
+    - Inherits all mathematical properties from MontgomeryPoint::mul
 -/
 /-- **Spec and proof concerning `montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
@@ -168,30 +166,29 @@ Natural language specs:
 
 @[progress]
 theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
-    ∃ res,
-    mul P rhs = ok res ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P)
+    mul P rhs ⦃ res =>
+    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P) ⦄
  := by
   unfold mul
   progress*
 
-end curve25519_dalek.montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint
+end curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint
 
-namespace curve25519_dalek.montgomery.MulScalarMontgomeryPointMontgomeryPoint
+namespace curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint
 
 /-
 Natural language description:
 
-    • This is the non-borrow variant of scalar multiplication: Scalar * MontgomeryPoint.
+    - This is the non-borrow variant of scalar multiplication: Scalar * MontgomeryPoint.
 
-    • Delegates to the shared reference implementation
+    - Delegates to the shared reference implementation
       MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul.
 
 Natural language specs:
 
-    • The function always succeeds (no panic) given valid inputs
-    • Returns the same result as the underlying scalar multiplication
-    • Inherits all mathematical properties from the core Montgomery ladder implementation
+    - The function always succeeds (no panic) given valid inputs
+    - Returns the same result as the underlying scalar multiplication
+    - Inherits all mathematical properties from the core Montgomery ladder implementation
 -/
 /-- **Spec and proof concerning `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
@@ -210,12 +207,11 @@ Natural language specs:
 -/
 
 @[progress]
-theorem mul_spec (scalar : scalar.Scalar) (P : MontgomeryPoint) :
-    ∃ res,
-    mul scalar P = ok res ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P)
+theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :
+    mul scalar P ⦃ res =>
+    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄
  := by
   unfold mul
   progress*
 
-end curve25519_dalek.montgomery.MulScalarMontgomeryPointMontgomeryPoint
+end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint

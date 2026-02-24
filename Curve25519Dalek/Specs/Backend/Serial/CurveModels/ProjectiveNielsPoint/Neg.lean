@@ -26,9 +26,9 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 503:4-510:5
 -/
 
-open Aeneas.Std Result
-open curve25519_dalek.backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint
-namespace curve25519_dalek.backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
+namespace curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
 
 /-
 natural language description:
@@ -64,15 +64,15 @@ where p = 2^255 - 19.
 This implements the negation of a point in projective Niels coordinates.
 -/
 theorem neg_spec
-    (self : ProjectiveNielsPoint)
+    (self : backend.serial.curve_models.ProjectiveNielsPoint)
     (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :
-    ∃ result, neg self = ok result ∧
+    neg self ⦃ result =>
     result.Y_plus_X = self.Y_minus_X ∧
     result.Y_minus_X = self.Y_plus_X ∧
     result.Z = self.Z ∧
-    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 := by
+    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by
   unfold neg
   progress
   grind
 
-end curve25519_dalek.backend.serial.curve_models.NegShared0ProjectiveNielsPointProjectiveNielsPoint
+end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint

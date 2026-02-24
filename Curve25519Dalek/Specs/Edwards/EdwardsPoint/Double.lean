@@ -18,7 +18,7 @@ This function doubles an Edwards point (adds it to itself) using elliptic curve 
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -41,9 +41,9 @@ natural language specs:
 - Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint
 -/
 @[progress]
-theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid):
-    ∃ result, double e = ok result
-    ∧ result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint := by
+theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
+    double e ⦃ result =>
+    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by
     sorry
 
 end curve25519_dalek.edwards.EdwardsPoint
