@@ -678,7 +678,7 @@ theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condition
 
    Conditionally assigns b to a in constant time.
    Returns b if choice.val = 1, otherwise returns a. -/
-noncomputable def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
+def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint :=
@@ -711,7 +711,7 @@ private def subtle.ConditionallySelectableU8' : subtle.ConditionallySelectable U
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5
    It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) for conditional_swap -/
-private noncomputable def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select'
+private def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select'
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint
@@ -726,7 +726,7 @@ private noncomputable def montgomery.MontgomeryPoint.Insts.SubtleConditionallySe
 
    Conditionally swaps two MontgomeryPoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
-noncomputable def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap
+def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) := do
@@ -760,7 +760,7 @@ axiom montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.ne
 
    Marker method required by the Eq trait to assert that the type has total equality.
    This is a no-op for MontgomeryPoint, always returning Unit. -/
-noncomputable def montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
+def montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   (_self : montgomery.MontgomeryPoint) : Result Unit :=
   ok ()
 
@@ -781,7 +781,7 @@ theorem montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_s
 
    Conditionally assigns b to a in constant time.
    This is a wrapper around conditional_select. -/
-noncomputable def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign
+def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result montgomery.ProjectivePoint :=
