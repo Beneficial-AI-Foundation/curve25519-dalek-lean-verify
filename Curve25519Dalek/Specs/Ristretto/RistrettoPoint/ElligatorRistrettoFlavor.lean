@@ -51,7 +51,7 @@ theorem elligator_ristretto_flavor_spec
     (h_s_valid : s.IsValid) :
     ∃ rist, elligator_ristretto_flavor s = ok rist ∧
     rist.IsValid ∧
-    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by
+    rist.toPoint = (elligator_ristretto_flavor_pure s.toField).val := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
