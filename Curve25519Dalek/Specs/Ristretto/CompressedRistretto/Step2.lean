@@ -271,23 +271,20 @@ a) The Rust flags must be set to success (1, 0, 0)
 b) The Rust point `pt` must match the mathematical point `P`
 And conversely.
 -/
-theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
+@[progress]
+theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
-    ∃ (ok1 c c1 : subtle.Choice) (pt : RistrettoPoint),
-    step_2 s = ok (ok1, c, c1, pt) ∧
-
+    step_2 s ⦃ (ok1, c, c1, pt) =>
     (let s_val := s.toField
      let u1 := 1 - s_val ^ 2
      let u2 := 1 + s_val ^ 2
      let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2
-
      (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧
      (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
      (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧
-
     (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
-      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) := by
-  unfold step_2 field.FieldElement51.invsqrt subtle.ConditionallyNegatable.Blanket.conditional_negate
+      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ⦄ := by
+  unfold step_2 field.FieldElement51.invsqrt
   progress
   · intro i hi; have := h_s i hi; omega
   rename_i ss ss_mod ss_bound
@@ -375,7 +372,7 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
     have hu4_add : (backend.serial.u64.constants.EDWARDS_D).toField + u4.toField = 0 := by
       unfold FieldElement51.toField
       have := lift_mod_eq _ _ (show (Field51_as_Nat backend.serial.u64.constants.EDWARDS_D +
-        Field51_as_Nat u4) % p = 0 % p by simp [u4_post])
+        Field51_as_Nat u4) % p = 0 % p by rw [Nat.zero_mod]; exact u4_post)
       push_cast at this; exact this
     have hu5 : u5.toField = u1.toField ^ 2 := by
       unfold FieldElement51.toField; have := lift_mod_eq _ _ u5_post; push_cast at this; exact this
@@ -427,9 +424,7 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
       exact (ZMod.natCast_eq_natCast_iff _ _ _).mp (by
         push_cast [ZMod.val_natCast] at h_zmod ⊢; simp only [ZMod.natCast_val, ZMod.cast_id',
           id_eq]; grind only [cases eager Prod])
-  refine ⟨invsqrt_res.1, c, c1,
-    ⟨x1, y, backend.serial.u64.field.FieldElement51.ONE, t⟩,
-    rfl, rfl, rfl, rfl, ?_, ?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_⟩
   · -- Goal 1: ok1 ↔ (v * u2² ≠ 0 ∧ IsSquare(v * u2²))
     constructor
     · intro h_ok
@@ -472,9 +467,8 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
     -- x_1 is the negation of x in the field
     have hx_1_neg : x_1.toField = -x.toField := by
       unfold FieldElement51.toField
-      have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_1) % p = 0 % p by simp [x_1_mod])
+      have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_1) % p = 0 % p by rw [Nat.zero_mod]; exact x_1_mod)
       push_cast at h; grind only [cases eager Prod]
-
     -- x1 = conditional select at Nat level
     have hx1_nat : Field51_as_Nat x1 = if x_neg.val = 1#u8 then Field51_as_Nat x_1 else Field51_as_Nat x := by
       unfold Field51_as_Nat
@@ -528,7 +522,6 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
       unfold FieldElement51.toField; rw [this]; push_cast
       rw [FieldElement51.ONE_spec]; push_cast
       have hss := hss_field; unfold FieldElement51.toField at hss; rw [hss]
-
     -- Re-derive u7.toField (= v in the math) in terms of d, u1, u2
     have hu7_val : u7.toField = (-Ed25519.d) * u1.toField ^ 2 - u2.toField ^ 2 := by
       have hu3 : u3.toField = u2.toField ^ 2 := by
@@ -539,7 +532,7 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
         have : (backend.serial.u64.constants.EDWARDS_D).toField + u4.toField = 0 := by
           unfold FieldElement51.toField
           have := lift_mod_eq _ _ (show (Field51_as_Nat backend.serial.u64.constants.EDWARDS_D +
-            Field51_as_Nat u4) % p = 0 % p by simp [u4_post])
+            Field51_as_Nat u4) % p = 0 % p by rw [Nat.zero_mod]; exact u4_post)
           push_cast at this; exact this
         linear_combination this - hd
       have hu5 : u5.toField = u1.toField ^ 2 := by
@@ -719,21 +712,5 @@ theorem step_2_spec' (s : backend.serial.u64.field.FieldElement51)
         h_neg h_y_ne
         (by rw [hPx, hx1_abs, hx_simp])
         (by rw [hPy, hy_simp])
-
-@[progress]
-theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
-    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
-    step_2 s ⦃ (ok1, c, c1, pt) =>
-    (let s_val := s.toField
-     let u1 := 1 - s_val ^ 2
-     let u2 := 1 + s_val ^ 2
-     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2
-     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧
-     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
-     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧
-    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
-      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ⦄ := by
-  obtain ⟨ok1, c, c1, pt, h_ok, h_post⟩ := step_2_spec' s h_s
-  exact exists_imp_spec ⟨(ok1, c, c1, pt), h_ok, h_post⟩
 
 end curve25519_dalek.ristretto.decompress

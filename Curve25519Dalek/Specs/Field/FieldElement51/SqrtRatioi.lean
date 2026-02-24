@@ -1636,7 +1636,7 @@ theorem sqrt_ratio_i_spec
       c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)
     ⦄ := by
   have ⟨c, h_ok, h1, h2, h3, h4, h_nonneg⟩ := spec_imp_exists (sqrt_ratio_i_spec' u v h_u_bounds h_v_bounds)
-  exact ⟨c, h_ok, by
+  exact exists_imp_spec ⟨c, h_ok, by
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
     · -- Unconditional bounds: by exhaustion over the 4 cases
       by_cases hu : Field51_as_Nat u % p = 0

@@ -66,31 +66,24 @@ noncomputable def compress_pure (P : Point Ed25519) : Nat :=
   let y := P.y
   let z := (1 : ZMod p)
   let t := x * y
-
   -- 1. Setup
   let u1 := (z + y) * (z - y)
   let u2 := x * y
-
   -- 2. Inverse Sqrt
   let (invsqrt, _was_square) := inv_sqrt_checked (u1 * u2^2)
   let den1 := invsqrt * u1
   let den2 := invsqrt * u2
   let z_inv := den1 * den2 * t
-
   -- 3. Rotation Decision
   let rotate := is_negative (t * z_inv)
-
   -- 4. Apply Rotation
   let x_prime := if rotate then y * sqrt_m1 else x
   let y_prime := if rotate then x * sqrt_m1 else y
   let den_inv := if rotate then den1 * invsqrt_a_minus_d else den2
-
   -- 5. Sign Adjustment
   let y_final := if is_negative (x_prime * z_inv) then -y_prime else y_prime
-
   -- 6. Final Calculation
   let s := abs_edwards (den_inv * (z - y_final))
-
   s.val
 
 end PureIsogeny
@@ -448,23 +441,18 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
   let u1 := 1 + a_val * s^2
   let u2 := 1 - a_val * s^2
   let v := a_val * d * u1^2 - u2^2
-
   -- 2. Inverse Square Root (Elligator)
   let arg := v * u2^2
   match h_call : inv_sqrt_checked arg with
   | (I, was_square) =>
-
     -- 3. Recover denominators
     let Dx := I * u2
     let Dy := I * Dx * v
-
     -- 4. Recover coordinates
     let x := abs_edwards (2 * s * Dx)
     let y := u1 * Dy
-
     -- 5. Validation Checks
     let t := x * y
-
     if h_invalid : !was_square || is_negative t || (y == 0) then
       none
     else
@@ -475,7 +463,6 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
               rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
               obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
               simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
-
               have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
                 apply inv_sqrt_checked_spec arg
                 · exact h_call
@@ -483,9 +470,9 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
                 · -- arg ≠ 0: follows from was_square = true + inv_sqrt_checked's zero guard
                   intro h_zero
                   rw [h_zero] at h_call
-                  rw [inv_sqrt_checked_zero] at h_call; simp at h_call
+                  rw [inv_sqrt_checked_zero] at h_call; simp only [Prod.mk.injEq,
+                    Bool.false_eq] at h_call
                   exact absurd h_call.2 (by rw [h_sq_not]; decide)
-
               let x_raw := 2 * s * Dx
               have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
                 dsimp only [y, Dy, Dx, x_raw]
@@ -493,11 +480,9 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
                 <;> try rw [a_val];
                 <;> try rfl
                 exact h_I_sq_mul
-
               have h_x_sq : x^2 = x_raw^2 := by
                 dsimp only [x]
                 exact abs_edwards_sq (2 * s * Dx)
-
               rw [h_x_sq]
               exact h_curve_raw
            }
@@ -656,7 +641,6 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
     simp_all only [ne_eq, mul_eq_zero, false_or, not_or, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff,
       or_self, mul_eq_mul_left_iff, mul_eq_mul_right_iff, or_false, beq_eq_false_iff_ne, Bool.not_true, Bool.or_self,
       Bool.false_or, beq_iff_eq, W]
-
   · -- some branch: show point equality
     congr 1; ext
     · exact h_x_match
@@ -798,7 +782,6 @@ def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
   let x := P.x
   let y := P.y
   let t := x * y
-
   -- 1. x must be even (non-negative)
   (is_negative x = false) ∧
   -- 2. t must be even (non-negative)
