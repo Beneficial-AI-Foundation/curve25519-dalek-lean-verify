@@ -4135,7 +4135,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = (elligator_ristretto_flavor_pure s.toField).val := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
