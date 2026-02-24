@@ -688,9 +688,9 @@ def subtle.ConditionallySelectableArray.conditional_swap
 
 /-- [curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 228:4-240:5
-It is in Funs.Lean previously, we move it here since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
-def
-  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
+private def
+  backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
   (a : backend.serial.u64.field.FieldElement51)
   (b : backend.serial.u64.field.FieldElement51) (choice : subtle.Choice) :
   Result backend.serial.u64.field.FieldElement51
@@ -716,17 +716,17 @@ def
 
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 311:4-320:5
-  It is in Funs.Lean previously, we move it here since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
-def montgomery.ConditionallySelectableProjectivePoint.conditional_select
+  It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) since montgomery.ConditionallySelectableProjectivePoint.conditional_swap depends on it -/
+private def montgomery.ConditionallySelectableProjectivePoint.conditional_select'
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result montgomery.ProjectivePoint
   := do
   let fe ←
-    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
       a.U b.U choice
   let fe1 ←
-    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
       a.W b.W choice
   ok { U := fe, W := fe1 }
 
@@ -739,8 +739,8 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) := do
-  let a_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
-  let b_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice
+  let a_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice
+  let b_new ← montgomery.ConditionallySelectableProjectivePoint.conditional_select' b a choice
   ok (a_new, b_new)
 
 /-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_swap`**:
@@ -751,12 +751,12 @@ def montgomery.ConditionallySelectableProjectivePoint.conditional_swap
 @[progress]
 theorem montgomery.ConditionallySelectableProjectivePoint.conditional_swap_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
-  (h_a : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res)
-  (h_b : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice = ok res) :
+  (h_a : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice = ok res)
+  (h_b : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select' b a choice = ok res) :
   ∃ c,
     montgomery.ConditionallySelectableProjectivePoint.conditional_swap a b choice = ok c ∧
-    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok c.1 ∧
-    montgomery.ConditionallySelectableProjectivePoint.conditional_select b a choice = ok c.2 := by
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice = ok c.1 ∧
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select' b a choice = ok c.2 := by
   unfold montgomery.ConditionallySelectableProjectivePoint.conditional_swap
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
@@ -794,7 +794,7 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_assign_spe
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u8>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallySelectable<u8>"]
-noncomputable def subtle.ConditionallySelectableU8 : subtle.ConditionallySelectable U8 := {
+private def subtle.ConditionallySelectableU8' : subtle.ConditionallySelectable U8 := {
   coremarkerCopyInst := core.marker.CopyU8
   conditional_select := subtle.ConditionallySelectableU8.conditional_select
   conditional_assign := subtle.ConditionallySelectableU8.conditional_assign
@@ -802,15 +802,16 @@ noncomputable def subtle.ConditionallySelectableU8 : subtle.ConditionallySelecta
 }
 
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5 -/
-noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5
+   It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) for conditional_swap -/
+private noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_select'
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint
   := do
   let a1 ←
     subtle.ConditionallySelectableArray.conditional_select
-      subtle.ConditionallySelectableU8 a b choice
+      subtle.ConditionallySelectableU8' a b choice
   ok a1
 
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
@@ -822,8 +823,8 @@ noncomputable def montgomery.ConditionallySelectableMontgomeryPoint.conditional_
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) := do
-  let a_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select a b choice
-  let b_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select b a choice
+  let a_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select' a b choice
+  let b_new ← montgomery.ConditionallySelectableMontgomeryPoint.conditional_select' b a choice
   ok (a_new, b_new)
 
 /-- **Spec theorem for `montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap`**:
@@ -840,7 +841,7 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_spec
     res = (if choice.val = 1#u8 then (b, a) else (a, b)) :=
   by
   unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap
-  unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_select
+  unfold montgomery.ConditionallySelectableMontgomeryPoint.conditional_select'
   unfold subtle.ConditionallySelectableArray.conditional_select
   split <;> simp_all
 
@@ -909,7 +910,7 @@ noncomputable def montgomery.ConditionallySelectableProjectivePoint.conditional_
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result montgomery.ProjectivePoint :=
-  montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice
+  montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice
 
 /-- **Spec theorem for `montgomery.ConditionallySelectableProjectivePoint.conditional_assign`**:
 - No panic (if conditional_select succeeds)
@@ -920,10 +921,10 @@ noncomputable def montgomery.ConditionallySelectableProjectivePoint.conditional_
 @[progress]
 theorem montgomery.ConditionallySelectableProjectivePoint.conditional_assign_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
-  (h : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res) :
+  (h : ∃ res, montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice = ok res) :
   ∃ res,
     montgomery.ConditionallySelectableProjectivePoint.conditional_assign a b choice = ok res ∧
-    montgomery.ConditionallySelectableProjectivePoint.conditional_select a b choice = ok res := by
+    montgomery.ConditionallySelectableProjectivePoint.conditional_select' a b choice = ok res := by
   unfold montgomery.ConditionallySelectableProjectivePoint.conditional_assign
   obtain ⟨res, h_eq⟩ := h
   use res
