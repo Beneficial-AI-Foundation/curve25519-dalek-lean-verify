@@ -844,6 +844,42 @@ theorem montgomery.ConditionallySelectableMontgomeryPoint.conditional_swap_spec
   unfold subtle.ConditionallySelectableArray.conditional_select
   split <;> simp_all
 
+
+/-- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1
+
+   Note: This function is listed as an axiom in the Curve25519Dalek/FunsExternal.lean, but has a concrete implementation here. It remains in Funs.lean (rather than FunsExternal.lean) because it depends on
+   montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq, which is defined in this file. -/
+
+axiom montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+  : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
+
+-- noncomputable def montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+--   (self : montgomery.MontgomeryPoint) (other : montgomery.MontgomeryPoint) :
+--   Result Bool := do
+--   let eq_result ← montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other
+--   ok (!eq_result)
+
+-- /-- **Spec theorem for `montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne`**:
+-- - No panic (if eq succeeds)
+-- - Returns true if and only if the two MontgomeryPoint values are not equal
+-- - Equivalent to negation of eq
+-- -/
+-- @[progress]
+-- theorem montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne_spec
+--   (self other : montgomery.MontgomeryPoint)
+--   (h : ∃ res, montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other = ok res) :
+--   ∃ ne_res,
+--     montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne self other = ok ne_res ∧
+--     ∃ eq_res, montgomery.PartialEqMontgomeryPointMontgomeryPoint.eq self other = ok eq_res ∧
+--     ne_res = !eq_res := by
+--   unfold montgomery.PartialEqMontgomeryPointMontgomeryPoint.ne
+--   obtain ⟨eq_res, h_eq⟩ := h
+--   use !eq_res
+--   constructor
+--   · simp [h_eq]
+--   · use eq_res
+
 /-- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30
 
