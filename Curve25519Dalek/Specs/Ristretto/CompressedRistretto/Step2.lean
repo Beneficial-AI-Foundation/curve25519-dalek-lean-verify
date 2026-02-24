@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
@@ -343,7 +343,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
   progress as ⟨c1, c1_post⟩
   -- Shared setup for Goals 1 and 4
   have h_one : Field51_as_Nat FieldElement51.ONE % p = 1 := by
-    simp [FieldElement51.ONE_spec]; decide
+    simp only [FieldElement51.ONE_spec]; decide
   rename_i invsqrt_case3 invsqrt_case4
   simp only [h_one, ne_eq, one_ne_zero, not_false_eq_true, true_and,
     mul_one] at invsqrt_post1 invsqrt_post2 invsqrt_case3 invsqrt_case4

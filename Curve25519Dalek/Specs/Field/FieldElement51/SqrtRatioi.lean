@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Hoang Le Truong
+Authors: Markus Dablander, Hoang Le Truong, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
@@ -38,7 +38,7 @@ namespace curve25519_dalek.field.FieldElement51
 theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [Nat.ModEq]
 
 theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔  a % p = 1 := by
-  simp [Nat.ModEq]
+  simp only [Nat.ModEq]
   have :1 % p= 1:= by unfold p; decide
   rw[this]
 
@@ -58,7 +58,7 @@ theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
   a ^ 2 ≡ b ^ 2 [MOD p] := by
   have h1  := h.mul_left a
   have h2  := h.mul_right b
-  simp at h2
+  simp only [zero_mul] at h2
   have h1' : a * a + a * b ≡ 0 [MOD p] := by simpa [Nat.mul_add, pow_two] using h1
   have h2' : a * b + b * b ≡ 0 [MOD p] := by simpa [Nat.add_mul, pow_two] using h2
   have hsum : a * b + a * a ≡ a * b + b * b [MOD p] := by
@@ -66,7 +66,7 @@ theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
     apply Nat.ModEq.symm at h2'
     apply Nat.ModEq.trans h1' h2'
   apply Nat.ModEq.add_left_cancel' at hsum
-  simp[pow_two]
+  simp only [pow_two]
   exact hsum
 
 theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
@@ -87,7 +87,7 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   rw[this] at h3
   have h4:=h3.add_left a
   have : a + (b + (p - 1) * b) =(a + b) + (p - 1) * b := by grind
-  simp[this] at h4
+  simp only [add_zero, this] at h4
   have h5:=h.add_right ((p - 1) * b)
   have h6:=h4.trans h5
   simp at h6
@@ -114,10 +114,10 @@ theorem eq_to_bytes_eq_Field51_as_Nat
 lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
     u = 0 := by
     rw[Nat.ModEq] at hu_mod
-    simp at hu_mod
+    simp only [Nat.zero_mod] at hu_mod
     have : u % p = u := Nat.mod_eq_of_lt hu_lt
     rw[hu_mod] at this
-    simp at this
+    simp only [ReduceNat.reduceNatEq] at this
     exact this
 
 theorem to_bytes_zero_of_Field51_as_Nat_zero
@@ -132,14 +132,18 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
   obtain ⟨c, c_ok, hc ⟩  := spec_imp_exists (is_zero_spec u)
   have hru_eq : ru = Array.repeat 32#usize 0#u8 := by
     unfold U8x32_as_Nat at h_bytes_zero
-    simp_all
+    simp_all only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_eq_zero_iff,
+      Finset.mem_range, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos,
+      Option.getD_some, mul_eq_zero, Nat.pow_eq_zero, OfNat.ofNat_ne_zero, ne_eq, false_or,
+      false_and]
     apply Subtype.ext
     apply List.ext_getElem
-    repeat simp
+    repeat simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
     intro i hi _
     have hi_val := h_bytes_zero i hi
     interval_cases i
-    all_goals simp [Array.repeat, List.replicate]; scalar_tac
+    all_goals simp only [Array.repeat, UScalar.ofNat_val_eq, List.replicate, List.getElem_cons_succ,
+      List.getElem_cons_zero]; scalar_tac
   rw [← hru_eq]
   exact hu
 
@@ -184,7 +188,6 @@ theorem SQRT_M1_not_square (x : ℕ) :
       unfold p
       simp
     rw[this] at eq1
-
     have := coprime_of_prime_not_dvd prime_25519 hpx
     have fermat:= (Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this ).symm.trans eq1
     have :(p-1)^2 ≡ 1[MOD p]:= by
@@ -218,7 +221,7 @@ lemma gcd_one_of_p {a : ℕ}
 lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat constants.SQRT_M1 ≡ 0 [MOD p]) :
   a ≡ 0 [MOD p] := by
   have eq:= ha.mul_right (Field51_as_Nat constants.SQRT_M1)
-  simp[mul_assoc] at eq
+  simp only [mul_assoc, zero_mul] at eq
   have : Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat constants.SQRT_M1 ≡ p-1 [MOD p] := by
     unfold constants.SQRT_M1
     decide
@@ -250,8 +253,10 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
       have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
         = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
         rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
-        simp[← add_assoc]
-        simp[add_assoc, (by grind : (p-1)* a^ ((p - 1) / 2)+ a^ ((p - 1) / 2)= ((p-1)+1)*a^ ((p - 1) / 2))]
+        simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
+        simp only [add_assoc,
+          (by grind :
+              (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) = ((p - 1) + 1) * a ^ ((p - 1) / 2))]
         have : p-1 +1 =p := by unfold p; scalar_tac
         rw[this]
         have : (p-1)/2 *2 =p-1 := by unfold p; scalar_tac
@@ -292,13 +297,14 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
           a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1)
            := by
         rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
-        simp[← add_assoc]
-        simp[add_assoc, (by grind : (p-1)* a^ ((p - 1) / 4)+ a^ ((p - 1) / 4)= ((p-1)+1)*a^ ((p - 1) / 4))]
+        simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
+        simp only [add_assoc,
+          (by grind :
+              (p - 1) * a ^ ((p - 1) / 4) + a ^ ((p - 1) / 4) = ((p - 1) + 1) * a ^ ((p - 1) / 4))]
         have : p-1 +1 =p := by unfold p; scalar_tac
         rw[this]
         have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
         rw[this]
-
   have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat constants.SQRT_M1)) *
           (a ^ ((p -1) / 4) + Field51_as_Nat constants.SQRT_M1)
            =
@@ -306,10 +312,13 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
            := by
         rw[mul_add, add_mul,add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
         rw[← add_assoc]
-        simp[add_assoc, (by grind : (p-1)*(Field51_as_Nat constants.SQRT_M1) * a^ ((p - 1) / 4)+ a^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1
-        = ((p-1)+1)*a^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1)]
+        simp only [add_assoc,
+          (by grind :
+              (p - 1) * (Field51_as_Nat constants.SQRT_M1) * a ^ ((p - 1) / 4) +
+                  a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1 =
+                ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1)]
         have : p-1 +1 =p := by unfold p; scalar_tac
-        rw[this]
+        rw [this]
         have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
         rw[this, ← add_assoc]
   have : (a ^ ((p -1) / 4) + (p-1)) *
@@ -317,7 +326,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
           (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat constants.SQRT_M1)) *
           (a ^ ((p -1) / 4) + Field51_as_Nat constants.SQRT_M1)
           ≡ 0 [MOD p] := by
-          simp[eq1, mul_assoc, eq2]
+          simp only [eq1, mul_assoc, eq2]
           have eq1:a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1) ≡
             a ^ ((p -1)/2 ) + (p-1)
             [MOD p] := by
@@ -332,14 +341,16 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
             have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1))
             apply Nat.ModEq.trans this
             simp[Nat.modEq_iff_dvd]
-
           apply (eq1.mul this).trans
           have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
             have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
               = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
               rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
-              simp[← add_assoc]
-              simp[add_assoc, (by grind : (p-1)* a^ ((p - 1) / 2)+ a^ ((p - 1) / 2)= ((p-1)+1)*a^ ((p - 1) / 2))]
+              simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
+              simp only [add_assoc,
+                (by grind :
+                    (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) =
+                      ((p - 1) + 1) * a ^ ((p - 1) / 2))]
               have : p-1 +1 =p := by unfold p; scalar_tac
               rw[this]
               have : (p-1)/2 *2 =p-1 := by unfold p; scalar_tac
@@ -371,7 +382,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
       · have r:= hl.add_right (p-1)
         rw[add_assoc] at r
         have :  1 + (p-1) =p := by unfold p; scalar_tac
-        simp[this] at r
+        simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
         have :p - 1  ≡Field51_as_Nat constants.SQRT_M1 ^2  [MOD p]:= by
               unfold constants.SQRT_M1
               decide
@@ -385,7 +396,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
   · have r:= hl.add_right ((p-1)*Field51_as_Nat constants.SQRT_M1)
     rw[add_assoc] at r
     have :  Field51_as_Nat constants.SQRT_M1 + (p-1) * Field51_as_Nat constants.SQRT_M1=p * (Field51_as_Nat constants.SQRT_M1) := by unfold p; scalar_tac
-    simp[this] at r
+    simp only [this, zero_add, Nat.add_modulus_mul_modEq_iff] at r
     have :(p - 1)* (Field51_as_Nat constants.SQRT_M1)  ≡Field51_as_Nat constants.SQRT_M1 ^3  [MOD p]:= by
               unfold constants.SQRT_M1
               decide
@@ -398,10 +409,14 @@ lemma eq_U8x32_as_Nat_eq {a b : Aeneas.Std.Array U8 32#usize}
     (hab : U8x32_as_Nat a = U8x32_as_Nat b) : a = b := by
     apply Subtype.ext
     apply List.ext_getElem
-    repeat simp
+    repeat simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
     intro i h1 h2
     interval_cases i
-    all_goals(simp[U8x32_as_Nat,Finset.sum_range_succ] at hab; scalar_tac)
+    all_goals(simp only [U8x32_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+      Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+      List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+      one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+      Nat.lt_add_one] at hab; scalar_tac)
 
 /-
 Natural language description:
@@ -494,9 +509,7 @@ private theorem conditional_negate_nonneg
     have := mt r_is_negative_post.mpr h
     omega
 
--- set_option maxHeartbeats  1000000000000 in
--- progress heavy
-
+set_option maxHeartbeats 400000 in -- nested and non trivial proof.
 theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
@@ -526,21 +539,8 @@ theorem sqrt_ratio_i_spec'
     -- Non-negativity of the result
     (r_nat % 2 = 0)
      ⦄ := by
-    sorry
-/- ATTEMPTED WP PROOF SKELETON (untested, reverted to sorry):
-    unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
-    progress* <;> try grind
-    · unfold constants.SQRT_M1; decide
-    · unfold constants.SQRT_M1; decide
-    · sorry  -- main mathematical proof (~1000 lines needed)
--/
-/- OLD PROOF for sqrt_ratio_i_spec (before Aeneas WP migration):
-   The proof (~1070 lines) was removed because it has extensive WP migration issues:
-   - rcases on WP-style match expressions from to_bytes/invert calls
-   - Unknown identifier x/x_post_1/x_post_2 (WP trace naming changes)
-   - sorry() in goals from inlined conditional_negate
-   The old proof can be found in git history (before Aeneas WP migration commit).
-
+  sorry
+/- OLD PROOF: see git history (ada/issue-546-step2-backup branch)
    Original proof started with:
     unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
     progress*
