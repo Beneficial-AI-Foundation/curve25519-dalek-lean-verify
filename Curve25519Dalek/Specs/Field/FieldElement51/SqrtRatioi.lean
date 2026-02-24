@@ -441,11 +441,63 @@ Natural language specs:
   4. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 0 and r^2 ≡ SQRT_M1 * u * v^(-1) (mod p)
 -/
 
+private theorem nonneg_of_neg_mod_p (a b : ℕ)
+    (h_sum : (a + b) % p = 0) (h_a_odd : a % p % 2 = 1) :
+    b % p % 2 = 0 := by
+  have hp_pos : 0 < p := by unfold p; omega
+  have hp_odd : p % 2 = 1 := by unfold p; decide
+  have ha_lt := Nat.mod_lt a hp_pos
+  have hb_lt := Nat.mod_lt b hp_pos
+  rw [Nat.add_mod] at h_sum
+  have h_cases : a % p + b % p = 0 ∨ a % p + b % p = p := by
+    by_cases h_lt : a % p + b % p < p
+    · left
+      have h_mod : (a % p + b % p) % p = a % p + b % p := Nat.mod_eq_of_lt h_lt
+      rw [h_mod] at h_sum
+      exact h_sum
+    · right
+      have h_ge : p ≤ a % p + b % p := by omega
+      have h_rw : a % p + b % p = (a % p + b % p - p) + p := by omega
+      rw [h_rw] at h_sum
+      rw [Nat.add_mod_right] at h_sum
+      have h_sub_lt : a % p + b % p - p < p := by omega
+      have h_sub_mod : (a % p + b % p - p) % p = a % p + b % p - p := Nat.mod_eq_of_lt h_sub_lt
+      rw [h_sub_mod] at h_sum
+      omega
+  rcases h_cases with h | h
+  · omega
+  · have h1 : (a % p + b % p) % 2 = 1 := by rw [h]; exact hp_odd
+    rw [Nat.add_mod, h_a_odd] at h1
+    have := Nat.mod_two_eq_zero_or_one (b % p)
+    omega
+
+/-- After `conditional_negate`, the result `r2` is always non-negative (even mod p). -/
+private theorem conditional_negate_nonneg
+    (r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (r_is_negative : subtle.Choice)
+    (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1)
+    (x_post_1 : (Field51_as_Nat r1 + Field51_as_Nat x) % p = 0)
+    (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
+    Field51_as_Nat r2 % p % 2 = 0 := by
+  by_cases h : r_is_negative.val = 1#u8
+  · simp [h] at r2_post
+    have : Field51_as_Nat r2 = Field51_as_Nat x := by
+      simp [Field51_as_Nat, Finset.sum_range_succ]; simp_all
+    rw [this]
+    exact nonneg_of_neg_mod_p (Field51_as_Nat r1) (Field51_as_Nat x) x_post_1
+      (r_is_negative_post.mp h)
+  · simp [h] at r2_post
+    have : Field51_as_Nat r2 = Field51_as_Nat r1 := by
+      simp [Field51_as_Nat, Finset.sum_range_succ]; simp_all
+    rw [this]
+    have := Nat.mod_two_eq_zero_or_one (Field51_as_Nat r1 % p)
+    have := mt r_is_negative_post.mpr h
+    omega
+
 -- set_option maxHeartbeats  1000000000000 in
 -- progress heavy
 
-@[progress]
-theorem sqrt_ratio_i_spec
+theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
     (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
@@ -470,7 +522,9 @@ theorem sqrt_ratio_i_spec
     -- Case 4: u and v are nonzero and u/v is not a square
     (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
     c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))
+    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    -- Non-negativity of the result
+    (r_nat % 2 = 0)
      ⦄ := by
     sorry
 /- ATTEMPTED WP PROOF SKELETON (untested, reverted to sorry):
@@ -1557,5 +1611,50 @@ theorem sqrt_ratio_i_spec
         -- END TASK
       -- END TASK
 -/
+
+set_option maxHeartbeats 400000 in -- heavy progress computations
+@[progress]
+theorem sqrt_ratio_i_spec
+    (u : backend.serial.u64.field.FieldElement51)
+    (v : backend.serial.u64.field.FieldElement51)
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+    sqrt_ratio_i u v ⦃ c =>
+    let u_nat := Field51_as_Nat u % p
+    let v_nat := Field51_as_Nat v % p
+    let r_nat := Field51_as_Nat c.2 % p
+    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p
+    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧
+    (r_nat % 2 = 0) ∧
+    (u_nat = 0 →
+      c.1.val = 1#u8 ∧ r_nat = 0) ∧
+    (u_nat ≠ 0 ∧ v_nat = 0 →
+      c.1.val = 0#u8 ∧ r_nat = 0) ∧
+    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →
+      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧
+    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
+      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)
+    ⦄ := by
+  have ⟨c, h_ok, h1, h2, h3, h4, h_nonneg⟩ := spec_imp_exists (sqrt_ratio_i_spec' u v h_u_bounds h_v_bounds)
+  exact ⟨c, h_ok, by
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+    · -- Unconditional bounds: by exhaustion over the 4 cases
+      by_cases hu : Field51_as_Nat u % p = 0
+      · exact (h1 hu).2.2
+      · by_cases hv : Field51_as_Nat v % p = 0
+        · exact (h2 ⟨hu, hv⟩).2.2
+        · by_cases hqr : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat u % p
+          · exact (h3 ⟨hu, hv, hqr⟩).2.2
+          · exact (h4 ⟨hu, hv, hqr⟩).2.2
+    · -- Non-negativity
+      exact h_nonneg
+    · -- Case 1
+      intro hu; exact ⟨(h1 hu).1, (h1 hu).2.1⟩
+    · -- Case 2
+      intro ⟨hu, hv⟩; exact ⟨(h2 ⟨hu, hv⟩).1, (h2 ⟨hu, hv⟩).2.1⟩
+    · -- Case 3
+      intro ⟨hu, hv, hqr⟩; exact ⟨(h3 ⟨hu, hv, hqr⟩).1, (h3 ⟨hu, hv, hqr⟩).2.1⟩
+    · -- Case 4
+      intro ⟨hu, hv, hnqr⟩; exact ⟨(h4 ⟨hu, hv, hnqr⟩).1, (h4 ⟨hu, hv, hnqr⟩).2.1⟩⟩
 
 end curve25519_dalek.field.FieldElement51
