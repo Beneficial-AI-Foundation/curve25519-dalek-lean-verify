@@ -673,30 +673,6 @@ theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condition
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
-
-   Conditionally assigns b to a in constant time.
-   Returns b if choice.val = 1, otherwise returns a. -/
-def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
-  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
-  (choice : subtle.Choice) :
-  Result montgomery.MontgomeryPoint :=
-  if choice.val = 1#u8 then ok b else ok a
-
-/-- **Spec theorem for `montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign`**:
-- No panic (always succeeds)
-- Returns b if choice.val = 1#u8, otherwise returns a
-- Implements constant-time conditional assignment for MontgomeryPoint
--/
-@[progress]
-theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
-  (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
-  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
-    res = (if choice.val = 1#u8 then b else a) ⦄ := by
-  unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
-  split <;> simp_all [spec_ok]
-
 /-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u8}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u8>] -/
@@ -749,6 +725,33 @@ theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.condition
   unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select'
   unfold Array.Insts.SubtleConditionallySelectable.conditional_select
   split <;> simp_all [bind_tc_ok, spec_ok]
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+   Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
+
+   Conditionally assigns b to a in constant time.
+   This is a wrapper around conditional_select. -/
+def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
+  (choice : subtle.Choice) :
+  Result montgomery.MontgomeryPoint :=
+  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+
+/-- **Spec theorem for `montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign`**:
+- No panic (if conditional_select succeeds)
+- Returns the result of conditional_select(a, b, choice)
+- This is a wrapper around conditional_select
+- Implements constant-time conditional assignment for MontgomeryPoint
+-/
+@[progress]
+theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice)
+  (h : ∃ res, montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
+  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
+    montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
+  unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  obtain ⟨res, h_eq⟩ := h
+  simp [h_eq, spec_ok]
 
 /- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
