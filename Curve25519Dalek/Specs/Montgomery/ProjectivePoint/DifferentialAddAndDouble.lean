@@ -143,13 +143,56 @@ theorem differential_add_and_double_spec
     (affine_PmQ : backend.serial.u64.field.FieldElement51) :
     differential_add_and_double P Q affine_PmQ ⦃ res =>
       let (P', Q') := res
-      -- P' and Q' are valid ProjectivePoints
-      -- P' represents [2]P (doubling of P)
-      -- Q' represents P+Q (addition of P and Q)
-      -- The computation maintains the Montgomery ladder invariant:
-      -- If initially Q - P has u-coordinate affine_PmQ,
-      -- then Q' - P' also has u-coordinate affine_PmQ
-      True -- Placeholder for full mathematical specification
+
+      -- Algebraic relations for doubling [2]P (Costello-Smith 2017, Section 3.2):
+      -- Let t4 = (U_P + W_P)²
+      --     t5 = (U_P - W_P)²
+      --     t6 = t4 - t5 = 4·U_P·W_P
+      -- Then:
+      --   U_{2P} = t4 · t5 = (U_P² - W_P²)²
+      --   W_{2P} = t6 · (t5 + ((A+2)/4)·t6)
+      --          = 4·U_P·W_P · ((U_P - W_P)² + ((A+2)/4)·4·U_P·W_P)
+
+      -- Algebraic relations for differential addition P+Q (given u(P-Q)):
+      -- Let t7 = (U_P + W_P)·(U_Q - W_Q)
+      --     t8 = (U_P - W_P)·(U_Q + W_Q)
+      --     t9 = t7 + t8 = 2·(U_P·U_Q - W_P·W_Q)
+      --     t10 = t7 - t8 = 2·(W_P·U_Q - U_P·W_Q)
+      -- Then:
+      --   U_{P+Q} = t9² = 4·(U_P·U_Q - W_P·W_Q)²
+      --   W_{P+Q} = u(P-Q)·t10² = u(P-Q)·4·(W_P·U_Q - U_P·W_Q)²
+
+      -- Specification: The outputs satisfy the Montgomery ladder formulas
+      (∃ (t0 t1 t2 t3 t4 t5 t6 t7 t8 t9 t10 t11 t12 t13 t14 t15 t16 t17 t18 : ℕ),
+        -- Intermediate values (all computed mod p)
+        t0 ≡ Field51_as_Nat P.U + Field51_as_Nat P.W [MOD p] ∧
+        t1 ≡ Field51_as_Nat P.U - Field51_as_Nat P.W [MOD p] ∧
+        t2 ≡ Field51_as_Nat Q.U + Field51_as_Nat Q.W [MOD p] ∧
+        t3 ≡ Field51_as_Nat Q.U - Field51_as_Nat Q.W [MOD p] ∧
+        t4 ≡ t0 * t0 [MOD p] ∧  -- (U_P + W_P)²
+        t5 ≡ t1 * t1 [MOD p] ∧  -- (U_P - W_P)²
+        t6 ≡ t4 - t5 [MOD p] ∧  -- 4·U_P·W_P
+        t7 ≡ t0 * t3 [MOD p] ∧  -- (U_P + W_P)(U_Q - W_Q)
+        t8 ≡ t1 * t2 [MOD p] ∧  -- (U_P - W_P)(U_Q + W_Q)
+        t9 ≡ t7 + t8 [MOD p] ∧  -- 2(U_P·U_Q - W_P·W_Q)
+        t10 ≡ t7 - t8 [MOD p] ∧  -- 2(W_P·U_Q - U_P·W_Q)
+        t11 ≡ t9 * t9 [MOD p] ∧  -- 4(U_P·U_Q - W_P·W_Q)²
+        t12 ≡ t10 * t10 [MOD p] ∧  -- 4(W_P·U_Q - U_P·W_Q)²
+        -- t13 involves APLUS2_OVER_FOUR, which is (A+2)/4 for Curve25519
+        -- where A = 486662, so (A+2)/4 = 121666
+        (∃ (aplus2_over_four : ℕ),
+          Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR ≡ aplus2_over_four [MOD p] ∧
+          t13 ≡ aplus2_over_four * t6 [MOD p]) ∧
+        t14 ≡ t4 * t5 [MOD p] ∧  -- (U_P + W_P)²(U_P - W_P)²
+        t15 ≡ t13 + t5 [MOD p] ∧
+        t16 ≡ t6 * t15 [MOD p] ∧
+        t17 ≡ Field51_as_Nat affine_PmQ * t12 [MOD p] ∧
+        t18 ≡ t11 [MOD p] ∧
+        -- Final outputs
+        Field51_as_Nat P'.U ≡ t14 [MOD p] ∧
+        Field51_as_Nat P'.W ≡ t16 [MOD p] ∧
+        Field51_as_Nat Q'.U ≡ t18 [MOD p] ∧
+        Field51_as_Nat Q'.W ≡ t17 [MOD p])
     ⦄ := by
   sorry
 
