@@ -833,7 +833,107 @@ theorem sqrt_ratio_i_spec'
         · -- main block A: by_cases on correct_sign_sqrt
           by_cases choice3 : correct_sign_sqrt.val = 1#u8
           · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
-            sorry -- A1: second_choice=true, choice3=true
+            -- A1: second_choice=true, choice3=true
+            -- Setup: derive check ≡ u [MOD p]
+            have h_check_u := correct_sign_sqrt_post.mp
+              ((Choice.val_eq_one_iff _).mp choice3)
+            have check_eq_u := eq_to_bytes_eq_Field51_as_Nat h_check_u
+            rw [← Nat.ModEq] at check_eq_u
+            -- Derive SQRT_M1 * check ≡ u from second_choice
+            have h_check_fe7 := flipped_sign_sqrt_i_post.mp
+              ((Choice.val_eq_one_iff _).mp second_choice)
+            have check_eq_fe7 := eq_to_bytes_eq_Field51_as_Nat h_check_fe7
+            rw [← Nat.ModEq] at check_eq_fe7
+            have check_eq_fe6_m := check_eq_fe7.trans fe7_post_1
+            have check_1 := check_eq_fe6_m.mul_left (Field51_as_Nat constants.SQRT_M1)
+            have : Field51_as_Nat constants.SQRT_M1 *
+                (Field51_as_Nat fe6 * Field51_as_Nat constants.SQRT_M1) =
+                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat fe6 := by ring
+            rw [this] at check_1
+            have u_eq1 := check_1.trans u_m.symm
+            -- sqrt_m1_u : SQRT_M1 * u ≡ u [MOD p]
+            have sqrt_m1_u :=
+              (check_eq_u.mul_left (Field51_as_Nat constants.SQRT_M1)).symm.trans u_eq1
+            -- Key: u ≡ 0 [MOD p]
+            have h_u_zero : Field51_as_Nat u % p = 0 := by
+              have hp : Nat.Prime p := Fact.out
+              have h_le : Field51_as_Nat u ≤
+                  Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat u :=
+                le_mul_of_one_le_left (Nat.zero_le _)
+                  (by unfold constants.SQRT_M1 Field51_as_Nat; decide)
+              have h_dvd := (Nat.modEq_iff_dvd' h_le).mp sqrt_m1_u.symm
+              have h_eq := Nat.sub_mul (Field51_as_Nat constants.SQRT_M1) 1 (Field51_as_Nat u)
+              rw [one_mul] at h_eq; rw [← h_eq] at h_dvd
+              rcases hp.dvd_mul.mp h_dvd with h1 | h2
+              · exfalso
+                exact (show ¬(p ∣ (Field51_as_Nat constants.SQRT_M1 - 1)) from by
+                  unfold p constants.SQRT_M1 Field51_as_Nat; decide) h1
+              · rcases h2 with ⟨k, hk⟩; rw [hk]; exact Nat.mul_mod_right p k
+            -- r1 = r_prime (Choice.one since second_choice=true)
+            simp only [Choice.one, ↓reduceIte] at r1_post
+            have r1_eq_rprime : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
+              simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+                List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
+                Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
+                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+                Nat.lt_add_one]
+              simp only [Array.getElem!_Nat_eq] at r1_post
+              expand r1_post with 5
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                Nat.reduceLT, Nat.lt_add_one]
+            -- Chain: u ≡ 0 → r ≡ 0 → r_prime ≡ 0
+            have hu : Nat.ModEq p (Field51_as_Nat u) 0 := by
+              rw [Nat.ModEq, Nat.zero_mod]; exact h_u_zero
+            have := hu.mul_right (Field51_as_Nat v3)
+            simp only [zero_mul] at this
+            have := fe2_post_1.trans this
+            have := this.mul_right (Field51_as_Nat fe4)
+            simp only [zero_mul] at this
+            have r_eq0 := r_post_1.trans this
+            have := r_eq0.mul_left (Field51_as_Nat constants.SQRT_M1)
+            simp only [mul_zero] at this
+            have r_prime_eq0 := r_prime_post_1.trans this
+            -- r_prime % p % 2 = 0 → r_is_negative = false
+            have r_is_neg_rprime :
+                r_is_negative.val = 1#u8 ↔ Field51_as_Nat r_prime % p % 2 = 1 := by
+              rw [← r1_eq_rprime]; exact r_is_negative_post
+            have h_rprime_parity : Field51_as_Nat r_prime % p % 2 = 0 := by
+              simp only [Nat.ModEq] at r_prime_eq0
+              rw [r_prime_eq0]; simp only [Nat.zero_mod]
+            have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
+              intro h; exact absurd (r_is_neg_rprime.mp h) (by omega)
+            simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
+            have r2_eq_rprime : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
+              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                Finset.sum_singleton]
+              simp only [Array.getElem!_Nat_eq] at r2_post r1_post
+              expand r2_post with 5
+              expand r1_post with 5
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
+                Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
+                Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+            refine ⟨?_, ?_, ?_, ?_, ?_⟩
+            · -- case 1: u=0
+              intro _
+              refine ⟨(Choice.val_eq_one_iff Choice.one).mpr rfl, ?_, ?_⟩
+              · rw [r2_eq_rprime]; exact r_prime_eq0
+              · intro i hi
+                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                have := r2_post i hi; have := r1_post i hi; have := r_prime_post_2 i hi
+                omega
+            · -- case 2: u≠0 → contradiction from h_u_zero
+              intro hu; exfalso; exact hu h_u_zero
+            · -- case 3: u≠0 → contradiction from h_u_zero
+              intro hu; exfalso; exact hu h_u_zero
+            · -- case 4: u≠0 → contradiction from h_u_zero
+              intro hu; exfalso; exact hu h_u_zero
+            · -- case 5: nonneg
+              rw [r2_eq_rprime]; exact h_rprime_parity
           · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
             sorry -- A2: second_choice=true, choice3=false
       · -- B: second_choice = false (c = Choice.zero, r1 = r)
