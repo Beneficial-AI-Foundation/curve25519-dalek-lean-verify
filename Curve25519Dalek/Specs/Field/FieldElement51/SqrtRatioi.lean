@@ -670,13 +670,85 @@ theorem sqrt_ratio_i_spec'
     rw[mul_comm] at check_eq_r_v
     by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
     · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok, Array.getElem!_Nat_eq,
-      List.getElem!_eq_getElem?_getD, Nat.reducePow, Nat.add_one_sub_one, ne_eq, and_imp,
+      List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
       Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
       progress*
-      · --
-        
-        sorry
-      · sorry
+      · intro i hi
+        simp only [Choice.one, ↓reduceIte] at r1_post
+        rw [r1_post i hi]
+        have := r_prime_post_2 i hi
+        omega
+      · simp only [Choice.one, ↓reduceIte] at r1_post
+        simp only [Choice.one]
+        have r1_eq : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
+          simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+              Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+              List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos,
+              Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul,
+              Nat.reduceLT, Nat.lt_add_one]
+          simp only [Array.getElem!_Nat_eq] at r1_post
+          expand r1_post with 5
+          simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+            getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+
+        simp only [← modEq_zero_iff]
+        refine ⟨?_, ?_, ?_, ?_, ?_⟩
+        · -- case 1: u = 0
+          intro hu
+          refine ⟨trivial, ?_, ?_⟩
+          · -- r2 ≡ 0 [MOD p]
+            have := Nat.ModEq.mul_right (Field51_as_Nat v3) hu
+            simp only [zero_mul] at this
+            have := Nat.ModEq.trans fe2_post_1 this
+            have := Nat.ModEq.mul_right (Field51_as_Nat fe4) this
+            simp only [zero_mul] at this
+            have := Nat.ModEq.trans r_post_1 this
+            have := Nat.ModEq.mul_left (Field51_as_Nat constants.SQRT_M1) this
+            have r_prime_eq0 := Nat.ModEq.trans r_prime_post_1 this
+            simp only [mul_zero] at r_prime_eq0
+            rw [r1_eq] at r_neg_post_1 r_is_negative_post
+            have : Field51_as_Nat r_prime % p % 2 = 0 := by
+              simp only [Nat.ModEq] at r_prime_eq0
+              rw [r_prime_eq0]; simp only [Nat.zero_mod]
+            have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
+              intro h; exact absurd (r_is_negative_post.mp h) (by omega)
+            simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
+            have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
+              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                Finset.sum_singleton]
+              expand r2_post with 5
+              simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+                getElem!_pos, Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
+                Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val, Nat.ofNat_pos,
+                Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+            rw [this]
+            exact r_prime_eq0
+          · -- bounds on r2
+            intro i hi
+            by_cases h : r_is_negative.val = 1#u8
+            · simp only [h, ite_true] at r2_post
+              have := r2_post i hi
+              have := r_neg_post_2 i hi
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+                getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
+              have := r_neg_post_2 i hi
+              omega
+            · simp only [h, ite_false] at r2_post
+              have := r2_post i hi
+              have := r1_post i hi
+              have := r_prime_post_2 i hi
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+                getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
+                getElem?_pos, Option.getD_some, ge_iff_le]
+              have := r2_post i hi; have := r_prime_post_2 i hi; omega
+        · --
+          
+          sorry -- case 2: u ≠ 0, v = 0
+        · sorry -- case 3: QR exists
+        · sorry -- case 4: no QR
+        · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
+            r_is_negative_post r_neg_post_1 r2_post
 
     · sorry
 
