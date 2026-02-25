@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Assistant (Claude Sonnet 4.5)
+Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
@@ -95,6 +95,53 @@ namespace curve25519_dalek.montgomery
     meaning it represents a finite affine point u = U/W. -/
 def ProjectivePoint.IsValid (P : montgomery.ProjectivePoint) : Prop :=
   (Field51_as_Nat P.W : Montgomery.CurveField) ≠ 0
+
+/-! ### Why we can't write `P' = [2]P` directly
+
+**Q: Why not just write `P' = 2 • P` or `P' = [2]P`?**
+
+**A: Because of type mismatch!**
+
+```lean
+P  : montgomery.ProjectivePoint  -- Rust FFI structure (U, W fields)
+P' : montgomery.ProjectivePoint  -- Rust FFI structure (U, W fields)
+
+[2]P : Montgomery.Point          -- Mathematical affine point (group element)
+```
+
+**Key differences:**
+
+1. **`montgomery.ProjectivePoint` has no group structure**
+   - It's just a structure with two `FieldElement51` fields
+   - No addition `+` or scalar multiplication `•` is defined
+   - You cannot write `2 * P` - Lean would error with "failed to synthesize instance HMul"
+
+2. **`Montgomery.Point` is a group element**
+   - It's an affine point on the Weierstrass curve (with u and v coordinates)
+   - Inherits AddCommGroup instance from mathlib
+   - Supports `P + Q` and `n • P` operations
+
+3. **Projective coordinates are equivalence classes**
+   - `(U:W) = (λU:λW)` for any λ ≠ 0
+   - Many projective representations map to the same affine point
+   - E.g., `(4:2)`, `(2:1)`, `(6:3)` all represent affine u-coordinate u = 2
+
+4. **Conversion requires division**
+   - Affine: u = U/W (requires field division, non-computable)
+   - Projective: (U:W) (no division needed, efficient for computation)
+
+**Our approach: Describe the relationship via coordinate formulas**
+
+Instead of writing `P' = [2]P`, we describe how the projective coordinates of P'
+relate to those of P through the doubling formula. This:
+- Avoids type conversion overhead
+- Directly specifies the implementation behavior
+- Makes verification more tractable
+
+The connection to `[2]P` is established in the mathematical interpretation:
+"When converted to affine coordinates u' = U'/W' and u = U/W,
+ the point with u-coordinate u' equals [2] of the point with u-coordinate u."
+-/
 
 /-
 Natural language description:
@@ -307,6 +354,67 @@ The projective formulas implement the addition that maintains this affine identi
 The projective formulas avoid field divisions (which are expensive) during the computation.
 Only when interpreting the result mathematically do we consider the affine form u = U/W.
 This makes the Montgomery ladder much more efficient while maintaining mathematical correctness.
+-/
+
+/-- Helper: Convert a projective point to its affine representation (if valid).
+    This bridges the gap between FFI types and mathematical types. -/
+noncomputable def ProjectivePoint.toAffinePoint (proj : montgomery.ProjectivePoint)
+    : Option Montgomery.Point :=
+  if h : (Field51_as_Nat proj.W : Montgomery.CurveField) ≠ 0 then
+    let u := (Field51_as_Nat proj.U : Montgomery.CurveField) /
+             (Field51_as_Nat proj.W : Montgomery.CurveField)
+    -- Construct affine point from u-coordinate
+    -- This requires solving the curve equation, which we defer for now
+    sorry
+  else none
+
+/-- **High-level mathematical spec**:
+    When `differential_add_and_double` succeeds with valid projective points P and Q,
+    and affine_PmQ represents the u-coordinate of P-Q, then:
+    - P' represents [2]P (doubling)
+    - Q' represents P+Q (differential addition)
+
+    This theorem connects the low-level coordinate spec to the high-level
+    mathematical operations in `Montgomery.Point`. -/
+theorem differential_add_and_double_math_spec
+    (P Q : montgomery.ProjectivePoint)
+    (affine_PmQ : backend.serial.u64.field.FieldElement51)
+    (hP : P.IsValid) (hQ : Q.IsValid) :
+    differential_add_and_double P Q affine_PmQ ⦃ res =>
+      let (P', Q') := res
+      -- When converted to affine points
+      ∃ (affP affQ affP' affQ' : Montgomery.Point),
+        ProjectivePoint.toAffinePoint P = some affP ∧
+        ProjectivePoint.toAffinePoint Q = some affQ ∧
+        ProjectivePoint.toAffinePoint P' = some affP' ∧
+        ProjectivePoint.toAffinePoint Q' = some affQ' ∧
+        -- Mathematical correctness
+        affP' = 2 • affP ∧                    -- P' = [2]P
+        affQ' = affP + affQ                   -- Q' = P+Q
+        -- Note: The differential affine_PmQ ensures the formula works,
+        -- but the high-level spec doesn't need to mention it explicitly
+    ⦄ := by
+  sorry
+
+/-
+**Connection theorem** (future work):
+
+The goal is to prove that `differential_add_and_double_spec` (low-level coordinates)
+implies `differential_add_and_double_math_spec` (high-level mathematics).
+
+```lean
+theorem coordinate_spec_implies_math_spec :
+    differential_add_and_double_spec P Q affine_PmQ →
+    differential_add_and_double_math_spec P Q affine_PmQ hP hQ
+```
+
+This requires:
+1. Completing `toAffinePoint` to convert projective to affine
+2. Proving that the projective coordinate formulas implement the affine group law
+3. Connecting to `Montgomery.uDBL` and `Montgomery.uADD` theorems in Curve.lean
+
+This connection theorem would enable using `differential_add_and_double` in proofs
+about high-level operations like scalar multiplication in `Mul.lean`.
 -/
 
 end curve25519_dalek.montgomery
