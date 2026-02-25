@@ -55,7 +55,8 @@ natural language specs:
 - Returns (P', Q') representing [2]P and P+Q in projective coordinates
 - Since the Rust code has no separate `double` or `add` for `montgomery.ProjectivePoint`,
   we directly characterize correctness using Costello-Smith 2017 formulas at the field level:
-  * P' satisfies the doubling formula: U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P)
+  * P' satisfies the doubling formula: U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P),
+    where c = (A+2)/4 is the Montgomery curve constant
   * Q' satisfies the differential addition formula using u(P-Q) = affine_PmQ:
     U' = 4·(U_P·U_Q - W_P·W_Q)², W' = u(P-Q)·4·(U_P·W_Q - W_P·U_Q)²
 - All operations are constant-time field operations
@@ -79,15 +80,15 @@ theorem differential_add_and_double_spec
         w'_Q = Field51_as_Nat Q'.W ∧
 
         -- Mathematical property 1: Doubling formula (from Costello-Smith 2017)
-        -- When w_P ≠ 0 and w'_P ≠ 0, the output P' represents [2]P:
+        -- If w_P ≠ 0 and w'_P ≠ 0, then both the input and output points are
+        -- valid projective points, and the resulting point P' represents [2]P.
         (w_P ≠ 0 → w'_P ≠ 0 →
           u'_P = (u_P + w_P)^2 * (u_P - w_P)^2 ∧
-          (∃ (aplus2_over_four : Montgomery.CurveField),
-            aplus2_over_four = Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR ∧
-            w'_P = (4 * u_P * w_P) * ((u_P - w_P)^2 + aplus2_over_four * (4 * u_P * w_P)))) ∧
-
+          (w'_P = (4 * u_P * w_P) * ((u_P - w_P)^2 +
+            Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR  * (4 * u_P * w_P)))) ∧
         -- Mathematical property 2: Differential addition formula
-        -- When w_P ≠ 0, w_Q ≠ 0, and w'_Q ≠ 0, the output Q' represents P+Q:
+        -- If w_P ≠ 0 and w'_P ≠ 0, then both the input and output points are
+        -- valid projective points, and the resulting point Q' represents P+Q.
         (w_P ≠ 0 → w_Q ≠ 0 → w'_Q ≠ 0 →
           let v1 := (u_P + w_P) * (u_Q - w_Q)
           let v2 := (u_P - w_P) * (u_Q + w_Q)
