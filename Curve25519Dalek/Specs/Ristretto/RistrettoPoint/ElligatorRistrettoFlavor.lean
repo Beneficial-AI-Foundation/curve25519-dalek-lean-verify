@@ -20,7 +20,7 @@ It maps an arbitrary field element s to a valid Ristretto point.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas.Std Result curve25519_dalek.math
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.math
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -45,12 +45,13 @@ natural language specs:
 • The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging
   the implementation to the pure mathematical Elligator map defined in Representation.lean
 -/
+@[progress]
 theorem elligator_ristretto_flavor_spec
     (s : backend.serial.u64.field.FieldElement51)
     (h_s_valid : s.IsValid) :
-    ∃ rist, elligator_ristretto_flavor s = ok rist ∧
-    rist.IsValid ∧
-    rist.toPoint = (elligator_ristretto_flavor_pure s.toField).val := by
+    elligator_ristretto_flavor s ⦃ result =>
+    result.IsValid ∧
+    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
