@@ -935,7 +935,191 @@ theorem sqrt_ratio_i_spec'
             · -- case 5: nonneg
               rw [r2_eq_rprime]; exact h_rprime_parity
           · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
-            sorry -- A2: second_choice=true, choice3=false
+            -- A2: second_choice=true, choice3=false
+            -- Derive check ≡ fe7 ≡ fe6*SQRT_M1 from second_choice
+            have h_check_fe7 := flipped_sign_sqrt_i_post.mp
+              ((Choice.val_eq_one_iff _).mp second_choice)
+            have check_eq_fe7 := eq_to_bytes_eq_Field51_as_Nat h_check_fe7
+            rw [← Nat.ModEq] at check_eq_fe7
+            have check_eq_fe6_m := check_eq_fe7.trans fe7_post_1
+            -- Derive u_eq1 : SQRT_M1 * check ≡ u
+            have u_eq1 := check_eq_fe6_m.mul_left (Field51_as_Nat constants.SQRT_M1)
+            have : Field51_as_Nat constants.SQRT_M1 *
+                (Field51_as_Nat fe6 * Field51_as_Nat constants.SQRT_M1) =
+                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat fe6 := by ring
+            rw [this] at u_eq1
+            have u_eq1 := u_eq1.trans u_m.symm
+            -- Derive rprime_v : r_prime²*v ≡ SQRT_M1*u
+            have mul_u_eq1 := u_eq1.mul_left (Field51_as_Nat constants.SQRT_M1)
+            have : Field51_as_Nat constants.SQRT_M1 *
+                (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat check) =
+                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat check := by ring
+            rw [this] at mul_u_eq1
+            have rprime_v := check_eq_mod.trans mul_u_eq1
+            -- Derive ¬(check.to_bytes = u.to_bytes) from choice3
+            have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
+              fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
+            -- Simplify r1 = r_prime (Choice.one)
+            simp only [Choice.one, ↓reduceIte] at r1_post
+            have r1_eq_rprime : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
+              simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+                List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
+                Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
+                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+                Nat.lt_add_one]
+              simp only [Array.getElem!_Nat_eq] at r1_post
+              expand r1_post with 5
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                Nat.reduceLT, Nat.lt_add_one]
+            rw [r1_eq_rprime] at r_is_negative_post r_neg_post_1
+            refine ⟨?_, ?_, ?_, ?_, ?_⟩
+            · -- case 1: u = 0 → exfalso (check=0=u contradicts choice3)
+              intro hu; exfalso
+              rw [← modEq_zero_iff] at hu
+              have := u_eq1.trans hu; rw [mul_comm] at this
+              have check_zero := zero_of_mul_SQRT_M1_zero this
+              rw [modEq_zero_iff] at check_zero hu
+              exact h_check_ne_u
+                ((to_bytes_zero_of_Field51_as_Nat_zero check_zero).trans
+                 (to_bytes_zero_of_Field51_as_Nat_zero hu).symm)
+            · -- case 2: u≠0, v=0
+              intro hu hv
+              rw [← modEq_zero_iff] at hv
+              have := hv.mul_left (Field51_as_Nat fe)
+              simp only [mul_zero] at this
+              have := v3_post_1.trans this
+              have := this.mul_left (Field51_as_Nat u)
+              simp only [mul_zero] at this
+              have := fe2_post_1.trans this
+              have := this.mul_right (Field51_as_Nat fe4)
+              simp only [zero_mul] at this
+              have r_zero := r_post_1.trans this
+              have := r_zero.mul_left (Field51_as_Nat constants.SQRT_M1)
+              simp only [mul_zero] at this
+              have rprime_zero := r_prime_post_1.trans this
+              have h_rprime_parity : Field51_as_Nat r_prime % p % 2 = 0 := by
+                simp only [Nat.ModEq] at rprime_zero; rw [rprime_zero]
+                simp only [Nat.zero_mod]
+              have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
+                intro h; exact absurd (r_is_negative_post.mp h) (by omega)
+              simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
+              have r2_eq_rprime : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
+                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                  Finset.sum_singleton]
+                simp only [Array.getElem!_Nat_eq] at r2_post r1_post
+                expand r2_post with 5
+                expand r1_post with 5
+                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                  UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                  Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
+                  Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
+                  Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+              refine ⟨rfl, ?_, ?_⟩
+              · rw [r2_eq_rprime]; exact rprime_zero
+              · intro i hi
+                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                have := r2_post i hi; have := r1_post i hi
+                have := r_prime_post_2 i hi
+                omega
+            · -- case 3: u≠0, v≠0, QR → exfalso via SQRT_M1_not_square
+              intro hu hv x hxx; exfalso
+              rw [← Nat.ModEq] at hxx
+              have eq_im := hxx.mul rprime_v
+              rw [(by ring : x ^ 2 * Field51_as_Nat v *
+                  (Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v) =
+                  (x * Field51_as_Nat v * Field51_as_Nat r_prime) ^ 2),
+                (by ring : Field51_as_Nat u *
+                  (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat u) =
+                  Field51_as_Nat u ^ 2 *
+                  Field51_as_Nat constants.SQRT_M1)] at eq_im
+              -- Get modular inverse via Fermat's little theorem
+              have h_not_dvd : ¬(p ∣ Field51_as_Nat u) := by
+                intro h; exact hu (Nat.dvd_iff_mod_eq_zero.mp h)
+              have h_coprime := coprime_of_prime_not_dvd prime_25519 h_not_dvd
+              have fermat_u :=
+                Nat.ModEq.pow_card_sub_one_eq_one prime_25519 h_coprime
+              have hp_sub : p - 1 = (p - 2) + 1 := by unfold p; omega
+              rw [hp_sub, pow_succ] at fermat_u
+              -- fermat_u : u^(p-2) * u ≡ 1 [MOD p]
+              have inv_sq := (fermat_u.pow 2).mul_right
+                (Field51_as_Nat constants.SQRT_M1)
+              simp only [one_pow, one_mul] at inv_sq
+              -- inv_sq : (u^(p-2)*u)^2 * SQRT_M1 ≡ SQRT_M1 [MOD p]
+              have u_eq := eq_im.mul_left
+                ((Field51_as_Nat u ^ (p - 2)) ^ 2)
+              rw [← mul_pow] at u_eq
+              have : (Field51_as_Nat u ^ (p - 2)) ^ 2 *
+                  (Field51_as_Nat u ^ 2 *
+                  Field51_as_Nat constants.SQRT_M1) =
+                  (Field51_as_Nat u ^ (p - 2) *
+                  Field51_as_Nat u) ^ 2 *
+                  Field51_as_Nat constants.SQRT_M1 := by ring
+              rw [this] at u_eq
+              have u_eq := u_eq.trans inv_sq
+              have u_eq := u_eq.pow 2
+              simp only [← pow_mul] at u_eq
+              have : (Field51_as_Nat constants.SQRT_M1) ^ 2 ≡
+                  p - 1 [MOD p] := by
+                unfold constants.SQRT_M1; decide
+              exact SQRT_M1_not_square _ (u_eq.trans this)
+            · -- case 4: u≠0, v≠0, ¬QR → r2²v ≡ SQRT_M1*u
+              intro hu hv hno_qr
+              refine ⟨rfl, ?_, ?_⟩
+              · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
+                have r2_eq_sq : Field51_as_Nat r2 ^ 2 ≡
+                    Field51_as_Nat r_prime ^ 2 [MOD p] := by
+                  by_cases h_neg : r_is_negative.val = 1#u8
+                  · simp only [h_neg, ite_true] at r2_post
+                    have r2_eq_r_neg : Field51_as_Nat r2 =
+                        Field51_as_Nat r_neg := by
+                      simp only [Field51_as_Nat, Finset.sum_range_succ,
+                        Finset.range_one, Finset.sum_singleton]
+                      expand r2_post with 5
+                      simp_all only [Array.getElem!_Nat_eq,
+                        List.Vector.length_val, UScalar.ofNat_val_eq,
+                        getElem!_pos, iff_true, Nat.reduceMul,
+                        UScalar.neq_to_neq_val, true_iff, Nat.ofNat_pos,
+                        Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
+                        mul_zero, pow_zero, one_mul, mul_one]
+                    rw [r2_eq_r_neg]
+                    exact nat_sq_of_add_modeq_zero
+                      (by rw [add_comm]; exact r_neg_post_1)
+                  · simp only [h_neg, if_neg, not_false_eq_true]
+                      at r2_post
+                    have r2_eq_rprime : Field51_as_Nat r2 =
+                        Field51_as_Nat r_prime := by
+                      simp only [Field51_as_Nat, Finset.sum_range_succ,
+                        Finset.range_one, Finset.sum_singleton]
+                      expand r2_post with 5
+                      simp_all only [Array.getElem!_Nat_eq,
+                        List.Vector.length_val, UScalar.ofNat_val_eq,
+                        getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                        Nat.reduceLT, Nat.lt_add_one]
+                    rw [r2_eq_rprime]
+                exact r2_eq_sq.mul_right _ |>.trans rprime_v
+              · intro i hi
+                by_cases h : r_is_negative.val = 1#u8
+                · simp only [h, ite_true] at r2_post
+                  have := r2_post i hi; have := r_neg_post_2 i hi
+                  simp_all only [Array.getElem!_Nat_eq,
+                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    getElem!_pos, UScalar.neq_to_neq_val, true_iff,
+                    getElem?_pos, Option.getD_some, ge_iff_le]
+                  have := r_neg_post_2 i hi; omega
+                · simp only [h, if_neg, not_false_eq_true] at r2_post
+                  simp_all only [Array.getElem!_Nat_eq,
+                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    getElem!_pos, UScalar.neq_to_neq_val, false_iff,
+                    Nat.mod_two_not_eq_one, getElem?_pos, Option.getD_some]
+                  have := r2_post i hi; have := r1_post i hi
+                  have := r_prime_post_2 i hi; omega
+            · -- case 5: nonneg
+              rw [← r1_eq_rprime] at r_is_negative_post r_neg_post_1
+              exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
+                r_is_negative_post r_neg_post_1 r2_post
       · -- B: second_choice = false (c = Choice.zero, r1 = r)
         simp only [first_choice, second_choice, or_false,
           ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
