@@ -565,7 +565,6 @@ theorem sqrt_ratio_i_spec'
     · unfold constants.SQRT_M1
       try decide
     · grind only [#e2b0]
-
     have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
       ≡ (Field51_as_Nat constants.SQRT_M1) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
       [MOD p]:= by
@@ -690,7 +689,6 @@ theorem sqrt_ratio_i_spec'
           expand r1_post with 5
           simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
             getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
-
         simp only [← modEq_zero_iff]
         -- Shared: first_choice → check ≡ fe6 [MOD p]
         have h_bytes_fe6 : check.to_bytes = fe6.to_bytes :=
@@ -815,7 +813,6 @@ theorem sqrt_ratio_i_spec'
           exact absurd r_prime_sq_v_u (hno_qr _)
         · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
             r_is_negative_post r_neg_post_1 r2_post
-
     · -- second branch: first_choice = false
       have u_m := nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
       by_cases second_choice : flipped_sign_sqrt_i.val = 1#u8
@@ -1267,1094 +1264,327 @@ theorem sqrt_ratio_i_spec'
               exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
                 r_is_negative_post r_neg_post_1 r2_post
           · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
-            sorry -- B2: second_choice=false, choice3=false
-
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · grind
-    -- · unfold constants.SQRT_M1
-    --   decide
-    -- · unfold constants.SQRT_M1
-    --   decide
-    -- · grind
-    -- · -- BEGIN TASK
-    --   have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-    --     ≡ (Field51_as_Nat constants.SQRT_M1) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
-    --     [MOD p]:= by
-    --     have := r_prime_post_1.pow 2
-    --     rw[mul_pow] at this
-    --     have := this.mul_right (Field51_as_Nat v)
-    --     apply this.trans
-    --     rw[mul_assoc]
-    --     apply Nat.ModEq.mul_left
-    --     have := Nat.ModEq.pow 2 r_post_1
-    --     rw[mul_pow] at this
-    --     have := this.mul_right (Field51_as_Nat v)
-    --     apply this.trans
-    --     rw[← Nat.ModEq] at fe4_post_1
-    --     have eq1:= fe4_post_1.pow 2
-    --     rw[← pow_mul] at eq1
-    --     have :=fe3_post_1.pow ((2 ^ 252 - 3) * 2)
-    --     have eq2:= eq1.trans  this
-    --     rw[mul_pow] at eq2
-    --     have := fe_post_1.mul_right (Field51_as_Nat v)
-    --     have eq_v3:= v3_post_1.trans this
-    --     rw[pow_add_one] at eq_v3
-    --     have := eq_v3.pow 2
-    --     rw[← pow_mul] at this
-    --     have := fe1_post_1.trans  this
-    --     have := this.mul_right (Field51_as_Nat v)
-    --     rw[pow_add_one] at this
-    --     have := v7_post_1.trans  this
-    --     have := this.pow ((2 ^ 252 - 3) * 2)
-    --     rw[← pow_mul] at this
-    --     have := this.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2))
-    --     have eq3:= eq2.trans  this
-    --     have := eq_v3.mul_left (Field51_as_Nat u)
-    --     have := fe2_post_1.trans  this
-    --     have eq4:= this.pow 2
-    --     rw[mul_pow] at eq4
-    --     have := eq4.mul  eq3
-    --     have := this.mul_right (Field51_as_Nat v)
-    --     apply this.trans
-    --     have :  Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-    --      (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) * Field51_as_Nat v
-    --       =  (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
-    --       ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-    --        Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
-    --       Field51_as_Nat v)
-    --         := by
-    --         simp
-    --         ring
-    --     rw[this]
-    --     clear this
-    --     rw[← pow_add, ← pow_mul, ← pow_add, pow_add_one,
-    --     (by simp : (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1= 7 * 2 ^ 253 - 35)]
-    --   have check_eq_v: Field51_as_Nat check ≡    Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
-    --     apply check_post_1.trans
-    --     have := fe5_post_1.mul_left (Field51_as_Nat v)
-    --     apply this.trans
-    --     have := r_post_1.pow 2
-    --     rw[mul_pow] at this
-    --     have := this.mul_left (Field51_as_Nat v)
-    --     apply this.trans
-    --     rw[← Nat.ModEq] at fe4_post_1
-    --     have eq1:= Nat.ModEq.pow 2 fe4_post_1
-    --     rw[← pow_mul] at eq1
-    --     have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post_1
-    --     have eq2:= Nat.ModEq.trans eq1 this
-    --     rw[mul_pow] at eq2
-    --     have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post_1
-    --     have eq_v3:= Nat.ModEq.trans v3_post_1 this
-    --     rw[pow_add_one] at eq_v3
-    --     have := Nat.ModEq.pow 2 eq_v3
-    --     rw[← pow_mul] at this
-    --     have := Nat.ModEq.trans fe1_post_1 this
-    --     have := Nat.ModEq.mul_right (Field51_as_Nat v) this
-    --     rw[pow_add_one] at this
-    --     have := Nat.ModEq.trans v7_post_1 this
-    --     have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
-    --     rw[← pow_mul] at this
-    --     have := Nat.ModEq.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2)) this
-    --     have eq3:= Nat.ModEq.trans eq2 this
-    --     have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
-    --     have := Nat.ModEq.trans fe2_post_1 this
-    --     have eq4:= Nat.ModEq.pow 2 this
-    --     rw[mul_pow] at eq4
-    --     have := Nat.ModEq.mul eq4 eq3
-    --     have := Nat.ModEq.mul_left (Field51_as_Nat v) this
-    --     apply Nat.ModEq.trans this
-    --     have :  Field51_as_Nat v *
-    --       (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-    --       (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))))
-    --       =  Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)
-    --         := by
-    --         simp
-    --         ring
-    --     rw[this]
-    --   have check_eq_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-    --     ≡ (Field51_as_Nat constants.SQRT_M1) ^2 *Field51_as_Nat check [MOD p] := by
-    --     have := Nat.ModEq.mul_left ((Field51_as_Nat constants.SQRT_M1) ^2) check_eq_v
-    --     apply Nat.ModEq.trans eq1_mod
-    --     apply Nat.ModEq.symm this
-    --   have :=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
-    --   have check_eq_r_v:= check_post_1.trans (fe5_post_1.mul_left (Field51_as_Nat v))
-    --   rw[mul_comm] at check_eq_r_v
-    --   by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
-    --   · -- BEGIN TASK
-    --     simp[first_choice]
-    --     progress*
-    --     · -- BEGIN TASK
-    --       simp[Choice.one] at r1_post
-    --       simp_all
-    --       clear check_eq_mod check_eq_v eq1_mod
-    --       grind
-    --       -- END TASK
-    --     · -- BEGIN TASK
-    --         simp[Choice.one] at r1_post
-    --         simp[Choice.one]
-    --         have : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-    --             simp[Field51_as_Nat, Finset.sum_range_succ]
-    --             simp_all
-    --         simp[← modEq_zero_iff]
-    --         constructor
-    --         · -- BEGIN TASK
-    --           intro hu
-    --           have := Nat.ModEq.mul_right (Field51_as_Nat v3) hu
-    --           simp at this
-    --           have := Nat.ModEq.trans fe2_post_1 this
-    --           have := Nat.ModEq.mul_right (Field51_as_Nat fe4) this
-    --           simp at this
-    --           have := Nat.ModEq.trans r_post_1 this
-    --           have := Nat.ModEq.mul_left (Field51_as_Nat constants.SQRT_M1) this
-    --           have r_prime_eq0:= Nat.ModEq.trans r_prime_post_1 this
-    --           simp at r_prime_eq0
-    --           have : Field51_as_Nat r_prime % p % 2 = 0 := by
-    --                   simp[Nat.ModEq] at r_prime_eq0
-    --                   rw[r_prime_eq0]
-    --           simp[r_is_negative_post] at r2_post
-    --           have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-    --             simp[Field51_as_Nat, Finset.sum_range_succ]
-    --             simp_all
-    --           rw[this]
-    --           constructor
-    --           · apply  r_prime_eq0
-    --           · by_cases h:Field51_as_Nat r1 % p % 2 = 1
-    --             · simp_all
-    --             · simp_all
-    --               clear *- r_prime_post_2
-    --               grind
-    --           -- END TASK
-    --         · -- BEGIN TASK
-    --           constructor
-    --           · -- BEGIN TASK
-    --             intro hu hv
-    --             simp_all
-    --             apply hu
-    --             have := Nat.ModEq.mul_right (Field51_as_Nat fe5) hv
-    --             have check0:= Nat.ModEq.trans  check_post_1 this
-    --             simp at check0
-    --             have : flipped_sign_sqrt = Choice.one := by
-    --               exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp first_choice
-    --             simp[this] at flipped_sign_sqrt_post
-    --             have := eq_to_bytes_eq_Field51_as_Nat  flipped_sign_sqrt_post
-    --             rw[← Nat.ModEq] at this
-    --             have :=  Nat.ModEq.trans (Nat.ModEq.symm this) check0
-    --             have := Nat.ModEq.add_left (Field51_as_Nat u) this
-    --             rw[← modEq_zero_iff] at fe6_post_1
-    --             have :=  Nat.ModEq.trans (Nat.ModEq.symm this) fe6_post_1
-    --             simp at this
-    --             apply this
-    --             -- END TASK
-    --           · -- BEGIN TASK
-    --             have r2_eq: (Field51_as_Nat r2 )^2 ≡ (Field51_as_Nat r_prime) ^2 [MOD p] := by
-    --                   rcases (mod_two_zero_or_one (Field51_as_Nat r_prime % p)) with one | zero
-    --                   · -- BEGIN TASK
-    --                     rw[mod_two_Eq_one_iff] at one
-    --                     simp[this, one] at r_is_negative_post
-    --                     simp[r_is_negative_post] at r2_post
-    --                     have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                       simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                       simp_all
-    --                     rw[← this] at r_neg_post_1
-    --                     simp_all
-    --                     rw[← modEq_zero_iff] at r_neg_post_1
-    --                     apply nat_sq_of_add_modeq_zero
-    --                     rw[add_comm]
-    --                     apply  r_neg_post_1
-    --                     -- END TASK
-    --                   · -- BEGIN TASK
-    --                     rw[modEq_zero_iff] at zero
-    --                     simp[this, zero] at r_is_negative_post
-    --                     simp[r_is_negative_post] at r2_post
-    --                     have : Field51_as_Nat r2 = Field51_as_Nat r_prime:= by
-    --                       simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                       simp_all
-    --                     rw[this]
-    --                     -- END TASK
-    --             constructor
-    --             · -- BEGIN TASK
-    --               intro hu hv xx hxx
-    --               constructor
-    --               · -- BEGIN TASK
-    --                 have := Nat.ModEq.mul_right (Field51_as_Nat v) r2_eq
-    --                 rw[mod_sq_mod_mul_eq, ← Nat.ModEq]
-    --                 rw[← Nat.ModEq] at hxx
-    --                 have := Nat.ModEq.trans this check_eq_mod
-    --                 apply Nat.ModEq.trans this
-    --                 have : flipped_sign_sqrt = Choice.one := by
-    --                     exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp first_choice
-    --                 simp[this] at flipped_sign_sqrt_post
-    --                 have this:= eq_to_bytes_eq_Field51_as_Nat  flipped_sign_sqrt_post
-    --                 rw[← Nat.ModEq] at this
-    --                 have :=this.mul_left  (Field51_as_Nat constants.SQRT_M1 ^ 2)
-    --                 rw[← modEq_zero_iff] at fe6_post_1
-    --                 have :=this.trans  (nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1).symm
-    --                 apply this
-    --                 -- END TASK
-    --               · -- BEGIN TASK
-    --                 rcases (mod_two_zero_or_one (Field51_as_Nat r_prime % p)) with one | zero
-    --                 · -- BEGIN TASK
-    --                     intro i hi
-    --                     interval_cases i
-    --                     all_goals try (rw[mod_two_Eq_one_iff] at one; simp[this, one] at r_is_negative_post; simp[r_is_negative_post] at r2_post; simp_all; expand r_neg_post_2 with 5; scalar_tac)
-    --                     -- END TASK
-    --                 · -- BEGIN TASK
-    --                     intro i hi
-    --                     interval_cases i
-    --                     · rw[modEq_zero_iff] at zero
-    --                       simp[this, zero] at r_is_negative_post
-    --                       simp[r_is_negative_post] at r2_post
-    --                       simp_all
-    --                       expand r_prime_post_2  with 5
-    --                       scalar_tac
-    --                     · rw[modEq_zero_iff] at zero
-    --                       simp[this, zero] at r_is_negative_post
-    --                       simp[r_is_negative_post] at r2_post
-    --                       simp_all
-    --                       expand r_prime_post_2  with 5
-    --                       scalar_tac
-    --                     · rw[modEq_zero_iff] at zero
-    --                       simp[this, zero] at r_is_negative_post
-    --                       simp[r_is_negative_post] at r2_post
-    --                       simp_all
-    --                       expand r_prime_post_2  with 5
-    --                       scalar_tac
-    --                     · rw[modEq_zero_iff] at zero
-    --                       simp[this, zero] at r_is_negative_post
-    --                       simp[r_is_negative_post] at r2_post
-    --                       simp_all
-    --                       expand r_prime_post_2  with 5
-    --                       scalar_tac
-    --                     · rw[modEq_zero_iff] at zero
-    --                       simp[this, zero] at r_is_negative_post
-    --                       simp[r_is_negative_post] at r2_post
-    --                       simp_all
-    --                       expand r_prime_post_2  with 5
-    --                       scalar_tac
-    --                     -- END TASK
-    --               -- END TASK
-    --             · -- BEGIN TASK
-    --                   have : flipped_sign_sqrt = Choice.one := by
-    --                     exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp first_choice
-    --                   simp[this] at flipped_sign_sqrt_post
-    --                   have this:= eq_to_bytes_eq_Field51_as_Nat  flipped_sign_sqrt_post
-    --                   rw[← Nat.ModEq] at this
-    --                   have :=this.mul_left  (Field51_as_Nat constants.SQRT_M1 ^ 2)
-    --                   rw[← modEq_zero_iff] at fe6_post_1
-    --                   have :=this.trans  (nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1).symm
-    --                   have := check_eq_mod.trans this
-    --                   constructor
-    --                   · intro hu hv
-    --                     use Field51_as_Nat r_prime
-    --                     rw[← Nat.ModEq]
-    --                     apply this
-    --                   · -- Non-negativity
-    --                     exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
-    --                       r_is_negative_post r_neg_post_1 r2_post
-    --                   -- END TASK
-    --           -- END TASK
-    --         -- END TASK
-    --   · -- BEGIN TASK
-    --     simp[first_choice]
-    --     have : ¬ flipped_sign_sqrt = Choice.one := by
-    --       intro h
-    --       apply first_choice
-    --       exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mpr h
-    --     simp[this] at flipped_sign_sqrt_post
-    --     have : ¬ check = fe6 := by
-    --       intro h
-    --       apply flipped_sign_sqrt_post
-    --       rw[h]
-    --     have u_m:=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
-    --     by_cases second_choice: flipped_sign_sqrt_i.val = 1#u8
-    --     · -- BEGIN TASK
-    --       simp[second_choice]
-    --       progress*
-    --       · simp[Choice.one] at r1_post
-    --         simp_all
-    --         clear check_eq_mod check_eq_v eq1_mod
-    --         grind
-    --       · -- BEGIN TASK
-    --         have : flipped_sign_sqrt_i = Choice.one := by
-    --           exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp second_choice
-    --         simp[this] at flipped_sign_sqrt_i_post
-    --         have := eq_to_bytes_eq_Field51_as_Nat  flipped_sign_sqrt_i_post
-    --         rw[← Nat.ModEq] at this
-    --         have := this.trans fe7_post_1
-    --         have check_1:=this.mul_left  (Field51_as_Nat constants.SQRT_M1)
-    --         have :Field51_as_Nat constants.SQRT_M1 * (Field51_as_Nat fe6 * Field51_as_Nat constants.SQRT_M1) =
-    --          Field51_as_Nat constants.SQRT_M1 ^2 * Field51_as_Nat fe6 := by ring
-    --         rw[this] at check_1
-    --         have u_eq1:= check_1.trans u_m.symm
-    --         by_cases choise3 : correct_sign_sqrt.val = 1#u8
-    --         · -- BEGIN TASK
-    --           have : correct_sign_sqrt = Choice.one := by
-    --             exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp choise3
-    --           simp[this] at correct_sign_sqrt_post
-    --           have := eq_to_bytes_eq_Field51_as_Nat  correct_sign_sqrt_post
-    --           rw[← Nat.ModEq] at this
-    --           have :=this.mul_left  (Field51_as_Nat constants.SQRT_M1)
-    --           have eq_im:=this.symm.trans u_eq1
-    --           simp[choise3, Choice.one]
-    --           have : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-    --             simp[Field51_as_Nat, Finset.sum_range_succ]
-    --             simp_all
-    --           simp[← modEq_zero_iff]
-    --           constructor
-    --           · -- BEGIN TASK
-    --             intro hu
-    --             have := Nat.ModEq.mul_right (Field51_as_Nat v3) hu
-    --             simp at this
-    --             have := Nat.ModEq.trans fe2_post_1 this
-    --             have := Nat.ModEq.mul_right (Field51_as_Nat fe4) this
-    --             simp at this
-    --             have := Nat.ModEq.trans r_post_1 this
-    --             have := Nat.ModEq.mul_left (Field51_as_Nat constants.SQRT_M1) this
-    --             have r_prime_eq0:= Nat.ModEq.trans r_prime_post_1 this
-    --             simp at r_prime_eq0
-    --             have : Field51_as_Nat r_prime % p % 2 = 0 := by
-    --                     simp[Nat.ModEq] at r_prime_eq0
-    --                     rw[r_prime_eq0]
-    --             simp[r_is_negative_post] at r2_post
-    --             have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-    --               simp[Field51_as_Nat, Finset.sum_range_succ]
-    --               simp_all
-    --             rw[this]
-    --             constructor
-    --             · apply  r_prime_eq0
-    --             · by_cases h:Field51_as_Nat r1 % p % 2 = 1
-    --               · simp_all
-    --               · simp_all
-    --                 clear *- r_prime_post_2
-    --                 grind
-    --             -- END TASK
-    --           · -- BEGIN TASK
-    --             constructor
-    --             · -- BEGIN TASK
-    --               intro hu
-    --               have :  ∀ i < 5, (u[i]!).val < 2 ^ 54 := by
-    --                         intro i _
-    --                         interval_cases i
-    --                         all_goals (expand h_u_bounds with 5; scalar_tac)
-    --               obtain ⟨ inv_u, inv_u_ok, inv_u_1, inv_u_2 ⟩  := invert_spec u this
-    --               have : Field51_as_Nat u % p ≠ 0 := by
-    --                 intro hu1
-    --                 apply hu
-    --                 rw[modEq_zero_iff]
-    --                 apply hu1
-    --               have inv_u_1:= inv_u_1 this
-    --               rw[← modEq_one_iff] at inv_u_1
-    --               have inv_u_1:= (mod_mul_mod (Field51_as_Nat inv_u) (Field51_as_Nat u)).symm.trans inv_u_1
-    --               simp[mul_comm] at inv_u_1
-    --               have u_eq:= (eq_im.mul_right (Field51_as_Nat inv_u)).trans inv_u_1
-    --               have := (inv_u_1.mul_left (Field51_as_Nat constants.SQRT_M1 )).symm
-    --               rw[← mul_assoc] at this
-    --               have u_eq:= this.trans u_eq
-    --               simp at u_eq
-    --               have u_eq:= u_eq.pow 2
-    --               simp at u_eq
-    --               have : (Field51_as_Nat constants.SQRT_M1) ^2 ≡ p-1 [MOD p] := by
-    --                 unfold constants.SQRT_M1
-    --                 decide
-    --               have := this.symm.trans u_eq
-    --               unfold p at this
-    --               rw[Nat.ModEq] at this
-    --               simp at this
-    --               -- END TASK
-    --             · constructor
-    --               · -- BEGIN TASK
-    --                 intro hu
-    --                 have :  ∀ i < 5, (u[i]!).val < 2 ^ 54 := by
-    --                           intro i _
-    --                           interval_cases i
-    --                           all_goals (expand h_u_bounds with 5; scalar_tac)
-    --                 obtain ⟨ inv_u, inv_u_ok, inv_u_1, inv_u_2 ⟩  := invert_spec u this
-    --                 have : Field51_as_Nat u % p ≠ 0 := by
-    --                   intro hu1
-    --                   apply hu
-    --                   rw[modEq_zero_iff]
-    --                   apply hu1
-    --                 have inv_u_1:= inv_u_1 this
-    --                 rw[← modEq_one_iff] at inv_u_1
-    --                 have inv_u_1:= (mod_mul_mod (Field51_as_Nat inv_u) (Field51_as_Nat u)).symm.trans inv_u_1
-    --                 simp[mul_comm] at inv_u_1
-    --                 have u_eq:= (eq_im.mul_right (Field51_as_Nat inv_u)).trans inv_u_1
-    --                 have := (inv_u_1.mul_left (Field51_as_Nat constants.SQRT_M1 )).symm
-    --                 rw[← mul_assoc] at this
-    --                 have u_eq:= this.trans u_eq
-    --                 simp at u_eq
-    --                 have u_eq:= u_eq.pow 2
-    --                 simp at u_eq
-    --                 have : (Field51_as_Nat constants.SQRT_M1) ^2 ≡ p-1 [MOD p] := by
-    --                   unfold constants.SQRT_M1
-    --                   decide
-    --                 have := this.symm.trans u_eq
-    --                 unfold p at this
-    --                 rw[Nat.ModEq] at this
-    --                 simp at this
-    --                 -- END TASK
-    --               · -- BEGIN TASK
-    --                 constructor
-    --                 · intro hu
-    --                   have :  ∀ i < 5, (u[i]!).val < 2 ^ 54 := by
-    --                             intro i _
-    --                             interval_cases i
-    --                             all_goals (expand h_u_bounds with 5; scalar_tac)
-    --                   obtain ⟨ inv_u, inv_u_ok, inv_u_1, inv_u_2 ⟩  := invert_spec u this
-    --                   have : Field51_as_Nat u % p ≠ 0 := by
-    --                     intro hu1
-    --                     apply hu
-    --                     rw[modEq_zero_iff]
-    --                     apply hu1
-    --                   have inv_u_1:= inv_u_1 this
-    --                   rw[← modEq_one_iff] at inv_u_1
-    --                   have inv_u_1:= (mod_mul_mod (Field51_as_Nat inv_u) (Field51_as_Nat u)).symm.trans inv_u_1
-    --                   simp[mul_comm] at inv_u_1
-    --                   have u_eq:= (eq_im.mul_right (Field51_as_Nat inv_u)).trans inv_u_1
-    --                   have := (inv_u_1.mul_left (Field51_as_Nat constants.SQRT_M1 )).symm
-    --                   rw[← mul_assoc] at this
-    --                   have u_eq:= this.trans u_eq
-    --                   simp at u_eq
-    --                   have u_eq:= u_eq.pow 2
-    --                   simp at u_eq
-    --                   have : (Field51_as_Nat constants.SQRT_M1) ^2 ≡ p-1 [MOD p] := by
-    --                     unfold constants.SQRT_M1
-    --                     decide
-    --                   have := this.symm.trans u_eq
-    --                   unfold p at this
-    --                   rw[Nat.ModEq] at this
-    --                   simp at this
-    --                   -- END TASK
-    --                 · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
-    --                     r_is_negative_post r_neg_post_1 r2_post -- Non-negativity
-    --             -- END TASK
-    --         · -- BEGIN TASK
-    --           simp[choise3, Choice.zero]
-    --           have :¬ correct_sign_sqrt = Choice.one := by
-    --             intro h
-    --             apply choise3
-    --             simp[h, Choice.one]
-    --           simp[this] at correct_sign_sqrt_post
-    --           have : ¬ check = u := by
-    --             intro h
-    --             apply correct_sign_sqrt_post
-    --             rw[h]
-    --           · constructor
-    --             · -- BEGIN TASK
-    --               intro hu
-    --               rw[← modEq_zero_iff] at hu
-    --               have := u_eq1.trans hu
-    --               rw[mul_comm] at this
-    --               have check_zero:= zero_of_mul_SQRT_M1_zero this
-    --               have := u_m.symm.trans hu
-    --               rw[mul_comm, (by ring :
-    --               Field51_as_Nat constants.SQRT_M1 ^ 2 =
-    --                Field51_as_Nat constants.SQRT_M1 *
-    --                Field51_as_Nat constants.SQRT_M1 ),
-    --                ←  mul_assoc
-    --                ] at this
-    --               have := zero_of_mul_SQRT_M1_zero (zero_of_mul_SQRT_M1_zero this)
-    --               have hu:=to_bytes_zero_of_Field51_as_Nat_zero hu
-    --               have :=to_bytes_zero_of_Field51_as_Nat_zero check_zero
-    --               rw[← hu] at this
-    --               apply correct_sign_sqrt_post this
-    --               -- END TASK
-    --             · -- BEGIN TASK
-    --               constructor
-    --               · -- BEGIN TASK
-    --                 simp[← modEq_zero_iff]
-    --                 intro hu hv
-    --                 have : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-    --                   simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                   simp_all
-    --                 have := (v3_post_1.trans (hv.mul_left (Field51_as_Nat fe))).mul_left (Field51_as_Nat u)
-    --                 have :=r_post_1.trans ((fe2_post_1.trans this).mul_right (Field51_as_Nat fe4))
-    --                 have r_prime_eq0 := r_prime_post_1.trans (this.mul_left (Field51_as_Nat constants.SQRT_M1))
-    --                 simp at r_prime_eq0
-    --                 have : Field51_as_Nat r_prime % p % 2 = 0 := by
-    --                     simp[Nat.ModEq] at r_prime_eq0
-    --                     rw[r_prime_eq0]
-    --                 simp[r_is_negative_post] at r2_post
-    --                 have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-    --                   simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                   simp_all
-    --                 rw[this]
-    --                 constructor
-    --                 · apply  r_prime_eq0
-    --                 · by_cases h: Field51_as_Nat r1 % p % 2 = 1
-    --                   · simp_all
-    --                   · simp_all
-    --                     intro i hi
-    --                     interval_cases i
-    --                     all_goals (expand r_prime_post_2 with 5 ; scalar_tac)
-    --                 -- END TASK
-    --               · -- BEGIN TASK
-    --                 constructor
-    --                 · -- BEGIN TASK
-    --                   simp[← modEq_zero_iff]
-    --                   intro hu hv x
-    --                   rw[← Nat.ModEq]
-    --                   have :=u_eq1.mul_left (Field51_as_Nat constants.SQRT_M1)
-    --                   rw[← mul_assoc, (by ring :
-    --                   Field51_as_Nat constants.SQRT_M1 *
-    --                   Field51_as_Nat constants.SQRT_M1 =Field51_as_Nat constants.SQRT_M1 ^ 2  ),
-    --                   ] at this
-    --                   have :=check_eq_mod.trans this
-    --                   intro hxx
-    --                   have eq_im:= hxx.mul this
-    --                   rw[(by ring : x ^ 2 * Field51_as_Nat v *
-    --                   (Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v) =
-    --                   (x * Field51_as_Nat v *Field51_as_Nat r_prime) ^ 2
-    --                   ), (by ring : Field51_as_Nat u * (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat u)
-    --                   = Field51_as_Nat u ^2 * Field51_as_Nat constants.SQRT_M1 )] at eq_im
-    --                   have :  ∀ i < 5, (u[i]!).val < 2 ^ 54 := by
-    --                           intro i _
-    --                           interval_cases i
-    --                           all_goals (expand h_u_bounds with 5; scalar_tac)
-    --                   obtain ⟨ inv_u, inv_u_ok, inv_u_1, inv_u_2 ⟩  := invert_spec u this
-    --                   have : Field51_as_Nat u % p ≠ 0 := by
-    --                     intro hu1
-    --                     apply hu
-    --                     rw[modEq_zero_iff]
-    --                     apply hu1
-    --                   have inv_u_1:= inv_u_1 this
-    --                   rw[← modEq_one_iff] at inv_u_1
-    --                   have inv_u_1:= (mod_mul_mod (Field51_as_Nat inv_u) (Field51_as_Nat u)).symm.trans inv_u_1
-    --                   have inv_u_1:=(inv_u_1.pow 2).mul_right (Field51_as_Nat constants.SQRT_M1)
-    --                   simp[mul_pow] at inv_u_1
-    --                   have u_eq:= eq_im.mul_left ((Field51_as_Nat inv_u)^2)
-    --                   rw[← mul_assoc, ← mul_pow] at u_eq
-    --                   have u_eq:= u_eq.trans inv_u_1
-    --                   have u_eq:= u_eq.pow 2
-    --                   simp[← pow_mul] at u_eq
-    --                   have : (Field51_as_Nat constants.SQRT_M1) ^2 ≡ p-1 [MOD p] := by
-    --                     unfold constants.SQRT_M1
-    --                     decide
-    --                   have := u_eq.trans this
-    --                   apply SQRT_M1_not_square (Field51_as_Nat inv_u * (x * Field51_as_Nat v * Field51_as_Nat r_prime)) this
-    --                   -- END TASK
-    --                 · -- BGEIN TASK
-    --                   constructor
-    --                   · intro hu hv hx
-    --                     constructor
-    --                     · -- BGEIN TASK
-    --                       rw[← Nat.ModEq]
-    --                       have :=u_eq1.mul_left (Field51_as_Nat constants.SQRT_M1)
-    --                       rw[← mul_assoc, (by ring :
-    --                         Field51_as_Nat constants.SQRT_M1 *
-    --                         Field51_as_Nat constants.SQRT_M1 =Field51_as_Nat constants.SQRT_M1 ^ 2  ),
-    --                         ] at this
-    --                       have eq_im:=check_eq_mod.trans this
-    --                       have : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-    --                         simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                         simp_all
-    --                       have r2_eq: (Field51_as_Nat r2 )^2 ≡ (Field51_as_Nat r_prime) ^2 [MOD p] := by
-    --                         rcases (mod_two_zero_or_one (Field51_as_Nat r_prime % p)) with one | zero
-    --                         · -- BEGIN TASK
-    --                           rw[mod_two_Eq_one_iff] at one
-    --                           simp[this, one] at r_is_negative_post
-    --                           simp[r_is_negative_post] at r2_post
-    --                           have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                             simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                             simp_all
-    --                           rw[← this] at r_neg_post_1
-    --                           simp_all
-    --                           rw[← modEq_zero_iff] at r_neg_post_1
-    --                           apply nat_sq_of_add_modeq_zero
-    --                           rw[add_comm]
-    --                           apply  r_neg_post_1
-    --                           -- END TASK
-    --                         · -- BEGIN TASK
-    --                           rw[modEq_zero_iff] at zero
-    --                           simp[this, zero] at r_is_negative_post
-    --                           simp[r_is_negative_post] at r2_post
-    --                           have : Field51_as_Nat r2 = Field51_as_Nat r_prime:= by
-    --                             simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                             simp_all
-    --                           rw[this]
-    --                           -- END TASK
-    --                       have r2_eq:= r2_eq.mul_right (Field51_as_Nat v)
-    --                       have :=(mod_sq_mod_mul (Field51_as_Nat r2) (Field51_as_Nat v) p)
-    --                       apply this.trans
-    --                       apply r2_eq.trans eq_im
-    --                       -- END TASK
-    --                     · -- BGEIN TASK
-    --                       by_cases h:(r_is_negative.val = 1#u8)
-    --                       · -- BGEIN TASK
-    --                         simp[h] at r2_post
-    --                         intro i hi
-    --                         interval_cases i
-    --                         all_goals (simp_all; expand r_neg_post_2 with 5;scalar_tac)
-    --                         -- END TASK
-    --                       · -- BGEIN TASK
-    --                         simp[h] at r2_post
-    --                         intro i hi
-    --                         interval_cases i
-    --                         all_goals (simp_all; expand r_prime_post_2 with 5;scalar_tac)
-    --                         -- END TASK
-    --                       -- END TASK
-    --                   · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
-    --                       r_is_negative_post r_neg_post_1 r2_post -- Non-negativity
-    --                   -- END TASK
-    --                 -- END TASK
-    --               -- END TASK
-    --           -- END TASK
-    --         -- END TASK
-    --         -- END TASK
-    --       -- END TASK
-    --     · -- BEGIN TASK
-    --       simp[second_choice]
-    --       progress*
-    --       · simp[Choice.zero] at r1_post
-    --         simp_all
-    --         clear check_eq_mod check_eq_v eq1_mod
-    --         grind
-    --       · -- BEGIN TASK
-    --         have : ¬ flipped_sign_sqrt_i = Choice.one := by
-    --           intro h
-    --           apply second_choice
-    --           exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mpr h
-    --         simp[this] at flipped_sign_sqrt_i_post
-    --         have :=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
-    --         by_cases choise3 : correct_sign_sqrt.val = 1#u8
-    --         · -- BEGIN TASK
-    --           have : correct_sign_sqrt = Choice.one := by
-    --             exact (curve25519_dalek.field.FieldElement51.Choice.val_eq_one_iff _).mp choise3
-    --           simp[this] at correct_sign_sqrt_post
-    --           have check_eq_u:= eq_to_bytes_eq_Field51_as_Nat  correct_sign_sqrt_post
-    --           rw[← Nat.ModEq] at check_eq_u
-    --           have v_eq_u:=check_eq_mod.trans (check_eq_u.mul_left  (Field51_as_Nat constants.SQRT_M1 ^2))
-    --           simp[choise3, Choice.one]
-    --           simp[Choice.zero] at r1_post
-    --           have : Field51_as_Nat r1 = Field51_as_Nat r := by
-    --               simp[Field51_as_Nat, Finset.sum_range_succ]
-    --               simp_all
-    --           simp[← modEq_zero_iff]
-    --           constructor
-    --           · -- BEGIN TASK
-    --             intro hu
-    --             have := Nat.ModEq.mul_right (Field51_as_Nat v3) hu
-    --             simp at this
-    --             have := Nat.ModEq.trans fe2_post_1 this
-    --             have := Nat.ModEq.mul_right (Field51_as_Nat fe4) this
-    --             simp at this
-    --             have r_eq0:= Nat.ModEq.trans r_post_1 this
-    --             have : Field51_as_Nat r % p % 2 = 0 := by
-    --                   simp[Nat.ModEq] at r_eq0
-    --                   rw[r_eq0]
-    --             have : Field51_as_Nat r2 = Field51_as_Nat r := by
-    --               simp[Field51_as_Nat, Finset.sum_range_succ]
-    --               simp_all
-    --             rw[this]
-    --             constructor
-    --             · apply  r_eq0
-    --             · by_cases h:Field51_as_Nat r1 % p % 2 = 1
-    --               · simp_all
-    --               · simp_all
-    --                 clear *- r_post_2
-    --                 grind
-
-    --             -- END TASK
-    --           · -- BEGIN TASK
-    --             constructor
-    --             · -- BEGIN TASK
-    --               intro hu hv
-    --               have := check_eq_u.symm.trans (check_eq_v.trans ((hv.pow  (7 * 2 ^ 253 - 35)).mul_left (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2))))
-    --               simp at this
-    --               apply hu this
-    --               -- END TASK
-    --             · -- BEGIN TASK
-    --               constructor
-    --               · -- BEGIN TASK
-    --                 intro hu hv xx hx
-    --                 constructor
-    --                 · -- BEGIN TASK
-    --                   rw[← Nat.ModEq] at hx
-    --                   have eq_im:=check_eq_r_v.symm.trans check_eq_u
-    --                   have : Field51_as_Nat r1 = Field51_as_Nat r := by
-    --                       simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                       simp_all
-    --                   have r2_eq: (Field51_as_Nat r2 )^2 ≡ (Field51_as_Nat r) ^2 [MOD p] := by
-    --                       rcases (mod_two_zero_or_one (Field51_as_Nat r % p)) with one | zero
-    --                       · -- BEGIN TASK
-    --                         rw[mod_two_Eq_one_iff] at one
-    --                         simp[this, one] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         rw[← this] at r_neg_post_1
-    --                         simp_all
-    --                         rw[← modEq_zero_iff] at r_neg_post_1
-    --                         apply nat_sq_of_add_modeq_zero
-    --                         rw[add_comm]
-    --                         apply  r_neg_post_1
-    --                         -- END TASK
-    --                       · -- BEGIN TASK
-    --                         rw[modEq_zero_iff] at zero
-    --                         simp[this, zero] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         rw[this]
-    --                         -- END TASK
-    --                   rw[← Nat.ModEq]
-    --                   apply ((mod_sq_mod_mul (Field51_as_Nat r2) (Field51_as_Nat v) p)).trans
-    --                   apply (r2_eq.mul_right (Field51_as_Nat v)).trans eq_im
-    --                   -- END TASK
-    --                 · -- BEGIN TASK
-    --                   rcases (mod_two_zero_or_one (Field51_as_Nat r % p)) with one | zero
-    --                   · -- BEGIN TASK
-    --                         rw[mod_two_Eq_one_iff] at one
-    --                         simp[this, one] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         rw[← this] at r_neg_post_1
-    --                         simp_all
-    --                         intro i hi
-    --                         interval_cases i
-    --                         all_goals (expand r_neg_post_2 with 5; scalar_tac)
-    --                         -- END TASK
-    --                   · -- BEGIN TASK
-    --                         rw[modEq_zero_iff] at zero
-    --                         simp[this, zero] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         simp_all
-    --                         intro i hi
-    --                         interval_cases i
-    --                         all_goals (expand r_post_2 with 5; scalar_tac)
-    --                         -- END TASK
-    --                   -- END TASK
-
-    --                 -- END TASK
-    --               · -- BEGIN TASK
-    --                 constructor
-    --                 · intro hu hv
-    --                   have eq_im:=check_eq_r_v.symm.trans check_eq_u
-    --                   use Field51_as_Nat r
-    --                   rw[← Nat.ModEq]
-    --                   apply eq_im
-    --                 · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
-    --                     r_is_negative_post r_neg_post_1 r2_post -- Non-negativity
-    --                 -- END TASK
-    --               -- END TASK
-    --             -- END TASK
-    --           -- END TASK
-    --         · -- BEGIN TASK
-    --           simp[choise3,Choice.zero]
-    --           have :¬ correct_sign_sqrt = Choice.one := by
-    --             intro h
-    --             apply choise3
-    --             simp[h, Choice.one]
-    --           simp[this] at correct_sign_sqrt_post
-    --           have : ¬ check = u := by
-    --             intro h
-    --             apply correct_sign_sqrt_post
-    --             rw[h]
-    --           · constructor
-    --             · -- BEGIN TASK
-    --               intro hu
-    --               rw[← modEq_zero_iff] at hu
-    --               have :=check_eq_v.trans ((hu.pow (2 + (2 ^ 252 - 3) * 2)).mul_right  (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)))
-    --               simp at this
-    --               have hu:=to_bytes_zero_of_Field51_as_Nat_zero hu
-    --               have :=to_bytes_zero_of_Field51_as_Nat_zero this
-    --               rw[← this] at hu
-    --               apply correct_sign_sqrt_post hu.symm
-    --               -- END TASK
-    --             · -- BEGIN TASK
-    --               constructor
-    --               · -- BEGIN TASK
-    --                 simp[← modEq_zero_iff]
-    --                 intro hu hv
-    --                 have :=check_eq_r_v.trans (hv.mul_left (Field51_as_Nat r ^ 2))
-    --                 simp at this
-    --                 simp[Choice.zero] at r1_post
-    --                 have r1_eq_r: Field51_as_Nat r1 = Field51_as_Nat r := by
-    --                       simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                       simp_all
-    --                 have :=(fe2_post_1.trans ((v3_post_1.trans (hv.mul_left (Field51_as_Nat fe))).mul_left (Field51_as_Nat u))).mul_right (Field51_as_Nat fe4)
-    --                 have r_eq0:= r_post_1.trans this
-    --                 simp at r_eq0
-    --                 rw[add_comm] at r_neg_post_1
-    --                 have := nat_sqrt_m1_sq_of_add_modeq_zero r_neg_post_1
-    --                 rw[r1_eq_r] at this
-    --                 have x_eq0:= this.trans (r_eq0.mul_left (Field51_as_Nat constants.SQRT_M1 ^ 2))
-    --                 simp at x_eq0
-    --                 rcases (mod_two_zero_or_one (Field51_as_Nat r % p)) with one | zero
-    --                 · -- BEGIN TASK
-    --                         rw[mod_two_Eq_one_iff] at one
-    --                         simp[r1_eq_r, one] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         rw[this]
-    --                         constructor
-    --                         · apply x_eq0
-    --                         · simp_all
-    --                           intro i hi
-    --                           interval_cases i
-    --                           all_goals (expand r_neg_post_2 with 5 ; scalar_tac)
-    --                         -- END TASK
-    --                 · -- BEGIN TASK
-    --                         rw[modEq_zero_iff] at zero
-    --                         simp[r1_eq_r, zero] at r_is_negative_post
-    --                         simp[r_is_negative_post] at r2_post
-    --                         have : Field51_as_Nat r2 = Field51_as_Nat r:= by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         rw[this]
-    --                         constructor
-    --                         · apply r_eq0
-    --                         · simp_all
-    --                           intro i hi
-    --                           interval_cases i
-    --                           all_goals (expand r_post_2 with 5 ; scalar_tac)
-    --                         -- END TASK
-    --                 -- END TASK
-    --               · -- BEGIN TASK
-    --                 constructor
-    --                 · -- BEGIN TASK
-    --                   simp[← modEq_zero_iff]
-    --                   intro hu hv xx hxx
-    --                   rw[← Nat.ModEq] at hxx
-    --                   have p_eq:2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) = (p-1) * 2 + 1 := by unfold p; simp
-    --                   have p_eq1: 2 * (2 + (2 ^ 252 - 3) * 2) = ((p-1)/2)+ 2 := by unfold p; scalar_tac
-    --                   have xx_check:= ((hxx.pow (2 + (2 ^ 252 - 3) * 2)).mul_right (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))).trans check_eq_v.symm
-    --                   rw[mul_pow,mul_assoc,← pow_add,p_eq,←  pow_mul, p_eq1, pow_add] at xx_check
-    --                   rw[Nat.modEq_zero_iff_dvd] at hv
-    --                   have := coprime_of_prime_not_dvd prime_25519 hv
-    --                   have fermat:= ((Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this ).pow 2).mul_right (Field51_as_Nat v)
-    --                   simp[← pow_mul, pow_add_one] at fermat
-    --                   have fermat:= (fermat.mul_left (xx ^ ((p - 1) / 2) * xx ^ 2)).symm.trans xx_check
-
-    --                   by_cases h: xx ≡ 0 [MOD p]
-    --                   · have := ((h.pow 2).mul_right (Field51_as_Nat v)).symm.trans hxx
-    --                     simp at this
-    --                     apply hu this.symm
-    --                   · have :=pow_div_two_eq_neg_one_or_one h
-    --                     rcases this with hl | hl
-    --                     · have := hl.mul_right (xx ^ 2 * Field51_as_Nat v)
-    --                       simp[← mul_assoc] at this
-    --                       have:= (fermat.symm.trans this).trans hxx
-    --                       obtain ⟨ru, hu, hru_mod, hru_lt⟩ := to_bytes_spec u
-    --                       obtain ⟨rcheck, hrcheck, hrcheck_mod, hrcheck_lt⟩ := to_bytes_spec check
-    --                       have := this.trans hru_mod.symm
-    --                       have check_eq_u:= hrcheck_mod.trans this
-    --                       rw[Nat.ModEq] at check_eq_u
-    --                       have := Nat.mod_eq_of_lt hru_lt
-    --                       rw[this] at check_eq_u
-    --                       have :=Nat.mod_eq_of_lt hrcheck_lt
-    --                       rw[this] at check_eq_u
-    --                       have := eq_U8x32_as_Nat_eq check_eq_u
-    --                       apply correct_sign_sqrt_post
-    --                       rw[hrcheck, hu, this]
-    --                     · have := hl.mul_right (xx ^ 2 * Field51_as_Nat v)
-    --                       simp[← mul_assoc] at this
-    --                       have fermat:= (fermat.symm.trans this)
-    --                       have := (hxx.mul_left (p-1))
-    --                       simp[← mul_assoc] at this
-    --                       have fermat:= (fermat.trans this).trans (u_m.mul_left (p-1))
-    --                       rw[← mul_assoc] at fermat
-    --                       have : (p-1) *Field51_as_Nat constants.SQRT_M1 ^2 ≡ 1 [MOD p] := by
-    --                           unfold constants.SQRT_M1
-    --                           decide
-    --                       have := fermat.trans (this.mul_right (Field51_as_Nat fe6))
-    --                       simp at this
-    --                       obtain ⟨ru, hu, hru_mod, hru_lt⟩ := to_bytes_spec fe6
-    --                       obtain ⟨rcheck, hrcheck, hrcheck_mod, hrcheck_lt⟩ := to_bytes_spec check
-    --                       have := this.trans hru_mod.symm
-    --                       have check_eq_u:= hrcheck_mod.trans this
-    --                       rw[Nat.ModEq] at check_eq_u
-    --                       have := Nat.mod_eq_of_lt hru_lt
-    --                       rw[this] at check_eq_u
-    --                       have :=Nat.mod_eq_of_lt hrcheck_lt
-    --                       rw[this] at check_eq_u
-    --                       have := eq_U8x32_as_Nat_eq check_eq_u
-    --                       apply flipped_sign_sqrt_post
-    --                       rw[hrcheck, hu, this]
-    --                   -- END TASK
-    --                 · -- BEGIN TASK
-    --                   refine ⟨?_, ?nonneg⟩
-    --                   case nonneg =>
-    --                     exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
-    --                       r_is_negative_post r_neg_post_1 r2_post -- Non-negativity
-    --                   intro hu hv hx
-    --                   constructor
-    --                   · -- BEGIN TASK
-    --                     rw[← Nat.ModEq]
-    --                     have eq_check:= (check_eq_v.symm.trans check_eq_r_v).symm
-    --                     have :2 + (2 ^ 252 - 3) * 2 = (p-1)/4 + 1 := by unfold p; scalar_tac
-    --                     rw[this,pow_add] at eq_check
-    --                     have : 7 * 2 ^ 253 - 35 = 7 * ((p-1)/4) := by unfold p; scalar_tac
-    --                     rw[this] at eq_check
-    --                     simp[pow_mul, mul_assoc] at eq_check
-    --                     simp[mul_comm (Field51_as_Nat u)] at eq_check
-    --                     rw[← mul_assoc,←  mul_pow] at eq_check
-    --                     have :¬ Field51_as_Nat u * Field51_as_Nat v ^ 7 ≡ 0 [MOD p] := by
-    --                       intro h
-    --                       have :=mul_zero_eq_or prime_25519 h
-    --                       rcases this with h | h
-    --                       · apply hu h
-    --                       · rw[(by scalar_tac: 7 =1+6), pow_add] at h
-    --                         have :=mul_zero_eq_or prime_25519 h
-    --                         simp at this
-    --                         rcases this with h | h
-    --                         · apply hv h
-    --                         · rw[(by scalar_tac: 6 =1+5), pow_add] at h
-    --                           have :=mul_zero_eq_or prime_25519 h
-    --                           simp at this
-    --                           rcases this with h | h
-    --                           · apply hv h
-    --                           · rw[(by scalar_tac : 5 = 1 + 4), pow_add] at h
-    --                             have :=mul_zero_eq_or prime_25519 h
-    --                             simp at this
-    --                             rcases this with h | h
-    --                             · apply hv h
-    --                             · rw[(by scalar_tac : 4 = 1 + 3), pow_add] at h
-    --                               have :=mul_zero_eq_or prime_25519 h
-    --                               simp at this
-    --                               rcases this with h | h
-    --                               · apply hv h
-    --                               · rw[(by scalar_tac : 3 = 1 + 2), pow_add] at h
-    --                                 have :=mul_zero_eq_or prime_25519 h
-    --                                 simp at this
-    --                                 rcases this with h | h
-    --                                 · apply hv h
-    --                                 · rw[(by scalar_tac : 2 = 1 + 1), pow_add] at h
-    --                                   have :=mul_zero_eq_or prime_25519 h
-    --                                   simp at this
-    --                                   apply hv this
-
-
-    --                     have := pow_div_four_eq_four_cases this
-    --                     rcases this with h | h
-    --                     · -- BEGIN TASK
-    --                       have := h.mul_right (Field51_as_Nat u)
-    --                       have := eq_check.trans this
-    --                       simp at this
-    --                       have :=hx (Field51_as_Nat r) this
-    --                       apply False.elim this
-    --                       -- END TASK
-    --                     · rcases h with h | h
-    --                       · -- BEGIN TASK
-    --                         have := h.mul_right (Field51_as_Nat u)
-    --                         have :=  (eq_check.trans this)
-    --                         simp at this
-    --                         simp[Choice.zero] at r1_post
-    --                         have r1_eq_r: Field51_as_Nat r1 = Field51_as_Nat r := by
-    --                           simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                           simp_all
-    --                         have r2_eq: (Field51_as_Nat r2 )^2 ≡ (Field51_as_Nat r) ^2 [MOD p] := by
-    --                           by_cases h: r_is_negative.val = 1#u8
-    --                           · -- BEGIN TASK
-    --                             simp[r_is_negative_post] at r2_post
-    --                             have : Field51_as_Nat r2 = Field51_as_Nat r_neg:= by
-    --                               simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                               simp_all
-    --                             rw[← this] at r_neg_post_1
-    --                             simp_all
-    --                             rw[← modEq_zero_iff] at r_neg_post_1
-    --                             apply nat_sq_of_add_modeq_zero
-    --                             rw[add_comm]
-    --                             apply  r_neg_post_1
-    --                             -- END TASK
-    --                           · -- BEGIN TASK
-    --                             simp[r_is_negative_post] at r2_post
-    --                             have : Field51_as_Nat r2 = Field51_as_Nat r:= by
-    --                               simp[Field51_as_Nat, Finset.sum_range_succ]
-    --                               simp_all
-    --                             rw[this]
-    --                             -- END TASK
-    --                         apply ((mod_sq_mod_mul (Field51_as_Nat r2) (Field51_as_Nat v) p)).trans
-    --                         apply (r2_eq.mul_right (Field51_as_Nat v)).trans this
-    --                         -- END TASK
-    --                       · rcases h with h | h
-    --                         · -- BEGIN TASK
-    --                           have := h.mul_right (Field51_as_Nat u)
-    --                           have h:=  (eq_check.trans this).mul_left (Field51_as_Nat constants.SQRT_M1 ^ 2)
-    --                           simp[← mul_assoc] at h
-    --                           have :Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat constants.SQRT_M1 ^ 2 ≡ 1 [MOD p] := by
-    --                             unfold constants.SQRT_M1
-    --                             decide
-    --                           have := h.trans (this.mul_right  (Field51_as_Nat u))
-    --                           simp[← mul_pow] at this
-    --                           have :=hx (Field51_as_Nat constants.SQRT_M1 *Field51_as_Nat r) this
-    --                           apply False.elim this
-    --                           -- END TASK
-    --                         · -- BEGIN TASK
-    --                           have := h.mul_right (Field51_as_Nat u)
-    --                           have h:=  (eq_check.trans this)
-    --                           have h:= (check_eq_r_v.trans h).trans (u_m.mul_left (Field51_as_Nat constants.SQRT_M1 ^3))
-    --                           rw[← mul_assoc] at h
-    --                           have : Field51_as_Nat constants.SQRT_M1 ^ 3 * Field51_as_Nat constants.SQRT_M1 ^ 2
-    --                             ≡ Field51_as_Nat constants.SQRT_M1 [MOD p] := by
-    --                             unfold constants.SQRT_M1
-    --                             decide
-    --                           have := h.trans (this.mul_right  (Field51_as_Nat fe6))
-    --                           rw[mul_comm] at fe7_post_1
-    --                           have := this.trans fe7_post_1.symm
-    --                           obtain ⟨ru, hu, hru_mod, hru_lt⟩ := to_bytes_spec fe7
-    --                           obtain ⟨rcheck, hrcheck, hrcheck_mod, hrcheck_lt⟩ := to_bytes_spec check
-    --                           have := this.trans hru_mod.symm
-    --                           have check_eq_u:= hrcheck_mod.trans this
-    --                           rw[Nat.ModEq] at check_eq_u
-    --                           have := Nat.mod_eq_of_lt hru_lt
-    --                           rw[this] at check_eq_u
-    --                           have :=Nat.mod_eq_of_lt hrcheck_lt
-    --                           rw[this] at check_eq_u
-    --                           have := eq_U8x32_as_Nat_eq check_eq_u
-    --                           simp[hrcheck, hu, this] at flipped_sign_sqrt_i_post
-    --                           -- END TASK
-    --                     -- END TASK
-    --                   · -- BEGIN TASK
-    --                     intro i hi
-    --                     by_cases one:r_is_negative.val = 1#u8
-    --                     · -- BEGIN TASK
-    --                         simp_all
-    --                         interval_cases i
-    --                         all_goals (expand r_neg_post_2 with 5; scalar_tac)
-    --                         -- END TASK
-    --                     · -- BEGIN TASK
-    --                         simp_all[Choice.zero]
-    --                         interval_cases i
-    --                         any_goals (expand r_post_2 with 5; scalar_tac)
-    --                         -- END TASK
-    --                     -- END TASK
-    --                   -- END TASK
-    --                 -- END TASK
-    --               -- END TASK
-    --           -- END TASK
-    --         -- END TASK
-    --     -- END TASK
-    --     -- END TASK
-    --     -- END TASK
-    --     -- END TASK
-    --   -- END TASK
-
+            -- B2: second_choice=false, choice3=false
+            -- r1 = r (Choice.zero)
+            have h01 : ¬(0#u8 = 1#u8) := by decide
+            simp only [Choice.zero, h01, ite_false] at r1_post
+            have r1_eq_r : Field51_as_Nat r1 = Field51_as_Nat r := by
+              simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+                List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
+                Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
+                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+                Nat.lt_add_one]
+              simp only [Array.getElem!_Nat_eq] at r1_post
+              expand r1_post with 5
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                Nat.reduceLT, Nat.lt_add_one]
+            -- Derive ¬(check.to_bytes = _) from the three false choices
+            have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
+              fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
+            have h_check_ne_fe6 : ¬(check.to_bytes = fe6.to_bytes) :=
+              fun h => first_choice (by rw [flipped_sign_sqrt_post.mpr h]; rfl)
+            have h_check_ne_fe7 : ¬(check.to_bytes = fe7.to_bytes) :=
+              fun h => second_choice (by rw [flipped_sign_sqrt_i_post.mpr h]; rfl)
+            rw [r1_eq_r] at r_is_negative_post r_neg_post_1
+            refine ⟨?_, ?_, ?_, ?_, ?_⟩
+            · -- case 1: u = 0 → exfalso (check=0=u contradicts choice3)
+              intro hu; exfalso
+              rw [← modEq_zero_iff] at hu
+              have := check_eq_v.trans
+                ((hu.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
+                 (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)))
+              simp only [Nat.reducePow, Nat.reduceSub, Nat.reduceMul, Nat.reduceAdd, ne_eq,
+                OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
+              rw [modEq_zero_iff] at hu this
+              exact h_check_ne_u
+                ((to_bytes_zero_of_Field51_as_Nat_zero this).trans
+                 (to_bytes_zero_of_Field51_as_Nat_zero hu).symm)
+            · -- case 2: u≠0, v=0
+              intro hu hv
+              rw [← modEq_zero_iff] at hv
+              have := hv.mul_left (Field51_as_Nat fe)
+              simp only [mul_zero] at this
+              have := v3_post_1.trans this
+              have := this.mul_left (Field51_as_Nat u)
+              simp only [mul_zero] at this
+              have := fe2_post_1.trans this
+              have := this.mul_right (Field51_as_Nat fe4)
+              simp only [zero_mul] at this
+              have r_zero := r_post_1.trans this
+              have : Field51_as_Nat r % p % 2 = 0 := by
+                simp only [Nat.ModEq] at r_zero; rw [r_zero]
+                simp only [Nat.zero_mod]
+              have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
+                intro h; exact absurd (r_is_negative_post.mp h) (by omega)
+              simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
+              have r2_eq_r : Field51_as_Nat r2 = Field51_as_Nat r := by
+                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                  Finset.sum_singleton]
+                simp only [Array.getElem!_Nat_eq] at r2_post r1_post
+                expand r2_post with 5
+                expand r1_post with 5
+                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                  UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                  Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
+                  Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
+                  Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+              refine ⟨rfl, ?_, ?_⟩
+              · rw [r2_eq_r]; exact r_zero
+              · intro i hi
+                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                have := r2_post i hi; have := r1_post i hi
+                have := r_post_2 i hi
+                omega
+            · -- case 3: u≠0, v≠0, QR → exfalso
+              intro hu hv xx hxx; exfalso
+              rw [← Nat.ModEq] at hxx
+              -- Derive eq_check relating check to xx via Fermat
+              have p_eq : 2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) =
+                  (p - 1) * 2 + 1 := by unfold p; simp
+              have p_eq1 : 2 * (2 + (2 ^ 252 - 3) * 2) =
+                  (p - 1) / 2 + 2 := by unfold p; omega
+              have xx_check :=
+                ((hxx.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
+                  (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))).trans
+                check_eq_v.symm
+              rw [mul_pow, mul_assoc, ← pow_add, p_eq,
+                ← pow_mul, p_eq1, pow_add] at xx_check
+              -- Use Fermat's little theorem on v
+              have h_not_dvd_v : ¬(p ∣ Field51_as_Nat v) := by
+                intro h; exact hv (Nat.dvd_iff_mod_eq_zero.mp h)
+              have h_coprime_v :=
+                coprime_of_prime_not_dvd prime_25519 h_not_dvd_v
+              have fermat :=
+                ((Nat.ModEq.pow_card_sub_one_eq_one prime_25519
+                  h_coprime_v).pow 2).mul_right (Field51_as_Nat v)
+              simp only [← pow_mul, pow_add_one, one_pow, one_mul] at fermat
+              have fermat :=
+                (fermat.mul_left
+                  (xx ^ ((p - 1) / 2) * xx ^ 2)).symm.trans xx_check
+              -- Case split on xx
+              by_cases hxx0 : xx ≡ 0 [MOD p]
+              · have := ((hxx0.pow 2).mul_right
+                    (Field51_as_Nat v)).symm.trans hxx
+                simp at this
+                exact hu this.symm
+              · -- xx ≠ 0 → Euler criterion on xx
+                have := pow_div_two_eq_neg_one_or_one hxx0
+                rcases this with hl | hl
+                · -- xx^((p-1)/2) ≡ 1 → check ≡ u
+                  have := hl.mul_right (xx ^ 2 * Field51_as_Nat v)
+                  simp only [← mul_assoc, one_mul] at this
+                  have := (fermat.symm.trans this).trans hxx
+                  -- this : check ≡ u → check.to_bytes = u.to_bytes
+                  obtain ⟨ru, hu_tb, hru_mod, hru_lt⟩ :=
+                    spec_imp_exists (to_bytes_spec u)
+                  obtain ⟨rcheck, hcheck_tb, hrcheck_mod, hrcheck_lt⟩ :=
+                    spec_imp_exists (to_bytes_spec check)
+                  have := this.trans hru_mod.symm
+                  have check_eq_u := hrcheck_mod.trans this
+                  rw [Nat.ModEq] at check_eq_u
+                  have := Nat.mod_eq_of_lt hru_lt
+                  rw [this] at check_eq_u
+                  have := Nat.mod_eq_of_lt hrcheck_lt
+                  rw [this] at check_eq_u
+                  have := eq_U8x32_as_Nat_eq check_eq_u
+                  exact h_check_ne_u (by rw [hcheck_tb, hu_tb, this])
+                · -- xx^((p-1)/2) ≡ p-1 → check ≡ fe6
+                  have := hl.mul_right (xx ^ 2 * Field51_as_Nat v)
+                  simp only [← mul_assoc] at this
+                  have fermat := fermat.symm.trans this
+                  have := hxx.mul_left (p - 1)
+                  simp only [← mul_assoc] at this
+                  have fermat :=
+                    (fermat.trans this).trans (u_m.mul_left (p - 1))
+                  rw [← mul_assoc] at fermat
+                  have : (p - 1) * Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
+                      1 [MOD p] := by
+                    unfold constants.SQRT_M1; decide
+                  have := fermat.trans (this.mul_right (Field51_as_Nat fe6))
+                  simp at this
+                  obtain ⟨ru, hu_tb, hru_mod, hru_lt⟩ :=
+                    spec_imp_exists (to_bytes_spec fe6)
+                  obtain ⟨rcheck, hcheck_tb, hrcheck_mod, hrcheck_lt⟩ :=
+                    spec_imp_exists (to_bytes_spec check)
+                  have := this.trans hru_mod.symm
+                  have check_eq_fe6 := hrcheck_mod.trans this
+                  rw [Nat.ModEq] at check_eq_fe6
+                  have := Nat.mod_eq_of_lt hru_lt
+                  rw [this] at check_eq_fe6
+                  have := Nat.mod_eq_of_lt hrcheck_lt
+                  rw [this] at check_eq_fe6
+                  have := eq_U8x32_as_Nat_eq check_eq_fe6
+                  exact h_check_ne_fe6
+                    (by rw [hcheck_tb, hu_tb, this])
+            · -- case 4: u≠0, v≠0, ¬QR
+              intro hu hv hx
+              refine ⟨rfl, ?_, ?_⟩
+              · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
+                -- Derive eq_check relating check to (u*v^7)^((p-1)/4) * u
+                have eq_check :=
+                  (check_eq_v.symm.trans check_eq_r_v).symm
+                have : 2 + (2 ^ 252 - 3) * 2 = (p - 1) / 4 + 1 := by
+                  unfold p; omega
+                rw [this, pow_add] at eq_check
+                have : 7 * 2 ^ 253 - 35 = 7 * ((p - 1) / 4) := by
+                  unfold p; omega
+                rw [this] at eq_check
+                simp only [pow_mul, mul_assoc, pow_one] at eq_check
+                rw [mul_comm (Field51_as_Nat u) ((Field51_as_Nat v ^ 7) ^ ((p - 1) / 4))] at eq_check
+                rw [← mul_assoc, ← mul_pow] at eq_check
+                -- eq_check : r²v ≡ (u*v^7)^((p-1)/4) * u [MOD p]
+                have h_uv7_ne : ¬ Field51_as_Nat u *
+                    Field51_as_Nat v ^ 7 ≡ 0 [MOD p] := by
+                  intro h
+                  have := mul_zero_eq_or prime_25519 h
+                  rcases this with h | h
+                  · exact hu ((modEq_zero_iff _ _).mp h)
+                  · have : Field51_as_Nat v ≡ 0 [MOD p] := by
+                      have hp : Nat.Prime p := Fact.out
+                      rw [show (7 : ℕ) = 1 + 6 from rfl, pow_add] at h
+                      rcases mul_zero_eq_or prime_25519 h with h1 | h1
+                      · simp only [pow_one] at h1; exact h1
+                      · rw [show (6 : ℕ) = 1 + 5 from rfl, pow_add] at h1
+                        rcases mul_zero_eq_or prime_25519 h1 with h2 | h2
+                        · simp only [pow_one] at h2; exact h2
+                        · rw [show (5 : ℕ) = 1 + 4 from rfl, pow_add] at h2
+                          rcases mul_zero_eq_or prime_25519 h2 with h3 | h3
+                          · simp only [pow_one] at h3; exact h3
+                          · rw [show (4 : ℕ) = 1 + 3 from rfl, pow_add] at h3
+                            rcases mul_zero_eq_or prime_25519 h3 with h4 | h4
+                            · simp only [pow_one] at h4; exact h4
+                            · rw [show (3 : ℕ) = 1 + 2 from rfl, pow_add] at h4
+                              rcases mul_zero_eq_or prime_25519 h4 with h5 | h5
+                              · simp only [pow_one] at h5; exact h5
+                              · rw [show (2 : ℕ) = 1 + 1 from rfl, pow_add] at h5
+                                rcases mul_zero_eq_or prime_25519 h5 with h6 | h6
+                                · simp only [pow_one] at h6; exact h6
+                                · simp only [pow_one] at h6; exact h6
+                    exact hv ((modEq_zero_iff _ _).mp this)
+                have := pow_div_four_eq_four_cases h_uv7_ne
+                rcases this with h | h
+                · -- sub-case 1: ≡ 1 → r²v ≡ u → QR → contradiction
+                  have := h.mul_right (Field51_as_Nat u)
+                  have := eq_check.trans this
+                  simp only [one_mul] at this
+                  exact absurd this (hx (Field51_as_Nat r))
+                · rcases h with h | h
+                  · -- sub-case 2: ≡ SQRT_M1 → r2²v ≡ SQRT_M1*u (desired)
+                    have := h.mul_right (Field51_as_Nat u)
+                    have := eq_check.trans this
+                    simp only at this
+                    -- this : r²v ≡ SQRT_M1 * u [MOD p]
+                    have r2_eq_sq : Field51_as_Nat r2 ^ 2 ≡
+                        Field51_as_Nat r ^ 2 [MOD p] := by
+                      by_cases h_neg : r_is_negative.val = 1#u8
+                      · simp only [h_neg, ite_true] at r2_post
+                        have r2_eq_r_neg : Field51_as_Nat r2 =
+                            Field51_as_Nat r_neg := by
+                          simp only [Field51_as_Nat, Finset.sum_range_succ,
+                            Finset.range_one, Finset.sum_singleton]
+                          expand r2_post with 5
+                          simp_all only [Array.getElem!_Nat_eq,
+                            List.Vector.length_val, UScalar.ofNat_val_eq,
+                            getElem!_pos, Nat.reduceMul,
+                            UScalar.neq_to_neq_val, true_iff, Nat.not_eq,
+                            ne_eq, zero_ne_one, not_false_eq_true,
+                            one_ne_zero, zero_lt_one, not_lt_zero, or_false,
+                            or_self, UScalar.val_not_eq_imp_not_eq,
+                            Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT,
+                            Nat.lt_add_one, mul_zero, pow_zero, one_mul,
+                            mul_one]
+                        rw [r2_eq_r_neg]
+                        exact nat_sq_of_add_modeq_zero
+                          (by rw [add_comm]; exact r_neg_post_1)
+                      · simp only [h_neg, if_neg, not_false_eq_true]
+                          at r2_post
+                        have r2_eq_r : Field51_as_Nat r2 =
+                            Field51_as_Nat r := by
+                          simp only [Field51_as_Nat, Finset.sum_range_succ,
+                            Finset.range_one, Finset.sum_singleton]
+                          expand r2_post with 5
+                          simp_all only [Array.getElem!_Nat_eq,
+                            List.Vector.length_val, UScalar.ofNat_val_eq,
+                            getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                            Nat.reduceLT, Nat.lt_add_one]
+                        rw [r2_eq_r]
+                    exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
+                  · rcases h with h | h
+                    · -- sub-case 3: ≡ SQRT_M1² → QR → contradiction
+                      have := h.mul_right (Field51_as_Nat u)
+                      have h := eq_check.trans this
+                      have h := h.mul_left
+                        (Field51_as_Nat constants.SQRT_M1 ^ 2)
+                      simp only [← mul_assoc] at h
+                      have : Field51_as_Nat constants.SQRT_M1 ^ 2 *
+                          Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
+                          1 [MOD p] := by
+                        unfold constants.SQRT_M1; decide
+                      have := h.trans (this.mul_right (Field51_as_Nat u))
+                      simp only [← mul_pow, one_mul] at this
+                      exact absurd this
+                        (hx (Field51_as_Nat constants.SQRT_M1 *
+                          Field51_as_Nat r))
+                    · -- sub-case 4: ≡ SQRT_M1³ → check ≡ fe7 → contradiction
+                      have := h.mul_right (Field51_as_Nat u)
+                      have h := eq_check.trans this
+                      have h := (check_eq_r_v.trans h).trans
+                        (u_m.mul_left
+                          (Field51_as_Nat constants.SQRT_M1 ^ 3))
+                      rw [← mul_assoc] at h
+                      have : Field51_as_Nat constants.SQRT_M1 ^ 3 *
+                          Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
+                          Field51_as_Nat constants.SQRT_M1 [MOD p] := by
+                        unfold constants.SQRT_M1; decide
+                      have := h.trans
+                        (this.mul_right (Field51_as_Nat fe6))
+                      rw [mul_comm] at fe7_post_1
+                      have := this.trans fe7_post_1.symm
+                      obtain ⟨ru, hu_tb, hru_mod, hru_lt⟩ :=
+                        spec_imp_exists (to_bytes_spec fe7)
+                      obtain ⟨rcheck, hcheck_tb, hrcheck_mod,
+                        hrcheck_lt⟩ :=
+                        spec_imp_exists (to_bytes_spec check)
+                      have := this.trans hru_mod.symm
+                      have check_eq_fe7 := hrcheck_mod.trans this
+                      rw [Nat.ModEq] at check_eq_fe7
+                      have := Nat.mod_eq_of_lt hru_lt
+                      rw [this] at check_eq_fe7
+                      have := Nat.mod_eq_of_lt hrcheck_lt
+                      rw [this] at check_eq_fe7
+                      have := eq_U8x32_as_Nat_eq check_eq_fe7
+                      exact False.elim (h_check_ne_fe7
+                        (by rw [hcheck_tb, hu_tb, this]))
+              · intro i hi
+                by_cases h : r_is_negative.val = 1#u8
+                · simp only [h, ite_true] at r2_post
+                  have := r2_post i hi; have := r_neg_post_2 i hi
+                  simp_all only [Array.getElem!_Nat_eq,
+                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    getElem!_pos, UScalar.neq_to_neq_val, true_iff,
+                    Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
+                    one_ne_zero, zero_lt_one, not_lt_zero, or_false,
+                    or_self, UScalar.val_not_eq_imp_not_eq,
+                    getElem?_pos, Option.getD_some, ge_iff_le]
+                  have := r_neg_post_2 i hi; omega
+                · simp only [h, if_neg, not_false_eq_true] at r2_post
+                  simp_all only [Array.getElem!_Nat_eq,
+                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    getElem!_pos, UScalar.neq_to_neq_val, false_iff,
+                    Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq,
+                    zero_ne_one, not_false_eq_true, one_ne_zero,
+                    zero_lt_one, not_lt_zero, or_false, or_self,
+                    UScalar.val_not_eq_imp_not_eq, getElem?_pos,
+                    Option.getD_some]
+                  have := r2_post i hi; have := r1_post i hi
+                  have := r_post_2 i hi; omega
+            · -- case 5: nonneg
+              rw [← r1_eq_r] at r_is_negative_post r_neg_post_1
+              exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
+                r_is_negative_post r_neg_post_1 r2_post
 
 
 set_option maxHeartbeats 400000 in -- heavy progress computations
