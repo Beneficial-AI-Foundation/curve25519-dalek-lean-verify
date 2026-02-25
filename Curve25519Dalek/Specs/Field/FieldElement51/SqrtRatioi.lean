@@ -692,6 +692,15 @@ theorem sqrt_ratio_i_spec'
             getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
 
         simp only [← modEq_zero_iff]
+        -- Shared: first_choice → check ≡ fe6 [MOD p]
+        have h_bytes_fe6 : check.to_bytes = fe6.to_bytes :=
+          flipped_sign_sqrt_post.mp ((Choice.val_eq_one_iff _).mp first_choice)
+        have check_fe6 := eq_to_bytes_eq_Field51_as_Nat h_bytes_fe6
+        rw [← Nat.ModEq] at check_fe6
+        -- Shared: r_prime^2 * v ≡ u [MOD p]
+        have r_prime_sq_v_u : Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
+            Field51_as_Nat u [MOD p] :=
+          (check_eq_mod.trans (check_fe6.mul_left _)).trans this.symm
         refine ⟨?_, ?_, ?_, ?_, ?_⟩
         · -- case 1: u = 0
           intro hu
@@ -742,11 +751,68 @@ theorem sqrt_ratio_i_spec'
                 getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
                 getElem?_pos, Option.getD_some, ge_iff_le]
               have := r2_post i hi; have := r_prime_post_2 i hi; omega
-        · --
-          
-          sorry -- case 2: u ≠ 0, v = 0
-        · sorry -- case 3: QR exists
-        · sorry -- case 4: no QR
+        · -- case 2: u ≠ 0, v = 0 → contradiction in first branch
+          intro hu hv
+          exfalso; apply hu
+          have check0 : Field51_as_Nat check ≡ 0 [MOD p] := by
+            have := hv.mul_right (Field51_as_Nat fe5)
+            simp only [zero_mul] at this
+            exact check_post_1.trans this
+          have h_bytes : check.to_bytes = fe6.to_bytes :=
+            flipped_sign_sqrt_post.mp ((Choice.val_eq_one_iff _).mp first_choice)
+          have check_fe6 := eq_to_bytes_eq_Field51_as_Nat h_bytes
+          rw [← Nat.ModEq] at check_fe6
+          have fe6_zero := check_fe6.symm.trans check0
+          have h_sum := fe6_zero.add_left (Field51_as_Nat u)
+          simp only [Nat.add_zero] at h_sum
+          rw [← modEq_zero_iff] at fe6_post_1
+          exact h_sum.symm.trans fe6_post_1
+        · -- case 3: QR exists
+          intro hu hv x hx
+          refine ⟨trivial, ?_, ?_⟩
+          · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
+            by_cases h_neg : r_is_negative.val = 1#u8
+            · simp only [h_neg, ite_true] at r2_post
+              have r2_eq_neg : Field51_as_Nat r2 = Field51_as_Nat r_neg := by
+                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                  Finset.sum_singleton]
+                expand r2_post with 5
+                simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
+              rw [r2_eq_neg]
+              have h_sum : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p] := by
+                rw [modEq_zero_iff]
+                exact r_neg_post_1
+              rw [r1_eq] at h_sum
+              exact ((nat_sq_of_add_modeq_zero h_sum).symm.mul_right _).trans r_prime_sq_v_u
+            · simp only [h_neg, ite_false] at r2_post
+              have r2_eq_r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
+                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+                  Finset.sum_singleton]
+                expand r2_post with 5
+                simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
+              rw [r2_eq_r1, r1_eq]
+              exact r_prime_sq_v_u
+          · intro i hi
+            by_cases h : r_is_negative.val = 1#u8
+            · simp only [h, ite_true] at r2_post
+              have := r2_post i hi
+              have := r_neg_post_2 i hi
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+                getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
+              have := r_neg_post_2 i hi
+              omega
+            · simp only [h, ite_false] at r2_post
+              have := r2_post i hi
+              have := r1_post i hi
+              have := r_prime_post_2 i hi
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+                getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
+                getElem?_pos, Option.getD_some, ge_iff_le]
+              have := r2_post i hi; have := r_prime_post_2 i hi; omega
+        · -- case 4: no QR → contradiction in first branch
+          intro hu hv hno_qr
+          exfalso
+          exact absurd r_prime_sq_v_u (hno_qr _)
         · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
             r_is_negative_post r_neg_post_1 r2_post
 
