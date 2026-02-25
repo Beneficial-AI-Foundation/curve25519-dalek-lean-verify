@@ -565,8 +565,120 @@ theorem sqrt_ratio_i_spec'
     · unfold constants.SQRT_M1
       try decide
     · grind only [#e2b0]
-    
-    sorry
+
+    have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
+      ≡ (Field51_as_Nat constants.SQRT_M1) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
+      [MOD p]:= by
+      have := r_prime_post_1.pow 2
+      rw[mul_pow] at this
+      have := this.mul_right (Field51_as_Nat v)
+      apply this.trans
+      rw[mul_assoc]
+      apply Nat.ModEq.mul_left
+      have := Nat.ModEq.pow 2 r_post_1
+      rw[mul_pow] at this
+      have := this.mul_right (Field51_as_Nat v)
+      apply this.trans
+      rw[← Nat.ModEq] at fe4_post_1
+      have eq1:= fe4_post_1.pow 2
+      rw[← pow_mul] at eq1
+      have :=fe3_post_1.pow ((2 ^ 252 - 3) * 2)
+      have eq2:= eq1.trans  this
+      rw[mul_pow] at eq2
+      have := fe_post_1.mul_right (Field51_as_Nat v)
+      have eq_v3:= v3_post_1.trans this
+      rw[pow_add_one] at eq_v3
+      have := eq_v3.pow 2
+      rw[← pow_mul] at this
+      have := fe1_post_1.trans  this
+      have := this.mul_right (Field51_as_Nat v)
+      rw[pow_add_one] at this
+      have := v7_post_1.trans  this
+      have := this.pow ((2 ^ 252 - 3) * 2)
+      rw[← pow_mul] at this
+      have := this.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2))
+      have eq3:= eq2.trans  this
+      have := eq_v3.mul_left (Field51_as_Nat u)
+      have := fe2_post_1.trans  this
+      have eq4:= this.pow 2
+      rw[mul_pow] at eq4
+      have := eq4.mul  eq3
+      have := this.mul_right (Field51_as_Nat v)
+      apply this.trans
+      have :  Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+       (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) * Field51_as_Nat v
+        =  (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
+        ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+         Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
+        Field51_as_Nat v)
+          := by
+          simp
+          ring
+      rw[this]
+      clear this
+      rw[← pow_add, ← pow_mul, ← pow_add, pow_add_one,
+      (by simp : (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1= 7 * 2 ^ 253 - 35)]
+    have check_eq_v: Field51_as_Nat check ≡    Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
+      apply check_post_1.trans
+      have := fe5_post_1.mul_left (Field51_as_Nat v)
+      apply this.trans
+      have := r_post_1.pow 2
+      rw[mul_pow] at this
+      have := this.mul_left (Field51_as_Nat v)
+      apply this.trans
+      rw[← Nat.ModEq] at fe4_post_1
+      have eq1:= Nat.ModEq.pow 2 fe4_post_1
+      rw[← pow_mul] at eq1
+      have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post_1
+      have eq2:= Nat.ModEq.trans eq1 this
+      rw[mul_pow] at eq2
+      have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post_1
+      have eq_v3:= Nat.ModEq.trans v3_post_1 this
+      rw[pow_add_one] at eq_v3
+      have := Nat.ModEq.pow 2 eq_v3
+      rw[← pow_mul] at this
+      have := Nat.ModEq.trans fe1_post_1 this
+      have := Nat.ModEq.mul_right (Field51_as_Nat v) this
+      rw[pow_add_one] at this
+      have := Nat.ModEq.trans v7_post_1 this
+      have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
+      rw[← pow_mul] at this
+      have := Nat.ModEq.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2)) this
+      have eq3:= Nat.ModEq.trans eq2 this
+      have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
+      have := Nat.ModEq.trans fe2_post_1 this
+      have eq4:= Nat.ModEq.pow 2 this
+      rw[mul_pow] at eq4
+      have := Nat.ModEq.mul eq4 eq3
+      have := Nat.ModEq.mul_left (Field51_as_Nat v) this
+      apply Nat.ModEq.trans this
+      have :  Field51_as_Nat v *
+        (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+        (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))))
+        =  Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)
+          := by
+          simp
+          ring
+      rw[this]
+    have check_eq_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
+      ≡ (Field51_as_Nat constants.SQRT_M1) ^2 *Field51_as_Nat check [MOD p] := by
+      have := Nat.ModEq.mul_left ((Field51_as_Nat constants.SQRT_M1) ^2) check_eq_v
+      apply Nat.ModEq.trans eq1_mod
+      apply Nat.ModEq.symm this
+    have :=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
+    have check_eq_r_v:= check_post_1.trans (fe5_post_1.mul_left (Field51_as_Nat v))
+    rw[mul_comm] at check_eq_r_v
+    by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
+    · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok, Array.getElem!_Nat_eq,
+      List.getElem!_eq_getElem?_getD, Nat.reducePow, Nat.add_one_sub_one, ne_eq, and_imp,
+      Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+      progress*
+      · --
+        
+        sorry
+      · sorry
+
+    · sorry
 
     -- · grind
     -- · grind
