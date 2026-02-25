@@ -36,6 +36,22 @@ namespace curve25519_dalek.montgomery
 def ProjectivePoint.IsValid (P : montgomery.ProjectivePoint) : Prop :=
   (Field51_as_Nat P.W : Montgomery.CurveField) ≠ 0
 
+/-- A valid Montgomery ladder state: P and Q are projective points, and affine_PmQ
+    contains the u-coordinate of the difference (P-Q).
+
+    This captures the invariant maintained by the Montgomery ladder algorithm:
+    the difference between consecutive points is always known. -/
+def valid_ladder_state
+    (P Q : montgomery.ProjectivePoint)
+    (affine_PmQ : backend.serial.u64.field.FieldElement51) : Prop :=
+  ∃ (P_affine Q_affine : Montgomery.Point),
+    P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
+    Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
+    P_affine ≠ Q_affine ∧
+    Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
+    Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
+    Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ
+
 /-
 natural language description:
 
@@ -51,37 +67,44 @@ natural language specs:
 
 /-- **Spec for `montgomery.differential_add_and_double`**:
 
-- No panic (always succeeds)
+- No panic (always succeeds for valid inputs)
+- Requires: P and Q are valid projective points (W ≠ 0)
+- Requires: (P, Q, affine_PmQ) form a valid ladder state
+  (i.e., affine_PmQ contains the u-coordinate of P-Q)
 - Returns (P', Q') representing [2]P and P+Q in projective coordinates
+- Ensures: outputs P' and Q' are also valid projective points
 - Correctness: the u-coordinates of the outputs correspond to point doubling and
   differential addition on the Montgomery curve
 - All operations are constant-time field operations
 
 **Mathematical Specification:**
-Given projective points P=(U:W) and Q, plus the u-coordinate of (P-Q),
+Given valid projective points P=(U:W) and Q, plus the u-coordinate of (P-Q),
 computes P'=(U':W') representing [2]P and Q' representing P+Q.
 
 In Montgomery curve arithmetic, only u-coordinates are needed for the ladder.
-The spec states: for any affine points with matching u-coordinates (u_P/w_P, u_Q/w_Q),
-the outputs have u-coordinates matching [2]P and P+Q respectively.
+The Montgomery ladder invariant maintains that the difference Q-P is known.
 -/
 @[progress]
 theorem differential_add_and_double_spec
     (P Q : montgomery.ProjectivePoint)
-    (affine_PmQ : backend.serial.u64.field.FieldElement51) :
+    (affine_PmQ : backend.serial.u64.field.FieldElement51)
+    (hP_valid : P.IsValid)
+    (hQ_valid : Q.IsValid)
+    (h_ladder_state : valid_ladder_state P Q affine_PmQ) :
     differential_add_and_double P Q affine_PmQ ⦃ res =>
       let (P', Q') := res
+      -- Outputs are valid
+      P'.IsValid ∧ Q'.IsValid ∧
       -- Correctness: outputs preserve u-coordinate relationship with [2]P and P+Q
-      (Field51_as_Nat P.W ≠ 0 → Field51_as_Nat Q.W ≠ 0 → Field51_as_Nat P'.W ≠ 0 → Field51_as_Nat Q'.W ≠ 0 →
-        ∀ (P_affine Q_affine : Montgomery.Point),
-          (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
-           Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
-           P_affine ≠ Q_affine ∧
-           Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
-           Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
-           Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →
-          (Field51_as_Nat P'.U / Field51_as_Nat P'.W = Montgomery.get_u (2 • P_affine)) ∧
-          (Field51_as_Nat Q'.U / Field51_as_Nat Q'.W = Montgomery.get_u (P_affine + Q_affine)))
+      (∀ (P_affine Q_affine : Montgomery.Point),
+        (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
+         Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
+         P_affine ≠ Q_affine ∧
+         Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
+         Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
+         Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →
+        (Field51_as_Nat P'.U / Field51_as_Nat P'.W = Montgomery.get_u (2 • P_affine)) ∧
+        (Field51_as_Nat Q'.U / Field51_as_Nat Q'.W = Montgomery.get_u (P_affine + Q_affine)))
     ⦄ := by
   sorry
 end curve25519_dalek.montgomery
