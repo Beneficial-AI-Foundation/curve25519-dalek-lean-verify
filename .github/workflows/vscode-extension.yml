@@ -1,0 +1,53 @@
+name: VSCode Extension
+
+on:
+  push:
+    branches: [ '**' ]
+    paths:
+      - 'vscode-aeneas-verify/**'
+  pull_request:
+    branches: [ '**' ]
+    paths:
+      - 'vscode-aeneas-verify/**'
+
+jobs:
+  check:
+    name: Check committed VSIX matches source
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: vscode-aeneas-verify
+        run: npm ci
+
+      - name: Compile TypeScript
+        working-directory: vscode-aeneas-verify
+        run: npm run compile
+
+      - name: Build VSIX from source and compare to committed VSIX
+        working-directory: vscode-aeneas-verify
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          COMMITTED="aeneas-verify-${VERSION}.vsix"
+
+          if [ ! -f "$COMMITTED" ]; then
+            echo "::error::Committed VSIX '${COMMITTED}' not found."
+            exit 1
+          fi
+
+          npx @vscode/vsce package --allow-missing-repository -o fresh.vsix
+
+          # VSIX is a zip — extract both and compare contents (ignoring zip metadata)
+          mkdir -p /tmp/committed /tmp/fresh
+          unzip -q "$COMMITTED" -d /tmp/committed
+          unzip -q fresh.vsix -d /tmp/fresh
+
+          if ! diff -r /tmp/committed /tmp/fresh; then
+            echo "::error::Committed VSIX is stale — it does not match what is built from source. Rebuild with: cd vscode-aeneas-verify && npx @vscode/vsce package --allow-missing-repository"
+            exit 1
+          fi

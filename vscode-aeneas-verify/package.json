@@ -1,0 +1,57 @@
+{
+  "name": "aeneas-verify",
+  "displayName": "Aeneas Verify",
+  "description": "Gutter icons and hover tooltips showing formal verification status of Rust functions",
+  "version": "0.1.0",
+  "publisher": "aeneas-verify",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Zhang-Liao/curve25519-dalek-lean-verify",
+    "directory": "vscode-aeneas-verify"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": ["Visualization"],
+  "activationEvents": [
+    "onLanguage:rust",
+    "workspaceContains:**/*.rs"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "configuration": {
+      "title": "Aeneas Verify",
+      "properties": {
+        "aeneas-verify.jsonPath": {
+          "type": "string",
+          "default": "functions.json",
+          "description": "Path to the verification status JSON file (relative to workspace root)"
+        },
+        "aeneas-verify.showExtractedOnly": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show a grey dot for functions that are extracted but have no spec"
+        }
+      }
+    },
+    "commands": [
+      {
+        "command": "aeneas-verify.openSpecFile",
+        "title": "Aeneas Verify: Open Lean Spec File"
+      },
+      {
+        "command": "aeneas-verify.reload",
+        "title": "Aeneas Verify: Reload Verification Data"
+      }
+    ]
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.75.0",
+    "@types/node": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}
