@@ -16,55 +16,12 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 
 Specification for `montgomery::differential_add_and_double`.
 
-This function performs the double-and-add step of the Montgomery ladder algorithm,
-which is the core operation for constant-time scalar multiplication on Montgomery curves.
-
-Given projective points P and Q on the Montgomery curve, and the affine u-coordinate
-of their difference P-Q, it simultaneously computes:
-- [2]P (the doubling of P)
-- P+Q (the addition of P and Q)
-
-This operation is fundamental to the Montgomery ladder (Algorithm 8 from Costello-Smith 2017),
-which maintains the invariant that two points differ by a known value throughout scalar
-multiplication.
+This function performs the core step of the Montgomery ladder: simultaneous point doubling
+and differential addition. Given projective points P, Q and the u-coordinate of P-Q,
+it computes [2]P and P+Q using formulas from Costello-Smith 2017.
+Here, differential addition denotes that we uses P-Q to more efficiently compute P+Q.
 
 **Source**: curve25519-dalek/src/montgomery.rs:L352-L390
-
-### What is "Differential" Addition?
-
-**The term "differential" refers to using the difference (differential) P-Q to compute the sum P+Q.**
-
-In standard elliptic curve addition, to compute P+Q, you only need the coordinates of P and Q.
-However, on Montgomery curves, there's a more efficient formula:
-
-**Differential Addition Formula:**
-To compute P+Q, you need:
-1. The coordinates of P (as projective point U_P:W_P)
-2. The coordinates of Q (as projective point U_Q:W_Q)
-3. The u-coordinate of their **difference** P-Q (this is the "differential" part!)
-
-The key insight is that you only need the u-coordinate of P-Q, not both u and v coordinates.
-
-**Why is this called "differential"?**
-- Because we use the **difference** (P-Q) to help compute the **sum** (P+Q)
-- The term "differential" emphasizes that we're working with differences between points
-- This is contrast to standard addition formulas that don't require difference information
-
-
-## Algorithm
-
-The function implements formulas from Costello-Smith 2017, Section 3.2:
-
-For doubling [2]P:
-- U₂ = (U_P + W_P)² · (U_P - W_P)²
-- W₂ = 4·U_P·W_P · ((U_P - W_P)² + ((A+2)/4)·4·U_P·W_P)
-
-For differential addition P+Q (given u(P-Q)):
-- U_{P+Q} = 4·(U_P·U_Q - W_P·W_Q)²
-- W_{P+Q} = u(P-Q)·4·(U_P·W_Q - U_Q·W_P)²
-
-The implementation uses temporary variables t0-t18 to compute these formulas
-efficiently with shared subexpressions.
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
@@ -80,92 +37,27 @@ def ProjectivePoint.IsValid (P : montgomery.ProjectivePoint) : Prop :=
   (Field51_as_Nat P.W : Montgomery.CurveField) ≠ 0
 
 /-
-Natural language description:
+natural language description:
 
-This function performs the core step of the Montgomery ladder: differential add-and-double.
+• Given projective points P and Q on the Montgomery curve, plus the u-coordinate of P-Q,
+  computes [2]P and P+Q simultaneously. Arithmetic is performed in 𝔽_p where p = 2^255 - 19.
 
-Given:
-- P: A projective point (U_P : W_P) on the Montgomery curve
-- Q: A projective point (U_Q : W_Q) on the Montgomery curve
-- affine_PmQ: The affine u-coordinate of P-Q  ← **This is the "differential"!**
+natural language specs:
 
-The function computes:
-1. P' = [2]P (the doubling of P)
-2. Q' = P+Q (the sum of P and Q, using the differential P-Q)
-
-And returns (P', Q').
-
-**Why we need affine_PmQ (the differential):**
-- Standard addition: P + Q needs only P and Q
-- Differential addition: P + Q needs P, Q, and P-Q (the difference/differential)
-- The differential formula is more efficient for Montgomery curves
-- Only the u-coordinate of P-Q is needed, not both coordinates
-
-**Mathematical Interpretation:**
-
-In projective coordinates, a point (U:W) represents the affine u-coordinate u = U/W.
-The function relates to the affine point operations defined in `Curve25519Dalek.Math.Montgomery.Curve`:
-- If P represents affine point with u-coordinate u_P = U_P/W_P
-- If Q represents affine point with u-coordinate u_Q = U_Q/W_Q
-- Then P' represents [2]P with u-coordinate U_{P'}/W_{P'}
-- And Q' represents P+Q with u-coordinate U_{Q'}/W_{Q'}
-
-The outputs satisfy the mathematical identities from `Montgomery.uADD` and `Montgomery.uDBL`:
-- For doubling: The identity relates u([2]P) to u(P) via the curve equation
-- For addition: The differential addition formula relates u(P+Q) to u(P), u(Q), and u(P-Q)
-
-Natural language specs:
-
-- The function always succeeds (no panic) given valid field element inputs
-- Returns a pair of ProjectivePoints representing ([2]P, P+Q)
-- Implements the formulas from Costello-Smith 2017, Algorithm 8
-- The computation is constant-time: all operations are field operations
-  without branches depending on secret data
-- Maintains the Montgomery ladder invariant: if Q = P + diff before the call,
-  then after the call, Q' = P' + diff where diff is the point with u-coordinate
-  affine_PmQ (the differential!)
+• The function always succeeds (no panic)
+• Returns (P', Q') where P' = [2]P and Q' = P+Q
+• Implements Costello-Smith 2017 differential formulas (Algorithm 8)
+• Constant-time operation using only field arithmetic
 -/
 
--- /-- Convert a projective coordinate pair to the affine u-coordinate u = U/W in the field.
---     Returns 0 if W = 0 (representing the point at infinity). -/
--- noncomputable def projective_to_affine_u (U W : backend.serial.u64.field.FieldElement51) : Montgomery.CurveField :=
---   let u_val : Montgomery.CurveField := Field51_as_Nat U
---   let w_val : Montgomery.CurveField := Field51_as_Nat W
---   if w_val = 0 then 0 else u_val / w_val
+/-- **Spec for `montgomery.differential_add_and_double`**:
 
-/-- **Spec and proof concerning `montgomery.differential_add_and_double`**:
-
-This theorem states that the differential add-and-double operation correctly computes
-[2]P and P+Q in projective coordinates, where the results are compatible with the
-affine point operations defined in `Curve25519Dalek.Math.Montgomery.Curve`.
-
-**Why "differential"?**
-The addition formula is called "differential" because it computes P+Q using the
-*difference* P-Q as auxiliary input. Specifically:
-- Input: P, Q, and u(P-Q) where u(P-Q) is the u-coordinate of the difference P-Q
-- Output: [2]P and P+Q
-- The parameter `affine_PmQ` is the "differential" — it provides u(P-Q)
-
-This is different from standard elliptic curve addition, which only needs P and Q.
-The differential formula is more efficient for Montgomery curves and is the foundation
-of the Montgomery ladder scalar multiplication algorithm.
-
-**Key Properties:**
-1. No panic (always returns successfully)
-2. Returns two ProjectivePoints (P', Q') representing [2]P and P+Q
-3. When converted to affine coordinates, the outputs satisfy the curve point addition
-   and doubling laws given by `Montgomery.uADD` and `Montgomery.uDBL`
-4. The computation follows Costello-Smith 2017 differential formulas
-5. All operations are constant-time field operations
-
-**Mathematical Correctness:**
-- The projective coordinates (U:W) represent the affine u-coordinate u = U/W
-- For valid inputs with non-zero W coordinates:
-  * P'.U/P'.W equals the u-coordinate of [2]P on the Montgomery curve
-  * Q'.U/Q'.W equals the u-coordinate of P+Q on the Montgomery curve
-  * affine_PmQ represents the u-coordinate of P-Q (the "differential"!)
-- The outputs satisfy the identities from `Montgomery.uDBL` for doubling
-  and can be used to construct the relation from `Montgomery.uADD` for addition
+- No panic (always succeeds)
+- Returns (P', Q') representing [2]P and P+Q in projective coordinates
+- P' satisfies the doubling formula: U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P)
+- Q' satisfies the differential addition formula using u(P-Q) = affine_PmQ:
+  U' = 4·(U_P·U_Q - W_P·W_Q)², W' = u(P-Q)·4·(U_P·W_Q - W_P·U_Q)²
+- All operations are constant-time field operations
 -/
 @[progress]
 theorem differential_add_and_double_spec
