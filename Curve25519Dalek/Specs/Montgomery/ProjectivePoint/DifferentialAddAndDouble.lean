@@ -30,13 +30,6 @@ multiplication.
 
 **Source**: curve25519-dalek/src/montgomery.rs:L352-L390
 
-## Mathematical Background
-
-The Montgomery curve for Curve25519 has equation: B·v² = u³ + A·u² + u
-
-In projective coordinates (U:W), a point has affine coordinate u = U/W.
-The identity element is represented as (1:0).
-
 ### What is "Differential" Addition?
 
 **The term "differential" refers to using the difference (differential) P-Q to compute the sum P+Q.**
@@ -52,20 +45,11 @@ To compute P+Q, you need:
 
 The key insight is that you only need the u-coordinate of P-Q, not both u and v coordinates.
 
-**Where the "differential" appears in the code:**
-- Input parameter: `affine_PmQ : FieldElement51` — This is u(P-Q), the differential!
-- In the algorithm (line 105): `t17 = affine_PmQ·t12` — The differential is used here
-- In the formula: W_{P+Q} = u(P-Q)·4·(U_P·W_Q - U_Q·W_P)²
-
 **Why is this called "differential"?**
 - Because we use the **difference** (P-Q) to help compute the **sum** (P+Q)
 - The term "differential" emphasizes that we're working with differences between points
 - This is contrast to standard addition formulas that don't require difference information
 
-**Why is this useful?**
-The Montgomery ladder algorithm maintains the invariant that two points always differ by
-a known amount (the base point). This makes differential addition perfect for efficient,
-constant-time scalar multiplication, which is essential for cryptography.
 
 ## Algorithm
 
@@ -89,59 +73,11 @@ open Montgomery
 
 namespace curve25519_dalek.montgomery
 
-/-! ## Helper definitions for connecting projective and affine representations -/
 
 /-- A projective point is valid if its W coordinate is non-zero,
     meaning it represents a finite affine point u = U/W. -/
 def ProjectivePoint.IsValid (P : montgomery.ProjectivePoint) : Prop :=
   (Field51_as_Nat P.W : Montgomery.CurveField) ≠ 0
-
-/-! ### Why we can't write `P' = [2]P` directly
-
-**Q: Why not just write `P' = 2 • P` or `P' = [2]P`?**
-
-**A: Because of type mismatch!**
-
-```lean
-P  : montgomery.ProjectivePoint  -- Rust FFI structure (U, W fields)
-P' : montgomery.ProjectivePoint  -- Rust FFI structure (U, W fields)
-
-[2]P : Montgomery.Point          -- Mathematical affine point (group element)
-```
-
-**Key differences:**
-
-1. **`montgomery.ProjectivePoint` has no group structure**
-   - It's just a structure with two `FieldElement51` fields
-   - No addition `+` or scalar multiplication `•` is defined
-   - You cannot write `2 * P` - Lean would error with "failed to synthesize instance HMul"
-
-2. **`Montgomery.Point` is a group element**
-   - It's an affine point on the Weierstrass curve (with u and v coordinates)
-   - Inherits AddCommGroup instance from mathlib
-   - Supports `P + Q` and `n • P` operations
-
-3. **Projective coordinates are equivalence classes**
-   - `(U:W) = (λU:λW)` for any λ ≠ 0
-   - Many projective representations map to the same affine point
-   - E.g., `(4:2)`, `(2:1)`, `(6:3)` all represent affine u-coordinate u = 2
-
-4. **Conversion requires division**
-   - Affine: u = U/W (requires field division, non-computable)
-   - Projective: (U:W) (no division needed, efficient for computation)
-
-**Our approach: Describe the relationship via coordinate formulas**
-
-Instead of writing `P' = [2]P`, we describe how the projective coordinates of P'
-relate to those of P through the doubling formula. This:
-- Avoids type conversion overhead
-- Directly specifies the implementation behavior
-- Makes verification more tractable
-
-The connection to `[2]P` is established in the mathematical interpretation:
-"When converted to affine coordinates u' = U'/W' and u = U/W,
- the point with u-coordinate u' equals [2] of the point with u-coordinate u."
--/
 
 /-
 Natural language description:
