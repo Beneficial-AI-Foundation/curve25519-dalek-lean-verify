@@ -53,13 +53,17 @@ natural language specs:
 
 - No panic (always succeeds)
 - Returns (P', Q') representing [2]P and P+Q in projective coordinates
-- Correctness is characterized by compatibility with `Montgomery.uDBL` and `Montgomery.uADD`:
-  when converted to affine coordinates, the outputs satisfy these high-level point operations
-- At the field level, implements Costello-Smith 2017 formulas:
-  * P': U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P)
-    where c = (A+2)/4 is the Montgomery curve constant
-  * Q': U' = 4·(U_P·U_Q - W_P·W_Q)², W' = u(P-Q)·4·(U_P·W_Q - W_P·U_Q)²
+- Correctness: the u-coordinates of the outputs correspond to point doubling and
+  differential addition on the Montgomery curve
 - All operations are constant-time field operations
+
+**Mathematical Specification:**
+Given projective points P=(U:W) and Q, plus the u-coordinate of (P-Q),
+computes P'=(U':W') representing [2]P and Q' representing P+Q.
+
+In Montgomery curve arithmetic, only u-coordinates are needed for the ladder.
+The spec states: for any affine points with matching u-coordinates (u_P/w_P, u_Q/w_Q),
+the outputs have u-coordinates matching [2]P and P+Q respectively.
 -/
 @[progress]
 theorem differential_add_and_double_spec
@@ -67,22 +71,17 @@ theorem differential_add_and_double_spec
     (affine_PmQ : backend.serial.u64.field.FieldElement51) :
     differential_add_and_double P Q affine_PmQ ⦃ res =>
       let (P', Q') := res
-      (∃ (u_P w_P u_Q w_Q u'_P w'_P u'_Q w'_Q u_diff : Montgomery.CurveField),
-        -- Correspondence with Montgomery.uDBL and Montgomery.uADD:
-        -- When projective coordinates represent valid affine points on the curve,
-        (w_P ≠ 0 → w_Q ≠ 0 → w'_P ≠ 0 → w'_Q ≠ 0 →
-          ∀ (P_affine Q_affine : Montgomery.Point),
-            (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
-             Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
-             P_affine ≠ Q_affine ∧
-             Montgomery.get_u P_affine = u_P / w_P ∧
-             Montgomery.get_u Q_affine = u_Q / w_Q ∧
-             Montgomery.get_u (P_affine - Q_affine) = u_diff) →
-            -- P' represents [2]P_affine (corresponds to Montgomery.uDBL)
-            (u'_P / w'_P = Montgomery.get_u (2 • P_affine)) ∧
-            -- Q' represents P_affine + Q_affine (corresponds to Montgomery.uADD)
-            (u'_Q / w'_Q = Montgomery.get_u (P_affine + Q_affine))))
+      -- Correctness: outputs preserve u-coordinate relationship with [2]P and P+Q
+      (Field51_as_Nat P.W ≠ 0 → Field51_as_Nat Q.W ≠ 0 → Field51_as_Nat P'.W ≠ 0 → Field51_as_Nat Q'.W ≠ 0 →
+        ∀ (P_affine Q_affine : Montgomery.Point),
+          (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
+           Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
+           P_affine ≠ Q_affine ∧
+           Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
+           Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
+           Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →
+          (Field51_as_Nat P'.U / Field51_as_Nat P'.W = Montgomery.get_u (2 • P_affine)) ∧
+          (Field51_as_Nat Q'.U / Field51_as_Nat Q'.W = Montgomery.get_u (P_affine + Q_affine)))
     ⦄ := by
   sorry
-
 end curve25519_dalek.montgomery
