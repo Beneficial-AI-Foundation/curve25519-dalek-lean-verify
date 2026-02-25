@@ -53,12 +53,12 @@ natural language specs:
 
 - No panic (always succeeds)
 - Returns (P', Q') representing [2]P and P+Q in projective coordinates
-- Since the Rust code has no separate `double` or `add` for `montgomery.ProjectivePoint`,
-  we directly characterize correctness using Costello-Smith 2017 formulas at the field level:
-  * P' satisfies the doubling formula: U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P),
+- Correctness is characterized by compatibility with `Montgomery.uDBL` and `Montgomery.uADD`:
+  when converted to affine coordinates, the outputs satisfy these high-level point operations
+- At the field level, implements Costello-Smith 2017 formulas:
+  * P': U' = (U_P + W_P)²·(U_P - W_P)², W' = 4·U_P·W_P·((U_P - W_P)² + c·4·U_P·W_P)
     where c = (A+2)/4 is the Montgomery curve constant
-  * Q' satisfies the differential addition formula using u(P-Q) = affine_PmQ:
-    U' = 4·(U_P·U_Q - W_P·W_Q)², W' = u(P-Q)·4·(U_P·W_Q - W_P·U_Q)²
+  * Q': U' = 4·(U_P·U_Q - W_P·W_Q)², W' = u(P-Q)·4·(U_P·W_Q - W_P·U_Q)²
 - All operations are constant-time field operations
 -/
 @[progress]
@@ -79,23 +79,42 @@ theorem differential_add_and_double_spec
         u'_Q = Field51_as_Nat Q'.U ∧
         w'_Q = Field51_as_Nat Q'.W ∧
 
-        -- Mathematical property 1: Doubling formula (from Costello-Smith 2017)
-        -- If w_P ≠ 0 and w'_P ≠ 0, then both the input and output points are
-        -- valid projective points, and the resulting point P' represents [2]P.
+        -- Mathematical property 1: Doubling (field-level Costello-Smith formula)
+        -- Implements the computation that corresponds to Montgomery.uDBL
         (w_P ≠ 0 → w'_P ≠ 0 →
           u'_P = (u_P + w_P)^2 * (u_P - w_P)^2 ∧
           (w'_P = (4 * u_P * w_P) * ((u_P - w_P)^2 +
             Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR  * (4 * u_P * w_P)))) ∧
-        -- Mathematical property 2: Differential addition formula
-        -- If w_P ≠ 0 and w'_P ≠ 0, then both the input and output points are
-        -- valid projective points, and the resulting point Q' represents P+Q.
+
+        -- Mathematical property 2: Differential addition (field-level Costello-Smith formula)
+        -- Implements the computation that corresponds to Montgomery.uADD
         (w_P ≠ 0 → w_Q ≠ 0 → w'_Q ≠ 0 →
           let v1 := (u_P + w_P) * (u_Q - w_Q)
           let v2 := (u_P - w_P) * (u_Q + w_Q)
           let v3 := v1 + v2
           let v4 := v1 - v2
           u'_Q = v3^2 ∧
-          w'_Q = u_diff * v4^2))
+          w'_Q = u_diff * v4^2) ∧
+
+        -- Compatibility with high-level point operations:
+        -- When the projective coordinates represent valid affine points on the curve,
+        -- the outputs satisfy the identities from Montgomery.uDBL and Montgomery.uADD
+        (w_P ≠ 0 → w_Q ≠ 0 → w'_P ≠ 0 → w'_Q ≠ 0 →
+          ∀ (P_affine Q_affine : Montgomery.Point),
+            (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
+             Q_affine ≠ 0 ∧ Q_affine ≠ Montgomery.T_point ∧
+             P_affine ≠ Q_affine ∧
+             Montgomery.get_u P_affine = u_P / w_P ∧
+             Montgomery.get_u Q_affine = u_Q / w_Q ∧
+             Montgomery.get_u (P_affine - Q_affine) = u_diff) →
+            -- P' corresponds to [2]P_affine (satisfies uDBL identity)
+            (4 * (u'_P / w'_P) * Montgomery.get_u P_affine *
+              ((Montgomery.get_u P_affine)^2 + Montgomery.Curve25519.A * Montgomery.get_u P_affine + 1) =
+             ((Montgomery.get_u P_affine)^2 - 1)^2) ∧
+            -- Q' corresponds to P_affine + Q_affine (satisfies uADD identity)
+            ((u'_Q / w'_Q) * Montgomery.get_u (P_affine - Q_affine) *
+              (Montgomery.get_u P_affine - Montgomery.get_u Q_affine)^2 =
+             (Montgomery.get_u P_affine * Montgomery.get_u Q_affine - 1)^2)))
     ⦄ := by
   sorry
 
