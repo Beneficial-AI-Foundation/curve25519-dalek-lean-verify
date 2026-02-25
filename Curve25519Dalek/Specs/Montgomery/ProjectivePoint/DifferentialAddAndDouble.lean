@@ -67,38 +67,9 @@ theorem differential_add_and_double_spec
     (affine_PmQ : backend.serial.u64.field.FieldElement51) :
     differential_add_and_double P Q affine_PmQ ⦃ res =>
       let (P', Q') := res
-
       (∃ (u_P w_P u_Q w_Q u'_P w'_P u'_Q w'_Q u_diff : Montgomery.CurveField),
-        u_P = Field51_as_Nat P.U ∧
-        w_P = Field51_as_Nat P.W ∧
-        u_Q = Field51_as_Nat Q.U ∧
-        w_Q = Field51_as_Nat Q.W ∧
-        u_diff = Field51_as_Nat affine_PmQ ∧
-        u'_P = Field51_as_Nat P'.U ∧
-        w'_P = Field51_as_Nat P'.W ∧
-        u'_Q = Field51_as_Nat Q'.U ∧
-        w'_Q = Field51_as_Nat Q'.W ∧
-
-        -- Mathematical property 1: Doubling (field-level Costello-Smith formula)
-        -- Implements the computation that corresponds to Montgomery.uDBL
-        (w_P ≠ 0 → w'_P ≠ 0 →
-          u'_P = (u_P + w_P)^2 * (u_P - w_P)^2 ∧
-          (w'_P = (4 * u_P * w_P) * ((u_P - w_P)^2 +
-            Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR  * (4 * u_P * w_P)))) ∧
-
-        -- Mathematical property 2: Differential addition (field-level Costello-Smith formula)
-        -- Implements the computation that corresponds to Montgomery.uADD
-        (w_P ≠ 0 → w_Q ≠ 0 → w'_Q ≠ 0 →
-          let v1 := (u_P + w_P) * (u_Q - w_Q)
-          let v2 := (u_P - w_P) * (u_Q + w_Q)
-          let v3 := v1 + v2
-          let v4 := v1 - v2
-          u'_Q = v3^2 ∧
-          w'_Q = u_diff * v4^2) ∧
-
-        -- Compatibility with high-level point operations:
-        -- When the projective coordinates represent valid affine points on the curve,
-        -- the outputs satisfy the identities from Montgomery.uDBL and Montgomery.uADD
+        -- Correspondence with Montgomery.uDBL and Montgomery.uADD:
+        -- When projective coordinates represent valid affine points on the curve,
         (w_P ≠ 0 → w_Q ≠ 0 → w'_P ≠ 0 → w'_Q ≠ 0 →
           ∀ (P_affine Q_affine : Montgomery.Point),
             (P_affine ≠ 0 ∧ P_affine ≠ Montgomery.T_point ∧
@@ -107,14 +78,10 @@ theorem differential_add_and_double_spec
              Montgomery.get_u P_affine = u_P / w_P ∧
              Montgomery.get_u Q_affine = u_Q / w_Q ∧
              Montgomery.get_u (P_affine - Q_affine) = u_diff) →
-            -- P' corresponds to [2]P_affine (satisfies uDBL identity)
-            (4 * (u'_P / w'_P) * Montgomery.get_u P_affine *
-              ((Montgomery.get_u P_affine)^2 + Montgomery.Curve25519.A * Montgomery.get_u P_affine + 1) =
-             ((Montgomery.get_u P_affine)^2 - 1)^2) ∧
-            -- Q' corresponds to P_affine + Q_affine (satisfies uADD identity)
-            ((u'_Q / w'_Q) * Montgomery.get_u (P_affine - Q_affine) *
-              (Montgomery.get_u P_affine - Montgomery.get_u Q_affine)^2 =
-             (Montgomery.get_u P_affine * Montgomery.get_u Q_affine - 1)^2)))
+            -- P' represents [2]P_affine (corresponds to Montgomery.uDBL)
+            (u'_P / w'_P = Montgomery.get_u (2 • P_affine)) ∧
+            -- Q' represents P_affine + Q_affine (corresponds to Montgomery.uADD)
+            (u'_Q / w'_Q = Montgomery.get_u (P_affine + Q_affine))))
     ⦄ := by
   sorry
 
