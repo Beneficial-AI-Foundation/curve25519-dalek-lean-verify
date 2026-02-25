@@ -816,7 +816,34 @@ theorem sqrt_ratio_i_spec'
         · exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
             r_is_negative_post r_neg_post_1 r2_post
 
-    · sorry
+    · -- second branch: first_choice = false
+      have u_m := nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
+      by_cases second_choice : flipped_sign_sqrt_i.val = 1#u8
+      · -- A: second_choice = true (c = Choice.one, r1 = r_prime)
+        simp only [first_choice, second_choice, or_true, or_false,
+          ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
+          Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+        progress*
+        · intro i hi
+          simp only [Choice.one, ↓reduceIte] at r1_post
+          rw [r1_post i hi]
+          have := r_prime_post_2 i hi
+          omega
+        · -- main block A: by_cases on correct_sign_sqrt
+          by_cases choice3 : correct_sign_sqrt.val = 1#u8
+          · simp only [choice3, ↓reduceIte]
+            sorry -- A1: second_choice=true, choice3=true
+          · simp only [choice3, ↓reduceIte]
+            sorry -- A2: second_choice=true, choice3=false
+      · -- B: second_choice = false (c = Choice.zero, r1 = r)
+        simp only [first_choice, second_choice, or_false,
+          ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
+          Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+        progress*
+        · sorry -- bounds for neg
+        · sorry -- main block B
 
     -- · grind
     -- · grind
