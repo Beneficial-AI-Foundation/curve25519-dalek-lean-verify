@@ -16,6 +16,35 @@ as closely as possible, including naming conventions and general code style.
 We prioritize getting proofs done over code perfection, but the guidelines below
 should be respected.
 
+### Spec Theorem Format
+
+New spec theorems should follow the Aeneas WP (weakest precondition) style
+using `⦃ ... ⦄` syntax. The canonical layout is:
+
+```lean
+@[progress]
+theorem fun_name_spec
+    (a : argType) (b : argType)
+    (h : pre_condition) :
+    fun_name a b ⦃ result : resultType =>
+      post_condition_1 ∧
+      post_condition_2 ⦄ := by
+  sorry
+```
+
+The WP brackets `⦃` and `⦄` are typed as `\{{` and `\}}` respectively in
+VS Code with the Lean 4 extension (Unicode characters U+2983 and U+2984).
+
+Key points:
+- Tag with `@[progress]` so the Aeneas `progress` tactic can chain specs
+- Arguments and preconditions on separate indented lines
+- The function call and WP binder on the `:` line
+- Postconditions as a conjunction inside `⦃ ... ⦄`
+- Proof body indented at one level (2 spaces)
+
+Some older specs use the existential form (`∃ result, f = ok result ∧ ...`).
+Both forms are acceptable, but **new specs should prefer the WP style**.
+
 ### Avoiding Flexible Tactics
 
 Flexible (non-terminal) tactics make proofs fragile and harder to maintain.
