@@ -20,11 +20,20 @@ axiom core.result.Result.map
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut] -/
 @[rust_fun
   "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
-axiom
-  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
+def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
-    Slice T))
+    Slice T)) :=
+  fun _ s => ok (s, id)
+
+/-- RangeFull index_mut (`s[..]`) returns the slice and the identity function. -/
+@[simp, progress]
+theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut_spec
+  {T : Type} (s : Slice T) :
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut () s ⦃ p =>
+    p.1 = s ∧ p.2 = id ⦄ := by
+  unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
+  simp [spec_ok]
 
 /- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::index]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 655:4-655:39
@@ -69,19 +78,39 @@ axiom
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
 @[rust_fun
   "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
-axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
+def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
-    (Option (Slice T) → Slice T))
+    (Option (Slice T) → Slice T)) :=
+  fun _ s => ok (some s, fun opt => opt.getD s)
+
+/-- RangeFull get_mut (`s[..]`) returns Some(s) and a function that replaces the slice if Some, or keeps it if None. -/
+@[simp, progress]
+theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut_spec
+  {T : Type} (s : Slice T) :
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut () s ⦃ p =>
+    p.1 = some s ∧ (∀ opt, p.2 opt = opt.getD s) ⦄ := by
+  unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
+  simp [spec_ok]
 
 /- [core::slice::index::{core::slice::index::SliceIndex<[T], [T]> for core::ops::range::RangeFull}::get]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 635:4-635:45
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get] -/
 @[rust_fun
   "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
-axiom core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
+def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
   {T : Type} :
-  core.ops.range.RangeFull → Slice T → Result (Option (Slice T))
+  core.ops.range.RangeFull → Slice T → Result (Option (Slice T)) :=
+  fun _ s => ok (some s)
+
+/-- RangeFull get (`s[..]`) always returns Some(s) for slices. -/
+@[simp, progress]
+theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_spec
+  {T : Type} (s : Slice T) :
+  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get () s ⦃ opt =>
+    opt = some s ⦄ := by
+  unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
+  simp [spec_ok]
 
 /- Convenience definitions for Choice values -/
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
