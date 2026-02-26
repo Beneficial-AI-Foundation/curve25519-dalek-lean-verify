@@ -50,9 +50,13 @@ theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     h ∣ U8x32_as_Nat clamped_scalar ∧
     U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧
     2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P)) ⦄ := by
+    let m:= (U8x32_as_Nat clamped_scalar)
+    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
       unfold mul_clamped
       progress*
+      have := Nat.mod_eq_of_lt  a_post_2
+      rw[this] at res_post
       exact ⟨a, a_post_1, a_post_2, a_post_3, res_post⟩
+
 
 end curve25519_dalek.montgomery.MontgomeryPoint
