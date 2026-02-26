@@ -6,6 +6,8 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step1
+import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step2
 
 /-! # Spec Theorem for `CompressedRistretto::decompress`
 

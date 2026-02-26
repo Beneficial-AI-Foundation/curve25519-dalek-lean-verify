@@ -812,28 +812,29 @@ set_option maxHeartbeats 3400000 in -- simp_alll heavy
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ result =>
     Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
+    (∀ i < 5, result[i]!.val < 2^51) ∧
     result.IsValid ⦄ := by
   unfold from_bytes
   progress*
-  refine ⟨?_, ?_⟩
+  -- Shared helper: each masked limb < 2^51 (mask = 2^51 - 1)
+  have h_mask_lt : (↑low_51_bit_mask : ℕ) < 2 ^ 51 := by
+    rw [low_51_bit_mask_post_1, i_post_1];
+    simp only [Nat.shiftLeft_eq, Nat.one_mul, U64.size_eq]
+    try scalar_tac
+  have and_mask_lt : ∀ (x : U64), (↑(x &&& low_51_bit_mask) : ℕ) < 2 ^ 51 := by
+    intro x
+    have : (↑(x &&& low_51_bit_mask) : ℕ) = ↑x &&& ↑low_51_bit_mask := by
+      simp only [UScalar.val_and]
+    rw [this]; exact lt_of_le_of_lt Nat.and_le_right h_mask_lt
+  refine ⟨?_, ?_, ?_⟩
   swap
-  · -- IsValid: each limb is (value &&& low_51_bit_mask) so < 2^51 < 2^54
-    have h_mask_lt : (↑low_51_bit_mask : ℕ) < 2 ^ 54 := by
-      rw [low_51_bit_mask_post_1, i_post_1];
-      simp only [Nat.shiftLeft_eq, Nat.one_mul, U64.size_eq]
-      try scalar_tac
-    have and_mask_lt : ∀ (x : U64), (↑(x &&& low_51_bit_mask) : ℕ) < 2 ^ 54 := by
-      intro x
-      have : (↑(x &&& low_51_bit_mask) : ℕ) = ↑x &&& ↑low_51_bit_mask := by
-        simp only [UScalar.val_and]
-      rw [this]; exact lt_of_le_of_lt Nat.and_le_right h_mask_lt
-    simp only [FieldElement51.IsValid, Array.make]
+  · -- Tight bounds: each limb < 2^51
+    simp only [Array.make]
     intro j hj
     interval_cases j
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.ofNat_pos, getElem!_pos, List.getElem_cons_zero]
-      rw [i2_post_1];
-      exact and_mask_lt i1
+      rw [i2_post_1]; exact and_mask_lt i1
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.one_lt_ofNat, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
       rw [i5_post_1]; exact and_mask_lt i4
@@ -846,7 +847,26 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.lt_add_one, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
       rw [i14_post_1]; exact and_mask_lt i13
-
+  swap
+  · -- IsValid (< 2^54): follows from tight bounds
+    simp only [FieldElement51.IsValid, Array.make]
+    intro j hj
+    interval_cases j
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+        Nat.ofNat_pos, getElem!_pos, List.getElem_cons_zero]
+      rw [i2_post_1]; exact lt_trans (and_mask_lt i1) (by norm_num)
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+        Nat.one_lt_ofNat, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i5_post_1]; exact lt_trans (and_mask_lt i4) (by norm_num)
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i8_post_1]; exact lt_trans (and_mask_lt i7) (by norm_num)
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i11_post_1]; exact lt_trans (and_mask_lt i10) (by norm_num)
+    · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
+      Nat.lt_add_one, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
+      rw [i14_post_1]; exact lt_trans (and_mask_lt i13) (by norm_num)
   -- Congruence proof (unchanged):
   rw [bytes_mod255_eq]
   simp_all only [Nat.reduceShiftLeft, U64.size, U64.numBits, UScalarTy.U64_numBits_eq,
