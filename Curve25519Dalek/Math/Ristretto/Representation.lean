@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo, Oliver Butterley
+Authors: Alessandro D'Angelo, Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
@@ -725,7 +725,6 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
      on_curve := by sorry},
     by
     unfold IsEven
-    dsimp
     by_cases hdenom : (1 : ZMod p) + s_sq = 0
     · have hzero : (1 - s_sq) / (1 + s_sq) = 0 := by
         rw [hdenom]
