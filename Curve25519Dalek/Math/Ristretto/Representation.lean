@@ -66,31 +66,24 @@ noncomputable def compress_pure (P : Point Ed25519) : Nat :=
   let y := P.y
   let z := (1 : ZMod p)
   let t := x * y
-
   -- 1. Setup
   let u1 := (z + y) * (z - y)
   let u2 := x * y
-
   -- 2. Inverse Sqrt
   let (invsqrt, _was_square) := inv_sqrt_checked (u1 * u2^2)
   let den1 := invsqrt * u1
   let den2 := invsqrt * u2
   let z_inv := den1 * den2 * t
-
   -- 3. Rotation Decision
   let rotate := is_negative (t * z_inv)
-
   -- 4. Apply Rotation
   let x_prime := if rotate then y * sqrt_m1 else x
   let y_prime := if rotate then x * sqrt_m1 else y
   let den_inv := if rotate then den1 * invsqrt_a_minus_d else den2
-
   -- 5. Sign Adjustment
   let y_final := if is_negative (x_prime * z_inv) then -y_prime else y_prime
-
   -- 6. Final Calculation
   let s := abs_edwards (den_inv * (z - y_final))
-
   s.val
 
 end PureIsogeny
@@ -448,23 +441,18 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
   let u1 := 1 + a_val * s^2
   let u2 := 1 - a_val * s^2
   let v := a_val * d * u1^2 - u2^2
-
   -- 2. Inverse Square Root (Elligator)
   let arg := v * u2^2
   match h_call : inv_sqrt_checked arg with
   | (I, was_square) =>
-
     -- 3. Recover denominators
     let Dx := I * u2
     let Dy := I * Dx * v
-
     -- 4. Recover coordinates
     let x := abs_edwards (2 * s * Dx)
     let y := u1 * Dy
-
     -- 5. Validation Checks
     let t := x * y
-
     if h_invalid : !was_square || is_negative t || (y == 0) then
       none
     else
@@ -475,12 +463,16 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
               rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
               obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
               simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
-
               have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
                 apply inv_sqrt_checked_spec arg
                 · exact h_call
                 · exact h_sq_not
-
+                · -- arg ≠ 0: follows from was_square = true + inv_sqrt_checked's zero guard
+                  intro h_zero
+                  rw [h_zero] at h_call
+                  rw [inv_sqrt_checked_zero] at h_call; simp only [Prod.mk.injEq,
+                    Bool.false_eq] at h_call
+                  exact absurd h_call.2 (by rw [h_sq_not]; decide)
               let x_raw := 2 * s * Dx
               have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
                 dsimp only [y, Dy, Dx, x_raw]
@@ -488,14 +480,171 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
                 <;> try rw [a_val];
                 <;> try rfl
                 exact h_I_sq_mul
-
               have h_x_sq : x^2 = x_raw^2 := by
                 dsimp only [x]
                 exact abs_edwards_sq (2 * s * Dx)
-
               rw [h_x_sq]
               exact h_curve_raw
            }
+
+/-- Forward characterization: if decompress_step2 returns some point, then
+    the arg is a nonzero square, validation passes, and coordinates are determined
+    by inv_sqrt_checked. -/
+lemma decompress_step2_1 (s : ZMod p) (pt : Point Ed25519)
+    (h : decompress_step2 s = some pt) :
+    let u1 := 1 + a_val * s ^ 2
+    let u2 := 1 - a_val * s ^ 2
+    let v := a_val * (d : CurveField) * u1 ^ 2 - u2 ^ 2
+    let W := v * u2 ^ 2
+    let I := (inv_sqrt_checked W).1
+    IsSquare W ∧ W ≠ 0 ∧
+    is_negative (abs_edwards (2 * s * (I * u2)) * (u1 * (I * (I * u2) * v))) = false ∧
+    u1 * (I * (I * u2) * v) ≠ 0 ∧
+    pt.x = abs_edwards (2 * s * (I * u2)) ∧
+    pt.y = u1 * (I * (I * u2) * v) := by
+  unfold decompress_step2 at h
+  dsimp only at h
+  split_ifs at h with h_invalid
+  -- some branch: h_invalid is ¬(...), h : some {...} = some pt
+  -- Extract point equality
+  have h_pt := Option.some.inj h
+  -- Introduce goal let bindings
+  intro u1 u2 v W I
+  -- Decompose the three validation conditions (mirrors on_curve proof pattern)
+  replace h_invalid := Bool.eq_false_iff.mpr h_invalid
+  rw [Bool.or_eq_false_iff, Bool.or_eq_false_iff] at h_invalid
+  obtain ⟨⟨h_ws, h_neg⟩, h_y_eq⟩ := h_invalid
+  simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_ws
+  -- Lift expanded hypotheses to compact let-binding types (definitional equality)
+  have h_ws' : (inv_sqrt_checked W).2 = true := h_ws
+  have h_neg' : is_negative (abs_edwards (2 * s * (I * u2)) *
+    (u1 * (I * (I * u2) * v))) = false := h_neg
+  have h_y_eq' : (u1 * (I * (I * u2) * v) == (0 : ZMod p)) = false := h_y_eq
+  -- W ≠ 0 from was_square = true + inv_sqrt_checked's zero guard
+  have h_W_ne : W ≠ 0 := by
+    intro h_zero
+    have : (inv_sqrt_checked W).2 = false := by
+      rw [show W = (0 : ZMod p) from h_zero, inv_sqrt_checked_zero]
+    rw [h_ws'] at this; exact absurd this (by decide)
+  -- IsSquare W via sqrt_checked_iff_isSquare (b = true ↔ IsSquare u)
+  have h_sq_W : IsSquare W := by
+    have h_sc : (sqrt_checked W).2 = true := by rw [← inv_sqrt_checked_snd W h_W_ne]; exact h_ws'
+    exact (sqrt_checked_iff_isSquare W (Prod.mk.eta (p := sqrt_checked W)).symm).mp h_sc
+  -- y ≠ 0 from BEq
+  have h_y_ne : u1 * (I * (I * u2) * v) ≠ 0 := by
+    exact beq_eq_false_iff_ne.mp h_y_eq'
+  -- Coordinate equalities from h_pt
+  have hx : pt.x = abs_edwards (2 * s * (I * u2)) := by rw [← h_pt]
+  have hy : pt.y = u1 * (I * (I * u2) * v) := by rw [← h_pt]
+  exact ⟨h_sq_W, h_W_ne, h_neg', h_y_ne, hx, hy⟩
+
+/-- Backward characterization: given ANY I with I² * W = 1, if the point
+    coordinates match those computed from I, validation passes, and y ≠ 0,
+    then decompress_step2 returns that point.
+    Key insight: the output only depends on I² = W⁻¹ (not on I's sign),
+    because y uses I² and x uses abs_edwards (sign-independent). -/
+lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
+    (hI : I ^ 2 * ((a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+      (1 - a_val * s ^ 2) ^ 2) * (1 - a_val * s ^ 2) ^ 2) = 1)
+    (h_neg : is_negative (pt.x * pt.y) = false)
+    (h_y_ne : pt.y ≠ 0)
+    (hx : pt.x = abs_edwards (2 * s * (I * (1 - a_val * s ^ 2))))
+    (hy : pt.y = (1 + a_val * s ^ 2) *
+      (I * (I * (1 - a_val * s ^ 2)) *
+        (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+          (1 - a_val * s ^ 2) ^ 2))) :
+    decompress_step2 s = some pt := by
+  -- Abbreviation for W (the arg to inv_sqrt_checked in decompress_step2)
+  set W := (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+    (1 - a_val * s ^ 2) ^ 2) * (1 - a_val * s ^ 2) ^ 2
+  -- 1. Key algebraic facts (established BEFORE unfolding)
+  have h_W_ne : W ≠ 0 := right_ne_zero_of_mul_eq_one hI
+  have h_I_ne : I ≠ 0 := by intro h; simp [h] at hI
+  have h_sq_W : IsSquare W := ⟨I⁻¹, by
+    have : W = (I ^ 2)⁻¹ := by rw [eq_inv_of_mul_eq_one_left hI, inv_inv]
+    rw [this, ← inv_pow, sq]⟩
+  -- 2. inv_sqrt_checked W returns true (was_square = true)
+  have h_ws : (inv_sqrt_checked W).2 = true := by
+    rw [inv_sqrt_checked_snd W h_W_ne]
+    exact (sqrt_checked_iff_isSquare W (Prod.mk.eta (p := sqrt_checked W)).symm).mpr h_sq_W
+  -- 3. I² = I'² (both equal W⁻¹)
+  have h_I'_sq : (inv_sqrt_checked W).1 ^ 2 * W = 1 :=
+    inv_sqrt_checked_sq_mul W h_sq_W h_W_ne
+  have h_sq_eq : I ^ 2 = (inv_sqrt_checked W).1 ^ 2 :=
+    mul_right_cancel₀ h_W_ne (by rw [hI, h_I'_sq])
+  -- 4. y coordinate: u1 * I' * (I' * u2) * v = u1 * I * (I * u2) * v (uses I² = I'²)
+  have h_y_match : (1 + a_val * s ^ 2) *
+      ((inv_sqrt_checked W).1 * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
+        (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+          (1 - a_val * s ^ 2) ^ 2)) = pt.y := by
+    rw [hy]; congr 1
+    have h1 : (inv_sqrt_checked W).1 * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
+      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) =
+      (inv_sqrt_checked W).1 ^ 2 * (1 - a_val * s ^ 2) *
+      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) := by ring
+    have h2 : I * (I * (1 - a_val * s ^ 2)) *
+      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) =
+      I ^ 2 * (1 - a_val * s ^ 2) *
+      (a_val * ↑d * (1 + a_val * s ^ 2) ^ 2 - (1 - a_val * s ^ 2) ^ 2) := by ring
+    rw [h1, h2, h_sq_eq]
+  -- 5. x coordinate: abs_edwards(2s * I' * u2) = abs_edwards(2s * I * u2) (I' = ±I)
+  have abs_edwards_neg : ∀ (x : ZMod p), abs_edwards (-x) = abs_edwards x := by
+    intro x; by_cases hx : x = 0
+    · simp [hx]
+    · unfold abs_edwards is_negative
+      have h_neg_val : (-x : ZMod p).val = p - x.val := by
+        rw [ZMod.neg_val]; exact if_neg hx
+      rw [h_neg_val]
+      have hxlt : x.val < p := x.val_lt
+      have hxv : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+      have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv
+      have hp_odd : p % 2 = 1 := by decide
+      have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
+      by_cases hpx : x.val % 2 = 1
+      · have : (p - x.val) % 2 = 0 := by omega
+        simp only [beq_iff_eq] at *; simp [hpx, this]
+      · have hpx0 : x.val % 2 = 0 := by omega
+        have : (p - x.val) % 2 = 1 := by omega
+        simp only [beq_iff_eq] at *; simp [hpx0, this]
+  have h_x_match : abs_edwards (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) =
+      pt.x := by
+    rw [hx]
+    have h_sq_x : (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) ^ 2 =
+        (2 * s * (I * (1 - a_val * s ^ 2))) ^ 2 := by
+      have h1 : (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) ^ 2 =
+        4 * s ^ 2 * (inv_sqrt_checked W).1 ^ 2 * (1 - a_val * s ^ 2) ^ 2 := by ring
+      have h2 : (2 * s * (I * (1 - a_val * s ^ 2))) ^ 2 =
+        4 * s ^ 2 * I ^ 2 * (1 - a_val * s ^ 2) ^ 2 := by ring
+      rw [h1, h2, h_sq_eq]
+    rcases sq_eq_sq_iff_eq_or_eq_neg.mp h_sq_x with h_eq | h_neg_eq
+    · rw [h_eq]
+    · rw [h_neg_eq]; exact abs_edwards_neg _
+  -- 6. Validation condition is false (ws=true, is_neg=false, y≠0)
+  -- is_negative(x_internal * y_internal) = is_negative(pt.x * pt.y) = false
+  have h_neg_match : is_negative (abs_edwards (2 * s *
+      ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) *
+    ((1 + a_val * s ^ 2) * ((inv_sqrt_checked W).1 *
+      ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
+      (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+        (1 - a_val * s ^ 2) ^ 2)))) = false := by
+    rw [h_x_match, h_y_match]; exact h_neg
+  have h_y_ne_match : ((1 + a_val * s ^ 2) * ((inv_sqrt_checked W).1 *
+      ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
+      (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
+        (1 - a_val * s ^ 2) ^ 2)) == (0 : ZMod p)) = false := by
+    rw [h_y_match]; exact beq_eq_false_iff_ne.mpr h_y_ne
+  -- 7. Unfold decompress_step2 and close
+  unfold decompress_step2; dsimp only
+  split_ifs with h_cond
+  · -- none branch: contradiction (validation should pass)
+    -- h_cond uses full expansion but h_ws/h_neg_match/h_y_ne_match use W (set abbrev);
+    simp_all only [ne_eq, mul_eq_zero, false_or, not_or, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff,
+      or_self, mul_eq_mul_left_iff, mul_eq_mul_right_iff, or_false, beq_eq_false_iff_ne, Bool.not_true, Bool.or_self,
+      Bool.false_or, beq_iff_eq, W]
+  · -- some branch: show point equality
+    congr 1; ext
+    · exact h_x_match
+    · exact h_y_match
 
 noncomputable def decompress_pure (c : CompressedRistretto) : Option (Point Ed25519) :=
   (decompress_step1 c).bind decompress_step2
@@ -533,10 +682,12 @@ section ElligatorMap
 /--
 **Elligator Ristretto Map (Pure Spec)**
 Maps a field element `r0` to an Affine Point on the Ed25519 curve.
+Comes with a proof that the output point is even (i.e., in the image of the doubling map)
 Logic corresponds to [RFC 9496 Section 4.3.4].
 -/
-noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p) : Point Ed25519 :=
-  -- 1. Constants
+noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
+    : {P : Point Ed25519 // IsEven P} :=
+    -- 1. Constants
   let i := sqrt_m1
   let d_val := d
   let one := (1 : ZMod p)
@@ -567,23 +718,20 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p) : Point Ed25519 
   --    x = X_ext / Z_ext = (2sD) / (Nt * sqrt_ad_minus_one)
   --    y = Y_ext / Z_ext = (1 - s^2) / (1 + s^2)
   let s_sq := s^2
-  {
-    x := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
-    y := (1 - s_sq) / (1 + s_sq)
-    on_curve := by
-       -- The proof that this point satisfies the curve equation
-       -- is much easier in Affine coordinates.
-       sorry
-  }
 
-/--
-**Validity Theorem**
-The Elligator map always produces a point that is "Even" (in the 2-torsion subgroup).
-This is the key Ristretto property.
--/
-theorem elligator_pure_is_even (r0 : ZMod p) :
-  IsEven (elligator_ristretto_flavor_pure r0) := by
-  sorry
+  -- 8. Bundle output point with proof of evenness
+  ⟨{ x        := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
+     y        := (1 - s_sq) / (1 + s_sq)
+     on_curve := by sorry},
+    by
+    unfold IsEven
+    by_cases hdenom : (1 : ZMod p) + s_sq = 0
+    · have hzero : (1 - s_sq) / (1 + s_sq) = 0 := by
+        rw [hdenom]
+        exact div_zero _
+      rw [hzero]
+      exact ⟨1, by ring⟩
+    · exact ⟨2 * s / (1 + s_sq), by field_simp [hdenom]; ring⟩⟩
 
 end ElligatorMap
 
@@ -633,7 +781,6 @@ def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
   let x := P.x
   let y := P.y
   let t := x * y
-
   -- 1. x must be even (non-negative)
   (is_negative x = false) ∧
   -- 2. t must be even (non-negative)

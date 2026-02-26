@@ -6211,10 +6211,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)\n    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →\n      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) ⦄ := by ...",
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Unconditional bounds\n    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n    -- Non-negativity\n    (r_nat % 2 = 0) ∧\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
+   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- Output limbs bounded by 2^53 - 1\n- Result r is non-negative (r_nat % 2 = 0)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
@@ -6301,10 +6301,10 @@
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    -- Case 1: u is zero\n    (u_nat = 0 →\n    c.1.val = 1#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 2: u is nonzero and v is zero\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n    c.1.val = 0#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 3: u and v are nonzero and u/v is a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 4: u and v are nonzero and u/v is not a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n    c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))\n     ⦄ := by ...",
+   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -8155,7 +8155,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
@@ -8247,10 +8247,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
