@@ -170,7 +170,7 @@ private lemma decompress_step2_forward (s : ZMod p) (P : Point Ed25519)
     have abs_edwards_neg : ∀ (x : ZMod p), abs_edwards (-x) = abs_edwards x := by
       intro x
       by_cases hx : x = 0
-      · simp [hx]
+      · simp only [hx, neg_zero]
       · unfold abs_edwards is_negative
         have h_neg_val : (-x : ZMod p).val = p - x.val := by
           rw [ZMod.neg_val]; exact if_neg hx
@@ -182,10 +182,10 @@ private lemma decompress_step2_forward (s : ZMod p) (P : Point Ed25519)
         have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
         by_cases hpx : x.val % 2 = 1
         · have : (p - x.val) % 2 = 0 := by omega
-          simp only [beq_iff_eq] at *; simp [hpx, this]
+          simp only [beq_iff_eq] at *; simp only [this, zero_ne_one, ↓reduceIte, hpx]
         · have hpx0 : x.val % 2 = 0 := by omega
           have : (p - x.val) % 2 = 1 := by omega
-          simp only [beq_iff_eq] at *; simp [hpx0, this]
+          simp only [beq_iff_eq] at *; simp only [this, ↓reduceIte, neg_neg, hpx0, zero_ne_one]
     constructor
     · -- P.x = abs_edwards (2 * s * I * u2)
       rw [h_Px']
@@ -283,7 +283,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
      (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
      (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧
     (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
-      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ⦄ := by
+      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧
+    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
   unfold step_2 field.FieldElement51.invsqrt
   progress
   · intro i hi; have := h_s i hi; omega
@@ -364,7 +365,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       apply Finset.sum_congr rfl
       intro i hi; rw [Finset.mem_range] at hi; rw [u2_post i hi, mul_add]
     have hu2 : u2.toField = 1 + ss.toField := by
-      unfold FieldElement51.toField; rw [hu2_nat]; push_cast; simp [FieldElement51.ONE_spec]
+      unfold FieldElement51.toField; rw [hu2_nat]; push_cast; simp only [FieldElement51.ONE_spec,
+        Nat.cast_one]
     have hu3 : u3.toField = u2.toField ^ 2 := by
       unfold FieldElement51.toField; have := lift_mod_eq _ _ u3_post; push_cast at this; exact this
     have hd : (backend.serial.u64.constants.EDWARDS_D).toField = Ed25519.d := by
@@ -402,12 +404,14 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     constructor
     · -- → : n²·w ≡ 1 (mod p) → w ≠ 0 ∧ IsSquare W
       rintro ⟨n, hn⟩
-      have h_nz : w ≠ 0 := by intro h_zero; simp [h_zero] at hn
+      have h_nz : w ≠ 0 := by intro h_zero; simp only [h_zero, mul_zero, Nat.zero_mod,
+        zero_ne_one] at hn
       have h_zmod : (n : CurveField) ^ 2 * W = 1 := by
         rw [← h_w_eq]
         have := lift_mod_eq _ _ (show (n ^ 2 * w) % p = 1 % p by rw [h_1mod]; exact hn)
         push_cast at this; exact this
-      have hn_ne : (n : CurveField) ≠ 0 := by intro h; simp [h] at h_zmod
+      have hn_ne : (n : CurveField) ≠ 0 := by intro h; simp only [h, ne_eq, OfNat.ofNat_ne_zero,
+        not_false_eq_true, zero_pow, zero_mul, zero_ne_one] at h_zmod
       refine ⟨h_nz, ⟨(n : CurveField)⁻¹, ?_⟩⟩
       -- W = ((↑n)²)⁻¹ = (↑n⁻¹)² = ↑n⁻¹ · ↑n⁻¹
       suffices h : W = ((n : CurveField) ^ 2)⁻¹ by rw [← inv_pow, sq] at h; exact h
@@ -424,7 +428,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       exact (ZMod.natCast_eq_natCast_iff _ _ _).mp (by
         push_cast [ZMod.val_natCast] at h_zmod ⊢; simp only [ZMod.natCast_val, ZMod.cast_id',
           id_eq]; grind only [cases eager Prod])
-  refine ⟨?_, ?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · -- Goal 1: ok1 ↔ (v * u2² ≠ 0 ∧ IsSquare(v * u2²))
     constructor
     · intro h_ok
@@ -488,12 +492,12 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
         have : (x.toField.val % 2 == 1) = true := by
           rw [beq_iff_eq]; unfold FieldElement51.toField; rw [ZMod.val_natCast]
           exact x_neg_post.mp hxn
-        simp [this]
+        simp only [this, ↓reduceIte]
       · rw [if_neg hxn]
         have : (x.toField.val % 2 == 1) = false := by
           rw [Bool.eq_false_iff]; intro h; rw [beq_iff_eq] at h
           exact hxn (x_neg_post.mpr (by unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
-        simp [this]
+        simp only [this, Bool.false_eq_true, ↓reduceIte]
     -- When ok1=1: I²·W = 1 in CurveField
     have hI_sq_W : invsqrt_res.1.val = 1#u8 → invsqrt_res.2.toField ^ 2 * W = 1 := by
       intro h_ok1
@@ -632,7 +636,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
             rw [← hW_eq]; exact hI
           exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
             invsqrt_res.2.toField u1.toField u2.toField u7.toField
-            (by simp [Ed25519]) hu1_val hu2_val hu7_val hIW
+            (by simp only [Ed25519]) hu1_val hu2_val hu7_val hIW
       have hPt := edwards.EdwardsPoint.toPoint_of_isValid h_valid
       refine ⟨h_ok1, h_c, h_c1, ?_⟩
       ext
@@ -697,7 +701,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
             rw [← hW_eq]; exact hI_sq
           exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
             invsqrt_res.2.toField u1.toField u2.toField u7.toField
-            (by simp [Ed25519]) hu1_val hu2_val hu7_val hIW
+            (by simp only [Ed25519]) hu1_val hu2_val hu7_val hIW
       -- Step C: Extract P.x and P.y from h_pt
       have ⟨hPx, hPy⟩ := toPoint_coords h_valid hONE h_pt
       -- Step D: is_negative (P.x * P.y) = false (from c = 0)
@@ -712,5 +716,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
         h_neg h_y_ne
         (by rw [hPx, hx1_abs, hx_simp])
         (by rw [hPy, hy_simp])
+  · -- Goal 5: ok1=1 ∧ c=0 ∧ c1=0 → RistrettoPoint.IsValid pt
+    sorry
 
 end curve25519_dalek.ristretto.decompress
