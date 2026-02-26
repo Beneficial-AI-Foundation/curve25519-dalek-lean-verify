@@ -3380,7 +3380,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid ⦄ := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -7341,10 +7341,10 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (comp : CompressedRistretto) :\n    ∃ result, decompress comp = ok result ∧\n    (¬comp.IsValid →\n      result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        decompress_pure comp = some rist.toPoint) := by ...",
+   "theorem decompress_spec (comp : CompressedRistretto) :\n    decompress comp ⦃ result =>\n    (¬comp.IsValid → result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        decompress_pure comp = some rist.toPoint) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean",
    "spec_docstring":
@@ -8232,7 +8232,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>\n    (∀ i < 5, s[i]!.val < 2^51) ∧\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
@@ -8253,7 +8253,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ⦄ := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
