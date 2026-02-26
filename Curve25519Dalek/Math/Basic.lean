@@ -198,8 +198,9 @@ lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
 
-/-- Helper: Inverse Square Root logic matching SQRT_RATIO_M1.
-    Returns (I, was_square) where I^2 = 1/u or I^2 = 1/(i*u). -/
+/-- Square root with quadratic residue check, matching Rust's sqrt_ratio_i(x, 1).
+    Returns (sqrt(x), true) when x is a square, (sqrt(i*x), false) otherwise.
+    Note: sqrt_checked 0 = (0, true) since 0 is a square (0² = 0). -/
 noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
   if h : IsSquare x then
     -- Case 1: x is a square. Pick the root 'y' such that y^2 = x.
@@ -303,12 +304,16 @@ theorem sqrt_checked_iff_isSquare (u : ZMod p) {r : ZMod p} {b : Bool} :
   sorry -- Proof deferred
 
 /--
-Inverse Square Root spec.
+Inverse Square Root, matching Rust's sqrt_ratio_i(1, u).
 Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
+Guard: inv_sqrt_checked 0 = (0, false) since 1/sqrt(0) is undefined.
+This matches Rust's sqrt_ratio_i(1, 0) returning (Choice(0), 0).
 -/
 noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
-  let (root, was_square) := sqrt_checked u
-  (root⁻¹, was_square)
+  if u = 0 then (0, false)
+  else
+    let (root, was_square) := sqrt_checked u
+    (root⁻¹, was_square)
 
 /--
 Mathematical specification for `inv_sqrt_checked`.
@@ -316,9 +321,28 @@ Mathematical specification for `inv_sqrt_checked`.
 theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
   inv_sqrt_checked arg = (I, was_square) →
   was_square = true →
+  arg ≠ 0 →
   I^2 * arg = 1 := by
   -- We treat this as an axiom/specification for now to avoid
   -- analyzing the massive bit-level recursion of the implementation.
   sorry
+
+/--
+When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
+Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`.
+-/
+theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
+    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
+  sorry
+
+/-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
+lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
+  delta inv_sqrt_checked; rw [if_pos rfl]
+
+/-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
+lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
+    (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
+  sorry
+
 
 end curve25519_dalek.math

@@ -59,132 +59,52 @@ Natural language specs:
 
 /-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:
 - No panic for field element inputs v (always returns (c, r) successfully)
+- Output limbs bounded by 2^53 - 1
+- Result r is non-negative (r_nat % 2 = 0)
 - The result satisfies exactly one of three mutually exclusive cases:
   1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
-  2. If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
-  3. If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
+  2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
+  3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
 -/
 @[progress]
 theorem invsqrt_spec
     (v : backend.serial.u64.field.FieldElement51)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)
-    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
     invsqrt v ⦃ res =>
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat res.snd % p
     let i_nat := Field51_as_Nat SQRT_M1 % p
+    -- Unconditional bounds
+    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧
+    -- Non-negativity
+    (r_nat % 2 = 0) ∧
     -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
     (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧
-    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
-    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧
-    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
-    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →
-      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) ⦄ := by
+    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
+    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →
+      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧
+    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)
+    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →
+      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by
   unfold invsqrt
-  progress*
+  progress as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
   · intro i _; unfold ONE; interval_cases i; all_goals decide
-  · have hone : Field51_as_Nat ONE % p = 1 := by rw [ONE_spec]; decide
-    have vpow : Field51_as_Nat v * Field51_as_Nat v ≡ 1 [MOD p] := by
-      rw [Nat.ModEq]; rw [Nat.ModEq, hone] at pow; rwa [show (1:Nat) % p = 1 from by decide]
-    -- Helper: derive x^2 % p = v%p from x^2*(v%p) % p = ONE % p
-    have sq_cancel : ∀ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat ONE % p →
-        x ^ 2 % p = Field51_as_Nat v % p := by
-      intro x hx
-      rw [hone] at hx
-      have hx_mod : x ^ 2 * (Field51_as_Nat v % p) ≡ 1 [MOD p] := by
-        rwa [Nat.ModEq, show (1:Nat) % p = 1 from by decide]
-      have v_mod : Field51_as_Nat v % p ≡ Field51_as_Nat v [MOD p] := by simp [Nat.ModEq]
-      have vv_mod : (Field51_as_Nat v % p) * (Field51_as_Nat v % p) ≡ 1 [MOD p] :=
-        (Nat.ModEq.mul v_mod v_mod).trans vpow
-      have h1 := Nat.ModEq.mul_right (Field51_as_Nat v % p) hx_mod
-      simp only [one_mul] at h1
-      have h3 := Nat.ModEq.mul_left (x ^ 2) vv_mod
-      simp only [mul_one] at h3
-      have : x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) =
-        x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) := by ring
-      rw [this] at h1
-      have key := Nat.ModEq.trans (Nat.ModEq.symm h3) h1
-      rwa [Nat.ModEq, Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide : p > 0))] at key
-    refine ⟨fun h ↦ ?_, fun h ↦ ?_, fun h ↦ ?_⟩
-    · -- v = 0: use res_post_2
-      have := res_post_2 ⟨by simp; decide, h⟩
-      exact ⟨this.1, this.2.1⟩
-    · -- v ≠ 0, v is square: use res_post_3
-      obtain ⟨hne, x, hx⟩ := h
-      have hex : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat ONE % p := by
-        use x; rw [hone]
-        have hmm : Field51_as_Nat v % p % p = Field51_as_Nat v % p := Nat.mod_mod_of_dvd _ (dvd_refl p)
-        rw [Nat.mul_mod, hx, hmm, ← Nat.mul_mod]
-        rw [Nat.ModEq] at vpow
-        rwa [show (1:Nat) % p = 1 from by decide] at vpow
-      have := res_post_3 ⟨by simp; decide, hne, hex⟩
-      refine ⟨this.1, ?_⟩
-      rw [hone] at this
-      exact this.2.1
-    · -- v ≠ 0, v not square: use res_post_4
-      obtain ⟨hne, hnsq⟩ := h
-      have hnsq' : ¬∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat ONE % p := by
-        intro ⟨x, hx⟩; exact hnsq ⟨x, sq_cancel x hx⟩
-      have := res_post_4 ⟨by simp; decide, hne, hnsq'⟩
-      refine ⟨this.1, ?_⟩
-      rw [hone] at this
-      simp only [mul_one, Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide : p > 0))] at this
-      exact this.2.1
-/- OLD PROOF (before Aeneas WP migration):
-  unfold invsqrt
-  progress*
-  · -- BEGIN TASK
-    intro i _
-    unfold ONE
-    interval_cases i; all_goals decide
-    --- END TASK
-  · refine ⟨fun h ↦ ?_, fun h ↦ ?_, fun h ↦ ?_⟩
-    · -- BEGIN TASK
-      rename_i res_1
-      have := res_1 ?_
-      · constructor
-        · simp[this]
-        · simp[this]
-      · simp_all[ONE]
-        decide
-      --- END TASK
-    · -- BEGIN TASK
-      have := res ?_
-      · simp_all [ONE]; decide
-      · refine ⟨?_, ?_, ?_⟩
-        · simp [ONE_spec, show ¬p = 1 by decide]
-        · grind
-        · obtain ⟨x, hx⟩ := h.2
-          use x
-          rw [Nat.ModEq, ONE_spec] at pow
-          rw [ONE_spec, Nat.mul_mod, Nat.mul_mod]
-          simpa [hx, Nat.mod_mul, ← Nat.mul_mod]
-      --- END TASK
-    · -- BEGIN TASK
-      have := res_post ?_
-      · simp_all [ONE_spec]
-      · refine ⟨?_, ?_, ?_⟩
-        · simp [ONE_spec, show ¬p = 1 by decide]
-        · exact h.1
-        · intro hx
-          obtain ⟨x, hx⟩ := hx
-          rw [ONE_spec, ne_eq, not_exists] at *
-          apply h.2 x
-          have eq1 := Nat.ModEq.mul_right (Field51_as_Nat v % p) hx
-          have eq2 := Nat.ModEq.mul_left (x ^2) pow
-          rw [mul_one] at eq2
-          have v_mod : Field51_as_Nat v % p ≡ Field51_as_Nat v [MOD p] := by simp [Nat.ModEq]
-          have key := Nat.ModEq.mul_left (x ^2) (Nat.ModEq.mul v_mod v_mod)
-          have : x ^ 2 * (Field51_as_Nat v % p) * (Field51_as_Nat v % p) =
-            x ^ 2 * ((Field51_as_Nat v % p) * (Field51_as_Nat v % p)) := by ring
-          rw [this] at eq1
-          have step : 1 % p * (Field51_as_Nat v % p) ≡ Field51_as_Nat v % p [MOD p] := by
-            simp [Nat.ModEq]
-          refine Nat.ModEq.trans ?_ v_mod
-          refine Nat.ModEq.trans ?_ step
-          refine Nat.ModEq.trans ?_ eq1
-          exact (Nat.ModEq.symm (Nat.ModEq.trans key eq2))
-      --- END TASK
--/
+  · -- Rewrite Field51_as_Nat ONE % p to 1 in all case hypotheses
+    have h_one : Field51_as_Nat ONE % p = 1 := by simp [ONE_spec]; decide
+    simp only [h_one] at h_case1 h_case2 h_case3 h_case4
+    refine ⟨h_bounds, h_nonneg, ?_, ?_, ?_⟩
+    · -- Case 1: v = 0 → Choice(0) ∧ r = 0
+      intro hv
+      exact h_case2 ⟨by decide, hv⟩
+    · -- Case 2: v ≠ 0, 1/v is a square → Choice(1) ∧ r^2 * v ≡ 1
+      intro ⟨hv, hx⟩
+      exact h_case3 ⟨by decide, hv, hx⟩
+    · -- Case 3: v ≠ 0, 1/v is not a square → Choice(0) ∧ r^2 * v ≡ i
+      intro ⟨hv, hx⟩
+      have h := h_case4 ⟨by decide, hv, hx⟩
+      refine ⟨h.1, ?_⟩
+      have h2 := h.2
+      rw [mul_one, Nat.mod_mod_of_dvd _ (dvd_refl p)] at h2
+      exact h2
 
 end curve25519_dalek.field.FieldElement51
