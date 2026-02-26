@@ -725,7 +725,6 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
      on_curve := by sorry},
     by
     unfold IsEven
-    dsimp
     by_cases hdenom : (1 : ZMod p) + s_sq = 0
     · have hzero : (1 - s_sq) / (1 + s_sq) = 0 := by
         rw [hdenom]
