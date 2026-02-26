@@ -62,8 +62,8 @@ use crate::scalar::{clamp_integer, Scalar};
 use crate::traits::Identity;
 
 use subtle::Choice;
+use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
-use subtle::{ConditionallyNegatable, ConditionallySelectable};
 
 #[cfg(feature = "zeroize")]
 use zeroize::Zeroize;
@@ -277,7 +277,8 @@ pub(crate) fn elligator_encode(r_0: &FieldElement) -> (MontgomeryPoint, Choice) 
     let zero = FieldElement::ZERO;
     let Atemp = FieldElement::conditional_select(&MONTGOMERY_A, &zero, eps_is_sq); /* 0, or A if nonsquare*/
     let mut u = &d + &Atemp; /* d, or d+A if nonsquare */
-    u.conditional_negate(!eps_is_sq); /* d, or -d-A if nonsquare */
+    let u_neg = -&u;
+    u.conditional_assign(&u_neg, !eps_is_sq); /* d, or -d-A if nonsquare */
 
     (MontgomeryPoint(u.to_bytes()), eps_is_sq)
 }

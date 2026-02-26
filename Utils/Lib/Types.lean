@@ -33,8 +33,6 @@ structure FunctionRecord where
   lineRange : Option (Nat × Nat) := none
   /-- Direct dependencies filtered to relevant functions only -/
   dependencies : Array Name := #[]
-  /-- Nested child functions (functions whose name has this as a prefix) -/
-  nestedChildren : Array Name := #[]
   /-- True if source is from the target crate (not /rustc/, /cargo/registry/, etc.) -/
   isRelevant : Bool := false
   /-- True if this is an Aeneas extraction artifact (_body, _loop, etc.) -/
@@ -68,7 +66,6 @@ structure FunctionOutput where
   source : Option String := none
   lines : Option String := none
   dependencies : Array String := #[]
-  nested_children : Array String := #[]
   is_relevant : Bool := false
   is_extraction_artifact : Bool := false
   is_hidden : Bool := false
@@ -90,7 +87,6 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     source := rec.source
     lines := lines
     dependencies := rec.dependencies.map (·.toString)
-    nested_children := rec.nestedChildren.map (·.toString)
     is_relevant := rec.isRelevant
     is_extraction_artifact := rec.isExtractionArtifact
     is_hidden := rec.isHidden

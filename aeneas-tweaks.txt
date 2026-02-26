@@ -91,9 +91,9 @@ set_option linter.style.commandStart false
 # Other syntax errors
 
 ===FIND===
-  let i41 ← (↑(U64.shr i36 20#i32) : Result U64)
+  let i41 ← (↑(U64.shr i36 20#i32) : Result Std.U64)
 ===REPLACE===
-  let i41 ← (i36 >>> 20#i32 : Result U64)
+  let i41 ← i36 >>> 20#i32
 
 # Add `noncomputable` when required
 
@@ -353,6 +353,27 @@ def
 noncomputable def
   backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign
 
+# Increase maxRecDepth for to_bytes (large function body exceeds default).
+# Must appear before the /- → /-- tweak so the FIND matches raw /- form.
+===FIND===
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
+def backend.serial.u64.field.FieldElement51.to_bytes
+===REPLACE===
+set_option maxRecDepth 4096 in
+/- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+   Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
+def backend.serial.u64.field.FieldElement51.to_bytes
+
+# Remove the comment before `noncomputable section` (otherwise the /- → /-- tweak
+# below turns it into a doc comment, which is invalid before `section`)
+
+===FIND===
+/- You can remove the following line by using the CLI option `-all-computable`: -/
+===REPLACE===
+-- You can remove the following line by using the CLI option `-all-computable`: 
+
+# Convert Aeneas block comments to doc comments for definitions
 ===FIND===
 /-
 ===REPLACE===
@@ -452,22 +473,11 @@ def backend.serial.scalar_mul.variable_base.mul_loop
 ===REPLACE===
 noncomputable def backend.serial.scalar_mul.variable_base.mul_loop
 
+# Fix parameter name shadowing: variable `scalar` shadows namespace `scalar`
 ===FIND===
-def backend.serial.scalar_mul.variable_base.mul
-  (point : edwards.EdwardsPoint) (scalar : scalar.Scalar) :
-  Result edwards.EdwardsPoint
-  := do
-  let lookup_table ←
-    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
   let scalar_digits ← scalar.Scalar.as_radix_16 scalar
 ===REPLACE===
-noncomputable def backend.serial.scalar_mul.variable_base.mul
-  (point : edwards.EdwardsPoint) (sc : scalar.Scalar) :
-  Result edwards.EdwardsPoint
-  := do
-  let lookup_table ←
-    window.FromLookupTableProjectiveNielsPointSharedAEdwardsPoint.from point
-  let scalar_digits ← scalar.Scalar.as_radix_16 sc
+  let scalar_digits ← scalar.as_radix_16
 
 ===FIND===
 def backend.variable_base_mul
@@ -657,23 +667,11 @@ def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
 ===REPLACE===
 noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul_loop
 
-# Fix parameter name shadowing (scalar shadows namespace) and add noncomputable
+# Fix parameter name shadowing: variable `scalar` shadows namespace `scalar`
 ===FIND===
-def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
-  (self : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
-  Result montgomery.MontgomeryPoint
-  := do
-  let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
-  let x0 ← montgomery.IdentityProjectivePoint.identity
   let scalar_bytes ← scalar.Scalar.as_bytes scalar
 ===REPLACE===
-noncomputable def montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul
-  (self : montgomery.MontgomeryPoint) (sc : scalar.Scalar) :
-  Result montgomery.MontgomeryPoint
-  := do
-  let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
-  let x0 ← montgomery.IdentityProjectivePoint.identity
-  let scalar_bytes ← scalar.Scalar.as_bytes sc
+  let scalar_bytes ← scalar.as_bytes
 
 ===FIND===
 def montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul

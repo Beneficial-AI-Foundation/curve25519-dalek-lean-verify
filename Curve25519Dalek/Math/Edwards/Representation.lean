@@ -70,18 +70,11 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
       some { x := x, y := y, on_curve := by
               have hx_sq : x^2 = x2 := by
                 simp only [x]
-                split_ifs
-                all_goals{
-                  try simp only [even_two, Even.neg_pow]
-                  dsimp [x_root, abs_edwards]
-                  split_ifs
-                  all_goals {
-                    try simp only [even_two, Even.neg_pow]
-                    have spec := Classical.choose_spec h
-                    rw [pow_two]
-                    rw [← spec]
-                  }
-                }
+                suffices x_root ^ 2 = x2 by split_ifs <;> simpa
+                have spec := Classical.choose_spec h
+                rw [spec]
+                dsimp [x_root]
+                rw [abs_edwards_sq (Classical.choose h), pow_two]
               have hv_ne0 : v ≠ 0 := by
                 intro hv
                 dsimp only [v] at hv

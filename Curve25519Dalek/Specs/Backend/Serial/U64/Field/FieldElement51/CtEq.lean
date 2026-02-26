@@ -15,8 +15,8 @@ The Rust implementation normalizes both operands to canonical wire format with
 Source: curve25519-dalek/src/field.rs (lines 96:4-98:5)
 -/
 
-open Aeneas.Std Result
-namespace curve25519_dalek.field.ConstantTimeEqFieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq
 
 /-!
 Natural language description:
@@ -41,20 +41,14 @@ Spec:
 -/
 @[progress]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
-    ∃ c, ct_eq a b = ok c ∧
-    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) := by
-  unfold field.ConstantTimeEqFieldElement51.ct_eq
-  progress as ⟨a_bytes, ha_bytes⟩
-  progress as ⟨sa, h_sa⟩
-  progress as ⟨b_bytes, hb_bytes⟩
-  progress as ⟨sb, h_sb⟩
-  progress as ⟨c, h_cteq⟩
-  simp_all
-  constructor
-  · intro eq
-    have : a_bytes.to_slice = b_bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-  · grind
+    ct_eq a b ⦃ c =>
+    (c = Choice.one ↔ a.to_bytes = b.to_bytes ) ⦄ := by
+  unfold ct_eq
+  have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
+  have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)
+  rw [ha_ok, hb_ok]
+  progress*
+  simp_all only [Array.to_slice, Slice.eq_iff]
+  exact ⟨fun h => Subtype.ext h, fun h => h ▸ rfl⟩
 
-end curve25519_dalek.field.ConstantTimeEqFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq

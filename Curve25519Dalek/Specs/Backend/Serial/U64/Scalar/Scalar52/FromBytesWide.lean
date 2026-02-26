@@ -18,7 +18,7 @@ This function constructs an unpacked scalar from a wide byte array.
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -37,8 +37,8 @@ natural language specs:
 - The result represents the input byte array reduced modulo L (canonical form) -/
 @[progress]
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
-    ∃ u, from_bytes_wide b = ok u ∧
-    Scalar52_as_Nat u = U8x64_as_Nat b % L := by
+    from_bytes_wide b ⦃ u =>
+    Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by
     sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

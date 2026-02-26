@@ -23,7 +23,7 @@ EdwardsPoint to a MontgomeryPoint.
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
@@ -51,9 +51,8 @@ natural language specs:
 -/
 @[progress]
 theorem mul_base_spec (scalar : scalar.Scalar) :
-    ∃ result,
-    mul_base scalar = ok result ∧
-    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards.toPoint constants.ED25519_BASEPOINT_POINT.toPoint)
+    mul_base scalar ⦃ result =>
+    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄
      := by
     unfold mul_base
     progress*

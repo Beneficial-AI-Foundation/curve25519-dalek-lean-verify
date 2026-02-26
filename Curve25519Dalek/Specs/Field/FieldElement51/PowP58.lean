@@ -18,7 +18,7 @@ and thus (p-5)/8 = 2^252 -3
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 /-
@@ -40,9 +40,9 @@ Natural language specs:
 -/
 @[progress]
 theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :
-    ∃ r', pow_p58 r = ok r' ∧
+    pow_p58 r ⦃ r' =>
     Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧
-    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1)
+    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1) ⦄
     := by
     unfold pow_p58
     progress*

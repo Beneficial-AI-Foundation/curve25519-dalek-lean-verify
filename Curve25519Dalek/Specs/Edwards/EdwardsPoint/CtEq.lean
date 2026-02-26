@@ -22,10 +22,10 @@ This function performs constant-time equality comparison for Edwards points.
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-namespace curve25519_dalek.edwards.ConstantTimeEqEdwardsPoint
+namespace curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq
 
 /-
 Natural language description:
@@ -57,11 +57,10 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)
   (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)
   (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :
-  ∃ c,
-  ct_eq e1 e2 = ok c ∧
+  ct_eq e1 e2 ⦃ c =>
   (c = Choice.one ↔
     (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
-    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) := by
+    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ⦄ := by
   unfold ct_eq
   progress as ⟨h1, h2⟩
   · intro i hi; have := h_e1_X i hi; scalar_tac
@@ -89,8 +88,8 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
       x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
     -- Retrieve the spec for both elements (existence of canonical bytes)
-    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := to_bytes_spec x
-    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := to_bytes_spec y
+    have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := spec_imp_exists (to_bytes_spec x)
+    have ⟨yb, hyb_eq, hyb_mod, hyb_lt⟩ := spec_imp_exists (to_bytes_spec y)
 
     rw [hxb_eq, hyb_eq]
     simp only [ok.injEq] -- ok a = ok b ↔ a = b
@@ -124,4 +123,4 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     exact Nat.ModEq.trans (Nat.ModEq.trans h8 hy) (Nat.ModEq.symm h10)
 
 
-end curve25519_dalek.edwards.ConstantTimeEqEdwardsPoint
+end curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq
