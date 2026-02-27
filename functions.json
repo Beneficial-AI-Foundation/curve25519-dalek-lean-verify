@@ -6989,8 +6989,7 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
    "specified": true,
-   "spec_statement":
-   "theorem as_affine_spec (self : montgomery.ProjectivePoint)\n    (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)\n    (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)\n    (h_valid : self.W.toField ≠ 0 ∧ self.U.toField / self.W.toField ≠ -1) :\n    as_affine self ⦃ res =>\n    MontgomeryPoint.IsValid res ∧\n    bytesToField res = self.U.toField  / self.W.toField  ⦄ := by ...",
+   "spec_statement": null,
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsAffine.lean",
    "spec_docstring": null,
