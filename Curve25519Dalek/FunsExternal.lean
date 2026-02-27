@@ -470,26 +470,6 @@ axiom Array.Insts.ZeroizeZeroize.zeroize
   {Z : Type} {N : Usize} (ZeroizeInst : zeroize.Zeroize Z) :
   Array Z N → Result (Array Z N)
 
-/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:0-312:1 -/
-axiom
-  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
-  :
-  backend.serial.curve_models.ProjectiveNielsPoint →
-    backend.serial.curve_models.ProjectiveNielsPoint → subtle.Choice →
-    Result (backend.serial.curve_models.ProjectiveNielsPoint ×
-    backend.serial.curve_models.ProjectiveNielsPoint)
-
-/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1 -/
-axiom
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
-  :
-  backend.serial.curve_models.AffineNielsPoint →
-    backend.serial.curve_models.AffineNielsPoint → subtle.Choice → Result
-    (backend.serial.curve_models.AffineNielsPoint ×
-    backend.serial.curve_models.AffineNielsPoint)
-
 /- [subtle::{subtle::ConditionallySelectable for u8}::conditional_select]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 513:12-513:77
    Name pattern: [subtle::{subtle::ConditionallySelectable<u8>}::conditional_select]
@@ -670,6 +650,107 @@ private def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condi
     backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
       a.W b.W choice
   ok { U := fe, W := fe1 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
+  It is in Funs.lean previously, we copy it here locally (with private and ' suffix) since ProjectiveNielsPoint.conditional_swap depends on it -/
+private def
+  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
+  (a b : backend.serial.curve_models.ProjectiveNielsPoint)
+  (choice : subtle.Choice) :
+  Result backend.serial.curve_models.ProjectiveNielsPoint := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.Y_plus_X b.Y_plus_X choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.Y_minus_X b.Y_minus_X choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.Z b.Z choice
+  let fe3 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.T2d b.T2d choice
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
+
+/-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select]:
+  It is in Funs.lean previously, we copy it here locally (with private and ' suffix) since AffineNielsPoint.conditional_swap depends on it -/
+private def
+  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
+  (a b : backend.serial.curve_models.AffineNielsPoint)
+  (choice : subtle.Choice) :
+  Result backend.serial.curve_models.AffineNielsPoint := do
+  let fe ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.y_plus_x b.y_plus_x choice
+  let fe1 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.y_minus_x b.y_minus_x choice
+  let fe2 ←
+    backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
+      a.xy2d b.xy2d choice
+  ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 296:0-312:1 -/
+def
+  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  (a b : backend.serial.curve_models.ProjectiveNielsPoint)
+  (choice : subtle.Choice) :
+  Result (backend.serial.curve_models.ProjectiveNielsPoint ×
+    backend.serial.curve_models.ProjectiveNielsPoint) := do
+  let a_new ← backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  let b_new ← backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  ok (a_new, b_new)
+
+/-- **Spec theorem for `ProjectiveNielsPoint.conditional_swap'`**:
+- No panic (if both conditional_select operations succeed)
+- Conditionally swaps two ProjectiveNielsPoint values in constant time
+- Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
+- Implements constant-time conditional swap for ProjectiveNielsPoint
+-/
+@[progress]
+theorem backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+  (a b : backend.serial.curve_models.ProjectiveNielsPoint) (choice : subtle.Choice)
+  (h_a : ∃ res, backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
+  (h_b : ∃ res, backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
+  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
+    backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
+    backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
+
+/- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
+   Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1 -/
+def
+  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'
+  (a b : backend.serial.curve_models.AffineNielsPoint)
+  (choice : subtle.Choice) :
+  Result (backend.serial.curve_models.AffineNielsPoint ×
+    backend.serial.curve_models.AffineNielsPoint) := do
+  let a_new ← backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  let b_new ← backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  ok (a_new, b_new)
+
+/-- **Spec theorem for `AffineNielsPoint.conditional_swap'`**:
+- No panic (if both conditional_select operations succeed)
+- Conditionally swaps two AffineNielsPoint values in constant time
+- Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
+- Implements constant-time conditional swap for AffineNielsPoint
+-/
+@[progress]
+theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec
+  (a b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice)
+  (h_a : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
+  (h_b : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
+  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap' a b choice ⦃ c =>
+    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
+    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
 /-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 311:0-322:1
