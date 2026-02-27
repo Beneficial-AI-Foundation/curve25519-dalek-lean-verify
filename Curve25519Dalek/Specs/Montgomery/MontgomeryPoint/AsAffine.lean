@@ -100,17 +100,15 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
     (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)
     (h_valid : self.W.toField ≠ 0 ∧ self.U.toField / self.W.toField ≠ -1) :
-    as_affine self ⦃ res =>
-    MontgomeryPoint.IsValid res ∧
-    bytesToField res = self.U.toField  / self.W.toField  ⦄ := by
+    as_affine self ⦃ res => bytesToField res = self.U.toField  / self.W.toField  ⦄ := by
   unfold as_affine at *
   progress*
   · grind
   -- · sorry
   · -- Show bytesToCurve25519Dalek/FunsExternal.leanField res = self.U.toField / self.W.toField
-    constructor
-    · unfold MontgomeryPoint.IsValid
-      intro u
+    -- constructor
+    -- unfold MontgomeryPoint.IsValid
+    intro u
       by_cases h1 : u + 1 = 0
       · simp only [h1]
         have hu : u = -1 := by linear_combination h1
@@ -192,22 +190,27 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           (↑d * ((bytesToField a - 1) * (bytesToField a + 1)⁻¹) ^ 2 + 1)⁻¹)
         -- Now this is exactly the IsValid condition for MontgomeryPoint a
         have h_valid_montgomery : MontgomeryPoint.IsValid a := by
-          -- Need to prove: MontgomeryPoint.IsValid a
-          -- We have:
-          -- - h_valid.2 : self.U.toField / self.W.toField ≠ -1
-          -- - h_u_eq : u = self.U.toField / self.W.toField
-          -- - h1 : ¬u + 1 = 0 (which means bytesToField a + 1 ≠ 0)
-          -- - a_post_2 : U8x32_as_Nat a < p
-          --
-          -- This requires proving that the computation preserves validity:
-          -- If the input (U/W) is a valid Montgomery point (≠ -1),
-          -- then the output bytes `a` also encode a valid Montgomery point.
-          --
-          -- This may require a new lemma connecting:
-          -- 1. The mathematical u-coordinate (U/W)
-          -- 2. The byte representation (a)
-          -- 3. The IsValid property
-          sorry
+          unfold MontgomeryPoint.IsValid
+          simp
+          constructor
+          · grind
+          ·
+            -- Need to prove: MontgomeryPoint.IsValid a
+            -- We have:
+            -- - h_valid.2 : self.U.toField / self.W.toField ≠ -1
+            -- - h_u_eq : u = self.U.toField / self.W.toField
+            -- - h1 : ¬u + 1 = 0 (which means bytesToField a + 1 ≠ 0)
+            -- - a_post_2 : U8x32_as_Nat a < p
+            --
+            -- This requires proving that the computation preserves validity:
+            -- If the input (U/W) is a valid Montgomery point (≠ -1),
+            -- then the output bytes `a` also encode a valid Montgomery point.
+            --
+            -- This may require a new lemma connecting:
+            -- 1. The mathematical u-coordinate (U/W)
+            -- 2. The byte representation (a)
+            -- 3. The IsValid property
+            sorry
         unfold MontgomeryPoint.IsValid at h_valid_montgomery
         rw [if_neg] at h_valid_montgomery
         · exact h_valid_montgomery
