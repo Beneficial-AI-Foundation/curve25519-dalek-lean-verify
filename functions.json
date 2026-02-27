@@ -6993,11 +6993,14 @@
    "fully_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "\ntheorem as_affine_spec (self : montgomery.ProjectivePoint)\n    (hU : self.U.IsValid)\n    (hW : self.W.IsValid)\n    (h_valid : self.W.toField ≠ 0) :\n    as_affine self ⦃ res => bytesToField res = self.U.toField  / self.W.toField  ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsAffine.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:\n- No panic (always returns successfully when input limbs satisfy bounds)\n- Returns bytesToField(result) = U/W (mod p) where p = 2^255 - 19\n- Does not verify curve validity (pure encoding of field element U/W)\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::ProjectivePoint}::as_affine",
