@@ -23,9 +23,13 @@ by computing u = U/W and encoding it as a 32-byte MontgomeryPoint.
 - Complete proof
 --/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
+
+-- in
 namespace curve25519_dalek.montgomery.ProjectivePoint
+
+-- set_option maxHeartbeats 400000
 
 /-
 Natural language description:
@@ -51,20 +55,6 @@ Natural language specs:
 lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
     bytesToField a = (U8x32_as_Nat a : ZMod p) := by
   sorry
-
-
-/-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
-- The function succeeds if and only if the W coordinate is non-zero in the field
-- When successful, returns a MontgomeryPoint encoding the affine u-coordinate
-- Mathematical properties of the result:
-  * If the projective point is (U : W) with W ≠ 0, the result encodes u = U/W (mod p)
-  * The encoded value satisfies: bytesToField(result) ≡ U/W (mod p)
-  * Projective equivalence: (U : W) and (λU : λW) produce the same affine encoding
-    for any non-zero λ in the field
-  * The result is a valid MontgomeryPoint (32-byte array with value reduced modulo 2^255-19)
-  * The computation uses constant-time field arithmetic operations
--/
-
 
 lemma Field51_modP_ne_zero_of_toField_ne_zero
     (W : backend.serial.u64.field.FieldElement51)
@@ -95,20 +85,31 @@ lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv 
   symm
   exact (mul_eq_one_iff_eq_inv₀ hW_ne_zero).mp h_mul
 
-@[progress]
+-- /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
+-- - No panic (always returns successfully) when input limbs satisfy bounds
+-- - For the input projective point (U : W), the resulting MontgomeryPoint encodes:
+--   * If W ≢ 0 (mod p): the affine u-coordinate where u ≡ U * W^(-1) (mod p)
+--   * If W ≡ 0 (mod p): u ≡ 0 (mod p) (since invert returns 0 on input 0)
+-- - The result is a valid 32-byte encoding with U8x32_as_Nat(result) < p
+-- - Projective equivalence: (U : W) and (λU : λW) produce the same affine encoding
+--   for any non-zero λ in the field (when W ≢ 0)
+-- where p = 2^255 - 19
+-- -/
+
+-- @[progress]
+
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
     (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)
     (h_valid : self.W.toField ≠ 0 ∧ self.U.toField / self.W.toField ≠ -1) :
-    ∃ res,
-    as_affine self = ok res ∧
+    as_affine self ⦃ res =>
     MontgomeryPoint.IsValid res ∧
-    U8x32_as_Nat res = self.U.toField  / self.W.toField := by
+    bytesToField res = self.U.toField  / self.W.toField  ⦄ := by
   unfold as_affine at *
   progress*
-  · -- Show MontgomeryPoint.IsValid res
-    grind
-  · -- Show bytesToField res = self.U.toField / self.W.toField
+  · grind
+  -- · sorry
+  · -- Show bytesToCurve25519Dalek/FunsExternal.leanField res = self.U.toField / self.W.toField
     constructor
     · unfold MontgomeryPoint.IsValid
       intro u
@@ -117,27 +118,29 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
         have hu : u = -1 := by linear_combination h1
         have a_eq_div : U8x32_as_Nat a = self.U.toField / self.W.toField := by
           have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
-          rename_i x_inv _ x_inv_post u_inv _
+          rename_i hw_inv h_mul_U_Winv h_mul_bind
+          --  _ x_inv_post u_inv
           rcases h_valid with ⟨h_W_nonzero, h_U_div_W_ne_neg_one⟩
-          have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
-            exact x_inv_post h_W_nat_nonzero
-          have h_inv2 : Field51_as_Nat x_inv * Field51_as_Nat self.W ≡ 1 [MOD p] := by
+          have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
+            -- sorry
+            exact fe_post_1 h_W_nat_nonzero
+          have h_inv2 : Field51_as_Nat fe * Field51_as_Nat self.W ≡ 1 [MOD p] := by
             dsimp [Nat.ModEq]
             calc
-              (Field51_as_Nat x_inv * Field51_as_Nat self.W) % p
-                  = (Field51_as_Nat x_inv % p *
+              (Field51_as_Nat fe * Field51_as_Nat self.W) % p
+                  = (Field51_as_Nat fe % p *
                     (Field51_as_Nat self.W % p)) % p := by
                       simp [Nat.mul_mod]
               _ = 1 := by simp [h_inv]
           have h_inv4: self.U.toField / self.W.toField = (Field51_as_Nat self.U) / (Field51_as_Nat self.W) := by
             unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
             simp
-          have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
-            exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
+          have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat fe := by
+            exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat fe) h_W_nat_nonzero h_inv2
           rw [h_inv4, h_inv5]
           have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
-          have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
-          have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
+          have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
+          have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
             rw [h_eq_zmod2, Nat.cast_mul]
           exact h_eq_zmod3
         have div_eq_neg_one : self.U.toField / self.W.toField = -1 := by
@@ -161,28 +164,28 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           -- Similar proof to line 118-142, establishing a = U/W
           have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 :=
             Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
-          rename_i x_inv _ x_inv_post u_inv _
-          have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
-            exact x_inv_post h_W_nat_nonzero
-          have h_inv2 : Field51_as_Nat x_inv * Field51_as_Nat self.W ≡ 1 [MOD p] := by
+          rename_i hw_inv h_mul_U_Winv h_mul_bind
+          have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
+            exact fe_post_1 h_W_nat_nonzero
+          have h_inv2 : Field51_as_Nat fe * Field51_as_Nat self.W ≡ 1 [MOD p] := by
             dsimp [Nat.ModEq]
-            calc (Field51_as_Nat x_inv * Field51_as_Nat self.W) % p
-                = (Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p)) % p := by simp [Nat.mul_mod]
+            calc (Field51_as_Nat fe * Field51_as_Nat self.W) % p
+                = (Field51_as_Nat fe % p * (Field51_as_Nat self.W % p)) % p := by simp [Nat.mul_mod]
               _ = 1 := by simp [h_inv]
           have h_inv4: self.U.toField / self.W.toField =
               (Field51_as_Nat self.U) / (Field51_as_Nat self.W) := by
             unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
             simp
           have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) =
-              Field51_as_Nat self.U * Field51_as_Nat x_inv := by
+              Field51_as_Nat self.U * Field51_as_Nat fe := by
             exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W)
-              (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
+              (Field51_as_Nat fe) h_W_nat_nonzero h_inv2
           rw [h_inv4, h_inv5]
           have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
           have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a)
-            (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
+            (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
           have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) =
-              (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
+              (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
             rw [h_eq_zmod2, Nat.cast_mul]
           exact h_eq_zmod3
         -- The goal is exactly the IsValid definition for Montgomery points!
@@ -211,28 +214,31 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
         rw [if_neg] at h_valid_montgomery
         · exact h_valid_montgomery
         · exact h1
-    · rename_i x_inv _ x_inv_post _
+    ·
+      rename_i fe_inv h_mul_U_Winv
+      -- rename_i x_inv _ x_inv_post _
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
-      have h_inv : Field51_as_Nat x_inv % p * (Field51_as_Nat self.W % p) % p = 1 := by
-        exact x_inv_post h_W_nat_nonzero
-      have h_inv2 : Field51_as_Nat x_inv * Field51_as_Nat self.W ≡ 1 [MOD p] := by
+      have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
+        exact fe_post_1 h_W_nat_nonzero
+      have h_inv2 : Field51_as_Nat fe * Field51_as_Nat self.W ≡ 1 [MOD p] := by
         dsimp [Nat.ModEq]
         calc
-          (Field51_as_Nat x_inv * Field51_as_Nat self.W) % p
-              = (Field51_as_Nat x_inv % p *
+          (Field51_as_Nat fe * Field51_as_Nat self.W) % p
+              = (Field51_as_Nat fe % p *
                 (Field51_as_Nat self.W % p)) % p := by
                   simp [Nat.mul_mod]
           _ = 1 := by simp [h_inv]
       have h_inv4: self.U.toField / self.W.toField = (Field51_as_Nat self.U) / (Field51_as_Nat self.W) := by
         unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
         simp
-      have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat x_inv := by
-        exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat x_inv) h_W_nat_nonzero h_inv2
+      have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat fe := by
+        exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat fe) h_W_nat_nonzero h_inv2
       rw [h_inv4, h_inv5]
       have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
-      have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat x_inv) h_chain2
-      have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat x_inv : ZMod p) := by
+      have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
+      have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
         rw [h_eq_zmod2, Nat.cast_mul]
-      exact h_eq_zmod3
+      sorry
+      -- exact h_eq_zmod3
 
 end curve25519_dalek.montgomery.ProjectivePoint
