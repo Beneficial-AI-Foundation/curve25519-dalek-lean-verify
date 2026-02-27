@@ -9,21 +9,13 @@ set_option linter.hashCommand false
 set_option linter.unusedVariables false
 set_option linter.style.commandStart false
 
+-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option
+set_option maxHeartbeats 1000000
+
 -- You can remove the following line by using the CLI option `-all-computable`: 
 noncomputable section
 
 namespace curve25519_dalek
-
-/-- Trait implementation: [core::array::{core::convert::TryFrom<&0 ([T]), core::array::TryFromSliceError> for [T; N]}]
-   Source: '/rustc/library/core/src/array/mod.rs', lines 250:0-252:12
-   Name pattern: [core::convert::TryFrom<[@T; @N], &'0 [@T], core::array::TryFromSliceError>] -/
-@[reducible, rust_trait_impl
-  "core::convert::TryFrom<[@T; @N], &'0 [@T], core::array::TryFromSliceError>"]
-def Array.Insts.CoreConvertTryFromShared0SliceTryFromSliceError {T : Type} (N :
-  Std.Usize) (markerCopyInst : core.marker.Copy T) : core.convert.TryFrom
-  (Array T N) (Slice T) core.array.TryFromSliceError := {
-  try_from := core.array.TryFromArrayCopySlice.try_from N markerCopyInst
-}
 
 /-- Trait implementation: [core::default::{core::default::Default for bool}]
    Source: '/rustc/library/core/src/default.rs', lines 154:8-154:33
@@ -148,26 +140,20 @@ def backend.get_selected_backend : Result backend.BackendKind := do
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::LOW_51_BIT_MASK]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 174:8-174:54 -/
-@[global_simps]
-def
-  backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body
-  : Result Std.U64 := do
-  let i ← 1#u64 <<< 51#i32
-  i - 1#u64
 @[global_simps, irreducible]
 def
   backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK
-  : Std.U64 :=
-  eval_global
-    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body
+  : Result Std.U64 := do
+  let i ← 1#u64 <<< 51#i32
+  i - 1#u64
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::m]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 121:8-121:66 -/
 def
   backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
   (x : Std.U64) (y : Std.U64) : Result Std.U128 := do
-  let i ← (↑(UScalar.cast .U128 x) : Result Std.U128)
-  let i1 ← (↑(UScalar.cast .U128 y) : Result Std.U128)
+  let i ← lift (UScalar.cast .U128 x)
+  let i1 ← lift (UScalar.cast .U128 y)
   i * i1
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul]:
@@ -300,81 +286,61 @@ def
   massert (i3 < i50)
   let out := Array.repeat 5#usize 0#u64
   let i51 ← c0 >>> 51#i32
-  let i52 ← (↑(UScalar.cast .U64 i51) : Result Std.U64)
-  let i53 ← (↑(UScalar.cast .U128 i52) : Result Std.U128)
+  let i52 ← lift (UScalar.cast .U64 i51)
+  let i53 ← lift (UScalar.cast .U128 i52)
   let c11 ← c1 + i53
-  let i54 ← (↑(UScalar.cast .U64 c0) : Result Std.U64)
+  let i54 ← lift (UScalar.cast .U64 c0)
   let i55 ←
-    (↑(i54 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out1 ← Array.update out 0#usize i55
-  let i56 ← c11 >>> 51#i32
-  let i57 ← (↑(UScalar.cast .U64 i56) : Result Std.U64)
-  let i58 ← (↑(UScalar.cast .U128 i57) : Result Std.U128)
-  let c21 ← c2 + i58
-  let i59 ← (↑(UScalar.cast .U64 c11) : Result Std.U64)
-  let i60 ←
-    (↑(i59 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out2 ← Array.update out1 1#usize i60
-  let i61 ← c21 >>> 51#i32
-  let i62 ← (↑(UScalar.cast .U64 i61) : Result Std.U64)
-  let i63 ← (↑(UScalar.cast .U128 i62) : Result Std.U128)
-  let c31 ← c3 + i63
-  let i64 ← (↑(UScalar.cast .U64 c21) : Result Std.U64)
-  let i65 ←
-    (↑(i64 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out3 ← Array.update out2 2#usize i65
-  let i66 ← c31 >>> 51#i32
-  let i67 ← (↑(UScalar.cast .U64 i66) : Result Std.U64)
-  let i68 ← (↑(UScalar.cast .U128 i67) : Result Std.U128)
-  let c41 ← c4 + i68
-  let i69 ← (↑(UScalar.cast .U64 c31) : Result Std.U64)
-  let i70 ←
-    (↑(i69 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out4 ← Array.update out3 3#usize i70
-  let i71 ← c41 >>> 51#i32
-  let carry ← (↑(UScalar.cast .U64 i71) : Result Std.U64)
-  let i72 ← (↑(UScalar.cast .U64 c41) : Result Std.U64)
-  let i73 ←
-    (↑(i72 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out5 ← Array.update out4 4#usize i73
-  let i74 ← carry * 19#u64
-  let i75 ← Array.index_usize out5 0#usize
-  let i76 ← i75 + i74
-  let out6 ← Array.update out5 0#usize i76
-  let i77 ← Array.index_usize out6 0#usize
-  let i78 ← i77 >>> 51#i32
-  let i79 ← Array.index_usize out6 1#usize
-  let i80 ← i79 + i78
-  let out7 ← Array.update out6 1#usize i80
-  let i81 ← Array.index_usize out7 0#usize
-  let i82 ←
-    (↑(i81 &&&
-      backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let out8 ← Array.update out7 0#usize i82
+    backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK
+  let i56 ← lift (i54 &&& i55)
+  let out1 ← Array.update out 0#usize i56
+  let i57 ← c11 >>> 51#i32
+  let i58 ← lift (UScalar.cast .U64 i57)
+  let i59 ← lift (UScalar.cast .U128 i58)
+  let c21 ← c2 + i59
+  let i60 ← lift (UScalar.cast .U64 c11)
+  let i61 ← lift (i60 &&& i55)
+  let out2 ← Array.update out1 1#usize i61
+  let i62 ← c21 >>> 51#i32
+  let i63 ← lift (UScalar.cast .U64 i62)
+  let i64 ← lift (UScalar.cast .U128 i63)
+  let c31 ← c3 + i64
+  let i65 ← lift (UScalar.cast .U64 c21)
+  let i66 ← lift (i65 &&& i55)
+  let out3 ← Array.update out2 2#usize i66
+  let i67 ← c31 >>> 51#i32
+  let i68 ← lift (UScalar.cast .U64 i67)
+  let i69 ← lift (UScalar.cast .U128 i68)
+  let c41 ← c4 + i69
+  let i70 ← lift (UScalar.cast .U64 c31)
+  let i71 ← lift (i70 &&& i55)
+  let out4 ← Array.update out3 3#usize i71
+  let i72 ← c41 >>> 51#i32
+  let carry ← lift (UScalar.cast .U64 i72)
+  let i73 ← lift (UScalar.cast .U64 c41)
+  let i74 ← lift (i73 &&& i55)
+  let out5 ← Array.update out4 4#usize i74
+  let i75 ← carry * 19#u64
+  let i76 ← Array.index_usize out5 0#usize
+  let i77 ← i76 + i75
+  let out6 ← Array.update out5 0#usize i77
+  let i78 ← Array.index_usize out6 0#usize
+  let i79 ← i78 >>> 51#i32
+  let i80 ← Array.index_usize out6 1#usize
+  let i81 ← i80 + i79
+  let out7 ← Array.update out6 1#usize i81
+  let i82 ← Array.index_usize out7 0#usize
+  let i83 ← lift (i82 &&& i55)
+  let out8 ← Array.update out7 0#usize i83
   ok out8
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce::LOW_51_BIT_MASK]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 293:8-293:54 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK
   : Result Std.U64 := do
   let i ← 1#u64 <<< 51#i32
   i - 1#u64
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK : Std.U64 :=
-  eval_global
-    backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 292:4-325:5 -/
@@ -392,48 +358,37 @@ def backend.serial.u64.field.FieldElement51.reduce
   let c3 ← i3 >>> 51#i32
   let i4 ← Array.index_usize limbs 4#usize
   let c4 ← i4 >>> 51#i32
-  let i5 ←
-    (↑(i &&& backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let limbs1 ← Array.update limbs 0#usize i5
-  let i6 ← Array.index_usize limbs1 1#usize
-  let i7 ←
-    (↑(i6 &&& backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let limbs2 ← Array.update limbs1 1#usize i7
-  let i8 ← Array.index_usize limbs2 2#usize
-  let i9 ←
-    (↑(i8 &&& backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK)
-      : Result Std.U64)
-  let limbs3 ← Array.update limbs2 2#usize i9
-  let i10 ← Array.index_usize limbs3 3#usize
-  let i11 ←
-    (↑(i10 &&&
-      backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK) : Result
-      Std.U64)
-  let limbs4 ← Array.update limbs3 3#usize i11
-  let i12 ← Array.index_usize limbs4 4#usize
-  let i13 ←
-    (↑(i12 &&&
-      backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK) : Result
-      Std.U64)
-  let limbs5 ← Array.update limbs4 4#usize i13
-  let i14 ← c4 * 19#u64
-  let i15 ← Array.index_usize limbs5 0#usize
-  let i16 ← i15 + i14
-  let limbs6 ← Array.update limbs5 0#usize i16
-  let i17 ← Array.index_usize limbs6 1#usize
-  let i18 ← i17 + c0
-  let limbs7 ← Array.update limbs6 1#usize i18
-  let i19 ← Array.index_usize limbs7 2#usize
-  let i20 ← i19 + c1
-  let limbs8 ← Array.update limbs7 2#usize i20
-  let i21 ← Array.index_usize limbs8 3#usize
-  let i22 ← i21 + c2
-  let limbs9 ← Array.update limbs8 3#usize i22
-  let i23 ← Array.index_usize limbs9 4#usize
-  let i24 ← i23 + c3
-  let limbs10 ← Array.update limbs9 4#usize i24
+  let i5 ← backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK
+  let i6 ← lift (i &&& i5)
+  let limbs1 ← Array.update limbs 0#usize i6
+  let i7 ← Array.index_usize limbs1 1#usize
+  let i8 ← lift (i7 &&& i5)
+  let limbs2 ← Array.update limbs1 1#usize i8
+  let i9 ← Array.index_usize limbs2 2#usize
+  let i10 ← lift (i9 &&& i5)
+  let limbs3 ← Array.update limbs2 2#usize i10
+  let i11 ← Array.index_usize limbs3 3#usize
+  let i12 ← lift (i11 &&& i5)
+  let limbs4 ← Array.update limbs3 3#usize i12
+  let i13 ← Array.index_usize limbs4 4#usize
+  let i14 ← lift (i13 &&& i5)
+  let limbs5 ← Array.update limbs4 4#usize i14
+  let i15 ← c4 * 19#u64
+  let i16 ← Array.index_usize limbs5 0#usize
+  let i17 ← i16 + i15
+  let limbs6 ← Array.update limbs5 0#usize i17
+  let i18 ← Array.index_usize limbs6 1#usize
+  let i19 ← i18 + c0
+  let limbs7 ← Array.update limbs6 1#usize i19
+  let i20 ← Array.index_usize limbs7 2#usize
+  let i21 ← i20 + c1
+  let limbs8 ← Array.update limbs7 2#usize i21
+  let i22 ← Array.index_usize limbs8 3#usize
+  let i23 ← i22 + c2
+  let limbs9 ← Array.update limbs8 3#usize i23
+  let i24 ← Array.index_usize limbs9 4#usize
+  let i25 ← i24 + c3
+  let limbs10 ← Array.update limbs9 4#usize i25
   ok limbs10
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub]:
@@ -520,18 +475,14 @@ def backend.serial.u64.field.FieldElement51.from_limbs
 
 /-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 54:0-60:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D2_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D2
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       1859910466990425#u64, 932731440258426#u64, 1072319116312658#u64,
       1815898335770999#u64, 633789495995903#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D2
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D2_body
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 520:4-527:5 -/
@@ -545,10 +496,11 @@ def edwards.EdwardsPoint.as_projective_niels
   let fe1 ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
       self.Y self.X
-  let fe2 ←
+  let fe2 ← backend.serial.u64.constants.EDWARDS_D2
+  let fe3 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      self.T backend.serial.u64.constants.EDWARDS_D2
-  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := self.Z, T2d := fe2 }
+      self.T fe2
+  ok { Y_plus_X := fe, Y_minus_X := fe1, Z := self.Z, T2d := fe3 }
 
 /-- [curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 415:4-430:5 -/
@@ -648,13 +600,9 @@ def
   := do
   let pnp ← edwards.EdwardsPoint.as_projective_niels P
   let points := Array.repeat 8#usize pnp
-  let iter ←
-    core.iter.traits.collect.IntoIterator.Blanket.into_iter
-      (core.iter.traits.iterator.IteratorRange core.iter.range.StepUsize)
-      { start := 0#usize, «end» := 7#usize }
   let points1 ←
     window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop
-      P points iter
+      P points { start := 0#usize, «end» := 7#usize }
   ok points1
 
 /-- [curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select]: loop 0:
@@ -670,8 +618,8 @@ noncomputable def window.LookupTable.select_loop
   match o with
   | none => ok t
   | some j =>
-    let i ← (↑(IScalar.hcast .U16 xabs) : Result Std.U16)
-    let i1 ← (↑(UScalar.cast .U16 j) : Result Std.U16)
+    let i ← lift (IScalar.hcast .U16 xabs)
+    let i1 ← lift (UScalar.cast .U16 j)
     let c ← U16.Insts.SubtleConstantTimeEq.ct_eq i i1
     let i2 ← j - 1#usize
     let t1 ← Array.index_usize self i2
@@ -690,23 +638,19 @@ noncomputable def window.LookupTable.select
   Result T
   := do
   massert (x >= (-8)#i8)
-  let i ← (↑(IScalar.cast .I16 x) : Result Std.I16)
+  let i ← lift (IScalar.cast .I16 x)
   massert (i <= 8#i16)
-  let i1 ← (↑(IScalar.cast .I16 x) : Result Std.I16)
+  let i1 ← lift (IScalar.cast .I16 x)
   let xmask ← i1 >>> 7#i32
-  let i2 ← (↑(IScalar.cast .I16 x) : Result Std.I16)
+  let i2 ← lift (IScalar.cast .I16 x)
   let i3 ← i2 + xmask
-  let xabs ← (↑(i3 ^^^ xmask) : Result Std.I16)
+  let xabs ← lift (i3 ^^^ xmask)
   let t ← traitsIdentityInst.identity
-  let iter ←
-    core.iter.traits.collect.IntoIterator.Blanket.into_iter
-      (core.iter.traits.iterator.IteratorRange core.iter.range.StepUsize)
-      { start := 1#usize, «end» := 9#usize }
   let t1 ←
     window.LookupTable.select_loop subtleConditionallySelectableInst self xabs
-      t iter
-  let i4 ← (↑(xmask &&& 1#i16) : Result Std.I16)
-  let i5 ← (↑(IScalar.hcast .U8 i4) : Result Std.U8)
+      t { start := 1#usize, «end» := 9#usize }
+  let i4 ← lift (xmask &&& 1#i16)
+  let i5 ← lift (IScalar.hcast .U8 i4)
   let neg_mask ← subtle.Choice.Insts.CoreConvertFromU8.from i5
   let t_neg ← coreopsarithNegInst.neg t1
   subtleConditionallySelectableInst.conditional_assign t1 t_neg neg_mask
@@ -740,11 +684,11 @@ def scalar.Scalar.as_radix_16_loop0
     let i1 ← scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index self i
     let i2 ← scalar.Scalar.as_radix_16.bot_half i1
     let i3 ← 2#usize * i
-    let i4 ← (↑(UScalar.hcast .I8 i2) : Result Std.I8)
+    let i4 ← lift (UScalar.hcast .I8 i2)
     let output1 ← Array.update output i3 i4
     let i5 ← scalar.Scalar.as_radix_16.top_half i1
     let i6 ← i3 + 1#usize
-    let i7 ← (↑(UScalar.hcast .I8 i5) : Result Std.I8)
+    let i7 ← lift (UScalar.hcast .I8 i5)
     let a ← Array.update output1 i6 i7
     let i8 ← i + 1#usize
     scalar.Scalar.as_radix_16_loop0 self a i8
@@ -785,39 +729,27 @@ def scalar.Scalar.as_radix_16
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 267:4-267:80 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 @[global_simps, irreducible]
 def backend.serial.u64.field.FieldElement51.ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.ONE_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 265:4-265:81 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.ZERO_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  let a := Array.repeat 5#usize 0#u64
-  backend.serial.u64.field.FieldElement51.from_limbs a
 @[global_simps, irreducible]
 def backend.serial.u64.field.FieldElement51.ZERO
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.ZERO_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  let a := Array.repeat 5#usize 0#u64
+  backend.serial.u64.field.FieldElement51.from_limbs a
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 421:4-428:5 -/
 def edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity
   : Result edwards.EdwardsPoint := do
-  ok
-    {
-      X := backend.serial.u64.field.FieldElement51.ZERO,
-      Y := backend.serial.u64.field.FieldElement51.ONE,
-      Z := backend.serial.u64.field.FieldElement51.ONE,
-      T := backend.serial.u64.field.FieldElement51.ZERO
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ZERO
+  let fe1 ← backend.serial.u64.field.FieldElement51.ONE
+  ok { X := fe, Y := fe1, Z := fe1, T := fe }
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 278:4-288:5 -/
@@ -886,22 +818,18 @@ def
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 519:12-519:58 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK
   : Result Std.U64 := do
   let i ← 1#u64 <<< 51#i32
   i - 1#u64
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK : Std.U64 :=
-  eval_global
-    backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::m]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 468:8-470:9 -/
 def backend.serial.u64.field.FieldElement51.pow2k.m
   (x : Std.U64) (y : Std.U64) : Result Std.U128 := do
-  let i ← (↑(UScalar.cast .U128 x) : Result Std.U128)
-  let i1 ← (↑(UScalar.cast .U128 y) : Result Std.U128)
+  let i ← lift (UScalar.cast .U128 x)
+  let i1 ← lift (UScalar.cast .U128 y)
   i * i1
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]: loop 0:
@@ -959,73 +887,57 @@ def backend.serial.u64.field.FieldElement51.pow2k_loop
           if i1 < i30
           then
             let i31 ← c0 >>> 51#i32
-            let i32 ← (↑(UScalar.cast .U64 i31) : Result Std.U64)
-            let i33 ← (↑(UScalar.cast .U128 i32) : Result Std.U128)
+            let i32 ← lift (UScalar.cast .U64 i31)
+            let i33 ← lift (UScalar.cast .U128 i32)
             let c11 ← c1 + i33
-            let i34 ← (↑(UScalar.cast .U64 c0) : Result Std.U64)
+            let i34 ← lift (UScalar.cast .U64 c0)
             let i35 ←
-              (↑(i34 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
-            let a1 ← Array.update a 0#usize i35
-            let i36 ← c11 >>> 51#i32
-            let i37 ← (↑(UScalar.cast .U64 i36) : Result Std.U64)
-            let i38 ← (↑(UScalar.cast .U128 i37) : Result Std.U128)
-            let c21 ← c2 + i38
-            let i39 ← (↑(UScalar.cast .U64 c11) : Result Std.U64)
-            let i40 ←
-              (↑(i39 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
-            let a2 ← Array.update a1 1#usize i40
-            let i41 ← c21 >>> 51#i32
-            let i42 ← (↑(UScalar.cast .U64 i41) : Result Std.U64)
-            let i43 ← (↑(UScalar.cast .U128 i42) : Result Std.U128)
-            let c31 ← c3 + i43
-            let i44 ← (↑(UScalar.cast .U64 c21) : Result Std.U64)
-            let i45 ←
-              (↑(i44 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
-            let a3 ← Array.update a2 2#usize i45
-            let i46 ← c31 >>> 51#i32
-            let i47 ← (↑(UScalar.cast .U64 i46) : Result Std.U64)
-            let i48 ← (↑(UScalar.cast .U128 i47) : Result Std.U128)
-            let c41 ← c4 + i48
-            let i49 ← (↑(UScalar.cast .U64 c31) : Result Std.U64)
-            let i50 ←
-              (↑(i49 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
-            let a4 ← Array.update a3 3#usize i50
-            let i51 ← c41 >>> 51#i32
-            let carry ← (↑(UScalar.cast .U64 i51) : Result Std.U64)
-            let i52 ← (↑(UScalar.cast .U64 c41) : Result Std.U64)
-            let i53 ←
-              (↑(i52 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
-            let a5 ← Array.update a4 4#usize i53
-            let i54 ← carry * 19#u64
-            let i55 ← Array.index_usize a5 0#usize
-            let i56 ← i55 + i54
-            let a6 ← Array.update a5 0#usize i56
-            let i57 ← Array.index_usize a6 0#usize
-            let i58 ← i57 >>> 51#i32
-            let i59 ← Array.index_usize a6 1#usize
-            let i60 ← i59 + i58
-            let a7 ← Array.update a6 1#usize i60
-            let i61 ← Array.index_usize a7 0#usize
-            let i62 ←
-              (↑(i61 &&&
-                backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK)
-                : Result Std.U64)
+              backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK
+            let i36 ← lift (i34 &&& i35)
+            let a1 ← Array.update a 0#usize i36
+            let i37 ← c11 >>> 51#i32
+            let i38 ← lift (UScalar.cast .U64 i37)
+            let i39 ← lift (UScalar.cast .U128 i38)
+            let c21 ← c2 + i39
+            let i40 ← lift (UScalar.cast .U64 c11)
+            let i41 ← lift (i40 &&& i35)
+            let a2 ← Array.update a1 1#usize i41
+            let i42 ← c21 >>> 51#i32
+            let i43 ← lift (UScalar.cast .U64 i42)
+            let i44 ← lift (UScalar.cast .U128 i43)
+            let c31 ← c3 + i44
+            let i45 ← lift (UScalar.cast .U64 c21)
+            let i46 ← lift (i45 &&& i35)
+            let a3 ← Array.update a2 2#usize i46
+            let i47 ← c31 >>> 51#i32
+            let i48 ← lift (UScalar.cast .U64 i47)
+            let i49 ← lift (UScalar.cast .U128 i48)
+            let c41 ← c4 + i49
+            let i50 ← lift (UScalar.cast .U64 c31)
+            let i51 ← lift (i50 &&& i35)
+            let a4 ← Array.update a3 3#usize i51
+            let i52 ← c41 >>> 51#i32
+            let carry ← lift (UScalar.cast .U64 i52)
+            let i53 ← lift (UScalar.cast .U64 c41)
+            let i54 ← lift (i53 &&& i35)
+            let a5 ← Array.update a4 4#usize i54
+            let i55 ← carry * 19#u64
+            let i56 ← Array.index_usize a5 0#usize
+            let i57 ← i56 + i55
+            let a6 ← Array.update a5 0#usize i57
+            let i58 ← Array.index_usize a6 0#usize
+            let i59 ← i58 >>> 51#i32
+            let i60 ← Array.index_usize a6 1#usize
+            let i61 ← i60 + i59
+            let a7 ← Array.update a6 1#usize i61
+            let i62 ← Array.index_usize a7 0#usize
+            let i63 ← lift (i62 &&& i35)
             let (_, index_mut_back) ← Array.index_mut_usize a7 0#usize
             let k1 ← k - 1#u32
             if k1 = 0#u32
-            then ok (index_mut_back i62)
+            then ok (index_mut_back i63)
             else
-              let a8 := index_mut_back i62
+              let a8 := index_mut_back i63
               backend.serial.u64.field.FieldElement51.pow2k_loop k1 a8
           else fail panic
         else fail panic
@@ -1280,13 +1192,9 @@ def
 def
   backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity
   : Result backend.serial.curve_models.ProjectiveNielsPoint := do
-  ok
-    {
-      Y_plus_X := backend.serial.u64.field.FieldElement51.ONE,
-      Y_minus_X := backend.serial.u64.field.FieldElement51.ONE,
-      Z := backend.serial.u64.field.FieldElement51.ONE,
-      T2d := backend.serial.u64.field.FieldElement51.ZERO
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ONE
+  let fe1 ← backend.serial.u64.field.FieldElement51.ZERO
+  ok { Y_plus_X := fe, Y_minus_X := fe, Z := fe, T2d := fe1 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 240:0-249:1 -/
@@ -1460,7 +1368,7 @@ def backend.serial.u64.field.FieldElement51.to_bytes
   let i16 ← i15 + i14
   let limbs1 ← Array.update limbs 1#usize i16
   let i17 ← Array.index_usize limbs1 0#usize
-  let i18 ← (↑(i17 &&& low_51_bit_mask) : Result Std.U64)
+  let i18 ← lift (i17 &&& low_51_bit_mask)
   let limbs2 ← Array.update limbs1 0#usize i18
   let i19 ← Array.index_usize limbs2 1#usize
   let i20 ← i19 >>> 51#i32
@@ -1468,7 +1376,7 @@ def backend.serial.u64.field.FieldElement51.to_bytes
   let i22 ← i21 + i20
   let limbs3 ← Array.update limbs2 2#usize i22
   let i23 ← Array.index_usize limbs3 1#usize
-  let i24 ← (↑(i23 &&& low_51_bit_mask) : Result Std.U64)
+  let i24 ← lift (i23 &&& low_51_bit_mask)
   let limbs4 ← Array.update limbs3 1#usize i24
   let i25 ← Array.index_usize limbs4 2#usize
   let i26 ← i25 >>> 51#i32
@@ -1476,7 +1384,7 @@ def backend.serial.u64.field.FieldElement51.to_bytes
   let i28 ← i27 + i26
   let limbs5 ← Array.update limbs4 3#usize i28
   let i29 ← Array.index_usize limbs5 2#usize
-  let i30 ← (↑(i29 &&& low_51_bit_mask) : Result Std.U64)
+  let i30 ← lift (i29 &&& low_51_bit_mask)
   let limbs6 ← Array.update limbs5 2#usize i30
   let i31 ← Array.index_usize limbs6 3#usize
   let i32 ← i31 >>> 51#i32
@@ -1484,122 +1392,122 @@ def backend.serial.u64.field.FieldElement51.to_bytes
   let i34 ← i33 + i32
   let limbs7 ← Array.update limbs6 4#usize i34
   let i35 ← Array.index_usize limbs7 3#usize
-  let i36 ← (↑(i35 &&& low_51_bit_mask) : Result Std.U64)
+  let i36 ← lift (i35 &&& low_51_bit_mask)
   let limbs8 ← Array.update limbs7 3#usize i36
   let i37 ← Array.index_usize limbs8 4#usize
-  let i38 ← (↑(i37 &&& low_51_bit_mask) : Result Std.U64)
+  let i38 ← lift (i37 &&& low_51_bit_mask)
   let limbs9 ← Array.update limbs8 4#usize i38
   let s := Array.repeat 32#usize 0#u8
   let i39 ← Array.index_usize limbs9 0#usize
-  let i40 ← (↑(UScalar.cast .U8 i39) : Result Std.U8)
+  let i40 ← lift (UScalar.cast .U8 i39)
   let s1 ← Array.update s 0#usize i40
   let i41 ← i39 >>> 8#i32
-  let i42 ← (↑(UScalar.cast .U8 i41) : Result Std.U8)
+  let i42 ← lift (UScalar.cast .U8 i41)
   let s2 ← Array.update s1 1#usize i42
   let i43 ← i39 >>> 16#i32
-  let i44 ← (↑(UScalar.cast .U8 i43) : Result Std.U8)
+  let i44 ← lift (UScalar.cast .U8 i43)
   let s3 ← Array.update s2 2#usize i44
   let i45 ← i39 >>> 24#i32
-  let i46 ← (↑(UScalar.cast .U8 i45) : Result Std.U8)
+  let i46 ← lift (UScalar.cast .U8 i45)
   let s4 ← Array.update s3 3#usize i46
   let i47 ← i39 >>> 32#i32
-  let i48 ← (↑(UScalar.cast .U8 i47) : Result Std.U8)
+  let i48 ← lift (UScalar.cast .U8 i47)
   let s5 ← Array.update s4 4#usize i48
   let i49 ← i39 >>> 40#i32
-  let i50 ← (↑(UScalar.cast .U8 i49) : Result Std.U8)
+  let i50 ← lift (UScalar.cast .U8 i49)
   let s6 ← Array.update s5 5#usize i50
   let i51 ← i39 >>> 48#i32
   let i52 ← Array.index_usize limbs9 1#usize
   let i53 ← i52 <<< 3#i32
-  let i54 ← (↑(i51 ||| i53) : Result Std.U64)
-  let i55 ← (↑(UScalar.cast .U8 i54) : Result Std.U8)
+  let i54 ← lift (i51 ||| i53)
+  let i55 ← lift (UScalar.cast .U8 i54)
   let s7 ← Array.update s6 6#usize i55
   let i56 ← i52 >>> 5#i32
-  let i57 ← (↑(UScalar.cast .U8 i56) : Result Std.U8)
+  let i57 ← lift (UScalar.cast .U8 i56)
   let s8 ← Array.update s7 7#usize i57
   let i58 ← i52 >>> 13#i32
-  let i59 ← (↑(UScalar.cast .U8 i58) : Result Std.U8)
+  let i59 ← lift (UScalar.cast .U8 i58)
   let s9 ← Array.update s8 8#usize i59
   let i60 ← i52 >>> 21#i32
-  let i61 ← (↑(UScalar.cast .U8 i60) : Result Std.U8)
+  let i61 ← lift (UScalar.cast .U8 i60)
   let s10 ← Array.update s9 9#usize i61
   let i62 ← i52 >>> 29#i32
-  let i63 ← (↑(UScalar.cast .U8 i62) : Result Std.U8)
+  let i63 ← lift (UScalar.cast .U8 i62)
   let s11 ← Array.update s10 10#usize i63
   let i64 ← i52 >>> 37#i32
-  let i65 ← (↑(UScalar.cast .U8 i64) : Result Std.U8)
+  let i65 ← lift (UScalar.cast .U8 i64)
   let s12 ← Array.update s11 11#usize i65
   let i66 ← i52 >>> 45#i32
   let i67 ← Array.index_usize limbs9 2#usize
   let i68 ← i67 <<< 6#i32
-  let i69 ← (↑(i66 ||| i68) : Result Std.U64)
-  let i70 ← (↑(UScalar.cast .U8 i69) : Result Std.U8)
+  let i69 ← lift (i66 ||| i68)
+  let i70 ← lift (UScalar.cast .U8 i69)
   let s13 ← Array.update s12 12#usize i70
   let i71 ← i67 >>> 2#i32
-  let i72 ← (↑(UScalar.cast .U8 i71) : Result Std.U8)
+  let i72 ← lift (UScalar.cast .U8 i71)
   let s14 ← Array.update s13 13#usize i72
   let i73 ← i67 >>> 10#i32
-  let i74 ← (↑(UScalar.cast .U8 i73) : Result Std.U8)
+  let i74 ← lift (UScalar.cast .U8 i73)
   let s15 ← Array.update s14 14#usize i74
   let i75 ← i67 >>> 18#i32
-  let i76 ← (↑(UScalar.cast .U8 i75) : Result Std.U8)
+  let i76 ← lift (UScalar.cast .U8 i75)
   let s16 ← Array.update s15 15#usize i76
   let i77 ← i67 >>> 26#i32
-  let i78 ← (↑(UScalar.cast .U8 i77) : Result Std.U8)
+  let i78 ← lift (UScalar.cast .U8 i77)
   let s17 ← Array.update s16 16#usize i78
   let i79 ← i67 >>> 34#i32
-  let i80 ← (↑(UScalar.cast .U8 i79) : Result Std.U8)
+  let i80 ← lift (UScalar.cast .U8 i79)
   let s18 ← Array.update s17 17#usize i80
   let i81 ← i67 >>> 42#i32
-  let i82 ← (↑(UScalar.cast .U8 i81) : Result Std.U8)
+  let i82 ← lift (UScalar.cast .U8 i81)
   let s19 ← Array.update s18 18#usize i82
   let i83 ← i67 >>> 50#i32
   let i84 ← Array.index_usize limbs9 3#usize
   let i85 ← i84 <<< 1#i32
-  let i86 ← (↑(i83 ||| i85) : Result Std.U64)
-  let i87 ← (↑(UScalar.cast .U8 i86) : Result Std.U8)
+  let i86 ← lift (i83 ||| i85)
+  let i87 ← lift (UScalar.cast .U8 i86)
   let s20 ← Array.update s19 19#usize i87
   let i88 ← i84 >>> 7#i32
-  let i89 ← (↑(UScalar.cast .U8 i88) : Result Std.U8)
+  let i89 ← lift (UScalar.cast .U8 i88)
   let s21 ← Array.update s20 20#usize i89
   let i90 ← i84 >>> 15#i32
-  let i91 ← (↑(UScalar.cast .U8 i90) : Result Std.U8)
+  let i91 ← lift (UScalar.cast .U8 i90)
   let s22 ← Array.update s21 21#usize i91
   let i92 ← i84 >>> 23#i32
-  let i93 ← (↑(UScalar.cast .U8 i92) : Result Std.U8)
+  let i93 ← lift (UScalar.cast .U8 i92)
   let s23 ← Array.update s22 22#usize i93
   let i94 ← i84 >>> 31#i32
-  let i95 ← (↑(UScalar.cast .U8 i94) : Result Std.U8)
+  let i95 ← lift (UScalar.cast .U8 i94)
   let s24 ← Array.update s23 23#usize i95
   let i96 ← i84 >>> 39#i32
-  let i97 ← (↑(UScalar.cast .U8 i96) : Result Std.U8)
+  let i97 ← lift (UScalar.cast .U8 i96)
   let s25 ← Array.update s24 24#usize i97
   let i98 ← i84 >>> 47#i32
   let i99 ← Array.index_usize limbs9 4#usize
   let i100 ← i99 <<< 4#i32
-  let i101 ← (↑(i98 ||| i100) : Result Std.U64)
-  let i102 ← (↑(UScalar.cast .U8 i101) : Result Std.U8)
+  let i101 ← lift (i98 ||| i100)
+  let i102 ← lift (UScalar.cast .U8 i101)
   let s26 ← Array.update s25 25#usize i102
   let i103 ← i99 >>> 4#i32
-  let i104 ← (↑(UScalar.cast .U8 i103) : Result Std.U8)
+  let i104 ← lift (UScalar.cast .U8 i103)
   let s27 ← Array.update s26 26#usize i104
   let i105 ← i99 >>> 12#i32
-  let i106 ← (↑(UScalar.cast .U8 i105) : Result Std.U8)
+  let i106 ← lift (UScalar.cast .U8 i105)
   let s28 ← Array.update s27 27#usize i106
   let i107 ← i99 >>> 20#i32
-  let i108 ← (↑(UScalar.cast .U8 i107) : Result Std.U8)
+  let i108 ← lift (UScalar.cast .U8 i107)
   let s29 ← Array.update s28 28#usize i108
   let i109 ← i99 >>> 28#i32
-  let i110 ← (↑(UScalar.cast .U8 i109) : Result Std.U8)
+  let i110 ← lift (UScalar.cast .U8 i109)
   let s30 ← Array.update s29 29#usize i110
   let i111 ← i99 >>> 36#i32
-  let i112 ← (↑(UScalar.cast .U8 i111) : Result Std.U8)
+  let i112 ← lift (UScalar.cast .U8 i111)
   let s31 ← Array.update s30 30#usize i112
   let i113 ← i99 >>> 44#i32
-  let i114 ← (↑(UScalar.cast .U8 i113) : Result Std.U8)
+  let i114 ← lift (UScalar.cast .U8 i113)
   let s32 ← Array.update s31 31#usize i114
   let i115 ← Array.index_usize s32 31#usize
-  let i116 ← (↑(i115 &&& 128#u8) : Result Std.U8)
+  let i116 ← lift (i115 &&& 128#u8)
   massert (i116 = 0#u8)
   ok s32
 
@@ -1611,9 +1519,9 @@ def backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq
   Result subtle.Choice
   := do
   let a ← backend.serial.u64.field.FieldElement51.to_bytes self
-  let s ← (↑(Array.to_slice a) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice a)
   let a1 ← backend.serial.u64.field.FieldElement51.to_bytes other
-  let s1 ← (↑(Array.to_slice a1) : Result (Slice Std.U8))
+  let s1 ← lift (Array.to_slice a1)
   Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s s1
 
 /-- [curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq]:
@@ -1762,12 +1670,9 @@ def backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize :
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 231:4-237:5 -/
 def IdentityCurveModelsProjectivePoint.identity
   : Result backend.serial.curve_models.ProjectivePoint := do
-  ok
-    {
-      X := backend.serial.u64.field.FieldElement51.ZERO,
-      Y := backend.serial.u64.field.FieldElement51.ONE,
-      Z := backend.serial.u64.field.FieldElement51.ONE
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ZERO
+  let fe1 ← backend.serial.u64.field.FieldElement51.ONE
+  ok { X := fe, Y := fe1, Z := fe1 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 230:0-238:1 -/
@@ -1798,12 +1703,9 @@ def backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault :
 def
   backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity
   : Result backend.serial.curve_models.AffineNielsPoint := do
-  ok
-    {
-      y_plus_x := backend.serial.u64.field.FieldElement51.ONE,
-      y_minus_x := backend.serial.u64.field.FieldElement51.ONE,
-      xy2d := backend.serial.u64.field.FieldElement51.ZERO
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ONE
+  let fe1 ← backend.serial.u64.field.FieldElement51.ZERO
+  ok { y_plus_x := fe, y_minus_x := fe, xy2d := fe1 }
 
 /-- Trait implementation: [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}]
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 257:0-265:1 -/
@@ -1833,18 +1735,14 @@ def backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault :
 
 /-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 45:0-51:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       929955233495203#u64, 466365720129213#u64, 1662059464998953#u64,
       2033849074728123#u64, 1442794654840575#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D_body
 
 /-- [curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 278:4-289:5 -/
@@ -1861,15 +1759,16 @@ def
   let lhs ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       fe ZZ
-  let fe1 ←
-    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      XX YY
+  let fe1 ← backend.serial.u64.constants.EDWARDS_D
   let fe2 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.EDWARDS_D fe1
+      XX YY
+  let fe3 ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
+      fe1 fe2
   let rhs ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      ZZZZ fe2
+      ZZZZ fe3
   backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
     lhs rhs
 
@@ -2179,132 +2078,96 @@ def
 
 /-- [curve25519_dalek::backend::serial::u64::constants::MINUS_ONE]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 26:0-32:3 -/
-@[global_simps]
-def backend.serial.u64.constants.MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MINUS_ONE
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
       2251799813685247#u64, 2251799813685247#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.MINUS_ONE_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 63:0-69:3 -/
-@[global_simps]
-def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       1136626929484150#u64, 1998550399581263#u64, 496427632559748#u64,
       118527312129759#u64, 45110755273534#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 72:0-78:3 -/
-@[global_simps]
-def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       1507062230895904#u64, 1572317787530805#u64, 683053064812840#u64,
       317374165784489#u64, 1572899562415810#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 81:0-87:3 -/
-@[global_simps]
-def backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       2241493124984347#u64, 425987919032274#u64, 2207028919301688#u64,
       1220490630685848#u64, 974799131293748#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.SQRT_AD_MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 90:0-96:3 -/
-@[global_simps]
-def backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.INVSQRT_A_MINUS_D
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       278908739862762#u64, 821645201101625#u64, 8113234426968#u64,
       1777959178193151#u64, 2118520810568447#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.INVSQRT_A_MINUS_D
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.INVSQRT_A_MINUS_D_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::SQRT_M1]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 99:0-105:3 -/
-@[global_simps]
-def backend.serial.u64.constants.SQRT_M1_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.SQRT_M1
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
       2117202627021982#u64, 765476049583133#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.SQRT_M1
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.SQRT_M1_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 108:0-109:53 -/
-@[global_simps]
-def backend.serial.u64.constants.APLUS2_OVER_FOUR_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [ 121666#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.APLUS2_OVER_FOUR
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.APLUS2_OVER_FOUR_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 121666#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 
 /-- [curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 114:0-114:97 -/
-@[global_simps]
-def backend.serial.u64.constants.MONTGOMERY_A_body
-  : Result backend.serial.u64.field.FieldElement51 := do
-  backend.serial.u64.field.FieldElement51.from_limbs
-    (Array.make 5#usize [ 486662#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 @[global_simps, irreducible]
 def backend.serial.u64.constants.MONTGOMERY_A
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.MONTGOMERY_A_body
+  : Result backend.serial.u64.field.FieldElement51 :=
+  backend.serial.u64.field.FieldElement51.from_limbs
+    (Array.make 5#usize [ 486662#u64, 0#u64, 0#u64, 0#u64, 0#u64 ])
 
 /-- [curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 118:0-124:3 -/
-@[global_simps]
-def backend.serial.u64.constants.MONTGOMERY_A_NEG_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.MONTGOMERY_A_NEG
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       2251799813198567#u64, 2251799813685247#u64, 2251799813685247#u64,
       2251799813685247#u64, 2251799813685247#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.MONTGOMERY_A_NEG
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.constants.MONTGOMERY_A_NEG_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::L]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 127:0-133:3 -/
@@ -2340,8 +2203,8 @@ def backend.serial.u64.constants.RR : backend.serial.u64.scalar.Scalar52 :=
 
 /-- [curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 161:0-184:2 -/
-@[global_simps]
-def backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body
+@[global_simps, irreducible]
+def backend.serial.u64.constants.ED25519_BASEPOINT_POINT
   : Result edwards.EdwardsPoint := do
   let fe ←
     backend.serial.u64.field.FieldElement51.from_limbs
@@ -2365,16 +2228,13 @@ def backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body
         900171276175154#u64, 1821297809914039#u64
         ])
   ok { X := fe, Y := fe1, Z := fe2, T := fe3 }
-@[global_simps, irreducible]
-def backend.serial.u64.constants.ED25519_BASEPOINT_POINT
-  : edwards.EdwardsPoint :=
-  eval_global backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION_INNER_DOC_HIDDEN]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 198:0-337:2 -/
-@[global_simps]
-def backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body
-  : Result (Array edwards.EdwardsPoint 8#usize) := do
+@[global_simps, irreducible]
+def backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+  : Result (Array edwards.EdwardsPoint 8#usize) :=
+  do
   let a := Array.repeat 5#usize 0#u64
   let fe ← backend.serial.u64.field.FieldElement51.from_limbs a
   let fe1 ←
@@ -2459,17 +2319,14 @@ def backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body
       { X := fe15, Y := fe16, Z := fe1, T := fe17 },
       { X := fe14, Y := fe4, Z := fe1, T := fe10 }
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
-  : Array edwards.EdwardsPoint 8#usize :=
-  eval_global backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body
 
 /-- [curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION]
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 194:0-194:76 -/
 @[global_simps, irreducible]
 def backend.serial.u64.constants.EIGHT_TORSION
-  : Array edwards.EdwardsPoint 8#usize :=
-  backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+  : Result (Array edwards.EdwardsPoint 8#usize) := do
+  let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+  ok a
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
@@ -2666,58 +2523,54 @@ def backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::MINUS_ONE]
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 269:4-275:7 -/
-@[global_simps]
-def backend.serial.u64.field.FieldElement51.MINUS_ONE_body
-  : Result backend.serial.u64.field.FieldElement51 := do
+@[global_simps, irreducible]
+def backend.serial.u64.field.FieldElement51.MINUS_ONE
+  : Result backend.serial.u64.field.FieldElement51 :=
   backend.serial.u64.field.FieldElement51.from_limbs
     (Array.make 5#usize [
       2251799813685228#u64, 2251799813685247#u64, 2251799813685247#u64,
       2251799813685247#u64, 2251799813685247#u64
       ])
-@[global_simps, irreducible]
-def backend.serial.u64.field.FieldElement51.MINUS_ONE
-  : backend.serial.u64.field.FieldElement51 :=
-  eval_global backend.serial.u64.field.FieldElement51.MINUS_ONE_body
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes::load8_at]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 341:8-350:9 -/
 def backend.serial.u64.field.FieldElement51.from_bytes.load8_at
   (input : Slice Std.U8) (i : Std.Usize) : Result Std.U64 := do
   let i1 ← Slice.index_usize input i
-  let i2 ← (↑(UScalar.cast .U64 i1) : Result Std.U64)
+  let i2 ← lift (UScalar.cast .U64 i1)
   let i3 ← i + 1#usize
   let i4 ← Slice.index_usize input i3
-  let i5 ← (↑(UScalar.cast .U64 i4) : Result Std.U64)
+  let i5 ← lift (UScalar.cast .U64 i4)
   let i6 ← i5 <<< 8#i32
-  let i7 ← (↑(i2 ||| i6) : Result Std.U64)
+  let i7 ← lift (i2 ||| i6)
   let i8 ← i + 2#usize
   let i9 ← Slice.index_usize input i8
-  let i10 ← (↑(UScalar.cast .U64 i9) : Result Std.U64)
+  let i10 ← lift (UScalar.cast .U64 i9)
   let i11 ← i10 <<< 16#i32
-  let i12 ← (↑(i7 ||| i11) : Result Std.U64)
+  let i12 ← lift (i7 ||| i11)
   let i13 ← i + 3#usize
   let i14 ← Slice.index_usize input i13
-  let i15 ← (↑(UScalar.cast .U64 i14) : Result Std.U64)
+  let i15 ← lift (UScalar.cast .U64 i14)
   let i16 ← i15 <<< 24#i32
-  let i17 ← (↑(i12 ||| i16) : Result Std.U64)
+  let i17 ← lift (i12 ||| i16)
   let i18 ← i + 4#usize
   let i19 ← Slice.index_usize input i18
-  let i20 ← (↑(UScalar.cast .U64 i19) : Result Std.U64)
+  let i20 ← lift (UScalar.cast .U64 i19)
   let i21 ← i20 <<< 32#i32
-  let i22 ← (↑(i17 ||| i21) : Result Std.U64)
+  let i22 ← lift (i17 ||| i21)
   let i23 ← i + 5#usize
   let i24 ← Slice.index_usize input i23
-  let i25 ← (↑(UScalar.cast .U64 i24) : Result Std.U64)
+  let i25 ← lift (UScalar.cast .U64 i24)
   let i26 ← i25 <<< 40#i32
-  let i27 ← (↑(i22 ||| i26) : Result Std.U64)
+  let i27 ← lift (i22 ||| i26)
   let i28 ← i + 6#usize
   let i29 ← Slice.index_usize input i28
-  let i30 ← (↑(UScalar.cast .U64 i29) : Result Std.U64)
+  let i30 ← lift (UScalar.cast .U64 i29)
   let i31 ← i30 <<< 48#i32
-  let i32 ← (↑(i27 ||| i31) : Result Std.U64)
+  let i32 ← lift (i27 ||| i31)
   let i33 ← i + 7#usize
   let i34 ← Slice.index_usize input i33
-  let i35 ← (↑(UScalar.cast .U64 i34) : Result Std.U64)
+  let i35 ← lift (UScalar.cast .U64 i34)
   let i36 ← i35 <<< 56#i32
   ok (i32 ||| i36)
 
@@ -2729,30 +2582,30 @@ def backend.serial.u64.field.FieldElement51.from_bytes
   := do
   let i ← 1#u64 <<< 51#i32
   let low_51_bit_mask ← i - 1#u64
-  let s ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice bytes)
   let i1 ←
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s 0#usize
-  let i2 ← (↑(i1 &&& low_51_bit_mask) : Result Std.U64)
-  let s1 ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
+  let i2 ← lift (i1 &&& low_51_bit_mask)
+  let s1 ← lift (Array.to_slice bytes)
   let i3 ←
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s1 6#usize
   let i4 ← i3 >>> 3#i32
-  let i5 ← (↑(i4 &&& low_51_bit_mask) : Result Std.U64)
-  let s2 ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
+  let i5 ← lift (i4 &&& low_51_bit_mask)
+  let s2 ← lift (Array.to_slice bytes)
   let i6 ←
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s2 12#usize
   let i7 ← i6 >>> 6#i32
-  let i8 ← (↑(i7 &&& low_51_bit_mask) : Result Std.U64)
-  let s3 ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
+  let i8 ← lift (i7 &&& low_51_bit_mask)
+  let s3 ← lift (Array.to_slice bytes)
   let i9 ←
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s3 19#usize
   let i10 ← i9 >>> 1#i32
-  let i11 ← (↑(i10 &&& low_51_bit_mask) : Result Std.U64)
-  let s4 ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
+  let i11 ← lift (i10 &&& low_51_bit_mask)
+  let s4 ← lift (Array.to_slice bytes)
   let i12 ←
     backend.serial.u64.field.FieldElement51.from_bytes.load8_at s4 24#usize
   let i13 ← i12 >>> 12#i32
-  let i14 ← (↑(i13 &&& low_51_bit_mask) : Result Std.U64)
+  let i14 ← lift (i13 &&& low_51_bit_mask)
   ok (Array.make 5#usize [ i2, i5, i8, i11, i14 ])
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes]:
@@ -2852,21 +2705,17 @@ def backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64 :
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 56:0-58:1 -/
 def backend.serial.u64.scalar.m
   (x : Std.U64) (y : Std.U64) : Result Std.U128 := do
-  let i ← (↑(UScalar.cast .U128 x) : Result Std.U128)
-  let i1 ← (↑(UScalar.cast .U128 y) : Result Std.U128)
+  let i ← lift (UScalar.cast .U128 x)
+  let i1 ← lift (UScalar.cast .U128 y)
   i * i1
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::ZERO]
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 62:4-62:57 -/
-@[global_simps]
-def backend.serial.u64.scalar.Scalar52.ZERO_body
-  : Result backend.serial.u64.scalar.Scalar52 := do
-  let a := Array.repeat 5#usize 0#u64
-  ok a
 @[global_simps, irreducible]
 def backend.serial.u64.scalar.Scalar52.ZERO
   : backend.serial.u64.scalar.Scalar52 :=
-  eval_global backend.serial.u64.scalar.Scalar52.ZERO_body
+  let a := Array.repeat 5#usize 0#u64
+  a
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 69:8-80:9 -/
@@ -2879,42 +2728,42 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_loop
   then
     let base ← i * 8#usize
     let i1 ← Array.index_usize bytes base
-    let i2 ← (↑(UScalar.cast .U64 i1) : Result Std.U64)
+    let i2 ← lift (UScalar.cast .U64 i1)
     let i3 ← base + 1#usize
     let i4 ← Array.index_usize bytes i3
-    let i5 ← (↑(UScalar.cast .U64 i4) : Result Std.U64)
+    let i5 ← lift (UScalar.cast .U64 i4)
     let i6 ← i5 <<< 8#i32
-    let i7 ← (↑(i2 ||| i6) : Result Std.U64)
+    let i7 ← lift (i2 ||| i6)
     let i8 ← base + 2#usize
     let i9 ← Array.index_usize bytes i8
-    let i10 ← (↑(UScalar.cast .U64 i9) : Result Std.U64)
+    let i10 ← lift (UScalar.cast .U64 i9)
     let i11 ← i10 <<< 16#i32
-    let i12 ← (↑(i7 ||| i11) : Result Std.U64)
+    let i12 ← lift (i7 ||| i11)
     let i13 ← base + 3#usize
     let i14 ← Array.index_usize bytes i13
-    let i15 ← (↑(UScalar.cast .U64 i14) : Result Std.U64)
+    let i15 ← lift (UScalar.cast .U64 i14)
     let i16 ← i15 <<< 24#i32
-    let i17 ← (↑(i12 ||| i16) : Result Std.U64)
+    let i17 ← lift (i12 ||| i16)
     let i18 ← base + 4#usize
     let i19 ← Array.index_usize bytes i18
-    let i20 ← (↑(UScalar.cast .U64 i19) : Result Std.U64)
+    let i20 ← lift (UScalar.cast .U64 i19)
     let i21 ← i20 <<< 32#i32
-    let i22 ← (↑(i17 ||| i21) : Result Std.U64)
+    let i22 ← lift (i17 ||| i21)
     let i23 ← base + 5#usize
     let i24 ← Array.index_usize bytes i23
-    let i25 ← (↑(UScalar.cast .U64 i24) : Result Std.U64)
+    let i25 ← lift (UScalar.cast .U64 i24)
     let i26 ← i25 <<< 40#i32
-    let i27 ← (↑(i22 ||| i26) : Result Std.U64)
+    let i27 ← lift (i22 ||| i26)
     let i28 ← base + 6#usize
     let i29 ← Array.index_usize bytes i28
-    let i30 ← (↑(UScalar.cast .U64 i29) : Result Std.U64)
+    let i30 ← lift (UScalar.cast .U64 i29)
     let i31 ← i30 <<< 48#i32
-    let i32 ← (↑(i27 ||| i31) : Result Std.U64)
+    let i32 ← lift (i27 ||| i31)
     let i33 ← base + 7#usize
     let i34 ← Array.index_usize bytes i33
-    let i35 ← (↑(UScalar.cast .U64 i34) : Result Std.U64)
+    let i35 ← lift (UScalar.cast .U64 i34)
     let i36 ← i35 <<< 56#i32
-    let i37 ← (↑(i32 ||| i36) : Result Std.U64)
+    let i37 ← lift (i32 ||| i36)
     let a ← Array.update words i i37
     let i38 ← i + 1#usize
     backend.serial.u64.scalar.Scalar52.from_bytes_loop bytes a i38
@@ -2938,50 +2787,50 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   let (_, index_mut_back) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       backend.serial.u64.scalar.Scalar52.ZERO 0#usize
-  let i3 ← (↑(i2 &&& mask) : Result Std.U64)
+  let i3 ← lift (i2 &&& mask)
   let i4 ← i2 >>> 52#i32
   let i5 ← Array.index_usize words1 1#usize
   let i6 ← i5 <<< 12#i32
-  let i7 ← (↑(i4 ||| i6) : Result Std.U64)
+  let i7 ← lift (i4 ||| i6)
   let s := index_mut_back i3
   let (_, index_mut_back1) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       s 1#usize
-  let i8 ← (↑(i7 &&& mask) : Result Std.U64)
+  let i8 ← lift (i7 &&& mask)
   let i9 ← i5 >>> 40#i32
   let i10 ← Array.index_usize words1 2#usize
   let i11 ← i10 <<< 24#i32
-  let i12 ← (↑(i9 ||| i11) : Result Std.U64)
+  let i12 ← lift (i9 ||| i11)
   let s1 := index_mut_back1 i8
   let (_, index_mut_back2) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       s1 2#usize
-  let i13 ← (↑(i12 &&& mask) : Result Std.U64)
+  let i13 ← lift (i12 &&& mask)
   let i14 ← i10 >>> 28#i32
   let i15 ← Array.index_usize words1 3#usize
   let i16 ← i15 <<< 36#i32
-  let i17 ← (↑(i14 ||| i16) : Result Std.U64)
+  let i17 ← lift (i14 ||| i16)
   let s2 := index_mut_back2 i13
   let (_, index_mut_back3) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       s2 3#usize
-  let i18 ← (↑(i17 &&& mask) : Result Std.U64)
+  let i18 ← lift (i17 &&& mask)
   let i19 ← i15 >>> 16#i32
   let s3 := index_mut_back3 i18
   let (_, index_mut_back4) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       s3 4#usize
-  let i20 ← (↑(i19 &&& top_mask) : Result Std.U64)
+  let i20 ← lift (i19 &&& top_mask)
   ok (index_mut_back4 i20)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 283:8-286:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   (sum : Std.U128) : Result (Std.U128 × Std.U64) := do
-  let i ← (↑(UScalar.cast .U64 sum) : Result Std.U64)
+  let i ← lift (UScalar.cast .U64 sum)
   let i1 ← 1#u64 <<< 52#i32
   let i2 ← i1 - 1#u64
-  let w ← (↑(i &&& i2) : Result Std.U64)
+  let w ← lift (i &&& i2)
   let i3 ← sum >>> 52#i32
   ok (i3, w)
 
@@ -2989,13 +2838,12 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 277:8-280:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
   (sum : Std.U128) : Result (Std.U128 × Std.U64) := do
-  let i ← (↑(UScalar.cast .U64 sum) : Result Std.U64)
+  let i ← lift (UScalar.cast .U64 sum)
   let i1 ←
-    (↑(core.num.U64.wrapping_mul i backend.serial.u64.constants.LFACTOR) :
-      Result Std.U64)
+    lift (core.num.U64.wrapping_mul i backend.serial.u64.constants.LFACTOR)
   let i2 ← 1#u64 <<< 52#i32
   let i3 ← i2 - 1#u64
-  let p ← (↑(i1 &&& i3) : Result Std.U64)
+  let p ← lift (i1 &&& i3)
   let i4 ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
       backend.serial.u64.constants.L 0#usize
@@ -3028,7 +2876,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
     let (_, index_mut_back) ←
       backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
         self i
-    let i5 ← (↑(carry1 &&& mask) : Result Std.U64)
+    let i5 ← lift (carry1 &&& mask)
     let i6 ← i + 1#usize
     let self1 := index_mut_back i5
     backend.serial.u64.scalar.Scalar52.conditional_add_l_loop self1 condition
@@ -3066,11 +2914,11 @@ def backend.serial.u64.scalar.Scalar52.sub_loop
         b i
     let i3 ← borrow >>> 63#i32
     let i4 ← i2 + i3
-    let borrow1 ← (↑(core.num.U64.wrapping_sub i1 i4) : Result Std.U64)
+    let borrow1 ← lift (core.num.U64.wrapping_sub i1 i4)
     let (_, index_mut_back) ←
       backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
         difference i
-    let i5 ← (↑(borrow1 &&& mask) : Result Std.U64)
+    let i5 ← lift (borrow1 &&& mask)
     let i6 ← i + 1#usize
     let difference1 := index_mut_back i5
     backend.serial.u64.scalar.Scalar52.sub_loop a b difference1 mask borrow1 i6
@@ -3090,7 +2938,7 @@ def backend.serial.u64.scalar.Scalar52.sub
     backend.serial.u64.scalar.Scalar52.sub_loop a b
       backend.serial.u64.scalar.Scalar52.ZERO mask 0#u64 0#usize
   let i1 ← borrow >>> 63#i32
-  let i2 ← (↑(UScalar.cast .U8 i1) : Result Std.U8)
+  let i2 ← lift (UScalar.cast .U8 i1)
   let c ← subtle.Choice.Insts.CoreConvertFromU8.from i2
   let (_, difference1) ←
     backend.serial.u64.scalar.Scalar52.conditional_add_l difference c
@@ -3176,7 +3024,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   let i49 ← i47 + i48
   let (carry8, r3) ←
     backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2 i49
-  let r4 ← (↑(UScalar.cast .U64 carry8) : Result Std.U64)
+  let r4 ← lift (UScalar.cast .U64 carry8)
   backend.serial.u64.scalar.Scalar52.sub
     (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
 
@@ -3302,7 +3150,7 @@ def backend.serial.u64.scalar.Scalar52.add_loop
     let (_, index_mut_back) ←
       backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
         sum i
-    let i5 ← (↑(carry1 &&& mask) : Result Std.U64)
+    let i5 ← lift (carry1 &&& mask)
     let i6 ← i + 1#usize
     let sum1 := index_mut_back i5
     backend.serial.u64.scalar.Scalar52.add_loop a b sum1 mask carry1 i6
@@ -3334,65 +3182,65 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
   then
     let i1 ← i * 8#usize
     let i2 ← Array.index_usize bytes i1
-    let i3 ← (↑(UScalar.cast .U64 i2) : Result Std.U64)
+    let i3 ← lift (UScalar.cast .U64 i2)
     let i4 ← i3 <<< 0#i32
     let i5 ← Array.index_usize words i
-    let i6 ← (↑(i5 ||| i4) : Result Std.U64)
+    let i6 ← lift (i5 ||| i4)
     let words1 ← Array.update words i i6
     let i7 ← i1 + 1#usize
     let i8 ← Array.index_usize bytes i7
-    let i9 ← (↑(UScalar.cast .U64 i8) : Result Std.U64)
+    let i9 ← lift (UScalar.cast .U64 i8)
     let i10 ← i9 <<< 8#i32
     let i11 ← Array.index_usize words1 i
-    let i12 ← (↑(i11 ||| i10) : Result Std.U64)
+    let i12 ← lift (i11 ||| i10)
     let words2 ← Array.update words1 i i12
     let i13 ← i1 + 2#usize
     let i14 ← Array.index_usize bytes i13
-    let i15 ← (↑(UScalar.cast .U64 i14) : Result Std.U64)
+    let i15 ← lift (UScalar.cast .U64 i14)
     let i16 ← 2#i32 * 8#i32
     let i17 ← i15 <<< i16
     let i18 ← Array.index_usize words2 i
-    let i19 ← (↑(i18 ||| i17) : Result Std.U64)
+    let i19 ← lift (i18 ||| i17)
     let words3 ← Array.update words2 i i19
     let i20 ← i1 + 3#usize
     let i21 ← Array.index_usize bytes i20
-    let i22 ← (↑(UScalar.cast .U64 i21) : Result Std.U64)
+    let i22 ← lift (UScalar.cast .U64 i21)
     let i23 ← 3#i32 * 8#i32
     let i24 ← i22 <<< i23
     let i25 ← Array.index_usize words3 i
-    let i26 ← (↑(i25 ||| i24) : Result Std.U64)
+    let i26 ← lift (i25 ||| i24)
     let words4 ← Array.update words3 i i26
     let i27 ← i1 + 4#usize
     let i28 ← Array.index_usize bytes i27
-    let i29 ← (↑(UScalar.cast .U64 i28) : Result Std.U64)
+    let i29 ← lift (UScalar.cast .U64 i28)
     let i30 ← 4#i32 * 8#i32
     let i31 ← i29 <<< i30
     let i32 ← Array.index_usize words4 i
-    let i33 ← (↑(i32 ||| i31) : Result Std.U64)
+    let i33 ← lift (i32 ||| i31)
     let words5 ← Array.update words4 i i33
     let i34 ← i1 + 5#usize
     let i35 ← Array.index_usize bytes i34
-    let i36 ← (↑(UScalar.cast .U64 i35) : Result Std.U64)
+    let i36 ← lift (UScalar.cast .U64 i35)
     let i37 ← 5#i32 * 8#i32
     let i38 ← i36 <<< i37
     let i39 ← Array.index_usize words5 i
-    let i40 ← (↑(i39 ||| i38) : Result Std.U64)
+    let i40 ← lift (i39 ||| i38)
     let words6 ← Array.update words5 i i40
     let i41 ← i1 + 6#usize
     let i42 ← Array.index_usize bytes i41
-    let i43 ← (↑(UScalar.cast .U64 i42) : Result Std.U64)
+    let i43 ← lift (UScalar.cast .U64 i42)
     let i44 ← 6#i32 * 8#i32
     let i45 ← i43 <<< i44
     let i46 ← Array.index_usize words6 i
-    let i47 ← (↑(i46 ||| i45) : Result Std.U64)
+    let i47 ← lift (i46 ||| i45)
     let words7 ← Array.update words6 i i47
     let i48 ← i1 + 7#usize
     let i49 ← Array.index_usize bytes i48
-    let i50 ← (↑(UScalar.cast .U64 i49) : Result Std.U64)
+    let i50 ← lift (UScalar.cast .U64 i49)
     let i51 ← 7#i32 * 8#i32
     let i52 ← i50 <<< i51
     let i53 ← Array.index_usize words7 i
-    let i54 ← (↑(i53 ||| i52) : Result Std.U64)
+    let i54 ← lift (i53 ||| i52)
     let a ← Array.update words7 i i54
     let i55 ← i + 1#usize
     backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop bytes a i55
@@ -3414,73 +3262,73 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let (_, index_mut_back) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       backend.serial.u64.scalar.Scalar52.ZERO 0#usize
-  let i2 ← (↑(i1 &&& mask) : Result Std.U64)
+  let i2 ← lift (i1 &&& mask)
   let i3 ← i1 >>> 52#i32
   let i4 ← Array.index_usize words1 1#usize
   let i5 ← i4 <<< 12#i32
-  let i6 ← (↑(i3 ||| i5) : Result Std.U64)
+  let i6 ← lift (i3 ||| i5)
   let lo := index_mut_back i2
   let (_, index_mut_back1) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       lo 1#usize
-  let i7 ← (↑(i6 &&& mask) : Result Std.U64)
+  let i7 ← lift (i6 &&& mask)
   let i8 ← i4 >>> 40#i32
   let i9 ← Array.index_usize words1 2#usize
   let i10 ← i9 <<< 24#i32
-  let i11 ← (↑(i8 ||| i10) : Result Std.U64)
+  let i11 ← lift (i8 ||| i10)
   let lo1 := index_mut_back1 i7
   let (_, index_mut_back2) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       lo1 2#usize
-  let i12 ← (↑(i11 &&& mask) : Result Std.U64)
+  let i12 ← lift (i11 &&& mask)
   let i13 ← i9 >>> 28#i32
   let i14 ← Array.index_usize words1 3#usize
   let i15 ← i14 <<< 36#i32
-  let i16 ← (↑(i13 ||| i15) : Result Std.U64)
+  let i16 ← lift (i13 ||| i15)
   let lo2 := index_mut_back2 i12
   let (_, index_mut_back3) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       lo2 3#usize
-  let i17 ← (↑(i16 &&& mask) : Result Std.U64)
+  let i17 ← lift (i16 &&& mask)
   let i18 ← i14 >>> 16#i32
   let i19 ← Array.index_usize words1 4#usize
   let i20 ← i19 <<< 48#i32
-  let i21 ← (↑(i18 ||| i20) : Result Std.U64)
+  let i21 ← lift (i18 ||| i20)
   let lo3 := index_mut_back3 i17
   let (_, index_mut_back4) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       lo3 4#usize
-  let i22 ← (↑(i21 &&& mask) : Result Std.U64)
+  let i22 ← lift (i21 &&& mask)
   let i23 ← i19 >>> 4#i32
-  let i24 ← (↑(i23 &&& mask) : Result Std.U64)
+  let i24 ← lift (i23 &&& mask)
   let i25 ← i19 >>> 56#i32
   let i26 ← Array.index_usize words1 5#usize
   let i27 ← i26 <<< 8#i32
-  let i28 ← (↑(i25 ||| i27) : Result Std.U64)
+  let i28 ← lift (i25 ||| i27)
   let hi := index_mut_back i24
   let (_, index_mut_back5) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       hi 1#usize
-  let i29 ← (↑(i28 &&& mask) : Result Std.U64)
+  let i29 ← lift (i28 &&& mask)
   let i30 ← i26 >>> 44#i32
   let i31 ← Array.index_usize words1 6#usize
   let i32 ← i31 <<< 20#i32
-  let i33 ← (↑(i30 ||| i32) : Result Std.U64)
+  let i33 ← lift (i30 ||| i32)
   let hi1 := index_mut_back5 i29
   let (_, index_mut_back6) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       hi1 2#usize
-  let i34 ← (↑(i33 &&& mask) : Result Std.U64)
+  let i34 ← lift (i33 &&& mask)
   let i35 ← i31 >>> 32#i32
   let i36 ← Array.index_usize words1 7#usize
   let i37 ← i36 <<< 32#i32
-  let i38 ← (↑(i35 ||| i37) : Result Std.U64)
+  let i38 ← lift (i35 ||| i37)
   let hi2 := index_mut_back6 i34
   let (_, index_mut_back7) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       hi2 3#usize
-  let i39 ← (↑(i38 &&& mask) : Result Std.U64)
-  let i40 ← (↑(IScalar.hcast .U32 20#i32) : Result Std.U32)
+  let i39 ← lift (i38 &&& mask)
+  let i40 ← lift (IScalar.hcast .U32 20#i32)
   massert (i40 < 64#u32)
   let hi3 := index_mut_back7 i39
   let (_, index_mut_back8) ←
@@ -3506,108 +3354,108 @@ def backend.serial.u64.scalar.Scalar52.to_bytes
   let s := Array.repeat 32#usize 0#u8
   let i ← Array.index_usize self 0#usize
   let i1 ← i >>> 0#i32
-  let i2 ← (↑(UScalar.cast .U8 i1) : Result Std.U8)
+  let i2 ← lift (UScalar.cast .U8 i1)
   let s1 ← Array.update s 0#usize i2
   let i3 ← i >>> 8#i32
-  let i4 ← (↑(UScalar.cast .U8 i3) : Result Std.U8)
+  let i4 ← lift (UScalar.cast .U8 i3)
   let s2 ← Array.update s1 1#usize i4
   let i5 ← i >>> 16#i32
-  let i6 ← (↑(UScalar.cast .U8 i5) : Result Std.U8)
+  let i6 ← lift (UScalar.cast .U8 i5)
   let s3 ← Array.update s2 2#usize i6
   let i7 ← i >>> 24#i32
-  let i8 ← (↑(UScalar.cast .U8 i7) : Result Std.U8)
+  let i8 ← lift (UScalar.cast .U8 i7)
   let s4 ← Array.update s3 3#usize i8
   let i9 ← i >>> 32#i32
-  let i10 ← (↑(UScalar.cast .U8 i9) : Result Std.U8)
+  let i10 ← lift (UScalar.cast .U8 i9)
   let s5 ← Array.update s4 4#usize i10
   let i11 ← i >>> 40#i32
-  let i12 ← (↑(UScalar.cast .U8 i11) : Result Std.U8)
+  let i12 ← lift (UScalar.cast .U8 i11)
   let s6 ← Array.update s5 5#usize i12
   let i13 ← i >>> 48#i32
   let i14 ← Array.index_usize self 1#usize
   let i15 ← i14 <<< 4#i32
-  let i16 ← (↑(i13 ||| i15) : Result Std.U64)
-  let i17 ← (↑(UScalar.cast .U8 i16) : Result Std.U8)
+  let i16 ← lift (i13 ||| i15)
+  let i17 ← lift (UScalar.cast .U8 i16)
   let s7 ← Array.update s6 6#usize i17
   let i18 ← i14 >>> 4#i32
-  let i19 ← (↑(UScalar.cast .U8 i18) : Result Std.U8)
+  let i19 ← lift (UScalar.cast .U8 i18)
   let s8 ← Array.update s7 7#usize i19
   let i20 ← i14 >>> 12#i32
-  let i21 ← (↑(UScalar.cast .U8 i20) : Result Std.U8)
+  let i21 ← lift (UScalar.cast .U8 i20)
   let s9 ← Array.update s8 8#usize i21
   let i22 ← i14 >>> 20#i32
-  let i23 ← (↑(UScalar.cast .U8 i22) : Result Std.U8)
+  let i23 ← lift (UScalar.cast .U8 i22)
   let s10 ← Array.update s9 9#usize i23
   let i24 ← i14 >>> 28#i32
-  let i25 ← (↑(UScalar.cast .U8 i24) : Result Std.U8)
+  let i25 ← lift (UScalar.cast .U8 i24)
   let s11 ← Array.update s10 10#usize i25
   let i26 ← i14 >>> 36#i32
-  let i27 ← (↑(UScalar.cast .U8 i26) : Result Std.U8)
+  let i27 ← lift (UScalar.cast .U8 i26)
   let s12 ← Array.update s11 11#usize i27
   let i28 ← i14 >>> 44#i32
-  let i29 ← (↑(UScalar.cast .U8 i28) : Result Std.U8)
+  let i29 ← lift (UScalar.cast .U8 i28)
   let s13 ← Array.update s12 12#usize i29
   let i30 ← Array.index_usize self 2#usize
   let i31 ← i30 >>> 0#i32
-  let i32 ← (↑(UScalar.cast .U8 i31) : Result Std.U8)
+  let i32 ← lift (UScalar.cast .U8 i31)
   let s14 ← Array.update s13 13#usize i32
   let i33 ← i30 >>> 8#i32
-  let i34 ← (↑(UScalar.cast .U8 i33) : Result Std.U8)
+  let i34 ← lift (UScalar.cast .U8 i33)
   let s15 ← Array.update s14 14#usize i34
   let i35 ← i30 >>> 16#i32
-  let i36 ← (↑(UScalar.cast .U8 i35) : Result Std.U8)
+  let i36 ← lift (UScalar.cast .U8 i35)
   let s16 ← Array.update s15 15#usize i36
   let i37 ← i30 >>> 24#i32
-  let i38 ← (↑(UScalar.cast .U8 i37) : Result Std.U8)
+  let i38 ← lift (UScalar.cast .U8 i37)
   let s17 ← Array.update s16 16#usize i38
   let i39 ← i30 >>> 32#i32
-  let i40 ← (↑(UScalar.cast .U8 i39) : Result Std.U8)
+  let i40 ← lift (UScalar.cast .U8 i39)
   let s18 ← Array.update s17 17#usize i40
   let i41 ← i30 >>> 40#i32
-  let i42 ← (↑(UScalar.cast .U8 i41) : Result Std.U8)
+  let i42 ← lift (UScalar.cast .U8 i41)
   let s19 ← Array.update s18 18#usize i42
   let i43 ← i30 >>> 48#i32
   let i44 ← Array.index_usize self 3#usize
   let i45 ← i44 <<< 4#i32
-  let i46 ← (↑(i43 ||| i45) : Result Std.U64)
-  let i47 ← (↑(UScalar.cast .U8 i46) : Result Std.U8)
+  let i46 ← lift (i43 ||| i45)
+  let i47 ← lift (UScalar.cast .U8 i46)
   let s20 ← Array.update s19 19#usize i47
   let i48 ← i44 >>> 4#i32
-  let i49 ← (↑(UScalar.cast .U8 i48) : Result Std.U8)
+  let i49 ← lift (UScalar.cast .U8 i48)
   let s21 ← Array.update s20 20#usize i49
   let i50 ← i44 >>> 12#i32
-  let i51 ← (↑(UScalar.cast .U8 i50) : Result Std.U8)
+  let i51 ← lift (UScalar.cast .U8 i50)
   let s22 ← Array.update s21 21#usize i51
   let i52 ← i44 >>> 20#i32
-  let i53 ← (↑(UScalar.cast .U8 i52) : Result Std.U8)
+  let i53 ← lift (UScalar.cast .U8 i52)
   let s23 ← Array.update s22 22#usize i53
   let i54 ← i44 >>> 28#i32
-  let i55 ← (↑(UScalar.cast .U8 i54) : Result Std.U8)
+  let i55 ← lift (UScalar.cast .U8 i54)
   let s24 ← Array.update s23 23#usize i55
   let i56 ← i44 >>> 36#i32
-  let i57 ← (↑(UScalar.cast .U8 i56) : Result Std.U8)
+  let i57 ← lift (UScalar.cast .U8 i56)
   let s25 ← Array.update s24 24#usize i57
   let i58 ← i44 >>> 44#i32
-  let i59 ← (↑(UScalar.cast .U8 i58) : Result Std.U8)
+  let i59 ← lift (UScalar.cast .U8 i58)
   let s26 ← Array.update s25 25#usize i59
   let i60 ← Array.index_usize self 4#usize
   let i61 ← i60 >>> 0#i32
-  let i62 ← (↑(UScalar.cast .U8 i61) : Result Std.U8)
+  let i62 ← lift (UScalar.cast .U8 i61)
   let s27 ← Array.update s26 26#usize i62
   let i63 ← i60 >>> 8#i32
-  let i64 ← (↑(UScalar.cast .U8 i63) : Result Std.U8)
+  let i64 ← lift (UScalar.cast .U8 i63)
   let s28 ← Array.update s27 27#usize i64
   let i65 ← i60 >>> 16#i32
-  let i66 ← (↑(UScalar.cast .U8 i65) : Result Std.U8)
+  let i66 ← lift (UScalar.cast .U8 i65)
   let s29 ← Array.update s28 28#usize i66
   let i67 ← i60 >>> 24#i32
-  let i68 ← (↑(UScalar.cast .U8 i67) : Result Std.U8)
+  let i68 ← lift (UScalar.cast .U8 i67)
   let s30 ← Array.update s29 29#usize i68
   let i69 ← i60 >>> 32#i32
-  let i70 ← (↑(UScalar.cast .U8 i69) : Result Std.U8)
+  let i70 ← lift (UScalar.cast .U8 i69)
   let s31 ← Array.update s30 30#usize i70
   let i71 ← i60 >>> 40#i32
-  let i72 ← (↑(UScalar.cast .U8 i71) : Result Std.U8)
+  let i72 ← lift (UScalar.cast .U8 i71)
   Array.update s31 31#usize i72
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal]:
@@ -3719,7 +3567,7 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
     let i1 ←
       backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
         self i
-    let i2 ← (↑(UScalar.cast .U128 i1) : Result Std.U128)
+    let i2 ← lift (UScalar.cast .U128 i1)
     let a ← Array.update limbs i i2
     let i3 ← i + 1#usize
     backend.serial.u64.scalar.Scalar52.from_montgomery_loop self a i3
@@ -3740,8 +3588,9 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery
 /-- [curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT]
    Source: 'curve25519-dalek/src/constants.rs', lines 66:0-66:94 -/
 @[global_simps, irreducible]
-def constants.RISTRETTO_BASEPOINT_POINT : ristretto.RistrettoPoint :=
-  backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+def constants.RISTRETTO_BASEPOINT_POINT : Result ristretto.RistrettoPoint := do
+  let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+  ok ep
 
 /-- [curve25519_dalek::constants::BASEPOINT_ORDER_PRIVATE]
    Source: 'curve25519-dalek/src/constants.rs', lines 75:0-81:2 -/
@@ -3835,11 +3684,9 @@ def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable :
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 39:4-44:5 -/
 def edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity
   : Result edwards.affine.AffinePoint := do
-  ok
-    {
-      x := backend.serial.u64.field.FieldElement51.ZERO,
-      y := backend.serial.u64.field.FieldElement51.ONE
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ZERO
+  let fe1 ← backend.serial.u64.field.FieldElement51.ONE
+  ok { x := fe, y := fe1 }
 
 /-- [curve25519_dalek::edwards::affine::{core::default::Default for curve25519_dalek::edwards::affine::AffinePoint}::default]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 33:4-35:5 -/
@@ -3909,13 +3756,8 @@ def edwards.affine.AffinePoint.to_edwards
   let fe ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       self.x self.y
-  ok
-    {
-      X := self.x,
-      Y := self.y,
-      Z := backend.serial.u64.field.FieldElement51.ONE,
-      T := fe
-    }
+  let fe1 ← backend.serial.u64.field.FieldElement51.ONE
+  ok { X := self.x, Y := self.y, Z := fe1, T := fe }
 
 /-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative]:
    Source: 'curve25519-dalek/src/field.rs', lines 149:4-152:5 -/
@@ -3923,7 +3765,7 @@ def field.FieldElement51.is_negative
   (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice := do
   let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
   let i ← Array.index_usize bytes 0#usize
-  let i1 ← (↑(i &&& 1#u8) : Result Std.U8)
+  let i1 ← lift (i &&& 1#u8)
   core.convert.IntoFrom.into subtle.Choice.Insts.CoreConvertFromU8 i1
 
 /-- [curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress]:
@@ -3935,7 +3777,7 @@ def edwards.affine.AffinePoint.compress
   let i ← subtle.Choice.unwrap_u8 c
   let i1 ← i <<< 7#i32
   let i2 ← Array.index_usize s 31#usize
-  let i3 ← (↑(i2 ^^^ i1) : Result Std.U8)
+  let i3 ← lift (i2 ^^^ i1)
   let s1 ← Array.update s 31#usize i3
   ok s1
 
@@ -4068,9 +3910,9 @@ def edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq
   Result subtle.Choice
   := do
   let a ← edwards.CompressedEdwardsY.as_bytes self
-  let s ← (↑(Array.to_slice a) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice a)
   let a1 ← edwards.CompressedEdwardsY.as_bytes other
-  let s1 ← (↑(Array.to_slice a1) : Result (Slice Std.U8))
+  let s1 ← lift (Array.to_slice a1)
   Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s s1
 
 /-- Trait implementation: [curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::CompressedEdwardsY}]
@@ -4199,6 +4041,7 @@ noncomputable def field.FieldElement51.sqrt_ratio_i
   let check ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       v fe5
+  let i ← backend.serial.u64.constants.SQRT_M1
   let correct_sign_sqrt ←
     backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq
       check u
@@ -4208,13 +4051,13 @@ noncomputable def field.FieldElement51.sqrt_ratio_i
       check fe6
   let fe7 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      fe6 backend.serial.u64.constants.SQRT_M1
+      fe6 i
   let flipped_sign_sqrt_i ←
     backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq
       check fe7
   let r_prime ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.SQRT_M1 r
+      i r
   let c ←
     subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor flipped_sign_sqrt
       flipped_sign_sqrt_i
@@ -4242,18 +4085,20 @@ noncomputable def edwards.decompress.step_1
   := do
   let a ← edwards.CompressedEdwardsY.as_bytes repr
   let Y ← backend.serial.u64.field.FieldElement51.from_bytes a
+  let Z ← backend.serial.u64.field.FieldElement51.ONE
   let YY ← backend.serial.u64.field.FieldElement51.square Y
   let u ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-      YY backend.serial.u64.field.FieldElement51.ONE
-  let fe ←
+      YY Z
+  let fe ← backend.serial.u64.constants.EDWARDS_D
+  let fe1 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      YY backend.serial.u64.constants.EDWARDS_D
+      YY fe
   let v ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      fe backend.serial.u64.field.FieldElement51.ONE
+      fe1 Z
   let (is_valid_y_coord, X) ← field.FieldElement51.sqrt_ratio_i u v
-  ok (is_valid_y_coord, X, Y, backend.serial.u64.field.FieldElement51.ONE)
+  ok (is_valid_y_coord, X, Y, Z)
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 201:4-209:5 -/
@@ -4299,9 +4144,7 @@ def edwards.CompressedEdwardsY.from_slice
     core.array.TryFromSliceError)
   := do
   let r ←
-    core.convert.TryInto.Blanket.try_into
-      (Array.Insts.CoreConvertTryFromShared0SliceTryFromSliceError 32#usize
-      core.marker.CopyU8) bytes
+    core.array.TryFromArrayCopySlice.try_from 32#usize core.marker.CopyU8 bytes
   core.result.Result.map
     edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY
     r ()
@@ -4568,16 +4411,17 @@ def edwards.EdwardsPoint.as_affine_niels
   let fe ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       x y
+  let fe1 ← backend.serial.u64.constants.EDWARDS_D2
   let xy2d ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      fe backend.serial.u64.constants.EDWARDS_D2
-  let fe1 ←
+      fe fe1
+  let fe2 ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
       y x
-  let fe2 ←
+  let fe3 ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
       y x
-  ok { y_plus_x := fe1, y_minus_x := fe2, xy2d }
+  ok { y_plus_x := fe2, y_minus_x := fe3, xy2d }
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 556:4-561:5 -/
@@ -4798,21 +4642,21 @@ def SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
    Source: 'curve25519-dalek/src/edwards.rs', lines 877:4-887:5 -/
 noncomputable def edwards.EdwardsPoint.mul_base
   (scalar : scalar.Scalar) : Result edwards.EdwardsPoint := do
-  SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul scalar
-    backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+  let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+  SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul scalar ep
 
 /-- [curve25519_dalek::scalar::clamp_integer]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1415:0-1420:1 -/
 def scalar.clamp_integer
   (bytes : Array Std.U8 32#usize) : Result (Array Std.U8 32#usize) := do
   let i ← Array.index_usize bytes 0#usize
-  let i1 ← (↑(i &&& 248#u8) : Result Std.U8)
+  let i1 ← lift (i &&& 248#u8)
   let bytes1 ← Array.update bytes 0#usize i1
   let i2 ← Array.index_usize bytes1 31#usize
-  let i3 ← (↑(i2 &&& 127#u8) : Result Std.U8)
+  let i3 ← lift (i2 &&& 127#u8)
   let bytes2 ← Array.update bytes1 31#usize i3
   let i4 ← Array.index_usize bytes2 31#usize
-  let i5 ← (↑(i4 ||| 64#u8) : Result Std.U8)
+  let i5 ← lift (i4 ||| 64#u8)
   Array.update bytes2 31#usize i5
 
 /-- [curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul]:
@@ -4955,8 +4799,8 @@ noncomputable def field.FieldElement51.is_zero
   (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice := do
   let zero := Array.repeat 32#usize 0#u8
   let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
-  let s ← (↑(Array.to_slice bytes) : Result (Slice Std.U8))
-  let s1 ← (↑(Array.to_slice zero) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice bytes)
+  let s1 ← lift (Array.to_slice zero)
   Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s s1
 
 /-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt]:
@@ -4965,8 +4809,8 @@ noncomputable def field.FieldElement51.invsqrt
   (self : backend.serial.u64.field.FieldElement51) :
   Result (subtle.Choice × backend.serial.u64.field.FieldElement51)
   := do
-  field.FieldElement51.sqrt_ratio_i backend.serial.u64.field.FieldElement51.ONE
-    self
+  let fe ← backend.serial.u64.field.FieldElement51.ONE
+  field.FieldElement51.sqrt_ratio_i fe self
 
 /-- [curve25519_dalek::edwards::{core::ops::arith::Add<&'b (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::add]:
    Source: 'curve25519-dalek/src/macros.rs', lines 19:12-21:13 -/
@@ -5556,9 +5400,10 @@ def montgomery.differential_add_and_double
       t7 t8
   let t11 ← backend.serial.u64.field.FieldElement51.square t9
   let t12 ← backend.serial.u64.field.FieldElement51.square t10
+  let fe ← backend.serial.u64.constants.APLUS2_OVER_FOUR
   let t13 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.APLUS2_OVER_FOUR t6
+      fe t6
   let t14 ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       t4 t5
@@ -5588,11 +5433,9 @@ def montgomery.ProjectivePoint.as_affine
    Source: 'curve25519-dalek/src/montgomery.rs', lines 297:4-302:5 -/
 def IdentityMontgomeryProjectivePoint.identity
   : Result montgomery.ProjectivePoint := do
-  ok
-    {
-      U := backend.serial.u64.field.FieldElement51.ONE,
-      W := backend.serial.u64.field.FieldElement51.ZERO
-    }
+  let fe ← backend.serial.u64.field.FieldElement51.ONE
+  let fe1 ← backend.serial.u64.field.FieldElement51.ZERO
+  ok { U := fe, W := fe1 }
 
 /-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul]: loop 0:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 429:14-434:56 -/
@@ -5606,15 +5449,13 @@ def
   if i >= 0#isize
   then
     let i1 ← i >>> 3#i32
-    let byte_idx ← (↑(IScalar.hcast .Usize i1) : Result Std.Usize)
-    let i2 ← (↑(i &&& 7#isize) : Result Std.Isize)
-    let bit_idx ← (↑(IScalar.hcast .Usize i2) : Result Std.Usize)
+    let byte_idx ← lift (IScalar.hcast .Usize i1)
+    let i2 ← lift (i &&& 7#isize)
+    let bit_idx ← lift (IScalar.hcast .Usize i2)
     let i3 ← Array.index_usize scalar_bytes byte_idx
     let i4 ← i3 >>> bit_idx
-    let i5 ← (↑(i4 &&& 1#u8) : Result Std.U8)
-    let choice ←
-      (↑(UScalar.cast_fromBool .U8 (prev_bit != (i5 = 1#u8))) : Result
-        Std.U8)
+    let i5 ← lift (i4 &&& 1#u8)
+    let choice ← lift (UScalar.cast_fromBool .U8 (prev_bit != (i5 = 1#u8)))
     if choice = 0#u8
     then ok ()
     else massert (choice = 1#u8)
@@ -5639,13 +5480,12 @@ def
   := do
   let affine_u ← backend.serial.u64.field.FieldElement51.from_bytes self
   let x0 ← IdentityMontgomeryProjectivePoint.identity
+  let fe ← backend.serial.u64.field.FieldElement51.ONE
   let scalar_bytes ← scalar.as_bytes
   let (x01, x1, prev_bit) ←
     Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop
-      affine_u x0
-      { U := affine_u, W := backend.serial.u64.field.FieldElement51.ONE }
-      scalar_bytes false 254#isize
-  let i ← (↑(UScalar.cast_fromBool .U8 prev_bit) : Result Std.U8)
+      affine_u x0 { U := affine_u, W := fe } scalar_bytes false 254#isize
+  let i ← lift (UScalar.cast_fromBool .U8 prev_bit)
   let c ← subtle.Choice.Insts.CoreConvertFromU8.from i
   let (x02, _) ←
     montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
@@ -6283,26 +6123,28 @@ noncomputable def montgomery.MontgomeryPoint.to_edwards
   Result (Option edwards.EdwardsPoint)
   := do
   let u ← backend.serial.u64.field.FieldElement51.from_bytes self
+  let fe ← backend.serial.u64.field.FieldElement51.MINUS_ONE
   let b ←
     backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
-      u backend.serial.u64.field.FieldElement51.MINUS_ONE
+      u fe
   if b
   then ok none
   else
-    let fe ←
-      Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-        u backend.serial.u64.field.FieldElement51.ONE
+    let one ← backend.serial.u64.field.FieldElement51.ONE
     let fe1 ←
+      Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
+        u one
+    let fe2 ←
       Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-        u backend.serial.u64.field.FieldElement51.ONE
-    let fe2 ← field.FieldElement51.invert fe1
+        u one
+    let fe3 ← field.FieldElement51.invert fe2
     let y ←
       Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-        fe fe2
+        fe1 fe3
     let y_bytes ← backend.serial.u64.field.FieldElement51.to_bytes y
     let i ← sign <<< 7#i32
     let i1 ← Array.index_usize y_bytes 31#usize
-    let i2 ← (↑(i1 ^^^ i) : Result Std.U8)
+    let i2 ← lift (i1 ^^^ i)
     let y_bytes1 ← Array.update y_bytes 31#usize i2
     edwards.CompressedEdwardsY.decompress y_bytes1
 
@@ -6312,35 +6154,36 @@ noncomputable def montgomery.elligator_encode
   (r_0 : backend.serial.u64.field.FieldElement51) :
   Result (montgomery.MontgomeryPoint × subtle.Choice)
   := do
+  let one ← backend.serial.u64.field.FieldElement51.ONE
   let fe ← backend.serial.u64.field.FieldElement51.square2 r_0
   let d_1 ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      backend.serial.u64.field.FieldElement51.ONE fe
-  let fe1 ← field.FieldElement51.invert d_1
+      one fe
+  let fe1 ← backend.serial.u64.constants.MONTGOMERY_A_NEG
+  let fe2 ← field.FieldElement51.invert d_1
   let d ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.MONTGOMERY_A_NEG fe1
+      fe1 fe2
   let d_sq ← backend.serial.u64.field.FieldElement51.square d
+  let fe3 ← backend.serial.u64.constants.MONTGOMERY_A
   let au ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.MONTGOMERY_A d
-  let fe2 ←
+      fe3 d
+  let fe4 ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
       d_sq au
   let inner ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      fe2 backend.serial.u64.field.FieldElement51.ONE
+      fe4 one
   let eps ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       d inner
-  let p ←
-    field.FieldElement51.sqrt_ratio_i eps
-      backend.serial.u64.field.FieldElement51.ONE
+  let p ← field.FieldElement51.sqrt_ratio_i eps one
   let (eps_is_sq, _) := p
+  let zero ← backend.serial.u64.field.FieldElement51.ZERO
   let Atemp ←
     backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select
-      backend.serial.u64.constants.MONTGOMERY_A
-      backend.serial.u64.field.FieldElement51.ZERO eps_is_sq
+      fe3 zero eps_is_sq
   let u ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
       d Atemp
@@ -6538,9 +6381,9 @@ def ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq
   Result subtle.Choice
   := do
   let a ← ristretto.CompressedRistretto.as_bytes self
-  let s ← (↑(Array.to_slice a) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice a)
   let a1 ← ristretto.CompressedRistretto.as_bytes other
-  let s1 ← (↑(Array.to_slice a1) : Result (Slice Std.U8))
+  let s1 ← lift (Array.to_slice a1)
   Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s s1
 
 /-- Trait implementation: [curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::CompressedRistretto}]
@@ -6586,9 +6429,7 @@ def ristretto.CompressedRistretto.from_slice
     core.array.TryFromSliceError)
   := do
   let r ←
-    core.convert.TryInto.Blanket.try_into
-      (Array.Insts.CoreConvertTryFromShared0SliceTryFromSliceError 32#usize
-      core.marker.CopyU8) bytes
+    core.array.TryFromArrayCopySlice.try_from 32#usize core.marker.CopyU8 bytes
   core.result.Result.map
     ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto
     r ()
@@ -6600,17 +6441,18 @@ noncomputable def ristretto.decompress.step_2
   Result (subtle.Choice × subtle.Choice × subtle.Choice ×
     ristretto.RistrettoPoint)
   := do
+  let one ← backend.serial.u64.field.FieldElement51.ONE
   let ss ← backend.serial.u64.field.FieldElement51.square s
   let u1 ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-      backend.serial.u64.field.FieldElement51.ONE ss
+      one ss
   let u2 ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      backend.serial.u64.field.FieldElement51.ONE ss
+      one ss
   let u2_sqr ← backend.serial.u64.field.FieldElement51.square u2
+  let fe ← backend.serial.u64.constants.EDWARDS_D
   let neg_d ←
-    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg
-      backend.serial.u64.constants.EDWARDS_D
+    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg fe
   let u1_sq ← backend.serial.u64.field.FieldElement51.square u1
   let neg_d_u1_sq ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
@@ -6651,9 +6493,7 @@ noncomputable def ristretto.decompress.step_2
       x1 y
   let c ← field.FieldElement51.is_negative t
   let c1 ← field.FieldElement51.is_zero y
-  ok (ok1, c, c1,
-    { X := x1, Y := y, Z := backend.serial.u64.field.FieldElement51.ONE, T := t
-    })
+  ok (ok1, c, c1, { X := x1, Y := y, Z := one, T := t })
 
 /-- [curve25519_dalek::ristretto::decompress::step_1]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 277:4-295:5 -/
@@ -6669,7 +6509,7 @@ noncomputable def ristretto.decompress.step_1
     core.array.Array.index (core.ops.index.IndexSlice
       (core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice
       Std.U8)) s_bytes_check ()
-  let s2 ← (↑(Array.to_slice a) : Result (Slice Std.U8))
+  let s2 ← lift (Array.to_slice a)
   let s_encoding_is_canonical ←
     Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s1 s2
   let s_is_negative ← field.FieldElement51.is_negative s
@@ -6809,15 +6649,17 @@ noncomputable def ristretto.RistrettoPoint.compress
   let z_inv ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       i1 i2_T
+  let fe ← backend.serial.u64.constants.SQRT_M1
   let iX ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      self.X backend.serial.u64.constants.SQRT_M1
+      self.X fe
   let iY ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      self.Y backend.serial.u64.constants.SQRT_M1
+      self.Y fe
+  let ristretto_magic ← backend.serial.u64.constants.INVSQRT_A_MINUS_D
   let enchanted_denominator ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      i1 backend.serial.u64.constants.INVSQRT_A_MINUS_D
+      i1 ristretto_magic
   let t_z_inv ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       self.T z_inv
@@ -6859,18 +6701,19 @@ def ristretto.RistrettoPoint.coset4
   (self : ristretto.RistrettoPoint) :
   Result (Array edwards.EdwardsPoint 4#usize)
   := do
+  let torsion ← backend.serial.u64.constants.EIGHT_TORSION
   let ep ←
-    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 2#usize
+    Array.index_usize torsion 2#usize
   let ep1 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep
   let ep2 ←
-    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 4#usize
+    Array.index_usize torsion 4#usize
   let ep3 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep2
   let ep4 ←
-    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 6#usize
+    Array.index_usize torsion 6#usize
   let ep5 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep4
@@ -6882,25 +6725,33 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   (r_0 : backend.serial.u64.field.FieldElement51) :
   Result ristretto.RistrettoPoint
   := do
+  let i ← backend.serial.u64.constants.SQRT_M1
+  let d ← backend.serial.u64.constants.EDWARDS_D
+  let one_minus_d_sq ←
+    backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+  let d_minus_one_sq ←
+    backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+  let c ← backend.serial.u64.constants.MINUS_ONE
+  let one ← backend.serial.u64.field.FieldElement51.ONE
   let r_0_sq ← backend.serial.u64.field.FieldElement51.square r_0
   let r ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.SQRT_M1 r_0_sq
+      i r_0_sq
   let r_plus_one ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      r backend.serial.u64.field.FieldElement51.ONE
+      r one
   let N_s ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      r_plus_one backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+      r_plus_one one_minus_d_sq
   let d_times_r ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      backend.serial.u64.constants.EDWARDS_D r
+      d r
   let c_minus_dr ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-      backend.serial.u64.constants.MINUS_ONE d_times_r
+      c d_times_r
   let r_plus_d ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      r backend.serial.u64.constants.EDWARDS_D
+      r d
   let D ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       c_minus_dr r_plus_d
@@ -6908,8 +6759,8 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   let s_prime ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       s r_0
-  let c ← field.FieldElement51.is_negative s_prime
-  let s_prime_is_pos ← subtle.Choice.Insts.CoreOpsBitNotChoice.not c
+  let c1 ← field.FieldElement51.is_negative s_prime
+  let s_prime_is_pos ← subtle.Choice.Insts.CoreOpsBitNotChoice.not c1
   let s_prime_neg ←
     Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg s_prime
   let s_prime1 ←
@@ -6919,18 +6770,18 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   let s1 ←
     backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign
       s s_prime1 not_sq
-  let c1 ←
+  let c2 ←
     backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign
-      backend.serial.u64.constants.MINUS_ONE r not_sq
+      c r not_sq
   let r_minus_one ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-      r backend.serial.u64.field.FieldElement51.ONE
+      r one
   let c_r_minus_one ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      c1 r_minus_one
+      c2 r_minus_one
   let c_r_minus_one_d ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      c_r_minus_one backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+      c_r_minus_one d_minus_one_sq
   let N_t ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
       c_r_minus_one_d D
@@ -6941,15 +6792,16 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
   let cp_X ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
       s_plus_s D
+  let fe ← backend.serial.u64.constants.SQRT_AD_MINUS_ONE
   let cp_Z ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul
-      N_t backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+      N_t fe
   let cp_Y ←
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub
-      backend.serial.u64.field.FieldElement51.ONE s_sq
+      one s_sq
   let cp_T ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
-      backend.serial.u64.field.FieldElement51.ONE s_sq
+      one s_sq
   let ep ←
     backend.serial.curve_models.CompletedPoint.as_extended
       { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
@@ -6960,9 +6812,7 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
 noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
   (bytes : Array Std.U8 64#usize) : Result ristretto.RistrettoPoint := do
   let r_1_bytes := Array.repeat 32#usize 0#u8
-  let (s, to_slice_mut_back) ←
-    (↑(Array.to_slice_mut r_1_bytes) : Result ((Slice Std.U8) × (Slice
-      Std.U8 → Array Std.U8 32#usize)))
+  let (s, to_slice_mut_back) ← lift (Array.to_slice_mut r_1_bytes)
   let s1 ←
     core.array.Array.index (core.ops.index.IndexSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) bytes
@@ -6972,9 +6822,7 @@ noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
   let r_1 ← backend.serial.u64.field.FieldElement51.from_bytes r_1_bytes1
   let R_1 ← ristretto.RistrettoPoint.elligator_ristretto_flavor r_1
   let r_2_bytes := Array.repeat 32#usize 0#u8
-  let (s3, to_slice_mut_back1) ←
-    (↑(Array.to_slice_mut r_2_bytes) : Result ((Slice Std.U8) × (Slice
-      Std.U8 → Array Std.U8 32#usize)))
+  let (s3, to_slice_mut_back1) ← lift (Array.to_slice_mut r_2_bytes)
   let s4 ←
     core.array.Array.index (core.ops.index.IndexSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) bytes
@@ -7184,8 +7032,9 @@ def Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint :
    Source: 'curve25519-dalek/src/ristretto.rs', lines 988:4-998:5 -/
 noncomputable def ristretto.RistrettoPoint.mul_base
   (scalar : scalar.Scalar) : Result ristretto.RistrettoPoint := do
+  let bp ← constants.RISTRETTO_BASEPOINT_POINT
   SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
-    constants.RISTRETTO_BASEPOINT_POINT
+    bp
 
 /-- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 1192:4-1198:5 -/
@@ -7266,8 +7115,8 @@ def scalar.Scalar.from_bytes_mod_order_wide
    Source: 'curve25519-dalek/src/scalar.rs', lines 301:4-303:5 -/
 def scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq
   (self : scalar.Scalar) (other : scalar.Scalar) : Result subtle.Choice := do
-  let s ← (↑(Array.to_slice self.bytes) : Result (Slice Std.U8))
-  let s1 ← (↑(Array.to_slice other.bytes) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice self.bytes)
+  let s1 ← lift (Array.to_slice other.bytes)
   Slice.Insts.SubtleConstantTimeEq.ct_eq U8.Insts.SubtleConstantTimeEq s s1
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical]:
@@ -7448,13 +7297,9 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select
   Result scalar.Scalar
   := do
   let bytes := Array.repeat 32#usize 0#u8
-  let iter ←
-    core.iter.traits.collect.IntoIterator.Blanket.into_iter
-      (core.iter.traits.iterator.IteratorRange core.iter.range.StepUsize)
-      { start := 0#usize, «end» := 32#usize }
   let bytes1 ←
     scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop a
-      b choice bytes iter
+      b choice bytes { start := 0#usize, «end» := 32#usize }
   ok { bytes := bytes1 }
 
 /-- Trait implementation: [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}]
@@ -7473,12 +7318,10 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable :
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO]
    Source: 'curve25519-dalek/src/scalar.rs', lines 564:4-564:53 -/
-@[global_simps]
-def scalar.Scalar.ZERO_body : Result scalar.Scalar := do
-  let a := Array.repeat 32#usize 0#u8
-  ok { bytes := a }
 @[global_simps, irreducible]
-def scalar.Scalar.ZERO : scalar.Scalar := eval_global scalar.Scalar.ZERO_body
+def scalar.Scalar.ZERO : scalar.Scalar :=
+  let a := Array.repeat 32#usize 0#u8
+  { bytes := a }
 
 /-- [curve25519_dalek::scalar::{core::default::Default for curve25519_dalek::scalar::Scalar}::default]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 485:4-487:5 -/
@@ -7514,15 +7357,14 @@ def scalar.Scalar.Insts.CoreConvertFromU8 : core.convert.From scalar.Scalar
 def scalar.Scalar.Insts.CoreConvertFromU16.from
   (x : Std.U16) : Result scalar.Scalar := do
   let s_bytes := Array.repeat 32#usize 0#u8
-  let x_bytes ←
-    (↑(core.num.U16.to_le_bytes x) : Result (Array Std.U8 2#usize))
-  let s ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let x_bytes ← lift (core.num.U16.to_le_bytes x)
+  let s ← lift (Array.to_slice x_bytes)
   let i := Slice.len s
   let (s1, index_mut_back) ←
     core.array.Array.index_mut (core.ops.index.IndexMutSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) s_bytes
       { start := 0#usize, «end» := i }
-  let s2 ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let s2 ← lift (Array.to_slice x_bytes)
   let s3 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s1 s2
   let s_bytes1 := index_mut_back s3
   ok { bytes := s_bytes1 }
@@ -7540,15 +7382,14 @@ def scalar.Scalar.Insts.CoreConvertFromU16 : core.convert.From scalar.Scalar
 def scalar.Scalar.Insts.CoreConvertFromU32.from
   (x : Std.U32) : Result scalar.Scalar := do
   let s_bytes := Array.repeat 32#usize 0#u8
-  let x_bytes ←
-    (↑(core.num.U32.to_le_bytes x) : Result (Array Std.U8 4#usize))
-  let s ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let x_bytes ← lift (core.num.U32.to_le_bytes x)
+  let s ← lift (Array.to_slice x_bytes)
   let i := Slice.len s
   let (s1, index_mut_back) ←
     core.array.Array.index_mut (core.ops.index.IndexMutSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) s_bytes
       { start := 0#usize, «end» := i }
-  let s2 ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let s2 ← lift (Array.to_slice x_bytes)
   let s3 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s1 s2
   let s_bytes1 := index_mut_back s3
   ok { bytes := s_bytes1 }
@@ -7566,15 +7407,14 @@ def scalar.Scalar.Insts.CoreConvertFromU32 : core.convert.From scalar.Scalar
 def scalar.Scalar.Insts.CoreConvertFromU64.from
   (x : Std.U64) : Result scalar.Scalar := do
   let s_bytes := Array.repeat 32#usize 0#u8
-  let x_bytes ←
-    (↑(core.num.U64.to_le_bytes x) : Result (Array Std.U8 8#usize))
-  let s ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let x_bytes ← lift (core.num.U64.to_le_bytes x)
+  let s ← lift (Array.to_slice x_bytes)
   let i := Slice.len s
   let (s1, index_mut_back) ←
     core.array.Array.index_mut (core.ops.index.IndexMutSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) s_bytes
       { start := 0#usize, «end» := i }
-  let s2 ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let s2 ← lift (Array.to_slice x_bytes)
   let s3 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s1 s2
   let s_bytes1 := index_mut_back s3
   ok { bytes := s_bytes1 }
@@ -7592,15 +7432,14 @@ def scalar.Scalar.Insts.CoreConvertFromU64 : core.convert.From scalar.Scalar
 def scalar.Scalar.Insts.CoreConvertFromU128.from
   (x : Std.U128) : Result scalar.Scalar := do
   let s_bytes := Array.repeat 32#usize 0#u8
-  let x_bytes ←
-    (↑(core.num.U128.to_le_bytes x) : Result (Array Std.U8 16#usize))
-  let s ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let x_bytes ← lift (core.num.U128.to_le_bytes x)
+  let s ← lift (Array.to_slice x_bytes)
   let i := Slice.len s
   let (s1, index_mut_back) ←
     core.array.Array.index_mut (core.ops.index.IndexMutSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U8)) s_bytes
       { start := 0#usize, «end» := i }
-  let s2 ← (↑(Array.to_slice x_bytes) : Result (Slice Std.U8))
+  let s2 ← lift (Array.to_slice x_bytes)
   let s3 ← core.slice.Slice.copy_from_slice core.marker.CopyU8 s1 s2
   let s_bytes1 := index_mut_back s3
   ok { bytes := s_bytes1 }
@@ -7850,9 +7689,8 @@ def scalar.read_le_u64_into_loop
     let i15 ← start + 7#usize
     let i16 ← Slice.index_usize src i15
     let i17 ←
-      (↑(core.num.U64.from_le_bytes
-        (Array.make 8#usize [ i2, i4, i6, i8, i10, i12, i14, i16 ])) : Result
-        Std.U64)
+      lift (core.num.U64.from_le_bytes
+        (Array.make 8#usize [ i2, i4, i6, i8, i10, i12, i14, i16 ]))
     let s ← Slice.update dst i i17
     let i18 ← i + 1#usize
     scalar.read_le_u64_into_loop src s i18
@@ -7894,9 +7732,9 @@ def scalar.Scalar.non_adjacent_form_loop
         let i5 ← 64#usize - bit_idx
         let i6 ← i4 <<< i5
         ok (i2 ||| i6)
-    let i1 ← (↑(bit_buf &&& window_mask) : Result Std.U64)
+    let i1 ← lift (bit_buf &&& window_mask)
     let window ← carry + i1
-    let i2 ← (↑(window &&& 1#u64) : Result Std.U64)
+    let i2 ← lift (window &&& 1#u64)
     if i2 = 0#u64
     then
       let pos1 ← pos + 1#usize
@@ -7907,13 +7745,13 @@ def scalar.Scalar.non_adjacent_form_loop
       let (naf1, carry1) ←
         if window < i3
         then
-          let i4 ← (↑(UScalar.hcast .I8 window) : Result Std.I8)
+          let i4 ← lift (UScalar.hcast .I8 window)
           let a ← Array.update naf pos i4
           ok (a, 0#u64)
         else
-          let i4 ← (↑(UScalar.hcast .I8 window) : Result Std.I8)
-          let i5 ← (↑(UScalar.hcast .I8 width) : Result Std.I8)
-          let i6 ← (↑(core.num.I8.wrapping_sub i4 i5) : Result Std.I8)
+          let i4 ← lift (UScalar.hcast .I8 window)
+          let i5 ← lift (UScalar.hcast .I8 width)
+          let i6 ← lift (core.num.I8.wrapping_sub i4 i5)
           let a ← Array.update naf pos i6
           ok (a, 1#u64)
       let pos1 ← pos + w
@@ -7932,7 +7770,7 @@ def scalar.Scalar.non_adjacent_form
   massert (w <= 8#usize)
   let naf := Array.repeat 256#usize 0#i8
   let x_u64 := Array.repeat 5#usize 0#u64
-  let s ← (↑(Array.to_slice self.bytes) : Result (Slice Std.U8))
+  let s ← lift (Array.to_slice self.bytes)
   let (s1, index_mut_back) ←
     core.array.Array.index_mut (core.ops.index.IndexMutSlice
       (core.slice.index.SliceIndexRangeUsizeSlice Std.U64)) x_u64
@@ -8001,16 +7839,16 @@ def scalar.Scalar.as_radix_2w_loop
             let i8 ← i6 <<< i7
             ok (i4 ||| i8)
         ok (iter1, i2)
-    let i2 ← (↑(bit_buf &&& window_mask) : Result Std.U64)
+    let i2 ← lift (bit_buf &&& window_mask)
     let coef ← carry + i2
     let i3 ← radix / 2#u64
     let i4 ← coef + i3
     let carry1 ← i4 >>> w
-    let i5 ← (↑(UScalar.hcast .I64 coef) : Result Std.I64)
+    let i5 ← lift (UScalar.hcast .I64 coef)
     let i6 ← carry1 <<< w
-    let i7 ← (↑(UScalar.hcast .I64 i6) : Result Std.I64)
+    let i7 ← lift (UScalar.hcast .I64 i6)
     let i8 ← i5 - i7
-    let i9 ← (↑(IScalar.cast .I8 i8) : Result Std.I8)
+    let i9 ← lift (IScalar.cast .I8 i8)
     let a ← Array.update digits i i9
     scalar.Scalar.as_radix_2w_loop w scalar64x4 radix window_mask carry1 a
       iter2
@@ -8026,7 +7864,7 @@ def scalar.Scalar.as_radix_2w
   then scalar.Scalar.as_radix_16 self
   else
     let scalar64x4 := Array.repeat 4#usize 0#u64
-    let s ← (↑(Array.to_slice self.bytes) : Result (Slice Std.U8))
+    let s ← lift (Array.to_slice self.bytes)
     let (s1, index_mut_back) ←
       core.array.Array.index_mut (core.ops.index.IndexMutSlice
         (core.slice.index.SliceIndexRangeUsizeSlice Std.U64)) scalar64x4
@@ -8038,23 +7876,19 @@ def scalar.Scalar.as_radix_2w
     let i ← 256#usize + w
     let i1 ← i - 1#usize
     let digits_count ← i1 / w
-    let iter ←
-      core.iter.traits.collect.IntoIterator.Blanket.into_iter
-        (core.iter.traits.iterator.IteratorRange core.iter.range.StepUsize)
-        { start := 0#usize, «end» := digits_count }
     let scalar64x41 := index_mut_back s2
     let (carry, digits1) ←
       scalar.Scalar.as_radix_2w_loop w scalar64x41 radix window_mask 0#u64
-        digits iter
+        digits { start := 0#usize, «end» := digits_count }
     if w = 8#usize
     then
-      let i2 ← (↑(UScalar.hcast .I8 carry) : Result Std.I8)
+      let i2 ← lift (UScalar.hcast .I8 carry)
       let i3 ← Array.index_usize digits1 digits_count
       let i4 ← i3 + i2
       Array.update digits1 digits_count i4
     else
       let i2 ← carry <<< w
-      let i3 ← (↑(UScalar.hcast .I8 i2) : Result Std.I8)
+      let i3 ← lift (UScalar.hcast .I8 i2)
       let i4 ← digits_count - 1#usize
       let i5 ← Array.index_usize digits1 i4
       let i6 ← i5 + i3

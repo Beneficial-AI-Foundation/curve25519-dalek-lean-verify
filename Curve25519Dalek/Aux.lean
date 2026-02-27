@@ -58,9 +58,7 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
 
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
-    (bs.set i#usize a)[i]! = a := by
-  simp [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNat_val_eq]
-  grind
+    (bs.set i#usize a)[i]! = a := by grind
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
@@ -109,12 +107,10 @@ lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
 /-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
 number representation, then the input arrays must be equal. -/
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
-
   intro a a' h_funs_eq
   rw [U8x32_as_Nat_is_NatofDigits a, U8x32_as_Nat_is_NatofDigits a'] at h_funs_eq
   let L := (List.ofFn fun i : Fin 32 => a[i]!.val)
   let L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
-
   have h_inj := Nat.ofDigits_inj_of_len_eq
     (b := 2 ^ 8)
     (by omega : 1 < 2 ^ 8)
@@ -124,15 +120,12 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
     (h_funs_eq)
-
   simp only [L, L', List.ofFn_inj] at h_inj
-  apply Subtype.eq
+  apply Subtype.ext
   apply List.ext_get
-
-  · simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+  · simp [List.Vector.length_val]
   · intro n h_a h_a'
-    have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNat_val_eq, Fin.is_lt, getElem!_pos]
+    have h_len : n < 32 := by grind
     have h_congr := congr_fun h_inj ⟨n, h_len⟩
     simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
@@ -140,6 +133,5 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
-  · simp
-    scalar_tac
+  · grind
   · simp

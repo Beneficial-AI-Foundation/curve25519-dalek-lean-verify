@@ -91,7 +91,7 @@ set_option linter.style.commandStart false
 # Other syntax errors
 
 ===FIND===
-  let i41 ← (↑(U64.shr i36 20#i32) : Result Std.U64)
+  let i41 ← lift (U64.shr i36 20#i32)
 ===REPLACE===
   let i41 ← i36 >>> 20#i32
 
@@ -372,6 +372,12 @@ def backend.serial.u64.field.FieldElement51.to_bytes
 /- You can remove the following line by using the CLI option `-all-computable`: -/
 ===REPLACE===
 -- You can remove the following line by using the CLI option `-all-computable`: 
+
+===FIND===
+/- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/
+===REPLACE===
+-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option
+
 
 # Convert Aeneas block comments to doc comments for definitions
 ===FIND===
@@ -854,5 +860,62 @@ def core.ops.arith.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint :
 ===REPLACE===
 @[reducible]
 noncomputable def core.ops.arith.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint :
+
+# Workaround for https://github.com/AeneasVerif/aeneas/issues/815
+# Globals referencing fallible globals get incorrect pure return types.
+
+===FIND===
+  : Array edwards.EdwardsPoint 8#usize := do
+  let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+  a
+===REPLACE===
+  : Result (Array edwards.EdwardsPoint 8#usize) := do
+  let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+  ok a
+
+===FIND===
+def constants.RISTRETTO_BASEPOINT_POINT : ristretto.RistrettoPoint := do
+  let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+  ep
+===REPLACE===
+def constants.RISTRETTO_BASEPOINT_POINT : Result ristretto.RistrettoPoint := do
+  let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+  ok ep
+
+===FIND===
+  let ep ←
+    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 2#usize
+  let ep1 ←
+    edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+      ep
+  let ep2 ←
+    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 4#usize
+  let ep3 ←
+    edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+      ep2
+  let ep4 ←
+    Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 6#usize
+===REPLACE===
+  let torsion ← backend.serial.u64.constants.EIGHT_TORSION
+  let ep ←
+    Array.index_usize torsion 2#usize
+  let ep1 ←
+    edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+      ep
+  let ep2 ←
+    Array.index_usize torsion 4#usize
+  let ep3 ←
+    edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+      ep2
+  let ep4 ←
+    Array.index_usize torsion 6#usize
+
+===FIND===
+  SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
+    constants.RISTRETTO_BASEPOINT_POINT
+===REPLACE===
+  let bp ← constants.RISTRETTO_BASEPOINT_POINT
+  SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
+    bp
 
 
