@@ -1249,20 +1249,77 @@ axiom ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.ne
 axiom ristretto.RistrettoPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : ristretto.RistrettoPoint → Result Unit
 
+/-- Private conditional_select for ristretto.RistrettoPoint.
+   It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) since
+   ristretto.RistrettoPoint conditional_swap and conditional_assign depend on it.
+   Note: ristretto.RistrettoPoint is defined as edwards.EdwardsPoint -/
+private def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select'
+  (a : ristretto.RistrettoPoint) (b : ristretto.RistrettoPoint)
+  (choice : subtle.Choice) :
+  Result ristretto.RistrettoPoint
+  := do
+  let ep ←
+    edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select'
+      a b choice
+  ok ep
+
 /- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_swap]:
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
-axiom
-  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
-  :
-  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
-    Result (ristretto.RistrettoPoint × ristretto.RistrettoPoint)
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1
+
+   Conditionally swaps two ristretto.RistrettoPoint values in constant time.
+   If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
+def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  (a b : ristretto.RistrettoPoint)
+  (choice : subtle.Choice) :
+  Result (ristretto.RistrettoPoint × ristretto.RistrettoPoint) := do
+  let a_new ← ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  let b_new ← ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  ok (a_new, b_new)
+
+/-- **Spec theorem for `ristretto.RistrettoPoint.conditional_swap`**:
+- No panic (if both conditional_select operations succeed)
+- Conditionally swaps two ristretto.RistrettoPoint values in constant time
+- Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
+- Implements constant-time conditional swap for ristretto.RistrettoPoint
+-/
+@[progress]
+theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+  (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
+  (h_a : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
+  (h_b : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
+    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
+    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  obtain ⟨a_new, h_a_eq⟩ := h_a
+  obtain ⟨b_new, h_b_eq⟩ := h_b
+  simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
 /- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_assign]:
-   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1 -/
-axiom
-  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
-  :
-  ristretto.RistrettoPoint → ristretto.RistrettoPoint → subtle.Choice →
-    Result ristretto.RistrettoPoint
+   Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1
+
+   Conditionally assigns b to a in constant time.
+   If choice.val = 1, assigns b; otherwise keeps a unchanged. -/
+def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  (a b : ristretto.RistrettoPoint)
+  (choice : subtle.Choice) :
+  Result ristretto.RistrettoPoint :=
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+
+/-- **Spec theorem for `ristretto.RistrettoPoint.conditional_assign`**:
+- No panic (if conditional_select succeeds)
+- Returns b if choice.val = 1, otherwise returns a
+- Equivalent to conditional_select(a, b, choice)
+- Implements constant-time conditional assignment for ristretto.RistrettoPoint
+-/
+@[progress]
+theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
+  (h : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
+  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
+    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
+  unfold ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  obtain ⟨res, h_eq⟩ := h
+  simp [h_eq, spec_ok]
 
 end curve25519_dalek
