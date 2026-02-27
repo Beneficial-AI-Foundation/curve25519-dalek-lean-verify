@@ -220,6 +220,19 @@ def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result sub
   else
     ok Choice.one
 
+/-- **Spec theorem for `subtle.Choice.Insts.CoreOpsBitNotChoice.not`**:
+- No panic (always returns successfully)
+- Returns `Choice.zero` if input is `1`, `Choice.one` otherwise
+-/
+@[progress]
+theorem subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec (c : subtle.Choice) :
+    subtle.Choice.Insts.CoreOpsBitNotChoice.not c ⦃ result =>
+    result.val = (if c.val = 1#u8 then 0#u8 else 1#u8) ⦄ := by
+  unfold subtle.Choice.Insts.CoreOpsBitNotChoice.not
+  split
+  · simp only [spec_ok, Choice.zero]
+  · simp only [spec_ok, Choice.one]
+
 /- [subtle::{subtle::ConstantTimeEq for u16}::ct_eq]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 348:12-348:51
    Name pattern: [subtle::{subtle::ConstantTimeEq<u16>}::ct_eq]

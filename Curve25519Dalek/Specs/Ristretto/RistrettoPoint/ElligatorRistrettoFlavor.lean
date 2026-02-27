@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -92,7 +93,63 @@ theorem elligator_ristretto_flavor_spec
   · intro i hi; have := D_post_2 i hi; omega -- 15: D ≤ 2^52-1
   · intro i hi; have := __discr_post_1 i hi; omega -- 16: __discr.2 < 2^54
   · exact h_s_valid -- 17: s < 2^54 (mul rhs)
-  · sorry -- 18: computation tail
+  · intro i hi; have := s_prime_post_2 i hi; omega -- 18: s_prime < 2^54
+  · intro i hi; have := r_post_2 i hi; omega -- 19: r < 2^63
+  · intro i hi;
+    unfold backend.serial.u64.field.FieldElement51.ONE
+    interval_cases i <;> decide -- 20: ONE < 2^54
+  · intro i hi; simp only [c1_post i hi] -- 21: c1 < 2^54 (conditional_assign)
+    split
+    · have := r_post_2 i hi; omega
+    · unfold backend.serial.u64.constants.MINUS_ONE; interval_cases i <;> decide
+  · intro i hi; have := r_minus_one_post_1 i hi; omega -- 22: r_minus_one < 2^54
+  · intro i hi; have := c_r_minus_one_post_2 i hi; omega -- 23: c_r_minus_one < 2^54
+  · intro i hi; -- 24: EDWARDS_D_MINUS_ONE_SQUARED < 2^54
+    unfold backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
+    interval_cases i <;> decide
+  · intro i hi; have := c_r_minus_one_post_2 i hi;
+    grind only [#b83a]
+  · intro i hi; have := D_post_2 i hi; omega -- 26: D < 2^54
+  · intro i hi; simp only [s1_post i hi] -- 27: s1 < 2^54 (conditional)
+    split
+    · simp only [s_prime1_post i hi]; split
+      · have := s_prime_neg_post_2 i hi; omega
+      · have := s_prime_post_2 i hi; omega
+    · have := __discr_post_1 i hi; omega
+  · intro i hi; simp only [s1_post i hi] -- 28: s1 < 2^53 (conditional)
+    split
+    · simp only [s_prime1_post i hi]; split
+      · have := s_prime_neg_post_2 i hi; omega
+      · have := s_prime_post_2 i hi; omega
+    · have := __discr_post_1 i hi; omega
+  · intro i hi; simp only [s1_post i hi] -- 29: s1 < 2^53 (conditional)
+    split
+    · simp only [s_prime1_post i hi]; split
+      · have := s_prime_neg_post_2 i hi; omega
+      · have := s_prime_post_2 i hi; omega
+    · have := __discr_post_1 i hi; omega
+  · intro i hi; have := D_post_2 i hi; omega -- 30: D < 2^54
+  · intro i hi; have := N_t_post_1 i hi; omega -- 31: N_t < 2^54
+  · intro i hi; -- 32: SQRT_AD_MINUS_ONE < 2^54
+    unfold backend.serial.u64.constants.SQRT_AD_MINUS_ONE
+    interval_cases i <;> decide
+  · intro i hi; -- 33: ONE < 2^63
+    unfold backend.serial.u64.field.FieldElement51.ONE
+    interval_cases i <;> decide
+  · intro i hi; have := s_sq_post_2 i hi; omega -- 34: s_sq < 2^54
+  · intro i hi; -- 35: ONE < 2^53
+    unfold backend.serial.u64.field.FieldElement51.ONE
+    interval_cases i <;> decide
+  · intro i hi; have := s_sq_post_2 i hi; omega -- 36: s_sq < 2^53
+  · intro i hi; have h := cp_X_post_2 i hi -- 37: cp_X < 2^54
+    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
+  · intro i hi; have h := cp_Y_post_1 i hi -- 38: cp_Y < 2^54
+    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
+  · intro i hi; have h := cp_Z_post_2 i hi -- 39: cp_Z < 2^54
+    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
+  · sorry -- 40: IsValid ∧ toPoint = elligator_ristretto_flavor_pure
+
+
 
 
 end curve25519_dalek.ristretto.RistrettoPoint
