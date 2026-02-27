@@ -106,15 +106,74 @@ lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
     change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
     simp [Nat.mul_comm]
 
+/-! ## Bridge between U8x32_as_Nat and U8x32_as_Field
+
+`U8x32_as_Nat` (Finset.sum in ℕ) and `U8x32_as_Field` (Horner foldr in ZMod p) compute the same
+little-endian byte interpretation but in different types. The bridge goes through `Nat.ofDigits`:
+
+  U8x32_as_Nat ──(is_NatofDigits)──▶ Nat.ofDigits 256 [b₀.val, ..., b₃₁.val]
+                                        │
+                                   (ofDigits = foldr)
+                                        │
+                                        ▼
+  U8x32_as_Field ◀──(Nat.cast)──── List.foldr Horner₂₅₆ 0 bytes.val
+-/
+
+/-- `Nat.ofDigits b l` equals Horner evaluation via `foldr`. -/
+private lemma ofDigits_eq_foldr (b : ℕ) (l : List ℕ) :
+    Nat.ofDigits b l = l.foldr (fun d acc => d + b * acc) 0 := by
+  induction l with
+  | nil => simp [Nat.ofDigits]
+  | cons h t ih => simp [Nat.ofDigits, ih]
+
+/-- `Nat.cast` commutes with Horner evaluation on a byte list. -/
+private lemma horner_natCast (l : List U8) :
+    ((l.foldr (fun (b : U8) (acc : ℕ) => b.val + 256 * acc) 0 : ℕ) : ZMod p) =
+    l.foldr (fun (b : U8) (acc : ZMod p) => (b.val : ZMod p) + 256 * acc) 0 := by
+  induction l with
+  | nil => simp
+  | cons h t ih =>
+    simp only [List.foldr_cons]
+    push_cast [ih]
+    ring
+
+/-- The byte-value list produced by `List.ofFn` on Array indices equals `List.map` on the
+    underlying list. Bridges the `Fin`-indexed view from `Nat.ofDigits` to the raw list view. -/
+private lemma ofFn_val_eq_map_val (a : Aeneas.Std.Array U8 32#usize) :
+    (List.ofFn fun i : Fin 32 => (a[i]! : U8).val) = a.val.map (fun b => b.val) := by
+  simp only [Fin.getElem!_fin, Array.getElem!_Nat_eq]
+  apply List.ext_getElem
+  · simp [a.property]
+  · intro i hi1 hi2
+    simp only [List.getElem_ofFn, List.getElem_map]
+    congr 1
+    rw [getElem!_pos (h := by rw [List.length_map] at hi2; omega)]
+
+/-- `U8x32_as_Nat` equals Horner evaluation at base 256 on the underlying byte list. -/
+lemma U8x32_as_Nat_eq_foldr (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Nat a = a.val.foldr (fun b (acc : ℕ) => b.val + 256 * acc) 0 := by
+  rw [U8x32_as_Nat_is_NatofDigits, ofDigits_eq_foldr]
+  have h256 : (2 : ℕ) ^ 8 = 256 := by norm_num
+  rw [h256]
+  -- Rewrite the List.ofFn to List.map, then use List.foldr_map
+  have h_list := ofFn_val_eq_map_val a
+  rw [h_list, List.foldr_map]
+
+/-- **Bridge lemma**: `U8x32_as_Field` and `U8x32_as_Nat` compute the same value,
+    just in different types (ZMod p vs ℕ). -/
+lemma U8x32_as_Field_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Field a = ((U8x32_as_Nat a : ℕ) : ZMod p) := by
+  unfold U8x32_as_Field
+  rw [U8x32_as_Nat_eq_foldr, horner_natCast]
+  rfl
+
 /-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
 number representation, then the input arrays must be equal. -/
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
-
   intro a a' h_funs_eq
   rw [U8x32_as_Nat_is_NatofDigits a, U8x32_as_Nat_is_NatofDigits a'] at h_funs_eq
   let L := (List.ofFn fun i : Fin 32 => a[i]!.val)
   let L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
-
   have h_inj := Nat.ofDigits_inj_of_len_eq
     (b := 2 ^ 8)
     (by omega : 1 < 2 ^ 8)
@@ -124,11 +183,9 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
     (h_funs_eq)
-
   simp only [L, L', List.ofFn_inj] at h_inj
-  apply Subtype.eq
+  apply Subtype.ext
   apply List.ext_get
-
   · simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
   · intro n h_a h_a'
     have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
@@ -140,6 +197,6 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
-  · simp
+  · simp only [pow_zero, tsub_self, Nat.and_zero, Aeneas.ReduceNat.reduceNatEq]
     scalar_tac
   · simp
