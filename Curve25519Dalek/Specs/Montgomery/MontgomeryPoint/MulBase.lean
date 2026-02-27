@@ -52,15 +52,15 @@ natural language specs:
 @[progress]
 theorem mul_base_spec (scalar : scalar.Scalar) :
     mul_base scalar ⦃ result =>
-    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄
+    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄
      := by
     unfold mul_base
     progress*
     · exact ep_post_1.Y_bounds
     · exact ep_post_1.Z_bounds
-    · simp_all
+    · simp_all only
       have := res_post_2 1
-      simp at this
+      simp only [one_smul] at this
       rw[← this]
       apply  Montgomery.comm_mul_fromEdwards
 

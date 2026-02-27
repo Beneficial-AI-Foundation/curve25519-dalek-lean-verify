@@ -458,9 +458,15 @@ theorem subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice
 /- [zeroize::{zeroize::Zeroize for Z}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 301:4-301:25
    Name pattern: [zeroize::{zeroize::Zeroize<@Z>}::zeroize] -/
+--@[rust_fun "zeroize::{zeroize::Zeroize<@Z>}::zeroize"]
+--axiom zeroize.Zeroize.Blanket.zeroize
+--  {Z : Type} (DefaultIsZeroesInst : zeroize.DefaultIsZeroes Z) : Z → Result Z
+
+
 @[rust_fun "zeroize::{zeroize::Zeroize<@Z>}::zeroize"]
-axiom zeroize.Zeroize.Blanket.zeroize
-  {Z : Type} (DefaultIsZeroesInst : zeroize.DefaultIsZeroes Z) : Z → Result Z
+def zeroize.Zeroize.Blanket.zeroize
+  {Z : Type} (DefaultIsZeroesInst : zeroize.DefaultIsZeroes Z) : Z → Result Z :=
+  fun _ => DefaultIsZeroesInst.coredefaultDefaultInst.default
 
 /- [zeroize::{zeroize::Zeroize for @Array<Z, N>}::zeroize]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 373:4-373:25
@@ -992,6 +998,12 @@ theorem edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_ass
 
    Conditionally swaps two ProjectivePoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
+
+def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+  (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
+  : Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) :=
+  if choice.val = 1#u8 then ok (b, a) else ok (a, b)
+/-
 def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
@@ -1017,7 +1029,7 @@ theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condition
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
-
+-/
 /-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u8}]
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
    Name pattern: [subtle::ConditionallySelectable<u8>] -/

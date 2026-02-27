@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo, Oliver Butterley
+Authors: Alessandro D'Angelo, Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
@@ -682,10 +682,12 @@ section ElligatorMap
 /--
 **Elligator Ristretto Map (Pure Spec)**
 Maps a field element `r0` to an Affine Point on the Ed25519 curve.
+Comes with a proof that the output point is even (i.e., in the image of the doubling map)
 Logic corresponds to [RFC 9496 Section 4.3.4].
 -/
-noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p) : Point Ed25519 :=
-  -- 1. Constants
+noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
+    : {P : Point Ed25519 // IsEven P} :=
+    -- 1. Constants
   let i := sqrt_m1
   let d_val := d
   let one := (1 : ZMod p)
@@ -716,23 +718,20 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p) : Point Ed25519 
   --    x = X_ext / Z_ext = (2sD) / (Nt * sqrt_ad_minus_one)
   --    y = Y_ext / Z_ext = (1 - s^2) / (1 + s^2)
   let s_sq := s^2
-  {
-    x := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
-    y := (1 - s_sq) / (1 + s_sq)
-    on_curve := by
-       -- The proof that this point satisfies the curve equation
-       -- is much easier in Affine coordinates.
-       sorry
-  }
 
-/--
-**Validity Theorem**
-The Elligator map always produces a point that is "Even" (in the 2-torsion subgroup).
-This is the key Ristretto property.
--/
-theorem elligator_pure_is_even (r0 : ZMod p) :
-  IsEven (elligator_ristretto_flavor_pure r0) := by
-  sorry
+  -- 8. Bundle output point with proof of evenness
+  ⟨{ x        := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
+     y        := (1 - s_sq) / (1 + s_sq)
+     on_curve := by sorry},
+    by
+    unfold IsEven
+    by_cases hdenom : (1 : ZMod p) + s_sq = 0
+    · have hzero : (1 - s_sq) / (1 + s_sq) = 0 := by
+        rw [hdenom]
+        exact div_zero _
+      rw [hzero]
+      exact ⟨1, by ring⟩
+    · exact ⟨2 * s / (1 + s_sq), by field_simp [hdenom]; ring⟩⟩
 
 end ElligatorMap
 

@@ -66,7 +66,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
       u % p = 0
     else
       (u * Z) % p = (u * Y + (Z + Y)) % p) ∧
-    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp)) ⦄ := by
+    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.mkPoint mp)) ⦄ := by
   unfold to_montgomery
   progress* <;> try grind
   · constructor
@@ -116,7 +116,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
                   simp only [h_U_eq]
         have h_full := Nat.ModEq.add_left (U8x32_as_Nat a * Field51_as_Nat e.Y) (h_elim)
         grind
-    · have :  fromEdwards e.toPoint =  MontgomeryPoint.toPoint a := by
+    · have :  fromEdwards e.toPoint =  MontgomeryPoint.mkPoint a := by
         sorry
       intro n
       rw[comm_mul_fromEdwards, this]
