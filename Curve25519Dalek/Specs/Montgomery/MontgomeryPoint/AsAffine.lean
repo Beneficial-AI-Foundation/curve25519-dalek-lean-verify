@@ -26,10 +26,8 @@ by computing u = U/W and encoding it as a 32-byte MontgomeryPoint.
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
 
--- in
 namespace curve25519_dalek.montgomery.ProjectivePoint
 
--- set_option maxHeartbeats 400000
 
 /-
 Natural language description:
@@ -147,12 +145,12 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
           -- This proof requires bytesToField_eq_cast lemma (line 51-53)
           -- which states: bytesToField a = (U8x32_as_Nat a : ZMod p)
           -- Once that lemma is proven, this calc chain will work:
-          sorry
-          -- calc self.U.toField / self.W.toField
-          --     = ↑(U8x32_as_Nat a) := a_eq_div.symm
-          --   _ = bytesToField a := (bytesToField_eq_cast a).symm
-          --   _ = u := rfl
-          --   _ = -1 := hu
+          -- sorry
+          calc self.U.toField / self.W.toField
+              = ↑(U8x32_as_Nat a) := a_eq_div.symm
+            _ = bytesToField a := (bytesToField_eq_cast a).symm
+            _ = u := rfl
+            _ = -1 := hu
         exact absurd div_eq_neg_one h_valid.2
       · -- neg case: u + 1 ≠ 0
         simp only [h1, if_false]
@@ -214,8 +212,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
         rw [if_neg] at h_valid_montgomery
         · exact h_valid_montgomery
         · exact h1
-    ·
-      rename_i fe_inv h_mul_U_Winv
+    · rename_i fe_inv h_mul_U_Winv
       -- rename_i x_inv _ x_inv_post _
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
       have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
