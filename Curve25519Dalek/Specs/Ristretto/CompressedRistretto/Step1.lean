@@ -79,6 +79,7 @@ Namely:
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
     step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>
+    (∀ i < 5, s[i]!.val < 2^51) ∧
     s.IsValid ∧
     (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧
     (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
@@ -89,7 +90,7 @@ theorem step_1_spec (c : CompressedRistretto) :
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c
   simp only [← ha]
-  progress as ⟨s, hs, hsv⟩          -- from_bytes: hs : congruence, hsv : s.IsValid
+  progress as ⟨s, hs, h_tight, hsv⟩ -- from_bytes: hs : congruence, h_tight : < 2^51, hsv : s.IsValid
   progress as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
   -- Simplify the SliceIndexRangeFullSliceSlice index chain (identity on slices)
   simp only [core.array.Array.index, core.ops.index.IndexSlice,
@@ -100,21 +101,23 @@ theorem step_1_spec (c : CompressedRistretto) :
   progress as ⟨ct_flag, hct⟩        -- ct_eq: ct_flag = Choice.one ↔ s_bytes.to_slice = s2
   progress as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
   -- Prove conjunction
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · -- tight bounds from from_bytes_spec
+    exact h_tight
   · -- s.IsValid from from_bytes_spec
     exact hsv
   · exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hs
   · -- goal: ct_flag.val = 1#u8 ↔ U8x32_as_Nat a < p
     have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by
-      cases ct_flag; simp [Choice.one]
+      cases ct_flag; simp only [Choice.one, subtle.Choice.mk.injEq]
     subst hs2; rw [val_iff, hct]
     -- goal: s_bytes.to_slice = a.to_slice ↔ U8x32_as_Nat a < p
     have array_eq_of_slice_eq : s_bytes.to_slice = a.to_slice → s_bytes = a := by
       intro h_slice
       have h_lists : s_bytes.val = a.val := by
         have := congrArg Subtype.val h_slice
-        simp [Aeneas.Std.Array.to_slice] at this; exact this
-      exact Subtype.eq h_lists
+        simp only [Array.to_slice] at this; exact this
+      exact Subtype.ext h_lists
     have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
     constructor
     · -- forward: slices equal → U8x32_as_Nat a < p
@@ -173,8 +176,8 @@ theorem step_1_spec (c : CompressedRistretto) :
       have h_arr_eq : s_bytes = a := by
         have h_lists : s_bytes.val = a.val := by
           have := congrArg Subtype.val h_slice_eq
-          simp [Aeneas.Std.Array.to_slice] at this; exact this
-        exact Subtype.eq h_lists
+          simp only [Array.to_slice] at this; exact this
+        exact Subtype.ext h_lists
       rw [← h_arr_eq]; exact hbc2
     have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
     have h_lt_255 : U8x32_as_Nat a < 2 ^ 255 := lt_trans h_lt p_lt_pow255
