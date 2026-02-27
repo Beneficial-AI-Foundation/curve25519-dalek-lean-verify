@@ -14,8 +14,13 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 Specification and proof for
 `curve25519_dalek::montgomery::{curve25519_dalek::montgomery::ProjectivePoint}::as_affine`.
 
-This function converts a Montgomery projective point (U : W) to its affine representation
-by computing u = U/W and encoding it as a 32-byte MontgomeryPoint.
+This function computes the affine u-coordinate u = U/W from a projective point (U : W)
+and encodes it as a 32-byte MontgomeryPoint.
+
+**Important**: This function does NOT verify that the result is a valid point on the
+Montgomery curve. It mechanically computes U/W and encodes it as bytes. If the input
+projective point does not represent a point on the curve, the output will not be a
+valid curve point. Validity checking is the caller's responsibility.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 330:4-333:5
 
@@ -30,22 +35,27 @@ namespace curve25519_dalek.montgomery.ProjectivePoint
 /-
 Natural language description:
 
-    • Converts a projective point (U : W) in Montgomery form to affine coordinates
+    • Computes the affine u-coordinate from a projective point (U : W)
 
-    • Computes the affine u-coordinate as U/W via:
+    • Computation steps:
       - Inverts the W coordinate using field inversion
       - Multiplies U by W⁻¹ to obtain u = U/W
       - Converts the resulting field element to a 32-byte encoding
 
-    • The projective coordinates (U : W) and (λU : λW) represent the same affine point
+    • Projective equivalence: (U : W) and (λU : λW) produce the same u-coordinate
       for any non-zero λ in the field
 
 Natural language specs:
 
-    • The function succeeds when W is invertible (W ≠ 0 in the field)
-    • Returns a 32-byte MontgomeryPoint encoding the affine u-coordinate
-    • The result represents the u-coordinate on the Montgomery curve y² = x³ + Ax² + x
-    • The conversion is deterministic and well-defined for valid projective points
+    • Precondition: Input field element limbs must satisfy bounds (< 2^54)
+    • Precondition: W ≠ 0 (in the field)
+    • Postcondition: The output correctly encodes u = U/W as a 32-byte array
+    • Postcondition: bytesToField(result) = U/W (mod p)
+
+    • No validity check: This function does NOT verify that u represents a point on
+      the Montgomery curve. It is a pure encoding function.
+    • Caller responsibility: If curve point validity is required, the caller must
+      ensure the input projective point represents a valid curve point.
 -/
 
 lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
@@ -81,28 +91,40 @@ lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv 
   symm
   exact (mul_eq_one_iff_eq_inv₀ hW_ne_zero).mp h_mul
 
--- /-- **Spec and proof concerning `montgomery.ProjectivePoint.as_affine`**:
--- - No panic (always returns successfully) when input limbs satisfy bounds
--- - For the input projective point (U : W), the resulting MontgomeryPoint encodes:
---   * If W ≢ 0 (mod p): the affine u-coordinate where u ≡ U * W^(-1) (mod p)
---   * If W ≡ 0 (mod p): u ≡ 0 (mod p) (since invert returns 0 on input 0)
--- - The result is a valid 32-byte encoding with U8x32_as_Nat(result) < p
--- - Projective equivalence: (U : W) and (λU : λW) produce the same affine encoding
---   for any non-zero λ in the field (when W ≢ 0)
--- where p = 2^255 - 19
--- -/
+/-- **Specification for `montgomery.ProjectivePoint.as_affine`**:
+
+This function computes the affine u-coordinate from projective coordinates (U : W)
+and encodes it as a 32-byte MontgomeryPoint.
+
+**Preconditions**:
+- Input limbs satisfy bounds: U[i] < 2^54 and W[i] < 2^54 for all i < 5
+- W ≠ 0 (mod p), ensuring the division U/W is well-defined
+
+**Postcondition**:
+- The output encodes u = U/W: bytesToField(result) = U/W (mod p)
+
+**No validity guarantee**: This function does NOT check whether u represents a point
+on the Montgomery curve y² = u³ + Au² + u. The output is simply the byte encoding of
+the field element U/W, which may or may not correspond to a valid curve point.
+
+**Note on Rust implementation**: The Rust type `MontgomeryPoint = [u8; 32]` is just
+a byte array without invariants. Rust's type system does not encode "valid curve point"
+as a constraint, so this function follows that design by not enforcing validity.
+
+where p = 2^255 - 19
+-/
 
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : ∀ i < 5, self.U[i]!.val < 2 ^ 54)
     (hW : ∀ i < 5, self.W[i]!.val < 2 ^ 54)
-    (h_valid : self.W.toField ≠ 0 ∧ self.U.toField / self.W.toField ≠ -1) :
+    (h_valid : self.W.toField ≠ 0) :
     as_affine self ⦃ res => bytesToField res = self.U.toField  / self.W.toField  ⦄ := by
   unfold as_affine at *
   progress*
   · grind
   · rename_i fe_inv h_mul_U_Winv
-    have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid.1
+    have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid
     have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
       exact fe_post_1 h_W_nat_nonzero
     have h_inv2 : Field51_as_Nat fe * Field51_as_Nat self.W ≡ 1 [MOD p] := by
