@@ -5,6 +5,15 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
+import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
+import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 
 /-! # Spec Theorem for `RistrettoPoint::elligator_ristretto_flavor`
 
@@ -52,6 +61,38 @@ theorem elligator_ristretto_flavor_spec
     elligator_ristretto_flavor s ⦃ result =>
     result.IsValid ∧
     result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by
-  sorry
+  unfold elligator_ristretto_flavor
+  progress*
+  · exact h_s_valid -- 1: s < 2^54 (square precond)
+  · intro i hi;
+    unfold backend.serial.u64.constants.SQRT_M1
+    interval_cases i <;> decide -- 2: SQRT_M1 < 2^54
+  · intro i hi; have := r_0_sq_post_2 i hi; omega -- 3: r_0_sq < 2^54
+  · intro i hi; have := r_post_2 i hi; omega -- 4: r < 2^53
+  · intro i hi;
+    unfold backend.serial.u64.field.FieldElement51.ONE
+    interval_cases i <;> decide -- 5: ONE < 2^53
+  · intro i hi;
+    unfold backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
+    interval_cases i <;> decide -- 6: ONE_MINUS_EDWARDS_D_SQUARED < 2^54
+  · intro i hi;
+    unfold backend.serial.u64.constants.EDWARDS_D
+    interval_cases i <;> decide -- 7: EDWARDS_D < 2^54
+  · intro i hi; have := r_post_2 i hi; omega -- 8: r < 2^54
+  · intro i hi;
+    unfold backend.serial.u64.constants.MINUS_ONE
+    interval_cases i <;> decide -- 9: MINUS_ONE < 2^63
+  · intro i hi; have := d_times_r_post_2 i hi; omega -- 10: d_times_r < 2^54
+  · intro i hi; have := r_post_2 i hi; omega -- 11: r < 2^53
+  · intro i hi;
+    unfold backend.serial.u64.constants.EDWARDS_D
+    interval_cases i <;> decide -- 12: EDWARDS_D < 2^53
+  · intro i hi; have := c_minus_dr_post_1 i hi; omega -- 13: c_minus_dr < 2^54
+  · intro i hi; have := N_s_post_2 i hi; omega -- 14: N_s ≤ 2^52-1
+  · intro i hi; have := D_post_2 i hi; omega -- 15: D ≤ 2^52-1
+  · intro i hi; have := __discr_post_1 i hi; omega -- 16: __discr.2 < 2^54
+  · exact h_s_valid -- 17: s < 2^54 (mul rhs)
+  · sorry -- 18: computation tail
+
 
 end curve25519_dalek.ristretto.RistrettoPoint
