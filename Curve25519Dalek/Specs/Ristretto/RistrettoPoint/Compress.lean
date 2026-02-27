@@ -28,7 +28,7 @@ RistrettoPoint to its canonical 32-byte representation. The function is defined 
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
 
 It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a unique, canonical byte representation.
-
+>>
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
