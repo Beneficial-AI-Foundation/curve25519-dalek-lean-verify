@@ -235,7 +235,6 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
       have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
       have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
         rw [h_eq_zmod2, Nat.cast_mul]
-      sorry
-      -- exact h_eq_zmod3
+      grind [bytesToField_eq_cast]
 
 end curve25519_dalek.montgomery.ProjectivePoint
