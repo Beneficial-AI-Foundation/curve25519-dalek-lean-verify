@@ -99,6 +99,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Double
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
@@ -127,6 +128,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulClamped
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToBytes
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ToEdwards
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.ConditionalSelect
+import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.DifferentialAddAndDouble
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Decompress

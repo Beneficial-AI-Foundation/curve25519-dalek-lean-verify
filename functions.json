@@ -238,10 +238,12 @@
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_e_valid : e.IsValid) :\n    mul e s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::mul",
@@ -637,11 +639,13 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (r : RistrettoPoint) (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul r s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for valid input RistrettoPoints r and canonical Scalars s\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::mul",
@@ -775,11 +779,13 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_e_valid : e.IsValid) :\n    mul s e ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input EdwardsPoints e\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -809,13 +815,13 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (s : scalar.Scalar) (r : ristretto.RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul s r ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
+   "theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul s r ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.MulShared0ScalarSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
+   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -956,13 +962,12 @@
    "fully_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul P scalar ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
+   "theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul P scalar ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements the Montgomery ladder for constant-time scalar multiplication\n- Processes scalar bits from bit 254 down to bit 0 using Algorithm 8 (Costello-Smith 2017)\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]P\n  * If P has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]P), the u-coordinate of the n-fold sum of P on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by P throughout the computation\n  * When the scalar is reduced modulo the group order L, the result corresponds to\n    scalar multiplication in the prime-order subgroup\n  * The result is computed via projective arithmetic and converted back to affine form\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n  * The computation maintains constant-time guarantees: the sequence of operations\n    executed is independent of the scalar bit values (only conditional swaps and\n    unconditional arithmetic operations are performed)\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul",
@@ -981,9 +986,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.montgomery.ProjectivePoint.as_affine"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_loop_spec\n    (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 x1 : montgomery.ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize)\n    (prev_bit : Bool)\n    (i : Isize)\n    (idx0W : x0.W = backend.serial.u64.field.FieldElement51.ZERO)\n    (idx1W : x1.W = backend.serial.u64.field.FieldElement51.ONE)\n    (idx0U : x0.U = backend.serial.u64.field.FieldElement51.ONE)\n    :\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>\n    (res.2.2 =true →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n        +  2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n        + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.2.1.U.toField\n      let w_out := res.2.1.W.toField\n      let u_ord := u_out/w_out\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧\n    (res.2.2 = false →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n      + 2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n      + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.1.U.toField\n      let w_out := res.1.W.toField\n      let u_ord := u_out/w_out\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄\n := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
@@ -1033,7 +1039,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
+   "theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the reverse operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MontgomeryPoint::mul with swapped arguments\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -3374,7 +3380,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    result.IsValid ⦄ := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -5836,7 +5842,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    to_montgomery e ⦃ mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.toPoint mp)) ⦄ := by ...",
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    to_montgomery e ⦃ mp =>\n    (let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let u := U8x32_as_Nat mp\n    if Z % p = Y % p then\n      u % p = 0\n    else\n      (u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n    (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.mkPoint mp)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_montgomery`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting MontgomeryPoint has u-coordinate:\n  - If Z ≢ Y (mod p): u ≡ (Z+Y) * (Z-Y)^(-1) (mod p)\n  - If Z ≡ Y (mod p): u ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -6211,10 +6217,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1)\n    (pow : Field51_as_Nat v * Field51_as_Nat v ≡ Field51_as_Nat ONE [MOD p]) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, x^2 % p = v_nat) → res.fst.val = 1#u8 ∧ (r_nat^2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, x^2 % p = v_nat) →\n      res.fst.val = 0#u8 ∧ (r_nat^2 * v_nat) % p = i_nat) ⦄ := by ...",
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Unconditional bounds\n    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n    -- Non-negativity\n    (r_nat % 2 = 0) ∧\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 (mod p) and ∃ x, x^2 ≡ v (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ v (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
+   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- Output limbs bounded by 2^53 - 1\n- Result r is non-negative (r_nat % 2 = 0)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
@@ -6301,10 +6307,10 @@
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    -- Case 1: u is zero\n    (u_nat = 0 →\n    c.1.val = 1#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 2: u is nonzero and v is zero\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n    c.1.val = 0#u8 ∧ r_nat = 0 ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 3: u and v are nonzero and u/v is a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n    c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1)) ∧\n    -- Case 4: u and v are nonzero and u/v is not a square\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n    c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p ∧\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1))\n     ⦄ := by ...",
+   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -6514,7 +6520,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul_assign P scalar ⦃ res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P) ⦄\n := by ...",
+   "theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul_assign P scalar ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulAssign.lean",
    "spec_docstring":
@@ -6585,7 +6591,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    mul P rhs ⦃ res =>\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat rhs.bytes) • (MontgomeryPoint.toPoint P) ⦄\n := by ...",
+   "theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    mul P rhs ⦃ res =>\n    let m:= (U8x32_as_Nat rhs.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
@@ -6764,7 +6770,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.toPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄\n := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -6783,7 +6789,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n    Montgomery.MontgomeryPoint.toPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n     MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -6803,7 +6809,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    mul_clamped P bytes ⦃ res =>\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    MontgomeryPoint.toPoint res = (U8x32_as_Nat clamped_scalar) • (MontgomeryPoint.toPoint P)) ⦄ := by ...",
+   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    mul_clamped P bytes ⦃ res =>\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    let m:= (U8x32_as_Nat clamped_scalar)\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulClamped.lean",
    "spec_docstring":
@@ -7007,10 +7013,13 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem differential_add_and_double_spec\n    (P Q : montgomery.ProjectivePoint)\n    (affine_PmQ : backend.serial.u64.field.FieldElement51)\n    (hP_valid : P.IsValid)\n    (hQ_valid : Q.IsValid)\n    (h_ladder_state : valid_ladder_state P Q affine_PmQ) :\n    differential_add_and_double P Q affine_PmQ ⦃ res =>\n      let (P', Q') := res\n      P'.IsValid ∧ Q'.IsValid ∧\n      (∀ (P_affine Q_affine : Montgomery.Point),\n        (Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧\n         Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧\n         Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →\n        (Field51_as_Nat P'.U / Field51_as_Nat P'.W = Montgomery.get_u (2 • P_affine)) ∧\n        (Field51_as_Nat Q'.U / Field51_as_Nat Q'.W = Montgomery.get_u (P_affine + Q_affine)))\n    ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/DifferentialAddAndDouble.lean",
+   "spec_docstring":
+   "/-- **Spec for `montgomery.differential_add_and_double`**:\n\n- No panic (always succeeds for valid inputs)\n- Requires: P and Q are valid projective points (W ≠ 0)\n- Requires: (P, Q, affine_PmQ) form a valid ladder state\n  (i.e., affine_PmQ contains the u-coordinate of P-Q)\n- Returns (P', Q') representing [2]P and P+Q in projective coordinates\n- Ensures: outputs P' and Q' are also valid projective points\n- Correctness: the u-coordinates of the outputs correspond to point doubling and\n  differential addition on the Montgomery curve\n- All operations are constant-time field operations\n\n**Mathematical Specification:**\nGiven valid projective points P=(U:W) and Q, plus the u-coordinate of (P-Q),\ncomputes P'=(U':W') representing [2]P and Q' representing P+Q.\n\nIn Montgomery curve arithmetic, only u-coordinates are needed for the ladder.\nThe Montgomery ladder invariant maintains that the difference Q-P is known.\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name": "curve25519_dalek::montgomery::differential_add_and_double",
    "lines": "L352-L390",
@@ -7336,10 +7345,10 @@
    "is_extraction_artifact": false,
    "fully_verified": true,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (comp : CompressedRistretto) :\n    ∃ result, decompress comp = ok result ∧\n    (¬comp.IsValid →\n      result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        decompress_pure comp = some rist.toPoint) := by ...",
+   "theorem decompress_spec (comp : CompressedRistretto) :\n    decompress comp ⦃ result =>\n    (¬comp.IsValid → result = none) ∧\n    (comp.IsValid →\n        ∃ rist,\n        result = some rist ∧\n        RistrettoPoint.IsValid rist ∧\n        decompress_pure comp = some rist.toPoint) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Decompress.lean",
    "spec_docstring":
@@ -8153,7 +8162,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    ∃ rist, elligator_ristretto_flavor s = ok rist ∧\n    rist.IsValid ∧\n    rist.toPoint = elligator_ristretto_flavor_pure s.toField := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
@@ -8185,13 +8194,14 @@
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED",
     "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ rist =>\n      rist.IsValid ⦄ := by ...",
+   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ (rist : RistrettoPoint) =>\n      rist.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:\n- The function always succeeds (no panic) for arbitrary 64-byte inputs\n- The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
@@ -8227,7 +8237,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_1_spec (c : CompressedRistretto) :\n    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by ...",
+   "theorem step_1_spec (c : CompressedRistretto) :\n    step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>\n    (∀ i < 5, s[i]!.val < 2^51) ∧\n    s.IsValid ∧\n    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧\n    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧\n    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧\n    (ristretto.decompress_step1 c = some s.toField ↔\n      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step1.lean",
    "spec_docstring":
@@ -8245,10 +8255,10 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51) (h_s : s.IsValid) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let u1 := 1 - s.toField ^ 2\n     let u2 := 1 + s.toField ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0) ∧ IsSquare (v * u2 ^ 2)) ∧\n    (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n    (c1.val = 1#u8 ↔ pt.Y.toField = 0) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
+   "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Step2.lean",
    "spec_docstring":
@@ -8849,7 +8859,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    montgomery.MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (montgomery.MontgomeryPoint.toPoint P) ⦄\n := by ...",
+   "theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",

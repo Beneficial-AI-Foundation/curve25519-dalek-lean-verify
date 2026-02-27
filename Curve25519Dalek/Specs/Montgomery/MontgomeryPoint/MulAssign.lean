@@ -51,7 +51,8 @@ natural language specs:
 @[progress]
 theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     mul_assign P scalar ⦃ res =>
-    MontgomeryPoint.toPoint res = (U8x32_as_Nat scalar.bytes) • (MontgomeryPoint.toPoint P) ⦄
+    let m:= (U8x32_as_Nat scalar.bytes) % 2^255
+    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
      := by
   unfold mul_assign
   progress*

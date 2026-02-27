@@ -6,6 +6,8 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 
 /-! # Spec Theorem for `RistrettoPoint::from_uniform_bytes`
 
@@ -19,6 +21,35 @@ and adding the resulting two Ristretto points via elliptic curve addition.
 -/
 
 open Aeneas Aeneas.Std Result core.ops.range Aeneas.Std.WP
+
+-- To be upstreamed to aeneas.
+-- Bridges the trait dispatch chain for immutable range-based array indexing.
+-- The mutable counterpart `Slice.index_mut_SliceIndexRangeUsizeSliceInst` exists in
+-- aeneas (Slice.lean) but this immutable version is missing.
+@[simp, progress_simps]
+theorem Aeneas.Std.Array.index_SliceIndexRangeUsizeSlice {T : Type} {N : Usize}
+    (a : Array T N) (r : core.ops.range.Range Usize) :
+    core.array.Array.index (core.ops.index.IndexSlice
+      (core.slice.index.SliceIndexRangeUsizeSlice T)) a r =
+    core.slice.index.SliceIndexRangeUsizeSlice.index r a.to_slice := by rfl
+
+-- To be upstreamed to Aeneas.
+-- Progress spec for immutable range-based slice indexing.
+-- The mutable counterpart `SliceIndexRangeUsizeSlice.index_mut.progress_spec` exists in
+-- aeneas (Slice.lean) but this immutable version is missing.
+@[progress]
+theorem core.slice.index.SliceIndexRangeUsizeSlice.index.progress_spec {α : Type}
+    (r : core.ops.range.Range Usize) (s : Slice α) (h0 : r.start ≤ r.end) (h1 : r.end ≤ s.length) :
+    core.slice.index.SliceIndexRangeUsizeSlice.index r s ⦃ (s1 : Slice α) =>
+      s1.val = s.val.slice r.start r.end ∧
+      s1.length = r.end - r.start ⦄ := by
+  simp only [core.slice.index.SliceIndexRangeUsizeSlice.index, UScalar.le_equiv, Slice.length]
+  split
+  · simp only [spec_ok, true_and]
+    simp_lists
+    omega
+  · simp only [spec_fail]
+    scalar_tac
 
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
@@ -43,11 +74,7 @@ natural language specs:
 - The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
 -/
 
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:
-- The function always succeeds (no panic) for arbitrary 64-byte inputs
-- The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
--/
-
+/-
 def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array U8 32#usize) :=
   let a1 := input.subslice (Range.mk 0#usize 32#usize)
   let a2 := input.subslice (Range.mk 32#usize 64#usize)
@@ -55,7 +82,9 @@ def split64to32 (input : Array U8 64#usize) : Result (Array U8 32#usize × Array
   | ok s1, ok s2 => ok (Array.from_slice (Array.repeat 32#usize 0#u8) s1,
                         Array.from_slice (Array.repeat 32#usize 0#u8) s2)
   | _, _ => fail Error.panic
+-/
 
+/-
 @[progress]
 theorem split64to32_spec (input : Array U8 64#usize) :
     split64to32 input ⦃ (a1, a2) =>
@@ -89,12 +118,21 @@ theorem split64to32_spec (input : Array U8 64#usize) :
       = Option.getD_some, = List.getElem?_eq_none, = List.length_take, = getElem?_pos,
       = getElem?_neg, = min_def, = List.drop_zero, = List.length_drop, = Nat.min_def,
       = List.getElem?_take]
+-/
 
+/-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:
+- The function always succeeds (no panic) for arbitrary 64-byte inputs
+- The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
+-/
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
-    from_uniform_bytes bytes ⦃ rist =>
+    from_uniform_bytes bytes ⦃ (rist : RistrettoPoint) =>
       rist.IsValid ⦄ := by
-  sorry
+  unfold from_uniform_bytes
+  unfold Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add
+  progress*
+  · simp_all [Array.to_slice_mut]
+  · simp_all [Array.to_slice_mut]
 
 
 /-
