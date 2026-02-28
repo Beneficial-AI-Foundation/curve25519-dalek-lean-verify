@@ -42,7 +42,8 @@ natural language specs:
 -/
 @[progress]
 theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :
-    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result => Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by
+    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>
+      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by
   unfold ONE_MINUS_EDWARDS_D_SQUARED field.FieldElement51.from_limbs
   simp only [spec_ok]
   decide
