@@ -153,6 +153,7 @@ def buildFunctionRecord
     isSpecified := hasSpecTheorem env rawData.name
     isVerified := isVerified env rawData.name
     isFullyVerified := isFullyVerified env relevantNames rawData.name
+    isExternallyVerified := isExternallyVerified env rawData.name
     specFilePath := getSpecFilePath env rawData.name
     specDocstring := specParts.docstring
     specStatement := specParts.statement

@@ -160,6 +160,7 @@ def StatusFile.getLeanNames (file : StatusFile) : Array String :=
 /-- Create a new StatusRow from a FunctionOutput -/
 def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
   let verifiedStr := if fn.verified then "verified"
+                     else if fn.externally_verified then "externally verified"
                      else if fn.specified then "specified"
                      else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""
@@ -186,6 +187,7 @@ def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
     Preserves: notes, ai_proveable -/
 def StatusRow.updateFrom (row : StatusRow) (fn : FunctionOutput) : StatusRow :=
   let verifiedStr := if fn.verified then "verified"
+                     else if fn.externally_verified then "externally verified"
                      else if fn.specified then "specified"
                      else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""

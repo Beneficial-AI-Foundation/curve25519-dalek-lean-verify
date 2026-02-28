@@ -13,6 +13,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.IdentityCurveModelsProjectivePoint.identity"]},
   {"verified": true,
@@ -32,6 +33,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
@@ -49,6 +51,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.IdentityMontgomeryProjectivePoint.identity"]},
   {"verified": true,
@@ -68,6 +71,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
@@ -86,6 +90,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg"]},
   {"verified": true,
@@ -105,6 +110,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
   {"verified": false,
@@ -122,6 +128,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add"]},
   {"verified": true,
@@ -141,6 +148,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -160,6 +168,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -177,6 +186,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add",
@@ -196,6 +206,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add"]},
   {"verified": true,
@@ -216,6 +227,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -235,6 +247,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -254,6 +267,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.backend.variable_base_mul"]},
   {"verified": false,
    "specified": false,
@@ -270,6 +284,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
   {"verified": false,
@@ -287,6 +302,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
   {"verified": false,
@@ -304,6 +320,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub"]},
   {"verified": true,
@@ -323,6 +340,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -342,6 +360,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -359,6 +378,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub",
@@ -378,6 +398,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub"]},
   {"verified": true,
@@ -397,6 +418,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -416,6 +438,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add"]},
   {"verified": true,
@@ -436,6 +459,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign"]},
   {"verified": false,
@@ -453,6 +477,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
@@ -472,6 +497,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK"]},
@@ -490,6 +516,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
   {"verified": true,
@@ -510,6 +537,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"]},
   {"verified": false,
@@ -527,6 +555,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub"]},
   {"verified": true,
@@ -547,6 +576,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
@@ -564,6 +594,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg"]},
   {"verified": true,
@@ -584,6 +615,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
   {"verified": false,
@@ -601,6 +633,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": true,
@@ -620,6 +653,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -637,6 +671,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
   {"verified": true,
@@ -656,6 +691,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -673,6 +709,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
   {"verified": false,
@@ -690,6 +727,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
   {"verified": false,
@@ -707,6 +745,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -724,6 +763,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -741,6 +781,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add"]},
   {"verified": false,
@@ -758,6 +799,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add",
@@ -777,6 +819,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": true,
@@ -796,6 +839,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -813,6 +857,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul"]},
   {"verified": true,
@@ -832,6 +877,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -849,6 +895,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul"]},
   {"verified": false,
@@ -866,6 +913,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
@@ -884,6 +932,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg"]},
   {"verified": false,
@@ -901,6 +950,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
@@ -924,6 +974,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub"]},
   {"verified": false,
@@ -941,6 +992,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub",
@@ -960,6 +1012,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": true,
@@ -978,6 +1031,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.IdentityMontgomeryProjectivePoint.identity",
@@ -1001,6 +1055,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop.mutual"]},
   {"verified": false,
@@ -1018,6 +1073,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.montgomery.differential_add_and_double"]},
   {"verified": false,
    "specified": false,
@@ -1034,6 +1090,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": true,
@@ -1053,6 +1110,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -1070,6 +1128,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -1087,6 +1146,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -1104,6 +1164,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -1121,6 +1182,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -1138,6 +1200,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -1155,6 +1218,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -1172,6 +1236,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAMontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -1189,6 +1254,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -1206,6 +1272,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -1223,6 +1290,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -1240,6 +1308,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -1257,6 +1326,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -1274,6 +1344,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -1291,6 +1362,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -1308,6 +1380,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar.add"]},
   {"verified": false,
@@ -1325,6 +1398,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add"]},
   {"verified": false,
@@ -1342,6 +1416,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -1359,6 +1434,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -1376,6 +1452,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
@@ -1393,6 +1470,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
@@ -1410,6 +1488,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -1427,6 +1506,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -1444,6 +1524,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul"]},
   {"verified": false,
@@ -1461,6 +1542,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul"]},
   {"verified": false,
@@ -1478,6 +1560,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithSubScalarScalar.sub"]},
   {"verified": false,
@@ -1495,6 +1578,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub"]},
   {"verified": false,
@@ -1510,6 +1594,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1526,6 +1611,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -1543,6 +1629,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1559,6 +1646,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint",
     "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq"]},
@@ -1580,6 +1668,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1596,6 +1685,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq"]},
   {"verified": true,
@@ -1616,6 +1706,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq"]},
   {"verified": false,
@@ -1633,6 +1724,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -1650,6 +1742,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -1667,6 +1760,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -1684,6 +1778,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1700,6 +1795,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg"]},
   {"verified": false,
@@ -1717,6 +1813,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg"]},
   {"verified": false,
@@ -1734,6 +1831,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": true,
@@ -1754,6 +1852,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
@@ -1772,6 +1871,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -1794,6 +1894,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign"]},
   {"verified": true,
@@ -1814,6 +1915,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
@@ -1831,6 +1933,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -1848,6 +1951,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -1865,6 +1969,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -1882,6 +1987,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1898,6 +2004,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone"]},
   {"verified": true,
@@ -1918,6 +2025,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
@@ -1938,6 +2046,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
@@ -1955,6 +2064,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -1972,6 +2082,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -1988,6 +2099,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -2005,6 +2117,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -2022,6 +2135,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -2039,6 +2153,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg"]},
   {"verified": false,
@@ -2056,6 +2171,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg"]},
   {"verified": false,
@@ -2073,6 +2189,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": true,
@@ -2093,6 +2210,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO"]},
@@ -2111,6 +2229,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -2133,6 +2252,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign"]},
   {"verified": true,
@@ -2153,6 +2273,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
@@ -2170,6 +2291,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -2187,6 +2309,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -2204,6 +2327,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid"]},
   {"verified": false,
@@ -2221,6 +2345,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -2246,6 +2371,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square"]},
@@ -2267,6 +2393,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -2286,6 +2413,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from",
     "curve25519_dalek.scalar.Scalar.as_radix_16",
@@ -2313,6 +2441,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
@@ -2338,6 +2467,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_body"]},
   {"verified": false,
@@ -2355,6 +2485,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
@@ -2375,6 +2506,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body"]},
   {"verified": false,
@@ -2392,6 +2524,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2410,6 +2543,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_body"]},
   {"verified": true,
@@ -2428,6 +2562,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_body"]},
   {"verified": false,
@@ -2443,6 +2578,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2463,6 +2599,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body"]},
   {"verified": false,
@@ -2480,6 +2617,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
@@ -2495,6 +2633,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
@@ -2514,6 +2653,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN"]},
   {"verified": false,
@@ -2531,6 +2671,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body"]},
   {"verified": false,
@@ -2548,6 +2689,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2568,6 +2710,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_body"]},
   {"verified": false,
@@ -2585,6 +2728,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2601,6 +2745,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -2618,6 +2763,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -2635,6 +2781,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_body"]},
   {"verified": false,
@@ -2650,6 +2797,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2669,6 +2817,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_body"]},
   {"verified": true,
@@ -2689,6 +2838,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_body"]},
   {"verified": false,
@@ -2706,6 +2856,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
@@ -2723,6 +2874,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2743,6 +2895,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body"]},
   {"verified": false,
@@ -2760,6 +2913,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2777,6 +2931,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -2793,6 +2948,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -2812,6 +2968,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body"]},
   {"verified": false,
@@ -2829,6 +2986,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -2847,6 +3005,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.SQRT_M1_body"]},
   {"verified": false,
@@ -2862,6 +3021,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": false,
@@ -2879,6 +3039,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -2896,6 +3057,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -2912,6 +3074,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51"]},
   {"verified": false,
@@ -2929,6 +3092,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq"]},
   {"verified": false,
@@ -2946,6 +3110,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -2963,6 +3128,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -2980,6 +3146,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign"]},
   {"verified": true,
@@ -3000,6 +3167,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop"]},
   {"verified": true,
@@ -3020,6 +3188,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop.mutual"]},
   {"verified": false,
@@ -3037,6 +3206,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3053,6 +3223,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51.mul_assign"]},
   {"verified": false,
@@ -3070,6 +3241,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
@@ -3087,6 +3259,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign"]},
   {"verified": false,
@@ -3104,6 +3277,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub"]},
   {"verified": false,
@@ -3121,6 +3295,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreMarkerCopy",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
@@ -3144,6 +3319,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3163,6 +3339,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3179,6 +3356,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3195,6 +3373,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": true,
@@ -3215,6 +3394,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
@@ -3232,6 +3412,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -3249,6 +3430,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3268,6 +3450,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_body"]},
   {"verified": false,
@@ -3285,6 +3468,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -3303,6 +3487,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_body"]},
   {"verified": false,
@@ -3320,6 +3505,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -3338,6 +3524,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_body"]},
   {"verified": false,
@@ -3355,6 +3542,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
@@ -3375,6 +3563,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
@@ -3394,6 +3583,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at"]},
   {"verified": false,
@@ -3411,6 +3601,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3430,6 +3621,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3449,6 +3641,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
@@ -3469,6 +3662,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop"]},
   {"verified": false,
@@ -3486,6 +3680,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body"]},
   {"verified": false,
@@ -3503,6 +3698,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3519,6 +3715,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3535,6 +3732,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK"]},
@@ -3556,6 +3754,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK"]},
   {"verified": false,
@@ -3573,6 +3772,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body"]},
   {"verified": false,
@@ -3590,6 +3790,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3609,6 +3810,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
   {"verified": true,
@@ -3629,6 +3831,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop"]},
@@ -3650,6 +3853,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -3669,6 +3873,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
@@ -3686,6 +3891,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body"]},
   {"verified": false,
@@ -3703,6 +3909,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3719,6 +3926,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3735,6 +3943,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -3752,6 +3961,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3768,6 +3978,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -3785,6 +3996,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
@@ -3803,6 +4015,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3819,6 +4032,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index"]},
   {"verified": false,
@@ -3836,6 +4050,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -3852,6 +4067,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -3869,6 +4085,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3886,6 +4103,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_body"]},
   {"verified": false,
@@ -3902,6 +4120,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -3920,6 +4139,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO",
@@ -3942,6 +4162,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop.mutual"]},
   {"verified": false,
@@ -3959,6 +4180,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
@@ -3980,6 +4202,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
     "curve25519_dalek.backend.serial.u64.constants.RR"]},
@@ -4001,6 +4224,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop"]},
   {"verified": true,
@@ -4020,6 +4244,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop.mutual"]},
   {"verified": false,
@@ -4037,6 +4262,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.constants.L",
@@ -4059,6 +4285,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
@@ -4078,6 +4305,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -4097,6 +4325,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
@@ -4120,6 +4349,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -4139,6 +4369,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
@@ -4160,6 +4391,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index"]},
   {"verified": true,
@@ -4180,6 +4412,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
@@ -4201,6 +4434,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -4223,6 +4457,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.LFACTOR",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -4243,6 +4478,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -4262,6 +4498,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
@@ -4279,6 +4516,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
@@ -4301,6 +4539,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
@@ -4318,6 +4557,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
@@ -4341,6 +4581,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
@@ -4361,6 +4602,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO",
@@ -4382,6 +4624,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop.mutual"]},
   {"verified": false,
@@ -4399,6 +4642,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
@@ -4419,6 +4663,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -4435,6 +4680,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4449,6 +4695,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.get_selected_backend",
     "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul"]},
@@ -4465,6 +4712,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -4482,6 +4730,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT"]},
   {"verified": false,
@@ -4499,6 +4748,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -4516,6 +4766,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4531,6 +4782,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY",
     "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpEq.assert_receiver_is_total_eq"]},
@@ -4549,6 +4801,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4565,6 +4818,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.eq"]},
   {"verified": false,
@@ -4582,6 +4836,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4597,6 +4852,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from"]},
   {"verified": false,
@@ -4613,6 +4869,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.edwards.CompressedEdwardsY.from_slice"]},
   {"verified": false,
    "specified": false,
@@ -4629,6 +4886,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -4646,6 +4904,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -4663,6 +4922,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -4680,6 +4940,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4696,6 +4957,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -4713,6 +4975,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4729,6 +4992,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -4746,6 +5010,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"]},
   {"verified": true,
    "specified": true,
@@ -4763,6 +5028,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -4781,6 +5047,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.decompress.step_1",
     "curve25519_dalek.edwards.decompress.step_2"]},
@@ -4798,6 +5065,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY"]},
   {"verified": false,
@@ -4815,6 +5083,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY.call_once"]},
   {"verified": false,
@@ -4832,6 +5101,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4847,6 +5117,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4862,6 +5133,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -4879,6 +5151,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -4894,6 +5167,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint"]},
   {"verified": false,
@@ -4911,6 +5185,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq"]},
   {"verified": false,
@@ -4928,6 +5203,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -4945,6 +5221,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -4962,6 +5239,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -4978,6 +5256,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -4995,6 +5274,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint.add_assign"]},
   {"verified": false,
@@ -5012,6 +5292,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint.add_assign"]},
   {"verified": false,
@@ -5029,6 +5310,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint.add_assign"]},
   {"verified": false,
@@ -5046,6 +5328,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -5063,6 +5346,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -5082,6 +5366,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -5099,6 +5384,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddSharedBEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -5116,6 +5402,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
   {"verified": false,
@@ -5133,6 +5420,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign"]},
   {"verified": false,
@@ -5150,6 +5438,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -5167,6 +5456,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -5184,6 +5474,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -5201,6 +5492,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -5218,6 +5510,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -5235,6 +5528,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -5252,6 +5546,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul"]},
   {"verified": false,
@@ -5269,6 +5564,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
   {"verified": false,
@@ -5286,6 +5582,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
   {"verified": false,
@@ -5303,6 +5600,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint.sub_assign"]},
   {"verified": false,
@@ -5320,6 +5618,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint.sub_assign"]},
   {"verified": false,
@@ -5337,6 +5636,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint.sub_assign"]},
   {"verified": false,
@@ -5354,6 +5654,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -5371,6 +5672,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -5388,6 +5690,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -5405,6 +5708,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubSharedBEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -5422,6 +5726,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
@@ -5439,6 +5744,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": true,
@@ -5458,6 +5764,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
@@ -5476,6 +5783,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid"]},
   {"verified": false,
@@ -5493,6 +5801,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
@@ -5513,6 +5822,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -5531,6 +5841,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
@@ -5548,6 +5859,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": true,
@@ -5567,6 +5879,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -5584,6 +5897,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.invert",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -5606,6 +5920,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -5624,6 +5939,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -5645,6 +5961,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.to_affine",
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},
@@ -5664,6 +5981,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
@@ -5684,6 +6002,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor",
     "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
@@ -5703,6 +6022,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul",
     "curve25519_dalek.constants.BASEPOINT_ORDER_PRIVATE",
@@ -5725,6 +6045,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul",
     "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT"]},
@@ -5745,6 +6066,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.edwards.EdwardsPoint.mul_base"]},
@@ -5764,6 +6086,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"]},
   {"verified": false,
    "specified": true,
@@ -5781,6 +6104,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_loop",
@@ -5800,6 +6124,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"]},
@@ -5817,6 +6142,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
@@ -5836,6 +6162,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.invert",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
@@ -5855,6 +6182,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -5876,6 +6204,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -5893,6 +6222,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -5908,6 +6238,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint"]},
   {"verified": false,
@@ -5925,6 +6256,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq"]},
   {"verified": false,
@@ -5942,6 +6274,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -5959,6 +6292,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -5976,6 +6310,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -5993,6 +6328,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -6010,6 +6346,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -6027,6 +6364,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
@@ -6045,6 +6383,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -6063,6 +6402,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
@@ -6080,6 +6420,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -6097,6 +6438,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -6114,6 +6456,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault"]},
@@ -6134,6 +6477,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
@@ -6151,6 +6495,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
@@ -6167,6 +6512,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.as_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
@@ -6190,6 +6536,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.as_bytes",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
@@ -6210,6 +6557,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -6230,6 +6578,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
@@ -6248,6 +6597,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": true,
@@ -6265,6 +6615,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
@@ -6283,6 +6634,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -6303,6 +6655,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -6322,6 +6675,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -6346,6 +6700,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -6363,6 +6718,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -6378,6 +6734,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint"]},
   {"verified": false,
@@ -6395,6 +6752,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq"]},
   {"verified": true,
@@ -6414,6 +6772,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -6431,6 +6790,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -6448,6 +6808,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -6464,6 +6825,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -6481,6 +6843,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign"]},
   {"verified": false,
@@ -6498,6 +6861,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign"]},
   {"verified": false,
@@ -6515,6 +6879,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign"]},
   {"verified": true,
@@ -6535,6 +6900,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -6552,6 +6918,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -6569,6 +6936,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -6586,6 +6954,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul"]},
   {"verified": true,
@@ -6605,6 +6974,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
   {"verified": false,
@@ -6622,6 +6992,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": true,
@@ -6642,6 +7013,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -6658,6 +7030,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -6679,6 +7052,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -6695,6 +7069,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": true,
@@ -6714,6 +7089,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -6732,6 +7108,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -6749,6 +7126,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -6766,6 +7144,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -6783,6 +7162,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_base",
     "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"]},
@@ -6803,6 +7183,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.montgomery.MontgomeryPoint.mul_base"]},
@@ -6823,6 +7204,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.clamp_integer",
     "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul"]},
@@ -6842,6 +7224,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": true,
@@ -6860,6 +7243,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
@@ -6886,6 +7270,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -6903,6 +7288,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -6919,6 +7305,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -6936,6 +7323,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.IdentityMontgomeryProjectivePoint.identity"]},
   {"verified": false,
@@ -6953,6 +7341,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -6970,6 +7359,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -6991,6 +7381,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": true,
@@ -7010,6 +7401,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.invert",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -7030,6 +7422,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -7049,6 +7442,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
@@ -7079,6 +7473,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -7096,6 +7491,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7112,6 +7508,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto",
     "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpEq.assert_receiver_is_total_eq"]},
@@ -7130,6 +7527,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7146,6 +7544,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.eq"]},
   {"verified": false,
@@ -7163,6 +7562,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7178,6 +7578,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from"]},
   {"verified": false,
@@ -7194,6 +7595,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.from_slice"]},
   {"verified": false,
@@ -7211,6 +7613,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -7228,6 +7631,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -7245,6 +7649,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -7262,6 +7667,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7278,6 +7684,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -7295,6 +7702,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7311,6 +7719,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -7328,6 +7737,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.ristretto.CompressedRistretto.as_bytes"]},
   {"verified": true,
    "specified": true,
@@ -7346,6 +7756,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -7364,6 +7775,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.decompress.step_1",
     "curve25519_dalek.ristretto.decompress.step_2"]},
@@ -7381,6 +7793,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto"]},
   {"verified": false,
@@ -7398,6 +7811,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto.call_once"]},
   {"verified": false,
@@ -7415,6 +7829,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -7433,6 +7848,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7449,6 +7865,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -7466,6 +7883,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -7481,6 +7899,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint"]},
   {"verified": false,
@@ -7498,6 +7917,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq"]},
   {"verified": false,
@@ -7515,6 +7935,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -7532,6 +7953,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -7549,6 +7971,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -7566,6 +7989,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone"]},
   {"verified": false,
@@ -7583,6 +8007,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint.add_assign"]},
   {"verified": false,
@@ -7600,6 +8025,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint.add_assign"]},
   {"verified": false,
@@ -7617,6 +8043,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint.add_assign"]},
   {"verified": false,
@@ -7634,6 +8061,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -7651,6 +8079,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -7668,6 +8097,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -7685,6 +8115,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddSharedBRistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -7702,6 +8133,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add"]},
   {"verified": false,
@@ -7719,6 +8151,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign"]},
   {"verified": false,
@@ -7736,6 +8169,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -7753,6 +8187,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -7770,6 +8205,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -7787,6 +8223,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -7804,6 +8241,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -7821,6 +8259,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulSharedBScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -7838,6 +8277,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul"]},
   {"verified": false,
@@ -7855,6 +8295,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
   {"verified": false,
@@ -7872,6 +8313,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg"]},
   {"verified": false,
@@ -7889,6 +8331,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint.sub_assign"]},
   {"verified": false,
@@ -7906,6 +8349,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint.sub_assign"]},
   {"verified": false,
@@ -7923,6 +8367,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint.sub_assign"]},
   {"verified": false,
@@ -7940,6 +8385,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -7957,6 +8403,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -7974,6 +8421,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -7991,6 +8439,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubSharedBRistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -8008,6 +8457,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
@@ -8025,6 +8475,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -8042,6 +8493,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
@@ -8059,6 +8511,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -8077,6 +8530,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
@@ -8094,6 +8548,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -8111,6 +8566,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -8130,6 +8586,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -8158,6 +8615,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
@@ -8179,6 +8637,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -8213,6 +8672,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
@@ -8233,6 +8693,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul",
     "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
@@ -8252,6 +8713,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.as_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
@@ -8273,6 +8735,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -8299,6 +8762,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone.clone"]},
   {"verified": false,
@@ -8315,6 +8779,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8330,6 +8795,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar"]},
   {"verified": false,
@@ -8346,6 +8812,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq"]},
   {"verified": false,
@@ -8363,6 +8830,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
@@ -8379,6 +8847,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from"]},
   {"verified": false,
@@ -8395,6 +8864,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8410,6 +8880,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from"]},
   {"verified": false,
@@ -8426,6 +8897,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8441,6 +8913,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from"]},
   {"verified": false,
@@ -8457,6 +8930,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8472,6 +8946,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from"]},
   {"verified": false,
@@ -8488,6 +8963,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8503,6 +8979,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from"]},
   {"verified": false,
@@ -8519,6 +8996,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -8534,6 +9012,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault.default"]},
   {"verified": false,
@@ -8551,6 +9030,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.ZERO"]},
   {"verified": false,
    "specified": false,
@@ -8566,6 +9046,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone"]},
   {"verified": false,
    "specified": false,
@@ -8582,6 +9063,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar.add_assign"]},
   {"verified": false,
@@ -8599,6 +9081,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar.add_assign"]},
   {"verified": false,
@@ -8616,6 +9099,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar.add_assign"]},
   {"verified": false,
@@ -8633,6 +9117,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add"]},
   {"verified": false,
@@ -8650,6 +9135,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddScalarScalar.add"]},
   {"verified": false,
@@ -8667,6 +9153,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add"]},
   {"verified": false,
@@ -8684,6 +9171,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add"]},
   {"verified": false,
@@ -8701,6 +9189,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add"]},
   {"verified": false,
@@ -8718,6 +9207,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint.mul"]},
   {"verified": false,
@@ -8735,6 +9225,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul"]},
   {"verified": false,
@@ -8752,6 +9243,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign"]},
   {"verified": false,
@@ -8769,6 +9261,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -8786,6 +9279,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
   {"verified": false,
@@ -8803,6 +9297,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
@@ -8822,6 +9317,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -8839,6 +9335,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -8856,6 +9353,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul"]},
   {"verified": true,
@@ -8875,6 +9373,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
@@ -8892,6 +9391,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -8909,6 +9409,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -8926,6 +9427,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul"]},
   {"verified": false,
@@ -8943,6 +9445,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul"]},
   {"verified": false,
@@ -8960,6 +9463,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul"]},
   {"verified": false,
@@ -8977,6 +9481,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul"]},
@@ -8995,6 +9500,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -9012,6 +9518,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul"]},
   {"verified": false,
@@ -9029,6 +9536,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBMontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
@@ -9046,6 +9554,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": false,
@@ -9063,6 +9572,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBRistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -9080,6 +9590,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul"]},
   {"verified": false,
@@ -9097,6 +9608,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul"]},
   {"verified": false,
@@ -9114,6 +9626,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul"]},
   {"verified": false,
@@ -9130,6 +9643,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg"]},
   {"verified": false,
@@ -9147,6 +9661,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg"]},
   {"verified": false,
@@ -9164,6 +9679,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar.sub_assign"]},
   {"verified": false,
@@ -9181,6 +9697,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar.sub_assign"]},
   {"verified": false,
@@ -9198,6 +9715,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar.sub_assign"]},
   {"verified": false,
@@ -9215,6 +9733,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub"]},
   {"verified": false,
@@ -9232,6 +9751,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar.sub"]},
   {"verified": false,
@@ -9249,6 +9769,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub"]},
   {"verified": false,
@@ -9266,6 +9787,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub"]},
   {"verified": false,
@@ -9283,6 +9805,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub"]},
   {"verified": false,
@@ -9299,6 +9822,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index"]},
   {"verified": false,
@@ -9316,6 +9840,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9332,6 +9857,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreMarkerCopy",
     "curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -9350,6 +9876,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop"]},
   {"verified": false,
@@ -9367,6 +9894,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9382,6 +9910,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": true,
@@ -9401,6 +9930,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9416,6 +9946,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize.zeroize"]},
   {"verified": false,
@@ -9432,6 +9963,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -9448,6 +9980,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -9465,6 +9998,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.ZERO_body"]},
   {"verified": false,
    "specified": false,
@@ -9480,6 +10014,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -9497,6 +10032,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9512,6 +10048,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
     "curve25519_dalek.scalar.Scalar.as_radix_16_loop0",
@@ -9530,6 +10067,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9545,6 +10083,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9560,6 +10099,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
     "curve25519_dalek.scalar.Scalar.as_radix_16.bot_half",
@@ -9578,6 +10118,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9593,6 +10134,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.as_radix_16",
     "curve25519_dalek.scalar.read_le_u64_into",
@@ -9611,6 +10153,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9626,6 +10169,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.scalar.Scalar.ONE",
@@ -9652,6 +10196,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.batch_invert_loop0.mutual"]},
   {"verified": false,
@@ -9668,6 +10213,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
@@ -9687,6 +10233,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.batch_invert_loop1.mutual"]},
   {"verified": false,
@@ -9703,6 +10250,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
@@ -9723,6 +10271,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.reduce",
     "curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index"]},
@@ -9743,6 +10292,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide",
     "curve25519_dalek.scalar.Scalar52.pack"]},
@@ -9762,6 +10312,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.is_canonical"]},
   {"verified": true,
    "specified": true,
@@ -9779,6 +10330,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.scalar.Scalar52.invert",
@@ -9799,6 +10351,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.reduce",
     "curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -9816,6 +10369,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.read_le_u64_into",
     "curve25519_dalek.scalar.Scalar.non_adjacent_form_loop"]},
@@ -9833,6 +10387,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.non_adjacent_form_loop.mutual"]},
   {"verified": false,
@@ -9849,6 +10404,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -9865,6 +10421,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.unpack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
@@ -9887,6 +10444,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -9902,6 +10460,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -9919,6 +10478,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"]},
   {"verified": true,
@@ -9938,6 +10498,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
     "curve25519_dalek.scalar.Scalar52.montgomery_invert",
@@ -9959,6 +10520,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
@@ -9978,6 +10540,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"]},
@@ -9996,6 +10559,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop.mutual"]},
   {"verified": false,
@@ -10013,6 +10577,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square"]},
   {"verified": true,
@@ -10032,6 +10597,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"]},
   {"verified": true,
@@ -10049,6 +10615,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -10063,6 +10630,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.read_le_u64_into_loop"]},
   {"verified": false,
    "specified": false,
@@ -10077,6 +10645,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -10092,6 +10661,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -10107,6 +10677,7 @@
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": ["curve25519_dalek.window.LookupTable.select_loop"]},
   {"verified": false,
    "specified": false,
@@ -10122,6 +10693,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": false,
    "specified": false,
@@ -10138,6 +10710,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop"]},
@@ -10156,6 +10729,7 @@
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended",

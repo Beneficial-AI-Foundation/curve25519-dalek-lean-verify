@@ -17,6 +17,7 @@ export interface ProgressDataPoint {
   timestamp: number
   total: number
   verified: number
+  externally_verified: number
   specified: number
   draft_spec: number
   extracted: number
@@ -67,6 +68,7 @@ function getFileFromCommit(commitHash: string, filepath: string): string | null 
 function countVerificationStatus(csvContent: string | null): {
   total: number
   verified: number
+  externally_verified: number
   specified: number
   draft_spec: number
   extracted: number
@@ -87,9 +89,10 @@ function countVerificationStatus(csvContent: string | null): {
     const draft_spec = records.filter(r => r.verified === 'draft spec').length
     const specified = records.filter(r => r.verified === 'specified').length
     const verified = records.filter(r => r.verified === 'verified').length
+    const externally_verified = records.filter(r => r.verified === 'externally verified').length
     const ai_proveable = records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
 
-    return { total, verified, specified, draft_spec, extracted, ai_proveable }
+    return { total, verified, externally_verified, specified, draft_spec, extracted, ai_proveable }
   } catch (error) {
     console.error('Error parsing CSV:', error)
     return null
@@ -114,6 +117,7 @@ export default {
           timestamp: commit.timestamp,
           total: counts.total,
           verified: counts.verified,
+          externally_verified: counts.externally_verified,
           specified: counts.specified,
           draft_spec: counts.draft_spec,
           extracted: counts.extracted,

@@ -230,6 +230,7 @@ const stats = computed(() => ({
       <select v-model="filters.verified" class="filter-select" @change="currentPage = 1">
         <option value="">All (Status)</option>
         <option value="verified">Verified</option>
+        <option value="externally verified">Ext. Verified</option>
         <option value="specified">Specified</option>
         <option value="draft spec">Draft Spec</option>
         <option value="no-status">No Status</option>
@@ -669,6 +670,10 @@ const stats = computed(() => ({
 .status-icon.checked,
 .status-icon.verified {
   color: #10b981;
+}
+
+.status-icon.externally-verified {
+  color: #6ee7b7;
 }
 
 .status-icon.specified {

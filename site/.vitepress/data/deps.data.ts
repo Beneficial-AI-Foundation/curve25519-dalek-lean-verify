@@ -15,6 +15,7 @@ interface RawFunctionRecord {
   specified: boolean
   verified: boolean
   fully_verified: boolean
+  externally_verified: boolean
   spec_docstring: string | null
   spec_statement: string | null
 }

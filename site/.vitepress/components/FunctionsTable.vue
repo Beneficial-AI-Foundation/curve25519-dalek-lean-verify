@@ -17,7 +17,7 @@ const props = defineProps<{
 const searchQuery = ref('')
 const showHidden = ref(false)
 const showArtifacts = ref(false)
-const statusFilter = ref<'all' | 'verified' | 'specified' | 'unspecified'>('all')
+const statusFilter = ref<'all' | 'verified' | 'externally-verified' | 'specified' | 'unspecified'>('all')
 
 // Sorting state
 const sortKey = ref<'lean_name' | 'rust_name' | 'source' | 'verified'>('lean_name')
@@ -50,8 +50,10 @@ const filteredFunctions = computed(() => {
   // Status filter
   if (statusFilter.value === 'verified') {
     result = result.filter(fn => fn.verified)
+  } else if (statusFilter.value === 'externally-verified') {
+    result = result.filter(fn => fn.externally_verified && !fn.verified)
   } else if (statusFilter.value === 'specified') {
-    result = result.filter(fn => fn.specified && !fn.verified)
+    result = result.filter(fn => fn.specified && !fn.verified && !fn.externally_verified)
   } else if (statusFilter.value === 'unspecified') {
     result = result.filter(fn => !fn.specified)
   }
@@ -85,8 +87,8 @@ const filteredFunctions = computed(() => {
         bVal = b.source ?? ''
         break
       case 'verified':
-        aVal = a.fully_verified ? 'a' : a.verified ? 'b' : a.specified ? 'c' : 'd'
-        bVal = b.fully_verified ? 'a' : b.verified ? 'b' : b.specified ? 'c' : 'd'
+        aVal = a.fully_verified ? 'a' : a.verified ? 'b' : a.externally_verified ? 'c' : a.specified ? 'd' : 'e'
+        bVal = b.fully_verified ? 'a' : b.verified ? 'b' : b.externally_verified ? 'c' : b.specified ? 'd' : 'e'
         break
     }
 
@@ -115,6 +117,7 @@ const stats = computed(() => {
     total: relevant.length,
     verified: relevant.filter(fn => fn.verified).length,
     fullyVerified: relevant.filter(fn => fn.fully_verified).length,
+    externallyVerified: relevant.filter(fn => fn.externally_verified && !fn.verified).length,
     specified: relevant.filter(fn => fn.specified).length,
     unspecified: relevant.filter(fn => !fn.specified).length
   }
@@ -138,6 +141,7 @@ function getSortIndicator(key: typeof sortKey.value) {
 // Map FunctionRecord status to the format expected by useStatusFormatting
 function getStatusString(fn: FunctionRecord): string {
   if (fn.verified) return 'verified'
+  if (fn.externally_verified) return 'externally verified'
   if (fn.specified) return 'specified'
   return ''
 }
@@ -189,7 +193,9 @@ watch(selectedFunction, async (fn) => {
       <span class="stat-sep">|</span>
       <span class="stat-verified"><strong>{{ stats.verified }}</strong> verified</span>
       <span class="stat-sep">|</span>
-      <span class="stat-specified"><strong>{{ stats.specified - stats.verified }}</strong> specified only</span>
+      <span class="stat-ext-verified"><strong>{{ stats.externallyVerified }}</strong> ext. verified</span>
+      <span class="stat-sep">|</span>
+      <span class="stat-specified"><strong>{{ stats.specified - stats.verified - stats.externallyVerified }}</strong> specified only</span>
       <span class="stat-sep">|</span>
       <span class="stat-unspecified"><strong>{{ stats.unspecified }}</strong> unspecified</span>
     </div>
@@ -205,6 +211,7 @@ watch(selectedFunction, async (fn) => {
       <select v-model="statusFilter" class="filter-select">
         <option value="all">All Status</option>
         <option value="verified">Verified</option>
+        <option value="externally-verified">Ext. Verified</option>
         <option value="specified">Specified (not verified)</option>
         <option value="unspecified">Unspecified</option>
       </select>
@@ -382,6 +389,7 @@ watch(selectedFunction, async (fn) => {
 }
 
 .stat-verified { color: var(--vp-c-green-1); }
+.stat-ext-verified { color: #6ee7b7; }
 .stat-specified { color: var(--vp-c-yellow-1); }
 .stat-unspecified { color: var(--vp-c-text-2); }
 
@@ -551,6 +559,10 @@ watch(selectedFunction, async (fn) => {
 .status-icon.checked,
 .status-icon.verified {
   color: #10b981;
+}
+
+.status-icon.externally-verified {
+  color: #6ee7b7;
 }
 
 .status-icon.specified {
