@@ -83,9 +83,10 @@ function isExpanded(nodeId: string): boolean {
 // Get status color
 function getStatusColor(node: GraphNode): string {
   switch (node.status) {
-    case 'fully_verified':
     case 'verified':
       return '#22c55e'
+    case 'externally_verified':
+      return '#6ee7b7'
     case 'specified':
       return '#f59e0b'
     default:
@@ -96,10 +97,10 @@ function getStatusColor(node: GraphNode): string {
 // Get status label
 function getStatusLabel(node: GraphNode): string {
   switch (node.status) {
-    case 'fully_verified':
-      return 'Fully Verified'
     case 'verified':
       return 'Verified'
+    case 'externally_verified':
+      return 'Ext. Verified'
     case 'specified':
       return 'Specified'
     default:

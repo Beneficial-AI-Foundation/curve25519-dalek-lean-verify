@@ -2,7 +2,7 @@
 
 // ============ Node Types ============
 
-export type NodeStatus = 'fully_verified' | 'verified' | 'specified' | 'none'
+export type NodeStatus = 'verified' | 'externally_verified' | 'specified' | 'none'
 
 export interface GraphNode {
   id: string                      // lean_name

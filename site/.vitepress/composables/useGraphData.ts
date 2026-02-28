@@ -58,8 +58,8 @@ function computeTransitiveDependencies(
  * Get the verification status of a function
  */
 function getNodeStatus(func: FunctionRecord): NodeStatus {
-  if (func.fully_verified) return 'fully_verified'
   if (func.verified) return 'verified'
+  if (func.externally_verified) return 'externally_verified'
   if (func.specified) return 'specified'
   return 'none'
 }
@@ -127,7 +127,7 @@ export function useGraphData(rawFunctions: Ref<FunctionRecord[]>) {
         sourceFile: func.source,
         lines: func.lines,
         status: getNodeStatus(func),
-        fullyVerified: func.fully_verified,
+        fullyVerified: func.verified,
         specStatement: func.spec_statement,
         specDocstring: func.spec_docstring,
         rustName: func.rust_name,
@@ -256,12 +256,12 @@ function computeStats(
 
     fileStats.total++
 
-    if (node.status === 'fully_verified') {
-      fullyVerified++
+    if (node.status === 'verified') {
       verified++
-      fileStats.fullyVerified++
+      fullyVerified++
       fileStats.verified++
-    } else if (node.status === 'verified') {
+      fileStats.fullyVerified++
+    } else if (node.status === 'externally_verified') {
       verified++
       fileStats.verified++
     } else if (node.status === 'specified') {

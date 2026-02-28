@@ -343,7 +343,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   private getEdgeColor(nodes: GraphNode[], targetId: string): string {
     const target = nodes.find(n => n.id === targetId)
-    if (target && (target.status === 'verified' || target.status === 'fully_verified')) {
+    if (target && (target.status === 'verified' || target.status === 'externally_verified')) {
       return edgeColors.verified
     }
     return edgeColors.default
