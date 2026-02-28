@@ -728,7 +728,7 @@ lemma bytes_mod255 (bytes : Array U8 32#usize) :(U8x32_as_Nat bytes % 2^255) =
     pow_one]
   simp_all only [Nat.reducePow, U8.val_mod_size_eq', U8x32_as_Nat, Array.getElem!_Nat_eq,
     List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton,
-    mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos,
+    mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
     Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
     Nat.lt_add_one]
   rw [← Nat.ModEq, Nat.modEq_iff_dvd]
@@ -785,7 +785,7 @@ lemma bytes_mod_lt (bytes : Array U8 32#usize) :
   have := Nat.mul_le_mul_left (2 ^ (8 * 31)) this
   have := Nat.add_le_add (Nat.le_pred_of_lt sum) this
   simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reduceMul,
-    List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem!_pos, Nat.pred_eq_sub_one,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Nat.pred_eq_sub_one,
     Nat.add_one_sub_one] at this
   simp only [gt_iff_lt]
   grind
@@ -877,7 +877,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     pow_zero, List.length_cons, List.length_nil, Nat.reduceAdd, Nat.ofNat_pos, getElem?_pos,
     List.getElem_cons_zero, Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat,
     List.getElem_cons_succ, Nat.reduceMul, Nat.reduceLT, Nat.lt_add_one, List.Vector.length_val,
-    UScalar.ofNat_val_eq, pow_one]
+    UScalar.ofNatCore_val_eq, pow_one]
   have := land_pow_two_sub_one_eq_mod i1 51
   simp only [Nat.reducePow, Nat.add_one_sub_one] at this
   rw [this]
@@ -948,7 +948,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (8+i) / 8 = 1 := by scalar_tac
      have mod8' : (8 + i ) % 8 = i % 8 := by simp only [Nat.add_mod_left]
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.one_lt_ofNat, getElem?_pos,
+     simp only [div8, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.one_lt_ofNat, getElem?_pos,
        Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow ((i1.val % 2^ 51) >>> 8) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -971,7 +971,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (16+i) / 8 = 2 := by scalar_tac
      have mod8' : (16 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos,
+     simp only [div8, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos,
        Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow ((i1.val % 2^ 51) >>> 16) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -980,7 +980,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp only [Nat.reducePow, this, decide_true, Bool.true_and] at mod_pow2
      simp_all only [Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
    · scalar_tac
@@ -993,7 +993,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (24 +i) / 8 = 3 := by scalar_tac
      have mod8' : (24 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos,
+     simp only [div8, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos,
        Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow ((i1.val % 2^ 51) >>> 24) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1002,7 +1002,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp only [Nat.reducePow, this, decide_true, Bool.true_and] at mod_pow2
      simp_all only [Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
    · scalar_tac
@@ -1015,7 +1015,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (32 +i) / 8 = 4 := by scalar_tac
      have mod8' : (32 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos,
+     simp only [div8, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos,
        Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow ((i1.val % 2^ 51) >>> 32) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1024,7 +1024,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp only [Nat.reducePow, this, decide_true, Bool.true_and] at mod_pow2
      simp_all only [Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
    · scalar_tac
@@ -1037,7 +1037,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (40 +i) / 8 = 5 := by scalar_tac
      have mod8' : (40 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos,
+     simp only [div8, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos,
        Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow ((i1.val % 2^ 51) >>> 40) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1046,7 +1046,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp only [Nat.reducePow, this, decide_true, Bool.true_and] at mod_pow2
      simp_all only [Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt, Nat.succ_eq_add_one,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
    · scalar_tac
@@ -1056,7 +1056,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := i1_post 48 (by simp only [Nat.reduceLT])
      have := Nat.testBit_mod_two_pow (i1.val) 51 48
      simp_all only [Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
-       Nat.reduceLT, decide_true, Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq,
+       Nat.reduceLT, decide_true, Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq,
        getElem?_pos, Option.getD_some, Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq61: ((i1.val % 2 ^ 51) >>> 48 >>> 1) % 2 = ((bytes.val[6]).val >>> 1) %2 := by
      have := Nat.toNat_testBit ((i1.val % 2 ^ 51) >>> 48 >>> 1) 0
@@ -1065,7 +1065,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i1.val) 51 49
      simp_all only [Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq62: ((i1.val % 2 ^ 51) >>> 48 >>> 2) % 2 = ((bytes.val[6]).val >>> 2) %2 := by
      have := Nat.toNat_testBit ((i1.val % 2 ^ 51) >>> 48 >>> 2) 0
@@ -1074,7 +1074,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i1.val) 51 50
      simp_all only [Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.lt_add_one, decide_true, Nat.reduceLT,
-       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some,
+       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eqi1:= powTwo_block_split_51 i1.val
   rw[eq0, eq1, eq2, eq3, eq4, eq5, eq60, eq61, eq62] at eqi1
@@ -1094,7 +1094,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := i3_post 3 (by simp only [Nat.reduceLT])
      simp_all only [Nat.reducePow, Nat.testBit_zero, Nat.reduceDvd, Nat.mod_mod_of_dvd,
        Nat.decide_shiftRight_mod_two_eq_one, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        pow_zero, Nat.div_one, pow_one]
   have eq64: (((i3.val >>>3) % 2 ^51)   >>> 1 )% 2 ^1 = ((bytes.val[6].val)>>>4)%2 := by
      have := i3_post 4 (by simp only [Nat.reduceLT])
@@ -1104,7 +1104,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i3.val >>>3) % 2^51)   >>>1) 0
      have := Nat.toNat_testBit ((bytes.val[6].val)>>>4) 0
      simp_all only [pow_one, Nat.reduceLT, Nat.reduceDiv, add_zero, List.Vector.length_val,
-       UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
+       UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq65: (((i3.val >>>3) % 2 ^51)   >>> 2 )% 2 ^1 = ((bytes.val[6].val)>>>5)%2 := by
      have := i3_post 5 (by simp only [Nat.reduceLT])
@@ -1114,7 +1114,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i3.val >>>3) % 2^51)   >>>2) 0
      have := Nat.toNat_testBit ((bytes.val[6].val)>>>5) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq66: (((i3.val >>>3) % 2 ^51)   >>> 3 )% 2 ^1 = ((bytes.val[6].val)>>> 6)%2 := by
      have := i3_post 6 (by simp only [Nat.reduceLT])
@@ -1124,7 +1124,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i3.val >>>3) % 2^51)   >>>3) 0
      have := Nat.toNat_testBit ((bytes.val[6].val)>>>6) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq67: (((i3.val >>>3) % 2 ^51)   >>> 4 )% 2 ^1 = ((bytes.val[6].val)>>> 7)%2 := by
      have := i3_post 7 (by simp only [Nat.reduceLT])
@@ -1134,7 +1134,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i3.val >>>3) % 2^51)   >>> 4) 0
      have := Nat.toNat_testBit ((bytes.val[6].val)>>> 7) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq1: ((i3.val >>>3) % 2^ 51) >>> 5 % 2 ^ 8 = (bytes.val[7]).val := by
    apply eq_of_testBit_eq
@@ -1145,7 +1145,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (8+i) / 8 = 1 := by scalar_tac
      have mod8' : (8 + i ) % 8 = i % 8 := by simp only [Nat.add_mod_left]
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i3.val >>>3) % 2^ 51) >>> 5) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1169,7 +1169,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (16+i) / 8 = 2 := by scalar_tac
      have mod8' : (16 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i3.val >>>3) % 2^ 51) >>> 13) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1179,7 +1179,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 3 + (13 + i) = 16 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1193,7 +1193,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (24+i) / 8 = 3 := by scalar_tac
      have mod8' : (24 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i3.val >>>3) % 2^ 51) >>> 21) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1203,7 +1203,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 3 + (21 + i) = 24 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1217,7 +1217,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (32+i) / 8 = 4 := by scalar_tac
      have mod8' : (32 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i3.val >>>3) % 2^ 51) >>> 29) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1227,7 +1227,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 3 + (29 + i) = 32 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1241,7 +1241,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (40+i) / 8 = 5 := by scalar_tac
      have mod8' : (40 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i3.val >>>3) % 2^ 51) >>> 37) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1251,7 +1251,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 3 + (37 + i) = 40 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1263,7 +1263,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 45
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.reduceLT, decide_true, Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq121: (((i3.val>>> 3) % 2 ^ 51) >>> 45 >>> 1)%2 = ((bytes.val[12].val) >>> 1)%2 := by
      have := Nat.toNat_testBit (((i3.val >>>3) % 2 ^ 51) >>> 45 >>> 1) 0
@@ -1272,7 +1272,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 46
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq122: (((i3.val>>> 3) % 2 ^ 51) >>> 45 >>> 2)%2 = ((bytes.val[12].val) >>> 2)%2 := by
      have := Nat.toNat_testBit (((i3.val >>>3) % 2 ^ 51) >>> 45 >>> 2) 0
@@ -1281,7 +1281,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 47
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq123: (((i3.val>>> 3) % 2 ^ 51) >>> 45 >>> 3)%2 = ((bytes.val[12].val) >>> 3)%2 := by
      have := Nat.toNat_testBit (((i3.val >>>3) % 2 ^ 51) >>> 45 >>> 3) 0
@@ -1290,7 +1290,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 48
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq124: (((i3.val>>> 3) % 2 ^ 51) >>> 45 >>> 4)%2 = ((bytes.val[12].val) >>> 4)%2 := by
      have := Nat.toNat_testBit (((i3.val >>>3) % 2 ^ 51) >>> 45 >>> 4) 0
@@ -1299,7 +1299,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 49
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq125: (((i3.val>>> 3) % 2 ^ 51) >>> 45 >>> 5)%2 = ((bytes.val[12].val) >>> 5)%2 := by
      have := Nat.toNat_testBit (((i3.val >>>3) % 2 ^ 51) >>> 45 >>> 5) 0
@@ -1308,7 +1308,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i3.val >>>3) 51 50
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.lt_add_one, decide_true, Nat.reduceLT,
-       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some,
+       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eqi3:= powTwo_block_split_51_remain5  (i3.val >>>3)
   have := @powTwo_five_block_split 1 51 (i3.val >>> 3) (by simp only [mul_one, Nat.reduceLT])
@@ -1324,7 +1324,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := i6_post 6 (by simp only [Nat.reduceLT])
      simp_all only [Nat.reducePow, Nat.testBit_zero, Nat.reduceDvd, Nat.mod_mod_of_dvd,
        Nat.decide_shiftRight_mod_two_eq_one, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        pow_zero, Nat.div_one, pow_one]
   have eq127: (((i6.val >>>6) % 2 ^51)   >>> 1 )% 2 ^1 = ((bytes.val[12].val)>>>7)%2 := by
      have := i3_post 7 (by simp only [Nat.reduceLT])
@@ -1334,7 +1334,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i6.val >>>6) % 2^51)   >>>1) 0
      have := Nat.toNat_testBit ((bytes.val[12].val)>>>7) 0
      simp_all only [pow_one, Nat.reduceLT, Nat.reduceDiv, add_zero, List.Vector.length_val,
-       UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ, Nat.reducePow,
+       UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ, Nat.reducePow,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq1: ((i6.val >>>6) % 2^ 51) >>> 2 % 2 ^ 8 = (bytes.val[13]).val := by
    apply eq_of_testBit_eq
@@ -1345,7 +1345,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (8+i) / 8 = 1 := by scalar_tac
      have mod8' : (8 + i ) % 8 = i % 8 := by simp only [Nat.add_mod_left]
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 2) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1369,7 +1369,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (16+i) / 8 = 2 := by scalar_tac
      have mod8' : (16 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 10) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1379,7 +1379,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 6 + (10 + i) = 16 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1393,7 +1393,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (24+i) / 8 = 3 := by scalar_tac
      have mod8' : (24 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 18) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1403,7 +1403,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 6 + (18 + i) = 24 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1417,7 +1417,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (32+i) / 8 = 4 := by scalar_tac
      have mod8' : (32 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 26) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1427,7 +1427,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 6 + (26 + i) = 32 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1441,7 +1441,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (40+i) / 8 = 5 := by scalar_tac
      have mod8' : (40 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 34) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1451,7 +1451,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 6 + (34 + i) = 40 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1465,7 +1465,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (48+i) / 8 = 6 := by scalar_tac
      have mod8' : (48 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i6.val >>>6) % 2^ 51) >>> 42) 8 i
      simp[hi] at mod_pow1
@@ -1475,7 +1475,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 6 + (42 + i) = 48 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1487,7 +1487,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i6.val >>>6) 51 50
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.lt_add_one, decide_true, Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT,
-       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some,
+       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eqi6:= powTwo_block_split_51_remain2  (i6.val >>>6)
   have := @powTwo_two_block_split 1 51 (i6.val >>> 6) (by simp only [mul_one, Nat.reduceLT])
@@ -1503,7 +1503,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := i6_post 9 (by simp only [Nat.reduceLT])
      simp_all only [pow_one, Nat.testBit_zero, dvd_refl, Nat.mod_mod_of_dvd,
        Nat.decide_shiftRight_mod_two_eq_one, Nat.one_lt_ofNat, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT, getElem?_pos, Option.getD_some,
        Nat.one_mod, pow_zero, Nat.div_one, Nat.reduceAdd, Nat.reduceMod]
   have eq192: (((i9.val >>>1) % 2 ^51)   >>> 1 )% 2 ^1 = ((bytes.val[19].val)>>>2)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 1
@@ -1512,7 +1512,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>>1) 0
      have := Nat.toNat_testBit ((bytes.val[19].val)>>>2) 0
      simp_all only [pow_one, Nat.reduceLT, Nat.reduceDiv, add_zero, List.Vector.length_val,
-       UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
+       UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq193: (((i9.val >>>1) % 2 ^51)   >>> 2 )% 2 ^1 = ((bytes.val[19].val)>>>3)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 2
@@ -1521,7 +1521,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>>2) 0
      have := Nat.toNat_testBit ((bytes.val[19].val)>>>3) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq194: (((i9.val >>>1) % 2 ^51)   >>> 3 )% 2 ^1 = ((bytes.val[19].val) >>> 4)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 3
@@ -1530,7 +1530,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>> 3) 0
      have := Nat.toNat_testBit ((bytes.val[19].val) >>> 4) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq195: (((i9.val >>>1) % 2 ^51)   >>> 4 )% 2 ^1 = ((bytes.val[19].val) >>> 5)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 4
@@ -1539,7 +1539,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>> 4) 0
      have := Nat.toNat_testBit ((bytes.val[19].val) >>> 5) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq196: (((i9.val >>>1) % 2 ^51)   >>> 5 )% 2 ^1 = ((bytes.val[19].val) >>> 6)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 5
@@ -1548,7 +1548,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>> 5) 0
      have := Nat.toNat_testBit ((bytes.val[19].val) >>> 6) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq197: (((i9.val >>>1) % 2 ^51)   >>> 6 )% 2 ^1 = ((bytes.val[19].val) >>> 7)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i9.val  >>> 1) 51 6
@@ -1557,7 +1557,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i9.val >>>1) % 2^51)   >>> 6) 0
      have := Nat.toNat_testBit ((bytes.val[19].val) >>> 7) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, add_zero,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.mod_succ,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq1: ((i9.val >>>1) % 2^ 51) >>> 7 % 2 ^ 8 = (bytes.val[20]).val := by
    apply eq_of_testBit_eq
@@ -1568,7 +1568,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (8+i) / 8 = 1 := by scalar_tac
      have mod8' : (8 + i ) % 8 = i % 8 := by simp only [Nat.add_mod_left]
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i9.val >>> 1) % 2^ 51) >>> 7) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1592,7 +1592,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (16 + i) / 8 = 2 := by scalar_tac
      have mod8' : (16 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i9.val >>> 1) % 2^ 51) >>> 15) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1602,7 +1602,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 1 + (15 + i) = 16 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1616,7 +1616,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (24 + i) / 8 = 3 := by scalar_tac
      have mod8' : (24 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i9.val >>> 1) % 2^ 51) >>> 23) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1625,7 +1625,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp[this, (by scalar_tac : 1 + (23 + i)= 24 +i)] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1639,7 +1639,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (32 + i) / 8 = 4 := by scalar_tac
      have mod8' : (32 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i9.val >>> 1) % 2 ^ 51) >>> 31) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1648,7 +1648,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
        Nat.reduceLT])
      simp[this, (by scalar_tac : 1 + (31 + i)= 32 +i)] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1662,7 +1662,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (40 + i) / 8 = 5 := by scalar_tac
      have mod8' : (40 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i9.val >>> 1) % 2 ^ 51) >>> 39) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1672,7 +1672,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 1 + (39 + i) = 40 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1684,7 +1684,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i9.val >>> 1) 51 47
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.reduceLT, decide_true, Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq251: (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 1)%2 = ((bytes.val[25].val) >>> 1)%2 := by
      have := Nat.toNat_testBit (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 1) 0
@@ -1693,7 +1693,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i9.val >>> 1) 51 48
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq252: (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 2)%2 = ((bytes.val[25].val) >>> 2)%2 := by
      have := Nat.toNat_testBit (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 2) 0
@@ -1702,7 +1702,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i9.val >>> 1) 51 49
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Bool.true_and, pow_zero, Nat.div_one]
   have eq253: (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 3)%2 = ((bytes.val[25].val) >>> 3)%2 := by
      have := Nat.toNat_testBit (((i9.val >>> 1) % 2 ^ 51) >>> 47 >>> 3) 0
@@ -1711,7 +1711,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i9.val >>> 1) 51 50
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.lt_add_one, decide_true, Nat.reduceLT,
-       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some,
+       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eqi9:= powTwo_block_split_51_remain7  (i9.val >>> 1)
   have := @powTwo_seven_block_split 1 51 (i9.val >>> 1) (by simp only [mul_one, Nat.reduceLT])
@@ -1728,7 +1728,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := i12_post 9 (by simp only [Nat.reduceLT])
      simp_all only [pow_one, Nat.testBit_zero, dvd_refl, Nat.mod_mod_of_dvd,
        Nat.decide_shiftRight_mod_two_eq_one, Nat.reduceLT, Nat.reduceDiv, Nat.reduceAdd,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        pow_zero, Nat.div_one]
   have eq255: (((i12.val >>> 12) % 2 ^51)   >>> 1 )% 2 ^1 = ((bytes.val[25].val)>>>5)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i12.val  >>> 12) 51 1
@@ -1737,7 +1737,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2^51)   >>> 1) 0
      have := Nat.toNat_testBit ((bytes.val[25].val)>>>5) 0
      simp_all only [pow_one, Nat.reduceLT, Nat.reduceDiv, Nat.reduceAdd, List.Vector.length_val,
-       UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
+       UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod, Nat.reducePow,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq256: (((i12.val >>> 12) % 2 ^51)   >>> 2 )% 2 ^1 = ((bytes.val[25].val)>>> 6)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i12.val  >>> 12) 51 2
@@ -1746,7 +1746,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2^51)   >>> 2) 0
      have := Nat.toNat_testBit ((bytes.val[25].val)>>> 6) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, Nat.reduceAdd,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq257: (((i12.val >>> 12) % 2 ^51)   >>> 3 )% 2 ^1 = ((bytes.val[25].val)>>> 7)%2 := by
      have mod_pow1:= Nat.testBit_mod_two_pow (i12.val  >>> 12) 51 3
@@ -1755,7 +1755,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2^51)   >>> 3) 0
      have := Nat.toNat_testBit ((bytes.val[25].val)>>> 7) 0
      simp_all only [pow_one, Nat.reducePow, Nat.reduceLT, Nat.reduceDiv, Nat.reduceAdd,
-       List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.reduceMod,
        Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one, pow_zero, Nat.div_one]
   have eq1: ((i12.val >>> 12) % 2^ 51) >>> 4 % 2 ^ 8 = (bytes.val[26]).val := by
    apply eq_of_testBit_eq
@@ -1766,7 +1766,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (16+i) / 8 = 2 := by scalar_tac
      have mod8' : (16 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i12.val >>> 12) % 2^ 51) >>> 4) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1776,7 +1776,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 12 + (4 + i) = 16 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1790,7 +1790,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (24+i) / 8 = 3 := by scalar_tac
      have mod8' : (24 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i12.val >>> 12) % 2^ 51) >>> 12) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1800,7 +1800,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 12 + (12 + i) = 24 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1814,7 +1814,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (32+i) / 8 = 4 := by scalar_tac
      have mod8' : (32 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i12.val >>> 12) % 2^ 51) >>> 20) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1824,7 +1824,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 12 + (20 + i) = 32 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1838,7 +1838,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (40+i) / 8 = 5 := by scalar_tac
      have mod8' : (40 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i12.val >>> 12) % 2^ 51) >>> 28) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1848,7 +1848,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 12 + (28 + i) = 40 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1862,7 +1862,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have div8: (48+i) / 8 = 6 := by scalar_tac
      have mod8' : (48 + i ) % 8 = i % 8 := by scalar_tac
      have mod8:= Nat.mod_eq_of_lt hi
-     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+     simp only [div8, Nat.reduceAdd, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some, mod8', mod8] at this
      have mod_pow1:= Nat.testBit_mod_two_pow (((i12.val >>> 12) % 2^ 51) >>> 36) 8 i
      simp only [Nat.reducePow, hi, decide_true, Nat.testBit_shiftRight, Bool.true_and] at mod_pow1
@@ -1872,7 +1872,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      simp only [Nat.reducePow, this, decide_true, Nat.testBit_shiftRight,
        (by scalar_tac : 12 + (36 + i) = 48 + i), Bool.true_and] at mod_pow2
      simp_all only [pow_one, Nat.reducePow, Nat.reduceAdd, Nat.mod_succ_eq_iff_lt,
-       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.reduceLT,
+       Nat.succ_eq_add_one, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLT,
        getElem?_pos, Option.getD_some]
    · apply Nat.mod_lt
      simp only [Nat.reducePow, Nat.ofNat_pos]
@@ -1884,7 +1884,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 44
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.reduceLT, decide_true, Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq311: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 1)%2 = ((bytes.val[31].val) >>> 1)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 1) 0
@@ -1893,7 +1893,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 45
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq312: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 2)%2 = ((bytes.val[31].val) >>> 2)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 2) 0
@@ -1902,7 +1902,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 46
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq313: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 3)%2 = ((bytes.val[31].val) >>> 3)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 3) 0
@@ -1911,7 +1911,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 47
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq314: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 4)%2 = ((bytes.val[31].val) >>> 4)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 4) 0
@@ -1920,7 +1920,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 48
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq315: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 5)%2 = ((bytes.val[31].val) >>> 5)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 5) 0
@@ -1929,7 +1929,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 49
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.reduceLT, decide_true, Nat.reduceDiv,
-       List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
+       List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eq316: (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 6)%2 = ((bytes.val[31].val) >>> 6)%2 := by
      have := Nat.toNat_testBit (((i12.val >>> 12) % 2 ^ 51) >>> 44 >>> 6) 0
@@ -1938,7 +1938,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
      have := Nat.testBit_mod_two_pow (i12.val >>> 12) 51 50
      simp_all only [pow_one, Nat.reducePow, Nat.testBit_zero, Nat.decide_shiftRight_mod_two_eq_one,
        Nat.testBit_shiftRight, Nat.reduceAdd, Nat.lt_add_one, decide_true, Nat.reduceLT,
-       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos, Option.getD_some,
+       Nat.reduceDiv, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
        Nat.reduceMod, Bool.true_and, pow_zero, Nat.div_one]
   have eqi12:= powTwo_block_split_51_remain4  (i12.val >>> 12)
   have := @powTwo_four_block_split 1 51 (i12.val >>> 12) (by simp only [mul_one, Nat.reduceLT])

@@ -105,7 +105,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       · rw [hi1_eq]; exact hL_i
       · decide
     progress as ⟨i2, hi2⟩  -- carry >>> 52
-    have hi2_bound : i2.val < 2 := by simp [hi2]; exact hcarry_shift
+    have hi2_bound : i2.val < 2 := by simpa [hi2] using hcarry_shift
     progress as ⟨i3, hi3⟩  -- self[i]
     have hi3_eq : i3.val = self[i.val]!.val := by simp [hi3]
     have hi3_bound : i3.val < 2 ^ 52 := by rw [hi3_eq]; exact hself_i
@@ -134,7 +134,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       by_cases hjc : j = i.val
       · rw [hjc]
         have := Array.set_of_eq self i5 i (by scalar_tac)
-        simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
+        simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
         simp only [this]
         exact hi5_bound
       · have hne := Array.set_of_ne self i5 j i (by scalar_tac) (by scalar_tac) (by omega)
@@ -179,7 +179,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         simp_all
       have heq_i : (Aeneas.Std.Array.set self i i5)[i.val]!.val = i5.val := by
         have := Array.set_of_eq self i5 i (by scalar_tac)
-        simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
+        simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
         simp_all
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
       interval_cases i.val <;> simp_all <;> omega
@@ -251,8 +251,7 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
   progress*
   rw [constants.L_spec] at *
   refine ⟨by assumption, ?_, ?_, ?_⟩
-  · -- BEGIN TASK
-    -- result < L
+  · -- result < L
     cases Choice.val_cases condition with
     | inl =>
       have : condition = Choice.zero := by cases condition; simp [Choice.zero]; grind
@@ -264,24 +263,19 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
       have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
       simp only [Finset.Ico_self] at *
       grind
-    -- END TASK
-  · -- BEGIN TASK
-    -- condition = Choice.one case
+  · -- condition = Choice.one case
     intro hc
     have : condition.val = 1#u8 := by rw [hc]; rfl
     have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
     have : L < 2 ^ 260 := by unfold L; grind
     simp only [Finset.Ico_self] at *
     grind
-    -- END TASK
-  · -- BEGIN TASK
-    -- condition = Choice.zero case
+  · -- condition = Choice.zero case
     intro hc
     have : condition.val = 0#u8 := by rw [hc]; rfl
     have : Scalar52_as_Nat res.2 + 2 ^ 260 * (res.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
       simp_all
     have : L < 2 ^ 260 := by unfold L; grind
     grind
-    -- END TASK
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
