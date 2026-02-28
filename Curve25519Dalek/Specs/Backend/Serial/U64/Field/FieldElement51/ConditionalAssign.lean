@@ -5,6 +5,8 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
+import Mathlib.Tactic
+
 /-! # ConditionalAssign
 
 Specification for `FieldElement51::conditional_assign`.
@@ -32,23 +34,19 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
   when `choice = Choice.zero`, the result equals `self`.
 -/
 @[progress]
-theorem conditional_assign_spec
-    (self other : backend.serial.u64.field.FieldElement51)
+theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
-    conditional_assign self other choice ⦃ res =>
-      (∀ i < 5,
-        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by
+    conditional_assign self other choice ⦃ (res : FieldElement51) =>
+      (∀ i < 5, res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by
   unfold conditional_assign
   unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
-  unfold U64.Insts.SubtleConditionallySelectable.conditional_select
-  by_cases h : choice.val = 1#u8
-  · simp only [h, ite_true, bind_tc_ok]
+  by_cases hc : choice.val = 1#u8
+  · simp only [hc, reduceIte]
     progress*
-    intro i hi
-    subst_vars
-    simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD]
-    rcases i with _ | _ | _ | _ | _ | n <;> simp_all; omega
-  · simp only [h, ite_false, bind_tc_ok]
+    intro i _
+    interval_cases i <;> simp [*]
+  · simp only [hc, reduceIte]
     progress*
+    simp [*]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
