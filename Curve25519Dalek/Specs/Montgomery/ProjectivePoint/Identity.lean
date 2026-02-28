@@ -8,6 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
 
 /-! # identity
@@ -19,7 +20,7 @@ This function returns the identity element of the Montgomery curve in projective
 **Source**: curve25519-dalek/src/montgomery.rs:L296-L301
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.IdentityMontgomeryProjectivePoint
 
@@ -47,9 +48,10 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.U = ONE ∧ q.W = ZERO) := by
-  unfold identity
-  simp
+    identity ⦃ q =>
+      q.U = (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ]) ∧
+      q.W = Array.repeat 5#usize 0#u64 ⦄ := by
+  unfold identity ONE ZERO
+  progress*
 
 end curve25519_dalek.IdentityMontgomeryProjectivePoint
