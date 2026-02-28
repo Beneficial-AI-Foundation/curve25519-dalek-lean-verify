@@ -15,7 +15,7 @@ This constant represents the multiplicative identity element (1) in the field.
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std.WP Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -33,9 +33,10 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ONE`**:
 - The constant, when converted to a natural number, equals 1
 -/
-@[simp]
-theorem ONE_spec : Field51_as_Nat ONE = 1 := by
-    unfold ONE
-    decide
+@[progress]
+theorem ONE_spec : ONE ⦃ result => Field51_as_Nat result = 1 ⦄ := by
+  unfold ONE from_limbs
+  simp only [spec_ok]
+  decide
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

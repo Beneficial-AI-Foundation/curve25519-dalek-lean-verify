@@ -5,6 +5,8 @@ Authors: Liao Zhang, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
 
 /-! # identity
@@ -16,7 +18,7 @@ This function returns the identity element.
 **Source**: curve25519-dalek/src/edwards.rs:L409-L416
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity
 
@@ -37,9 +39,10 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO) := by
+    identity ⦃ (q : EdwardsPoint) =>
+      Field51_as_Nat q.X = 0 ∧ Field51_as_Nat q.Y = 1 ∧
+      Field51_as_Nat q.Z = 1 ∧ Field51_as_Nat q.T = 0 ⦄ := by
   unfold identity
-  simp
+  progress*
 
 end curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity

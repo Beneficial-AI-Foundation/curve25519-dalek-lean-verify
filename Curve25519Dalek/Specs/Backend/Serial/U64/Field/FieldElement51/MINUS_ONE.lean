@@ -16,7 +16,7 @@ multiplicative identity element in the field. This is congruent to p-1 (mod p) w
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std.WP Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -37,9 +37,10 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.MINUS_ONE`**:
 - The constant, when converted to a natural number, equals 2^255 - 20 (i.e., p - 1)
 -/
-@[simp]
-theorem MINUS_ONE_spec : Field51_as_Nat MINUS_ONE = p - 1 := by
-    unfold MINUS_ONE
+@[progress]
+theorem MINUS_ONE_spec : MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by
+    unfold MINUS_ONE from_limbs
+    simp only [spec_ok];
     decide
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
