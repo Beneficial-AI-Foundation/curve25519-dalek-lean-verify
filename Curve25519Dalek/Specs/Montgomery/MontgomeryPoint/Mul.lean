@@ -8,6 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
 /-! # Spec Theorem for `MontgomeryPoint::mul`
 
 Specification and proof for
@@ -65,6 +66,7 @@ theorem mul_loop_spec
     (scalar_bytes : Array U8 32#usize)
     (prev_bit : Bool)
     (i : Isize)
+    (h : affine_u.IsValid)
     (idx0W : x0.W = backend.serial.u64.field.FieldElement51.ZERO)
     (idx1W : x1.W = backend.serial.u64.field.FieldElement51.ONE)
     (idx0U : x0.U = backend.serial.u64.field.FieldElement51.ONE)
@@ -80,6 +82,10 @@ theorem mul_loop_spec
       let u_out := res.2.1.U.toField
       let w_out := res.2.1.W.toField
       let u_ord := u_out/w_out
+      res.2.1.U.IsValid ∧
+      res.2.1.W.IsValid ∧
+      res.1.U.IsValid ∧
+      res.1.W.IsValid ∧
       w_out ≠ 0 ∧
       MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧
     (res.2.2 = false →
@@ -92,6 +98,10 @@ theorem mul_loop_spec
       let u_out := res.1.U.toField
       let w_out := res.1.W.toField
       let u_ord := u_out/w_out
+      res.2.1.U.IsValid ∧
+      res.2.1.W.IsValid ∧
+      res.1.U.IsValid ∧
+      res.1.W.IsValid ∧
       w_out ≠ 0 ∧
       MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄
     := by
@@ -129,14 +139,6 @@ theorem mul_loop_spec
     executed is independent of the scalar bit values (only conditional swaps and
     unconditional arithmetic operations are performed)
 -/
-
-@[progress]
-theorem as_affine_spec (self : montgomery.ProjectivePoint)
-    (h_valid : self.W.toField ≠ 0) :
-    montgomery.ProjectivePoint.as_affine self ⦃ res =>
-    ((U8x32_as_Nat res % 2^ 255) :ℕ ) = self.U.toField  / self.W.toField ⦄ := by
-    sorry
-
 lemma aux_eq_mul (scalar : scalar.Scalar) : U8x32_as_Nat scalar.bytes =
 (∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
         2 ^ (8 * ((254 :ℤ ) / 8).toNat) * ((scalar.bytes[((254 :ℤ )/ 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) ))
@@ -225,7 +227,6 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     progress as ⟨ s, hs, hsb⟩
     progress as ⟨ c, ct, cf⟩
     progress as ⟨ y, hy⟩
-    set m:= (U8x32_as_Nat scalar.bytes) % 2^254 with hm
     by_cases h: c.2.2 = true
     · simp_all only [Nat.reducePow, forall_const, Bool.true_eq_false, IsEmpty.forall_iff, Bool.toNat_true, Nat.not_eq, UScalar.ofNat_val_eq, ne_eq,
     one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self,
@@ -235,8 +236,11 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
         unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap  zeroize.Zeroize.Blanket.zeroize
         simp only [↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
         progress*
+        have eq1:= Nat.mod_eq_of_lt res_post_2
+        have := curve25519_dalek.montgomery.ProjectivePoint.bytesToField_eq_cast res
+        rw[this, ← eq1] at res_post_1
         unfold MontgomeryPoint.mkPoint
-        rw[ res_post, ct.right]
+        rw[res_post_1, ct.right.right.right.right.right]
         have := aux_eq_mod_mul scalar
         rw[← this]
         have : false.toNat =0 := by decide
@@ -264,8 +268,11 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
       bind_tc_ok]
       progress*
+      have eq1:= Nat.mod_eq_of_lt res_post_2
+      have := curve25519_dalek.montgomery.ProjectivePoint.bytesToField_eq_cast res
+      rw[this, ← eq1] at res_post_1
       unfold MontgomeryPoint.mkPoint
-      rw[ res_post, cf.right]
+      rw[ res_post_1, cf.right.right.right.right.right]
       have := aux_eq_mod_mul scalar
       simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
       Nat.reduceMul, List.Vector.length_val, UScalar.ofNat_val_eq, Nat.lt_add_one, getElem!_pos, Int.reduceMod, Nat.reduceAdd, Nat.reducePow] at this
