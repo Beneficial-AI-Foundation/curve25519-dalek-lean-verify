@@ -58,22 +58,31 @@ const dragState = ref<{
 
 // Cache of highlighted code per node
 const highlightedSpecs = ref<Map<string, string>>(new Map())
+const highlightedRust = ref<Map<string, string>>(new Map())
 
 // Track which panels are expanded (showing full details)
 const expandedPanels = ref<Set<string>>(new Set())
 
-// Highlight spec statements for selected nodes
+// Highlight spec statements and Rust source for selected nodes
 watch(() => props.selectedNodes, async (nodes) => {
   for (const node of nodes) {
     if (node.specStatement && !highlightedSpecs.value.has(node.id)) {
       const html = await highlightCode(node.specStatement, 'lean4')
       highlightedSpecs.value.set(node.id, html)
     }
+    if (node.rustSource && !highlightedRust.value.has(node.id)) {
+      const html = await highlightCode(node.rustSource, 'rust')
+      highlightedRust.value.set(node.id, html)
+    }
   }
 }, { immediate: true, deep: true })
 
 function getHighlightedSpec(nodeId: string): string | undefined {
   return highlightedSpecs.value.get(nodeId)
+}
+
+function getHighlightedRust(nodeId: string): string | undefined {
+  return highlightedRust.value.get(nodeId)
 }
 
 function toggleExpanded(nodeId: string) {
@@ -116,6 +125,37 @@ function getStatusLabel(node: GraphNode): string {
     default:
       return 'Not Specified'
   }
+}
+
+// Strip Lean docstring delimiters and convert basic markdown to HTML
+function formatDocstring(raw: string): string {
+  let text = raw.trim()
+  // Strip /-- and -/ delimiters
+  if (text.startsWith('/--')) text = text.slice(3)
+  if (text.endsWith('-/')) text = text.slice(0, -2)
+  text = text.trim()
+  // Escape HTML
+  text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  // Convert **bold**
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  // Convert `code`
+  text = text.replace(/`([^`]+)`/g, '<code>$1</code>')
+  // Split into lines and build HTML
+  const lines = text.split('\n')
+  let html = ''
+  let inList = false
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (trimmed.startsWith('- ')) {
+      if (!inList) { html += '<ul>'; inList = true }
+      html += `<li>${trimmed.slice(2)}</li>`
+    } else {
+      if (inList) { html += '</ul>'; inList = false }
+      if (trimmed) html += `<p>${trimmed}</p>`
+    }
+  }
+  if (inList) html += '</ul>'
+  return html
 }
 
 // Copy to clipboard
@@ -345,19 +385,6 @@ onMounted(() => {
           <span class="panel-title" :title="node.id">{{ node.label }}</span>
         </div>
         <div class="panel-actions" @pointerdown.stop>
-          <a
-            v-if="node.sourceFile"
-            class="panel-btn source-link"
-            :href="getSourceLink(node.sourceFile, node.lines || '')"
-            target="_blank"
-            :title="node.sourceFile.split('/').pop() + (node.lines ? ' ' + node.lines : '')"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
-              <polyline points="15 3 21 3 21 9"/>
-              <line x1="10" y1="14" x2="21" y2="3"/>
-            </svg>
-          </a>
           <button
             class="panel-btn"
             @click="emit('focusOn', node.id)"
@@ -381,70 +408,78 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Spec statement (always visible when present) -->
-      <div v-if="node.specStatement" class="spec-section">
-        <div
-          v-if="getHighlightedSpec(node.id)"
-          class="spec-code-highlighted"
-          v-html="getHighlightedSpec(node.id)"
-        ></div>
-        <pre v-else class="spec-code">{{ node.specStatement }}</pre>
-      </div>
-      <div v-else class="no-spec">
-        <span class="no-spec-text">{{ getStatusLabel(node) }}</span>
-      </div>
-
-      <!-- Expanded details -->
-      <div v-if="isExpanded(node.id)" class="panel-details">
-        <!-- Full name -->
-        <div class="info-row">
-          <span class="info-label">Name:</span>
-          <code class="info-value name-value" @click="copyToClipboard(node.id)" title="Click to copy">
-            {{ node.fullLabel }}
-          </code>
+      <!-- Scrollable panel body -->
+      <div class="panel-body">
+        <!-- Spec statement (always visible when present) -->
+        <div v-if="node.specStatement" class="spec-section">
+          <div
+            v-if="getHighlightedSpec(node.id)"
+            class="spec-code-highlighted"
+            v-html="getHighlightedSpec(node.id)"
+          ></div>
+          <pre v-else class="spec-code">{{ node.specStatement }}</pre>
+        </div>
+        <div v-else class="no-spec">
+          <span class="no-spec-text">{{ getStatusLabel(node) }}</span>
         </div>
 
-        <!-- Source file -->
-        <div v-if="node.sourceFile" class="info-row">
-          <span class="info-label">Source:</span>
-          <a
-            :href="getSourceLink(node.sourceFile, node.lines || '')"
-            target="_blank"
-            class="info-link"
+        <!-- Expanded details -->
+        <div v-if="isExpanded(node.id)" class="panel-details">
+          <!-- Full name -->
+          <div class="info-row">
+            <span class="info-label">Name:</span>
+            <code class="info-value name-value" @click="copyToClipboard(node.id)" title="Click to copy">
+              {{ node.fullLabel }}
+            </code>
+          </div>
+
+          <!-- Source file -->
+          <div v-if="node.sourceFile" class="info-row">
+            <span class="info-label">Source:</span>
+            <a
+              :href="getSourceLink(node.sourceFile, node.lines || '')"
+              target="_blank"
+              class="info-link"
+            >
+              {{ node.sourceFile.split('/').pop() }}
+              <span v-if="node.lines" class="lines-badge">{{ node.lines }}</span>
+            </a>
+          </div>
+
+          <!-- Rust source code -->
+          <div v-if="node.rustSource" class="rust-source-section">
+            <div class="section-label">Rust source</div>
+            <div
+              v-if="getHighlightedRust(node.id)"
+              class="spec-code-highlighted"
+              v-html="getHighlightedRust(node.id)"
+            ></div>
+            <pre v-else class="spec-code">{{ node.rustSource }}</pre>
+          </div>
+
+          <!-- Spec docstring -->
+          <div v-if="node.specDocstring" class="docstring-section">
+            <div class="docstring" v-html="formatDocstring(node.specDocstring)"></div>
+          </div>
+        </div>
+
+        <!-- Expand hint -->
+        <div class="expand-hint" @click="toggleExpanded(node.id)">
+          <span v-if="!isExpanded(node.id)">Details</span>
+          <span v-else>Hide details</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            :class="{ rotated: isExpanded(node.id) }"
           >
-            {{ node.sourceFile.split('/').pop() }}
-            <span v-if="node.lines" class="lines-badge">{{ node.lines }}</span>
-          </a>
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
         </div>
-
-        <!-- Dependencies/Dependents -->
-        <div class="info-row">
-          <span class="info-label">Deps:</span>
-          <span class="info-value">{{ node.dependencies.length }} in / {{ node.dependents.length }} out</span>
-        </div>
-
-        <!-- Spec docstring -->
-        <div v-if="node.specDocstring" class="docstring-section">
-          <p class="docstring">{{ node.specDocstring }}</p>
-        </div>
-      </div>
-
-      <!-- Expand hint -->
-      <div class="expand-hint" @click="toggleExpanded(node.id)">
-        <span v-if="!isExpanded(node.id)">Details</span>
-        <span v-else>Hide details</span>
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          width="10"
-          height="10"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          :class="{ rotated: isExpanded(node.id) }"
-        >
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
       </div>
     </div>
   </div>
@@ -507,6 +542,18 @@ onMounted(() => {
   overflow: hidden;
   pointer-events: auto;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  resize: both;
+  min-width: 280px;
+  min-height: 100px;
+  max-height: 80vh;
+}
+
+.panel-body {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
 }
 
 .panel-header {
@@ -518,6 +565,7 @@ onMounted(() => {
   cursor: grab;
   user-select: none;
   touch-action: none;
+  flex-shrink: 0;
 }
 
 .panel-header:active {
@@ -575,14 +623,6 @@ onMounted(() => {
   color: #ef4444;
 }
 
-.panel-btn.source-link {
-  text-decoration: none;
-}
-
-.panel-btn.source-link:hover {
-  color: var(--vp-c-brand-1);
-}
-
 /* Spec section - always visible */
 .spec-section {
   padding: 0.5rem;
@@ -597,7 +637,6 @@ onMounted(() => {
   border: 1px solid var(--vp-c-divider);
   border-radius: 4px;
   overflow-x: auto;
-  max-height: 150px;
   margin: 0;
   white-space: pre;
   color: var(--vp-c-text-1);
@@ -608,7 +647,6 @@ onMounted(() => {
   font-size: 0.6875rem;
   line-height: 1.4;
   overflow-x: auto;
-  max-height: 150px;
   border-radius: 4px;
   border: 1px solid var(--vp-c-divider);
 }
@@ -645,6 +683,17 @@ onMounted(() => {
   font-size: 0.6875rem;
   color: var(--vp-c-text-3);
   font-style: italic;
+}
+
+/* Rust source section in details */
+.rust-source-section {
+  margin-bottom: 0.5rem;
+}
+
+.section-label {
+  font-size: 0.6875rem;
+  color: var(--vp-c-text-3);
+  margin-bottom: 0.25rem;
 }
 
 /* Expanded details */
@@ -723,9 +772,36 @@ onMounted(() => {
 .docstring {
   font-size: 0.6875rem;
   color: var(--vp-c-text-2);
-  line-height: 1.4;
-  margin: 0;
-  font-style: italic;
+  line-height: 1.5;
+}
+
+.docstring :deep(p) {
+  margin: 0 0 0.25rem;
+}
+
+.docstring :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.docstring :deep(ul) {
+  margin: 0.25rem 0;
+  padding-left: 1.25rem;
+}
+
+.docstring :deep(li) {
+  margin-bottom: 0.125rem;
+}
+
+.docstring :deep(code) {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.625rem;
+  padding: 0.0625rem 0.25rem;
+  background: var(--vp-c-bg);
+  border-radius: 2px;
+}
+
+.docstring :deep(strong) {
+  color: var(--vp-c-text-1);
 }
 
 /* Expand hint */

@@ -18,6 +18,7 @@ interface RawFunctionRecord {
   externally_verified: boolean
   spec_docstring: string | null
   spec_statement: string | null
+  rust_source: string | null
 }
 
 // Extended record with computed dependents field

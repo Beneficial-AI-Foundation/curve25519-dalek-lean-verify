@@ -15,6 +15,7 @@ export interface GraphNode {
   specStatement: string | null
   specDocstring: string | null
   rustName: string | null
+  rustSource: string | null         // actual Rust source code
   originalDependencies: string[]  // before transitive calculation
   dependencies: string[]          // after transitive calculation (visible deps only)
   dependents: string[]            // computed reverse deps (visible only)

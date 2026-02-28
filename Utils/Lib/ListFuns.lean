@@ -127,6 +127,17 @@ def gatherRawData (env : Environment) (name : Name) : IO RawFunctionData := do
     | .error _ => #[]
   return { name, docInfo, rawDeps, isExtractionArtifact := isArtifact, isHidden := hidden }
 
+/-- Read Rust source code lines from a file given path and line range -/
+def getRustSourceCode (source : String) (lineStart lineEnd : Nat) : IO (Option String) := do
+  let filePath : System.FilePath := source
+  if !(← filePath.pathExists) then return none
+  let contents ← IO.FS.readFile filePath
+  let lines := contents.splitOn "\n"
+  if lineStart == 0 || lineEnd == 0 || lineStart > lines.length then return none
+  let relevantLines := lines.toArray.extract (lineStart - 1) lineEnd
+  if relevantLines.isEmpty then return none
+  return some (String.intercalate "\n" relevantLines.toList)
+
 /-- Build a complete FunctionRecord from raw data -/
 def buildFunctionRecord
     (env : Environment)
@@ -141,6 +152,9 @@ def buildFunctionRecord
   let filteredDeps := rawData.rawDeps.filter (relevantNames.contains ·)
   let isRelevant := isRelevantSource docInfo.source crate
   let specParts ← getSpecParts env rawData.name
+  let rustSource ← match docInfo.source, docInfo.lineStart, docInfo.lineEnd with
+    | some src, some s, some e => getRustSourceCode src s e
+    | _, _, _ => pure none
   return {
     leanName := rawData.name
     rustName := docInfo.rustName
@@ -157,6 +171,7 @@ def buildFunctionRecord
     specFilePath := getSpecFilePath env rawData.name
     specDocstring := specParts.docstring
     specStatement := specParts.statement
+    rustSourceCode := rustSource
   }
 
 /-- Main pipeline: build all FunctionRecords from a module -/
