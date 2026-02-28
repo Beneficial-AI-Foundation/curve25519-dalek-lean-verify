@@ -47,33 +47,12 @@ theorem m_spec (x y : U64) :
     r.val = x.val * y.val ⦄ := by
   unfold mul.m
   progress*
-  have : x.val < 2 ^64 := by scalar_tac
-  have i_lt: i.val < 2^ 64 := by
-    rw[i_post, UScalar.cast_val_eq, UScalarTy.numBits]
-    have : x.val < 2 ^ 128 := by scalar_tac
-    have := Nat.mod_eq_of_lt this
-    rw[this]
-    scalar_tac
-  have : y.val < 2 ^64 := by scalar_tac
-  have i1_lt: i1.val < 2^ 64 := by
-    rw[i1_post, UScalar.cast_val_eq, UScalarTy.numBits]
-    have : y.val < 2 ^ 128 := by scalar_tac
-    have := Nat.mod_eq_of_lt this
-    rw[this]
-    scalar_tac
-  have := Nat.mul_lt_mul'' i_lt i1_lt
-  scalar_tac
 
-
-
-lemma LOW_51_BIT_MASK_spec : mul.LOW_51_BIT_MASK.val = 2^ 51 -1 := by
+@[progress]
+theorem LOW_51_BIT_MASK_spec :
+    mul.LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
   unfold mul.LOW_51_BIT_MASK
-  decide
-
-
-
-
-
+  progress*
 
 lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
   (a0 +
@@ -160,40 +139,38 @@ set_option maxHeartbeats 10000000000 in
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
     mul lhs rhs ⦃ r =>
-    Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
+      Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
+      (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
   progress*
-  · -- BEGIN TASK
-    expand hrhs with 5; expand hlhs with 5; simp [*];
-    have := Nat.mul_lt_mul_of_pos_right hrhs_1 (by simp : 19 > 0)
-    simp at this
-    apply le_trans (le_of_lt this)
-    scalar_tac
-    -- END TASK
-  ·-- BEGIN TASK
-    expand hrhs with 5; expand hlhs with 5; simp [*];
+  · sorry
+  · sorry
+  · sorry
+  constructor
+  · -- ⊢ Field51_as_Nat out8 ≡ Field51_as_Nat lhs * Field51_as_Nat rhs [MOD p]
+    sorry
+  · -- ⊢ ∀ i < 5, ↑out8[i]! < 2 ^ 52
+    sorry
+
+  -- ideas for closing these 5 sorry from the commented out proof below
+
+/-
+  · expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_2 (by simp : 19 > 0)
     simp at this
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand hrhs with 5; expand hlhs with 5; simp [*];
+  · expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_3 (by simp : 19 > 0)
     simp at this
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand hrhs with 5; expand hlhs with 5; simp [*];
+  · expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_4 (by simp : 19 > 0)
     simp at this
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_1 (by simp : 19 > 0)
     have eq1:= Nat.mul_lt_mul'' hlhs_4 this
@@ -201,9 +178,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add eq2 eq1
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_1 (by simp : 19 > 0)
     have eq1:= Nat.mul_lt_mul'' hlhs_4 this
@@ -214,9 +189,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq3
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_1 (by simp : 19 > 0)
     have eq1:= Nat.mul_lt_mul'' hlhs_4 this
@@ -230,9 +203,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq4
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have := Nat.mul_lt_mul_of_pos_right hrhs_1 (by simp : 19 > 0)
     have eq1:= Nat.mul_lt_mul'' hlhs_4 this
@@ -249,18 +220,14 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq5
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_0 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_1 hrhs_0
     have := Nat.add_lt_add eq2 eq1
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_0 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_1 hrhs_0
@@ -270,9 +237,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq3
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_0 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_1 hrhs_0
@@ -285,9 +250,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq4
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_0 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_1 hrhs_0
@@ -303,18 +266,14 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq5
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_1 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_2 hrhs_0
     have := Nat.add_lt_add eq2 eq1
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_1 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_2 hrhs_0
@@ -323,9 +282,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq3
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_1 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_2 hrhs_0
@@ -337,9 +294,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq4
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_1 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_2 hrhs_0
@@ -354,18 +309,14 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq5
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_2 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_3 hrhs_0
     have := Nat.add_lt_add eq2 eq1
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_2 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_3 hrhs_0
@@ -374,9 +325,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq3
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_2 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_3 hrhs_0
@@ -387,9 +336,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq4
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_2 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_3 hrhs_0
@@ -403,18 +350,14 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq5
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_3 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_4 hrhs_0
     have := Nat.add_lt_add eq2 eq1
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_3 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_4 hrhs_0
@@ -423,9 +366,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq3
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_3 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_4 hrhs_0
@@ -436,9 +377,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq4
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     have eq1:= Nat.mul_lt_mul'' hlhs_3 hrhs_1
     have eq2:= Nat.mul_lt_mul'' hlhs_4 hrhs_0
@@ -451,34 +390,22 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     have := Nat.add_lt_add this eq5
     apply le_trans (le_of_lt this)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all
+  · simp_all
     expand hrhs with 5; expand hlhs with 5; simp [*];
     scalar_tac
     -- END TASK
@@ -614,7 +541,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
       -- END TASK
   · -- BEGIN TASK
     simp_all
-    rw[ UScalar.cast_val_eq, UScalarTy.numBits, LOW_51_BIT_MASK_spec,
+    rw[ UScalar.cast_val_eq, UScalarTy.numBits,
     land_pow_two_sub_one_eq_mod,
     UScalar.cast_val_eq, UScalarTy.numBits]
     suffices h: i71.val < (2^ 64 - 1 - 2^ 51)/19 by
@@ -650,7 +577,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     -- END TASK
   · -- BEGIN TASK
     simp_all
-    rw[ UScalar.cast_val_eq, UScalarTy.numBits, LOW_51_BIT_MASK_spec,
+    rw[ UScalar.cast_val_eq, UScalarTy.numBits,
     land_pow_two_sub_one_eq_mod,
     UScalar.cast_val_eq, UScalarTy.numBits,
     land_pow_two_sub_one_eq_mod,
@@ -707,7 +634,7 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     constructor
     · -- BEGIN TASK
       simp_all[Field51_as_Nat, Finset.sum_range_succ, U64.size, U64.numBits]
-      rw [LOW_51_BIT_MASK_spec, land_pow_two_sub_one_eq_mod,
+      rw [i55_post, land_pow_two_sub_one_eq_mod,
       land_pow_two_sub_one_eq_mod,
       land_pow_two_sub_one_eq_mod,
       land_pow_two_sub_one_eq_mod,
@@ -996,14 +923,14 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
       interval_cases i
       · -- BEGIN TASK
         simp_all
-        rw [LOW_51_BIT_MASK_spec, land_pow_two_sub_one_eq_mod]
+        rw [i55_post, land_pow_two_sub_one_eq_mod]
         apply lt_trans _ (by simp : 2 ^ 51 < 2 ^52)
         apply Nat.mod_lt
         simp
         -- END TASK
       · -- BEGIN TASK
         simp_all
-        rw[ UScalar.cast_val_eq, UScalarTy.numBits, LOW_51_BIT_MASK_spec,
+        rw[ UScalar.cast_val_eq, UScalarTy.numBits,
         land_pow_two_sub_one_eq_mod,
         UScalar.cast_val_eq, UScalarTy.numBits,
         land_pow_two_sub_one_eq_mod,
@@ -1059,24 +986,25 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         -- END TASK
       · -- BEGIN TASK
         simp_all
-        rw [LOW_51_BIT_MASK_spec, land_pow_two_sub_one_eq_mod]
+        rw [i55_post, land_pow_two_sub_one_eq_mod]
         apply lt_trans _ (by simp : 2 ^ 51 < 2 ^52)
         apply Nat.mod_lt
         simp
         -- END TASK
       · -- BEGIN TASK
         simp_all
-        rw [LOW_51_BIT_MASK_spec, land_pow_two_sub_one_eq_mod]
+        rw [i55_post, land_pow_two_sub_one_eq_mod]
         apply lt_trans _ (by simp : 2 ^ 51 < 2 ^52)
         apply Nat.mod_lt
         simp
         -- END TASK
       · -- BEGIN TASK
         simp_all
-        rw [LOW_51_BIT_MASK_spec, land_pow_two_sub_one_eq_mod]
+        rw [i55_post, land_pow_two_sub_one_eq_mod]
         apply lt_trans _ (by simp : 2 ^ 51 < 2 ^52)
         apply Nat.mod_lt
         simp
         -- END TASK
+-/
 
 end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
