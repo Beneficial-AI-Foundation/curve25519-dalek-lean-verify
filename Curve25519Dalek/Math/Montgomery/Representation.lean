@@ -878,9 +878,6 @@ lemma aux_eq : 0 =
   unfold Curve25519.A
   grind
 
-
-
-
 theorem add_eq_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (non_e1_x : e₁.x ≠ 0)
   (non_e2_x : e₂.x ≠ 0)
@@ -1009,13 +1006,6 @@ theorem add_eq_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   field_simp
   ring
 
-
-
-
-
-
-
-
 lemma add_eq_fromEdwards_nonI {e₁ e₂ : Edwards.Point Edwards.Ed25519}
    (non_e1_x : e₁.x ≠ 0)
   (non_e2_x : e₂.x ≠ 0)
@@ -1099,43 +1089,6 @@ lemma add_eq_fromEdwards_nonI {e₁ e₂ : Edwards.Point Edwards.Ed25519}
     · grind
   simp[heqy]
   sorry
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 lemma Aux_eq_x0 {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   (non_e1_x : e₁.x ≠ 0)
@@ -1232,7 +1185,6 @@ lemma Aux_eq_x0 {e₁ e₂ : Edwards.Point Edwards.Ed25519}
         have := (Edwards.Ed25519.denomsNeZero e₁ e₂).left h
         apply False.elim this
 
-
 theorem add_eq_T_point_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (non_e1_x : e₁.x ≠ 0)
   (non_e2_x : ¬e₂.x = 0)
@@ -1244,7 +1196,6 @@ theorem add_eq_T_point_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (sum_y_1 : (e₁ + e₂).y = -1)
 : fromEdwards (e₁ + e₂) = fromEdwards e₁ + fromEdwards e₂ := by
 sorry
-
 
 theorem add_eq_T_point_fromEdwards' (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (non_e1_x : e₁.x ≠ 0)
@@ -1348,8 +1299,6 @@ theorem add_eq_T_point_fromEdwards' (e₁ e₂ : Edwards.Point Edwards.Ed25519)
           have := Edwards.Ed25519.denomsNeZero e₁ e₂
           simp only [this, or_false] at sum_x
           simp only [Edwards.add_y] at sum_y
-
-
           have := Edwards.Ed25519.denomsNeZero e₁ e₂
           simp only [ne_eq] at this
           have : (1 - e₁.y * e₂.y * e₁.x * e₂.x * Edwards.Ed25519.d) ≠ 0 := by  grind
@@ -1424,9 +1373,6 @@ theorem add_eq_T_point_fromEdwards' (e₁ e₂ : Edwards.Point Edwards.Ed25519)
             rw[mul_assoc, this] at h
             sorry
 
-
-
-
 lemma trans_birational {x y u v : CurveField}
   (non_x : ¬x = 0)
   (hya : 1 - y ≠ 0)
@@ -1442,6 +1388,7 @@ lemma trans_birational {x y u v : CurveField}
     simp
     have : (1+1:CurveField) ≠ 0 := by decide
     field_simp
+
 lemma sum_aux_u
   {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   {u1 v1 u2 v2 : CurveField}
@@ -1469,11 +1416,6 @@ lemma sum_aux_u
   have hx := trans_birational non_e1_x hy1 hy3 hu1 hv1
   have hy := trans_birational non_e2_x hy2 hy4 hu2 hv2
   sorry
-
-
-
-
-
 
 lemma sum_aux_x_two {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   (non_e1_x : ¬e₁.x = 0)
@@ -1521,21 +1463,6 @@ lemma sum_aux_x_two {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   · have : e₂.x ^ 2 - e₁.x ^ 2=   (e₂.x  - e₁.x ) * (e₂.x  + e₁.x ) := by grind => ring
     simp only [this, mul_eq_zero] at h
     grind
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 lemma sum_aux_x_eq {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   (non_e1_x : ¬e₁.x = 0)
@@ -1647,21 +1574,6 @@ lemma sum_aux_x_eq {e₁ e₂ : Edwards.Point Edwards.Ed25519}
     have : Edwards.Ed25519.a =-1 := rfl
     sorry
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 lemma sum_aux_x_eqI {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   (sum_x : (e₁ + e₂).x ≠ 0)
   (heqy : e₁.y = e₂.y)
@@ -1676,24 +1588,6 @@ lemma sum_aux_x_eqI {e₁ e₂ : Edwards.Point Edwards.Ed25519}
       (1 + e₂.y) / (1 - e₂.y) := by
     simp [Edwards.add_x, heqy, heqx] at sum_x
     grind
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 lemma sum_aux_x {e₁ e₂ : Edwards.Point Edwards.Ed25519}
   (non_e1_x : ¬e₁.x = 0)
@@ -1717,35 +1611,6 @@ lemma sum_aux_x {e₁ e₂ : Edwards.Point Edwards.Ed25519}
         all_goals simp_all
       · apply sum_aux_x_eqI
         all_goals simp_all
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 lemma sum_aux_y {e₁ e₂ : Edwards.Point Edwards.Ed25519} (non_e1_x : e₁.x ≠ 0)
   (non_e1_x : ¬e₁.x = 0)
@@ -1775,11 +1640,6 @@ Curve25519.roots_B * (1 + (e₁ + e₂).y) / ((1 - (e₁ + e₂).y) * (e₁ + e�
             (Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₁.x) +
               Curve25519.roots_B * (1 + e₂.y) / ((1 - e₂.y) * e₁.x))) with ha
     sorry
-
-
-
-
-
 
 theorem add_non_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (non_e1_x : e₁.x ≠ 0)
@@ -1856,10 +1716,6 @@ theorem add_non_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519)
             all_goals simp_all
           · simp[heqy ]
             sorry
-
-
-
-
 
 lemma fromEdwards_add_of_snd_y_eq_neg_one (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   (non_e2_x : ¬e₂.x = 0)
@@ -2154,7 +2010,7 @@ theorem fromEdwards_eq_MontgomeryPoint_toPoint (e : Edwards.Point Edwards.Ed2551
   (m : MontgomeryPoint)
   (non : ¬ e.y = 1)
   (non_x : ¬ e.x = 0)
-  (h : (((U8x32_as_Nat m) % 2 ^255):ℕ )= (1 + e.y) / (1 - e.y)) :
+  (h : (((U8x32_as_Nat m) % 2 ^ 255) : ℕ) = (1 + e.y) / (1 - e.y)) :
   fromEdwards e = MontgomeryPoint.mkPoint m  := by
   unfold fromEdwards
   simp only [non, ↓reduceDIte, non_x, false_and]
