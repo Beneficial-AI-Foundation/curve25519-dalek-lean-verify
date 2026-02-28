@@ -33,7 +33,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 @[progress]
 theorem reduce_spec (limbs : Array U64 5#usize) :
     reduce limbs ⦃ (result : FieldElement51) =>
-      (∀ i < 5, result[i]!.val ≤ 2 ^ 52) ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
       Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by
   unfold reduce
   progress*
