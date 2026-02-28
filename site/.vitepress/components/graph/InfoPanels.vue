@@ -28,10 +28,20 @@ const emit = defineEmits<{
 
 const { getSourceLink } = useGitHubLinks()
 
-// Panel width constant
-const PANEL_WIDTH = 320
+// Panel sizing
+const PANEL_MIN_WIDTH = 320
+const PANEL_MAX_WIDTH = 700 // ~100 monospace chars at 0.6875rem
 const PANEL_MIN_HEIGHT = 100
 const PANEL_MARGIN = 10
+
+// Compute panel width from longest line in spec statement
+function getPanelWidth(node: GraphNode): number {
+  if (!node.specStatement) return PANEL_MIN_WIDTH
+  const maxLen = Math.max(...node.specStatement.split('\n').map(line => line.length))
+  // ~6.6px per char at 0.6875rem monospace + ~34px horizontal padding
+  const needed = maxLen * 6.6 + 34
+  return Math.max(PANEL_MIN_WIDTH, Math.min(Math.ceil(needed), PANEL_MAX_WIDTH))
+}
 
 // Store panel refs and positions
 const panelRefs = ref<Map<string, HTMLElement>>(new Map())
@@ -141,7 +151,7 @@ function calculateInitialPosition(nodeId: string, existingPanels: string[]): { x
   let x: number
   if (distToRight < distToLeft) {
     // Place on right edge
-    x = containerRect.width - PANEL_WIDTH - PANEL_MARGIN
+    x = containerRect.width - PANEL_MAX_WIDTH - PANEL_MARGIN
   } else {
     // Place on left edge
     x = PANEL_MARGIN
@@ -259,7 +269,10 @@ function onDrag(event: PointerEvent) {
   // Clamp to container bounds
   if (props.containerRef) {
     const containerRect = props.containerRef.getBoundingClientRect()
-    newX = Math.max(0, Math.min(newX, containerRect.width - PANEL_WIDTH))
+    const dragNodeId = dragState.value.nodeId!
+    const el = panelRefs.value.get(dragNodeId)
+    const panelW = el?.offsetWidth || PANEL_MAX_WIDTH
+    newX = Math.max(0, Math.min(newX, containerRect.width - panelW))
     newY = Math.max(0, Math.min(newY, containerRect.height - PANEL_MIN_HEIGHT))
   }
 
@@ -283,7 +296,7 @@ function emitPanelPositions() {
       positions.set(nodeId, {
         x: pos.x,
         y: pos.y,
-        width: el.offsetWidth || PANEL_WIDTH,
+        width: el.offsetWidth || PANEL_MIN_WIDTH,
         height: el.offsetHeight || PANEL_MIN_HEIGHT
       })
     }
@@ -317,7 +330,7 @@ onMounted(() => {
       :ref="(el) => setPanelRef(node.id, el as HTMLElement)"
       class="info-panel draggable"
       :class="{ expanded: isExpanded(node.id) }"
-      :style="{ left: getPanelPosition(node.id).x + 'px', top: getPanelPosition(node.id).y + 'px' }"
+      :style="{ left: getPanelPosition(node.id).x + 'px', top: getPanelPosition(node.id).y + 'px', width: getPanelWidth(node) + 'px' }"
     >
       <!-- Drag handle header -->
       <div
@@ -332,6 +345,19 @@ onMounted(() => {
           <span class="panel-title" :title="node.id">{{ node.label }}</span>
         </div>
         <div class="panel-actions" @pointerdown.stop>
+          <a
+            v-if="node.sourceFile"
+            class="panel-btn source-link"
+            :href="getSourceLink(node.sourceFile, node.lines || '')"
+            target="_blank"
+            :title="node.sourceFile.split('/').pop() + (node.lines ? ' ' + node.lines : '')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+              <polyline points="15 3 21 3 21 9"/>
+              <line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
           <button
             class="panel-btn"
             @click="emit('focusOn', node.id)"
@@ -474,7 +500,6 @@ onMounted(() => {
 
 .info-panel.draggable {
   position: absolute;
-  width: 320px;
   max-width: calc(100vw - 2rem);
   background: var(--vp-c-bg-elv);
   border: 1px solid var(--vp-c-divider);
@@ -548,6 +573,14 @@ onMounted(() => {
 
 .panel-btn.close:hover {
   color: #ef4444;
+}
+
+.panel-btn.source-link {
+  text-decoration: none;
+}
+
+.panel-btn.source-link:hover {
+  color: var(--vp-c-brand-1);
 }
 
 /* Spec section - always visible */
