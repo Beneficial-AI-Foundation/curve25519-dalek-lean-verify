@@ -127,7 +127,7 @@ private lemma ofDigits_eq_foldr (b : ℕ) (l : List ℕ) :
   | cons h t ih => simp [Nat.ofDigits, ih]
 
 /-- `Nat.cast` commutes with Horner evaluation on a byte list. -/
-private lemma horner_natCast (l : List U8) :
+ lemma horner_natCast (l : List U8) :
     ((l.foldr (fun (b : U8) (acc : ℕ) => b.val + 256 * acc) 0 : ℕ) : ZMod p) =
     l.foldr (fun (b : U8) (acc : ZMod p) => (b.val : ZMod p) + 256 * acc) 0 := by
   induction l with
@@ -166,6 +166,7 @@ lemma U8x32_as_Field_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
   unfold U8x32_as_Field
   rw [U8x32_as_Nat_eq_foldr, horner_natCast]
   rfl
+
 
 /-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
 number representation, then the input arrays must be equal. -/
