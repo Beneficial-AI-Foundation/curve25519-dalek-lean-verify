@@ -1,4 +1,5 @@
 import Curve25519Dalek.Aux
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Basic
