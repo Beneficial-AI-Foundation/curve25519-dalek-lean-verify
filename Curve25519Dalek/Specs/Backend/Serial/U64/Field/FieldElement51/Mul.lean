@@ -126,16 +126,16 @@ lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
     2 ^ (4 * 51) * (a4 * b0 + a3 * b1 + a2 * b2 + a1 * b3 + a0 * b4) := by grind
   rw[this]
 
-/- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.Mul.mul`**:
+-- TODO: once we have understand how to do the multiplication used in pow2k, this is the same issue
+set_option maxHeartbeats 10000000000 in
+-- progress heavy
+/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.Mul.mul`**:
 - No panic (always returns successfully)
 - The result, when converted to a natural number, is congruent to the product of the inputs modulo p
 - Input bounds: each limb < 2^54
 - Output bounds: each limb < 2^52
+EXTERNALY_VERIFIED
 -/
-
--- TODO: once we have understand how to do the multiplication used in pow2k, this is the same issue
-set_option maxHeartbeats 10000000000 in
--- progress heavy
 @[progress]
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
