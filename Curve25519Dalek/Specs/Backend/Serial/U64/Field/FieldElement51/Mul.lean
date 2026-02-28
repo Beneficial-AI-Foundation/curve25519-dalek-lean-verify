@@ -133,6 +133,7 @@ lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
 - Output bounds: each limb < 2^52
 -/
 
+-- TODO: once we have understand how to do the multiplication used in pow2k, this is the same issue
 set_option maxHeartbeats 10000000000 in
 -- progress heavy
 @[progress]
