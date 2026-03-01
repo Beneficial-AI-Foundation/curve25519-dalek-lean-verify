@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
@@ -51,7 +52,7 @@ Natural language specs:
   - Bytes 0-30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian
   - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)
       (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)
       -- (hself : self.IsValid)

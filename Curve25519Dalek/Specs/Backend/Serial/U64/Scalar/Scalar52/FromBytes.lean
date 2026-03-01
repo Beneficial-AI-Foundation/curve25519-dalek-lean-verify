@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `Scalar52::from_bytes`
 
@@ -36,7 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the same number as the input byte array
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem from_bytes_spec (b : Array U8 32#usize) :
     from_bytes b ⦃ u =>
     Scalar52_as_Nat u = U8x32_as_Nat b ∧

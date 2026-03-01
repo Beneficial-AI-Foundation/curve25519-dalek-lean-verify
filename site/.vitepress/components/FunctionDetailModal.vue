@@ -370,8 +370,8 @@ watch(() => props.isOpen, (isOpen) => {
 }
 
 .status-badge.warning {
-  background: rgba(245, 158, 11, 0.1);
-  color: #f59e0b;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
 }
 
 .status-badge.pending {

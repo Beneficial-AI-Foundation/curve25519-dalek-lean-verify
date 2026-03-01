@@ -39,12 +39,16 @@ structure FunctionRecord where
   isExtractionArtifact : Bool := false
   /-- True if this function is explicitly hidden via Config.hiddenFunctions -/
   isHidden : Bool := false
+  /-- True if this function is marked as ignored via Config.ignoredFunctions -/
+  isIgnored : Bool := false
   /-- True if a `{leanName}_spec` theorem exists -/
   isSpecified : Bool := false
   /-- True if specified AND the spec proof contains no `sorry` -/
   isVerified : Bool := false
   /-- True if verified AND all transitive dependencies are verified -/
   isFullyVerified : Bool := false
+  /-- True if spec theorem has @[externally_verified] and proof still uses sorry -/
+  isExternallyVerified : Bool := false
   /-- File path where the spec theorem is defined (e.g., "Curve25519Dalek/Specs/.../Add.lean") -/
   specFilePath : Option String := none
   /-- The spec theorem docstring, if one exists -/
@@ -69,9 +73,11 @@ structure FunctionOutput where
   is_relevant : Bool := false
   is_extraction_artifact : Bool := false
   is_hidden : Bool := false
+  is_ignored : Bool := false
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
+  externally_verified : Bool := false
   spec_file : Option String := none
   spec_docstring : Option String := none
   spec_statement : Option String := none
@@ -90,9 +96,11 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     is_relevant := rec.isRelevant
     is_extraction_artifact := rec.isExtractionArtifact
     is_hidden := rec.isHidden
+    is_ignored := rec.isIgnored
     specified := rec.isSpecified
     verified := rec.isVerified
     fully_verified := rec.isFullyVerified
+    externally_verified := rec.isExternallyVerified
     spec_file := rec.specFilePath
     spec_docstring := rec.specDocstring
     spec_statement := rec.specStatement }

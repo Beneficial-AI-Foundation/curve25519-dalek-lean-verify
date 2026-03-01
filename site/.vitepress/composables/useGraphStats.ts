@@ -33,10 +33,10 @@ export function useGraphStats(
 
     for (const node of nodes) {
       total++
-      if (node.status === 'fully_verified') {
-        fullyVerified++
+      if (node.status === 'verified') {
         verified++
-      } else if (node.status === 'verified') {
+        fullyVerified++
+      } else if (node.status === 'externally_verified') {
         verified++
       } else if (node.status === 'specified') {
         specified++

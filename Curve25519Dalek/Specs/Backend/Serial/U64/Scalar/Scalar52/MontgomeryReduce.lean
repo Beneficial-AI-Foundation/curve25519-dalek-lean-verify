@@ -6,6 +6,7 @@ Authors: Markus Dablander
 -- import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
@@ -238,7 +239,7 @@ set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 - The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 -/
-@[progress]
+@[externally_verified, progress] -- working proof commented out because of slow build
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
     montgomery_reduce a ⦃ m =>

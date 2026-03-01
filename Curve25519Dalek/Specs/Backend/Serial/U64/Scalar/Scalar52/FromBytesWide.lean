@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `Scalar52::from_bytes_wide`
 
@@ -35,7 +36,7 @@ natural language specs:
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form) -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     from_bytes_wide b ⦃ u =>
     Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by

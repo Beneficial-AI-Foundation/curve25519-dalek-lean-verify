@@ -38,6 +38,12 @@ export function useStatusFormatting() {
           label: 'Verified',
           cssClass: 'verified'
         }
+      case 'externally verified':
+        return {
+          icon: '✓',
+          label: 'Ext. Verified',
+          cssClass: 'externally-verified'
+        }
       case 'specified':
         return {
           icon: '📋',
