@@ -6603,7 +6603,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6698,7 +6698,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6738,7 +6738,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6776,7 +6776,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6821,7 +6821,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
@@ -6836,7 +6836,7 @@
    "lines": "L60-L67",
    "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,

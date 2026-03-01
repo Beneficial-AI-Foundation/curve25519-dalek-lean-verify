@@ -441,6 +441,12 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
   "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub",
   "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add",
+  -- AffinePoint
+  "curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity",
+  "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select",
+  "curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
+  "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq",
+  "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq",
   -- Scalar
   "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from",
   "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from",
