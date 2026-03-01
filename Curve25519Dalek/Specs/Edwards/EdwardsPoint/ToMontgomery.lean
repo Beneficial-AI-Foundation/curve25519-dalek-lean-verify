@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
@@ -55,7 +56,7 @@ where p = 2^255 - 19
   - If Z ≡ Y (mod p): u ≡ 0 (mod p)
 where p = 2^255 - 19
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem to_montgomery_spec (e : EdwardsPoint)
     (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
     to_montgomery e ⦃ mp =>

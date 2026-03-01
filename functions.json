@@ -281,7 +281,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies": ["curve25519_dalek.backend.variable_base_mul"]},
   {"verified": false,
    "specified": false,
@@ -5314,7 +5314,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.decompress.step_1",
     "curve25519_dalek.edwards.decompress.step_2"]},
@@ -6278,7 +6278,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.to_affine",
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},
@@ -6299,7 +6299,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
@@ -6366,7 +6366,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul",
     "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT"]},
@@ -6428,7 +6428,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_loop",
@@ -6510,7 +6510,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
