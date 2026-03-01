@@ -415,4 +415,28 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.scalar.Scalar.as_radix_16.top_half"
 ]
 
+/-!
+### Ignored Functions
+
+Functions that are not important for verification tracking but should still
+appear in all views. They are excluded from progress percentages.
+If an ignored function becomes specified/verified, it is no longer considered
+ignored for display purposes.
+-/
+def ignoredFunctions : List String := [
+  "curve25519_dalek.edwards.decompress.step_1",
+  "curve25519_dalek.edwards.EdwardsPoint.as_affine_niels",
+  "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select",
+  "curve25519_dalek.edwards.CompressedEdwardsY.from_slice",
+  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity",
+  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
+  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub",
+  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add",
+  "curve25519_dalek.edwards.decompress.step_2",
+  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq",
+  "curve25519_dalek.edwards.EdwardsPoint.is_torsion_free",
+  "curve25519_dalek.edwards.EdwardsPoint.mul_clamped",
+  "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq"
+]
+
 end Utils.Config

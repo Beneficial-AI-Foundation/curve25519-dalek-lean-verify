@@ -17,6 +17,7 @@ const props = defineProps<{
 const searchQuery = ref('')
 const showHidden = ref(false)
 const showArtifacts = ref(false)
+const showIgnored = ref(true)
 const statusFilter = ref<'all' | 'verified' | 'externally-verified' | 'specified' | 'unspecified'>('all')
 
 // Sorting state
@@ -45,6 +46,11 @@ const filteredFunctions = computed(() => {
   // Hide extraction artifacts unless explicitly shown
   if (!showArtifacts.value) {
     result = result.filter(fn => !fn.is_extraction_artifact)
+  }
+
+  // Hide ignored functions unless explicitly shown
+  if (!showIgnored.value) {
+    result = result.filter(fn => !fn.is_ignored)
   }
 
   // Status filter
@@ -113,8 +119,10 @@ const totalPages = computed(() => Math.ceil(filteredFunctions.value.length / pag
 // Stats
 const stats = computed(() => {
   const relevant = props.functions.filter(fn => fn.is_relevant && !fn.is_hidden && !fn.is_extraction_artifact)
+  const ignored = relevant.filter(fn => fn.is_ignored && !fn.specified && !fn.verified && !fn.externally_verified).length
   return {
     total: relevant.length,
+    ignored,
     verified: relevant.filter(fn => fn.verified).length,
     fullyVerified: relevant.filter(fn => fn.fully_verified).length,
     externallyVerified: relevant.filter(fn => fn.externally_verified && !fn.verified).length,
@@ -198,6 +206,8 @@ watch(selectedFunction, async (fn) => {
       <span class="stat-specified"><strong>{{ stats.specified - stats.verified - stats.externallyVerified }}</strong> specified only</span>
       <span class="stat-sep">|</span>
       <span class="stat-unspecified"><strong>{{ stats.unspecified }}</strong> unspecified</span>
+      <span v-if="stats.ignored > 0" class="stat-sep">|</span>
+      <span v-if="stats.ignored > 0" class="stat-ignored"><strong>{{ stats.ignored }}</strong> ignored</span>
     </div>
 
     <!-- Filters -->
@@ -215,6 +225,10 @@ watch(selectedFunction, async (fn) => {
         <option value="specified">Specified (not verified)</option>
         <option value="unspecified">Unspecified</option>
       </select>
+      <label class="checkbox-label">
+        <input type="checkbox" v-model="showIgnored" />
+        Show ignored
+      </label>
       <label class="checkbox-label">
         <input type="checkbox" v-model="showHidden" />
         Show hidden
@@ -255,6 +269,7 @@ watch(selectedFunction, async (fn) => {
               </button>
               <span v-if="fn.is_hidden" class="tag tag-hidden">hidden</span>
               <span v-if="fn.is_extraction_artifact" class="tag tag-artifact">artifact</span>
+              <span v-if="fn.is_ignored" class="tag tag-ignored">ignored</span>
             </td>
             <td class="cell-source">
               <span class="source-link" :title="fn.source ?? ''">{{ formatSource(fn) }}</span>
@@ -392,6 +407,7 @@ watch(selectedFunction, async (fn) => {
 .stat-ext-verified { color: #6ee7b7; }
 .stat-specified { color: var(--vp-c-yellow-1); }
 .stat-unspecified { color: var(--vp-c-text-2); }
+.stat-ignored { color: var(--vp-c-text-3); }
 
 .filters {
   display: flex;
@@ -524,6 +540,11 @@ watch(selectedFunction, async (fn) => {
 .tag-artifact {
   background: var(--vp-c-gray-soft);
   color: var(--vp-c-text-2);
+}
+
+.tag-ignored {
+  background: var(--vp-c-gray-soft);
+  color: var(--vp-c-text-3);
 }
 
 .cell-source {

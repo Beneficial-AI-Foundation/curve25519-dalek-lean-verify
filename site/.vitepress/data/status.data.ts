@@ -13,6 +13,7 @@ export interface StatusEntry {
   extracted: string
   verified: string
   notes: string
+  ignored?: string
   'ai-proveable'?: string
 }
 
@@ -25,6 +26,7 @@ export interface StatusData {
     specified: number
     verified: number
     externally_verified: number
+    ignored: number
     ai_proveable: number
   }
 }
@@ -56,6 +58,7 @@ export default {
       specified: records.filter(r => r.verified === 'specified').length,
       verified: records.filter(r => r.verified === 'verified').length,
       externally_verified: records.filter(r => r.verified === 'externally verified').length,
+      ignored: records.filter(r => r.ignored === 'ignored').length,
       ai_proveable: records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
     }
 

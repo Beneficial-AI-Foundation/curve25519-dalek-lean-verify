@@ -131,6 +131,7 @@ export function useGraphData(rawFunctions: Ref<FunctionRecord[]>) {
         specStatement: func.spec_statement,
         specDocstring: func.spec_docstring,
         rustName: func.rust_name,
+        isIgnored: func.is_ignored,
         rustSource: func.rust_source,
         originalDependencies: func.dependencies,
         dependencies: transitiveDeps,

@@ -39,6 +39,8 @@ structure FunctionRecord where
   isExtractionArtifact : Bool := false
   /-- True if this function is explicitly hidden via Config.hiddenFunctions -/
   isHidden : Bool := false
+  /-- True if this function is marked as ignored via Config.ignoredFunctions -/
+  isIgnored : Bool := false
   /-- True if a `{leanName}_spec` theorem exists -/
   isSpecified : Bool := false
   /-- True if specified AND the spec proof contains no `sorry` -/
@@ -71,6 +73,7 @@ structure FunctionOutput where
   is_relevant : Bool := false
   is_extraction_artifact : Bool := false
   is_hidden : Bool := false
+  is_ignored : Bool := false
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
@@ -93,6 +96,7 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     is_relevant := rec.isRelevant
     is_extraction_artifact := rec.isExtractionArtifact
     is_hidden := rec.isHidden
+    is_ignored := rec.isIgnored
     specified := rec.isSpecified
     verified := rec.isVerified
     fully_verified := rec.isFullyVerified

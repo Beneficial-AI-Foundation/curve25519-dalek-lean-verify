@@ -57,6 +57,11 @@ def isHiddenFunction (name : Name) : Bool :=
   let str := name.toString
   hiddenFunctions.any fun hidden => str == hidden
 
+/-- Check if a name is in the ignored functions list -/
+def isIgnoredFunction (name : Name) : Bool :=
+  let str := name.toString
+  ignoredFunctions.any fun ignored => str == ignored
+
 /-- Check if a name passes basic filters (prefix only, not suffix) -/
 def passesBasicFilters (name : Name) : Bool :=
   !hasExcludedPrefix name
@@ -150,6 +155,7 @@ def buildFunctionRecord
     isRelevant := isRelevant
     isExtractionArtifact := rawData.isExtractionArtifact
     isHidden := rawData.isHidden
+    isIgnored := isIgnoredFunction rawData.name
     isSpecified := hasSpecTheorem env rawData.name
     isVerified := isVerified env rawData.name
     isFullyVerified := isFullyVerified env relevantNames rawData.name

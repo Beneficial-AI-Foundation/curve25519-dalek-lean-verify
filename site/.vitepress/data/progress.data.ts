@@ -9,6 +9,7 @@ export interface StatusEntry {
   extracted: string
   verified: string
   notes: string
+  ignored?: string
   'ai-proveable'?: string
 }
 
@@ -22,6 +23,7 @@ export interface ProgressDataPoint {
   draft_spec: number
   extracted: number
   ai_proveable: number
+  ignored: number
 }
 
 export interface ProgressData {
@@ -73,6 +75,7 @@ function countVerificationStatus(csvContent: string | null): {
   draft_spec: number
   extracted: number
   ai_proveable: number
+  ignored: number
 } | null {
   if (!csvContent) return null
 
@@ -91,8 +94,9 @@ function countVerificationStatus(csvContent: string | null): {
     const verified = records.filter(r => r.verified === 'verified').length
     const externally_verified = records.filter(r => r.verified === 'externally verified').length
     const ai_proveable = records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
+    const ignored = records.filter(r => r.ignored === 'ignored').length
 
-    return { total, verified, externally_verified, specified, draft_spec, extracted, ai_proveable }
+    return { total, verified, externally_verified, specified, draft_spec, extracted, ai_proveable, ignored }
   } catch (error) {
     console.error('Error parsing CSV:', error)
     return null
@@ -121,7 +125,8 @@ export default {
           specified: counts.specified,
           draft_spec: counts.draft_spec,
           extracted: counts.extracted,
-          ai_proveable: counts.ai_proveable
+          ai_proveable: counts.ai_proveable,
+          ignored: counts.ignored
         })
       }
     }

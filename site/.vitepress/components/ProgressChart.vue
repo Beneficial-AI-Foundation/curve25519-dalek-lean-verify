@@ -37,6 +37,7 @@ interface ProgressDataPoint {
   draft_spec: number
   extracted: number
   ai_proveable: number
+  ignored: number
 }
 
 const props = withDefaults(defineProps<{
@@ -101,6 +102,7 @@ const chartData = computed(() => {
     y: dp.draft_spec + dp.specified + (dp.externally_verified ?? 0) + dp.verified
   }))
   const total = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total }))
+  const active = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total - dp.ignored }))
   const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
   const ai_proveable = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.ai_proveable }))
 
@@ -172,6 +174,18 @@ const chartData = computed(() => {
       order: 0
     },
     {
+      label: 'Active Functions',
+      data: active,
+      borderColor: '#6b7280',
+      backgroundColor: 'transparent',
+      fill: false,
+      stepped: 'after' as const,
+      borderWidth: 1.5,
+      borderDash: [6, 3],
+      pointRadius: 0,
+      order: 0
+    },
+    {
       label: 'Extracted',
       data: extracted,
       borderColor: '#9ca3af',
@@ -227,8 +241,7 @@ const chartOptions: ChartOptions<'line'> = {
         usePointStyle: true,
         padding: 15,
         filter: function(item, chart) {
-          // Only show Verified, Ext. verified, Spec only, and Draft in legend
-          return item.text === 'Verified' || item.text === 'Ext. verified' || item.text === 'Spec only' || item.text === 'Draft'
+          return item.text === 'Verified' || item.text === 'Ext. verified' || item.text === 'Spec only' || item.text === 'Draft' || item.text === 'Active Functions'
         }
       }
     },

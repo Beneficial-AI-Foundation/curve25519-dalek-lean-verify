@@ -10,6 +10,7 @@
    "lines": "L230-L238",
    "lean_name": "curve25519_dalek.IdentityCurveModelsProjectivePoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -30,6 +31,7 @@
    "lines": "L231-L237",
    "lean_name": "curve25519_dalek.IdentityCurveModelsProjectivePoint.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -48,6 +50,7 @@
    "lines": "L296-L303",
    "lean_name": "curve25519_dalek.IdentityMontgomeryProjectivePoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -68,6 +71,7 @@
    "lines": "L297-L302",
    "lean_name": "curve25519_dalek.IdentityMontgomeryProjectivePoint.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -87,6 +91,7 @@
    "lean_name":
    "curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -107,6 +112,7 @@
    "lean_name":
    "curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -125,6 +131,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -145,6 +152,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -165,6 +173,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -183,6 +192,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -203,6 +213,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -224,6 +235,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -244,6 +256,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -264,6 +277,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -281,6 +295,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -299,6 +314,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -317,6 +333,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -337,6 +354,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -357,6 +375,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -375,6 +394,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -395,6 +415,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -415,6 +436,7 @@
    "lean_name":
    "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -435,6 +457,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -456,6 +479,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -474,6 +498,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -494,6 +519,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -513,6 +539,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -534,6 +561,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -552,6 +580,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -573,6 +602,7 @@
    "lean_name":
    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -591,6 +621,7 @@
    "lean_name":
    "curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -612,6 +643,7 @@
    "lean_name":
    "curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -630,6 +662,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -650,6 +683,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -668,6 +702,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -688,6 +723,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -706,6 +742,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -724,6 +761,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -742,6 +780,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -760,6 +799,7 @@
    "lean_name":
    "curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -778,6 +818,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -796,6 +837,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -816,6 +858,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -836,6 +879,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -854,6 +898,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -874,6 +919,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -892,6 +938,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -910,6 +957,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -929,6 +977,7 @@
    "lines": "L372-L380",
    "lean_name": "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -947,6 +996,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -971,6 +1021,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -989,6 +1040,7 @@
    "lean_name":
    "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1009,6 +1061,7 @@
    "lean_name":
    "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1028,6 +1081,7 @@
    "lean_name":
    "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1052,6 +1106,7 @@
    "lean_name":
    "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -1070,6 +1125,7 @@
    "lean_name":
    "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1087,6 +1143,7 @@
    "lean_name":
    "curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1107,6 +1164,7 @@
    "lean_name":
    "curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1125,6 +1183,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1143,6 +1202,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1161,6 +1221,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1179,6 +1240,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1197,6 +1259,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1215,6 +1278,7 @@
    "lean_name":
    "curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1233,6 +1297,7 @@
    "lean_name":
    "curve25519_dalek.SharedAMontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1251,6 +1316,7 @@
    "lean_name":
    "curve25519_dalek.SharedAMontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1269,6 +1335,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1287,6 +1354,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1305,6 +1373,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1323,6 +1392,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1341,6 +1411,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1359,6 +1430,7 @@
    "lean_name":
    "curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1377,6 +1449,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1395,6 +1468,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1413,6 +1487,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1431,6 +1506,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1449,6 +1525,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1467,6 +1544,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1485,6 +1563,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1503,6 +1582,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1521,6 +1601,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1539,6 +1620,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1557,6 +1639,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithSubScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1575,6 +1658,7 @@
    "lean_name":
    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithSubScalarScalar.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1591,6 +1675,7 @@
    "lines": "L55-L75",
    "lean_name": "curve25519_dalek.backend.get_selected_backend",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1608,6 +1693,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1626,6 +1712,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1643,6 +1730,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1665,6 +1753,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -1682,6 +1771,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1703,6 +1793,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1721,6 +1812,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1739,6 +1831,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1757,6 +1850,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1775,6 +1869,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerStructuralPartialEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1792,6 +1887,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1810,6 +1906,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1828,6 +1925,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1849,6 +1947,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1868,6 +1967,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1891,6 +1991,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -1912,6 +2013,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -1930,6 +2032,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1948,6 +2051,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1966,6 +2070,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -1984,6 +2089,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2001,6 +2107,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2022,6 +2129,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2043,6 +2151,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2061,6 +2170,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2079,6 +2189,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2096,6 +2207,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2114,6 +2226,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2132,6 +2245,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2150,6 +2264,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2168,6 +2283,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2186,6 +2302,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2207,6 +2324,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2226,6 +2344,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2249,6 +2368,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2270,6 +2390,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2288,6 +2409,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2306,6 +2428,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2324,6 +2447,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2342,6 +2466,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2368,6 +2493,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2390,6 +2516,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2410,6 +2537,7 @@
    "lines": "L11-L51",
    "lean_name": "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2438,6 +2566,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2464,6 +2593,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2482,6 +2612,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2503,6 +2634,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2521,6 +2653,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2540,6 +2673,7 @@
    "lines": "L45-L51",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2559,6 +2693,7 @@
    "lines": "L54-L60",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2575,6 +2710,7 @@
    "lines": "L54-L60",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2596,6 +2732,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2614,6 +2751,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2630,6 +2768,7 @@
    "lines": "L45-L51",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2650,6 +2789,7 @@
    "lines": "L194-L194",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2668,6 +2808,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2686,6 +2827,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2707,6 +2849,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2725,6 +2868,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2742,6 +2886,7 @@
    "lines": "L127-L133",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.L",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2760,6 +2905,7 @@
    "lines": "L136-L136",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.LFACTOR",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2778,6 +2924,7 @@
    "lines": "L26-L32",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2794,6 +2941,7 @@
    "lines": "L26-L32",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2814,6 +2962,7 @@
    "lines": "L114-L114",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2835,6 +2984,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2853,6 +3003,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2871,6 +3022,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2892,6 +3044,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2910,6 +3063,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -2928,6 +3082,7 @@
    "lines": "L139-L145",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.R",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2945,6 +3100,7 @@
    "lines": "L148-L154",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.RR",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -2965,6 +3121,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2983,6 +3140,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3002,6 +3160,7 @@
    "lines": "L99-L105",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3018,6 +3177,7 @@
    "lines": "L99-L105",
    "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3036,6 +3196,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3054,6 +3215,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3071,6 +3233,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3089,6 +3252,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3107,6 +3271,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3125,6 +3290,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3143,6 +3309,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3164,6 +3331,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3185,6 +3353,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3203,6 +3372,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3220,6 +3390,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3238,6 +3409,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3256,6 +3428,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3274,6 +3447,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3292,6 +3466,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3316,6 +3491,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -3336,6 +3512,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -3353,6 +3530,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_swap",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3370,6 +3548,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3391,6 +3570,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3409,6 +3589,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3427,6 +3608,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3447,6 +3629,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3465,6 +3648,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3484,6 +3668,7 @@
    "lines": "L267-L267",
    "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3502,6 +3687,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3521,6 +3707,7 @@
    "lines": "L265-L265",
    "lean_name": "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3539,6 +3726,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3560,6 +3748,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3580,6 +3769,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3598,6 +3788,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3618,6 +3809,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -3638,6 +3830,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.negate",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3659,6 +3852,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3677,6 +3871,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3695,6 +3890,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3712,6 +3908,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3729,6 +3926,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3751,6 +3949,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3769,6 +3968,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3787,6 +3987,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3807,6 +4008,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3828,6 +4030,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3850,6 +4053,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": true,
@@ -3870,6 +4074,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3888,6 +4093,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3906,6 +4112,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -3923,6 +4130,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3940,6 +4148,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3958,6 +4167,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3975,6 +4185,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -3993,6 +4204,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4012,6 +4224,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4029,6 +4242,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4047,6 +4261,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4064,6 +4279,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4082,6 +4298,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4100,6 +4317,7 @@
    "lines": "L62-L62",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4117,6 +4335,7 @@
    "lines": "L62-L62",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4136,6 +4355,7 @@
    "lines": "L177-L192",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4159,6 +4379,7 @@
    "lines": "L184-L188",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4177,6 +4398,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4199,6 +4421,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4221,6 +4444,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4241,6 +4465,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4259,6 +4484,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4282,6 +4508,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4302,6 +4529,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4322,6 +4550,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4346,6 +4575,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4366,6 +4596,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4388,6 +4619,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4409,6 +4641,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4431,6 +4664,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4454,6 +4688,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4475,6 +4710,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4495,6 +4731,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4513,6 +4750,7 @@
    "lines": "L311-L314",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4536,6 +4774,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4554,6 +4793,7 @@
    "lines": "L319-L322",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4578,6 +4818,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4599,6 +4840,7 @@
    "lines": "L195-L211",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4621,6 +4863,7 @@
    "lines": "L202-L206",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -4639,6 +4882,7 @@
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4660,6 +4904,7 @@
    "lines": "L137-L174",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4677,6 +4922,7 @@
    "lines": "L56-L58",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.m",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -4692,6 +4938,7 @@
    "lines": "L253-L263",
    "lean_name": "curve25519_dalek.backend.variable_base_mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4709,6 +4956,7 @@
    "lines": "L75-L81",
    "lean_name": "curve25519_dalek.constants.BASEPOINT_ORDER_PRIVATE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4727,6 +4975,7 @@
    "lines": "L66-L66",
    "lean_name": "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4745,6 +4994,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4763,6 +5013,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4779,6 +5030,7 @@
    "lines": "L171-L171",
    "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4798,6 +5050,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpEq.assert_receiver_is_total_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4815,6 +5068,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4833,6 +5087,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4849,6 +5104,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4866,6 +5122,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4883,6 +5140,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4901,6 +5159,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4919,6 +5178,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4937,6 +5197,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreMarkerStructuralPartialEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4954,6 +5215,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4972,6 +5234,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4989,6 +5252,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5007,6 +5271,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5025,6 +5290,7 @@
    "lines": "L188-L190",
    "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.as_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -5044,6 +5310,7 @@
    "lines": "L201-L209",
    "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.decompress",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5062,6 +5329,7 @@
    "lines": "L414-L417",
    "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.from_slice",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5080,6 +5348,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5098,6 +5367,7 @@
    "lean_name":
    "curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY.call_once",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5114,6 +5384,7 @@
    "lines": "L193-L195",
    "lean_name": "curve25519_dalek.edwards.CompressedEdwardsY.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5130,6 +5401,7 @@
    "lines": "L379-L379",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5148,6 +5420,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5164,6 +5437,7 @@
    "lines": "L512-L512",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5182,6 +5456,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5200,6 +5475,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5218,6 +5494,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5236,6 +5513,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5253,6 +5531,7 @@
    "lines": "L379-L379",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5271,6 +5550,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5289,6 +5569,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5307,6 +5588,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5325,6 +5607,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5343,6 +5626,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5363,6 +5647,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5381,6 +5666,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddSharedBEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5399,6 +5685,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddSharedBEdwardsPointEdwardsPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5417,6 +5704,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5435,6 +5723,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5453,6 +5742,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5471,6 +5761,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5489,6 +5780,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5507,6 +5799,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5525,6 +5818,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5543,6 +5837,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5561,6 +5856,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5579,6 +5875,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5597,6 +5894,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5615,6 +5913,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5633,6 +5932,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5651,6 +5951,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5669,6 +5970,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5687,6 +5989,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5705,6 +6008,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubSharedBEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5723,6 +6027,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubSharedBEdwardsPointEdwardsPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5741,6 +6046,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5761,6 +6067,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5780,6 +6087,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5798,6 +6106,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5819,6 +6128,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5838,6 +6148,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5856,6 +6167,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5876,6 +6188,7 @@
    "lean_name":
    "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5894,6 +6207,7 @@
    "lines": "L543-L553",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_affine_niels",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5917,6 +6231,7 @@
    "lines": "L533-L539",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -5936,6 +6251,7 @@
    "lines": "L520-L527",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5958,6 +6274,7 @@
    "lines": "L607-L609",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.compress",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5978,6 +6295,7 @@
    "lines": "L745-L747",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.double",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -5999,6 +6317,7 @@
    "lines": "L1367-L1369",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_small_order",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6019,6 +6338,7 @@
    "lines": "L1397-L1399",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.is_torsion_free",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6042,6 +6362,7 @@
    "lines": "L877-L887",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_base",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6063,6 +6384,7 @@
    "lines": "L907-L915",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6083,6 +6405,7 @@
    "lines": "L1325-L1327",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6101,6 +6424,7 @@
    "lines": "L1330-L1342",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6121,6 +6445,7 @@
    "lines": "L1335-L1339",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -6139,6 +6464,7 @@
    "lines": "L891-L903",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.mul_clamped",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6159,6 +6485,7 @@
    "lines": "L556-L561",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_affine",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6179,6 +6506,7 @@
    "lines": "L572-L582",
    "lean_name": "curve25519_dalek.edwards.EdwardsPoint.to_montgomery",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6201,6 +6529,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6219,6 +6548,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6235,6 +6565,7 @@
    "lines": "L53-L53",
    "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6253,6 +6584,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6271,6 +6603,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6289,6 +6622,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6307,6 +6641,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6325,6 +6660,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6343,6 +6679,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6361,6 +6698,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6380,6 +6718,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6399,6 +6738,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6417,6 +6757,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6435,6 +6776,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6453,6 +6795,7 @@
    "lean_name":
    "curve25519_dalek.edwards.affine.AffinePoint.Insts.ZeroizeDefaultIsZeroes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6474,6 +6817,7 @@
    "lines": "L71-L75",
    "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.compress",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6492,6 +6836,7 @@
    "lines": "L60-L67",
    "lean_name": "curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6509,6 +6854,7 @@
    "lines": "L216-L227",
    "lean_name": "curve25519_dalek.edwards.decompress.step_1",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6533,6 +6879,7 @@
    "lines": "L230-L248",
    "lean_name": "curve25519_dalek.edwards.decompress.step_2",
    "is_relevant": true,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6554,6 +6901,7 @@
    "lines": "L254-L263",
    "lean_name": "curve25519_dalek.field.FieldElement51.invert",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6575,6 +6923,7 @@
    "lines": "L352-L354",
    "lean_name": "curve25519_dalek.field.FieldElement51.invsqrt",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6594,6 +6943,7 @@
    "lines": "L149-L152",
    "lean_name": "curve25519_dalek.field.FieldElement51.is_negative",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6612,6 +6962,7 @@
    "lines": "L159-L164",
    "lean_name": "curve25519_dalek.field.FieldElement51.is_zero",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6631,6 +6982,7 @@
    "lines": "L169-L203",
    "lean_name": "curve25519_dalek.field.FieldElement51.pow22501",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6652,6 +7004,7 @@
    "lines": "L268-L277",
    "lean_name": "curve25519_dalek.field.FieldElement51.pow_p58",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6672,6 +7025,7 @@
    "lines": "L291-L338",
    "lean_name": "curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6697,6 +7051,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6715,6 +7070,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6731,6 +7087,7 @@
    "lines": "L99-L99",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6749,6 +7106,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6769,6 +7127,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6787,6 +7146,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6805,6 +7165,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6822,6 +7183,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6840,6 +7202,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6858,6 +7221,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6876,6 +7240,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6897,6 +7262,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6915,6 +7281,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6933,6 +7300,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6951,6 +7319,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6971,6 +7340,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -6989,6 +7359,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7010,6 +7381,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7027,6 +7399,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7049,6 +7422,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7066,6 +7440,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7086,6 +7461,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7105,6 +7481,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7123,6 +7500,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7141,6 +7519,7 @@
    "lines": "L199-L201",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.as_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7159,6 +7538,7 @@
    "lines": "L128-L130",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.mul_base",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7180,6 +7560,7 @@
    "lines": "L150-L158",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7201,6 +7582,7 @@
    "lines": "L134-L146",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7221,6 +7603,7 @@
    "lines": "L204-L206",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7240,6 +7623,7 @@
    "lines": "L224-L253",
    "lean_name": "curve25519_dalek.montgomery.MontgomeryPoint.to_edwards",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7267,6 +7651,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7285,6 +7670,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7302,6 +7688,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7320,6 +7707,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7338,6 +7726,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7356,6 +7745,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7378,6 +7768,7 @@
    "lean_name":
    "curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7398,6 +7789,7 @@
    "lines": "L331-L334",
    "lean_name": "curve25519_dalek.montgomery.ProjectivePoint.as_affine",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7419,6 +7811,7 @@
    "lines": "L352-L390",
    "lean_name": "curve25519_dalek.montgomery.differential_add_and_double",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7439,6 +7832,7 @@
    "lines": "L263-L284",
    "lean_name": "curve25519_dalek.montgomery.elligator_encode",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7470,6 +7864,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7488,6 +7883,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7505,6 +7901,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7524,6 +7921,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpEq.assert_receiver_is_total_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7541,6 +7939,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7559,6 +7958,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7575,6 +7975,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7592,6 +7993,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7610,6 +8012,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7628,6 +8031,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7646,6 +8050,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7664,6 +8069,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreMarkerStructuralPartialEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7681,6 +8087,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7699,6 +8106,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7716,6 +8124,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7734,6 +8143,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7753,6 +8163,7 @@
    "lines": "L235-L237",
    "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.as_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7772,6 +8183,7 @@
    "lines": "L257-L271",
    "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.decompress",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7790,6 +8202,7 @@
    "lines": "L245-L248",
    "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.from_slice",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7808,6 +8221,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7826,6 +8240,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto.call_once",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7845,6 +8260,7 @@
    "lines": "L230-L232",
    "lean_name": "curve25519_dalek.ristretto.CompressedRistretto.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -7862,6 +8278,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7880,6 +8297,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7896,6 +8314,7 @@
    "lines": "L881-L881",
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7914,6 +8333,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7932,6 +8352,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7950,6 +8371,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7968,6 +8390,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -7986,6 +8409,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8004,6 +8428,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8022,6 +8447,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8040,6 +8466,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8058,6 +8485,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8076,6 +8504,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8094,6 +8523,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8112,6 +8542,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddSharedBRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8130,6 +8561,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddSharedBRistrettoPointRistrettoPoint.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8148,6 +8580,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8166,6 +8599,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8184,6 +8618,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8202,6 +8637,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8220,6 +8656,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8238,6 +8675,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8256,6 +8694,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulSharedBScalarRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8274,6 +8713,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulSharedBScalarRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8292,6 +8732,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8310,6 +8751,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8328,6 +8770,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8346,6 +8789,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8364,6 +8808,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8382,6 +8827,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8400,6 +8846,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8418,6 +8865,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8436,6 +8884,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubSharedBRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8454,6 +8903,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubSharedBRistrettoPointRistrettoPoint.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8472,6 +8922,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8490,6 +8941,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8508,6 +8960,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8527,6 +8980,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8545,6 +8999,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8563,6 +9018,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8583,6 +9039,7 @@
    "lines": "L498-L542",
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.compress",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8612,6 +9069,7 @@
    "lines": "L659-L666",
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.coset4",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8634,6 +9092,7 @@
    "lean_name":
    "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8669,6 +9128,7 @@
    "lines": "L823-L839",
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8690,6 +9150,7 @@
    "lines": "L988-L998",
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.mul_base",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8710,6 +9171,7 @@
    "lines": "L277-L295",
    "lean_name": "curve25519_dalek.ristretto.decompress.step_1",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8732,6 +9194,7 @@
    "lines": "L297-L342",
    "lean_name": "curve25519_dalek.ristretto.decompress.step_2",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8759,6 +9222,7 @@
    "lines": "L194-L194",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8776,6 +9240,7 @@
    "lines": "L194-L194",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone.clone",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8792,6 +9257,7 @@
    "lines": "L293-L293",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreCmpEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8809,6 +9275,7 @@
    "lines": "L294-L298",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8827,6 +9294,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8844,6 +9312,7 @@
    "lines": "L546-L553",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8861,6 +9330,7 @@
    "lines": "L547-L552",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8877,6 +9347,7 @@
    "lines": "L498-L505",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8894,6 +9365,7 @@
    "lines": "L499-L504",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8910,6 +9382,7 @@
    "lines": "L507-L514",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8927,6 +9400,7 @@
    "lines": "L508-L513",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8943,6 +9417,7 @@
    "lines": "L516-L544",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8960,6 +9435,7 @@
    "lines": "L538-L543",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8976,6 +9452,7 @@
    "lines": "L490-L496",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -8993,6 +9470,7 @@
    "lines": "L491-L495",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9009,6 +9487,7 @@
    "lines": "L484-L488",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9027,6 +9506,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault.default",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9043,6 +9523,7 @@
    "lines": "L194-L194",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreMarkerCopy",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9060,6 +9541,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9078,6 +9560,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9096,6 +9579,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9114,6 +9598,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar.add_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9132,6 +9617,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9150,6 +9636,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddScalarScalar.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9168,6 +9655,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9186,6 +9674,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9204,6 +9693,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9222,6 +9712,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9240,6 +9731,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9258,6 +9750,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9276,6 +9769,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9294,6 +9788,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9314,6 +9809,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9332,6 +9828,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9350,6 +9847,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9370,6 +9868,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9388,6 +9887,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9406,6 +9906,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9424,6 +9925,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9442,6 +9944,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9460,6 +9963,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9478,6 +9982,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9497,6 +10002,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBEdwardsPointEdwardsPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9515,6 +10021,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBEdwardsPointEdwardsPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9533,6 +10040,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBMontgomeryPointMontgomeryPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9551,6 +10059,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBMontgomeryPointMontgomeryPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9569,6 +10078,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBRistrettoPointRistrettoPoint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9587,6 +10097,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBRistrettoPointRistrettoPoint.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9605,6 +10116,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9623,6 +10135,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9640,6 +10153,7 @@
    "lines": "L382-L387",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9658,6 +10172,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9676,6 +10191,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9694,6 +10210,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9712,6 +10229,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9730,6 +10248,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar.sub_assign",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9748,6 +10267,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9766,6 +10286,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9784,6 +10305,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9802,6 +10324,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9819,6 +10342,7 @@
    "lines": "L306-L313",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9837,6 +10361,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9854,6 +10379,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9873,6 +10399,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9891,6 +10418,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -9907,6 +10435,7 @@
    "lines": "L300-L304",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9927,6 +10456,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -9943,6 +10473,7 @@
    "lines": "L556-L560",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9960,6 +10491,7 @@
    "lines": "L557-L559",
    "lean_name": "curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize.zeroize",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -9977,6 +10509,7 @@
    "lines": "L567-L572",
    "lean_name": "curve25519_dalek.scalar.Scalar.ONE",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -9995,6 +10528,7 @@
    "lines": "L564-L564",
    "lean_name": "curve25519_dalek.scalar.Scalar.ZERO",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10011,6 +10545,7 @@
    "lines": "L564-L564",
    "lean_name": "curve25519_dalek.scalar.Scalar.ZERO_body",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10029,6 +10564,7 @@
    "lines": "L706-L708",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -10045,6 +10581,7 @@
    "lines": "L995-L1031",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_16",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10064,6 +10601,7 @@
    "lines": "L1003-L1005",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_16.bot_half",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10080,6 +10618,7 @@
    "lines": "L1007-L1009",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_16.top_half",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10096,6 +10635,7 @@
    "lines": "L1012-L1016",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_16_loop0",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10115,6 +10655,7 @@
    "lines": "L1021-L1026",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_16_loop1",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10131,6 +10672,7 @@
    "lines": "L1080-L1140",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_2w",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10150,6 +10692,7 @@
    "lines": "L1099-L1121",
    "lean_name": "curve25519_dalek.scalar.Scalar.as_radix_2w_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10166,6 +10709,7 @@
    "lines": "L788-L845",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10193,6 +10737,7 @@
    "lines": "L808-L818",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert_loop0",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10210,6 +10755,7 @@
    "lines": "L808-L818",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert_loop0.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10230,6 +10776,7 @@
    "lines": "L832-L839",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert_loop1",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10247,6 +10794,7 @@
    "lines": "L832-L839",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert_loop1.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10268,6 +10816,7 @@
    "lines": "L237-L246",
    "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10289,6 +10838,7 @@
    "lines": "L250-L252",
    "lean_name": "curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10309,6 +10859,7 @@
    "lines": "L261-L265",
    "lean_name": "curve25519_dalek.scalar.Scalar.from_canonical_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10327,6 +10878,7 @@
    "lines": "L747-L749",
    "lean_name": "curve25519_dalek.scalar.Scalar.invert",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10348,6 +10900,7 @@
    "lines": "L1158-L1160",
    "lean_name": "curve25519_dalek.scalar.Scalar.is_canonical",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10366,6 +10919,7 @@
    "lines": "L931-L983",
    "lean_name": "curve25519_dalek.scalar.Scalar.non_adjacent_form",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10384,6 +10938,7 @@
    "lines": "L947-L980",
    "lean_name": "curve25519_dalek.scalar.Scalar.non_adjacent_form_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10401,6 +10956,7 @@
    "lines": "L947-L980",
    "lean_name": "curve25519_dalek.scalar.Scalar.non_adjacent_form_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10418,6 +10974,7 @@
    "lines": "L1149-L1154",
    "lean_name": "curve25519_dalek.scalar.Scalar.reduce",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10441,6 +10998,7 @@
    "lines": "L691-L693",
    "lean_name": "curve25519_dalek.scalar.Scalar.to_bytes",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -10457,6 +11015,7 @@
    "lines": "L1036-L1056",
    "lean_name": "curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10475,6 +11034,7 @@
    "lines": "L1143-L1145",
    "lean_name": "curve25519_dalek.scalar.Scalar.unpack",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10495,6 +11055,7 @@
    "lines": "L1232-L1234",
    "lean_name": "curve25519_dalek.scalar.Scalar52.invert",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10517,6 +11078,7 @@
    "lines": "L1174-L1229",
    "lean_name": "curve25519_dalek.scalar.Scalar52.montgomery_invert",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10537,6 +11099,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10556,6 +11119,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10574,6 +11138,7 @@
    "lean_name":
    "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop.mutual",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10594,6 +11159,7 @@
    "lines": "L1165-L1169",
    "lean_name": "curve25519_dalek.scalar.Scalar52.pack",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10612,6 +11178,7 @@
    "lines": "L1415-L1420",
    "lean_name": "curve25519_dalek.scalar.clamp_integer",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": true,
@@ -10627,6 +11194,7 @@
    "lines": "L1376-L1393",
    "lean_name": "curve25519_dalek.scalar.read_le_u64_into",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10642,6 +11210,7 @@
    "lines": "L1379-L1392",
    "lean_name": "curve25519_dalek.scalar.read_le_u64_into_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10658,6 +11227,7 @@
    "lines": "L45-L47",
    "lean_name": "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10674,6 +11244,7 @@
    "lines": "L55-L78",
    "lean_name": "curve25519_dalek.window.LookupTable.select",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10690,6 +11261,7 @@
    "lines": "L65-L138",
    "lean_name": "curve25519_dalek.window.LookupTable.select_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
@@ -10707,6 +11279,7 @@
    "lean_name":
    "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -10726,6 +11299,7 @@
    "lean_name":
    "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop",
    "is_relevant": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
    "fully_verified": false,
