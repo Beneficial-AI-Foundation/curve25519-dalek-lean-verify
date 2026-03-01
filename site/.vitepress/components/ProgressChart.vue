@@ -132,8 +132,8 @@ const chartData = computed(() => {
     {
       label: 'Spec only',
       data: specified,
-      borderColor: '#fdba74',
-      backgroundColor: 'rgba(253, 186, 116, 0.6)',
+      borderColor: '#93c5fd',
+      backgroundColor: 'rgba(147, 197, 253, 0.6)',
       fill: true,
       stepped: 'after' as const,
       borderWidth: 0,

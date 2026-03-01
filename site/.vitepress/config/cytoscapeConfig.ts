@@ -3,7 +3,7 @@ import type { NodeStatus } from '../types/graph'
 // Node colors based on verification status
 export const nodeColors = {
   nothing: '#9ca3af',              // gray-400 - not specified
-  specified: '#f59e0b',            // amber-500 - has spec but not verified
+  specified: '#3b82f6',            // blue-500 - has spec but not verified
   externally_verified: '#6ee7b7',  // emerald-300 - externally verified
   verified: '#22c55e'              // green-500 - verified
 }
@@ -128,6 +128,12 @@ export function createCytoscapeStyles(borderColor: string) {
       selector: '.faded',
       style: {
         'opacity': 0.15
+      }
+    },
+    {
+      selector: 'node[?isIgnored]',
+      style: {
+        'opacity': 0.3
       }
     }
   ]

@@ -405,7 +405,7 @@ watch(selectedFunction, async (fn) => {
 
 .stat-verified { color: var(--vp-c-green-1); }
 .stat-ext-verified { color: #6ee7b7; }
-.stat-specified { color: var(--vp-c-yellow-1); }
+.stat-specified { color: #3b82f6; }
 .stat-unspecified { color: var(--vp-c-text-2); }
 .stat-ignored { color: var(--vp-c-text-3); }
 

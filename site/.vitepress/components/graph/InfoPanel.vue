@@ -100,7 +100,7 @@ function getStatusColor(node: GraphNode): string {
   switch (node.status) {
     case 'verified': return '#22c55e'
     case 'externally_verified': return '#6ee7b7'
-    case 'specified': return '#f59e0b'
+    case 'specified': return '#3b82f6'
     default: return '#9ca3af'
   }
 }
