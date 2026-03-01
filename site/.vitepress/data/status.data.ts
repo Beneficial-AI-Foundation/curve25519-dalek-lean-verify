@@ -24,6 +24,7 @@ export interface StatusData {
     draft_spec: number
     specified: number
     verified: number
+    externally_verified: number
     ai_proveable: number
   }
 }
@@ -54,6 +55,7 @@ export default {
       draft_spec: records.filter(r => r.verified === 'draft spec').length,
       specified: records.filter(r => r.verified === 'specified').length,
       verified: records.filter(r => r.verified === 'verified').length,
+      externally_verified: records.filter(r => r.verified === 'externally verified').length,
       ai_proveable: records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
     }
 

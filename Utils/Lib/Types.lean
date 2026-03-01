@@ -53,8 +53,6 @@ structure FunctionRecord where
   specDocstring : Option String := none
   /-- The spec theorem statement (without proof), if one exists -/
   specStatement : Option String := none
-  /-- The actual Rust source code for this function -/
-  rustSourceCode : Option String := none
   deriving Repr, Inhabited
 
 /-!
@@ -80,7 +78,6 @@ structure FunctionOutput where
   spec_file : Option String := none
   spec_docstring : Option String := none
   spec_statement : Option String := none
-  rust_source : Option String := none
   deriving ToJson, FromJson, Repr
 
 /-- Convert a FunctionRecord to JSON-serializable output -/
@@ -102,8 +99,7 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     externally_verified := rec.isExternallyVerified
     spec_file := rec.specFilePath
     spec_docstring := rec.specDocstring
-    spec_statement := rec.specStatement
-    rust_source := rec.rustSourceCode }
+    spec_statement := rec.specStatement }
 
 /-- Output structure for list of functions -/
 structure FunctionListOutput where

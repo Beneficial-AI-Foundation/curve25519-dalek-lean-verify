@@ -24,19 +24,19 @@ const { dataPoints } = progressData
     <div class="stat-label">Total Functions</div>
   </div>
   <div class="stat-card">
-    <div class="stat-value">{{ stats.extracted }}</div>
-    <div class="stat-label">Extracted</div>
-    <div class="stat-percent">{{ Math.round(stats.extracted / stats.total * 100) }}%</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.specified + stats.verified }}</div>
+    <div class="stat-value">{{ stats.specified + stats.verified + stats.externally_verified }}</div>
     <div class="stat-label">Specified</div>
-    <div class="stat-percent">{{ Math.round((stats.specified + stats.verified) / stats.total * 100) }}%</div>
+    <div class="stat-percent">{{ Math.round((stats.specified + stats.verified + stats.externally_verified) / stats.total * 100) }}%</div>
   </div>
   <div class="stat-card">
     <div class="stat-value">{{ stats.verified }}</div>
     <div class="stat-label">Verified</div>
     <div class="stat-percent">{{ Math.round(stats.verified / stats.total * 100) }}%</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-value">{{ stats.externally_verified }}</div>
+    <div class="stat-label">Ext. Verified</div>
+    <div class="stat-percent">{{ Math.round(stats.externally_verified / stats.total * 100) }}%</div>
   </div>
 </div>
 
