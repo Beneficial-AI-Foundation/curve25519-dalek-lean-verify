@@ -59,6 +59,7 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.IdentityCurveModelsProjectivePoint",
   "curve25519_dalek.IdentityMontgomeryProjectivePoint",
   "curve25519_dalek.backend.get_selected_backend",
+  "curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN",
   "curve25519_dalek.window.LookupTable.select",
   -- Clone (struct literal + .clone child that just returns ok)
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone",
@@ -180,6 +181,7 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
   "curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable",
   "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
+  "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg",
   "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity",
   "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable",
   "curve25519_dalek.Bool.Insts.CoreConvertFromChoice",
@@ -187,6 +189,7 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.U8.Insts.SubtleConstantTimeEq",
   "curve25519_dalek.U8.Insts.SubtleConditionallySelectable",
   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable",
+  "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_swap",
   "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq",
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64",
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64",
@@ -456,7 +459,10 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add",
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul",
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub",
-  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg"
+  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
+  -- Scalar52 (thin wrappers, specs live on montgomery_mul/montgomery_square)
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square"
 ]
 
 end Utils.Config
