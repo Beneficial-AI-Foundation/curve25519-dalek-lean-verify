@@ -7,7 +7,8 @@ open Aeneas Aeneas.Std Result ControlFlow Error
 set_option linter.dupNamespace false
 set_option linter.hashCommand false
 set_option linter.unusedVariables false
-set_option linter.style.commandStart false
+set_option linter.style.whitespace false
+set_option linter.style.setOption false
 
 -- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option
 set_option maxHeartbeats 1000000
@@ -101,7 +102,7 @@ def U8.Insts.SubtleConditionallySelectable : subtle.ConditionallySelectable
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/zeroize-1.8.2/src/lib.rs', lines 297:0-299:23
    Name pattern: [zeroize::Zeroize<@Z>] -/
 @[reducible, rust_trait_impl "zeroize::Zeroize<@Z>"]
-noncomputable def zeroize.Zeroize.Blanket {Z : Type} (DefaultIsZeroesInst :
+def zeroize.Zeroize.Blanket {Z : Type} (DefaultIsZeroesInst :
   zeroize.DefaultIsZeroes Z) : zeroize.Zeroize Z := {
   zeroize := zeroize.Zeroize.Blanket.zeroize DefaultIsZeroesInst
 }
@@ -607,7 +608,7 @@ def
 
 /-- [curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select]: loop 0:
    Source: 'curve25519-dalek/src/window.rs', lines 65:16-138:20 -/
-noncomputable def window.LookupTable.select_loop
+def window.LookupTable.select_loop
   {T : Type} (subtleConditionallySelectableInst :
   subtle.ConditionallySelectable T) (self : window.LookupTable T)
   (xabs : Std.I16) (t : T) (iter : core.ops.range.Range Std.Usize) :
@@ -630,7 +631,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select]:
    Source: 'curve25519-dalek/src/window.rs', lines 55:12-78:13 -/
-noncomputable def window.LookupTable.select
+def window.LookupTable.select
   {T : Type} (traitsIdentityInst : traits.Identity T)
   (subtleConditionallySelectableInst : subtle.ConditionallySelectable T)
   (coremarkerCopyInst : core.marker.Copy T) (coreopsarithNegInst :
@@ -1208,7 +1209,7 @@ def
 
 /-- [curve25519_dalek::backend::serial::scalar_mul::variable_base::mul]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs', lines 36:4-49:5 -/
-noncomputable def backend.serial.scalar_mul.variable_base.mul_loop
+def backend.serial.scalar_mul.variable_base.mul_loop
   (lookup_table : window.LookupTable
   backend.serial.curve_models.ProjectiveNielsPoint)
   (scalar_digits : Array Std.I8 64#usize) (tmp3 : edwards.EdwardsPoint)
@@ -1276,7 +1277,7 @@ def backend.serial.scalar_mul.variable_base.mul
 
 /-- [curve25519_dalek::backend::variable_base_mul]:
    Source: 'curve25519-dalek/src/backend/mod.rs', lines 253:0-263:1 -/
-noncomputable def backend.variable_base_mul
+def backend.variable_base_mul
   (point : edwards.EdwardsPoint) (scalar : scalar.Scalar) :
   Result edwards.EdwardsPoint
   := do
@@ -3334,7 +3335,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes_wide
   let (_, index_mut_back8) ←
     backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
       hi3 4#usize
-  let i41 ← i36 >>> 20#i32
+  let i41 ← (i36 >>> 20#i32)
   let lo4 := index_mut_back4 i22
   let lo5 ←
     backend.serial.u64.scalar.Scalar52.montgomery_mul lo4
@@ -3931,7 +3932,7 @@ def edwards.CompressedEdwardsY.to_bytes
 
 /-- [curve25519_dalek::edwards::decompress::step_2]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 230:4-248:5 -/
-noncomputable def edwards.decompress.step_2
+def edwards.decompress.step_2
   (repr : edwards.CompressedEdwardsY)
   (X : backend.serial.u64.field.FieldElement51)
   (Y : backend.serial.u64.field.FieldElement51)
@@ -4014,7 +4015,7 @@ def field.FieldElement51.pow_p58
 
 /-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i]:
    Source: 'curve25519-dalek/src/field.rs', lines 291:4-338:5 -/
-noncomputable def field.FieldElement51.sqrt_ratio_i
+def field.FieldElement51.sqrt_ratio_i
   (u : backend.serial.u64.field.FieldElement51)
   (v : backend.serial.u64.field.FieldElement51) :
   Result (subtle.Choice × backend.serial.u64.field.FieldElement51)
@@ -4077,7 +4078,7 @@ noncomputable def field.FieldElement51.sqrt_ratio_i
 
 /-- [curve25519_dalek::edwards::decompress::step_1]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 216:4-227:5 -/
-noncomputable def edwards.decompress.step_1
+def edwards.decompress.step_1
   (repr : edwards.CompressedEdwardsY) :
   Result (subtle.Choice × backend.serial.u64.field.FieldElement51 ×
     backend.serial.u64.field.FieldElement51 ×
@@ -4102,7 +4103,7 @@ noncomputable def edwards.decompress.step_1
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 201:4-209:5 -/
-noncomputable def edwards.CompressedEdwardsY.decompress
+def edwards.CompressedEdwardsY.decompress
   (self : edwards.CompressedEdwardsY) :
   Result (Option edwards.EdwardsPoint)
   := do
@@ -4640,7 +4641,7 @@ def SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 877:4-887:5 -/
-noncomputable def edwards.EdwardsPoint.mul_base
+def edwards.EdwardsPoint.mul_base
   (scalar : scalar.Scalar) : Result edwards.EdwardsPoint := do
   let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
   SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul scalar ep
@@ -4670,7 +4671,7 @@ def scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 891:4-903:5 -/
-noncomputable def edwards.EdwardsPoint.mul_clamped
+def edwards.EdwardsPoint.mul_clamped
   (self : edwards.EdwardsPoint) (bytes : Array Std.U8 32#usize) :
   Result edwards.EdwardsPoint
   := do
@@ -4680,7 +4681,7 @@ noncomputable def edwards.EdwardsPoint.mul_clamped
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 907:4-915:5 -/
-noncomputable def edwards.EdwardsPoint.mul_base_clamped
+def edwards.EdwardsPoint.mul_base_clamped
   (bytes : Array Std.U8 32#usize) : Result edwards.EdwardsPoint := do
   let a ← scalar.clamp_integer bytes
   edwards.EdwardsPoint.mul_base { bytes := a }
@@ -4733,7 +4734,7 @@ def traits.IsIdentity.Blanket.is_identity
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1367:4-1369:5 -/
-noncomputable def edwards.EdwardsPoint.is_small_order
+def edwards.EdwardsPoint.is_small_order
   (self : edwards.EdwardsPoint) : Result Bool := do
   let ep ← edwards.EdwardsPoint.mul_by_cofactor self
   traits.IsIdentity.Blanket.is_identity
@@ -4751,7 +4752,7 @@ def SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_torsion_free]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1397:4-1399:5 -/
-noncomputable def edwards.EdwardsPoint.is_torsion_free
+def edwards.EdwardsPoint.is_torsion_free
   (self : edwards.EdwardsPoint) : Result Bool := do
   let ep ←
     SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul self
@@ -4795,7 +4796,7 @@ def backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq :
 
 /-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero]:
    Source: 'curve25519-dalek/src/field.rs', lines 159:4-164:5 -/
-noncomputable def field.FieldElement51.is_zero
+def field.FieldElement51.is_zero
   (self : backend.serial.u64.field.FieldElement51) : Result subtle.Choice := do
   let zero := Array.repeat 32#usize 0#u8
   let bytes ← backend.serial.u64.field.FieldElement51.to_bytes self
@@ -4805,7 +4806,7 @@ noncomputable def field.FieldElement51.is_zero
 
 /-- [curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt]:
    Source: 'curve25519-dalek/src/field.rs', lines 352:4-354:5 -/
-noncomputable def field.FieldElement51.invsqrt
+def field.FieldElement51.invsqrt
   (self : backend.serial.u64.field.FieldElement51) :
   Result (subtle.Choice × backend.serial.u64.field.FieldElement51)
   := do
@@ -6082,14 +6083,14 @@ def montgomery.MontgomeryPoint.Insts.ZeroizeZeroize : zeroize.Zeroize
 
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 128:4-130:5 -/
-noncomputable def montgomery.MontgomeryPoint.mul_base
+def montgomery.MontgomeryPoint.mul_base
   (scalar : scalar.Scalar) : Result montgomery.MontgomeryPoint := do
   let ep ← edwards.EdwardsPoint.mul_base scalar
   edwards.EdwardsPoint.to_montgomery ep
 
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_clamped]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 134:4-146:5 -/
-noncomputable def montgomery.MontgomeryPoint.mul_clamped
+def montgomery.MontgomeryPoint.mul_clamped
   (self : montgomery.MontgomeryPoint) (bytes : Array Std.U8 32#usize) :
   Result montgomery.MontgomeryPoint
   := do
@@ -6099,7 +6100,7 @@ noncomputable def montgomery.MontgomeryPoint.mul_clamped
 
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 150:4-158:5 -/
-noncomputable def montgomery.MontgomeryPoint.mul_base_clamped
+def montgomery.MontgomeryPoint.mul_base_clamped
   (bytes : Array Std.U8 32#usize) : Result montgomery.MontgomeryPoint := do
   let a ← scalar.clamp_integer bytes
   montgomery.MontgomeryPoint.mul_base { bytes := a }
@@ -6118,7 +6119,7 @@ def montgomery.MontgomeryPoint.to_bytes
 
 /-- [curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 224:4-253:5 -/
-noncomputable def montgomery.MontgomeryPoint.to_edwards
+def montgomery.MontgomeryPoint.to_edwards
   (self : montgomery.MontgomeryPoint) (sign : Std.U8) :
   Result (Option edwards.EdwardsPoint)
   := do
@@ -6150,7 +6151,7 @@ noncomputable def montgomery.MontgomeryPoint.to_edwards
 
 /-- [curve25519_dalek::montgomery::elligator_encode]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 263:0-284:1 -/
-noncomputable def montgomery.elligator_encode
+def montgomery.elligator_encode
   (r_0 : backend.serial.u64.field.FieldElement51) :
   Result (montgomery.MontgomeryPoint × subtle.Choice)
   := do
@@ -6436,7 +6437,7 @@ def ristretto.CompressedRistretto.from_slice
 
 /-- [curve25519_dalek::ristretto::decompress::step_2]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 297:4-342:5 -/
-noncomputable def ristretto.decompress.step_2
+def ristretto.decompress.step_2
   (s : backend.serial.u64.field.FieldElement51) :
   Result (subtle.Choice × subtle.Choice × subtle.Choice ×
     ristretto.RistrettoPoint)
@@ -6497,7 +6498,7 @@ noncomputable def ristretto.decompress.step_2
 
 /-- [curve25519_dalek::ristretto::decompress::step_1]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 277:4-295:5 -/
-noncomputable def ristretto.decompress.step_1
+def ristretto.decompress.step_1
   (repr : ristretto.CompressedRistretto) :
   Result (subtle.Choice × subtle.Choice ×
     backend.serial.u64.field.FieldElement51)
@@ -6517,7 +6518,7 @@ noncomputable def ristretto.decompress.step_1
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 257:4-271:5 -/
-noncomputable def ristretto.CompressedRistretto.decompress
+def ristretto.CompressedRistretto.decompress
   (self : ristretto.CompressedRistretto) :
   Result (Option ristretto.RistrettoPoint)
   := do
@@ -6616,7 +6617,7 @@ def ristretto.RistrettoPoint.Insts.CoreMarkerCopy : core.marker.Copy
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 498:4-542:5 -/
-noncomputable def ristretto.RistrettoPoint.compress
+def ristretto.RistrettoPoint.compress
   (self : ristretto.RistrettoPoint) :
   Result ristretto.CompressedRistretto
   := do
@@ -6701,19 +6702,19 @@ def ristretto.RistrettoPoint.coset4
   (self : ristretto.RistrettoPoint) :
   Result (Array edwards.EdwardsPoint 4#usize)
   := do
-  let torsion ← backend.serial.u64.constants.EIGHT_TORSION
+  let a ← backend.serial.u64.constants.EIGHT_TORSION
   let ep ←
-    Array.index_usize torsion 2#usize
+    Array.index_usize a 2#usize
   let ep1 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep
   let ep2 ←
-    Array.index_usize torsion 4#usize
+    Array.index_usize a 4#usize
   let ep3 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep2
   let ep4 ←
-    Array.index_usize torsion 6#usize
+    Array.index_usize a 6#usize
   let ep5 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep4
@@ -6721,7 +6722,7 @@ def ristretto.RistrettoPoint.coset4
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 676:4-728:5 -/
-noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
+def ristretto.RistrettoPoint.elligator_ristretto_flavor
   (r_0 : backend.serial.u64.field.FieldElement51) :
   Result ristretto.RistrettoPoint
   := do
@@ -6809,7 +6810,7 @@ noncomputable def ristretto.RistrettoPoint.elligator_ristretto_flavor
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 823:4-839:5 -/
-noncomputable def ristretto.RistrettoPoint.from_uniform_bytes
+def ristretto.RistrettoPoint.from_uniform_bytes
   (bytes : Array Std.U8 64#usize) : Result ristretto.RistrettoPoint := do
   let r_1_bytes := Array.repeat 32#usize 0#u8
   let (s, to_slice_mut_back) ← lift (Array.to_slice_mut r_1_bytes)
@@ -7030,11 +7031,11 @@ def Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint :
 
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::mul_base]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 988:4-998:5 -/
-noncomputable def ristretto.RistrettoPoint.mul_base
+def ristretto.RistrettoPoint.mul_base
   (scalar : scalar.Scalar) : Result ristretto.RistrettoPoint := do
-  let bp ← constants.RISTRETTO_BASEPOINT_POINT
+  let a ← constants.RISTRETTO_BASEPOINT_POINT
   SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
-    bp
+    a
 
 /-- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 1192:4-1198:5 -/
@@ -7121,14 +7122,14 @@ def scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1158:4-1160:5 -/
-noncomputable def scalar.Scalar.is_canonical
+def scalar.Scalar.is_canonical
   (self : scalar.Scalar) : Result subtle.Choice := do
   let s ← scalar.Scalar.reduce self
   scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq self s
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 261:4-265:5 -/
-noncomputable def scalar.Scalar.from_canonical_bytes
+def scalar.Scalar.from_canonical_bytes
   (bytes : Array Std.U8 32#usize) :
   Result (subtle.CtOption scalar.Scalar)
   := do
@@ -7638,7 +7639,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]:
    Source: 'curve25519-dalek/src/scalar.rs', lines 788:4-845:5 -/
-noncomputable def scalar.Scalar.batch_invert
+def scalar.Scalar.batch_invert
   (inputs : Slice scalar.Scalar) :
   Result (scalar.Scalar × (Slice scalar.Scalar))
   := do
