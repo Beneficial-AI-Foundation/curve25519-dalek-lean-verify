@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
 /-! # Spec Theorem for `constants::ED25519_BASEPOINT_POINT`
 
@@ -16,7 +17,7 @@ point for the prime order subgroup of the Ed25519 elliptic curve group.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result Edwards
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -36,28 +37,24 @@ natural language specs:
     • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)
     • ED25519_BASEPOINT_POINT is of prime order L
 -/
+@[progress]
 theorem ED25519_BASEPOINT_POINT_spec :
-    ED25519_BASEPOINT_POINT.IsValid ∧
-    _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0 ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0 := by
-  have h_valid : ED25519_BASEPOINT_POINT.IsValid := by
-    unfold ED25519_BASEPOINT_POINT
-    decide
-  constructor
-  · exact h_valid
-  constructor
+    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>
+      result.IsValid ∧
+      _root_.L • result.toPoint = 0 ∧
+      result.toPoint ≠ 0 ⦄ := by
+  unfold ED25519_BASEPOINT_POINT
+  progress*
+  refine ⟨?_, ?_, ?_⟩
+  · simp only [*]; decide
   · sorry
-  · intro h
-    have h_X_zero : ED25519_BASEPOINT_POINT.X.toField = 0 := by
-      have : ED25519_BASEPOINT_POINT.toPoint.x = 0 := by
-        rw [h]
-        rfl
-      rw [(edwards.EdwardsPoint.toPoint_of_isValid h_valid).1] at this
-      field_simp [h_valid.Z_ne_zero] at this
-      simp only [mul_zero] at this
-      exact this
-    have h_X_nonzero : ED25519_BASEPOINT_POINT.X.toField ≠ 0 := by
-      unfold ED25519_BASEPOINT_POINT
-      decide
-    exact h_X_nonzero h_X_zero
+  · by_contra h
+    set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
+    have h : ep.X.toField = 0 := by
+      have hv : ep.IsValid := by simp only [ep, *]; decide
+      have : ep.toPoint.x = 0 := by rw [h]; rfl
+      have := edwards.EdwardsPoint.toPoint_of_isValid hv
+      grind [hv.Z_ne_zero]
+    exact absurd h (by simp only [*, ep]; decide)
 
 end curve25519_dalek.backend.serial.u64.constants
