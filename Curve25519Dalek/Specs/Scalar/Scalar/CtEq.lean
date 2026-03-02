@@ -29,10 +29,6 @@ natural language specs:
     • s.bytes = s'.bytes \iff Choice = True
 -/
 
-private theorem Array.to_slice_injective {self : Type} {n : Usize} {A B : Array self n}
-    (h : A.to_slice = B.to_slice) : A = B := by
-  grind [Subtype.ext]
-
 /-- **Spec and proof concerning `scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice` representing equality in constant time
@@ -45,7 +41,7 @@ theorem ct_eq_spec (self other : scalar.Scalar) :
   unfold ct_eq
   progress*
   constructor
-  · grind [Array.to_slice_injective]
+  · grind [Subtype.ext]
   · grind
 
 end curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq
