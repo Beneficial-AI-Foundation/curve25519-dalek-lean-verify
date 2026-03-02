@@ -415,7 +415,11 @@ def hiddenFunctions : List String := [
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2",
   "curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply",
   "curve25519_dalek.scalar.Scalar.as_radix_16.bot_half",
-  "curve25519_dalek.scalar.Scalar.as_radix_16.top_half"
+  "curve25519_dalek.scalar.Scalar.as_radix_16.top_half",
+  -- IsIdentity (trivial trait blanket impl)
+  "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
+  -- LookupTable From (table construction from Edwards point)
+  "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from"
 ]
 
 /-!
@@ -468,7 +472,10 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
   -- Scalar52 (thin wrappers, specs live on montgomery_mul/montgomery_square)
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
-  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square"
+  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
+  -- Variable-base scalar multiplication
+  "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
+  "curve25519_dalek.backend.variable_base_mul"
 ]
 
 end Utils.Config
