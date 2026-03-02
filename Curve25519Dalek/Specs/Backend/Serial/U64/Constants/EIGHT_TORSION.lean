@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
 /-! # Spec Theorem for `constants::EIGHT_TORSION`
 
@@ -23,7 +24,7 @@ generator of order eight. This implies that:
 **Source**: curve25519-dalek/src/backend/serial/u64/constants.rs
 -/
 
-open Aeneas.Std Result Edwards
+open Aeneas Aeneas.Std Result Edwards
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -49,23 +50,27 @@ natural language specs:
 • P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that the order of P divides 8)
 • For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P
 -/
+@[progress]
 theorem EIGHT_TORSION_spec :
-    let P := EIGHT_TORSION.val[1]
-    P.IsValid ∧
-    (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧
-    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧
-    EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by
-  constructor
-  · simp only [EIGHT_TORSION, EIGHT_TORSION_INNER_DOC_HIDDEN]
-    decide
-  constructor
-  · constructor
-    · sorry
-    · sorry
+    EIGHT_TORSION ⦃ result =>
+      let P := result.val[1]
+      P.IsValid ∧ 4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0 ∧
+      (∀ (i : Fin 8), result.val[i].IsValid) ∧
+      (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by
+  unfold EIGHT_TORSION EIGHT_TORSION_INNER_DOC_HIDDEN
+  progress*
+  refine ⟨?_, ?_, ?_, ?_, ?_⟩
+  · simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]; decide
+  · -- ⊢ 4 • EIGHT_TORSION = 0
+    sorry
+  · -- ⊢ 8 • EIGHT_TORSION = 0
+    sorry
   · intro i
-    constructor
-    · simp only [EIGHT_TORSION, EIGHT_TORSION_INNER_DOC_HIDDEN]
-      fin_cases i <;> decide
-    · fin_cases i <;> sorry
+    fin_cases i
+    all_goals
+    · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
+      decide
+  · -- ⊢ EIGHT_TORSION[i].toPoint = (i : ℕ) • P.toPoint
+    sorry
 
 end curve25519_dalek.backend.serial.u64.constants
