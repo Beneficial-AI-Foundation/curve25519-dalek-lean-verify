@@ -29,26 +29,23 @@ natural language specs:
     • s.bytes = s'.bytes \iff Choice = True
 -/
 
+private theorem Array.to_slice_injective {self : Type} {n : Usize} {A B : Array self n}
+    (h : A.to_slice = B.to_slice) : A = B := by
+  grind [Subtype.ext]
+
 /-- **Spec and proof concerning `scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice` representing equality in constant time
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
 -/
 @[progress]
-theorem ct_eq_spec (s s' : scalar.Scalar) :
-    ct_eq s s' ⦃ c =>
-    c = Choice.one ↔ s.bytes = s'.bytes ⦄ := by
+theorem ct_eq_spec (self other : scalar.Scalar) :
+    ct_eq self other ⦃ (c : subtle.Choice) =>
+      c = Choice.one ↔ self.bytes = other.bytes ⦄ := by
   unfold ct_eq
-  repeat progress
+  progress*
   constructor
-  · -- BEGIN TASK
-    intro _
-    have : s.bytes.to_slice = s'.bytes.to_slice := by grind
-    simp only [Array.to_slice, Slice.eq_iff] at *
-    exact Subtype.eq this
-    -- END TASK
-  · -- BEGIN TASK
-    grind
-    -- END TASK
+  · grind [Array.to_slice_injective]
+  · grind
 
 end curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq
