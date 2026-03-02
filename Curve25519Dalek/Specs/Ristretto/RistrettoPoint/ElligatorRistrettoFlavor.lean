@@ -16,6 +16,9 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQUARED
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
 
 /-! # Spec Theorem for `RistrettoPoint::elligator_ristretto_flavor`
 
@@ -35,6 +38,73 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.math
 open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint
+
+/-- **Elligator invariant**: the value s1 produced by the Elligator map never satisfies s1² = -1.
+This ensures the denominator 1 + s1² is never zero in 𝔽_p.
+
+**Proof sketch** (both cases yield a quadratic in r with non-square discriminant):
+- The Elligator map computes r = √(-1)·s², N_s = (r+1)(1-d²), D = (-1-dr)(r+d),
+  then applies sqrt_ratio_i(N_s, D) to get s1 satisfying either:
+  - **Case A** (square): s1²·D = N_s, so s1²=-1 gives N_s+D = 0.
+    Expanding: -(d²+d+1)r² - 2(1+d)r - d = 0 with Δ = -4(d³-d-1), a non-square mod p.
+  - **Case B** (non-square): s1²·D = r·N_s, so s1²=-1 gives r·N_s+D = 0.
+    Expanding: (1-d-d²)r² - 2d²r - d = 0 with Δ = 4d(d-1)²(d+1).
+    Since d is a non-square and (1+d) is a square, d(1+d) is a non-square, so Δ is a non-square.
+-/
+private lemma elligator_s1_sq_ne_neg_one
+    (r_F N_s_F D_F s1_F : CurveField)
+    (hNs : N_s_F = (r_F + 1) * (1 - (d : CurveField) ^ 2))
+    (hD : D_F = (-1 - (d : CurveField) * r_F) * (r_F + (d : CurveField)))
+    (h_cases : s1_F ^ 2 * D_F = N_s_F ∨ s1_F ^ 2 * D_F = r_F * N_s_F)
+    : s1_F ^ 2 ≠ -1 := by
+  set dd := (d : CurveField) with hdd
+  -- The discriminant 4d(d-1)²(d+1) is not a square (d non-square, 1+d square ⟹ d(1+d) non-square)
+  have h_disc_not_sq : ¬IsSquare (4 * dd * (dd - 1) ^ 2 * (dd + 1)) := by
+    have h_eq : 4 * dd * (dd - 1) ^ 2 * (dd + 1) =
+        (Int.cast (4 * (d : ℤ) * ((d : ℤ) - 1) ^ 2 * ((d : ℤ) + 1)) : CurveField) := by
+      push_cast; ring
+    rw [h_eq]
+    exact (legendreSym.eq_neg_one_iff p).mp (by norm_num [d, p])
+  intro h_neg1
+  rcases h_cases with hA | hB
+  · -- Case A: s1² · D = N_s, with s1² = -1 gives N_s + D = 0
+    have h_sum : N_s_F + D_F = 0 := by
+      have : N_s_F = -D_F := by
+        calc N_s_F = s1_F ^ 2 * D_F := hA.symm
+          _ = -1 * D_F := by rw [h_neg1]
+          _ = -D_F := by ring
+      rw [this]; ring
+    -- Expand to polynomial in r_F
+    have h_expanded : (r_F + 1) * (1 - dd ^ 2) + (-1 - dd * r_F) * (r_F + dd) = 0 := by
+      rw [← hNs, ← hD]; exact h_sum
+    have h_poly : dd * r_F ^ 2 + 2 * dd ^ 2 * r_F + (dd + dd ^ 2 - 1) = 0 := by
+      linear_combination -h_expanded
+    -- Complete the square: (2d·r + 2d²)² = 4d(d-1)²(d+1)
+    have h_sq : (2 * dd * r_F + 2 * dd ^ 2) ^ 2 = 4 * dd * (dd - 1) ^ 2 * (dd + 1) := by
+      have : (2 * dd * r_F + 2 * dd ^ 2) ^ 2 =
+        4 * dd * (dd * r_F ^ 2 + 2 * dd ^ 2 * r_F + (dd + dd ^ 2 - 1)) +
+        4 * dd * (dd - 1) ^ 2 * (dd + 1) := by ring
+      rw [this, h_poly, mul_zero, zero_add]
+    exact h_disc_not_sq ⟨2 * dd * r_F + 2 * dd ^ 2, by rw [← sq]; exact h_sq.symm⟩
+  · -- Case B: s1² · D = r · N_s, with s1² = -1 gives r · N_s + D = 0
+    have h_sum : r_F * N_s_F + D_F = 0 := by
+      have : r_F * N_s_F = -D_F := by
+        calc r_F * N_s_F = s1_F ^ 2 * D_F := hB.symm
+          _ = -1 * D_F := by rw [h_neg1]
+          _ = -D_F := by ring
+      rw [this]; ring
+    have h_expanded : r_F * ((r_F + 1) * (1 - dd ^ 2)) + (-1 - dd * r_F) * (r_F + dd) = 0 := by
+      rw [← hNs, ← hD]; exact h_sum
+    have h_poly : (1 - dd - dd ^ 2) * r_F ^ 2 - 2 * dd ^ 2 * r_F - dd = 0 := by
+      linear_combination h_expanded
+    -- Complete the square: (2(1-d-d²)·r - 2d²)² = 4d(d-1)²(d+1)
+    have h_sq : (2 * (1 - dd - dd ^ 2) * r_F - 2 * dd ^ 2) ^ 2 =
+        4 * dd * (dd - 1) ^ 2 * (dd + 1) := by
+      have : (2 * (1 - dd - dd ^ 2) * r_F - 2 * dd ^ 2) ^ 2 =
+        4 * (1 - dd - dd ^ 2) * ((1 - dd - dd ^ 2) * r_F ^ 2 - 2 * dd ^ 2 * r_F - dd) +
+        4 * dd * (dd - 1) ^ 2 * (dd + 1) := by ring
+      rw [this, h_poly, mul_zero, zero_add]
+    exact h_disc_not_sq ⟨2 * (1 - dd - dd ^ 2) * r_F - 2 * dd ^ 2, by rw [← sq]; exact h_sq.symm⟩
 
 /-
 natural language description:
@@ -187,10 +257,106 @@ theorem elligator_ristretto_flavor_spec
       intro h_zero
       have h_s1_sq_eq_m1 : s1.toField ^ 2 = -1 := by
         linear_combination h_zero
-      
-      -- Elligator invariant: The value `s1` produced by the map never squares to -1.
-      -- This requires analyzing the `sqrt_ratio_i` output and `not_sq` selection.
-      sorry -- Elligator invariant: 1 + s₁² ≠ 0 in 𝔽_p
+      -- Lift postconditions to CurveField
+      have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
+        unfold toField
+        have h_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat ONE := by
+          unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+          intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post_1 i hi, mul_add]
+        rw [h_nat]; push_cast; rw [ONE_spec]; simp only [Nat.cast_one]
+      have h_omeds_F :
+          backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField =
+          1 - (d : CurveField) ^ 2 := by
+        unfold toField
+        have h_sum : (Field51_as_Nat backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED +
+            d ^ 2) % p = 1 % p := by
+          rw [backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_spec]; norm_num [d, p]
+        have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
+      have h_ns_eq : N_s.toField = (r.toField + 1) * (1 - (d : CurveField) ^ 2) := by
+        have hN : N_s.toField = r_plus_one.toField *
+            backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField := by
+          unfold toField; have h := lift_mod_eq _ _ N_s_post_1; push_cast at h; exact h
+        rw [hN, h_rpo_F, h_omeds_F]
+      have h_rpd_F : r_plus_d.toField = r.toField + (d : CurveField) := by
+        unfold toField
+        have h_nat : Field51_as_Nat r_plus_d =
+            Field51_as_Nat r + Field51_as_Nat backend.serial.u64.constants.EDWARDS_D := by
+          unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+          intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post_1 i hi, mul_add]
+        rw [h_nat]; push_cast; rw [backend.serial.u64.constants.EDWARDS_D_spec]
+      have h_cmdr_F : c_minus_dr.toField = -1 - (d : CurveField) * r.toField := by
+        have h_m1 : backend.serial.u64.constants.MINUS_ONE.toField = (-1 : CurveField) := by
+          unfold toField; rw [backend.serial.u64.constants.MINUS_ONE_spec]
+          have : (p - 1 : ℕ) + 1 = p := by unfold p; omega
+          have h := lift_mod_eq _ _
+            (show (p - 1 + 1) % p = 0 % p from by rw [this, Nat.mod_self, Nat.zero_mod])
+          push_cast at h; linear_combination h
+        have h_ed : backend.serial.u64.constants.EDWARDS_D.toField = (d : CurveField) := by
+          unfold toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]
+        have hD_sub : c_minus_dr.toField + d_times_r.toField =
+            backend.serial.u64.constants.MINUS_ONE.toField := by
+          unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post_2; push_cast at h; exact h
+        have hD_dr : d_times_r.toField =
+            backend.serial.u64.constants.EDWARDS_D.toField * r.toField := by
+          unfold toField; have h := lift_mod_eq _ _ d_times_r_post_1; push_cast at h; exact h
+        rw [h_m1] at hD_sub
+        rw [h_ed] at hD_dr
+        linear_combination hD_sub - hD_dr
+      have h_D_eq : D.toField =
+          (-1 - (d : CurveField) * r.toField) * (r.toField + (d : CurveField)) := by
+        have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
+          unfold toField; have h := lift_mod_eq _ _ D_post_1; push_cast at h; exact h
+        rw [hD, h_cmdr_F, h_rpd_F]
+      -- Helper: Field51_as_Nat x % p = 0 → x.toField = 0
+      have toField_of_mod_zero {x : backend.serial.u64.field.FieldElement51}
+          (h : Field51_as_Nat x % p = 0) : x.toField = 0 := by
+        unfold toField
+        exact (ZMod.natCast_eq_zero_iff _ _).mpr (Nat.dvd_iff_mod_eq_zero.mpr h)
+      -- Helper: limb-wise conditional assign lifts to Field51_as_Nat equality
+      have cond_f51_eq {z x y : backend.serial.u64.field.FieldElement51}
+          {c : subtle.Choice}
+          (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
+          (hc : c.val = 1#u8) : Field51_as_Nat z = Field51_as_Nat x := by
+        unfold Field51_as_Nat; apply Finset.sum_congr rfl; intro i hi
+        rw [Finset.mem_range] at hi; have h := hpost i hi; simp only [Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, hc, ↓reduceIte] at h; simp only [Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, h]
+      have cond_f51_eq' {z x y : backend.serial.u64.field.FieldElement51}
+          {c : subtle.Choice}
+          (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
+          (hc : ¬(c.val = 1#u8)) : Field51_as_Nat z = Field51_as_Nat y := by
+        unfold Field51_as_Nat; apply Finset.sum_congr rfl; intro i hi
+        rw [Finset.mem_range] at hi; have h := hpost i hi; simp only [Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, hc, ↓reduceIte] at h; simp only [Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, h]
+      -- Case split on D % p = 0
+      by_cases hD_mod : Field51_as_Nat D % p = 0
+      · -- D ≡ 0 (mod p): s1 must be 0, contradicting s1² = -1
+        have h_raw_zero : Field51_as_Nat __discr.2 % p = 0 := by
+          by_cases hN0 : Field51_as_Nat N_s % p = 0
+          · exact (__discr_post_3 hN0).2
+          · exact (__discr_post_4 ⟨hN0, hD_mod⟩).2
+        have h_sp_mod : Field51_as_Nat s_prime % p = 0 := by
+          have : Field51_as_Nat s_prime % p =
+              (Field51_as_Nat __discr.2 * Field51_as_Nat s) % p := s_prime_post_1
+          rw [Nat.mul_mod, h_raw_zero, zero_mul, Nat.zero_mod] at this; exact this
+        have h_spn_mod : Field51_as_Nat s_prime_neg % p = 0 := by
+          have := s_prime_neg_post_1
+          rwa [Nat.add_mod, h_sp_mod, zero_add, Nat.mod_mod] at this
+        have h_sp1_mod : Field51_as_Nat s_prime1 % p = 0 := by
+          by_cases hc : s_prime_is_pos.val = 1#u8
+          · rw [cond_f51_eq s_prime1_post hc]; exact h_spn_mod
+          · rw [cond_f51_eq' s_prime1_post hc]; exact h_sp_mod
+        have h_s1_mod : Field51_as_Nat s1 % p = 0 := by
+          by_cases hc : not_sq.val = 1#u8
+          · rw [cond_f51_eq s1_post hc]; exact h_sp1_mod
+          · rw [cond_f51_eq' s1_post hc]; exact h_raw_zero
+        rw [show s1.toField = 0 from toField_of_mod_zero h_s1_mod] at h_s1_sq_eq_m1
+        simp at h_s1_sq_eq_m1
+      · -- D ≢ 0 (mod p): prove the disjunction and apply the lemma
+        exact absurd h_s1_sq_eq_m1
+          (elligator_s1_sq_ne_neg_one r.toField N_s.toField D.toField s1.toField
+            h_ns_eq h_D_eq (by sorry))
     -- Elligator invariant: N_t · √(ad−1) is never zero in 𝔽_p.
     -- √(ad−1) ≠ 0 follows from sqrt_ad_minus_one_ne_zero;
     -- N_t ≠ 0 requires algorithmic reasoning about the Elligator map.

@@ -222,19 +222,22 @@ theorem add_y (p q : Point Ed25519) :
 /-- The identity element (0, 1) is a left identity for addition. -/
 theorem zero_add_Ed25519 (p : Point Ed25519) : (0 : Point Ed25519) + p = p := by
   ext
-  · rw [add_x]; simp [Ed25519]
-  · rw [add_y]; simp [Ed25519]
+  · rw [add_x]; simp only [Ed25519, zero_x, zero_mul, zero_y, one_mul, zero_add, mul_zero, mul_one,
+    add_zero, div_one]
+  · rw [add_y]; simp only [Ed25519, zero_y, one_mul, zero_x, mul_zero, zero_mul, sub_zero, mul_one,
+    div_one]
 
 /-- The identity element (0, 1) is a right identity for addition. -/
 theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
   ext
-  · rw [add_x]; simp [Ed25519]
-  · rw [add_y]; simp [Ed25519]
+  · rw [add_x]; simp only [Ed25519, zero_y, mul_one, zero_x, mul_zero, add_zero, zero_mul, div_one]
+  · rw [add_y]; simp only [Ed25519, zero_y, mul_one, neg_mul, one_mul, zero_x, mul_zero, sub_zero,
+    zero_mul, div_one]
 
 /-- Negation is a left inverse: -p + p = 0. -/
 theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
   have h : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by
-    have := p.on_curve; simp [Ed25519] at this; grind
+    have := p.on_curve; simp only [Ed25519, neg_mul, one_mul] at this; grind
   have : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := calc
     1 + d * p.x^2 * p.y^2 = 1 - d * (-p.x) * p.x * p.y * p.y := by ring
     _ ≠ 0 := (Ed25519.denomsNeZero (-p) p).2
