@@ -31,6 +31,8 @@ It maps an arbitrary field element s to a valid Ristretto point.
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.math
+open Edwards
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -147,7 +149,48 @@ theorem elligator_ristretto_flavor_spec
     simp only [Array.getElem!_Nat_eq] at h ⊢; omega
   · intro i hi; have h := cp_Z_post_2 i hi -- 39: cp_Z < 2^54
     simp only [Array.getElem!_Nat_eq] at h ⊢; omega
-  · sorry -- 40: IsValid ∧ toPoint = elligator_ristretto_flavor_pure
+  · -- 40: IsValid ∧ toPoint = elligator_ristretto_flavor_pure
+    -- Step 1: Lift arithmetic postconditions to field equalities
+    have hX_F : ep.X.toField = cp_X.toField * cp_T.toField := by
+      unfold toField
+      have h := lift_mod_eq _ _ ep_post_1
+      push_cast at h; exact h
+    have hY_F : ep.Y.toField = cp_Y.toField * cp_Z.toField := by
+      unfold toField
+      have h := lift_mod_eq _ _ ep_post_2
+      push_cast at h; exact h
+    have hZ_F : ep.Z.toField = cp_Z.toField * cp_T.toField := by
+      unfold toField
+      have h := lift_mod_eq _ _ ep_post_3
+      push_cast at h; exact h
+    have hT_F : ep.T.toField = cp_X.toField * cp_Y.toField := by
+      unfold toField
+      have h := lift_mod_eq _ _ ep_post_4
+      push_cast at h; exact h
+    -- Step 2: Prove ep.Z.toField ≠ 0
+    have hZ_ne : ep.Z.toField ≠ 0 := by
+      rw [hZ_F]
+      exact mul_ne_zero sorry sorry -- cp_Z.toField ≠ 0 ∧ cp_T.toField ≠ 0
+    -- Step 3: Assemble EdwardsPoint.IsValid
+    have h_ep_valid : edwards.EdwardsPoint.IsValid ep := {
+      X_bounds := fun i hi => by have := ep_post_5 i hi; omega
+      Y_bounds := fun i hi => by have := ep_post_6 i hi; omega
+      Z_bounds := fun i hi => by have := ep_post_7 i hi; omega
+      T_bounds := fun i hi => by have := ep_post_8 i hi; omega
+      Z_ne_zero := hZ_ne
+      T_relation := by rw [hX_F, hY_F, hT_F, hZ_F]; ring
+      on_curve := by
+        simp only [hX_F, hY_F, hZ_F]
+        sorry -- curve equation
+    }
+    constructor
+    · -- RistrettoPoint.IsValid ep = EdwardsPoint.IsValid ∧ IsSquare (Z² - Y²)
+      exact ⟨h_ep_valid, by
+        simp only [hZ_F, hY_F]
+        sorry -- evenness: IsSquare ((cp_Z*cp_T)² - (cp_Y*cp_Z)²)
+      ⟩
+    · -- toPoint ep = (elligator_ristretto_flavor_pure s.toField).val
+      sorry
 
 
 

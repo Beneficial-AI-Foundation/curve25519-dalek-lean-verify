@@ -49,6 +49,7 @@ satisfies the conversion formulas modulo p:
 - Z' ≡ Z·T (mod p)
 - T' ≡ X·Y (mod p)
 where p = 2^255 - 19
+- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)
 These formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended
 twisted Edwards ℙ³ coordinates.
 -/
@@ -70,11 +71,16 @@ let T' := Field51_as_Nat e.T
 X' % p = (X * T) % p ∧
 Y' % p = (Y * Z) % p ∧
 Z' % p = (Z * T) % p ∧
-T' % p = (X * Y) % p ⦄
+T' % p = (X * Y) % p ∧
+(∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧
+(∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧
+(∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧
+(∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄
 := by
   unfold as_extended
   progress*
   rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
-  simp_all
+  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos,
+    Nat.reducePow, implies_true, and_self]
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint
