@@ -8,7 +8,7 @@ async function getHighlighter(): Promise<Highlighter> {
   if (!highlighterPromise) {
     highlighterPromise = createHighlighter({
       themes: ['github-dark', 'github-light'],
-      langs: ['lean4']
+      langs: ['lean4', 'rust']
     })
   }
   return highlighterPromise

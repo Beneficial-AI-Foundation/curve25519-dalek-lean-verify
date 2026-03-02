@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorems for `EdwardsPoint::mul`
 
@@ -44,7 +45,7 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < L)
     (h_e_valid : e.IsValid) :

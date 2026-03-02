@@ -6,6 +6,17 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
+import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
+import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
 
 /-! # Spec Theorem for `RistrettoPoint::compress`
 
@@ -17,7 +28,7 @@ RistrettoPoint to its canonical 32-byte representation. The function is defined 
 - [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
 
 It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a unique, canonical byte representation.
-
+>>
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
@@ -52,6 +63,83 @@ theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
     compress rist ⦃ result =>
     result.IsValid ∧
     math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by
-  sorry
+  unfold compress
+  progress*
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · sorry
+
+  · constructor
+
+    · sorry
+
+    · sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
