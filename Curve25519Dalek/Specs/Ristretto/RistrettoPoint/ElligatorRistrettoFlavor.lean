@@ -14,6 +14,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 
 /-! # Spec Theorem for `RistrettoPoint::elligator_ristretto_flavor`
@@ -168,10 +169,28 @@ theorem elligator_ristretto_flavor_spec
       have h := lift_mod_eq _ _ ep_post_4
       push_cast at h; exact h
     -- Step 2: Prove ep.Z.toField ≠ 0
+    -- Elligator invariant: the denominator 1 + s² is never zero in 𝔽_p
+    -- for the specific s produced by the algorithm.
+    have h_cp_T_ne : cp_T.toField ≠ 0 := by
+
+      sorry -- Elligator invariant: 1 + s₁² ≠ 0 in 𝔽_p
+    -- Elligator invariant: N_t · √(ad−1) is never zero in 𝔽_p.
+    -- √(ad−1) ≠ 0 follows from sqrt_ad_minus_one_ne_zero;
+    -- N_t ≠ 0 requires algorithmic reasoning about the Elligator map.
+    have h_cp_Z_ne : cp_Z.toField ≠ 0 := by
+      sorry -- Elligator invariant: N_t · √(ad−1) ≠ 0 in 𝔽_p
     have hZ_ne : ep.Z.toField ≠ 0 := by
       rw [hZ_F]
-      exact mul_ne_zero sorry sorry -- cp_Z.toField ≠ 0 ∧ cp_T.toField ≠ 0
-    -- Step 3: Assemble EdwardsPoint.IsValid
+      exact mul_ne_zero h_cp_Z_ne h_cp_T_ne
+    -- Step 3: Completed point lies on the twisted Edwards curve.
+    -- This is the key Elligator invariant: the map produces a valid curve point.
+    have h_cp_curve :
+        Ed25519.a * cp_X.toField ^ 2 * cp_T.toField ^ 2 +
+          cp_Y.toField ^ 2 * cp_Z.toField ^ 2 =
+        cp_Z.toField ^ 2 * cp_T.toField ^ 2 +
+          Ed25519.d * cp_X.toField ^ 2 * cp_Y.toField ^ 2 := by
+      sorry -- Elligator invariant: completed point (cp_X, cp_Y, cp_Z, cp_T) on curve
+    -- Step 4: Assemble EdwardsPoint.IsValid
     have h_ep_valid : edwards.EdwardsPoint.IsValid ep := {
       X_bounds := fun i hi => by have := ep_post_5 i hi; omega
       Y_bounds := fun i hi => by have := ep_post_6 i hi; omega
@@ -181,15 +200,42 @@ theorem elligator_ristretto_flavor_spec
       T_relation := by rw [hX_F, hY_F, hT_F, hZ_F]; ring
       on_curve := by
         simp only [hX_F, hY_F, hZ_F]
-        sorry -- curve equation
+        linear_combination (cp_Z.toField ^ 2 * cp_T.toField ^ 2) * h_cp_curve
     }
     constructor
     · -- RistrettoPoint.IsValid ep = EdwardsPoint.IsValid ∧ IsSquare (Z² - Y²)
-      exact ⟨h_ep_valid, by
-        simp only [hZ_F, hY_F]
-        sorry -- evenness: IsSquare ((cp_Z*cp_T)² - (cp_Y*cp_Z)²)
-      ⟩
+      refine ⟨h_ep_valid, ?_⟩
+      simp only [hZ_F, hY_F]
+      -- Goal: IsSquare ((cpZ*cpT)² - (cpY*cpZ)²)
+      -- Factor: cpZ² · (cpT² - cpY²) with cpT = 1+s², cpY = 1-s²
+      --   ⟹ cpZ² · 4 · s1² = (2 · cpZ · s1)²
+      have h_s_sq_F : s_sq.toField = s1.toField ^ 2 := by
+        unfold toField
+        have h := lift_mod_eq _ _ s_sq_post_1
+        push_cast at h; exact h
+      have h_cp_Y_F : cp_Y.toField + s_sq.toField = ONE.toField := by
+        unfold toField
+        have h := lift_mod_eq _ _ cp_Y_post_2
+        push_cast at h; exact h
+      have h_cp_T_F : cp_T.toField = ONE.toField + s_sq.toField := by
+        unfold toField
+        have h_nat : Field51_as_Nat cp_T = Field51_as_Nat ONE + Field51_as_Nat s_sq := by
+          unfold Field51_as_Nat
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post_1 i hi, mul_add]
+        rw [h_nat]; push_cast; ring
+      have h_ONE_F : ONE.toField = (1 : CurveField) := by
+        unfold toField; rw [ONE_spec]; simp only [Nat.cast_one]
+      exact ⟨2 * cp_Z.toField * s1.toField, by
+        have h_Y : cp_Y.toField = ONE.toField - s_sq.toField := by
+          linear_combination h_cp_Y_F
+        rw [h_cp_T_F, h_Y, h_s_sq_F, h_ONE_F]; ring⟩
     · -- toPoint ep = (elligator_ristretto_flavor_pure s.toField).val
+      -- Strategy: decompose into x and y coordinate equality, then show
+      -- each coordinate of the implementation matches the pure Elligator map.
+      -- ep.toPoint = (ep.X/ep.Z, ep.Y/ep.Z) = (cp_X/cp_Z, cp_Y/cp_T)
+      -- Pure spec: x = 2sD/(N_t·√(ad-1)), y = (1-s²)/(1+s²)
       sorry
 
 
