@@ -168,11 +168,28 @@ theorem elligator_ristretto_flavor_spec
       unfold toField
       have h := lift_mod_eq _ _ ep_post_4
       push_cast at h; exact h
+    have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
+        unfold toField
+        have h_nat : Field51_as_Nat cp_T = Field51_as_Nat ONE + Field51_as_Nat s_sq := by
+          unfold Field51_as_Nat
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post_1 i hi, mul_add]
+        rw [h_nat]; push_cast
+        have hsq := lift_mod_eq _ _ s_sq_post_1
+        push_cast at hsq; rw [hsq, ONE_spec]
+        simp only [Nat.cast_one]
     -- Step 2: Prove ep.Z.toField ≠ 0
     -- Elligator invariant: the denominator 1 + s² is never zero in 𝔽_p
     -- for the specific s produced by the algorithm.
     have h_cp_T_ne : cp_T.toField ≠ 0 := by
-
+      rw [h_cp_T_F]
+      intro h_zero
+      have h_s1_sq_eq_m1 : s1.toField ^ 2 = -1 := by
+        linear_combination h_zero
+      
+      -- Elligator invariant: The value `s1` produced by the map never squares to -1.
+      -- This requires analyzing the `sqrt_ratio_i` output and `not_sq` selection.
       sorry -- Elligator invariant: 1 + s₁² ≠ 0 in 𝔽_p
     -- Elligator invariant: N_t · √(ad−1) is never zero in 𝔽_p.
     -- √(ad−1) ≠ 0 follows from sqrt_ad_minus_one_ne_zero;
