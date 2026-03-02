@@ -54,7 +54,19 @@ def valid_ladder_state
     P_affine ≠ Q_affine ∧
     Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
     Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
-    Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ
+    Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ ∧
+    -- P_affine ∈ Curve25519Dalek.Set ∧
+    -- Q_affine ∈ Curve25519Dalek.toSet ∧
+    -- (Field51_as_Nat affine_PmQ : Montgomery.CurveField) ≠ 0
+    -- 新增：P 和 Q 的 W 坐标的特定代数性质
+    -- 保证 doubling 和 differential addition 的分母非零?need?
+    (4 : Montgomery.CurveField) * (Field51_as_Nat P.U : Montgomery.CurveField) *
+      (Field51_as_Nat P.W : Montgomery.CurveField) *
+      ((Field51_as_Nat backend.serial.u64.constants.APLUS2_OVER_FOUR : Montgomery.CurveField) *
+        4 * (Field51_as_Nat P.U) * (Field51_as_Nat P.W) +
+        ((Field51_as_Nat P.U - Field51_as_Nat P.W) : Montgomery.CurveField)^2) ≠ 0
+
+
 
 /-
 natural language description:
@@ -105,5 +117,21 @@ theorem differential_add_and_double_spec
         (Field51_as_Nat P'.U / Field51_as_Nat P'.W = Montgomery.get_u (2 • P_affine)) ∧
         (Field51_as_Nat Q'.U / Field51_as_Nat Q'.W = Montgomery.get_u (P_affine + Q_affine)))
     ⦄ := by
-  sorry
+  -- Unfold the function definition
+  unfold differential_add_and_double
+  progress* <;> try grind only
+  · exact APLUS2_OVER_FOUR_bounded
+  · constructor
+    -- refine ⟨?h_valid1, ?h_rest⟩
+    · unfold  valid_ladder_state at h_ladder_state
+      sorry
+    · sorry
+
+
+  -- STEP 1: Execute the computation and extract intermediate values
+  -- The function computes 18 intermediate values t0...t17
+  -- Following the implementation in Funs.lean:5528-5574
+
+  -- For now, we use a simplified proof structure
+  -- TODO: Fill in the detailed computation steps
 end curve25519_dalek.montgomery
