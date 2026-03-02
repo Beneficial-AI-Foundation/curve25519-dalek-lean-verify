@@ -2323,11 +2323,14 @@
     "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem APLUS2_OVER_FOUR_spec : Field51_as_Nat APLUS2_OVER_FOUR = 121666 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/APLUS2_OVER_FOUR.lean",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:\n- The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
