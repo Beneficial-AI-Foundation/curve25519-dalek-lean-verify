@@ -255,25 +255,25 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
     cases Choice.val_cases condition with
     | inl =>
       have : condition = Choice.zero := by cases condition; simp [Choice.zero]; grind
-      have : Scalar52_as_Nat res.2 + 2 ^ 260 * (res.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
+      have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
         simp_all
       grind
     | inr =>
       have : condition = Choice.one := by cases condition; simp [Choice.one]; grind
-      have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
+      have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
       simp only [Finset.Ico_self] at *
       grind
   · -- condition = Choice.one case
     intro hc
     have : condition.val = 1#u8 := by rw [hc]; rfl
-    have : Scalar52_as_Nat res.2 < 2 ^ 260 := Scalar52_as_Nat_bounded res.2 (by assumption)
+    have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
     have : L < 2 ^ 260 := by unfold L; grind
     simp only [Finset.Ico_self] at *
     grind
   · -- condition = Choice.zero case
     intro hc
     have : condition.val = 0#u8 := by rw [hc]; rfl
-    have : Scalar52_as_Nat res.2 + 2 ^ 260 * (res.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
+    have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
       simp_all
     have : L < 2 ^ 260 := by unfold L; grind
     grind
