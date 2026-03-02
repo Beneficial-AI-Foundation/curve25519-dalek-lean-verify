@@ -4962,10 +4962,10 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -9029,7 +9029,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n    compress rist ⦃ result =>\n    result.IsValid ∧\n    math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by ...",
+   "theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :\n    compress self ⦃ (result : CompressedRistretto) =>\n      result.IsValid ∧\n      math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n• The function always succeeds (no panic) for all valid RistrettoPoint inputs\n• The output is a valid CompressedRistretto 32-byte representation\n• The output accurately reflects the output of the pure mathematical compression function\n-/",
