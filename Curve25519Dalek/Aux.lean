@@ -183,7 +183,6 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (h_funs_eq)
   simp only [L, L', List.ofFn_inj] at h_inj
   apply Subtype.ext
-  apply Subtype.ext
   apply List.ext_get
   · simp [List.Vector.length_val]
   · intro n h_a h_a'
