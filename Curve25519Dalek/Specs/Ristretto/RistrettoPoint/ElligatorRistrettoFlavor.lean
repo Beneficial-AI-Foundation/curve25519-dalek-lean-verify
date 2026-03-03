@@ -836,7 +836,26 @@ theorem elligator_ristretto_flavor_spec
           unfold toField; rw [cond_f51_eq_neg c1_post h_nsq]; exact MINUS_ONE_toField
         · -- Non-square case: c1 = r
           have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
-          have h_not_sq : ¬ elligator_is_square s.toField := by sorry
+          have h_not_sq : ¬ elligator_is_square s.toField := by
+            change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
+            rw [← h_D_bridge, ← h_Ns_bridge]
+            by_cases hN0 : Field51_as_Nat N_s % p = 0
+            · exact absurd (__discr_post_3 hN0).1 h_sq_flag
+            · by_cases hD_mod : Field51_as_Nat D % p = 0
+              · intro ⟨x, hx⟩; apply hN0
+                rw [toField_of_mod_zero hD_mod, mul_zero] at hx
+                unfold toField at hx
+                exact Nat.dvd_iff_mod_eq_zero.mp
+                  ((ZMod.natCast_eq_zero_iff _ _).mp hx.symm)
+              · intro ⟨x, hx⟩; apply h_sq_flag
+                exact (__discr_post_5 ⟨hN0, hD_mod, ⟨ZMod.val x, by
+                  unfold toField at hx
+                  exact ((Nat.ModEq.mul_left (ZMod.val x ^ 2)
+                    (Nat.mod_modEq (Field51_as_Nat D) p).symm).symm.trans
+                    ((ZMod.natCast_eq_natCast_iff _ _ p).mp (by
+                      push_cast
+                      simp only [ZMod.natCast_val, ZMod.cast_id', id_eq]
+                      exact hx)))⟩⟩).1
           rw [if_neg h_not_sq]
           rw [show c1.toField = r.toField from by
             unfold toField; rw [cond_f51_eq c1_post h_nsq]]
