@@ -50,3 +50,4 @@ site/public/doc
 
 # FVS analysis output
 .formalising/
+stubs/
