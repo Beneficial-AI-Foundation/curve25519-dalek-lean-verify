@@ -789,36 +789,29 @@ theorem elligator_ristretto_flavor_spec
       have h_cp_Z_F : cp_Z.toField = N_t.toField *
           backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField := by
         unfold toField; have h := lift_mod_eq _ _ cp_Z_post_1; push_cast at h; exact h
+      -- Bridge identities: connect implementation variables to spec step functions
+      have h_s1_bridge : s1.toField = elligator_s s.toField := by sorry
+      have h_D_bridge : D.toField = elligator_D s.toField := by sorry
+      have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by sorry
+      have h_omega_bridge :
+          backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField =
+            sqrt_ad_minus_one := by sorry
       ext
       · -- x coordinate
         rw [h_impl_x, hX_F, hZ_F]
         rw [(IsUnit.mk0 _ h_cp_T_ne).mul_div_mul_right cp_X.toField cp_Z.toField]
-        -- Goal: cp_X / cp_Z = pure_x
         rw [h_cp_X_F, h_cp_Z_F]
-        -- delta elligator_ristretto_flavor_pure
-        sorry
-        -- dsimp only [Lean.Elab.WF.paramLet, neg_add_rev, mul_inv_rev]
-        -- split
-        -- · -- Square case: IsSquare ratio
-        --   rename_i h_is_sq
-        --   -- simp only [neg_add_rev, mul_inv_rev, neg_mul, one_mul, neg_sub]
-        --   -- simp only [if_pos h_is_sq]
-
-        --   sorry
-        -- · -- Non-square case: ¬IsSquare ratio
-        --   rename_i h_not_sq
-        --   -- simp only [if_neg h_not_sq]
-        --   sorry
+        simp only [elligator_pure_val_x]
+        unfold elligator_ristretto_flavor_x
+        rw [h_s1_bridge, h_D_bridge, h_Nt_bridge, h_omega_bridge]
       · -- y coordinate
         rw [h_impl_y, hY_F, hZ_F]
         rw [show cp_Z.toField * cp_T.toField = cp_T.toField * cp_Z.toField from mul_comm _ _]
         rw [(IsUnit.mk0 _ h_cp_Z_ne).mul_div_mul_right cp_Y.toField cp_T.toField]
-        -- Goal: cp_Y / cp_T = pure_y
         rw [h_cp_Y_F, h_cp_T_F]
-        -- delta elligator_ristretto_flavor_pure
-        -- dsimp only [Lean.Elab.WF.paramLet, neg_add_rev, mul_inv_rev]
-
-        sorry
+        simp only [elligator_pure_val_y]
+        unfold elligator_ristretto_flavor_y
+        rw [h_s1_bridge]
 
 
 
