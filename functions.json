@@ -788,10 +788,11 @@
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem sub_spec : True := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Sub.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Sub<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::sub",
@@ -8098,10 +8099,12 @@
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem identity_spec : True := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::CompressedRistretto}::identity",
@@ -8135,10 +8138,11 @@
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem ct_eq_spec : True := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/CtEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::CompressedRistretto}::ct_eq",
@@ -8195,10 +8199,12 @@
    ["curve25519_dalek.ristretto.decompress.step_1",
     "curve25519_dalek.ristretto.decompress.step_2"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem from_slice_spec : True := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.from_slice`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::from_slice",
@@ -8344,10 +8350,11 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem eq_spec : True := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Eq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::eq",
@@ -8933,10 +8940,11 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem identity_spec : True := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::RistrettoPoint}::identity",
@@ -8972,10 +8980,12 @@
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem conditional_select_spec : True := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select",
@@ -9010,10 +9020,11 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement": "theorem ct_eq_spec : True := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/CtEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq`**:\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::RistrettoPoint}::ct_eq",
