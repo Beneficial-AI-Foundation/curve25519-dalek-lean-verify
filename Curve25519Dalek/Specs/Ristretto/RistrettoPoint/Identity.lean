@@ -4,8 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 
 /-! # Spec Theorem for `RistrettoPoint::identity`
 
@@ -14,20 +13,33 @@ Specification and proof for the `Identity` trait implementation for `RistrettoPo
 This function returns the identity element of the Ristretto group by delegating to the
 underlying Edwards point identity.
 
-**Source**: curve25519-dalek/src/ristretto.rs
+**Source**: curve25519-dalek/src/ristretto.rs, lines 843:4-845:5
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
+open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
 
 /-
 natural language description:
 
+- Returns the identity element of the Ristretto group
+- Delegates to `EdwardsPoint::identity` which returns (X=0, Y=1, Z=1, T=0)
+
+natural language specs:
+
+- The function always succeeds (no panic)
+- The resulting RistrettoPoint has coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+- No panic (always returns successfully)
+- The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
-theorem identity_spec : True := by
+@[progress]
+theorem identity_spec :
+    spec identity (fun q =>
+    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO) := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
