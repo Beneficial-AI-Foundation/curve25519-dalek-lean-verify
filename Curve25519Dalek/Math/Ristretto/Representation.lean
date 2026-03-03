@@ -559,7 +559,8 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
     (1 - a_val * s ^ 2) ^ 2) * (1 - a_val * s ^ 2) ^ 2
   -- 1. Key algebraic facts (established BEFORE unfolding)
   have h_W_ne : W ≠ 0 := right_ne_zero_of_mul_eq_one hI
-  have h_I_ne : I ≠ 0 := by intro h; simp [h] at hI
+  have h_I_ne : I ≠ 0 := by intro h; simp only [h, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+    zero_pow, zero_mul, zero_ne_one] at hI
   have h_sq_W : IsSquare W := ⟨I⁻¹, by
     have : W = (I ^ 2)⁻¹ := by rw [eq_inv_of_mul_eq_one_left hI, inv_inv]
     rw [this, ← inv_pow, sq]⟩
@@ -590,7 +591,7 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
   -- 5. x coordinate: abs_edwards(2s * I' * u2) = abs_edwards(2s * I * u2) (I' = ±I)
   have abs_edwards_neg : ∀ (x : ZMod p), abs_edwards (-x) = abs_edwards x := by
     intro x; by_cases hx : x = 0
-    · simp [hx]
+    · simp only [hx, neg_zero]
     · unfold abs_edwards is_negative
       have h_neg_val : (-x : ZMod p).val = p - x.val := by
         rw [ZMod.neg_val]; exact if_neg hx
@@ -602,10 +603,10 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
       have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
       by_cases hpx : x.val % 2 = 1
       · have : (p - x.val) % 2 = 0 := by omega
-        simp only [beq_iff_eq] at *; simp [hpx, this]
+        simp only [beq_iff_eq] at *; simp only [this, zero_ne_one, ↓reduceIte, hpx]
       · have hpx0 : x.val % 2 = 0 := by omega
         have : (p - x.val) % 2 = 1 := by omega
-        simp only [beq_iff_eq] at *; simp [hpx0, this]
+        simp only [beq_iff_eq] at *; simp only [this, ↓reduceIte, neg_neg, hpx0, zero_ne_one]
   have h_x_match : abs_edwards (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) =
       pt.x := by
     rw [hx]
@@ -705,7 +706,7 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
 
   -- 5. Selection Logic
   let (s, c, D_final) := if is_sq then
-      (sqrt ratio, -one, D_initial)
+      (abs_edwards (sqrt ratio), -one, D_initial)
     else
       let s_prime := (sqrt (i * ratio)) * r0
       (-abs_edwards s_prime, r, D_initial)
