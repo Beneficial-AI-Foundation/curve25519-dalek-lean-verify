@@ -1096,7 +1096,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_loop_spec\n    (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 x1 : montgomery.ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize)\n    (prev_bit : Bool)\n    (i : Isize)\n    (idx0W : x0.W = backend.serial.u64.field.FieldElement51.ZERO)\n    (idx1W : x1.W = backend.serial.u64.field.FieldElement51.ONE)\n    (idx0U : x0.U = backend.serial.u64.field.FieldElement51.ONE)\n    :\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>\n    (res.2.2 =true →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n        +  2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n        + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.2.1.U.toField\n      let w_out := res.2.1.W.toField\n      let u_ord := u_out/w_out\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧\n    (res.2.2 = false →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n      + 2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n      + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.1.U.toField\n      let w_out := res.1.W.toField\n      let u_ord := u_out/w_out\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄\n := by ...",
+   "theorem mul_loop_spec\n    (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 x1 : montgomery.ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize)\n    (prev_bit : Bool)\n    (i : Isize)\n    (h : affine_u.IsValid)\n    (idx0W : x0.W = backend.serial.u64.field.FieldElement51.ZERO)\n    (idx1W : x1.W = backend.serial.u64.field.FieldElement51.ONE)\n    (idx0U : x0.U = backend.serial.u64.field.FieldElement51.ONE)\n    :\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>\n    (res.2.2 =true →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n        +  2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n        + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.2.1.U.toField\n      let w_out := res.2.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧\n    (res.2.2 = false →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n      + 2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n      + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.1.U.toField\n      let w_out := res.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
@@ -2537,7 +2537,7 @@
    "lines": "L11-L51",
    "lean_name": "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -2581,11 +2581,14 @@
     "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem APLUS2_OVER_FOUR_spec : Field51_as_Nat APLUS2_OVER_FOUR = 121666 := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/APLUS2_OVER_FOUR.lean",
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:\n- The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
@@ -4938,7 +4941,7 @@
    "lines": "L253-L263",
    "lean_name": "curve25519_dalek.backend.variable_base_mul",
    "is_relevant": true,
-   "is_ignored": false,
+   "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4962,10 +4965,10 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -7778,7 +7781,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem as_affine_spec (self : montgomery.ProjectivePoint)\n    (hU : self.U.IsValid)\n    (hW : self.W.IsValid)\n    (h_valid : self.W.toField ≠ 0) :\n    as_affine self ⦃ res => bytesToField res = self.U.toField  / self.W.toField  ⦄ := by ...",
+   "\ntheorem as_affine_spec (self : montgomery.ProjectivePoint)\n    (hU : self.U.IsValid)\n    (hW : self.W.IsValid)\n    (h_valid : self.W.toField ≠ 0) :\n    as_affine self ⦃ res => (bytesToField res = self.U.toField  / self.W.toField) ∧\n    (U8x32_as_Nat res < 2 ^255)  ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/AsAffine.lean",
    "spec_docstring":
@@ -9029,7 +9032,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :\n    compress rist ⦃ result =>\n    result.IsValid ∧\n    math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by ...",
+   "theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :\n    compress self ⦃ (result : CompressedRistretto) =>\n      result.IsValid ∧\n      math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Compress.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:\n• The function always succeeds (no panic) for all valid RistrettoPoint inputs\n• The output is a valid CompressedRistretto 32-byte representation\n• The output accurately reflects the output of the pure mathematical compression function\n-/",
@@ -11228,7 +11231,7 @@
    "lean_name": "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
    "is_relevant": true,
    "is_ignored": false,
-   "is_hidden": false,
+   "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
    "externally_verified": false,
@@ -11280,7 +11283,7 @@
    "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from",
    "is_relevant": true,
    "is_ignored": false,
-   "is_hidden": false,
+   "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
    "externally_verified": false,

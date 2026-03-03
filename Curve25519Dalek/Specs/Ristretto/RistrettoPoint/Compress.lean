@@ -59,10 +59,10 @@ natural language specs:
 • The output accurately reflects the output of the pure mathematical compression function
 -/
 @[progress]
-theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
-    compress rist ⦃ result =>
-    result.IsValid ∧
-    math.compress_pure rist.toPoint = U8x32_as_Nat result ⦄ := by
+theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
+    compress self ⦃ (result : CompressedRistretto) =>
+      result.IsValid ∧
+      math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by
   unfold compress
   progress*
 
@@ -138,7 +138,9 @@ theorem compress_spec (rist : RistrettoPoint) (h_rist_valid : rist.IsValid) :
 
   · constructor
 
-    · sorry
+    · unfold CompressedRistretto.IsValid
+
+      sorry
 
     · sorry
 
