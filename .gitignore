@@ -47,3 +47,6 @@ site/public/doc
 
 .direnv
 .DS_Store
+
+# FVS analysis output
+.formalising/
