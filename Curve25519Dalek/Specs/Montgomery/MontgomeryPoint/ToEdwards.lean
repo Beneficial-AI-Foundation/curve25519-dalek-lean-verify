@@ -176,11 +176,27 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- We're in the else branch: ¬x.val = 1#u8
           -- From x_post: x = Choice.one ↔ u.to_bytes = FieldElement51.MINUS_ONE.to_bytes
           -- So u.to_bytes ≠ MINUS_ONE.to_bytes
-          -- This means u ≠ MINUS_ONE, so u + 1 ≠ 0
           intro h_contra
           -- If fe1 % p = 0, then (u + 1) % p = 0, so u ≡ -1 (mod p)
-          -- Need to derive contradiction from h✝ : ¬x.val = 1#u8
-          sorry
+
+          -- We need to show that fe1 % p = 0 implies u.to_bytes = MINUS_ONE.to_bytes
+          -- This requires: if (u + 1) % p = 0, then u % p = p - 1 = MINUS_ONE % p
+          -- and since to_bytes produces canonical representations, they should be equal
+
+          -- We need a lemma about to_bytes being injective on canonical representatives
+          -- For now, leave as sorry as this requires the full to_bytes_spec which isn't proven yet
+          have h_eq_bytes : u.to_bytes = FieldElement51.MINUS_ONE.to_bytes := by sorry
+
+          -- From h_eq_bytes and x_post, we get x = Choice.one
+          have h_x_one : x = Choice.one := x_post.mpr h_eq_bytes
+
+          -- But x = Choice.one means x.val = 1#u8, contradicting the else branch condition
+          have h_x_val : x.val = 1#u8 := by rw [h_x_one]; rfl
+
+          -- This contradicts the else branch condition ¬x.val = 1#u8
+          -- Use absurd to derive False
+          absurd h_x_val
+          assumption
 
         -- Step 3a: Get the inversion property
         have h_fe2_inv := fe2_post_1 h_fe1_ne_zero
@@ -192,8 +208,22 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- This means fe1 is the limb-wise sum of u and ONE
           -- Need to show this equals Field51_as_Nat u + Field51_as_Nat ONE mod p
           have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
-          -- Need lemma about limb-wise addition
-          sorry
+
+          -- Expand Field51_as_Nat and use linearity of sum
+          have h_expand : Field51_as_Nat fe1 = Field51_as_Nat u + Field51_as_Nat FieldElement51.ONE := by
+            unfold Field51_as_Nat
+            -- Goal: ∑ i, 2^(51*i) * fe1[i].val = ∑ i, 2^(51*i) * u[i].val + ∑ i, 2^(51*i) * ONE[i].val
+            rw [← Finset.sum_add_distrib]
+            -- Now show the functions agree pointwise
+            apply Finset.sum_congr rfl
+            intro i hi
+            -- Use fe1_post_1: fe1[i].val = u[i].val + ONE[i].val
+            have h_limb := fe1_post_1 i (Finset.mem_range.mp hi)
+            simp only at h_limb
+            rw [h_limb]
+            ring
+
+          rw [h_expand, h_ONE]
 
         -- Step 5: Connect fe to u - 1
         have h_fe_eq : Field51_as_Nat fe % p = (Field51_as_Nat u - 1) % p := by
