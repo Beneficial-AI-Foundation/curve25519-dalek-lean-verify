@@ -139,7 +139,7 @@ def sqrt_m1 : ZMod p :=
 Raw value for sqrt(ad - 1). Kept private so it's not accidentally used.
 -/
 private def sqrt_ad_minus_one_val : Nat :=
-  25063068953384623474111466158185098518371208170673930163546292076677493185328
+  25063068953384623474111414158702152701244531502492656460079210482610430750235
 
 /--
 Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).

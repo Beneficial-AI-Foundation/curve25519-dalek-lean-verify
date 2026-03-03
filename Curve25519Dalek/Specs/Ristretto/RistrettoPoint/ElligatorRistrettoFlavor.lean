@@ -795,7 +795,10 @@ theorem elligator_ristretto_flavor_spec
       have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by sorry
       have h_omega_bridge :
           backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField =
-            sqrt_ad_minus_one := by sorry
+            sqrt_ad_minus_one := by
+        unfold toField sqrt_ad_minus_one
+        exact lift_mod_eq _ _ (by
+          unfold backend.serial.u64.constants.SQRT_AD_MINUS_ONE; decide)
       ext
       · -- x coordinate
         rw [h_impl_x, hX_F, hZ_F]
