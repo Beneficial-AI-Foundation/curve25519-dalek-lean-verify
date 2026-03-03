@@ -2,7 +2,7 @@ name: Lean Call Graph
 
 on:
   push:
-    branches: [master]
+    branches: [master, la/add_callgraph]
     paths:
       - 'Curve25519Dalek/**'
       - 'Curve25519Dalek.lean'
