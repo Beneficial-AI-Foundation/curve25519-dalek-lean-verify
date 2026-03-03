@@ -238,6 +238,7 @@ private lemma EDWARDS_D_MINUS_ONE_SQUARED_toField :
   rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
   simp only [Ed25519]
 
+set_option maxHeartbeats 200000 in -- needed for complex elligator unfold
 /-
 natural language description:
 
@@ -794,13 +795,29 @@ theorem elligator_ristretto_flavor_spec
         rw [(IsUnit.mk0 _ h_cp_T_ne).mul_div_mul_right cp_X.toField cp_Z.toField]
         -- Goal: cp_X / cp_Z = pure_x
         rw [h_cp_X_F, h_cp_Z_F]
+        -- delta elligator_ristretto_flavor_pure
         sorry
+        -- dsimp only [Lean.Elab.WF.paramLet, neg_add_rev, mul_inv_rev]
+        -- split
+        -- · -- Square case: IsSquare ratio
+        --   rename_i h_is_sq
+        --   -- simp only [neg_add_rev, mul_inv_rev, neg_mul, one_mul, neg_sub]
+        --   -- simp only [if_pos h_is_sq]
+
+        --   sorry
+        -- · -- Non-square case: ¬IsSquare ratio
+        --   rename_i h_not_sq
+        --   -- simp only [if_neg h_not_sq]
+        --   sorry
       · -- y coordinate
         rw [h_impl_y, hY_F, hZ_F]
         rw [show cp_Z.toField * cp_T.toField = cp_T.toField * cp_Z.toField from mul_comm _ _]
         rw [(IsUnit.mk0 _ h_cp_Z_ne).mul_div_mul_right cp_Y.toField cp_T.toField]
         -- Goal: cp_Y / cp_T = pure_y
         rw [h_cp_Y_F, h_cp_T_F]
+        -- delta elligator_ristretto_flavor_pure
+        -- dsimp only [Lean.Elab.WF.paramLet, neg_add_rev, mul_inv_rev]
+
         sorry
 
 
