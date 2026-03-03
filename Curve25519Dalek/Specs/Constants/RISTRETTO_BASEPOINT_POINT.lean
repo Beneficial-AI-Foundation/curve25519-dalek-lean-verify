@@ -16,8 +16,9 @@ point for the Ristretto group.
 
 Source: curve25519-dalek/src/constants.rs -/
 
-open Aeneas.Std Result Edwards
+open Aeneas Aeneas.Std Result Edwards
 open curve25519_dalek.backend.serial.u64.field (FieldElement51.toField)
+open curve25519_dalek.ristretto
 namespace curve25519_dalek.constants
 
 /-
@@ -52,33 +53,13 @@ natural language specs:
       is equivalent to saying that the difference between both points is not in E[4])
 -/
 theorem RISTRETTO_BASEPOINT_POINT_spec :
-    RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT ∧
-    RISTRETTO_BASEPOINT_POINT.IsValid ∧
-    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by
-  have h_eq : RISTRETTO_BASEPOINT_POINT = backend.serial.u64.constants.ED25519_BASEPOINT_POINT := by
-    simp only [global_simps]
-  constructor
-  · exact h_eq
-  constructor
-  · rw [h_eq]
-    constructor
-    · exact backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.1
-    · use (34737626771194858627071295502606372355980995399692169211837275202373938891970 : CurveField)
-      unfold backend.serial.u64.constants.ED25519_BASEPOINT_POINT
-      rfl
-  · rw [h_eq]
-    intro h_contra
-    have h_L_mul := backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.2.1
-    have h_ne_zero := backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec.2.2
-    have h_L_prime : Nat.Prime L := by
-      unfold L
-      sorry
-      -- exact PrimeCert.prime_ed25519_order
-    have h_order_eq_L : addOrderOf (backend.serial.u64.constants.ED25519_BASEPOINT_POINT.toPoint) = L :=
-      (h_L_prime.eq_one_or_self_of_dvd _ (addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_L_mul)).resolve_left
-      (fun h => h_ne_zero (AddMonoid.addOrderOf_eq_one_iff.mp h))
-    exact absurd
-      (Nat.le_of_dvd (by decide) (h_order_eq_L ▸ addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_contra))
-      (by unfold L; decide)
+    RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧ _root_.L • result.toPoint = 0 ∧
+      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ⦄ := by
+    unfold RISTRETTO_BASEPOINT_POINT RistrettoPoint.IsValid RistrettoPoint.toPoint
+    progress*
+    refine ⟨by grind, ?_, by grind, by grind, by grind⟩
+    · use 34737626771194858627071295502606372355980995399692169211837275202373938891970
+      grind
 
 end curve25519_dalek.constants
