@@ -70,7 +70,7 @@ theorem square2_spec (self : Array U64 5#usize) (h_bounds : ∀ i < 5, self[i]!.
   unfold square2
   progress*
   refine ⟨?_, by grind⟩
-  have : Field51_as_Nat res = 2 * Field51_as_Nat square := by
+  have : Field51_as_Nat result = 2 * Field51_as_Nat square := by
     unfold Field51_as_Nat
     rw [Finset.mul_sum]
     apply Finset.sum_congr rfl

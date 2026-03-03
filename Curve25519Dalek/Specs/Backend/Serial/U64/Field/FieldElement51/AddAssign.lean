@@ -40,7 +40,7 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
     · intro j _ _
       obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
     · intro j hj _
-      have := res_post_2 j hj (by omega)
+      have := result_post2 j hj (by omega)
       simp_all
   · progress*
   termination_by 5 - i.val
