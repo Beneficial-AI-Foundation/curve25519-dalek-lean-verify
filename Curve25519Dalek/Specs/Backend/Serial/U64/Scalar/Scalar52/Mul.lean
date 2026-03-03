@@ -44,14 +44,14 @@ natural language specs:
     • For any two scalars a and b:
       - The function returns successfully
       - Scalar52_as_Nat(result) ≡ Scalar52_as_Nat(a) * Scalar52_as_Nat(b) (mod L)
-      - Each limb of the result is bounded by 2^62
+      - Each limb of the result is bounded by 2^52
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.mul`**:
 - No panic (always returns successfully)
 - The result represents the product of the two input scalars modulo L
 - Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)
-- Output limbs are also bounded by 2^62
+- Output limbs are bounded by 2^52
 -/
 
 /- Helper lemmas/theorems -/
@@ -72,7 +72,7 @@ theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     mul a b ⦃ ( result : Scalar52 ) =>
     Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 62) ⦄ := by
+    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
   progress*
   -- 1. To prove ∀ i < 5, ↑ab[i]! < 2 ^ 62
@@ -104,7 +104,7 @@ theorem mul_spec (a b : Scalar52)
     -- v. res ≡ a * b [MOD L]
     apply cancelR
     exact h_res_R_a_b_R
-  -- 3b. To prove ∀ i < 5, ↑res[i]! < 2 ^ 62
+  -- 3b. To prove ∀ i < 5, ↑res[i]! < 2 ^ 52
   · grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

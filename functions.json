@@ -4742,7 +4742,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n    Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n    Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
    "spec_docstring": null,
