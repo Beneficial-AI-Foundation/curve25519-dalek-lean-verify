@@ -5,8 +5,11 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
+
+set_option linter.style.nativeDecide false
 
 /-! # Spec Theorem for `constants::ED25519_BASEPOINT_POINT`
 
@@ -50,26 +53,12 @@ theorem ED25519_BASEPOINT_POINT_spec :
   progress*
   set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
   have h_valid : ep.IsValid := by simp only [ep, *]; decide
-  have h_ne_zero : ep.toPoint ≠ 0 := by
-    by_contra h
-    have h : ep.X.toField = 0 := by
-      have : ep.toPoint.x = 0 := by rw [h]; rfl
-      have := edwards.EdwardsPoint.toPoint_of_isValid h_valid
-      grind [h_valid.Z_ne_zero]
-    exact absurd h (by simp only [*, ep]; decide)
-  have h_L_mul : _root_.L • ep.toPoint = 0 := by
-    -- ⊢ L • ED25519_BASEPOINT_POINT = 0
-    sorry
-  refine ⟨h_valid, h_L_mul, h_ne_zero, ?_, ?_⟩
-  · intro h_contra
-    have h_L_prime : Nat.Prime _root_.L := by unfold _root_.L; exact PrimeCert.prime_ed25519_order
-    have h_order_eq_L : addOrderOf ep.toPoint = _root_.L :=
-      (h_L_prime.eq_one_or_self_of_dvd _ (addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_L_mul)).resolve_left
-        (fun h => h_ne_zero (AddMonoid.addOrderOf_eq_one_iff.mp h))
-    exact absurd
-      (Nat.le_of_dvd (by decide) (h_order_eq_L ▸ addOrderOf_dvd_iff_nsmul_eq_zero.mpr h_contra))
-      (by unfold _root_.L; decide)
-  · simp only [*]
-    decide
+  have h_bp : ep.toPoint = _root_.Edwards.basepoint := by simp only [ep, *]; decide
+  rw [h_bp]
+  refine ⟨h_valid, ?_, ?_, ?_, ?_⟩
+  · exact _root_.Edwards.basepoint_order_L
+  · exact _root_.Edwards.basepoint_ne_zero
+  · exact _root_.Edwards.four_nsmul_basepoint_ne_zero
+  · simp only [*]; decide
 
 end curve25519_dalek.backend.serial.u64.constants
