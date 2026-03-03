@@ -2,7 +2,7 @@ name: Lean Call Graph
 
 on:
   push:
-    branches: [master, la/add_callgraph]
+    branches: [master]
     paths:
       - 'Curve25519Dalek/**'
       - 'Curve25519Dalek.lean'
@@ -53,5 +53,3 @@ jobs:
         with:
           path: callgraph
           key: callgraph-${{ github.sha }}-${{ github.run_id }}
-
-# retrigger

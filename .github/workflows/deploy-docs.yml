@@ -95,7 +95,7 @@ jobs:
   # Deployment job
   deploy:
     # Deploy on push to master, when issues are updated, or when PRs are updated
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'issues' || github.event_name == 'pull_request_target'
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'issues' || github.event_name == 'pull_request_target' || github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     name: Deploy
