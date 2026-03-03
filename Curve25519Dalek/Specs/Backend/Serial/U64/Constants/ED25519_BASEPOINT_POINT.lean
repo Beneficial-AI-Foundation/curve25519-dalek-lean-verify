@@ -42,12 +42,14 @@ theorem ED25519_BASEPOINT_POINT_spec :
     ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>
       result.IsValid ∧
       _root_.L • result.toPoint = 0 ∧
-      result.toPoint ≠ 0 ⦄ := by
+      result.toPoint ≠ 0 ∧
+      4 • result.toPoint ≠ 0 ⦄ := by
   unfold ED25519_BASEPOINT_POINT
   progress*
-  refine ⟨?_, ?_, ?_⟩
+  refine ⟨?_, ?_, ?_, ?_⟩
   · simp only [*]; decide
-  · sorry
+  · -- ⊢ L • result = 0
+    sorry
   · by_contra h
     set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
     have h : ep.X.toField = 0 := by
@@ -56,5 +58,6 @@ theorem ED25519_BASEPOINT_POINT_spec :
       have := edwards.EdwardsPoint.toPoint_of_isValid hv
       grind [hv.Z_ne_zero]
     exact absurd h (by simp only [*, ep]; decide)
+  · sorry
 
 end curve25519_dalek.backend.serial.u64.constants
