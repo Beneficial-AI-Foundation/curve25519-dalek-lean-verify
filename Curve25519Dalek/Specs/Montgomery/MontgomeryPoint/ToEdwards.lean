@@ -115,6 +115,150 @@ natural language specs:
     · grind only
     · have h_res := res_post_1 res_post_2 res_post_3
       obtain ⟨Z_inv, x_val, y_val, x_is_neg, h_Zinv, h_X, h_Y, h_neg, h_curve, h_y_val, h_sign, h_T⟩ := h_res
-      sorry
+  -- · -- Main proof at line 118
+    -- Step 0: Provide the witness Z_inv and split the goal
+      use Z_inv
+      constructor
+      · -- Prove: field.FieldElement51.invert res_post_2.Z = ok Z_inv
+        exact h_Zinv
+      -- Now prove the main equation
+      -- Goal: Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp + 1) % p
+      --       = (U8x32_as_Nat mp - 1) % p
+      ·
+        -- Step 1: Substitute res_post_2.Y * Z_inv with y_val using h_Y
+        have h_affine_y : Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv % p = y_val := h_Y
+
+        -- Step 2: Chain y_val back through y_bytes1, y_bytes, y, fe, fe2, to show it equals (u-1)/(u+1)
+
+        -- Step 2a: Relate y_bytes1 to y_bytes (modifying sign bit doesn't affect low 255 bits)
+        have h_bytes_equiv : U8x32_as_Nat y_bytes1 % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p := by
+          rw [y_bytes1_post]
+          -- Goal: U8x32_as_Nat (y_bytes.set 31#usize i2) % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p
+          -- Need lemma about set preserving low bits
+          sorry
+
+        -- Step 2b: Simplify % 2^255 using the fact that y_bytes < p < 2^255
+        have h_bytes_mod : U8x32_as_Nat y_bytes % 2^255 % p = U8x32_as_Nat y_bytes % p := by
+          have hp : p < 2^255 := by decide
+          have hlt : U8x32_as_Nat y_bytes < p := y_bytes_post_2
+          -- If x < p < 2^255, then x % 2^255 = x, so x % 2^255 % p = x % p
+          omega
+
+        -- Step 2c: Connect y_bytes to field element y
+        have h_y_bytes : U8x32_as_Nat y_bytes % p = Field51_as_Nat y % p := by
+          -- From y_bytes_post_1 : U8x32_as_Nat y_bytes ≡ Field51_as_Nat y [MOD p]
+          exact Nat.ModEq.to_eq_mod y_bytes_post_1
+
+        -- Step 2d: Connect y to fe * fe2
+        have h_y_eq : Field51_as_Nat y % p = (Field51_as_Nat fe * Field51_as_Nat fe2) % p := by
+          -- From y_post_1 : Field51_as_Nat y ≡ Field51_as_Nat fe * Field51_as_Nat fe2 [MOD p]
+          exact Nat.ModEq.to_eq_mod y_post_1
+
+        -- Step 2e: Chain everything together to get y_val = (fe * fe2) % p
+        have h_y_val_eq : y_val % p = (Field51_as_Nat fe * Field51_as_Nat fe2) % p := by
+          calc y_val % p
+              = U8x32_as_Nat y_bytes1 % 2^255 % p := h_y_val
+            _ = U8x32_as_Nat y_bytes % 2^255 % p := h_bytes_equiv
+            _ = U8x32_as_Nat y_bytes % p := h_bytes_mod
+            _ = Field51_as_Nat y % p := h_y_bytes
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) % p := h_y_eq
+
+        -- Step 3: Prove fe1 ≠ 0 (i.e., u ≠ -1 mod p)
+        have h_fe1_ne_zero : Field51_as_Nat fe1 % p ≠ 0 := by
+          -- We're in the else branch: ¬x.val = 1#u8
+          -- From x_post: x = Choice.one ↔ u.to_bytes = FieldElement51.MINUS_ONE.to_bytes
+          -- So u.to_bytes ≠ MINUS_ONE.to_bytes
+          -- This means u ≠ MINUS_ONE, so u + 1 ≠ 0
+          intro h_contra
+          -- If fe1 % p = 0, then (u + 1) % p = 0, so u ≡ -1 (mod p)
+          -- Need to derive contradiction from h✝ : ¬x.val = 1#u8
+          sorry
+
+        -- Step 3a: Get the inversion property
+        have h_fe2_inv := fe2_post_1 h_fe1_ne_zero
+        -- h_fe2_inv : Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p = 1
+
+        -- Step 4: Connect fe1 to u + 1
+        have h_fe1_eq : Field51_as_Nat fe1 % p = (Field51_as_Nat u + 1) % p := by
+          -- From fe1_post_1: ∀ i < 5, ↑fe1[i]! = ↑u[i]! + ↑FieldElement51.ONE[i]!
+          -- This means fe1 is the limb-wise sum of u and ONE
+          -- Need to show this equals Field51_as_Nat u + Field51_as_Nat ONE mod p
+          have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
+          -- Need lemma about limb-wise addition
+          sorry
+
+        -- Step 5: Connect fe to u - 1
+        have h_fe_eq : Field51_as_Nat fe % p = (Field51_as_Nat u - 1) % p := by
+          -- From fe_post_2: (Field51_as_Nat fe + Field51_as_Nat FieldElement51.ONE) % p = Field51_as_Nat u % p
+          have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
+          rw [h_ONE] at fe_post_2
+          -- fe_post_2 : (Field51_as_Nat fe + 1) % p = Field51_as_Nat u % p
+          -- So: Field51_as_Nat fe % p = (Field51_as_Nat u - 1) % p
+          omega
+
+        -- Step 6: Connect u to mp
+        have h_u_eq : Field51_as_Nat u % p = U8x32_as_Nat mp % 2^255 % p := by
+          -- From u_post_1 : Field51_as_Nat u ≡ U8x32_as_Nat mp % 2^255 [MOD p]
+          exact Nat.ModEq.to_eq_mod u_post_1
+
+        have h_u_mod : U8x32_as_Nat mp % 2^255 % p = U8x32_as_Nat mp % p := by
+          -- mp is a MontgomeryPoint, which is Array U8 32
+          -- U8x32_as_Nat mp < 2^256, but we need < 2^255 for this to work
+          -- Actually, from_bytes masks to 2^255, so Field51_as_Nat u corresponds to mp % 2^255
+          sorry
+
+        -- Step 7: Main calculation
+        calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp + 1) % p
+
+            -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
+            = y_val * (U8x32_as_Nat mp + 1) % p := by
+                conv_lhs => rw [Nat.mul_assoc]
+                rw [Nat.mod_mod_of_dvd _ _ (dvd_refl p)]
+                rw [← h_affine_y]
+                ring_nf
+
+            -- Use h_y_val_eq to replace y_val with (fe * fe2)
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
+                conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
+                rw [h_y_val_eq]
+                ring_nf
+
+            -- Relate mp to u
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
+                congr 1
+                rw [← h_u_eq, ← h_u_mod]
+                sorry
+
+            -- Substitute u + 1 with fe1
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
+                congr 1
+                rw [← h_fe1_eq]
+                sorry
+
+            -- Rearrange: fe * fe2 * fe1 = fe * (fe2 * fe1)
+            _ = Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p := by
+                ring_nf
+
+            -- Use fe2 * fe1 = 1
+            _ = Field51_as_Nat fe * 1 % p := by
+                conv_rhs => arg 1; arg 2
+                rw [Nat.mul_comm, h_fe2_inv]
+
+            -- Simplify
+            _ = Field51_as_Nat fe % p := by
+                ring_nf
+
+            -- Use fe = u - 1
+            _ = (Field51_as_Nat u - 1) % p := h_fe_eq
+
+            -- Relate u to mp
+            _ = (U8x32_as_Nat mp % p - 1) % p := by
+                rw [← h_u_mod, ← h_u_eq]
+                sorry
+
+            -- Simplify
+            _ = (U8x32_as_Nat mp - 1) % p := by
+                sorry
+
 
 end curve25519_dalek.montgomery.MontgomeryPoint
