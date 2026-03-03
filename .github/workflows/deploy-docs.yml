@@ -69,6 +69,24 @@ jobs:
       - name: Build with VitePress
         run: npm run docs:build
 
+      - name: Restore callgraph from cache
+        id: cache-callgraph
+        uses: actions/cache/restore@v4
+        with:
+          path: callgraph
+          key: callgraph-nevermatch
+          restore-keys: callgraph-
+
+      - name: Copy callgraph to site
+        run: |
+          if [ -f callgraph/index.html ]; then
+            mkdir -p site/.vitepress/dist/callgraph
+            cp -r callgraph/* site/.vitepress/dist/callgraph/
+            echo "✓ Callgraph added to site/callgraph/"
+          else
+            echo "No callgraph cache found — deploying without callgraph"
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
