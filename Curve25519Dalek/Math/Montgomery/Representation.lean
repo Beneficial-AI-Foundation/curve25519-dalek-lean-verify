@@ -1333,8 +1333,36 @@ theorem add_fromEdwards (e₁ e₂ : Edwards.Point Edwards.Ed25519) :
   by_cases non_e1_x : e₁.x ≠ 0
   ·  by_cases e2_x : e₂.x = 0
      · apply  add_fromEdwards_second _ _ non_e1_x e2_x
-     · sorry
-  · sorry
+     · by_cases sum_x : (e₁ + e₂).x = 0
+       · by_cases sum_y : (e₁ + e₂).y = -1
+         · have e2_x_ne : e₂.x ≠ 0 := e2_x
+           apply add_eq_T_point_fromEdwards e₁ e₂ non_e1_x e2_x_ne sum_x sum_y
+         · have : (e₁ + e₂).y = 1 := by
+             have := T_point_x sum_x
+             rcases this with h | h <;> simp_all
+           apply add_eq_zero_fromEdwards e₁ e₂ this
+       · have sum_x_ne : (e₁ + e₂).x ≠ 0 := sum_x
+         have e2_x_ne : e₂.x ≠ 0 := e2_x
+         apply add_non_fromEdwards e₁ e₂ non_e1_x e2_x_ne sum_x_ne
+  · push_neg at non_e1_x
+    rw [Edwards.add_comm_Ed25519, Montgomery.add_comm]
+    by_cases e2_x_ne : e₂.x ≠ 0
+    · apply add_fromEdwards_second e₂ e₁ e2_x_ne non_e1_x
+    · push_neg at e2_x_ne
+      have e1_y := T_point_x non_e1_x
+      have e2_y := T_point_x e2_x_ne
+      rcases e1_y with (e1_y | e1_y) <;> rcases e2_y with (e2_y | e2_y)
+      · unfold fromEdwards
+        simp [non_e1_x, e2_x_ne, e1_y, e2_y, Edwards.add_y]
+      · unfold fromEdwards
+        simp [non_e1_x, e2_x_ne, e1_y, e2_y, Edwards.add_x, Edwards.add_y]
+      · unfold fromEdwards
+        simp [non_e1_x, e2_x_ne, e1_y, e2_y, Edwards.add_x, Edwards.add_y]
+      · unfold fromEdwards
+        simp [non_e1_x, e2_x_ne, e1_y, e2_y, Edwards.add_y]
+        have : (-1 : CurveField) ≠ 1 := by decide
+        simp [this]
+        rw [← Montgomery.T_point_order_two]
 
 theorem double_T {e : Edwards.Point Edwards.Ed25519} (hx : e.x = 0) :
   (e + e).x=0 := by
