@@ -20,6 +20,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQ
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_AD_MINUS_ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQUARED
 
 /-! # Spec Theorem for `RistrettoPoint::elligator_ristretto_flavor`
 
@@ -106,6 +107,20 @@ private lemma elligator_s1_sq_ne_neg_one
         4 * dd * (dd - 1) ^ 2 * (dd + 1) := by ring
       rw [this, h_poly, mul_zero, zero_add]
     exact h_disc_not_sq ⟨2 * (1 - dd - dd ^ 2) * r_F - 2 * dd ^ 2, by rw [← sq]; exact h_sq.symm⟩
+
+/-- If d is not a square and -1 is a square in a field, then d·x² + y² = 0 implies x = 0 ∧ y = 0.
+Used to show N_t ≠ 0 in the Elligator map. -/
+private lemma non_square_quad_zero {d x y : CurveField}
+    (hd : ¬IsSquare d) (hm1 : IsSquare (-1 : CurveField))
+    (h : d * x ^ 2 + y ^ 2 = 0) : x = 0 ∧ y = 0 := by
+  have key : d * x ^ 2 = -(y ^ 2) := by linear_combination h
+  have hx : x = 0 := by
+    by_contra hx
+    obtain ⟨α, hα⟩ := hm1
+    have h1 : d * x ^ 2 = (α * y) ^ 2 := by linear_combination key + y ^ 2 * hα
+    have h2 : d = (α * y / x) * (α * y / x) := by field_simp; linear_combination h1
+    exact hd ⟨_, h2⟩
+  exact ⟨hx, sq_eq_zero_iff.mp (by rw [hx] at h; simpa using h)⟩
 
 /-
 natural language description:
