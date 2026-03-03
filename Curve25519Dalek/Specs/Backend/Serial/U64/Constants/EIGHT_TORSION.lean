@@ -77,10 +77,10 @@ theorem EIGHT_TORSION_spec :
       decide
   · -- ∀ i, result.val[i].toPoint = (i : ℕ) • P.toPoint
     intro i;
-    have h := (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨i, by omega⟩).symm
+    have h := _root_.Edwards.nsmul_eightTorsionGen_eq ⟨i, by omega⟩
     fin_cases i
     all_goals
     · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
-      exact h
+      exact h.symm
 
 end curve25519_dalek.backend.serial.u64.constants
