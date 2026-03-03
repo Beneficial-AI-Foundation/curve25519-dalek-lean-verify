@@ -4,15 +4,12 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Math.Edwards.Curve
+set_option linter.style.nativeDecide false
 
 /-! # Ed25519 Basepoint Order
 
 The Ed25519 basepoint B = (x, y) has prime order L in the Edwards curve group.
 This is a purely mathematical fact, independent of any implementation representation.
-
-The basepoint coordinates are the standard Ed25519 values:
-- y = 4/5 mod p (the canonical generator y-coordinate)
-- x is the positive square root derived from the curve equation
 -/
 
 namespace Edwards
@@ -25,9 +22,8 @@ private def basepoint : Point Ed25519 where
 /-- The Ed25519 basepoint has order L, i.e., L • basepoint = 0.
 
 This is verified computationally using double-and-add scalar multiplication via `native_decide`. -/
-theorem basepoint_order_L :
-    L • basepoint = 0 := by
-  rw [(binary_nsmul_Ed25519_eq L basepoint).symm]
+theorem basepoint_order_L : L • basepoint = 0 := by
+  rw [← binary_nsmul_Ed25519_eq L basepoint]
   native_decide
 
 end Edwards
