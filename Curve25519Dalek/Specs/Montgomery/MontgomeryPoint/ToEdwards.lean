@@ -58,7 +58,7 @@ natural language specs:
 -- -/
 
 
-set_option maxHeartbeats 400000 in
+set_option maxHeartbeats 800000 in
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
@@ -231,8 +231,15 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
           rw [h_ONE] at fe_post_2
           -- fe_post_2 : (Field51_as_Nat fe + 1) % p = Field51_as_Nat u % p
-          -- So: Field51_as_Nat fe % p = (Field51_as_Nat u - 1) % p
-          -- Use modular arithmetic: (a + 1) % p = b % p implies a % p = (b - 1) % p when b > 0
+
+          -- Use modular arithmetic: (a + 1) % p = b % p implies a % p = (b - 1) % p
+          -- This is a standard property that requires careful handling of natural number subtraction
+
+          -- The key insight: we want to show that fe ≡ u - 1 (mod p)
+          -- We have: fe + 1 ≡ u (mod p)
+          -- In the integers/field, this clearly gives fe ≡ u - 1
+          -- But in natural numbers with % we need to be careful
+
           sorry
 
         -- Step 6: Connect u to mp
@@ -252,13 +259,16 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp + 1) % p := by
-                -- Regroup: (Y * Z_inv) * (mp + 1)
-                conv_lhs => arg 1; rw [Nat.mul_assoc]
-                -- Use modular arithmetic: (a * b) % p = ((a % p) * b) % p
-                have key : (Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv % p) * (U8x32_as_Nat mp + 1) % p =
-                           (Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv) * (U8x32_as_Nat mp + 1) % p := by
-                  rw [← Nat.mul_mod]
-                rw [← key, h_affine_y]
+                -- Apply Nat.mul_mod to decompose the modulo
+                rw [Nat.mul_mod]
+                -- Now rewrite using h_affine_y
+                rw [h_affine_y]
+                -- Use Nat.mul_comm to swap the entire multiplication
+                rw [Nat.mul_comm (y_val % p)]
+                -- Apply Nat.mul_mod_left to remove the mod on the left factor
+                rw [Nat.mul_mod_left]
+                -- Swap back
+                rw [Nat.mul_comm]
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
@@ -268,7 +278,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
-                congr 1
+                -- congr 1
                 rw [← h_u_eq, ← h_u_mod]
                 sorry
 
@@ -296,8 +306,12 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Relate u to mp
             _ = (U8x32_as_Nat mp % p - 1) % p := by
-                rw [← h_u_mod, ← h_u_eq]
-                sorry
+                -- First establish that Field51_as_Nat u % p = U8x32_as_Nat mp % p
+                have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
+                  sorry
+                -- Rewrite using the fact that (a - 1) % p depends on a % p
+                conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
+                rw [← Nat.sub_mod]
 
             -- Simplify
             _ = (U8x32_as_Nat mp - 1) % p := by
