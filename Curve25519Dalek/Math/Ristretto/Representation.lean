@@ -689,26 +689,36 @@ without the RAM blowup caused by nested `let`-inlining.
 -/
 
 /-- r = SQRT_M1 * r₀² (Rust L685–686) -/
-noncomputable def elligator_r (r0 : ZMod p) : ZMod p :=
+def elligator_r (r0 : ZMod p) : ZMod p :=
   sqrt_m1 * r0 ^ 2
 
 /-- N_s = (r + 1) * (1 - d²) (Rust L687–688) -/
-noncomputable def elligator_Ns (r0 : ZMod p) : ZMod p :=
+def elligator_Ns (r0 : ZMod p) : ZMod p :=
   (elligator_r r0 + 1) * (1 - d ^ 2)
 
 /-- D = -(1 + d · r) * (r + d) (Rust L689–692) -/
-noncomputable def elligator_D (r0 : ZMod p) : ZMod p :=
+def elligator_D (r0 : ZMod p) : ZMod p :=
   -(1 + d * elligator_r r0) * (elligator_r r0 + d)
 
 /-- ratio = N_s / D (argument to `sqrt_ratio_i`, Rust L694) -/
-noncomputable def elligator_ratio (r0 : ZMod p) : ZMod p :=
+def elligator_ratio (r0 : ZMod p) : ZMod p :=
   elligator_Ns r0 * (elligator_D r0)⁻¹
+
+/-- Squareness predicate matching `sqrt_ratio_i` semantics:
+    ∃ x, x² · D = N_s.  Agrees with `IsSquare (N_s/D)` when D ≠ 0,
+    but correctly returns False when D = 0 and N_s ≠ 0. -/
+def elligator_is_square (r0 : ZMod p) : Prop :=
+  ∃ x : ZMod p, x ^ 2 * elligator_D r0 = elligator_Ns r0
+
+instance instDecidableElligatorIsSquare (r0 : ZMod p) :
+    Decidable (elligator_is_square r0) :=
+  show Decidable (∃ x : ZMod p, x ^ 2 * elligator_D r0 = elligator_Ns r0) from inferInstance
 
 /-- s after conditional selection (Rust L694–701):
     Square case:     s = abs_edwards(sqrt(ratio))
     Non-square case: s = -(abs_edwards(sqrt(i · ratio) · r₀)) -/
 noncomputable def elligator_s (r0 : ZMod p) : ZMod p :=
-  if IsSquare (elligator_ratio r0) then
+  if elligator_is_square r0 then
     abs_edwards (sqrt (elligator_ratio r0))
   else
     -(abs_edwards ((sqrt (sqrt_m1 * elligator_ratio r0)) * r0))
@@ -716,8 +726,8 @@ noncomputable def elligator_s (r0 : ZMod p) : ZMod p :=
 /-- c after conditional selection (Rust L681, L700–702):
     Square case:     c = −1
     Non-square case: c = r -/
-noncomputable def elligator_c (r0 : ZMod p) : ZMod p :=
-  if IsSquare (elligator_ratio r0) then -(1 : ZMod p)
+def elligator_c (r0 : ZMod p) : ZMod p :=
+  if elligator_is_square r0 then -(1 : ZMod p)
   else elligator_r r0
 
 /-- N_t = c · (r − 1) · (d − 1)² − D (Rust L704–707) -/

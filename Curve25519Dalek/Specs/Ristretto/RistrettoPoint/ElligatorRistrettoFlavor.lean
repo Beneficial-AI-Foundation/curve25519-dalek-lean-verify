@@ -789,10 +789,30 @@ theorem elligator_ristretto_flavor_spec
       have h_cp_Z_F : cp_Z.toField = N_t.toField *
           backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField := by
         unfold toField; have h := lift_mod_eq _ _ cp_Z_post_1; push_cast at h; exact h
+      -- Bridge helpers: lift r to spec
+      have h_r_F : r.toField =
+          backend.serial.u64.constants.SQRT_M1.toField * s.toField ^ 2 := by
+        unfold toField
+        have hme := r_post_1.trans (Nat.ModEq.mul_left
+          (Field51_as_Nat backend.serial.u64.constants.SQRT_M1) r_0_sq_post_1)
+        have h := lift_mod_eq _ _ hme; push_cast at h; exact h
+      have h_sm1 : backend.serial.u64.constants.SQRT_M1.toField = sqrt_m1 := by
+        unfold toField sqrt_m1
+        exact lift_mod_eq _ _ (by unfold backend.serial.u64.constants.SQRT_M1; decide)
+      have h_r_bridge : r.toField = elligator_r s.toField := by
+        rw [h_r_F, h_sm1]; unfold elligator_r; rfl
       -- Bridge identities: connect implementation variables to spec step functions
       have h_s1_bridge : s1.toField = elligator_s s.toField := by sorry
-      have h_D_bridge : D.toField = elligator_D s.toField := by sorry
-      have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by sorry
+      have h_D_bridge : D.toField = elligator_D s.toField := by
+        rw [h_D_eq_F, h_r_bridge]
+        unfold elligator_D
+        rw [show Ed25519.d = (d : CurveField) from rfl]; ring
+      have h_c1_bridge : c1.toField = elligator_c s.toField := by
+        sorry
+      have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by
+        rw [h_Nt_eq_F, h_r_bridge, h_D_bridge, h_c1_bridge]
+        unfold elligator_Nt
+        rw [show Ed25519.d = (d : CurveField) from rfl]
       have h_omega_bridge :
           backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField =
             sqrt_ad_minus_one := by
