@@ -108,6 +108,23 @@ private lemma elligator_s1_sq_ne_neg_one
       rw [this, h_poly, mul_zero, zero_add]
     exact h_disc_not_sq ⟨2 * (1 - dd - dd ^ 2) * r_F - 2 * dd ^ 2, by rw [← sq]; exact h_sq.symm⟩
 
+/-- The twisted Edwards curve equation `a·X²T² + Y²Z² = Z²T² + d·X²Y²` holds for
+the Elligator completed point coordinates when `ω² = -d-1` and the "inner identity"
+`(d+1)·Nt² = D²·((1+σ)² + d·(1-σ)²)` holds (where σ = s²).
+This lemma handles the factorization: after substituting X=2sD, Y=1-s², Z=Nt·ω, T=1+s²,
+the curve equation reduces to `4s²·[(d+1)Nt² - D²·P(s²,d)] = 0`. -/
+private lemma elligator_curve_eq_of_inner {dd s Df Nt w : CurveField}
+    (hw : w ^ 2 = -dd - 1)
+    (h_inner : s = 0 ∨
+      (dd + 1) * Nt ^ 2 = Df ^ 2 * ((1 + s ^ 2) ^ 2 + dd * (1 - s ^ 2) ^ 2)) :
+    -1 * (2 * s * Df) ^ 2 * (1 + s ^ 2) ^ 2 +
+      (1 - s ^ 2) ^ 2 * (Nt * w) ^ 2 =
+    (Nt * w) ^ 2 * (1 + s ^ 2) ^ 2 +
+      dd * (2 * s * Df) ^ 2 * (1 - s ^ 2) ^ 2 := by
+  rcases h_inner with hs0 | h
+  · rw [hs0]; ring
+  · linear_combination 4 * s ^ 2 * h + (-4 * s ^ 2 * Nt ^ 2) * hw
+
 /-- If d is not a square and -1 is a square in a field, then d·x² + y² = 0 implies x = 0 ∧ y = 0.
 Used to show N_t ≠ 0 in the Elligator map. -/
 private lemma non_square_quad_zero {d x y : CurveField}
@@ -479,7 +496,7 @@ theorem elligator_ristretto_flavor_spec
           rw [backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec]
           have h := lift_mod_eq _ _ (Nat.mod_mod_of_dvd ((d - 1) ^ 2) (dvd_refl p))
           rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
-          simp [Ed25519]
+          simp only [Ed25519]
         -- Arithmetic postconditions lifted to CurveField
         have h_rm1 : r_minus_one.toField = r.toField - 1 := by
           unfold toField; have h := lift_mod_eq _ _ r_minus_one_post_2
@@ -574,7 +591,28 @@ theorem elligator_ristretto_flavor_spec
           cp_Y.toField ^ 2 * cp_Z.toField ^ 2 =
         cp_Z.toField ^ 2 * cp_T.toField ^ 2 +
           Ed25519.d * cp_X.toField ^ 2 * cp_Y.toField ^ 2 := by
-      sorry -- Elligator invariant: completed point (cp_X, cp_Y, cp_Z, cp_T) on curve
+      -- Lift coordinate postconditions to CurveField
+      -- cp_X = s_plus_s * D = 2*s1*D
+      have h_cp_X_F : cp_X.toField = s_plus_s.toField * D.toField := by
+        unfold toField; have h := lift_mod_eq _ _ cp_X_post_1; push_cast at h; exact h
+      have h_sps_F : s_plus_s.toField = 2 * s1.toField := by
+        unfold toField
+        have h_nat : Field51_as_Nat s_plus_s = Field51_as_Nat s1 + Field51_as_Nat s1 := by
+          unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+          intro i hi; rw [Finset.mem_range] at hi; rw [s_plus_s_post_1 i hi, mul_add]
+        rw [h_nat]; push_cast; ring
+      -- cp_Y = 1 - s1²
+      have h_cp_Y_F : cp_Y.toField = 1 - s1.toField ^ 2 := by
+        unfold toField
+        have h_sub := lift_mod_eq _ _ cp_Y_post_2
+        have hsq := lift_mod_eq _ _ s_sq_post_1
+        push_cast at h_sub hsq; rw [ONE_spec, Nat.cast_one] at h_sub
+        linear_combination h_sub - hsq
+      -- cp_Z = N_t * SQRT_AD_MINUS_ONE
+      have h_cp_Z_F : cp_Z.toField = N_t.toField *
+          backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField := by
+        unfold toField; have h := lift_mod_eq _ _ cp_Z_post_1; push_cast at h; exact h
+      sorry
     -- Step 4: Assemble EdwardsPoint.IsValid
     have h_ep_valid : edwards.EdwardsPoint.IsValid ep := {
       X_bounds := fun i hi => by have := ep_post_5 i hi; omega
