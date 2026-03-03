@@ -15,6 +15,7 @@
 import Lean
 import Lean.PrettyPrinter
 import Std.Data.HashSet
+import Curve25519Dalek.ExternallyVerified
 
 open Lean
 open Lean.Meta
@@ -73,6 +74,13 @@ def isVerified (env : Environment) (name : Name) : Bool :=
   match env.find? specName with
   | some _ => !proofContainsSorry env specName
   | none => false
+
+/-- Check if a function's spec theorem is marked as externally verified.
+    Returns false if the spec has no sorry (a real proof overrides the tag). -/
+def isExternallyVerified (env : Environment) (name : Name) : Bool :=
+  let specName := getSpecName name
+  if !proofContainsSorry env specName then false  -- real proof overrides
+  else externallyVerifiedAttr.hasTag env specName
 
 /-- Get the file path where the spec theorem is defined.
     Returns the path relative to the project root (e.g., "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean"). -/

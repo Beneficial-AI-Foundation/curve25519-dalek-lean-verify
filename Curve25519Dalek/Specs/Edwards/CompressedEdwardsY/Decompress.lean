@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `CompressedEdwardsY::decompress`
 
@@ -53,7 +54,7 @@ Natural language specs:
   - The sign (parity) of x matches the high bit of byte 31 in the input byte array
   - T = X * Y (mod p)
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
     edwards.CompressedEdwardsY.decompress cey ⦃ result =>
 
