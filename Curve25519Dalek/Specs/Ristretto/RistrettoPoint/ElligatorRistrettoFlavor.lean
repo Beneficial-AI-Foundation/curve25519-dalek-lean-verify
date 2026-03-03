@@ -463,7 +463,104 @@ theorem elligator_ristretto_flavor_spec
         unfold toField; have h := lift_mod_eq _ _ cp_Z_post_1; push_cast at h; exact h
       rw [h_cpz_F]; apply mul_ne_zero
       · -- N_t.toField ≠ 0
-        sorry
+        -- Constant specs lifted to CurveField
+        have h_ed_F : backend.serial.u64.constants.EDWARDS_D.toField = Ed25519.d := by
+          unfold toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
+        have h_m1_F : backend.serial.u64.constants.MINUS_ONE.toField = (-1 : CurveField) := by
+          unfold toField; rw [backend.serial.u64.constants.MINUS_ONE_spec]
+          have : (p - 1 : ℕ) + 1 = p := by unfold p; omega
+          have h := lift_mod_eq _ _
+            (show (p - 1 + 1) % p = 0 % p from by rw [this, Nat.mod_self, Nat.zero_mod])
+          push_cast at h; linear_combination h
+        have h_edmsq_F :
+            backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField =
+            (Ed25519.d - 1) ^ 2 := by
+          unfold toField
+          rw [backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec]
+          have h := lift_mod_eq _ _ (Nat.mod_mod_of_dvd ((d - 1) ^ 2) (dvd_refl p))
+          rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
+          simp [Ed25519]
+        -- Arithmetic postconditions lifted to CurveField
+        have h_rm1 : r_minus_one.toField = r.toField - 1 := by
+          unfold toField; have h := lift_mod_eq _ _ r_minus_one_post_2
+          push_cast at h; rw [ONE_spec, Nat.cast_one] at h; linear_combination h
+        have h_cr : c_r_minus_one.toField = c1.toField * r_minus_one.toField := by
+          unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post_1
+          push_cast at h; exact h
+        have h_crd : c_r_minus_one_d.toField = c_r_minus_one.toField *
+            backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField := by
+          unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post_1
+          push_cast at h; exact h
+        have h_Nt_add : N_t.toField + D.toField = c_r_minus_one_d.toField := by
+          unfold toField; have h := lift_mod_eq _ _ N_t_post_2; push_cast at h; exact h
+        have h_D : D.toField = c_minus_dr.toField * r_plus_d.toField := by
+          unfold toField; have h := lift_mod_eq _ _ D_post_1; push_cast at h; exact h
+        have h_rpd : r_plus_d.toField = r.toField + Ed25519.d := by
+          unfold toField
+          have h_nat : Field51_as_Nat r_plus_d =
+              Field51_as_Nat r + Field51_as_Nat backend.serial.u64.constants.EDWARDS_D := by
+            unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]
+            apply Finset.sum_congr rfl; intro i hi
+            rw [Finset.mem_range] at hi; rw [r_plus_d_post_1 i hi, mul_add]
+          rw [h_nat]; push_cast; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
+        have h_cmdr : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
+          have h_sub : c_minus_dr.toField + d_times_r.toField =
+              backend.serial.u64.constants.MINUS_ONE.toField := by
+            unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post_2
+            push_cast at h; exact h
+          have h_dr : d_times_r.toField =
+              backend.serial.u64.constants.EDWARDS_D.toField * r.toField := by
+            unfold toField; have h := lift_mod_eq _ _ d_times_r_post_1
+            push_cast at h; exact h
+          rw [h_m1_F] at h_sub; rw [h_ed_F] at h_dr; linear_combination h_sub - h_dr
+        -- N_t = c1*(r-1)*(d-1)² - (-1-d*r)*(r+d)
+        have h_Nt_eq : N_t.toField =
+            c1.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 -
+            (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
+          have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
+            linear_combination h_Nt_add
+          rw [this, h_crd, h_edmsq_F, h_cr, h_rm1, h_D, h_cmdr, h_rpd]
+        -- Conditional assign helpers
+        have cond_f51_eq {z x y : backend.serial.u64.field.FieldElement51}
+            {c : subtle.Choice}
+            (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
+            (hc : c.val = 1#u8) : Field51_as_Nat z = Field51_as_Nat x := by
+          unfold Field51_as_Nat; apply Finset.sum_congr rfl; intro i hi
+          rw [Finset.mem_range] at hi; have h := hpost i hi; simp only [Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, hc, ↓reduceIte] at h; simp only [Array.getElem!_Nat_eq,
+              List.getElem!_eq_getElem?_getD, h]
+        have cond_f51_eq' {z x y : backend.serial.u64.field.FieldElement51}
+            {c : subtle.Choice}
+            (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
+            (hc : ¬(c.val = 1#u8)) : Field51_as_Nat z = Field51_as_Nat y := by
+          unfold Field51_as_Nat; apply Finset.sum_congr rfl; intro i hi
+          rw [Finset.mem_range] at hi; have h := hpost i hi; simp only [Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, hc, ↓reduceIte] at h; simp only [Array.getElem!_Nat_eq,
+              List.getElem!_eq_getElem?_getD, h]
+        -- Case split: not_sq determines c1
+        intro h0; rw [h_Nt_eq] at h0
+        by_cases h_nsq : not_sq.val = 1#u8
+        · -- NOT square: c1 = r
+          rw [show c1.toField = r.toField from by
+            unfold toField; rw [cond_f51_eq c1_post h_nsq]] at h0
+          -- h0 : r*(r-1)*(d-1)² - (-1-d*r)*(r+d) = 0 = d*(r+1)² + ((d-1)*r)²
+          have h_quad : Ed25519.d * (r.toField + 1) ^ 2 +
+              ((Ed25519.d - 1) * r.toField) ^ 2 = 0 := by linear_combination h0
+          have ⟨hr1, hr2⟩ :=
+            non_square_quad_zero Edwards.d_not_square neg_one_is_square h_quad
+          rw [show r.toField = -1 from by linear_combination hr1] at hr2
+          exact Edwards.d_not_square ⟨1, by
+            linear_combination (mul_eq_zero.mp hr2).resolve_right
+              (neg_ne_zero.mpr (one_ne_zero (α := CurveField)))⟩
+        · -- IS square: c1 = -1
+          rw [show c1.toField = (-1 : CurveField) from by
+            unfold toField; rw [cond_f51_eq' c1_post h_nsq]; exact h_m1_F] at h0
+          -- h0 : (-1)*(r-1)*(d-1)² - (-1-d*r)*(r+d) = 0 = d*(r+1)² + (d-1)²
+          have h_quad : Ed25519.d * (r.toField + 1) ^ 2 +
+              (Ed25519.d - 1) ^ 2 = 0 := by linear_combination h0
+          have ⟨_, hd1⟩ :=
+            non_square_quad_zero Edwards.d_not_square neg_one_is_square h_quad
+          exact Edwards.d_not_square ⟨1, by linear_combination hd1⟩
       · -- SQRT_AD_MINUS_ONE.toField ≠ 0
         unfold backend.serial.u64.constants.SQRT_AD_MINUS_ONE
         decide
