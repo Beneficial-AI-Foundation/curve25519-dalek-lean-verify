@@ -193,13 +193,11 @@ theorem non_u_affine_toPoint_spec {u v : CurveField}
   simp only [MontgomeryCurveCurve25519]
   simp only [equation]
   ring
-
+/-
 theorem MontgomeryPoint.u_affine_toPoint_spec (u v : CurveField)
   (non : u ≠ 0)
   (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
   MontgomeryPoint.u_affine_toPoint (u : CurveField) = WeierstrassCurve.Affine.Point.some ( non_u_affine_toPoint_spec equation) := by
-  sorry
-/-
   have := Aux_u_affine_toPoint_spec non equation
   unfold MontgomeryPoint.u_affine_toPoint
   simp only [Bool.or_eq_true, Bool.not_eq_eq_eq_not, Bool.not_true, beq_iff_eq]
@@ -252,20 +250,17 @@ lemma A_add_2 : 486664=  Curve25519.A+2 := by
   unfold Curve25519.A
   decide
 
-lemma d_one_IsSquare : IsSquare (Edwards.Ed25519.d+1) := by
-  sorry
+lemma d_plus_one_square : IsSquare (Edwards.Ed25519.d +1) := by
+  have : Edwards.Ed25519.d =d:=rfl
+  rw[this]
+  have : ↑(↑d+1)≠ 0 := by  unfold d; decide
+  apply ((@legendreSym.eq_one_iff p _ (d+1)) (by  unfold d; decide)).mp
+  norm_num [d, p]
 
 lemma B_d_relation : IsSquare (4 / ((Edwards.Ed25519.a : CurveField) - Edwards.Ed25519.d)) := by
   rw[adB]
-  unfold IsSquare
-  refine ⟨(-486664 : ZMod p) ^ ((p + 1) / 4), ?_⟩
-  have hp : (p : ℕ) % 4 = 1 := by
-    -- arithmetic fact: 2^255 ≡ 0 (mod 4)
-    -- so 2^255 - 19 ≡ 1 (mod 4)
-    norm_num [p]
-  -- square-root lemma for ZMod when p ≡ 1 mod 4
-  sorry
-
+  apply ((@legendreSym.eq_one_iff p _ (-486664)) (by decide)).mp
+  norm_num [p]
 
 lemma inver_Ad : (Curve25519.A + 2) * Edwards.Ed25519.d + (Curve25519.A - 2) = 0:= by
   rw[← adA ]
@@ -2419,7 +2414,7 @@ theorem comm_mul_fromEdwards {n : ℕ} (e : Edwards.Point Edwards.Ed25519) :
   · rename_i n hn
     simp only [add_smul, one_smul]
     rw[add_fromEdwards, hn]
-
+/-
 theorem fromEdwards_eq_MontgomeryPoint_toPoint (e : Edwards.Point Edwards.Ed25519)
   (m : MontgomeryPoint)
   (non : ¬ e.y = 1)
@@ -2442,7 +2437,7 @@ theorem fromEdwards_eq_MontgomeryPoint_toPoint (e : Edwards.Point Edwards.Ed2551
   · have := on_MontgomeryCurves e non non_x
     simp only at this
     apply this
-
+-/
 end fromEdwards
 
 section toEdwards
