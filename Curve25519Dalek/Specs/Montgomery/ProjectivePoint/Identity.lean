@@ -48,10 +48,10 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    identity ⦃ q =>
-      q.U = (Array.make 5#usize [ 1#u64, 0#u64, 0#u64, 0#u64, 0#u64 ]) ∧
-      q.W = Array.repeat 5#usize 0#u64 ⦄ := by
-  unfold identity ONE ZERO
+    identity ⦃ (q : montgomery.ProjectivePoint) =>
+      Field51_as_Nat q.U = 1 ∧
+      Field51_as_Nat q.W = 0 ⦄ := by
+  unfold identity
   progress*
 
 end curve25519_dalek.IdentityMontgomeryProjectivePoint

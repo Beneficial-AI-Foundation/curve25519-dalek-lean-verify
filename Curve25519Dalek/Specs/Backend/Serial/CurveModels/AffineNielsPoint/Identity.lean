@@ -19,7 +19,7 @@ This function returns the identity element of the Edwards curve in AffineNiels c
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs:L258-L264
 -/
 
-open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity
 
@@ -50,9 +50,11 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.y_plus_x = ONE ∧ q.y_minus_x = ONE ∧ q.xy2d = ZERO) := by
+    identity ⦃ (q : AffineNielsPoint) =>
+      Field51_as_Nat q.y_plus_x = 1 ∧
+      Field51_as_Nat q.y_minus_x = 1 ∧
+      Field51_as_Nat q.xy2d = 0 ⦄ := by
   unfold identity
-  simp
+  progress*
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity

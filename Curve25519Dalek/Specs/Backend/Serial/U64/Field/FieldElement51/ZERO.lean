@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
 /-! # Spec Theorem for `FieldElement51::ZERO`
 
@@ -31,12 +32,14 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:
-- The constant, when converted to a natural number, equals 0
+- The constant is equal to 0
 -/
 @[progress]
-theorem ZERO_spec : ZERO ⦃ result => Field51_as_Nat result = 0 ⦄ := by
-    unfold ZERO from_limbs
-    simp only [spec_ok]
-    decide
+theorem ZERO_spec : ZERO ⦃ (result : FieldElement51) =>
+    Field51_as_Nat result = 0 ⦄ := by
+  unfold ZERO
+  progress*
+  simp only [*]
+  decide
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
