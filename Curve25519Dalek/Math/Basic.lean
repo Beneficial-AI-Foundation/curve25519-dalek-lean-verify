@@ -56,6 +56,14 @@ def Scalar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
 
+/-- Interpret a 32-element byte array as a field element in ZMod p via Horner's method.
+    This avoids the massive syntax tree that casting `U8x32_as_Nat` to `ZMod p` produces
+    (which causes deterministic timeouts when the 32-term Finset.sum gets Nat.cast distributed
+    through it). See `U8x32_as_Field_eq_cast` in Aux.lean for the equivalence proof. -/
+def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
+  bytes.val.foldr (init := (0 : ZMod (2^255 - 19))) fun b acc =>
+    (b.val : ZMod (2^255 - 19)) + (256 : ZMod (2^255 - 19)) * acc
+
 /-- Interpret a 64-element byte array as a natural number. -/
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val

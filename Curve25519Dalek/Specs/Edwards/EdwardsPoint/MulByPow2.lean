@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `EdwardsPoint::mul_by_pow_2`
 
@@ -38,6 +39,7 @@ natural language specs:
 - For k = 1, returns the doubled point 2e for the input point e
 - For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))
 -/
+@[externally_verified] -- proven in Verus
 theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32) (hself : self.IsValid) (hk : k.val > 0) :
     ∃ result : EdwardsPoint, mul_by_pow_2 self k = ok result ∧
     result.IsValid ∧

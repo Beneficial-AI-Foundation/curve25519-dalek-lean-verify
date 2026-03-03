@@ -32,10 +32,12 @@ interface ProgressDataPoint {
   timestamp: number
   total: number
   verified: number
+  externally_verified: number
   specified: number
   draft_spec: number
   extracted: number
   ai_proveable: number
+  ignored: number
 }
 
 const props = withDefaults(defineProps<{
@@ -87,15 +89,20 @@ ChartJS.register(robotEmojiPlugin)
 const chartData = computed(() => {
   // For TimeScale, we need to provide data as {x, y} objects
   const verified = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.verified }))
-  const specified = props.dataPoints.map((dp, idx) => ({
+  const ext_verified = props.dataPoints.map(dp => ({
     x: dp.timestamp * 1000,
-    y: dp.specified + props.dataPoints[idx].verified
+    y: (dp.externally_verified ?? 0) + dp.verified
   }))
-  const draft_spec = props.dataPoints.map((dp, idx) => ({
+  const specified = props.dataPoints.map(dp => ({
     x: dp.timestamp * 1000,
-    y: dp.draft_spec + props.dataPoints[idx].specified + props.dataPoints[idx].verified
+    y: dp.specified + (dp.externally_verified ?? 0) + dp.verified
+  }))
+  const draft_spec = props.dataPoints.map(dp => ({
+    x: dp.timestamp * 1000,
+    y: dp.draft_spec + dp.specified + (dp.externally_verified ?? 0) + dp.verified
   }))
   const total = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total }))
+  const active = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total - dp.ignored }))
   const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
   const ai_proveable = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.ai_proveable }))
 
@@ -112,15 +119,26 @@ const chartData = computed(() => {
       order: 1
     },
     {
-      label: 'Spec only',
-      data: specified,
-      borderColor: '#fdba74',
-      backgroundColor: 'rgba(253, 186, 116, 0.6)',
+      label: 'Ext. verified',
+      data: ext_verified,
+      borderColor: '#6ee7b7',
+      backgroundColor: 'rgba(110, 231, 183, 0.7)',
       fill: true,
       stepped: 'after' as const,
       borderWidth: 0,
       pointRadius: 0,
       order: 2
+    },
+    {
+      label: 'Spec only',
+      data: specified,
+      borderColor: '#93c5fd',
+      backgroundColor: 'rgba(147, 197, 253, 0.6)',
+      fill: true,
+      stepped: 'after' as const,
+      borderWidth: 0,
+      pointRadius: 0,
+      order: 3
     },
     {
       label: 'Draft',
@@ -131,7 +149,7 @@ const chartData = computed(() => {
       stepped: 'after' as const,
       borderWidth: 0,
       pointRadius: 0,
-      order: 3
+      order: 4
     },
     {
       label: 'Not started',
@@ -142,7 +160,7 @@ const chartData = computed(() => {
       stepped: 'after' as const,
       borderWidth: 0,
       pointRadius: 0,
-      order: 4
+      order: 5
     },
     {
       label: 'Total Functions',
@@ -152,6 +170,18 @@ const chartData = computed(() => {
       fill: false,
       stepped: 'after' as const,
       borderWidth: 2,
+      pointRadius: 0,
+      order: 0
+    },
+    {
+      label: 'Active Functions',
+      data: active,
+      borderColor: '#6b7280',
+      backgroundColor: 'transparent',
+      fill: false,
+      stepped: 'after' as const,
+      borderWidth: 1.5,
+      borderDash: [6, 3],
       pointRadius: 0,
       order: 0
     },
@@ -211,8 +241,7 @@ const chartOptions: ChartOptions<'line'> = {
         usePointStyle: true,
         padding: 15,
         filter: function(item, chart) {
-          // Only show Verified, Spec only, and Draft in legend
-          return item.text === 'Verified' || item.text === 'Spec only' || item.text === 'Draft'
+          return item.text === 'Verified' || item.text === 'Ext. verified' || item.text === 'Spec only' || item.text === 'Draft' || item.text === 'Active Functions'
         }
       }
     },
@@ -223,8 +252,10 @@ const chartOptions: ChartOptions<'line'> = {
           const value = context.parsed.y
 
           // For stacked areas, show the actual count, not cumulative
-          if (label === 'Spec only' && context.dataIndex !== undefined) {
-            const verified = props.dataPoints[context.dataIndex].verified
+          if (label === 'Ext. verified' && context.dataIndex !== undefined) {
+            const extVerified = props.dataPoints[context.dataIndex].externally_verified ?? 0
+            return `${label}: ${extVerified}`
+          } else if (label === 'Spec only' && context.dataIndex !== undefined) {
             const specified = props.dataPoints[context.dataIndex].specified
             return `${label}: ${specified}`
           } else if (label === 'Draft' && context.dataIndex !== undefined) {
@@ -232,7 +263,7 @@ const chartOptions: ChartOptions<'line'> = {
             return `${label}: ${draft_spec}`
           } else if (label === 'Not started' && context.dataIndex !== undefined) {
             const dp = props.dataPoints[context.dataIndex]
-            const notStarted = dp.total - dp.verified - dp.specified - dp.draft_spec
+            const notStarted = dp.total - dp.verified - (dp.externally_verified ?? 0) - dp.specified - dp.draft_spec
             return `${label}: ${notStarted}`
           }
 

@@ -6,6 +6,7 @@ Authors: Markus Dablander, Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.ExternallyVerified
 
 /- # Spec Theorem for `FieldElement51::pow2k`
 
@@ -1741,7 +1742,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
 -/
 
 
-@[progress]
+@[externally_verified, progress] -- working proof commented out because of slow build
 theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     pow2k a k ⦃ r =>

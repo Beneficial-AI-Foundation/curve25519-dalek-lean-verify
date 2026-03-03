@@ -230,7 +230,8 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
         color: getNodeColorByStatus(node.status),
         status: node.status,
         sourceFile: node.sourceFile,
-        isTransitive: node.isTransitiveTarget
+        isTransitive: node.isTransitiveTarget,
+        isIgnored: node.isIgnored && node.status === 'none'
       }
     }))
 
@@ -343,7 +344,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
 
   private getEdgeColor(nodes: GraphNode[], targetId: string): string {
     const target = nodes.find(n => n.id === targetId)
-    if (target && (target.status === 'verified' || target.status === 'fully_verified')) {
+    if (target && (target.status === 'verified' || target.status === 'externally_verified')) {
       return edgeColors.verified
     }
     return edgeColors.default
@@ -359,6 +360,7 @@ export class CytoscapeAdapter implements IVisualizationAdapter {
         cyNode.data('fullLabel', node.fullLabel)
         cyNode.data('color', getNodeColorByStatus(node.status))
         cyNode.data('status', node.status)
+        cyNode.data('isIgnored', node.isIgnored && node.status === 'none')
       }
     }
   }
