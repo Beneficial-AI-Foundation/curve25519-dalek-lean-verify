@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Math.Edwards.EightTorsion
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
@@ -61,16 +62,33 @@ theorem EIGHT_TORSION_spec :
   progress*
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]; decide
-  · -- ⊢ 4 • EIGHT_TORSION = 0
-    sorry
-  · -- ⊢ 8 • EIGHT_TORSION = 0
-    sorry
+  · -- 4 • P.toPoint ≠ 0
+    simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]
+    change 4 • _root_.Edwards.eightTorsionGen ≠ 0
+    exact _root_.Edwards.four_nsmul_gen_ne_zero
+  · -- 8 • P.toPoint = 0
+    simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]
+    change 8 • _root_.Edwards.eightTorsionGen = 0
+    exact _root_.Edwards.eight_nsmul_gen_eq_zero
   · intro i
     fin_cases i
     all_goals
     · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
       decide
-  · -- ⊢ EIGHT_TORSION[i].toPoint = (i : ℕ) • P.toPoint
-    sorry
+  · -- ∀ i, result.val[i].toPoint = (i : ℕ) • P.toPoint
+    intro i; fin_cases i
+    all_goals (simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ,
+      List.getElem_cons_zero, *])
+    -- Each goal is now: (concrete_ep_k).toPoint = k • (concrete_ep_1).toPoint
+    -- Decompose via change: LHS ≡_def eightTorsionPoints k (cheap toPoint eval),
+    -- RHS k • ep_1.toPoint ≡_def k • eightTorsionGen (cheap bridge, no point multiplication).
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨0, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨1, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨2, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨3, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨4, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨5, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨6, by omega⟩).symm
+    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨7, by omega⟩).symm
 
 end curve25519_dalek.backend.serial.u64.constants
