@@ -70,25 +70,17 @@ theorem EIGHT_TORSION_spec :
     simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]
     change 8 • _root_.Edwards.eightTorsionGen = 0
     exact _root_.Edwards.eight_nsmul_gen_eq_zero
-  · intro i
-    fin_cases i
+  · -- ∀ i, result.val[i].IsValid
+    intro i; fin_cases i
     all_goals
     · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
       decide
   · -- ∀ i, result.val[i].toPoint = (i : ℕ) • P.toPoint
-    intro i; fin_cases i
-    all_goals (simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ,
-      List.getElem_cons_zero, *])
-    -- Each goal is now: (concrete_ep_k).toPoint = k • (concrete_ep_1).toPoint
-    -- Decompose via change: LHS ≡_def eightTorsionPoints k (cheap toPoint eval),
-    -- RHS k • ep_1.toPoint ≡_def k • eightTorsionGen (cheap bridge, no point multiplication).
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨0, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨1, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨2, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨3, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨4, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨5, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨6, by omega⟩).symm
-    · exact (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨7, by omega⟩).symm
+    intro i;
+    have h := (_root_.Edwards.nsmul_eightTorsionGen_eq ⟨i, by omega⟩).symm
+    fin_cases i
+    all_goals
+    · simp only [Array.make, Fin.getElem_fin, List.getElem_cons_succ, List.getElem_cons_zero, *]
+      exact h
 
 end curve25519_dalek.backend.serial.u64.constants
