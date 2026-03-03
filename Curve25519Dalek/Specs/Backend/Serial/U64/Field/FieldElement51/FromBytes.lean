@@ -53,10 +53,10 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
   intro j hj
   simp only [UScalar.val_or, List.getElem!_eq_getElem?_getD, UScalarTy.U8_numBits_eq,
     UScalarTy.U64_numBits_eq, Nat.reduceLeDiff, UScalar.cast_val_mod_pow_greater_numBits_eq,
-    Nat.testBit_or, i32_post_1, i27_post_1, i22_post_1, i17_post_1, i12_post_1, i7_post_1, i2_post,
-    i1_post, i6_post_1, i5_post, i4_post, i3_post, i11_post_1, i10_post, i9_post, i8_post,
-    i16_post_1, i15_post, i14_post, i13_post, i21_post_1, i20_post, i19_post, i18_post, i26_post_1,
-    i25_post, i24_post, i23_post, i31_post_1, i30_post, i29_post, i28_post, i36_post_1, i35_post,
+    Nat.testBit_or, i32_post1, i27_post1, i22_post1, i17_post1, i12_post1, i7_post1, i2_post,
+    i1_post, i6_post1, i5_post, i4_post, i3_post, i11_post1, i10_post, i9_post, i8_post,
+    i16_post1, i15_post, i14_post, i13_post, i21_post1, i20_post, i19_post, i18_post, i26_post1,
+    i25_post, i24_post, i23_post, i31_post1, i30_post, i29_post, i28_post, i36_post1, i35_post,
     i34_post, i33_post]
   obtain hc | hc | hc | hc | hc | hc | hc | hc : j / 8 = 0 ∨ j / 8 = 1 ∨ j / 8 = 2 ∨ j / 8 = 3 ∨
       j / 8 = 4 ∨ j / 8 = 5 ∨ j / 8 = 6 ∨ j / 8 = 7 := by omega
@@ -818,7 +818,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
   progress*
   -- Shared helper: each masked limb < 2^51 (mask = 2^51 - 1)
   have h_mask_lt : (↑low_51_bit_mask : ℕ) < 2 ^ 51 := by
-    rw [low_51_bit_mask_post_1, i_post_1];
+    rw [low_51_bit_mask_post1, i_post1];
     simp only [Nat.shiftLeft_eq, Nat.one_mul, U64.size_eq]
     try scalar_tac
   have and_mask_lt : ∀ (x : U64), (↑(x &&& low_51_bit_mask) : ℕ) < 2 ^ 51 := by
@@ -834,19 +834,19 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     interval_cases j
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.ofNat_pos, getElem!_pos, List.getElem_cons_zero]
-      rw [i2_post_1]; exact and_mask_lt i1
+      rw [i2_post1]; exact and_mask_lt i1
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.one_lt_ofNat, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i5_post_1]; exact and_mask_lt i4
+      rw [i5_post1]; exact and_mask_lt i4
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i8_post_1]; exact and_mask_lt i7
+      rw [i8_post1]; exact and_mask_lt i7
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i11_post_1]; exact and_mask_lt i10
+      rw [i11_post1]; exact and_mask_lt i10
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.lt_add_one, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i14_post_1]; exact and_mask_lt i13
+      rw [i14_post1]; exact and_mask_lt i13
   swap
   · -- IsValid (< 2^54): follows from tight bounds
     simp only [FieldElement51.IsValid, Array.make]
@@ -854,19 +854,19 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     interval_cases j
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.ofNat_pos, getElem!_pos, List.getElem_cons_zero]
-      rw [i2_post_1]; exact lt_trans (and_mask_lt i1) (by norm_num)
+      rw [i2_post1]; exact lt_trans (and_mask_lt i1) (by norm_num)
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
         Nat.one_lt_ofNat, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i5_post_1]; exact lt_trans (and_mask_lt i4) (by norm_num)
+      rw [i5_post1]; exact lt_trans (and_mask_lt i4) (by norm_num)
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i8_post_1]; exact lt_trans (and_mask_lt i7) (by norm_num)
+      rw [i8_post1]; exact lt_trans (and_mask_lt i7) (by norm_num)
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.reduceLT, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i11_post_1]; exact lt_trans (and_mask_lt i10) (by norm_num)
+      rw [i11_post1]; exact lt_trans (and_mask_lt i10) (by norm_num)
     · simp only [Array.getElem!_Nat_eq, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd,
       Nat.lt_add_one, getElem!_pos, List.getElem_cons_succ, List.getElem_cons_zero]
-      rw [i14_post_1]; exact lt_trans (and_mask_lt i13) (by norm_num)
+      rw [i14_post1]; exact lt_trans (and_mask_lt i13) (by norm_num)
   -- Congruence proof (unchanged):
   rw [bytes_mod255_eq]
   simp_all only [Nat.reduceShiftLeft, U64.size, U64.numBits, UScalarTy.U64_numBits_eq,

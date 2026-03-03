@@ -36,7 +36,9 @@ natural language specs:
 -/
 @[progress]
 theorem EDWARDS_D2_spec :
-    EDWARDS_D2 ⦃ result => Field51_as_Nat result = (2 * d) % p ⦄ := by
+    EDWARDS_D2 ⦃ (result : field.FieldElement51) =>
+      Field51_as_Nat result = (2 * d) % p ∧
+      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold EDWARDS_D2 field.FieldElement51.from_limbs
   simp only [spec_ok]
   decide

@@ -63,21 +63,10 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ⦄ := by
   unfold ct_eq
   progress as ⟨h1, h2⟩
-  · intro i hi; have := h_e1_X i hi; scalar_tac
-  · intro i hi; have := h_e2_Z i hi; scalar_tac
-
   progress as ⟨h3, h4⟩
-  · intro i hi; have := h_e2_X i hi; scalar_tac
-  · intro i hi; have := h_e1_Z i hi; scalar_tac
-
   progress as ⟨h5, h6⟩
   progress as ⟨h7, h8⟩
-  · intro i hi; have := h_e1_Y i hi; scalar_tac
-  · intro i hi; have := h_e2_Z i hi; scalar_tac
-
   progress as ⟨h9, h10⟩
-  · intro i hi; have := h_e2_Y i hi; scalar_tac
-  · intro i hi; have := h_e1_Z i hi; scalar_tac
 
   progress as ⟨h11, h12⟩
   progress as ⟨h13, h14⟩
