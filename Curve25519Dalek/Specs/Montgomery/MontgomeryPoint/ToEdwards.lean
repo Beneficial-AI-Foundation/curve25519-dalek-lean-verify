@@ -74,9 +74,15 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
   -- Add auxiliary lemmas for bounds on constants
   -- TODO: These can be proven by evaluating the constants
-  have h_ONE_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53 := by sorry
+  have h_ONE_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53 := by
+    intro i hi
+    unfold FieldElement51.ONE
+    interval_cases i <;> decide
 
-  have h_MINUS_ONE_bounds : ∀ i < 5, FieldElement51.MINUS_ONE[i]!.val < 2 ^ 54 := by sorry
+  have h_MINUS_ONE_bounds : ∀ i < 5, FieldElement51.MINUS_ONE[i]!.val < 2 ^ 54 := by
+    intro i hi
+    unfold FieldElement51.MINUS_ONE
+    interval_cases i <;> decide
 
   -- We also need bounds that are compatible with u
   have h_u_sub_bounds : ∀ i < 5, u[i]!.val < 2 ^ 63 := by
@@ -103,8 +109,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   · -- Case: b = true (u = MINUS_ONE, return none)
     simp
   · progress*
-    · sorry
-    · sorry
+    · grind only
+    · grind only
     · sorry
     -- -- Case: b ≠ true (continue with computation)
     -- -- Apply all the specs automatically with progress*
