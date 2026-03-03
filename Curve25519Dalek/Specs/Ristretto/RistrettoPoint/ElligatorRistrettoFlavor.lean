@@ -125,6 +125,36 @@ private lemma elligator_curve_eq_of_inner {dd s Df Nt w : CurveField}
   · rw [hs0]; ring
   · linear_combination 4 * s ^ 2 * h + (-4 * s ^ 2 * Nt ^ 2) * hw
 
+/-- Case A ring identity: when c₁ = -1 (square case), Nₜ = -(r-1)(d-1)²-D,
+the inner identity `(d+1)Nₜ² = (D+Nₛ)² + d(D-Nₛ)²` holds as a polynomial identity in r, d. -/
+private lemma inner_ring_A (dd r : CurveField) :
+    (dd + 1) * (-(r - 1) * (dd - 1) ^ 2 - (-1 - dd * r) * (r + dd)) ^ 2 =
+    ((-1 - dd * r) * (r + dd) + (r + 1) * (1 - dd ^ 2)) ^ 2 +
+    dd * ((-1 - dd * r) * (r + dd) - (r + 1) * (1 - dd ^ 2)) ^ 2 := by ring
+
+/-- Case B ring identity: when c₁ = r (non-square case), Nₜ = r(r-1)(d-1)²-D,
+the inner identity `(d+1)Nₜ² = (D+rNₛ)² + d(D-rNₛ)²` holds as a polynomial identity in r, d. -/
+private lemma inner_ring_B (dd r : CurveField) :
+    (dd + 1) * (r * (r - 1) * (dd - 1) ^ 2 - (-1 - dd * r) * (r + dd)) ^ 2 =
+    ((-1 - dd * r) * (r + dd) + r * ((r + 1) * (1 - dd ^ 2))) ^ 2 +
+    dd * ((-1 - dd * r) * (r + dd) - r * ((r + 1) * (1 - dd ^ 2))) ^ 2 := by ring
+
+/-- Bridge lemma: when s²D = Nₛ, converts `(D+Nₛ)² + d(D-Nₛ)²` to `D²((1+s²)² + d(1-s²)²)`. -/
+private lemma constr_to_squares {dd s Df Ns : CurveField}
+    (h : s ^ 2 * Df = Ns) :
+    (Df + Ns) ^ 2 + dd * (Df - Ns) ^ 2 =
+    Df ^ 2 * ((1 + s ^ 2) ^ 2 + dd * (1 - s ^ 2) ^ 2) := by
+  linear_combination
+    -((2 - 2 * dd) * Df + (1 + dd) * (Ns + s ^ 2 * Df)) * h
+
+/-- Bridge lemma (case B): when s²D = r·Nₛ, converts `(D+rNₛ)² + d(D-rNₛ)²` to `D²((1+s²)² + d(1-s²)²)`. -/
+private lemma constr_to_squares_r {dd s r Df Ns : CurveField}
+    (h : s ^ 2 * Df = r * Ns) :
+    (Df + r * Ns) ^ 2 + dd * (Df - r * Ns) ^ 2 =
+    Df ^ 2 * ((1 + s ^ 2) ^ 2 + dd * (1 - s ^ 2) ^ 2) := by
+  linear_combination
+    -((2 - 2 * dd) * Df + (1 + dd) * (r * Ns + s ^ 2 * Df)) * h
+
 /-- If d is not a square and -1 is a square in a field, then d·x² + y² = 0 implies x = 0 ∧ y = 0.
 Used to show N_t ≠ 0 in the Elligator map. -/
 private lemma non_square_quad_zero {d x y : CurveField}
@@ -612,7 +642,102 @@ theorem elligator_ristretto_flavor_spec
       have h_cp_Z_F : cp_Z.toField = N_t.toField *
           backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField := by
         unfold toField; have h := lift_mod_eq _ _ cp_Z_post_1; push_cast at h; exact h
-      sorry
+      -- Rewrite goal using coordinate lifts
+      rw [h_cp_X_F, h_sps_F, h_cp_Y_F, h_cp_Z_F, h_cp_T_F, show Ed25519.a = -1 from rfl]
+      -- Establish ω² = -d - 1
+      have h_omega_sq : backend.serial.u64.constants.SQRT_AD_MINUS_ONE.toField ^ 2 =
+          -Ed25519.d - 1 := by
+        unfold toField
+        -- Lift Int-level spec to CurveField
+        have h := (ZMod.intCast_eq_intCast_iff _ _ p).mpr
+          backend.serial.u64.constants.SQRT_AD_MINUS_ONE_spec
+        push_cast at h; simp only [a] at h; rw [h]; simp only [Int.reduceNeg, Int.cast_neg,
+          Int.cast_one, neg_mul, one_mul, Ed25519];
+      -- Apply the curve equation lemma
+      apply elligator_curve_eq_of_inner h_omega_sq
+      -- Re-derive postcondition lifts needed for the inner identity
+      -- (these were derived inside h_cp_T_ne but are out of scope here)
+      -- N_s equation
+      have h_ns_eq' : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
+        have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
+          unfold toField
+          have h_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat ONE := by
+            unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+            intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post_1 i hi, mul_add]
+          rw [h_nat]; push_cast; rw [ONE_spec]; simp only [Nat.cast_one]
+        have h_omeds_F :
+            backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField =
+            1 - Ed25519.d ^ 2 := by
+          unfold toField
+          have h_sum : (Field51_as_Nat backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED +
+              d ^ 2) % p = 1 % p := by
+            rw [backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_spec]; norm_num [d, p]
+          have h := lift_mod_eq _ _ h_sum; push_cast at h
+          have : Ed25519.d = (d : CurveField) := rfl; rw [this]; linear_combination h
+        have hN : N_s.toField = r_plus_one.toField *
+            backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField := by
+          unfold toField; have h := lift_mod_eq _ _ N_s_post_1; push_cast at h; exact h
+        rw [hN, h_rpo_F, h_omeds_F]
+      -- D equation
+      have h_D_eq' : D.toField =
+          (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
+        have h_ed_F : backend.serial.u64.constants.EDWARDS_D.toField = Ed25519.d := by
+          unfold toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
+        have h_m1_F : backend.serial.u64.constants.MINUS_ONE.toField = (-1 : CurveField) := by
+          unfold toField; rw [backend.serial.u64.constants.MINUS_ONE_spec]
+          have : (p - 1 : ℕ) + 1 = p := by unfold p; omega
+          have h := lift_mod_eq _ _
+            (show (p - 1 + 1) % p = 0 % p from by rw [this, Nat.mod_self, Nat.zero_mod])
+          push_cast at h; linear_combination h
+        have h_rpd : r_plus_d.toField = r.toField + Ed25519.d := by
+          unfold toField
+          have h_nat : Field51_as_Nat r_plus_d =
+              Field51_as_Nat r + Field51_as_Nat backend.serial.u64.constants.EDWARDS_D := by
+            unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+            intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post_1 i hi, mul_add]
+          rw [h_nat]; push_cast; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
+        have h_cmdr : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
+          have h_sub : c_minus_dr.toField + d_times_r.toField =
+              backend.serial.u64.constants.MINUS_ONE.toField := by
+            unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post_2; push_cast at h; exact h
+          have h_dr : d_times_r.toField =
+              backend.serial.u64.constants.EDWARDS_D.toField * r.toField := by
+            unfold toField; have h := lift_mod_eq _ _ d_times_r_post_1; push_cast at h; exact h
+          rw [h_m1_F] at h_sub; rw [h_ed_F] at h_dr; linear_combination h_sub - h_dr
+        have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
+          unfold toField; have h := lift_mod_eq _ _ D_post_1; push_cast at h; exact h
+        rw [hD, h_cmdr, h_rpd]
+      -- N_t equation: N_t = c1*(r-1)*(d-1)² - D
+      have h_Nt_eq' : N_t.toField =
+          c1.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
+        have h_edmsq_F :
+            backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField =
+            (Ed25519.d - 1) ^ 2 := by
+          unfold toField
+          rw [backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec]
+          have h := lift_mod_eq _ _ (Nat.mod_mod_of_dvd ((d - 1) ^ 2) (dvd_refl p))
+          rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
+          simp only [Ed25519]
+        have h_rm1 : r_minus_one.toField = r.toField - 1 := by
+          unfold toField; have h := lift_mod_eq _ _ r_minus_one_post_2
+          push_cast at h; rw [ONE_spec, Nat.cast_one] at h; linear_combination h
+        have h_cr : c_r_minus_one.toField = c1.toField * r_minus_one.toField := by
+          unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post_1
+          push_cast at h; exact h
+        have h_crd : c_r_minus_one_d.toField = c_r_minus_one.toField *
+            backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField := by
+          unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post_1
+          push_cast at h; exact h
+        have h_Nt_add : N_t.toField + D.toField = c_r_minus_one_d.toField := by
+          unfold toField; have h := lift_mod_eq _ _ N_t_post_2; push_cast at h; exact h
+        have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
+          linear_combination h_Nt_add
+        rw [this, h_crd, h_edmsq_F, h_cr, h_rm1]
+      -- s1²·D constraint
+      have h_disj' : s1.toField ^ 2 * D.toField = N_s.toField ∨
+          s1.toField ^ 2 * D.toField = r.toField * N_s.toField := by
+        sorry -- will fill next
+      sorry -- final assembly
     -- Step 4: Assemble EdwardsPoint.IsValid
     have h_ep_valid : edwards.EdwardsPoint.IsValid ep := {
       X_bounds := fun i hi => by have := ep_post_5 i hi; omega
