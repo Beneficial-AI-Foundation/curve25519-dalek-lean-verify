@@ -55,6 +55,7 @@ natural language specs:
 -/
 
 /- Helper lemmas/theorems -/
+
 -- Helper theorem to cancel R [mod L] on right retrieved from Curve25519Dalek.Specs.Scalar.Scalar.Reduce.lean
 -- NOTE: We should refactoring such helper theorems into a common file to avoid duplication
 theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
@@ -64,17 +65,12 @@ theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := b
   have h1 := Nat.Coprime.symm hcoprime
   exact Nat.ModEq.cancel_right_of_coprime h1 h
 
--- Helper theorem that RR ≡ R * R [MOD L]
--- NOTE: We should refactoring such helper theorems into a common file to avoid duplication
-theorem RR_mod_L : Scalar52_as_Nat constants.RR ≡ R * R [MOD L] := by
-  rw [Nat.ModEq, ← pow_two]
-  exact constants.RR_spec
 /- End of helper lemmas/theorems -/
 
 @[progress]
 theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
-    mul a b ⦃ result =>
+    mul a b ⦃ ( result : Scalar52 ) =>
     Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
     (∀ i < 5, result[i]!.val < 2 ^ 62) ⦄ := by
   unfold mul
@@ -93,10 +89,8 @@ theorem mul_spec (a b : Scalar52)
       exact res_post_1
     -- ii. res * R ≡ ab * R * R [MOD L]
     have h_res_R_ab_R_R : Scalar52_as_Nat res * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
-      have h_temp : Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
-        sorry
-        -- exact Nat.ModEq.mul_left (Scalar52_as_Nat ab) RR_mod_L
-      exact Nat.ModEq.trans h_res_R_ab_RR h_temp
+      have := curve25519_dalek.backend.serial.u64.constants.RR_spec
+      grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
     -- iii. res * R ≡ a1 * R [MOD L]
     have h_res_R_a1_R : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
       rw [← Nat.ModEq] at ab_post_1
@@ -111,6 +105,6 @@ theorem mul_spec (a b : Scalar52)
     apply cancelR
     exact h_res_R_a_b_R
   -- 3b. To prove ∀ i < 5, ↑res[i]! < 2 ^ 62
-  · try grind
+  · grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
