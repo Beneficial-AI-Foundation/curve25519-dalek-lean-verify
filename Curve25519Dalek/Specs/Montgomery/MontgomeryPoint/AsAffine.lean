@@ -44,12 +44,6 @@ Natural language specs:
 • Does not verify that the result represents a valid curve point
 -/
 
-lemma bytesToField_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
-    bytesToField a = (U8x32_as_Nat a : ZMod p) := by
-  unfold bytesToField
-  rw [U8x32_as_Nat_eq_foldr, horner_natCast]
-
-
 lemma Field51_modP_ne_zero_of_toField_ne_zero
     (W : backend.serial.u64.field.FieldElement51)
     (hW : W.toField ≠ 0) :
@@ -84,13 +78,12 @@ lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv 
 - Returns bytesToField(result) = U/W (mod p) where p = 2^255 - 19
 - Does not verify curve validity (pure encoding of field element U/W)
 -/
-
 @[progress]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : self.U.IsValid)
     (hW : self.W.IsValid)
     (h_valid : self.W.toField ≠ 0) :
-    as_affine self ⦃ res => (bytesToField res = self.U.toField  / self.W.toField) ∧
+    as_affine self ⦃ res => (U8x32_as_Field res = self.U.toField  / self.W.toField) ∧
     (U8x32_as_Nat res < 2 ^255)  ⦄ := by
   unfold as_affine at *
   progress*
@@ -120,7 +113,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
       have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
       have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
         rw [h_eq_zmod2, Nat.cast_mul]
-      grind only [bytesToField_eq_cast]
+      grind only [ U8x32_as_Field_eq_cast]
     · apply lt_trans a_post_2
       decide
 
