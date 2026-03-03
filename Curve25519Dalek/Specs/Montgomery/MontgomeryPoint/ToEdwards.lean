@@ -57,14 +57,16 @@ natural language specs:
 - The returned point lies on the twisted Edwards curve
 -/
 @[progress]
-theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
-    to_edwards mp sign ⦃ result =>
-      (∀ ep, result = some ep →
-        let u := U8x32_as_Nat mp
-        let y := Field51_as_Nat ep.Y
-        -- The y-coordinate satisfies the birational map y = (u-1)/(u+1) mod p
-        (y * ((u + 1) % p)) % p = ((u - 1) % p) % p)
-    ⦄ := by
+  theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
+      to_edwards mp sign ⦃ result =>
+        (∀ ep, result = some ep →
+          ∃ Z_inv,
+            field.FieldElement51.invert ep.Z = ok Z_inv ∧
+            let u := U8x32_as_Nat mp
+            let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p  -- Affine y = Y/Z
+            (y * ((u + 1) % p)) % p = ((u - 1) % p) % p)
+      ⦄ := by
+
   unfold to_edwards
   progress*
   -- After progress*, we have eliminated from_bytes
@@ -111,13 +113,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   · progress*
     · grind only
     · grind only
-    · sorry
-    -- -- Case: b ≠ true (continue with computation)
-    -- -- Apply all the specs automatically with progress*
-    -- progress*
-    -- case hrhs => intro i hi; have := fe2_post_3 i hi; omega
-    -- -- Main proof: show that the Y-coordinate satisfies the birational map
-    -- -- We have all the postconditions from sub, add, invert, mul, to_bytes, decompress
-    -- sorry
+    · have h_res := res_post_1 res_post_2 res_post_3
+      obtain ⟨Z_inv, x_val, y_val, x_is_neg, h_Zinv, h_X, h_Y, h_neg, h_curve, h_y_val, h_sign, h_T⟩ := h_res
+      sorry
 
 end curve25519_dalek.montgomery.MontgomeryPoint
