@@ -71,6 +71,12 @@ structure Point {F : Type} [Mul F] [Add F] [Pow F ℕ] [One F] (C : EdwardsCurve
   on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
   deriving Repr
 
+instance : DecidableEq (Point Ed25519) := fun p1 p2 =>
+  if hx : p1.x = p2.x then
+    if hy : p1.y = p2.y then isTrue (Point.ext hx hy)
+    else isFalse (fun h => hy (congrArg Point.y h))
+  else isFalse (fun h => hx (congrArg Point.x h))
+
 instance : Inhabited (Point Ed25519) := ⟨{ x := 0, y := 1}⟩
 
 /-- -1 is a square in F_p since p ≡ 1 (mod 4). -/
@@ -195,6 +201,16 @@ def nsmul_Ed25519 (n : ℕ) (p : Point Ed25519) : Point Ed25519 :=
   | 0 => 0
   | n + 1 => p + (nsmul_Ed25519 n p)
 
+/-- Binary scalar multiplication, O(log n) point operations.
+    Equivalent to `nsmul_Ed25519` but computationally feasible for large scalars like L ~ 2^252. -/
+def binary_nsmul_Ed25519 (n : ℕ) (p : Point Ed25519) : Point Ed25519 :=
+  if n = 0 then 0
+  else
+    let half := binary_nsmul_Ed25519 (n / 2) p
+    let doubled := half + half
+    if n % 2 = 1 then doubled + p else doubled
+decreasing_by omega
+
 def zsmul_Ed25519 (z : ℤ) (p : Point Ed25519) : Point Ed25519 :=
   match z with
   | (n : ℕ) => nsmul_Ed25519 n p
@@ -296,5 +312,25 @@ theorem add_def (p1 p2 : Point Ed25519) :
   (p1 + p2).x = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).1 ∧
   (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
   exact Prod.mk_inj.mp rfl
+
+/-- Binary scalar multiplication equals the standard linear scalar multiplication. -/
+theorem binary_nsmul_Ed25519_eq (n : ℕ) (q : Point Ed25519) :
+    binary_nsmul_Ed25519 n q = n • q := by
+  induction n using Nat.strongRecOn with
+  | _ n ih =>
+    unfold binary_nsmul_Ed25519
+    split
+    case isTrue h => subst h; simp
+    case isFalse h =>
+      have h_lt : n / 2 < n := Nat.div_lt_self (Nat.pos_of_ne_zero h) (by omega)
+      dsimp only []
+      rw [ih _ h_lt]
+      split
+      case isTrue hmod =>
+        conv_rhs => rw [show n = n / 2 + n / 2 + 1 from by omega]
+        rw [add_nsmul, add_nsmul, one_nsmul]
+      case isFalse hmod =>
+        conv_rhs => rw [show n = n / 2 + n / 2 from by omega]
+        rw [add_nsmul]
 
 end Edwards
