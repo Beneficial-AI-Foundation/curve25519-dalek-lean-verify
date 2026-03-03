@@ -502,7 +502,6 @@ theorem elligator_ristretto_flavor_spec
             h_ns_eq h_D_eq h_disj)
     -- Elligator invariant: N_t · √(ad−1) is never zero in 𝔽_p.
     -- √(ad−1) ≠ 0 follows from sqrt_ad_minus_one_ne_zero;
-    -- N_t ≠ 0 requires algorithmic reasoning about the Elligator map.
     have h_cp_Z_ne : cp_Z.toField ≠ 0 := by
       -- cp_Z = N_t * SQRT_AD_MINUS_ONE
       have h_cpz_F : cp_Z.toField = N_t.toField *
@@ -656,7 +655,6 @@ theorem elligator_ristretto_flavor_spec
       -- Apply the curve equation lemma
       apply elligator_curve_eq_of_inner h_omega_sq
       -- Re-derive postcondition lifts needed for the inner identity
-      -- (these were derived inside h_cp_T_ne but are out of scope here)
       -- N_s equation
       have h_ns_eq' : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
         have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
@@ -876,7 +874,7 @@ theorem elligator_ristretto_flavor_spec
         · -- Case B: s1²D = r·N_s, c1 = r
           have h_nt_B : N_t.toField =
               r.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
-            rw [h_Nt_eq', h_c1]; 
+            rw [h_Nt_eq', h_c1];
           have step1 : (Ed25519.d + 1) * N_t.toField ^ 2 =
               (D.toField + r.toField * N_s.toField) ^ 2 +
               Ed25519.d * (D.toField - r.toField * N_s.toField) ^ 2 := by
@@ -924,11 +922,16 @@ theorem elligator_ristretto_flavor_spec
           linear_combination h_cp_Y_F
         rw [h_cp_T_F, h_Y, h_s_sq_F, h_ONE_F]; ring⟩
     · -- toPoint ep = (elligator_ristretto_flavor_pure s.toField).val
-      -- Strategy: decompose into x and y coordinate equality, then show
-      -- each coordinate of the implementation matches the pure Elligator map.
-      -- ep.toPoint = (ep.X/ep.Z, ep.Y/ep.Z) = (cp_X/cp_Z, cp_Y/cp_T)
-      -- Pure spec: x = 2sD/(N_t·√(ad-1)), y = (1-s²)/(1+s²)
-      sorry
+      have ⟨hx_ep, hy_ep⟩ := edwards.EdwardsPoint.toPoint_of_isValid h_ep_valid
+      have h_impl_x : (toPoint ep).x = ep.X.toField / ep.Z.toField := hx_ep
+      have h_impl_y : (toPoint ep).y = ep.Y.toField / ep.Z.toField := hy_ep
+      ext
+      · -- x coordinate
+        rw [h_impl_x]
+        sorry
+      · -- y coordinate
+        rw [h_impl_y]
+        sorry
 
 
 
