@@ -95,29 +95,16 @@ Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
   unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  · grind
-  · grind
   progress  as ⟨ PP , h_PP , PP_bounds⟩
-  · grind
   progress  as ⟨ MM, h_MM, MM_bounds⟩
-  · grind
-  · grind
   progress  as ⟨ Txy2d, h_Txy2d, Txy2d_bounds⟩
-  · grind
-  · grind
   progress as ⟨Z2, h_Z2,  Z2_bounds⟩
   progress as ⟨PPMM, h_PPMM,  PPMM_bounds⟩
-  · grind
-  · grind
   progress as ⟨fe, h_fe,  fe_bounds⟩
-  · grind
-  · grind
   have hzz: ∀ i < 5, Z2[i]!.val < 2 ^ 54 := by simp_all
   obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := CompletedPoint.add_spec' hzz  Txy2d_bounds
   simp only [h_fe2_ok, bind_tc_ok]
   progress as ⟨fe3, h_fe3, fe3_bounds⟩
-  · grind
-  · grind
   constructor
   · rw[← Nat.ModEq]
     rw[← Nat.ModEq] at PPMM_bounds
