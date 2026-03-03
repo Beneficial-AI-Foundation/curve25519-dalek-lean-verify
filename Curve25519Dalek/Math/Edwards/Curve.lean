@@ -319,18 +319,13 @@ theorem binary_nsmul_Ed25519_eq (n : ℕ) (q : Point Ed25519) :
   induction n using Nat.strongRecOn with
   | _ n ih =>
     unfold binary_nsmul_Ed25519
-    split
-    case isTrue h => subst h; simp
-    case isFalse h =>
-      have h_lt : n / 2 < n := Nat.div_lt_self (Nat.pos_of_ne_zero h) (by omega)
-      dsimp only []
-      rw [ih _ h_lt]
-      split
-      case isTrue hmod =>
-        conv_rhs => rw [show n = n / 2 + n / 2 + 1 from by omega]
-        rw [add_nsmul, add_nsmul, one_nsmul]
-      case isFalse hmod =>
-        conv_rhs => rw [show n = n / 2 + n / 2 from by omega]
-        rw [add_nsmul]
+    split_ifs
+    · simp_all
+    · have : n / 2 < n := by omega
+      conv_rhs => rw [show n = n / 2 + n / 2 + 1 from by omega]
+      simp [ih _ this, add_nsmul]
+    · have : n / 2 < n := by omega
+      conv_rhs => rw [show n = n / 2 + n / 2 from by omega]
+      simp [ih _ this, add_nsmul]
 
 end Edwards
