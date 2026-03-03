@@ -20,7 +20,8 @@ export default defineConfig({
       { text: 'Functions', link: '/functions' },
       { text: 'Status', link: '/status' },
       { text: 'Project', link: '/details' },
-      { text: 'Rust Docs', link: '/doc/curve25519_dalek/index.html', target: '_blank' }
+      { text: 'Rust Docs', link: '/doc/curve25519_dalek/index.html', target: '_blank' },
+      { text: 'Call Graph', link: '/callgraph/', target: '_blank' }
     ],
 
     socialLinks: [
