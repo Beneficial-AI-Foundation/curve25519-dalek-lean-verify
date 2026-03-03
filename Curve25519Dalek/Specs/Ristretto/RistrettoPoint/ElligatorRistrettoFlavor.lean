@@ -802,13 +802,46 @@ theorem elligator_ristretto_flavor_spec
       have h_r_bridge : r.toField = elligator_r s.toField := by
         rw [h_r_F, h_sm1]; unfold elligator_r; rfl
       -- Bridge identities: connect implementation variables to spec step functions
-      have h_s1_bridge : s1.toField = elligator_s s.toField := by sorry
+      have h_Ns_bridge : N_s.toField = elligator_Ns s.toField := by
+        rw [h_ns_eq_F, h_r_bridge]
+        unfold elligator_Ns
+        rw [show Ed25519.d = (d : CurveField) from rfl]
       have h_D_bridge : D.toField = elligator_D s.toField := by
         rw [h_D_eq_F, h_r_bridge]
         unfold elligator_D
         rw [show Ed25519.d = (d : CurveField) from rfl]; ring
       have h_c1_bridge : c1.toField = elligator_c s.toField := by
-        sorry
+        unfold elligator_c
+        by_cases h_sq_flag : __discr.1.val = 1#u8
+        · -- Square case: c1 = -1
+          have h_nsq : not_sq.val ≠ 1#u8 := by
+            rw [not_sq_post, if_pos h_sq_flag]; decide
+          have h_is_sq : elligator_is_square s.toField := by
+            change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
+            rw [← h_D_bridge, ← h_Ns_bridge]
+            by_cases hN0 : Field51_as_Nat N_s % p = 0
+            · exact ⟨0, by rw [show N_s.toField = (0 : CurveField) from
+                  toField_of_mod_zero hN0]; ring⟩
+            · by_cases hD_mod : Field51_as_Nat D % p = 0
+              · exact absurd (__discr_post_4 ⟨hN0, hD_mod⟩).1
+                  (by rw [h_sq_flag]; decide)
+              · have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
+                    Field51_as_Nat N_s % p := by
+                  by_contra hNSq
+                  exact absurd (__discr_post_6 ⟨hN0, hD_mod, hNSq⟩).1
+                    (by rw [h_sq_flag]; decide)
+                exact ⟨__discr.2.toField,
+                  lift_sq_mod (__discr_post_5 ⟨hN0, hD_mod, hSq⟩).2⟩
+          rw [if_pos h_is_sq]
+          unfold toField; rw [cond_f51_eq_neg c1_post h_nsq]; exact MINUS_ONE_toField
+        · -- Non-square case: c1 = r
+          have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
+          have h_not_sq : ¬ elligator_is_square s.toField := by sorry
+          rw [if_neg h_not_sq]
+          rw [show c1.toField = r.toField from by
+            unfold toField; rw [cond_f51_eq c1_post h_nsq]]
+          exact h_r_bridge
+      have h_s1_bridge : s1.toField = elligator_s s.toField := by sorry
       have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by
         rw [h_Nt_eq_F, h_r_bridge, h_D_bridge, h_c1_bridge]
         unfold elligator_Nt
