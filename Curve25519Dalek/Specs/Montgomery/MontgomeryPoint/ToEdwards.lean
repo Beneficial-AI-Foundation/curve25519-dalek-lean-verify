@@ -56,8 +56,9 @@ natural language specs:
   the birational map: y * (u + 1) ≡ (u - 1) (mod p)
 - The returned point lies on the twisted Edwards curve
 -/
+set_option maxHeartbeats 400000 in
 @[progress]
-  theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
+theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
         (∀ ep, result = some ep →
           ∃ Z_inv,
@@ -139,10 +140,13 @@ natural language specs:
 
         -- Step 2b: Simplify % 2^255 using the fact that y_bytes < p < 2^255
         have h_bytes_mod : U8x32_as_Nat y_bytes % 2^255 % p = U8x32_as_Nat y_bytes % p := by
-          have hp : p < 2^255 := by decide
+          have hp : p < 2^255 := by
+            unfold p
+            norm_num
           have hlt : U8x32_as_Nat y_bytes < p := y_bytes_post_2
           -- If x < p < 2^255, then x % 2^255 = x, so x % 2^255 % p = x % p
-          omega
+          have h_lt_255 : U8x32_as_Nat y_bytes < 2^255 := by omega
+          rw [Nat.mod_eq_of_lt h_lt_255]
 
         -- Step 2c: Connect y_bytes to field element y
         have h_y_bytes : U8x32_as_Nat y_bytes % p = Field51_as_Nat y % p := by
