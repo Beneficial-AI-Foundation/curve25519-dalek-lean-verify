@@ -32,7 +32,9 @@ It takes a RistrettoPoint (which represents an equivalence class of Edwards poin
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP Edwards
+open curve25519_dalek.backend.serial.u64.field
+open curve25519_dalek.math curve25519_dalek.ristretto
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -218,12 +220,196 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     · -- Goal 37: compress_pure matches byte output
       -- Key bridge: s1.toField = compress_s self.toPoint
       -- Key bridge: s1.toField = compress_s self.toPoint
-      have h_key : s1.toField = math.compress_s self.toPoint := by
-        sorry
+      have h_key : s1.toField = compress_s self.toPoint := by
+        -- Setup: affine coordinates and IsValid properties
+        set P := self.toPoint with hP_def
+        have hvalid := h.1
+        have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
+        have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0
+        have hT_rel := hvalid.T_relation  -- X.toField * Y.toField = T.toField * Z.toField
+        -- Step 1: s1.toField = abs_edwards(s.toField) via conditional negation
+        have h_s_neg_field : s_neg.toField = -s.toField := by
+          unfold FieldElement51.toField
+          have := lift_mod_eq _ _
+            (show (Field51_as_Nat s + Field51_as_Nat s_neg) % p = 0 % p by
+              rw [Nat.zero_mod]; exact s_neg_post_1)
+          push_cast at this; linear_combination this
+        have h_s1_select : s1.toField =
+            if s_is_negative.val = 1#u8 then s_neg.toField else s.toField := by
+          unfold FieldElement51.toField; rw [h_s1_nat]; split <;> rfl
+        have h_s1_abs : s1.toField = abs_edwards s.toField := by
+          rw [h_s1_select, h_s_neg_field, abs_edwards, is_negative]
+          by_cases hc : s_is_negative.val = 1#u8
+          · rw [if_pos hc]
+            have : (s.toField.val % 2 == 1) = true := by
+              rw [beq_iff_eq]; unfold FieldElement51.toField;
+              rw [ZMod.val_natCast]
+              exact s_is_negative_post.mp hc
+            simp only [this, ite_true]
+          · rw [if_neg hc]
+            have : (s.toField.val % 2 == 1) = false := by
+              rw [Bool.eq_false_iff]; intro hh; rw [beq_iff_eq] at hh
+              exact hc (s_is_negative_post.mpr
+                (by unfold FieldElement51.toField at hh; rwa [ZMod.val_natCast] at hh))
+            simp only [this, Bool.false_eq_true, ↓reduceIte]
+        -- Step 2: s.toField ^ 2 = (compress_den_inv P * (1 - compress_y_final P)) ^ 2
+        -- Note: We do NOT need SQRT_M1.toField = sqrt_m1 or INVSQRT_A_MINUS_D.toField = invsqrt_a_minus_d.
+        -- The sign ambiguity (±) of SQRT_M1.toField is compensated by the y_sign flag,
+        -- and we only need INVSQRT_A_MINUS_D.toField² = invsqrt_a_minus_d² (from both being inv sqrt of a-d).
+        -- Mul bridges (lift Nat mod postconditions to ZMod p)
+        have hb_u1 : u1.toField = z_plus_y.toField * z_minus_y.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_post_1
+          push_cast at this; exact this
+        have hb_u2 : u2.toField = self.X.toField * self.Y.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ u2_post_1
+          push_cast at this; exact this
+        have hb_u2_sq : u2_sq.toField = u2.toField ^ 2 := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ u2_sq_post_1
+          push_cast at this; exact this
+        have hb_u1_u2_sq : u1_u2_sq.toField = u1.toField * u2_sq.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_u2_sq_post_1
+          push_cast at this; exact this
+        have hb_i1 : i1.toField = __discr.2.toField * u1.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ i1_post_1
+          push_cast at this; exact this
+        have hb_i2 : i2.toField = __discr.2.toField * u2.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ i2_post_1
+          push_cast at this; exact this
+        have hb_i2_T : i2_T.toField = i2.toField * self.T.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ i2_T_post_1
+          push_cast at this; exact this
+        have hb_z_inv : z_inv.toField = i1.toField * i2_T.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ z_inv_post_1
+          push_cast at this; exact this
+        have hb_iX : iX.toField = self.X.toField *
+            backend.serial.u64.constants.SQRT_M1.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ iX_post_1
+          push_cast at this; exact this
+        have hb_iY : iY.toField = self.Y.toField *
+            backend.serial.u64.constants.SQRT_M1.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ iY_post_1
+          push_cast at this; exact this
+        have hb_enchanted : enchanted_denominator.toField = i1.toField *
+            backend.serial.u64.constants.INVSQRT_A_MINUS_D.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ enchanted_denominator_post_1
+          push_cast at this; exact this
+        have hb_t_z_inv : t_z_inv.toField = self.T.toField * z_inv.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ t_z_inv_post_1
+          push_cast at this; exact this
+        have hb_x_z_inv : x_z_inv.toField = X.toField * z_inv.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ x_z_inv_post_1
+          push_cast at this; exact this
+        have hb_s : s.toField = i21.toField * z_minus_y2.toField := by
+          unfold FieldElement51.toField; have := lift_mod_eq _ _ s_post_1
+          push_cast at this; exact this
+        -- Sub bridges
+        have hb_zmy : z_minus_y.toField = self.Z.toField - self.Y.toField := by
+          unfold FieldElement51.toField
+          have := lift_mod_eq _ _ z_minus_y_post_2
+          push_cast at this; linear_combination this
+        have hb_zmy2 : z_minus_y2.toField = self.Z.toField - Y1.toField := by
+          unfold FieldElement51.toField
+          have := lift_mod_eq _ _ z_minus_y2_post_2
+          push_cast at this; linear_combination this
+        -- Add bridge
+        have hb_zpy : z_plus_y.toField = self.Z.toField + self.Y.toField := by
+          unfold FieldElement51.toField Field51_as_Nat
+          have h : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * z_plus_y[i]!.val =
+              ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * self.Z[i]!.val +
+              ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * self.Y[i]!.val := by
+            rw [← Finset.sum_add_distrib]
+            apply Finset.sum_congr rfl
+            intro i hi; rw [Finset.mem_range] at hi
+            rw [z_plus_y_post_1 i hi]; ring
+          exact (congrArg Nat.cast h).trans (Nat.cast_add _ _)
+        -- Neg bridge
+        have hb_y_neg : y_neg.toField = -Y.toField := by
+          unfold FieldElement51.toField
+          have := lift_mod_eq _ _
+            (show (Field51_as_Nat Y + Field51_as_Nat y_neg) % p = 0 % p by
+              rw [Nat.zero_mod]; exact y_neg_post_1)
+          push_cast at this; linear_combination this
+        -- Conditional assign bridges (lift limb-level ite to toField-level ite)
+        have hb_i21_nat : Field51_as_Nat i21 =
+            if rotate.val = 1#u8 then Field51_as_Nat enchanted_denominator
+            else Field51_as_Nat i2 := by
+          unfold Field51_as_Nat; split <;> rename_i hc
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := i21_post i hi; rw [if_pos hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := i21_post i hi; rw [if_neg hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+        have hb_i21 : i21.toField =
+            if rotate.val = 1#u8 then enchanted_denominator.toField else i2.toField := by
+          unfold FieldElement51.toField; rw [hb_i21_nat]; split <;> rfl
+        have hb_Y_nat : Field51_as_Nat Y =
+            if rotate.val = 1#u8 then Field51_as_Nat iX else Field51_as_Nat self.Y := by
+          unfold Field51_as_Nat; split <;> rename_i hc
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := Y_post i hi; rw [if_pos hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := Y_post i hi; rw [if_neg hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+        have hb_Y : Y.toField =
+            if rotate.val = 1#u8 then iX.toField else self.Y.toField := by
+          unfold FieldElement51.toField; rw [hb_Y_nat]; split <;> rfl
+        have hb_X_nat : Field51_as_Nat X =
+            if rotate.val = 1#u8 then Field51_as_Nat iY else Field51_as_Nat self.X := by
+          unfold Field51_as_Nat; split <;> rename_i hc
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := X_post i hi; rw [if_pos hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := X_post i hi; rw [if_neg hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+        have hb_X : X.toField =
+            if rotate.val = 1#u8 then iY.toField else self.X.toField := by
+          unfold FieldElement51.toField; rw [hb_X_nat]; split <;> rfl
+        have hb_Y1_nat : Field51_as_Nat Y1 =
+            if y_sign.val = 1#u8 then Field51_as_Nat y_neg else Field51_as_Nat Y := by
+          unfold Field51_as_Nat; split <;> rename_i hc
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := Y1_post i hi; rw [if_pos hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+          · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+            have := Y1_post i hi; rw [if_neg hc] at this
+            exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+        have hb_Y1 : Y1.toField =
+            if y_sign.val = 1#u8 then y_neg.toField else Y.toField := by
+          unfold FieldElement51.toField; rw [hb_Y1_nat]; split <;> rfl
+        -- ═══ Projective coordinate relations ═══
+        have h_u1_proj : u1.toField = self.Z.toField ^ 2 - self.Y.toField ^ 2 := by
+          rw [hb_u1, hb_zpy, hb_zmy]; ring
+        have h_u1_u2_sq_val : u1_u2_sq.toField =
+            (self.Z.toField ^ 2 - self.Y.toField ^ 2) *
+            (self.X.toField * self.Y.toField) ^ 2 := by
+          rw [hb_u1_u2_sq, hb_u2_sq, h_u1_proj, hb_u2];
+        -- ═══ QR argument (IsSquare from self.IsValid) ═══
+        -- u1_u2_sq.toField = Z⁶ · (compress_u1 P · compress_u2 P²) via projective→affine
+        -- For valid Ristretto points, IsSquare(Z²-Y²) → IsSquare(compress_u1 P)
+        -- And compress_u2 P² is always a square → product is a square
+        -- In QR case: I² · u1_u2_sq = 1
+        have h_I_sq_mul : u1_u2_sq.toField ≠ 0 →
+            __discr.2.toField ^ 2 * u1_u2_sq.toField = 1 := by
+          sorry
+        -- ═══ z_inv.toField = 1/Z (key identity from QR) ═══
+        have h_z_inv_chain : z_inv.toField =
+            __discr.2.toField ^ 2 * u1.toField * u2.toField *
+            self.T.toField := by
+          rw [hb_z_inv, hb_i1, hb_i2_T, hb_i2]; ring
+        -- ═══ Step 2: The squared equality ═══
+        have h_sq_eq : s.toField ^ 2 =
+            (compress_den_inv P * (1 - compress_y_final P)) ^ 2 := by
+          sorry
+        -- Conclude
+        rw [h_s1_abs]; unfold compress_s
+        exact abs_edwards_eq_of_sq_eq h_sq_eq
       -- compress_pure P = (compress_s P).val = s1.toField.val = Field51_as_Nat s1 % p
-      change math.compress_pure self.toPoint = U8x32_as_Nat a
-      unfold math.compress_pure
-      rw [← h_key, backend.serial.u64.field.FieldElement51.toField, ZMod.val_natCast]
+      change compress_pure self.toPoint = U8x32_as_Nat a
+      unfold compress_pure
+      rw [← h_key, FieldElement51.toField, ZMod.val_natCast]
       exact h_a_eq.symm
 
 end curve25519_dalek.ristretto.RistrettoPoint

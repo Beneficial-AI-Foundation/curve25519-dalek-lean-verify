@@ -262,6 +262,33 @@ lemma abs_edwards_eq_of_sq_eq_sq (hp_odd : p % 2 = 1) {a b : ZMod p}
     (h : a ^ 2 = b ^ 2) : abs_edwards a = abs_edwards b :=
   eq_abs_edwards_of_sq_eq hp_odd (by rw [abs_edwards_sq, h]) (abs_edwards_val_even hp_odd a)
 
+/-- `abs_edwards` is invariant under negation: `abs_edwards (-x) = abs_edwards x`. -/
+lemma abs_edwards_neg (x : ZMod p) : abs_edwards (-x) = abs_edwards x := by
+  by_cases hx : x = 0
+  · simp [hx]
+  · unfold abs_edwards is_negative
+    have h_neg_val : (-x : ZMod p).val = p - x.val := by
+      rw [ZMod.neg_val]; exact if_neg hx
+    rw [h_neg_val]
+    have hxlt : x.val < p := x.val_lt
+    have hxv : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv
+    have hp_odd : p % 2 = 1 := by decide
+    have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
+    by_cases hpx : x.val % 2 = 1
+    · have : (p - x.val) % 2 = 0 := by omega
+      simp only [beq_iff_eq] at *; simp [hpx, this]
+    · have hpx0 : x.val % 2 = 0 := by omega
+      have : (p - x.val) % 2 = 1 := by omega
+      simp only [beq_iff_eq] at *; simp [hpx0, this]
+
+/-- If `x^2 = y^2` then `abs_edwards x = abs_edwards y`. -/
+lemma abs_edwards_eq_of_sq_eq {x y : ZMod p} (h : x ^ 2 = y ^ 2) :
+    abs_edwards x = abs_edwards y := by
+  rcases sq_eq_sq_iff_eq_or_eq_neg.mp h with h_eq | h_neg
+  · rw [h_eq]
+  · rw [h_neg, abs_edwards_neg]
+
 /-- Square root with quadratic residue check, matching Rust's sqrt_ratio_i(x, 1).
     Returns (sqrt(x), true) when x is a square, (sqrt(i*x), false) otherwise.
     Note: sqrt_checked 0 = (0, true) since 0 is a square (0² = 0). -/
