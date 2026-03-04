@@ -37,6 +37,7 @@ natural language specs:
 theorem identity_spec :
     identity ⦃ (result : CompressedRistretto) =>
       ∀ i : Fin 32, result[i]! = 0#u8 ⦄ := by
-  sorry
+  intro i
+  fin_cases i <;> simp [Array.repeat]
 
 end curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity
