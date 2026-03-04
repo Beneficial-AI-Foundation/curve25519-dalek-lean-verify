@@ -393,7 +393,25 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         -- In QR case: I² · u1_u2_sq = 1
         have h_I_sq_mul : u1_u2_sq.toField ≠ 0 →
             __discr.2.toField ^ 2 * u1_u2_sq.toField = 1 := by
-          sorry
+          intro h_ne
+          have h_ne_nat : Field51_as_Nat u1_u2_sq % p ≠ 0 := by
+            rwa [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff,
+                 Nat.dvd_iff_mod_eq_zero] at h_ne
+          have h_qr : ∃ x, x ^ 2 * (Field51_as_Nat u1_u2_sq % p) % p = 1 := by sorry
+          have h_post := (__discr_post_4 ⟨h_ne_nat, h_qr⟩).2
+          -- Lift Nat % p equation to Nat.ModEq, then to ZMod
+          have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
+            change (a % p) % p = a % p
+            exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
+          have h1 : (Field51_as_Nat __discr.2 % p) ^ 2 *
+              (Field51_as_Nat u1_u2_sq % p) ≡ 1 [MOD p] := by
+            change _ % _ = _ % _
+            rw [h_post, Nat.mod_eq_of_lt (by decide : 1 < p)]
+          have h_modeq : Field51_as_Nat __discr.2 ^ 2 *
+              Field51_as_Nat u1_u2_sq ≡ 1 [MOD p] :=
+            ((hmm _).symm.pow 2).mul (hmm _).symm |>.trans h1
+          unfold FieldElement51.toField
+          have := lift_mod_eq _ _ h_modeq; push_cast at this; exact this
         -- ═══ z_inv.toField = 1/Z (key identity from QR) ═══
         have h_z_inv_chain : z_inv.toField =
             __discr.2.toField ^ 2 * u1.toField * u2.toField *
