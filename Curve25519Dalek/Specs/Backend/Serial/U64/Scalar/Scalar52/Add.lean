@@ -174,63 +174,45 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
-    add a b ⦃ v =>
-    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
-    Scalar52_as_Nat v < L ⦄ := by
-  sorry
-  /- OLD PROOF (broken by Aeneas lift changes — needs rework):
+    add a b ⦃ (v : Scalar52) =>
+      Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
+      Scalar52_as_Nat v < L ⦄ := by
   unfold add
   progress*
-  · -- BEGIN TASK
-    have : L < 2 ^ 259 := by unfold L; grind
+  · have : L < 2 ^ 259 := by unfold L; grind
     grind
-    -- END TASK
-  · -- BEGIN TASK
-    have : L < 2 ^ 259 := by unfold L; grind
+  · have : L < 2 ^ 259 := by unfold L; grind
     grind
-    -- END TASK
-  · -- BEGIN TASK
-    intro j _
+  · intro j _
     unfold ZERO
     interval_cases j <;> decide
-    -- END TASK
-  · -- BEGIN TASK
-    unfold ZERO; decide
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
+  · unfold ZERO; decide
+  · intro i hi
     unfold constants.L
     interval_cases i <;> decide
-    -- END TASK
-  · -- BEGIN TASK
-    rw [constants.L_spec]
+  · rw [constants.L_spec]
     have : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := calc
       ∑ i ∈ Finset.Ico 0 5, 2 ^ (52 * i) * sum[i]!.val
       _ = ∑ i ∈ Finset.Ico 0 5, 2 ^ (52 * i) * (a[i]!.val + b[i]!.val) := by assumption
       _ = ∑ i ∈ Finset.Ico 0 5, (2 ^ (52 * i) * a[i]!.val + 2 ^ (52 * i) * b[i]!.val) := by grind
       _ = _ := by simp [Scalar52_as_Nat, Finset.sum_add_distrib]
     omega
-    -- END TASK
+  · grind [constants.L_spec]
   · constructor
-    · -- BEGIN TASK
-      rw [constants.L_spec] at res_post_1
-      have h1 : Scalar52_as_Nat res ≡ Scalar52_as_Nat sum [MOD L] := by
+    · rw [constants.L_spec] at *
+      have h1 : Scalar52_as_Nat v ≡ Scalar52_as_Nat sum [MOD L] := by
         have hL_mod : L ≡ 0 [MOD L] := by
           rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]
-        have : Scalar52_as_Nat res + L ≡ Scalar52_as_Nat res + 0 [MOD L] :=
+        have : Scalar52_as_Nat v + L ≡ Scalar52_as_Nat v + 0 [MOD L] :=
           Nat.ModEq.add_left _ hL_mod
         simp only [add_zero] at this
-        exact this.symm.trans res_post_1
+        exact this.symm.trans v_post1
       have h2 : Scalar52_as_Nat sum = Scalar52_as_Nat a + Scalar52_as_Nat b := by
         unfold Scalar52_as_Nat
-        simp only [Finset.range_eq_Ico] at sum_post_3 ⊢
-        conv_lhs => rw [sum_post_3]
+        simp only [Finset.range_eq_Ico] at v_post3 ⊢
+        conv_lhs => rw [sum_post3]
         simp [Finset.sum_add_distrib, Nat.mul_add]
       grind
-      -- END TASK
-    · -- BEGIN TASK
-      assumption
-      -- END TASK
-  -/
+    · assumption
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
