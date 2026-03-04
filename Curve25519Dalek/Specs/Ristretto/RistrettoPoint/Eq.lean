@@ -56,6 +56,13 @@ theorem eq_spec
       (result = true ↔
         (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
         (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by
-  sorry
+  unfold eq
+  progress*
+  unfold Bool.Insts.CoreConvertFromChoice.from
+  simp only [spec, theta, wp_return]
+  have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by
+    cases c with | mk val valid => simp [Choice.one]
+  rw [key]
+  exact c_post
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint
