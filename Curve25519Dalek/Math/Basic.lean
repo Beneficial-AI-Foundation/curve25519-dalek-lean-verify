@@ -206,17 +206,37 @@ lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
 
+/-- `abs_edwards` always produces a non-negative (even parity) value. -/
+lemma is_negative_abs_edwards (x : ZMod p) : is_negative (abs_edwards x) = false := by
+  unfold abs_edwards
+  split_ifs with h
+  · -- x is negative (odd parity): result is -x
+    unfold is_negative at h ⊢
+    by_cases hx : x = 0
+    · simp [hx] at h
+    · have h_neg_val : (-x : ZMod p).val = p - x.val := by
+        rw [ZMod.neg_val]; exact if_neg hx
+      rw [h_neg_val]
+      have hxlt : x.val < p := x.val_lt
+      have hxpos : 0 < x.val := Nat.pos_of_ne_zero (by rwa [ne_eq, ZMod.val_eq_zero])
+      have hp_odd : p % 2 = 1 := by decide
+      simp only [beq_iff_eq] at h
+      rw [beq_eq_false_iff_ne]
+      omega
+  · -- x is non-negative: result is x, already non-negative
+    exact Bool.eq_false_iff.mpr h
+
+/-- `abs_edwards x` has even parity: `(abs_edwards x).val % 2 = 0`. -/
+lemma abs_edwards_val_even' (x : ZMod p) : (abs_edwards x).val % 2 = 0 := by
+  have h := is_negative_abs_edwards x
+  unfold is_negative at h
+  rw [beq_eq_false_iff_ne] at h
+  omega
+
 /-- abs_edwards always produces a non-negative (even val) result. -/
 lemma abs_edwards_val_even (hp_odd : p % 2 = 1) (b : ZMod p) :
-    (abs_edwards b).val % 2 = 0 := by
-  unfold abs_edwards is_negative; split_ifs with hb
-  · simp only [beq_iff_eq] at hb
-    by_cases hb0 : b = 0
-    · simp [hb0] at hb
-    · rw [ZMod.neg_val, if_neg hb0]
-      have := Nat.add_sub_cancel' (le_of_lt (ZMod.val_lt b))
-      omega
-  · simp only [beq_iff_eq] at hb; omega
+    (abs_edwards b).val % 2 = 0 :=
+  abs_edwards_val_even' b
 
 /-- If a² = b² and a has even val, then a = abs_edwards b.
     In ZMod p for odd p, the non-negative square root is unique. -/
