@@ -212,6 +212,7 @@ def subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor (a : subtle.Choice) (b
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 207:4-207:26
    Name pattern: [subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not]
    Bitwise NOT for Choice values (NOT 0 = 1, NOT 1 = 0) -/
+
 @[rust_fun
   "subtle::{core::ops::bit::Not<subtle::Choice, subtle::Choice>}::not"]
 def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result subtle.Choice :=
@@ -220,18 +221,26 @@ def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result sub
   else
     ok Choice.one
 
-/-- **Spec theorem for `subtle.Choice.Insts.CoreOpsBitNotChoice.not`**:
-- No panic (always returns successfully)
-- Returns `Choice.zero` if input is `1`, `Choice.one` otherwise
--/
+
 @[progress]
-theorem subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec (c : subtle.Choice) :
-    subtle.Choice.Insts.CoreOpsBitNotChoice.not c ⦃ result =>
-    result.val = (if c.val = 1#u8 then 0#u8 else 1#u8) ⦄ := by
+theorem subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec (a : subtle.Choice) :
+  subtle.Choice.Insts.CoreOpsBitNotChoice.not a ⦃ b =>
+  (a.val = 1#u8 ↔ b = Choice.zero) ⦄ := by
   unfold subtle.Choice.Insts.CoreOpsBitNotChoice.not
   split
-  · simp only [spec_ok, Choice.zero]
-  · simp only [spec_ok, Choice.one]
+  · -- Case: a = b
+    rename_i h_eq
+    simp only [spec_ok]
+    constructor
+    · intro _; trivial
+    · simp[h_eq]
+  · -- Case: a ≠ b
+    rename_i h_ne
+    simp only [spec_ok]
+    constructor
+    · intro _; trivial
+    · simp [Choice.one, Choice.zero]
+
 
 /- [subtle::{subtle::ConstantTimeEq for u16}::ct_eq]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 348:12-348:51
