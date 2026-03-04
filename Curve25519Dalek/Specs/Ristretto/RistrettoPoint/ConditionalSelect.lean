@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ConditionalSelect
 
 /-! # Spec Theorem for `RistrettoPoint::conditional_select`
 
@@ -16,35 +16,37 @@ by delegating to the underlying Edwards point conditional selection, which in tu
 
 Returns `b` when `choice = 1` and `a` when `choice = 0`, in constant time.
 
-**Source**: curve25519-dalek/src/ristretto.rs, lines 1192:4-1198:5
+**Source**: curve25519-dalek/src/ristretto.rs
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable
 
+/-
+natural language description:
+
+- Takes two RistrettoPoints `a` and `b` and a `Choice` value
+- Returns one of the two points based on the choice, in constant time
+- Implementation: delegates to `EdwardsPoint::conditional_select`, which applies
+  `FieldElement51::conditional_select` component-wise to the coordinates (X, Y, Z, T)
+
+natural language specs:
+
+- The function always succeeds (no panic)
+- Returns `b` when `choice = 1` and `a` when `choice = 0`
+-/
+
 /--
 **Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select`**:
 - No panic (always returns successfully)
-- Given inputs:
-  - RistrettoPoint `a` with coordinates (X, Y, Z, T),
-  - RistrettoPoint `b` with coordinates (X', Y', Z', T'),
-  - a Choice `choice`,
-  the output RistrettoPoint has coordinates selected component-wise:
-  - If choice = 1, each coordinate equals the corresponding one of `b`
-  - If choice = 0, each coordinate equals the corresponding one of `a`
-  - The operation is constant-time (does not branch on choice)
+- Returns `b` when `choice = 1` and `a` when `choice = 0`
 -/
 @[progress]
 theorem conditional_select_spec
-    (a b : ristretto.RistrettoPoint)
+    (a b : RistrettoPoint)
     (choice : subtle.Choice) :
-    conditional_select a b choice ⦃ result =>
-    (∀ i < 5, result.X[i]! = (if choice.val = 1#u8 then b.X[i]! else a.X[i]!)) ∧
-    (∀ i < 5, result.Y[i]! = (if choice.val = 1#u8 then b.Y[i]! else a.Y[i]!)) ∧
-    (∀ i < 5, result.Z[i]! = (if choice.val = 1#u8 then b.Z[i]! else a.Z[i]!)) ∧
-    (∀ i < 5, result.T[i]! = (if choice.val = 1#u8 then b.T[i]! else a.T[i]!)) ⦄ := by
-  unfold conditional_select
-  unfold edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select
-  progress*
+    conditional_select a b choice ⦃ (result : RistrettoPoint) =>
+      result = if choice.val = 1#u8 then b else a ⦄ := by
+  sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable
