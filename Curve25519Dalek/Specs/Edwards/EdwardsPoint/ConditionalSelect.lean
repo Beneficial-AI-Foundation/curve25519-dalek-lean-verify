@@ -46,6 +46,24 @@ theorem conditional_select_spec
     (choice : subtle.Choice) :
     conditional_select a b choice ⦃ (result : EdwardsPoint) =>
       result = if choice.val = 1#u8 then b else a ⦄ := by
-  sorry
+  unfold conditional_select
+  progress as ⟨feX, hfeX⟩
+  progress as ⟨feY, hfeY⟩
+  progress as ⟨feZ, hfeZ⟩
+  progress as ⟨feT, hfeT⟩
+  have arr_ext : ∀ (x y : backend.serial.u64.field.FieldElement51),
+      (∀ i < 5, x[i]! = y[i]!) → x = y := by
+    intro x y h
+    apply Subtype.ext
+    rw [List.eq_iff_forall_eq_getElem!]
+    exact ⟨by simp only [List.Vector.length_val], fun i hi => by
+      simp only [List.getElem!_eq_getElem?_getD]
+      exact h i (by scalar_tac)⟩
+  by_cases h : choice.val = 1#u8
+  all_goals simp only [h, ite_true, ite_false] at *
+  all_goals obtain ⟨_, _, _, _⟩ := a
+  all_goals obtain ⟨_, _, _, _⟩ := b
+  all_goals simp only [EdwardsPoint.mk.injEq] at *
+  all_goals exact ⟨arr_ext _ _ hfeX, arr_ext _ _ hfeY, arr_ext _ _ hfeZ, arr_ext _ _ hfeT⟩
 
 end curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable
