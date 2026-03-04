@@ -16,7 +16,7 @@ the slice into a 32-byte array via `TryFrom`. If the slice has exactly 32 bytes,
 The function never panics — it always succeeds at the Aeneas `Result` level. The inner
 `core.result.Result` signals success or failure of the byte-to-array conversion.
 
-**Source**: curve25519-dalek/src/ristretto.rs, lines 245:4-248:5
+**Source**: curve25519-dalek/src/ristretto.rs
 
 **Dependencies**:
 - `core.array.TryFromArrayCopySlice.try_from` (Aeneas library, has definition)
@@ -50,12 +50,11 @@ natural language specs:
     • If bytes.length ≠ 32: the result is Err(())
 -/
 @[progress]
-theorem from_slice_spec (bytes : Slice Std.U8) :
-    from_slice bytes ⦃ r =>
-    (bytes.length = 32 →
-      ∃ cr : CompressedRistretto, r = .Ok cr ∧ cr.val = bytes.val) ∧
-    (bytes.length ≠ 32 →
-      r = .Err ()) ⦄ := by
+theorem from_slice_spec
+    (bytes : Slice U8) :
+    from_slice bytes ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>
+      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧
+      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.CompressedRistretto
