@@ -126,17 +126,36 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   -- Goal 27: z_inv limbs < 2^54 (mul rhs, for t_z_inv)
   · intro i hi; have := z_inv_post_2 i hi; omega
   -- Goal 28: X (after cond_assign) limbs < 2^54 (mul lhs, for x_z_inv)
-  · sorry
+  · intro i hi
+    simp only [X_post i hi]
+    split_ifs
+    · have := iY_post_2 i hi; omega
+    · have := h.1.X_bounds i hi; omega
   -- Goal 29: z_inv limbs < 2^54 (mul rhs, for x_z_inv)
   · intro i hi; have := z_inv_post_2 i hi; omega
   -- Goal 30: Y (after cond_assign) limbs < 2^54 (neg precond)
-  · sorry
+  · intro i hi
+    simp only [Y_post i hi]
+    split_ifs
+    · have := iX_post_2 i hi; omega
+    · have := h.1.Y_bounds i hi; omega
   -- Goal 31: Z limbs < 2^63 (sub precond, for z_minus_y2)
   · intro i hi; have := h.1.Z_bounds i hi; omega
   -- Goal 32: Y1 (after cond_assign) limbs < 2^54 (sub precond)
-  · sorry
+  · intro i hi
+    simp only [Y1_post i hi]
+    split_ifs
+    · have := y_neg_post_2 i hi; omega
+    · simp only [Y_post i hi]
+      split_ifs
+      · have := iX_post_2 i hi; omega
+      · have := h.1.Y_bounds i hi; omega
   -- Goal 33: i21 (after cond_assign) limbs < 2^54 (mul lhs, for s)
-  · sorry
+  · intro i hi
+    simp only [i21_post i hi]
+    split_ifs
+    · have := enchanted_denominator_post_2 i hi; omega
+    · have := i2_post_2 i hi; omega
   -- Goal 34: z_minus_y2 limbs < 2^54 (mul rhs, for s)
   · intro i hi; have := z_minus_y2_post_1 i hi; omega
   -- Goal 35: s limbs < 2^54 (neg precond for s_neg)
