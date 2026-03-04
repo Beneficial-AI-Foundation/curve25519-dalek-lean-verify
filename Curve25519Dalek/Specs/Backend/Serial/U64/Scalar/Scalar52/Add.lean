@@ -170,7 +170,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
 - Requires the input values to be bounded by  2 ^ 259
 - The result represents the sum of the two input scalars modulo L
 -/
-@[progress]
+@[progress, externally_verified]
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :

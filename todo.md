@@ -7,6 +7,10 @@
 - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 - Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 
+Probably can be fixed with minimal effort:
+- curve25519_dalek.edwards.EdwardsPoint.is_small_order_spec
+- curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
+
 ## Other failing targets
 
 - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare

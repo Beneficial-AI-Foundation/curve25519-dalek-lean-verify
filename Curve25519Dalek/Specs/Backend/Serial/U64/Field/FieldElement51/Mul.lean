@@ -7,6 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.ExternallyVerified
+
 /-! # Spec Theorem for `FieldElement51::mul`
 
 Specification and proof for `FieldElement51::mul`.
@@ -136,7 +138,7 @@ set_option maxHeartbeats 10000000000 in
 - Output bounds: each limb < 2^52
 EXTERNALY_VERIFIED
 -/
-@[progress]
+@[progress, externally_verified]
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
     mul lhs rhs ⦃ r =>

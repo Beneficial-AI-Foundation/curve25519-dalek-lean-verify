@@ -56,9 +56,8 @@ lemma coprime_of_prime_not_dvd {a p : ℕ}
 - No panic for field element inputs r (always returns r' successfully)
 - If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)
 - If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)
-EXTERNALLY_VERIFIED
 -/
-@[progress]
+@[progress, externally_verified]
 theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>
       let r_nat := Field51_as_Nat r % p
