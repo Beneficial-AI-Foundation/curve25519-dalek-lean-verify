@@ -51,3 +51,6 @@ site/public/doc
 # FVS analysis output
 .formalising/
 stubs/
+
+# Claude Code project config
+CLAUDE.md
