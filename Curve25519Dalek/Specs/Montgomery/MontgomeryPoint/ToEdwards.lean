@@ -256,21 +256,21 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           sorry
 
         -- Step 7: Main calculation
-        calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp + 1) % p
+        calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (bytesToField mp + 1)
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp + 1) % p := by
                 -- -- Apply Nat.mul_mod to decompose the modulo
-                rw [Nat.mul_mod]
+                -- rw [Nat.mul_mod]
                 -- -- Now rewrite using h_affine_y
-                rw [h_affine_y]
-                rw [Nat.mul_mod]
+                -- rw [h_affine_y]
+                -- rw [Nat.mul_mod]
                 -- have (U8x32_as_Nat mp + 1) % p % p = (U8x32_as_Nat mp + 1) % p by :=
                 --   sorry
                 sorry
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
-            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (bytesToField mp + 1) % p := by
                 conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
                 rw [h_y_val_eq]
                 ring_nf
@@ -300,19 +300,19 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 ring_nf
 
             -- Use fe = u - 1
-            _ = (Field51_as_Nat u - 1) % p := h_fe_eq
+            -- _ = (Field51_as_Nat u - 1) % p := h_fe_eq
 
             -- Relate u to mp
-            _ = (U8x32_as_Nat mp % p - 1) % p := by
+            _ = (bytesToField mp % p - 1) % p := by
                 -- First establish that Field51_as_Nat u % p = U8x32_as_Nat mp % p
-                have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
+                have h_u_mp : Field51_as_Nat u % p = bytesToField mp % p := by
                   sorry
                 -- Rewrite using the fact that (a - 1) % p depends on a % p
                 -- conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
                 -- rw [← Nat.sub_mod]
                 sorry
             -- Simplify
-            _ = (U8x32_as_Nat mp - 1) % p := by
+            _ = (bytesToField mp - 1) := by
                 sorry
 
 
