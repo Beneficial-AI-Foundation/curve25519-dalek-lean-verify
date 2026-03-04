@@ -39,9 +39,10 @@ natural language specs:
 - The result is Choice.one iff the two CompressedRistretto values are equal
 -/
 @[progress]
-theorem ct_eq_spec (self other : ristretto.CompressedRistretto) :
-    ct_eq self other ⦃ c =>
-    c = Choice.one ↔ self = other ⦄ := by
+theorem ct_eq_spec
+    (self other : CompressedRistretto) :
+    ct_eq self other ⦃ (result : subtle.Choice) =>
+      result = Choice.one ↔ self = other ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq
