@@ -49,6 +49,20 @@ theorem sub_spec
     sub self other ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = self.toPoint - other.toPoint ⦄ := by
-  sorry
+  unfold sub edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub
+  progress
+  · exact h_self_valid.1
+  · exact h_other_valid.1
+  · rename_i ep h_ep_valid h_ep_toPoint
+    have h_toPoint : ep.toPoint = self.toPoint - other.toPoint := by
+      unfold RistrettoPoint.toPoint; exact h_ep_toPoint
+    have h_even : ∀ r : RistrettoPoint, r.IsValid → IsEven r.toPoint := fun r hr => by
+      unfold RistrettoPoint.toPoint; exact (EdwardsPoint_IsSquare_iff_IsEven r hr.1).mp hr.2
+    refine ⟨⟨h_ep_valid, ?_⟩, h_toPoint⟩
+    rw [EdwardsPoint_IsSquare_iff_IsEven ep h_ep_valid, h_toPoint, sub_eq_add_neg]
+    apply even_add_closure_Ed25519
+    · exact h_even self h_self_valid
+    · obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp (h_even other h_other_valid)
+      exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by rw [hQ]; abel⟩
 
 end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
