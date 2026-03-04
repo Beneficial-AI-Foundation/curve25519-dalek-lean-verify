@@ -43,6 +43,8 @@ theorem identity_spec :
       result.Y = ONE ∧
       result.Z = ONE ∧
       result.T = ZERO ⦄ := by
-  sorry
+  unfold identity
+  progress
+  tauto
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
