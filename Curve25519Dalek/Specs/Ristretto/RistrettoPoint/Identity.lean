@@ -13,11 +13,11 @@ Specification and proof for the `Identity` trait implementation for `RistrettoPo
 This function returns the identity element of the Ristretto group by delegating to the
 underlying Edwards point identity.
 
-**Source**: curve25519-dalek/src/ristretto.rs, lines 843:4-845:5
+**Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
-open backend.serial.u64.field.FieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
 
 /-
@@ -38,8 +38,11 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO) := by
+    identity ⦃ (result : RistrettoPoint) =>
+      result.X = ZERO ∧
+      result.Y = ONE ∧
+      result.Z = ONE ∧
+      result.T = ZERO ⦄ := by
   sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
