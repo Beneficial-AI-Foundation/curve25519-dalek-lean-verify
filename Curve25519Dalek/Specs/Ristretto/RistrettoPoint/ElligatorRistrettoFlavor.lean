@@ -469,7 +469,7 @@ theorem elligator_ristretto_flavor_spec
           · -- IS a square: not_sq=0, s1 = __discr.2
             left
             have h_nsq : not_sq.val ≠ 1#u8 := by
-              rw [not_sq_post, if_pos h_sq_flag]; decide
+              have := not_sq_post.mp h_sq_flag; subst this; decide
             rw [show s1.toField = __discr.2.toField from by
               unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
             have h_eq : (Field51_as_Nat __discr.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
@@ -485,7 +485,10 @@ theorem elligator_ristretto_flavor_spec
             exact lift_sq_mod h_eq
           · -- NOT a square: not_sq=1, s1 = s_prime1
             right
-            have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
+            have h_nsq : not_sq.val = 1#u8 := by
+              rcases not_sq with ⟨val, hv | hv⟩
+              · exact absurd (not_sq_post.mpr (by simp [Choice.zero, hv])) h_sq_flag
+              · exact hv
             rw [show s1.toField = s_prime1.toField from by
               unfold toField; rw [cond_f51_eq s1_post h_nsq]]
             have h_sp1_sq : s_prime1.toField ^ 2 = s_prime.toField ^ 2 := by
@@ -621,7 +624,7 @@ theorem elligator_ristretto_flavor_spec
           · -- IS a square: s1 = __discr.2, s1²D = N_s, c1 = -1
             left
             have h_nsq : not_sq.val ≠ 1#u8 := by
-              rw [not_sq_post, if_pos h_sq_flag]; decide
+              have := not_sq_post.mp h_sq_flag; subst this; decide
             constructor
             · rw [show s1.toField = __discr.2.toField from by
                 unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
@@ -644,7 +647,10 @@ theorem elligator_ristretto_flavor_spec
               exact MINUS_ONE_toField
           · -- NOT a square: s1 = s_prime1, s1²D = r·N_s, c1 = r
             right
-            have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
+            have h_nsq : not_sq.val = 1#u8 := by
+              rcases not_sq with ⟨val, hv | hv⟩
+              · exact absurd (not_sq_post.mpr (by simp [Choice.zero, hv])) h_sq_flag
+              · exact hv
             constructor
             · rw [show s1.toField = s_prime1.toField from by
                 unfold toField; rw [cond_f51_eq s1_post h_nsq]]
@@ -815,7 +821,7 @@ theorem elligator_ristretto_flavor_spec
         by_cases h_sq_flag : __discr.1.val = 1#u8
         · -- Square case: c1 = -1
           have h_nsq : not_sq.val ≠ 1#u8 := by
-            rw [not_sq_post, if_pos h_sq_flag]; decide
+            have := not_sq_post.mp h_sq_flag; subst this; decide
           have h_is_sq : elligator_is_square s.toField := by
             change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
             rw [← h_D_bridge, ← h_Ns_bridge]
@@ -835,7 +841,10 @@ theorem elligator_ristretto_flavor_spec
           rw [if_pos h_is_sq]
           unfold toField; rw [cond_f51_eq_neg c1_post h_nsq]; exact MINUS_ONE_toField
         · -- Non-square case: c1 = r
-          have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
+          have h_nsq : not_sq.val = 1#u8 := by
+            rcases not_sq with ⟨val, hv | hv⟩
+            · exact absurd (not_sq_post.mpr (by simp [Choice.zero, hv])) h_sq_flag
+            · exact hv
           have h_not_sq : ¬ elligator_is_square s.toField := by
             change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
             rw [← h_D_bridge, ← h_Ns_bridge]
@@ -865,7 +874,7 @@ theorem elligator_ristretto_flavor_spec
         by_cases h_sq_flag : __discr.1.val = 1#u8
         · -- Square case: s1 = __discr.2
           have h_nsq : not_sq.val ≠ 1#u8 := by
-            rw [not_sq_post, if_pos h_sq_flag]; decide
+            have := not_sq_post.mp h_sq_flag; subst this; decide
           have h_is_sq : elligator_is_square s.toField := by
             change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
             rw [← h_D_bridge, ← h_Ns_bridge]
@@ -913,7 +922,10 @@ theorem elligator_ristretto_flavor_spec
           · -- __discr.2.toField.val % 2 = 0
             unfold toField; rw [ZMod.val_natCast]; exact __discr_post_2
         · -- Non-square case: s1 = s_prime1
-          have h_nsq : not_sq.val = 1#u8 := by rw [not_sq_post, if_neg h_sq_flag]
+          have h_nsq : not_sq.val = 1#u8 := by
+            rcases not_sq with ⟨val, hv | hv⟩
+            · exact absurd (not_sq_post.mpr (by simp [Choice.zero, hv])) h_sq_flag
+            · exact hv
           have h_not_sq : ¬ elligator_is_square s.toField := by
             change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
             rw [← h_D_bridge, ← h_Ns_bridge]
@@ -954,7 +966,7 @@ theorem elligator_ristretto_flavor_spec
             by_cases hc : c.val = 1#u8
             · -- s_prime is negative (odd val): s_prime1 = s_prime, abs = -s_prime
               have h_sip : s_prime_is_pos.val ≠ 1#u8 := by
-                rw [s_prime_is_pos_post, if_pos hc]; decide
+                have := s_prime_is_pos_post.mp hc; subst this; decide
               rw [show s_prime1.toField = s_prime.toField from by
                 unfold toField; rw [cond_f51_eq_neg s_prime1_post h_sip]]
               have h_neg : (s_prime.toField.val % 2 == 1) = true := by
@@ -962,7 +974,9 @@ theorem elligator_ristretto_flavor_spec
               rw [if_pos h_neg]; ring
             · -- s_prime is non-negative (even val): s_prime1 = -s_prime, abs = s_prime
               have h_sip : s_prime_is_pos.val = 1#u8 := by
-                rw [s_prime_is_pos_post, if_neg hc]
+                rcases s_prime_is_pos with ⟨val, hv | hv⟩
+                · exact absurd (s_prime_is_pos_post.mpr (by simp [Choice.zero, hv])) hc
+                · exact hv
               rw [show s_prime1.toField = s_prime_neg.toField from by
                 unfold toField; rw [cond_f51_eq s_prime1_post h_sip]]
               rw [h_spn_F]
