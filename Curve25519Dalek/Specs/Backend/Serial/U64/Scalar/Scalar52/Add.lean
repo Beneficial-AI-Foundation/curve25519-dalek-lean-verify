@@ -48,90 +48,67 @@ set_option maxHeartbeats 1000000 in
 - Result limbs are bounded by 2^52
 - Parts of sum before index i are preserved
 - The result satisfies the modular arithmetic property -/
-@[progress, externally_verified] -- proof worked before aeneas update
+@[progress]
 theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)
     (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)
     (hcarry : i.val = 5 → carry.val < 2 ^ 52)
-    (hcarry : ∀ i < 5, carry.val < 2 ^ 53)
+    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)
     (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)
     (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :
-    add_loop a b sum mask carry i ⦃ sum' =>
-    (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
-    (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
-    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =
-      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
-      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by
-  sorry
-  /- OLD PROOF (broken by Aeneas lift changes — needs rework):
+    add_loop a b sum mask carry i ⦃ (sum' : Scalar52) =>
+      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧
+      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧
+      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =
+        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +
+        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by
   unfold add_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   progress*
-  · -- BEGIN TASK
-    have := ha i (by scalar_tac)
+  · have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    have := ha i (by scalar_tac)
-    have := hb i (by scalar_tac)
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro hi
+  · intro hi
     have : i.val = 4 := by grind
     have : a[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
     have : b[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
     simp [*]
-    have : carry.val >>> 52 ≤ 1 := by have := hcarry i (by scalar_tac); omega
+    have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by scalar_tac); omega
     simp at *; grind
-    -- END TASK
-  · -- BEGIN TASK
-    intro j hj
-    have : carry.val >>> 52 ≤ 1 := by have := hcarry i (by scalar_tac); omega
+  · intro j hj
+    have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by scalar_tac); omega
     have := ha i (by scalar_tac)
     have := hb i (by scalar_tac)
     simp at *; grind
-    -- END TASK
-  · -- BEGIN TASK
-    intro j hj
+  · intro j hj
     by_cases hc : j = i
     · rw [hc]
       have := Array.set_of_eq sum i5 i (by scalar_tac)
-      simp only [UScalar.ofNat_val, Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
-      simp_all [i5_post_1, hmask]
+      simp only [Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
+      simp_all
       grind
     · have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by grind)
       have := hsum j (by scalar_tac)
       simp_all
-    -- END TASK
-  · -- BEGIN TASK
-    intro j hj _
+  · intro j hj _
     have hne : j ≠ i := by grind
     have := Array.set_of_ne' sum i5 j i (by scalar_tac) (by omega)
     have := hsum' j hj (by omega)
     simp_all
-    -- END TASK
-  · refine ⟨?_, ?_, ?_⟩
-    · -- BEGIN TASK
-      grind
-      -- END TASK
-    · -- BEGIN TASK
-      intro j hj
-      have := res_post_2 j (by omega)
+  · refine ⟨by grind, ?_, ?_⟩
+    · intro j hj
+      have := sum'_post2 j (by omega)
       have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
       simp_all
-      -- END TASK
-    · -- BEGIN TASK
-      have : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 := by
+    · have : carry1.val = a[i]!.val + b[i]!.val + carry.val / 2 ^ 52 := by
         simp [*]; omega
-      have : res[i]! = carry1.val % 2 ^ 52 := by
-        have := res_post_2 i.val (by omega)
+      have : sum'[i]! = carry1.val % 2 ^ 52 := by
+        have := sum'_post2 i.val (by omega)
         have := Array.set_of_eq sum i5 i (by scalar_tac)
         simp_all
-      have : ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * res[j]!.val =
+      have : ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * sum'[j]!.val =
           ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * ((a)[j]!.val + (b)[j]!.val) +
           2 ^ (52 * (i.val + 1)) * (↑carry1 / 2 ^ 52) := by
         have : 4503599627370496 = 2 ^ 52 := by grind
@@ -140,9 +117,9 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
           2 ^ (52 * (i.val + 1)) * (carry1.val / 2 ^ 52) = 2 ^ (52 * i.val) * carry1.val := by
         have : carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) = carry1.val := by grind
         grind
-      calc ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * res[j]!
-        _ = 2 ^ (52 * ↑i) * res[i]! +
-            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * res[j]! := by
+      calc ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * sum'[j]!
+        _ = 2 ^ (52 * ↑i) * sum'[i]! +
+            ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * sum'[j]! := by
           have hi : i.val < 5 := by scalar_tac
           simp [Finset.sum_eq_sum_Ico_succ_bot hi]
         _ = ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
@@ -150,27 +127,17 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
           have hi : i.val < 5 := by scalar_tac
           rw [Finset.sum_eq_sum_Ico_succ_bot hi]
           grind
-      -- END TASK
-  · refine ⟨?_, fun j hj ↦ ?_, ?_⟩
-    · -- BEGIN TASK
-      grind
-      -- END TASK
-    · -- BEGIN TASK
-      simp
-      -- END TASK
-    · -- BEGIN TASK
-      have : i.val = 5 := by scalar_tac
-      simp [this]; grind
-      -- END TASK
+  · refine ⟨by grind, by grind, ?_⟩
+    have : i.val = 5 := by scalar_tac
+    simp [this]; grind
   termination_by 5 - i.val
   decreasing_by scalar_decr_tac
-  -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.add`**:
 - Requires the input values to be bounded by  2 ^ 259
 - The result represents the sum of the two input scalars modulo L
 -/
-@[progress, externally_verified]
+@[progress]
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
