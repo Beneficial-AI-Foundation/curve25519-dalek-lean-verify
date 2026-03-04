@@ -211,11 +211,19 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     -- Shared bridge: parity of U8x32_as_Nat a
     have h_a_parity : U8x32_as_Nat a % 2 = 0 := by
       rw [h_a_eq]; exact h_s1_parity
-    constructor
+    refine ⟨?_, ?_⟩
     · -- Goal 36: IsValid (decompress_pure succeeds)
       unfold CompressedRistretto.IsValid
       sorry
     · -- Goal 37: compress_pure matches byte output
-      sorry
+      -- Key bridge: s1.toField = compress_s self.toPoint
+      -- Key bridge: s1.toField = compress_s self.toPoint
+      have h_key : s1.toField = math.compress_s self.toPoint := by
+        sorry
+      -- compress_pure P = (compress_s P).val = s1.toField.val = Field51_as_Nat s1 % p
+      change math.compress_pure self.toPoint = U8x32_as_Nat a
+      unfold math.compress_pure
+      rw [← h_key, backend.serial.u64.field.FieldElement51.toField, ZMod.val_natCast]
+      exact h_a_eq.symm
 
 end curve25519_dalek.ristretto.RistrettoPoint
