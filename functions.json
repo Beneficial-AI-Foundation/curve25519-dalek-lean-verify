@@ -7827,7 +7827,7 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem elligator_encode_spec\n    (r_0 : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r_0[i]!).val ≤ 2 ^ 52 - 1) :\n    elligator_encode r_0 ⦃ res =>\n    -- Field arithmetic interpretation of input and outputs\n    let r     : ZMod p := (Field51_as_Nat r_0 : ZMod p)\n    let d_1   : ZMod p := 1 + 2 * r ^ 2\n    let d     : ZMod p := -Curve25519.A * d_1⁻¹\n    let eps   : ZMod p := d * (d ^ 2 + Curve25519.A * d + 1)\n    let point  := res.1\n    let eps_is_sq := res.2\n    -- The returned Choice correctly identifies whether eps is a square\n    (eps_is_sq.val = 1#u8 ↔ IsSquare eps) ∧\n    -- The returned MontgomeryPoint encodes the Elligator 2 u-coordinate\n    (eps_is_sq.val = 1#u8 →\n      (U8x32_as_Nat point : ZMod p) = d) ∧\n    (eps_is_sq.val = 0#u8 →\n      (U8x32_as_Nat point : ZMod p) = -d - Curve25519.A) ∧\n    -- In the QR case, u lies on the Montgomery curve\n    (eps_is_sq.val = 1#u8 →\n      let u : ZMod p := (U8x32_as_Nat point : ZMod p)\n      u * (u ^ 2 + Curve25519.A * u + 1) = eps) ∧\n    -- In the NQR case, u lies on the quadratic twist\n    (eps_is_sq.val = 0#u8 →\n      let u : ZMod p := (U8x32_as_Nat point : ZMod p)\n      IsSquare (-(u * (u ^ 2 + Curve25519.A * u + 1)))) ⦄ := by ...",
