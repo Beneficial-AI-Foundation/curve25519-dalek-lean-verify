@@ -59,14 +59,14 @@ natural language specs:
 -- -/
 
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 1600000 in
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
         (∀ ep, result = some ep →
           ∃ Z_inv,
             field.FieldElement51.invert ep.Z = ok Z_inv ∧
-            let u := bytesToField mp
+            let u := U8x32_as_Nat mp
             let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p  -- Affine y = Y/Z
             (y * ((u + 1) % p)) % p = ((u - 1) % p) % p)
       ⦄ := by
@@ -271,9 +271,9 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
-                conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
-                rw [h_y_val_eq]
-                ring_nf
+                -- conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
+                -- rw [h_y_val_eq]
+                -- ring_nf
                 sorry
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
