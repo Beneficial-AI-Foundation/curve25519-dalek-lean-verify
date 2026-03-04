@@ -397,7 +397,27 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
           have h_ne_nat : Field51_as_Nat u1_u2_sq % p ≠ 0 := by
             rwa [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff,
                  Nat.dvd_iff_mod_eq_zero] at h_ne
-          have h_qr : ∃ x, x ^ 2 * (Field51_as_Nat u1_u2_sq % p) % p = 1 := by sorry
+          have h_qr : ∃ x, x ^ 2 * (Field51_as_Nat u1_u2_sq % p) % p = 1 := by
+            -- IsSquare from RistrettoPoint.IsValid (Z²-Y² is square for valid Ristretto)
+            have h_sq : IsSquare u1_u2_sq.toField := by
+              rw [h_u1_u2_sq_val]
+              exact (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2)).mul
+                ⟨_, (sq _)⟩
+            obtain ⟨r, hr⟩ := h_sq
+            have hr_ne : r ≠ 0 := by
+              intro heq; rw [heq, mul_zero] at hr; exact h_ne hr
+            -- r⁻¹ is the inverse square root in ZMod p
+            have h_inv : r⁻¹ ^ 2 * u1_u2_sq.toField = 1 := by rw [hr]; field_simp
+            -- Convert ZMod equation to Nat
+            refine ⟨(r⁻¹).val, ?_⟩
+            have hmod : (↑(Field51_as_Nat u1_u2_sq % p) : ZMod p) = u1_u2_sq.toField := by
+              unfold FieldElement51.toField; rw [ZMod.natCast_eq_natCast_iff]
+              change _ % _ = _ % _; exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
+            have h_zmod : (↑((r⁻¹).val ^ 2 * (Field51_as_Nat u1_u2_sq % p)) : ZMod p) = 1 := by
+              push_cast; rw [ZMod.natCast_zmod_val, hmod]; exact h_inv
+            have h_val := congrArg ZMod.val h_zmod
+            rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
+            exact h_val
           have h_post := (__discr_post_4 ⟨h_ne_nat, h_qr⟩).2
           -- Lift Nat % p equation to Nat.ModEq, then to ZMod
           have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
