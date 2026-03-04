@@ -67,6 +67,82 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by
   unfold compress
   progress*
-  all_goals sorry
+
+  -- Goal 1: Z limbs < 2^53 (from IsValid)
+  · intro i hi; exact h.1.Z_bounds i hi
+  -- Goal 2: Y limbs < 2^53 (from IsValid)
+  · intro i hi; exact h.1.Y_bounds i hi
+  -- Goal 3: Z limbs < 2^63 (sub precond)
+  · intro i hi; have := h.1.Z_bounds i hi; omega
+  -- Goal 4: Y limbs < 2^54 (sub precond)
+  · intro i hi; have := h.1.Y_bounds i hi; omega
+  -- Goal 5: z_minus_y < 2^54 (mul rhs precond)
+  · intro i hi; have := z_minus_y_post_1 i hi; omega
+  -- Goal 6: X limbs < 2^54 (mul lhs precond)
+  · intro i hi; have := h.1.X_bounds i hi; omega
+  -- Goal 7: Y limbs < 2^54 (mul rhs precond)
+  · intro i hi; have := h.1.Y_bounds i hi; omega
+  -- Goal 8: u2 limbs < 2^54 (square precond)
+  · intro i hi; have := u2_post_2 i hi; omega
+  -- Goal 9: u1 limbs < 2^54 (mul lhs precond)
+  · intro i hi; have := u1_post_2 i hi; omega
+  -- Goal 10: u2_sq limbs < 2^54 (mul rhs precond)
+  · intro i hi; have := u2_sq_post_2 i hi; omega
+  -- Goal 11: u1_u2_sq limbs ≤ 2^52 - 1 (invsqrt precond)
+  · intro i hi; have := u1_u2_sq_post_2 i hi; omega
+  -- Goal 12: invsqrt limbs < 2^54 (mul lhs precond)
+  · intro i hi; have := __discr_post_1 i hi; omega
+  -- Goal 13: u1 limbs < 2^54 (mul rhs precond, for i1)
+  · intro i hi; have := u1_post_2 i hi; omega
+  -- Goal 14: invsqrt limbs < 2^54 (mul lhs, for i2)
+  · intro i hi; have := __discr_post_1 i hi; omega
+  -- Goal 15: u2 limbs < 2^54 (mul rhs, for i2)
+  · intro i hi; have := u2_post_2 i hi; omega
+  -- Goal 16: i2 limbs < 2^54 (mul lhs, for i2_T)
+  · intro i hi; have := i2_post_2 i hi; omega
+  -- Goal 17: T limbs < 2^54 (mul rhs, for i2_T)
+  · intro i hi; have := h.1.T_bounds i hi; omega
+  -- Goal 18: i1 limbs < 2^54 (mul lhs, for z_inv)
+  · intro i hi; have := i1_post_2 i hi; omega
+  -- Goal 19: i2_T limbs < 2^54 (mul rhs, for z_inv)
+  · intro i hi; have := i2_T_post_2 i hi; omega
+  -- Goal 20: X limbs < 2^54 (mul lhs, for iX)
+  · intro i hi; have := h.1.X_bounds i hi; omega
+  -- Goal 21: SQRT_M1 limbs < 2^54 (mul rhs, for iX)
+  · sorry
+  -- Goal 22: Y limbs < 2^54 (mul lhs, for iY)
+  · intro i hi; have := h.1.Y_bounds i hi; omega
+  -- Goal 23: SQRT_M1 limbs < 2^54 (mul rhs, for iY)
+  · sorry
+  -- Goal 24: i1 limbs < 2^54 (mul lhs, for enchanted)
+  · intro i hi; have := i1_post_2 i hi; omega
+  -- Goal 25: INVSQRT_A_MINUS_D limbs < 2^54 (mul rhs, for enchanted)
+  · sorry
+  -- Goal 26: T limbs < 2^54 (mul lhs, for t_z_inv)
+  · intro i hi; have := h.1.T_bounds i hi; omega
+  -- Goal 27: z_inv limbs < 2^54 (mul rhs, for t_z_inv)
+  · intro i hi; have := z_inv_post_2 i hi; omega
+  -- Goal 28: X (after cond_assign) limbs < 2^54 (mul lhs, for x_z_inv)
+  · sorry
+  -- Goal 29: z_inv limbs < 2^54 (mul rhs, for x_z_inv)
+  · intro i hi; have := z_inv_post_2 i hi; omega
+  -- Goal 30: Y (after cond_assign) limbs < 2^54 (neg precond)
+  · sorry
+  -- Goal 31: Z limbs < 2^63 (sub precond, for z_minus_y2)
+  · intro i hi; have := h.1.Z_bounds i hi; omega
+  -- Goal 32: Y1 (after cond_assign) limbs < 2^54 (sub precond)
+  · sorry
+  -- Goal 33: i21 (after cond_assign) limbs < 2^54 (mul lhs, for s)
+  · sorry
+  -- Goal 34: z_minus_y2 limbs < 2^54 (mul rhs, for s)
+  · intro i hi; have := z_minus_y2_post_1 i hi; omega
+  -- Goal 35: s limbs < 2^54 (neg precond for s_neg)
+  · intro i hi; have := s_post_2 i hi; omega
+  -- Goal 36: IsValid (decompress_pure succeeds)
+  · constructor
+    · unfold CompressedRistretto.IsValid
+      sorry
+  -- Goal 37: compress_pure matches byte output
+    · sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
