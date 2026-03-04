@@ -5,7 +5,7 @@ name: Lean Profiling
 
 on:
   schedule:
-    - cron: '0 8 * * 1'    # Every Monday at 8:00 UTC
+    - cron: '0 1 * * 1'    # Every Monday at 01:00 UTC
   workflow_dispatch:
     inputs:
       scope:
@@ -73,9 +73,6 @@ jobs:
             ./scripts/bench/profile-lean.sh Curve25519Dalek/Specs/ Curve25519Dalek/Math/
           fi
 
-      - name: Run heartbeat analysis
-        run: ./scripts/bench/count-heartbeats.sh > heartbeats.txt
-
       - name: Find profile output directory
         id: find-profile
         run: |
@@ -88,7 +85,6 @@ jobs:
           SCOPE="${{ github.event.inputs.scope || 'specs-math' }}"
           ./scripts/bench/profile-report-md.sh \
             "${{ steps.find-profile.outputs.json }}" \
-            --heartbeats heartbeats.txt \
             --commit "${{ github.sha }}" \
             --scope "$SCOPE" \
             > report.md
@@ -99,7 +95,6 @@ jobs:
           name: lean-profile-${{ github.run_id }}
           path: |
             ${{ steps.find-profile.outputs.dir }}
-            heartbeats.txt
             report.md
           retention-days: 90
 
