@@ -37,6 +37,9 @@ deps.json
 # Temporary files
 .tmp/
 
+# Profiling output
+benchmarks/
+
 # VitePress
 node_modules
 site/.vitepress/dist

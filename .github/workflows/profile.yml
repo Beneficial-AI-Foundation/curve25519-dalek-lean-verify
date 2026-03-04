@@ -1,0 +1,120 @@
+name: Lean Profiling
+
+# Profiles Lean compilation times weekly and posts results as a GitHub issue.
+# Also available via manual dispatch with configurable scope.
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'    # Every Monday at 8:00 UTC
+  workflow_dispatch:
+    inputs:
+      scope:
+        description: 'What to profile'
+        required: false
+        default: 'specs-math'
+        type: choice
+        options:
+          - specs-math
+          - all
+
+env:
+  LEAN_ABORT_ON_PANIC: 1
+
+jobs:
+  profile:
+    name: Profile Lean Files
+    runs-on: ubuntu-latest
+    timeout-minutes: 330    # 5.5h buffer before 6h hard limit
+
+    permissions:
+      issues: write
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Verify elan installation
+        run: |
+          elan --version
+          lean --version
+
+      - name: Cache Lean build
+        uses: actions/cache@v4
+        with:
+          path: |
+            .lake
+            build
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
+            ${{ runner.os }}-lean-
+
+      - name: Download dependency caches
+        run: lake exe cache get
+
+      - name: Build Lean project
+        run: lake build
+
+      - name: Run profiling
+        run: |
+          SCOPE="${{ github.event.inputs.scope || 'specs-math' }}"
+          if [ "$SCOPE" = "all" ]; then
+            echo "Profiling all project files..."
+            ./scripts/bench/profile-lean.sh --all
+          else
+            echo "Profiling Specs/ and Math/..."
+            ./scripts/bench/profile-lean.sh Curve25519Dalek/Specs/ Curve25519Dalek/Math/
+          fi
+
+      - name: Run heartbeat analysis
+        run: ./scripts/bench/count-heartbeats.sh > heartbeats.txt
+
+      - name: Find profile output directory
+        id: find-profile
+        run: |
+          PROFILE_DIR=$(ls -td benchmarks/profile-* | head -1)
+          echo "dir=$PROFILE_DIR" >> "$GITHUB_OUTPUT"
+          echo "json=$PROFILE_DIR/profile.json" >> "$GITHUB_OUTPUT"
+
+      - name: Generate Markdown report
+        run: |
+          SCOPE="${{ github.event.inputs.scope || 'specs-math' }}"
+          ./scripts/bench/profile-report-md.sh \
+            "${{ steps.find-profile.outputs.json }}" \
+            --heartbeats heartbeats.txt \
+            --commit "${{ github.sha }}" \
+            --scope "$SCOPE" \
+            > report.md
+
+      - name: Upload profile artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-profile-${{ github.run_id }}
+          path: |
+            ${{ steps.find-profile.outputs.dir }}
+            heartbeats.txt
+            report.md
+          retention-days: 90
+
+      - name: Ensure profiling label exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh label create profiling --description "Automated profiling reports" --color "0E8A16" 2>/dev/null || true
+
+      - name: Create GitHub issue with report
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          SCOPE="${{ github.event.inputs.scope || 'specs-math' }}"
+          gh issue create \
+            --title "Lean Profiling Report - ${DATE} (${SCOPE})" \
+            --body-file report.md \
+            --label "profiling"
