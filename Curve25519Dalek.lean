@@ -28,6 +28,7 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtend
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.APLUS2_OVER_FOUR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ED25519_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
@@ -77,6 +78,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
@@ -119,6 +121,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsBytes
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.CtEq
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ElligatorEncode
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Eq
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Identity
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
