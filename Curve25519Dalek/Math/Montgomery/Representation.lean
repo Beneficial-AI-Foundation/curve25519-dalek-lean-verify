@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Alessandro D'Angelo, Oliver Butterley, Hoang Le Truong
+Authors: Alessandro D'Angelo, Oliver Butterley, Hoang Le Truong, Liao Zhang
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
@@ -210,12 +210,6 @@ theorem MontgomeryPoint.u_affine_toPoint_spec (u v : CurveField)
   (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
   MontgomeryPoint.u_affine_toPoint (u : CurveField) = WeierstrassCurve.Affine.Point.some ( non_u_affine_toPoint_spec equation) := by
   sorry
-/-
-  have := Aux_u_affine_toPoint_spec non equation
-  unfold MontgomeryPoint.u_affine_toPoint
-  simp only [Bool.or_eq_true, Bool.not_eq_eq_eq_not, Bool.not_true, beq_iff_eq]
-  simp only [this]
-  -/
 
 noncomputable def MontgomeryPoint.mkPoint (m : MontgomeryPoint) : Point:=
     MontgomeryPoint.u_affine_toPoint  (((U8x32_as_Nat m) % 2^255 ):ℕ)
