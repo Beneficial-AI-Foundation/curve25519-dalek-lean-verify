@@ -109,15 +109,18 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   -- Goal 20: X limbs < 2^54 (mul lhs, for iX)
   · intro i hi; have := h.1.X_bounds i hi; omega
   -- Goal 21: SQRT_M1 limbs < 2^54 (mul rhs, for iX)
-  · sorry
+  · unfold backend.serial.u64.constants.SQRT_M1
+    decide
   -- Goal 22: Y limbs < 2^54 (mul lhs, for iY)
   · intro i hi; have := h.1.Y_bounds i hi; omega
   -- Goal 23: SQRT_M1 limbs < 2^54 (mul rhs, for iY)
-  · sorry
+  · unfold backend.serial.u64.constants.SQRT_M1
+    decide
   -- Goal 24: i1 limbs < 2^54 (mul lhs, for enchanted)
   · intro i hi; have := i1_post_2 i hi; omega
   -- Goal 25: INVSQRT_A_MINUS_D limbs < 2^54 (mul rhs, for enchanted)
-  · sorry
+  · unfold backend.serial.u64.constants.INVSQRT_A_MINUS_D
+    decide
   -- Goal 26: T limbs < 2^54 (mul lhs, for t_z_inv)
   · intro i hi; have := h.1.T_bounds i hi; omega
   -- Goal 27: z_inv limbs < 2^54 (mul rhs, for t_z_inv)
