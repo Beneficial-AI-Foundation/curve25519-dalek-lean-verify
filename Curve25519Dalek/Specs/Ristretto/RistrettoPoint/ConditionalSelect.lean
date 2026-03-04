@@ -47,6 +47,8 @@ theorem conditional_select_spec
     (choice : subtle.Choice) :
     conditional_select a b choice ⦃ (result : RistrettoPoint) =>
       result = if choice.val = 1#u8 then b else a ⦄ := by
-  sorry
+  unfold conditional_select
+  progress
+  assumption
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable
