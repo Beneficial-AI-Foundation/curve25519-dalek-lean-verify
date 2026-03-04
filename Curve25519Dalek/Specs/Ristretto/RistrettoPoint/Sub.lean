@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Sub
 
 /-! # Spec Theorem for `RistrettoPoint::sub`
 
@@ -32,7 +33,7 @@ natural language specs:
 
 • The function always succeeds (no panic) for valid input Ristretto points
 • The result is a valid Ristretto point
-• The result represents the difference of the inputs (in the context of elliptic curve subtraction)
+• The result represents the difference of the inputs (in the mathematical context of elliptic curve subtraction)
 -/
 
 /-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:
@@ -41,10 +42,13 @@ natural language specs:
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
 @[progress]
-theorem sub_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
-    sub self other ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = self.toPoint - other.toPoint ⦄ := by
+theorem sub_spec
+    (self other : RistrettoPoint)
+    (h_self_valid : self.IsValid)
+    (h_other_valid : other.IsValid) :
+    sub self other ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧
+      result.toPoint = self.toPoint - other.toPoint ⦄ := by
   sorry
 
 end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
