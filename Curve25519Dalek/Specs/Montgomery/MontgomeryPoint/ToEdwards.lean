@@ -259,33 +259,34 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp + 1) % p := by
-                -- Apply Nat.mul_mod to decompose the modulo
-                rw [Nat.mul_mod]
-                -- Now rewrite using h_affine_y
-                rw [h_affine_y]
-                -- Use Nat.mul_comm to swap the entire multiplication
-                rw [Nat.mul_comm (y_val % p)]
-                -- Apply Nat.mul_mod_left to remove the mod on the left factor
-                rw [Nat.mul_mod_left]
-                -- Swap back
-                rw [Nat.mul_comm]
+                -- -- Apply Nat.mul_mod to decompose the modulo
+                -- rw [Nat.mul_mod]
+                -- -- Now rewrite using h_affine_y
+                -- rw [h_affine_y]
+                -- -- Use Nat.mul_comm to swap the entire multiplication
+                -- rw [Nat.mul_comm (y_val % p)]
+                -- -- Apply Nat.mul_mod_left to remove the mod on the left factor
+                -- rw [Nat.mul_mod_left]
+                -- -- Swap back
+                -- rw [Nat.mul_comm]
+                sorry
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
                 conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
                 rw [h_y_val_eq]
                 ring_nf
-
+                sorry
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
                 -- congr 1
-                rw [← h_u_eq, ← h_u_mod]
+                -- rw [← h_u_eq, ← h_u_mod]
                 sorry
 
             -- Substitute u + 1 with fe1
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
-                congr 1
-                rw [← h_fe1_eq]
+                -- congr 1
+                -- rw [← h_fe1_eq]
                 sorry
 
             -- Rearrange: fe * fe2 * fe1 = fe * (fe2 * fe1)
@@ -294,8 +295,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use fe2 * fe1 = 1
             _ = Field51_as_Nat fe * 1 % p := by
-                conv_rhs => arg 1; arg 2
-                rw [Nat.mul_comm, h_fe2_inv]
+              sorry
 
             -- Simplify
             _ = Field51_as_Nat fe % p := by
@@ -310,9 +310,9 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
                   sorry
                 -- Rewrite using the fact that (a - 1) % p depends on a % p
-                conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
-                rw [← Nat.sub_mod]
-
+                -- conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
+                -- rw [← Nat.sub_mod]
+                sorry
             -- Simplify
             _ = (U8x32_as_Nat mp - 1) % p := by
                 sorry
