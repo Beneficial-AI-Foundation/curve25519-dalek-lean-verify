@@ -43,6 +43,9 @@ theorem ct_eq_spec
     (self other : CompressedRistretto) :
     ct_eq self other ⦃ (result : subtle.Choice) =>
       result = Choice.one ↔ self = other ⦄ := by
-  sorry
+  unfold ct_eq
+  progress*
+  simp_all only [Array.to_slice, Slice.eq_iff]
+  exact Subtype.val_injective.eq_iff
 
 end curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq
