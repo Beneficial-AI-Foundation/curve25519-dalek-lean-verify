@@ -37,11 +37,11 @@ namespace curve25519_dalek.field.FieldElement51
 
 /-- The SQRT_M1 constant as a plain FieldElement51 (extracted from Result wrapper).
     This is the concrete value of `constants.SQRT_M1` for use in pure mathematical proofs. -/
-private def SQRT_M1_val : backend.serial.u64.field.FieldElement51 :=
+def SQRT_M1_val : backend.serial.u64.field.FieldElement51 :=
   Array.make 5#usize [1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
     2117202627021982#u64, 765476049583133#u64]
 
-private theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
+theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
   unfold SQRT_M1_val; decide
 
 theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [Nat.ModEq]

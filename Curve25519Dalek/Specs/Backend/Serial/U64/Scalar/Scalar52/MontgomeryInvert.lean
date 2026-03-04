@@ -178,48 +178,48 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   have step_u : IsMont RZ uZ (Scalar52_as_Nat u) 1 := by
     unfold IsMont; simp only [Nat.cast_one, sub_self, zpow_zero, mul_one, pow_one]; rw [h_uZ]
   -- Pre-computation
-  have step_10   := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero u   _10   1 step_u  _10_post_1
-  have step_100  := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero _10 _100  2 step_10 _100_post_1
-  have step_11   := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10  u    _11    2 1  step_10     step_u   _11_post_1
-  have step_101  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _11   _101   2 3  step_10    step_11  _101_post_1
-  have step_111  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _101  _111   2 5  step_10   step_101  _111_post_1
-  have step_1001 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _111  _1001  2 7  step_10   step_111 _1001_post_1
-  have step_1011 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _1001 _1011  2 9  step_10  step_1001 _1011_post_1
-  have step_1111 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _100 _1011 _1111 4 11 step_100 step_1011 _1111_post_1
-  have step_y    := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _1111 u y 15 1 step_1111 step_u y_post_1
+  have step_10   := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero u   _10   1 step_u  _10_post1
+  have step_100  := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero _10 _100  2 step_10 _100_post1
+  have step_11   := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10  u    _11    2 1  step_10     step_u   _11_post1
+  have step_101  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _11   _101   2 3  step_10    step_11  _101_post1
+  have step_111  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _101  _111   2 5  step_10   step_101  _111_post1
+  have step_1001 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _111  _1001  2 7  step_10   step_111 _1001_post1
+  have step_1011 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _1001 _1011  2 9  step_10  step_1001 _1011_post1
+  have step_1111 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _100 _1011 _1111 4 11 step_100 step_1011 _1111_post1
+  have step_y    := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _1111 u y 15 1 step_1111 step_u y_post1
   -- SPECIAL HANDLING FOR y1
   generalize h_huge : 85070591730234615865843651857942052864 = N_huge
   have y1_post_safe : Scalar52_as_Nat y1 * R ^ N_huge % L = Scalar52_as_Nat y ^ N_huge * Scalar52_as_Nat _101 % L := by
     rw [← h_huge]
-    exact y1_post_1
+    exact y1_post1
   have step_y1  := by apply run_loop_nat RZ  uZ h_RZ hRZ_ne_zero y _101 y1 16 5 N_huge step_y step_101 y1_post_safe
   -- THE REST OF THE CHAIN (Small Exponents)
-  have step_y2  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y1  _11   y2  _  3  16   step_y1  step_11    y2_post_1
-  have step_y3  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y2  _1111 y3  _  15 32   step_y2  step_1111  y3_post_1
-  have step_y4  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y3  _1111 y4  _  15 32   step_y3  step_1111  y4_post_1
-  have step_y5  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y4  _1001 y5  _  9  16   step_y4  step_1001  y5_post_2
-  have step_y6  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y5  _11   y6  _  3  4    step_y5  step_11    y6_post_2
-  have step_y7  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y6  _1111 y7  _  15 32   step_y6  step_1111  y7_post_1
-  have step_y8  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y7  _101  y8  _  5  16   step_y7  step_101   y8_post_1
-  have step_y9  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y8  _101  y9  _  5  64   step_y8  step_101   y9_post_1
-  have step_y10 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y9  _111  y10 _  7  8    step_y9  step_111  y10_post_2
-  have step_y11 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y10 _1111 y11 _  15 32   step_y10 step_1111 y11_post_1
-  have step_y12 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y11 _111  y12 _  7  32   step_y11 step_111  y12_post_1
-  have step_y13 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y12 _11   y13 _  3  16   step_y12 step_11   y13_post_1
-  have step_y14 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y13 _1011 y14 _  11 32   step_y13 step_1011 y14_post_1
-  have step_y15 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y14 _1011 y15 _  11 64   step_y14 step_1011 y15_post_1
-  have step_y16 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y15 _1001 y16 _  9  1024 step_y15 step_1001 y16_post_1
-  have step_y17 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y16 _11   y17 _  3  16   step_y16 step_11   y17_post_1
-  have step_y18 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y17 _11   y18 _  3  32   step_y17 step_11   y18_post_1
-  have step_y19 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y18 _11   y19 _  3  32   step_y18 step_11   y19_post_1
-  have step_y20 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y19 _1001 y20 _  9  32   step_y19 step_1001 y20_post_1
-  have step_y21 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y20 _111  y21 _  7  16   step_y20 step_111  y21_post_1
-  have step_y22 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y21 _1111 y22 _  15 64   step_y21 step_1111 y22_post_1
-  have step_y23 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y22 _1011 y23 _  11 32   step_y22 step_1011 y23_post_1
-  have step_y24 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y23 _101  y24 _  5  8    step_y23 step_101  y24_post_2
-  have step_y25 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y24 _1111 y25 _  15 64   step_y24 step_1111 y25_post_1
-  have step_y26 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y25 _101  y26 _  5  8    step_y25 step_101  y26_post_2
-  have step_res := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y26 _11 res _ 3 8 step_y26 step_11 res_post_1
+  have step_y2  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y1  _11   y2  _  3  16   step_y1  step_11    y2_post1
+  have step_y3  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y2  _1111 y3  _  15 32   step_y2  step_1111  y3_post1
+  have step_y4  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y3  _1111 y4  _  15 32   step_y3  step_1111  y4_post1
+  have step_y5  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y4  _1001 y5  _  9  16   step_y4  step_1001  y5_post1
+  have step_y6  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y5  _11   y6  _  3  4    step_y5  step_11    y6_post1
+  have step_y7  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y6  _1111 y7  _  15 32   step_y6  step_1111  y7_post1
+  have step_y8  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y7  _101  y8  _  5  16   step_y7  step_101   y8_post1
+  have step_y9  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y8  _101  y9  _  5  64   step_y8  step_101   y9_post1
+  have step_y10 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y9  _111  y10 _  7  8    step_y9  step_111  y10_post1
+  have step_y11 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y10 _1111 y11 _  15 32   step_y10 step_1111 y11_post1
+  have step_y12 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y11 _111  y12 _  7  32   step_y11 step_111  y12_post1
+  have step_y13 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y12 _11   y13 _  3  16   step_y12 step_11   y13_post1
+  have step_y14 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y13 _1011 y14 _  11 32   step_y13 step_1011 y14_post1
+  have step_y15 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y14 _1011 y15 _  11 64   step_y14 step_1011 y15_post1
+  have step_y16 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y15 _1001 y16 _  9  1024 step_y15 step_1001 y16_post1
+  have step_y17 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y16 _11   y17 _  3  16   step_y16 step_11   y17_post1
+  have step_y18 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y17 _11   y18 _  3  32   step_y17 step_11   y18_post1
+  have step_y19 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y18 _11   y19 _  3  32   step_y18 step_11   y19_post1
+  have step_y20 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y19 _1001 y20 _  9  32   step_y19 step_1001 y20_post1
+  have step_y21 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y20 _111  y21 _  7  16   step_y20 step_111  y21_post1
+  have step_y22 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y21 _1111 y22 _  15 64   step_y21 step_1111 y22_post1
+  have step_y23 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y22 _1011 y23 _  11 32   step_y22 step_1011 y23_post1
+  have step_y24 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y23 _101  y24 _  5  8    step_y23 step_101  y24_post1
+  have step_y25 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y24 _1111 y25 _  15 64   step_y24 step_1111 y25_post1
+  have step_y26 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y25 _101  y26 _  5  8    step_y25 step_101  y26_post1
+  have step_res := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y26 _11 u' _ 3 8 step_y26 step_11 u'_post1
   -- CONCLUSION
   unfold IsMont at step_res
   refine ⟨?_, ?_⟩
@@ -249,6 +249,6 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
       try ring
     rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
     field_simp
-  · intro i hi; have bounds := res_post_2 i hi; exact bounds
+  · intro i hi; have bounds := u'_post2 i hi; exact bounds
 
 end curve25519_dalek.scalar.Scalar52

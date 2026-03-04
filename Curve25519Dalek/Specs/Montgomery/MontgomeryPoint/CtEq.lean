@@ -72,10 +72,10 @@ theorem ct_eq_spec (u v : MontgomeryPoint) :
       have h_nat_eq : U8x32_as_Nat xb = U8x32_as_Nat yb := by
         rw [h_x_canon, h_y_canon]; exact h_mod
       exact U8x32_as_Nat_injective h_nat_eq
-  have key := res_post.trans (to_bytes_iff_mod self_fe other_fe)
+  have key := c_post.trans (to_bytes_iff_mod self_fe other_fe)
   rw [key, ← Nat.ModEq]
   constructor
-  · intro h; exact (self_fe_post_1.symm.trans h).trans other_fe_post_1
-  · intro h; exact (self_fe_post_1.trans h).trans other_fe_post_1.symm
+  · intro h; exact (self_fe_post1.symm.trans h).trans other_fe_post1
+  · intro h; exact (self_fe_post1.trans h).trans other_fe_post1.symm
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq

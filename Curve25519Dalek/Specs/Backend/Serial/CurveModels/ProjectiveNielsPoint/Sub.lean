@@ -99,68 +99,17 @@ T' % p = ((2 * Z * Z₀) + (T * T2d)) % p ⦄
   unfold Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  · intro i hi
-    apply lt_trans (h_selfY_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_selfX_bounds i hi)
-    simp
   progress  as ⟨ PM , h_PM , PM_bounds⟩
-  · intro i hi
-    apply lt_trans (h_otherYmX_bounds  i hi)
-    simp
   progress  as ⟨ MP, h_MP, MP_bounds⟩
-  · intro i hi
-    apply lt_trans (Y_minus_X_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherYpX_bounds i hi)
-    simp
   progress  as ⟨ TT2d, h_TT2d, TT2d_bounds⟩
-  · intro i hi
-    apply lt_trans (h_selfT_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherT2d_bounds i hi)
-    simp
   progress  as ⟨ ZZ, h_ZZ, ZZ_bounds⟩
-  · intro i hi
-    apply lt_trans (h_selfZ_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherZ_bounds i hi)
-    simp
   progress as ⟨ZZ2, h_ZZ2,  ZZ2_bounds⟩
-  · intro i hi
-    apply lt_trans (ZZ_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (ZZ_bounds i hi)
-    simp
   progress as ⟨fe, h_fe,  fe_bounds⟩
-  · intro i hi
-    apply lt_trans (PM_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (MP_bounds i hi)
-    simp
   progress as ⟨fe1, h_fe1,  fe1_bounds⟩
-  · intro i hi
-    apply lt_trans (PM_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (MP_bounds i hi)
-    simp
   have hzz: ∀ i < 5, ZZ2[i]!.val < 2 ^ 54 := by simp_all
   obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := CompletedPoint.add_spec' hzz  TT2d_bounds
   simp only [h_fe2_ok, bind_tc_ok]
   progress as ⟨fe3, h_fe3, fe3_bounds⟩
-  · intro i hi
-    apply lt_trans (ZZ2_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (TT2d_bounds i hi)
-    simp
   constructor
   · rw[← Nat.ModEq]
     rw[← Nat.ModEq] at fe_bounds
