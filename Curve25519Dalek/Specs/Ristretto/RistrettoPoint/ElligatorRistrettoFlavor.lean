@@ -238,7 +238,7 @@ private lemma EDWARDS_D_MINUS_ONE_SQUARED_toField :
   rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
   simp only [Ed25519]
 
-set_option maxHeartbeats 200000 in -- needed for complex elligator unfold
+
 /-
 natural language description:
 
@@ -938,7 +938,81 @@ theorem elligator_ristretto_flavor_spec
           rw [show s1.toField = s_prime1.toField from by
             unfold toField; rw [cond_f51_eq s1_post h_nsq]]
           -- Goal: s_prime1.toField = -(abs_edwards (sqrt (sqrt_m1 * elligator_ratio s.toField) * s.toField))
-          sorry
+          -- Step A: s_prime.toField = __discr.2.toField * s.toField
+          have h_sp_F : s_prime.toField = __discr.2.toField * s.toField := by
+            unfold toField; have h := lift_mod_eq _ _ s_prime_post_1
+            push_cast at h; exact h
+          -- Step B: s_prime_neg.toField = -s_prime.toField
+          have h_spn_F : s_prime_neg.toField = -s_prime.toField := by
+            unfold toField
+            have h := lift_mod_eq _ 0
+              (s_prime_neg_post_1.trans (Nat.zero_mod p).symm)
+            push_cast at h; linear_combination h
+          -- Step C: s_prime1 = -(abs_edwards(s_prime))
+          have h_sp1_neg_abs : s_prime1.toField = -(abs_edwards s_prime.toField) := by
+            unfold abs_edwards is_negative
+            by_cases hc : c.val = 1#u8
+            · -- s_prime is negative (odd val): s_prime1 = s_prime, abs = -s_prime
+              have h_sip : s_prime_is_pos.val ≠ 1#u8 := by
+                rw [s_prime_is_pos_post, if_pos hc]; decide
+              rw [show s_prime1.toField = s_prime.toField from by
+                unfold toField; rw [cond_f51_eq_neg s_prime1_post h_sip]]
+              have h_neg : (s_prime.toField.val % 2 == 1) = true := by
+                simp only [beq_iff_eq]; exact c_post.mp hc
+              rw [if_pos h_neg]; ring
+            · -- s_prime is non-negative (even val): s_prime1 = -s_prime, abs = s_prime
+              have h_sip : s_prime_is_pos.val = 1#u8 := by
+                rw [s_prime_is_pos_post, if_neg hc]
+              rw [show s_prime1.toField = s_prime_neg.toField from by
+                unfold toField; rw [cond_f51_eq s_prime1_post h_sip]]
+              rw [h_spn_F]
+              have h_not_neg : ¬(s_prime.toField.val % 2 == 1) = true := by
+                simp only [beq_iff_eq]; exact fun h => hc (c_post.mpr h)
+              rw [if_neg h_not_neg]
+          -- Step D: abs_edwards(s_prime) = abs_edwards(sqrt(i*ratio)*s)
+          rw [h_sp1_neg_abs]; simp only [neg_inj]
+          rw [h_sp_F]
+          -- Goal: abs_edwards(__discr.2 * s) = abs_edwards(sqrt(i*ratio) * s)
+          apply abs_edwards_eq_of_sq_eq_sq (by decide : p % 2 = 1)
+          rw [mul_pow, mul_pow]
+          have hN0 : Field51_as_Nat N_s % p ≠ 0 := by
+            intro h0; exact absurd (__discr_post_3 h0).1 h_sq_flag
+          suffices h_key : __discr.2.toField ^ 2 =
+              sqrt (sqrt_m1 * elligator_ratio s.toField) ^ 2 by rw [h_key]
+          by_cases hD_mod : Field51_as_Nat D % p = 0
+          · -- D = 0: __discr.2 = 0, ratio = 0
+            rw [toField_of_mod_zero (__discr_post_4 ⟨hN0, hD_mod⟩).2]
+            unfold elligator_ratio; rw [← h_Ns_bridge, ← h_D_bridge,
+              toField_of_mod_zero hD_mod]; simp only [ne_eq, OfNat.ofNat_ne_zero,
+                not_false_eq_true, zero_pow, inv_zero, mul_zero]
+            exact (sqrt_sq ⟨0, by ring⟩).symm
+          · -- D ≠ 0: use __discr_post_6
+            have hNSq : ¬∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
+                Field51_as_Nat N_s % p := by
+              intro hSq; exact absurd (__discr_post_5 ⟨hN0, hD_mod, hSq⟩).1 h_sq_flag
+            have h6 := (__discr_post_6 ⟨hN0, hD_mod, hNSq⟩).2
+            have h_disc_D : __discr.2.toField ^ 2 * D.toField =
+                backend.serial.u64.constants.SQRT_M1.toField * N_s.toField := by
+              unfold toField
+              have lhs_me := ((Nat.mod_modEq (Field51_as_Nat __discr.2) p).symm.pow 2).mul
+                (Nat.mod_modEq (Field51_as_Nat D) p).symm
+              have rhs_me := (Nat.mod_modEq
+                (Field51_as_Nat backend.serial.u64.constants.SQRT_M1) p).symm.mul
+                (Nat.mod_modEq (Field51_as_Nat N_s) p).symm
+              have hme := lhs_me.trans (h6.trans rhs_me.symm)
+              have h := lift_mod_eq _ _ hme; push_cast at h; exact h
+            have hD_ne : D.toField ≠ 0 := by
+              intro h; apply hD_mod; unfold toField at h
+              exact Nat.dvd_iff_mod_eq_zero.mp
+                ((ZMod.natCast_eq_zero_iff _ _).mp h)
+            have h_disc_sq : __discr.2.toField ^ 2 =
+                sqrt_m1 * elligator_ratio s.toField := by
+              unfold elligator_ratio; rw [← h_Ns_bridge, ← h_D_bridge]
+              rw [h_sm1] at h_disc_D
+              field_simp [hD_ne]; exact h_disc_D
+            have hIsSq : IsSquare (sqrt_m1 * elligator_ratio s.toField) :=
+              ⟨__discr.2.toField, by rw [← h_disc_sq]; ring⟩
+            rw [h_disc_sq, sqrt_sq hIsSq]
       have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by
         rw [h_Nt_eq_F, h_r_bridge, h_D_bridge, h_c1_bridge]
         unfold elligator_Nt

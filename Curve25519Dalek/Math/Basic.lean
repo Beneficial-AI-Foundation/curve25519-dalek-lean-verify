@@ -237,6 +237,11 @@ lemma eq_abs_edwards_of_sq_eq (hp_odd : p % 2 = 1) {a b : ZMod p}
       have := Nat.add_sub_cancel' (le_of_lt (ZMod.val_lt (abs_edwards b)))
       omega
 
+/-- abs_edwards is invariant under sign: if a² = b² then abs_edwards a = abs_edwards b. -/
+lemma abs_edwards_eq_of_sq_eq_sq (hp_odd : p % 2 = 1) {a b : ZMod p}
+    (h : a ^ 2 = b ^ 2) : abs_edwards a = abs_edwards b :=
+  eq_abs_edwards_of_sq_eq hp_odd (by rw [abs_edwards_sq, h]) (abs_edwards_val_even hp_odd a)
+
 /-- Square root with quadratic residue check, matching Rust's sqrt_ratio_i(x, 1).
     Returns (sqrt(x), true) when x is a square, (sqrt(i*x), false) otherwise.
     Note: sqrt_checked 0 = (0, true) since 0 is a square (0² = 0). -/
