@@ -237,7 +237,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
         simp only [↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
         progress*
         have eq1:= Nat.mod_eq_of_lt res_post_2
-        have := curve25519_dalek.montgomery.ProjectivePoint.bytesToField_eq_cast res
+        have :=  U8x32_as_Field_eq_cast res
         rw[this, ← eq1] at res_post_1
         unfold MontgomeryPoint.mkPoint
         rw[res_post_1, ct.right.right.right.right.right]
@@ -269,7 +269,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       bind_tc_ok]
       progress*
       have eq1:= Nat.mod_eq_of_lt res_post_2
-      have := curve25519_dalek.montgomery.ProjectivePoint.bytesToField_eq_cast res
+      have :=  U8x32_as_Field_eq_cast res
       rw[this, ← eq1] at res_post_1
       unfold MontgomeryPoint.mkPoint
       rw[ res_post_1, cf.right.right.right.right.right]
@@ -284,7 +284,6 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       have := this hmod_x
       rw[this]
       ring_nf
-
 
 end curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
 

@@ -121,6 +121,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsBytes
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.CtEq
+import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ElligatorEncode
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Eq
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Identity
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
