@@ -8702,12 +8702,10 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
   {"verified": false,
-   "specified": true,
-   "spec_statement":
-   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    coset4 self ⦃ result =>\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + eightTorsionPoints 0 ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + eightTorsionPoints 2 ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + eightTorsionPoints 4 ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + eightTorsionPoints 6 ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4",
@@ -8715,10 +8713,10 @@
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.coset4",
    "is_relevant": true,
    "is_ignored": false,
-   "is_hidden": false,
+   "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},

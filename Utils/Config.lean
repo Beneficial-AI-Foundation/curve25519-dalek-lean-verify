@@ -56,6 +56,7 @@ verification tracking (e.g., trivial trait implementations).
 -/
 def hiddenFunctions : List String := [
   -- Other
+  "curve25519_dalek.ristretto.RistrettoPoint.coset4",
   "curve25519_dalek.IdentityCurveModelsProjectivePoint",
   "curve25519_dalek.IdentityMontgomeryProjectivePoint",
   "curve25519_dalek.backend.get_selected_backend",
