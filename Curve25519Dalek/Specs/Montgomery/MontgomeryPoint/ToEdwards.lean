@@ -261,10 +261,10 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp + 1) % p := by
                 -- -- Apply Nat.mul_mod to decompose the modulo
-                rw [Nat.mul_mod]
+                -- rw [Nat.mul_mod]
                 -- -- Now rewrite using h_affine_y
-                rw [h_affine_y]
-                rw [Nat.mul_mod]
+                -- rw [h_affine_y]
+                -- rw [Nat.mul_mod]
                 -- have (U8x32_as_Nat mp + 1) % p % p = (U8x32_as_Nat mp + 1) % p by :=
                 --   sorry
                 sorry
