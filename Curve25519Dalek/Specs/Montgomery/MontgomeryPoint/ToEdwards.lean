@@ -137,8 +137,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
         -- Step 2a: Relate y_bytes1 to y_bytes (modifying sign bit doesn't affect low 255 bits)
         have h_bytes_equiv : U8x32_as_Nat y_bytes1 % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p := by
           rw [y_bytes1_post]
-          -- Goal: U8x32_as_Nat (y_bytes.set 31#usize i2) % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p
-          -- Need lemma about set preserving low bits
           sorry
 
         -- Step 2b: Simplify % 2^255 using the fact that y_bytes < p < 2^255
@@ -186,7 +184,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
           -- We need a lemma about to_bytes being injective on canonical representatives
           -- For now, leave as sorry as this requires the full to_bytes_spec which isn't proven yet
-          have h_eq_bytes : u.to_bytes = FieldElement51.MINUS_ONE.to_bytes := by sorry
+          have h_eq_bytes : u.to_bytes = FieldElement51.MINUS_ONE.to_bytes := by
+            sorry
 
           -- From h_eq_bytes and x_post, we get x = Choice.one
           have h_x_one : x = Choice.one := x_post.mpr h_eq_bytes
@@ -331,14 +330,16 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 have h_u_modp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
                   grind only
                   -- simpa [h_u_mod] using h_u_eq
-
-                cases h : Field51_as_Nat u with
-                | zero =>
-                  rw [h] at h_u_modp
-                  simp at h_u_modp
-                  rw [h_u_modp]
-                | succ k => sorry
-                -- sorry
+                sorry
+                -- cases h : Field51_as_Nat u with
+                -- | zero =>
+                --   rw [h] at h_u_modp
+                --   simp at h_u_modp
+                --   rw [h_u_modp]
+                -- | succ k =>
+                --   rw [← h_u_modp, h]
+                --   simp
+                --   sorry
             -- Simplify
             _ = (U8x32_as_Nat mp - 1) % p := by
               -- omega
