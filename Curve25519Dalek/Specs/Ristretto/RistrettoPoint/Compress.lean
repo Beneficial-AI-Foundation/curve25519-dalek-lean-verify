@@ -284,7 +284,34 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         -- Step 1: Lift constant squared facts to ZMod
         have h_fe_sq := lift_fe_sq fe fe_post1
         have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
-        sorry
+        -- Affine ↔ projective bridge for P
+        have hpx' : P.x = self.X.toField / self.Z.toField := by rw [hP_def]; exact hpx
+        have hpy' : P.y = self.Y.toField / self.Z.toField := by rw [hP_def]; exact hpy
+        -- Key link: compress_u1 P * compress_u2 P² = u1_u2_sq / Z⁶
+        have h_aff : compress_u1 P * compress_u2 P ^ 2 =
+            u1_u2_sq.toField / self.Z.toField ^ 6 := by
+          unfold compress_u1 compress_u2; rw [hpx', hpy', h_u1_u2_sq_val]; field_simp; ring
+        by_cases hd : u1_u2_sq.toField = 0
+        · -- Degenerate: I = 0, so s = 0 and compress_den_inv P = 0
+          have h_nat : Field51_as_Nat u1_u2_sq % p = 0 := by
+            rwa [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at hd
+          have hI0 : x_post1.2.toField = 0 := by
+            rw [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
+            exact (x_post4 h_nat).2
+          -- LHS: I=0 → i1=i2=0 → i21=0 → s=0
+          have hi2_0 : i2.toField = 0 := by rw [hb_i2, hI0, zero_mul]
+          have hs0 : s.toField = 0 := by
+            rw [hb_s, hb_i21]; split_ifs
+            · rw [hb_enchanted, hb_i1, hI0, zero_mul, zero_mul, zero_mul]
+            · rw [hi2_0, zero_mul]
+          -- RHS: compress_invsqrt P = 0 → compress_den_inv P = 0
+          have hJ0 : compress_invsqrt P = 0 := by
+            unfold compress_invsqrt; rw [h_aff, hd, zero_div, inv_sqrt_checked_zero]
+          have hdi0 : compress_den_inv P = 0 := by
+            unfold compress_den_inv compress_den1 compress_den2; rw [hJ0]; split_ifs <;> ring
+          rw [hs0, hdi0]; ring
+        · -- Nondegenerate: J² = I²·Z⁶, both sides equal
+          sorry
       -- Conclude: s1 = abs(s) = abs(compress_den_inv * (1 - y_final)) = compress_s P
       rw [h_s1_abs]; unfold compress_s
       exact abs_edwards_eq_of_sq_eq h_sq_eq
