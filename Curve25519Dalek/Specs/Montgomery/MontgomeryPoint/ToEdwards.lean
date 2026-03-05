@@ -272,7 +272,9 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 simpa [Nat.mul_mod] using this
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
-                sorry
+                have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
+                  grind only
+                simp [h_mp, Nat.mul_mod, Nat.add_mod]
 
             -- Substitute u + 1 with fe1
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
