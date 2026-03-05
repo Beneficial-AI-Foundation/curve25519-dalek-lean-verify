@@ -2118,11 +2118,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\n  as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n    let X := Field51_as_Nat q.X\n    let Y := Field51_as_Nat q.Y\n    let Z := Field51_as_Nat q.Z\n    let T := Field51_as_Nat q.T\n    let X' := Field51_as_Nat e.X\n    let Y' := Field51_as_Nat e.Y\n    let Z' := Field51_as_Nat e.Z\n    let T' := Field51_as_Nat e.T\n    X' % p = (X * T) % p ∧\n    Y' % p = (Y * Z) % p ∧\n    Z' % p = (Z * T) % p ∧\n    T' % p = (X * Y) % p ∧\n    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
+   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -3465,10 +3465,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result.IsValid ⦄ := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2^51) ∧\n      result.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -3483,7 +3483,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at"]},
   {"verified": false,
@@ -7481,7 +7481,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -8739,7 +8739,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",

@@ -559,7 +559,8 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
     (1 - a_val * s ^ 2) ^ 2) * (1 - a_val * s ^ 2) ^ 2
   -- 1. Key algebraic facts (established BEFORE unfolding)
   have h_W_ne : W ≠ 0 := right_ne_zero_of_mul_eq_one hI
-  have h_I_ne : I ≠ 0 := by intro h; simp [h] at hI
+  have h_I_ne : I ≠ 0 := by intro h; simp only [h, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true,
+    zero_pow, zero_mul, zero_ne_one] at hI
   have h_sq_W : IsSquare W := ⟨I⁻¹, by
     have : W = (I ^ 2)⁻¹ := by rw [eq_inv_of_mul_eq_one_left hI, inv_inv]
     rw [this, ← inv_pow, sq]⟩
@@ -590,7 +591,7 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
   -- 5. x coordinate: abs_edwards(2s * I' * u2) = abs_edwards(2s * I * u2) (I' = ±I)
   have abs_edwards_neg : ∀ (x : ZMod p), abs_edwards (-x) = abs_edwards x := by
     intro x; by_cases hx : x = 0
-    · simp [hx]
+    · simp only [hx, neg_zero]
     · unfold abs_edwards is_negative
       have h_neg_val : (-x : ZMod p).val = p - x.val := by
         rw [ZMod.neg_val]; exact if_neg hx
@@ -602,10 +603,10 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
       have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
       by_cases hpx : x.val % 2 = 1
       · have : (p - x.val) % 2 = 0 := by omega
-        simp only [beq_iff_eq] at *; simp [hpx, this]
+        simp only [beq_iff_eq] at *; simp only [this, zero_ne_one, ↓reduceIte, hpx]
       · have hpx0 : x.val % 2 = 0 := by omega
         have : (p - x.val) % 2 = 1 := by omega
-        simp only [beq_iff_eq] at *; simp [hpx0, this]
+        simp only [beq_iff_eq] at *; simp only [this, ↓reduceIte, neg_neg, hpx0, zero_ne_one]
   have h_x_match : abs_edwards (2 * s * ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2))) =
       pt.x := by
     rw [hx]
@@ -679,59 +680,105 @@ open Edwards ZMod ristretto
 
 section ElligatorMap
 
+/-! ### Elligator Step Functions
+
+Step-by-step decomposition of the Elligator Ristretto map.
+Each step corresponds to a block of the Rust implementation
+(`ristretto.rs` L676–727) and can be individually unfolded
+without the RAM blowup caused by nested `let`-inlining.
+-/
+
+/-- r = SQRT_M1 * r₀² (Rust L685–686) -/
+def elligator_r (r0 : ZMod p) : ZMod p :=
+  sqrt_m1 * r0 ^ 2
+
+/-- N_s = (r + 1) * (1 - d²) (Rust L687–688) -/
+def elligator_Ns (r0 : ZMod p) : ZMod p :=
+  (elligator_r r0 + 1) * (1 - d ^ 2)
+
+/-- D = -(1 + d · r) * (r + d) (Rust L689–692) -/
+def elligator_D (r0 : ZMod p) : ZMod p :=
+  -(1 + d * elligator_r r0) * (elligator_r r0 + d)
+
+/-- ratio = N_s / D (argument to `sqrt_ratio_i`, Rust L694) -/
+def elligator_ratio (r0 : ZMod p) : ZMod p :=
+  elligator_Ns r0 * (elligator_D r0)⁻¹
+
+/-- Squareness predicate matching `sqrt_ratio_i` semantics:
+    ∃ x, x² · D = N_s.  Agrees with `IsSquare (N_s/D)` when D ≠ 0,
+    but correctly returns False when D = 0 and N_s ≠ 0. -/
+def elligator_is_square (r0 : ZMod p) : Prop :=
+  ∃ x : ZMod p, x ^ 2 * elligator_D r0 = elligator_Ns r0
+
+instance instDecidableElligatorIsSquare (r0 : ZMod p) :
+    Decidable (elligator_is_square r0) :=
+  show Decidable (∃ x : ZMod p, x ^ 2 * elligator_D r0 = elligator_Ns r0) from inferInstance
+
+/-- s after conditional selection (Rust L694–701):
+    Square case:     s = abs_edwards(sqrt(ratio))
+    Non-square case: s = -(abs_edwards(sqrt(i · ratio) · r₀)) -/
+noncomputable def elligator_s (r0 : ZMod p) : ZMod p :=
+  if elligator_is_square r0 then
+    abs_edwards (sqrt (elligator_ratio r0))
+  else
+    -(abs_edwards ((sqrt (sqrt_m1 * elligator_ratio r0)) * r0))
+
+/-- c after conditional selection (Rust L681, L700–702):
+    Square case:     c = −1
+    Non-square case: c = r -/
+def elligator_c (r0 : ZMod p) : ZMod p :=
+  if elligator_is_square r0 then -(1 : ZMod p)
+  else elligator_r r0
+
+/-- N_t = c · (r − 1) · (d − 1)² − D (Rust L704–707) -/
+noncomputable def elligator_Nt (r0 : ZMod p) : ZMod p :=
+  elligator_c r0 * (elligator_r r0 - 1) * (d - 1) ^ 2 - elligator_D r0
+
+/-- x-coordinate of Elligator output: 2sD / (N_t · sqrt_ad_minus_one) (Rust L712–714) -/
+noncomputable def elligator_ristretto_flavor_x (r0 : ZMod p) : ZMod p :=
+  (2 * elligator_s r0 * elligator_D r0) / (elligator_Nt r0 * sqrt_ad_minus_one)
+
+/-- y-coordinate of Elligator output: (1 − s²) / (1 + s²) (Rust L715–716) -/
+noncomputable def elligator_ristretto_flavor_y (r0 : ZMod p) : ZMod p :=
+  (1 - elligator_s r0 ^ 2) / (1 + elligator_s r0 ^ 2)
+
 /--
 **Elligator Ristretto Map (Pure Spec)**
 Maps a field element `r0` to an Affine Point on the Ed25519 curve.
-Comes with a proof that the output point is even (i.e., in the image of the doubling map)
+Comes with a proof that the output point is even (i.e., in the image of the doubling map).
 Logic corresponds to [RFC 9496 Section 4.3.4].
+
+Defined via step functions (`elligator_r`, `elligator_s`, …) to avoid
+RAM blowup from nested `let`-inlining during unfold/delta.
+Use `elligator_pure_val_x` / `elligator_pure_val_y` to project coordinates.
 -/
 noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
     : {P : Point Ed25519 // IsEven P} :=
-    -- 1. Constants
-  let i := sqrt_m1
-  let d_val := d
-  let one := (1 : ZMod p)
-
-  -- 2. Compute r = i * r0^2
-  let r := i * r0^2
-
-  -- 3. Compute Elligator numerator and denominator
-  let N_s := (r + 1) * (1 - d_val^2)
-  let D_initial := -(1 + d_val * r) * (r + d_val)
-
-  -- 4. Check if N_s / D is a square
-  let ratio := N_s * D_initial⁻¹
-  let is_sq := IsSquare ratio
-
-  -- 5. Selection Logic
-  let (s, c, D_final) := if is_sq then
-      (sqrt ratio, -one, D_initial)
-    else
-      let s_prime := (sqrt (i * ratio)) * r0
-      (-abs_edwards s_prime, r, D_initial)
-
-  -- 6. Compute N_t
-  let N_t := c * (r - 1) * (d_val - 1)^2 - D_final
-
-  -- 7. Construct Affine Coordinates directly
-  --    We use the simplification:
-  --    x = X_ext / Z_ext = (2sD) / (Nt * sqrt_ad_minus_one)
-  --    y = Y_ext / Z_ext = (1 - s^2) / (1 + s^2)
-  let s_sq := s^2
-
-  -- 8. Bundle output point with proof of evenness
-  ⟨{ x        := (2 * s * D_final) / (N_t * sqrt_ad_minus_one)
-     y        := (1 - s_sq) / (1 + s_sq)
-     on_curve := by sorry},
+  ⟨{ x := elligator_ristretto_flavor_x r0
+     y := elligator_ristretto_flavor_y r0
+     on_curve := by sorry },
     by
     unfold IsEven
-    by_cases hdenom : (1 : ZMod p) + s_sq = 0
-    · have hzero : (1 - s_sq) / (1 + s_sq) = 0 := by
-        rw [hdenom]
-        exact div_zero _
+    unfold elligator_ristretto_flavor_y
+    by_cases hdenom : (1 : ZMod p) + elligator_s r0 ^ 2 = 0
+    · have hzero : (1 - elligator_s r0 ^ 2) / (1 + elligator_s r0 ^ 2) = 0 := by
+        rw [hdenom]; exact div_zero _
       rw [hzero]
       exact ⟨1, by ring⟩
-    · exact ⟨2 * s / (1 + s_sq), by field_simp [hdenom]; ring⟩⟩
+    · exact ⟨2 * elligator_s r0 / (1 + elligator_s r0 ^ 2),
+        by field_simp [hdenom]; ring⟩⟩
+
+/-- Projection: x-coordinate of the pure spec equals the step function. -/
+@[simp]
+lemma elligator_pure_val_x (r0 : ZMod p) :
+    (elligator_ristretto_flavor_pure r0).val.x =
+      elligator_ristretto_flavor_x r0 := rfl
+
+/-- Projection: y-coordinate of the pure spec equals the step function. -/
+@[simp]
+lemma elligator_pure_val_y (r0 : ZMod p) :
+    (elligator_ristretto_flavor_pure r0).val.y =
+      elligator_ristretto_flavor_y r0 := rfl
 
 end ElligatorMap
 

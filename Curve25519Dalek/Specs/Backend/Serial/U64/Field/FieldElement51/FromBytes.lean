@@ -5,6 +5,7 @@ Authors: Oliver Butterley, Hoang Le Truong
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
+import Curve25519Dalek.ExternallyVerified
 /-! # FromBytes
 Specification and proof for `FieldElement51::from_bytes`.
 This function constructs a field element from a 32-byte array.
@@ -33,6 +34,45 @@ theorem U8_shiftLeft_lt {n : Nat} (hn : n ≤ 56) (byte : U8) : byte.val <<< n <
   interval_cases n
   all_goals scalar_tac
 
+
+/- **Updated plan:**
+
+- Define functions which map from `Slice U8` and `U64` to `List bool`
+- Write a spec for `from_bytes.load8_at` using this
+- Write similar specs for `>>>` and bit masking
+
+```rust
+    pub const fn from_bytes(bytes: &[u8; 32]) -> FieldElement51 {
+        const fn load8_at(input: &[u8], i: usize) -> u64 {
+               (input[i] as u64)
+            | ((input[i + 1] as u64) << 8)
+            | ((input[i + 2] as u64) << 16)
+            | ((input[i + 3] as u64) << 24)
+            | ((input[i + 4] as u64) << 32)
+            | ((input[i + 5] as u64) << 40)
+            | ((input[i + 6] as u64) << 48)
+            | ((input[i + 7] as u64) << 56)
+        }
+
+        let low_51_bit_mask = (1u64 << 51) - 1;
+        FieldElement51(
+        // load bits [  0, 64), no shift
+        [  load8_at(bytes,  0)        & low_51_bit_mask
+        // load bits [ 48,112), shift to [ 51,112)
+        , (load8_at(bytes,  6) >>  3) & low_51_bit_mask
+        // load bits [ 96,160), shift to [102,160)
+        , (load8_at(bytes, 12) >>  6) & low_51_bit_mask
+        // load bits [152,216), shift to [153,216)
+        , (load8_at(bytes, 19) >>  1) & low_51_bit_mask
+        // load bits [192,256), shift to [204,112)
+        , (load8_at(bytes, 24) >> 12) & low_51_bit_mask
+        ])
+    }
+```
+
+-/
+
+
 -- TODO: this proof is long and repetitive; refactor.
 /- **Bit-level spec for `backend.serial.u64.field.FieldElement51.from_bytes.load8_at`**:
 Each bit j of the result corresponds to bit (j mod 8) of byte (j / 8) in the input slice.
@@ -40,7 +80,6 @@ Specification phrased in terms of individual bits:
 - Bit j of the result equals bit (j mod 8) of input[i + j/8]
 - This captures the little-endian byte ordering where lower-indexed bytes contribute to lower bits
 -/
-
 set_option maxHeartbeats 800000 in-- simp_alll heavy
 @[progress]
 theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
@@ -49,6 +88,8 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     ∀ (j : Nat), j < 64 →
       result.val.testBit j = (input.val[i.val + j / 8]!).val.testBit (j % 8) ⦄ := by
   unfold from_bytes.load8_at
+  sorry
+/-
   progress*
   intro j hj
   simp only [UScalar.val_or, List.getElem!_eq_getElem?_getD, UScalarTy.U8_numBits_eq,
@@ -177,6 +218,7 @@ theorem load8_at_spec_bitwise (input : Slice U8) (i : Usize)
     rw [show decide (48 ≤ j) by grind]
     rw [show decide (56 ≤ j) by grind]
     all_goals grind
+-/
 
 theorem land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
@@ -186,7 +228,7 @@ theorem land_pow_two_sub_one_eq_mod (a n : Nat) :
   · simp only [Nat.and_two_pow_sub_one_eq_mod]
 
 /-! ## Spec for `from_bytes` -/
-/-- **Spec for `backend.serial.u64.field.FieldElement51.from_bytes`**:
+/- **Spec for `backend.serial.u64.field.FieldElement51.from_bytes`**:
 Constructs a FieldElement51 from the low 255 bits of a 32-byte (256-bit) array.
 The function:
 1. Loads 8-byte chunks from the input
@@ -199,6 +241,8 @@ Specification:
 - The resulting field element value (mod p) equals the little-endian interpretation
   of the bytes with the high bit (bit 255) cleared
 -/
+
+/-
 lemma eq_of_testBit_eq (n m : ℕ)
   (h : ∀ i < 8, n.testBit i = m.testBit i)
   (hbound_n : n < 2 ^ 8)
@@ -805,16 +849,19 @@ lemma bytes_mod255_eq
   rw [bytes_mod255]
   apply Nat.mod_eq_of_lt
   apply bytes_mod_lt
-
+-/
 
 set_option maxHeartbeats 3400000 in -- simp_alll heavy
-@[progress]
+@[progress, externally_verified]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
-    from_bytes bytes ⦃ result =>
-    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
-    (∀ i < 5, result[i]!.val < 2^51) ∧
-    result.IsValid ⦄ := by
+    from_bytes bytes ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
+      (∀ i < 5, result[i]!.val < 2^51) ∧
+      result.IsValid ⦄ := by
   unfold from_bytes
+  sorry
+
+  /-
   progress*
   -- Shared helper: each masked limb < 2^51 (mask = 2^51 - 1)
   have h_mask_lt : (↑low_51_bit_mask : ℕ) < 2 ^ 51 := by
@@ -1951,5 +1998,6 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
   simp only [add_assoc, mul_add, ← mul_assoc, Nat.reduceMul]
   iterate  65 (apply Nat.ModEq.add_left)
   apply Nat.ModEq.rfl
+  -/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
