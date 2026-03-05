@@ -79,6 +79,17 @@ private lemma bridge_neg {a b : FieldElement51}
   unfold FieldElement51.toField; have := lift_mod_eq _ _ h
   push_cast at this; linear_combination this
 
+private lemma bridge_add {a b c : FieldElement51}
+    (h : ∀ i < 5, (a[i]!).val = (b[i]!).val + (c[i]!).val) :
+    a.toField = b.toField + c.toField := by
+  unfold FieldElement51.toField Field51_as_Nat
+  have key : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (a[i]!).val =
+    ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (b[i]!).val +
+    ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (c[i]!).val := by
+    rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+    intro i hi; rw [Finset.mem_range] at hi; rw [h i hi]; ring
+  exact (congrArg Nat.cast key).trans (Nat.cast_add _ _)
+
 private lemma bridge_cond_nat {a b c : FieldElement51} {flag : subtle.Choice}
     (h : ∀ i < 5, a[i]! = if flag.val = 1#u8 then b[i]! else c[i]!) :
     Field51_as_Nat a = if flag.val = 1#u8 then Field51_as_Nat b else Field51_as_Nat c := by
@@ -117,23 +128,9 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     split_ifs
     · have := iY_post2 i hi; omega
     · have := h.1.X_bounds i hi; omega
-  -- Shared bridge: lift conditional_assign s1 to Field51_as_Nat level
-  have h_s1_nat : Field51_as_Nat s1 =
-    if s_is_negative.val = 1#u8 then Field51_as_Nat s_neg else Field51_as_Nat s := by
-      unfold Field51_as_Nat
-      split <;> rename_i hc
-      · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-        have := s1_post i hi; rw [if_pos hc] at this
-        exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
-      · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-        have := s1_post i hi; rw [if_neg hc] at this
-        exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
-    -- Shared bridge: U8x32_as_Nat a = Field51_as_Nat s1 % p
+  have h_s1_nat := bridge_cond_nat s1_post
   have h_a_eq : U8x32_as_Nat a = Field51_as_Nat s1 % p := by
-    have h_mod := a_post1
-    rw [Nat.ModEq] at h_mod
-    rw [Nat.mod_eq_of_lt a_post2] at h_mod
-    exact h_mod
+    have := a_post1; rw [Nat.ModEq, Nat.mod_eq_of_lt a_post2] at this; exact this
   -- Shared bridge: parity of s1 mod p is 0
   have h_s1_parity : Field51_as_Nat s1 % p % 2 = 0 := by
     rw [h_s1_nat]
@@ -149,7 +146,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       have h_neg_mod : Field51_as_Nat s_neg % p = p - Field51_as_Nat s % p := by
         have h1 : (Field51_as_Nat s % p + Field51_as_Nat s_neg % p) % p = 0 := by
           simp only [Nat.add_mod_mod, Nat.mod_add_mod]
-          sorry
+          rw [Nat.ModEq] at h_sum; simpa using h_sum
         have h2 : Field51_as_Nat s_neg % p < p := Nat.mod_lt _ (by decide)
         have h_dvd := Nat.dvd_of_mod_eq_zero h1
         have h_sum_pos : 0 < Field51_as_Nat s % p + Field51_as_Nat s_neg % p := by omega
@@ -199,27 +196,13 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     have hb_zmy := bridge_sub z_minus_y_post2
     have hb_zmy2 := bridge_sub z_minus_y2_post2
     have hb_y_neg := bridge_neg y_neg_post1
-    -- Add bridge (limb-level postcondition — unique case)
-    have hb_zpy : z_plus_y.toField = self.Z.toField + self.Y.toField := by
-      unfold FieldElement51.toField Field51_as_Nat
-      have h : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * z_plus_y[i]!.val =
-        ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * self.Z[i]!.val +
-        ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * self.Y[i]!.val := by
-        rw [← Finset.sum_add_distrib]
-        apply Finset.sum_congr rfl
-        intro i hi; rw [Finset.mem_range] at hi
-        rw [z_plus_y_post1 i hi]; ring
-      exact (congrArg Nat.cast h).trans (Nat.cast_add _ _)
+    have hb_zpy := bridge_add z_plus_y_post1
     have h_key : s1.toField = compress_s self.toPoint := by
       -- Setup: affine coordinates and IsValid properties
       set P := self.toPoint with hP_def
       -- Step 1: s1.toField = abs_edwards(s.toField) via conditional negation
-      have h_s_neg_field := bridge_neg s_neg_post1
-      have h_s1_select : s1.toField =
-          if s_is_negative.val = 1#u8 then s_neg.toField else s.toField := by
-        unfold FieldElement51.toField; rw [h_s1_nat]; split <;> rfl
       have h_s1_abs : s1.toField = abs_edwards s.toField := by
-        rw [h_s1_select, h_s_neg_field, abs_edwards, is_negative]
+        rw [bridge_cond s1_post, bridge_neg s_neg_post1, abs_edwards, is_negative]
         by_cases hc : s_is_negative.val = 1#u8
         · rw [if_pos hc]
           have : (s.toField.val % 2 == 1) = true := by
@@ -291,18 +274,3 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     exact h_a_eq.symm
 
 end curve25519_dalek.ristretto.RistrettoPoint
-
-/-  OLD PROOF (pre-Aeneas-update, commented out for reference while rebuilding)
-    See git history for full proof body.
-
-    Key proof structure:
-    - Goals 1-35: limb bounds (intro i hi; have := xxx_post_N i hi; omega)
-    - Goal 36 (last bullet): shared bridges + refine ⟨?_, ?_⟩
-      - IsValid (sorry)
-      - compress_pure matches: h_key : s1.toField = compress_s self.toPoint
-        - h_s1_abs via conditional negation
-        - bridge lemmas (hb_u1, hb_u2, ..., hb_Y1)
-        - h_I_sq_mul (QR argument)
-        - h_sq_eq (squared equality, sorry)
-        - abs_edwards_eq_of_sq_eq concludes
--/
