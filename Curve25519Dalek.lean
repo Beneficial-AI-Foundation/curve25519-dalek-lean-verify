@@ -149,7 +149,6 @@ import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ConditionalSelect
-import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Coset4
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.CtEq
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Eq
