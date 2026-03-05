@@ -56,35 +56,73 @@ lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
   rw [hv, hu1, hu2, ha];
   try ring
 
+/-! ### Compress Step Functions
+
+Decomposition of `compress_pure` into individual step functions.
+This avoids RAM blowup when unfolding the monolithic definition in proofs.
+Each step function computes one intermediate value of the Ristretto ENCODE algorithm.
+-/
+
+/-- Phase 1: u1 = (1 + y)(1 - y) -/
+def compress_u1 (P : Point Ed25519) : ZMod p :=
+  (1 + P.y) * (1 - P.y)
+
+/-- Phase 1: u2 = x * y -/
+def compress_u2 (P : Point Ed25519) : ZMod p :=
+  P.x * P.y
+
+/-- Phase 2: invsqrt = 1/√(u1 · u2²) -/
+noncomputable def compress_invsqrt (P : Point Ed25519) : ZMod p :=
+  (inv_sqrt_checked (compress_u1 P * (compress_u2 P) ^ 2)).1
+
+/-- Phase 3: den1 = invsqrt · u1 -/
+noncomputable def compress_den1 (P : Point Ed25519) : ZMod p :=
+  compress_invsqrt P * compress_u1 P
+
+/-- Phase 3: den2 = invsqrt · u2 -/
+noncomputable def compress_den2 (P : Point Ed25519) : ZMod p :=
+  compress_invsqrt P * compress_u2 P
+
+/-- Phase 3: z_inv = den1 · den2 · (x · y) -/
+noncomputable def compress_z_inv (P : Point Ed25519) : ZMod p :=
+  compress_den1 P * compress_den2 P * (P.x * P.y)
+
+/-- Phase 4: rotation flag = is_negative(x · y · z_inv) -/
+noncomputable def compress_rotate (P : Point Ed25519) : Bool :=
+  is_negative (P.x * P.y * compress_z_inv P)
+
+/-- Phase 5: x' = y · √(-1) if rotate, else x -/
+noncomputable def compress_x_prime (P : Point Ed25519) : ZMod p :=
+  if compress_rotate P then P.y * sqrt_m1 else P.x
+
+/-- Phase 5: y' = x · √(-1) if rotate, else y -/
+noncomputable def compress_y_prime (P : Point Ed25519) : ZMod p :=
+  if compress_rotate P then P.x * sqrt_m1 else P.y
+
+/-- Phase 5: den_inv = den1 · invsqrt_a_minus_d if rotate, else den2 -/
+noncomputable def compress_den_inv (P : Point Ed25519) : ZMod p :=
+  if compress_rotate P then compress_den1 P * invsqrt_a_minus_d else compress_den2 P
+
+/-- Phase 6: y_final with sign adjustment -/
+noncomputable def compress_y_final (P : Point Ed25519) : ZMod p :=
+  if is_negative (compress_x_prime P * compress_z_inv P)
+  then -(compress_y_prime P)
+  else compress_y_prime P
+
+/-- Phase 7: s = |den_inv · (1 - y_final)| -/
+noncomputable def compress_s (P : Point Ed25519) : ZMod p :=
+  abs_edwards (compress_den_inv P * (1 - compress_y_final P))
+
 /--
 **Pure Mathematical Compression**
 Encodes a Point P into a scalar s (https://ristretto.group/formulas/encoding.html).
 Used to define the Canonical property.
+
+Defined via step functions (`compress_u1`, `compress_u2`, ..., `compress_s`)
+to enable incremental unfolding in proofs.
 -/
 noncomputable def compress_pure (P : Point Ed25519) : Nat :=
-  let x := P.x
-  let y := P.y
-  let z := (1 : ZMod p)
-  let t := x * y
-  -- 1. Setup
-  let u1 := (z + y) * (z - y)
-  let u2 := x * y
-  -- 2. Inverse Sqrt
-  let (invsqrt, _was_square) := inv_sqrt_checked (u1 * u2^2)
-  let den1 := invsqrt * u1
-  let den2 := invsqrt * u2
-  let z_inv := den1 * den2 * t
-  -- 3. Rotation Decision
-  let rotate := is_negative (t * z_inv)
-  -- 4. Apply Rotation
-  let x_prime := if rotate then y * sqrt_m1 else x
-  let y_prime := if rotate then x * sqrt_m1 else y
-  let den_inv := if rotate then den1 * invsqrt_a_minus_d else den2
-  -- 5. Sign Adjustment
-  let y_final := if is_negative (x_prime * z_inv) then -y_prime else y_prime
-  -- 6. Final Calculation
-  let s := abs_edwards (den_inv * (z - y_final))
-  s.val
+  (compress_s P).val
 
 end PureIsogeny
 

@@ -37,7 +37,9 @@ natural language specs:
 -/
 @[progress]
 theorem INVSQRT_A_MINUS_D_spec :
-    INVSQRT_A_MINUS_D ⦃ result => (Field51_as_Nat result)^2 * (a - d) % p = 1 ⦄ := by
+    INVSQRT_A_MINUS_D ⦃ result =>
+      (Field51_as_Nat result)^2 * (a - d) % p = 1 ∧
+      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold INVSQRT_A_MINUS_D field.FieldElement51.from_limbs
   simp only [spec_ok]
   decide
