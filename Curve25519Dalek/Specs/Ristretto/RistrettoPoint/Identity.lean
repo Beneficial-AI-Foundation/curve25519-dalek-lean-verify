@@ -39,10 +39,10 @@ natural language specs:
 @[progress]
 theorem identity_spec :
     identity ⦃ (result : RistrettoPoint) =>
-      result.X = ZERO ∧
-      result.Y = ONE ∧
-      result.Z = ONE ∧
-      result.T = ZERO ⦄ := by
+      Field51_as_Nat result.X = 0 ∧
+      Field51_as_Nat result.Y = 1 ∧
+      Field51_as_Nat result.Z = 1 ∧
+      Field51_as_Nat result.T = 0 ⦄ := by
   unfold identity
   progress
   tauto
