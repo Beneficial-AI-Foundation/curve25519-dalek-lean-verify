@@ -341,6 +341,17 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
             rw [hb_z_inv, hb_i1, hb_i2_T, hb_i2, h_u1_proj, hb_u2]
             linear_combination hI - I ^ 2 * (Z ^ 2 - self.Y.toField ^ 2) *
               (self.X.toField * self.Y.toField) * hT_rel
+          have h_t_z_inv : t_z_inv.toField = P.x * P.y := by
+            rw [show P.x = self.X.toField / Z from hpx, show P.y = self.Y.toField / Z from hpy,
+                hb_t_z_inv]
+            field_simp
+            linear_combination self.T.toField * Z * h_z_inv_mul - hT_rel
+          have h_rotate : rotate.val = 1#u8 ↔ compress_rotate P = true := by
+            have h_val := congrArg ZMod.val h_t_z_inv
+            simp only [FieldElement51.toField, ZMod.val_natCast] at h_val
+            unfold compress_rotate is_negative
+            rw [hz_inv_one, mul_one]; simp only [beq_iff_eq]
+            rw [← h_val]; exact rotate_post
           sorry
       -- Conclude: s1 = abs(s) = abs(compress_den_inv * (1 - y_final)) = compress_s P
       rw [h_s1_abs]; unfold compress_s
