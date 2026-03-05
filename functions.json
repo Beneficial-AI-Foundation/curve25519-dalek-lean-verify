@@ -2117,11 +2117,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p ∧\n(∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n(∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n(∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n(∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
+   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -9084,7 +9084,7 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",

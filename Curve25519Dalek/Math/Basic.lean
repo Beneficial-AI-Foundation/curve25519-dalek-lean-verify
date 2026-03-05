@@ -139,7 +139,7 @@ def sqrt_m1 : ZMod p :=
 Raw value for sqrt(ad - 1). Kept private so it's not accidentally used.
 -/
 private def sqrt_ad_minus_one_val : Nat :=
-  25063068953384623474111466158185098518371208170673930163546292076677493185328
+  25063068953384623474111414158702152701244531502492656460079210482610430750235
 
 /--
 Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).
@@ -205,6 +205,42 @@ Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
 lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
+
+/-- abs_edwards always produces a non-negative (even val) result. -/
+lemma abs_edwards_val_even (hp_odd : p % 2 = 1) (b : ZMod p) :
+    (abs_edwards b).val % 2 = 0 := by
+  unfold abs_edwards is_negative; split_ifs with hb
+  · simp only [beq_iff_eq] at hb
+    by_cases hb0 : b = 0
+    · simp [hb0] at hb
+    · rw [ZMod.neg_val, if_neg hb0]
+      have := Nat.add_sub_cancel' (le_of_lt (ZMod.val_lt b))
+      omega
+  · simp only [beq_iff_eq] at hb; omega
+
+/-- If a² = b² and a has even val, then a = abs_edwards b.
+    In ZMod p for odd p, the non-negative square root is unique. -/
+lemma eq_abs_edwards_of_sq_eq (hp_odd : p % 2 = 1) {a b : ZMod p}
+    (h_sq : a ^ 2 = b ^ 2) (ha : a.val % 2 = 0) :
+    a = abs_edwards b := by
+  have h_sq' : a ^ 2 = (abs_edwards b) ^ 2 := by rw [h_sq, abs_edwards_sq]
+  have hab : (abs_edwards b).val % 2 = 0 := abs_edwards_val_even hp_odd b
+  have h_factor : (a - abs_edwards b) * (a + abs_edwards b) = 0 := by
+    linear_combination h_sq'
+  rcases mul_eq_zero.mp h_factor with h | h
+  · exact sub_eq_zero.mp h
+  · have heq : a = -(abs_edwards b) := by linear_combination h
+    by_cases h0 : abs_edwards b = 0
+    · rw [h0, neg_zero] at heq; rw [heq, h0]
+    · exfalso
+      rw [heq, ZMod.neg_val, if_neg h0] at ha
+      have := Nat.add_sub_cancel' (le_of_lt (ZMod.val_lt (abs_edwards b)))
+      omega
+
+/-- abs_edwards is invariant under sign: if a² = b² then abs_edwards a = abs_edwards b. -/
+lemma abs_edwards_eq_of_sq_eq_sq (hp_odd : p % 2 = 1) {a b : ZMod p}
+    (h : a ^ 2 = b ^ 2) : abs_edwards a = abs_edwards b :=
+  eq_abs_edwards_of_sq_eq hp_odd (by rw [abs_edwards_sq, h]) (abs_edwards_val_even hp_odd a)
 
 /-- Square root with quadratic residue check, matching Rust's sqrt_ratio_i(x, 1).
     Returns (sqrt(x), true) when x is a square, (sqrt(i*x), false) otherwise.
