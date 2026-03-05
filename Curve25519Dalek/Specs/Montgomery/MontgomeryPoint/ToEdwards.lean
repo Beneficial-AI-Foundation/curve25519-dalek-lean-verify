@@ -263,10 +263,13 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
-                -- conv_lhs => arg 1; rw [← Nat.mod_eq_of_lt (by sorry : y_val < p)]
-                -- rw [h_y_val_eq]
-                -- ring_nf
-                sorry
+                have h :
+                  y_val % p = (Field51_as_Nat fe * Field51_as_Nat fe2) % p :=
+                  h_y_val_eq
+                have :=
+                  congrArg (fun x => x * (U8x32_as_Nat mp + 1) % p) h
+
+                simpa [Nat.mul_mod] using this
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
                 sorry
