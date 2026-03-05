@@ -16,7 +16,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
-
+-- import Mathlib.Data.Nat.Basic
 /-! # Spec Theorem for `MontgomeryPoint::to_edwards`
 
 Specification and proof for `MontgomeryPoint::to_edwards`.
@@ -306,20 +306,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use fe2 * fe1 = 1
             _ = Field51_as_Nat fe * 1 % p := by
-              -- -- congr 1
-              -- -- Goal: Field51_as_Nat fe2 * Field51_as_Nat fe1 = 1
-              -- -- From h_fe2_inv: Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p = 1
-              -- have h_comm : Field51_as_Nat fe2 * Field51_as_Nat fe1 % p = Field51_as_Nat fe1 * Field51_as_Nat fe2 % p := by
-              --   rw [Nat.mul_comm]
-              -- rw [h_comm]
-              -- -- Now we need: Field51_as_Nat fe1 * Field51_as_Nat fe2 % p % p = 1 % p
-              -- rw [Nat.mod_mod_of_dvd _ _ (dvd_refl p)]
-              -- -- From h_fe2_inv but in the right order
-              -- have : Field51_as_Nat fe1 % p * Field51_as_Nat fe2 % p % p = Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p := by
-              --   rw [Nat.mul_comm]
-              -- rw [this, h_fe2_inv]
-              -- simp [Nat.mul_mod]
-              -- grind [Nat.mul_mod, Nat.add_mod]
               have h_mul : (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p = 1 := by
                 have := h_fe2_inv
                 simpa [Nat.mul_mod] using this
@@ -341,10 +327,25 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 -- Rewrite using the fact that (a - 1) % p depends on a % p
                 -- conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
                 -- rw [← Nat.sub_mod]
-                sorry
+
+                have h_u_modp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
+                  grind only
+                  -- simpa [h_u_mod] using h_u_eq
+
+                cases h : Field51_as_Nat u with
+                | zero =>
+                  rw [h] at h_u_modp
+                  simp at h_u_modp
+                  rw [h_u_modp]
+                | succ k => sorry
+                -- sorry
             -- Simplify
             _ = (U8x32_as_Nat mp - 1) % p := by
-                sorry
+              -- omega
+                -- have := Nat.mod_add_div (U8x32_as_Nat mp) p
+              sorry
+                -- simp [this, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
+              -- sorry
 
 
 end curve25519_dalek.montgomery.MontgomeryPoint
