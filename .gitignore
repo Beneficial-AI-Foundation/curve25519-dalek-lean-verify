@@ -47,10 +47,3 @@ site/public/doc
 
 .direnv
 .DS_Store
-
-# FVS analysis output
-.formalising/
-stubs/
-
-# Claude Code project config
-CLAUDE.md
