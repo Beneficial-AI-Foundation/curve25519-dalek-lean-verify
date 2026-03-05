@@ -71,6 +71,12 @@ structure Point {F : Type} [Mul F] [Add F] [Pow F ℕ] [One F] (C : EdwardsCurve
   on_curve : C.a * x^2 + y^2 = 1 + C.d * x^2 * y^2 := by grind
   deriving Repr
 
+instance : DecidableEq (Point Ed25519) := fun p1 p2 =>
+  if hx : p1.x = p2.x then
+    if hy : p1.y = p2.y then isTrue (Point.ext hx hy)
+    else isFalse (fun h => hy (congrArg Point.y h))
+  else isFalse (fun h => hx (congrArg Point.x h))
+
 instance : Inhabited (Point Ed25519) := ⟨{ x := 0, y := 1}⟩
 
 /-- -1 is a square in F_p since p ≡ 1 (mod 4). -/
@@ -195,6 +201,16 @@ def nsmul_Ed25519 (n : ℕ) (p : Point Ed25519) : Point Ed25519 :=
   | 0 => 0
   | n + 1 => p + (nsmul_Ed25519 n p)
 
+/-- Binary scalar multiplication, O(log n) point operations.
+    Equivalent to `nsmul_Ed25519` but computationally feasible for large scalars like L ~ 2^252. -/
+def binary_nsmul_Ed25519 (n : ℕ) (p : Point Ed25519) : Point Ed25519 :=
+  if n = 0 then 0
+  else
+    let half := binary_nsmul_Ed25519 (n / 2) p
+    let doubled := half + half
+    if n % 2 = 1 then doubled + p else doubled
+decreasing_by omega
+
 def zsmul_Ed25519 (z : ℤ) (p : Point Ed25519) : Point Ed25519 :=
   match z with
   | (n : ℕ) => nsmul_Ed25519 n p
@@ -222,19 +238,22 @@ theorem add_y (p q : Point Ed25519) :
 /-- The identity element (0, 1) is a left identity for addition. -/
 theorem zero_add_Ed25519 (p : Point Ed25519) : (0 : Point Ed25519) + p = p := by
   ext
-  · rw [add_x]; simp [Ed25519]
-  · rw [add_y]; simp [Ed25519]
+  · rw [add_x]; simp only [Ed25519, zero_x, zero_mul, zero_y, one_mul, zero_add, mul_zero, mul_one,
+    add_zero, div_one]
+  · rw [add_y]; simp only [Ed25519, zero_y, one_mul, zero_x, mul_zero, zero_mul, sub_zero, mul_one,
+    div_one]
 
 /-- The identity element (0, 1) is a right identity for addition. -/
 theorem add_zero_Ed25519 (p : Point Ed25519) : p + (0 : Point Ed25519) = p := by
   ext
-  · rw [add_x]; simp [Ed25519]
-  · rw [add_y]; simp [Ed25519]
+  · rw [add_x]; simp only [Ed25519, zero_y, mul_one, zero_x, mul_zero, add_zero, zero_mul, div_one]
+  · rw [add_y]; simp only [Ed25519, zero_y, mul_one, neg_mul, one_mul, zero_x, mul_zero, sub_zero,
+    zero_mul, div_one]
 
 /-- Negation is a left inverse: -p + p = 0. -/
 theorem neg_add_cancel_Ed25519 (p : Point Ed25519) : -p + p = (0 : Point Ed25519) := by
   have h : p.y^2 - p.x^2 = 1 + (d : CurveField) * p.x^2 * p.y^2 := by
-    have := p.on_curve; simp [Ed25519] at this; grind
+    have := p.on_curve; simp only [Ed25519, neg_mul, one_mul] at this; grind
   have : 1 + (d : CurveField) * p.x^2 * p.y^2 ≠ 0 := calc
     1 + d * p.x^2 * p.y^2 = 1 - d * (-p.x) * p.x * p.y * p.y := by ring
     _ ≠ 0 := (Ed25519.denomsNeZero (-p) p).2
@@ -296,5 +315,20 @@ theorem add_def (p1 p2 : Point Ed25519) :
   (p1 + p2).x = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).1 ∧
   (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
   exact Prod.mk_inj.mp rfl
+
+/-- Binary scalar multiplication equals the standard linear scalar multiplication. -/
+theorem binary_nsmul_Ed25519_eq (n : ℕ) (q : Point Ed25519) :
+    binary_nsmul_Ed25519 n q = n • q := by
+  induction n using Nat.strongRecOn with
+  | _ n ih =>
+    unfold binary_nsmul_Ed25519
+    split_ifs
+    · simp_all
+    · have : n / 2 < n := by omega
+      conv_rhs => rw [show n = n / 2 + n / 2 + 1 from by omega]
+      simp [ih _ this, add_nsmul]
+    · have : n / 2 < n := by omega
+      conv_rhs => rw [show n = n / 2 + n / 2 from by omega]
+      simp [ih _ this, add_nsmul]
 
 end Edwards

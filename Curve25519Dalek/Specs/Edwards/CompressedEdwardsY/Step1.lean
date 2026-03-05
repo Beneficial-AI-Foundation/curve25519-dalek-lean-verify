@@ -77,19 +77,18 @@ theorem step_1_spec (cey : edwards.CompressedEdwardsY)
 
       let (is_valid_y_coord, X, Y, Z) := result
 
-      -- Z is always ONE
-      Z = ONE ∧
-
-      -- Y is extracted from the input bytes
-      (from_bytes bytes = ok Y) ∧
-
-      -- The computation follows the curve equation
-      (∃ YY u v fe,
-        square Y = ok YY ∧
-        sub YY ONE = ok u ∧
-        mul YY EDWARDS_D = ok fe ∧
-        add fe ONE = ok v ∧
-        sqrt_ratio_i u v = ok (is_valid_y_coord, X)) ⦄ := by
+      (∃ one edwards_d, ONE = ok one ∧ EDWARDS_D = ok edwards_d ∧
+        -- Z is always ONE
+        Z = one ∧
+        -- Y is extracted from the input bytes
+        (from_bytes bytes = ok Y) ∧
+        -- The computation follows the curve equation
+        (∃ YY u v fe,
+          square Y = ok YY ∧
+          sub YY one = ok u ∧
+          mul YY edwards_d = ok fe ∧
+          add fe one = ok v ∧
+          sqrt_ratio_i u v = ok (is_valid_y_coord, X))) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

@@ -20,7 +20,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun q =>\n    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE) := by ...",
+   "theorem identity_spec :\n    spec identity (fun (q : ProjectivePoint) =>\n      Field51_as_Nat q.X = 0 ∧\n      Field51_as_Nat q.Y = 1 ∧\n      Field51_as_Nat q.Z = 1) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean",
    "spec_docstring":
@@ -34,7 +34,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
@@ -60,7 +60,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun q =>\n    q.U = ONE ∧ q.W = ZERO) := by ...",
+   "theorem identity_spec :\n    identity ⦃ (q : montgomery.ProjectivePoint) =>\n      Field51_as_Nat q.U = 1 ∧\n      Field51_as_Nat q.W = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/ProjectivePoint/Identity.lean",
    "spec_docstring":
@@ -74,7 +74,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
@@ -101,7 +101,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, ↑self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ result =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
+   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : AffineNielsPoint) =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
    "spec_docstring": null,
@@ -115,7 +115,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
@@ -507,13 +507,14 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (lhs rhs : Array U64 5#usize)\n    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :\n    mul lhs rhs ⦃ r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem mul_spec (lhs rhs : Array U64 5#usize)\n    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :\n    mul lhs rhs ⦃ r =>\n      Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧\n      (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.Mul.mul`**:\n- No panic (always returns successfully)\n- The result, when converted to a natural number, is congruent to the product of the inputs modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^52\nEXTERNALY_VERIFIED\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul",
@@ -525,7 +526,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m",
     "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK"]},
@@ -551,7 +552,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec (r : backend.serial.u64.field.FieldElement51)\n    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    neg r ⦃ r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by ...",
+   "theorem neg_spec (self : FieldElement51)\n    (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    neg self ⦃ (neg : FieldElement51) =>\n      Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧\n      ∀ i < 5, neg[i]!.val ≤ 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
    "spec_docstring":
@@ -566,7 +567,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.negate"]},
@@ -592,7 +593,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec (a b : Array U64 5#usize)\n    (h_bounds_a : ∀ i < 5, a[i]!.val < 2 ^ 63)\n    (h_bounds_b : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    sub a b ⦃ d =>\n    (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n    (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by ...",
+   "theorem sub_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 63) (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    sub a b ⦃ (d : FieldElement51) =>\n      (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
    "spec_docstring":
@@ -607,7 +608,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
@@ -633,7 +634,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : backend.serial.curve_models.ProjectiveNielsPoint)\n    (self_bound : ∀ i, i < 5 → (self.T2d[i]!).val < 2 ^ 54) :\n    neg self ⦃ result =>\n    result.Y_plus_X = self.Y_minus_X ∧\n    result.Y_minus_X = self.Y_plus_X ∧\n    result.Z = self.Z ∧\n    (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
+   "theorem neg_spec (self : ProjectiveNielsPoint) (self_bound : ∀ i < 5, self.T2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.Y_plus_X = self.Y_minus_X ∧\n      result.Y_minus_X = self.Y_plus_X ∧\n      result.Z = self.Z ∧\n      (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
@@ -648,7 +649,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
@@ -674,7 +675,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
+   "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
@@ -714,7 +715,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (r : RistrettoPoint) (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul r s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
+   "theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)\n    (hscalar : U8x32_as_Nat scalar.bytes < L) (hself : self.IsValid) :\n    mul self scalar ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for valid input RistrettoPoints r and canonical Scalars s\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
@@ -912,7 +913,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L)\n    (h_rist_valid : r.IsValid) :\n    mul s r ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by ...",
+   "theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)\n    (hself : U8x32_as_Nat self.bytes < L) (hpoint : point.IsValid) :\n    mul self point ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧ result.toPoint = (U8x32_as_Nat self.bytes) • point.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
@@ -1072,7 +1073,7 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul P scalar ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
@@ -1089,18 +1090,18 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.IdentityMontgomeryProjectivePoint.identity",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.scalar.Scalar.as_bytes",
     "curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.montgomery.ProjectivePoint.as_affine"]},
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_loop_spec\n    (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 x1 : montgomery.ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize)\n    (prev_bit : Bool)\n    (i : Isize)\n    (h : affine_u.IsValid)\n    (idx0W : x0.W = backend.serial.u64.field.FieldElement51.ZERO)\n    (idx1W : x1.W = backend.serial.u64.field.FieldElement51.ONE)\n    (idx0U : x0.U = backend.serial.u64.field.FieldElement51.ONE)\n    :\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>\n    (res.2.2 =true →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n        +  2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n        + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.2.1.U.toField\n      let w_out := res.2.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧\n    (res.2.2 = false →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n      + 2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n      + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.1.U.toField\n      let w_out := res.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄\n := by ...",
+   "theorem mul_loop_spec\n    (affine_u : backend.serial.u64.field.FieldElement51)\n    (x0 x1 : montgomery.ProjectivePoint)\n    (scalar_bytes : Array U8 32#usize)\n    (prev_bit : Bool)\n    (i : Isize)\n    (idx0W : Field51_as_Nat x0.W = 0)\n    (idx1W : Field51_as_Nat x1.W = 1)\n    (idx0U : Field51_as_Nat x0.U = 1)\n    :\n    mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>\n    (res.2.2 =true →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n        +  2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n        + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.2.1.U.toField\n      let w_out := res.2.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ∧\n    (res.2.2 = false →\n      let q := (i.val / 8).toNat\n      let r := (i.val % 8).toNat\n      let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val\n      + 2^(8 * q) * ((scalar_bytes[q]!).val % 2^(r+1))\n      + 2^(8 * q+r) * prev_bit.toNat\n      let u := x1.U.toField\n      let u_out := res.1.U.toField\n      let w_out := res.1.W.toField\n      let u_ord := u_out/w_out\n      res.2.1.U.IsValid ∧\n      res.2.1.W.IsValid ∧\n      res.1.U.IsValid ∧\n      res.1.W.IsValid ∧\n      w_out ≠ 0 ∧\n      MontgomeryPoint.u_affine_toPoint u_ord = m • (MontgomeryPoint.u_affine_toPoint u)) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
@@ -1939,7 +1940,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun q =>\n    q.y_plus_x = ONE ∧ q.y_minus_x = ONE ∧ q.xy2d = ZERO) := by ...",
+   "theorem identity_spec :\n    identity ⦃ (q : AffineNielsPoint) =>\n      Field51_as_Nat q.y_plus_x = 1 ∧\n      Field51_as_Nat q.y_minus_x = 1 ∧\n      Field51_as_Nat q.xy2d = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Identity.lean",
    "spec_docstring":
@@ -1954,7 +1955,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
@@ -2121,11 +2122,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet T := Field51_as_Nat q.T\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * T) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z * T) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\n  as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n    let X := Field51_as_Nat q.X\n    let Y := Field51_as_Nat q.Y\n    let Z := Field51_as_Nat q.Z\n    let T := Field51_as_Nat q.T\n    let X' := Field51_as_Nat e.X\n    let Y' := Field51_as_Nat e.Y\n    let Z' := Field51_as_Nat e.Z\n    let T' := Field51_as_Nat e.T\n    X' % p = (X * T) % p ∧\n    Y' % p = (Y * Z) % p ∧\n    Z' % p = (Z * T) % p ∧\n    T' % p = (X * Y) % p ∧\n    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
+   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -2316,7 +2317,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun q =>\n    q.Y_plus_X = ONE ∧ q.Y_minus_X = ONE ∧ q.Z = ONE ∧ q.T2d = ZERO) := by ...",
+   "theorem identity_spec :\n    spec identity (fun (q : ProjectiveNielsPoint) =>\n      Field51_as_Nat q.Y_plus_X = 1 ∧\n      Field51_as_Nat q.Y_minus_X = 1 ∧\n      Field51_as_Nat q.Z = 1 ∧\n      Field51_as_Nat q.T2d = 0) := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Identity.lean",
    "spec_docstring":
@@ -2331,7 +2332,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
@@ -2588,11 +2589,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem APLUS2_OVER_FOUR_spec : Field51_as_Nat APLUS2_OVER_FOUR = 121666 := by ...",
+   "theorem APLUS2_OVER_FOUR_spec :\n  APLUS2_OVER_FOUR ⦃ result =>\n    Field51_as_Nat result = 121666 ∧\n    ∀ i < 5, result[i]!.val < 2 ^ 54 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/APLUS2_OVER_FOUR.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:\n- The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666\n-/",
+   "/-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:\n- The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666\n- All limbs of APLUS2_OVER_FOUR are bounded by 2^54, which is used in the Montgomery\ndifferential addition formula (`Montgomery.ProjectivePoint.DifferentialAddAndDouble`).\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
@@ -2603,33 +2604,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
-   "lines": "L108-L109",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT.IsValid ∧\n    _root_.L • ED25519_BASEPOINT_POINT.toPoint = 0 ∧ ED25519_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧\n      4 • result.toPoint ≠ 0 ∧\n      result.Z.toField ^ 2 - result.Y.toField ^ 2 =\n        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -2644,33 +2626,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
-   "lines": "L161-L184",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_spec : Field51_as_Nat EDWARDS_D = d := by ...",
+   "theorem EDWARDS_D_spec : EDWARDS_D ⦃ result => Field51_as_Nat result = d ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean",
    "spec_docstring":
@@ -2683,14 +2646,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_body"]},
+   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D2_spec : Field51_as_Nat EDWARDS_D2 =  (2 * d) % p := by ...",
+   "theorem EDWARDS_D2_spec :\n    EDWARDS_D2 ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = (2 * d) % p ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D2.lean",
    "spec_docstring":
@@ -2703,31 +2666,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2",
-   "lines": "L54-L60",
-   "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec : Field51_as_Nat EDWARDS_D_MINUS_ONE_SQUARED = (d - 1)^2 % p := by ...",
+   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :\n    EDWARDS_D_MINUS_ONE_SQUARED ⦃ result => Field51_as_Nat result = (d - 1) ^ 2 % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D_MINUS_ONE_SQUARED.lean",
    "spec_docstring":
@@ -2742,50 +2688,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED",
-   "lines": "L72-L78",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D",
-   "lines": "L45-L51",
-   "lean_name": "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EIGHT_TORSION_spec :\n    let P := EIGHT_TORSION.val[1]\n    P.IsValid ∧\n    (4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0) ∧\n    ∀ (i : Fin 8), EIGHT_TORSION.val[i].IsValid ∧\n    EIGHT_TORSION.val[i].toPoint = (i : ℕ) • P.toPoint := by ...",
+   "theorem EIGHT_TORSION_spec :\n    EIGHT_TORSION ⦃ result =>\n      let P := result.val[1]\n      P.IsValid ∧ 4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0 ∧\n      (∀ (i : Fin 8), result.val[i].IsValid) ∧\n      (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EIGHT_TORSION.lean",
    "spec_docstring":
@@ -2821,30 +2731,11 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION_INNER_DOC_HIDDEN",
-   "lines": "L198-L337",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem INVSQRT_A_MINUS_D_spec :\n    (Field51_as_Nat INVSQRT_A_MINUS_D)^2 * (a - d) % p = 1 := by ...",
+   "theorem INVSQRT_A_MINUS_D_spec :\n    INVSQRT_A_MINUS_D ⦃ result => (Field51_as_Nat result)^2 * (a - d) % p = 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/INVSQRT_A_MINUS_D.lean",
    "spec_docstring":
@@ -2859,26 +2750,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D",
-   "lines": "L90-L96",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
@@ -2921,7 +2793,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MINUS_ONE_spec : Field51_as_Nat MINUS_ONE = p - 1 := by ...",
+   "theorem MINUS_ONE_spec :\n    MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MINUS_ONE.lean",
    "spec_docstring":
@@ -2934,31 +2806,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name": "curve25519_dalek::backend::serial::u64::constants::MINUS_ONE",
-   "lines": "L26-L32",
-   "lean_name": "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MONTGOMERY_A_spec : Field51_as_Nat MONTGOMERY_A = 486662 := by ...",
+   "theorem MONTGOMERY_A_spec :\n    MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A.lean",
    "spec_docstring":
@@ -2972,14 +2827,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_body"]},
+   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MONTGOMERY_A_NEG_spec :\n    Field51_as_Nat MONTGOMERY_A_NEG + Field51_as_Nat MONTGOMERY_A= p := by ...",
+   "theorem MONTGOMERY_A_NEG_spec :\n    MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A_NEG.lean",
    "spec_docstring":
@@ -2994,52 +2849,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG",
-   "lines": "L118-L124",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A",
-   "lines": "L114-L114",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec : Field51_as_Nat ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p := by ...",
+   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :\n    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>\n      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ONE_MINUS_EDWARDS_D_SQUARED.lean",
    "spec_docstring":
@@ -3054,26 +2871,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED",
-   "lines": "L63-L69",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
@@ -3116,7 +2914,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem SQRT_AD_MINUS_ONE_spec :\n    (Field51_as_Nat SQRT_AD_MINUS_ONE)^2 % p = (a * d - 1) % p := by ...",
+   "theorem SQRT_AD_MINUS_ONE_spec :\n    SQRT_AD_MINUS_ONE ⦃ result => (Field51_as_Nat result)^2 % p = (a * d - 1) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_AD_MINUS_ONE.lean",
    "spec_docstring":
@@ -3131,33 +2929,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::constants::SQRT_AD_MINUS_ONE",
-   "lines": "L81-L87",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem SQRT_M1_spec :\n    (Field51_as_Nat SQRT_M1)^2 % p = p - 1 := by ...",
+   "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result => (Field51_as_Nat result)^2 % p = p - 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_M1.lean",
    "spec_docstring":
@@ -3170,24 +2949,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.constants.SQRT_M1_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
-   "rust_name": "curve25519_dalek::backend::serial::u64::constants::SQRT_M1",
-   "lines": "L99-L105",
-   "lean_name": "curve25519_dalek.backend.serial.u64.constants.SQRT_M1_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
@@ -3326,7 +3088,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_assign_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :\n    add_assign a b ⦃ result =>\n    (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by ...",
+   "theorem add_assign_spec (self _rhs : Array U64 5#usize)\n    (ha : ∀ i < 5, self[i]!.val < 2 ^ 53) (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 53) :\n    add_assign self _rhs ⦃ (result : FieldElement51) =>\n      (∀ i < 5, (result[i]!).val = (self[i]!).val + (_rhs[i]!).val) ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
@@ -3348,7 +3110,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_assign_loop_spec (a b : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (hab : ∀ j < 5, i.val ≤ j → a[j]!.val + b[j]!.val ≤ U64.max) :\n    add_assign_loop a b i ⦃ a' =>\n    (∀ j < 5, i.val ≤ j → a'[j]!.val = a[j]!.val + b[j]!.val) ∧\n    (∀ j < 5, j < i.val → a'[j]! = a[j]!) ⦄ := by ...",
+   "theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (hab : ∀ j < 5, i.val ≤ j → self[j]!.val + _rhs[j]!.val ≤ U64.max) :\n    add_assign_loop self _rhs i ⦃ (result : FieldElement51) =>\n      (∀ j < 5, i.val ≤ j → result[j]!.val = self[j]!.val + _rhs[j]!.val) ∧\n      (∀ j < 5, j < i.val → result[j]! = self[j]!) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/AddAssign.lean",
    "spec_docstring":
@@ -3486,7 +3248,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_assign_spec\n    (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ res =>\n      (∀ i < 5,\n        res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by ...",
+   "theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElement51)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ (res : FieldElement51) =>\n      (∀ i < 5, res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ConditionalAssign.lean",
    "spec_docstring":
@@ -3624,7 +3386,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MINUS_ONE_spec : Field51_as_Nat MINUS_ONE = p - 1 := by ...",
+   "theorem MINUS_ONE_spec : MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/MINUS_ONE.lean",
    "spec_docstring":
@@ -3639,32 +3401,14 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::MINUS_ONE",
-   "lines": "L269-L275",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
-   "spec_statement": "theorem ONE_spec : Field51_as_Nat ONE = 1 := by ...",
+   "spec_statement":
+   "theorem ONE_spec : ONE ⦃ result => Field51_as_Nat result = 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean",
    "spec_docstring":
@@ -3678,36 +3422,18 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ONE",
-   "lines": "L267-L267",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
   {"verified": true,
    "specified": true,
-   "spec_statement": "theorem ZERO_spec : Field51_as_Nat ZERO = 0 := by ...",
+   "spec_statement":
+   "theorem ZERO_spec : ZERO ⦃ (result : FieldElement51) =>\n    Field51_as_Nat result = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ZERO.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:\n- The constant, when converted to a natural number, equals 0\n-/",
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:\n- The constant is equal to 0\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO",
@@ -3717,26 +3443,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::ZERO",
-   "lines": "L265-L265",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs"]},
@@ -3762,10 +3469,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ result =>\n    Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result.IsValid ⦄ := by ...",
+   "theorem from_bytes_spec (bytes : Array U8 32#usize) :\n    from_bytes bytes ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2^51) ∧\n      result.IsValid ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/FromBytes.lean",
    "spec_docstring": null,
@@ -3780,7 +3487,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at"]},
   {"verified": false,
@@ -3825,11 +3532,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem negate_spec (r : FieldElement51) (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :\n    negate r ⦃ r_inv =>\n    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧\n    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by ...",
+   "theorem negate_spec (self : FieldElement51) (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    negate self ⦃ (neg : FieldElement51) =>\n      Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧\n      ∀ i < 5, neg[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Negate.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:\n- No panic (always returns successfully)\n- The result r_inv represents the additive inverse of the input r in 𝔽_p, i.e.,\n  Field51_as_Nat(r) + Field51_as_Nat(r_inv) ≡ 0 (mod p)\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- Requires that input limbs of r are bounded to avoid underflow:\n  - Limb 0 must be ≤ 36028797018963664\n  - Limbs 1-4 must be ≤ 36028797018963952\n  To make the theorem more readable we use a single bound for all limbs. -/",
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.negate`**:\n- The result `neg` represents the additive inverse of the input `self` in 𝔽_p.\n- All the limbs of the result are ≤ 2^(51 + ε).\n- Requires that input limbs of `self` are bounded to avoid underflow. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate",
@@ -3840,7 +3547,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
@@ -3866,10 +3573,12 @@
    "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem LOW_51_BIT_MASK_spec :\n    LOW_51_BIT_MASK ⦃ result => result.val = 2^51 - 1 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3881,26 +3590,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK",
-   "lines": "L519-L519",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": false,
@@ -3944,11 +3634,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    reduce limbs ⦃ result =>\n    (∀ i < 5, result[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ∧\n    Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by ...",
+   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    reduce limbs ⦃ (result : FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- Does not overflow and hence returns a result\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p. -/",
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
@@ -3959,14 +3649,16 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem LOW_51_BIT_MASK_spec :\n    LOW_51_BIT_MASK ⦃ result => result.val = 2^51 - 1 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3978,26 +3670,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce::LOW_51_BIT_MASK",
-   "lines": "L293-L293",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
@@ -4025,7 +3698,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    square2 a ⦃ r =>\n    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) ⦄ := by ...",
+   "theorem square2_spec (self : Array U64 5#usize) (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    square2 self ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (2 * (Field51_as_Nat self) ^ 2) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 53) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
@@ -4048,7 +3721,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :\n    square2_loop square i ⦃ r =>\n    (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧\n    (∀ j < 5, j < i.val → r[j]! = square[j]!) ⦄ := by ...",
+   "theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)\n    (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :\n    square2_loop square i ⦃ (result : FieldElement51) =>\n      (∀ j < 5, i.val ≤ j → result[j]!.val = square[j]!.val * 2) ∧\n      (∀ j < 5, j < i.val → result[j]! = square[j]!) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Square2.lean",
    "spec_docstring":
@@ -4103,25 +3776,6 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul::LOW_51_BIT_MASK",
-   "lines": "L174-L174",
-   "lean_name":
-   "curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -4327,31 +3981,13 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies":
-   ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
-   "rust_name":
-   "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::ZERO",
-   "lines": "L62-L62",
-   "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :\n    add a b ⦃ v =>\n    Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧\n    Scalar52_as_Nat v < L ⦄ := by ...",
+   "theorem add_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :\n    add a b ⦃ (v : Scalar52) =>\n      Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧\n      Scalar52_as_Nat v < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "spec_docstring":
@@ -4375,7 +4011,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop a b sum mask carry i ⦃ sum' =>\n    (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n    (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n    ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
+   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop a b sum mask carry i ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
    "spec_docstring":
@@ -4749,17 +4385,18 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n    Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.mul`**:\n- No panic (always returns successfully)\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
    "lines": "L311-L314",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
    "is_relevant": true,
-   "is_ignored": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
@@ -4771,11 +4408,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_internal_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul_internal a b ⦃ result =>\n    Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧\n    (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by ...",
+   "theorem mul_internal_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul_internal a b ⦃ (result : Array U128 9#usize) =>\n      Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat b ∧\n      (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MulInternal.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:\n- Does not error and hence returns a result\n- The result represents the product of the two input field elements\n- Requires that each input limb is at most 62 bits to prevent overflow -/",
+   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:\n- The result represents the product of the two input field elements\n- Requires that each input limb is at most 62 bits to prevent overflow -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
@@ -4922,10 +4559,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem m_spec (x y : U64) :\n    m x y ⦃ result =>\n    result.val = x.val * y.val ⦄ := by ...",
+   "theorem m_spec (x y : U64) :\n    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/M.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.m`**:\n- Does not overflow and hence returns a result\n- The result equals the product of the two input values -/",
+   "/-- **Spec for `backend.serial.u64.scalar.m`**:\n- The result equals the product of the two input values -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::scalar::m",
    "lines": "L56-L58",
@@ -4974,7 +4611,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT = constants.ED25519_BASEPOINT_POINT ∧\n    RISTRETTO_BASEPOINT_POINT.IsValid ∧\n    4 • RISTRETTO_BASEPOINT_POINT.toPoint ≠ 0 := by ...",
+   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧ _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -4987,7 +4624,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT"]},
@@ -6065,7 +5702,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun q =>\n    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE ∧ q.T = ZERO) := by ...",
+   "theorem identity_spec :\n    identity ⦃ (q : EdwardsPoint) =>\n      Field51_as_Nat q.X = 0 ∧ Field51_as_Nat q.Y = 1 ∧\n      Field51_as_Nat q.Z = 1 ∧ Field51_as_Nat q.T = 0 ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Identity.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)\n-/",
@@ -6079,7 +5716,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
@@ -6252,7 +5889,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    as_projective_niels e ⦃ pn =>\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let T := Field51_as_Nat e.T\n    let A := Field51_as_Nat pn.Y_plus_X\n    let B := Field51_as_Nat pn.Y_minus_X\n    let Z' := Field51_as_Nat pn.Z\n    let C := Field51_as_Nat pn.T2d\n    let d2 := Field51_as_Nat EDWARDS_D2\n    A % p = (Y + X) % p ∧\n    (B + X) % p = Y % p ∧\n    Z' % p = Z % p ∧\n    C % p = (T * d2) % p ⦄ := by ...",
+   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let T := Field51_as_Nat e.T\n      let A := Field51_as_Nat pn.Y_plus_X\n      let B := Field51_as_Nat pn.Y_minus_X\n      let Z' := Field51_as_Nat pn.Z\n      let C := Field51_as_Nat pn.T2d\n      A % p = (Y + X) % p ∧\n      (B + X) % p = Y % p ∧\n      Z' % p = Z % p ∧\n      C % p = (T * (2 * d)) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean",
    "spec_docstring":
@@ -6271,8 +5908,8 @@
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
-    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2"]},
+    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": false,
    "specified": true,
    "spec_statement":
@@ -6316,7 +5953,7 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    is_small_order self ⦃ result =>\n    (result ↔ h • self.toPoint = 0) ⦄ := by ...",
@@ -6333,7 +5970,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor",
     "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
@@ -6364,7 +6001,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint ⦄ := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to scalar multiplication with the Edwards basepoint constant\n- The returned EdwardsPoint equals the output of that scalar multiplication\n-/",
@@ -6380,12 +6017,12 @@
    "fully_verified": false,
    "externally_verified": true,
    "dependencies":
-   ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul",
-    "curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT"]},
+   ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT",
+    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    EdwardsPoint.IsValid result ∧\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    result.toPoint = ((U8x32_as_Nat clamped_scalar) • constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ (result : EdwardsPoint) =>\n      EdwardsPoint.IsValid result ∧\n      (∃ clamped_scalar,\n      h ∣ U8x32_as_Nat clamped_scalar ∧\n      U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n      2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n      result.toPoint = ((U8x32_as_Nat clamped_scalar) • _root_.Edwards.basepoint)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -6487,7 +6124,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    to_affine e ⦃ ap =>\n\n    let X := Field51_as_Nat e.X\n    let Y := Field51_as_Nat e.Y\n    let Z := Field51_as_Nat e.Z\n    let x := Field51_as_Nat ap.x\n    let y := Field51_as_Nat ap.y\n\n    (if Z % p = 0 then\n      x % p = 0 ∧ y % p = 0\n    else\n      (x * Z) % p = X % p ∧\n      (y * Z) % p = Y % p) ∧\n      (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    to_affine e ⦃ ap =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let x := Field51_as_Nat ap.x\n      let y := Field51_as_Nat ap.y\n      (if Z % p = 0 then\n        x % p = 0 ∧ y % p = 0\n      else\n        (x * Z) % p = X % p ∧\n        (y * Z) % p = Y % p) ∧\n        (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n        (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToAffine.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_affine`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting AffinePoint has coordinates:\n  - If Z ≢ 0 (mod p): x * Z ≡ X (mod p) and y * Z ≡ Y (mod p)\n  - If Z ≡ 0 (mod p): x ≡ 0 (mod p) and y ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
@@ -6874,11 +6511,11 @@
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.as_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"]},
   {"verified": false,
@@ -6901,12 +6538,13 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ r' =>\n    let r_nat := Field51_as_Nat r % p\n    let r'_nat := Field51_as_Nat r' % p\n    (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n    (r_nat = 0 → r'_nat = 0) ∧\n    (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄\n := by ...",
+   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>\n      let r_nat := Field51_as_Nat r % p\n      let r'_nat := Field51_as_Nat r' % p\n      (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n      (r_nat = 0 → r'_nat = 0) ∧\n      (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Invert.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `field.FieldElement51.invert`**:\n- No panic for field element inputs r (always returns r' successfully)\n- If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)\n- If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert",
@@ -6917,7 +6555,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -6925,7 +6563,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1 % p\n    -- Unconditional bounds\n    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n    -- Non-negativity\n    (r_nat % 2 = 0) ∧\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1_val % p\n    -- Unconditional bounds\n    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n    -- Non-negativity\n    (r_nat % 2 = 0) ∧\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- Output limbs bounded by 2^53 - 1\n- Result r is non-negative (r_nat % 2 = 0)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
@@ -6941,8 +6579,8 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
-   ["curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE"]},
+   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.field.FieldElement51.sqrt_ratio_i"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
@@ -7003,13 +6641,13 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n    Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n    (∀ i, i < 5 → (r'[i]!).val ≤ 2 ^ 52 - 1) ⦄\n := by ...",
+   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n      (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
+   "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\nEXTERNALLY_VERIFIED\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
@@ -7020,7 +6658,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -7028,7 +6666,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
+   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat SQRT_M1_val % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -7046,9 +6684,9 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.field.FieldElement51.pow_p58",
+    "curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
-    "curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
   {"verified": false,
@@ -7537,10 +7175,10 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint) ⦄\n := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`\n- The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result\n-/",
@@ -7554,14 +7192,14 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_base",
     "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n     MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards constants.ED25519_BASEPOINT_POINT.toPoint)) ⦄ := by ...",
+   "theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :\n    mul_base_clamped bytes ⦃ result =>\n    (∃ clamped_scalar_nat,\n    h ∣ clamped_scalar_nat ∧\n    clamped_scalar_nat < 2 ^ 255 ∧\n    2 ^ 254 ≤ clamped_scalar_nat ∧\n     MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards _root_.Edwards.basepoint)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBaseClamped.lean",
    "spec_docstring":
@@ -7583,7 +7221,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    mul_clamped P bytes ⦃ res =>\n    (∃ clamped_scalar,\n    h ∣ U8x32_as_Nat clamped_scalar ∧\n    U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n    2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n    let m:= (U8x32_as_Nat clamped_scalar)\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by ...",
+   "theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :\n    mul_clamped P bytes ⦃ res =>\n      (∃ clamped_scalar,\n      h ∣ U8x32_as_Nat clamped_scalar ∧\n      U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n      2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n      let m:= (U8x32_as_Nat clamped_scalar)\n      MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulClamped.lean",
    "spec_docstring":
@@ -7642,10 +7280,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.field.FieldElement51.invert",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -7850,19 +7488,19 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
+   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG",
     "curve25519_dalek.field.FieldElement51.invert",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
-    "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A",
     "curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
@@ -9087,13 +8725,11 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem coset4_spec (self : RistrettoPoint) (h_self_valid : self.IsValid) :\n    coset4 self ⦃ result =>\n    result.val[0].IsValid ∧ result.val[0].toPoint = self.toPoint + EIGHT_TORSION.val[0].toPoint ∧\n    result.val[1].IsValid ∧ result.val[1].toPoint = self.toPoint + EIGHT_TORSION.val[2].toPoint ∧\n    result.val[2].IsValid ∧ result.val[2].toPoint = self.toPoint + EIGHT_TORSION.val[4].toPoint ∧\n    result.val[3].IsValid ∧ result.val[3].toPoint = self.toPoint + EIGHT_TORSION.val[6].toPoint ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Coset4.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.coset4`**:\n• The function always succeeds (no panic) for valid RistrettoPoint input self\n• The four output Edwards points are all valid and are given by\n\n  - self + T₀ = self (where T₀ is the identity)\n  - self + T₂ (where T₂ is EIGHT_TORSION[2])\n  - self + T₄ (where T₄ is EIGHT_TORSION[4])\n  - self + T₆ (where T₆ is EIGHT_TORSION[6])\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4",
@@ -9101,7 +8737,7 @@
    "lean_name": "curve25519_dalek.ristretto.RistrettoPoint.coset4",
    "is_relevant": true,
    "is_ignored": false,
-   "is_hidden": false,
+   "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
    "externally_verified": false,
@@ -9127,22 +8763,22 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
-    "curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
-    "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED",
+   ["curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
+    "curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED",
+    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED",
     "curve25519_dalek.backend.serial.u64.constants.MINUS_ONE",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
     "curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
     "curve25519_dalek.field.FieldElement51.is_negative",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
-    "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED",
     "curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": true,
@@ -9168,10 +8804,10 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
     "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    mul_base s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint ⦄ := by ...",
+   "theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    mul_base s ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul_Base.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n• The function always succeeds (no panic) for canonical input Scalars s\n• The result is a valid RistrettoPoint\n• The result = b + ... + b represents the Ristretto basepoint b added to itself s-times\n-/",
@@ -9185,10 +8821,10 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
-   ["curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul",
-    "curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT"]},
+   ["curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT",
+    "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
@@ -9212,7 +8848,7 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
@@ -9229,14 +8865,14 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
-   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
+   ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
+    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
-    "curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
-    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
+    "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.field.FieldElement51.invsqrt",
     "curve25519_dalek.field.FieldElement51.is_negative",
@@ -10476,7 +10112,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (s s' : scalar.Scalar) :\n    ct_eq s s' ⦃ c =>\n    c = Choice.one ↔ s.bytes = s'.bytes ⦄ := by ...",
+   "theorem ct_eq_spec (self other : scalar.Scalar) :\n    ct_eq self other ⦃ (c : subtle.Choice) =>\n      c = Choice.one ↔ self.bytes = other.bytes ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- Returns `Choice` representing equality in constant time\n- The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)\n-/",
@@ -10562,24 +10198,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": false,
-   "dependencies": ["curve25519_dalek.scalar.Scalar.ZERO_body"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
-   "source": "curve25519-dalek/src/scalar.rs",
-   "rust_name":
-   "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::ZERO",
-   "lines": "L564-L564",
-   "lean_name": "curve25519_dalek.scalar.Scalar.ZERO_body",
-   "is_relevant": true,
-   "is_ignored": false,
-   "is_hidden": false,
-   "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
@@ -10899,7 +10518,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    invert s ⦃ s' =>\n    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by ...",
+   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    invert s ⦃ s' =>\n      U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.invert`**:\n- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result s' satisfies the multiplicative inverse property:\n  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)\n-/",
@@ -10921,7 +10540,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_canonical_spec (s : Scalar) :\n    is_canonical s ⦃ c =>\n    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by ...",
+   "theorem is_canonical_spec (s : Scalar) :\n    is_canonical s ⦃ (c : subtle.Choice) =>\n      (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/IsCanonical.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:\n- No panic (always returns successfully)\n- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)\n-/",
@@ -10996,7 +10615,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem reduce_spec (s : Scalar) :\n    reduce s ⦃ s' =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L ⦄ := by ...",
+   "theorem reduce_spec (s : Scalar) :\n    reduce s ⦃ (s' : Scalar) =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
@@ -11055,7 +10674,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem unpack_spec (s : Scalar) :\n    unpack s ⦃ u =>\n    Scalar52_as_Nat u = U8x32_as_Nat s.bytes ∧\n    (∀ i < 5, u[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem unpack_spec (self : Scalar) :\n    unpack self ⦃ (u : Scalar52 ) =>\n        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.unpack`**:\n- No panic (always returns successfully)\n- Packing the result back yields the original scalar: pack(u) = s\n- Both the packed s and the unpacked u represent the same natural number\n-/",

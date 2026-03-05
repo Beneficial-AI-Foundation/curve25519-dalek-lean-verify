@@ -47,13 +47,6 @@ natural language specs:
       - Each limb of the result is bounded by 2^52
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.mul`**:
-- No panic (always returns successfully)
-- The result represents the product of the two input scalars modulo L
-- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)
-- Output limbs are bounded by 2^52
--/
-
 /- Helper lemmas/theorems -/
 
 -- Helper theorem to cancel R [mod L] on right retrieved from Curve25519Dalek.Specs.Scalar.Scalar.Reduce.lean
@@ -67,44 +60,44 @@ theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := b
 
 /- End of helper lemmas/theorems -/
 
+/-- **Spec and proof concerning `scalar.Scalar52.mul`**:
+- No panic (always returns successfully)
+- The result represents the product of the two input scalars modulo L
+- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)
+- Output limbs are bounded by 2^52
+-/
 @[progress]
 theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     mul a b ⦃ ( result : Scalar52 ) =>
-    Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
+      Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
+      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold mul
   progress*
-  -- 1. To prove ∀ i < 5, ↑ab[i]! < 2 ^ 62
-  · intro i hi
-    apply lt_trans (ab_post_2 i hi); simp
-  -- 2. To prove ∀ i < 5, ↑constants.RR[i]! < 2 ^ 62
+  -- -- 2. To prove ∀ i < 5, ↑constants.RR[i]! < 2 ^ 62
   · unfold constants.RR; decide
-  refine ⟨?_, ?_⟩
+  refine ⟨?_, by grind⟩
   -- 3a. To prove Scalar52_as_Nat res ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L]
-  · -- i. res * R ≡ ab * RR [MOD L]
-    have h_res_R_ab_RR : Scalar52_as_Nat res * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
-      rw [a2_post_1] at res_post_1
-      rw [Nat.ModEq]
-      exact res_post_1
-    -- ii. res * R ≡ ab * R * R [MOD L]
-    have h_res_R_ab_R_R : Scalar52_as_Nat res * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
-      have := curve25519_dalek.backend.serial.u64.constants.RR_spec
-      grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
-    -- iii. res * R ≡ a1 * R [MOD L]
-    have h_res_R_a1_R : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
-      rw [← Nat.ModEq] at ab_post_1
-      have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
-        exact Nat.ModEq.mul_right R ab_post_1
-      exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
-    -- iv. res * R ≡ a * b * R [MOD L]
-    have h_res_R_a_b_R : Scalar52_as_Nat res * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
-      rw [a1_post_1] at h_res_R_a1_R
-      exact h_res_R_a1_R
-    -- v. res ≡ a * b [MOD L]
-    apply cancelR
-    exact h_res_R_a_b_R
-  -- 3b. To prove ∀ i < 5, ↑res[i]! < 2 ^ 52
-  · grind
+  -- i. res * R ≡ ab * RR [MOD L]
+  have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
+    rw [a2_post1] at result_post1
+    rw [Nat.ModEq]
+    exact result_post1
+  -- ii. res * R ≡ ab * R * R [MOD L]
+  have h_res_R_ab_R_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
+    have := curve25519_dalek.backend.serial.u64.constants.RR_spec
+    grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
+  -- iii. res * R ≡ a1 * R [MOD L]
+  have h_res_R_a1_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
+    rw [← Nat.ModEq] at ab_post1
+    have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
+      exact Nat.ModEq.mul_right R ab_post1
+    exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
+  -- iv. res * R ≡ a * b * R [MOD L]
+  have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
+    rw [a1_post1] at h_res_R_a1_R
+    exact h_res_R_a1_R
+  -- v. res ≡ a * b [MOD L]
+  grind [cancelR]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

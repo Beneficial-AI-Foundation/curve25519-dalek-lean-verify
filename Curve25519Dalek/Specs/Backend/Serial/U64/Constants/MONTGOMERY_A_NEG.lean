@@ -16,7 +16,7 @@ the Elligator map.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -40,9 +40,11 @@ natural language specs:
 - The value of constants.MONTGOMERY_A_NEG when converted to a natural number equals
   p - 486662 = 57896044618658097711785492504343953926634992332820282019728792003956564333287
 -/
+@[progress]
 theorem MONTGOMERY_A_NEG_spec :
-    Field51_as_Nat MONTGOMERY_A_NEG + Field51_as_Nat MONTGOMERY_A= p  := by
-  unfold MONTGOMERY_A_NEG p MONTGOMERY_A
+    MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ⦄ := by
+  unfold MONTGOMERY_A_NEG field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

@@ -89,12 +89,11 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
   progress*
   · exact hW
   · exact hU
-  · grind only
   · constructor
     · rename_i fe_inv h_mul_U_Winv
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid
       have h_inv : Field51_as_Nat fe % p * (Field51_as_Nat self.W % p) % p = 1 := by
-        exact fe_post_1 h_W_nat_nonzero
+        exact fe_post1 h_W_nat_nonzero
       have h_inv2 : Field51_as_Nat fe * Field51_as_Nat self.W ≡ 1 [MOD p] := by
         dsimp [Nat.ModEq]
         calc
@@ -109,12 +108,12 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
       have h_inv5: (Field51_as_Nat self.U:ZMod p) / (Field51_as_Nat self.W:ZMod p) = Field51_as_Nat self.U * Field51_as_Nat fe := by
         exact zmod_div_eq_mul_of_mod_inv (Field51_as_Nat self.U) (Field51_as_Nat self.W) (Field51_as_Nat fe) h_W_nat_nonzero h_inv2
       rw [h_inv4, h_inv5]
-      have h_chain2 := Nat.ModEq.trans a_post_1 u_post_1
+      have h_chain2 := Nat.ModEq.trans a_post1 u_post1
       have h_eq_zmod2 := Edwards.lift_mod_eq (U8x32_as_Nat a) (Field51_as_Nat self.U * Field51_as_Nat fe) h_chain2
       have h_eq_zmod3 : (U8x32_as_Nat a : ZMod p) = (Field51_as_Nat self.U : ZMod p) * (Field51_as_Nat fe : ZMod p) := by
         rw [h_eq_zmod2, Nat.cast_mul]
       grind only [ U8x32_as_Field_eq_cast]
-    · apply lt_trans a_post_2
+    · apply lt_trans a_post2
       decide
 
 end curve25519_dalek.montgomery.ProjectivePoint

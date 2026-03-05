@@ -47,23 +47,22 @@ natural language specs:
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
 @[progress]
-theorem mul_spec (r : RistrettoPoint) (s : scalar.Scalar)
-    (h_s_canonical : U8x32_as_Nat s.bytes < L)
-    (h_rist_valid : r.IsValid) :
-    mul r s ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by
+theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)
+    (hscalar : U8x32_as_Nat scalar.bytes < L) (hself : self.IsValid) :
+    mul self scalar ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧
+      result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by
   unfold mul edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul
   progress*
-  · exact h_rist_valid.1
+  · exact hself.1
   · constructor
     · unfold RistrettoPoint.IsValid
-      refine ⟨ep_post_1, ?_⟩
-      rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post_1, ep_post_2]
-      obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp ((EdwardsPoint_IsSquare_iff_IsEven r h_rist_valid.1).mp h_rist_valid.2)
-      exact (IsEven_iff_in_doubling_image _).mpr ⟨U8x32_as_Nat s.bytes • Q, by rw [hQ, nsmul_add]⟩
-    · simp only [RistrettoPoint.toPoint]
-      exact ep_post_2
+      refine ⟨ep_post1, ?_⟩
+      rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post1, ep_post2]
+      obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp
+        ((EdwardsPoint_IsSquare_iff_IsEven self hself.1).mp hself.2)
+      exact (IsEven_iff_in_doubling_image _).mpr ⟨U8x32_as_Nat scalar.bytes • Q, by grind [nsmul_add]⟩
+    · simpa [RistrettoPoint.toPoint]
 
 /-
 Note:
@@ -121,12 +120,10 @@ natural language specs:
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
 @[progress]
-theorem mul_spec (s : scalar.Scalar) (r : RistrettoPoint)
-    (h_s_canonical : U8x32_as_Nat s.bytes < L)
-    (h_rist_valid : r.IsValid) :
-    mul s r ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint ⦄ := by
-  exact Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec r s h_s_canonical h_rist_valid
+theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)
+    (hself : U8x32_as_Nat self.bytes < L) (hpoint : point.IsValid) :
+    mul self point ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧ result.toPoint = (U8x32_as_Nat self.bytes) • point.toPoint ⦄ := by
+  exact Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec point self hself hpoint
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint

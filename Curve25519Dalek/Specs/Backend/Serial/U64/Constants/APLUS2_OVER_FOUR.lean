@@ -5,6 +5,7 @@ Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
 /-! # Spec Theorem for `constants::APLUS2_OVER_FOUR`
 
@@ -38,24 +39,18 @@ natural language specs:
 
 /-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:
 - The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666
--/
-@[simp]
-theorem APLUS2_OVER_FOUR_spec : Field51_as_Nat APLUS2_OVER_FOUR = 121666 := by
-  unfold APLUS2_OVER_FOUR
-  decide
-
-/-- **Bounds lemma for `APLUS2_OVER_FOUR`**:
-
-All limbs of APLUS2_OVER_FOUR are bounded by 2^54, which is used in the Montgomery
+- All limbs of APLUS2_OVER_FOUR are bounded by 2^54, which is used in the Montgomery
 differential addition formula (`Montgomery.ProjectivePoint.DifferentialAddAndDouble`).
-
-This helper lemma provides bounds guarantees without unfolding the constant definition.
 -/
-
-theorem APLUS2_OVER_FOUR_bound :
-    ∀ i < 5, APLUS2_OVER_FOUR[i]!.val < 2 ^ 54 := by
-  intro i _
+@[progress]
+theorem APLUS2_OVER_FOUR_spec :
+  APLUS2_OVER_FOUR ⦃ result =>
+    Field51_as_Nat result = 121666 ∧
+    ∀ i < 5, result[i]!.val < 2 ^ 54 ⦄ := by
   unfold APLUS2_OVER_FOUR
-  interval_cases i <;> decide
+  progress*
+  constructor
+  · simp only [*]; decide
+  · simp only [*]; intro i hi; interval_cases i <;> decide
 
 end curve25519_dalek.backend.serial.u64.constants

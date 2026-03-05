@@ -90,15 +90,14 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
     apply le_trans (le_of_lt this)
     scalar_tac
   obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
-  simp[hw_ok]
+  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
+    exists_eq_left']
   constructor
   · simp_all
   · intro i hi
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
       have := ha i hi; have := hb i hi; omega
-    simp_all
-    apply lt_trans this
-    simp
+    grind
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
@@ -222,51 +221,12 @@ theorem add_spec_aux
   unfold add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  · intro i hi
-    apply lt_trans (h_selfY_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_selfX_bounds i hi)
-    simp
   progress  as ⟨ PP , h_PP , PP_bounds⟩
-  · intro i hi
-    apply lt_trans (h_otherYpX_bounds  i hi)
-    simp
   progress  as ⟨ MM, h_MM, MM_bounds⟩
-  · intro i hi
-    apply lt_trans (Y_minus_X_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherYmX_bounds i hi)
-    simp
   progress  as ⟨ TT2d, h_TT2d, TT2d_bounds⟩
-  · intro i hi
-    apply lt_trans (h_selfT_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherT2d_bounds i hi)
-    simp
   progress  as ⟨ ZZ, h_ZZ, ZZ_bounds⟩
-  · intro i hi
-    apply lt_trans (h_selfZ_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (h_otherZ_bounds i hi)
-    simp
   progress as ⟨ZZ2, h_ZZ2,  ZZ2_bounds⟩
-  · intro i hi
-    apply lt_trans (ZZ_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (ZZ_bounds i hi)
-    simp
   progress as ⟨fe, h_fe,  fe_bounds⟩
-  · intro i hi
-    apply lt_trans (PP_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (MM_bounds i hi)
-    simp
   -- Use tighter add spec for Y = PP + MM: (< 2^52) + (< 2^52) → < 2^53
   obtain ⟨fe1, h_fe1_ok, h_fe1, fe1_bounds⟩ := add_spec_52_52 PP_bounds MM_bounds
   simp only [h_fe1_ok, bind_tc_ok]
@@ -282,12 +242,6 @@ theorem add_spec_aux
   obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := add_spec_53_52 hzz2_tight TT2d_bounds
   simp only [h_fe2_ok, bind_tc_ok]
   progress as ⟨fe3, h_fe3, fe3_bounds⟩
-  · intro i hi
-    apply lt_trans (ZZ2_bounds i hi)
-    simp
-  · intro i hi
-    apply lt_trans (TT2d_bounds i hi)
-    simp
   constructor
   · rw[← Nat.ModEq]
     rw[← Nat.ModEq] at fe_bounds

@@ -74,20 +74,20 @@ theorem to_montgomery_spec (e : EdwardsPoint)
     · split_ifs
       · rename_i h_zy
         have h_W_zero : Field51_as_Nat W % p = 0 := by
-          rw [h_zy, ← Nat.ModEq] at W_post_2
-          conv_rhs at W_post_2 => rw [← Nat.zero_add (Field51_as_Nat e.Y)]
-          exact Nat.ModEq.add_right_cancel' (Field51_as_Nat e.Y) W_post_2
-        -- fe is the invert result — in WP mode, fe_post_2 is the zero case
-        rw [a_post_1, u_post_1, Nat.mul_mod, fe_post_2 h_W_zero, mul_zero, Nat.zero_mod]
+          rw [h_zy, ← Nat.ModEq] at W_post2
+          conv_rhs at W_post2 => rw [← Nat.zero_add (Field51_as_Nat e.Y)]
+          exact Nat.ModEq.add_right_cancel' (Field51_as_Nat e.Y) W_post2
+        -- fe is the invert result — in WP mode, fe_post2 is the zero case
+        rw [a_post1, u_post1, Nat.mul_mod, fe_post2 h_W_zero, mul_zero, Nat.zero_mod]
       · rename_i h_zy
         have h_W_neq_zero : Field51_as_Nat W % p ≠ 0 := by
           intro h_contra
-          rw [Nat.add_mod, h_contra, Nat.zero_add, Nat.mod_mod] at W_post_2
-          exact h_zy W_post_2.symm
-        have h_W_inv := fe_post_1 h_W_neq_zero
+          rw [Nat.add_mod, h_contra, Nat.zero_add, Nat.mod_mod] at W_post2
+          exact h_zy W_post2.symm
+        have h_W_inv := fe_post1 h_W_neq_zero
         simp at h_W_inv
         ring_nf at h_W_inv
-        rw [Nat.mul_mod, ← W_post_2, Nat.add_mod, ← Nat.mul_mod, Nat.mul_add, ← Nat.ModEq]
+        rw [Nat.mul_mod, ← W_post2, Nat.add_mod, ← Nat.mul_mod, Nat.mul_add, ← Nat.ModEq]
         ring_nf
         have h_sum : U8x32_as_Nat a * (Field51_as_Nat W % p) + U8x32_as_Nat a * (Field51_as_Nat e.Y % p)
           ≡ U8x32_as_Nat a * Field51_as_Nat W + U8x32_as_Nat a * Field51_as_Nat e.Y [MOD p] :=
@@ -99,9 +99,9 @@ theorem to_montgomery_spec (e : EdwardsPoint)
           calc
             U8x32_as_Nat a * Field51_as_Nat W ≡
                 Field51_as_Nat u * Field51_as_Nat W [MOD p] := by
-                  simpa using a_post_1.mul_right (Field51_as_Nat W)
+                  simpa using a_post1.mul_right (Field51_as_Nat W)
             _ ≡ (Field51_as_Nat U * Field51_as_Nat fe) * Field51_as_Nat W [MOD p] := by
-                  simpa using u_post_1.mul_right (Field51_as_Nat W)
+                  simpa using u_post1.mul_right (Field51_as_Nat W)
             _ ≡ Field51_as_Nat U [MOD p] := by
                   rw [Nat.mul_assoc]
                   simpa using @Nat.ModEq.mul_left p (Field51_as_Nat fe * Field51_as_Nat W) 1 (Field51_as_Nat U) h_W_inv
@@ -111,7 +111,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
                     rw [← Finset.sum_add_distrib]
                     apply Finset.sum_congr rfl
                     intro i hi
-                    rw [U_post_1 i (Finset.mem_range.mp hi)]
+                    rw [U_post1 i (Finset.mem_range.mp hi)]
                     ring
                   unfold Nat.ModEq
                   simp only [h_U_eq]

@@ -58,26 +58,22 @@ theorem to_affine_spec (e : EdwardsPoint)
     (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)
     (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :
     to_affine e ⦃ ap =>
-
-    let X := Field51_as_Nat e.X
-    let Y := Field51_as_Nat e.Y
-    let Z := Field51_as_Nat e.Z
-    let x := Field51_as_Nat ap.x
-    let y := Field51_as_Nat ap.y
-
-    (if Z % p = 0 then
-      x % p = 0 ∧ y % p = 0
-    else
-      (x * Z) % p = X % p ∧
-      (y * Z) % p = Y % p) ∧
-      (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧
-      (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by
+      let X := Field51_as_Nat e.X
+      let Y := Field51_as_Nat e.Y
+      let Z := Field51_as_Nat e.Z
+      let x := Field51_as_Nat ap.x
+      let y := Field51_as_Nat ap.y
+      (if Z % p = 0 then
+        x % p = 0 ∧ y % p = 0
+      else
+        (x * Z) % p = X % p ∧
+        (y * Z) % p = Y % p) ∧
+        (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧
+        (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by
     unfold to_affine
     progress as ⟨Z_inv, h_inv_nonzero, h_inv_zero, h_inv_bounds⟩  -- invert e.Z
     progress as ⟨x, hx_mod, hx_bounds⟩  -- mul e.X Z_inv
-    · intro i hi; have := h_inv_bounds i hi; omega
     progress as ⟨y, hy_mod, hy_bounds⟩  -- mul e.Y Z_inv
-    · intro i hi; have := h_inv_bounds i hi; omega
     constructor
     · split_ifs with h_Z
       · -- Z ≡ 0 case

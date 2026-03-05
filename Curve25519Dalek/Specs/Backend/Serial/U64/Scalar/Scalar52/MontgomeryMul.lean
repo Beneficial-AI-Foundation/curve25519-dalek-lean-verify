@@ -54,12 +54,9 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_mul
   progress*
-  have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [Nat.ModEq]
-    exact res_post_1
-  have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [← a1_post_1]
-  rw [Nat.ModEq]
-  refine ⟨by try grind , fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
+  constructor
+  · simpa [a1_post1, eq_comm] using w_post1
+  · intro i hi
+    exact lt_trans (w_post2 i hi) (by norm_num)
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
