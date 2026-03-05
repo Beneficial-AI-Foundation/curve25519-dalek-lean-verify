@@ -278,10 +278,27 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Substitute u + 1 with fe1
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
-                sorry
-                -- Goal: (Field51_as_Nat u % p + 1) % p = Field51_as_Nat fe1 % p
-                -- rw [← h_fe1_eq]
-                -- rw [Nat.add_mod]
+
+              have h1 : (Field51_as_Nat u % p + 1) % p =
+              Field51_as_Nat fe1 % p := by
+                have := Nat.add_mod (Field51_as_Nat u) 1 p
+              -- (u + 1) % p = (u % p + 1 % p) % p
+                simp at this
+              -- 得到 (u % p + 1) % p = (u + 1) % p
+                simp [h_fe1_eq]
+
+              have h2 :
+              Field51_as_Nat fe * Field51_as_Nat fe2 *
+                  (Field51_as_Nat u % p + 1) % p
+                =
+              Field51_as_Nat fe * Field51_as_Nat fe2 *
+                  (Field51_as_Nat fe1 % p) % p := by
+            -- 再整理 mod
+                simp [Nat.mul_mod]
+                grind only
+              rw [Nat.mul_mod]
+              rw [h1]
+              rw [← Nat.mul_mod]
 
             -- Rearrange: fe * fe2 * fe1 = fe * (fe2 * fe1)
             _ = Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p := by
