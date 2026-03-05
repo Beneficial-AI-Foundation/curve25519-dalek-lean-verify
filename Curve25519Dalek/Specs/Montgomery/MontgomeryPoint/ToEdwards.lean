@@ -318,7 +318,14 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
               -- have : Field51_as_Nat fe1 % p * Field51_as_Nat fe2 % p % p = Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p := by
               --   rw [Nat.mul_comm]
               -- rw [this, h_fe2_inv]
-              sorry
+              -- simp [Nat.mul_mod]
+              -- grind [Nat.mul_mod, Nat.add_mod]
+              have h_mul : (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p = 1 := by
+                have := h_fe2_inv
+                simpa [Nat.mul_mod] using this
+              have : Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p = Field51_as_Nat fe * 1 % p := by
+                simp [Nat.mul_mod, h_mul]
+              grind only
               -- Simplify
             _ = Field51_as_Nat fe % p := by
                 ring_nf
