@@ -8594,7 +8594,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (result : RistrettoPoint) =>\n      result.X = ZERO ∧\n      result.Y = ONE ∧\n      result.Z = ONE ∧\n      result.T = ZERO ⦄ := by ...",
+   "theorem identity_spec :\n    identity ⦃ (result : RistrettoPoint) =>\n      Field51_as_Nat result.X = 0 ∧\n      Field51_as_Nat result.Y = 1 ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T = 0 ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)\n-/",
@@ -8608,7 +8608,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
