@@ -232,15 +232,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
           rw [h_ONE] at fe_post_2
           -- fe_post_2 : (Field51_as_Nat fe + 1) % p = Field51_as_Nat u % p
-
-          -- Use modular arithmetic: (a + 1) % p = b % p implies a % p = (b - 1) % p
-          -- This is a standard property that requires careful handling of natural number subtraction
-
-          -- The key insight: we want to show that fe ≡ u - 1 (mod p)
-          -- We have: fe + 1 ≡ u (mod p)
-          -- In the integers/field, this clearly gives fe ≡ u - 1
-          -- But in natural numbers with % we need to be careful
-
           sorry
 
         -- Step 6: Connect u to mp
@@ -261,13 +252,14 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp + 1) % p := by
                 -- -- Apply Nat.mul_mod to decompose the modulo
-                -- rw [Nat.mul_mod]
+                rw [Nat.mul_mod]
                 -- -- Now rewrite using h_affine_y
-                -- rw [h_affine_y]
-                -- rw [Nat.mul_mod]
-                -- have (U8x32_as_Nat mp + 1) % p % p = (U8x32_as_Nat mp + 1) % p by :=
-                --   sorry
-                sorry
+                rw [h_affine_y]
+                rw [Nat.mul_mod]
+                have this: (U8x32_as_Nat mp + 1) % p % p = (U8x32_as_Nat mp + 1) % p := by
+                  rw [Nat.mod_mod]
+                rw [this]
+                rw [← Nat.mul_mod]
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
@@ -277,15 +269,14 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 sorry
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
-                -- congr 1
-                -- rw [← h_u_eq, ← h_u_mod]
                 sorry
 
             -- Substitute u + 1 with fe1
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
-                -- congr 1
-                -- rw [← h_fe1_eq]
                 sorry
+                -- Goal: (Field51_as_Nat u % p + 1) % p = Field51_as_Nat fe1 % p
+                -- rw [← h_fe1_eq]
+                -- rw [Nat.add_mod]
 
             -- Rearrange: fe * fe2 * fe1 = fe * (fe2 * fe1)
             _ = Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p := by
@@ -293,9 +284,20 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use fe2 * fe1 = 1
             _ = Field51_as_Nat fe * 1 % p := by
+              -- -- congr 1
+              -- -- Goal: Field51_as_Nat fe2 * Field51_as_Nat fe1 = 1
+              -- -- From h_fe2_inv: Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p = 1
+              -- have h_comm : Field51_as_Nat fe2 * Field51_as_Nat fe1 % p = Field51_as_Nat fe1 * Field51_as_Nat fe2 % p := by
+              --   rw [Nat.mul_comm]
+              -- rw [h_comm]
+              -- -- Now we need: Field51_as_Nat fe1 * Field51_as_Nat fe2 % p % p = 1 % p
+              -- rw [Nat.mod_mod_of_dvd _ _ (dvd_refl p)]
+              -- -- From h_fe2_inv but in the right order
+              -- have : Field51_as_Nat fe1 % p * Field51_as_Nat fe2 % p % p = Field51_as_Nat fe2 % p * (Field51_as_Nat fe1 % p) % p := by
+              --   rw [Nat.mul_comm]
+              -- rw [this, h_fe2_inv]
               sorry
-
-            -- Simplify
+              -- Simplify
             _ = Field51_as_Nat fe % p := by
                 ring_nf
 
@@ -305,8 +307,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             -- Relate u to mp
             _ = (U8x32_as_Nat mp % p - 1) % p := by
                 -- First establish that Field51_as_Nat u % p = U8x32_as_Nat mp % p
-                have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
-                  sorry
+                -- have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
+                --   sorry
                 -- Rewrite using the fact that (a - 1) % p depends on a % p
                 -- conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
                 -- rw [← Nat.sub_mod]
