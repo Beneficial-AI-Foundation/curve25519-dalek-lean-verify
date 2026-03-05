@@ -85,7 +85,7 @@ theorem decompress_spec (comp : CompressedRistretto) :
       · simp only [h_canon, ↓reduceIte, Choice.zero, h_s_neg, or_true, Choice.one, bind_tc_ok,
         decide_eq_true_eq]
       · simp only [decompress_pure, h_step1_none (by simp only [h_s_neg, Nat.not_eq,
-        UScalar.ofNat_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero,
+        UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero,
         zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, and_false]), Option.bind_none,
         reduceCtorEq] at h
     · -- Non-negative s: proceed to step_2
@@ -125,7 +125,7 @@ theorem decompress_spec (comp : CompressedRistretto) :
           simp only [h_t_neg]
           exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
             simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none (by simp only [h_t_neg,
-              Nat.not_eq, UScalar.ofNat_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one,
+              Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one,
               not_lt_zero, zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, false_and,
               and_false]),
               reduceCtorEq] at h⟩
@@ -136,7 +136,7 @@ theorem decompress_spec (comp : CompressedRistretto) :
             simp only [h_t_neg_zero, h_y_zero]
             exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
               simp only [decompress_pure, h_ds1, Option.bind_some,
-                h_step2_none (by simp only [h_y_zero, Nat.not_eq, UScalar.ofNat_val_eq, ne_eq,
+                h_step2_none (by simp only [h_y_zero, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq,
                   one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true,
                   or_self, UScalar.val_not_eq_imp_not_eq, and_false]), reduceCtorEq] at h⟩
           · -- ALL VALID: return some res

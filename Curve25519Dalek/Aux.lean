@@ -58,9 +58,7 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
 
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
-    (bs.set i#usize a)[i]! = a := by
-  simp [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNat_val_eq]
-  grind
+    (bs.set i#usize a)[i]! = a := by grind
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
@@ -187,10 +185,9 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
   simp only [L, L', List.ofFn_inj] at h_inj
   apply Subtype.ext
   apply List.ext_get
-  · simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+  · simp [List.Vector.length_val]
   · intro n h_a h_a'
-    have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNat_val_eq, Fin.is_lt, getElem!_pos]
+    have h_len : n < 32 := by grind
     have h_congr := congr_fun h_inj ⟨n, h_len⟩
     simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
@@ -198,6 +195,5 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
-  · simp only [pow_zero, tsub_self, Nat.and_zero, Aeneas.ReduceNat.reduceNatEq]
-    scalar_tac
+  · grind
   · simp

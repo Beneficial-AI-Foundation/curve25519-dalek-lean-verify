@@ -56,6 +56,7 @@ verification tracking (e.g., trivial trait implementations).
 -/
 def hiddenFunctions : List String := [
   -- Other
+  "curve25519_dalek.ristretto.RistrettoPoint.coset4",
   "curve25519_dalek.IdentityCurveModelsProjectivePoint",
   "curve25519_dalek.IdentityMontgomeryProjectivePoint",
   "curve25519_dalek.backend.get_selected_backend",
@@ -471,7 +472,6 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub",
   "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
   -- Scalar52 (thin wrappers, specs live on montgomery_mul/montgomery_square)
-  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
   "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
   -- Variable-base scalar multiplication
   "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",

@@ -3,7 +3,9 @@ import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Curve
+import Curve25519Dalek.Math.Edwards.EightTorsion
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Math.Montgomery.Representation
@@ -141,7 +143,6 @@ import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step2
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.ToBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Compress
-import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Coset4
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul

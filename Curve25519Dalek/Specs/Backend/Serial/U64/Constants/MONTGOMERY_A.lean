@@ -15,7 +15,7 @@ By^2 = x^3 + Ax^2 + x.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -35,9 +35,11 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A`**:
 - The value of constants.MONTGOMERY_A when converted to a natural number equals 486662
 -/
-@[simp]
-theorem MONTGOMERY_A_spec : Field51_as_Nat MONTGOMERY_A = 486662 := by
-  unfold MONTGOMERY_A
+@[progress]
+theorem MONTGOMERY_A_spec :
+    MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ⦄ := by
+  unfold MONTGOMERY_A field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

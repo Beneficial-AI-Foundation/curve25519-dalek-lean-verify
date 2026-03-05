@@ -5,7 +5,6 @@ Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
@@ -50,9 +49,12 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.Y_plus_X = ONE ∧ q.Y_minus_X = ONE ∧ q.Z = ONE ∧ q.T2d = ZERO) := by
+    spec identity (fun (q : ProjectiveNielsPoint) =>
+      Field51_as_Nat q.Y_plus_X = 1 ∧
+      Field51_as_Nat q.Y_minus_X = 1 ∧
+      Field51_as_Nat q.Z = 1 ∧
+      Field51_as_Nat q.T2d = 0) := by
   unfold identity
-  simp
+  progress*
 
 end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity

@@ -44,41 +44,17 @@ natural language specs:
 @[progress]
 theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (h_no_overflow : ∀ j < 5, i.val ≤ j → square[j]!.val * 2 ≤ U64.max) :
-    square2_loop square i ⦃ r =>
-    (∀ j < 5, i.val ≤ j → r[j]!.val = square[j]!.val * 2) ∧
-    (∀ j < 5, j < i.val → r[j]! = square[j]!) ⦄ := by
+    square2_loop square i ⦃ (result : FieldElement51) =>
+      (∀ j < 5, i.val ≤ j → result[j]!.val = square[j]!.val * 2) ∧
+      (∀ j < 5, j < i.val → result[j]! = square[j]!) ⦄ := by
   unfold square2_loop
   split
   · progress*
-    · -- BEGIN TASK
-      have := h_no_overflow i (by scalar_tac) (by simp)
-      scalar_tac
-      -- END TASK
-    · -- BEGIN TASK
-      intro j hj _
-      have := h_no_overflow j hj
-      have := h_no_overflow j (by scalar_tac) (by omega)
-      have : i.val ≠ j := by scalar_tac
-      simp_all
-      -- END TASK
-    · refine ⟨fun j hj _ ↦ ?_, fun j hj _ ↦ ?_⟩
-      · -- BEGIN TASK
-        obtain hc | hc := (show j = i ∨ i + 1 ≤ j by omega)
-        · simp_all
-        · have := res_post_1 j hj (by omega)
-          have := Array.set_of_ne' square i2 j i (by scalar_tac) (by omega)
-          have := Array.val_getElem!_eq' square j (by scalar_tac)
-          simp_all
-      -- END TASK
-      · -- BEGIN TASK
-        have := res_post_2 j hj (by omega)
-        simp_all
-        -- END TASK
-  · -- BEGIN TASK
-    refine ⟨fun j hj hij => absurd hj (by scalar_tac), fun j _ _ => rfl⟩
-    -- END TASK
+    · refine ⟨fun j _ _ ↦ ?_, by grind⟩
+      obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> grind
+  · progress*
   termination_by 5 - i.val
-  decreasing_by scalar_decr_tac
+  decreasing_by scalar_tac
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:
 - No panic (always returns successfully)
@@ -87,29 +63,18 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
 - Output bounds: each limb < 2^53
 -/
 @[progress]
-theorem square2_spec (a : Array U64 5#usize) (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    square2 a ⦃ r =>
-    Field51_as_Nat r % p = (2 * (Field51_as_Nat a)^2) % p ∧ (∀ i < 5, r[i]!.val < 2 ^ 53) ⦄ := by
+theorem square2_spec (self : Array U64 5#usize) (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 54) :
+    square2 self ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result ≡ (2 * (Field51_as_Nat self) ^ 2) [MOD p] ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 53) ⦄ := by
   unfold square2
   progress*
-  · -- BEGIN TASK
-    intro j hj _
-    have := square_post_1 j hj
-    scalar_tac
-    -- END TASK
-  · refine ⟨?_, fun i hi ↦ ?_⟩
-    · -- BEGIN TASK
-      have : Field51_as_Nat res = 2 * Field51_as_Nat square := by
-        unfold Field51_as_Nat
-        rw [Finset.mul_sum]
-        apply Finset.sum_congr rfl
-        grind
-      rw [this, Nat.mul_mod, square_post_2, ← Nat.mul_mod, pow_one]
-      -- END TASK
-    · -- BEGIN TASK
-      have := res_post_1 i hi (by omega)
-      have := square_post_1 i hi
-      scalar_tac
-      -- END TASK
+  refine ⟨?_, by grind⟩
+  have : Field51_as_Nat result = 2 * Field51_as_Nat square := by
+    unfold Field51_as_Nat
+    rw [Finset.mul_sum]
+    apply Finset.sum_congr rfl
+    grind
+  grind [Nat.ModEq, Nat.mul_mod]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

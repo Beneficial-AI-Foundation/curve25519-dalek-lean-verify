@@ -59,28 +59,26 @@ theorem as_extended_spec (q : CompletedPoint)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
   (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
   (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
-as_extended q ⦃ e =>
-let X := Field51_as_Nat q.X
-let Y := Field51_as_Nat q.Y
-let Z := Field51_as_Nat q.Z
-let T := Field51_as_Nat q.T
-let X' := Field51_as_Nat e.X
-let Y' := Field51_as_Nat e.Y
-let Z' := Field51_as_Nat e.Z
-let T' := Field51_as_Nat e.T
-X' % p = (X * T) % p ∧
-Y' % p = (Y * Z) % p ∧
-Z' % p = (Z * T) % p ∧
-T' % p = (X * Y) % p ∧
-(∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄
-:= by
+  as_extended q ⦃ (e : edwards.EdwardsPoint) =>
+    let X := Field51_as_Nat q.X
+    let Y := Field51_as_Nat q.Y
+    let Z := Field51_as_Nat q.Z
+    let T := Field51_as_Nat q.T
+    let X' := Field51_as_Nat e.X
+    let Y' := Field51_as_Nat e.Y
+    let Z' := Field51_as_Nat e.Z
+    let T' := Field51_as_Nat e.T
+    X' % p = (X * T) % p ∧
+    Y' % p = (Y * Z) % p ∧
+    Z' % p = (Z * T) % p ∧
+    T' % p = (X * Y) % p ∧
+    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold as_extended
   progress*
-  rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
-  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos,
-    Nat.reducePow, implies_true, and_self]
+  rw [← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
+  simp_all
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

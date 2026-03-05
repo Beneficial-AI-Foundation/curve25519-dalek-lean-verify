@@ -26,7 +26,7 @@ theorem Scalar_ext (a b : Scalar) : a.bytes = b.bytes → a = b := by
 /-- If `U8x32_as_Nat` of a Scalar equals `0` then is it `ZERO`. -/
 lemma U8x32_as_Nat_eq_zero_iff_ZERO (s : Scalar) : U8x32_as_Nat s.bytes = 0 ↔ s = ZERO := by
   have : U8x32_as_Nat ZERO.bytes = 0 := by
-    unfold ZERO ZERO_body eval_global U8x32_as_Nat
+    unfold ZERO U8x32_as_Nat
     decide
   constructor
   · intro _

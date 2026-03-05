@@ -21,6 +21,7 @@ This function returns the identity element of the Edwards curve in projective co
 
 open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
+open backend.serial.curve_models
 namespace curve25519_dalek.IdentityCurveModelsProjectivePoint
 
 /-
@@ -42,9 +43,11 @@ natural language specs:
 -/
 @[progress]
 theorem identity_spec :
-    spec identity (fun q =>
-    q.X = ZERO ∧ q.Y = ONE ∧ q.Z = ONE) := by
+    spec identity (fun (q : ProjectivePoint) =>
+      Field51_as_Nat q.X = 0 ∧
+      Field51_as_Nat q.Y = 1 ∧
+      Field51_as_Nat q.Z = 1) := by
   unfold identity
-  simp
+  progress*
 
 end curve25519_dalek.IdentityCurveModelsProjectivePoint

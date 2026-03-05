@@ -53,6 +53,8 @@ natural language specs:
 • The output accurately reflects the output of the pure mathematical compression function
 -/
 
+-- maxHeartbeats increased: compress has many sub-calls, progress* needs more time after Aeneas update
+set_option maxHeartbeats 1600000 in
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
 • The output is a valid CompressedRistretto 32-byte representation
@@ -65,83 +67,6 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by
   unfold compress
   progress*
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · sorry
-
-  · constructor
-
-    · unfold CompressedRistretto.IsValid
-
-      sorry
-
-    · sorry
+  all_goals sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

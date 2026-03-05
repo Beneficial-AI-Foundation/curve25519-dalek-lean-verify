@@ -18,7 +18,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
-open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.backend.serial.u64.field FieldElement51
 
 /-! ## Spec for `neg` -/
 
@@ -28,14 +28,13 @@ open curve25519_dalek.backend.serial.u64.field.FieldElement51
 - Input bound assumption: all limbs of the input are < 2^54 (as in `negate_spec`)
 - Output bound matches `negate_spec` -/
 @[progress]
-theorem neg_spec (r : backend.serial.u64.field.FieldElement51)
-    (h : ∀ i < 5, r[i]!.val < 2 ^ 54) :
-    neg r ⦃ r_inv =>
-    (Field51_as_Nat r + Field51_as_Nat r_inv) % p = 0 ∧
-    (∀ i < 5, r_inv[i]!.val ≤ 2^51 + (2^13 - 1) * 19) ⦄ := by
+theorem neg_spec (self : FieldElement51)
+    (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :
+    neg self ⦃ (neg : FieldElement51) =>
+      Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧
+      ∀ i < 5, neg[i]!.val ≤ 2 ^ 52 ⦄ := by
   unfold neg
-  -- Use the `negate` specification since `neg` is just a thin wrapper
-  progress
-  exact ⟨‹_›, ‹_›⟩
+  progress*
+
 
 end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51

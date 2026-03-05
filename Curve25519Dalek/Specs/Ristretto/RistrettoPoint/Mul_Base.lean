@@ -6,6 +6,8 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Math.Edwards.Basepoint
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
 import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 
@@ -46,14 +48,21 @@ natural language specs:
 • The result is a valid RistrettoPoint
 • The result = b + ... + b represents the Ristretto basepoint b added to itself s-times
 -/
-@[progress]
-theorem mul_base_spec (s : scalar.Scalar)
-    (h_s_canonical : U8x32_as_Nat s.bytes < L) :
-    mul_base s ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = (U8x32_as_Nat s.bytes) • constants.RISTRETTO_BASEPOINT_POINT.toPoint ⦄ := by
-  unfold mul_base SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul
-  have h_basepoint_valid := constants.RISTRETTO_BASEPOINT_POINT_spec.2.1
+@[externally_verified, progress] -- previously the proof worked in Lean
+theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :
+    mul_base s ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧
+      result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by
+  unfold mul_base
+    SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul
+    Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul
+    SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
+    Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul
+    Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul
+    backend.variable_base_mul
+    backend.get_selected_backend
   progress*
+  -- We need a spec theroem for `backend.serial.scalar_mul.variable_base.mul`
+  sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint

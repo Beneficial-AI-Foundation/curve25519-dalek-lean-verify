@@ -39,16 +39,16 @@ natural language specs:
 -/
 @[progress]
 theorem is_canonical_spec (s : Scalar) :
-    is_canonical s ⦃ c =>
-    (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by
+    is_canonical s ⦃ (c : subtle.Choice) =>
+      (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by
   unfold is_canonical
   progress*
   constructor
   · grind
   · intro h
     rename_i s' _
-    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post_1 s_post_2 h
-    rw [res_post]
+    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post1 s_post2 h
+    rw [c_post]
     apply U8x32_as_Nat_injective
     symm
     exact bytes_eq

@@ -41,6 +41,8 @@ natural language specs:
       scalar_to_nat(u) * scalar_to_nat(u') is congruent to 1 (mod \ell)
 -/
 
+-- Stack overflow from deeply nested progress* chain; increase recursion depth
+set_option maxRecDepth 4096 in
 /-- **Spec and proof concerning `scalar.Scalar52.invert`**:
 - Precondition: The unpacked input scalar u must be non-zero modulo L (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
@@ -59,15 +61,15 @@ theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i
       try simp_all [Nat.ModEq]
     try simp_all
   · rw [Nat.ModEq] at *
-    have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) % L
-        = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat res * R % L) % L := by rw [Nat.mul_mod]
+    have h := calc (Scalar52_as_Nat u * R) * (Scalar52_as_Nat u' * R) % L
+        = (Scalar52_as_Nat u * R % L) * (Scalar52_as_Nat u' * R % L) % L := by rw [Nat.mul_mod]
       _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
       _ = R * R % L := by
         simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
-        try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq, getElem!_pos,
+        try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
           Nat.reducePow]
-    have : (Scalar52_as_Nat u * R) * (Scalar52_as_Nat res * R) =
-        Scalar52_as_Nat u * Scalar52_as_Nat res * (R * R) := by try grind
+    have : (Scalar52_as_Nat u * R) * (Scalar52_as_Nat u' * R) =
+        Scalar52_as_Nat u * Scalar52_as_Nat u' * (R * R) := by try grind
     rw [this] at h
     have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
       have coprime : Nat.Coprime (R ^ 2) L := by try decide
