@@ -311,6 +311,36 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
             unfold compress_den_inv compress_den1 compress_den2; rw [hJ0]; split_ifs <;> ring
           rw [hs0, hdi0]; ring
         · -- Nondegenerate: J² = I²·Z⁶, both sides equal
+          have h_ne_aff : compress_u1 P * compress_u2 P ^ 2 ≠ 0 := by
+            rw [h_aff]; exact div_ne_zero hd (pow_ne_zero _ hZ_ne)
+          have h_isq : IsSquare (compress_u1 P * compress_u2 P ^ 2) := by
+            rw [h_aff, h_u1_u2_sq_val]
+            obtain ⟨w, hw⟩ := (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2))
+            exact ⟨w * (self.X.toField * self.Y.toField) / self.Z.toField ^ 3,
+              by rw [hw]; field_simp⟩
+          have hJ_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
+            unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_isq h_ne_aff
+          -- Step B: J² = I²·Z⁶ and compress_z_inv P = 1
+          set I := x_post1.2.toField with hI_def
+          set Z := self.Z.toField with hZ_def
+          have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
+            have hI_u := h_I_sq_mul hd
+            have hJ_u : compress_invsqrt P ^ 2 * u1_u2_sq.toField = Z ^ 6 := by
+              rwa [h_aff, ← mul_div_assoc, div_eq_iff (pow_ne_zero 6 hZ_ne), one_mul] at hJ_sq
+            have : u1_u2_sq.toField * (compress_invsqrt P ^ 2 - I ^ 2 * Z ^ 6) = 0 := by
+              linear_combination hJ_u - hI_u * Z ^ 6
+            exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hd)
+          have hz_inv_one : compress_z_inv P = 1 := by
+            have : compress_z_inv P =
+                compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by
+              unfold compress_z_inv compress_den1 compress_den2 compress_u2; ring
+            rw [this, hJ_sq]
+          -- Step C: z_inv.toField * Z = 1 (key for flag matching)
+          have h_z_inv_mul : z_inv.toField * Z = 1 := by
+            have hI := h_I_sq_mul hd; rw [h_u1_u2_sq_val] at hI
+            rw [hb_z_inv, hb_i1, hb_i2_T, hb_i2, h_u1_proj, hb_u2]
+            linear_combination hI - I ^ 2 * (Z ^ 2 - self.Y.toField ^ 2) *
+              (self.X.toField * self.Y.toField) * hT_rel
           sorry
       -- Conclude: s1 = abs(s) = abs(compress_den_inv * (1 - y_final)) = compress_s P
       rw [h_s1_abs]; unfold compress_s
