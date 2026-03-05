@@ -383,10 +383,12 @@
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Sub.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Sub<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -788,11 +790,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec\n    (self other : RistrettoPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Sub.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Sub<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::sub",
@@ -5778,11 +5782,14 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : EdwardsPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : EdwardsPoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec and proof concerning `edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select`**:\n- No panic (always returns successfully)\n- Returns `b` when `choice = 1` and `a` when `choice = 0`\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_select",
@@ -5793,7 +5800,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -7739,11 +7746,14 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    identity ⦃ (result : CompressedRistretto) =>\n      ∀ i : Fin 32, result[i]! = 0#u8 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting CompressedRistretto is 32 zero bytes\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::CompressedRistretto}::identity",
@@ -7754,7 +7764,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": false,
@@ -7776,11 +7786,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem ct_eq_spec\n    (self other : CompressedRistretto) :\n    ct_eq self other ⦃ (result : subtle.Choice) =>\n      result = Choice.one ↔ self = other ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/CtEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one iff the two CompressedRistretto values are equal\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::CompressedRistretto}::ct_eq",
@@ -7791,7 +7803,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.ristretto.CompressedRistretto.as_bytes"]},
   {"verified": true,
@@ -7837,10 +7849,13 @@
    ["curve25519_dalek.ristretto.decompress.step_1",
     "curve25519_dalek.ristretto.decompress.step_2"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.CompressedRistretto.from_slice`**:\n    • The operation never panics (always returns `ok` at the Aeneas level)\n    • If bytes.length = 32: the result is Ok(cr) where cr.val = bytes.val\n    • If bytes.length ≠ 32: the result is Err(())\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::from_slice",
@@ -7985,11 +8000,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem eq_spec\n    (self other : RistrettoPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    eq self other ⦃ (result : Bool) =>\n      (result = true ↔\n        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨\n        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Eq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq`**:\n- No panic (always returns successfully given valid inputs)\n- Returns true iff the two points satisfy the multiplicative Ristretto equivalence condition:\n  X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::eq",
@@ -8574,11 +8591,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem identity_spec :\n    identity ⦃ (result : RistrettoPoint) =>\n      Field51_as_Nat result.X = 0 ∧\n      Field51_as_Nat result.Y = 1 ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T = 0 ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Identity.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::RistrettoPoint}::identity",
@@ -8589,7 +8608,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
@@ -8613,11 +8632,14 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem conditional_select_spec\n    (a b : RistrettoPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : RistrettoPoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ConditionalSelect.lean",
+   "spec_docstring":
+   "/--\n**Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select`**:\n- No panic (always returns successfully)\n- Returns `b` when `choice = 1` and `a` when `choice = 0`\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select",
@@ -8628,7 +8650,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -8652,10 +8674,12 @@
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
   {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem ct_eq_spec\n    (self other : RistrettoPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    ct_eq self other ⦃ (result : subtle.Choice) =>\n      result = Choice.one ↔\n        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨\n        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/CtEq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully given valid inputs)\n- The result is Choice.one iff the two points satisfy the multiplicative Ristretto equivalence condition:\n  X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::RistrettoPoint}::ct_eq",
