@@ -63,17 +63,17 @@ def ofByteArray (arr : Array U8 32#usize) : List Bool :=
 
 variable {bs₁ bs₂ bs₃ : List Bool}
 
-theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
+@[grind] theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
   fun _ => rfl
 
-theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
+@[grind] theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
   fun i => (h i).symm
 
-theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
+@[grind] theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
   fun i => (h₁ i).trans (h₂ i)
 
 /-- Appending `false` bits does not change equivalence. -/
-theorem Equiv.append_false (bs : List Bool) (n : Nat) :
+@[grind] theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
   intro i
   simp only [List.getD_eq_getElem?_getD]
@@ -113,7 +113,7 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
       · intro i; simp only [getD_drop_one]; exact heq (i + 1)
     omega
 
-theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
+@[grind] theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
   toNat_eq_toNat_of_equiv_aux (bs₁.length + bs₂.length) bs₁ bs₂ (by omega) (by omega) h
 
 /-- Equiv is preserved by `List.take` on both sides. -/
@@ -126,7 +126,7 @@ private theorem getD_take (bs : List Bool) (n i : Nat) :
     · rfl
     · simp [List.length_take]; omega
 
-theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+@[grind] theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.take n ≈ₗ bs₂.take n := by
   intro i
   simp only [getD_take]
@@ -137,14 +137,14 @@ private theorem getD_drop (bs : List Bool) (n i : Nat) :
     (bs.drop n).getD i false = bs.getD (n + i) false := by
   simp only [List.getD_eq_getElem?_getD, List.getElem?_drop]
 
-theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+@[grind] theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.drop n ≈ₗ bs₂.drop n := by
   intro i
   simp only [getD_drop]
   exact h (n + i)
 
 /-- Equiv is preserved by `List.extract` on both sides. -/
-theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
+@[grind] theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
   simp only [List.extract_eq_drop_take]
   exact (h.drop start).take (stop - start)
