@@ -63,20 +63,18 @@ def ofByteArray (arr : Array U8 32#usize) : List Bool :=
 
 variable {bs₁ bs₂ bs₃ : List Bool}
 
-@[grind]
 theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
   fun _ => rfl
 
-@[grind]
+@[grind →]
 theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
   fun i => (h i).symm
 
-@[grind]
 theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
   fun i => (h₁ i).trans (h₂ i)
 
 /-- Appending `false` bits does not change equivalence. -/
-@[grind]
+@[grind =]
 theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
   intro i
@@ -107,7 +105,7 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
       · intro i; simp only [getD_drop_one]; exact heq (i + 1)
     omega
 
-@[grind]
+@[grind →]
 theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
   toNat_eq_toNat_of_equiv_aux (bs₁.length + bs₂.length) bs₁ bs₂ (by omega) (by omega) h
 
@@ -116,7 +114,6 @@ private theorem getD_take (bs : List Bool) (n i : Nat) :
     (bs.take n).getD i false = if i < n then bs.getD i false else false := by
   by_cases hi : i < n <;> simp [hi]
 
-@[grind]
 theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.take n ≈ₗ bs₂.take n := by
   intro i
@@ -128,7 +125,6 @@ private theorem getD_drop (bs : List Bool) (n i : Nat) :
     (bs.drop n).getD i false = bs.getD (n + i) false := by
   simp only [List.getD_eq_getElem?_getD, List.getElem?_drop]
 
-@[grind]
 theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.drop n ≈ₗ bs₂.drop n := by
   intro i
@@ -136,7 +132,6 @@ theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
   exact h (n + i)
 
 /-- Equiv is preserved by `List.extract` on both sides. -/
-@[grind]
 theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
   simp only [List.extract_eq_drop_take]
@@ -161,10 +156,10 @@ theorem ofByteList_length (bytes : List U8) :
   induction bytes with
   | nil => simp [ofByteList]
   | cons x xs ih =>
-    simp only [ofByteList, List.map_cons, List.flatten_cons, List.length_append]
-    rw [show (ofU8 x).length = 8 from ofU8_length x]
-    rw [show ((xs.map ofU8).flatten).length = (ofByteList xs).length from rfl]
-    rw [ih]; simp; ring
+    unfold ofByteList
+    simp only [List.map_cons, List.flatten_cons, List.length_append, ofU8_length]
+    change 8 + (ofByteList xs).length = 8 * (xs.length + 1)
+    rw [ih]; ring
 
 theorem ofByteArray_length (arr : Array U8 32#usize) :
     (ofByteArray arr).length = 256 := by
@@ -260,11 +255,7 @@ theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k)
 theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
     (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
   simp only [List.extract_eq_drop_take]
-  -- LHS: take (c+d-c) (drop c (take (b-a) (drop a l)))
-  -- RHS: take (a+c+d-(a+c)) (drop (a+c) l)
-  rw [List.drop_take, List.drop_drop]
-  -- LHS: take (c+d-c) (take (b-a-c) (drop (c+a) l))
-  rw [List.take_take]
+  rw [List.drop_take, List.drop_drop, List.take_take]
   congr 1; omega
 
 /-! ## Byte list decomposition into bits -/
@@ -427,10 +418,8 @@ theorem toNat_ofByteList (bytes : List U8) :
   | nil => simp [ofByteList, toNat]
   | cons x xs ih =>
     simp only [ofByteList_cons, toNat_append, toNat_ofU8, ofU8_length,
-      List.map_cons, Nat.ofDigits]
-    rw [show (ofByteList xs) = ((xs.map ofU8).flatten) from rfl]
-    rw [show toNat ((xs.map ofU8).flatten) = toNat (ofByteList xs) from rfl]
-    rw [ih]; push_cast; ring
+      List.map_cons, Nat.ofDigits, ih]
+    push_cast; ring
 
 /-- `Nat.ofDigits 256` on a byte list equals the corresponding `Finset.sum`. -/
 lemma ofDigits_map_val_eq_sum (bytes : List U8) :
@@ -461,8 +450,8 @@ theorem toNat_ofByteArray (arr : Array U8 32#usize) :
   apply Finset.sum_congr rfl
   intro j hj
   rw [Finset.mem_range] at hj
-  rw [show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul, Nat.mul_comm 8 j]
-  rw [Array.getElem!_Nat_eq]
+  rw [show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul, Nat.mul_comm 8 j,
+    Array.getElem!_Nat_eq]
   ring
 
 /-! ## Splitting / reassembly lemma -/

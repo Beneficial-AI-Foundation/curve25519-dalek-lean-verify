@@ -267,8 +267,7 @@ theorem field51_eq_of_bitList
     rw [hlimb i hi]; ring
   rw [hsum, ← toNat_split_chunks (ofByteArray bytes) 51 5 (by rw [ofByteArray_length]; norm_num),
     show 51 * 5 = 255 from by norm_num]
-  rw [toNat_take 255 (ofByteArray bytes)]
-  rw [toNat_ofByteArray]
+  rw [toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
 
 /-- The limb bound follows from Equiv (the extract has length ≤ 51). -/
 theorem limb_bound_of_equiv
@@ -278,15 +277,9 @@ theorem limb_bound_of_equiv
         (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
     ∀ i : Fin 5, result[i]!.val < 2 ^ 51 := by
   intro i
-  have hequiv_i := hequiv i
-  rw [← toNat_ofU64 result[i]!]
-  rw [hequiv_i.toNat_eq]
-  calc toNat ((ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51))
-      < 2 ^ ((ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)).length :=
-        toNat_lt_pow _
-    _ ≤ 2 ^ 51 := by
-        apply Nat.pow_le_pow_right (by omega)
-        simp [List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteArray_length]
+  rw [← toNat_ofU64 result[i]!, (hequiv i).toNat_eq]
+  exact (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) (by
+    simp [List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteArray_length]))
 
 /-! ## The pure List Bool specification for from_bytes -/
 
