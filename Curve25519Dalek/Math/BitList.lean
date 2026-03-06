@@ -96,10 +96,7 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
     ∀ (bs₁ bs₂ : List Bool), bs₁.length ≤ n → bs₂.length ≤ n →
     (bs₁ ≈ₗ bs₂) → toNat bs₁ = toNat bs₂ := by
   induction n with
-  | zero =>
-    intro bs₁ bs₂ h1 h2 _
-    simp [List.length_eq_zero_iff] at h1 h2
-    rw [h1, h2]
+  | zero => grind
   | succ n ih =>
     intro bs₁ bs₂ h1 h2 heq
     have step : ∀ bs : List Bool,
@@ -494,7 +491,7 @@ theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length
       rw [List.extract_eq_drop_take]
       conv_lhs => rw [← List.take_append_drop (k * n) (bs.take (k * n + k))]
       rw [List.take_take, List.drop_take]
-      simp [min_def]
+      simp
     rw [hsplit, toNat_append]
     have hlen : (bs.take (k * n)).length = k * n := by
       rw [List.length_take]; omega
