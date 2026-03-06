@@ -51,7 +51,6 @@ natural language specs:
 
     where p = 2^255 - 19
 -/
-
 -- /-- **Spec and proof concerning `montgomery.MontgomeryPoint.to_edwards`**:
 -- - When the function returns Some(edwards_point), the Edwards y-coordinate satisfies
 --   the birational map: y * (u + 1) ≡ (u - 1) (mod p)
@@ -191,10 +190,17 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             have h2 :
             Field51_as_Nat u % p = p - 1 := by
               rw [Nat.add_mod] at h1
-              rw [Nat.mod_eq_of_lt]
+              have hp : 0 < p := by decide
+              have hlt : Field51_as_Nat u % p < p := Nat.mod_lt _ hp
+              have h2 : Field51_as_Nat u % p + 1 = p := by
+                sorry
+              have : Field51_as_Nat u % p = p - 1 := by
+                omega
+              exact this
+
+              -- rw [Nat.mod_eq_of_lt]
               -- exact h1
-              sorry
-              sorry
+              -- sorry
             -- modular arithmetic
 
             have h3 :
