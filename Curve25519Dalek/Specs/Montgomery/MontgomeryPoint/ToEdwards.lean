@@ -59,7 +59,6 @@ natural language specs:
 -- -/
 
 
-set_option maxHeartbeats 1600000 in
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
@@ -185,6 +184,34 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- We need a lemma about to_bytes being injective on canonical representatives
           -- For now, leave as sorry as this requires the full to_bytes_spec which isn't proven yet
           have h_eq_bytes : u.to_bytes = FieldElement51.MINUS_ONE.to_bytes := by
+            have h1 : (Field51_as_Nat u + 1) % p = 0 := by
+              sorry
+            -- simpa using h_contra
+
+            have h2 :
+            Field51_as_Nat u % p = p - 1 := by
+              rw [Nat.add_mod] at h1
+              rw [Nat.mod_eq_of_lt]
+              -- exact h1
+              sorry
+              sorry
+            -- modular arithmetic
+
+            have h3 :
+            Field51_as_Nat u % p =
+            Field51_as_Nat FieldElement51.MINUS_ONE % p := by
+              simp only [FieldElement51.MINUS_ONE_spec, Nat.self_sub_mod]
+              exact h2
+            -- simpa using h2
+
+            have h4 :
+            Field51_as_Nat u =
+            Field51_as_Nat FieldElement51.MINUS_ONE := by
+            -- use IsValid bounds
+              sorry
+            -- final
+            -- simpa using
+            -- FieldElement51.to_bytes_injective h4
             sorry
 
           -- From h_eq_bytes and x_post, we get x = Choice.one
@@ -331,20 +358,18 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                   grind only
                   -- simpa [h_u_mod] using h_u_eq
                 sorry
-                -- cases h : Field51_as_Nat u with
-                -- | zero =>
-                --   rw [h] at h_u_modp
-                --   simp at h_u_modp
-                --   rw [h_u_modp]
-                -- | succ k =>
-                --   rw [← h_u_modp, h]
-                --   simp
-                --   sorry
-            -- Simplify
             _ = (U8x32_as_Nat mp - 1) % p := by
+              sorry
               -- omega
                 -- have := Nat.mod_add_div (U8x32_as_Nat mp) p
-              sorry
+
+              -- set a := U8x32_as_Nat mp
+              -- have h : a ≡ a % p [MOD p] := Nat.mod_modEq a p
+              -- have h' : a - 1 ≡ a % p - 1 [MOD p] := by
+              --   -- simpa using h.sub_right 1
+              --   sorry
+              -- exact Nat.modEq_iff_eq_mod.mp h'
+              -- sorry
                 -- simp [this, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
               -- sorry
 
