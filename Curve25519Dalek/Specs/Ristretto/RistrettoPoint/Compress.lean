@@ -391,8 +391,95 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have h_u2_aff : u2.toField = Z ^ 2 * compress_u2 P := by
           rw [hb_u2, hX_scale, hY_scale]; unfold compress_u2; ring
         -- Y1 = Z · compress_y_final P (branch-independent)
+        -- fe = ±sqrt_m1; when fe = -sqrt_m1 in the rotate case, double negation compensates
+        have h_fe_or : fe.toField = sqrt_m1 ∨ fe.toField = -sqrt_m1 := by
+          have : (fe.toField - sqrt_m1) * (fe.toField + sqrt_m1) = 0 := by
+            have : fe.toField ^ 2 = sqrt_m1 ^ 2 := by rw [h_fe_sq, sqrt_m1_sq]
+            linear_combination this
+          rcases mul_eq_zero.mp this with h | h
+          · left; linear_combination h
+          · right; linear_combination h
         have h_Y1_proj : Y1.toField = Z * compress_y_final P := by
-          sorry
+          rw [hb_Y1, hb_y_neg, compress_y_final]
+          by_cases hr : rotate.val = 1#u8
+          · -- ROTATE case
+            have hrot := h_rotate.mp hr
+            rw [hb_Y, if_pos hr, hb_iX, hX_scale,
+                compress_x_prime, if_pos hrot, compress_y_prime, if_pos hrot,
+                hz_inv_one, mul_one]
+            -- x_z_inv.toField = P.y * fe.toField (X' = iY, z_inv·Z = 1)
+            have h_xzinv : x_z_inv.toField = P.y * fe.toField := by
+              rw [hb_x_z_inv, hb_X, if_pos hr, hb_iY, hY_scale]
+              linear_combination P.y * fe.toField * h_z_inv_mul
+            have h_xzinv_val : Field51_as_Nat x_z_inv % p = (P.y * fe.toField).val := by
+              have := congrArg ZMod.val h_xzinv
+              simp only [FieldElement51.toField, ZMod.val_natCast] at this; exact this
+            -- P.y ≠ 0 and sqrt_m1 ≠ 0 (rotate implies P.x*P.y is negative)
+            have h_py_ne : P.y ≠ 0 := by
+              intro h0; have : compress_rotate P = false := by
+                unfold compress_rotate; rw [hz_inv_one, mul_one, h0, mul_zero]; rfl
+              exact absurd hrot (by rw [this]; decide)
+            have h_sm1_ne : (sqrt_m1 : ZMod p) ≠ 0 := by
+              intro h; have hsq := sqrt_m1_sq; rw [h, zero_pow (by norm_num)] at hsq
+              exact absurd hsq (by decide)
+            rcases h_fe_or with hfe | hfe
+            · -- fe = sqrt_m1: direct value & parity match
+              rw [hfe] at h_xzinv_val ⊢
+              by_cases hys : y_sign.val = 1#u8
+              · have : is_negative (P.y * sqrt_m1) = true := by
+                  unfold is_negative; rw [beq_iff_eq, ← h_xzinv_val]; exact y_sign_post.mp hys
+                rw [if_pos hys, this]; simp only [↓reduceIte, mul_neg, neg_inj]; ring
+              · have : is_negative (P.y * sqrt_m1) = false := by
+                  apply Bool.eq_false_iff.mpr; intro h_neg; apply hys
+                  exact y_sign_post.mpr (by
+                    unfold is_negative at h_neg; rw [beq_iff_eq, ← h_xzinv_val] at h_neg; exact h_neg)
+                rw [if_neg hys, this]; simp only [Bool.false_eq_true, ↓reduceIte]; ring
+            · -- fe = -sqrt_m1: parity flips, double negation compensates
+              rw [hfe] at h_xzinv_val ⊢
+              have h_pysm1_ne : P.y * sqrt_m1 ≠ 0 := mul_ne_zero h_py_ne h_sm1_ne
+              -- (-v).val % 2 ≠ v.val % 2 for v ≠ 0
+              have h_parity_flip : (P.y * -(sqrt_m1 : ZMod p)).val % 2 ≠ (P.y * sqrt_m1).val % 2 := by
+                rw [show P.y * -sqrt_m1 = -(P.y * sqrt_m1) from by ring,
+                    ZMod.neg_val, if_neg h_pysm1_ne]
+                have := (P.y * sqrt_m1).val_lt
+                have := Nat.pos_of_ne_zero (show (P.y * sqrt_m1).val ≠ 0 from by
+                  rwa [ne_eq, ZMod.val_eq_zero])
+                have : p % 2 = 1 := by decide
+                omega
+              by_cases hys : y_sign.val = 1#u8
+              · have h_par : Field51_as_Nat x_z_inv % p % 2 = 1 := y_sign_post.mp hys
+                have : (P.y * sqrt_m1).val % 2 = 0 := by
+                  rw [h_xzinv_val] at h_par; omega
+                have : is_negative (P.y * sqrt_m1) = false := by
+                  unfold is_negative; rw [beq_eq_false_iff_ne]; omega
+                rw [if_pos hys, this]; simp only [mul_neg, neg_neg, Bool.false_eq_true, ↓reduceIte]
+                ring
+              · have h_par : Field51_as_Nat x_z_inv % p % 2 ≠ 1 :=
+                  fun h => hys (y_sign_post.mpr h)
+                have : (P.y * sqrt_m1).val % 2 = 1 := by
+                  rw [h_xzinv_val] at h_par; omega
+                have : is_negative (P.y * sqrt_m1) = true := by
+                  unfold is_negative; rw [beq_iff_eq]; exact this
+                rw [if_neg hys, this]; simp only [mul_neg, ↓reduceIte, neg_inj]; ring
+          · -- NO-ROTATE case: Y = self.Y, no fe involvement
+            rw [hb_Y, if_neg hr, hY_scale,
+                compress_x_prime, if_neg (fun h => hr (h_rotate.mpr h)),
+                compress_y_prime, if_neg (fun h => hr (h_rotate.mpr h)),
+                hz_inv_one, mul_one]
+            have h_xzinv_val : Field51_as_Nat x_z_inv % p = P.x.val := by
+              have : x_z_inv.toField = P.x := by
+                rw [hb_x_z_inv, hb_X, if_neg hr, hX_scale]
+                linear_combination P.x * h_z_inv_mul
+              have := congrArg ZMod.val this
+              simp only [FieldElement51.toField, ZMod.val_natCast] at this; exact this
+            by_cases hys : y_sign.val = 1#u8
+            · have : is_negative P.x = true := by
+                unfold is_negative; rw [beq_iff_eq, ← h_xzinv_val]; exact y_sign_post.mp hys
+              rw [if_pos hys, this]; simp only [↓reduceIte, mul_neg]
+            · have : is_negative P.x = false := by
+                apply Bool.eq_false_iff.mpr; intro h_neg; apply hys
+                exact y_sign_post.mpr (by unfold is_negative at h_neg; rw [beq_iff_eq, ← h_xzinv_val] at h_neg; exact h_neg)
+              rw [if_neg hys, this]; simp only [Bool.false_eq_true, ↓reduceIte]
         have h_zmy_sq :
             (Z - Y1.toField) ^ 2 = Z ^ 2 * (1 - compress_y_final P) ^ 2 := by
           rw [h_Y1_proj]; ring
@@ -446,6 +533,20 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   case goal1 =>
     -- Main Goal 1: CompressedRistretto.IsValid
     unfold CompressedRistretto.IsValid
-    sorry
+    -- Extract evenness from validity
+    have h_even : IsEven self.toPoint :=
+      (EdwardsPoint_IsSquare_iff_IsEven self hvalid).mp h.2
+    -- Step 1: decompress_step1 a succeeds, yielding compress_s P
+    have h_s_cast : (↑(U8x32_as_Nat a) : ZMod p) = compress_s self.toPoint := by
+      rw [h_a_eq, ZMod.natCast_mod, ← h_key]; rfl
+    have h_step1 : decompress_step1 a = some (compress_s self.toPoint) := by
+      unfold decompress_step1
+      have h1 : ¬(p ≤ U8x32_as_Nat a) := Nat.not_le.mpr a_post2
+      have h2 : U8x32_as_Nat a % 2 = 0 := h_a_parity
+      simp only [ge_iff_le, h1, decide_false, h2, bne_self_eq_false, Bool.false_or,
+        ↓reduceIte, h_s_cast, Bool.false_eq_true, ↓reduceIte]
+    -- Step 2: decompress_step2 (compress_s P) succeeds (pure roundtrip)
+    obtain ⟨pt, hpt⟩ := decompress_step2_compress_s self.toPoint h_even
+    exact ⟨pt, by unfold decompress_pure; rw [h_step1, Option.bind_some]; exact hpt⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint

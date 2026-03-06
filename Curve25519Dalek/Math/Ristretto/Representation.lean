@@ -685,6 +685,12 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
     · exact h_x_match
     · exact h_y_match
 
+/-- Decode-of-encode: decompressing the scalar produced by compression succeeds.
+    This is the pure math core of the Ristretto roundtrip property. -/
+lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
+    ∃ pt, decompress_step2 (compress_s P) = some pt := by
+  sorry
+
 noncomputable def decompress_pure (c : CompressedRistretto) : Option (Point Ed25519) :=
   (decompress_step1 c).bind decompress_step2
 
