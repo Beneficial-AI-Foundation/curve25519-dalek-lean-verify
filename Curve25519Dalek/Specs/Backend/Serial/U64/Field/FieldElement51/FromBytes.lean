@@ -151,9 +151,10 @@ theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val
   --   ofNat 64 (x.val / 2^k.toNat) ≈ₗ ofNat (64 - k.toNat) (x.val / 2^k.toNat). ✓
 
 /-- Masking a U64 with `2^n - 1` takes the first n bits. -/
-theorem u64_and_mask_bitList_equiv (x mask : U64) (n : Nat)
+@[progress]
+theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
     (hn : n ≤ 64) (hmask : mask.val = 2 ^ n - 1) :
-    ofU64 (x &&& mask) ≈ₗ (ofU64 x).take n := by
+    lift (x &&& mask) ⦃ z => ofU64 z ≈ₗ (ofU64 x).take n ⦄ := by
   sorry
   -- By UScalar.val_and: (x &&& mask).val = x.val &&& mask.val = x.val &&& (2^n - 1).
   -- By land_pow_two_sub_one_eq_mod: x.val &&& (2^n - 1) = x.val % 2^n.
