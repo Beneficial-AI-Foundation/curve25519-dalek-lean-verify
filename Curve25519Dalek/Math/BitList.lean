@@ -85,6 +85,21 @@ theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ := b
   -- Both toNat values equal ∑ i, (bs.getD i false).toNat * 2^i.
   -- Since h says getD agrees at every position, the sums are equal. ✓
 
+/-- Equiv is preserved by `List.take` on both sides. -/
+theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+    bs₁.take n ≈ₗ bs₂.take n := by
+  sorry
+  -- take n gives a sublist; getD on take at position i < n corresponds
+  -- to getD on the original at position i, which agrees by h.
+  -- For i ≥ n, both sides return false. ✓
+
+/-- Equiv is preserved by `List.drop` on both sides. -/
+theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+    bs₁.drop n ≈ₗ bs₂.drop n := by
+  sorry
+  -- drop n gives a sublist; getD on drop at position i corresponds
+  -- to getD on the original at position (n + i), which agrees by h. ✓
+
 /-- Equiv is preserved by `List.extract` on both sides. -/
 theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by

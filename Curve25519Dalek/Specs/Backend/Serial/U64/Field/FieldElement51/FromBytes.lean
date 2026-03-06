@@ -130,6 +130,50 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize)
   --   ofU64 result = ofByteList (input.val.extract i.val (i.val + 8))
   --   = (ofByteList input.val).extract (8*i.val) (8*i.val + 64)  [ofByteList_extract]
 
+/-! ## BitList-native specs for shift and mask
+
+These replace the Nat-level Aeneas specs with List Bool equivalents,
+so the proof of `from_bytes_bitList_spec` stays entirely in List Bool land. -/
+
+-- Remove @[progress] from the Nat-level specs so the BitList versions are preferred.
+attribute [-progress] load8_at_val_spec load8_at_bitList_spec
+
+/-- Right-shifting a U64 by k drops k bits from its List Bool representation. -/
+@[progress]
+theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val < 64) :
+    (x >>> k) ⦃ z => ofU64 z ≈ₗ (ofU64 x).drop k.toNat ⦄ := by
+  sorry
+  -- By U64.ShiftRight_IScalar_spec: z.val = x.val >>> k.toNat = x.val / 2^k.toNat.
+  -- ofU64 z = ofNat 64 (x.val / 2^k.toNat)
+  -- (ofU64 x).drop k.toNat = (ofNat 64 x.val).drop k.toNat
+  --   = ofNat (64 - k.toNat) (x.val / 2^k.toNat)   [ofNat_drop]
+  -- By ofNat_equiv_of_lt (since x.val / 2^k.toNat < 2^(64 - k.toNat)):
+  --   ofNat 64 (x.val / 2^k.toNat) ≈ₗ ofNat (64 - k.toNat) (x.val / 2^k.toNat). ✓
+
+/-- Masking a U64 with `2^n - 1` takes the first n bits. -/
+theorem u64_and_mask_bitList_equiv (x mask : U64) (n : Nat)
+    (hn : n ≤ 64) (hmask : mask.val = 2 ^ n - 1) :
+    ofU64 (x &&& mask) ≈ₗ (ofU64 x).take n := by
+  sorry
+  -- By UScalar.val_and: (x &&& mask).val = x.val &&& mask.val = x.val &&& (2^n - 1).
+  -- By land_pow_two_sub_one_eq_mod: x.val &&& (2^n - 1) = x.val % 2^n.
+  -- ofU64 (x &&& mask) = ofNat 64 (x.val % 2^n)
+  --   ≈ₗ ofNat n (x.val % 2^n)           [ofNat_equiv_of_lt, val < 2^n]
+  --   = ofNat n x.val                      [ofNat_mod]
+  --   = (ofNat 64 x.val).take n            [ofNat_take]
+  --   = (ofU64 x).take n. ✓
+
+/-- load8_at in List Bool terms, as a progress-compatible spec. -/
+@[progress]
+theorem load8_at_bitList_progress_spec (input : Slice U8) (i : Usize)
+    (h : i.val + 8 ≤ input.val.length) :
+    from_bytes.load8_at input i ⦃ result =>
+      ofU64 result ≈ₗ
+        (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
+  sorry
+  -- By load8_at_bitList_spec (which gives equality, not just ≈ₗ).
+  -- Equality implies Equiv. ✓
+
 /-! ## Bridge: List Bool spec implies Nat spec -/
 
 /-- Equiv implies the limb value equals the slice value. -/
@@ -170,6 +214,35 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
       let allBits := ofByteArray bytes
       ∀ i : Fin 5,
         ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
+  unfold from_bytes
+  /-
+  ⊢ (do
+    let i ← 1#u64 <<< 51#i32
+    let low_51_bit_mask ← i - 1#u64
+    let s ← lift bytes.to_slice
+    let i1 ← from_bytes.load8_at s 0#usize
+    let i2 ← lift (i1 &&& low_51_bit_mask)
+    let s1 ← lift bytes.to_slice
+    let i3 ← from_bytes.load8_at s1 6#usize
+    let i4 ← i3 >>> 3#i32
+    let i5 ← lift (i4 &&& low_51_bit_mask)
+    let s2 ← lift bytes.to_slice
+    let i6 ← from_bytes.load8_at s2 12#usize
+    let i7 ← i6 >>> 6#i32
+    let i8 ← lift (i7 &&& low_51_bit_mask)
+    let s3 ← lift bytes.to_slice
+    let i9 ← from_bytes.load8_at s3 19#usize
+    let i10 ← i9 >>> 1#i32
+    let i11 ← lift (i10 &&& low_51_bit_mask)
+    let s4 ← lift bytes.to_slice
+    let i12 ← from_bytes.load8_at s4 24#usize
+    let i13 ← i12 >>> 12#i32
+    let i14 ← lift (i13 &&& low_51_bit_mask)
+    ok (Array.make 5#usize [i2, i5, i8, i11, i14] ⋯)) ⦃
+  result =>
+  let allBits := ofByteArray bytes;
+  ∀ (i : Fin 5), ofU64 result[i]! ≈ₗ allBits.extract (51 * ↑i) (51 * ↑i + 51) ⦄
+  -/
   sorry
   -- Unfold from_bytes. For each limb i with byte offset j and shift k:
   --   result[i] = (load8_at(bytes.to_slice, j) >>> k) &&& low_51_bit_mask
