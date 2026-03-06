@@ -99,7 +99,7 @@ private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
   calc x.val * 2 ^ k
       ≤ 255 * 2 ^ k := Nat.mul_le_mul_right _ hx
     _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_right (by omega) hk)
-    _ < U64.size := by native_decide
+    _ < U64.size := by scalar_tac
 
 private lemma u8_val_mod_u64_numBits (x : U8) :
     x.val % 2 ^ UScalarTy.U64.numBits = x.val :=
@@ -156,25 +156,6 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize)
     have := (input.val[i.val + 4]!).hmax; have := (input.val[i.val + 5]!).hmax
     have := (input.val[i.val + 6]!).hmax; norm_num at *; omega)]
   simp [Finset.sum_range_succ]
-
-private lemma ofDigits_map_val_eq_sum (bytes : List U8) :
-    Nat.ofDigits 256 (bytes.map (·.val)) =
-      ∑ j ∈ Finset.range bytes.length, bytes[j]!.val * 256 ^ j := by
-  induction bytes with
-  | nil => simp
-  | cons x xs ih =>
-    simp only [List.map_cons, List.length_cons]
-    rw [Finset.sum_range_succ']
-    simp only [Nat.pow_zero, Nat.mul_one, List.getElem!_cons_zero]
-    rw [Nat.ofDigits]
-    rw [ih, Finset.mul_sum]
-    rw [Nat.add_comm]
-    congr 1
-    apply Finset.sum_congr rfl
-    intro j hj
-    rw [Finset.mem_range] at hj
-    rw [List.getElem!_cons_succ]
-    ring
 
 private lemma extract_getElem! (l : List U8) (i j : Nat) (hj : j < 8) :
     (l.extract i (i + 8))[j]! = l[i + j]! := by grind

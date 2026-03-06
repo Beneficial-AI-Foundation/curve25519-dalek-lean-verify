@@ -441,10 +441,38 @@ theorem toNat_ofByteList (bytes : List U8) :
     rw [show toNat ((xs.map ofU8).flatten) = toNat (ofByteList xs) from rfl]
     rw [ih]; push_cast; ring
 
+/-- `Nat.ofDigits 256` on a byte list equals the corresponding `Finset.sum`. -/
+lemma ofDigits_map_val_eq_sum (bytes : List U8) :
+    Nat.ofDigits 256 (bytes.map (·.val)) =
+      ∑ j ∈ Finset.range bytes.length, bytes[j]!.val * 256 ^ j := by
+  induction bytes with
+  | nil => simp
+  | cons x xs ih =>
+    simp only [List.map_cons, List.length_cons]
+    rw [Finset.sum_range_succ']
+    simp only [Nat.pow_zero, Nat.mul_one, List.getElem!_cons_zero]
+    rw [Nat.ofDigits]
+    rw [ih, Finset.mul_sum]
+    rw [Nat.add_comm]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro j hj
+    rw [Finset.mem_range] at hj
+    rw [List.getElem!_cons_succ]
+    ring
+
 /-- The value of a 32-byte array's bits equals U8x32_as_Nat. -/
 theorem toNat_ofByteArray (arr : Array U8 32#usize) :
     toNat (ofByteArray arr) = U8x32_as_Nat arr := by
-  sorry
+  rw [ofByteArray, toNat_ofByteList, ofDigits_map_val_eq_sum]
+  unfold U8x32_as_Nat
+  rw [show arr.val.length = 32 from arr.property]
+  apply Finset.sum_congr rfl
+  intro j hj
+  rw [Finset.mem_range] at hj
+  rw [show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul, Nat.mul_comm 8 j]
+  rw [Array.getElem!_Nat_eq]
+  ring
 
 /-! ## Splitting / reassembly lemma -/
 
