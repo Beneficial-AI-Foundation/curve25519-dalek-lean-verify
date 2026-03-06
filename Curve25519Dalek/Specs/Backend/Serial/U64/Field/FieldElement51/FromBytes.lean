@@ -104,6 +104,26 @@ private lemma u8_val_mod_u64_numBits (x : U8) :
     x.val % 2 ^ UScalarTy.U64.numBits = x.val :=
   Nat.mod_eq_of_lt (Nat.lt_of_lt_of_le x.hmax (by norm_num))
 
+private lemma u8_mul_pow_mod_u64 (x : U8) (k : Nat) (hk : k ≤ 56) :
+    x.val * 2 ^ k % U64.size = x.val * 2 ^ k :=
+  Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size x k hk)
+
+/-- Left-associated OR of 8 byte values shifted by multiples of 8 equals their sum. -/
+private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat)
+    (h0 : b0 < 256) (h1 : b1 < 256) (h2 : b2 < 256) (h3 : b3 < 256)
+    (h4 : b4 < 256) (h5 : b5 < 256) (h6 : b6 < 256) (_ : b7 < 256) :
+    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) |||
+    b4 * 2^32) ||| b5 * 2^40) ||| b6 * 2^48) ||| b7 * 2^56 =
+    b0 + b1 * 2^8 + b2 * 2^16 + b3 * 2^24 +
+    b4 * 2^32 + b5 * 2^40 + b6 * 2^48 + b7 * 2^56 := by
+  rw [or_mul_pow_two_eq_add _ _ 8 (by omega),
+    or_mul_pow_two_eq_add _ _ 16 (by norm_num at *; omega),
+    or_mul_pow_two_eq_add _ _ 24 (by norm_num at *; omega),
+    or_mul_pow_two_eq_add _ _ 32 (by norm_num at *; omega),
+    or_mul_pow_two_eq_add _ _ 40 (by norm_num at *; omega),
+    or_mul_pow_two_eq_add _ _ 48 (by norm_num at *; omega),
+    or_mul_pow_two_eq_add _ _ 56 (by norm_num at *; omega)]
+
 /-- The Nat-level spec for load8_at: the result is the little-endian
     combination of 8 consecutive bytes. -/
 @[progress]
@@ -121,39 +141,12 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize)
   simp only [i34_post, i29_post, i24_post, i19_post, i14_post, i9_post, i4_post, i1_post,
     i33_post, i28_post, i23_post, i18_post, i13_post, i8_post, i3_post]
   simp only [u8_val_mod_u64_numBits, Nat.shiftLeft_eq]
-  conv_lhs =>
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 1]!) 8 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 2]!) 16 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 3]!) 24 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 4]!) 32 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 5]!) 40 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 6]!) 48 (by omega))]
-    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 7]!) 56 (by omega))]
-  rw [or_mul_pow_two_eq_add _ _ 8 (by exact (input.val[i.val]!).hmax)]
-  rw [or_mul_pow_two_eq_add _ _ 16 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    norm_num at *; omega)]
-  rw [or_mul_pow_two_eq_add _ _ 24 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    have := (input.val[i.val + 2]!).hmax; norm_num at *; omega)]
-  rw [or_mul_pow_two_eq_add _ _ 32 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
-    norm_num at *; omega)]
-  rw [or_mul_pow_two_eq_add _ _ 40 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
-    have := (input.val[i.val + 4]!).hmax; norm_num at *; omega)]
-  rw [or_mul_pow_two_eq_add _ _ 48 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
-    have := (input.val[i.val + 4]!).hmax; have := (input.val[i.val + 5]!).hmax
-    norm_num at *; omega)]
-  rw [or_mul_pow_two_eq_add _ _ 56 (by
-    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
-    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
-    have := (input.val[i.val + 4]!).hmax; have := (input.val[i.val + 5]!).hmax
-    have := (input.val[i.val + 6]!).hmax; norm_num at *; omega)]
+  simp (discharger := omega) only [u8_mul_pow_mod_u64]
+  rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
+    (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
+    (input.val[i.val + 2]!).hmax (input.val[i.val + 3]!).hmax
+    (input.val[i.val + 4]!).hmax (input.val[i.val + 5]!).hmax
+    (input.val[i.val + 6]!).hmax (input.val[i.val + 7]!).hmax]
   simp [Finset.sum_range_succ]
 
 private lemma extract_getElem! (l : List U8) (i j : Nat) (hj : j < 8) :
