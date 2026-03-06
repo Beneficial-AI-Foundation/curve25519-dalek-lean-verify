@@ -63,17 +63,21 @@ def ofByteArray (arr : Array U8 32#usize) : List Bool :=
 
 variable {bs₁ bs₂ bs₃ : List Bool}
 
-@[grind] theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
+@[grind]
+theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
   fun _ => rfl
 
-@[grind] theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
+@[grind]
+theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
   fun i => (h i).symm
 
-@[grind] theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
+@[grind]
+theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
   fun i => (h₁ i).trans (h₂ i)
 
 /-- Appending `false` bits does not change equivalence. -/
-@[grind] theorem Equiv.append_false (bs : List Bool) (n : Nat) :
+@[grind]
+theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
   intro i
   by_cases i < bs.length <;> grind
@@ -103,7 +107,8 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
       · intro i; simp only [getD_drop_one]; exact heq (i + 1)
     omega
 
-@[grind] theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
+@[grind]
+theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
   toNat_eq_toNat_of_equiv_aux (bs₁.length + bs₂.length) bs₁ bs₂ (by omega) (by omega) h
 
 /-- Equiv is preserved by `List.take` on both sides. -/
@@ -111,7 +116,8 @@ private theorem getD_take (bs : List Bool) (n i : Nat) :
     (bs.take n).getD i false = if i < n then bs.getD i false else false := by
   by_cases hi : i < n <;> simp [hi]
 
-@[grind] theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+@[grind]
+theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.take n ≈ₗ bs₂.take n := by
   intro i
   simp only [getD_take]
@@ -122,14 +128,16 @@ private theorem getD_drop (bs : List Bool) (n i : Nat) :
     (bs.drop n).getD i false = bs.getD (n + i) false := by
   simp only [List.getD_eq_getElem?_getD, List.getElem?_drop]
 
-@[grind] theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
+@[grind]
+theorem Equiv.drop (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.drop n ≈ₗ bs₂.drop n := by
   intro i
   simp only [getD_drop]
   exact h (n + i)
 
 /-- Equiv is preserved by `List.extract` on both sides. -/
-@[grind] theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
+@[grind]
+theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
   simp only [List.extract_eq_drop_take]
   exact (h.drop start).take (stop - start)
@@ -182,7 +190,7 @@ theorem ofNat_take (k w : Nat) (n : Nat) (hkw : k ≤ w) :
 theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     (ofNat w n).drop k = ofNat (w - k) (n / 2 ^ k) := by
   induction k generalizing w n with
-  | zero => simp [ofNat]
+  | zero => simp
   | succ k ih =>
     match w, hkw with
     | w + 1, hkw =>
@@ -257,7 +265,7 @@ theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d �
   rw [List.drop_take, List.drop_drop]
   -- LHS: take (c+d-c) (take (b-a-c) (drop (c+a) l))
   rw [List.take_take]
-  congr 1 <;> omega
+  congr 1; omega
 
 /-! ## Byte list decomposition into bits -/
 
@@ -280,7 +288,7 @@ private theorem flatten_drop_uniform {α : Type} (xss : List (List α)) (k i : N
       have hlen : xs.length = k := hunif xs (by simp)
       rw [show k * (i + 1) = xs.length + k * i from by rw [hlen]; ring]
       rw [List.drop_append, List.drop_eq_nil_of_le (by omega)]
-      simp
+      simp only [add_tsub_cancel_left, List.nil_append]
       exact ih xss (fun ys hy => hunif ys (by simp [hy]))
 
 private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : Nat)
@@ -295,14 +303,12 @@ private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : N
       simp only [List.flatten_cons, List.take_succ_cons]
       have hlen : xs.length = k := hunif xs (by simp)
       rw [show k * (n + 1) = xs.length + k * n from by rw [hlen]; ring]
-      rw [List.take_append]
-      rw [List.take_of_length_le (by omega)]
-      simp
-      congr 1
+      rw [List.take_append, List.take_of_length_le (by omega)]
+      simp only [add_tsub_cancel_left, List.append_cancel_left_eq]
       exact ih xss (fun ys hy => hunif ys (by simp [hy]))
 
 theorem ofByteList_extract (bytes : List U8) (i j : Nat)
-    (h : j ≤ bytes.length) :
+    (_ : j ≤ bytes.length) :
     (ofByteList bytes).extract (8 * i) (8 * j) =
       ofByteList (bytes.extract i j) := by
   simp only [List.extract_eq_drop_take, ofByteList]
@@ -352,9 +358,9 @@ theorem ofNat_toNat (bs : List Bool) :
   | cons b bs ih =>
     simp only [List.length_cons, toNat, ofNat]
     congr 1
-    · cases b <;> simp [Bool.toNat] <;> omega
+    · cases b <;> simp [Bool.toNat]
     · have : (b.toNat + 2 * toNat bs) / 2 = toNat bs := by
-        cases b <;> simp [Bool.toNat] <;> omega
+        cases b <;> simp [Bool.toNat]; omega
       rw [this, ih]
 
 /-- A bit list's value is bounded by `2^length`. -/
