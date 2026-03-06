@@ -338,34 +338,6 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
       ∀ i : Fin 5,
         ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
   unfold from_bytes
-  /-
-  ⊢ (do
-    let i ← 1#u64 <<< 51#i32
-    let low_51_bit_mask ← i - 1#u64
-    let s ← lift bytes.to_slice
-    let i1 ← from_bytes.load8_at s 0#usize
-    let i2 ← lift (i1 &&& low_51_bit_mask)
-    let s1 ← lift bytes.to_slice
-    let i3 ← from_bytes.load8_at s1 6#usize
-    let i4 ← i3 >>> 3#i32
-    let i5 ← lift (i4 &&& low_51_bit_mask)
-    let s2 ← lift bytes.to_slice
-    let i6 ← from_bytes.load8_at s2 12#usize
-    let i7 ← i6 >>> 6#i32
-    let i8 ← lift (i7 &&& low_51_bit_mask)
-    let s3 ← lift bytes.to_slice
-    let i9 ← from_bytes.load8_at s3 19#usize
-    let i10 ← i9 >>> 1#i32
-    let i11 ← lift (i10 &&& low_51_bit_mask)
-    let s4 ← lift bytes.to_slice
-    let i12 ← from_bytes.load8_at s4 24#usize
-    let i13 ← i12 >>> 12#i32
-    let i14 ← lift (i13 &&& low_51_bit_mask)
-    ok (Array.make 5#usize [i2, i5, i8, i11, i14] ⋯)) ⦃
-  result =>
-  let allBits := ofByteArray bytes;
-  ∀ (i : Fin 5), ofU64 result[i]! ≈ₗ allBits.extract (51 * ↑i) (51 * ↑i + 51) ⦄
-  -/
   -- Step through the mask computation
   progress as ⟨i_shl, hi_shl1, _⟩   -- 1 <<< 51
   progress as ⟨low_51_bit_mask, hmask_val, _⟩  -- i - 1
@@ -441,17 +413,16 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
 
 /-! ## Final spec -/
 
-@[progress, externally_verified]
+@[progress]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
-  progress as ⟨result, hresult⟩
-  have heq := field51_eq_of_bitList result bytes hresult
-  have hbound := limb_bound_of_equiv result bytes hresult
-  refine ⟨?_, fun i hi => hbound ⟨i, hi⟩⟩
-  show Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p]
-  rw [heq]
-
+  progress*
+  constructor
+  · rw [field51_eq_of_bitList result bytes _]
+    assumption
+  · intro i hi
+    exact limb_bound_of_equiv result bytes ‹_› ⟨i, hi⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
