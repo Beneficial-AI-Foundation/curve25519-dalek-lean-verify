@@ -76,21 +76,14 @@ variable {bs₁ bs₂ bs₃ : List Bool}
 @[grind] theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
   intro i
-  simp only [List.getD_eq_getElem?_getD]
-  by_cases hi : i < bs.length
-  · rw [List.getElem?_append_left (by omega)]
-  · rw [List.getElem?_append_right (by omega)]
-    simp only [List.getElem?_replicate]
-    rw [List.getElem?_eq_none_iff.mpr (by omega)]
-    simp
-    split <;> rfl
+  by_cases i < bs.length <;> grind
 
 /-- Equiv implies the same numeric value. -/
 private theorem getD_drop_one (bs : List Bool) (i : Nat) :
     (bs.drop 1).getD i false = bs.getD (i + 1) false := by
   cases bs with
-  | nil => simp [List.getD]
-  | cons b bs => simp [List.getD]
+  | nil => simp
+  | cons b bs => simp
 
 private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
     ∀ (bs₁ bs₂ : List Bool), bs₁.length ≤ n → bs₂.length ≤ n →
@@ -116,12 +109,7 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
 /-- Equiv is preserved by `List.take` on both sides. -/
 private theorem getD_take (bs : List Bool) (n i : Nat) :
     (bs.take n).getD i false = if i < n then bs.getD i false else false := by
-  by_cases hi : i < n
-  · simp [List.getD_eq_getElem?_getD, List.getElem?_take, hi]
-  · simp only [hi, ↓reduceIte, List.getD_eq_getElem?_getD]
-    rw [List.getElem?_eq_none_iff.mpr]
-    · rfl
-    · simp [List.length_take]; omega
+  by_cases hi : i < n <;> simp [hi]
 
 @[grind] theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
     bs₁.take n ≈ₗ bs₂.take n := by
