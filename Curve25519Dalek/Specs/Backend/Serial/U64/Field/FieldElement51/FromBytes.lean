@@ -93,6 +93,18 @@ open BitList
 in little-endian order. In List Bool terms, the result's bits are exactly
 the 64 bits starting at position `8*i` in the slice's bit representation. -/
 
+private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
+    x.val * 2 ^ k < U64.size := by
+  have hx : x.val ≤ 255 := Nat.lt_succ_iff.mp x.hmax
+  calc x.val * 2 ^ k
+      ≤ 255 * 2 ^ k := Nat.mul_le_mul_right _ hx
+    _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_right (by omega) hk)
+    _ < U64.size := by native_decide
+
+private lemma u8_val_mod_u64_numBits (x : U8) :
+    x.val % 2 ^ UScalarTy.U64.numBits = x.val :=
+  Nat.mod_eq_of_lt (Nat.lt_of_lt_of_le x.hmax (by norm_num))
+
 /-- The Nat-level spec for load8_at: the result is the little-endian
     combination of 8 consecutive bytes. -/
 @[progress]
@@ -101,18 +113,83 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize)
     from_bytes.load8_at input i ⦃ result =>
       result.val = ∑ j ∈ Finset.range 8,
         input[i.val + j]!.val * 2 ^ (8 * j) ⦄ := by
-  sorry
-  -- Unfold load8_at. It computes:
-  --   input[i] | (input[i+1] << 8) | ... | (input[i+7] << 56)
-  --
-  -- By Aeneas specs:
-  --   U8.cast_U64_val_eq: cast to U64 preserves value
-  --   U64.ShiftLeft_spec: (x <<< k).val = x.val * 2^k (when no overflow)
-  --   UScalar.val_or: (x ||| y).val = x.val ||| y.val
-  --
-  -- OR on disjoint bit ranges equals addition:
-  --   Each byte occupies a disjoint 8-bit range [8j, 8j+8).
-  --   result.val = ∑ j, input[i+j].val * 2^(8*j). ✓
+  unfold from_bytes.load8_at
+  progress*
+  simp only [i32_post1, i27_post1, i22_post1, i17_post1, i12_post1, i7_post1, UScalar.val_or]
+  simp only [i36_post1, i31_post1, i26_post1, i21_post1, i16_post1, i11_post1, i6_post1]
+  simp only [i35_post, i30_post, i25_post, i20_post, i15_post, i10_post, i5_post, i2_post,
+    UScalar.cast_val_eq]
+  simp only [i34_post, i29_post, i24_post, i19_post, i14_post, i9_post, i4_post, i1_post,
+    i33_post, i28_post, i23_post, i18_post, i13_post, i8_post, i3_post]
+  simp only [u8_val_mod_u64_numBits, Nat.shiftLeft_eq]
+  conv_lhs =>
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 1]!) 8 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 2]!) 16 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 3]!) 24 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 4]!) 32 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 5]!) 40 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 6]!) 48 (by omega))]
+    rw [Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size (input.val[i.val + 7]!) 56 (by omega))]
+  rw [or_mul_pow_two_eq_add _ _ 8 (by exact (input.val[i.val]!).hmax)]
+  rw [or_mul_pow_two_eq_add _ _ 16 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    norm_num at *; omega)]
+  rw [or_mul_pow_two_eq_add _ _ 24 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    have := (input.val[i.val + 2]!).hmax; norm_num at *; omega)]
+  rw [or_mul_pow_two_eq_add _ _ 32 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
+    norm_num at *; omega)]
+  rw [or_mul_pow_two_eq_add _ _ 40 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
+    have := (input.val[i.val + 4]!).hmax; norm_num at *; omega)]
+  rw [or_mul_pow_two_eq_add _ _ 48 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
+    have := (input.val[i.val + 4]!).hmax; have := (input.val[i.val + 5]!).hmax
+    norm_num at *; omega)]
+  rw [or_mul_pow_two_eq_add _ _ 56 (by
+    have := (input.val[i.val]!).hmax; have := (input.val[i.val + 1]!).hmax
+    have := (input.val[i.val + 2]!).hmax; have := (input.val[i.val + 3]!).hmax
+    have := (input.val[i.val + 4]!).hmax; have := (input.val[i.val + 5]!).hmax
+    have := (input.val[i.val + 6]!).hmax; norm_num at *; omega)]
+  simp [Finset.sum_range_succ]
+
+private lemma ofDigits_map_val_eq_sum (bytes : List U8) :
+    Nat.ofDigits 256 (bytes.map (·.val)) =
+      ∑ j ∈ Finset.range bytes.length, bytes[j]!.val * 256 ^ j := by
+  induction bytes with
+  | nil => simp
+  | cons x xs ih =>
+    simp only [List.map_cons, List.length_cons]
+    rw [Finset.sum_range_succ']
+    simp only [Nat.pow_zero, Nat.mul_one, List.getElem!_cons_zero]
+    rw [Nat.ofDigits]
+    rw [ih, Finset.mul_sum]
+    rw [Nat.add_comm]
+    congr 1
+    apply Finset.sum_congr rfl
+    intro j hj
+    rw [Finset.mem_range] at hj
+    rw [List.getElem!_cons_succ]
+    ring
+
+private lemma extract_getElem! (l : List U8) (i j : Nat) (hj : j < 8) :
+    (l.extract i (i + 8))[j]! = l[i + j]! := by grind
+
+private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
+    ∑ j ∈ Finset.range 8, l[i + j]!.val * 2 ^ (8 * j) =
+      Nat.ofDigits 256 ((l.extract i (i + 8)).map (·.val)) := by
+  have hlen : (l.extract i (i + 8)).length = 8 := by
+    simp [List.extract_eq_drop_take, List.length_take, List.length_drop]; omega
+  rw [ofDigits_map_val_eq_sum, hlen]
+  apply Finset.sum_congr rfl
+  intro j hj
+  rw [Finset.mem_range] at hj
+  rw [extract_getElem! l i j hj]
+  rw [show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
 
 /-- The List Bool spec for load8_at: the result's bits are exactly
     the 64 bits starting at byte position i in the input. -/
@@ -122,56 +199,24 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize)
     from_bytes.load8_at input i ⦃ result =>
       ofU64 result =
         (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
-  unfold from_bytes.load8_at
-  progress*
-  -- Goal: ofU64 (i32 ||| i36) = (ofByteList input.val).extract (8*i.val) (8*i.val + 64)
-  -- Strategy: show toNat equality, then use round-trip.
-  -- Both sides have length 64 when converted to List Bool.
-  -- Suffices to show their toNat values are equal.
-  -- Strategy: show both sides equal when converted to Nat, then use round-trip
+  apply spec_mono (load8_at_val_spec input i h)
+  intro result hval
   set rhs := (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64)
   have hlen : rhs.length = 64 := by
     simp [rhs, List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteList_length]
     omega
-  suffices hval : (i32 ||| i36).val = toNat rhs by
-    simp only [ofU64]
-    conv_rhs => rw [← ofNat_toNat rhs, hlen]
-    rw [hval]
-  -- Express RHS via ofByteList_extract and toNat_ofByteList
-  have hrhs : toNat rhs =
-      toNat (ofByteList (input.val.extract i.val (i.val + 8))) := by
+  have hval_eq : result.val = toNat rhs := by
+    have hval' : result.val = ∑ j ∈ Finset.range 8,
+        input.val[i.val + j]!.val * 2 ^ (8 * j) := by
+      simp only [Slice.getElem!_Nat_eq] at hval; exact hval
+    rw [hval']
     simp only [rhs]
     rw [show 8 * i.val + 64 = 8 * (i.val + 8) from by ring]
     rw [ofByteList_extract input.val i.val (i.val + 8) (by omega)]
-  rw [hrhs, toNat_ofByteList]
-  -- Goal: (i32 ||| i36).val = Nat.ofDigits 256 ((input.val.extract i.val (i.val+8)).map (·.val))
-  -- Simplify LHS: expand OR chain using val_or and shift specs
-  -- Each byte occupies a disjoint 8-bit range, so OR = addition
-  simp only [UScalar.val_or]
-  -- Expand the bytes
-  set b0 := input.val[i.val]!
-  set b1 := input.val[i.val + 1]!
-  set b2 := input.val[i.val + 2]!
-  set b3 := input.val[i.val + 3]!
-  set b4 := input.val[i.val + 4]!
-  set b5 := input.val[i.val + 5]!
-  set b6 := input.val[i.val + 6]!
-  set b7 := input.val[i.val + 7]!
-  -- Rewrite all the post conditions
-  simp only [i1_post, i2_post, i4_post, i5_post, i9_post, i10_post, i14_post, i15_post,
-    i19_post, i20_post, i24_post, i25_post, i29_post, i30_post, i34_post, i35_post] at *
-  simp only [i3_post, i8_post, i13_post, i18_post, i23_post, i28_post, i33_post] at *
-  -- Now use bvify to convert to bitvector
-  bvify 64 at *
-  bv_decide
-  all_goals sorry
-  -- From load8_at_val_spec:
-  --   result.val = ∑ j, input[i+j].val * 2^(8*j)
-  --             = toNat (ofByteList (input.val.extract i.val (i.val + 8)))
-  --
-  -- By ofNat_toNat round-trip (since the byte sublist has 64 bits):
-  --   ofU64 result = ofByteList (input.val.extract i.val (i.val + 8))
-  --   = (ofByteList input.val).extract (8*i.val) (8*i.val + 64)  [ofByteList_extract]
+    rw [toNat_ofByteList]
+    rw [sum_extract_eq input.val i.val (by omega)]
+  simp only [ofU64, hval_eq]
+  rw [← hlen, ofNat_toNat rhs]
 
 /-! ## BitList-native specs for shift and mask
 
