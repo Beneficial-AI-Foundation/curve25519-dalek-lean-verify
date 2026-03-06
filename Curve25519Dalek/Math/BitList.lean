@@ -74,11 +74,8 @@ theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs
 theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
   sorry
-  -- For i < bs.length: (bs ++ replicate n false).getD i false = bs.getD i false
-  --   (the appended part doesn't affect positions within bs).
-  -- For bs.length ≤ i < bs.length + n: getD gives false (from replicate), matching
-  --   bs.getD i false = false (out of bounds).
-  -- For i ≥ bs.length + n: both return false (out of bounds). ✓
+  -- For i < bs.length: getD agrees (append doesn't affect).
+  -- For i ≥ bs.length: both sides return false. ✓
 
 /-- Equiv implies the same numeric value. -/
 theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ := by
@@ -86,14 +83,12 @@ theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ := b
   -- Both toNat values equal ∑ i, (bs.getD i false).toNat * 2^i.
   -- Since h says getD agrees at every position, the sums are equal. ✓
 
-/-- A bit list is equivalent to its take-k if the remaining bits are all false. -/
-theorem Equiv.of_take (bs : List Bool) (k : Nat)
-    (h : ∀ i, k ≤ i → bs.getD i false = false) :
-    bs ≈ₗ bs.take k := by
+/-- Equiv is preserved by `List.extract` on both sides. -/
+theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
+    bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
   sorry
-  -- For i < k: bs.getD i false = (bs.take k).getD i false (take preserves within range).
-  -- For i ≥ k: bs.getD i false = false (by h), and (bs.take k).getD i false = false
-  --   (out of bounds since (bs.take k).length ≤ k). ✓
+  -- extract takes a subrange; getD on extract at position i corresponds
+  -- to getD on the original at position (start + i), which agrees by h. ✓
 
 /-! ## Length lemmas -/
 
@@ -101,8 +96,6 @@ theorem Equiv.of_take (bs : List Bool) (k : Nat)
 theorem ofNat_length (w n : Nat) : (ofNat w n).length = w := by
   sorry
   -- By induction on w.
-  -- Base: ofNat 0 n = [], length 0.
-  -- Step: ofNat (w+1) n = _ :: ofNat w (n/2), length = 1 + w = w + 1.
 
 theorem ofU8_length (x : U8) : (ofU8 x).length = 8 :=
   ofNat_length 8 x.val
@@ -113,156 +106,136 @@ theorem ofU64_length (x : U64) : (ofU64 x).length = 64 :=
 theorem ofByteList_length (bytes : List U8) :
     (ofByteList bytes).length = 8 * bytes.length := by
   sorry
-  -- By induction on bytes.
-  -- Base: [].bind ofU8 = [], length 0 = 8 * 0.
-  -- Step: (x :: xs).bind ofU8 = ofU8 x ++ xs.bind ofU8,
-  --   length = 8 + 8 * xs.length = 8 * (xs.length + 1).
+  -- By induction on bytes. Each byte contributes 8 bits.
 
 theorem ofByteArray_length (arr : Array U8 32#usize) :
     (ofByteArray arr).length = 256 := by
   sorry
-  -- ofByteArray arr = ofByteList arr.val, arr.val.length = 32,
-  -- so length = 8 * 32 = 256, by ofByteList_length.
+  -- 8 * 32 = 256, by ofByteList_length.
 
 /-! ## Pure List Bool lemmas: `ofNat` interacts with list operations
 
-These are the primary lemmas. They express how `take`, `drop`, and `extract`
-on bit lists correspond to arithmetic operations — but stated as equalities
-between `List Bool` values, not between `Nat` values. -/
+These are the primary lemmas, stated as equalities between `List Bool` values. -/
 
-/-- Taking fewer bits from a bit representation gives the narrower representation.
-    This is the List Bool version of "masking to k bits". -/
+/-- Taking fewer bits gives the narrower representation (mask is take). -/
 theorem ofNat_take (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     (ofNat w n).take k = ofNat k n := by
   sorry
   -- By induction on k, generalizing w and n.
-  -- Base: take 0 of anything = [] = ofNat 0 n. ✓
-  -- Step: w = w' + 1 (since k+1 ≤ w), so ofNat w n = (n%2==1) :: ofNat w' (n/2).
-  --   take (k+1) = (n%2==1) :: take k (ofNat w' (n/2))
-  --              = (n%2==1) :: ofNat k (n/2)               [by IH]
-  --              = ofNat (k+1) n. ✓
+  -- Step: take (k+1) (ofNat (w'+1) n) = (n%2==1) :: take k (ofNat w' (n/2))
+  --   = (n%2==1) :: ofNat k (n/2) = ofNat (k+1) n. ✓
 
-/-- Dropping bits from the front gives the shifted representation.
-    This is the List Bool version of "right shift by k". -/
+/-- Dropping bits gives the shifted representation (shift is drop). -/
 theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     (ofNat w n).drop k = ofNat (w - k) (n / 2 ^ k) := by
   sorry
   -- By induction on k, generalizing w and n.
-  -- Base: drop 0 = id, n / 2^0 = n, w - 0 = w. ✓
-  -- Step: w = w' + 1 (since k+1 ≤ w), so ofNat w n = (n%2==1) :: ofNat w' (n/2).
-  --   drop (k+1) = drop k (ofNat w' (n/2))
-  --              = ofNat (w' - k) ((n/2) / 2^k)            [by IH]
-  --              = ofNat (w - (k+1)) (n / 2^(k+1)). ✓
-  --   (using (n/2)/2^k = n/2^(k+1) and w' - k = (w'+1) - (k+1))
+  -- Step: drop (k+1) = drop k (ofNat w' (n/2)) = ofNat (w-(k+1)) (n/2^(k+1)). ✓
 
-/-- Extracting a range of bits gives the shifted, narrower representation.
-    `(ofNat w n).extract start stop` gives bits [start, stop) of n. -/
+/-- Extracting a range of bits gives the shifted, narrower representation. -/
 theorem ofNat_extract (w start len : Nat) (n : Nat)
     (h : start + len ≤ w) :
     (ofNat w n).extract start (start + len) = ofNat len (n / 2 ^ start) := by
   sorry
-  -- List.extract l s e = (l.drop s).take (e - s).
-  -- (ofNat w n).extract start (start+len) = ((ofNat w n).drop start).take len
-  --   = (ofNat (w - start) (n / 2^start)).take len          [by ofNat_drop]
-  --   = ofNat len (n / 2^start)                              [by ofNat_take, since len ≤ w - start]
+  -- Combines ofNat_drop and ofNat_take.
 
-/-- Splitting a bit list at position k gives two shorter bit lists. -/
+/-- Splitting a bit list gives two shorter bit lists. -/
 theorem ofNat_split (w₁ w₂ : Nat) (n : Nat) :
     ofNat (w₁ + w₂) n = ofNat w₁ n ++ ofNat w₂ (n / 2 ^ w₁) := by
   sorry
   -- By induction on w₁, generalizing n.
-  -- Base: ofNat (0 + w₂) n = ofNat w₂ n, and
-  --   ofNat 0 n ++ ofNat w₂ (n / 2^0) = [] ++ ofNat w₂ n = ofNat w₂ n. ✓
-  -- Step: ofNat ((w₁+1) + w₂) n = (n%2==1) :: ofNat (w₁ + w₂) (n/2)
-  --   = (n%2==1) :: (ofNat w₁ (n/2) ++ ofNat w₂ ((n/2) / 2^w₁))  [by IH]
-  --   = ((n%2==1) :: ofNat w₁ (n/2)) ++ ofNat w₂ (n / 2^(w₁+1))
-  --   = ofNat (w₁+1) n ++ ofNat w₂ (n / 2^(w₁+1)). ✓
 
-/-- A wider representation is Equiv to a narrower one (the extra bits are zero
-    when n < 2^k). -/
+/-- `ofNat w` ignores bits above position w: `ofNat w (n % 2^w) = ofNat w n`. -/
+theorem ofNat_mod (w n : Nat) :
+    ofNat w (n % 2 ^ w) = ofNat w n := by
+  sorry
+  -- By induction on w, generalizing n.
+  -- Base: both sides are []. ✓
+  -- Step: ofNat (w+1) (n % 2^(w+1))
+  --   = ((n % 2^(w+1)) % 2 == 1) :: ofNat w ((n % 2^(w+1)) / 2)
+  --   The key identities:
+  --     (n % 2^(w+1)) % 2 = n % 2
+  --       [since 2 | 2^(w+1), we have n % 2^(w+1) % 2 = n % 2]
+  --     (n % 2^(w+1)) / 2 = (n / 2) % 2^w
+  --       [standard: (n % (2*m)) / 2 = (n/2) % m]
+  --   So = (n%2==1) :: ofNat w ((n/2) % 2^w)
+  --      = (n%2==1) :: ofNat w (n/2)           [by IH]
+  --      = ofNat (w+1) n. ✓
+
+/-- A wider representation is Equiv to a narrower one when the value fits. -/
 theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k) :
     ofNat w n ≈ₗ ofNat k n := by
   sorry
-  -- ofNat w n = ofNat k n ++ ofNat (w-k) (n / 2^k)   [by ofNat_split]
-  -- Since n < 2^k, we have n / 2^k = 0, so ofNat (w-k) 0 = replicate (w-k) false.
-  -- Therefore ofNat w n = ofNat k n ++ replicate (w-k) false ≈ₗ ofNat k n
-  --   [by Equiv.append_false]. ✓
+  -- ofNat w n = ofNat k n ++ ofNat (w-k) (n / 2^k)   [ofNat_split]
+  -- Since n < 2^k, n / 2^k = 0, so the tail is all false.
+  -- By Equiv.append_false. ✓
 
-/-! ## Byte list decomposition into bits
+/-! ## Composing extracts -/
 
-These lemmas express how the bit representation of a byte list relates to
-the bit representations of individual bytes and sublists. -/
+/-- Extracting from an extract composes: takes the sub-subrange. -/
+theorem extract_extract (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
+    (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
+  sorry
+  -- extract l a b = (l.drop a).take (b - a).
+  -- Applying extract c (c+d) to that:
+  --   ((l.drop a).take (b-a)).drop c |>.take d
+  --   = (l.drop a).drop c |>.take d          [drop of take when c ≤ b-a]
+  --   = (l.drop (a+c)).take d
+  --   = l.extract (a+c) (a+c+d). ✓
 
-/-- The bits of a cons byte list are the bits of the head byte
-    followed by the bits of the tail. -/
+/-! ## Byte list decomposition into bits -/
+
+/-- The bits of a cons byte list are the head byte's bits followed by the tail's. -/
 theorem ofByteList_cons (x : U8) (xs : List U8) :
     ofByteList (x :: xs) = ofU8 x ++ ofByteList xs := by
   sorry -- Immediate from the definition of List.bind.
 
-/-- Extracting 8-aligned bits from a byte list corresponds to
-    extracting the corresponding sub-list of bytes. -/
+/-- Extracting 8-aligned bits from a byte list = extracting the corresponding bytes. -/
 theorem ofByteList_extract (bytes : List U8) (i j : Nat)
     (h : j ≤ bytes.length) :
     (ofByteList bytes).extract (8 * i) (8 * j) =
       ofByteList (bytes.extract i j) := by
   sorry
-  -- By induction on bytes and i.
-  -- The key idea: ofByteList is a flat-map of ofU8 (each producing 8 bits),
-  -- so extracting at 8-aligned boundaries corresponds to extracting
-  -- the underlying bytes. Each byte contributes exactly 8 bits, so
-  -- bits [8i, 8j) come from bytes [i, j).
+  -- By induction on bytes. Each byte contributes exactly 8 bits,
+  -- so 8-aligned bit extraction maps to byte extraction.
 
 /-! ## Round-trip and bridge lemmas (connecting to Nat) -/
 
 /-- Converting to bits and back recovers the original value. -/
 theorem toNat_ofNat (w n : Nat) (h : n < 2 ^ w) : toNat (ofNat w n) = n := by
   sorry
-  -- By induction on w, generalizing n.
-  -- Base: n < 1, so n = 0. toNat [] = 0. ✓
-  -- Step: toNat ((n%2==1) :: ofNat w (n/2))
-  --   = (n%2==1).toNat + 2 * toNat (ofNat w (n/2))
-  --   = (n%2) + 2 * (n/2)     [by IH, since n/2 < 2^w]
-  --   = n                       [Nat.mod_add_div]
+  -- By induction on w. Uses Nat.mod_add_div.
 
 theorem toNat_ofU8 (x : U8) : toNat (ofU8 x) = x.val := by
-  sorry -- Follows from toNat_ofNat since x.val < 2^8.
+  sorry -- toNat_ofNat + x.val < 2^8.
 
 theorem toNat_ofU64 (x : U64) : toNat (ofU64 x) = x.val := by
-  sorry -- Follows from toNat_ofNat since x.val < 2^64.
+  sorry -- toNat_ofNat + x.val < 2^64.
 
 /-- A bit list's value is bounded by `2^length`. -/
 theorem toNat_lt_pow (bs : List Bool) : toNat bs < 2 ^ bs.length := by
   sorry
   -- By induction on bs.
-  -- Base: toNat [] = 0 < 1 = 2^0. ✓
-  -- Step: toNat (b :: bs) = b.toNat + 2 * toNat bs
-  --   ≤ 1 + 2 * (2^bs.length - 1) = 2^(bs.length+1) - 1 < 2^(bs.length+1). ✓
 
 /-- Appending two bit lists adds their values with the appropriate shift. -/
 theorem toNat_append (bs₁ bs₂ : List Bool) :
     toNat (bs₁ ++ bs₂) = toNat bs₁ + toNat bs₂ * 2 ^ bs₁.length := by
   sorry
   -- By induction on bs₁.
-  -- Base: [] ++ bs₂ = bs₂, toNat bs₂ = 0 + toNat bs₂ * 1. ✓
-  -- Step: (b :: bs₁) ++ bs₂ = b :: (bs₁ ++ bs₂).
-  --   toNat = b.toNat + 2 * (toNat bs₁ + toNat bs₂ * 2^bs₁.length)   [by IH]
-  --         = toNat (b :: bs₁) + toNat bs₂ * 2^(b :: bs₁).length. ✓
 
 /-- Taking k bits gives the value mod 2^k. -/
 theorem toNat_take (k : Nat) (bs : List Bool) :
     toNat (bs.take k) = toNat bs % 2 ^ k := by
   sorry
-  -- Follows from toNat_append applied to bs = bs.take k ++ bs.drop k,
-  -- plus the fact that toNat (bs.take k) < 2^k (by toNat_lt_pow + length of take).
+  -- From toNat_append on bs = bs.take k ++ bs.drop k.
 
 /-- Dropping k bits gives the value divided by 2^k. -/
 theorem toNat_drop (k : Nat) (bs : List Bool) :
     toNat (bs.drop k) = toNat bs / 2 ^ k := by
   sorry
-  -- Follows from toNat_append applied to bs = bs.take k ++ bs.drop k,
-  -- which gives the Euclidean division.
+  -- From toNat_append on bs = bs.take k ++ bs.drop k.
 
-/-- The value of a byte list's bits equals the little-endian byte interpretation. -/
+/-- The value of a byte list's bits equals the base-256 interpretation. -/
 theorem toNat_ofByteList (bytes : List U8) :
     toNat (ofByteList bytes) = Nat.ofDigits 256 (bytes.map (·.val)) := by
   sorry
@@ -272,74 +245,133 @@ theorem toNat_ofByteList (bytes : List U8) :
 theorem toNat_ofByteArray (arr : Array U8 32#usize) :
     toNat (ofByteArray arr) = U8x32_as_Nat arr := by
   sorry
-  -- Follows from toNat_ofByteList and U8x32_as_Nat_is_NatofDigits.
+  -- From toNat_ofByteList and U8x32_as_Nat_is_NatofDigits.
 
 /-! ## Splitting / reassembly lemma -/
 
-/-- Splitting a bit list into n consecutive chunks of size k and weighting
-    by powers of 2^k reconstructs the value of the first k*n bits.
-    This is the heart of the from_bytes correctness argument. -/
+/-- Splitting a bit list into n consecutive chunks of size k reconstructs
+    the value of the first k*n bits. Heart of the from_bytes argument. -/
 theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length) :
     toNat (bs.take (k * n)) =
       ∑ i ∈ Finset.range n,
         toNat (bs.extract (k * i) (k * i + k)) * 2 ^ (k * i) := by
   sorry
-  -- By induction on n.
-  -- Base (n=0): take 0 = [], sum over empty range = 0. ✓
-  -- Step (n → n+1): bs.take (k*(n+1)) = bs.take (k*n) ++ bs.extract (k*n) (k*n+k)
-  --   By toNat_append and IH, the sum extends to range (n+1). ✓
+  -- By induction on n. Uses toNat_append.
 
 /-! ## The pure List Bool specification for from_bytes
 
-Each of the 5 result limbs, viewed as a 64-bit list, is `Equiv` to the
-corresponding 51-bit slice of the input byte array's bit representation.
+Each of the 5 result limbs is `Equiv` to the corresponding 51-bit slice.
+`Equiv` captures both the bit-match and the zero-padding simultaneously. -/
 
-Using `Equiv` (≈ₗ) captures both facts simultaneously:
-- The first 51 bits of the limb match the slice (positions 0..50 agree).
-- The remaining 13 bits of the U64 are zero (positions 51..63 are `false`,
-  matching the out-of-bounds `false` default of the 51-element slice).
-
-No `.take`, no explicit padding, no lost information. -/
-
-/-- The pure List Bool spec for from_bytes: each limb is Equiv to the
-    corresponding 51-bit slice of the input's 256 bits. -/
+/-- The pure List Bool spec for from_bytes. -/
 theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       let allBits := ofByteArray bytes
       ∀ i : Fin 5,
         ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
   sorry
-  -- Unfold from_bytes. Each limb is computed as:
-  --   (load8_at(bytes, j) >> k) & low_51_bit_mask
+  -- **Proof sketch**: Unfold from_bytes. For each limb i with byte offset j
+  -- and shift k, the computation is:
+  --   result[i] = (load8_at(bytes.to_slice, j) >>> k) &&& low_51_bit_mask
   --
-  -- In List Bool terms, for each limb i with byte offset j and shift k:
-  --   ofU64 result[i]  (64 bits)
-  --   = ofNat 64 ((load8_at_val >>> k) &&& (2^51 - 1))
-  --   = ofNat 64 ((load8_at_val / 2^k) % 2^51)
+  -- Step 1 (load8_at): By load8_at_bitList_spec,
+  --   ofU64 (load8_at s j) = (ofByteList s.val).extract (8*j) (8*j + 64)
+  --   Since s = bytes.to_slice, s.val = bytes.val, so
+  --   = (ofByteArray bytes).extract (8*j) (8*j + 64)
   --
-  -- Since (load8_at_val / 2^k) % 2^51 < 2^51 < 2^64:
-  --   ofNat 64 ((load8_at_val / 2^k) % 2^51)
-  --     ≈ₗ ofNat 51 ((load8_at_val / 2^k) % 2^51)    [ofNat_equiv_of_lt]
-  --     = ofNat 51 (load8_at_val / 2^k)                [ofNat_take applied backwards]
+  -- Step 2 (shift + mask): The value after >>> k and &&& mask is
+  --   ((load8_at_val.val / 2^k) % 2^51)
+  --   Using Aeneas specs: U64.ShiftRight_spec gives z.val = x.val >>> y.val,
+  --   UScalar.val_and gives (x &&& y).val = x.val &&& y.val,
+  --   Nat.shiftRight_eq gives >>> = / 2^k,
+  --   land_pow_two_sub_one_eq_mod gives &&& (2^51-1) = % 2^51.
   --
-  -- Now load8_at_val is the little-endian value of bytes[j..j+8], so its bits
-  -- are allBits[8j..8j+64). Extracting bits [k, k+51):
-  --   ofNat 51 (load8_at_val / 2^k)
-  --   = (ofNat 64 load8_at_val).extract k (k + 51)     [ofNat_extract]
-  --   = allBits.extract (8*j) (8*j+64) |>.extract k (k+51)
-  --   = allBits.extract (8*j + k) (8*j + k + 51)       [extract of extract]
+  -- Step 3 (convert to List Bool):
+  --   ofU64 result[i] = ofNat 64 ((load8_at_val / 2^k) % 2^51)
+  --   ≈ₗ ofNat 51 ((load8_at_val / 2^k) % 2^51)   [ofNat_equiv_of_lt]
+  --   = ofNat 51 (load8_at_val / 2^k)               [ofNat_mod]
+  --   = (ofNat 64 load8_at_val).extract k (k+51)    [ofNat_extract]
+  --   = allBits.extract (8*j) (8*j+64) |>.extract k (k+51)  [load8_at result]
+  --   = allBits.extract (8*j+k) (8*j+k+51)          [extract_extract]
   --
-  -- Checking each limb (8*j + k = 51*i):
-  --   i=0: j=0,  k=0  → 8*0  + 0  = 0   = 51*0  ✓
-  --   i=1: j=6,  k=3  → 8*6  + 3  = 51  = 51*1  ✓
-  --   i=2: j=12, k=6  → 8*12 + 6  = 102 = 51*2  ✓
-  --   i=3: j=19, k=1  → 8*19 + 1  = 153 = 51*3  ✓
-  --   i=4: j=24, k=12 → 8*24 + 12 = 204 = 51*4  ✓
+  -- Step 4 (check 8*j + k = 51*i for each limb):
+  --   i=0: j=0,  k=0  → 0   = 51*0  ✓
+  --   i=1: j=6,  k=3  → 51  = 51*1  ✓
+  --   i=2: j=12, k=6  → 102 = 51*2  ✓
+  --   i=3: j=19, k=1  → 153 = 51*3  ✓
+  --   i=4: j=24, k=12 → 204 = 51*4  ✓
+
+/-! ## load8_at specification
+
+`load8_at` loads 8 consecutive bytes from a slice and packs them into a U64
+in little-endian order. In List Bool terms, the result's bits are exactly
+the 64 bits starting at position `8*i` in the slice's bit representation. -/
+
+/-- The Nat-level spec for load8_at: the result is the little-endian
+    combination of 8 consecutive bytes. -/
+theorem load8_at_val_spec (input : Slice U8) (i : Usize)
+    (h : i.val + 8 ≤ input.val.length) :
+    from_bytes.load8_at input i ⦃ result =>
+      result.val = ∑ j ∈ Finset.range 8,
+        input[i.val + j]!.val * 2 ^ (8 * j) ⦄ := by
+  sorry
+  -- Unfold load8_at. It computes:
+  --   input[i] | (input[i+1] << 8) | ... | (input[i+7] << 56)
+  --
+  -- At the Nat level, OR on disjoint bit ranges equals addition:
+  --   (a ||| (b <<< 8k)).val = a.val + b.val * 2^(8k)
+  -- when a.val < 2^(8k) (no overlap).
+  --
+  -- By Aeneas specs:
+  --   UScalar.cast_val: cast to U64 preserves the value (U8 < 2^64)
+  --   U64.ShiftLeft_spec: (x <<< k).val = x.val * 2^k (when no overflow)
+  --   UScalar.val_or: (x ||| y).val = x.val ||| y.val
+  --
+  -- The disjoint-OR-equals-addition argument:
+  --   Each byte b[j] is cast to U64 and shifted left by 8*j bits.
+  --   The shifted values occupy disjoint 8-bit ranges [8j, 8j+8).
+  --   OR on disjoint ranges = addition.
+  --
+  -- This gives result.val = ∑ j, input[i+j].val * 2^(8*j). ✓
+
+/-- The List Bool spec for load8_at: the result's bits are exactly
+    the 64 bits starting at byte position i in the input. -/
+theorem load8_at_bitList_spec (input : Slice U8) (i : Usize)
+    (h : i.val + 8 ≤ input.val.length) :
+    from_bytes.load8_at input i ⦃ result =>
+      ofU64 result = (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
+  sorry
+  -- From load8_at_val_spec:
+  --   result.val = ∑ j, input[i+j].val * 2^(8*j)
+  --             = toNat (ofByteList (input.val.extract i.val (i.val + 8)))
+  --                     [by toNat_ofByteList on the 8-byte sublist]
+  --
+  -- So ofU64 result = ofNat 64 result.val
+  --   = ofNat 64 (toNat (ofByteList (input.val.extract i.val (i.val+8))))
+  --
+  -- The byte sublist has 8 bytes → 64 bits, and its toNat < 2^64.
+  -- By toNat_ofNat round-trip:
+  --   ofNat 64 (toNat bs) = bs    when bs.length = 64
+  --
+  -- So ofU64 result = ofByteList (input.val.extract i.val (i.val + 8))
+  --   = (ofByteList input.val).extract (8*i.val) (8*i.val + 64)  [ofByteList_extract]
+
+/-! ## Additional lemma: ofNat round-trip for bit lists -/
+
+/-- If a bit list has length w, converting to Nat and back gives the same list. -/
+theorem ofNat_toNat (bs : List Bool) :
+    ofNat bs.length (toNat bs) = bs := by
+  sorry
+  -- By induction on bs.
+  -- Base: ofNat 0 0 = []. ✓
+  -- Step: ofNat (bs.length+1) (b.toNat + 2 * toNat bs)
+  --   = ((b.toNat + 2 * toNat bs) % 2 == 1) :: ofNat bs.length ((b.toNat + 2 * toNat bs) / 2)
+  --   = (b.toNat % 2 == 1) :: ofNat bs.length (toNat bs)   [div/mod of b.toNat + 2*k]
+  --   = b :: bs                                              [by IH + b.toNat % 2 determines b]
 
 /-! ## Bridge: List Bool spec implies Nat spec -/
 
-/-- Equiv implies the limb value equals the slice value. Combined with
-    toNat_split_chunks, this bridges to the full Nat spec. -/
+/-- Equiv implies the limb value equals the slice value. -/
 theorem field51_eq_of_bitList
     (result : FieldElement51) (bytes : Array U8 32#usize)
     (hequiv : ∀ i : Fin 5,
@@ -349,16 +381,14 @@ theorem field51_eq_of_bitList
   sorry
   -- For each i:
   --   result[i].val = toNat (ofU64 result[i])                  [toNat_ofU64]
-  --                 = toNat (allBits.extract (51*i) (51*i+51)) [Equiv.toNat_eq from hequiv]
-  --
-  -- Therefore:
-  --   Field51_as_Nat = ∑ i, result[i].val * 2^(51*i)
-  --     = ∑ i, toNat (allBits.extract (51*i) (51*i+51)) * 2^(51*i)
-  --     = toNat (allBits.take 255)                [toNat_split_chunks, k=51, n=5]
-  --     = toNat (ofByteArray bytes) % 2^255       [toNat_take]
-  --     = U8x32_as_Nat bytes % 2^255              [toNat_ofByteArray]
+  --                 = toNat (allBits.extract (51*i) (51*i+51)) [Equiv.toNat_eq]
+  -- Field51_as_Nat = ∑ i, result[i].val * 2^(51*i)
+  --   = ∑ i, toNat (allBits.extract (51*i) (51*i+51)) * 2^(51*i)
+  --   = toNat (allBits.take 255)                [toNat_split_chunks, k=51, n=5]
+  --   = toNat (ofByteArray bytes) % 2^255       [toNat_take]
+  --   = U8x32_as_Nat bytes % 2^255              [toNat_ofByteArray]
 
-/-- The limb bound result[i] < 2^51 also follows from Equiv. -/
+/-- The limb bound follows from Equiv (the extract has length ≤ 51). -/
 theorem limb_bound_of_equiv
     (result : FieldElement51) (bytes : Array U8 32#usize)
     (hequiv : ∀ i : Fin 5,
@@ -366,10 +396,8 @@ theorem limb_bound_of_equiv
         (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
     ∀ i : Fin 5, result[i]!.val < 2 ^ 51 := by
   sorry
-  -- For each i:
-  --   result[i].val = toNat (ofU64 result[i])                  [toNat_ofU64]
-  --                 = toNat (allBits.extract (51*i) (51*i+51)) [Equiv.toNat_eq]
-  -- The extract has length ≤ 51, so by toNat_lt_pow:
-  --   toNat (allBits.extract (51*i) (51*i+51)) < 2^(extract.length) ≤ 2^51. ✓
+  -- result[i].val = toNat (ofU64 result[i])    [toNat_ofU64]
+  --              = toNat (extract ...)           [Equiv.toNat_eq]
+  -- extract has length ≤ 51, so toNat < 2^51   [toNat_lt_pow]. ✓
 
 end BitList
