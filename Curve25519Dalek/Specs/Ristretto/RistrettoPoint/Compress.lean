@@ -104,43 +104,11 @@ private lemma bridge_cond {a b c : FieldElement51} {flag : subtle.Choice}
     a.toField = if flag.val = 1#u8 then b.toField else c.toField := by
   unfold FieldElement51.toField; rw [bridge_cond_nat h]; split <;> rfl
 
-private lemma p_sub_one_lt : p - 1 < p := by decide
-
-private lemma p_sub_one_cast : (↑(p - 1) : ZMod p) = -1 := by
-  rw [Nat.cast_sub (by decide : 1 ≤ p), ZMod.natCast_self, zero_sub, Nat.cast_one]
-
 private lemma lift_fe_sq (fe : FieldElement51) (h : Field51_as_Nat fe ^ 2 % p = p - 1) :
     fe.toField ^ 2 = -1 := by
   unfold FieldElement51.toField
-  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1) (by rwa [Nat.mod_eq_of_lt p_sub_one_lt])
+  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1) (by rwa [Nat.mod_eq_of_lt (show p - 1 < p from by decide)])
   push_cast at h; rwa [p_sub_one_cast] at h
-
-private lemma sqrt_m1_sq_nat :
-    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
-  decide
-
-private lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
-  unfold sqrt_m1
-  have h := lift_mod_eq _ (p - 1)
-    (by rw [Nat.mod_eq_of_lt p_sub_one_lt])
-  push_cast at h; rwa [p_sub_one_cast] at h
-
-private lemma iad_sq_nat :
-    54469307008909316920995813868745141605393597292927456921205312896311721017578 ^ 2 *
-    (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
-     37095705934669439343138083508754565189542113879843219016388785533085940283555) % p = 1 := by
-  decide
-
-private lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 := by
-  unfold invsqrt_a_minus_d a_val d
-  have h := iad_sq_nat
-  unfold p at h
-  have : (((54469307008909316920995813868745141605393597292927456921205312896311721017578 : ℕ) ^ 2 *
-    (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
-     37095705934669439343138083508754565189542113879843219016388785533085940283555) : ℤ) : ZMod p) = 1 := by
-    rw [← ZMod.intCast_mod _ p]
-    decide
-  push_cast at this; exact this
 
 private lemma lift_rm_sq (rm : FieldElement51)
     (h : (Field51_as_Nat rm) ^ 2 * (a - d) % p = 1) :
