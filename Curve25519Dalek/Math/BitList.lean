@@ -53,13 +53,15 @@ def ofU64 (x : U64) : List Bool := ofNat 64 x.val
 /-- Convert a list of bytes to a flat bit list (LSB-first within each byte,
     bytes in list order). -/
 def ofByteList (bytes : List U8) : List Bool :=
-  bytes.bind ofU8
+  (bytes.map ofU8).flatten
 
 /-- Convert a 32-byte array to a 256-bit list. -/
 def ofByteArray (arr : Array U8 32#usize) : List Bool :=
   ofByteList arr.val
 
 /-! ## Equiv: basic properties -/
+
+variable {bs₁ bs₂ bs₃ : List Bool}
 
 theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
   fun _ => rfl
@@ -159,7 +161,7 @@ theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k)
 /-! ## Composing extracts -/
 
 /-- Extracting from an extract composes: takes the sub-subrange. -/
-theorem extract_extract (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
+theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
     (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
   sorry
   -- Uses: extract = drop then take, drop/take composition.

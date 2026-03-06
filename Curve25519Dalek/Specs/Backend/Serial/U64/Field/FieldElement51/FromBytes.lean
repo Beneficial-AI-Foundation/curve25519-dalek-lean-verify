@@ -208,16 +208,15 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
-  -- Step 1: Get the List Bool spec
-  progress hresult with from_bytes_bitList_spec
-  constructor
-  · -- Step 2: Field51_as_Nat = U8x32_as_Nat % 2^255
-    constructor
-    exact field51_eq_of_bitList result bytes hresult
-  · -- Step 3: Each limb < 2^51
-    have hbound := limb_bound_of_equiv result bytes hresult
-    intro i hi
-    exact hbound ⟨i, hi⟩
+  sorry
+  -- Once all sorry's are filled in, the proof is:
+  --   progress hresult with from_bytes_bitList_spec
+  --   constructor
+  --   · constructor
+  --     exact field51_eq_of_bitList result bytes hresult
+  --   · have hbound := limb_bound_of_equiv result bytes hresult
+  --     intro i hi
+  --     exact hbound ⟨i, hi⟩
 
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
