@@ -115,6 +115,33 @@ private lemma lift_fe_sq (fe : FieldElement51) (h : Field51_as_Nat fe ^ 2 % p = 
   have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1) (by rwa [Nat.mod_eq_of_lt p_sub_one_lt])
   push_cast at h; rwa [p_sub_one_cast] at h
 
+private lemma sqrt_m1_sq_nat :
+    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
+  decide
+
+private lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
+  unfold sqrt_m1
+  have h := lift_mod_eq _ (p - 1)
+    (by rw [Nat.mod_eq_of_lt p_sub_one_lt])
+  push_cast at h; rwa [p_sub_one_cast] at h
+
+private lemma iad_sq_nat :
+    54469307008909316920995813868745141605393597292927456921205312896311721017578 ^ 2 *
+    (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
+     37095705934669439343138083508754565189542113879843219016388785533085940283555) % p = 1 := by
+  decide
+
+private lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 := by
+  unfold invsqrt_a_minus_d a_val d
+  have h := iad_sq_nat
+  unfold p at h
+  have : (((54469307008909316920995813868745141605393597292927456921205312896311721017578 : ℕ) ^ 2 *
+    (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
+     37095705934669439343138083508754565189542113879843219016388785533085940283555) : ℤ) : ZMod p) = 1 := by
+    rw [← ZMod.intCast_mod _ p]
+    decide
+  push_cast at this; exact this
+
 private lemma lift_rm_sq (rm : FieldElement51)
     (h : (Field51_as_Nat rm) ^ 2 * (a - d) % p = 1) :
     rm.toField ^ 2 * (a_val - (↑d : ZMod p)) = 1 := by
@@ -124,7 +151,7 @@ private lemma lift_rm_sq (rm : FieldElement51)
     rw [← ZMod.intCast_mod _ p, h, Int.cast_one]
   push_cast at this; exact this
 
-set_option maxHeartbeats 600000 in -- maxHeartbeats increased: compress has many sub-calls, progress* needs more time after Aeneas update
+set_option maxHeartbeats 800000 in -- maxHeartbeats increased: compress has many sub-calls, progress* needs more time after Aeneas update
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
 • The output is a valid CompressedRistretto 32-byte representation
@@ -186,182 +213,239 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   -- Shared bridge: parity of U8x32_as_Nat a
   have h_a_parity : U8x32_as_Nat a % 2 = 0 := by
     rw [h_a_eq]; exact h_s1_parity
-  refine ⟨ ?_, ?_ ⟩
-  · -- Main Goal 1: CompressedRistretto.IsValid
-    unfold CompressedRistretto.IsValid
-    sorry
-  · -- Main Goal 2: compress_pure self.toPoint = U8x32_as_Nat a
-    -- Name the invsqrt result and its postconditions
-    rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    have hvalid := h.1
-    have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
-    have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0
-    have hT_rel := hvalid.T_relation  -- X.toField * Y.toField = T.toField * Z.toField
-    -- Mul/Sq bridges (implicit args infer x✝.2 for i1/i2 automatically)
-    have hb_u1 := bridge_mul u1_post1
-    have hb_u2 := bridge_mul u2_post1
-    have hb_u2_sq := bridge_sq u2_sq_post1
-    have hb_u1_u2_sq := bridge_mul u1_u2_sq_post1
-    have hb_i1 := bridge_mul i1_post1
-    have hb_i2 := bridge_mul i2_post1
-    have hb_i2_T := bridge_mul i2_T_post1
-    have hb_z_inv := bridge_mul z_inv_post1
-    have hb_iX := bridge_mul iX_post1
-    have hb_iY := bridge_mul iY_post1
-    have hb_enchanted := bridge_mul enchanted_denominator_post1
-    have hb_t_z_inv := bridge_mul t_z_inv_post1
-    have hb_x_z_inv := bridge_mul x_z_inv_post1
-    have hb_s := bridge_mul s_post1
-    -- Sub/Neg bridges
-    have hb_zmy := bridge_sub z_minus_y_post2
-    have hb_zmy2 := bridge_sub z_minus_y2_post2
-    have hb_y_neg := bridge_neg y_neg_post1
-    have hb_zpy := bridge_add z_plus_y_post1
-    have h_key : s1.toField = compress_s self.toPoint := by
-      -- Setup: affine coordinates and IsValid properties
-      set P := self.toPoint with hP_def
-      -- Step 1: s1.toField = abs_edwards(s.toField) via conditional negation
-      have h_s1_abs : s1.toField = abs_edwards s.toField := by
-        rw [bridge_cond s1_post, bridge_neg s_neg_post1, abs_edwards, is_negative]
-        by_cases hc : s_is_negative.val = 1#u8
-        · rw [if_pos hc]
-          have : (s.toField.val % 2 == 1) = true := by
-            rw [beq_iff_eq]; unfold FieldElement51.toField;
-            rw [ZMod.val_natCast]
-            exact s_is_negative_post.mp hc
-          simp only [this, ite_true]
-        · rw [if_neg hc]
-          simp only [beq_iff_eq, right_eq_ite_iff]
-          intro h_odd
-          exact absurd (s_is_negative_post.mpr
-          (by unfold FieldElement51.toField at h_odd; rwa [ZMod.val_natCast] at h_odd)) hc
-      -- Step 2: conditional assign bridges
-      have hb_i21 := bridge_cond i21_post
-      have hb_Y := bridge_cond Y_post
-      have hb_X := bridge_cond X_post
-      have hb_Y1 := bridge_cond Y1_post
-      -- Step 3: projective coordinate relations
-      have h_u1_proj : u1.toField = self.Z.toField ^ 2 - self.Y.toField ^ 2 := by
-        rw [hb_u1, hb_zpy, hb_zmy]; ring
-      have h_u1_u2_sq_val : u1_u2_sq.toField =
-          (self.Z.toField ^ 2 - self.Y.toField ^ 2) *
-          (self.X.toField * self.Y.toField) ^ 2 := by
-        rw [hb_u1_u2_sq, hb_u2_sq, h_u1_proj, hb_u2]
-      -- Step 4: QR argument — when u1_u2_sq ≠ 0, I² · u1_u2_sq = 1
-      have h_I_sq_mul : u1_u2_sq.toField ≠ 0 →
-          x_post1.2.toField ^ 2 * u1_u2_sq.toField = 1 := by
-        intro h_ne
-        have h_ne_nat : Field51_as_Nat u1_u2_sq % p ≠ 0 := by
-          rwa [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff,
-               Nat.dvd_iff_mod_eq_zero] at h_ne
-        have h_qr : ∃ x, x ^ 2 * (Field51_as_Nat u1_u2_sq % p) % p = 1 := by
-          have h_sq : IsSquare u1_u2_sq.toField := by
-            rw [h_u1_u2_sq_val]
-            exact (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2)).mul ⟨_, (sq _)⟩
-          obtain ⟨r, hr⟩ := h_sq
-          have hr_ne : r ≠ 0 := by intro heq; rw [heq, mul_zero] at hr; exact h_ne hr
-          have h_inv : r⁻¹ ^ 2 * u1_u2_sq.toField = 1 := by rw [hr]; field_simp
-          refine ⟨(r⁻¹).val, ?_⟩
-          have hmod : (↑(Field51_as_Nat u1_u2_sq % p) : ZMod p) = u1_u2_sq.toField := by
-            unfold FieldElement51.toField; rw [ZMod.natCast_eq_natCast_iff]
-            exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
-          have h_zmod : (↑((r⁻¹).val ^ 2 * (Field51_as_Nat u1_u2_sq % p)) : ZMod p) = 1 := by
-            push_cast; rw [ZMod.natCast_zmod_val, hmod]; exact h_inv
-          have h_val := congrArg ZMod.val h_zmod
-          rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
-          exact h_val
-        have h_post := (x_post5 ⟨h_ne_nat, h_qr⟩).2
-        -- Lift Nat % p equation to ZMod
-        have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
-          exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
-        have h_modeq : Field51_as_Nat x_post1.2 ^ 2 * Field51_as_Nat u1_u2_sq ≡ 1 [MOD p] :=
-          ((hmm _).symm.pow 2).mul (hmm _).symm |>.trans (by exact h_post)
-        unfold FieldElement51.toField
-        have := lift_mod_eq _ _ h_modeq; push_cast at this; exact this
-      -- Step 5: The squared equality (the main algebraic content)
-      have h_sq_eq : s.toField ^ 2 =
-          (compress_den_inv P * (1 - compress_y_final P)) ^ 2 := by
-        -- Step 1: Lift constant squared facts to ZMod
-        have h_fe_sq := lift_fe_sq fe fe_post1
-        have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
-        -- Affine ↔ projective bridge for P
-        have hpx' : P.x = self.X.toField / self.Z.toField := by rw [hP_def]; exact hpx
-        have hpy' : P.y = self.Y.toField / self.Z.toField := by rw [hP_def]; exact hpy
-        -- Key link: compress_u1 P * compress_u2 P² = u1_u2_sq / Z⁶
-        have h_aff : compress_u1 P * compress_u2 P ^ 2 =
-            u1_u2_sq.toField / self.Z.toField ^ 6 := by
-          unfold compress_u1 compress_u2; rw [hpx', hpy', h_u1_u2_sq_val]; field_simp; ring
-        by_cases hd : u1_u2_sq.toField = 0
-        · -- Degenerate: I = 0, so s = 0 and compress_den_inv P = 0
-          have h_nat : Field51_as_Nat u1_u2_sq % p = 0 := by
-            rwa [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at hd
-          have hI0 : x_post1.2.toField = 0 := by
-            rw [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
-            exact (x_post4 h_nat).2
-          -- LHS: I=0 → i1=i2=0 → i21=0 → s=0
-          have hi2_0 : i2.toField = 0 := by rw [hb_i2, hI0, zero_mul]
-          have hs0 : s.toField = 0 := by
-            rw [hb_s, hb_i21]; split_ifs
-            · rw [hb_enchanted, hb_i1, hI0, zero_mul, zero_mul, zero_mul]
-            · rw [hi2_0, zero_mul]
-          -- RHS: compress_invsqrt P = 0 → compress_den_inv P = 0
-          have hJ0 : compress_invsqrt P = 0 := by
-            unfold compress_invsqrt; rw [h_aff, hd, zero_div, inv_sqrt_checked_zero]
-          have hdi0 : compress_den_inv P = 0 := by
-            unfold compress_den_inv compress_den1 compress_den2; rw [hJ0]; split_ifs <;> ring
-          rw [hs0, hdi0]; ring
-        · -- Nondegenerate: J² = I²·Z⁶, both sides equal
-          have h_ne_aff : compress_u1 P * compress_u2 P ^ 2 ≠ 0 := by
-            rw [h_aff]; exact div_ne_zero hd (pow_ne_zero _ hZ_ne)
-          have h_isq : IsSquare (compress_u1 P * compress_u2 P ^ 2) := by
-            rw [h_aff, h_u1_u2_sq_val]
-            obtain ⟨w, hw⟩ := (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2))
-            exact ⟨w * (self.X.toField * self.Y.toField) / self.Z.toField ^ 3,
-              by rw [hw]; field_simp⟩
-          have hJ_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
-            unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_isq h_ne_aff
-          -- Step B: J² = I²·Z⁶ and compress_z_inv P = 1
-          set I := x_post1.2.toField with hI_def
-          set Z := self.Z.toField with hZ_def
-          have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
-            have hI_u := h_I_sq_mul hd
-            have hJ_u : compress_invsqrt P ^ 2 * u1_u2_sq.toField = Z ^ 6 := by
-              rwa [h_aff, ← mul_div_assoc, div_eq_iff (pow_ne_zero 6 hZ_ne), one_mul] at hJ_sq
-            have : u1_u2_sq.toField * (compress_invsqrt P ^ 2 - I ^ 2 * Z ^ 6) = 0 := by
-              linear_combination hJ_u - hI_u * Z ^ 6
-            exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hd)
-          have hz_inv_one : compress_z_inv P = 1 := by
-            have : compress_z_inv P =
-                compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by
-              unfold compress_z_inv compress_den1 compress_den2 compress_u2; ring
-            rw [this, hJ_sq]
-          -- Step C: z_inv.toField * Z = 1 (key for flag matching)
-          have h_z_inv_mul : z_inv.toField * Z = 1 := by
-            have hI := h_I_sq_mul hd; rw [h_u1_u2_sq_val] at hI
-            rw [hb_z_inv, hb_i1, hb_i2_T, hb_i2, h_u1_proj, hb_u2]
-            linear_combination hI - I ^ 2 * (Z ^ 2 - self.Y.toField ^ 2) *
-              (self.X.toField * self.Y.toField) * hT_rel
-          have h_t_z_inv : t_z_inv.toField = P.x * P.y := by
-            rw [show P.x = self.X.toField / Z from hpx, show P.y = self.Y.toField / Z from hpy,
-                hb_t_z_inv]
-            field_simp
-            linear_combination self.T.toField * Z * h_z_inv_mul - hT_rel
-          have h_rotate : rotate.val = 1#u8 ↔ compress_rotate P = true := by
-            have h_val := congrArg ZMod.val h_t_z_inv
-            simp only [FieldElement51.toField, ZMod.val_natCast] at h_val
-            unfold compress_rotate is_negative
-            rw [hz_inv_one, mul_one]; simp only [beq_iff_eq]
-            rw [← h_val]; exact rotate_post
+  -- Build the shared implementation-to-pure bridge once.
+  -- Both final goals consume h_key : s1.toField = compress_s self.toPoint.
+  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  have hvalid := h.1
+  have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
+  have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0
+  have hT_rel := hvalid.T_relation  -- X.toField * Y.toField = T.toField * Z.toField
+  -- Mul/Sq bridges (implicit args infer x✝.2 for i1/i2 automatically)
+  have hb_u1 := bridge_mul u1_post1
+  have hb_u2 := bridge_mul u2_post1
+  have hb_u2_sq := bridge_sq u2_sq_post1
+  have hb_u1_u2_sq := bridge_mul u1_u2_sq_post1
+  have hb_i1 := bridge_mul i1_post1
+  have hb_i2 := bridge_mul i2_post1
+  have hb_i2_T := bridge_mul i2_T_post1
+  have hb_z_inv := bridge_mul z_inv_post1
+  have hb_iX := bridge_mul iX_post1
+  have hb_iY := bridge_mul iY_post1
+  have hb_enchanted := bridge_mul enchanted_denominator_post1
+  have hb_t_z_inv := bridge_mul t_z_inv_post1
+  have hb_x_z_inv := bridge_mul x_z_inv_post1
+  have hb_s := bridge_mul s_post1
+  -- Sub/Neg bridges
+  have hb_zmy := bridge_sub z_minus_y_post2
+  have hb_zmy2 := bridge_sub z_minus_y2_post2
+  have hb_y_neg := bridge_neg y_neg_post1
+  have hb_zpy := bridge_add z_plus_y_post1
+  have h_key : s1.toField = compress_s self.toPoint := by
+    -- Setup: affine coordinates and IsValid properties
+    set P := self.toPoint with hP_def
+    -- Step 1: s1.toField = abs_edwards(s.toField) via conditional negation
+    have h_s1_abs : s1.toField = abs_edwards s.toField := by
+      rw [bridge_cond s1_post, bridge_neg s_neg_post1, abs_edwards, is_negative]
+      by_cases hc : s_is_negative.val = 1#u8
+      · rw [if_pos hc]
+        have : (s.toField.val % 2 == 1) = true := by
+          rw [beq_iff_eq]; unfold FieldElement51.toField;
+          rw [ZMod.val_natCast]
+          exact s_is_negative_post.mp hc
+        simp only [this, ite_true]
+      · rw [if_neg hc]
+        simp only [beq_iff_eq, right_eq_ite_iff]
+        intro h_odd
+        exact absurd (s_is_negative_post.mpr
+        (by unfold FieldElement51.toField at h_odd; rwa [ZMod.val_natCast] at h_odd)) hc
+    -- Step 2: conditional assign bridges
+    have hb_i21 := bridge_cond i21_post
+    have hb_Y := bridge_cond Y_post
+    have hb_X := bridge_cond X_post
+    have hb_Y1 := bridge_cond Y1_post
+    -- Step 3: projective coordinate relations
+    have h_u1_proj : u1.toField = self.Z.toField ^ 2 - self.Y.toField ^ 2 := by
+      rw [hb_u1, hb_zpy, hb_zmy]; ring
+    have h_u1_u2_sq_val : u1_u2_sq.toField =
+        (self.Z.toField ^ 2 - self.Y.toField ^ 2) *
+        (self.X.toField * self.Y.toField) ^ 2 := by
+      rw [hb_u1_u2_sq, hb_u2_sq, h_u1_proj, hb_u2]
+    -- Step 4: QR argument — when u1_u2_sq ≠ 0, I² · u1_u2_sq = 1
+    have h_I_sq_mul : u1_u2_sq.toField ≠ 0 →
+        x_post1.2.toField ^ 2 * u1_u2_sq.toField = 1 := by
+      intro h_ne
+      have h_ne_nat : Field51_as_Nat u1_u2_sq % p ≠ 0 := by
+        rwa [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff,
+             Nat.dvd_iff_mod_eq_zero] at h_ne
+      have h_qr : ∃ x, x ^ 2 * (Field51_as_Nat u1_u2_sq % p) % p = 1 := by
+        have h_sq : IsSquare u1_u2_sq.toField := by
+          rw [h_u1_u2_sq_val]
+          exact (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2)).mul ⟨_, (sq _)⟩
+        obtain ⟨r, hr⟩ := h_sq
+        have hr_ne : r ≠ 0 := by intro heq; rw [heq, mul_zero] at hr; exact h_ne hr
+        have h_inv : r⁻¹ ^ 2 * u1_u2_sq.toField = 1 := by rw [hr]; field_simp
+        refine ⟨(r⁻¹).val, ?_⟩
+        have hmod : (↑(Field51_as_Nat u1_u2_sq % p) : ZMod p) = u1_u2_sq.toField := by
+          unfold FieldElement51.toField; rw [ZMod.natCast_eq_natCast_iff]
+          exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
+        have h_zmod : (↑((r⁻¹).val ^ 2 * (Field51_as_Nat u1_u2_sq % p)) : ZMod p) = 1 := by
+          push_cast; rw [ZMod.natCast_zmod_val, hmod]; exact h_inv
+        have h_val := congrArg ZMod.val h_zmod
+        rw [ZMod.val_natCast, ZMod.val_one'' (by decide : p ≠ 1)] at h_val
+        exact h_val
+      have h_post := (x_post5 ⟨h_ne_nat, h_qr⟩).2
+      -- Lift Nat % p equation to ZMod
+      have hmm : ∀ a, (a % p) ≡ a [MOD p] := fun a => by
+        exact Nat.mod_eq_of_lt (Nat.mod_lt a (by decide))
+      have h_modeq : Field51_as_Nat x_post1.2 ^ 2 * Field51_as_Nat u1_u2_sq ≡ 1 [MOD p] :=
+        ((hmm _).symm.pow 2).mul (hmm _).symm |>.trans (by exact h_post)
+      unfold FieldElement51.toField
+      have := lift_mod_eq _ _ h_modeq; push_cast at this; exact this
+    -- Step 5: The squared equality (the main algebraic content)
+    have h_sq_eq : s.toField ^ 2 =
+        (compress_den_inv P * (1 - compress_y_final P)) ^ 2 := by
+      -- Step 1: Lift constant squared facts to ZMod
+      have h_fe_sq := lift_fe_sq fe fe_post1
+      have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
+      -- Affine ↔ projective bridge for P
+      have hpx' : P.x = self.X.toField / self.Z.toField := by rw [hP_def]; exact hpx
+      have hpy' : P.y = self.Y.toField / self.Z.toField := by rw [hP_def]; exact hpy
+      -- Key link: compress_u1 P * compress_u2 P² = u1_u2_sq / Z⁶
+      have h_aff : compress_u1 P * compress_u2 P ^ 2 =
+          u1_u2_sq.toField / self.Z.toField ^ 6 := by
+        unfold compress_u1 compress_u2; rw [hpx', hpy', h_u1_u2_sq_val]; field_simp; ring
+      by_cases hd : u1_u2_sq.toField = 0
+      · -- Degenerate: I = 0, so s = 0 and compress_den_inv P = 0
+        have h_nat : Field51_as_Nat u1_u2_sq % p = 0 := by
+          rwa [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero] at hd
+        have hI0 : x_post1.2.toField = 0 := by
+          rw [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
+          exact (x_post4 h_nat).2
+        -- LHS: I=0 → i1=i2=0 → i21=0 → s=0
+        have hi2_0 : i2.toField = 0 := by rw [hb_i2, hI0, zero_mul]
+        have hs0 : s.toField = 0 := by
+          rw [hb_s, hb_i21]; split_ifs
+          · rw [hb_enchanted, hb_i1, hI0, zero_mul, zero_mul, zero_mul]
+          · rw [hi2_0, zero_mul]
+        -- RHS: compress_invsqrt P = 0 → compress_den_inv P = 0
+        have hJ0 : compress_invsqrt P = 0 := by
+          unfold compress_invsqrt; rw [h_aff, hd, zero_div, inv_sqrt_checked_zero]
+        have hdi0 : compress_den_inv P = 0 := by
+          unfold compress_den_inv compress_den1 compress_den2; rw [hJ0]; split_ifs <;> ring
+        rw [hs0, hdi0]; ring
+      · -- Nondegenerate: J² = I²·Z⁶, both sides equal
+        have h_ne_aff : compress_u1 P * compress_u2 P ^ 2 ≠ 0 := by
+          rw [h_aff]; exact div_ne_zero hd (pow_ne_zero _ hZ_ne)
+        have h_isq : IsSquare (compress_u1 P * compress_u2 P ^ 2) := by
+          rw [h_aff, h_u1_u2_sq_val]
+          obtain ⟨w, hw⟩ := (h.2 : IsSquare (self.Z.toField ^ 2 - self.Y.toField ^ 2))
+          exact ⟨w * (self.X.toField * self.Y.toField) / self.Z.toField ^ 3,
+            by rw [hw]; field_simp⟩
+        have hJ_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
+          unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_isq h_ne_aff
+        -- Step B: J² = I²·Z⁶ and compress_z_inv P = 1
+        set I := x_post1.2.toField with hI_def
+        set Z := self.Z.toField with hZ_def
+        have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
+          have hI_u := h_I_sq_mul hd
+          have hJ_u : compress_invsqrt P ^ 2 * u1_u2_sq.toField = Z ^ 6 := by
+            rwa [h_aff, ← mul_div_assoc, div_eq_iff (pow_ne_zero 6 hZ_ne), one_mul] at hJ_sq
+          have : u1_u2_sq.toField * (compress_invsqrt P ^ 2 - I ^ 2 * Z ^ 6) = 0 := by
+            linear_combination hJ_u - hI_u * Z ^ 6
+          exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hd)
+        have hz_inv_one : compress_z_inv P = 1 := by
+          have : compress_z_inv P =
+              compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by
+            unfold compress_z_inv compress_den1 compress_den2 compress_u2; ring
+          rw [this, hJ_sq]
+        -- Step C: z_inv.toField * Z = 1 (key for flag matching)
+        have h_z_inv_mul : z_inv.toField * Z = 1 := by
+          have hI := h_I_sq_mul hd; rw [h_u1_u2_sq_val] at hI
+          rw [hb_z_inv, hb_i1, hb_i2_T, hb_i2, h_u1_proj, hb_u2]
+          linear_combination hI - I ^ 2 * (Z ^ 2 - self.Y.toField ^ 2) *
+            (self.X.toField * self.Y.toField) * hT_rel
+        have h_t_z_inv : t_z_inv.toField = P.x * P.y := by
+          rw [show P.x = self.X.toField / Z from hpx, show P.y = self.Y.toField / Z from hpy,
+              hb_t_z_inv]
+          field_simp
+          linear_combination self.T.toField * Z * h_z_inv_mul - hT_rel
+        have h_rotate : rotate.val = 1#u8 ↔ compress_rotate P = true := by
+          have h_val := congrArg ZMod.val h_t_z_inv
+          simp only [FieldElement51.toField, ZMod.val_natCast] at h_val
+          unfold compress_rotate is_negative
+          rw [hz_inv_one, mul_one]; simp only [beq_iff_eq]
+          rw [← h_val]; exact rotate_post
+        -- Step D: s = i21 * (Z - Y1)
+        have h_s_proj : s.toField = i21.toField * (Z - Y1.toField) := by
+          rw [hb_s, hb_zmy2]
+        -- Step E: rm² = iad²
+        have h_rm_iad : ristretto_magic.toField ^ 2 = invsqrt_a_minus_d ^ 2 := by
+          have had_ne : a_val - (↑d : ZMod p) ≠ 0 := by
+            intro heq; rw [heq, mul_zero] at h_rm_sq; exact zero_ne_one h_rm_sq
+          exact mul_right_cancel₀ had_ne (h_rm_sq.trans iad_sq.symm)
+        -- Scaling identities (projective ↔ affine)
+        have hX_scale : self.X.toField = Z * P.x := by rw [hpx']; field_simp
+        have hY_scale : self.Y.toField = Z * P.y := by rw [hpy']; field_simp
+        have h_u1_aff : u1.toField = Z ^ 2 * compress_u1 P := by
+          rw [h_u1_proj, hY_scale]; unfold compress_u1; ring
+        have h_u2_aff : u2.toField = Z ^ 2 * compress_u2 P := by
+          rw [hb_u2, hX_scale, hY_scale]; unfold compress_u2; ring
+        -- Y1 = Z · compress_y_final P (branch-independent)
+        have h_Y1_proj : Y1.toField = Z * compress_y_final P := by
           sorry
-      -- Conclude: s1 = abs(s) = abs(compress_den_inv * (1 - y_final)) = compress_s P
-      rw [h_s1_abs]; unfold compress_s
-      exact abs_edwards_eq_of_sq_eq h_sq_eq
-    -- Goal 2 conclusion: compress_pure self.toPoint = U8x32_as_Nat a
+        have h_zmy_sq :
+            (Z - Y1.toField) ^ 2 = Z ^ 2 * (1 - compress_y_final P) ^ 2 := by
+          rw [h_Y1_proj]; ring
+        -- Denominator square identity: i21² = compress_den_inv² / Z²
+        have h_i2_sq : i2.toField ^ 2 = compress_den2 P ^ 2 / Z ^ 2 := by
+          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
+          have h1 : i2.toField ^ 2 * Z ^ 2 = I ^ 2 * Z ^ 6 * compress_u2 P ^ 2 := by
+            rw [hb_i2, h_u2_aff]; ring
+          rw [h1, ← hJ_I]; unfold compress_den2; ring
+        have h_i1_sq : i1.toField ^ 2 = compress_den1 P ^ 2 / Z ^ 2 := by
+          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
+          have h1 : i1.toField ^ 2 * Z ^ 2 = I ^ 2 * Z ^ 6 * compress_u1 P ^ 2 := by
+            rw [hb_i1, h_u1_aff]; ring
+          rw [h1, ← hJ_I]; unfold compress_den1; ring
+        have h_ench_sq : enchanted_denominator.toField ^ 2 =
+            (compress_den1 P * invsqrt_a_minus_d) ^ 2 / Z ^ 2 := by
+          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
+          have h_exp : enchanted_denominator.toField ^ 2 * Z ^ 2 =
+              i1.toField ^ 2 * ristretto_magic.toField ^ 2 * Z ^ 2 := by
+            rw [hb_enchanted]; ring
+          rw [h_exp, h_rm_iad]
+          have h_exp2 : i1.toField ^ 2 * invsqrt_a_minus_d ^ 2 * Z ^ 2 =
+              I ^ 2 * Z ^ 6 * compress_u1 P ^ 2 * invsqrt_a_minus_d ^ 2 := by
+            rw [hb_i1, h_u1_aff]; ring
+          rw [h_exp2, ← hJ_I]; unfold compress_den1; ring
+        have h_i21_sq : i21.toField ^ 2 = compress_den_inv P ^ 2 / Z ^ 2 := by
+          rw [hb_i21]; split_ifs with hr
+          · rw [compress_den_inv, if_pos (h_rotate.mp hr)]; exact h_ench_sq
+          · rw [compress_den_inv, if_neg (fun h => hr (h_rotate.mpr h))]; exact h_i2_sq
+        -- Close the squared equality via calc
+        rw [h_s_proj]
+        calc (i21.toField * (Z - Y1.toField)) ^ 2
+            = i21.toField ^ 2 * (Z - Y1.toField) ^ 2 := by ring
+          _ = (compress_den_inv P ^ 2 / Z ^ 2) *
+              (Z ^ 2 * (1 - compress_y_final P) ^ 2) := by
+              rw [h_i21_sq, h_zmy_sq]
+          _ = (compress_den_inv P * (1 - compress_y_final P)) ^ 2 := by
+              field_simp;
+    -- Conclude: s1 = abs(s) = abs(compress_den_inv * (1 - y_final)) = compress_s P
+    rw [h_s1_abs]; unfold compress_s
+    exact abs_edwards_eq_of_sq_eq h_sq_eq
+  refine ⟨?goal1, ?goal2⟩
+  case goal2 =>
+    -- Main Goal 2: compress_pure self.toPoint = U8x32_as_Nat a
     change compress_pure self.toPoint = U8x32_as_Nat a
     unfold compress_pure
     rw [← h_key]
     unfold FieldElement51.toField
     rw [ZMod.val_natCast]
     exact h_a_eq.symm
+  case goal1 =>
+    -- Main Goal 1: CompressedRistretto.IsValid
+    unfold CompressedRistretto.IsValid
+    sorry
 
 end curve25519_dalek.ristretto.RistrettoPoint
