@@ -92,32 +92,30 @@ To `List Bool` (all LSB-first):
 From `List Bool`:
   - `bitsToNat : List Bool → Nat`   — numeric value: `∑ i, if bs[i] then 2^i else 0`
 
-## Key lemmas
+## Key lemmas (in `Math/BitList.lean`)
 
-Connecting list operations to arithmetic:
-  - `bitsToNat (List.drop k bs) = bitsToNat bs / 2^k`   — right shift is drop
-  - `bitsToNat (List.take k bs) = bitsToNat bs % 2^k`   — mask is take
-  - `bitsToNat (U64.toBits x) = x.val`
-  - `bitsToNat (U8.toBits x) = x.val`
+Pure `List Bool = List Bool` (primary — no Nat):
+  - `ofNat_take`: `(ofNat w n).take k = ofNat k n`                — mask is take
+  - `ofNat_drop`: `(ofNat w n).drop k = ofNat (w-k) (n / 2^k)`   — shift is drop
+  - `ofNat_extract`: combining drop + take for subrange extraction
+  - `ofNat_split`: `ofNat (w₁+w₂) n = ofNat w₁ n ++ ofNat w₂ (n / 2^w₁)`
+  - `ofByteList_extract`: 8-aligned extract on bits = extract on bytes
 
-Connecting `load8_at` to list extraction:
-  - `U64.toBits (load8_at s i) = (sliceToBits s).extract (8*i) 64`
-
-Length lemmas:
-  - `(U8.toBits x).length = 8`
-  - `(U64.toBits x).length = 64`
-  - `(arrayToBits bytes).length = 256`
+Bridge to Nat (corollaries):
+  - `toNat_take`: `toNat (bs.take k) = toNat bs % 2^k`
+  - `toNat_drop`: `toNat (bs.drop k) = toNat bs / 2^k`
+  - `toNat_ofU8 / toNat_ofU64`: round-trip
+  - `toNat_ofByteArray`: connects to `U8x32_as_Nat`
 
 The splitting lemma (heart of the proof):
-  If `bs` has length ≥ 255, then
-  `bitsToNat (bs.take 255) = ∑ i in range 5, bitsToNat (bs.extract (51*i) 51) * 2^(51*i)`
+  `toNat (bs.take (k*n)) = ∑ i in range n, toNat (bs.extract (k*i) (k*i+k)) * 2^(k*i)`
 
 ## Plan
 
-1. Define the `toBits` / `bitsToNat` infrastructure (separate file or section).
-2. Prove the key lemmas above.
-3. Prove `load8_at` spec: extracts a 64-bit sublist starting at bit `8*i`.
-4. Prove `from_bytes` spec by composing the lemmas.
+1. `Math/BitList.lean`: definitions + key lemmas (done, proofs pending).
+2. `from_bytes_bitList_spec`: pure List Bool spec for from_bytes.
+3. `field51_eq_of_bitList`: bridge from List Bool spec to Nat spec.
+4. Compose to prove `from_bytes_spec`.
 -/
 
 
