@@ -93,9 +93,8 @@ In List Bool terms, the result's bits are exactly the 64 bits starting at positi
 slice's bit representation. -/
 
 private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
-    x.val * 2 ^ k < U64.size :=
-  calc x.val * 2 ^ k
-      ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
+    x.val * 2 ^ k < U64.size := calc
+    _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
         (Nat.pow_le_pow_right (by omega) hk)
     _ < U64.size := by scalar_tac
 
@@ -108,18 +107,17 @@ private lemma u8_mul_pow_mod_u64 (x : U8) (k : Nat) (hk : k ≤ 56) :
   Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size x k hk)
 
 /-- Left-associated OR of 8 byte values shifted by multiples of 8 equals their sum. -/
-private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat) (h0 : b0 < 256) (h1 : b1 < 256)
-    (h2 : b2 < 256) (h3 : b3 < 256) (h4 : b4 < 256) (h5 : b5 < 256) (h6 : b6 < 256) (_ : b7 < 256) :
-    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) ||| b4 * 2^32) ||| b5 * 2^40) |||
-      b6 * 2^48) ||| b7 * 2^56 =
+private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat) (_ : b0 < 256) (_ : b1 < 256)
+    (_ : b2 < 256) (_ : b3 < 256) (_ : b4 < 256) (_ : b5 < 256) (_ : b6 < 256) (_ : b7 < 256) :
+    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) |||
+      b4 * 2^32) ||| b5 * 2^40) ||| b6 * 2^48) ||| b7 * 2^56 =
       b0 + b1 * 2^8 + b2 * 2^16 + b3 * 2^24 + b4 * 2^32 + b5 * 2^40 + b6 * 2^48 + b7 * 2^56 := by
   rw [or_mul_pow_two_eq_add _ _ 8 (by omega), or_mul_pow_two_eq_add _ _ 16 (by grind),
     or_mul_pow_two_eq_add _ _ 24 (by grind), or_mul_pow_two_eq_add _ _ 32 (by grind),
     or_mul_pow_two_eq_add _ _ 40 (by grind), or_mul_pow_two_eq_add _ _ 48 (by grind),
     or_mul_pow_two_eq_add _ _ 56 (by grind)]
 
-/-- The Nat-level spec for load8_at: the result is the little-endian
-    combination of 8 consecutive bytes. -/
+/-- The Nat-level spec for load8_at: the result is the little-endian combination of 8 bytes. -/
 @[progress]
 theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ (result : U64) =>
@@ -128,11 +126,9 @@ theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ inpu
   progress*
   simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq, u8_val_mod_u64_numBits,
     Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
-  rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-    (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
-    (input.val[i.val + 2]!).hmax (input.val[i.val + 3]!).hmax
-    (input.val[i.val + 4]!).hmax (input.val[i.val + 5]!).hmax
-    (input.val[i.val + 6]!).hmax (input.val[i.val + 7]!).hmax]
+  rw [or_bytes_eq_sum _ _ _ _ _ _ _ _ (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
+    (input.val[i.val + 2]!).hmax (input.val[i.val + 3]!).hmax (input.val[i.val + 4]!).hmax
+    (input.val[i.val + 5]!).hmax (input.val[i.val + 6]!).hmax (input.val[i.val + 7]!).hmax]
   simp [Finset.sum_range_succ]
 
 private lemma extract_getElem! (l : List U8) (i j : Nat) (hj : j < 8) :
@@ -147,8 +143,7 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
   apply Finset.sum_congr rfl; intro j hj; rw [Finset.mem_range] at hj
   rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
 
-/-- The List Bool spec for load8_at: the result's bits are exactly
-    the 64 bits starting at byte position i in the input. -/
+/-- The List Bool spec for load8_at: the result bits are the 64 bits starting at byte position i. -/
 @[progress]
 theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ (result : U64) =>
@@ -194,7 +189,7 @@ theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val
 @[progress]
 theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
     (hn : n ≤ 64) (hmask : mask.val = 2 ^ n - 1) :
-    lift (x &&& mask) ⦃ z => ofU64 z ≈ₗ (ofU64 x).take n ⦄ := by
+    lift (x &&& mask) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).take n ⦄ := by
   simp only [lift, spec_ok]
   have hval : (x &&& mask).val = x.val % 2 ^ n := by
     rw [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
@@ -215,11 +210,9 @@ theorem load8_at_bitList_progress_spec (input : Slice U8) (i : Usize)
 /-! ## Bridge: List Bool spec implies Nat spec -/
 
 /-- Equiv implies the limb value equals the slice value. -/
-theorem field51_eq_of_bitList
-    (result : FieldElement51) (bytes : Array U8 32#usize)
+theorem field51_eq_of_bitList (result : FieldElement51) (bytes : Array U8 32#usize)
     (hequiv : ∀ i : Fin 5,
-      ofU64 result[i]! ≈ₗ
-        (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
+      ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
     Field51_as_Nat result = U8x32_as_Nat bytes % 2 ^ 255 := by
   unfold Field51_as_Nat
   have hsum : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * result[i]!.val =
@@ -228,20 +221,17 @@ theorem field51_eq_of_bitList
     apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
     rw [(toNat_ofU64 result[i]!).symm.trans (hequiv ⟨i, hi⟩).toNat_eq]; ring
   rw [hsum, ← toNat_split_chunks (ofByteArray bytes) 51 5 (by rw [ofByteArray_length]; norm_num),
-    show 51 * 5 = 255 from by norm_num,
-    toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
+    show 51 * 5 = 255 from by norm_num, toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
 
 /-- The limb bound follows from Equiv (the extract has length ≤ 51). -/
-theorem limb_bound_of_equiv
-    (result : FieldElement51) (bytes : Array U8 32#usize)
+theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize)
     (hequiv : ∀ i : Fin 5,
-      ofU64 result[i]! ≈ₗ
-        (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
+      ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
     ∀ i : Fin 5, result[i]!.val < 2 ^ 51 := by
   intro i
   rw [← toNat_ofU64 result[i]!, (hequiv i).toNat_eq]
-  exact (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) (by
-    simp [List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteArray_length]))
+  refine (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) ?_)
+  simp [List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteArray_length]
 
 /-! ## The pure List Bool specification for from_bytes -/
 
