@@ -132,7 +132,12 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
   unfold Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add
   progress*
   · simp_all [Array.to_slice_mut]
+  · unfold backend.serial.u64.field.FieldElement51.IsValid
+    grind
   · simp_all [Array.to_slice_mut]
+  · unfold backend.serial.u64.field.FieldElement51.IsValid
+    grind
+
 
 
 /-
