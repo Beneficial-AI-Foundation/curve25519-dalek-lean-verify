@@ -145,7 +145,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     · have := h.1.X_bounds i hi; omega
   have h_s1_nat := bridge_cond_nat s1_post
   have h_a_eq : U8x32_as_Nat a = Field51_as_Nat s1 % p := by
-    have := a_post1; rw [Nat.ModEq, Nat.mod_eq_of_lt a_post2] at this; exact this
+    simpa [Nat.ModEq, Nat.mod_eq_of_lt a_post2] using a_post1
   -- Shared bridge: parity of s1 mod p is 0
   have h_s1_parity : Field51_as_Nat s1 % p % 2 = 0 := by
     rw [h_s1_nat]
@@ -321,11 +321,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
           have : u1_u2_sq.toField * (compress_invsqrt P ^ 2 - I ^ 2 * Z ^ 6) = 0 := by
             linear_combination hJ_u - hI_u * Z ^ 6
           exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hd)
-        have hz_inv_one : compress_z_inv P = 1 := by
-          have : compress_z_inv P =
-              compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by
-            unfold compress_z_inv compress_den1 compress_den2 compress_u2; ring
-          rw [this, hJ_sq]
+        have hz_inv_one : compress_z_inv P = 1 := compress_z_inv_eq_one P hJ_sq
         -- Step C: z_inv.toField * Z = 1 (key for flag matching)
         have h_z_inv_mul : z_inv.toField * Z = 1 := by
           have hI := h_I_sq_mul hd; rw [h_u1_u2_sq_val] at hI
