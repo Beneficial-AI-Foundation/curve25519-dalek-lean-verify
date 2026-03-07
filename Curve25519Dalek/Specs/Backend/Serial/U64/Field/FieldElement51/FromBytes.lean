@@ -186,7 +186,6 @@ theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val
     exact x.hmax)
 
 /-- Masking a U64 with `2^n - 1` takes the first n bits. -/
-@[progress]
 theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
     (hn : n ≤ 64) (hmask : mask.val = 2 ^ n - 1) :
     lift (x &&& mask) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).take n ⦄ := by
@@ -197,6 +196,13 @@ theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
   rw [ofNat_take n 64 x.val (by omega), ← ofNat_mod n x.val]
   exact ofNat_equiv_of_lt n 64 (x.val % 2 ^ n) (by omega)
     (Nat.mod_lt _ (by positivity))
+
+/-- Specialized mask spec for 51-bit mask with literal precondition for progress*. -/
+@[progress]
+theorem u64_and_mask51_bitList_spec (x mask : U64)
+    (hmask : mask.val = 2251799813685247) :
+    lift (x &&& mask) ⦃ (z : U64) => ofU64 z ≈ₗ (ofU64 x).take 51 ⦄ :=
+  u64_and_mask_bitList_spec x mask 51 (by omega) (by omega)
 
 /-- load8_at in List Bool terms, as a progress-compatible spec. -/
 @[progress]
@@ -235,10 +241,9 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
 
 /-! ## The pure List Bool specification for from_bytes -/
 
-/-- Normalize extract/drop/take expressions and close by reflexivity. -/
-local macro "norm_extract" : tactic =>
-  `(tactic| (simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
-    List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]; intro i; rfl))
+section
+attribute [simp] List.extract_eq_drop_take List.drop_take List.drop_drop List.take_take
+  inf_of_le_left
 
 /-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
 @[progress]
@@ -247,10 +252,6 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
       let allBits := ofByteArray bytes
       ∀ i : Fin 5, ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
   unfold from_bytes
-  progress as ⟨i_shl, hi_shl1, _⟩
-  progress as ⟨low_51_bit_mask, hmask_val, _⟩
-  have hmask51 : low_51_bit_mask.val = 2 ^ 51 - 1 := by
-    rw [hmask_val, hi_shl1]; scalar_tac
   progress*
   have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
     intro sx hsx; rw [hsx]; simp [Array.to_slice]
@@ -258,15 +259,17 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   rw [hs s2 s2_post] at i6_post; rw [hs s3 s3_post] at i9_post
   rw [hs s4 s4_post] at i12_post
   intro i; fin_cases i <;> simp only [Array.make, ofByteArray]
-  · exact i2_post.trans (i1_post.take 51 |>.trans (by norm_extract))
+  · exact i2_post.trans (i1_post.take 51 |>.trans (by simp; intro i; rfl))
   · exact i5_post.trans ((i4_post.take 51).trans ((i3_post.drop 3 |>.take 51).trans (by
-      norm_extract)))
+      simp; intro i; rfl)))
   · exact i8_post.trans ((i7_post.take 51).trans ((i6_post.drop 6 |>.take 51).trans (by
-      norm_extract)))
+      simp; intro i; rfl)))
   · exact i11_post.trans ((i10_post.take 51).trans ((i9_post.drop 1 |>.take 51).trans (by
-      norm_extract)))
+      simp; intro i; rfl)))
   · exact i14_post.trans ((i13_post.take 51).trans ((i12_post.drop 12 |>.take 51).trans (by
-      norm_extract)))
+      simp; intro i; rfl)))
+
+end -- section: local simp attributes for extract/drop/take normalization
 
 /-! ## Final spec -/
 
