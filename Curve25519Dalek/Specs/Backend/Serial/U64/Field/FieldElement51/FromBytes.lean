@@ -292,4 +292,6 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
   · intro i hi
     exact limb_bound_of_equiv result bytes ‹_› ⟨i, hi⟩
 
+attribute [-progress] from_bytes_bitList_spec
+
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
