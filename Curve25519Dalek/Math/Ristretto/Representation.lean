@@ -139,7 +139,7 @@ lemma compress_z_inv_eq_one (P : Point Ed25519)
         compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by
     unfold compress_u2
     ring
-  rw [h_mul, hI]
+  simpa only [h_mul] using hI
 
 private lemma p_sub_one_lt : p - 1 < p := by decide
 
@@ -172,7 +172,8 @@ lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 
      37095705934669439343138083508754565189542113879843219016388785533085940283555) : ℤ) : ZMod p) = 1 := by
     rw [← ZMod.intCast_mod _ p]
     decide
-  push_cast at this; exact this
+  simpa only [Nat.cast_ofNat, Int.reducePow, Int.reduceSub, Int.reduceMul, Int.cast_ofNat] using
+    this
 
 end PureIsogeny
 

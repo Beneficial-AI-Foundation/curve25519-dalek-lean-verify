@@ -60,12 +60,14 @@ natural language specs:
 private lemma bridge_mul {a b c : FieldElement51}
     (h : Field51_as_Nat a ≡ Field51_as_Nat b * Field51_as_Nat c [MOD p]) :
     a.toField = b.toField * c.toField := by
-  unfold FieldElement51.toField; have := lift_mod_eq _ _ h; push_cast at this; exact this
+  unfold FieldElement51.toField
+  simpa only [Nat.cast_mul] using lift_mod_eq _ _ h
 
 private lemma bridge_sq {a b : FieldElement51}
     (h : Field51_as_Nat a ≡ Field51_as_Nat b ^ 2 [MOD p]) :
     a.toField = b.toField ^ 2 := by
-  unfold FieldElement51.toField; have := lift_mod_eq _ _ h; push_cast at this; exact this
+  unfold FieldElement51.toField
+  simpa only [Nat.cast_pow] using lift_mod_eq _ _ h
 
 private lemma bridge_sub {a b c : FieldElement51}
     (h : (Field51_as_Nat a + Field51_as_Nat c) % p = Field51_as_Nat b % p) :
@@ -145,7 +147,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     · have := h.1.X_bounds i hi; omega
   have h_s1_nat := bridge_cond_nat s1_post
   have h_a_eq : U8x32_as_Nat a = Field51_as_Nat s1 % p := by
-    simpa [Nat.ModEq, Nat.mod_eq_of_lt a_post2] using a_post1
+    simpa only [Nat.ModEq, Nat.mod_eq_of_lt a_post2] using a_post1
   -- Shared bridge: parity of s1 mod p is 0
   have h_s1_parity : Field51_as_Nat s1 % p % 2 = 0 := by
     rw [h_s1_nat]
@@ -161,7 +163,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       have h_neg_mod : Field51_as_Nat s_neg % p = p - Field51_as_Nat s % p := by
         have h1 : (Field51_as_Nat s % p + Field51_as_Nat s_neg % p) % p = 0 := by
           simp only [Nat.add_mod_mod, Nat.mod_add_mod]
-          rw [Nat.ModEq] at h_sum; simpa using h_sum
+          rw [Nat.ModEq] at h_sum; simpa only [Nat.zero_mod] using h_sum
         have h2 : Field51_as_Nat s_neg % p < p := Nat.mod_lt _ (by decide)
         have h_dvd := Nat.dvd_of_mod_eq_zero h1
         have h_sum_pos : 0 < Field51_as_Nat s % p + Field51_as_Nat s_neg % p := by omega
@@ -489,11 +491,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
   case goal2 =>
     -- Main Goal 2: compress_pure self.toPoint = U8x32_as_Nat a
     change compress_pure self.toPoint = U8x32_as_Nat a
-    unfold compress_pure
-    rw [← h_key]
-    unfold FieldElement51.toField
-    rw [ZMod.val_natCast]
-    exact h_a_eq.symm
+    simpa only [compress_pure] using ((congrArg ZMod.val h_key).symm.trans h_a_eq.symm)
   case goal1 =>
     -- Main Goal 1: CompressedRistretto.IsValid
     unfold CompressedRistretto.IsValid
@@ -511,6 +509,6 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         ↓reduceIte, h_s_cast, Bool.false_eq_true, ↓reduceIte]
     -- Step 2: decompress_step2 (compress_s P) succeeds (pure roundtrip)
     obtain ⟨pt, hpt⟩ := decompress_step2_compress_s self.toPoint h_even
-    exact ⟨pt, by unfold decompress_pure; rw [h_step1, Option.bind_some]; exact hpt⟩
+    exact ⟨pt, by simpa only [decompress_pure, h_step1, Option.bind_some] using hpt⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint
