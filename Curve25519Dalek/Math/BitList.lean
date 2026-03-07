@@ -18,6 +18,9 @@ All bit lists are **LSB-first**: the head of the list is bit 0 (least significan
 
 open Aeneas Aeneas.Std
 
+attribute [grind =] Nat.add_mod Nat.mul_mod_mul_left Nat.mod_eq_of_lt
+attribute [grind .] Nat.mod_lt
+
 namespace BitList
 open List
 
@@ -349,23 +352,6 @@ theorem toNat_append (bs₁ bs₂ : List Bool) :
   | nil => simp [toNat]
   | cons _ _ _ => grind [toNat, Nat.pow_succ']
 
-private theorem mul_two_mod (m n : Nat) :
-    (2 * m) % (2 * n) = 2 * (m % n) := by
-  grind [Nat.mul_mod_mul_left]
-
-private theorem add_one_mul_two_mod (m n : Nat) (hn : 0 < n) :
-    (1 + 2 * m) % (2 * n) = 1 + 2 * (m % n) := by
-  rw [show 2 * m = 2 * (n * (m / n) + m % n) from by rw [Nat.div_add_mod]]
-  rw [show 1 + 2 * (n * (m / n) + m % n) = (1 + 2 * (m % n)) + (2 * n) * (m / n) from by ring]
-  rw [Nat.add_mul_mod_self_left]
-  exact Nat.mod_eq_of_lt (by have := Nat.mod_lt m hn; omega)
-
-private theorem add_mul_two_mod (a m n : Nat) (ha : a < 2) (hn : 0 < n) :
-    (a + 2 * m) % (2 * n) = a + 2 * (m % n) := by
-  obtain _ | _ : a = 0 ∨ a = 1 := by omega
-  · simpa [*] using mul_two_mod _ _
-  · simpa [*] using add_one_mul_two_mod _ _ (by omega)
-
 /-- Taking k bits gives the value mod 2^k. -/
 theorem toNat_take (k : Nat) (bs : List Bool) :
     toNat (bs.take k) = toNat bs % 2 ^ k := by
@@ -375,9 +361,8 @@ theorem toNat_take (k : Nat) (bs : List Bool) :
     cases bs with
     | nil => simp [toNat]
     | cons b bs =>
-      simp only [take_succ_cons, toNat, Nat.pow_succ']
-      rw [ih bs]
-      exact (add_mul_two_mod b.toNat (toNat bs) (2 ^ k) (by have := Bool.toNat_le b; omega) (by positivity)).symm
+      have := Bool.toNat_le b
+      grind [toNat]
 
 /-- Dropping k bits gives the value divided by 2^k. -/
 private theorem add_mul_two_div (a m : Nat) (ha : a < 2) :
