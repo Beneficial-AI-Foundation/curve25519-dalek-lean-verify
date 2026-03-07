@@ -347,16 +347,24 @@ theorem toNat_append (bs₁ bs₂ : List Bool) :
     toNat (bs₁ ++ bs₂) = toNat bs₁ + toNat bs₂ * 2 ^ bs₁.length := by
   induction bs₁ with
   | nil => simp [toNat]
-  | cons b bs₁ ih =>
-    grind [toNat, Nat.pow_succ']
+  | cons _ _ _ => grind [toNat, Nat.pow_succ']
+
+private theorem mul_two_mod (m n : Nat) :
+    (2 * m) % (2 * n) = 2 * (m % n) := by
+  grind [Nat.mul_mod_mul_left]
+
+private theorem add_one_mul_two_mod (m n : Nat) (hn : 0 < n) :
+    (1 + 2 * m) % (2 * n) = 1 + 2 * (m % n) := by
+  rw [show 2 * m = 2 * (n * (m / n) + m % n) from by rw [Nat.div_add_mod]]
+  rw [show 1 + 2 * (n * (m / n) + m % n) = (1 + 2 * (m % n)) + (2 * n) * (m / n) from by ring]
+  rw [Nat.add_mul_mod_self_left]
+  exact Nat.mod_eq_of_lt (by have := Nat.mod_lt m hn; omega)
 
 private theorem add_mul_two_mod (a m n : Nat) (ha : a < 2) (hn : 0 < n) :
     (a + 2 * m) % (2 * n) = a + 2 * (m % n) := by
-  conv_lhs => rw [show 2 * m = 2 * (n * (m / n) + m % n) from by rw [Nat.div_add_mod]]
-  ring_nf
-  rw [show a + n * (m / n) * 2 + m % n * 2 = (a + m % n * 2) + (n * 2) * (m / n) from by ring]
-  rw [Nat.add_mul_mod_self_left]
-  exact Nat.mod_eq_of_lt (by have := Nat.mod_lt m hn; omega)
+  obtain _ | _ : a = 0 ∨ a = 1 := by omega
+  · simpa [*] using mul_two_mod _ _
+  · simpa [*] using add_one_mul_two_mod _ _ (by omega)
 
 /-- Taking k bits gives the value mod 2^k. -/
 theorem toNat_take (k : Nat) (bs : List Bool) :
