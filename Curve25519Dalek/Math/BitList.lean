@@ -35,9 +35,8 @@ def ofNat : Nat → Nat → List Bool
   | 0, _ => []
   | w + 1, n => (n % 2 == 1) :: ofNat w (n / 2)
 
-/-- Two bit lists are equivalent if they agree at every position, treating
-    out-of-bounds positions as `false` (zero-extension).
-    This captures "same numeric value, possibly different widths". -/
+/-- Two bit lists are equivalent if they agree at every position, treating out-of-bounds positions
+as `false`. I.e., "same numeric value, possibly different widths". -/
 def Equiv (bs₁ bs₂ : List Bool) : Prop :=
   ∀ i : Nat, bs₁.getD i false = bs₂.getD i false
 
@@ -340,9 +339,8 @@ theorem toNat_lt_pow (bs : List Bool) : toNat bs < 2 ^ bs.length := by
   induction bs with
   | nil => simp [toNat]
   | cons b bs ih =>
-    simp only [toNat, length_cons, Nat.pow_succ']
-    have hb : b.toNat ≤ 1 := Bool.toNat_le b
-    omega
+    have : b.toNat ≤ 1 := Bool.toNat_le b
+    grind [toNat, Nat.pow_succ']
 
 /-- Appending two bit lists adds their values with the appropriate shift. -/
 theorem toNat_append (bs₁ bs₂ : List Bool) :
@@ -350,8 +348,7 @@ theorem toNat_append (bs₁ bs₂ : List Bool) :
   induction bs₁ with
   | nil => simp [toNat]
   | cons b bs₁ ih =>
-    simp only [cons_append, toNat, length_cons, Nat.pow_succ', ih]
-    ring
+    grind [toNat, Nat.pow_succ']
 
 private theorem add_mul_two_mod (a m n : Nat) (ha : a < 2) (hn : 0 < n) :
     (a + 2 * m) % (2 * n) = a + 2 * (m % n) := by
