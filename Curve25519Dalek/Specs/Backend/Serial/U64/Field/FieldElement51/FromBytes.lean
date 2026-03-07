@@ -241,10 +241,6 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
 
 /-! ## The pure List Bool specification for from_bytes -/
 
-section
-attribute [simp] List.extract_eq_drop_take List.drop_take List.drop_drop List.take_take
-  inf_of_le_left
-
 /-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
 @[progress]
 theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
@@ -254,34 +250,14 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   unfold from_bytes
   progress*
   have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
-    intro sx hsx; rw [hsx]; simp [Array.to_slice]
+    intro _ hsx; simp [hsx, Array.to_slice]
   intro i; fin_cases i
-  · simp_all only [Array.make, ofByteArray]
-    have A := i2_post
-    have B := i1_post
-    exact A.trans ((B.take 51).trans (by simp [*, List.take_take]))
-  · sorry
-  · sorry
-  · sorry
-  · sorry
-
-/-
-  rw [hs s s_post] at i1_post; rw [hs s1 s1_post] at i3_post
-  rw [hs s2 s2_post] at i6_post; rw [hs s3 s3_post] at i9_post
-  rw [hs s4 s4_post] at i12_post
-  intro i; fin_cases i <;> simp only [Array.make, ofByteArray]
-  · exact i2_post.trans (i1_post.take 51 |>.trans (by simp; intro i; rfl))
-  · exact i5_post.trans ((i4_post.take 51).trans ((i3_post.drop 3 |>.take 51).trans (by
-      simp; intro i; rfl)))
-  · exact i8_post.trans ((i7_post.take 51).trans ((i6_post.drop 6 |>.take 51).trans (by
-      simp; intro i; rfl)))
-  · exact i11_post.trans ((i10_post.take 51).trans ((i9_post.drop 1 |>.take 51).trans (by
-      simp; intro i; rfl)))
-  · exact i14_post.trans ((i13_post.take 51).trans ((i12_post.drop 12 |>.take 51).trans (by
-      simp; intro i; rfl)))
--/
-
-end -- section: local simp attributes for extract/drop/take normalization
+  · grind [Array.make, ofByteArray]
+  · simp_all [Array.make, ofByteArray]; grind
+  · simp_all [Array.make, ofByteArray]; grind
+  · clear i1_post -- TODO: why is this required for grind to succeed?
+    simp_all [Array.make, ofByteArray, -List.drop_one]; grind
+  · simp_all [Array.make, ofByteArray]; grind
 
 /-! ## Final spec -/
 

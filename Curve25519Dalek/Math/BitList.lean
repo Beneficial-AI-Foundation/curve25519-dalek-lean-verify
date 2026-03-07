@@ -74,6 +74,7 @@ theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
 theorem Equiv.symm (h : bs₁ ≈ₗ bs₂) : bs₂ ≈ₗ bs₁ :=
   fun i => (h i).symm
 
+@[grind →]
 theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs₁ ≈ₗ bs₃ :=
   fun i => (h₁ i).trans (h₂ i)
 
@@ -139,6 +140,30 @@ theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
     bs₁.extract start stop ≈ₗ bs₂.extract start stop := by
   simp only [extract_eq_drop_take]
   exact (h.drop start).take (stop - start)
+
+/-! ### Grind support for chaining Equiv through take/drop -/
+
+attribute [grind =] List.drop_take List.drop_drop List.take_take
+
+
+@[grind →]
+theorem Equiv.trans_take {m n : Nat}
+    (h1 : bs₁ ≈ₗ bs₂.take m) (h2 : bs₂ ≈ₗ bs₃.take n) :
+    bs₁ ≈ₗ bs₃.take (min m n) :=
+  h1.trans ((h2.take m).trans (by simp [List.take_take]))
+
+@[grind →]
+theorem Equiv.trans_drop {m : Nat}
+    (h1 : bs₁ ≈ₗ bs₂.drop m) (h2 : bs₂ ≈ₗ bs₃) :
+    bs₁ ≈ₗ bs₃.drop m :=
+  h1.trans (h2.drop m)
+
+@[grind →]
+theorem Equiv.trans_take_drop {m n : Nat}
+    (h1 : bs₁ ≈ₗ bs₂.take m) (h2 : bs₂ ≈ₗ bs₃.drop n) :
+    bs₁ ≈ₗ (bs₃.drop n).take m :=
+  h1.trans (h2.take m)
+
 
 /-! ## Length lemmas -/
 
