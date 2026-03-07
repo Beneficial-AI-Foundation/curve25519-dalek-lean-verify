@@ -77,15 +77,14 @@ theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs
 @[grind =]
 theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ List.replicate n false ≈ₗ bs := by
-  intro i
-  by_cases i < bs.length <;> grind
+  intro i; by_cases i < bs.length <;> grind
 
 /-- Equiv implies the same numeric value. -/
 private theorem getD_drop_one (bs : List Bool) (i : Nat) :
     (bs.drop 1).getD i false = bs.getD (i + 1) false := by
   cases bs with
   | nil => simp
-  | cons b bs => simp
+  | cons _ _ => simp
 
 private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
     ∀ (bs₁ bs₂ : List Bool), bs₁.length ≤ n → bs₂.length ≤ n →
@@ -176,10 +175,7 @@ theorem ofNat_take (k w : Nat) (n : Nat) (hkw : k ≤ w) :
   | zero => simp [ofNat]
   | succ k ih =>
     match w, hkw with
-    | w + 1, hkw =>
-      simp only [ofNat, List.take_succ_cons]
-      congr 1
-      exact ih w (n / 2) (by omega)
+    | w + 1, hkw => grind [ofNat]
 
 /-- Dropping bits gives the shifted representation (shift is drop). -/
 theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
@@ -191,13 +187,10 @@ theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     | w + 1, hkw =>
       simp only [ofNat, List.drop_succ_cons]
       rw [ih w (n / 2) (by omega)]
-      congr 1
-      · omega
-      · rw [Nat.pow_succ', Nat.div_div_eq_div_mul]
+      grind [Nat.pow_succ', Nat.div_div_eq_div_mul]
 
 /-- Extracting a range of bits gives the shifted, narrower representation. -/
-theorem ofNat_extract (w start len : Nat) (n : Nat)
-    (h : start + len ≤ w) :
+theorem ofNat_extract (w start len : Nat) (n : Nat) (h : start + len ≤ w) :
     (ofNat w n).extract start (start + len) = ofNat len (n / 2 ^ start) := by
   simp only [List.extract_eq_drop_take]
   rw [ofNat_drop start w n (by omega)]
@@ -210,13 +203,8 @@ theorem ofNat_split (w₁ w₂ : Nat) (n : Nat) :
   induction w₁ generalizing n with
   | zero => simp [ofNat]
   | succ w₁ ih =>
-    have hrw : w₁ + 1 + w₂ = (w₁ + w₂) + 1 := by omega
-    rw [hrw]
-    simp only [ofNat]
-    congr 1
-    rw [ih (n / 2)]
-    congr 1
-    rw [Nat.pow_succ', Nat.div_div_eq_div_mul]
+    have : w₁ + 1 + w₂ = (w₁ + w₂) + 1 := by omega
+    grind [ofNat, Nat.pow_succ', Nat.div_div_eq_div_mul]
 
 /-- `ofNat w` ignores bits above position w: `ofNat w (n % 2^w) = ofNat w n`. -/
 theorem ofNat_mod (w n : Nat) :
@@ -224,16 +212,11 @@ theorem ofNat_mod (w n : Nat) :
   induction w generalizing n with
   | zero => simp [ofNat]
   | succ w ih =>
-    simp only [ofNat]
-    have h1 : n % 2 ^ (w + 1) % 2 = n % 2 :=
+    have : n % 2 ^ (w + 1) % 2 = n % 2 :=
       Nat.mod_mod_of_dvd n (by rw [Nat.pow_succ']; exact dvd_mul_right 2 (2 ^ w))
-    have h2 : n % (2 * 2 ^ w) / 2 = n / 2 % 2 ^ w :=
+    have : n % (2 * 2 ^ w) / 2 = n / 2 % 2 ^ w :=
       Nat.mod_mul_right_div_self n 2 (2 ^ w)
-    congr 1
-    · simp [h1]
-    · rw [Nat.pow_succ'] at h1 ⊢
-      rw [show n % (2 * 2 ^ w) / 2 = n / 2 % 2 ^ w from h2]
-      exact ih (n / 2)
+    grind [ofNat]
 
 /-- A wider representation is Equiv to a narrower one when the value fits. -/
 private theorem ofNat_zero (w : Nat) : ofNat w 0 = List.replicate w false := by
@@ -243,20 +226,17 @@ private theorem ofNat_zero (w : Nat) : ofNat w 0 = List.replicate w false := by
 
 theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k) :
     ofNat w n ≈ₗ ofNat k n := by
-  have hsplit : w = k + (w - k) := by omega
-  rw [hsplit, ofNat_split]
+  have : w = k + (w - k) := by omega
   have : n / 2 ^ k = 0 := Nat.div_eq_zero_iff.mpr (Or.inr hn)
-  rw [this, ofNat_zero]
-  exact Equiv.append_false (ofNat k n) (w - k)
+  grind [ofNat_split, ofNat_zero, Equiv.append_false]
 
 /-! ## Composing extracts -/
 
 /-- Extracting from an extract composes: takes the sub-subrange. -/
 theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
     (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
-  simp only [List.extract_eq_drop_take]
-  rw [List.drop_take, List.drop_drop, List.take_take]
-  congr 1; omega
+  simp only [List.extract_eq_drop_take, List.drop_take, List.drop_drop]
+  grind
 
 /-! ## Byte list decomposition into bits -/
 

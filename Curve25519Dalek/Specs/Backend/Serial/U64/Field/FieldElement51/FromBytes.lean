@@ -93,11 +93,10 @@ in little-endian order. In List Bool terms, the result's bits are exactly
 the 64 bits starting at position `8*i` in the slice's bit representation. -/
 
 private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
-    x.val * 2 ^ k < U64.size := by
-  have hx : x.val ≤ 255 := Nat.lt_succ_iff.mp x.hmax
+    x.val * 2 ^ k < U64.size :=
   calc x.val * 2 ^ k
-      ≤ 255 * 2 ^ k := Nat.mul_le_mul_right _ hx
-    _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul_left _ (Nat.pow_le_pow_right (by omega) hk)
+      ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
+        (Nat.pow_le_pow_right (by omega) hk)
     _ < U64.size := by scalar_tac
 
 private lemma u8_val_mod_u64_numBits (x : U8) :
@@ -158,11 +157,8 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
   have hlen : (l.extract i (i + 8)).length = 8 := by
     simp [List.extract_eq_drop_take, List.length_take, List.length_drop]; omega
   rw [ofDigits_map_val_eq_sum, hlen]
-  apply Finset.sum_congr rfl
-  intro j hj
-  rw [Finset.mem_range] at hj
-  rw [extract_getElem! l i j hj]
-  rw [show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
+  apply Finset.sum_congr rfl; intro j hj; rw [Finset.mem_range] at hj
+  rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
 
 /-- The List Bool spec for load8_at: the result's bits are exactly
     the 64 bits starting at byte position i in the input. -/
@@ -174,20 +170,17 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize)
         (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
   apply spec_mono (load8_at_val_spec input i h)
   intro result hval
+  simp only [Slice.getElem!_Nat_eq] at hval
   set rhs := (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64)
   have hlen : rhs.length = 64 := by
     simp [rhs, List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteList_length]
     omega
   have hval_eq : result.val = toNat rhs := by
-    have hval' : result.val = ∑ j ∈ Finset.range 8,
-        input.val[i.val + j]!.val * 2 ^ (8 * j) := by
-      simp only [Slice.getElem!_Nat_eq] at hval; exact hval
-    rw [hval']
     simp only [rhs]
-    rw [show 8 * i.val + 64 = 8 * (i.val + 8) from by ring]
-    rw [ofByteList_extract input.val i.val (i.val + 8) (by omega)]
-    rw [toNat_ofByteList]
-    rw [sum_extract_eq input.val i.val (by omega)]
+    rw [show 8 * i.val + 64 = 8 * (i.val + 8) from by ring,
+      ofByteList_extract input.val i.val (i.val + 8) (by omega),
+      toNat_ofByteList, ← sum_extract_eq input.val i.val (by omega)]
+    exact hval
   simp only [ofU64, hval_eq]
   rw [← hlen, ofNat_toNat rhs]
 
@@ -207,12 +200,10 @@ theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val
   progress as ⟨z, hval, _⟩
   simp only [ofU64]
   rw [hval, Nat.shiftRight_eq_div_pow, ofNat_drop k.toNat 64 x.val (by omega)]
-  exact ofNat_equiv_of_lt (64 - k.toNat) 64 (x.val / 2 ^ k.toNat)
-    (by omega) (by
-      rw [Nat.div_lt_iff_lt_mul (by positivity)]
-      calc x.val < 2 ^ 64 := x.hmax
-        _ = 2 ^ (64 - k.toNat) * 2 ^ k.toNat := by
-          rw [← Nat.pow_add]; congr 1; omega)
+  exact ofNat_equiv_of_lt _ 64 _ (by omega) (by
+    rw [Nat.div_lt_iff_lt_mul (by positivity), ← Nat.pow_add,
+      show 64 - k.toNat + k.toNat = 64 from by omega]
+    exact x.hmax)
 
 /-- Masking a U64 with `2^n - 1` takes the first n bits. -/
 @[progress]
@@ -245,22 +236,15 @@ theorem field51_eq_of_bitList
       ofU64 result[i]! ≈ₗ
         (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51)) :
     Field51_as_Nat result = U8x32_as_Nat bytes % 2 ^ 255 := by
-  have hlimb : ∀ (i : Nat) (hi : i < 5),
-      result[i]!.val = toNat ((ofByteArray bytes).extract (51 * i) (51 * i + 51)) := by
-    intro i hi
-    rw [← toNat_ofU64 result[i]!]
-    exact (hequiv ⟨i, hi⟩).toNat_eq
   unfold Field51_as_Nat
   have hsum : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * result[i]!.val =
       ∑ i ∈ Finset.range 5,
         toNat ((ofByteArray bytes).extract (51 * i) (51 * i + 51)) * 2 ^ (51 * i) := by
-    apply Finset.sum_congr rfl
-    intro i hi
-    rw [Finset.mem_range] at hi
-    rw [hlimb i hi]; ring
+    apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
+    rw [(toNat_ofU64 result[i]!).symm.trans (hequiv ⟨i, hi⟩).toNat_eq]; ring
   rw [hsum, ← toNat_split_chunks (ofByteArray bytes) 51 5 (by rw [ofByteArray_length]; norm_num),
-    show 51 * 5 = 255 from by norm_num]
-  rw [toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
+    show 51 * 5 = 255 from by norm_num,
+    toNat_take 255 (ofByteArray bytes), toNat_ofByteArray]
 
 /-- The limb bound follows from Equiv (the extract has length ≤ 51). -/
 theorem limb_bound_of_equiv
@@ -276,6 +260,11 @@ theorem limb_bound_of_equiv
 
 /-! ## The pure List Bool specification for from_bytes -/
 
+/-- Normalize extract/drop/take expressions and close by reflexivity. -/
+local macro "norm_extract" : tactic =>
+  `(tactic| (simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
+    List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]; intro i; rfl))
+
 /-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
 @[progress]
 theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
@@ -289,33 +278,21 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   have hmask51 : low_51_bit_mask.val = 2 ^ 51 - 1 := by
     rw [hmask_val, hi_shl1]; scalar_tac
   progress*
-  have hs_val : ∀ (sx : Slice U8), sx = bytes.to_slice → (ofByteList sx.val) = ofByteList bytes.val := by
+  have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
     intro sx hsx; rw [hsx]; simp [Array.to_slice]
+  rw [hs s s_post] at i1_post; rw [hs s1 s1_post] at i3_post
+  rw [hs s2 s2_post] at i6_post; rw [hs s3 s3_post] at i9_post
+  rw [hs s4 s4_post] at i12_post
   intro i; fin_cases i <;> simp only [Array.make, ofByteArray]
-  · have h1 := i1_post; rw [hs_val s s_post] at h1
-    exact i2_post.trans (h1.take 51 |>.trans (by
-      simp only [List.extract_eq_drop_take, List.take_take]
-      intro i; rfl))
-  · have h3 := i3_post; rw [hs_val s1 s1_post] at h3
-    exact i5_post.trans ((i4_post.take 51).trans ((h3.drop 3 |>.take 51).trans (by
-      simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
-        List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]
-      intro i; rfl)))
-  · have h6 := i6_post; rw [hs_val s2 s2_post] at h6
-    exact i8_post.trans ((i7_post.take 51).trans ((h6.drop 6 |>.take 51).trans (by
-      simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
-        List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]
-      intro i; rfl)))
-  · have h9 := i9_post; rw [hs_val s3 s3_post] at h9
-    exact i11_post.trans ((i10_post.take 51).trans ((h9.drop 1 |>.take 51).trans (by
-      simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
-        List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]
-      intro i; rfl)))
-  · have h12 := i12_post; rw [hs_val s4 s4_post] at h12
-    exact i14_post.trans ((i13_post.take 51).trans ((h12.drop 12 |>.take 51).trans (by
-      simp only [Nat.reduceMul, Nat.reduceAdd, List.extract_eq_drop_take, Nat.reduceSub,
-        List.drop_take, List.drop_drop, List.take_take, Nat.reduceLeDiff, inf_of_le_left]
-      intro i; rfl)))
+  · exact i2_post.trans (i1_post.take 51 |>.trans (by norm_extract))
+  · exact i5_post.trans ((i4_post.take 51).trans ((i3_post.drop 3 |>.take 51).trans (by
+      norm_extract)))
+  · exact i8_post.trans ((i7_post.take 51).trans ((i6_post.drop 6 |>.take 51).trans (by
+      norm_extract)))
+  · exact i11_post.trans ((i10_post.take 51).trans ((i9_post.drop 1 |>.take 51).trans (by
+      norm_extract)))
+  · exact i14_post.trans ((i13_post.take 51).trans ((i12_post.drop 12 |>.take 51).trans (by
+      norm_extract)))
 
 /-! ## Final spec -/
 
