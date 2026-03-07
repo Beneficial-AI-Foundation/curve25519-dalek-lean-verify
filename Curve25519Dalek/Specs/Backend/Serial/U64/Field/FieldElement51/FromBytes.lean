@@ -49,7 +49,7 @@ open scoped BigOperators
 
 ## Approach
 
-Think of the 32 bytes as a single list of 256 booleans (bits), LSB-first:
+We think of the 32 bytes as a single list of 256 booleans (bits), LSB-first:
   `bits[0], bits[1], ..., bits[255]`.
 Byte `bytes[i]` contributes `bits[8i .. 8i+7]`.
 
@@ -88,9 +88,9 @@ open BitList
 
 /-! ## load8_at specification
 
-`load8_at` loads 8 consecutive bytes from a slice and packs them into a U64
-in little-endian order. In List Bool terms, the result's bits are exactly
-the 64 bits starting at position `8*i` in the slice's bit representation. -/
+`load8_at` loads 8 consecutive bytes from a slice and packs them into a U64 in little-endian order.
+In List Bool terms, the result's bits are exactly the 64 bits starting at position `8*i` in the
+slice's bit representation. -/
 
 private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
     x.val * 2 ^ k < U64.size :=
@@ -108,39 +108,26 @@ private lemma u8_mul_pow_mod_u64 (x : U8) (k : Nat) (hk : k ≤ 56) :
   Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size x k hk)
 
 /-- Left-associated OR of 8 byte values shifted by multiples of 8 equals their sum. -/
-private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat)
-    (h0 : b0 < 256) (h1 : b1 < 256) (h2 : b2 < 256) (h3 : b3 < 256)
-    (h4 : b4 < 256) (h5 : b5 < 256) (h6 : b6 < 256) (_ : b7 < 256) :
-    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) |||
-    b4 * 2^32) ||| b5 * 2^40) ||| b6 * 2^48) ||| b7 * 2^56 =
-    b0 + b1 * 2^8 + b2 * 2^16 + b3 * 2^24 +
-    b4 * 2^32 + b5 * 2^40 + b6 * 2^48 + b7 * 2^56 := by
-  rw [or_mul_pow_two_eq_add _ _ 8 (by omega),
-    or_mul_pow_two_eq_add _ _ 16 (by norm_num at *; omega),
-    or_mul_pow_two_eq_add _ _ 24 (by norm_num at *; omega),
-    or_mul_pow_two_eq_add _ _ 32 (by norm_num at *; omega),
-    or_mul_pow_two_eq_add _ _ 40 (by norm_num at *; omega),
-    or_mul_pow_two_eq_add _ _ 48 (by norm_num at *; omega),
-    or_mul_pow_two_eq_add _ _ 56 (by norm_num at *; omega)]
+private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat) (h0 : b0 < 256) (h1 : b1 < 256)
+    (h2 : b2 < 256) (h3 : b3 < 256) (h4 : b4 < 256) (h5 : b5 < 256) (h6 : b6 < 256) (_ : b7 < 256) :
+    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) ||| b4 * 2^32) ||| b5 * 2^40) |||
+      b6 * 2^48) ||| b7 * 2^56 =
+      b0 + b1 * 2^8 + b2 * 2^16 + b3 * 2^24 + b4 * 2^32 + b5 * 2^40 + b6 * 2^48 + b7 * 2^56 := by
+  rw [or_mul_pow_two_eq_add _ _ 8 (by omega), or_mul_pow_two_eq_add _ _ 16 (by grind),
+    or_mul_pow_two_eq_add _ _ 24 (by grind), or_mul_pow_two_eq_add _ _ 32 (by grind),
+    or_mul_pow_two_eq_add _ _ 40 (by grind), or_mul_pow_two_eq_add _ _ 48 (by grind),
+    or_mul_pow_two_eq_add _ _ 56 (by grind)]
 
 /-- The Nat-level spec for load8_at: the result is the little-endian
     combination of 8 consecutive bytes. -/
 @[progress]
-theorem load8_at_val_spec (input : Slice U8) (i : Usize)
-    (h : i.val + 8 ≤ input.val.length) :
-    from_bytes.load8_at input i ⦃ result =>
-      result.val = ∑ j ∈ Finset.range 8,
-        input[i.val + j]!.val * 2 ^ (8 * j) ⦄ := by
+theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
+    from_bytes.load8_at input i ⦃ (result : U64) =>
+      result.val = ∑ j ∈ Finset.range 8, input[i.val + j]!.val * 2 ^ (8 * j) ⦄ := by
   unfold from_bytes.load8_at
   progress*
-  simp only [i32_post1, i27_post1, i22_post1, i17_post1, i12_post1, i7_post1, UScalar.val_or]
-  simp only [i36_post1, i31_post1, i26_post1, i21_post1, i16_post1, i11_post1, i6_post1]
-  simp only [i35_post, i30_post, i25_post, i20_post, i15_post, i10_post, i5_post, i2_post,
-    UScalar.cast_val_eq]
-  simp only [i34_post, i29_post, i24_post, i19_post, i14_post, i9_post, i4_post, i1_post,
-    i33_post, i28_post, i23_post, i18_post, i13_post, i8_post, i3_post]
-  simp only [u8_val_mod_u64_numBits, Nat.shiftLeft_eq]
-  simp (discharger := omega) only [u8_mul_pow_mod_u64]
+  simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq, u8_val_mod_u64_numBits,
+    Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
   rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
     (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
     (input.val[i.val + 2]!).hmax (input.val[i.val + 3]!).hmax
@@ -163,11 +150,9 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
 /-- The List Bool spec for load8_at: the result's bits are exactly
     the 64 bits starting at byte position i in the input. -/
 @[progress]
-theorem load8_at_bitList_spec (input : Slice U8) (i : Usize)
-    (h : i.val + 8 ≤ input.val.length) :
-    from_bytes.load8_at input i ⦃ result =>
-      ofU64 result =
-        (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
+theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
+    from_bytes.load8_at input i ⦃ (result : U64) =>
+      ofU64 result = (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
   apply spec_mono (load8_at_val_spec input i h)
   intro result hval
   simp only [Slice.getElem!_Nat_eq] at hval
@@ -270,8 +255,7 @@ local macro "norm_extract" : tactic =>
 theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       let allBits := ofByteArray bytes
-      ∀ i : Fin 5,
-        ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
+      ∀ i : Fin 5, ofU64 result[i]! ≈ₗ allBits.extract (51 * i.val) (51 * i.val + 51) ⦄ := by
   unfold from_bytes
   progress as ⟨i_shl, hi_shl1, _⟩
   progress as ⟨low_51_bit_mask, hmask_val, _⟩
