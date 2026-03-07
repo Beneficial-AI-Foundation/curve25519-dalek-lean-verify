@@ -66,6 +66,7 @@ def ofByteArray (arr : Array U8 32#usize) : List Bool :=
 
 variable {bs₁ bs₂ bs₃ : List Bool}
 
+@[simp, refl]
 theorem Equiv.refl (bs : List Bool) : bs ≈ₗ bs :=
   fun _ => rfl
 
