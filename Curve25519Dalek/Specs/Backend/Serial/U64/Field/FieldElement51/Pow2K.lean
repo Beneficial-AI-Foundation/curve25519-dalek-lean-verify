@@ -423,13 +423,13 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
 set_option maxHeartbeats 1000000 in
 -- progress* needs this
 @[progress]
-theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
+theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     pow2k_loop k' a ⦃ (result : Std.Array U64 5#usize) =>
       Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p] ∧
-      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
+      (if k'.val = 0 then result = a
+       else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
-  have : k' > 0#u32 := by scalar_tac
   split
   case isTrue hlt =>
 
@@ -485,8 +485,8 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
     clear i3_post i5_post i7_post i8_post i9_post i10_post i11_post i12_post i13_post i14_post
       i15_post i16_post i17_post i18_post i19_post i20_post i21_post i22_post i23_post i24_post
       i25_post i26_post i27_post i28_post i29_post a3_19_post a4_19_post wp0 eq0 wp1 eq1 wp2 eq2 wp3
-      eq3 wp4 this i3 i5 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 i23 i24 i26
-      i27 i28 a3_19 a4_19 hlt
+      eq3 wp4 i3 i5 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 i23 i24 i26
+      i27 i28 a3_19 a4_19
 
     -- Continue to the 2nd halt point
     let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -624,38 +624,33 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
 
     let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
 
+    -- Recursive call: pow2k_loop k1 a8
+    -- With the updated spec (no hk precondition), progress handles both k1=0 and k1>0
     progress as ⟨ res, res_post_1, res_post_2 ⟩
-    · -- side condition: 0 < k1.val
-      -- simp only [*]
-      sorry
     · -- side condition: ∀ i < 5, a8[i]!.val < 2 ^ 54
-      intro i hi
-      interval_cases i
-      · sorry
-      · sorry
-      · sorry
-      · sorry
-      · sorry
-    -- Now we have res with res_post_1 and res_post_2
+      sorry
     constructor
-    · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
-      -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a8)^(2^(k-1)) [MOD p]
-      -- a8 ≡ a^2 [MOD p], so res ≡ (a^2)^(2^(k-1)) = a^(2^k) [MOD p]
+    · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p]
       have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
         sorry
-      simp only [*] at res_post_1
-      -- have hpow := Nat.ModEq.pow (2^(k-1)) hsq
-      -- apply Nat.ModEq.trans res_post_1 hpow |>.trans
-      -- rw [← pow_mul]
-      -- have hk_pos : k ≥ 1 := by omega
-      -- have h2k : 2 * 2 ^ (k - 1) = 2 ^ k := by
-      --   conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
-      -- rw [h2k]
+      have hpow := Nat.ModEq.pow (2^k1.val) hsq
+      apply Nat.ModEq.trans res_post_1 hpow |>.trans
+      rw [← pow_mul]
+      have hk_pos : k'.val ≥ 1 := by omega
+      have : k1.val = k'.val - 1 := by scalar_tac
+      rw [this]
+      have h2k : 2 * 2 ^ (k'.val - 1) = 2 ^ k'.val := by
+        conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
+      rw [h2k]
+    · -- ∀ i < 5, result[i]!.val < 2^52
+      -- From res_post_2: if k1.val = 0 then res = a8 else ∀ i < 5, res[i]!.val < 2^52
       sorry
-    · assumption
 
   case isFalse hge =>
-    progress*
+    -- k' = 0: return a unchanged
+    have hk0 : k'.val = 0 := by scalar_tac
+    simp only [hk0, progress_simps]
+    exact ⟨by simp [Nat.ModEq], by simp⟩
 
 /-
 
@@ -696,7 +691,7 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
 
     -/
   termination_by k'.val
-  decreasing_by scalar_decr_tac; sorry
+  decreasing_by scalar_decr_tac
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
@@ -705,6 +700,9 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
       Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
-  progress*
+  simp only [massert, ite_true, show k > 0#u32 from by scalar_tac, progress_simps]
+  progress as ⟨ a, hmod, hbounds ⟩ -- pow2k_loop
+  simp only [show k.val ≠ 0 by omega] at hbounds
+  exact ⟨hmod, hbounds⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
