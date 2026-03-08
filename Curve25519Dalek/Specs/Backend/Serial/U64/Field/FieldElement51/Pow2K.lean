@@ -433,14 +433,14 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
       Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
-  have := ha 0 (by simp)
-  have := ha 1 (by simp)
-  have := ha 2 (by simp)
-  have := ha 3 (by simp)
-  have := ha 4 (by simp)
-  have hk_gt : k' > 0#u32 := by scalar_tac
-  simp only [hk_gt, reduceIte, progress_simps]
-  -- Progress through the loop body to the first halt point
+  -- have := ha 0 (by simp)
+  -- have := ha 1 (by simp)
+  -- have := ha 2 (by simp)
+  -- have := ha 3 (by simp)
+  -- have := ha 4 (by simp)
+  have : k' > 0#u32 := by scalar_tac
+  simp only [this, reduceIte, progress_simps]
+  -- Progress through the loop body to the first halt point, name only c0 c1 c2 c3 c4
   iterate 12 progress
   let* ⟨ c0, _ ⟩ ← U128.add_spec
   iterate 5 progress
@@ -462,22 +462,23 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
   -/
 
+  subst_vars
   have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
-      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp_all
+      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp[*]
   have hc1 : c1.val = a[3]!.val *
-      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp_all
+      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp[*]
   have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
-      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp_all
+      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp[*]
   have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
-      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp_all
+      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp[*]
   have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
-      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp_all
+      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp[*]
 
-  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> assumption
-  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> assumption
-  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> assumption
-  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> assumption
-  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> assumption
+  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind
+  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind
+  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind
+  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind
+  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind
 
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
@@ -485,7 +486,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
   -- clear everything except what we have just proven
-  clear * - hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
+  clear * - hk ha a_pow_two hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
 
   sorry
   /-
