@@ -6,6 +6,10 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Add
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
 /-! # Spec Theorem for `Scalar52::from_bytes_wide`
 
@@ -38,6 +42,11 @@ natural language specs:
 def word_j_from_bytes (bytes : Array U8 64#usize) (j : Nat) : Nat :=
   ∑ k ∈ Finset.range 8, 2 ^ (8 * k) * (bytes[j * 8 + k]!).val
 
+/-- The natural number value of an array of 8 u64 words, interpreted as a little-endian
+512-bit integer. -/
+def words_as_Nat (words : Array U64 8#usize) : Nat :=
+  ∑ j ∈ Finset.range 8, (words[j]!).val * 2 ^ (64 * j)
+
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop`**:
 - Starting from index `i` with byte array `bytes` and word array `words`
 - Assembles 8-byte little-endian chunks into u64 words
@@ -50,9 +59,7 @@ theorem from_bytes_wide_loop_spec
     -- inputs to the loop
     (bytes : Array U8 64#usize) (words : Array U64 8#usize) (i : Usize)
     -- bounds for the inputs
-    (hi : i.val ≤ 8)
-    (hbytes : ∀ j < 64, ∀ k < 8, (bytes[j]!).val < 2 ^ 8)
-    (hwords: ∀ j < 8, (words[j]!).val < 2 ^ 64)
+    (hi : i.val < 8)
     -- Precondtion 1: already processed words hold the correct assembled value
     (hpre1 : ∀ j < 8, j < i.val → (words[j]!).val = word_j_from_bytes bytes j)
     -- Preconditon 2: not-yet-processed words are zero
@@ -61,10 +68,11 @@ theorem from_bytes_wide_loop_spec
     -- Sum of all words equals the sum of already-processed words plus the
     --newly processed word at index i
     from_bytes_wide_loop bytes words i ⦃ words' =>
-    ∑ j ∈ Finset.range 8, (words'[j]!).val
-      = ∑ j ∈ Finset.range 8, (words[j]!).val + word_j_from_bytes bytes i ⦄ := by
+    words_as_Nat words' =
+      words_as_Nat words + word_j_from_bytes bytes i * 2 ^ (64 * i.val) ⦄ := by
   sorry
 
+set_option maxHeartbeats 1000000 in
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:
 - No panic (always returns successfully)
 - The result represents the input byte array reduced modulo L (canonical form) -/
@@ -74,6 +82,12 @@ theorem from_bytes_wide_spec ( b : Array U8 64#usize ) :
     Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by
   unfold from_bytes_wide Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   progress*
+  -- Rough sketch of the proof steps:
+  -- 1. To prove U8x64_as_Nat b = ∑ words
+  -- 2. To prove lo + hi * R = ∑ words
+  -- 3. To prove lo + hi * R % L = ∑ words % L
+  -- 4. To prove Scalar52_as_Nat u = U8x64_as_Nat b % L
+
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
