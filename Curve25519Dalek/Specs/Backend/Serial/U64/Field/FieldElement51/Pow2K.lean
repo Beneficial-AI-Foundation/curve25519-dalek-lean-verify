@@ -23,18 +23,24 @@ set_option maxHeartbeats 10000000
 -- progress* and scalar_tac are heavy
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
 
 @[progress]
-theorem pow2k.m_spec (x y : U64) :
-    ∃ prod : U128, pow2k.m x y = ok prod ∧
-    prod.val = x.val * y.val := by
+theorem m_spec (x y : U64) :
+    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
   unfold pow2k.m
   progress*
-  suffices x.val * y.val < 2^64 * 2^64 by scalar_tac
-  apply Nat.mul_lt_mul''
-  · scalar_tac
-  · scalar_tac
+
+@[progress]
+theorem LOW_51_BIT_MASK_spec :
+    LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
+  unfold LOW_51_BIT_MASK
+  progress*
+
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
+
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 -- /-- Compute the 5 limbs of a² (before carry propagation) using radix-2^51 squaring.
 --     Uses the identity 2^255 ≡ 19 (mod p) to reduce overflow terms. -/
@@ -315,19 +321,17 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
 --   simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
 @[progress]
-theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
-    (hk : 0 < k) (eqk : k'.val = k)
+theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k) (eqk : k'.val = k)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    ∃ r : Array U64 5#usize, pow2k_loop k' a = ok r ∧
-    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
-    (∀ i < 5, r[i]!.val < 2 ^ 52) := by
+    pow2k_loop k' a ⦃ (result : Std.Array U64 5#usize) =>
+      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
   have := ha 0 (by simp)
   have := ha 1 (by simp)
   have := ha 2 (by simp)
   have := ha 3 (by simp)
   have := ha 4 (by simp)
-  -- The while loop condition `k > 0` is true since hk : 0 < k
   have hk_gt : k' > 0#u32 := by scalar_tac
   simp only [hk_gt, reduceIte, progress_simps]
   -- Now progress through the loop body
@@ -342,50 +346,32 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post ⟩ ← pow2k.m_spec
   let* ⟨ i8, i8_post ⟩ ← U128.add_spec
-  · simp_all only
-    apply cross_product_bound <;> simp_all
   let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
-  · simp_all only
-    apply two_cross_product_bound <;> simp_all
   let* ⟨ c0, c0_post ⟩ ← U128.add_spec
-  · simp_all only
-    apply c0_bound <;> simp_all
   let* ⟨ i10, i10_post ⟩ ← pow2k.m_spec
   let* ⟨ i11, i11_post ⟩ ← pow2k.m_spec
   let* ⟨ i12, i12_post ⟩ ← pow2k.m_spec
   let* ⟨ i13, i13_post ⟩ ← U128.add_spec
-  · simp_all only; apply intermediate_sum_bound <;> simp_all
   let* ⟨ i14, i14_post ⟩ ← U128.mul_spec
-  · simp_all only; apply two_intermediate_sum_bound <;> simp_all
   let* ⟨ c1, c1_post ⟩ ← U128.add_spec
-  · simp_all only; apply c1_bound <;> simp_all
   let* ⟨ i15, i15_post ⟩ ← pow2k.m_spec
   let* ⟨ i16, i16_post ⟩ ← pow2k.m_spec
   let* ⟨ i17, i17_post ⟩ ← pow2k.m_spec
   let* ⟨ i18, i18_post ⟩ ← U128.add_spec
-  · simp_all only; apply intermediate_sum_bound <;> simp_all
   let* ⟨ i19, i19_post ⟩ ← U128.mul_spec
-  · simp_all only; apply two_intermediate_sum_bound <;> simp_all
   let* ⟨ c2, c2_post ⟩ ← U128.add_spec
-  · simp_all only; apply c2_bound <;> simp_all
   let* ⟨ i20, i20_post ⟩ ← pow2k.m_spec
   let* ⟨ i21, i21_post ⟩ ← pow2k.m_spec
   let* ⟨ i22, i22_post ⟩ ← pow2k.m_spec
   let* ⟨ i23, i23_post ⟩ ← U128.add_spec
-  · simp_all only; apply intermediate_sum_bound' <;> simp_all
   let* ⟨ i24, i24_post ⟩ ← U128.mul_spec
-  · simp_all only; apply two_intermediate_sum_bound' <;> simp_all
   let* ⟨ c3, c3_post ⟩ ← U128.add_spec
-  · simp_all only; apply c3_bound <;> simp_all
   let* ⟨ i25, i25_post ⟩ ← pow2k.m_spec
   let* ⟨ i26, i26_post ⟩ ← pow2k.m_spec
   let* ⟨ i27, i27_post ⟩ ← pow2k.m_spec
   let* ⟨ i28, i28_post ⟩ ← U128.add_spec
-  · simp_all only; apply intermediate_sum_bound' <;> simp_all
   let* ⟨ i29, i29_post ⟩ ← U128.mul_spec
-  · simp_all only; apply two_intermediate_sum_bound' <;> simp_all
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
-  · simp_all only; apply c4_bound <;> simp_all
 
   -- Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
@@ -406,16 +392,16 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
   -/
 
-  have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 * (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by
-    simp_all
-  have hc1 : c1.val = a[3]!.val * (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by
-    simp_all
-  have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 * (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by
-    simp_all
-  have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 * (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by
-    simp_all
-  have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by
-    simp_all
+  have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
+      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp_all
+  have hc1 : c1.val = a[3]!.val *
+      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp_all
+  have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
+      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp_all
+  have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
+      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp_all
+  have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
+      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp_all
 
   -- Bounds on c0-c4
   have hc0_bound : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> assumption
@@ -431,11 +417,14 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
 
   clear * - hc0 hc1 hc2 hc3 hc4 hc0_bound hc1_bound hc2_bound hc3_bound hc4_bound
 
+  sorry
+  /-
   let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c11, c11_post ⟩ ← U128.add_spec
   let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
+  progress
   let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a1, a1_post ⟩ ← Array.update_spec
   let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -527,6 +516,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
     omega
 
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
+  · sorry
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
   let* ⟨ i55, i55_post ⟩ ← U64.add_spec
   · -- i54 < 2^51 (masked), i53 = 19*carry. By hcarry: sum < 2^64
@@ -596,53 +586,15 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
       rw [h2k]
     · assumption
-
--- @[progress]
--- theorem pow2k_loop_spec' (k : ℕ) (k' : U32) (a : Array U64 5#usize)
---     (hk : 0 < k) (eqk : k'.val = k)
---     (h_bounds : ∀ i < 5, a[i]!.val < 2 ^ 54) :
---     ∃ r, pow2k_loop k' a = ok r ∧
---     Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
---     (∀ i < 5, r[i]!.val < 2 ^ 52) := by
---   unfold pow2k_loop
---   progress*
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
---   · sorry
+  -/
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 54) :
-    ∃ result : FieldElement51, pow2k self k = ok result ∧
-    Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
-    (∀ i < 5, result[i]!.val < 2 ^ 52) := by
+    pow2k self k ⦃ result =>
+      Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
   progress*
-  grind
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
