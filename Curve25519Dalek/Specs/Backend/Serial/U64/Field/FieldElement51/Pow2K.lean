@@ -350,6 +350,50 @@ lemma c4_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
+/-- Generic carry chain bound: if formula < K * 2^108 and carry < 2^64 and K ≤ 127, then sum < 2^115 -/
+private lemma carry_chain_lt_pow2_115 (formula carry : ℕ) (K : ℕ)
+    (hf : formula < K * 2 ^ 108) (hc : carry < 2 ^ 64) (hK : K ≤ 127) :
+    formula + carry < 2 ^ 115 := by
+  have : K * 2 ^ 108 + 2 ^ 64 ≤ 128 * 2 ^ 108 := by omega
+  have : (128 : ℕ) * 2 ^ 108 = 2 ^ 115 := by decide
+  omega
+
+/-- Tight bound: c1 formula < 59 * 2^108 -/
+private lemma c1_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) < 59 * 2 ^ 108 := by
+  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a1 < 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c2 formula < 41 * 2^108 -/
+private lemma c2_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) < 41 * 2 ^ 108 := by
+  have : a1 * a1 < 2 ^ 108 := by nlinarith
+  have : a0 * a2 < 2 ^ 108 := by nlinarith
+  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c3 formula < 23 * 2^108 -/
+private lemma c3_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) < 23 * 2 ^ 108 := by
+  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a3 < 2 ^ 108 := by nlinarith
+  have : a1 * a2 < 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c4 formula < 5 * 2^108 -/
+private lemma c4_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a2 * a2 + 2 * (a0 * a4 + a1 * a3) < 5 * 2 ^ 108 := by
+  have : a2 * a2 < 2 ^ 108 := by nlinarith
+  have : a0 * a4 < 2 ^ 108 := by nlinarith
+  have : a1 * a3 < 2 ^ 108 := by nlinarith
+  omega
+
 /-- Squaring in radix-2^51, mod p, key algebraic identity underlying field squaring. -/
 lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2
@@ -420,7 +464,7 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
 --   refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
 --   simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 2000000 in
 -- progress* needs this
 @[progress]
 theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
@@ -527,16 +571,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
 
     -- Stage 2: After carry propagation (l.532 of source code)
 
-    have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
-    have hc11_bound : c11.val < 2 ^ 115 := by sorry
-    have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val (by grind)
-    have hc21_bound : c21.val < 2 ^ 115 := by sorry
-    have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
-    have hc31_bound : c31.val < 2 ^ 115 := by sorry
-    have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
-    have hc41_bound : c41.val < 2 ^ 115 := by sorry
-    have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
-
     /-
     Define intermediate carry-propagated values:
     c1' = c1 + ⌈c0⌉₅₁
@@ -553,26 +587,54 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     carry = ⌈c4'⌉₅₁
     -/
 
+    -- Interleaved carry chain: each step needs the previous carry-fits bound for omega
+    -- to eliminate the % 2^64 from the U128→U64→U128 cast chain.
+
+    have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
+
     -- c11 = c1 + carry from c0
     have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
       simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
         UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
+    have hc11_bound : c11.val < 2 ^ 115 := by
+      rw [hc11']; apply carry_chain_lt_pow2_115 _ _ 59 _ hcarry0_fits (by omega)
+      rw [hc1]; exact c1_lt_tight _ _ _ _ _
+        (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
+    have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
+
     -- c21 = c2 + carry from c11
     have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
       simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
         UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
+    have hc21_bound : c21.val < 2 ^ 115 := by
+      rw [hc21']; apply carry_chain_lt_pow2_115 _ _ 41 _ hcarry1_fits (by omega)
+      rw [hc2]; exact c2_lt_tight _ _ _ _ _
+        (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
+    have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
+
     -- c31 = c3 + carry from c21
     have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
       simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
         UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
+    have hc31_bound : c31.val < 2 ^ 115 := by
+      rw [hc31']; apply carry_chain_lt_pow2_115 _ _ 23 _ hcarry2_fits (by omega)
+      rw [hc3]; exact c3_lt_tight _ _ _ _ _
+        (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
+    have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
+
     -- c41 = c4 + carry from c31
     have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
       simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
         UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
+    have hc41_bound : c41.val < 2 ^ 115 := by
+      rw [hc41']; apply carry_chain_lt_pow2_115 _ _ 5 _ hcarry3_fits (by omega)
+      rw [hc4]; exact c4_lt_tight _ _ _ _ _
+        (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
+    have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
 
     -- Array values after carry propagation
     have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
@@ -642,9 +704,18 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       have h2k : 2 * 2 ^ (k'.val - 1) = 2 ^ k'.val := by
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
       rw [h2k]
-    · -- ∀ i < 5, result[i]!.val < 2^52
-      -- From res_post_2: if k1.val = 0 then res = a8 else ∀ i < 5, res[i]!.val < 2^52
-      sorry
+    · -- if k'.val = 0 then res = a else ∀ i < 5, res[i]!.val < 2^52
+      -- We're in isTrue case, so k'.val ≠ 0
+      simp only [show k'.val ≠ 0 by omega]
+      -- res_post_2: if k1.val = 0 then res = a8 else ∀ i < 5, res[i]!.val < 2^52
+      by_cases hk1 : k1.val = 0
+      · -- k1 = 0: res = a8, need a8[i] < 2^52
+        simp only [hk1] at res_post_2
+        rw [res_post_2]
+        sorry -- need: ∀ i < 5, a8[i]!.val < 2^52 (from ha8_* and carry bounds)
+      · -- k1 ≠ 0: directly from recursive postcondition
+        simp only [hk1, ite_false] at res_post_2
+        exact res_post_2
 
   case isFalse hge =>
     -- k' = 0: return a unchanged
