@@ -10,6 +10,7 @@
   - extracted: Extraction status
   - verified: Verification status
   - notes: Additional notes
+  - ignored: Whether the function is ignored ("ignored" or "")
   - ai-proveable: AI proveability notes
 -/
 import Lean
@@ -30,6 +31,7 @@ structure StatusRow where
   extracted : String
   verified : String
   notes : String
+  ignored : String
   ai_proveable : String
   deriving Repr, Inhabited
 
@@ -56,10 +58,10 @@ def escapeField (s : String) : String :=
 
 /-- Parse a single CSV field, handling quoted fields -/
 private def parseField (s : String) : String :=
-  let trimmed := s.trim
+  let trimmed := s.trimAscii.toString
   if trimmed.startsWith "\"" && trimmed.endsWith "\"" && trimmed.length >= 2 then
     -- Remove surrounding quotes and unescape doubled quotes
-    let inner := trimmed.drop 1 |>.dropRight 1
+    let inner := trimmed.drop 1 |>.dropEnd 1
     inner.replace "\"\"" "\""
   else
     s
@@ -101,7 +103,7 @@ def joinCsvLine (fields : Array String) : String :=
 /-- Parse a CSV line into a StatusRow -/
 def parseRow (line : String) : Option StatusRow :=
   let fields := splitCsvLine line
-  if fields.size >= 9 then
+  if fields.size >= 10 then
     some {
       function := fields[0]!
       lean_name := fields[1]!
@@ -111,10 +113,11 @@ def parseRow (line : String) : Option StatusRow :=
       extracted := fields[5]!
       verified := fields[6]!
       notes := fields[7]!
-      ai_proveable := fields[8]!
+      ignored := fields[8]!
+      ai_proveable := fields[9]!
     }
   else if fields.size >= 2 then
-    -- Minimal row with just function and lean_name
+    -- Minimal row or old format without ignored column
     some {
       function := fields[0]!
       lean_name := fields[1]!
@@ -124,7 +127,8 @@ def parseRow (line : String) : Option StatusRow :=
       extracted := fields.getD 5 ""
       verified := fields.getD 6 ""
       notes := fields.getD 7 ""
-      ai_proveable := ""
+      ignored := ""
+      ai_proveable := fields.getD 8 ""
     }
   else
     none
@@ -132,12 +136,12 @@ def parseRow (line : String) : Option StatusRow :=
 /-- Convert a StatusRow to a CSV line -/
 def StatusRow.toCsvLine (row : StatusRow) : String :=
   joinCsvLine #[row.function, row.lean_name, row.source, row.lines,
-                row.spec_theorem, row.extracted, row.verified, row.notes, row.ai_proveable]
+                row.spec_theorem, row.extracted, row.verified, row.notes, row.ignored, row.ai_proveable]
 
 /-- Read and parse status.csv -/
 def readStatusFile (path : System.FilePath := defaultPath) : IO StatusFile := do
   let content ← IO.FS.readFile path
-  let lines := content.splitOn "\n" |>.filter (·.trim != "")
+  let lines := content.splitOn "\n" |>.filter (·.trimAscii.toString != "")
   match lines with
   | [] => return { header := "", rows := #[] }
   | header :: dataLines =>
@@ -160,9 +164,11 @@ def StatusFile.getLeanNames (file : StatusFile) : Array String :=
 /-- Create a new StatusRow from a FunctionOutput -/
 def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
   let verifiedStr := if fn.verified then "verified"
+                     else if fn.externally_verified then "externally verified"
                      else if fn.specified then "specified"
                      else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""
+  let ignoredStr := if fn.is_ignored then "ignored" else ""
   { function := fn.rust_name.getD ""
     lean_name := fn.lean_name
     source := fn.source.getD ""
@@ -171,6 +177,7 @@ def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
     extracted := extractedStr
     verified := verifiedStr
     notes := ""
+    ignored := ignoredStr
     ai_proveable := "" }
 
 /-- Check if two StatusRows have the same updatable fields -/
@@ -180,22 +187,26 @@ def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
   a.lines == b.lines &&
   a.spec_theorem == b.spec_theorem &&
   a.extracted == b.extracted &&
-  a.verified == b.verified
+  a.verified == b.verified &&
+  a.ignored == b.ignored
 
 /-- Update an existing StatusRow with data from FunctionOutput.
     Preserves: notes, ai_proveable -/
 def StatusRow.updateFrom (row : StatusRow) (fn : FunctionOutput) : StatusRow :=
   let verifiedStr := if fn.verified then "verified"
+                     else if fn.externally_verified then "externally verified"
                      else if fn.specified then "specified"
                      else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""
+  let ignoredStr := if fn.is_ignored then "ignored" else ""
   { row with
     function := fn.rust_name.getD row.function
     source := fn.source.getD row.source
     lines := fn.lines.getD row.lines
     spec_theorem := fn.spec_file.getD row.spec_theorem
     extracted := extractedStr
-    verified := verifiedStr }
+    verified := verifiedStr
+    ignored := ignoredStr }
 
 /-- Add a new row to the StatusFile -/
 def StatusFile.addRow (file : StatusFile) (row : StatusRow) : StatusFile :=
@@ -220,5 +231,30 @@ def StatusFile.upsertFromFunction (file : StatusFile) (fn : FunctionOutput) : St
   | none =>
     -- Add new row
     file.addRow (StatusRow.fromFunctionOutput fn)
+
+/-- Remove rows whose lean_name is in the given set -/
+def StatusFile.removeByLeanNames (file : StatusFile) (names : Std.HashSet String) : StatusFile :=
+  { file with rows := file.rows.filter fun row => !names.contains row.lean_name }
+
+/-- Find duplicate lean_names in the StatusFile. Returns array of lean_names that appear more than once. -/
+def StatusFile.findDuplicateLeanNames (file : StatusFile) : Array String := Id.run do
+  let mut seen : Std.HashSet String := {}
+  let mut duplicates : Std.HashSet String := {}
+  for row in file.rows do
+    if seen.contains row.lean_name then
+      duplicates := duplicates.insert row.lean_name
+    else
+      seen := seen.insert row.lean_name
+  return duplicates.toArray.qsort (· < ·)
+
+/-- Remove duplicate rows by lean_name, keeping only the first occurrence. -/
+def StatusFile.deduplicate (file : StatusFile) : StatusFile := Id.run do
+  let mut seen : Std.HashSet String := {}
+  let mut uniqueRows : Array StatusRow := #[]
+  for row in file.rows do
+    if !seen.contains row.lean_name then
+      seen := seen.insert row.lean_name
+      uniqueRows := uniqueRows.push row
+  return { file with rows := uniqueRows }
 
 end Utils.Lib.StatusCsv

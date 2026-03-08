@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs.Edwards.Representation
+import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `EdwardsPoint::double`
 
@@ -18,7 +19,7 @@ This function doubles an Edwards point (adds it to itself) using elliptic curve 
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -40,10 +41,10 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint
 -/
-@[progress]
-theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid):
-    ∃ result, double e = ok result
-    ∧ result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint := by
+@[externally_verified, progress] -- proven in Verus
+theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
+    double e ⦃ result =>
+    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by
     sorry
 
 end curve25519_dalek.edwards.EdwardsPoint

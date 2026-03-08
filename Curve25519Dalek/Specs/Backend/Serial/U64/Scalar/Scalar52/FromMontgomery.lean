@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
@@ -17,7 +17,7 @@ This function converts from Montgomery form.
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -57,30 +57,28 @@ theorem zero_array (i : ℕ) (hi : i < 9) :
 @[progress]
 theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize) (i : Usize)
     (hi : i.val ≤ 5) :
-    ∃ result, from_montgomery_loop self limbs i = ok result ∧
+    from_montgomery_loop self limbs i ⦃ result =>
     (∀ j < 5, i.val ≤ j → result[j]! = UScalar.cast .U128 self[j]!) ∧
     (∀ j < 9, 5 ≤ j → result[j]! = limbs[j]!) ∧
-    (∀ j < i.val, result[j]! = limbs[j]!) := by
+    (∀ j < i.val, result[j]! = limbs[j]!) ⦄ := by
   unfold from_montgomery_loop
-  unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
+  unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   split
   · progress*
     refine ⟨fun j hj hij ↦ ?_, fun j hj hj' ↦ ?_, ?_⟩
     · by_cases hc : i = j
-      · rw [res_post_3 j (by simp_all), a_post, i2_post, i1_post, ← hc]
+      · rw [result_post3 j (by simp_all), a_post, i2_post, i1_post, ← hc]
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
         apply set_getElem!_eq
         simp; grind
-      · exact res_post_1 j hj (by omega)
-    · rw [res_post_2 j hj hj']
+      · exact result_post1 j hj (by omega)
+    · rw [result_post2 j hj hj']
       have : i ≠ j := by scalar_tac
       simp [*]
     · intro j _
-      have := res_post_3 j (by omega)
+      have := result_post3 j (by omega)
       simp_all
   · progress*
-    have : i.val = 5 := by scalar_tac
-    grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
@@ -91,27 +89,22 @@ decreasing_by scalar_decr_tac
 @[progress]
 theorem from_montgomery_spec (self : Scalar52)
     (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :
-    ∃ u, from_montgomery self = ok u ∧
-    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L := by
+    from_montgomery self ⦃ u =>
+    (Scalar52_as_Nat u * R) % L = Scalar52_as_Nat self % L ⦄ := by
   unfold from_montgomery
   progress*
-  · -- Bounds
-    intro i hi
+  · intro i hi
     by_cases h_lt : i < 5
-    · -- Case 1: Indices 0-4
-      rw [limbs1_post_2 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp [*];
+    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp [*];
       scalar_tac
-    · -- Case 2: Indices 5-8
-      have h_ge : 5 ≤ i := by scalar_tac
-      rw [limbs1_post_1 i hi h_ge]
+    · have h_ge : 5 ≤ i := by scalar_tac
+      rw [limbs1_post2 i hi h_ge]
       simp only [Array.repeat] at ⊢
       simp only [getElem!]
       simp only [List.getElem?_replicate]
-      try simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
-        IsEmpty.forall_iff,not_lt, UScalar.ofNat_val_eq, ↓reduceIte, Nat.ofNat_pos]
-
-  · -- Main equality
-    rw [res_post_1]
+      simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
+        IsEmpty.forall_iff, not_lt, UScalar.ofNatCore_val_eq, ↓reduceIte, Nat.ofNat_pos]
+  · rw [u_post1]
     simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]
     simp [-Nat.reducePow, *, zero_array]
 

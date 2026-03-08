@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: AI Assistant
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -22,12 +22,12 @@ This function performs the initial decompression step which:
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.constants
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.SubShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.AddShared0FieldElement51SharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.field.FieldElement51
 namespace curve25519_dalek.edwards.CompressedEdwardsY
@@ -73,23 +73,22 @@ Natural language specs:
 theorem step_1_spec (cey : edwards.CompressedEdwardsY)
   (bytes : Aeneas.Std.Array U8 32#usize)
   (h_byter : cey.as_bytes = ok bytes) :
-    ∃ result, edwards.decompress.step_1 cey = ok result ∧
+    edwards.decompress.step_1 cey ⦃ result =>
 
       let (is_valid_y_coord, X, Y, Z) := result
 
-      -- Z is always ONE
-      Z = ONE ∧
-
-      -- Y is extracted from the input bytes
-      (from_bytes bytes = ok Y) ∧
-
-      -- The computation follows the curve equation
-      (∃ YY u v fe,
-        square Y = ok YY ∧
-        sub YY ONE = ok u ∧
-        mul YY EDWARDS_D = ok fe ∧
-        add fe ONE = ok v ∧
-        sqrt_ratio_i u v = ok (is_valid_y_coord, X)) := by
+      (∃ one edwards_d, ONE = ok one ∧ EDWARDS_D = ok edwards_d ∧
+        -- Z is always ONE
+        Z = one ∧
+        -- Y is extracted from the input bytes
+        (from_bytes bytes = ok Y) ∧
+        -- The computation follows the curve equation
+        (∃ YY u v fe,
+          square Y = ok YY ∧
+          sub YY one = ok u ∧
+          mul YY edwards_d = ok fe ∧
+          add fe one = ok v ∧
+          sqrt_ratio_i u v = ok (is_valid_y_coord, X))) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

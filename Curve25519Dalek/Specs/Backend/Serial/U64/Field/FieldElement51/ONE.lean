@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `FieldElement51::ONE`
 
@@ -15,7 +15,7 @@ This constant represents the multiplicative identity element (1) in the field.
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std.WP Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -34,8 +34,9 @@ natural language specs:
 - The constant, when converted to a natural number, equals 1
 -/
 @[progress]
-theorem ONE_spec : Field51_as_Nat ONE = 1 := by
-    unfold ONE
-    decide
+theorem ONE_spec : ONE ⦃ result => Field51_as_Nat result = 1 ⦄ := by
+  unfold ONE from_limbs
+  simp only [spec_ok]
+  decide
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

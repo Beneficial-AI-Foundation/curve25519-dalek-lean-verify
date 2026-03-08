@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
@@ -18,8 +18,10 @@ This function performs Montgomery multiplication.
 
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 262
 
 /-
 natural language description:
@@ -47,23 +49,14 @@ natural language specs:
 @[progress]
 theorem montgomery_mul_spec (m m' : Scalar52)
     (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
-    ∃ w, montgomery_mul m m' = ok w ∧
+    montgomery_mul m m' ⦃ w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62) := by
-
+    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_mul
   progress*
-  -- BEGIN TASK
-  have h1 : Scalar52_as_Nat res * R ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [Nat.ModEq]
-    exact res_post_1
-  have h2 : Scalar52_as_Nat m * Scalar52_as_Nat m' ≡ Scalar52_wide_as_Nat a1 [MOD L] := by
-    rw [← a1_post_1]
-  rw [Nat.ModEq]
-  refine  ⟨?_, ?_ ⟩
-  · try grind
-  · intro i hi; have h_bounds:= res_post_2 i hi; exact h_bounds
-  -- END TASK
-
+  constructor
+  · simpa [a1_post1, eq_comm] using w_post1
+  · intro i hi
+    exact lt_trans (w_post2 i hi) (by norm_num)
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -511,6 +511,14 @@ impl Neg for &ProjectiveNielsPoint {
     }
 }
 
+impl Neg for ProjectiveNielsPoint {
+    type Output = ProjectiveNielsPoint;
+
+    fn neg(self) -> ProjectiveNielsPoint {
+        -&self
+    }
+}
+
 impl Neg for &AffineNielsPoint {
     type Output = AffineNielsPoint;
 
@@ -520,6 +528,14 @@ impl Neg for &AffineNielsPoint {
             y_minus_x: self.y_plus_x,
             xy2d: -(&self.xy2d),
         }
+    }
+}
+
+impl Neg for AffineNielsPoint {
+    type Output = AffineNielsPoint;
+
+    fn neg(self) -> AffineNielsPoint {
+        -&self
     }
 }
 

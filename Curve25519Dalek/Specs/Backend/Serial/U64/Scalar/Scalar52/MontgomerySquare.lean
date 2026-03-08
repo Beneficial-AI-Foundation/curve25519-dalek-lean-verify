@@ -4,9 +4,15 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
+
+import Mathlib.Algebra.Polynomial.Eval.Algebra
+import Mathlib.Algebra.Polynomial.Eval.Coeff
+import Mathlib.Algebra.Polynomial.Eval.Defs
+import Mathlib.Algebra.Polynomial.Eval.Degree
+
 /-! # Spec Theorem for `Scalar52::montgomery_square`
 
 Specification and proof for `Scalar52::montgomery_square`.
@@ -17,8 +23,10 @@ This function performs Montgomery squaring.
 
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
+
+set_option exponentiation.threshold 262
 
 /-
 natural language description:
@@ -41,13 +49,10 @@ natural language specs:
 -/
 @[progress]
 theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :
-    ∃ w,
-    montgomery_square m = ok w ∧
+    montgomery_square m ⦃ w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62)
-    := by
+    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_square
   progress*
-
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
+
 
 /-! # Spec Theorem for `constants::L`
 
@@ -31,9 +32,20 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.L`**:
 - The value of constants.L when converted to a natural number equals L
 -/
-@[progress]
+@[simp]
 theorem L_spec : Scalar52_as_Nat L = _root_.L := by
   unfold L
   decide
+
+-- Helper lemma to bound the limbs of L without unfolding it everywhere
+lemma L_limbs_spec (i : Usize) (h : i.val < 5) :
+    (constants.L[i.val]!).val < 2 ^ 52 := by
+  unfold constants.L
+  rcases h_idx : i.val with _ | _ | _ | _ | _ | n <;> try decide
+  rw [h_idx] at h
+  contradiction
+
+
+
 
 end curve25519_dalek.backend.serial.u64.constants

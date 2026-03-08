@@ -17,7 +17,7 @@ use super::field::FieldElement2625;
 use super::scalar::Scalar29;
 use crate::edwards::EdwardsPoint;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::{
     backend::serial::curve_models::AffineNielsPoint,
     edwards::EdwardsBasepointTable,
@@ -246,13 +246,13 @@ pub const EIGHT_TORSION_INNER_DOC_HIDDEN: [EdwardsPoint; 8] = [
 ];
 
 /// Table containing precomputed multiples of the Ed25519 basepoint \\(B = (x, 4/5)\\).
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 pub static ED25519_BASEPOINT_TABLE: &'static EdwardsBasepointTable =
     &ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN;
 
 /// Inner constant, used to avoid filling the docs with precomputed points.
 #[doc(hidden)]
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 static ED25519_BASEPOINT_TABLE_INNER_DOC_HIDDEN: EdwardsBasepointTable = EdwardsBasepointTable([
     LookupTable([
         AffineNielsPoint {

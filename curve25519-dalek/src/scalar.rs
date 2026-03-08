@@ -457,7 +457,6 @@ impl<'de> Deserialize<'de> for Scalar {
     }
 }
 
-#[cfg(not(verify))]
 impl<T> Product<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -470,7 +469,6 @@ where
     }
 }
 
-#[cfg(not(verify))]
 impl<T> Sum<T> for Scalar
 where
     T: Borrow<Scalar>,
@@ -930,7 +928,6 @@ impl Scalar {
     /// If \\( k \mod 2^w\\) is even, we emit \\(0\\), advance 1 bit
     /// and reindex.  In fact, by setting all digits to \\(0\\)
     /// initially, we don't need to emit anything.
-    #[cfg(not(verify))]
     pub(crate) fn non_adjacent_form(&self, w: usize) -> [i8; 256] {
         // required by the NAF definition
         debug_assert!(w >= 2);
@@ -1035,19 +1032,23 @@ impl Scalar {
 
     /// Returns a size hint indicating how many entries of the return
     /// value of `to_radix_2w` are nonzero.
-    #[cfg(all(
-        any(feature = "alloc", all(test, feature = "precomputed-tables")),
-        not(verify)
-    ))]
+    #[cfg(any(feature = "alloc", all(test, feature = "precomputed-tables")))]
     pub(crate) fn to_radix_2w_size_hint(w: usize) -> usize {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
 
-        let digits_count = match w {
-            4..=7 => (256 + w - 1) / w,
+        // TODO: upstream uses `match w { 4..=7 => ..., 8 => ... }` but Aeneas
+        // translates usize match arms as scalar patterns which fail Lean's
+        // dependent elimination for Usize (see FIXME in
+        // aeneas/backends/lean/Aeneas/Std/Scalar/Notations.lean:131-142).
+        // Using if/else avoids the issue.
+        let digits_count = if w <= 7 {
+            (256 + w - 1) / w
+        } else if w == 8 {
             // See comment in to_radix_2w on handling the terminal carry.
-            8 => (256 + w - 1) / w + 1_usize,
-            _ => panic!("invalid radix parameter"),
+            (256 + w - 1) / w + 1_usize
+        } else {
+            panic!("invalid radix parameter")
         };
 
         debug_assert!(digits_count <= 64);
@@ -1075,7 +1076,7 @@ impl Scalar {
     /// $$
     /// with \\(-2\^w/2 \leq a_i < 2\^w/2\\) for \\(0 \leq i < (n-1)\\) and \\(-2\^w/2 \leq a_{n-1} \leq 2\^w/2\\).
     ///
-    #[cfg(all(any(feature = "alloc", feature = "precomputed-tables"), not(verify)))]
+    #[cfg(any(feature = "alloc", feature = "precomputed-tables"))]
     pub(crate) fn as_radix_2w(&self, w: usize) -> [i8; 64] {
         debug_assert!(w >= 4);
         debug_assert!(w <= 8);
@@ -1127,9 +1128,12 @@ impl Scalar {
         // reduced scalars, but Scalar invariant #1 allows 255-bit scalars.
         // To handle this, we expand the size_hint by 1 when w=8,
         // and accumulate the final carry onto another digit.
-        match w {
-            8 => digits[digits_count] += carry as i8,
-            _ => digits[digits_count - 1] += (carry << w) as i8,
+        // TODO: upstream uses `match w { 8 => ..., _ => ... }` — see
+        // TODO comment in to_radix_2w_size_hint for why we use if/else.
+        if w == 8 {
+            digits[digits_count] += carry as i8;
+        } else {
+            digits[digits_count - 1] += (carry << w) as i8;
         }
 
         digits

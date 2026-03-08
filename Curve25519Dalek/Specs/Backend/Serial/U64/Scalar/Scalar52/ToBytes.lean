@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `Scalar52::to_bytes`
 
@@ -18,7 +19,7 @@ Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 /-
@@ -37,11 +38,11 @@ natural language specs:
 - No panic (always returns successfully)
 - The result byte array represents the same number as the input unpacked scalar modulo L
 - The result is in canonical form (less than L) -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem to_bytes_spec (u : Scalar52) :
-    ∃ b, to_bytes u = ok b ∧
+    to_bytes u ⦃ b =>
     U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat b < L := by
+    U8x32_as_Nat b < L ⦄ := by
     sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

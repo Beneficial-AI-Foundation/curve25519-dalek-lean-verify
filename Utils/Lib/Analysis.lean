@@ -15,6 +15,7 @@
 import Lean
 import Lean.PrettyPrinter
 import Std.Data.HashSet
+import Curve25519Dalek.ExternallyVerified
 
 open Lean
 open Lean.Meta
@@ -74,6 +75,13 @@ def isVerified (env : Environment) (name : Name) : Bool :=
   | some _ => !proofContainsSorry env specName
   | none => false
 
+/-- Check if a function's spec theorem is marked as externally verified.
+    Returns false if the spec has no sorry (a real proof overrides the tag). -/
+def isExternallyVerified (env : Environment) (name : Name) : Bool :=
+  let specName := getSpecName name
+  if !proofContainsSorry env specName then false  -- real proof overrides
+  else externallyVerifiedAttr.hasTag env specName
+
 /-- Get the file path where the spec theorem is defined.
     Returns the path relative to the project root (e.g., "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean"). -/
 def getSpecFilePath (env : Environment) (name : Name) : Option String :=
@@ -119,9 +127,9 @@ structure StatementLineResult where
 def processStatementLine (line : String) : StatementLineResult :=
   let parts := line.splitOn ":= by"
   if parts.length > 1 then
-    { line := parts[0]!.trimRight ++ " := by ...", isEnd := true }
-  else if line.trimRight.endsWith ":=" then
-    { line := line.trimRight ++ " ...", isEnd := true }
+    { line := parts[0]!.trimAsciiEnd.toString ++ " := by ...", isEnd := true }
+  else if line.trimAsciiEnd.toString.endsWith ":=" then
+    { line := line.trimAsciiEnd.toString ++ " ...", isEnd := true }
   else
     { line := line, isEnd := false }
 
@@ -135,7 +143,7 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
   for line in relevantLines do
     if !docstringDone then
       -- Check for docstring start
-      if line.trimLeft.startsWith "/-" then
+      if line.trimAsciiStart.toString.startsWith "/-" then
         inDocstring := true
         docstringLines := docstringLines.push line
       else if inDocstring then
@@ -143,11 +151,11 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
         if (line.splitOn "-/").length > 1 then
           inDocstring := false
           docstringDone := true
-      else if line.trimLeft.startsWith "@[" then
+      else if line.trimAsciiStart.toString.startsWith "@[" then
         -- Skip attribute declarations (e.g., @[progress], @[simp])
         docstringDone := true
         continue
-      else if line.trimLeft.startsWith "theorem" then
+      else if line.trimAsciiStart.toString.startsWith "theorem" then
         docstringDone := true
         let result := processStatementLine line
         statementLines := statementLines.push result.line
@@ -157,7 +165,7 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
         continue
     else
       -- Processing statement (skip attribute lines)
-      if line.trimLeft.startsWith "@[" then
+      if line.trimAsciiStart.toString.startsWith "@[" then
         continue
       let result := processStatementLine line
       statementLines := statementLines.push result.line

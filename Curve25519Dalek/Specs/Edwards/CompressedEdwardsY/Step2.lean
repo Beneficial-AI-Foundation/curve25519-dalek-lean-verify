@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: AI Assistant
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 
 /-! # Spec Theorem for `CompressedEdwardsY::decompress::step_2`
@@ -20,9 +20,9 @@ This function performs the final decompression step which:
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
-open curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
-open curve25519_dalek.backend.serial.u64.field.NegShared0FieldElement51FieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 namespace curve25519_dalek.edwards.CompressedEdwardsY
 
 /-
@@ -64,9 +64,8 @@ theorem step_2_spec
     (bytes : Aeneas.Std.Array U8 32#usize)
     (sign_bit : Bool)
     (h_repr : repr.as_bytes = ok bytes)
-    (h_byter : sign_bit = (bytes[31]!.val.testBit 7))
-     :
-    ∃ result, edwards.decompress.step_2 repr X Y Z = ok result ∧
+    (h_byter : sign_bit = (bytes[31]!.val.testBit 7)) :
+    edwards.decompress.step_2 repr X Y Z ⦃ result =>
       -- Y and Z are unchanged
       result.Y = Y ∧
       result.Z = Z ∧
@@ -74,12 +73,12 @@ theorem step_2_spec
       -- The sign bit is extracted from the compressed representation
       -- X is conditionally negated based on the sign bit
         (if sign_bit then
-          (result.X = neg X)
+          neg X = ok result.X
         else
           result.X = X) ∧
 
         -- T = X' * Y
-        (result.T = mul result.X Y ) := by
+        mul result.X Y = ok result.T ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

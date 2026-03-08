@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
@@ -20,10 +20,10 @@ This function performs modular reduction.
 **Source**: curve25519-dalek/src/scalar.rs
 -/
 
-set_option linter.style.commandStart false
+set_option linter.style.whitespace false
 set_option exponentiation.threshold 260
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar
@@ -55,23 +55,21 @@ theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := b
 
 @[progress]
 theorem reduce_spec (s : Scalar) :
-    ∃ s',
-      reduce s = ok s' ∧
+    reduce s ⦃ (s' : Scalar) =>
       U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧
-      U8x32_as_Nat s'.bytes < L
-    := by
+      U8x32_as_Nat s'.bytes < L ⦄ := by
   unfold reduce
   progress*
   · unfold constants.R; decide
-  simp[res_post_2]
-  rw[← x_post_1]
-  rw[← Nat.ModEq] at x_mod_l_post_1
-  rw[xR_post_1] at x_mod_l_post_1
+  simp only [and_true, *]
+  rw [← x_post1]
+  rw [← Nat.ModEq] at x_mod_l_post1
+  rw [xR_post1] at x_mod_l_post1
   have Rs := constants.R_spec
-  rw[← Nat.ModEq] at Rs
+  rw [← Nat.ModEq] at Rs
   have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
-  have := Nat.ModEq.trans x_mod_l_post_1 this
+  have := Nat.ModEq.trans x_mod_l_post1 this
   apply cancelR
-  apply Nat.ModEq.trans (Nat.ModEq.mul_right R res_post_1) this
+  apply Nat.ModEq.trans (Nat.ModEq.mul_right R s'_post1) this
 
 end curve25519_dalek.scalar.Scalar

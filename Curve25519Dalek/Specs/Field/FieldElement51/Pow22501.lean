@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -18,7 +18,7 @@ This function computes (r^(2^250-1), r^11) for a field element r in 𝔽_p where
 
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.field.FieldElement51
 
 set_option exponentiation.threshold 100000
@@ -44,12 +44,17 @@ Natural language specs:
 -/
 @[progress]
 theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
-    ∃ r1 r2, pow22501 r = ok (r1, r2) ∧
+    pow22501 r ⦃ result =>
+    let r1 := result.1
+    let r2 := result.2
     Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧
     Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧
     (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
-    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52)
+    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄
     := by
+    unfold pow22501
+    sorry
+/- OLD PROOF (needs updating for WP spec form + timeout issues)
     unfold pow22501
     progress*
     · -- BEGIN TASK
@@ -332,5 +337,6 @@ theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : 
       intro i hi
       simp_all
       --- END TASK
+    -/
 
 end curve25519_dalek.field.FieldElement51

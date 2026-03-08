@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `constants::MINUS_ONE`
 
@@ -15,7 +15,7 @@ representation (five u64 limbs).
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -35,8 +35,10 @@ natural language specs:
   (the canonical representative of −1 modulo p in [0, p-1]).
 -/
 @[progress]
-theorem MINUS_ONE_spec : Field51_as_Nat MINUS_ONE = p - 1 := by
-  unfold MINUS_ONE
+theorem MINUS_ONE_spec :
+    MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by
+  unfold MINUS_ONE field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

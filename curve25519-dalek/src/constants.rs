@@ -19,7 +19,7 @@ use crate::montgomery::MontgomeryPoint;
 use crate::ristretto::{CompressedRistretto, RistrettoPoint};
 use crate::scalar::Scalar;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::edwards::EdwardsBasepointTable;
 
 cfg_if! {
@@ -80,11 +80,11 @@ pub(crate) const BASEPOINT_ORDER_PRIVATE: Scalar = Scalar {
     ],
 };
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::ristretto::RistrettoBasepointTable;
 
 /// The Ristretto basepoint, as a `RistrettoBasepointTable` for scalar multiplication.
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 pub static RISTRETTO_BASEPOINT_TABLE: &RistrettoBasepointTable = unsafe {
     // SAFETY: `RistrettoBasepointTable` is a `#[repr(transparent)]` newtype of
     // `EdwardsBasepointTable`

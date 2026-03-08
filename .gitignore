@@ -46,3 +46,4 @@ site/.env
 site/public/doc
 
 .direnv
+.DS_Store

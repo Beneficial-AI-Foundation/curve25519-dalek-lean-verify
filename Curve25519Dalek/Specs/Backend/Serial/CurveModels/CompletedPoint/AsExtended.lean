@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 /-! # Spec Theorem for `CompletedPoint::as_extended`
 
@@ -19,7 +19,7 @@ it computes an equivalent representation (X':Y':Z':T') in extended coordinates
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -49,6 +49,7 @@ satisfies the conversion formulas modulo p:
 - Z' ≡ Z·T (mod p)
 - T' ≡ X·Y (mod p)
 where p = 2^255 - 19
+- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)
 These formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended
 twisted Edwards ℙ³ coordinates.
 -/
@@ -58,24 +59,26 @@ theorem as_extended_spec (q : CompletedPoint)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
   (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
   (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
-∃ e,
-as_extended q = ok e ∧
-let X := Field51_as_Nat q.X
-let Y := Field51_as_Nat q.Y
-let Z := Field51_as_Nat q.Z
-let T := Field51_as_Nat q.T
-let X' := Field51_as_Nat e.X
-let Y' := Field51_as_Nat e.Y
-let Z' := Field51_as_Nat e.Z
-let T' := Field51_as_Nat e.T
-X' % p = (X * T) % p ∧
-Y' % p = (Y * Z) % p ∧
-Z' % p = (Z * T) % p ∧
-T' % p = (X * Y) % p
-:= by
+  as_extended q ⦃ (e : edwards.EdwardsPoint) =>
+    let X := Field51_as_Nat q.X
+    let Y := Field51_as_Nat q.Y
+    let Z := Field51_as_Nat q.Z
+    let T := Field51_as_Nat q.T
+    let X' := Field51_as_Nat e.X
+    let Y' := Field51_as_Nat e.Y
+    let Z' := Field51_as_Nat e.Z
+    let T' := Field51_as_Nat e.T
+    X' % p = (X * T) % p ∧
+    Y' % p = (Y * Z) % p ∧
+    Z' % p = (Z * T) % p ∧
+    T' % p = (X * Y) % p ∧
+    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧
+    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold as_extended
   progress*
-  rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
+  rw [← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
   simp_all
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

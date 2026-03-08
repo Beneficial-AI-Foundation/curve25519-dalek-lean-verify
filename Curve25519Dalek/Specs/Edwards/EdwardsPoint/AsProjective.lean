@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `EdwardsPoint::as_projective`
 
@@ -15,7 +15,7 @@ This function converts to projective coordinates.
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -36,8 +36,8 @@ natural language specs:
 -/
 @[progress]
 theorem as_projective_spec (e : EdwardsPoint) :
-    ∃ q, edwards.EdwardsPoint.as_projective e = ok q ∧
-    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z := by
+    edwards.EdwardsPoint.as_projective e ⦃ q =>
+    q.X = e.X ∧ q.Y = e.Y ∧ q.Z = e.Z ⦄ := by
   unfold edwards.EdwardsPoint.as_projective
   simp
 

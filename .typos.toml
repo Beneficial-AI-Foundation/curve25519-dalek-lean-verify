@@ -6,6 +6,8 @@ extend-exclude = [
     "TESTVECTORS",
     "*.lean", # Allow in lean anything since identifies are often false positives
     "functions.json", # Auto-generated file with many identifiers
+    "package.json",
+    "package-lock.json"
 ]
 
 [default]

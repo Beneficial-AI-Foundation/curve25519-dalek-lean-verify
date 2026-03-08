@@ -4,10 +4,11 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.ExternallyVerified
 
 
 /-! # to_bytes
@@ -28,7 +29,7 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 set_option linter.style.setOption false
 set_option maxHeartbeats 2000000
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -154,50 +155,51 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
-    ∃ result, to_bytes self = ok result ∧
+    to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
-    U8x32_as_Nat result < p := by
+    U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
-  progress*
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    expand fe_post_1 with 5; scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    sorry
-    -- END TASK
-  · -- BEGIN TASK
-    refine ⟨?_, ?_⟩
-    · sorry
-    · sorry
-    -- END TASK
+  sorry
+  -- progress*
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   expand fe_post_1 with 5; scalar_tac
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   sorry
+  --   -- END TASK
+  -- · -- BEGIN TASK
+  --   refine ⟨?_, ?_⟩
+  --   · sorry
+  --   · sorry
+  --   -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

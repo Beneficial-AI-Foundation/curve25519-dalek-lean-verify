@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `constants::EDWARDS_D`
 
@@ -14,7 +14,7 @@ This constant represents the twisted Edwards curve parameter d.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -34,8 +34,9 @@ natural language specs:
 - The value of constants.EDWARDS_D when converted to a natural number equals d
 -/
 @[progress]
-theorem EDWARDS_D_spec : Field51_as_Nat EDWARDS_D = d := by
-  unfold EDWARDS_D
+theorem EDWARDS_D_spec : EDWARDS_D ⦃ result => Field51_as_Nat result = d ⦄ := by
+  unfold EDWARDS_D field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

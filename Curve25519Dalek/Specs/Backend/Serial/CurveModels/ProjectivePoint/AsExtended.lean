@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 /-! # Spec Theorem for `ProjectivePoint::as_extended`
@@ -19,7 +19,7 @@ P = (X:Y:Z) in projective coordinates, it computes an equivalent representation
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 
 /-
@@ -60,8 +60,7 @@ theorem as_extended_spec (q : ProjectivePoint)
   (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
   (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :
-∃ e,
-as_extended q = ok e ∧
+as_extended q ⦃ e =>
 let X := Field51_as_Nat q.X
 let Y := Field51_as_Nat q.Y
 let Z := Field51_as_Nat q.Z
@@ -72,7 +71,7 @@ let T' := Field51_as_Nat e.T
 X' % p = (X * Z) % p ∧
 Y' % p = (Y * Z) % p ∧
 Z' % p = (Z^2) % p ∧
-T' % p = (X * Y) % p
+T' % p = (X * Y) % p ⦄
 := by
   unfold as_extended
   progress*

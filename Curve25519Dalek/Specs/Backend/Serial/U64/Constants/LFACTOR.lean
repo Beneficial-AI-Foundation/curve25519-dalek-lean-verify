@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `constants::LFACTOR`
 
@@ -35,7 +35,6 @@ natural language specs:
 - The value of LFACTOR satisfies: L * LFACTOR ≡ -1 (mod 2^52)
 - LFACTOR is in the range [0, 2^52 - 1]
 -/
-@[progress]
 theorem LFACTOR_spec :
     (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧
     0 ≤ LFACTOR.val ∧

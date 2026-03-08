@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 set_option exponentiation.threshold 260
 
@@ -34,7 +34,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.R`**:
 - The value of constants.R when converted to a natural number is congruent to R modulo L
 -/
-@[progress]
+@[simp]
 theorem R_spec : Scalar52_as_Nat R % _root_.L = _root_.R % _root_.L := by
   unfold R
   decide

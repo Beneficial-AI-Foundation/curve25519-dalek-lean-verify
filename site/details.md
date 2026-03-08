@@ -1,37 +1,7 @@
 # Project
 
 <script setup lang="ts">
-import MermaidDiagram from './.vitepress/components/MermaidDiagram.vue'
-
-const diagramCode = `flowchart TD
-    subgraph extraction [" "]
-        direction TB
-        A@{ shape: lin-cyl, label: "Rust crate" }
-        AE@{ shape: stadium, label: "Aeneas extraction" }
-        B[Funs]
-        C[Types]
-
-        A -.- AE
-        AE -.- B
-        AE -.- C
-    end
-
-    D[FunsExternal]
-    E[TypesExternal]
-    F[Defs]
-    H[Aux]
-    G@{ shape: docs, label: "Specs" }
-
-    B --> D
-    C --> E
-
-    G --> B
-    G --> C
-    G --> F
-    G --> H
-
-    style AE fill:#f5f5f5,stroke:#999
-    style extraction fill:#f9f9f9,stroke:#999,stroke-width:2px,stroke-dasharray: 5 5`
+import ExtractionDiagram from './.vitepress/components/ExtractionDiagram.vue'
 </script>
 
 ## Curve25519-dalek
@@ -51,7 +21,7 @@ The aims are two fold:
 
 ## Extraction Overview
 
-<MermaidDiagram :graph="diagramCode" />
+<ExtractionDiagram />
 
 ## Our Progress
 

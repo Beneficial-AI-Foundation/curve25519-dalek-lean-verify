@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
@@ -22,7 +23,7 @@ given the defining equation $ax^2 + y^2 = 1 + dx^2y^2$ of the Edwards curve whic
 **Source**: curve25519-dalek/src/edwards.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
@@ -51,14 +52,12 @@ Natural language specs:
   - Bytes 0-30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian
   - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)
       (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)
       -- (hself : self.IsValid)
       :
-    ∃ result, compress self = ok result -- ∧
-    -- result.IsValid ∧ result.toPoint = self.toPoint
-    := by
+    compress self ⦃ result => True ⦄ := by
   unfold compress
   sorry
 

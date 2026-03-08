@@ -21,9 +21,9 @@ def extractRustName (doc : String) : Option String :=
     let afterBracket := parts[1]
     let endParts := afterBracket.splitOn "]"
     if h2 : endParts.length >= 1 then
-      let content := endParts[0].trim
+      let content := endParts[0].trimAscii.toString
       -- Remove trailing ':' if present
-      some (if content.endsWith ":" then content.dropRight 1 else content)
+      some (if content.endsWith ":" then (content.dropEnd 1).toString else content)
     else none
   else none
 

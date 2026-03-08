@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `constants::ONE_MINUS_EDWARDS_D_SQUARED`
 
@@ -14,7 +14,7 @@ This constant represents 1 - d² (mod p) whereby d is the twisted Edwards curve 
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -41,8 +41,11 @@ natural language specs:
   implemented by Lean.
 -/
 @[progress]
-theorem ONE_MINUS_EDWARDS_D_SQUARED_spec : Field51_as_Nat ONE_MINUS_EDWARDS_D_SQUARED = (1 + p - (d^2 % p)) % p:= by
-  unfold ONE_MINUS_EDWARDS_D_SQUARED
+theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :
+    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>
+      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by
+  unfold ONE_MINUS_EDWARDS_D_SQUARED field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

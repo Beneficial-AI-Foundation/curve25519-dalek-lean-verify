@@ -20,9 +20,19 @@ export function getMediumLabel(lean_name: string): string {
 }
 
 /**
- * Convert Rust path to Lean notation
- * e.g., "curve25519_dalek::backend::serial" -> "curve25519_dalek.backend.serial"
+ * Get function name from Rust path (last component after ::)
+ * e.g., "curve25519_dalek::backend::serial::add" -> "add"
  */
-export function rustPathToLean(rustPath: string): string {
-  return rustPath.replace(/::/g, '.')
+export function getRustFunctionName(rustPath: string): string {
+  const parts = rustPath.split('::')
+  return parts[parts.length - 1]
+}
+
+/**
+ * Shorten source file path by removing common prefix
+ * e.g., "curve25519-dalek/src/backend/serial.rs" -> "backend/serial.rs"
+ */
+export function shortenSourcePath(source: string | null): string {
+  if (!source) return '-'
+  return source.replace('curve25519-dalek/src/', '')
 }

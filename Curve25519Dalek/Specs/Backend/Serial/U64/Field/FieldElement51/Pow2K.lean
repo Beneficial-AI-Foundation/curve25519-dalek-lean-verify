@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
 #setup_aeneas_simps
@@ -22,7 +22,7 @@ This function computes the 2^k-th power of the element.
 set_option maxHeartbeats 10000000
 -- progress* and scalar_tac are heavy
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 @[progress]

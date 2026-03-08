@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `FieldElement51::from_limbs`
 
@@ -17,7 +17,7 @@ is essentially the identity function wrapped in a `Result` type.
 **Source**: curve25519-dalek/src/backend/serial/u64/field.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
@@ -42,8 +42,8 @@ Natural language specs:
 -/
 @[progress]
 theorem from_limbs_spec (a : Array U64 5#usize) :
-    ∃ r, from_limbs a = ok r ∧
-    r = a ∧ Field51_as_Nat r = Field51_as_Nat a := by
+    from_limbs a ⦃ r =>
+    r = a ∧ Field51_as_Nat r = Field51_as_Nat a ⦄ := by
   simp [from_limbs]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

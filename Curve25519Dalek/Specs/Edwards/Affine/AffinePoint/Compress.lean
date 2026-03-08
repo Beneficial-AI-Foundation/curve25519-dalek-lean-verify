@@ -4,7 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `AffinePoint::compress`
 
@@ -20,7 +21,7 @@ storing the sign bit of x in the most significant bit of the last byte.
 - Complete proof
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.affine.AffinePoint
 
 /-
@@ -44,12 +45,12 @@ Natural language specs:
 - Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero
 - Returns a CompressedEdwardsY equal to the input AffinePoint
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)
     (h : Field51_as_Nat self.y < 2 ^ 255) :
-    ∃ result, compress self = ok result -- ∧
-    -- result.IsValid ∧ result.toPoint = self.toPoint
-    := by
+    compress self ⦃ result =>
+    True -- result.IsValid ∧ result.toPoint = self.toPoint
+     ⦄ := by
   sorry
 
 -- To do: update this when relevant definitions have been added.

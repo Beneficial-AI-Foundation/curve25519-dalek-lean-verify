@@ -3,7 +3,7 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
 
 /-! # ZERO
@@ -25,9 +25,9 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 The ZERO constant represents the scalar 0.
 -/
-@[progress]
+@[simp]
 theorem ZERO_spec : Scalar52_as_Nat ZERO = 0 := by
-  unfold ZERO ZERO_body
+  unfold ZERO
   decide
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 
 /-! # Spec Theorem for `constants::SQRT_M1`
 
@@ -14,7 +14,7 @@ This constant represents one of the square roots of -1 modulo p.
 
 Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
 
 /-
@@ -35,8 +35,9 @@ natural language specs:
 -/
 @[progress]
 theorem SQRT_M1_spec :
-    (Field51_as_Nat SQRT_M1)^2 % p = p - 1 := by
-  unfold SQRT_M1
+    SQRT_M1 ⦃ result => (Field51_as_Nat result)^2 % p = p - 1 ⦄ := by
+  unfold SQRT_M1 field.FieldElement51.from_limbs
+  simp only [spec_ok]
   decide
 
 end curve25519_dalek.backend.serial.u64.constants

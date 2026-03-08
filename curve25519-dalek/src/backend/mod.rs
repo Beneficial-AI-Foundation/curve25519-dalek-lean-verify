@@ -75,7 +75,7 @@ fn get_selected_backend() -> BackendKind {
 }
 
 #[allow(missing_docs)]
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub fn pippenger_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
 where
     I: IntoIterator,
@@ -96,7 +96,7 @@ where
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub(crate) enum VartimePrecomputedStraus {
     #[cfg(curve25519_dalek_backend = "simd")]
     Avx2(vector::scalar_mul::precomputed_straus::spec_avx2::VartimePrecomputedStraus),
@@ -107,7 +107,7 @@ pub(crate) enum VartimePrecomputedStraus {
     Scalar(serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus),
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedStraus {
     pub fn new<I>(static_points: I) -> Self
     where
@@ -220,7 +220,7 @@ where
 }
 
 #[allow(missing_docs)]
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub fn straus_optional_multiscalar_mul<I, J>(scalars: I, points: J) -> Option<EdwardsPoint>
 where
     I: IntoIterator,
@@ -263,7 +263,7 @@ pub fn variable_base_mul(point: &EdwardsPoint, scalar: &Scalar) -> EdwardsPoint 
 }
 
 /// Compute \\(aA + bB\\) in variable time, where \\(B\\) is the Ed25519 basepoint.
-#[cfg(not(verify))]
+#[allow(dead_code)]
 #[allow(non_snake_case)]
 pub fn vartime_double_base_mul(a: &Scalar, A: &EdwardsPoint, b: &Scalar) -> EdwardsPoint {
     match get_selected_backend() {

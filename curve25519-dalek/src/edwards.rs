@@ -120,6 +120,7 @@ use {
 use rand_core::RngCore;
 
 use subtle::Choice;
+#[cfg(feature = "digest")]
 use subtle::ConditionallyNegatable;
 use subtle::ConditionallySelectable;
 use subtle::ConstantTimeEq;
@@ -139,13 +140,13 @@ use crate::backend::serial::curve_models::CompletedPoint;
 use crate::backend::serial::curve_models::ProjectiveNielsPoint;
 use crate::backend::serial::curve_models::ProjectivePoint;
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::window::{
     LookupTableRadix128, LookupTableRadix16, LookupTableRadix256, LookupTableRadix32,
     LookupTableRadix64,
 };
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 use crate::traits::BasepointTable;
 
 use crate::traits::ValidityCheck;
@@ -154,10 +155,8 @@ use crate::traits::{Identity, IsIdentity};
 use affine::AffinePoint;
 
 #[cfg(feature = "alloc")]
-use crate::traits::MultiscalarMul;
+use crate::traits::{MultiscalarMul, VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
 #[cfg(all(feature = "alloc", not(verify)))]
-use crate::traits::{VartimeMultiscalarMul, VartimePrecomputedMultiscalarMul};
-#[cfg(feature = "alloc")]
 use alloc::vec::Vec;
 
 // ------------------------------------------------------------------------
@@ -237,7 +236,8 @@ mod decompress {
          // FieldElement::sqrt_ratio_i always returns the nonnegative square root,
          // so we negate according to the supplied sign bit.
         let compressed_sign_bit = Choice::from(repr.as_bytes()[31] >> 7);
-        X.conditional_negate(compressed_sign_bit);
+        let x_neg = -&X;
+        X.conditional_assign(&x_neg, compressed_sign_bit);
 
         EdwardsPoint {
             X,
@@ -412,7 +412,8 @@ impl CompressedEdwardsY {
     /// Returns [`TryFromSliceError`] if the input `bytes` slice does not have
     /// a length of 32.
     pub fn from_slice(bytes: &[u8]) -> Result<CompressedEdwardsY, TryFromSliceError> {
-        bytes.try_into().map(CompressedEdwardsY)
+        #[allow(clippy::redundant_closure)]
+        bytes.try_into().map(|b| CompressedEdwardsY(b))
     }
 }
 
@@ -582,7 +583,7 @@ impl EdwardsPoint {
 
     /// Converts a large batch of points to Edwards at once. This has the same
     /// behavior on identity elements as [`Self::to_montgomery`].
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub fn to_montgomery_batch(eds: &[Self]) -> Vec<MontgomeryPoint> {
         // Do the same thing as the above function. u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
         // We will do this in a batch, ie compute (Z-Y) for all the input
@@ -609,7 +610,7 @@ impl EdwardsPoint {
 
     /// Compress several `EdwardsPoint`s into `CompressedEdwardsY` format, using a batch inversion
     /// for a significant speedup.
-    #[cfg(feature = "alloc")]
+    #[cfg(all(feature = "alloc", not(verify)))]
     pub fn compress_batch(inputs: &[EdwardsPoint]) -> Vec<CompressedEdwardsY> {
         let mut zs = inputs.iter().map(|input| input.Z).collect::<Vec<_>>();
         FieldElement::batch_invert(&mut zs);
@@ -874,12 +875,12 @@ impl EdwardsPoint {
     /// Uses precomputed basepoint tables when the `precomputed-tables` feature
     /// is enabled, trading off increased code size for ~4x better performance.
     pub fn mul_base(scalar: &Scalar) -> Self {
-        #[cfg(any(not(feature = "precomputed-tables"), verify))]
+        #[cfg(not(feature = "precomputed-tables"))]
         {
             scalar * constants::ED25519_BASEPOINT_POINT
         }
 
-        #[cfg(all(feature = "precomputed-tables", not(verify)))]
+        #[cfg(feature = "precomputed-tables")]
         {
             scalar * constants::ED25519_BASEPOINT_TABLE
         }
@@ -953,7 +954,7 @@ impl MultiscalarMul for EdwardsPoint {
     }
 }
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimeMultiscalarMul for EdwardsPoint {
     type Point = EdwardsPoint;
 
@@ -992,10 +993,10 @@ impl VartimeMultiscalarMul for EdwardsPoint {
 // This wraps the inner implementation in a facade type so that we can
 // decouple stability of the inner type from the stability of the
 // outer type.
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 pub struct VartimeEdwardsPrecomputation(crate::backend::VartimePrecomputedStraus);
 
-#[cfg(all(feature = "alloc", not(verify)))]
+#[cfg(feature = "alloc")]
 impl VartimePrecomputedMultiscalarMul for VartimeEdwardsPrecomputation {
     type Point = EdwardsPoint;
 
@@ -1045,7 +1046,7 @@ impl EdwardsPoint {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 macro_rules! impl_basepoint_table {
     (Name = $name:ident, LookupTable = $table:ident, Point = $point:ty, Radix = $radix:expr, Additions = $adds:expr) => {
         /// A precomputed table of multiples of a basepoint, for accelerating
@@ -1203,7 +1204,7 @@ macro_rules! impl_basepoint_table {
 
 // The number of additions required is ceil(256/w) where w is the radix representation.
 cfg_if! {
-    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+    if #[cfg(feature = "precomputed-tables")] {
         impl_basepoint_table! {
             Name = EdwardsBasepointTable,
             LookupTable = LookupTableRadix16,
@@ -1250,7 +1251,7 @@ cfg_if! {
     }
 }
 
-#[cfg(all(feature = "precomputed-tables", not(verify)))]
+#[cfg(feature = "precomputed-tables")]
 macro_rules! impl_basepoint_table_conversions {
     (LHS = $lhs:ty, RHS = $rhs:ty) => {
         impl<'a> From<&'a $lhs> for $rhs {
@@ -1268,7 +1269,7 @@ macro_rules! impl_basepoint_table_conversions {
 }
 
 cfg_if! {
-    if #[cfg(all(feature = "precomputed-tables", not(verify)))] {
+    if #[cfg(feature = "precomputed-tables")] {
         // Conversions from radix 16
         impl_basepoint_table_conversions! {
             LHS = EdwardsBasepointTableRadix16,

@@ -4,7 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Defs
+import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 
 /-! # Spec Theorem for `CompletedPoint::add`
@@ -33,9 +33,10 @@ The concrete formulas are:
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
 
-open Aeneas.Std Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.backend.serial.curve_models
 
-namespace curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
+namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
 
 
@@ -74,8 +75,7 @@ theorem add_spec
   (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)
   (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)
   (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :
-∃ c,
-add self other = ok c ∧
+Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other ⦃ c =>
 let X := Field51_as_Nat self.X
 let Y := Field51_as_Nat self.Y
 let Z := Field51_as_Nat self.Z
@@ -90,34 +90,21 @@ let T' := Field51_as_Nat c.T
 (X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧
 (Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧
 Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
-(T' + (T * XY2D)) % p = (2 * Z) % p
+(T' + (T * XY2D)) % p = (2 * Z) % p ⦄
 := by
-  unfold AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint.add
+  unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add
   progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
   progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  · grind
-  · grind
   progress  as ⟨ PP , h_PP , PP_bounds⟩
-  · grind
   progress  as ⟨ MM, h_MM, MM_bounds⟩
-  · grind
-  · grind
   progress  as ⟨ Txy2d, h_Txy2d, Txy2d_bounds⟩
-  · grind
-  · grind
   progress as ⟨Z2, h_Z2,  Z2_bounds⟩
   progress as ⟨PPMM, h_PPMM,  PPMM_bounds⟩
-  · grind
-  · grind
   progress as ⟨fe, h_fe,  fe_bounds⟩
-  · grind
-  · grind
   have hzz: ∀ i < 5, Z2[i]!.val < 2 ^ 54 := by simp_all
   obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := CompletedPoint.add_spec' hzz  Txy2d_bounds
   simp only [h_fe2_ok, bind_tc_ok]
   progress as ⟨fe3, h_fe3, fe3_bounds⟩
-  · grind
-  · grind
   constructor
   · rw[← Nat.ModEq]
     rw[← Nat.ModEq] at PPMM_bounds
@@ -180,4 +167,4 @@ Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
       scalar_tac
     rw[this, (by scalar_tac :∀ a, a + a = 2 * a)]
 
-end curve25519_dalek.backend.serial.curve_models.AddShared0EdwardsPointSharedAAffineNielsPointCompletedPoint
+end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
