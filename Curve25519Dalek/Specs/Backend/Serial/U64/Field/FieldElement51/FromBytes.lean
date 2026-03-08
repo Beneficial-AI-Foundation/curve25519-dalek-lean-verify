@@ -7,19 +7,12 @@ import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Aux
 import Curve25519Dalek.ExternallyVerified
+
 /-! # FromBytes
+
 Specification and proof for `FieldElement51::from_bytes`.
 This function constructs a field element from a 32-byte array.
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
-
--/
-
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open scoped BigOperators
-
-
-/- **Proof strategy: List Bool interpretation**
 
 ## Rust source
 
@@ -84,7 +77,10 @@ covering `bits[0..255)`. Bit 255 (the 256th bit) is discarded — this is the `%
    `field51_eq_of_bitList` + `limb_bound_of_equiv`
 -/
 
-open BitList
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open scoped BigOperators
+open List BitList
 
 /-! ## load8_at specification
 
@@ -94,9 +90,9 @@ slice's bit representation. -/
 
 private lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
     x.val * 2 ^ k < U64.size := calc
-    _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
+  _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
         (Nat.pow_le_pow_right (by omega) hk)
-    _ < U64.size := by scalar_tac
+  _ < U64.size := by scalar_tac
 
 private lemma u8_val_mod_u64_numBits (x : U8) :
     x.val % 2 ^ UScalarTy.U64.numBits = x.val :=
@@ -138,7 +134,7 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
     ∑ j ∈ Finset.range 8, l[i + j]!.val * 2 ^ (8 * j) =
       Nat.ofDigits 256 ((l.extract i (i + 8)).map (·.val)) := by
   have hlen : (l.extract i (i + 8)).length = 8 := by
-    simp [List.extract_eq_drop_take, List.length_take, List.length_drop]; omega
+    simp [extract_eq_drop_take, length_take, length_drop]; omega
   rw [ofDigits_map_val_eq_sum, hlen]
   apply Finset.sum_congr rfl; intro j hj; rw [Finset.mem_range] at hj
   rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
@@ -153,7 +149,7 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ 
   simp only [Slice.getElem!_Nat_eq] at hval
   set rhs := (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64)
   have hlen : rhs.length = 64 := by
-    simp [rhs, List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteList_length]
+    simp [rhs, extract_eq_drop_take, length_take, length_drop, ofByteList_length]
     omega
   have hval_eq : result.val = toNat rhs := by
     simp only [rhs]
@@ -175,7 +171,7 @@ attribute [-progress] load8_at_val_spec load8_at_bitList_spec
 /-- Right-shifting a U64 by k drops k bits from its List Bool representation. -/
 @[progress]
 theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val < 64) :
-    (x >>> k) ⦃ z => ofU64 z ≈ₗ (ofU64 x).drop k.toNat ⦄ := by
+    (x >>> k) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).drop k.toNat ⦄ := by
   have hknat : k.toNat < 64 := by scalar_tac
   progress as ⟨z, hval, _⟩
   simp only [ofU64]
@@ -237,7 +233,7 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
   intro i
   rw [← toNat_ofU64 result[i]!, (hequiv i).toNat_eq]
   refine (toNat_lt_pow _).trans_le (Nat.pow_le_pow_right (by omega) ?_)
-  simp [List.extract_eq_drop_take, List.length_take, List.length_drop, ofByteArray_length]
+  simp [List.extract_eq_drop_take, length_take, length_drop, ofByteArray_length]
 
 /-! ## The pure List Bool specification for from_bytes -/
 
@@ -256,7 +252,7 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   · simp_all [Array.make, ofByteArray]; grind
   · simp_all [Array.make, ofByteArray]; grind
   · clear i1_post -- TODO: why is this required for grind to succeed?
-    simp_all [Array.make, ofByteArray, -List.drop_one]; grind
+    simp_all [Array.make, ofByteArray, -drop_one]; grind
   · simp_all [Array.make, ofByteArray]; grind
 
 /-! ## Final spec -/
