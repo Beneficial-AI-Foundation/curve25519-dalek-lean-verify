@@ -431,191 +431,202 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
   have : k' > 0#u32 := by scalar_tac
-  simp only [this, reduceIte, progress_simps]
-  -- Progress through the loop body to the 1st halt point, name only c0 c1 c2 c3 c4
-  iterate 12 progress
-  let* ⟨ c0, _ ⟩ ← U128.add_spec
-  iterate 5 progress
-  let* ⟨ c1, _ ⟩ ← U128.add_spec
-  iterate 5 progress
-  let* ⟨ c2, _ ⟩ ← U128.add_spec
-  iterate 5 progress
-  let* ⟨ c3, _ ⟩ ← U128.add_spec
-  iterate 5 progress
-  let* ⟨ c4, _ ⟩ ← U128.add_spec
-  -- We are at the 1st halt point
+  split
+  case isTrue hlt =>
 
-  /-
-  Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
+    -- Progress through the loop body to the 1st halt point, name only c0 c1 c2 c3 c4
+    iterate 12 progress
+    let* ⟨ c0, _ ⟩ ← U128.add_spec
+    iterate 5 progress
+    let* ⟨ c1, _ ⟩ ← U128.add_spec
+    iterate 5 progress
+    let* ⟨ c2, _ ⟩ ← U128.add_spec
+    iterate 5 progress
+    let* ⟨ c3, _ ⟩ ← U128.add_spec
+    iterate 5 progress
+    let* ⟨ c4, _ ⟩ ← U128.add_spec
+    -- We are at the 1st halt point
 
-  c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3])) = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
-  c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4])) = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
-  c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3])) = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
-  c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2]) = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
-  c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
-  -/
+    /-
+    Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
-  subst_vars
-  have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
-      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp [*]
-  have hc1 : c1.val = a[3]!.val *
-      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp [*]
-  have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
-      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp [*]
-  have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
-      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
-  have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
-      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
+    c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3])) = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
+    c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4])) = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
+    c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3])) = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
+    c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2]) = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
+    c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
+    -/
 
-  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind only
-  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind only
-  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind only
-  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind only
-  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind only
+    subst_vars
+    have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
+        (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp [*]
+    have hc1 : c1.val = a[3]!.val *
+        (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp [*]
+    have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
+        (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp [*]
+    have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
+        (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
+    have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
+        (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
 
-  have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
-      ≡ (Field51_as_Nat a)^2 [MOD p] := by
-    have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
-    simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
+    have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind only
+    have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind only
+    have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind only
+    have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind only
+    have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind only
 
-  -- clear everything except what we have just proven
-  clear * - hk ha a_pow_two hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
+    have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
+        ≡ (Field51_as_Nat a)^2 [MOD p] := by
+      have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
+      simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
-  -- Continue to the 2nd halt point
-  let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-  let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ c11, c11_post ⟩ ← U128.add_spec
-  let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
-  progress with pow2k.LOW_51_BIT_MASK_spec
-  let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a1, a1_post ⟩ ← Array.update_spec
-  let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-  let* ⟨ i36, i36_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ c21, c21_post ⟩ ← U128.add_spec
-  let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i39, i39_post_1, i39_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a2, a2_post ⟩ ← Array.update_spec
-  let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-  let* ⟨ i41, i41_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ c31, c31_post ⟩ ← U128.add_spec
-  let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i44, i44_post_1, i44_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a3, a3_post ⟩ ← Array.update_spec
-  let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-  let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ c41, c41_post ⟩ ← U128.add_spec
-  let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a4, a4_post ⟩ ← Array.update_spec
-  let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-  let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
-  let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a5, a5_post ⟩ ← Array.update_spec
-  -- We are at the 2nd halt point
+    -- clear everything except what we have just proven
+    clear * - hk ha a_pow_two hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
 
-  -- Stage 2: After carry propagation (l.532 of source code)
+    -- Continue to the 2nd halt point
+    let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+    let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ c11, c11_post ⟩ ← U128.add_spec
+    let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
+    progress with pow2k.LOW_51_BIT_MASK_spec
+    let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a1, a1_post ⟩ ← Array.update_spec
+    let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+    let* ⟨ i36, i36_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ c21, c21_post ⟩ ← U128.add_spec
+    let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i39, i39_post_1, i39_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a2, a2_post ⟩ ← Array.update_spec
+    let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+    let* ⟨ i41, i41_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ c31, c31_post ⟩ ← U128.add_spec
+    let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i44, i44_post_1, i44_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a3, a3_post ⟩ ← Array.update_spec
+    let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+    let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ c41, c41_post ⟩ ← U128.add_spec
+    let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a4, a4_post ⟩ ← Array.update_spec
+    let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
+    let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
+    let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a5, a5_post ⟩ ← Array.update_spec
+    -- We are at the 2nd halt point
 
-  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
-  have hc11_bound : c11.val < 2 ^ 115 := by sorry
-  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val (by grind)
-  have hc21_bound : c21.val < 2 ^ 115 := by sorry
-  have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
-  have hc31_bound : c31.val < 2 ^ 115 := by sorry
-  have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
-  have hc41_bound : c41.val < 2 ^ 115 := by sorry
-  have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
+    -- Stage 2: After carry propagation (l.532 of source code)
 
-  /-
-  Define intermediate carry-propagated values:
-  c1' = c1 + ⌈c0⌉₅₁
-  c2' = c2 + ⌈c1'⌉₅₁
-  c3' = c3 + ⌈c2'⌉₅₁
-  c4' = c4 + ⌈c3'⌉₅₁
+    have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
+    have hc11_bound : c11.val < 2 ^ 115 := by sorry
+    have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val (by grind)
+    have hc21_bound : c21.val < 2 ^ 115 := by sorry
+    have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
+    have hc31_bound : c31.val < 2 ^ 115 := by sorry
+    have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
+    have hc41_bound : c41.val < 2 ^ 115 := by sorry
+    have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
 
-  At this stage we have:
-  a[0] = ⌊c0⌋₅₁
-  a[1] = ⌊c1'⌋₅₁
-  a[2] = ⌊c2'⌋₅₁
-  a[3] = ⌊c3'⌋₅₁
-  a[4] = ⌊c4'⌋₅₁
-  carry = ⌈c4'⌉₅₁
-  -/
+    /-
+    Define intermediate carry-propagated values:
+    c1' = c1 + ⌈c0⌉₅₁
+    c2' = c2 + ⌈c1'⌉₅₁
+    c3' = c3 + ⌈c2'⌉₅₁
+    c4' = c4 + ⌈c3'⌉₅₁
 
-  -- c11 = c1 + carry from c0
-  have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
-    simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
-      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
-    omega
-  -- c21 = c2 + carry from c11
-  have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
-    simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
-      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
-    omega
-  -- c31 = c3 + carry from c21
-  have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
-    simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
-      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
-    omega
-  -- c41 = c4 + carry from c31
-  have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
-    simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
-      UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
-    omega
+    At this stage we have:
+    a[0] = ⌊c0⌋₅₁
+    a[1] = ⌊c1'⌋₅₁
+    a[2] = ⌊c2'⌋₅₁
+    a[3] = ⌊c3'⌋₅₁
+    a[4] = ⌊c4'⌋₅₁
+    carry = ⌈c4'⌉₅₁
+    -/
 
-  -- Array values after carry propagation
-  have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
-  have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by sorry
-  have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by sorry
-  have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by sorry
-  have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by sorry
-  have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
-    simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
-      Nat.shiftRight_eq_div_pow]
-    omega
+    -- c11 = c1 + carry from c0
+    have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
+      simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
+        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      omega
+    -- c21 = c2 + carry from c11
+    have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
+      simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
+        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      omega
+    -- c31 = c3 + carry from c21
+    have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
+      simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
+        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      omega
+    -- c41 = c4 + carry from c31
+    have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
+      simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
+        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      omega
 
-  -- Continue until the end of the function
-  let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
-  let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i55, i55_post ⟩ ← U64.add_spec
-  let* ⟨ a6, a6_post ⟩ ← Array.update_spec
-  let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
-  let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
-  -- Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
-  apply spec_bind
-  · apply U64.add_spec
-    sorry  -- overflow side condition
-  intro i59 i59_post
-  -- let* ⟨ i59, i59_post ⟩ ← U64.add_spec
-  let* ⟨ a7, a7_post ⟩ ← Array.update_spec
-  let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
-  let* ⟨ a8, a8_post ⟩ ← Array.update_spec
+    -- Array values after carry propagation
+    have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
+    have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by sorry
+    have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by sorry
+    have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by sorry
+    have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by sorry
+    have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
+      simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
+        Nat.shiftRight_eq_div_pow]
+      omega
 
-  -- Stage 3: Final reduction (l.552 of source file)
+    -- Continue until the end of the function
+    let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
+    let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i55, i55_post ⟩ ← U64.add_spec
+    let* ⟨ a6, a6_post ⟩ ← Array.update_spec
+    let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
+    let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
+    -- Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
+    apply spec_bind
+    · apply U64.add_spec
+      sorry  -- overflow side condition
+    intro i59 i59_post
+    -- let* ⟨ i59, i59_post ⟩ ← U64.add_spec
+    let* ⟨ a7, a7_post ⟩ ← Array.update_spec
+    let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
+    let* ⟨ a8, a8_post ⟩ ← Array.update_spec
 
-  /-
-  Let the values from stage 2 be denoted with subscript ₂. Now we have:
-  a[0] = ⌊a[0]₂ + 19·carry⌋₅₁
-  a[1] = a[1]₂ + ⌈a[0]₂ + 19·carry⌉₅₁
-  a[2] = a[2]₂
-  a[3] = a[3]₂
-  a[4] = a[4]₂
-  -/
+    -- Stage 3: Final reduction (l.552 of source file)
 
-  -- Array values after final reduction
-  have ha8_0 : a8[0]!.val = (a5[0]!.val + 19 * carry.val) % 2 ^ 51 := by sorry
-  have ha8_1 : a8[1]!.val = a5[1]!.val + (a5[0]!.val + 19 * carry.val) / 2 ^ 51 := by sorry
-  have ha8_2 : a8[2]!.val = a5[2]!.val := by sorry
-  have ha8_3 : a8[3]!.val = a5[3]!.val := by sorry
-  have ha8_4 : a8[4]!.val = a5[4]!.val := by sorry
+    /-
+    Let the values from stage 2 be denoted with subscript ₂. Now we have:
+    a[0] = ⌊a[0]₂ + 19·carry⌋₅₁
+    a[1] = a[1]₂ + ⌈a[0]₂ + 19·carry⌉₅₁
+    a[2] = a[2]₂
+    a[3] = a[3]₂
+    a[4] = a[4]₂
+    -/
 
-  let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
+    -- Array values after final reduction
+    have ha8_0 : a8[0]!.val = (a5[0]!.val + 19 * carry.val) % 2 ^ 51 := by sorry
+    have ha8_1 : a8[1]!.val = a5[1]!.val + (a5[0]!.val + 19 * carry.val) / 2 ^ 51 := by sorry
+    have ha8_2 : a8[2]!.val = a5[2]!.val := by sorry
+    have ha8_3 : a8[3]!.val = a5[3]!.val := by sorry
+    have ha8_4 : a8[4]!.val = a5[4]!.val := by sorry
+
+    let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
+
+    sorry
+    -- let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
+
+  case isFalse hge =>
+    progress*
+
+/-
+
   -- Now handle the recursive call
   -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
   -- Base case (k=1): k1=0, next iteration returns immediately with ok a8
@@ -650,6 +661,10 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
       rw [h2k]
     · assumption
+
+    -/
+  termination_by k
+  decreasing_by scalar_tac
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
