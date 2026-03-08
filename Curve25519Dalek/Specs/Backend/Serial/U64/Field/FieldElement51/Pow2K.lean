@@ -301,8 +301,7 @@ lemma c4_bound (a0 a1 a2 a3 a4 : ℕ)
 
 /-! ### Bounds for carry chain (< 2^115)
 
-These bounds ensure that the carry from each intermediate value fits in U64
-without truncation, which is needed for the carry propagation to work correctly. -/
+These bounds ensure that the carry from each intermediate value fits in U64 without truncation. -/
 
 /-- c0 < 77 * 2^108 < 2^115 -/
 lemma c0_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
@@ -311,7 +310,7 @@ lemma c0_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : a0 * a0 < 2 ^ 108 := by nlinarith
   have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
   have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (77 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  have : (77 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
 /-- c1 < 59 * 2^108 < 2^115 -/
@@ -321,7 +320,7 @@ lemma c1_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
   have : a0 * a1 < 2 ^ 108 := by nlinarith
   have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : (59 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  have : (59 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
 /-- c2 < 41 * 2^108 < 2^115 -/
@@ -331,7 +330,7 @@ lemma c2_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : a1 * a1 < 2 ^ 108 := by nlinarith
   have : a0 * a2 < 2 ^ 108 := by nlinarith
   have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (41 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  have : (41 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
 /-- c3 < 23 * 2^108 < 2^115 -/
@@ -341,7 +340,7 @@ lemma c3_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
   have : a0 * a3 < 2 ^ 108 := by nlinarith
   have : a1 * a2 < 2 ^ 108 := by nlinarith
-  have : (23 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  have : (23 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
 /-- c4 < 5 * 2^108 < 2^115 -/
@@ -351,19 +350,17 @@ lemma c4_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : a2 * a2 < 2 ^ 108 := by nlinarith
   have : a0 * a4 < 2 ^ 108 := by nlinarith
   have : a1 * a3 < 2 ^ 108 := by nlinarith
-  have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by native_decide
+  have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
-/-- Decomposition lemma: squaring in radix-2^51 representation mod p.
-    This is the key algebraic identity underlying field squaring. -/
+/-- Squaring in radix-2^51, mod p, key algebraic identity underlying field squaring. -/
 lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2
     ≡ a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) +
       2^51 * (a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4))) +
       2^102 * (a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3))) +
       2^153 * (a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2)) +
-      2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3))
-    [MOD p] := by
+      2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) [MOD p] := by
   have expand : (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2 =
     a0^2 +
     2^51 * (2 * a0 * a1) +
@@ -395,8 +392,8 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
   rw [this]
 
-@[local simp]
-theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
+-- @[local simp]
+-- theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
 
 /-- The final carry bound: if carry ≤ (2^64 - 2^51)/19 then 2^51 + 19*carry < 2^64. -/
 lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 19) :
@@ -433,11 +430,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
       Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
-  -- have := ha 0 (by simp)
-  -- have := ha 1 (by simp)
-  -- have := ha 2 (by simp)
-  -- have := ha 3 (by simp)
-  -- have := ha 4 (by simp)
   have : k' > 0#u32 := by scalar_tac
   simp only [this, reduceIte, progress_simps]
   -- Progress through the loop body to the first halt point, name only c0 c1 c2 c3 c4
@@ -464,21 +456,21 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
 
   subst_vars
   have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
-      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp[*]
+      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp [*]
   have hc1 : c1.val = a[3]!.val *
-      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp[*]
+      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp [*]
   have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
-      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp[*]
+      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp [*]
   have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
-      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp[*]
+      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
   have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
-      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp[*]
+      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
 
-  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind
-  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind
-  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind
-  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind
-  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind
+  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind only
+  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind only
+  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind only
+  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind only
+  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind only
 
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
