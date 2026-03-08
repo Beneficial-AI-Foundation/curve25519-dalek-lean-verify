@@ -56,10 +56,18 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
-/-- Convert GetElem to getElem! for Aeneas Array -/
+/-- Convert GetElem (Nat index) to getElem! for Aeneas Array -/
 theorem Array.getElem_eq_getElem! (bs : Array U64 5#usize) (i : Nat) (hi : i < bs.length) :
     (bs[i] : U64) = bs[i]! := by
   rw [Array.getElem!_Nat_eq, ← Array.val_getElem!_eq' bs i hi]
+
+/-- Convert GetElem (Usize index) to getElem! for Aeneas Array -/
+theorem Array.getElem_usize_eq_getElem! (bs : Array U64 5#usize) (i : Usize)
+    (hi : i.val < bs.length) :
+    (bs[i] : U64) = bs[i.val]! := by
+  simp only [Array.getElem!_Nat_eq]
+  show bs.val[i.val] = bs.val[i.val]!
+  exact List.Inhabited_getElem_eq_getElem! bs.val i.val hi
 
 /-- Like set_of_ne but returns getElem! on both sides -/
 theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i < bs.length)
