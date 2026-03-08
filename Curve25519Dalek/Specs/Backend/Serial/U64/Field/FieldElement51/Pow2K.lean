@@ -125,9 +125,6 @@ This function computes the 2^k-th power of the element.
 
 -/
 
-set_option maxHeartbeats 10000000
--- progress* and scalar_tac are heavy
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
@@ -423,11 +420,13 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
 --   refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
 --   simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
+set_option maxHeartbeats 1000000 in
+-- progress* needs this
 @[progress]
-theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k) (eqk : k'.val = k)
+theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     pow2k_loop k' a ⦃ (result : Std.Array U64 5#usize) =>
-      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k) [MOD p] ∧
+      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
   have : k' > 0#u32 := by scalar_tac
@@ -445,7 +444,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
     let* ⟨ c3, _ ⟩ ← U128.add_spec
     iterate 5 progress
     let* ⟨ c4, _ ⟩ ← U128.add_spec
-    -- We are at the 1st halt point
+    -- Arrived at the 1st halt point
 
     /-
     Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
@@ -469,19 +468,25 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
     have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
         (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
 
-    have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> grind only
-    have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> grind only
-    have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> grind only
-    have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> grind only
-    have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> grind only
+    have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> exact ha _ (by simp)
 
     have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
       simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
-    -- clear everything except what we have just proven
-    clear * - hk ha a_pow_two hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
+    -- NOTE: We can't use clear * - it kills the IH needed for recursion
+    -- TODO: Find a convenient way to clear all the hypotheses which are no longer required
+    rename_i wp0 eq0 wp1 eq1 wp2 eq2 wp3 eq3 wp4
+    clear i3_post i5_post i7_post i8_post i9_post i10_post i11_post i12_post i13_post i14_post
+      i15_post i16_post i17_post i18_post i19_post i20_post i21_post i22_post i23_post i24_post
+      i25_post i26_post i27_post i28_post i29_post a3_19_post a4_19_post wp0 eq0 wp1 eq1 wp2 eq2 wp3
+      eq3 wp4 this i3 i5 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 i23 i24 i26
+      i27 i28 a3_19 a4_19 hlt
 
     -- Continue to the 2nd halt point
     let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -619,8 +624,35 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
 
     let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
 
-    sorry
-    -- let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
+    progress as ⟨ res, res_post_1, res_post_2 ⟩
+    · -- side condition: 0 < k1.val
+      -- simp only [*]
+      sorry
+    · -- side condition: ∀ i < 5, a8[i]!.val < 2 ^ 54
+      intro i hi
+      interval_cases i
+      · sorry
+      · sorry
+      · sorry
+      · sorry
+      · sorry
+    -- Now we have res with res_post_1 and res_post_2
+    constructor
+    · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
+      -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a8)^(2^(k-1)) [MOD p]
+      -- a8 ≡ a^2 [MOD p], so res ≡ (a^2)^(2^(k-1)) = a^(2^k) [MOD p]
+      have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
+        sorry
+      simp only [*] at res_post_1
+      -- have hpow := Nat.ModEq.pow (2^(k-1)) hsq
+      -- apply Nat.ModEq.trans res_post_1 hpow |>.trans
+      -- rw [← pow_mul]
+      -- have hk_pos : k ≥ 1 := by omega
+      -- have h2k : 2 * 2 ^ (k - 1) = 2 ^ k := by
+      --   conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
+      -- rw [h2k]
+      sorry
+    · assumption
 
   case isFalse hge =>
     progress*
@@ -663,8 +695,8 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
     · assumption
 
     -/
-  termination_by k
-  decreasing_by scalar_tac
+  termination_by k'.val
+  decreasing_by scalar_decr_tac; rw [k1_post1]; omega
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
