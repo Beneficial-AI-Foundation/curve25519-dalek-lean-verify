@@ -56,6 +56,17 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- Convert GetElem to getElem! for Aeneas Array -/
+theorem Array.getElem_eq_getElem! (bs : Array U64 5#usize) (i : Nat) (hi : i < bs.length) :
+    (bs[i] : U64) = bs[i]! := by
+  rw [Array.getElem!_Nat_eq, ← Array.val_getElem!_eq' bs i hi]
+
+/-- Like set_of_ne but returns getElem! on both sides -/
+theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i < bs.length)
+    (hj : j < bs.length) (h : i ≠ j) :
+    (bs.set j#usize a)[i]! = bs[i]! := by
+  rw [Array.set_of_ne bs a i j hi hj h, Array.getElem_eq_getElem! bs i hi]
+
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
     (bs.set i#usize a)[i]! = a := by grind

@@ -637,11 +637,39 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
 
     -- Array values after carry propagation
-    have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by sorry
-    have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by sorry
-    have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by sorry
-    have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by sorry
-    have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by sorry
+    -- Each ha5_i traces: a5[i]! → chain of set operations → AND with mask → ci % 2^51
+    -- Strategy: use set_of_ne_getElem! to peel through non-matching sets, set_of_eq at the match
+    have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by
+      simp only [a5_post, Array.set_of_ne_getElem! _ _ 0 4 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a4_post, Array.set_of_ne_getElem! _ _ 0 3 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a3_post, Array.set_of_ne_getElem! _ _ 0 2 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a2_post, Array.set_of_ne_getElem! _ _ 0 1 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a1_post, Array.set_of_eq _ _ 0 (by scalar_tac)]
+      simp only [i34_post_1, UScalar.val_and, i33_post, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+    have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by
+      simp only [a5_post, Array.set_of_ne_getElem! _ _ 1 4 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a4_post, Array.set_of_ne_getElem! _ _ 1 3 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a3_post, Array.set_of_ne_getElem! _ _ 1 2 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a2_post, Array.set_of_eq _ _ 1 (by scalar_tac)]
+      simp only [i39_post_1, UScalar.val_and, i38_post, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+    have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by
+      simp only [a5_post, Array.set_of_ne_getElem! _ _ 2 4 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a4_post, Array.set_of_ne_getElem! _ _ 2 3 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a3_post, Array.set_of_eq _ _ 2 (by scalar_tac)]
+      simp only [i44_post_1, UScalar.val_and, i43_post, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+    have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by
+      simp only [a5_post, Array.set_of_ne_getElem! _ _ 3 4 (by scalar_tac) (by scalar_tac) (by omega)]
+      simp only [a4_post, Array.set_of_eq _ _ 3 (by scalar_tac)]
+      simp only [i49_post_1, UScalar.val_and, i48_post, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+    have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by
+      simp only [a5_post, Array.set_of_eq _ _ 4 (by scalar_tac)]
+      simp only [i52_post_1, UScalar.val_and, i51_post, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod]
+      omega
     have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
       simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
         Nat.shiftRight_eq_div_pow]
@@ -723,47 +751,10 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     simp only [hk0, progress_simps]
     exact ⟨by simp [Nat.ModEq], by simp⟩
 
-/-
-
-  -- Now handle the recursive call
-  -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
-  -- Base case (k=1): k1=0, next iteration returns immediately with ok a8
-  -- Recursive case (k>1): k1>0, continues squaring
-  by_cases hk1 : k'.val = 1
-  · -- k = 1 case: k1 = 0, so recursive call returns immediately
-    -- subst hk1
-    have hk1_zero : ¬(k1 > 0#u32) := by scalar_tac
-    unfold pow2k_loop
-    simp only [hk1_zero, ↓reduceIte, progress_simps]
-    constructor
-    · -- Main equality for k=1: a8 ≡ a^2 [MOD p]
-      sorry
-    · -- Bounds: each limb < 2^52
-      sorry
-  · -- k > 1 case: k1 > 0, recursive call does more squaring
-    have hk1_pos : 0 < k'.val - 1 := by omega
-    have ha8 : ∀ i < 5, a8[i]!.val < 2 ^ 54 := by sorry
-    let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
-    constructor
-    · -- Main equality: Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k) [MOD p]
-      -- res satisfies: Field51_as_Nat res ≡ (Field51_as_Nat a8)^(2^(k-1)) [MOD p]
-      -- a8 ≡ a^2 [MOD p], so res ≡ (a^2)^(2^(k-1)) = a^(2^k) [MOD p]
-      have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
-        sorry
-      simp only [eqk] at res_post_1
-      have hpow := Nat.ModEq.pow (2^(k-1)) hsq
-      apply Nat.ModEq.trans res_post_1 hpow |>.trans
-      rw [← pow_mul]
-      have hk_pos : k ≥ 1 := by omega
-      have h2k : 2 * 2 ^ (k - 1) = 2 ^ k := by
-        conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
-      rw [h2k]
-    · assumption
-
-    -/
   termination_by k'.val
   decreasing_by scalar_decr_tac
 
+/-  Commented out while working on loop spec
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -775,5 +766,6 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
   progress as ⟨ a, hmod, hbounds ⟩ -- pow2k_loop
   simp only [show k.val ≠ 0 by omega] at hbounds
   exact ⟨hmod, hbounds⟩
+-/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
