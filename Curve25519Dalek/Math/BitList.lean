@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -7,11 +7,9 @@ import Curve25519Dalek.Math.Basic
 
 /-! # List Bool bit manipulation infrastructure
 
-Definitions and lemmas for reasoning about bit-level operations using `List Bool`.
-The key idea is that bitwise operations like shifts and masks correspond to simple
-list operations (`List.drop`, `List.take`, `List.extract`).
-
-## Convention
+Definitions and lemmas for reasoning about bit-level operations using `List Bool`. The key idea is
+that bitwise operations like shifts and masks correspond to simple list operations (`List.drop`,
+`List.take`, `List.extract`).
 
 All bit lists are **LSB-first**: the head of the list is bit 0 (least significant).
 -/
@@ -32,14 +30,14 @@ def toNat : List Bool → Nat
   | [] => 0
   | b :: bs => b.toNat + 2 * toNat bs
 
-/-- Convert a natural number to a fixed-width bit list (LSB-first).
-    `ofNat 4 5 = [true, false, true, false]` -/
+/-- Convert a natural number to a fixed-width bit list (LSB-first). `ofNat w n` encodes `n` as a bit
+list of width `w`. E.g., `ofNat 4 5 = [true, false, true, false]`. -/
 def ofNat : Nat → Nat → List Bool
   | 0, _ => []
   | w + 1, n => (n % 2 == 1) :: ofNat w (n / 2)
 
 /-- Two bit lists are equivalent if they agree at every position, treating out-of-bounds positions
-as `false`. I.e., "same numeric value, possibly different widths". -/
+as `false`. I.e., same numeric value, possibly different widths. -/
 def Equiv (bs₁ bs₂ : List Bool) : Prop :=
   ∀ i : Nat, bs₁.getD i false = bs₂.getD i false
 
@@ -53,8 +51,7 @@ def ofU8 (x : U8) : List Bool := ofNat 8 x.val
 /-- 64-bit LSB-first representation of a U64 value. -/
 def ofU64 (x : U64) : List Bool := ofNat 64 x.val
 
-/-- Convert a list of bytes to a flat bit list (LSB-first within each byte,
-    bytes in list order). -/
+/-- Convert a list of bytes to a flat bit list (LSB-first within each byte, bytes in list order). -/
 def ofByteList (bytes : List U8) : List Bool :=
   (bytes.map ofU8).flatten
 
@@ -102,10 +99,10 @@ private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
         toNat bs = (bs.getD 0 false).toNat + 2 * toNat (bs.drop 1) := by
       intro bs; cases bs <;> simp [toNat, getD]
     rw [step bs₁, step bs₂, heq 0]
-    have hdrop : toNat (bs₁.drop 1) = toNat (bs₂.drop 1) := by
+    have : toNat (bs₁.drop 1) = toNat (bs₂.drop 1) := by
       apply ih
-      · simp only [length_drop]; omega
-      · simp only [length_drop]; omega
+      · grind [length_drop]
+      · grind [length_drop]
       · intro i; simp only [getD_drop_one]; exact heq (i + 1)
     omega
 
@@ -145,7 +142,6 @@ theorem Equiv.extract (h : bs₁ ≈ₗ bs₂) (start stop : Nat) :
 
 attribute [grind =] List.drop_take List.drop_drop List.take_take
 
-
 @[grind →]
 theorem Equiv.trans_take {m n : Nat}
     (h1 : bs₁ ≈ₗ bs₂.take m) (h2 : bs₂ ≈ₗ bs₃.take n) :
@@ -163,7 +159,6 @@ theorem Equiv.trans_take_drop {m n : Nat}
     (h1 : bs₁ ≈ₗ bs₂.take m) (h2 : bs₂ ≈ₗ bs₃.drop n) :
     bs₁ ≈ₗ (bs₃.drop n).take m :=
   h1.trans (h2.take m)
-
 
 /-! ## Length lemmas -/
 
@@ -274,7 +269,7 @@ theorem ofByteList_cons (x : U8) (xs : List U8) :
     ofByteList (x :: xs) = ofU8 x ++ ofByteList xs := by
   simp [ofByteList]
 
-/-- Extracting 8-aligned bits from a byte list = extracting the corresponding bytes. -/
+/-- Extracting 8-aligned bits from a byte list equal to extracting the corresponding bytes. -/
 private theorem flatten_drop_uniform {α : Type} (xss : List (List α)) (k i : Nat)
     (hunif : ∀ xs ∈ xss, xs.length = k) :
     (xss.flatten).drop (k * i) = (xss.drop i).flatten := by
@@ -285,11 +280,11 @@ private theorem flatten_drop_uniform {α : Type} (xss : List (List α)) (k i : N
     | nil => simp
     | cons xs xss =>
       simp only [flatten_cons, drop_succ_cons]
-      have hlen : xs.length = k := hunif xs (by simp)
-      rw [show k * (i + 1) = xs.length + k * i from by rw [hlen]; ring]
-      rw [drop_append, drop_eq_nil_of_le (by omega)]
-      simp only [add_tsub_cancel_left, nil_append]
-      exact ih xss (fun ys hy => hunif ys (by simp [hy]))
+      have : xs.length = k := hunif xs (by simp)
+      have : k * (i + 1) = xs.length + k * i := by rw [this]; ring
+      rw [this, drop_append, drop_eq_nil_of_le (by omega)]
+      simpa [add_tsub_cancel_left, nil_append] using
+        ih xss (fun ys hy => hunif ys (by simp [hy]))
 
 private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : Nat)
     (hunif : ∀ xs ∈ xss, xs.length = k) :
@@ -300,30 +295,23 @@ private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : N
     cases xss with
     | nil => simp
     | cons xs xss =>
-      simp only [flatten_cons, take_succ_cons]
-      have hlen : xs.length = k := hunif xs (by simp)
-      rw [show k * (n + 1) = xs.length + k * n from by rw [hlen]; ring]
-      rw [take_append, take_of_length_le (by omega)]
-      simp only [add_tsub_cancel_left, append_cancel_left_eq]
-      exact ih xss (fun ys hy => hunif ys (by simp [hy]))
+      have : xs.length = k := hunif xs (by simp)
+      have : k * (n + 1) = xs.length + k * n := by rw [this]; ring
+      simpa [this, take_append, take_of_length_le] using
+        ih xss (fun ys hy => hunif ys (by simp [hy]))
 
-theorem ofByteList_extract (bytes : List U8) (i j : Nat)
-    (_ : j ≤ bytes.length) :
-    (ofByteList bytes).extract (8 * i) (8 * j) =
-      ofByteList (bytes.extract i j) := by
+theorem ofByteList_extract (bytes : List U8) (i j : Nat) (_ : j ≤ bytes.length) :
+    (ofByteList bytes).extract (8 * i) (8 * j) = ofByteList (bytes.extract i j) := by
   simp only [extract_eq_drop_take, ofByteList]
   have hunif : ∀ xs ∈ (bytes.map ofU8), xs.length = 8 := by
-    intro xs hxs
+    intro _ hxs
     rw [mem_map] at hxs
     obtain ⟨x, _, rfl⟩ := hxs
     exact ofU8_length x
   rw [show 8 * j - 8 * i = 8 * (j - i) from by omega]
   rw [flatten_drop_uniform _ 8 i hunif]
-  rw [flatten_take_uniform _ 8 (j - i) (by
-    intro xs hxs
-    exact hunif xs (mem_of_mem_drop hxs))]
-  congr 1
-  rw [← map_drop, ← map_take]
+  rw [flatten_take_uniform _ 8 (j - i) (by intro xs hxs; exact hunif xs (mem_of_mem_drop hxs))]
+  grind [map_drop, map_take]
 
 /-! ## Round-trip and bridge lemmas (connecting to Nat) -/
 
@@ -336,12 +324,8 @@ theorem toNat_ofNat (w n : Nat) (h : n < 2 ^ w) : toNat (ofNat w n) = n := by
   induction w generalizing n with
   | zero => simp [ofNat, toNat]; omega
   | succ w ih =>
-    simp only [ofNat, toNat]
-    have hd : n / 2 < 2 ^ w := by
-      rw [Nat.div_lt_iff_lt_mul (by norm_num : 0 < 2)]
-      calc n < 2 ^ (w + 1) := h
-        _ = 2 ^ w * 2 := by ring
-    rw [ih _ hd]
+    have hd : n / 2 < 2 ^ w := by grind
+    simp only [ofNat, toNat, ih _ hd]
     exact beq_one_toNat n
 
 theorem toNat_ofU8 (x : U8) : toNat (ofU8 x) = x.val :=
