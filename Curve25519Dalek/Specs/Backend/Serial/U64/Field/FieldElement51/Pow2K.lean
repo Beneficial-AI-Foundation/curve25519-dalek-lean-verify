@@ -432,7 +432,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   unfold pow2k_loop
   have : k' > 0#u32 := by scalar_tac
   simp only [this, reduceIte, progress_simps]
-  -- Progress through the loop body to the first halt point, name only c0 c1 c2 c3 c4
+  -- Progress through the loop body to the 1st halt point, name only c0 c1 c2 c3 c4
   iterate 12 progress
   let* ⟨ c0, _ ⟩ ← U128.add_spec
   iterate 5 progress
@@ -443,6 +443,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   let* ⟨ c3, _ ⟩ ← U128.add_spec
   iterate 5 progress
   let* ⟨ c4, _ ⟩ ← U128.add_spec
+  -- We are at the 1st halt point
 
   /-
   Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
@@ -480,14 +481,13 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   -- clear everything except what we have just proven
   clear * - hk ha a_pow_two hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
 
-  sorry
-  /-
+  -- Continue to the 2nd halt point
   let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
   let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c11, c11_post ⟩ ← U128.add_spec
   let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
-  progress
+  progress with pow2k.LOW_51_BIT_MASK_spec
   let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a1, a1_post ⟩ ← Array.update_spec
   let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -508,7 +508,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ c41, c41_post ⟩ ← U128.add_spec
-
   let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a4, a4_post ⟩ ← Array.update_spec
@@ -517,12 +516,13 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
   let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
   let* ⟨ a5, a5_post ⟩ ← Array.update_spec
+  -- We are at the 2nd halt point
 
   -- Stage 2: After carry propagation (l.532 of source code)
 
-  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0_bound
+  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
   have hc11_bound : c11.val < 2 ^ 115 := by sorry
-  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
+  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val (by grind)
   have hc21_bound : c21.val < 2 ^ 115 := by sorry
   have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
   have hc31_bound : c31.val < 2 ^ 115 := by sorry
@@ -578,19 +578,20 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
       Nat.shiftRight_eq_div_pow]
     omega
 
+  -- Continue until the end of the function
   let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
-  · sorry
   let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
   let* ⟨ i55, i55_post ⟩ ← U64.add_spec
-  · -- i54 < 2^51 (masked), i53 = 19*carry. By hcarry: sum < 2^64
-    sorry
   let* ⟨ a6, a6_post ⟩ ← Array.update_spec
   let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
   let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i59, i59_post ⟩ ← U64.add_spec
-  · -- i58 < 2^51 (masked), i57 = i55 >> 51 < 2^13 (since i55 < 2^64)
-    sorry
+  -- Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
+  apply spec_bind
+  · apply U64.add_spec
+    sorry  -- overflow side condition
+  intro i59 i59_post
+  -- let* ⟨ i59, i59_post ⟩ ← U64.add_spec
   let* ⟨ a7, a7_post ⟩ ← Array.update_spec
   let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
   let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
@@ -619,9 +620,9 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   -- The recursion: pow2k_loop (k-1) a8 where a8 is the squared result
   -- Base case (k=1): k1=0, next iteration returns immediately with ok a8
   -- Recursive case (k>1): k1>0, continues squaring
-  by_cases hk1 : k = 1
+  by_cases hk1 : k'.val = 1
   · -- k = 1 case: k1 = 0, so recursive call returns immediately
-    subst hk1
+    -- subst hk1
     have hk1_zero : ¬(k1 > 0#u32) := by scalar_tac
     unfold pow2k_loop
     simp only [hk1_zero, ↓reduceIte, progress_simps]
@@ -631,7 +632,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
     · -- Bounds: each limb < 2^52
       sorry
   · -- k > 1 case: k1 > 0, recursive call does more squaring
-    have hk1_pos : 0 < k - 1 := by omega
+    have hk1_pos : 0 < k'.val - 1 := by omega
     have ha8 : ∀ i < 5, a8[i]!.val < 2 ^ 54 := by sorry
     let* ⟨ res, res_post_1, res_post_2 ⟩ ← pow2k_loop_spec
     constructor
@@ -649,7 +650,6 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
       rw [h2k]
     · assumption
-  -/
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
