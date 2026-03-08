@@ -334,62 +334,26 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   have := ha 4 (by simp)
   have hk_gt : k' > 0#u32 := by scalar_tac
   simp only [hk_gt, reduceIte, progress_simps]
-  -- Now progress through the loop body
-  let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
-  let* ⟨ a3_19, a3_19_post ⟩ ← U64.mul_spec
-  let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
-  let* ⟨ a4_19, a4_19_post ⟩ ← U64.mul_spec
-  let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i3, i3_post ⟩ ← pow2k.m_spec
-  let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i5, i5_post ⟩ ← pow2k.m_spec
-  let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i7, i7_post ⟩ ← pow2k.m_spec
-  let* ⟨ i8, i8_post ⟩ ← U128.add_spec
-  let* ⟨ i9, i9_post ⟩ ← U128.mul_spec
-  let* ⟨ c0, c0_post ⟩ ← U128.add_spec
-  let* ⟨ i10, i10_post ⟩ ← pow2k.m_spec
-  let* ⟨ i11, i11_post ⟩ ← pow2k.m_spec
-  let* ⟨ i12, i12_post ⟩ ← pow2k.m_spec
-  let* ⟨ i13, i13_post ⟩ ← U128.add_spec
-  let* ⟨ i14, i14_post ⟩ ← U128.mul_spec
-  let* ⟨ c1, c1_post ⟩ ← U128.add_spec
-  let* ⟨ i15, i15_post ⟩ ← pow2k.m_spec
-  let* ⟨ i16, i16_post ⟩ ← pow2k.m_spec
-  let* ⟨ i17, i17_post ⟩ ← pow2k.m_spec
-  let* ⟨ i18, i18_post ⟩ ← U128.add_spec
-  let* ⟨ i19, i19_post ⟩ ← U128.mul_spec
-  let* ⟨ c2, c2_post ⟩ ← U128.add_spec
-  let* ⟨ i20, i20_post ⟩ ← pow2k.m_spec
-  let* ⟨ i21, i21_post ⟩ ← pow2k.m_spec
-  let* ⟨ i22, i22_post ⟩ ← pow2k.m_spec
-  let* ⟨ i23, i23_post ⟩ ← U128.add_spec
-  let* ⟨ i24, i24_post ⟩ ← U128.mul_spec
-  let* ⟨ c3, c3_post ⟩ ← U128.add_spec
-  let* ⟨ i25, i25_post ⟩ ← pow2k.m_spec
-  let* ⟨ i26, i26_post ⟩ ← pow2k.m_spec
-  let* ⟨ i27, i27_post ⟩ ← pow2k.m_spec
-  let* ⟨ i28, i28_post ⟩ ← U128.add_spec
-  let* ⟨ i29, i29_post ⟩ ← U128.mul_spec
-  let* ⟨ c4, c4_post ⟩ ← U128.add_spec
-
-  -- Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
+  -- Progress through the loop body to the first halt point
+  iterate 12 progress
+  let* ⟨ c0, _ ⟩ ← U128.add_spec
+  iterate 5 progress
+  let* ⟨ c1, _ ⟩ ← U128.add_spec
+  iterate 5 progress
+  let* ⟨ c2, _ ⟩ ← U128.add_spec
+  iterate 5 progress
+  let* ⟨ c3, _ ⟩ ← U128.add_spec
+  iterate 5 progress
+  let* ⟨ c4, _ ⟩ ← U128.add_spec
 
   /-
-  c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))
-    = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
+  Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
-  c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))
-    = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
-
-  c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))
-    = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
-
-  c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])
-    = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
-
-  c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])
-    = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
+  c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3])) = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
+  c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4])) = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
+  c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3])) = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
+  c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2]) = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
+  c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
   -/
 
   have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
@@ -403,19 +367,19 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
   have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
       (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp_all
 
-  -- Bounds on c0-c4
-  have hc0_bound : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> assumption
-  have hc1_bound : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> assumption
-  have hc2_bound : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> assumption
-  have hc3_bound : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> assumption
-  have hc4_bound : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> assumption
+  have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> assumption
+  have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> assumption
+  have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> assumption
+  have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> assumption
+  have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> assumption
 
   have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
       ≡ (Field51_as_Nat a)^2 [MOD p] := by
     have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
     simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
 
-  clear * - hc0 hc1 hc2 hc3 hc4 hc0_bound hc1_bound hc2_bound hc3_bound hc4_bound
+  -- clear everything except what we have just proven
+  clear * - hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4'
 
   sorry
   /-
@@ -591,7 +555,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize) (hk : 0 < k
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 54) :
-    pow2k self k ⦃ result =>
+    pow2k self k ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
