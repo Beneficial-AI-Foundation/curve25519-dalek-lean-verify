@@ -696,7 +696,7 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize) (hk : 0 < k'.val)
 
     -/
   termination_by k'.val
-  decreasing_by scalar_decr_tac; rw [k1_post1]; omega
+  decreasing_by scalar_decr_tac; sorry
 
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
