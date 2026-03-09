@@ -287,19 +287,15 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- From fe_post_2: (Field51_as_Nat fe + Field51_as_Nat FieldElement51.ONE) % p = Field51_as_Nat u % p
           have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
           rw [h_ONE] at fe_post_2
-          -- fe_post_2 : (Field51_as_Nat fe + 1) % p = Field51_as_Nat u % p
-          -- have hmod : Field51_as_Nat fe + 1 ≡ Field51_as_Nat u [MOD p] := by
-          --   exact Nat.ModEq.of_eq fe_post_2
-          -- have h22 :
-          --   ((Field51_as_Nat fe + 1) % p - 1 % p) % p =
-          --   (Field51_as_Nat u % p - 1 % p) % p := by
-          --   grind only
-
-          -- have h31 :
-          --   (Field51_as_Nat fe) % p =
-          --   (Field51_as_Nat u - 1) % p := by
-          --   sorry
-          sorry
+          have key : (Field51_as_Nat fe + 1 + (p - 1)) % p = (Field51_as_Nat u + (p - 1)) % p := by
+            rw [Nat.add_mod (Field51_as_Nat fe + 1), fe_post_2, ← Nat.add_mod]
+          have hleft : (Field51_as_Nat fe + 1 + (p - 1)) % p = Field51_as_Nat fe % p := by
+            have h : Field51_as_Nat fe + 1 + (p - 1) = Field51_as_Nat fe + p := by omega
+            rw [h, Nat.add_mod, Nat.mod_self, add_zero]
+            exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
+          have hright : (Field51_as_Nat u + (p - 1)) % p = (Field51_as_Nat u + p - 1) % p := by
+            grind only
+          rw [← hleft, key]; exact hright
 
         -- Step 6: Connect u to mp
         have h_u_eq : Field51_as_Nat u % p = U8x32_as_Nat mp % 2^255 % p := by
@@ -312,14 +308,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-              sorry
-                -- rw [Nat.mul_mod]
-                -- rw [h_affine_y]
-                -- rw [Nat.mul_mod]
-                -- have this: (U8x32_as_Nat mp % 2 ^ 255 + 1) % p % p = (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-                --   rw [Nat.mod_mod]
-                -- rw [this]
-                -- rw [← Nat.mul_mod]
+              simp only [Nat.mul_mod (Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv), h_affine_y]
+              simp [Nat.mul_mod]
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
