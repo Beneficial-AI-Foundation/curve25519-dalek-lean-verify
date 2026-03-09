@@ -145,110 +145,6 @@ end curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-/-- Bound for sum of two cross-products with 19x multipliers in squaring. -/
-lemma cross_product_bound (a1 a2 a3 a4 : ℕ)
-    (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a1 * (19 * a4) + a2 * (19 * a3) ≤ U128.max := by
-  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (38 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for 2 * (sum of two cross-products) -/
-lemma two_cross_product_bound (a1 a2 a3 a4 : ℕ)
-    (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    2 * (a1 * (19 * a4) + a2 * (19 * a3)) ≤ U128.max := by
-  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (76 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for c0 = a0² + 2*(cross products) -/
-lemma c0_bound (a0 a1 a2 a3 a4 : ℕ)
-    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) ≤ U128.max := by
-  have : a0 * a0 < 2 ^ 108 := by nlinarith
-  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (77 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for intermediate sum: a*b + c*(19*d) -/
-lemma intermediate_sum_bound (a b c d : ℕ)
-    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
-    a * b + c * (19 * d) ≤ U128.max := by
-  have : a * b < 2 ^ 108 := by nlinarith
-  have : c * (19 * d) < 19 * 2 ^ 108 := by nlinarith
-  have : (20 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for intermediate sum: a*b + c*d (no 19x factor) -/
-lemma intermediate_sum_bound' (a b c d : ℕ)
-    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
-    a * b + c * d ≤ U128.max := by
-  have : a * b < 2 ^ 108 := by nlinarith
-  have : c * d < 2 ^ 108 := by nlinarith
-  have : (2 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for 2 * intermediate sum: 2*(a*b + c*(19*d)) -/
-lemma two_intermediate_sum_bound (a b c d : ℕ)
-    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
-    2 * (a * b + c * (19 * d)) ≤ U128.max := by
-  have : a * b < 2 ^ 108 := by nlinarith
-  have : c * (19 * d) < 19 * 2 ^ 108 := by nlinarith
-  have : (40 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for 2 * intermediate sum: 2*(a*b + c*d) (no 19x factor) -/
-lemma two_intermediate_sum_bound' (a b c d : ℕ)
-    (ha : a < 2 ^ 54) (hb : b < 2 ^ 54) (hc : c < 2 ^ 54) (hd : d < 2 ^ 54) :
-    2 * (a * b + c * d) ≤ U128.max := by
-  have : a * b < 2 ^ 108 := by nlinarith
-  have : c * d < 2 ^ 108 := by nlinarith
-  have : (4 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for c1 = a3*(19*a3) + 2*(a0*a1 + a2*(19*a4)) -/
-lemma c1_bound (a0 a1 a2 a3 a4 : ℕ)
-    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) ≤ U128.max := by
-  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : a0 * a1 < 2 ^ 108 := by nlinarith
-  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : (59 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for c2 = a1² + 2*(a0*a2 + a4*(19*a3)) -/
-lemma c2_bound (a0 a1 a2 a3 a4 : ℕ)
-    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) ≤ U128.max := by
-  have : a1 * a1 < 2 ^ 108 := by nlinarith
-  have : a0 * a2 < 2 ^ 108 := by nlinarith
-  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
-  have : (41 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for c3 = a4*(19*a4) + 2*(a0*a3 + a1*a2) -/
-lemma c3_bound (a0 a1 a2 a3 a4 : ℕ)
-    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) ≤ U128.max := by
-  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
-  have : a0 * a3 < 2 ^ 108 := by nlinarith
-  have : a1 * a2 < 2 ^ 108 := by nlinarith
-  have : (23 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
-/-- Bound for c4 = a2² + 2*(a0*a4 + a1*a3) -/
-lemma c4_bound (a0 a1 a2 a3 a4 : ℕ)
-    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
-    a2 * a2 + 2 * (a0 * a4 + a1 * a3) ≤ U128.max := by
-  have : a2 * a2 < 2 ^ 108 := by nlinarith
-  have : a0 * a4 < 2 ^ 108 := by nlinarith
-  have : a1 * a3 < 2 ^ 108 := by nlinarith
-  have : (5 : ℕ) * 2 ^ 108 ≤ U128.max + 1 := by scalar_tac
-  omega
-
 /-! ### Bounds for carry chain (< 2^115)
 
 These bounds ensure that the carry from each intermediate value fits in U64 without truncation. -/
@@ -386,21 +282,14 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
   rw [this]
 
-/-- The final carry bound: if carry ≤ (2^64 - 2^51)/19 then 2^51 + 19*carry < 2^64. -/
-lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 19) :
-    2 ^ 51 + 19 * carry_val < 2 ^ 64 := by
-  have hle := Nat.mul_le_mul_right 19 h
-  have hdiv : 19 * ((2 ^ 64 - 2 ^ 51) / 19) ≤ 2 ^ 64 - 2 ^ 51 := Nat.mul_div_le _ _
-  omega
-
 set_option maxHeartbeats 2000000 in
 -- progress*
 @[progress]
-theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
+theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    pow2k_loop k' a ⦃ (result : Std.Array U64 5#usize) =>
-      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p] ∧
-      (if k'.val = 0 then result = a else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
+    pow2k_loop k a ⦃ (result : Std.Array U64 5#usize) =>
+      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧
+      (if k.val = 0 then result = a else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k_loop
   split
   case isTrue hlt =>
@@ -716,7 +605,7 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       hc31_bound hcarry3_fits hc41_bound hcarry4_fits
     -- Prove the post conditions
     constructor
-    · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p]
+    · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k.val) [MOD p]
       have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
         -- Strategy: show Field51_as_Nat a8 + carry.val * p = c0 + 2^51*c1 + ... + 2^204*c4
         -- Then conclude ModEq, and chain with a_pow_two.
@@ -769,15 +658,15 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       have hpow := Nat.ModEq.pow (2^k1.val) hsq
       apply Nat.ModEq.trans res_post_1 hpow |>.trans
       rw [← pow_mul]
-      have hk_pos : k'.val ≥ 1 := by omega
-      have : k1.val = k'.val - 1 := by scalar_tac
+      have hk_pos : k.val ≥ 1 := by omega
+      have : k1.val = k.val - 1 := by scalar_tac
       rw [this]
-      have h2k : 2 * 2 ^ (k'.val - 1) = 2 ^ k'.val := by
+      have h2k : 2 * 2 ^ (k.val - 1) = 2 ^ k.val := by
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
       rw [h2k]
-    · -- if k'.val = 0 then res = a else ∀ i < 5, res[i]!.val < 2^52
-      -- We're in isTrue case, so k'.val ≠ 0
-      simp only [show k'.val ≠ 0 by omega]
+    · -- if k.val = 0 then res = a else ∀ i < 5, res[i]!.val < 2^52
+      -- We're in isTrue case, so k.val ≠ 0
+      simp only [show k.val ≠ 0 by omega]
       -- res_post_2: if k1.val = 0 then res = a8 else ∀ i < 5, res[i]!.val < 2^52
       by_cases hk1 : k1.val = 0
       · -- k1 = 0: res = a8, need a8[i] < 2^52
@@ -788,11 +677,11 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
         simp only [hk1, ite_false] at res_post_2
         exact res_post_2
   case isFalse hge =>
-    -- k' = 0: return a unchanged
-    have hk0 : k'.val = 0 := by scalar_tac
+    -- k = 0: return a unchanged
+    have hk0 : k.val = 0 := by scalar_tac
     simp only [hk0, progress_simps]
     exact ⟨by simp [Nat.ModEq], by simp⟩
-  termination_by k'.val
+  termination_by k.val
   decreasing_by scalar_decr_tac
 
 @[progress]
