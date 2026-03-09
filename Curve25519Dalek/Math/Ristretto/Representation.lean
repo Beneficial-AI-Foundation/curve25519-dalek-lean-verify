@@ -174,6 +174,96 @@ lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 
     decide
   push_cast at this; exact this
 
+lemma compress_den_inv_cancel (P : Point Ed25519)
+    (hI : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1) :
+    compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2) = 1 := by
+  have h_curve : P.y ^ 2 - P.x ^ 2 = 1 + (↑d : ZMod p) * P.x ^ 2 * P.y ^ 2 := by
+    have := P.on_curve
+    simp only [Ed25519, neg_mul, one_mul] at this
+    linear_combination this
+  by_cases h_rot : compress_rotate P
+  · have hD : compress_den_inv P = compress_invsqrt P * compress_u1 P * invsqrt_a_minus_d := by
+      unfold compress_den_inv compress_den1
+      rw [if_pos h_rot]
+    have h_yprime : compress_y_prime P = P.x * sqrt_m1 := by
+      unfold compress_y_prime
+      rw [if_pos h_rot]
+    have h_yf_sq : compress_y_final P ^ 2 = -(P.x ^ 2) := by
+      unfold compress_y_final
+      rw [h_yprime]
+      split_ifs <;> (try rw [neg_sq]) <;>
+        rw [show (P.x * sqrt_m1) ^ 2 = P.x ^ 2 * sqrt_m1 ^ 2 from by ring, sqrt_m1_sq] <;> ring
+    have h_factor : compress_u1 P * (1 + P.x ^ 2) =
+        compress_u2 P ^ 2 * (a_val - (↑d : ZMod p)) := by
+      unfold compress_u1 compress_u2 a_val
+      linear_combination -h_curve
+    calc compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2)
+        = (compress_invsqrt P * compress_u1 P * invsqrt_a_minus_d) ^ 2 * (1 + P.x ^ 2) := by
+            rw [hD, h_yf_sq]
+            ring
+      _ = compress_invsqrt P ^ 2 * compress_u1 P *
+          (compress_u1 P * (1 + P.x ^ 2)) * invsqrt_a_minus_d ^ 2 := by ring
+      _ = compress_invsqrt P ^ 2 * compress_u1 P *
+          (compress_u2 P ^ 2 * (a_val - ↑d)) * invsqrt_a_minus_d ^ 2 := by rw [h_factor]
+      _ = (compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2)) *
+          (invsqrt_a_minus_d ^ 2 * (a_val - ↑d)) := by ring
+      _ = 1 := by
+          rw [hI, iad_sq]
+          simp
+  · have h_rot_false : compress_rotate P = false := by
+      revert h_rot
+      cases compress_rotate P <;> simp
+    have hD : compress_den_inv P = compress_invsqrt P * compress_u2 P := by
+      unfold compress_den_inv compress_den2
+      rw [h_rot_false, if_neg (by decide)]
+    have h_yprime : compress_y_prime P = P.y := by
+      unfold compress_y_prime
+      rw [h_rot_false, if_neg (by decide)]
+    have h_yf_sq : compress_y_final P ^ 2 = P.y ^ 2 := by
+      unfold compress_y_final
+      rw [h_yprime]
+      split_ifs <;> ring
+    have h_u1_eq : 1 - compress_y_final P ^ 2 = compress_u1 P := by
+      rw [h_yf_sq]
+      unfold compress_u1
+      ring
+    calc compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2)
+        = (compress_invsqrt P * compress_u2 P) ^ 2 * compress_u1 P := by
+            rw [hD, h_u1_eq]
+      _ = compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by ring
+      _ = 1 := hI
+
+lemma compress_x_prime_sq (P : Point Ed25519) :
+    compress_x_prime P ^ 2 = if compress_rotate P then -(P.y ^ 2) else P.x ^ 2 := by
+  unfold compress_x_prime
+  split_ifs with h
+  · rw [show (P.y * sqrt_m1) ^ 2 = P.y ^ 2 * sqrt_m1 ^ 2 from by ring, sqrt_m1_sq]
+    ring
+  · rfl
+
+lemma compress_y_final_sq (P : Point Ed25519) :
+    compress_y_final P ^ 2 = if compress_rotate P then -(P.x ^ 2) else P.y ^ 2 := by
+  unfold compress_y_final compress_y_prime
+  split_ifs <;> ring_nf <;> rw [sqrt_m1_sq] <;> ring
+
+lemma compress_canonical_on_curve (P : Point Ed25519) :
+    a_val * compress_x_prime P ^ 2 + compress_y_final P ^ 2 =
+      1 + (↑d : ZMod p) * compress_x_prime P ^ 2 * compress_y_final P ^ 2 := by
+  have h_curve : P.y ^ 2 - P.x ^ 2 = 1 + (↑d : ZMod p) * P.x ^ 2 * P.y ^ 2 := by
+    have := P.on_curve
+    simp only [Ed25519, neg_mul, one_mul] at this
+    linear_combination this
+  rw [compress_x_prime_sq, compress_y_final_sq]
+  dsimp only [a_val]
+  split_ifs <;> linear_combination h_curve
+
+lemma compress_canonical_eq (P : Point Ed25519) :
+    compress_x_prime P ^ 2 * (1 + (↑d : ZMod p) * compress_y_final P ^ 2) =
+      compress_y_final P ^ 2 - 1 := by
+  have h := compress_canonical_on_curve P
+  dsimp only [a_val] at h
+  linear_combination -h
+
 end PureIsogeny
 
 end curve25519_dalek.math
@@ -788,52 +878,9 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- Compression invsqrt: I² * (u1 * u2²) = 1
     have h_I_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
       unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_arg_sq h_degen
-    -- On-curve relation (rewritten with a = -1)
-    have h_curve : P.y ^ 2 - P.x ^ 2 = 1 + (↑d : ZMod p) * P.x ^ 2 * P.y ^ 2 := by
-      have := P.on_curve; simp only [Ed25519, neg_mul, one_mul] at this; linear_combination (this)
     -- KEY IDENTITY: D² · (1 - y_f²) = 1
-    have h_den_cancel : compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2) = 1 := by
-      by_cases h_rot : compress_rotate P
-      · -- Rotate case: D = I · u1 · iad, y_f² = -P.x²
-        have hD : compress_den_inv P = compress_invsqrt P * compress_u1 P * invsqrt_a_minus_d := by
-          unfold compress_den_inv compress_den1; rw [if_pos h_rot]
-        have h_yprime : compress_y_prime P = P.x * sqrt_m1 := by
-          unfold compress_y_prime; rw [if_pos h_rot]
-        have h_yf_sq : compress_y_final P ^ 2 = -(P.x ^ 2) := by
-          unfold compress_y_final; rw [h_yprime]
-          split_ifs <;> (try rw [neg_sq]) <;>
-            rw [show (P.x * sqrt_m1) ^ 2 = P.x ^ 2 * sqrt_m1 ^ 2 from by ring, sqrt_m1_sq] <;> ring
-        -- From curve: u1 · (1 + P.x²) = u2² · (a - d)
-        have h_factor : compress_u1 P * (1 + P.x ^ 2) =
-            compress_u2 P ^ 2 * (a_val - (↑d : ZMod p)) := by
-          unfold compress_u1 compress_u2 a_val
-          linear_combination -h_curve
-        calc compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2)
-            = (compress_invsqrt P * compress_u1 P * invsqrt_a_minus_d) ^ 2 * (1 + P.x ^ 2) := by
-              rw [hD, h_yf_sq]; ring
-          _ = compress_invsqrt P ^ 2 * compress_u1 P *
-              (compress_u1 P * (1 + P.x ^ 2)) * invsqrt_a_minus_d ^ 2 := by ring
-          _ = compress_invsqrt P ^ 2 * compress_u1 P *
-              (compress_u2 P ^ 2 * (a_val - ↑d)) * invsqrt_a_minus_d ^ 2 := by rw [h_factor]
-          _ = (compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2)) *
-              (invsqrt_a_minus_d ^ 2 * (a_val - ↑d)) := by ring
-          _ = 1 := by rw [h_I_sq, iad_sq, one_mul]
-      · -- No-rotate case: D = I · u2, y_f² = P.y²
-        have h_rot_false : compress_rotate P = false := by
-          revert h_rot; cases compress_rotate P <;> simp
-        have hD : compress_den_inv P = compress_invsqrt P * compress_u2 P := by
-          unfold compress_den_inv compress_den2; rw [h_rot_false, if_neg (by decide)]
-        have h_yprime : compress_y_prime P = P.y := by
-          unfold compress_y_prime; rw [h_rot_false, if_neg (by decide)]
-        have h_yf_sq : compress_y_final P ^ 2 = P.y ^ 2 := by
-          unfold compress_y_final; rw [h_yprime]; split_ifs <;> ring
-        have h_u1_eq : 1 - compress_y_final P ^ 2 = compress_u1 P := by
-          rw [h_yf_sq]; unfold compress_u1; ring
-        calc compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2)
-            = (compress_invsqrt P * compress_u2 P) ^ 2 * compress_u1 P := by
-              rw [hD, h_u1_eq]
-          _ = compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) := by ring
-          _ = 1 := h_I_sq
+    have h_den_cancel : compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2) = 1 :=
+      compress_den_inv_cancel P h_I_sq
     -- From h_den_cancel, derive the Mobius identity
     have h_sigma_sq := compress_s_sq P
     have h_mobius : compress_s P ^ 2 * (1 + compress_y_final P) = 1 - compress_y_final P := by
@@ -875,17 +922,9 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
       split_ifs <;> [exact mul_ne_zero h_py_ne h_sqrt_m1_ne; exact h_px_ne]
     -- compress_z_inv P = 1
     have h_z_inv_one : compress_z_inv P = 1 := compress_z_inv_eq_one P h_I_sq
-    -- Squared values: x'^2 and y_f^2 in terms of P.x^2 and P.y^2
-    have h_xprime_sq : x' ^ 2 = if compress_rotate P then -(P.y ^ 2) else P.x ^ 2 := by
-      simp only [hx'_def]; unfold compress_x_prime; split_ifs with h
-      · rw [show (P.y * sqrt_m1) ^ 2 = P.y ^ 2 * sqrt_m1 ^ 2 from by ring, sqrt_m1_sq]; ring
-      · rfl
-    have h_yfinal_sq : y_f ^ 2 = if compress_rotate P then -(P.x ^ 2) else P.y ^ 2 := by
-      simp only [hyf_def]; unfold compress_y_final compress_y_prime
-      split_ifs <;> ring_nf <;> rw [sqrt_m1_sq] <;> ring
     -- On-curve identity for canonical coordinates
     have h_can : x' ^ 2 * (1 + ↑d * y_f ^ 2) = y_f ^ 2 - 1 := by
-      rw [h_xprime_sq, h_yfinal_sq]; split_ifs <;> linear_combination -h_curve
+      simpa only [hx'_def, hyf_def] using compress_canonical_eq P
     -- y_f ≠ 0
     have h_yf_ne : y_f ≠ 0 := by
       simp only [hyf_def]; unfold compress_y_final compress_y_prime
@@ -1010,8 +1049,9 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- On-curve proof for the canonical point
     have h_on_curve : Ed25519.a * (abs_edwards x') ^ 2 + y_f ^ 2 =
         1 + Ed25519.d * (abs_edwards x') ^ 2 * y_f ^ 2 := by
-      rw [abs_edwards_sq]; change a_val * x' ^ 2 + y_f ^ 2 = 1 + ↑d * x' ^ 2 * y_f ^ 2
-      rw [h_xprime_sq, h_yfinal_sq]; dsimp only [a_val]; split_ifs <;> linear_combination h_curve
+      rw [abs_edwards_sq]
+      change a_val * x' ^ 2 + y_f ^ 2 = 1 + (↑d : ZMod p) * x' ^ 2 * y_f ^ 2
+      simpa only [hx'_def, hyf_def] using compress_canonical_on_curve P
     let pt_can : Point Ed25519 := ⟨abs_edwards x', y_f, h_on_curve⟩
     exact ⟨pt_can, decompress_step2_2 σ pt_can I_dec h_I_W h_neg_ok h_yf_ne hx_eq hy_eq⟩
 
