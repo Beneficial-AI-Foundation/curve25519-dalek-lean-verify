@@ -152,6 +152,19 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
         -- Step 2a: Relate y_bytes1 to y_bytes (modifying sign bit doesn't affect low 255 bits)
         have h_bytes_equiv : U8x32_as_Nat y_bytes1 % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p := by
           rw [y_bytes1_post]
+          have hb31 : (y_bytes).val[31]!.val < 128 := by
+            have h255 : U8x32_as_Nat y_bytes < 2^255 := by
+              have : p < 2^255 := by unfold p; norm_num
+              linarith [y_bytes_post_2]
+            have := high_bit_zero_of_lt_255 y_bytes h255
+            omega
+
+        -- 第二步：建立 i2.val 与 y_bytes[31]!.val 的关系
+
+        -- i.val ∈ {0, 128}（sign <<< 7 只有最高位）
+          have hi_cases : i.val = 0 ∨ i.val = 128 := by
+            sorry
+
           sorry
 
         -- Step 2b: Simplify % 2^255 using the fact that y_bytes < p < 2^255
