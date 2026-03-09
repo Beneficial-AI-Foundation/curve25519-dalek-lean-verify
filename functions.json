@@ -2735,7 +2735,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem INVSQRT_A_MINUS_D_spec :\n    INVSQRT_A_MINUS_D ⦃ result => (Field51_as_Nat result)^2 * (a - d) % p = 1 ⦄ := by ...",
+   "theorem INVSQRT_A_MINUS_D_spec :\n    INVSQRT_A_MINUS_D ⦃ result =>\n      (Field51_as_Nat result)^2 * (a - d) % p = 1 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/INVSQRT_A_MINUS_D.lean",
    "spec_docstring":
@@ -2936,7 +2936,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result => (Field51_as_Nat result)^2 % p = p - 1 ⦄ := by ...",
+   "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result =>\n      (Field51_as_Nat result)^2 % p = p - 1 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_M1.lean",
    "spec_docstring":
@@ -8694,7 +8694,7 @@
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :\n    compress self ⦃ (result : CompressedRistretto) =>\n      result.IsValid ∧\n      math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by ...",
