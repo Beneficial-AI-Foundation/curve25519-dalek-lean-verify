@@ -537,7 +537,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       a[2] = a5[2]     a[3] = a5[3]     a[4] = a5[4]
 
     Limb bounds (ha8_0_lt–ha8_4_lt):
-      a[0] < 2^51,  a[1] < 2^51 + 2^13,  a[2..4] < 2^51
+      a[i] < 2^52 for all i
     -/
     -- Conversion helper: index_usize result .val to getElem! .val
     have h54_val : i54.val = a5[0]!.val := by
@@ -583,9 +583,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
     -- Recursive call: pow2k_loop k1 a8
     -- With the updated spec (no hk precondition), progress handles both k1=0 and k1>0
-    -- Limb bounds for a8
-    have ha8_0_lt : a8[0]!.val < 2 ^ 51 := by rw [ha8_0]; exact Nat.mod_lt _ (by positivity)
-    have ha8_1_lt : a8[1]!.val < 2 ^ 51 + 2 ^ 13 := by
+    -- Limb bounds for a8: all < 2^52
+    have ha8_0_lt : a8[0]!.val < 2 ^ 52 := by
+      rw [ha8_0]; have := Nat.mod_lt (a5[0]!.val + 19 * carry.val) (show 0 < 2 ^ 51 by positivity); omega
+    have ha8_1_lt : a8[1]!.val < 2 ^ 52 := by
       rw [ha8_1, ha5_1]
       have hmod : c1'.val % 2 ^ 51 < 2 ^ 51 := Nat.mod_lt _ (by positivity)
       have hdiv : (a5[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by
@@ -595,9 +596,12 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         have : i55.val < 2 ^ 64 := by scalar_tac
         omega
       omega
-    have ha8_2_lt : a8[2]!.val < 2 ^ 51 := by rw [ha8_2, ha5_2]; exact Nat.mod_lt _ (by positivity)
-    have ha8_3_lt : a8[3]!.val < 2 ^ 51 := by rw [ha8_3, ha5_3]; exact Nat.mod_lt _ (by positivity)
-    have ha8_4_lt : a8[4]!.val < 2 ^ 51 := by rw [ha8_4, ha5_4]; exact Nat.mod_lt _ (by positivity)
+    have ha8_2_lt : a8[2]!.val < 2 ^ 52 := by
+      rw [ha8_2, ha5_2]; have := Nat.mod_lt c2'.val (show 0 < 2 ^ 51 by positivity); omega
+    have ha8_3_lt : a8[3]!.val < 2 ^ 52 := by
+      rw [ha8_3, ha5_3]; have := Nat.mod_lt c3'.val (show 0 < 2 ^ 51 by positivity); omega
+    have ha8_4_lt : a8[4]!.val < 2 ^ 52 := by
+      rw [ha8_4, ha5_4]; have := Nat.mod_lt c4'.val (show 0 < 2 ^ 51 by positivity); omega
     --
     progress as ⟨ res, res_post_1, res_post_2 ⟩
     · -- side condition: ∀ i < 5, a8[i]!.val < 2 ^ 54
