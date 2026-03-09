@@ -895,14 +895,14 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- Non-zero conditions from h_den_cancel
     have h_1_sub_yf_sq_ne : (1 : ZMod p) - y_f ^ 2 ≠ 0 :=
       right_ne_zero_of_mul_eq_one h_den_cancel
+    have h_1_sub_yf_sq_fact : (1 : ZMod p) - y_f ^ 2 = (1 - y_f) * (1 + y_f) := by
+      ring
     have h_1_plus_yf_ne : (1 : ZMod p) + y_f ≠ 0 := by
       intro h; apply h_1_sub_yf_sq_ne
-      have : (1 : ZMod p) - y_f ^ 2 = (1 - y_f) * (1 + y_f) := by ring
-      rw [this, h, mul_zero]
+      rw [h_1_sub_yf_sq_fact, h, mul_zero]
     have h_1_sub_yf_ne : (1 : ZMod p) - y_f ≠ 0 := by
       intro h; apply h_1_sub_yf_sq_ne
-      have : (1 : ZMod p) - y_f ^ 2 = (1 - y_f) * (1 + y_f) := by ring
-      rw [this, h, zero_mul]
+      rw [h_1_sub_yf_sq_fact, h, zero_mul]
     have h_den_inv_ne : compress_den_inv P ≠ 0 := by
       intro h; rw [h, zero_pow (by omega : 2 ≠ 0), zero_mul] at h_den_cancel
       exact zero_ne_one h_den_cancel
@@ -910,10 +910,10 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
       intro h; rw [h, zero_pow (by omega : 2 ≠ 0)] at h_sigma_sq
       exact (mul_ne_zero (pow_ne_zero 2 h_den_inv_ne) (pow_ne_zero 2 h_1_sub_yf_ne))
         h_sigma_sq.symm
-    have h_px_ne : P.x ≠ 0 := by
-      intro h; exact h_u2_ne (by unfold compress_u2; rw [h, zero_mul])
-    have h_py_ne : P.y ≠ 0 := by
-      intro h; exact h_u2_ne (by unfold compress_u2; rw [h, mul_zero])
+    have h_xy_ne : P.x * P.y ≠ 0 := by
+      simpa only [compress_u2] using h_u2_ne
+    have h_px_ne : P.x ≠ 0 := left_ne_zero_of_mul h_xy_ne
+    have h_py_ne : P.y ≠ 0 := right_ne_zero_of_mul h_xy_ne
     have h_sqrt_m1_ne : (sqrt_m1 : ZMod p) ≠ 0 := by
       intro h; have hsm := sqrt_m1_sq; rw [h, zero_pow (by omega : 2 ≠ 0)] at hsm
       exact (neg_ne_zero.mpr one_ne_zero) hsm.symm
@@ -936,6 +936,9 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- Mobius reformulation: y_f * u2_dec = u1_dec
     have h_yf_u2 : y_f * (1 - a_val * σ ^ 2) = 1 + a_val * σ ^ 2 := by
       unfold a_val; linear_combination h_mobius
+    have h_u2_dec_scale : (1 - a_val * σ ^ 2) * (1 + y_f) = 2 := by
+      unfold a_val
+      linear_combination h_mobius
     -- Key identity: x'^2 * v_dec = 4 * σ^2
     -- (proved by clearing (1+y_f)^2 denominator using h_mobius + h_can)
     have h_xsq_v : x' ^ 2 * (a_val * ↑d * (1 + a_val * σ ^ 2) ^ 2 -
@@ -943,13 +946,11 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
       apply mul_right_cancel₀ (pow_ne_zero 2 h_1_plus_yf_ne)
       have h1 : (1 + a_val * σ ^ 2) * (1 + y_f) = 2 * y_f := by
         unfold a_val; linear_combination -h_mobius
-      have h2 : (1 - a_val * σ ^ 2) * (1 + y_f) = 2 := by
-        unfold a_val; linear_combination h_mobius
       have h_lhs : x' ^ 2 * (a_val * ↑d * (1 + a_val * σ ^ 2) ^ 2 -
           (1 - a_val * σ ^ 2) ^ 2) * (1 + y_f) ^ 2 =
           x' ^ 2 * (a_val * ↑d * ((1 + a_val * σ ^ 2) * (1 + y_f)) ^ 2 -
           ((1 - a_val * σ ^ 2) * (1 + y_f)) ^ 2) := by ring
-      rw [h_lhs, h1, h2]
+      rw [h_lhs, h1, h_u2_dec_scale]
       have h_rhs : 4 * σ ^ 2 * (1 + y_f) ^ 2 = 4 * (1 - y_f) * (1 + y_f) := by
         linear_combination 4 * (1 + y_f) * h_mobius
       rw [h_rhs]; unfold a_val
@@ -966,9 +967,8 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
       exact mul_ne_zero h2_ne h_sigma_ne (sq_eq_zero_iff.mp this)
     have h_u2_dec_ne : (1 - a_val * σ ^ 2 : ZMod p) ≠ 0 := by
       intro h
-      have : (1 - a_val * σ ^ 2) * (1 + y_f) = 2 := by
-        unfold a_val; linear_combination h_mobius
-      rw [h, zero_mul] at this; exact h2_ne this.symm
+      rw [h, zero_mul] at h_u2_dec_scale
+      exact h2_ne h_u2_dec_scale.symm
     have h_W_ne : W_dec ≠ 0 :=
       mul_ne_zero h_v_ne (pow_ne_zero 2 h_u2_dec_ne)
     have h_xsq_W : x' ^ 2 * W_dec = (2 * σ * (1 - a_val * σ ^ 2)) ^ 2 := by
