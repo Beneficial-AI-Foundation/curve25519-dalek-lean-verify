@@ -306,13 +306,20 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     let* ⟨ c4, _ ⟩ ← U128.add_spec
     -- Arrived at the 1st halt point
     /-
-    Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
+    Stage 1: The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
-    c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3])) = a[0]² + 38·(a[1]·a[4] + a[2]·a[3])
-    c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4])) = 19·a[3]² + 2·a[0]·a[1] + 38·a[2]·a[4]
-    c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3])) = a[1]² + 2·a[0]·a[2] + 38·a[3]·a[4]
-    c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2]) = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
-    c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
+    Values (hc0-hc4):
+      c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))
+      c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))
+      c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))
+      c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])
+      c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])
+
+    Bounds (hc0'-hc4'):
+      c0.val < 2^115, ..., c4.val < 2^115
+
+    Algebraic identity (a_pow_two):
+      c0 + 2^51·c1 + 2^102·c2 + 2^153·c3 + 2^204·c4 ≡ (Field51_as_Nat a)² [MOD p]
     -/
     subst_vars
     have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
