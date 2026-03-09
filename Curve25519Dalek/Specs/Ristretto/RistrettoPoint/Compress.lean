@@ -106,6 +106,78 @@ private lemma bridge_cond {a b c : FieldElement51} {flag : subtle.Choice}
     a.toField = if flag.val = 1#u8 then b.toField else c.toField := by
   unfold FieldElement51.toField; rw [bridge_cond_nat h]; split <;> rfl
 
+private lemma flag_eq_true_iff_is_negative_of_val {flag : subtle.Choice} {n : Nat} {x : ZMod p}
+    (hflag : flag.val = 1#u8 ↔ n % 2 = 1) (hx : n = x.val) :
+    flag.val = 1#u8 ↔ is_negative x = true := by
+  refine ⟨?_, ?_ ⟩
+  · intro hf
+    unfold is_negative
+    rw [beq_iff_eq, ← hx]; exact hflag.mp hf
+  · intro hneg
+    exact hflag.mpr (by
+      unfold is_negative at hneg; rw [beq_iff_eq] at hneg; rwa [← hx] at hneg)
+
+private lemma flag_eq_true_iff_is_negative_of_neg_val
+    {flag : subtle.Choice} {n : Nat} {x : ZMod p}
+    (hflag : flag.val = 1#u8 ↔ n % 2 = 1) (hx : n = (-x).val) (hx_ne : x ≠ 0) :
+    flag.val = 1#u8 ↔ is_negative x = false := by
+  constructor
+  · intro hf
+    unfold is_negative
+    rw [beq_eq_false_iff_ne]
+    have hxlt : x.val < p := x.val_lt
+    have hxv_ne : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv_ne
+    have hp_odd : p % 2 = 1 := by decide
+    have hneg : (-x).val % 2 = 1 := by
+      have : n % 2 = 1 := hflag.mp hf; rwa [hx] at this
+    rw [ZMod.neg_val, if_neg hx_ne] at hneg
+    exact fun h => by omega
+  · intro hneg
+    have hxlt : x.val < p := x.val_lt
+    have hxv_ne : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv_ne
+    have hp_odd : p % 2 = 1 := by decide
+    apply hflag.mpr
+    unfold is_negative at hneg
+    rw [beq_eq_false_iff_ne] at hneg
+    rw [hx, ZMod.neg_val, if_neg hx_ne]
+    omega
+
+private lemma cond_neg_scale_of_flag_match (Z y x : ZMod p) (flag : subtle.Choice)
+    (hflag : flag.val = 1#u8 ↔ is_negative x = true) :
+    (if flag.val = 1#u8 then -(Z * y) else Z * y) =
+      Z * (if is_negative x = true then -y else y) := by
+  cases hix : is_negative x with
+  | false =>
+      have hf : flag.val ≠ 1#u8 := by
+        intro hf
+        have : is_negative x = true := hflag.mp hf
+        rw [hix] at this
+        cases this
+      rw [if_neg hf, if_neg (by decide : ¬ false = true)]
+  | true =>
+      have hf : flag.val = 1#u8 := hflag.mpr hix
+      rw [if_pos hf, if_pos (by decide : true = true)]
+      ring
+
+private lemma cond_neg_scale_of_neg_flag_match (Z y x : ZMod p) (flag : subtle.Choice)
+    (hflag : flag.val = 1#u8 ↔ is_negative x = false) :
+    (if flag.val = 1#u8 then -(Z * -y) else Z * -y) =
+      Z * (if is_negative x = true then -y else y) := by
+  cases hix : is_negative x with
+  | false =>
+      have hf : flag.val = 1#u8 := hflag.mpr hix
+      rw [if_pos hf, if_neg (by decide : ¬ false = true)]
+      ring
+  | true =>
+      have hf : flag.val ≠ 1#u8 := by
+        intro hf
+        have : is_negative x = false := hflag.mp hf
+        rw [hix] at this
+        cases this
+      rw [if_neg hf, if_pos (by decide : true = true)]
+
 private lemma lift_fe_sq (fe : FieldElement51) (h : Field51_as_Nat fe ^ 2 % p = p - 1) :
     fe.toField ^ 2 = -1 := by
   unfold FieldElement51.toField
@@ -393,42 +465,22 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
             rcases h_fe_or with hfe | hfe
             · -- fe = sqrt_m1: direct value & parity match
               rw [hfe] at h_xzinv_val ⊢
-              by_cases hys : y_sign.val = 1#u8
-              · have : is_negative (P.y * sqrt_m1) = true := by
-                  unfold is_negative; rw [beq_iff_eq, ← h_xzinv_val]; exact y_sign_post.mp hys
-                rw [if_pos hys, this]; simp only [↓reduceIte, mul_neg, neg_inj]; ring
-              · have : is_negative (P.y * sqrt_m1) = false := by
-                  apply Bool.eq_false_iff.mpr; intro h_neg; apply hys
-                  exact y_sign_post.mpr (by
-                    unfold is_negative at h_neg; rw [beq_iff_eq, ← h_xzinv_val] at h_neg; exact h_neg)
-                rw [if_neg hys, this]; simp only [Bool.false_eq_true, ↓reduceIte]; ring
+              have h_sign_match : y_sign.val = 1#u8 ↔ is_negative (P.y * sqrt_m1) = true :=
+                flag_eq_true_iff_is_negative_of_val y_sign_post h_xzinv_val
+              simpa only [mul_assoc] using
+                cond_neg_scale_of_flag_match Z (P.x * sqrt_m1) (P.y * sqrt_m1) y_sign
+                  h_sign_match
             · -- fe = -sqrt_m1: parity flips, double negation compensates
               rw [hfe] at h_xzinv_val ⊢
               have h_pysm1_ne : P.y * sqrt_m1 ≠ 0 := mul_ne_zero h_py_ne h_sm1_ne
-              -- (-v).val % 2 ≠ v.val % 2 for v ≠ 0
-              have h_parity_flip : (P.y * -(sqrt_m1 : ZMod p)).val % 2 ≠ (P.y * sqrt_m1).val % 2 := by
-                rw [show P.y * -sqrt_m1 = -(P.y * sqrt_m1) from by ring,
-                    ZMod.neg_val, if_neg h_pysm1_ne]
-                have := (P.y * sqrt_m1).val_lt
-                have := Nat.pos_of_ne_zero (show (P.y * sqrt_m1).val ≠ 0 from by
-                  rwa [ne_eq, ZMod.val_eq_zero])
-                have : p % 2 = 1 := by decide
-                omega
-              by_cases hys : y_sign.val = 1#u8
-              · have h_par : Field51_as_Nat x_z_inv % p % 2 = 1 := y_sign_post.mp hys
-                have : (P.y * sqrt_m1).val % 2 = 0 := by
-                  rw [h_xzinv_val] at h_par; omega
-                have : is_negative (P.y * sqrt_m1) = false := by
-                  unfold is_negative; rw [beq_eq_false_iff_ne]; omega
-                rw [if_pos hys, this]; simp only [mul_neg, neg_neg, Bool.false_eq_true, ↓reduceIte]
-                ring
-              · have h_par : Field51_as_Nat x_z_inv % p % 2 ≠ 1 :=
-                  fun h => hys (y_sign_post.mpr h)
-                have : (P.y * sqrt_m1).val % 2 = 1 := by
-                  rw [h_xzinv_val] at h_par; omega
-                have : is_negative (P.y * sqrt_m1) = true := by
-                  unfold is_negative; rw [beq_iff_eq]; exact this
-                rw [if_neg hys, this]; simp only [mul_neg, ↓reduceIte, neg_inj]; ring
+              have h_xzinv_neg_val : Field51_as_Nat x_z_inv % p = (-(P.y * sqrt_m1)).val := by
+                rw [show P.y * -sqrt_m1 = -(P.y * sqrt_m1) from by ring] at h_xzinv_val
+                exact h_xzinv_val
+              have h_sign_match : y_sign.val = 1#u8 ↔ is_negative (P.y * sqrt_m1) = false :=
+                flag_eq_true_iff_is_negative_of_neg_val y_sign_post h_xzinv_neg_val h_pysm1_ne
+              simpa only [mul_assoc, mul_neg, neg_mul, neg_neg] using
+                cond_neg_scale_of_neg_flag_match Z (P.x * sqrt_m1) (P.y * sqrt_m1) y_sign
+                  h_sign_match
           · -- NO-ROTATE case: Y = self.Y, no fe involvement
             rw [hb_Y, if_neg hr, hY_scale,
                 compress_x_prime, if_neg (fun h => hr (h_rotate.mpr h)),
@@ -440,14 +492,9 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
                 linear_combination P.x * h_z_inv_mul
               have := congrArg ZMod.val this
               simp only [FieldElement51.toField, ZMod.val_natCast] at this; exact this
-            by_cases hys : y_sign.val = 1#u8
-            · have : is_negative P.x = true := by
-                unfold is_negative; rw [beq_iff_eq, ← h_xzinv_val]; exact y_sign_post.mp hys
-              rw [if_pos hys, this]; simp only [↓reduceIte, mul_neg]
-            · have : is_negative P.x = false := by
-                apply Bool.eq_false_iff.mpr; intro h_neg; apply hys
-                exact y_sign_post.mpr (by unfold is_negative at h_neg; rw [beq_iff_eq, ← h_xzinv_val] at h_neg; exact h_neg)
-              rw [if_neg hys, this]; simp only [Bool.false_eq_true, ↓reduceIte]
+            have h_sign_match : y_sign.val = 1#u8 ↔ is_negative P.x = true :=
+              flag_eq_true_iff_is_negative_of_val y_sign_post h_xzinv_val
+            simpa only [mul_assoc] using cond_neg_scale_of_flag_match Z P.y P.x y_sign h_sign_match
         have h_zmy_sq :
             (Z - Y1.toField) ^ 2 = Z ^ 2 * (1 - compress_y_final P) ^ 2 := by
           rw [h_Y1_proj]; ring
