@@ -70,7 +70,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             field.FieldElement51.invert ep.Z = ok Z_inv ∧
             let u := U8x32_as_Nat mp % 2^255
             let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p  -- Affine y = Y/Z
-            (y * ((u + 1) % p)) % p = ((u - 1) % p) % p)
+            (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p)
       ⦄ := by
 
   unfold to_edwards
@@ -283,11 +283,22 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           rw [h_expand, h_ONE]
 
         -- Step 5: Connect fe to u - 1
-        have h_fe_eq : Field51_as_Nat fe % p = (Field51_as_Nat u - 1) % p := by
+        have h_fe_eq : Field51_as_Nat fe % p = (Field51_as_Nat u + p - 1) % p := by
           -- From fe_post_2: (Field51_as_Nat fe + Field51_as_Nat FieldElement51.ONE) % p = Field51_as_Nat u % p
           have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
           rw [h_ONE] at fe_post_2
           -- fe_post_2 : (Field51_as_Nat fe + 1) % p = Field51_as_Nat u % p
+          -- have hmod : Field51_as_Nat fe + 1 ≡ Field51_as_Nat u [MOD p] := by
+          --   exact Nat.ModEq.of_eq fe_post_2
+          -- have h22 :
+          --   ((Field51_as_Nat fe + 1) % p - 1 % p) % p =
+          --   (Field51_as_Nat u % p - 1 % p) % p := by
+          --   grind only
+
+          -- have h31 :
+          --   (Field51_as_Nat fe) % p =
+          --   (Field51_as_Nat u - 1) % p := by
+          --   sorry
           sorry
 
         -- Step 6: Connect u to mp
@@ -313,13 +324,14 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
             = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-                rw [Nat.mul_mod]
-                rw [h_affine_y]
-                rw [Nat.mul_mod]
-                have this: (U8x32_as_Nat mp % 2 ^ 255 + 1) % p % p = (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-                  rw [Nat.mod_mod]
-                rw [this]
-                rw [← Nat.mul_mod]
+              sorry
+                -- rw [Nat.mul_mod]
+                -- rw [h_affine_y]
+                -- rw [Nat.mul_mod]
+                -- have this: (U8x32_as_Nat mp % 2 ^ 255 + 1) % p % p = (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
+                --   rw [Nat.mod_mod]
+                -- rw [this]
+                -- rw [← Nat.mul_mod]
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
@@ -378,17 +390,13 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 ring_nf
 
             -- Use fe = u - 1
-            _ = (Field51_as_Nat u - 1) % p := h_fe_eq
+            _ = (Field51_as_Nat u + p - 1) % p := h_fe_eq
 
-            -- Relate u to mp
-            _ = (U8x32_as_Nat mp % p - 1) % p := by
-                have h_u_modp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
-                  sorry
-                  -- grind only
-                  -- simpa [h_u_mod] using h_u_eq
-                sorry
-            _ = (U8x32_as_Nat mp % 2^ 255 - 1) % p := by
-              sorry
+            _ = (U8x32_as_Nat mp % 2^ 255 + p - 1) % p := by
+              have hp1 : 1 ≤ p := by decide
+              rw [Nat.add_sub_assoc hp1, Nat.add_sub_assoc hp1]
+              rw [Nat.add_mod (Field51_as_Nat u), Nat.add_mod (U8x32_as_Nat mp % 2 ^ 255),
+                  Nat.mod_eq_of_lt (show p - 1 < p from by omega), h_u_eq]
 
 
 end curve25519_dalek.montgomery.MontgomeryPoint
