@@ -1,12 +1,13 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Hoang Le Truong
+Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
+set_option linter.hashCommand false
 #setup_aeneas_simps
 
 /- # Spec Theorem for `FieldElement51::pow2k`
@@ -122,7 +123,6 @@ This function computes the 2^k-th power of the element.
     }
 ```
 
-
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -144,53 +144,6 @@ theorem LOW_51_BIT_MASK_spec :
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
-
--- /-- Compute the 5 limbs of a² (before carry propagation) using radix-2^51 squaring.
---     Uses the identity 2^255 ≡ 19 (mod p) to reduce overflow terms. -/
--- def compute_square_limbs (a : Array U64 5#usize) : Result (U128 × U128 × U128 × U128 × U128) := do
---   let a0 := a[0]!
---   let a1 := a[1]!
---   let a2 := a[2]!
---   let a3 := a[3]!
---   let a4 := a[4]!
---   let a3_19 ← 19#u64 * a3
---   let a4_19 ← 19#u64 * a4
---   -- c0 = a0² + 2*(a1*a4_19 + a2*a3_19)
---   let t0 ← pow2k.m a0 a0
---   let t1 ← pow2k.m a1 a4_19
---   let t2 ← pow2k.m a2 a3_19
---   let t3 ← t1 + t2
---   let t4 ← 2#u128 * t3
---   let c0 ← t0 + t4
---   -- c1 = a3*a3_19 + 2*(a0*a1 + a2*a4_19)
---   let t5 ← pow2k.m a3 a3_19
---   let t6 ← pow2k.m a0 a1
---   let t7 ← pow2k.m a2 a4_19
---   let t8 ← t6 + t7
---   let t9 ← 2#u128 * t8
---   let c1 ← t5 + t9
---   -- c2 = a1² + 2*(a0*a2 + a4*a3_19)
---   let t10 ← pow2k.m a1 a1
---   let t11 ← pow2k.m a0 a2
---   let t12 ← pow2k.m a4 a3_19
---   let t13 ← t11 + t12
---   let t14 ← 2#u128 * t13
---   let c2 ← t10 + t14
---   -- c3 = a4*a4_19 + 2*(a0*a3 + a1*a2)
---   let t15 ← pow2k.m a4 a4_19
---   let t16 ← pow2k.m a0 a3
---   let t17 ← pow2k.m a1 a2
---   let t18 ← t16 + t17
---   let t19 ← 2#u128 * t18
---   let c3 ← t15 + t19
---   -- c4 = a2² + 2*(a0*a4 + a1*a3)
---   let t20 ← pow2k.m a2 a2
---   let t21 ← pow2k.m a0 a4
---   let t22 ← pow2k.m a1 a3
---   let t23 ← t21 + t22
---   let t24 ← 2#u128 * t23
---   let c4 ← t20 + t24
---   ok (c0, c1, c2, c3, c4)
 
 /-- Bound for sum of two cross-products with 19x multipliers in squaring. -/
 lemma cross_product_bound (a1 a2 a3 a4 : ℕ)
@@ -433,9 +386,6 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
   rw [this]
 
--- @[local simp]
--- theorem shiftLeft_54 : 1 <<< 54 % U64.size = 2^54 := by scalar_tac
-
 /-- The final carry bound: if carry ≤ (2^64 - 2^51)/19 then 2^51 + 19*carry < 2^64. -/
 lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 19) :
     2 ^ 51 + 19 * carry_val < 2 ^ 64 := by
@@ -443,29 +393,8 @@ lemma carry_mul_bound (carry_val : ℕ) (h : carry_val ≤ (2 ^ 64 - 2 ^ 51) / 1
   have hdiv : 19 * ((2 ^ 64 - 2 ^ 51) / 19) ≤ 2 ^ 64 - 2 ^ 51 := Nat.mul_div_le _ _
   omega
 
-
--- /-- The square limbs represent a² in radix-2^51 form modulo p.
---     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 ≡ (Field51_as_Nat a)² [MOD p] -/
--- @[progress]
--- theorem compute_square_limbs_spec (a : Array U64 5#usize)
---     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
---     ∃ c0 c1 c2 c3 c4 : U128, compute_square_limbs a = ok (c0, c1, c2, c3, c4) ∧
---     (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
---       ≡ (Field51_as_Nat a)^2 [MOD p] := by
---   unfold compute_square_limbs
---   have := ha 0 (by simp)
---   have := ha 1 (by simp)
---   have := ha 2 (by simp)
---   have := ha 3 (by simp)
---   have := ha 4 (by simp)
---   progress*
---   have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
---   use c0; use c1; use c2; use c3; use c4
---   refine ⟨rfl, rfl, rfl, rfl, rfl, ?_⟩
---   simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
-
 set_option maxHeartbeats 2000000 in
--- progress* needs this
+-- progress*
 @[progress]
 theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -475,7 +404,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
   unfold pow2k_loop
   split
   case isTrue hlt =>
-
     -- Progress through the loop body to the 1st halt point, name only c0 c1 c2 c3 c4
     iterate 12 progress
     let* ⟨ c0, _ ⟩ ← U128.add_spec
@@ -488,7 +416,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     iterate 5 progress
     let* ⟨ c4, _ ⟩ ← U128.add_spec
     -- Arrived at the 1st halt point
-
     /-
     Stage 1:  The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
@@ -498,7 +425,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2]) = 19·a[4]² + 2·a[0]·a[3] + 2·a[1]·a[2]
     c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3]) = a[2]² + 2·a[0]·a[4] + 2·a[1]·a[3]
     -/
-
     subst_vars
     have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
         (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp [*]
@@ -510,18 +436,16 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
         (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
     have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
         (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
-
     have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> exact ha _ (by simp)
     have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> exact ha _ (by simp)
     have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> exact ha _ (by simp)
     have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> exact ha _ (by simp)
     have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> exact ha _ (by simp)
-
     have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
       simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
-
+    -- Clear everything we don't need
     -- NOTE: We can't use clear * - it kills the IH needed for recursion
     -- TODO: Find a convenient way to clear all the hypotheses which are no longer required
     rename_i wp0 eq0 wp1 eq1 wp2 eq2 wp3 eq3 wp4
@@ -530,7 +454,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       i25_post i26_post i27_post i28_post i29_post a3_19_post a4_19_post wp0 eq0 wp1 eq1 wp2 eq2 wp3
       eq3 wp4 i3 i5 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 i23 i24 i26
       i27 i28 a3_19 a4_19
-
     -- Continue to the 2nd halt point
     let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
     let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
@@ -567,10 +490,9 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
     let* ⟨ a5, a5_post ⟩ ← Array.update_spec
     -- We are at the 2nd halt point
-
-    -- Stage 2: After carry propagation (l.532 of source code)
-
     /-
+    Stage 2: After carry propagation (l.532 of source code)
+
     Define intermediate carry-propagated values:
     c1' = c1 + ⌈c0⌉₅₁
     c2' = c2 + ⌈c1'⌉₅₁
@@ -585,12 +507,9 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     a[4] = ⌊c4'⌋₅₁
     carry = ⌈c4'⌉₅₁
     -/
-
     -- Interleaved carry chain: each step needs the previous carry-fits bound for omega
     -- to eliminate the % 2^64 from the U128→U64→U128 cast chain.
-
     have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
-
     -- c11 = c1 + carry from c0
     have hc11' : c11.val = c1.val + c0.val / 2 ^ 51 := by
       simp only [c11_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
@@ -601,7 +520,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       rw [hc1]; exact c1_lt_tight _ _ _ _ _
         (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
     have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
-
     -- c21 = c2 + carry from c11
     have hc21' : c21.val = c2.val + c11.val / 2 ^ 51 := by
       simp only [c21_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
@@ -612,7 +530,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       rw [hc2]; exact c2_lt_tight _ _ _ _ _
         (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
     have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
-
     -- c31 = c3 + carry from c21
     have hc31' : c31.val = c3.val + c21.val / 2 ^ 51 := by
       simp only [c31_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
@@ -623,7 +540,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       rw [hc3]; exact c3_lt_tight _ _ _ _ _
         (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
     have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
-
     -- c41 = c4 + carry from c31
     have hc41' : c41.val = c4.val + c31.val / 2 ^ 51 := by
       simp only [c41_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
@@ -634,7 +550,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       rw [hc4]; exact c4_lt_tight _ _ _ _ _
         (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))
     have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
-
     -- Array values after carry propagation
     -- Each ha5_i traces: a5[i]! → chain of set operations → AND with mask → ci % 2^51
     -- Strategy: use set_of_ne_getElem! to peel through non-matching sets, set_of_eq at the match
@@ -673,7 +588,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
         Nat.shiftRight_eq_div_pow]
       omega
-
     -- Continue until the end of the function
     let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
     let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
@@ -703,10 +617,9 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
     let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
     let* ⟨ a8, a8_post ⟩ ← Array.update_spec
-
-    -- Stage 3: Final reduction (l.552 of source file)
-
     /-
+    Stage 3: Final reduction (l.552 of source file)
+
     Let the values from stage 2 be denoted with subscript ₂. Now we have:
     a[0] = ⌊a[0]₂ + 19·carry⌋₅₁
     a[1] = a[1]₂ + ⌈a[0]₂ + 19·carry⌉₅₁
@@ -714,7 +627,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
     a[3] = a[3]₂
     a[4] = a[4]₂
     -/
-
     -- Conversion helper: index_usize result .val to getElem! .val
     have h54_val : i54.val = a5[0]!.val := by
       simp [i54_post]
@@ -732,7 +644,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       simp [i60_post]
     have h58_val : i58.val = a6[1]!.val := by
       simp [i58_post]
-
     -- Array values after final reduction
     have ha8_0 : a8[0]!.val = (a5[0]!.val + 19 * carry.val) % 2 ^ 51 := by
       simp only [a8_post, Array.set_of_eq _ _ 0 (by scalar_tac)]
@@ -756,9 +667,8 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       simp only [a8_post, Array.set_of_ne_getElem! _ _ 4 0 (by scalar_tac) (by scalar_tac) (by omega)]
       simp only [a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by scalar_tac) (by scalar_tac) (by omega)]
       simp only [a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by scalar_tac) (by scalar_tac) (by omega)]
-
+    --
     let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
-
     -- Recursive call: pow2k_loop k1 a8
     -- With the updated spec (no hk precondition), progress handles both k1=0 and k1>0
     -- Limb bounds for a8
@@ -770,26 +680,46 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
         have heq : a5[0]!.val + 19 * carry.val = i55.val := by
           simp only [i55_post, h54_val, i53_post]; ring
         rw [heq]
-        have : i55.val < 2 ^ 64 := by
-          rw [h_i55]
-
-
-          sorry -- i55.val_lt
+        have : i55.val < 2 ^ 64 := by scalar_tac
         omega
       omega
     have ha8_2_lt : a8[2]!.val < 2 ^ 51 := by rw [ha8_2, ha5_2]; exact Nat.mod_lt _ (by positivity)
     have ha8_3_lt : a8[3]!.val < 2 ^ 51 := by rw [ha8_3, ha5_3]; exact Nat.mod_lt _ (by positivity)
     have ha8_4_lt : a8[4]!.val < 2 ^ 51 := by rw [ha8_4, ha5_4]; exact Nat.mod_lt _ (by positivity)
-
+    --
     progress as ⟨ res, res_post_1, res_post_2 ⟩
     · -- side condition: ∀ i < 5, a8[i]!.val < 2 ^ 54
       intro i hi; interval_cases i <;> omega
+    -- Clear everything no longer needed (stage 2+3 intermediates, postconditions, bounds)
+    clear
+      -- Stage 2 postconditions
+      i30_post_1 i30_post_2 i31_post i32_post c11_post i33_post
+      i34_post_1 i34_post_2 a1_post
+      i35_post_1 i35_post_2 i36_post i37_post c21_post
+      i38_post i39_post_1 i39_post_2 a2_post
+      i40_post_1 i40_post_2 i41_post i42_post c31_post
+      i43_post i44_post_1 i44_post_2 a3_post
+      i45_post_1 i45_post_2 i46_post i47_post c41_post
+      i48_post i49_post_1 i49_post_2 a4_post
+      i50_post_1 i50_post_2 carry_post
+      i51_post i52_post_1 i52_post_2 a5_post
+      -- Stage 3 postconditions
+      i53_post i54_post i55_post a6_post i56_post
+      i57_post_1 i57_post_2 i58_post i59_post a7_post
+      i60_post i61_post_1 i61_post_2 a8_post
+      -- Conversion helpers
+      h54_val h_i55 ha6_0 ha6_1 h56_val h_i57 h60_val h58_val
+      -- Derived bounds
+      hc0 hc1 hc2 hc3 hc4
+      hc0' hc1' hc2' hc3' hc4'
+      hcarry0_fits hc11_bound hcarry1_fits hc21_bound hcarry2_fits
+      hc31_bound hcarry3_fits hc41_bound hcarry4_fits
+    -- Prove the post conditions
     constructor
     · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p]
       have hsq : Field51_as_Nat a8 ≡ (Field51_as_Nat a)^2 [MOD p] := by
         -- Strategy: show Field51_as_Nat a8 + carry.val * p = c0 + 2^51*c1 + ... + 2^204*c4
         -- Then conclude ModEq, and chain with a_pow_two.
-
         -- Step A: Field51_as_Nat a8 = (a5[0]+19*carry) + 2^51*a5[1]+2^102*a5[2]+2^153*a5[3]+2^204*a5[4]
         have hf_a8 : Field51_as_Nat a8 =
             (a5[0]!.val + 19 * carry.val) + 2^51 * a5[1]!.val + 2^102 * a5[2]!.val +
@@ -799,7 +729,6 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
           rw [ha8_0, ha8_1, ha8_2, ha8_3, ha8_4]
           have := Nat.mod_add_div (a5[0]!.val + 19 * carry.val) (2 ^ 51)
           omega
-
         -- Step B: Carry chain conservation (step by step)
         have cc1 : c0.val + 2^51 * c1.val = a5[0]!.val + 2^51 * c11.val := by
           have := Nat.mod_add_div c0.val (2^51);
@@ -825,20 +754,17 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
         have h_chain : c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val =
             a5[0]!.val + 2^51 * a5[1]!.val + 2^102 * a5[2]!.val + 2^153 * a5[3]!.val + 2^204 * a5[4]!.val +
             2^255 * carry.val := by linarith
-
         -- Step C: Field51_as_Nat a8 + carry * p = c0 + ... + 2^204*c4
         have h_key : Field51_as_Nat a8 + carry.val * p =
             c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val := by
-          -- rw [hf_a8, h_chain];
-          -- unfold p; omega
-          sorry
-
-        -- Step D: Conclude ModEq
-        have h_mod : Nat.ModEq p (Field51_as_Nat a8)
-            (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val) := by
-          -- rw [Nat.modEq_iff_dvd' (by omega : Field51_as_Nat a8 ≤ _)]
-          -- exact ⟨carry.val, by omega⟩
-          sorry
+          rw [hf_a8, h_chain]; unfold p; omega
+        -- Step D: Conclude ModEq (from h_key: a8_nat + carry*p = c_sum)
+        set c_sum := c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val with hc_sum_def
+        have h_mod : Nat.ModEq p (Field51_as_Nat a8) c_sum := by
+          rw [Nat.ModEq]
+          have : Field51_as_Nat a8 % p = (Field51_as_Nat a8 + carry.val * p) % p :=
+            by rw [Nat.add_mul_mod_self_right]
+          rw [this, h_key]
         exact h_mod.trans a_pow_two
       have hpow := Nat.ModEq.pow (2^k1.val) hsq
       apply Nat.ModEq.trans res_post_1 hpow |>.trans
@@ -861,17 +787,14 @@ theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)
       · -- k1 ≠ 0: directly from recursive postcondition
         simp only [hk1, ite_false] at res_post_2
         exact res_post_2
-
   case isFalse hge =>
     -- k' = 0: return a unchanged
     have hk0 : k'.val = 0 := by scalar_tac
     simp only [hk0, progress_simps]
     exact ⟨by simp [Nat.ModEq], by simp⟩
-
   termination_by k'.val
   decreasing_by scalar_decr_tac
 
-/-  Commented out while working on loop spec
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -881,6 +804,5 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
   unfold pow2k
   progress*
   exact ⟨by assumption, by grind⟩
--/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
