@@ -307,18 +307,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- In Lean 4, ModEq unfolds to the equality we need
           exact u_post_1
 
-        -- have h_u_mod : U8x32_as_Nat mp % 2^255 % p = U8x32_as_Nat mp % p := by
-        --   -- mp is a MontgomeryPoint, which is Array U8 32
-        --   -- U8x32_as_Nat mp < 2^256, but we need < 2^255 for this to work
-        --   -- Actually, from_bytes masks to 2^255, so Field51_as_Nat u corresponds to mp % 2^255
-        --   -- obtain
-        --   have hlt : U8x32_as_Nat mp < 2^255 := by
-        --     sorry
-        --   have h_tmp: U8x32_as_Nat mp % 2^ 255 = U8x32_as_Nat mp := by
-        --     grind only [Nat.mod_eq_of_lt]
-        --   grind only
-          -- omega
-        -- sorry
         -- Step 7: Main calculation
         calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p
 
@@ -345,8 +333,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
                 have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := by
-                  sorry
-                  -- grind only
+                  exact h_u_eq
                 simp [h_mp, Nat.mul_mod, Nat.add_mod]
 
             -- Substitute u + 1 with fe1
@@ -357,7 +344,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 have := Nat.add_mod (Field51_as_Nat u) 1 p
               -- (u + 1) % p = (u % p + 1 % p) % p
                 simp at this
-              -- 得到 (u % p + 1) % p = (u + 1) % p
                 simp [h_fe1_eq]
 
               have h2 :
@@ -366,7 +352,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 =
               Field51_as_Nat fe * Field51_as_Nat fe2 *
                   (Field51_as_Nat fe1 % p) % p := by
-            -- 再整理 mod
                 simp [Nat.mul_mod]
                 grind only
               rw [Nat.mul_mod]
