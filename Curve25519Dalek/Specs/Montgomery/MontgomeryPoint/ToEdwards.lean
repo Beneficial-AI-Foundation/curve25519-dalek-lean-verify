@@ -245,16 +245,13 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 have hMINUS_ONE_val : Field51_as_Nat FieldElement51.MINUS_ONE = p - 1 :=
                   FieldElement51.MINUS_ONE_spec
                 grind only
-            -- have ⟨ub, hub_eq, hub_mod, hub_lt⟩ := spec_imp_exists (to_bytes_spec u)
             obtain ⟨ub, hub_eq, hub_rest⟩ := spec_imp_exists (to_bytes_spec u)
             obtain ⟨hub_mod, hub_lt⟩ := hub_rest
             obtain ⟨mb, hmb_eq, hmb_rest⟩ := spec_imp_exists (to_bytes_spec MINUS_ONE)
             obtain ⟨hmb_mod, hmb_lt⟩ := hmb_rest
-            -- goal: u.to_bytes = MINUS_ONE.to_bytes
             rw [hub_eq, hmb_eq]        -- goal: ok ub = ok mb
             simp only [ok.injEq]       -- goal: ub = mb
             apply U8x32_as_Nat_injective
-            -- goal: U8x32_as_Nat ub = U8x32_as_Nat mb
             have h_u_canon : U8x32_as_Nat ub = Field51_as_Nat u % p := by
               rw [← Nat.mod_eq_of_lt hub_lt]; exact hub_mod
             have h_m_canon : U8x32_as_Nat mb = Field51_as_Nat MINUS_ONE % p := by
