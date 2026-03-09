@@ -209,7 +209,11 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
               have hp : 0 < p := by decide
               have hlt : Field51_as_Nat u % p < p := Nat.mod_lt _ hp
               have h2 : Field51_as_Nat u % p + 1 = p := by
-                sorry
+                obtain h1modp: 1 % p = 1 := by decide
+                rw [h1modp] at h1
+                have hdvd : p ∣ (Field51_as_Nat u % p + 1) := Nat.dvd_of_mod_eq_zero h1
+                have hge : p ≤ Field51_as_Nat u % p + 1 := Nat.le_of_dvd (by omega) hdvd
+                omega
               have : Field51_as_Nat u % p = p - 1 := by
                 omega
               exact this
