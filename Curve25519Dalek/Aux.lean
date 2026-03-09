@@ -261,3 +261,35 @@ theorem double_cast_of_lt (x : ℕ) (hx : x < 2 ^ 64) :
 /-- Key lemma: when `c < 2^115`, the carry extraction `(c / 2^51) % 2^64` equals `c / 2^51` -/
 theorem carry_mod_eq (c : ℕ) (hc : c < 2 ^ 115) : (c / 2 ^ 51) % 2 ^ 64 = c / 2 ^ 51 := by
   exact Nat.mod_eq_of_lt (carry_fits_U64 c hc)
+
+/-! ## Bitwise OR equals addition for disjoint ranges -/
+
+/-- Nat.bit decomposition: every natural number is `bit (testBit 0) (n / 2)`. -/
+private lemma bit_decomp (a : Nat) : a = Nat.bit (a.testBit 0) (a / 2) := by
+  rw [Nat.testBit_zero]
+  unfold Nat.bit
+  have := Nat.div_add_mod a 2
+  rcases Nat.mod_two_eq_zero_or_one a with h | h <;> simp [h] <;> omega
+
+/-- OR of a value below `2^k` with a multiple of `2^k` equals their sum,
+    because the bit ranges are disjoint. -/
+lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
+    a ||| (b * 2 ^ k) = a + b * 2 ^ k := by
+  induction k generalizing a b with
+  | zero => simp at ha; subst ha; simp
+  | succ k ih =>
+    have ha_div : a / 2 < 2 ^ k := by
+      rw [Nat.div_lt_iff_lt_mul (by norm_num)]
+      linarith [show 2 ^ (k + 1) = 2 ^ k * 2 from by ring]
+    conv_lhs =>
+      rw [bit_decomp a,
+        show b * 2 ^ (k + 1) = Nat.bit false (b * 2 ^ k) from by
+          unfold Nat.bit; simp; ring]
+    rw [Nat.lor_bit, Bool.or_false, ih (a / 2) b ha_div]
+    unfold Nat.bit
+    have h2 : b * 2 ^ (k + 1) = 2 * (b * 2 ^ k) := by ring
+    have hmod := Nat.div_add_mod a 2
+    rw [h2]
+    rcases Nat.mod_two_eq_zero_or_one a with h | h
+    · rw [Nat.testBit_zero]; simp [h]; omega
+    · rw [Nat.testBit_zero]; simp [h]; omega
