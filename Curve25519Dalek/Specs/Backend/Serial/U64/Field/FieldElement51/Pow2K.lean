@@ -712,10 +712,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         simp only [hk1, ite_false] at res_post_2
         exact res_post_2
   case isFalse hge =>
-    -- k = 0: return a unchanged
+    progress*
     have hk0 : k.val = 0 := by scalar_tac
-    simp only [hk0, progress_simps]
-    exact ⟨by simp [Nat.ModEq], by simp⟩
+    simpa [hk0] using Nat.ModEq.trans rfl rfl
   termination_by k.val
   decreasing_by scalar_decr_tac
 
