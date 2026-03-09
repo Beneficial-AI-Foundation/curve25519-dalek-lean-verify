@@ -296,46 +296,45 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- In Lean 4, ModEq unfolds to the equality we need
           exact u_post_1
 
-        have h_u_mod : U8x32_as_Nat mp % 2^255 % p = U8x32_as_Nat mp % p := by
-          -- mp is a MontgomeryPoint, which is Array U8 32
-          -- U8x32_as_Nat mp < 2^256, but we need < 2^255 for this to work
-          -- Actually, from_bytes masks to 2^255, so Field51_as_Nat u corresponds to mp % 2^255
-          -- obtain
-          have hlt : U8x32_as_Nat mp < 2^255 := by
-            sorry
-          have h_tmp: U8x32_as_Nat mp % 2^ 255 = U8x32_as_Nat mp := by
-            grind only [Nat.mod_eq_of_lt]
-          grind only
+        -- have h_u_mod : U8x32_as_Nat mp % 2^255 % p = U8x32_as_Nat mp % p := by
+        --   -- mp is a MontgomeryPoint, which is Array U8 32
+        --   -- U8x32_as_Nat mp < 2^256, but we need < 2^255 for this to work
+        --   -- Actually, from_bytes masks to 2^255, so Field51_as_Nat u corresponds to mp % 2^255
+        --   -- obtain
+        --   have hlt : U8x32_as_Nat mp < 2^255 := by
+        --     sorry
+        --   have h_tmp: U8x32_as_Nat mp % 2^ 255 = U8x32_as_Nat mp := by
+        --     grind only [Nat.mod_eq_of_lt]
+        --   grind only
           -- omega
-
+        -- sorry
         -- Step 7: Main calculation
-        calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp + 1) % p
+        calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p
 
             -- Use h_Y to replace res_post_2.Y * Z_inv with y_val
-            = y_val * (U8x32_as_Nat mp + 1) % p := by
-                -- -- Apply Nat.mul_mod to decompose the modulo
+            = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
                 rw [Nat.mul_mod]
-                -- -- Now rewrite using h_affine_y
                 rw [h_affine_y]
                 rw [Nat.mul_mod]
-                have this: (U8x32_as_Nat mp + 1) % p % p = (U8x32_as_Nat mp + 1) % p := by
+                have this: (U8x32_as_Nat mp % 2 ^ 255 + 1) % p % p = (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
                   rw [Nat.mod_mod]
                 rw [this]
                 rw [← Nat.mul_mod]
 
             -- Use h_y_val_eq to replace y_val with (fe * fe2)
-            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp + 1) % p := by
+            _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
                 have h :
                   y_val % p = (Field51_as_Nat fe * Field51_as_Nat fe2) % p :=
                   h_y_val_eq
                 have :=
-                  congrArg (fun x => x * (U8x32_as_Nat mp + 1) % p) h
+                  congrArg (fun x => x * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p) h
 
                 simpa [Nat.mul_mod] using this
             -- Relate mp to u
             _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
-                have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
-                  grind only
+                have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := by
+                  sorry
+                  -- grind only
                 simp [h_mp, Nat.mul_mod, Nat.add_mod]
 
             -- Substitute u + 1 with fe1
@@ -384,10 +383,11 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             -- Relate u to mp
             _ = (U8x32_as_Nat mp % p - 1) % p := by
                 have h_u_modp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
-                  grind only
+                  sorry
+                  -- grind only
                   -- simpa [h_u_mod] using h_u_eq
                 sorry
-            _ = (U8x32_as_Nat mp - 1) % p := by
+            _ = (U8x32_as_Nat mp % 2^ 255 - 1) % p := by
               sorry
 
 
