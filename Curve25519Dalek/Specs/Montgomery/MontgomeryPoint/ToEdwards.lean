@@ -228,10 +228,19 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             Field51_as_Nat u =
             Field51_as_Nat FieldElement51.MINUS_ONE := by
             -- use IsValid bounds
-              sorry
-            -- final
-            -- simpa using
-            -- FieldElement51.to_bytes_injective h4
+                have hu_lt : Field51_as_Nat u < 2^255 := by
+                  simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.sum_range_zero]
+                  have h0 := u_post_2 0 (by norm_num)
+                  have h1 := u_post_2 1 (by norm_num)
+                  have h2' := u_post_2 2 (by norm_num)
+                  have h3' := u_post_2 3 (by norm_num)
+                  have h4' := u_post_2 4 (by norm_num)
+                  simp only [Array.getElem!_Nat_eq, Nat.zero_add] at *
+                  omega
+                have hp_val : p = 2^255 - 19 := by norm_num [p]
+                have hMINUS_ONE_val : Field51_as_Nat FieldElement51.MINUS_ONE = p - 1 :=
+                  FieldElement51.MINUS_ONE_spec
+                grind only
             sorry
 
           -- From h_eq_bytes and x_post, we get x = Choice.one
@@ -352,31 +361,12 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
 
             -- Relate u to mp
             _ = (U8x32_as_Nat mp % p - 1) % p := by
-                -- First establish that Field51_as_Nat u % p = U8x32_as_Nat mp % p
-                -- have h_u_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
-                --   sorry
-                -- Rewrite using the fact that (a - 1) % p depends on a % p
-                -- conv_lhs => arg 1; rw [Nat.sub_mod, h_u_mp]
-                -- rw [← Nat.sub_mod]
-
                 have h_u_modp : Field51_as_Nat u % p = U8x32_as_Nat mp % p := by
                   grind only
                   -- simpa [h_u_mod] using h_u_eq
                 sorry
             _ = (U8x32_as_Nat mp - 1) % p := by
               sorry
-              -- omega
-                -- have := Nat.mod_add_div (U8x32_as_Nat mp) p
-
-              -- set a := U8x32_as_Nat mp
-              -- have h : a ≡ a % p [MOD p] := Nat.mod_modEq a p
-              -- have h' : a - 1 ≡ a % p - 1 [MOD p] := by
-              --   -- simpa using h.sub_right 1
-              --   sorry
-              -- exact Nat.modEq_iff_eq_mod.mp h'
-              -- sorry
-                -- simp [this, Nat.add_comm, Nat.add_left_comm, Nat.add_assoc]
-              -- sorry
 
 
 end curve25519_dalek.montgomery.MontgomeryPoint
