@@ -16,6 +16,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
+-- import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
+
+
 -- import Mathlib.Data.Nat.Basic
 /-! # Spec Theorem for `MontgomeryPoint::to_edwards`
 
@@ -32,6 +35,7 @@ y = (u-1)/(u+1), followed by Edwards decompression with a specified sign bit.
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 open curve25519_dalek.backend.serial.u64.field
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 /-
 natural language description:
@@ -237,11 +241,26 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                   have h4' := u_post_2 4 (by norm_num)
                   simp only [Array.getElem!_Nat_eq, Nat.zero_add] at *
                   omega
-                have hp_val : p = 2^255 - 19 := by norm_num [p]
+                have hp_val : p = 2^255 - 19 := by rfl
                 have hMINUS_ONE_val : Field51_as_Nat FieldElement51.MINUS_ONE = p - 1 :=
                   FieldElement51.MINUS_ONE_spec
                 grind only
-            sorry
+            -- have ⟨ub, hub_eq, hub_mod, hub_lt⟩ := spec_imp_exists (to_bytes_spec u)
+            obtain ⟨ub, hub_eq, hub_rest⟩ := spec_imp_exists (to_bytes_spec u)
+            obtain ⟨hub_mod, hub_lt⟩ := hub_rest
+            obtain ⟨mb, hmb_eq, hmb_rest⟩ := spec_imp_exists (to_bytes_spec MINUS_ONE)
+            obtain ⟨hmb_mod, hmb_lt⟩ := hmb_rest
+            -- goal: u.to_bytes = MINUS_ONE.to_bytes
+            rw [hub_eq, hmb_eq]        -- goal: ok ub = ok mb
+            simp only [ok.injEq]       -- goal: ub = mb
+            apply U8x32_as_Nat_injective
+            -- goal: U8x32_as_Nat ub = U8x32_as_Nat mb
+            have h_u_canon : U8x32_as_Nat ub = Field51_as_Nat u % p := by
+              rw [← Nat.mod_eq_of_lt hub_lt]; exact hub_mod
+            have h_m_canon : U8x32_as_Nat mb = Field51_as_Nat MINUS_ONE % p := by
+              rw [← Nat.mod_eq_of_lt hmb_lt]; exact hmb_mod
+            rw [h_u_canon, h_m_canon, h4]
+
 
           -- From h_eq_bytes and x_post, we get x = Choice.one
           have h_x_one : x = Choice.one := x_post.mpr h_eq_bytes
