@@ -276,7 +276,7 @@ private lemma bit_decomp (a : Nat) : a = Nat.bit (a.testBit 0) (a / 2) := by
 lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     a ||| (b * 2 ^ k) = a + b * 2 ^ k := by
   induction k generalizing a b with
-  | zero => simp at ha; subst ha; simp
+  | zero => simp_all
   | succ k ih =>
     have ha_div : a / 2 < 2 ^ k := by
       rw [Nat.div_lt_iff_lt_mul (by norm_num)]
