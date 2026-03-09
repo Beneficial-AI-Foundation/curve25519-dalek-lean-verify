@@ -309,20 +309,19 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   unfold pow2k_loop
   split
   case isTrue hlt =>
-    -- Progress through the loop body to the 1st halt point, name only c0 c1 c2 c3 c4
+    -- Progress through the loop body to the 1st halt point, name c0 c1 c2 c3 c4
     iterate 12 progress
-    let* ⟨ c0, _ ⟩ ← U128.add_spec
+    progress as ⟨ c0, _ ⟩
     iterate 5 progress
-    let* ⟨ c1, _ ⟩ ← U128.add_spec
+    progress as ⟨ c1, _ ⟩
     iterate 5 progress
-    let* ⟨ c2, _ ⟩ ← U128.add_spec
+    progress as ⟨ c2, _ ⟩
     iterate 5 progress
-    let* ⟨ c3, _ ⟩ ← U128.add_spec
+    progress as ⟨ c3, _ ⟩
     iterate 5 progress
-    let* ⟨ c4, _ ⟩ ← U128.add_spec
-    -- Arrived at the 1st halt point
+    progress as ⟨ c4, _ ⟩
     /-
-    Stage 1: The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
+    Stage 1: The 5 intermediate products (c0-c4) have been computed
 
     Values (`hc0`-`hc4`):
       `c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))`
@@ -356,56 +355,48 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
-      -- Named list for speed
       simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
         Finset.sum_singleton, mul_zero, pow_zero, one_mul]
-    -- Clear everything we don't need
-    -- NOTE: We can't use clear * - it kills the IH needed for recursion
-    -- TODO: Find a convenient way to clear all the hypotheses which are no longer required
-    rename_i wp0 eq0 wp1 eq1 wp2 eq2 wp3 eq3 wp4
-    clear i3_post i5_post i7_post i8_post i9_post i10_post i11_post i12_post i13_post i14_post
-      i15_post i16_post i17_post i18_post i19_post i20_post i21_post i22_post i23_post i24_post
-      i25_post i26_post i27_post i28_post i29_post a3_19_post a4_19_post wp0 eq0 wp1 eq1 wp2 eq2 wp3
-      eq3 wp4 i3 i5 i7 i8 i9 i10 i11 i12 i13 i14 i15 i16 i17 i18 i19 i20 i21 i22 i23 i24 i26
-      i27 i28 a3_19 a4_19
+    -- Clear Stage 1 intermediates, keeping only what's needed going forward
+    clear * - pow2k_loop_spec k a ha hlt
+      c0 c1 c2 c3 c4 hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4' a_pow_two
     -- Continue to the 2nd halt point
-    let* ⟨ i30, i30_post_1, i30_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-    let* ⟨ i31, i31_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i32, i32_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ c1', c1'_post ⟩ ← U128.add_spec
-    let* ⟨ i33, i33_post ⟩ ← UScalar.cast.progress_spec
-    progress with pow2k.LOW_51_BIT_MASK_spec
-    let* ⟨ i34, i34_post_1, i34_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a1, a1_post ⟩ ← Array.update_spec
-    let* ⟨ i35, i35_post_1, i35_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-    let* ⟨ i36, i36_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i37, i37_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ c2', c2'_post ⟩ ← U128.add_spec
-    let* ⟨ i38, i38_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i39, i39_post_1, i39_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a2, a2_post ⟩ ← Array.update_spec
-    let* ⟨ i40, i40_post_1, i40_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-    let* ⟨ i41, i41_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i42, i42_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ c3', c3'_post ⟩ ← U128.add_spec
-    let* ⟨ i43, i43_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i44, i44_post_1, i44_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a3, a3_post ⟩ ← Array.update_spec
-    let* ⟨ i45, i45_post_1, i45_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-    let* ⟨ i46, i46_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i47, i47_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ c4', c4'_post ⟩ ← U128.add_spec
-    let* ⟨ i48, i48_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i49, i49_post_1, i49_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a4, a4_post ⟩ ← Array.update_spec
-    let* ⟨ i50, i50_post_1, i50_post_2 ⟩ ← U128.ShiftRight_IScalar_spec
-    let* ⟨ carry, carry_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i51, i51_post ⟩ ← UScalar.cast.progress_spec
-    let* ⟨ i52, i52_post_1, i52_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a', a'_post ⟩ ← Array.update_spec
-    -- We are at the 2nd halt point
+    progress as ⟨ _, i30_post_1, _ ⟩
+    progress as ⟨ _, i31_post ⟩
+    progress as ⟨ _, i32_post ⟩
+    progress as ⟨ c1', c1'_post ⟩
+    progress as ⟨ _, i33_post ⟩
+    progress as ⟨ _, mask_post ⟩
+    progress as ⟨ _, i34_post_1, _ ⟩
+    progress as ⟨ _, a1_post ⟩
+    progress as ⟨ _, i35_post_1, _ ⟩
+    progress as ⟨ _, i36_post ⟩
+    progress as ⟨ _, i37_post ⟩
+    progress as ⟨ c2', c2'_post ⟩
+    progress as ⟨ _, i38_post ⟩
+    progress as ⟨ _, i39_post_1, _ ⟩
+    progress as ⟨ _, a2_post ⟩
+    progress as ⟨ _, i40_post_1, _ ⟩
+    progress as ⟨ _, i41_post ⟩
+    progress as ⟨ _, i42_post ⟩
+    progress as ⟨ c3', c3'_post ⟩
+    progress as ⟨ _, i43_post ⟩
+    progress as ⟨ _, i44_post_1, _ ⟩
+    progress as ⟨ _, a3_post ⟩
+    progress as ⟨ _, i45_post_1, _ ⟩
+    progress as ⟨ _, i46_post ⟩
+    progress as ⟨ _, i47_post ⟩
+    progress as ⟨ c4', c4'_post ⟩
+    progress as ⟨ _, i48_post ⟩
+    progress as ⟨ _, i49_post_1, _ ⟩
+    progress as ⟨ _, a4_post ⟩
+    progress as ⟨ _, i50_post_1, _ ⟩
+    progress as ⟨ carry, carry_post ⟩
+    progress as ⟨ _, i51_post ⟩
+    progress as ⟨ _, i52_post_1, _ ⟩
+    progress as ⟨ a', a'_post ⟩
     /-
-    Stage 2: Carry propagation (Rust l.523–532)
+    Stage 2: Carry propagation
 
     The Rust code propagates carries through c1–c4:
     ```rust
@@ -516,17 +507,12 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         Nat.shiftRight_eq_div_pow]
       omega
     -- Clear Stage 2 postconditions
-    clear
-      i30_post_1 i30_post_2 i31_post i32_post c1'_post i33_post
-      i34_post_1 i34_post_2 a1_post
-      i35_post_1 i35_post_2 i36_post i37_post c2'_post
-      i38_post i39_post_1 i39_post_2 a2_post
-      i40_post_1 i40_post_2 i41_post i42_post c3'_post
-      i43_post i44_post_1 i44_post_2 a3_post
-      i45_post_1 i45_post_2 i46_post i47_post c4'_post
-      i48_post i49_post_1 i49_post_2 a4_post
-      i50_post_1 i50_post_2 carry_post
-      i51_post i52_post_1 i52_post_2 a'_post
+    clear * - pow2k_loop_spec k a ha hlt c0 c1 c2 c3 c4
+      hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4' a_pow_two
+      c1' c2' c3' c4' carry a' mask_post
+      hcarry0_fits hc1'_eq hc1'_bound hcarry1_fits hc2'_eq hc2'_bound hcarry2_fits
+      hc3'_eq hc3'_bound hcarry3_fits hc4'_eq hc4'_bound hcarry4_fits
+      ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 hcarry_val
     -- Continue until the end of the function
     let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
     let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
@@ -535,16 +521,14 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
     let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
     let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
+    -- progress
     -- TODO: Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
     apply spec_bind
     · apply U64.add_spec
       -- i58 = a6[1] = a'[1] (since a6 = a'.set 0 ...), so i58.val = c1' % 2^51 < 2^51
       -- i57 = i56 >>> 51 where i56 is U64, so i57.val ≤ 2^13 - 1
       have hi58_bound : i58.val < 2 ^ 51 := by
-        have h58 : i58.val = a'[1]!.val := by
-          simp only [i58_post]
-          simp only [a6_post]
-          simp
+        have h58 : i58.val = a'[1]!.val := by simp [i58_post, a6_post]
         rw [h58, ha'_1]; exact Nat.mod_lt _ (by positivity)
       have hi57_bound : i57.val ≤ 2 ^ 13 - 1 := by
         rw [i57_post_1]; exact U64_shiftRight_le i56
@@ -637,20 +621,14 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     --
     have ha''_54 : ∀ i < 5, a''[i]!.val < 2 ^ 54 :=
       fun i hi => by have := ha''_lt i hi; omega
-    progress as ⟨ res, res_post_1, res_post_2 ⟩
+    progress with pow2k_loop_spec as ⟨ res, res_post_1, res_post_2 ⟩
     -- Clear everything no longer needed
-    clear
-      -- Stage 3 postconditions
-      i53_post i54_post i55_post a6_post i56_post
-      i57_post_1 i57_post_2 i58_post i59_post a7_post
-      i60_post i61_post_1 i61_post_2 a''_post
-      -- Conversion helpers
-      h54_val h_i55 ha6_0 ha6_1 h56_val h_i57 h60_val h58_val
-      -- Derived bounds
-      hc0 hc1 hc2 hc3 hc4
-      hc0' hc1' hc2' hc3' hc4'
-      hcarry0_fits hc1'_bound hcarry1_fits hc2'_bound hcarry2_fits
-      hc3'_bound hcarry3_fits hc4'_bound hcarry4_fits
+    clear * - pow2k_loop_spec k a ha hlt a'' carry a'
+      ha''_0 ha''_1 ha''_2 ha''_3 ha''_4 ha''_lt
+      ha'_0 ha'_1 ha'_2 ha'_3 ha'_4
+      c0 c1 c2 c3 c4 c1' c2' c3' c4' a_pow_two
+      hc1'_eq hc2'_eq hc3'_eq hc4'_eq hcarry_val
+      k1 k1_post_1 k1_post_2 res res_post_1 res_post_2
     -- Prove the post conditions using what was already established
     constructor
     · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k.val) [MOD p]
