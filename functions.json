@@ -3615,7 +3615,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow2k_loop_spec (k' : U32) (a : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    pow2k_loop k' a ⦃ (result : Std.Array U64 5#usize) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k'.val) [MOD p] ∧\n      (if k'.val = 0 then result = a else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    pow2k_loop k a ⦃ (result : Std.Array U64 5#usize) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n      (if k.val = 0 then result = a else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring": null,
