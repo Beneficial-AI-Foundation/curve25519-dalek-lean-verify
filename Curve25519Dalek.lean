@@ -3,6 +3,7 @@ import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.Math.Edwards.EightTorsion

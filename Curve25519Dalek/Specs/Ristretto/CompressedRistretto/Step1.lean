@@ -90,7 +90,7 @@ theorem step_1_spec (c : CompressedRistretto) :
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c
   simp only [← ha]
-  progress as ⟨s, hs, h_tight, hsv⟩ -- from_bytes: hs : congruence, h_tight : < 2^51, hsv : s.IsValid
+  progress as ⟨s, hs, h_tight⟩ -- from_bytes: hs : congruence, h_tight : < 2^51, hsv : s.IsValid
   progress as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
   -- Simplify the SliceIndexRangeFullSliceSlice index chain (identity on slices)
   simp only [core.array.Array.index, core.ops.index.IndexSlice,
@@ -105,7 +105,8 @@ theorem step_1_spec (c : CompressedRistretto) :
   · -- tight bounds from from_bytes_spec
     exact h_tight
   · -- s.IsValid from from_bytes_spec
-    exact hsv
+    unfold backend.serial.u64.field.FieldElement51.IsValid
+    grind
   · exact (ZMod.natCast_eq_natCast_iff _ _ _).mpr hs
   · -- goal: ct_flag.val = 1#u8 ↔ U8x32_as_Nat a < p
     have val_iff : ct_flag.val = 1#u8 ↔ ct_flag = Choice.one := by
