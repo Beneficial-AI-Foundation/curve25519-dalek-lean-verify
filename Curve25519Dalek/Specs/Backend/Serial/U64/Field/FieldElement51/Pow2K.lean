@@ -486,7 +486,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp only [a2_post, Array.set_of_ne_getElem! _ _ 0 1 (by scalar_tac) (by scalar_tac) (by omega)]
       simp only [a1_post, Array.set_of_eq _ _ 0 (by scalar_tac)]
       simp only [i34_post_1, UScalar.val_and, i33_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+      simp_all only [Nat.and_two_pow_sub_one_eq_mod];
+      omega
     have ha'_1 : a'[1]!.val = c1'.val % 2 ^ 51 := by
       simp only [a'_post, Array.set_of_ne_getElem! _ _ 1 4 (by scalar_tac) (by scalar_tac) (by omega)]
       simp only [a4_post, Array.set_of_ne_getElem! _ _ 1 3 (by scalar_tac) (by scalar_tac) (by omega)]
@@ -547,7 +548,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         rw [h58, ha'_1]; exact Nat.mod_lt _ (by positivity)
       have hi57_bound : i57.val ≤ 2 ^ 13 - 1 := by
         rw [i57_post_1]; exact U64_shiftRight_le i56
-      have : U64.max = 2 ^ 64 - 1 := by scalar_tac
+      have : U64.max = 2 ^ 64 - 1 := by simp only [U64.max_eq]; norm_num
       omega
     intro i59 i59_post
     let* ⟨ a7, a7_post ⟩ ← Array.update_spec
@@ -706,7 +707,6 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by scalar_decr_tac
 
-/- commented out for speed whilst improving the other proof
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -716,6 +716,5 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
   unfold pow2k
   progress*
   exact ⟨by assumption, by grind⟩
--/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
