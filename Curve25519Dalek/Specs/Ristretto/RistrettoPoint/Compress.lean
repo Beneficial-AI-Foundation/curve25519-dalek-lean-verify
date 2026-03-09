@@ -497,27 +497,31 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
             (Z - Y1.toField) ^ 2 = Z ^ 2 * (1 - compress_y_final P) ^ 2 := by
           rw [h_Y1_proj]; ring
         -- Denominator square identity: i21² = compress_den_inv² / Z²
+        have h_scaled_sq {i u : ZMod p}
+            (hi : i = I * Z ^ 2 * u) :
+            i ^ 2 = (compress_invsqrt P * u) ^ 2 / Z ^ 2 := by
+          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]; rw [hi]
+          rw [show (compress_invsqrt P * u) ^ 2 = compress_invsqrt P ^ 2 * u ^ 2 by ring]
+          rw [hJ_I]; ring
+        have h_i2_aff : i2.toField = I * Z ^ 2 * compress_u2 P := by
+          rw [hb_i2, h_u2_aff]; ring
+        have h_i1_aff : i1.toField = I * Z ^ 2 * compress_u1 P := by
+          rw [hb_i1, h_u1_aff]; ring
         have h_i2_sq : i2.toField ^ 2 = compress_den2 P ^ 2 / Z ^ 2 := by
-          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
-          have h1 : i2.toField ^ 2 * Z ^ 2 = I ^ 2 * Z ^ 6 * compress_u2 P ^ 2 := by
-            rw [hb_i2, h_u2_aff]; ring
-          rw [h1, ← hJ_I]; unfold compress_den2; ring
+          simpa only [compress_den2] using h_scaled_sq h_i2_aff
         have h_i1_sq : i1.toField ^ 2 = compress_den1 P ^ 2 / Z ^ 2 := by
-          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
-          have h1 : i1.toField ^ 2 * Z ^ 2 = I ^ 2 * Z ^ 6 * compress_u1 P ^ 2 := by
-            rw [hb_i1, h_u1_aff]; ring
-          rw [h1, ← hJ_I]; unfold compress_den1; ring
+          simpa only [compress_den1] using h_scaled_sq h_i1_aff
         have h_ench_sq : enchanted_denominator.toField ^ 2 =
             (compress_den1 P * invsqrt_a_minus_d) ^ 2 / Z ^ 2 := by
-          rw [eq_div_iff (pow_ne_zero 2 hZ_ne)]
-          have h_exp : enchanted_denominator.toField ^ 2 * Z ^ 2 =
-              i1.toField ^ 2 * ristretto_magic.toField ^ 2 * Z ^ 2 := by
-            rw [hb_enchanted]; ring
-          rw [h_exp, h_rm_iad]
-          have h_exp2 : i1.toField ^ 2 * invsqrt_a_minus_d ^ 2 * Z ^ 2 =
-              I ^ 2 * Z ^ 6 * compress_u1 P ^ 2 * invsqrt_a_minus_d ^ 2 := by
-            rw [hb_i1, h_u1_aff]; ring
-          rw [h_exp2, ← hJ_I]; unfold compress_den1; ring
+          calc
+            enchanted_denominator.toField ^ 2
+                = (i1.toField * ristretto_magic.toField) ^ 2 := by
+                    rw [hb_enchanted]
+            _ = i1.toField ^ 2 * ristretto_magic.toField ^ 2 := by ring
+            _ = (compress_den1 P ^ 2 / Z ^ 2) * invsqrt_a_minus_d ^ 2 := by
+                  rw [h_i1_sq, h_rm_iad]
+            _ = (compress_den1 P * invsqrt_a_minus_d) ^ 2 / Z ^ 2 := by
+                  field_simp [hZ_ne]
         have h_i21_sq : i21.toField ^ 2 = compress_den_inv P ^ 2 / Z ^ 2 := by
           rw [hb_i21]; split_ifs with hr
           · simpa only [compress_den_inv, if_pos (h_rotate.mp hr)] using h_ench_sq
