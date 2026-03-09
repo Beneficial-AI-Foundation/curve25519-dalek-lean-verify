@@ -283,7 +283,7 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
   rw [this]
 
 set_option maxHeartbeats 2000000 in
--- progress*
+-- Required for progress*
 @[progress]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -552,8 +552,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       a[1] = a'[1] + (a'[0] + 19 * carry) / 2^51
       a[2] = a'[2]     a[3] = a'[3]     a[4] = a'[4]
 
-    Limb bounds (ha''_0_lt–ha''_4_lt):
-      a[i] < 2^52 for all i
+    Limb bounds (ha''_lt):
+      a''[i] < 2^52 for all i
     -/
     -- Conversion helper: index_usize result .val to getElem! .val
     have h54_val : i54.val = a'[0]!.val := by
@@ -600,28 +600,25 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     -- Recursive call: pow2k_loop k1 a''
     -- With the updated spec (no hk precondition), progress handles both k1=0 and k1>0
     -- Limb bounds for a'': all < 2^52
-    have ha''_0_lt : a''[0]!.val < 2 ^ 52 := by
-      rw [ha''_0]; have := Nat.mod_lt (a'[0]!.val + 19 * carry.val) (show 0 < 2 ^ 51 by positivity); omega
-    have ha''_1_lt : a''[1]!.val < 2 ^ 52 := by
-      rw [ha''_1, ha'_1]
-      have hmod : c1'.val % 2 ^ 51 < 2 ^ 51 := Nat.mod_lt _ (by positivity)
-      have hdiv : (a'[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by
-        have heq : a'[0]!.val + 19 * carry.val = i55.val := by
-          simp only [i55_post, h54_val, i53_post]; ring
-        rw [heq]
-        have : i55.val < 2 ^ 64 := by scalar_tac
+    have ha''_lt : ∀ i < 5, a''[i]!.val < 2 ^ 52 := by
+      intro i hi; interval_cases i
+      · rw [ha''_0]; have := Nat.mod_lt (a'[0]!.val + 19 * carry.val) (show 0 < 2 ^ 51 by positivity); omega
+      · rw [ha''_1, ha'_1]
+        have hmod : c1'.val % 2 ^ 51 < 2 ^ 51 := Nat.mod_lt _ (by positivity)
+        have hdiv : (a'[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by
+          have heq : a'[0]!.val + 19 * carry.val = i55.val := by
+            simp only [i55_post, h54_val, i53_post]; ring
+          rw [heq]
+          have : i55.val < 2 ^ 64 := by scalar_tac
+          omega
         omega
-      omega
-    have ha''_2_lt : a''[2]!.val < 2 ^ 52 := by
-      rw [ha''_2, ha'_2]; have := Nat.mod_lt c2'.val (show 0 < 2 ^ 51 by positivity); omega
-    have ha''_3_lt : a''[3]!.val < 2 ^ 52 := by
-      rw [ha''_3, ha'_3]; have := Nat.mod_lt c3'.val (show 0 < 2 ^ 51 by positivity); omega
-    have ha''_4_lt : a''[4]!.val < 2 ^ 52 := by
-      rw [ha''_4, ha'_4]; have := Nat.mod_lt c4'.val (show 0 < 2 ^ 51 by positivity); omega
+      · rw [ha''_2, ha'_2]; have := Nat.mod_lt c2'.val (show 0 < 2 ^ 51 by positivity); omega
+      · rw [ha''_3, ha'_3]; have := Nat.mod_lt c3'.val (show 0 < 2 ^ 51 by positivity); omega
+      · rw [ha''_4, ha'_4]; have := Nat.mod_lt c4'.val (show 0 < 2 ^ 51 by positivity); omega
     --
+    have ha''_54 : ∀ i < 5, a''[i]!.val < 2 ^ 54 :=
+      fun i hi => by have := ha''_lt i hi; omega
     progress as ⟨ res, res_post_1, res_post_2 ⟩
-    · -- side condition: ∀ i < 5, a''[i]!.val < 2 ^ 54
-      intro i hi; interval_cases i <;> omega
     -- Clear everything no longer needed
     clear
       -- Stage 3 postconditions
@@ -704,7 +701,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       · -- k1 = 0: res = a'', need a''[i] < 2^52
         simp only [hk1] at res_post_2
         rw [res_post_2]
-        intro i hi; interval_cases i <;> omega
+        exact ha''_lt
       · -- k1 ≠ 0: directly from recursive postcondition
         simp only [hk1, ite_false] at res_post_2
         exact res_post_2
@@ -716,7 +713,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by scalar_decr_tac
 
--- /- commented out for speed whilst improving the other proof
+/- commented out for speed whilst improving the other proof
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -726,6 +723,6 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
   unfold pow2k
   progress*
   exact ⟨by assumption, by grind⟩
--- -/
+-/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
