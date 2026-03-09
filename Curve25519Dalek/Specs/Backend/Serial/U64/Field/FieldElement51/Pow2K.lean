@@ -123,6 +123,12 @@ This function computes the 2^k-th power of the element.
     }
 ```
 
+## Proof strategy
+
+The proof proceeds in three stages. At each stage we prove the key results required for the next
+steps and clear all the other hypothesis. See the comments within the proof for details of the
+precise intermediate results.
+
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -308,18 +314,18 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     /-
     Stage 1: The 5 intermediate products (c0-c4) have been computed (l.501 of source code)
 
-    Values (hc0-hc4):
-      c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))
-      c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))
-      c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))
-      c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])
-      c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])
+    Values (`hc0`-`hc4`):
+      `c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))`
+      `c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))`
+      `c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))`
+      `c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])`
+      `c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])`
 
-    Bounds (hc0'-hc4'):
-      c0.val < 2^115, ..., c4.val < 2^115
+    Bounds (`hc0'`-`hc4'`):
+      `c0.val < 2^115`, ..., `c4.val < 2^115`
 
-    Algebraic identity (a_pow_two):
-      c0 + 2^51·c1 + 2^102·c2 + 2^153·c3 + 2^204·c4 ≡ (Field51_as_Nat a)² [MOD p]
+    Algebraic identity (`a_pow_two`):
+      `c0 + 2^51·c1 + 2^102·c2 + 2^153·c3 + 2^204·c4 ≡ (Field51_as_Nat a)² [MOD p]`
     -/
     subst_vars
     have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
@@ -398,22 +404,22 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       carry = (c4 >> 51) as u64; a[4] = (c4 as u64) & LOW_51_BIT_MASK;
     ```
 
-    We name the carry-propagated accumulators c1', c2', c3', c4':
-      c1' = c1 + (c0 >> 51)      c2' = c2 + (c1' >> 51)
-      c3' = c3 + (c2' >> 51)     c4' = c4 + (c3' >> 51)
+    We name the carry-propagated accumulators `c1'`,.., `c4'`:
+      `c1' = c1 + (c0 >> 51)`      `c2' = c2 + (c1' >> 51)`
+      `c3' = c3 + (c2' >> 51)`     `c4' = c4 + (c3' >> 51)`
 
-    Carry-fits bounds (hcarry0_fits–hcarry4_fits):
-      c0/2^51 < 2^64, c1'/2^51 < 2^64, ..., c4'/2^51 < 2^64
+    Carry-fits bounds (`hcarry0_fits`–`hcarry4_fits`):
+      `c0/2^51 < 2^64`, `c1'/2^51 < 2^64`, ..., `c4'/2^51 < 2^64`
 
-    Accumulator bounds (hc1'_bound–hc4'_bound):
-      c1' < 2^115, c2' < 2^115, c3' < 2^115, c4' < 2^115
+    Accumulator bounds (`hc1'_bound`–`hc4'_bound`):
+      `c1' < 2^115`, `c2' < 2^115`, `c3' < 2^115`, `c4' < 2^115`
 
-    Array values (ha'_0–ha'_4):
-      a[0] = c0 % 2^51       a[1] = c1' % 2^51      a[2] = c2' % 2^51
-      a[3] = c3' % 2^51      a[4] = c4' % 2^51
+    Array values (`ha'_0`–`ha'_4`):
+      `a[0] = c0 % 2^51`       `a[1] = c1' % 2^51`      `a[2] = c2' % 2^51`
+      `a[3] = c3' % 2^51`      `a[4] = c4' % 2^51`
 
-    Carry value (hcarry_val):
-      carry = c4' / 2^51
+    Carry value (`hcarry_val`):
+      `carry = c4' / 2^51`
     -/
     -- Interleaved carry chain: each step needs the previous carry-fits bound for omega
     -- to eliminate the % 2^64 from the U128→U64→U128 cast chain.
@@ -496,9 +502,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
         Nat.shiftRight_eq_div_pow]
       omega
-    -- Clear
+    -- Clear Stage 2 postconditions
     clear
-      -- Stage 2 postconditions
       i30_post_1 i30_post_2 i31_post i32_post c1'_post i33_post
       i34_post_1 i34_post_2 a1_post
       i35_post_1 i35_post_2 i36_post i37_post c2'_post
@@ -517,7 +522,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
     let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
     let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
-    -- Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
+    -- TODO: Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
     apply spec_bind
     · apply U64.add_spec
       -- i58 = a6[1] = a'[1] (since a6 = a'.set 0 ...), so i58.val = c1' % 2^51 < 2^51
@@ -533,7 +538,6 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       have : U64.max = 2 ^ 64 - 1 := by scalar_tac
       omega
     intro i59 i59_post
-    -- let* ⟨ i59, i59_post ⟩ ← U64.add_spec
     let* ⟨ a7, a7_post ⟩ ← Array.update_spec
     let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
     let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
@@ -541,19 +545,21 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     /-
     Stage 3: Final reduction (Rust l.534–545)
 
-    The Rust code reduces carry back into the low limb:
+    The Rust code reduces `carry` back into the low limb:
     ```rust
       a[0] += carry * 19;
       a[1] += a[0] >> 51;
       a[0] &= LOW_51_BIT_MASK;
     ```
-    Writing a' for the array from stage 2 and a'' for the output, we prove (ha''_0–ha''_4):
-      a[0] = (a'[0] + 19 * carry) % 2^51
-      a[1] = a'[1] + (a'[0] + 19 * carry) / 2^51
-      a[2] = a'[2]     a[3] = a'[3]     a[4] = a'[4]
+    Writing `a'` for the array from stage 2 and `a''` for the output, we prove (`ha''_0`–`ha''_4`):
+      `a[0] = (a'[0] + 19 * carry) % 2^51`
+      `a[1] = a'[1] + (a'[0] + 19 * carry) / 2^51`
+      `a[2] = a'[2]`
+      `a[3] = a'[3]`
+      `a[4] = a'[4]`
 
-    Limb bounds (ha''_lt):
-      a''[i] < 2^52 for all i
+    Limb bounds (`ha''_lt`):
+      `a''[i] < 2^52 for all i`
     -/
     -- Conversion helper: index_usize result .val to getElem! .val
     have h54_val : i54.val = a'[0]!.val := by
@@ -632,7 +638,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       hc0' hc1' hc2' hc3' hc4'
       hcarry0_fits hc1'_bound hcarry1_fits hc2'_bound hcarry2_fits
       hc3'_bound hcarry3_fits hc4'_bound hcarry4_fits
-    -- Prove the post conditions
+    -- Prove the post conditions using what was already established
     constructor
     · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k.val) [MOD p]
       have hsq : Field51_as_Nat a'' ≡ (Field51_as_Nat a)^2 [MOD p] := by
