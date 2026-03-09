@@ -496,6 +496,19 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
         Nat.shiftRight_eq_div_pow]
       omega
+    -- Clear
+    clear
+      -- Stage 2 postconditions
+      i30_post_1 i30_post_2 i31_post i32_post c1'_post i33_post
+      i34_post_1 i34_post_2 a1_post
+      i35_post_1 i35_post_2 i36_post i37_post c2'_post
+      i38_post i39_post_1 i39_post_2 a2_post
+      i40_post_1 i40_post_2 i41_post i42_post c3'_post
+      i43_post i44_post_1 i44_post_2 a3_post
+      i45_post_1 i45_post_2 i46_post i47_post c4'_post
+      i48_post i49_post_1 i49_post_2 a4_post
+      i50_post_1 i50_post_2 carry_post
+      i51_post i52_post_1 i52_post_2 a'_post
     -- Continue until the end of the function
     let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
     let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
@@ -609,19 +622,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     progress as ⟨ res, res_post_1, res_post_2 ⟩
     · -- side condition: ∀ i < 5, a''[i]!.val < 2 ^ 54
       intro i hi; interval_cases i <;> omega
-    -- Clear everything no longer needed (stage 2+3 intermediates, postconditions, bounds)
+    -- Clear everything no longer needed
     clear
-      -- Stage 2 postconditions
-      i30_post_1 i30_post_2 i31_post i32_post c1'_post i33_post
-      i34_post_1 i34_post_2 a1_post
-      i35_post_1 i35_post_2 i36_post i37_post c2'_post
-      i38_post i39_post_1 i39_post_2 a2_post
-      i40_post_1 i40_post_2 i41_post i42_post c3'_post
-      i43_post i44_post_1 i44_post_2 a3_post
-      i45_post_1 i45_post_2 i46_post i47_post c4'_post
-      i48_post i49_post_1 i49_post_2 a4_post
-      i50_post_1 i50_post_2 carry_post
-      i51_post i52_post_1 i52_post_2 a'_post
       -- Stage 3 postconditions
       i53_post i54_post i55_post a6_post i56_post
       i57_post_1 i57_post_2 i58_post i59_post a7_post
@@ -714,7 +716,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by scalar_decr_tac
 
-/- commented out for speed whilst improving the other proof
+-- /- commented out for speed whilst improving the other proof
 @[progress]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
@@ -724,6 +726,6 @@ theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
   unfold pow2k
   progress*
   exact ⟨by assumption, by grind⟩
--/
+-- -/
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
