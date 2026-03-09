@@ -121,27 +121,25 @@ private lemma flag_eq_true_iff_is_negative_of_neg_val
     {flag : subtle.Choice} {n : Nat} {x : ZMod p}
     (hflag : flag.val = 1#u8 ↔ n % 2 = 1) (hx : n = (-x).val) (hx_ne : x ≠ 0) :
     flag.val = 1#u8 ↔ is_negative x = false := by
-  constructor
+  have hxv_ne : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+  have hxlt : x.val < p := x.val_lt
+  have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv_ne
+  have hp_odd : p % 2 = 1 := by decide
+  have hneg_val : (-x).val = p - x.val := by
+    rw [ZMod.neg_val]; exact if_neg hx_ne
+  refine ⟨?_, ?_⟩
   · intro hf
     unfold is_negative
     rw [beq_eq_false_iff_ne]
-    have hxlt : x.val < p := x.val_lt
-    have hxv_ne : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
-    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv_ne
-    have hp_odd : p % 2 = 1 := by decide
     have hneg : (-x).val % 2 = 1 := by
       have : n % 2 = 1 := hflag.mp hf; rwa [hx] at this
-    rw [ZMod.neg_val, if_neg hx_ne] at hneg
+    rw [hneg_val] at hneg
     exact fun h => by omega
   · intro hneg
-    have hxlt : x.val < p := x.val_lt
-    have hxv_ne : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
-    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv_ne
-    have hp_odd : p % 2 = 1 := by decide
     apply hflag.mpr
     unfold is_negative at hneg
     rw [beq_eq_false_iff_ne] at hneg
-    rw [hx, ZMod.neg_val, if_neg hx_ne]
+    rw [hx, hneg_val]
     omega
 
 private lemma cond_neg_scale_of_flag_match (Z y x : ZMod p) (flag : subtle.Choice)
