@@ -68,7 +68,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
         (∀ ep, result = some ep →
           ∃ Z_inv,
             field.FieldElement51.invert ep.Z = ok Z_inv ∧
-            let u := U8x32_as_Nat mp
+            let u := U8x32_as_Nat mp % 2^255
             let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p  -- Affine y = Y/Z
             (y * ((u + 1) % p)) % p = ((u - 1) % p) % p)
       ⦄ := by
@@ -300,7 +300,13 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           -- mp is a MontgomeryPoint, which is Array U8 32
           -- U8x32_as_Nat mp < 2^256, but we need < 2^255 for this to work
           -- Actually, from_bytes masks to 2^255, so Field51_as_Nat u corresponds to mp % 2^255
-          sorry
+          -- obtain
+          have hlt : U8x32_as_Nat mp < 2^255 := by
+            sorry
+          have h_tmp: U8x32_as_Nat mp % 2^ 255 = U8x32_as_Nat mp := by
+            grind only [Nat.mod_eq_of_lt]
+          grind only
+          -- omega
 
         -- Step 7: Main calculation
         calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp + 1) % p
