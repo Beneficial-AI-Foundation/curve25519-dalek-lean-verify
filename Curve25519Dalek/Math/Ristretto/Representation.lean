@@ -172,8 +172,7 @@ lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 
      37095705934669439343138083508754565189542113879843219016388785533085940283555) : ℤ) : ZMod p) = 1 := by
     rw [← ZMod.intCast_mod _ p]
     decide
-  simpa only [Nat.cast_ofNat, Int.reducePow, Int.reduceSub, Int.reduceMul, Int.cast_ofNat] using
-    this
+  push_cast at this; exact this
 
 end PureIsogeny
 
@@ -617,7 +616,8 @@ lemma decompress_step2_1 (s : ZMod p) (pt : Point Ed25519)
     rw [h_ws'] at this; exact absurd this (by decide)
   -- IsSquare W via sqrt_checked_iff_isSquare (b = true ↔ IsSquare u)
   have h_sq_W : IsSquare W := by
-    have h_sc : (sqrt_checked W).2 = true := by rw [← inv_sqrt_checked_snd W h_W_ne]; exact h_ws'
+    have h_sc : (sqrt_checked W).2 = true := by
+      simpa only [← inv_sqrt_checked_snd W h_W_ne] using h_ws'
     exact (sqrt_checked_iff_isSquare W (Prod.mk.eta (p := sqrt_checked W)).symm).mp h_sc
   -- y ≠ 0 from BEq
   have h_y_ne : u1 * (I * (I * u2) * v) ≠ 0 := by
@@ -690,7 +690,7 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
       rw [h1, h2, h_sq_eq]
     rcases sq_eq_sq_iff_eq_or_eq_neg.mp h_sq_x with h_eq | h_neg_eq
     · rw [h_eq]
-    · rw [h_neg_eq]; exact abs_edwards_neg _
+    · simpa only [h_neg_eq] using abs_edwards_neg (2 * s * (I * (1 - a_val * s ^ 2)))
   -- 6. Validation condition is false (ws=true, is_neg=false, y≠0)
   -- is_negative(x_internal * y_internal) = is_negative(pt.x * pt.y) = false
   have h_neg_match : is_negative (abs_edwards (2 * s *
@@ -699,12 +699,13 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
       ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
       (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
         (1 - a_val * s ^ 2) ^ 2)))) = false := by
-    rw [h_x_match, h_y_match]; exact h_neg
+    simpa only [h_x_match, h_y_match] using h_neg
   have h_y_ne_match : ((1 + a_val * s ^ 2) * ((inv_sqrt_checked W).1 *
       ((inv_sqrt_checked W).1 * (1 - a_val * s ^ 2)) *
       (a_val * (d : CurveField) * (1 + a_val * s ^ 2) ^ 2 -
         (1 - a_val * s ^ 2) ^ 2)) == (0 : ZMod p)) = false := by
-    rw [h_y_match]; exact beq_eq_false_iff_ne.mpr h_y_ne
+    rw [h_y_match]
+    exact beq_eq_false_iff_ne.mpr h_y_ne
   -- 7. Unfold decompress_step2 and close
   unfold decompress_step2; dsimp only
   split_ifs with h_cond
@@ -717,6 +718,39 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
     congr 1; ext
     · exact h_x_match
     · exact h_y_match
+
+/-- The zero scalar always passes `decompress_step2`, with canonical witness `(0, 1)`. -/
+lemma decompress_step2_zero : ∃ pt, decompress_step2 0 = some pt := by
+  have h_on_curve : Ed25519.a * (0 : ZMod p) ^ 2 + 1 ^ 2 =
+      1 + Ed25519.d * 0 ^ 2 * 1 ^ 2 := by ring
+  let pt : Point Ed25519 := ⟨0, 1, h_on_curve⟩
+  have h_W_simp : (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
+      (1 - a_val * (0 : ZMod p) ^ 2) ^ 2) * (1 - a_val * (0 : ZMod p) ^ 2) ^ 2 =
+      a_val - (↑d : ZMod p) := by
+    unfold a_val
+    ring
+  have h_hy : pt.y = (1 + a_val * (0 : ZMod p) ^ 2) *
+      (invsqrt_a_minus_d * (invsqrt_a_minus_d * (1 - a_val * (0 : ZMod p) ^ 2)) *
+        (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
+          (1 - a_val * (0 : ZMod p) ^ 2) ^ 2)) := by
+    change (1 : ZMod p) = _
+    have h_ring : (1 + a_val * (0 : ZMod p) ^ 2) *
+        (invsqrt_a_minus_d * (invsqrt_a_minus_d * (1 - a_val * (0 : ZMod p) ^ 2)) *
+          (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
+            (1 - a_val * (0 : ZMod p) ^ 2) ^ 2)) =
+        invsqrt_a_minus_d ^ 2 * (a_val - ↑d) := by
+      unfold a_val
+      ring
+    rw [h_ring]
+    exact iad_sq.symm
+  exact ⟨pt, decompress_step2_2 0 pt invsqrt_a_minus_d
+    (by rw [h_W_simp]; exact iad_sq)
+    (by change is_negative (0 * 1 : ZMod p) = false; simp [is_negative])
+    one_ne_zero
+    (by
+      change (0 : ZMod p) = abs_edwards (2 * 0 * (invsqrt_a_minus_d * (1 - a_val * 0 ^ 2)))
+      simp [abs_edwards, is_negative])
+    h_hy⟩
 
 set_option maxHeartbeats 400000 in -- large proof with many algebraic identities and case splits
 /-- Decode-of-encode: decompressing the scalar produced by compression succeeds.
@@ -739,31 +773,7 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
       unfold compress_s; rw [h_deninv_zero, zero_mul]
       unfold abs_edwards is_negative; simp
     rw [h_s_zero]
-    -- decompress_step2 0 = some (0, 1) via decompress_step2_2
-    have h_on_curve : Ed25519.a * (0 : ZMod p) ^ 2 + 1 ^ 2 =
-        1 + Ed25519.d * 0 ^ 2 * 1 ^ 2 := by ring
-    let pt : Point Ed25519 := ⟨0, 1, h_on_curve⟩
-    have h_W_simp : (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
-        (1 - a_val * (0 : ZMod p) ^ 2) ^ 2) * (1 - a_val * (0 : ZMod p) ^ 2) ^ 2 =
-        a_val - (↑d : ZMod p) := by unfold a_val; ring
-    have h_hy : pt.y = (1 + a_val * (0 : ZMod p) ^ 2) *
-        (invsqrt_a_minus_d * (invsqrt_a_minus_d * (1 - a_val * (0 : ZMod p) ^ 2)) *
-          (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
-            (1 - a_val * (0 : ZMod p) ^ 2) ^ 2)) := by
-      change (1 : ZMod p) = _
-      have h_ring : (1 + a_val * (0 : ZMod p) ^ 2) *
-          (invsqrt_a_minus_d * (invsqrt_a_minus_d * (1 - a_val * (0 : ZMod p) ^ 2)) *
-            (a_val * (↑d : CurveField) * (1 + a_val * (0 : ZMod p) ^ 2) ^ 2 -
-              (1 - a_val * (0 : ZMod p) ^ 2) ^ 2)) =
-          invsqrt_a_minus_d ^ 2 * (a_val - ↑d) := by unfold a_val; ring
-      rw [h_ring]; exact iad_sq.symm
-    exact ⟨pt, decompress_step2_2 0 pt invsqrt_a_minus_d
-      (by rw [h_W_simp]; exact iad_sq)
-      (by change is_negative (0 * 1 : ZMod p) = false; simp [is_negative])
-      one_ne_zero
-      (by change (0 : ZMod p) = abs_edwards (2 * 0 * (invsqrt_a_minus_d * (1 - a_val * 0 ^ 2)))
-          simp [abs_edwards, is_negative])
-      h_hy⟩
+    exact decompress_step2_zero
   · -- NON-DEGENERATE CASE: compress_u1 P * compress_u2 P ^ 2 ≠ 0
     -- Setup: extract non-zero conditions
     have h_u1_ne : compress_u1 P ≠ 0 := left_ne_zero_of_mul h_degen
@@ -772,7 +782,7 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     -- IsSquare for compression argument
     have h_u1_sq : IsSquare (compress_u1 P) := by
       have : compress_u1 P = 1 - P.y ^ 2 := by unfold compress_u1; ring
-      rw [this]; exact heven
+      simpa only [this] using heven
     have h_arg_sq : IsSquare (compress_u1 P * compress_u2 P ^ 2) :=
       h_u1_sq.mul ⟨compress_u2 P, (sq _)⟩
     -- Compression invsqrt: I² * (u1 * u2²) = 1

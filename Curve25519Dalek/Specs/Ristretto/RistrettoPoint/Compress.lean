@@ -182,7 +182,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       omega
   -- Shared bridge: parity of U8x32_as_Nat a
   have h_a_parity : U8x32_as_Nat a % 2 = 0 := by
-    rw [h_a_eq]; exact h_s1_parity
+    simpa only [h_a_eq] using h_s1_parity
   -- Build the shared implementation-to-pure bridge once.
   -- Both final goals consume h_key : s1.toField = compress_s self.toPoint.
   rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -278,8 +278,10 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
       have h_fe_sq := lift_fe_sq fe fe_post1
       have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
       -- Affine ↔ projective bridge for P
-      have hpx' : P.x = self.X.toField / self.Z.toField := by rw [hP_def]; exact hpx
-      have hpy' : P.y = self.Y.toField / self.Z.toField := by rw [hP_def]; exact hpy
+      have hpx' : P.x = self.X.toField / self.Z.toField := by
+        simpa only [hP_def] using hpx
+      have hpy' : P.y = self.Y.toField / self.Z.toField := by
+        simpa only [hP_def] using hpy
       -- Key link: compress_u1 P * compress_u2 P² = u1_u2_sq / Z⁶
       have h_aff : compress_u1 P * compress_u2 P ^ 2 =
           u1_u2_sq.toField / self.Z.toField ^ 6 := by
@@ -314,8 +316,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have hJ_sq : compress_invsqrt P ^ 2 * (compress_u1 P * compress_u2 P ^ 2) = 1 := by
           unfold compress_invsqrt; exact inv_sqrt_checked_sq_mul _ h_isq h_ne_aff
         -- Step B: J² = I²·Z⁶ and compress_z_inv P = 1
-        set I := x_post1.2.toField with hI_def
-        set Z := self.Z.toField with hZ_def
+        set I := x_post1.2.toField
+        set Z := self.Z.toField
         have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
           have hI_u := h_I_sq_mul hd
           have hJ_u : compress_invsqrt P ^ 2 * u1_u2_sq.toField = Z ^ 6 := by
@@ -340,7 +342,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
           simp only [FieldElement51.toField, ZMod.val_natCast] at h_val
           unfold compress_rotate is_negative
           rw [hz_inv_one, mul_one]; simp only [beq_iff_eq]
-          rw [← h_val]; exact rotate_post
+          simpa only [h_val] using rotate_post
         -- Step D: s = i21 * (Z - Y1)
         have h_s_proj : s.toField = i21.toField * (Z - Y1.toField) := by
           rw [hb_s, hb_zmy2]
@@ -473,8 +475,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
           rw [h_exp2, ← hJ_I]; unfold compress_den1; ring
         have h_i21_sq : i21.toField ^ 2 = compress_den_inv P ^ 2 / Z ^ 2 := by
           rw [hb_i21]; split_ifs with hr
-          · rw [compress_den_inv, if_pos (h_rotate.mp hr)]; exact h_ench_sq
-          · rw [compress_den_inv, if_neg (fun h => hr (h_rotate.mpr h))]; exact h_i2_sq
+          · simpa only [compress_den_inv, if_pos (h_rotate.mp hr)] using h_ench_sq
+          · simpa only [compress_den_inv, if_neg (fun h => hr (h_rotate.mpr h))] using h_i2_sq
         -- Close the squared equality via calc
         rw [h_s_proj]
         calc (i21.toField * (Z - Y1.toField)) ^ 2
