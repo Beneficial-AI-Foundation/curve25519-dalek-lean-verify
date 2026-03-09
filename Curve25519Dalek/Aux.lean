@@ -293,3 +293,9 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     rcases Nat.mod_two_eq_zero_or_one a with h | h
     · rw [Nat.testBit_zero]; simp [h]; omega
     · rw [Nat.testBit_zero]; simp [h]; omega
+
+/-- If `x + n * m = y` then `x ≡ y [MOD m]`. -/
+lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
+    Nat.ModEq m x y := by
+  have : x % m = (x + n * m) % m := by rw [Nat.add_mul_mod_self_right]
+  rw [Nat.ModEq, this, h]

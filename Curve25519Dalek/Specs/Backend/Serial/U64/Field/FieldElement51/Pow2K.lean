@@ -288,6 +288,16 @@ lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
     2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
   rw [this]
 
+/-- Carry chain conservation: the radix-2^51 sum is preserved through 5 carry steps. -/
+private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4' : ℕ)
+    (ha0 : a0 = c0 % 2 ^ 51) (ha1 : a1 = c1' % 2 ^ 51) (ha2 : a2 = c2' % 2 ^ 51)
+    (ha3 : a3 = c3' % 2 ^ 51) (ha4 : a4 = c4' % 2 ^ 51)
+    (hc1' : c1' = c1 + c0 / 2 ^ 51) (hc2' : c2' = c2 + c1' / 2 ^ 51)
+    (hc3' : c3' = c3 + c2' / 2 ^ 51) (hc4' : c4' = c4 + c3' / 2 ^ 51)
+    (hcarry : carry = c4' / 2 ^ 51) :
+    c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 =
+    a0 + 2^51*a1 + 2^102*a2 + 2^153*a3 + 2^204*a4 + 2^255*carry := by omega
+
 set_option maxHeartbeats 2000000 in
 -- Required for progress*
 @[progress]
@@ -346,7 +356,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
-      simp_all [-Nat.reducePow, Field51_as_Nat, Finset.sum_range_succ, Nat.ModEq]
+      -- Named list for speed
+      simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+        Finset.sum_singleton, mul_zero, pow_zero, one_mul]
     -- Clear everything we don't need
     -- NOTE: We can't use clear * - it kills the IH needed for recursion
     -- TODO: Find a convenient way to clear all the hypotheses which are no longer required
@@ -653,43 +665,19 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
           rw [ha''_0, ha''_1, ha''_2, ha''_3, ha''_4]
           have := Nat.mod_add_div (a'[0]!.val + 19 * carry.val) (2 ^ 51)
           omega
-        -- Step B: Carry chain conservation (step by step)
-        have cc1 : c0.val + 2^51 * c1.val = a'[0]!.val + 2^51 * c1'.val := by
-          have := Nat.mod_add_div c0.val (2^51);
-          rw [← ha'_0] at this;
-          grind
-        have cc2 : a'[0]!.val + 2^51 * c1'.val + 2^102 * c2.val =
-            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * c2'.val := by
-          have hm := Nat.mod_add_div c1'.val (2^51)
-          grind
-        have cc3 : a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * c2'.val + 2^153 * c3.val =
-            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * c3'.val := by
-          have hm := Nat.mod_add_div c2'.val (2^51)
-          grind
-        have cc4 : a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * c3'.val + 2^204 * c4.val =
-            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * a'[3]!.val + 2^204 * c4'.val := by
-          have hm := Nat.mod_add_div c3'.val (2^51)
-          grind
-        have cc5 : a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * a'[3]!.val + 2^204 * c4'.val =
-            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * a'[3]!.val + 2^204 * a'[4]!.val +
-            2^255 * carry.val := by
-          have hm := Nat.mod_add_div c4'.val (2^51)
-          grind
+        -- Step B: Carry chain conservation
         have h_chain : c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val =
             a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * a'[3]!.val + 2^204 * a'[4]!.val +
-            2^255 * carry.val := by linarith
+            2^255 * carry.val :=
+          carry_chain_eq c0.val c1.val c2.val c3.val c4.val
+            a'[0]!.val a'[1]!.val a'[2]!.val a'[3]!.val a'[4]!.val carry.val c1'.val c2'.val c3'.val c4'.val
+            ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 hc1'_eq hc2'_eq hc3'_eq hc4'_eq hcarry_val
         -- Step C: Field51_as_Nat a'' + carry * p = c0 + ... + 2^204*c4
         have h_key : Field51_as_Nat a'' + carry.val * p =
             c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val := by
           rw [hf_a'', h_chain]; unfold p; omega
         -- Step D: Conclude ModEq (from h_key: a''_nat + carry*p = c_sum)
-        set c_sum := c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val with hc_sum_def
-        have h_mod : Nat.ModEq p (Field51_as_Nat a'') c_sum := by
-          rw [Nat.ModEq]
-          have : Field51_as_Nat a'' % p = (Field51_as_Nat a'' + carry.val * p) % p :=
-            by rw [Nat.add_mul_mod_self_right]
-          rw [this, h_key]
-        exact h_mod.trans a_pow_two
+        exact (modeq_of_add_mul_eq _ _ carry.val p h_key).trans a_pow_two
       have hpow := Nat.ModEq.pow (2^k1.val) hsq
       apply Nat.ModEq.trans res_post_1 hpow |>.trans
       rw [← pow_mul]
