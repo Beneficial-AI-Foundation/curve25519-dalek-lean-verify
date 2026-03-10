@@ -1,14 +1,14 @@
-{"tool": {"version": "0.1.0", "name": "probe-lean", "command": "stubify"},
- "timestamp": "2026-03-07T02:42:27Z",
+{"tool": {"version": "0.1.0", "name": "probe-lean", "command": "viewify"},
+ "timestamp": "2026-03-10T00:39:25Z",
  "source":
  {"repo":
   "git@github.com:Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
   "package-version": "0.1.0",
   "package": "Curve25519Dalek",
   "language": "lean",
-  "commit": "184c636"},
+  "commit": "988499e446b53f26a10bb0b8862f8437303da6d9"},
  "schema-version": "2.0",
- "schema": "probe-lean/view",
+ "schema": "probe-lean/viewify",
  "data":
  {"Curve25519Dalek/Funs.lean/variable_base_mul":
   {"spec-path": "Curve25519Dalek/Funs.lean",
