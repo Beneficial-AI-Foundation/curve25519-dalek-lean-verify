@@ -4,7 +4,7 @@ import chalk from "chalk";
 import { type AeneasConfig } from "../config.js";
 import { findBinary } from "../lib/paths.js";
 import { runStreaming } from "../lib/shell.js";
-import { applyTweaks } from "../lib/tweaks.js";
+import { applyTweaks, warnUnmatchedTweaks } from "../lib/tweaks.js";
 import { ExtractionError } from "../lib/errors.js";
 
 export async function extractCommand(
@@ -111,21 +111,23 @@ export async function extractCommand(
   if (config.tweaks.substitutions.length > 0 && config.tweaks.files.length > 0) {
     console.log(chalk.bold("\nStep 3: Applying tweaks..."));
 
+    const matchedPerFile: Set<number>[] = [];
     for (const file of config.tweaks.files) {
       const filePath = path.join(outputDir, file);
       if (!fs.existsSync(filePath)) {
         console.log(chalk.yellow(`  ⚠ File not found, skipping: ${file}`));
         continue;
       }
-      applyTweaks(filePath, config.tweaks.substitutions);
-      console.log(chalk.green(`  ✓ Tweaks applied to ${file}`));
+      const matched = applyTweaks(filePath, config.tweaks.substitutions);
+      matchedPerFile.push(matched);
+      console.log(chalk.green(`  ✓ Tweaks applied to ${file} (${matched.size} substitutions matched)`));
     }
+    warnUnmatchedTweaks(config.tweaks.substitutions, matchedPerFile);
   }
 
   // Step 4: Sync lean toolchain
   syncLeanToolchain(root);
 
-  console.log(chalk.bold.green("\n=== Extraction complete! ===\n"));
 }
 
 function syncLeanToolchain(root: string): void {

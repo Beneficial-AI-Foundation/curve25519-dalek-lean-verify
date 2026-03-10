@@ -7,68 +7,64 @@ export interface Substitution {
   replace: string;
 }
 
+/**
+ * Apply substitutions to a single file.
+ * Returns a Set of substitution indices that matched in this file.
+ */
 export function applyTweaks(
   filePath: string,
   substitutions: Substitution[],
-): void {
+): Set<number> {
   let content = fs.readFileSync(filePath, "utf-8");
-  const warnings: string[] = [];
+  const matched = new Set<number>();
 
   for (let i = 0; i < substitutions.length; i++) {
     const sub = substitutions[i];
 
     if (sub.find !== undefined) {
-      // Literal find/replace
-      if (!content.includes(sub.find)) {
-        const preview =
-          sub.find.length > 60
-            ? sub.find.substring(0, 60) + "..."
-            : sub.find;
-        warnings.push(
-          `Substitution #${i + 1} (literal) not found: "${preview}"`,
-        );
-        continue;
-      }
-      const before = content;
+      if (!content.includes(sub.find)) continue;
+      matched.add(i);
       content = content.replaceAll(sub.find, sub.replace);
-      const count = (before.length - content.length + sub.replace.length * countOccurrences(before, sub.find)) / (sub.find.length);
-      // Simpler: just count how many times it was replaced
-      void count;
     } else if (sub.find_regex !== undefined) {
-      // Regex find/replace
       const regex = new RegExp(sub.find_regex, "gs");
-      if (!regex.test(content)) {
-        const preview =
-          sub.find_regex.length > 60
-            ? sub.find_regex.substring(0, 60) + "..."
-            : sub.find_regex;
-        warnings.push(
-          `Substitution #${i + 1} (regex) not found: "${preview}"`,
-        );
-        continue;
-      }
-      // Reset lastIndex after test
+      if (!regex.test(content)) continue;
+      matched.add(i);
       regex.lastIndex = 0;
       content = content.replace(regex, sub.replace);
     }
   }
 
   fs.writeFileSync(filePath, content, "utf-8");
+  return matched;
+}
 
-  if (warnings.length > 0) {
-    console.log(chalk.yellow(`\n  Warnings for ${filePath}:`));
-    for (const w of warnings) {
+/**
+ * Warn about substitutions that were not found in any file.
+ */
+export function warnUnmatchedTweaks(
+  substitutions: Substitution[],
+  matchedPerFile: Set<number>[],
+): void {
+  const allMatched = new Set<number>();
+  for (const s of matchedPerFile) {
+    for (const i of s) allMatched.add(i);
+  }
+
+  const unmatched: string[] = [];
+  for (let i = 0; i < substitutions.length; i++) {
+    if (allMatched.has(i)) continue;
+    const sub = substitutions[i];
+    const pattern = sub.find ?? sub.find_regex ?? "";
+    const preview =
+      pattern.length > 60 ? pattern.substring(0, 60) + "..." : pattern;
+    const kind = sub.find !== undefined ? "literal" : "regex";
+    unmatched.push(`Substitution #${i + 1} (${kind}) not found in any file: "${preview}"`);
+  }
+
+  if (unmatched.length > 0) {
+    console.log(chalk.yellow("\n  Tweak warnings:"));
+    for (const w of unmatched) {
       console.log(chalk.yellow(`    ⚠ ${w}`));
     }
   }
-}
-
-function countOccurrences(str: string, sub: string): number {
-  let count = 0;
-  let pos = 0;
-  while ((pos = str.indexOf(sub, pos)) !== -1) {
-    count++;
-    pos += sub.length;
-  }
-  return count;
 }

@@ -69,19 +69,34 @@ export async function runStreaming(
     stderr: "pipe",
   };
 
-  const result = await execa(cmd, args, execaOpts);
+  const child = execa(cmd, args, execaOpts);
+  const chunks: string[] = [];
 
-  const output = [result.stdout, result.stderr].filter(Boolean).join("\n");
+  // Stream stdout in real time
+  if (child.stdout) {
+    child.stdout.on("data", (data: Buffer) => {
+      const text = data.toString();
+      chunks.push(text);
+      process.stdout.write(text);
+    });
+  }
+
+  // Stream stderr in real time
+  if (child.stderr) {
+    child.stderr.on("data", (data: Buffer) => {
+      const text = data.toString();
+      chunks.push(text);
+      process.stderr.write(text);
+    });
+  }
+
+  const result = await child;
 
   if (opts?.logFile) {
     const logDir = path.dirname(opts.logFile);
     fs.mkdirSync(logDir, { recursive: true });
-    fs.writeFileSync(opts.logFile, output, "utf-8");
+    fs.writeFileSync(opts.logFile, chunks.join(""), "utf-8");
   }
-
-  // Print output to console
-  if (result.stdout) process.stdout.write(result.stdout + "\n");
-  if (result.stderr) process.stderr.write(result.stderr + "\n");
 
   if (result.exitCode !== 0) {
     throw new AeneasToolError(

@@ -94,53 +94,6 @@ tweaks:
     - "Funs.lean"
     - "Types.lean"
   substitutions:
-    # --- Forbidden identifiers: rename long trait impl names ---
-
-    - find: "AddAssigncurve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51"
-      replace: "FieldElement51.AddAssign"
-
-    - find: "Mul&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51"
-      replace: "FieldElement51.Mul"
-
-    - find: "Add&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51"
-      replace: "FieldElement51.Add"
-
-    - find: "Sub&0 curve25519_dalekbackendserialu64fieldFieldElement51&'a curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51"
-      replace: "FieldElement51.Sub"
-
-    - find: "Neg&0 curve25519_dalekbackendserialu64fieldFieldElement51curve25519_dalekbackendserialu64fieldFieldElement51"
-      replace: "FieldElement51"
-
-    - find: "Add&0 curve25519_dalekedwardsEdwardsPoint&'a curve25519_dalekbackendserialcurve_modelsProjectiveNielsPointcurve25519_dalekbackendserialcurve_modelsCompletedPoint"
-      replace: "CompletedPoint"
-
-    - find: "Add&0 curve25519_dalekedwardsEdwardsPoint&'a curve25519_dalekedwardsEdwardsPointcurve25519_dalekedwardsEdwardsPoint"
-      replace: "EdwardsPoint"
-
-    - find: "Add&0 curve25519_dalekristrettoRistrettoPoint&'a curve25519_dalekristrettoRistrettoPointcurve25519_dalekristrettoRistrettoPoint"
-      replace: "RistrettoPoint"
-
-    # --- Fix ConditionallyNegatable: & in identifier → _ ---
-
-    - find: |-
-        def subtle.ConditionallyNegatable.Blanket {T : Type}
-          (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-          (coreopsarithNeg& TTInst : core.ops.arith.Neg T T) :
-          subtle.ConditionallyNegatable T := {
-          conditional_negate :=
-            subtle.ConditionallyNegatable.Blanket.conditional_negate
-            ConditionallySelectableInst coreopsarithNeg& TTInst
-        }
-      replace: |-
-        def subtle.ConditionallyNegatable.Blanket {T : Type}
-          (ConditionallySelectableInst : subtle.ConditionallySelectable T)
-          (coreopsarithNeg_TTInst : core.ops.arith.Neg T T) :
-          subtle.ConditionallyNegatable T := {
-          conditional_negate :=
-            subtle.ConditionallyNegatable.Blanket.conditional_negate
-            ConditionallySelectableInst coreopsarithNeg_TTInst
-        }
-
     # --- Avoid linter complaints ---
 
     - find: "set_option linter.unusedVariables false"
@@ -149,10 +102,13 @@ tweaks:
         set_option linter.style.whitespace false
         set_option linter.style.setOption false
 
-    # --- Fix shift syntax error ---
+    # --- Convert single-line comments before noncomputable section ---
 
-    - find: "  let i41 ← lift (U64.shr i36 20#i32)"
-      replace: "  let i41 ← (i36 >>> 20#i32)"
+    - find: "/- You can remove the following line by using the CLI option `-all-computable`: -/"
+      replace: "-- You can remove the following line by using the CLI option `-all-computable`: "
+
+    - find: "/- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/"
+      replace: "-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option"
 
     # --- Increase maxRecDepth for to_bytes ---
     # Must appear BEFORE the /- → /-- tweak so the FIND matches raw /- form
@@ -167,18 +123,15 @@ tweaks:
            Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
         def backend.serial.u64.field.FieldElement51.to_bytes
 
-    # --- Convert single-line comments before noncomputable section ---
-
-    - find: "/- You can remove the following line by using the CLI option `-all-computable`: -/"
-      replace: "-- You can remove the following line by using the CLI option `-all-computable`: "
-
-    - find: "/- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/"
-      replace: "-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option"
-
     # --- Convert Aeneas block comments to doc comments ---
 
     - find: "/- "
       replace: "/-- "
+
+    # --- Fix shift syntax error ---
+
+    - find: "  let i41 ← lift (U64.shr i36 20#i32)"
+      replace: "  let i41 ← (i36 >>> 20#i32)"
 
     # --- Fix parameter name shadowing: variable `scalar` shadows namespace ---
 
@@ -187,21 +140,6 @@ tweaks:
 
     - find: "  let scalar_bytes ← scalar.Scalar.as_bytes scalar"
       replace: "  let scalar_bytes ← scalar.as_bytes"
-
-    # --- Rename CompressedRistretto constructor to avoid conflict with type ---
-
-    - find: |-
-        /-- [curve25519_dalek::ristretto::CompressedRistretto]:
-           Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
-        def ristretto.CompressedRistretto
-          (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
-          ok a
-      replace: |-
-        /-- [curve25519_dalek::ristretto::CompressedRistretto]:
-           Source: 'curve25519-dalek/src/ristretto.rs', lines 221:0-221:45 -/
-        def ristretto.CompressedRistretto.mk
-          (a : Array U8 32#usize) : Result ristretto.CompressedRistretto := do
-          ok a
 
     # --- Fix EIGHT_TORSION return type ---
 
