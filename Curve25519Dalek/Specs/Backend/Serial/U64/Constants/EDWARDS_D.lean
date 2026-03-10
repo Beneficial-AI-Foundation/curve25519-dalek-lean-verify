@@ -34,9 +34,12 @@ natural language specs:
 - The value of constants.EDWARDS_D when converted to a natural number equals d
 -/
 @[progress]
-theorem EDWARDS_D_spec : EDWARDS_D ⦃ result => Field51_as_Nat result = d ⦄ := by
+theorem EDWARDS_D_spec :
+    EDWARDS_D ⦃ result =>
+    Field51_as_Nat result = d ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold EDWARDS_D field.FieldElement51.from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.constants

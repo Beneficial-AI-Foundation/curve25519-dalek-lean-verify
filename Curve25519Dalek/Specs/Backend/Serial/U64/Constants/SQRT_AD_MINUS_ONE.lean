@@ -37,9 +37,11 @@ natural language specs:
 -/
 @[progress]
 theorem SQRT_AD_MINUS_ONE_spec :
-    SQRT_AD_MINUS_ONE ⦃ result => (Field51_as_Nat result)^2 % p = (a * d - 1) % p ⦄ := by
+    SQRT_AD_MINUS_ONE ⦃ result =>
+    (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold SQRT_AD_MINUS_ONE field.FieldElement51.from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.constants

@@ -551,7 +551,7 @@ theorem sqrt_ratio_i_spec'
     apply spec_imp_exists
     unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
     progress*
-    sorry
+    all_goals sorry
     /-
     have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
       ≡ (Field51_as_Nat SQRT_M1_val) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))

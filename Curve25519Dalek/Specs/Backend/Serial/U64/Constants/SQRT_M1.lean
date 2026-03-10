@@ -36,10 +36,10 @@ natural language specs:
 @[progress]
 theorem SQRT_M1_spec :
     SQRT_M1 ⦃ result =>
-      (Field51_as_Nat result)^2 % p = p - 1 ∧
-      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
+    (Field51_as_Nat result)^2 % p = p - 1 ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold SQRT_M1 field.FieldElement51.from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.constants

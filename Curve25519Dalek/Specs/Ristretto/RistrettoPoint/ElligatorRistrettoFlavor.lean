@@ -256,6 +256,7 @@ natural language specs:
 • The output matches the pure mathematical Elligator map applied to the field value of s
 -/
 
+set_option maxHeartbeats 1000000 in -- needed for complex progress
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
@@ -270,92 +271,74 @@ theorem elligator_ristretto_flavor_spec
     result.IsValid ∧
     result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by
   unfold elligator_ristretto_flavor
-  sorry
-  /-
   progress*
-  · exact h_s_valid -- 1: s < 2^54 (square precond)
-  · intro i hi;
-    unfold backend.serial.u64.constants.SQRT_M1
-    interval_cases i <;> decide -- 2: SQRT_M1 < 2^54
-  · intro i hi; have := r_0_sq_post_2 i hi; omega -- 3: r_0_sq < 2^54
-  · intro i hi; have := r_post_2 i hi; omega -- 4: r < 2^53
-  · intro i hi;
-    unfold backend.serial.u64.field.FieldElement51.ONE
-    interval_cases i <;> decide -- 5: ONE < 2^53
-  · intro i hi;
-    unfold backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED
-    interval_cases i <;> decide -- 6: ONE_MINUS_EDWARDS_D_SQUARED < 2^54
-  · intro i hi;
-    unfold backend.serial.u64.constants.EDWARDS_D
-    interval_cases i <;> decide -- 7: EDWARDS_D < 2^54
-  · intro i hi; have := r_post_2 i hi; omega -- 8: r < 2^54
-  · intro i hi;
-    unfold backend.serial.u64.constants.MINUS_ONE
-    interval_cases i <;> decide -- 9: MINUS_ONE < 2^63
-  · intro i hi; have := d_times_r_post_2 i hi; omega -- 10: d_times_r < 2^54
-  · intro i hi; have := r_post_2 i hi; omega -- 11: r < 2^53
-  · intro i hi;
-    unfold backend.serial.u64.constants.EDWARDS_D
-    interval_cases i <;> decide -- 12: EDWARDS_D < 2^53
-  · intro i hi; have := c_minus_dr_post_1 i hi; omega -- 13: c_minus_dr < 2^54
-  · intro i hi; have := N_s_post_2 i hi; omega -- 14: N_s ≤ 2^52-1
-  · intro i hi; have := D_post_2 i hi; omega -- 15: D ≤ 2^52-1
-  · intro i hi; have := __discr_post_1 i hi; omega -- 16: __discr.2 < 2^54
-  · exact h_s_valid -- 17: s < 2^54 (mul rhs)
-  · intro i hi; have := s_prime_post_2 i hi; omega -- 18: s_prime < 2^54
-  · intro i hi; have := r_post_2 i hi; omega -- 19: r < 2^63
-  · intro i hi;
-    unfold backend.serial.u64.field.FieldElement51.ONE
-    interval_cases i <;> decide -- 20: ONE < 2^54
-  · intro i hi; simp only [c1_post i hi] -- 21: c1 < 2^54 (conditional_assign)
+  · -- ∀ i < 5, ↑c2[i]! < 2 ^ 54
+    intro i hi
+    have h := c2_post i hi
+    simp only [h]
     split
-    · have := r_post_2 i hi; omega
-    · unfold backend.serial.u64.constants.MINUS_ONE; interval_cases i <;> decide
-  · intro i hi; have := r_minus_one_post_1 i hi; omega -- 22: r_minus_one < 2^54
-  · intro i hi; have := c_r_minus_one_post_2 i hi; omega -- 23: c_r_minus_one < 2^54
-  · intro i hi; -- 24: EDWARDS_D_MINUS_ONE_SQUARED < 2^54
-    unfold backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED
-    interval_cases i <;> decide
-  · intro i hi; have := c_r_minus_one_post_2 i hi;
-    grind only [#b83a]
-  · intro i hi; have := D_post_2 i hi; omega -- 26: D < 2^54
-  · intro i hi; simp only [s1_post i hi] -- 27: s1 < 2^54 (conditional)
-    split
+    · have := r_post2 i hi; omega
+    · have := c_post2 i hi; omega
+  · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
-      · have := s_prime_neg_post_2 i hi; omega
-      · have := s_prime_post_2 i hi; omega
-    · have := __discr_post_1 i hi; omega
-  · intro i hi; simp only [s1_post i hi] -- 28: s1 < 2^53 (conditional)
-    split
+      · have := s_prime_neg_post2 i hi; omega
+      · have := s_prime_post2 i hi; omega
+    · grind
+  · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
-      · have := s_prime_neg_post_2 i hi; omega
-      · have := s_prime_post_2 i hi; omega
-    · have := __discr_post_1 i hi; omega
-  · intro i hi; simp only [s1_post i hi] -- 29: s1 < 2^53 (conditional)
-    split
+      · have := s_prime_neg_post2 i hi; omega
+      · have := s_prime_post2 i hi; omega
+    · grind
+  · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
-      · have := s_prime_neg_post_2 i hi; omega
-      · have := s_prime_post_2 i hi; omega
-    · have := __discr_post_1 i hi; omega
-  · intro i hi; have := D_post_2 i hi; omega -- 30: D < 2^54
-  · intro i hi; have := N_t_post_1 i hi; omega -- 31: N_t < 2^54
-  · intro i hi; -- 32: SQRT_AD_MINUS_ONE < 2^54
-    unfold backend.serial.u64.constants.SQRT_AD_MINUS_ONE
-    interval_cases i <;> decide
-  · intro i hi; -- 33: ONE < 2^63
-    unfold backend.serial.u64.field.FieldElement51.ONE
-    interval_cases i <;> decide
-  · intro i hi; have := s_sq_post_2 i hi; omega -- 34: s_sq < 2^54
-  · intro i hi; -- 35: ONE < 2^53
-    unfold backend.serial.u64.field.FieldElement51.ONE
-    interval_cases i <;> decide
-  · intro i hi; have := s_sq_post_2 i hi; omega -- 36: s_sq < 2^53
-  · intro i hi; have h := cp_X_post_2 i hi -- 37: cp_X < 2^54
-    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
-  · intro i hi; have h := cp_Y_post_1 i hi -- 38: cp_Y < 2^54
-    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
-  · intro i hi; have h := cp_Z_post_2 i hi -- 39: cp_Z < 2^54
-    simp only [Array.getElem!_Nat_eq] at h ⊢; omega
+      · have := s_prime_neg_post2 i hi; omega
+      · have := s_prime_post2 i hi; omega
+    · grind
+  -- Main Goals: ⊢ IsValid ep ∧ toPoint ep = ↑(elligator_ristretto_flavor_pure s.toField)
+  -- Step 1: Lift arithmetic postconditions to field equalities
+  have hX_F : ep.X.toField = cp_X.toField * cp_T.toField := by
+    unfold toField; have h := lift_mod_eq _ _ ep_post1; push_cast at h; exact h
+  have hY_F : ep.Y.toField = cp_Y.toField * cp_Z.toField := by
+    unfold toField; have h := lift_mod_eq _ _ ep_post2; push_cast at h; exact h
+  have hZ_F : ep.Z.toField = cp_Z.toField * cp_T.toField := by
+    unfold toField; have h := lift_mod_eq _ _ ep_post3; push_cast at h; exact h
+  have hT_F : ep.T.toField = cp_X.toField * cp_Y.toField := by
+    unfold toField; have h := lift_mod_eq _ _ ep_post4; push_cast at h; exact h
+  have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
+    unfold toField
+    have h_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
+    rw [h_nat]; push_cast
+    have hsq := lift_mod_eq _ _ s_sq_post1
+    push_cast at hsq; rw [hsq, one_post1]
+    simp only [Nat.cast_one]
+  -- Shared postcondition lifts (used by h_cp_T_ne, h_cp_Z_ne, h_cp_curve)
+  have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
+    unfold toField
+    have h_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
+      unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
+    rw [h_nat]; push_cast; rw [one_post1]; simp only [Nat.cast_one]
+  have h_omds_F : one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 := by
+    unfold toField; rw [one_minus_d_sq_post1]
+    have h_sum : ((1 + p - _root_.d ^ 2 % p) % p + _root_.d ^ 2) % p = 1 % p := by
+      norm_num [_root_.d, p]
+    have h := lift_mod_eq _ _ h_sum; push_cast at h
+    change _ = 1 - (_root_.d : CurveField) ^ 2; linear_combination h
+  have h_ns_eq_F : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
+    have hN : N_s.toField = r_plus_one.toField * one_minus_d_sq.toField := by
+      unfold toField; have h := lift_mod_eq _ _ N_s_post1; push_cast at h; exact h
+    rw [hN, h_rpo_F, h_omds_F]
+  sorry
+
+
+
+
+  /-
+
   · -- 40: IsValid ∧ toPoint = elligator_ristretto_flavor_pure
     -- Step 1: Lift arithmetic postconditions to field equalities
     have hX_F : ep.X.toField = cp_X.toField * cp_T.toField := by
@@ -397,6 +380,7 @@ theorem elligator_ristretto_flavor_spec
           backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField := by
         unfold toField; have h := lift_mod_eq _ _ N_s_post_1; push_cast at h; exact h
       rw [hN, h_rpo_F, ONE_MINUS_EDWARDS_D_SQUARED_toField]
+
     have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
       unfold toField
       have h_nat : Field51_as_Nat r_plus_d =
