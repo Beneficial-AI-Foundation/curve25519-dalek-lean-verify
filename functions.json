@@ -8672,7 +8672,7 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem ct_eq_spec\n    (self other : RistrettoPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    ct_eq self other ⦃ (result : subtle.Choice) =>\n      result = Choice.one ↔\n        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨\n        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by ...",
