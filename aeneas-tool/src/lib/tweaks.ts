@@ -2,8 +2,7 @@ import fs from "node:fs";
 import chalk from "chalk";
 
 export interface Substitution {
-  find?: string;
-  find_regex?: string;
+  find: string;
   replace: string;
 }
 
@@ -20,18 +19,9 @@ export function applyTweaks(
 
   for (let i = 0; i < substitutions.length; i++) {
     const sub = substitutions[i];
-
-    if (sub.find !== undefined) {
-      if (!content.includes(sub.find)) continue;
-      matched.add(i);
-      content = content.replaceAll(sub.find, sub.replace);
-    } else if (sub.find_regex !== undefined) {
-      const regex = new RegExp(sub.find_regex, "gs");
-      if (!regex.test(content)) continue;
-      matched.add(i);
-      regex.lastIndex = 0;
-      content = content.replace(regex, sub.replace);
-    }
+    if (!content.includes(sub.find)) continue;
+    matched.add(i);
+    content = content.replaceAll(sub.find, sub.replace);
   }
 
   fs.writeFileSync(filePath, content, "utf-8");
@@ -53,12 +43,11 @@ export function warnUnmatchedTweaks(
   const unmatched: string[] = [];
   for (let i = 0; i < substitutions.length; i++) {
     if (allMatched.has(i)) continue;
-    const sub = substitutions[i];
-    const pattern = sub.find ?? sub.find_regex ?? "";
     const preview =
-      pattern.length > 60 ? pattern.substring(0, 60) + "..." : pattern;
-    const kind = sub.find !== undefined ? "literal" : "regex";
-    unmatched.push(`Substitution #${i + 1} (${kind}) not found in any file: "${preview}"`);
+      substitutions[i].find.length > 60
+        ? substitutions[i].find.substring(0, 60) + "..."
+        : substitutions[i].find;
+    unmatched.push(`Substitution #${i + 1} not found in any file: "${preview}"`);
   }
 
   if (unmatched.length > 0) {

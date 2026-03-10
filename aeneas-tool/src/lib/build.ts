@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { run, which } from "./shell.js";
-import { DependencyError, BuildError } from "./errors.js";
+import { DependencyError } from "./errors.js";
 
 export async function checkDependencies(): Promise<void> {
   const deps = ["git", "opam", "make"];
@@ -97,42 +97,31 @@ export async function installOcamlDeps(
   });
 }
 
+function parseToolchainChannel(filePath: string): string | null {
+  if (!fs.existsSync(filePath)) return null;
+  const content = fs.readFileSync(filePath, "utf-8");
+  const match = content.match(/channel\s*=\s*"?([^"\s]+)"?/);
+  return match ? match[1] : null;
+}
+
+async function installRustToolchain(toolchain: string): Promise<void> {
+  await run("rustup", ["toolchain", "install", toolchain], {
+    label: `Installing Rust toolchain ${toolchain}...`,
+  });
+  await run(
+    "rustup",
+    ["component", "add", "--toolchain", toolchain, "rustfmt"],
+    { label: "Adding rustfmt component..." },
+  );
+}
+
 export async function setupRustToolchain(charonDir: string): Promise<void> {
-  // Look for rust-toolchain.toml
-  const toolchainToml = path.join(charonDir, "charon", "rust-toolchain.toml");
-  const toolchainFile = path.join(charonDir, "charon", "rust-toolchain");
+  const toolchain =
+    parseToolchainChannel(path.join(charonDir, "charon", "rust-toolchain.toml")) ??
+    parseToolchainChannel(path.join(charonDir, "charon", "rust-toolchain")) ??
+    "nightly";
 
-  let nightlyVersion: string | null = null;
-
-  if (fs.existsSync(toolchainToml)) {
-    const content = fs.readFileSync(toolchainToml, "utf-8");
-    const match = content.match(/channel\s*=\s*"([^"]+)"/);
-    if (match) nightlyVersion = match[1];
-  } else if (fs.existsSync(toolchainFile)) {
-    const content = fs.readFileSync(toolchainFile, "utf-8");
-    const match = content.match(/channel\s*=\s*"([^"]+)"/);
-    if (match) nightlyVersion = match[1];
-  }
-
-  if (nightlyVersion) {
-    await run("rustup", ["toolchain", "install", nightlyVersion], {
-      label: `Installing Rust toolchain ${nightlyVersion}...`,
-    });
-    await run(
-      "rustup",
-      ["component", "add", "--toolchain", nightlyVersion, "rustfmt"],
-      { label: "Adding rustfmt component..." },
-    );
-  } else {
-    await run("rustup", ["toolchain", "install", "nightly"], {
-      label: "Installing Rust nightly (no specific version found)...",
-    });
-    await run(
-      "rustup",
-      ["component", "add", "--toolchain", "nightly", "rustfmt"],
-      { label: "Adding rustfmt component..." },
-    );
-  }
+  await installRustToolchain(toolchain);
 }
 
 export async function buildCharon(

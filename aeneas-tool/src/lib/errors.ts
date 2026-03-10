@@ -22,13 +22,6 @@ export class ConfigError extends AeneasToolError {
   }
 }
 
-export class BuildError extends AeneasToolError {
-  constructor(message: string, options?: { cause?: Error; hint?: string }) {
-    super(message, options);
-    this.name = "BuildError";
-  }
-}
-
 export class ExtractionError extends AeneasToolError {
   constructor(message: string, options?: { cause?: Error; hint?: string }) {
     super(message, options);

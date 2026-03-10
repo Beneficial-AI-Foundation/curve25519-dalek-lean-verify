@@ -37,12 +37,10 @@ export async function updateCommand(
   const repoDir = getAeneasRepoDir(root);
   const aeneasDir = getAeneasDir(root);
 
-  // We need a local repo to view commits. Clone temp if not exists
-  let tempClone = false;
+  // We need a local repo to view commits. Clone if not exists
   if (!fs.existsSync(repoDir)) {
     fs.mkdirSync(aeneasDir, { recursive: true });
     await git.clone(config.aeneas.repo, repoDir);
-    tempClone = true;
   } else {
     await git.fetch(repoDir);
   }

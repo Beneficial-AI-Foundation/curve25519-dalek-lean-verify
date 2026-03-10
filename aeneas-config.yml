@@ -86,9 +86,7 @@ aeneas_args:
   dest: "Curve25519Dalek"
 
 # Post-extraction tweaks applied to generated Lean files.
-# Substitutions are applied IN ORDER. Each entry is either:
-#   find/replace   — literal text replacement (all occurrences)
-#   find_regex/replace — regex replacement (all occurrences, dotAll mode)
+# Substitutions are applied IN ORDER using literal find/replace (all occurrences).
 tweaks:
   files:
     - "Funs.lean"

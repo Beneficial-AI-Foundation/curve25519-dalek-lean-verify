@@ -5,15 +5,10 @@ export async function clone(
   dest: string,
   opts?: { commit?: string; branch?: string },
 ): Promise<void> {
-  if (opts?.branch) {
-    await run("git", ["clone", "--branch", opts.branch, repo, dest], {
-      label: `Cloning ${repo}...`,
-    });
-  } else {
-    await run("git", ["clone", repo, dest], {
-      label: `Cloning ${repo}...`,
-    });
-  }
+  const cloneArgs = ["clone"];
+  if (opts?.branch) cloneArgs.push("--branch", opts.branch);
+  cloneArgs.push(repo, dest);
+  await run("git", cloneArgs, { label: `Cloning ${repo}...` });
 
   if (opts?.commit) {
     await run("git", ["checkout", opts.commit], {
@@ -68,14 +63,14 @@ export interface CommitInfo {
 export async function commitInfo(dir: string): Promise<CommitInfo> {
   const output = await run(
     "git",
-    ["log", "-1", "--format=%H%n%h%n%ci%n%s"],
+    ["log", "-1", "--format=%H%n%h%n%cd%n%s", "--date=short"],
     { cwd: dir, silent: true },
   );
-  const [hash, shortHash, date, subject] = output.split("\n");
+  const lines = output.split("\n");
   return {
-    hash,
-    shortHash,
-    date: date.split(" ")[0], // just the date part
-    subject,
+    hash: lines[0] ?? "",
+    shortHash: lines[1] ?? "",
+    date: lines[2] ?? "",
+    subject: lines[3] ?? "",
   };
 }

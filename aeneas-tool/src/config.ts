@@ -12,7 +12,6 @@ export interface AeneasConfig {
   charon: {
     preset: string;
     cargo_args: string[];
-    package: string;
     start_from: string[];
     exclude: string[];
     opaque: string[];
@@ -29,8 +28,7 @@ export interface AeneasConfig {
   tweaks: {
     files: string[];
     substitutions: Array<{
-      find?: string;
-      find_regex?: string;
+      find: string;
       replace: string;
     }>;
   };
@@ -62,6 +60,10 @@ export function loadConfig(configPath?: string): {
     throw new ConfigError("Failed to parse aeneas-config.yml", {
       cause: err as Error,
     });
+  }
+
+  if (!raw || typeof raw !== "object") {
+    throw new ConfigError("aeneas-config.yml is empty or invalid");
   }
 
   const config = raw as AeneasConfig;
@@ -105,7 +107,7 @@ export function updateConfigCommit(
 ): void {
   let content = fs.readFileSync(configPath, "utf-8");
   content = content.replace(
-    /^(\s*commit:\s*)"[^"]*"/m,
+    /^(\s*commit:\s*)["']?[a-f0-9]+["']?/m,
     `$1"${newCommit}"`,
   );
   fs.writeFileSync(configPath, content, "utf-8");

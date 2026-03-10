@@ -90,19 +90,26 @@ export async function runStreaming(
     });
   }
 
-  const result = await child;
+  try {
+    const result = await child;
 
-  if (opts?.logFile) {
-    const logDir = path.dirname(opts.logFile);
-    fs.mkdirSync(logDir, { recursive: true });
-    fs.writeFileSync(opts.logFile, chunks.join(""), "utf-8");
-  }
+    if (opts?.logFile) {
+      const logDir = path.dirname(opts.logFile);
+      fs.mkdirSync(logDir, { recursive: true });
+      fs.writeFileSync(opts.logFile, chunks.join(""), "utf-8");
+    }
 
-  if (result.exitCode !== 0) {
-    throw new AeneasToolError(
-      `Command failed: ${cmd} ${args.join(" ")}`,
-      { hint: opts?.logFile ? `See log: ${opts.logFile}` : undefined },
-    );
+    if (result.exitCode !== 0) {
+      throw new AeneasToolError(
+        `Command failed: ${cmd} ${args.join(" ")}`,
+        { hint: opts?.logFile ? `See log: ${opts.logFile}` : undefined },
+      );
+    }
+  } catch (err) {
+    if (err instanceof AeneasToolError) throw err;
+    throw new AeneasToolError(`Failed to execute: ${cmd}`, {
+      cause: err as Error,
+    });
   }
 }
 
