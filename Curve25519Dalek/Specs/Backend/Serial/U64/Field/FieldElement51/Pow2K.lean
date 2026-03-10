@@ -514,31 +514,28 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       hc3'_eq hc3'_bound hcarry3_fits hc4'_eq hc4'_bound hcarry4_fits
       ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 hcarry_val
     -- Continue until the end of the function
-    let* ⟨ i53, i53_post ⟩ ← U64.mul_spec
-    let* ⟨ i54, i54_post ⟩ ← Array.index_usize_spec
-    let* ⟨ i55, i55_post ⟩ ← U64.add_spec
-    let* ⟨ a6, a6_post ⟩ ← Array.update_spec
-    let* ⟨ i56, i56_post ⟩ ← Array.index_usize_spec
-    let* ⟨ i57, i57_post_1, i57_post_2 ⟩ ← U64.ShiftRight_IScalar_spec
-    let* ⟨ i58, i58_post ⟩ ← Array.index_usize_spec
-    -- progress
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ i55, _ ⟩
+    progress as ⟨ a6, a6_post ⟩
+    progress as ⟨ i56, _ ⟩
+    progress as ⟨ i57, i57_post_1, _ ⟩
+    progress as ⟨ i58, _ ⟩
     -- TODO: Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
     apply spec_bind
     · apply U64.add_spec
-      -- i58 = a6[1] = a'[1] (since a6 = a'.set 0 ...), so i58.val = c1' % 2^51 < 2^51
-      -- i57 = i56 >>> 51 where i56 is U64, so i57.val ≤ 2^13 - 1
-      have hi58_bound : i58.val < 2 ^ 51 := by
-        have h58 : i58.val = a'[1]!.val := by simp [i58_post, a6_post]
-        rw [h58, ha'_1]; exact Nat.mod_lt _ (by positivity)
-      have hi57_bound : i57.val ≤ 2 ^ 13 - 1 := by
-        rw [i57_post_1]; exact U64_shiftRight_le i56
+      have : i58.val < 2 ^ 51 := by
+        have : i58.val = a'[1]!.val := by simp [*]
+        rw [this, ha'_1]; exact Nat.mod_lt _ (by positivity)
+      rw [i57_post_1]
+      have : i56.val >>> 51 ≤ 2 ^ 13 - 1 := U64_shiftRight_le i56
       have : U64.max = 2 ^ 64 - 1 := by simp only [U64.max_eq]; norm_num
       omega
     intro i59 i59_post
-    let* ⟨ a7, a7_post ⟩ ← Array.update_spec
-    let* ⟨ i60, i60_post ⟩ ← Array.index_usize_spec
-    let* ⟨ i61, i61_post_1, i61_post_2 ⟩ ← UScalar.and_spec
-    let* ⟨ a'', a''_post ⟩ ← Array.update_spec
+    progress as ⟨ a7, a7_post ⟩
+    progress as ⟨ i60, _ ⟩
+    progress as ⟨ _, i61_post_1, _ ⟩
+    progress as ⟨ a'', a''_post ⟩
     /-
     Stage 3: Final reduction (Rust l.534–545)
 
@@ -558,23 +555,17 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     Limb bounds (`ha''_lt`):
       `a''[i] < 2^52 for all i`
     -/
-    -- Conversion helper: index_usize result .val to getElem! .val
-    have h54_val : i54.val = a'[0]!.val := by
-      simp [i54_post]
-    have h_i55 : i55.val = a'[0]!.val + 19 * carry.val := by
-      simp only [i55_post, h54_val, i53_post]; ring
+    -- Conversion helpers
+    have h_i55 : i55.val = a'[0]!.val + 19 * carry.val := by simp [*]; ring
     have ha6_0 : a6[0]!.val = a'[0]!.val + 19 * carry.val := by
       simp only [a6_post, Array.set_of_eq _ _ 0 (by scalar_tac)]; exact h_i55
     have ha6_1 : a6[1]!.val = a'[1]!.val := by
       simp only [a6_post, Array.set_of_ne_getElem! _ _ 1 0 (by scalar_tac) (by scalar_tac) (by omega)]
-    have h56_val : i56.val = a6[0]!.val := by
-      simp [i56_post]
+    have h56_val : i56.val = a6[0]!.val := by simp [*]
     have h_i57 : i57.val = (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
       simp only [i57_post_1, Nat.shiftRight_eq_div_pow, h56_val, ha6_0]
-    have h60_val : i60.val = a7[0]!.val := by
-      simp [i60_post]
-    have h58_val : i58.val = a6[1]!.val := by
-      simp [i58_post]
+    have h60_val : i60.val = a7[0]!.val := by simp [*]
+    have h58_val : i58.val = a6[1]!.val := by simp [*]
     -- Array values after final reduction
     have ha''_0 : a''[0]!.val = (a'[0]!.val + 19 * carry.val) % 2 ^ 51 := by
       simp only [a''_post, Array.set_of_eq _ _ 0 (by scalar_tac)]
@@ -599,9 +590,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp only [a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by scalar_tac) (by scalar_tac) (by omega)]
       simp only [a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by scalar_tac) (by scalar_tac) (by omega)]
     --
-    let* ⟨ k1, k1_post_1, k1_post_2 ⟩ ← U32.sub_spec
+    progress as ⟨ k1, k1_post_1, k1_post_2 ⟩
     -- Recursive call: pow2k_loop k1 a''
-    -- With the updated spec (no hk precondition), progress handles both k1=0 and k1>0
     -- Limb bounds for a'': all < 2^52
     have ha''_lt : ∀ i < 5, a''[i]!.val < 2 ^ 52 := by
       intro i hi; interval_cases i
@@ -609,9 +599,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       · rw [ha''_1, ha'_1]
         have hmod : c1'.val % 2 ^ 51 < 2 ^ 51 := Nat.mod_lt _ (by positivity)
         have hdiv : (a'[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by
-          have heq : a'[0]!.val + 19 * carry.val = i55.val := by
-            simp only [i55_post, h54_val, i53_post]; ring
-          rw [heq]
+          have : a'[0]!.val + 19 * carry.val = i55.val := h_i55.symm
+          rw [this]
           have : i55.val < 2 ^ 64 := by scalar_tac
           omega
         omega
@@ -623,12 +612,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       fun i hi => by have := ha''_lt i hi; omega
     progress with pow2k_loop_spec as ⟨ res, res_post_1, res_post_2 ⟩
     -- Clear everything no longer needed
-    clear * - pow2k_loop_spec k a ha hlt a'' carry a'
-      ha''_0 ha''_1 ha''_2 ha''_3 ha''_4 ha''_lt
-      ha'_0 ha'_1 ha'_2 ha'_3 ha'_4
-      c0 c1 c2 c3 c4 c1' c2' c3' c4' a_pow_two
-      hc1'_eq hc2'_eq hc3'_eq hc4'_eq hcarry_val
-      k1 k1_post_1 k1_post_2 res res_post_1 res_post_2
+    clear * - pow2k_loop_spec k a ha hlt a'' carry a' ha''_0 ha''_1 ha''_2 ha''_3 ha''_4 ha''_lt
+      ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 c0 c1 c2 c3 c4 c1' c2' c3' c4' a_pow_two
+      hc1'_eq hc2'_eq hc3'_eq hc4'_eq hcarry_val k1 k1_post_1 k1_post_2 res res_post_1 res_post_2
     -- Prove the post conditions using what was already established
     constructor
     · -- Field51_as_Nat res ≡ (Field51_as_Nat a)^(2^k.val) [MOD p]
@@ -680,8 +666,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         exact res_post_2
   case isFalse hge =>
     progress*
-    have hk0 : k.val = 0 := by scalar_tac
-    simpa [hk0] using Nat.ModEq.trans rfl rfl
+    have : k.val = 0 := by scalar_tac
+    simpa [this] using Nat.ModEq.trans rfl rfl
   termination_by k.val
   decreasing_by scalar_decr_tac
 
