@@ -16,10 +16,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
--- import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 
-
--- import Mathlib.Data.Nat.Basic
 /-! # Spec Theorem for `MontgomeryPoint::to_edwards`
 
 Specification and proof for `MontgomeryPoint::to_edwards`.
@@ -48,18 +45,14 @@ natural language description:
 
 natural language specs:
 
-    When the function returns Some(edwards_point):
-      - The Edwards y-coordinate satisfies the birational map: y ≡ (u-1)/(u+1) (mod p)
-      - The edwards_point lies on the twisted Edwards curve equation
-      - The sign bit is properly encoded
+    When the function returns Some(ep):
+      - ep.Z is invertible in the field (invert ep.Z = ok Z_inv for some Z_inv)
+      - The affine Edwards y-coordinate y = ep.Y / ep.Z satisfies the birational map:
+          y * (u + 1) ≡ u - 1 (mod p)
+        where u = U8x32_as_Nat mp % 2^255
 
     where p = 2^255 - 19
 -/
--- /-- **Spec and proof concerning `montgomery.MontgomeryPoint.to_edwards`**:
--- - When the function returns Some(edwards_point), the Edwards y-coordinate satisfies
---   the birational map: y * (u + 1) ≡ (u - 1) (mod p)
--- - The returned point lies on the twisted Edwards curve
--- -/
 
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
