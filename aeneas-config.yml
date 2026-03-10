@@ -177,8 +177,8 @@ tweaks:
 
     # --- Convert Aeneas block comments to doc comments ---
 
-    - find: "/-\n"
-      replace: "/--\n"
+    - find: "/- "
+      replace: "/-- "
 
     # --- Fix parameter name shadowing: variable `scalar` shadows namespace ---
 
