@@ -112,3 +112,38 @@ export function updateConfigCommit(
   );
   fs.writeFileSync(configPath, content, "utf-8");
 }
+
+/**
+ * Find lakefile.toml in root and check if it has an aeneas require with a rev field.
+ * Returns the file path and current rev, or null if not found.
+ */
+export function findLakefileAeneasRev(
+  root: string,
+): { filePath: string; currentRev: string } | null {
+  const lakefilePath = path.join(root, "lakefile.toml");
+  if (!fs.existsSync(lakefilePath)) return null;
+
+  const content = fs.readFileSync(lakefilePath, "utf-8");
+
+  // Match a [[require]] block with name = "aeneas" and a rev field
+  const match = content.match(
+    /\[\[require\]\][^[]*?name\s*=\s*"aeneas"[^[]*?rev\s*=\s*"([a-f0-9]+)"/s,
+  );
+  if (!match) return null;
+
+  return { filePath: lakefilePath, currentRev: match[1] };
+}
+
+export function updateLakefileRev(
+  filePath: string,
+  newRev: string,
+): void {
+  let content = fs.readFileSync(filePath, "utf-8");
+
+  // Replace rev inside the aeneas [[require]] block
+  content = content.replace(
+    /(\[\[require\]\][^[]*?name\s*=\s*"aeneas"[^[]*?rev\s*=\s*")([a-f0-9]+)(")/s,
+    `$1${newRev}$3`,
+  );
+  fs.writeFileSync(filePath, content, "utf-8");
+}

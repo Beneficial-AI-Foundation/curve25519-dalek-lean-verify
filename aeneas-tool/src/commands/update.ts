@@ -2,7 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import chalk from "chalk";
 import { select } from "@inquirer/prompts";
-import { type AeneasConfig, updateConfigCommit } from "../config.js";
+import {
+  type AeneasConfig,
+  updateConfigCommit,
+  findLakefileAeneasRev,
+  updateLakefileRev,
+} from "../config.js";
 import { getAeneasDir, getAeneasRepoDir } from "../lib/paths.js";
 import * as git from "../lib/git.js";
 import { installCommand } from "./install.js";
@@ -81,7 +86,24 @@ export async function updateCommand(
   // Step 3: Update config
   const configPath = path.join(root, "aeneas-config.yml");
   updateConfigCommit(configPath, selectedHash);
-  console.log(chalk.green(`\n  ✓ Updated aeneas-config.yml to ${selectedHash.substring(0, 8)}\n`));
+  console.log(chalk.green(`  ✓ Updated aeneas-config.yml to ${selectedHash.substring(0, 8)}`));
+
+  // Step 3b: Update lakefile.toml if it has an aeneas rev
+  const lakefile = findLakefileAeneasRev(root);
+  if (lakefile && lakefile.currentRev !== selectedHash) {
+    const updateLakefile = await select({
+      message: `Update lakefile.toml rev? (currently ${lakefile.currentRev.substring(0, 8)})`,
+      choices: [
+        { name: "Yes", value: true },
+        { name: "No", value: false },
+      ],
+    });
+    if (updateLakefile) {
+      updateLakefileRev(lakefile.filePath, selectedHash);
+      console.log(chalk.green(`  ✓ Updated lakefile.toml rev to ${selectedHash.substring(0, 8)}`));
+    }
+  }
+  console.log();
 
   // Step 4: Ask to install
   const doInstall = await select({
