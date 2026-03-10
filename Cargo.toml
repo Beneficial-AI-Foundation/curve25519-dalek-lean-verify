@@ -2,7 +2,7 @@
 members = [
     "curve25519-dalek"
 ]
-exclude = ["aeneas"]
+exclude = ["aeneas", ".aeneas"]
 resolver = "2"
 
 [profile.dev]
