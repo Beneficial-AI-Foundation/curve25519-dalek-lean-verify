@@ -61,7 +61,6 @@ natural language specs:
 -- - The returned point lies on the twisted Edwards curve
 -- -/
 
-
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
@@ -199,25 +198,49 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             simp [Array.getElem!_Nat_eq]
 
 
-          -- have h_set_eq : U8x32_as_Nat (y_bytes.set 31#usize i2) =
-          --     (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) + 2^248 * i2.val := by
-          --   unfold U8x32_as_Nat
-          --   rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
-          --   simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-          --   congr 1
-          --   · apply Finset.sum_congr rfl
-          --     intro j hj
-          --     congr 1
-          --     exact congrArg UScalar.val (List.getElem!_set_ne y_bytes 31 j i2 (by omega))
-          --   · exact congrArg UScalar.val
-          --         (List.getElem!_set y_bytes 31 i2 (by simp [y_bytes.property]))
+          have h_set_eq : U8x32_as_Nat (y_bytes.set 31#usize i2) =
+              (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) + 2^248 * i2.val := by
+            unfold U8x32_as_Nat
+            rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
+            simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+            -- The goal has (↑31#usize : ℕ) as the List.set position.
+            -- USize.toNat 31#usize = 31, but whnf is slow for this coercion.
+            -- Use native_decide + rw to substitute without whnf.
+            have h_idx : (↑(31#usize) : ℕ) = 31 := by native_decide
+            rw [h_idx]
+            -- Now the goal has literal 31 as the set position.
+            -- Rewrite the last element: congrArg UScalar.val avoids coercion ambiguity
+            rw [congrArg UScalar.val (List.getElem!_set (↑y_bytes : List U8) 31 i2
+              (by simp [y_bytes.property]))]
+            sorry
+            -- Prove sum equality using UScalar.val (no ↑ coercion ambiguity).
+            -- Then close with `h_eq ▸ rfl` which uses fast isDefEq (UScalar.val = ↑ is rfl),
+            -- avoiding whnf on List.set inside the Finset.sum.
+            -- have h_eq : ∑ j ∈ Finset.range 31, 2^(8*j) *
+            --         UScalar.val ((↑y_bytes : List U8).set 31 i2)[j]! =
+            --     ∑ j ∈ Finset.range 31, 2^(8*j) *
+            --         UScalar.val (↑y_bytes : List U8)[j]! :=
+            --   Finset.sum_congr rfl (fun j hj => congrArg (2^(8*j) * ·)
+            --     (congrArg UScalar.val (List.getElem!_set_ne (↑y_bytes : List U8) 31 j i2
+            --       (Or.inr (Or.inr (Or.inr (Finset.mem_range.mp hj))))))))
+            -- exact h_eq ▸ rfl
 
+          -- Step 3: Use 2^248 * 128 = 2^255 to conclude
+          rw [h_set_eq, h_orig_eq]
+          set S := ∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val
+          set v := (↑y_bytes)[31]!.val
+          have h_expand : S + 2^248 * i2.val = (S + 2^248 * v) + 2^255 * (i2.val / 128) := by
+            have h_decomp : i2.val = v + 128 * (i2.val / 128) := by omega  -- from h_i2_mod
+            calc S + 2^248 * i2.val
+                = S + 2^248 * (v + 128 * (i2.val / 128)) := by grind only
+              _ = (S + 2^248 * v) + 2^248 * 128 * (i2.val / 128) := by ring
+              _ = (S + 2^248 * v) + 2^255 * (i2.val / 128) := by norm_num
+          rw [h_expand, Nat.add_mul_mod_self_left]
 
         -- -- i.val ∈ {0, 128}（sign <<< 7 只有最高位）
         --   have hi_cases : i.val = 0 ∨ i.val = 128 := by
         --     sorry
 
-          sorry
 
         -- Step 2b: Simplify % 2^255 using the fact that y_bytes < p < 2^255
         have h_bytes_mod : U8x32_as_Nat y_bytes % 2^255 % p = U8x32_as_Nat y_bytes % p := by
