@@ -34,8 +34,7 @@ natural language description:
     • Internally, tries to convert the slice into a `[u8; 32]` array via `TryFrom`.
     • If the slice has exactly 32 bytes, returns `Ok(CompressedRistretto(bytes))`.
     • If the slice does not have exactly 32 bytes, returns `Err(TryFromSliceError)`.
-    • The function never panics — it always succeeds at the Aeneas `Result` level.
-    • The inner Rust-level `core::result::Result` signals success or failure.
+    • The function never panics; it always succeeds at the Aeneas `Result` level.
 
 natural language specs:
 
