@@ -159,11 +159,63 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             have := high_bit_zero_of_lt_255 y_bytes h255
             omega
 
-        -- 第二步：建立 i2.val 与 y_bytes[31]!.val 的关系
+          -- Step 1: i2.val % 128 = (↑y_bytes)[31]!.val
+          -- have h_i1_eq := congrArg UScalar.val i1_post
+          have coerce_eq : (↑y_bytes : List U8)[31]! = y_bytes[31]! := by
+            simp only [Array.getElem!_Nat_eq]
 
-        -- i.val ∈ {0, 128}（sign <<< 7 只有最高位）
-          have hi_cases : i.val = 0 ∨ i.val = 128 := by
-            sorry
+          have h_i1_eq : i1.val = y_bytes[31]!.val := by
+            have h := congrArg UScalar.val i1_post
+            grind only
+
+          have h_i1_lt : i1.val < 128 := by
+            grind only
+          have h_i2_lo : i2.val % 128 = i1.val := by
+            -- Lower 7 bits: (i1.bv ^^^ sign.bv<<<7) &&& 0x7F = i1.bv &&& 0x7F (bitwise tautology)
+            have h_xor_lo : (i2.bv &&& 0x7F#8) = (i1.bv &&& 0x7F#8) := by
+              simp [i2_post_2, i_post_2]
+              -- omega
+              bv_decide
+            have h_mod_i2 : i2.val % 128 = (i2.bv &&& 0x7F#8).toNat := by
+              change i2.bv.toNat % 128 = (i2.bv &&& 0x7F#8).toNat
+              simp only [BitVec.toNat_and, BitVec.toNat_ofNat, Nat.reducePow, Nat.reduceMod]
+              have hmask := Nat.and_two_pow_sub_one_eq_mod i2.bv.toNat 7
+              norm_num at hmask; linarith
+            have h_mod_i1 : (i1.bv &&& 0x7F#8).toNat = i1.val := by
+              change (i1.bv &&& 0x7F#8).toNat = i1.bv.toNat
+              simp only [BitVec.toNat_and, BitVec.toNat_ofNat, Nat.reducePow, Nat.reduceMod]
+              have hmask := Nat.and_two_pow_sub_one_eq_mod i1.bv.toNat 7
+              have hlt : i1.bv.toNat < 128 := h_i1_lt
+              norm_num at hmask; linarith [Nat.mod_eq_of_lt hlt]
+            rw [h_mod_i2, h_xor_lo, h_mod_i1]
+          have h_i2_mod : i2.val % 128 = (↑y_bytes)[31]!.val := by rw [h_i2_lo, h_i1_eq]
+
+
+          -- Step 2: Decompose U8x32_as_Nat at byte 31
+          have h_orig_eq : U8x32_as_Nat y_bytes =
+              (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) + 2^248 * (↑y_bytes)[31]!.val := by
+            unfold U8x32_as_Nat
+            rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
+            simp [Array.getElem!_Nat_eq]
+
+
+          -- have h_set_eq : U8x32_as_Nat (y_bytes.set 31#usize i2) =
+          --     (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) + 2^248 * i2.val := by
+          --   unfold U8x32_as_Nat
+          --   rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
+          --   simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+          --   congr 1
+          --   · apply Finset.sum_congr rfl
+          --     intro j hj
+          --     congr 1
+          --     exact congrArg UScalar.val (List.getElem!_set_ne y_bytes 31 j i2 (by omega))
+          --   · exact congrArg UScalar.val
+          --         (List.getElem!_set y_bytes 31 i2 (by simp [y_bytes.property]))
+
+
+        -- -- i.val ∈ {0, 128}（sign <<< 7 只有最高位）
+        --   have hi_cases : i.val = 0 ∨ i.val = 128 := by
+        --     sorry
 
           sorry
 
