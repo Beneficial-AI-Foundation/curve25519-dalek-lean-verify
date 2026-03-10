@@ -332,6 +332,41 @@ theorem elligator_ristretto_flavor_spec
     have hN : N_s.toField = r_plus_one.toField * one_minus_d_sq.toField := by
       unfold toField; have h := lift_mod_eq _ _ N_s_post1; push_cast at h; exact h
     rw [hN, h_rpo_F, h_omds_F]
+  have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
+    unfold toField
+    have h_nat : Field51_as_Nat r_plus_d =
+        Field51_as_Nat r + Field51_as_Nat d := by
+      unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add];
+    rw [h_nat]; push_cast; rw [d_post1]; rfl
+  have h_cmdr_F : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
+    have hD_sub : c_minus_dr.toField + d_times_r.toField = c.toField := by
+      unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post2; push_cast at h; exact h
+    have hD_dr : d_times_r.toField = d.toField * r.toField := by
+      unfold toField; have h := lift_mod_eq _ _ d_times_r_post1; push_cast at h; exact h
+    have hc_F : c.toField = -1 := by
+      unfold toField; rw [c_post1]
+      have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
+      have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
+    have hd_F : d.toField = Ed25519.d := by
+      unfold toField; rw [d_post1]; rfl
+    rw [hc_F] at hD_sub; rw [hd_F] at hD_dr
+    linear_combination hD_sub - hD_dr
+  have h_D_eq_F : D.toField =
+      (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
+    have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
+      unfold toField; have h := lift_mod_eq _ _ D_post1; push_cast at h; exact h
+    rw [hD, h_cmdr_F, h_rpd_F]
+  have h_rm1_F : r_minus_one.toField = r.toField - 1 := by
+    unfold toField; have h := lift_mod_eq _ _ r_minus_one_post2
+    push_cast at h; rw [one_post1, Nat.cast_one] at h; linear_combination h
+  have h_cr_F : c_r_minus_one.toField = c2.toField * r_minus_one.toField := by
+    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post1
+    push_cast at h; exact h
+  have h_crd_F : c_r_minus_one_d.toField = c_r_minus_one.toField *
+      d_minus_one_sq.toField := by
+    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post1
+    push_cast at h; exact h
   sorry
 
 
@@ -380,7 +415,6 @@ theorem elligator_ristretto_flavor_spec
           backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField := by
         unfold toField; have h := lift_mod_eq _ _ N_s_post_1; push_cast at h; exact h
       rw [hN, h_rpo_F, ONE_MINUS_EDWARDS_D_SQUARED_toField]
-
     have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
       unfold toField
       have h_nat : Field51_as_Nat r_plus_d =
@@ -408,10 +442,12 @@ theorem elligator_ristretto_flavor_spec
     have h_cr_F : c_r_minus_one.toField = c1.toField * r_minus_one.toField := by
       unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post_1
       push_cast at h; exact h
+
     have h_crd_F : c_r_minus_one_d.toField = c_r_minus_one.toField *
         backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField := by
       unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post_1
       push_cast at h; exact h
+
     have h_Nt_add_F : N_t.toField + D.toField = c_r_minus_one_d.toField := by
       unfold toField; have h := lift_mod_eq _ _ N_t_post_2; push_cast at h; exact h
     have h_Nt_eq_F : N_t.toField =
