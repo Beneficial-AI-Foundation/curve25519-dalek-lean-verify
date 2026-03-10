@@ -64,8 +64,7 @@ theorem step_2_spec
     (bytes : Aeneas.Std.Array U8 32#usize)
     (sign_bit : Bool)
     (h_repr : repr.as_bytes = ok bytes)
-    (h_byter : sign_bit = (bytes[31]!.val.testBit 7))
-     :
+    (h_byter : sign_bit = (bytes[31]!.val.testBit 7)) :
     edwards.decompress.step_2 repr X Y Z ⦃ result =>
       -- Y and Z are unchanged
       result.Y = Y ∧
@@ -74,12 +73,12 @@ theorem step_2_spec
       -- The sign bit is extracted from the compressed representation
       -- X is conditionally negated based on the sign bit
         (if sign_bit then
-          (result.X = neg X)
+          neg X = ok result.X
         else
           result.X = X) ∧
 
         -- T = X' * Y
-        (result.T = mul result.X Y ) ⦄ := by
+        mul result.X Y = ok result.T ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

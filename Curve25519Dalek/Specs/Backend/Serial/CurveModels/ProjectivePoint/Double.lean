@@ -99,60 +99,6 @@ theorem double_spec_aux (q : ProjectivePoint)
     (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
   progress*
-  · -- BEGIN TASK
-    intro i hi
-    have := h_qX_bounds i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := h_qY_bounds i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK: X_plus_Y bounds for squaring (X < 2^53, Y < 2^53 → X+Y < 2^54)
-    intro i hi
-    have := h_qX_bounds i hi
-    have := h_qY_bounds i hi
-    have : ∀ i < 5, YY[i]!.val < 2 ^ 52 := by grind
-    have := this i (by grind)
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK: YY_plus_XX = add YY XX bounds (YY, XX < 2^52 → output < 2^54 for sub)
-    intro i hi
-    have := YY_post_2 i hi
-    have := XX_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := YY_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := XX_post_2 i hi
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have : ∀ i < 5, X_plus_Y_sq[i]!.val < 2 ^ 52 := by grind
-    have := this i (by grind)
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK
-    intro i hi
-    have := XX_post_2 i hi
-    have : ∀ i < 5, ZZ2[i]!.val < 2 ^ 53 := by grind
-    have := this i (by grind)
-    scalar_tac
-    -- END TASK
-  · -- BEGIN TASK: X_plus_Y_sq input to sub (< 2^63 first arg bound)
-    intro i hi
-    have := X_plus_Y_sq_post_2 i hi
-    have : ∀ i < 5, YY_minus_XX[i]!.val < 2 ^ 52 := by grind
-    have := this i (by grind)
-    scalar_tac
-    -- END TASK
   unfold Field51_as_Nat at *
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- BEGIN TASK: X' % p = (2 * X * Y) % p
@@ -162,14 +108,14 @@ theorem double_spec_aux (q : ProjectivePoint)
       rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
       intro i hi
       simp_all [Finset.mem_range, Nat.mul_add]
-    rw [this] at X_plus_Y_sq_post_1;
+    rw [this] at X_plus_Y_sq_post1;
     have h_YY_plus_XX : (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY_plus_XX[i]!).val) =
         (∑ i ∈ Finset.range 5, 2^(51 * i) * (YY[i]!).val) +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * (XX[i]!).val) := by
       rw [← Finset.sum_add_distrib, Finset.sum_congr rfl]
       intro i hi
       simp_all [Finset.mem_range, Nat.mul_add]
-    rw [h_YY_plus_XX] at fe_post_2;
+    rw [h_YY_plus_XX] at fe_post2;
     have hB_equiv : (∑ i ∈ Finset.range 5, 2^(51 * i) * YY[i]!.val) +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * XX[i]!.val) ≡
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
@@ -179,9 +125,9 @@ theorem double_spec_aux (q : ProjectivePoint)
       · grind
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *
-    rw [← Nat.ModEq] at fe_post_2
-    apply Nat.ModEq.trans fe_post_2
-    exact X_plus_Y_sq_post_1
+    rw [← Nat.ModEq] at fe_post2
+    apply Nat.ModEq.trans fe_post2
+    exact X_plus_Y_sq_post1
     -- END TASK
   · -- BEGIN TASK: Y' % p = (Y^2 + X^2) % p
     rw [← Nat.ModEq] at *
@@ -198,35 +144,35 @@ theorem double_spec_aux (q : ProjectivePoint)
     -- END TASK
   · -- BEGIN TASK: (Z' + X^2) % p = Y^2 % p
     rw [← Nat.ModEq] at *; ring_nf at *;
-    apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post_1.symm)
-    apply Nat.ModEq.trans YY_minus_XX_post_2
-    exact YY_post_1
+    apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post1.symm)
+    apply Nat.ModEq.trans YY_minus_XX_post2
+    exact YY_post1
     -- END TASK
   · -- BEGIN TASK: (T' + Z') % p = (2 * Z^2) % p
     rw [← Nat.ModEq] at *;
-    apply Nat.ModEq.trans fe1_post_2
-    exact ZZ2_post_1
+    apply Nat.ModEq.trans fe1_post2
+    exact ZZ2_post1
     -- END TASK
   · -- BEGIN TASK: c.X bounds < 2^52
     intro i hi
-    exact fe_post_1 i hi
+    exact fe_post1 i hi
     -- END TASK
   · -- BEGIN TASK: c.Y bounds < 2^53
     -- c.Y = YY_plus_XX = YY + XX where YY < 2^52 and XX < 2^52
     -- So YY_plus_XX < 2^52 + 2^52 = 2^53
     intro i hi
-    have h_eq := YY_plus_XX_post_1 i hi
-    have h_YY := YY_post_2 i hi
-    have h_XX := XX_post_2 i hi
+    have h_eq := YY_plus_XX_post1 i hi
+    have h_YY := YY_post2 i hi
+    have h_XX := XX_post2 i hi
     omega
     -- END TASK
   · -- BEGIN TASK: c.Z bounds < 2^52
     intro i hi
-    exact YY_minus_XX_post_1 i hi
+    exact YY_minus_XX_post1 i hi
     -- END TASK
   · -- BEGIN TASK: c.T bounds < 2^52
     intro i hi
-    exact fe1_post_1 i hi
+    exact fe1_post1 i hi
     -- END TASK
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint

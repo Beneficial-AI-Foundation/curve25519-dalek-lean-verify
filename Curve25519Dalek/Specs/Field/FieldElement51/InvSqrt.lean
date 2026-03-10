@@ -73,7 +73,7 @@ theorem invsqrt_spec
     invsqrt v ⦃ res =>
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat res.snd % p
-    let i_nat := Field51_as_Nat SQRT_M1 % p
+    let i_nat := Field51_as_Nat SQRT_M1_val % p
     -- Unconditional bounds
     (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧
     -- Non-negativity
@@ -87,24 +87,27 @@ theorem invsqrt_spec
     (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →
       res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by
   unfold invsqrt
+    backend.serial.u64.field.FieldElement51.ONE
+    backend.serial.u64.field.FieldElement51.from_limbs
+  simp only [bind_tc_ok]
   progress as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
-  · intro i _; unfold ONE; interval_cases i; all_goals decide
-  · -- Rewrite Field51_as_Nat ONE % p to 1 in all case hypotheses
-    have h_one : Field51_as_Nat ONE % p = 1 := by simp [ONE_spec]; decide
-    simp only [h_one] at h_case1 h_case2 h_case3 h_case4
-    refine ⟨h_bounds, h_nonneg, ?_, ?_, ?_⟩
-    · -- Case 1: v = 0 → Choice(0) ∧ r = 0
-      intro hv
-      exact h_case2 ⟨by decide, hv⟩
-    · -- Case 2: v ≠ 0, 1/v is a square → Choice(1) ∧ r^2 * v ≡ 1
-      intro ⟨hv, hx⟩
-      exact h_case3 ⟨by decide, hv, hx⟩
-    · -- Case 3: v ≠ 0, 1/v is not a square → Choice(0) ∧ r^2 * v ≡ i
-      intro ⟨hv, hx⟩
-      have h := h_case4 ⟨by decide, hv, hx⟩
-      refine ⟨h.1, ?_⟩
-      have h2 := h.2
-      rw [mul_one, Nat.mod_mod_of_dvd _ (dvd_refl p)] at h2
-      exact h2
+  · intro i _; interval_cases i; all_goals decide
+  -- Rewrite Field51_as_Nat of literal ONE to 1 in all case hypotheses
+  have h_one : Field51_as_Nat (Array.make 5#usize [1#u64, 0#u64, 0#u64, 0#u64, 0#u64]) % p = 1 := by decide
+  simp only [h_one] at h_case1 h_case2 h_case3 h_case4
+  refine ⟨h_bounds, h_nonneg, ?_, ?_, ?_⟩
+  · -- Case 1: v = 0 → Choice(0) ∧ r = 0
+    intro hv
+    exact h_case2 ⟨by decide, hv⟩
+  · -- Case 2: v ≠ 0, 1/v is a square → Choice(1) ∧ r^2 * v ≡ 1
+    intro ⟨hv, hx⟩
+    exact h_case3 ⟨by decide, hv, hx⟩
+  · -- Case 3: v ≠ 0, 1/v is not a square → Choice(0) ∧ r^2 * v ≡ i
+    intro ⟨hv, hx⟩
+    have h := h_case4 ⟨by decide, hv, hx⟩
+    refine ⟨h.1, ?_⟩
+    have h2 := h.2
+    rw [mul_one, Nat.mod_mod_of_dvd _ (dvd_refl p)] at h2
+    exact h2
 
 end curve25519_dalek.field.FieldElement51

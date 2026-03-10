@@ -8,6 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.ExternallyVerified
 
 
 /-! # to_bytes
@@ -154,7 +155,7 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧

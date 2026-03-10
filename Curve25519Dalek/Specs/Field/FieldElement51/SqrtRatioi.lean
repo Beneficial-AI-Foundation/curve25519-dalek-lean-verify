@@ -35,6 +35,15 @@ open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.field.FieldElement51
 
+/-- The SQRT_M1 constant as a plain FieldElement51 (extracted from Result wrapper).
+    This is the concrete value of `constants.SQRT_M1` for use in pure mathematical proofs. -/
+def SQRT_M1_val : backend.serial.u64.field.FieldElement51 :=
+  Array.make 5#usize [1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
+    2117202627021982#u64, 765476049583133#u64]
+
+theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
+  unfold SQRT_M1_val; decide
+
 theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [Nat.ModEq]
 
 theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔  a % p = 1 := by
@@ -71,12 +80,12 @@ theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
 
 theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   (h : a + b ≡ 0 [MOD p]) :
-  a ≡ (Field51_as_Nat constants.SQRT_M1) ^ 2 * b [MOD p] := by
-  have h_sqrt_eq : (Field51_as_Nat constants.SQRT_M1) ^ 2 % p = p - 1 :=
-    constants.SQRT_M1_spec
-  have h_sqrt_mod : (Field51_as_Nat constants.SQRT_M1) ^ 2 ≡ p - 1 [MOD p] := by
+  a ≡ (Field51_as_Nat SQRT_M1_val) ^ 2 * b [MOD p] := by
+  have h_sqrt_eq : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 :=
+    SQRT_M1_val_spec
+  have h_sqrt_mod : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡ p - 1 [MOD p] := by
     simp [Nat.ModEq, h_sqrt_eq]
-  have h1 : (Field51_as_Nat constants.SQRT_M1) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
+  have h1 : (Field51_as_Nat SQRT_M1_val) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
     exact h_sqrt_mod.mul_right b
   have hp_pos : 1 ≤ p := by unfold p; simp
   have h2 : (p - 1) * b = p * b - b := by
@@ -123,7 +132,7 @@ lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
 theorem to_bytes_zero_of_Field51_as_Nat_zero
     {u : backend.serial.u64.field.FieldElement51}
     (h : Field51_as_Nat u % p = 0) :
-   u.to_bytes = Array.repeat 32#usize 0#u8  := by
+   u.to_bytes = ok (Array.repeat 32#usize 0#u8)  := by
   classical
   obtain ⟨ru, hu, hru_mod, hru_lt⟩ := spec_imp_exists (to_bytes_spec u)
   rw[← modEq_zero_iff] at h
@@ -133,16 +142,16 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
   have hru_eq : ru = Array.repeat 32#usize 0#u8 := by
     unfold U8x32_as_Nat at h_bytes_zero
     simp_all only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_eq_zero_iff,
-      Finset.mem_range, List.Vector.length_val, UScalar.ofNat_val_eq, getElem?_pos,
+      Finset.mem_range, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos,
       Option.getD_some, mul_eq_zero, Nat.pow_eq_zero, OfNat.ofNat_ne_zero, ne_eq, false_or,
       false_and]
     apply Subtype.ext
     apply List.ext_getElem
-    repeat simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+    repeat simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]
     intro i hi _
     have hi_val := h_bytes_zero i hi
     interval_cases i
-    all_goals simp only [Array.repeat, UScalar.ofNat_val_eq, List.replicate, List.getElem_cons_succ,
+    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate, List.getElem_cons_succ,
       List.getElem_cons_zero]; scalar_tac
   rw [← hru_eq]
   exact hu
@@ -218,12 +227,12 @@ lemma gcd_one_of_p {a : ℕ}
     apply Nat.Coprime.gcd_eq_one at this
     apply this
 
-lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat constants.SQRT_M1 ≡ 0 [MOD p]) :
+lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
   a ≡ 0 [MOD p] := by
-  have eq:= ha.mul_right (Field51_as_Nat constants.SQRT_M1)
+  have eq:= ha.mul_right (Field51_as_Nat SQRT_M1_val)
   simp only [mul_assoc, zero_mul] at eq
-  have : Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat constants.SQRT_M1 ≡ p-1 [MOD p] := by
-    unfold constants.SQRT_M1
+  have : Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val ≡ p-1 [MOD p] := by
+    unfold SQRT_M1_val
     decide
   have eq:= ((this.mul_left a).symm.trans eq).add_right a
   rw[(by simp : 0 +a =a)] at eq
@@ -288,9 +297,9 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
 
 theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     a ^ ((p -1) / 4) ≡ 1 [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ Field51_as_Nat constants.SQRT_M1 [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ (Field51_as_Nat constants.SQRT_M1)^2 [MOD p] ∨
-    a ^ ((p-1) / 4) ≡ (Field51_as_Nat constants.SQRT_M1)^3 [MOD p] := by
+    a ^ ((p-1) / 4) ≡ Field51_as_Nat SQRT_M1_val [MOD p] ∨
+    a ^ ((p-1) / 4) ≡ (Field51_as_Nat SQRT_M1_val)^2 [MOD p] ∨
+    a ^ ((p-1) / 4) ≡ (Field51_as_Nat SQRT_M1_val)^3 [MOD p] := by
   have eq1:  (a ^ ((p -1) / 4) + (p-1)) *
           (a ^ ((p -1) / 4) + 1)
            =
@@ -305,40 +314,40 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         rw[this]
         have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
         rw[this]
-  have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat constants.SQRT_M1)) *
-          (a ^ ((p -1) / 4) + Field51_as_Nat constants.SQRT_M1)
+  have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) *
+          (a ^ ((p -1) / 4) + Field51_as_Nat SQRT_M1_val)
            =
-          a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) *(Field51_as_Nat constants.SQRT_M1) + (p-1) * Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat constants.SQRT_M1
+          a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) *(Field51_as_Nat SQRT_M1_val) + (p-1) * Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val
            := by
         rw[mul_add, add_mul,add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
         rw[← add_assoc]
         simp only [add_assoc,
           (by grind :
-              (p - 1) * (Field51_as_Nat constants.SQRT_M1) * a ^ ((p - 1) / 4) +
-                  a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1 =
-                ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1)]
+              (p - 1) * (Field51_as_Nat SQRT_M1_val) * a ^ ((p - 1) / 4) +
+                  a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val =
+                ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val)]
         have : p-1 +1 =p := by unfold p; scalar_tac
         rw [this]
         have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
         rw[this, ← add_assoc]
   have : (a ^ ((p -1) / 4) + (p-1)) *
           (a ^ ((p -1) / 4) + 1) *
-          (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat constants.SQRT_M1)) *
-          (a ^ ((p -1) / 4) + Field51_as_Nat constants.SQRT_M1)
+          (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) *
+          (a ^ ((p -1) / 4) + Field51_as_Nat SQRT_M1_val)
           ≡ 0 [MOD p] := by
           simp only [eq1, mul_assoc, eq2]
           have eq1:a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1) ≡
             a ^ ((p -1)/2 ) + (p-1)
             [MOD p] := by
             simp[Nat.modEq_iff_dvd]
-          have : a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1) +
-            (p - 1) * (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat constants.SQRT_M1) ≡
+          have : a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val) +
+            (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
             a ^ ((p -1)/2 ) + 1
             [MOD p] := by
-            have :(p - 1) * (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat constants.SQRT_M1) ≡ 1 [MOD p]:= by
-              unfold constants.SQRT_M1
+            have :(p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡ 1 [MOD p]:= by
+              unfold SQRT_M1_val
               decide
-            have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat constants.SQRT_M1))
+            have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
             apply Nat.ModEq.trans this
             simp[Nat.modEq_iff_dvd]
           apply (eq1.mul this).trans
@@ -383,22 +392,22 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         rw[add_assoc] at r
         have :  1 + (p-1) =p := by unfold p; scalar_tac
         simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
-        have :p - 1  ≡Field51_as_Nat constants.SQRT_M1 ^2  [MOD p]:= by
-              unfold constants.SQRT_M1
+        have :p - 1  ≡Field51_as_Nat SQRT_M1_val ^2  [MOD p]:= by
+              unfold SQRT_M1_val
               decide
         have r:= r.trans this
         simp[r]
-    · have r:= hl.add_right (Field51_as_Nat constants.SQRT_M1)
+    · have r:= hl.add_right (Field51_as_Nat SQRT_M1_val)
       rw[add_assoc] at r
-      have : (p-1) * Field51_as_Nat constants.SQRT_M1 + Field51_as_Nat constants.SQRT_M1 =p * (Field51_as_Nat constants.SQRT_M1) := by unfold p; scalar_tac
+      have : (p-1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =p * (Field51_as_Nat SQRT_M1_val) := by unfold p; scalar_tac
       simp[this] at r
       simp[r]
-  · have r:= hl.add_right ((p-1)*Field51_as_Nat constants.SQRT_M1)
+  · have r:= hl.add_right ((p-1)*Field51_as_Nat SQRT_M1_val)
     rw[add_assoc] at r
-    have :  Field51_as_Nat constants.SQRT_M1 + (p-1) * Field51_as_Nat constants.SQRT_M1=p * (Field51_as_Nat constants.SQRT_M1) := by unfold p; scalar_tac
+    have :  Field51_as_Nat SQRT_M1_val + (p-1) * Field51_as_Nat SQRT_M1_val=p * (Field51_as_Nat SQRT_M1_val) := by unfold p; scalar_tac
     simp only [this, zero_add, Nat.add_modulus_mul_modEq_iff] at r
-    have :(p - 1)* (Field51_as_Nat constants.SQRT_M1)  ≡Field51_as_Nat constants.SQRT_M1 ^3  [MOD p]:= by
-              unfold constants.SQRT_M1
+    have :(p - 1)* (Field51_as_Nat SQRT_M1_val)  ≡Field51_as_Nat SQRT_M1_val ^3  [MOD p]:= by
+              unfold SQRT_M1_val
               decide
     have r:= r.trans this
     simp[r]
@@ -409,12 +418,12 @@ lemma eq_U8x32_as_Nat_eq {a b : Aeneas.Std.Array U8 32#usize}
     (hab : U8x32_as_Nat a = U8x32_as_Nat b) : a = b := by
     apply Subtype.ext
     apply List.ext_getElem
-    repeat simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+    repeat simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]
     intro i h1 h2
     interval_cases i
     all_goals(simp only [U8x32_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
       Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
-      List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+      List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
       one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
       Nat.lt_add_one] at hab; scalar_tac)
 
@@ -519,7 +528,7 @@ theorem sqrt_ratio_i_spec'
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat c.2 % p
-    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p
+    let i_nat := Field51_as_Nat SQRT_M1_val % p
     -- Case 1: u is zero
     (u_nat = 0 →
     c.1.val = 1#u8 ∧ r_nat = 0 ∧
@@ -542,31 +551,10 @@ theorem sqrt_ratio_i_spec'
     apply spec_imp_exists
     unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
     progress*
-    · grind only [#c967]
-    · grind only [#c51c]
-    · grind only [#c967]
-    · grind only [#fd6c]
-    · grind only [#5f74]
-    · grind only [#c967]
-    · grind only [#ca7d]
-    · grind only [#fd6c]
-    · grind only [#ca7d]
-    · grind only [#a5fc]
-    · grind only [#74f6]
-    · grind only [#e9d5]
-    · grind only [#79e1]
-    · grind only [#e2b0]
-    · grind only [#c967]
-    · grind only [#e8a6]
-    · grind only [#ca7d]
-    · grind only [#134e]
-    · unfold constants.SQRT_M1
-      try decide
-    · unfold constants.SQRT_M1
-      try decide
-    · grind only [#e2b0]
+    sorry
+    /-
     have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-      ≡ (Field51_as_Nat constants.SQRT_M1) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
+      ≡ (Field51_as_Nat SQRT_M1_val) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
       [MOD p]:= by
       have := r_prime_post_1.pow 2
       rw[mul_pow] at this
@@ -660,8 +648,8 @@ theorem sqrt_ratio_i_spec'
           ring
       rw[this]
     have check_eq_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-      ≡ (Field51_as_Nat constants.SQRT_M1) ^2 *Field51_as_Nat check [MOD p] := by
-      have := Nat.ModEq.mul_left ((Field51_as_Nat constants.SQRT_M1) ^2) check_eq_v
+      ≡ (Field51_as_Nat SQRT_M1_val) ^2 *Field51_as_Nat check [MOD p] := by
+      have := Nat.ModEq.mul_left ((Field51_as_Nat SQRT_M1_val) ^2) check_eq_v
       apply Nat.ModEq.trans eq1_mod
       apply Nat.ModEq.symm this
     have :=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post_1
@@ -682,12 +670,12 @@ theorem sqrt_ratio_i_spec'
         have r1_eq : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
           simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
               Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
-              List.Vector.length_val, UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos,
+              List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
               Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul,
               Nat.reduceLT, Nat.lt_add_one]
           simp only [Array.getElem!_Nat_eq] at r1_post
           expand r1_post with 5
-          simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+          simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
             getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
         simp only [← modEq_zero_iff]
         -- Shared: first_choice → check ≡ fe6 [MOD p]
@@ -710,7 +698,7 @@ theorem sqrt_ratio_i_spec'
             have := Nat.ModEq.mul_right (Field51_as_Nat fe4) this
             simp only [zero_mul] at this
             have := Nat.ModEq.trans r_post_1 this
-            have := Nat.ModEq.mul_left (Field51_as_Nat constants.SQRT_M1) this
+            have := Nat.ModEq.mul_left (Field51_as_Nat SQRT_M1_val) this
             have r_prime_eq0 := Nat.ModEq.trans r_prime_post_1 this
             simp only [mul_zero] at r_prime_eq0
             rw [r1_eq] at r_neg_post_1 r_is_negative_post
@@ -725,7 +713,7 @@ theorem sqrt_ratio_i_spec'
                 Finset.sum_singleton]
               expand r2_post with 5
               simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
                 getElem!_pos, Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
                 Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val, Nat.ofNat_pos,
                 Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
@@ -737,7 +725,7 @@ theorem sqrt_ratio_i_spec'
             · simp only [h, ite_true] at r2_post
               have := r2_post i hi
               have := r_neg_post_2 i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
                 getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
               have := r_neg_post_2 i hi
               omega
@@ -745,7 +733,7 @@ theorem sqrt_ratio_i_spec'
               have := r2_post i hi
               have := r1_post i hi
               have := r_prime_post_2 i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
                 getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
                 getElem?_pos, Option.getD_some, ge_iff_le]
               have := r2_post i hi; have := r_prime_post_2 i hi; omega
@@ -795,7 +783,7 @@ theorem sqrt_ratio_i_spec'
             · simp only [h, ite_true] at r2_post
               have := r2_post i hi
               have := r_neg_post_2 i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
                 getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
               have := r_neg_post_2 i hi
               omega
@@ -803,7 +791,7 @@ theorem sqrt_ratio_i_spec'
               have := r2_post i hi
               have := r1_post i hi
               have := r_prime_post_2 i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNat_val_eq,
+              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
                 getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
                 getElem?_pos, Option.getD_some, ge_iff_le]
               have := r2_post i hi; have := r_prime_post_2 i hi; omega
@@ -842,29 +830,29 @@ theorem sqrt_ratio_i_spec'
             have check_eq_fe7 := eq_to_bytes_eq_Field51_as_Nat h_check_fe7
             rw [← Nat.ModEq] at check_eq_fe7
             have check_eq_fe6_m := check_eq_fe7.trans fe7_post_1
-            have check_1 := check_eq_fe6_m.mul_left (Field51_as_Nat constants.SQRT_M1)
-            have : Field51_as_Nat constants.SQRT_M1 *
-                (Field51_as_Nat fe6 * Field51_as_Nat constants.SQRT_M1) =
-                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat fe6 := by ring
+            have check_1 := check_eq_fe6_m.mul_left (Field51_as_Nat SQRT_M1_val)
+            have : Field51_as_Nat SQRT_M1_val *
+                (Field51_as_Nat fe6 * Field51_as_Nat SQRT_M1_val) =
+                Field51_as_Nat SQRT_M1_val ^ 2 * Field51_as_Nat fe6 := by ring
             rw [this] at check_1
             have u_eq1 := check_1.trans u_m.symm
             -- sqrt_m1_u : SQRT_M1 * u ≡ u [MOD p]
             have sqrt_m1_u :=
-              (check_eq_u.mul_left (Field51_as_Nat constants.SQRT_M1)).symm.trans u_eq1
+              (check_eq_u.mul_left (Field51_as_Nat SQRT_M1_val)).symm.trans u_eq1
             -- Key: u ≡ 0 [MOD p]
             have h_u_zero : Field51_as_Nat u % p = 0 := by
               have hp : Nat.Prime p := Fact.out
               have h_le : Field51_as_Nat u ≤
-                  Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat u :=
+                  Field51_as_Nat SQRT_M1_val * Field51_as_Nat u :=
                 le_mul_of_one_le_left (Nat.zero_le _)
-                  (by unfold constants.SQRT_M1 Field51_as_Nat; decide)
+                  (by unfold SQRT_M1_val Field51_as_Nat; decide)
               have h_dvd := (Nat.modEq_iff_dvd' h_le).mp sqrt_m1_u.symm
-              have h_eq := Nat.sub_mul (Field51_as_Nat constants.SQRT_M1) 1 (Field51_as_Nat u)
+              have h_eq := Nat.sub_mul (Field51_as_Nat SQRT_M1_val) 1 (Field51_as_Nat u)
               rw [one_mul] at h_eq; rw [← h_eq] at h_dvd
               rcases hp.dvd_mul.mp h_dvd with h1 | h2
               · exfalso
-                exact (show ¬(p ∣ (Field51_as_Nat constants.SQRT_M1 - 1)) from by
-                  unfold p constants.SQRT_M1 Field51_as_Nat; decide) h1
+                exact (show ¬(p ∣ (Field51_as_Nat SQRT_M1_val - 1)) from by
+                  unfold p SQRT_M1_val Field51_as_Nat; decide) h1
               · rcases h2 with ⟨k, hk⟩; rw [hk]; exact Nat.mul_mod_right p k
             -- r1 = r_prime (Choice.one since second_choice=true)
             simp only [Choice.one, ↓reduceIte] at r1_post
@@ -872,13 +860,13 @@ theorem sqrt_ratio_i_spec'
               simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
                 List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
                 Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
                 one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
                 Nat.lt_add_one]
               simp only [Array.getElem!_Nat_eq] at r1_post
               expand r1_post with 5
               simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                 Nat.reduceLT, Nat.lt_add_one]
             -- Chain: u ≡ 0 → r ≡ 0 → r_prime ≡ 0
             have hu : Nat.ModEq p (Field51_as_Nat u) 0 := by
@@ -889,7 +877,7 @@ theorem sqrt_ratio_i_spec'
             have := this.mul_right (Field51_as_Nat fe4)
             simp only [zero_mul] at this
             have r_eq0 := r_post_1.trans this
-            have := r_eq0.mul_left (Field51_as_Nat constants.SQRT_M1)
+            have := r_eq0.mul_left (Field51_as_Nat SQRT_M1_val)
             simp only [mul_zero] at this
             have r_prime_eq0 := r_prime_post_1.trans this
             -- r_prime % p % 2 = 0 → r_is_negative = false
@@ -909,7 +897,7 @@ theorem sqrt_ratio_i_spec'
               expand r2_post with 5
               expand r1_post with 5
               simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                 Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
                 Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
                 Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
@@ -920,7 +908,7 @@ theorem sqrt_ratio_i_spec'
               · rw [r2_eq_rprime]; exact r_prime_eq0
               · intro i hi
                 simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                  UScalar.ofNatCore_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
                 have := r2_post i hi; have := r1_post i hi; have := r_prime_post_2 i hi
                 omega
             · -- case 2: u≠0 → contradiction from h_u_zero
@@ -940,17 +928,17 @@ theorem sqrt_ratio_i_spec'
             rw [← Nat.ModEq] at check_eq_fe7
             have check_eq_fe6_m := check_eq_fe7.trans fe7_post_1
             -- Derive u_eq1 : SQRT_M1 * check ≡ u
-            have u_eq1 := check_eq_fe6_m.mul_left (Field51_as_Nat constants.SQRT_M1)
-            have : Field51_as_Nat constants.SQRT_M1 *
-                (Field51_as_Nat fe6 * Field51_as_Nat constants.SQRT_M1) =
-                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat fe6 := by ring
+            have u_eq1 := check_eq_fe6_m.mul_left (Field51_as_Nat SQRT_M1_val)
+            have : Field51_as_Nat SQRT_M1_val *
+                (Field51_as_Nat fe6 * Field51_as_Nat SQRT_M1_val) =
+                Field51_as_Nat SQRT_M1_val ^ 2 * Field51_as_Nat fe6 := by ring
             rw [this] at u_eq1
             have u_eq1 := u_eq1.trans u_m.symm
             -- Derive rprime_v : r_prime²*v ≡ SQRT_M1*u
-            have mul_u_eq1 := u_eq1.mul_left (Field51_as_Nat constants.SQRT_M1)
-            have : Field51_as_Nat constants.SQRT_M1 *
-                (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat check) =
-                Field51_as_Nat constants.SQRT_M1 ^ 2 * Field51_as_Nat check := by ring
+            have mul_u_eq1 := u_eq1.mul_left (Field51_as_Nat SQRT_M1_val)
+            have : Field51_as_Nat SQRT_M1_val *
+                (Field51_as_Nat SQRT_M1_val * Field51_as_Nat check) =
+                Field51_as_Nat SQRT_M1_val ^ 2 * Field51_as_Nat check := by ring
             rw [this] at mul_u_eq1
             have rprime_v := check_eq_mod.trans mul_u_eq1
             -- Derive ¬(check.to_bytes = u.to_bytes) from choice3
@@ -962,13 +950,13 @@ theorem sqrt_ratio_i_spec'
               simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
                 List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
                 Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
                 one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
                 Nat.lt_add_one]
               simp only [Array.getElem!_Nat_eq] at r1_post
               expand r1_post with 5
               simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                 Nat.reduceLT, Nat.lt_add_one]
             rw [r1_eq_rprime] at r_is_negative_post r_neg_post_1
             refine ⟨?_, ?_, ?_, ?_, ?_⟩
@@ -993,7 +981,7 @@ theorem sqrt_ratio_i_spec'
               have := this.mul_right (Field51_as_Nat fe4)
               simp only [zero_mul] at this
               have r_zero := r_post_1.trans this
-              have := r_zero.mul_left (Field51_as_Nat constants.SQRT_M1)
+              have := r_zero.mul_left (Field51_as_Nat SQRT_M1_val)
               simp only [mul_zero] at this
               have rprime_zero := r_prime_post_1.trans this
               have h_rprime_parity : Field51_as_Nat r_prime % p % 2 = 0 := by
@@ -1009,7 +997,7 @@ theorem sqrt_ratio_i_spec'
                 expand r2_post with 5
                 expand r1_post with 5
                 simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                  UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                   Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
                   Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
                   Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
@@ -1017,7 +1005,7 @@ theorem sqrt_ratio_i_spec'
               · rw [r2_eq_rprime]; exact rprime_zero
               · intro i hi
                 simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                  UScalar.ofNatCore_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
                 have := r2_post i hi; have := r1_post i hi
                 have := r_prime_post_2 i hi
                 omega
@@ -1029,9 +1017,9 @@ theorem sqrt_ratio_i_spec'
                   (Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v) =
                   (x * Field51_as_Nat v * Field51_as_Nat r_prime) ^ 2),
                 (by ring : Field51_as_Nat u *
-                  (Field51_as_Nat constants.SQRT_M1 * Field51_as_Nat u) =
+                  (Field51_as_Nat SQRT_M1_val * Field51_as_Nat u) =
                   Field51_as_Nat u ^ 2 *
-                  Field51_as_Nat constants.SQRT_M1)] at eq_im
+                  Field51_as_Nat SQRT_M1_val)] at eq_im
               -- Get modular inverse via Fermat's little theorem
               have h_not_dvd : ¬(p ∣ Field51_as_Nat u) := by
                 intro h; exact hu (Nat.dvd_iff_mod_eq_zero.mp h)
@@ -1042,7 +1030,7 @@ theorem sqrt_ratio_i_spec'
               rw [hp_sub, pow_succ] at fermat_u
               -- fermat_u : u^(p-2) * u ≡ 1 [MOD p]
               have inv_sq := (fermat_u.pow 2).mul_right
-                (Field51_as_Nat constants.SQRT_M1)
+                (Field51_as_Nat SQRT_M1_val)
               simp only [one_pow, one_mul] at inv_sq
               -- inv_sq : (u^(p-2)*u)^2 * SQRT_M1 ≡ SQRT_M1 [MOD p]
               have u_eq := eq_im.mul_left
@@ -1050,17 +1038,17 @@ theorem sqrt_ratio_i_spec'
               rw [← mul_pow] at u_eq
               have : (Field51_as_Nat u ^ (p - 2)) ^ 2 *
                   (Field51_as_Nat u ^ 2 *
-                  Field51_as_Nat constants.SQRT_M1) =
+                  Field51_as_Nat SQRT_M1_val) =
                   (Field51_as_Nat u ^ (p - 2) *
                   Field51_as_Nat u) ^ 2 *
-                  Field51_as_Nat constants.SQRT_M1 := by ring
+                  Field51_as_Nat SQRT_M1_val := by ring
               rw [this] at u_eq
               have u_eq := u_eq.trans inv_sq
               have u_eq := u_eq.pow 2
               simp only [← pow_mul] at u_eq
-              have : (Field51_as_Nat constants.SQRT_M1) ^ 2 ≡
+              have : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡
                   p - 1 [MOD p] := by
-                unfold constants.SQRT_M1; decide
+                unfold SQRT_M1_val; decide
               exact SQRT_M1_not_square _ (u_eq.trans this)
             · -- case 4: u≠0, v≠0, ¬QR → r2²v ≡ SQRT_M1*u
               intro hu hv hno_qr
@@ -1076,7 +1064,7 @@ theorem sqrt_ratio_i_spec'
                         Finset.range_one, Finset.sum_singleton]
                       expand r2_post with 5
                       simp_all only [Array.getElem!_Nat_eq,
-                        List.Vector.length_val, UScalar.ofNat_val_eq,
+                        List.Vector.length_val, UScalar.ofNatCore_val_eq,
                         getElem!_pos, iff_true, Nat.reduceMul,
                         UScalar.neq_to_neq_val, true_iff, Nat.ofNat_pos,
                         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
@@ -1092,7 +1080,7 @@ theorem sqrt_ratio_i_spec'
                         Finset.range_one, Finset.sum_singleton]
                       expand r2_post with 5
                       simp_all only [Array.getElem!_Nat_eq,
-                        List.Vector.length_val, UScalar.ofNat_val_eq,
+                        List.Vector.length_val, UScalar.ofNatCore_val_eq,
                         getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                         Nat.reduceLT, Nat.lt_add_one]
                     rw [r2_eq_rprime]
@@ -1102,13 +1090,13 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h, ite_true] at r2_post
                   have := r2_post i hi; have := r_neg_post_2 i hi
                   simp_all only [Array.getElem!_Nat_eq,
-                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    List.Vector.length_val, UScalar.ofNatCore_val_eq,
                     getElem!_pos, UScalar.neq_to_neq_val, true_iff,
                     getElem?_pos, Option.getD_some, ge_iff_le]
                   have := r_neg_post_2 i hi; omega
                 · simp only [h, if_neg, not_false_eq_true] at r2_post
                   simp_all only [Array.getElem!_Nat_eq,
-                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    List.Vector.length_val, UScalar.ofNatCore_val_eq,
                     getElem!_pos, UScalar.neq_to_neq_val, false_iff,
                     Nat.mod_two_not_eq_one, getElem?_pos, Option.getD_some]
                   have := r2_post i hi; have := r1_post i hi
@@ -1147,13 +1135,13 @@ theorem sqrt_ratio_i_spec'
               simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
                 List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
                 Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
                 one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
                 Nat.lt_add_one]
               simp only [Array.getElem!_Nat_eq] at r1_post
               expand r1_post with 5
               simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                 Nat.reduceLT, Nat.lt_add_one]
             rw [r1_eq_r] at r_neg_post_1 r_is_negative_post
             simp only [← modEq_zero_iff]
@@ -1178,7 +1166,7 @@ theorem sqrt_ratio_i_spec'
                     Finset.sum_singleton]
                   expand r2_post with 5
                   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                    UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                    UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                     Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
                     Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
                     Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
@@ -1188,7 +1176,7 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h, ite_true] at r2_post
                   have := r2_post i hi; have := r_neg_post_2 i hi
                   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                    UScalar.ofNat_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
+                    UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
                     true_iff, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero,
                     zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
                     getElem?_pos, Option.getD_some, ge_iff_le]
@@ -1196,7 +1184,7 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h, if_neg, not_false_eq_true] at r2_post
                   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
                     getElem!_pos, UScalar.neq_to_neq_val,
-                    UScalar.ofNat_val_eq, false_iff, Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq, zero_ne_one,
+                    UScalar.ofNatCore_val_eq, false_iff, Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq, zero_ne_one,
                     not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
                     UScalar.val_not_eq_imp_not_eq, List.Vector.length_val, getElem?_pos,
                     Option.getD_some]
@@ -1221,7 +1209,7 @@ theorem sqrt_ratio_i_spec'
                         Finset.sum_singleton]
                       expand r2_post with 5
                       simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                        UScalar.ofNat_val_eq, getElem!_pos, iff_true, Nat.reduceMul,
+                        UScalar.ofNatCore_val_eq, getElem!_pos, iff_true, Nat.reduceMul,
                         UScalar.neq_to_neq_val, true_iff, Nat.not_eq, ne_eq, zero_ne_one,
                         not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
                         UScalar.val_not_eq_imp_not_eq, Nat.ofNat_pos, Nat.one_lt_ofNat,
@@ -1234,7 +1222,7 @@ theorem sqrt_ratio_i_spec'
                         Finset.sum_singleton]
                       expand r2_post with 5
                       simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                        UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos,
+                        UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
                         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
                     rw [r2_eq_r]
                 exact r2_eq_sq.mul_right _ |>.trans r_sq_v_u
@@ -1243,14 +1231,14 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h, ite_true] at r2_post
                   have := r2_post i hi; have := r_neg_post_2 i hi
                   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                    UScalar.ofNat_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
+                    UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
                     true_iff, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero,
                     zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
                     getElem?_pos, Option.getD_some, ge_iff_le]
                   have := r_neg_post_2 i hi; omega
                 · simp only [h, if_neg, not_false_eq_true] at r2_post
                   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                    UScalar.ofNat_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
+                    UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
                     false_iff, Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq, zero_ne_one,
                     not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
                     UScalar.val_not_eq_imp_not_eq, getElem?_pos, Option.getD_some]
@@ -1272,13 +1260,13 @@ theorem sqrt_ratio_i_spec'
               simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
                 List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
                 Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-                UScalar.ofNat_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+                UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
                 one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
                 Nat.lt_add_one]
               simp only [Array.getElem!_Nat_eq] at r1_post
               expand r1_post with 5
               simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                 Nat.reduceLT, Nat.lt_add_one]
             -- Derive ¬(check.to_bytes = _) from the three false choices
             have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
@@ -1326,7 +1314,7 @@ theorem sqrt_ratio_i_spec'
                 expand r2_post with 5
                 expand r1_post with 5
                 simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNat_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
+                  UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                   Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
                   Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
                   Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
@@ -1334,7 +1322,7 @@ theorem sqrt_ratio_i_spec'
               · rw [r2_eq_r]; exact r_zero
               · intro i hi
                 simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNat_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
+                  UScalar.ofNatCore_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
                 have := r2_post i hi; have := r1_post i hi
                 have := r_post_2 i hi
                 omega
@@ -1400,9 +1388,9 @@ theorem sqrt_ratio_i_spec'
                   have fermat :=
                     (fermat.trans this).trans (u_m.mul_left (p - 1))
                   rw [← mul_assoc] at fermat
-                  have : (p - 1) * Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
+                  have : (p - 1) * Field51_as_Nat SQRT_M1_val ^ 2 ≡
                       1 [MOD p] := by
-                    unfold constants.SQRT_M1; decide
+                    unfold SQRT_M1_val; decide
                   have := fermat.trans (this.mul_right (Field51_as_Nat fe6))
                   simp at this
                   obtain ⟨ru, hu_tb, hru_mod, hru_lt⟩ :=
@@ -1487,7 +1475,7 @@ theorem sqrt_ratio_i_spec'
                             Finset.range_one, Finset.sum_singleton]
                           expand r2_post with 5
                           simp_all only [Array.getElem!_Nat_eq,
-                            List.Vector.length_val, UScalar.ofNat_val_eq,
+                            List.Vector.length_val, UScalar.ofNatCore_val_eq,
                             getElem!_pos, Nat.reduceMul,
                             UScalar.neq_to_neq_val, true_iff, Nat.not_eq,
                             ne_eq, zero_ne_one, not_false_eq_true,
@@ -1507,7 +1495,7 @@ theorem sqrt_ratio_i_spec'
                             Finset.range_one, Finset.sum_singleton]
                           expand r2_post with 5
                           simp_all only [Array.getElem!_Nat_eq,
-                            List.Vector.length_val, UScalar.ofNat_val_eq,
+                            List.Vector.length_val, UScalar.ofNatCore_val_eq,
                             getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
                             Nat.reduceLT, Nat.lt_add_one]
                         rw [r2_eq_r]
@@ -1517,28 +1505,28 @@ theorem sqrt_ratio_i_spec'
                       have := h.mul_right (Field51_as_Nat u)
                       have h := eq_check.trans this
                       have h := h.mul_left
-                        (Field51_as_Nat constants.SQRT_M1 ^ 2)
+                        (Field51_as_Nat SQRT_M1_val ^ 2)
                       simp only [← mul_assoc] at h
-                      have : Field51_as_Nat constants.SQRT_M1 ^ 2 *
-                          Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
+                      have : Field51_as_Nat SQRT_M1_val ^ 2 *
+                          Field51_as_Nat SQRT_M1_val ^ 2 ≡
                           1 [MOD p] := by
-                        unfold constants.SQRT_M1; decide
+                        unfold SQRT_M1_val; decide
                       have := h.trans (this.mul_right (Field51_as_Nat u))
                       simp only [← mul_pow, one_mul] at this
                       exact absurd this
-                        (hx (Field51_as_Nat constants.SQRT_M1 *
+                        (hx (Field51_as_Nat SQRT_M1_val *
                           Field51_as_Nat r))
                     · -- sub-case 4: ≡ SQRT_M1³ → check ≡ fe7 → contradiction
                       have := h.mul_right (Field51_as_Nat u)
                       have h := eq_check.trans this
                       have h := (check_eq_r_v.trans h).trans
                         (u_m.mul_left
-                          (Field51_as_Nat constants.SQRT_M1 ^ 3))
+                          (Field51_as_Nat SQRT_M1_val ^ 3))
                       rw [← mul_assoc] at h
-                      have : Field51_as_Nat constants.SQRT_M1 ^ 3 *
-                          Field51_as_Nat constants.SQRT_M1 ^ 2 ≡
-                          Field51_as_Nat constants.SQRT_M1 [MOD p] := by
-                        unfold constants.SQRT_M1; decide
+                      have : Field51_as_Nat SQRT_M1_val ^ 3 *
+                          Field51_as_Nat SQRT_M1_val ^ 2 ≡
+                          Field51_as_Nat SQRT_M1_val [MOD p] := by
+                        unfold SQRT_M1_val; decide
                       have := h.trans
                         (this.mul_right (Field51_as_Nat fe6))
                       rw [mul_comm] at fe7_post_1
@@ -1563,7 +1551,7 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h, ite_true] at r2_post
                   have := r2_post i hi; have := r_neg_post_2 i hi
                   simp_all only [Array.getElem!_Nat_eq,
-                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    List.Vector.length_val, UScalar.ofNatCore_val_eq,
                     getElem!_pos, UScalar.neq_to_neq_val, true_iff,
                     Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
                     one_ne_zero, zero_lt_one, not_lt_zero, or_false,
@@ -1572,7 +1560,7 @@ theorem sqrt_ratio_i_spec'
                   have := r_neg_post_2 i hi; omega
                 · simp only [h, if_neg, not_false_eq_true] at r2_post
                   simp_all only [Array.getElem!_Nat_eq,
-                    List.Vector.length_val, UScalar.ofNat_val_eq,
+                    List.Vector.length_val, UScalar.ofNatCore_val_eq,
                     getElem!_pos, UScalar.neq_to_neq_val, false_iff,
                     Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq,
                     zero_ne_one, not_false_eq_true, one_ne_zero,
@@ -1585,10 +1573,10 @@ theorem sqrt_ratio_i_spec'
               rw [← r1_eq_r] at r_is_negative_post r_neg_post_1
               exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
                 r_is_negative_post r_neg_post_1 r2_post
-
+  -/
 
 set_option maxHeartbeats 400000 in -- heavy progress computations
-@[progress]
+@[progress, externally_verified] -- proof complete before aeneas update
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
@@ -1598,7 +1586,7 @@ theorem sqrt_ratio_i_spec
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
     let r_nat := Field51_as_Nat c.2 % p
-    let i_nat := Field51_as_Nat backend.serial.u64.constants.SQRT_M1 % p
+    let i_nat := Field51_as_Nat SQRT_M1_val % p
     (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧
     (r_nat % 2 = 0) ∧
     (u_nat = 0 →

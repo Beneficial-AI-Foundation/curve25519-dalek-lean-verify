@@ -58,9 +58,7 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
 
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
-    (bs.set i#usize a)[i]! = a := by
-  simp [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNat_val_eq]
-  grind
+    (bs.set i#usize a)[i]! = a := by grind
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
@@ -106,15 +104,75 @@ lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
     change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
     simp [Nat.mul_comm]
 
+/-! ## Bridge between U8x32_as_Nat and U8x32_as_Field
+
+`U8x32_as_Nat` (Finset.sum in ℕ) and `U8x32_as_Field` (Horner foldr in ZMod p) compute the same
+little-endian byte interpretation but in different types. The bridge goes through `Nat.ofDigits`:
+
+  U8x32_as_Nat ──(is_NatofDigits)──▶ Nat.ofDigits 256 [b₀.val, ..., b₃₁.val]
+                                        │
+                                   (ofDigits = foldr)
+                                        │
+                                        ▼
+  U8x32_as_Field ◀──(Nat.cast)──── List.foldr Horner₂₅₆ 0 bytes.val
+-/
+
+/-- `Nat.ofDigits b l` equals Horner evaluation via `foldr`. -/
+private lemma ofDigits_eq_foldr (b : ℕ) (l : List ℕ) :
+    Nat.ofDigits b l = l.foldr (fun d acc => d + b * acc) 0 := by
+  induction l with
+  | nil => simp [Nat.ofDigits]
+  | cons h t ih => simp [Nat.ofDigits, ih]
+
+/-- `Nat.cast` commutes with Horner evaluation on a byte list. -/
+ lemma horner_natCast (l : List U8) :
+    ((l.foldr (fun (b : U8) (acc : ℕ) => b.val + 256 * acc) 0 : ℕ) : ZMod p) =
+    l.foldr (fun (b : U8) (acc : ZMod p) => (b.val : ZMod p) + 256 * acc) 0 := by
+  induction l with
+  | nil => simp
+  | cons h t ih =>
+    simp only [List.foldr_cons]
+    push_cast [ih]
+    ring
+
+/-- The byte-value list produced by `List.ofFn` on Array indices equals `List.map` on the
+    underlying list. Bridges the `Fin`-indexed view from `Nat.ofDigits` to the raw list view. -/
+private lemma ofFn_val_eq_map_val (a : Aeneas.Std.Array U8 32#usize) :
+    (List.ofFn fun i : Fin 32 => (a[i]! : U8).val) = a.val.map (fun b => b.val) := by
+  simp only [Fin.getElem!_fin, Array.getElem!_Nat_eq]
+  apply List.ext_getElem
+  · simp [a.property]
+  · intro i hi1 hi2
+    simp only [List.getElem_ofFn, List.getElem_map]
+    congr 1
+    rw [getElem!_pos (h := by rw [List.length_map] at hi2; omega)]
+
+/-- `U8x32_as_Nat` equals Horner evaluation at base 256 on the underlying byte list. -/
+lemma U8x32_as_Nat_eq_foldr (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Nat a = a.val.foldr (fun b (acc : ℕ) => b.val + 256 * acc) 0 := by
+  rw [U8x32_as_Nat_is_NatofDigits, ofDigits_eq_foldr]
+  have h256 : (2 : ℕ) ^ 8 = 256 := by norm_num
+  rw [h256]
+  -- Rewrite the List.ofFn to List.map, then use List.foldr_map
+  have h_list := ofFn_val_eq_map_val a
+  rw [h_list, List.foldr_map]
+
+/-- **Bridge lemma**: `U8x32_as_Field` and `U8x32_as_Nat` compute the same value,
+    just in different types (ZMod p vs ℕ). -/
+lemma U8x32_as_Field_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Field a = ((U8x32_as_Nat a : ℕ) : ZMod p) := by
+  unfold U8x32_as_Field
+  rw [U8x32_as_Nat_eq_foldr, horner_natCast]
+  rfl
+
+
 /-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
 number representation, then the input arrays must be equal. -/
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
-
   intro a a' h_funs_eq
   rw [U8x32_as_Nat_is_NatofDigits a, U8x32_as_Nat_is_NatofDigits a'] at h_funs_eq
   let L := (List.ofFn fun i : Fin 32 => a[i]!.val)
   let L' := (List.ofFn fun i : Fin 32 => a'[i]!.val)
-
   have h_inj := Nat.ofDigits_inj_of_len_eq
     (b := 2 ^ 8)
     (by omega : 1 < 2 ^ 8)
@@ -124,15 +182,12 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
     (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
     (h_funs_eq)
-
   simp only [L, L', List.ofFn_inj] at h_inj
-  apply Subtype.eq
+  apply Subtype.ext
   apply List.ext_get
-
-  · simp only [List.Vector.length_val, UScalar.ofNat_val_eq]
+  · simp [List.Vector.length_val]
   · intro n h_a h_a'
-    have h_len : n < 32 := by  simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNat_val_eq, Fin.is_lt, getElem!_pos]
+    have h_len : n < 32 := by grind
     have h_congr := congr_fun h_inj ⟨n, h_len⟩
     simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
@@ -140,6 +195,37 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
+  · grind
   · simp
-    scalar_tac
-  · simp
+
+/-! ## Bitwise OR equals addition for disjoint ranges -/
+
+/-- Nat.bit decomposition: every natural number is `bit (testBit 0) (n / 2)`. -/
+private lemma bit_decomp (a : Nat) : a = Nat.bit (a.testBit 0) (a / 2) := by
+  rw [Nat.testBit_zero]
+  unfold Nat.bit
+  have := Nat.div_add_mod a 2
+  rcases Nat.mod_two_eq_zero_or_one a with h | h <;> simp [h] <;> omega
+
+/-- OR of a value below `2^k` with a multiple of `2^k` equals their sum,
+    because the bit ranges are disjoint. -/
+lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
+    a ||| (b * 2 ^ k) = a + b * 2 ^ k := by
+  induction k generalizing a b with
+  | zero => simp at ha; subst ha; simp
+  | succ k ih =>
+    have ha_div : a / 2 < 2 ^ k := by
+      rw [Nat.div_lt_iff_lt_mul (by norm_num)]
+      linarith [show 2 ^ (k + 1) = 2 ^ k * 2 from by ring]
+    conv_lhs =>
+      rw [bit_decomp a,
+        show b * 2 ^ (k + 1) = Nat.bit false (b * 2 ^ k) from by
+          unfold Nat.bit; simp; ring]
+    rw [Nat.lor_bit, Bool.or_false, ih (a / 2) b ha_div]
+    unfold Nat.bit
+    have h2 : b * 2 ^ (k + 1) = 2 * (b * 2 ^ k) := by ring
+    have hmod := Nat.div_add_mod a 2
+    rw [h2]
+    rcases Nat.mod_two_eq_zero_or_one a with h | h
+    · rw [Nat.testBit_zero]; simp [h]; omega
+    · rw [Nat.testBit_zero]; simp [h]; omega

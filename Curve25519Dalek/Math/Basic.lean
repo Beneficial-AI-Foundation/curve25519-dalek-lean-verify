@@ -56,6 +56,14 @@ def Scalar52_wide_as_Nat (limbs : Array U128 9#usize) : Nat :=
 def U8x32_as_Nat (bytes : Array U8 32#usize) : Nat :=
   ∑ i ∈ Finset.range 32, 2^(8 * i) * (bytes[i]!).val
 
+/-- Interpret a 32-element byte array as a field element in ZMod p via Horner's method.
+    This avoids the massive syntax tree that casting `U8x32_as_Nat` to `ZMod p` produces
+    (which causes deterministic timeouts when the 32-term Finset.sum gets Nat.cast distributed
+    through it). See `U8x32_as_Field_eq_cast` in Aux.lean for the equivalence proof. -/
+def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
+  bytes.val.foldr (init := (0 : ZMod (2^255 - 19))) fun b acc =>
+    (b.val : ZMod (2^255 - 19)) + (256 : ZMod (2^255 - 19)) * acc
+
 /-- Interpret a 64-element byte array as a natural number. -/
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
@@ -131,7 +139,7 @@ def sqrt_m1 : ZMod p :=
 Raw value for sqrt(ad - 1). Kept private so it's not accidentally used.
 -/
 private def sqrt_ad_minus_one_val : Nat :=
-  25063068953384623474111466158185098518371208170673930163546292076677493185328
+  25063068953384623474111414158702152701244531502492656460079210482610430750235
 
 /--
 Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).
@@ -197,6 +205,89 @@ Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
 lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
+
+/-- `abs_edwards` always produces a non-negative (even parity) value. -/
+lemma is_negative_abs_edwards (x : ZMod p) : is_negative (abs_edwards x) = false := by
+  unfold abs_edwards
+  split_ifs with h
+  · -- x is negative (odd parity): result is -x
+    unfold is_negative at h ⊢
+    by_cases hx : x = 0
+    · simp [hx] at h
+    · have h_neg_val : (-x : ZMod p).val = p - x.val := by
+        rw [ZMod.neg_val]; exact if_neg hx
+      rw [h_neg_val]
+      have hxlt : x.val < p := x.val_lt
+      have hxpos : 0 < x.val := Nat.pos_of_ne_zero (by rwa [ne_eq, ZMod.val_eq_zero])
+      have hp_odd : p % 2 = 1 := by decide
+      simp only [beq_iff_eq] at h
+      rw [beq_eq_false_iff_ne]
+      omega
+  · -- x is non-negative: result is x, already non-negative
+    exact Bool.eq_false_iff.mpr h
+
+/-- `abs_edwards x` has even parity: `(abs_edwards x).val % 2 = 0`. -/
+lemma abs_edwards_val_even' (x : ZMod p) : (abs_edwards x).val % 2 = 0 := by
+  have h := is_negative_abs_edwards x
+  unfold is_negative at h
+  rw [beq_eq_false_iff_ne] at h
+  omega
+
+/-- abs_edwards always produces a non-negative (even val) result. -/
+lemma abs_edwards_val_even (hp_odd : p % 2 = 1) (b : ZMod p) :
+    (abs_edwards b).val % 2 = 0 :=
+  abs_edwards_val_even' b
+
+/-- If a² = b² and a has even val, then a = abs_edwards b.
+    In ZMod p for odd p, the non-negative square root is unique. -/
+lemma eq_abs_edwards_of_sq_eq (hp_odd : p % 2 = 1) {a b : ZMod p}
+    (h_sq : a ^ 2 = b ^ 2) (ha : a.val % 2 = 0) :
+    a = abs_edwards b := by
+  have h_sq' : a ^ 2 = (abs_edwards b) ^ 2 := by rw [h_sq, abs_edwards_sq]
+  have hab : (abs_edwards b).val % 2 = 0 := abs_edwards_val_even hp_odd b
+  have h_factor : (a - abs_edwards b) * (a + abs_edwards b) = 0 := by
+    linear_combination h_sq'
+  rcases mul_eq_zero.mp h_factor with h | h
+  · exact sub_eq_zero.mp h
+  · have heq : a = -(abs_edwards b) := by linear_combination h
+    by_cases h0 : abs_edwards b = 0
+    · rw [h0, neg_zero] at heq; rw [heq, h0]
+    · exfalso
+      rw [heq, ZMod.neg_val, if_neg h0] at ha
+      have := Nat.add_sub_cancel' (le_of_lt (ZMod.val_lt (abs_edwards b)))
+      omega
+
+/-- abs_edwards is invariant under sign: if a² = b² then abs_edwards a = abs_edwards b. -/
+lemma abs_edwards_eq_of_sq_eq_sq (hp_odd : p % 2 = 1) {a b : ZMod p}
+    (h : a ^ 2 = b ^ 2) : abs_edwards a = abs_edwards b :=
+  eq_abs_edwards_of_sq_eq hp_odd (by rw [abs_edwards_sq, h]) (abs_edwards_val_even hp_odd a)
+
+/-- `abs_edwards` is invariant under negation: `abs_edwards (-x) = abs_edwards x`. -/
+lemma abs_edwards_neg (x : ZMod p) : abs_edwards (-x) = abs_edwards x := by
+  by_cases hx : x = 0
+  · simp [hx]
+  · unfold abs_edwards is_negative
+    have h_neg_val : (-x : ZMod p).val = p - x.val := by
+      rw [ZMod.neg_val]; exact if_neg hx
+    rw [h_neg_val]
+    have hxlt : x.val < p := x.val_lt
+    have hxv : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
+    have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv
+    have hp_odd : p % 2 = 1 := by decide
+    have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
+    by_cases hpx : x.val % 2 = 1
+    · have : (p - x.val) % 2 = 0 := by omega
+      simp only [beq_iff_eq] at *; simp [hpx, this]
+    · have hpx0 : x.val % 2 = 0 := by omega
+      have : (p - x.val) % 2 = 1 := by omega
+      simp only [beq_iff_eq] at *; simp [hpx0, this]
+
+/-- If `x^2 = y^2` then `abs_edwards x = abs_edwards y`. -/
+lemma abs_edwards_eq_of_sq_eq {x y : ZMod p} (h : x ^ 2 = y ^ 2) :
+    abs_edwards x = abs_edwards y := by
+  rcases sq_eq_sq_iff_eq_or_eq_neg.mp h with h_eq | h_neg
+  · rw [h_eq]
+  · rw [h_neg, abs_edwards_neg]
 
 /-- Square root with quadratic residue check, matching Rust's sqrt_ratio_i(x, 1).
     Returns (sqrt(x), true) when x is a square, (sqrt(i*x), false) otherwise.

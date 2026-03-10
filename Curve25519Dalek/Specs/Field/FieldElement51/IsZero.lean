@@ -65,7 +65,7 @@ expensive for `simp` to reduce (whnf timeout), causing any subsequent `progress`
 time out.
 
 Workaround:
-1. Use `simp only [toResult, bind_tc_ok] at ⊢` to reduce the pure `Array.to_slice` binds
+1. Use `simp only [lift, bind_tc_ok] at ⊢` to reduce the pure `Array.to_slice` binds
    without touching hypotheses (bypasses `progress` for those steps).
 2. Wrap the expensive hypotheses in `Hold` (opaque to `simp`) before calling `progress`
    on `ct_eq`.
@@ -80,7 +80,7 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
     (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by
   unfold is_zero
   progress as ⟨bytes, h_to_bytes_mod, h_to_bytes_lt⟩
-  simp only [toResult, bind_tc_ok] at ⊢
+  simp only [lift, bind_tc_ok] at ⊢
   have h_mod : Hold (U8x32_as_Nat bytes ≡ Field51_as_Nat r [MOD p]) := h_to_bytes_mod
   have h_lt : Hold (U8x32_as_Nat bytes < p) := h_to_bytes_lt
   clear h_to_bytes_mod h_to_bytes_lt

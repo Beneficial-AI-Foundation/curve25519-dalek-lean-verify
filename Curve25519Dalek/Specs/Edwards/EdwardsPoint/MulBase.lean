@@ -6,6 +6,8 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Math.Edwards.Basepoint
+import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `EdwardsPoint::mul_base`
 
@@ -45,11 +47,11 @@ natural language specs:
 - Delegates to scalar multiplication with the Edwards basepoint constant
 - The returned EdwardsPoint equals the output of that scalar multiplication
 -/
-@[progress]
+@[externally_verified, progress] -- proven in Verus
 theorem mul_base_spec (scalar : scalar.Scalar) :
     mul_base scalar ⦃ res =>
     EdwardsPoint.IsValid res ∧
-    res.toPoint = (U8x32_as_Nat scalar.bytes) • constants.ED25519_BASEPOINT_POINT.toPoint ⦄ := by
+    res.toPoint = (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint ⦄ := by
     sorry
 
 end curve25519_dalek.edwards.EdwardsPoint

@@ -54,7 +54,5 @@ theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 6
     (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_square
   progress*
-  refine ⟨by simpa [a_post_1, eq_comm] using res_post_1,
-    fun i hi => lt_trans (res_post_2 i hi) (by norm_num)⟩
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

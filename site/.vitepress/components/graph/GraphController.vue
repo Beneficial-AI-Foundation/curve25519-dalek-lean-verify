@@ -458,7 +458,11 @@ onUnmounted(() => {
         <span>Verified</span>
       </div>
       <div class="legend-item">
-        <span class="legend-dot" style="background-color: #f59e0b;"></span>
+        <span class="legend-dot" style="background-color: #6ee7b7;"></span>
+        <span>Ext. Verified</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot" style="background-color: #3b82f6;"></span>
         <span>Specified</span>
       </div>
       <div class="legend-item">

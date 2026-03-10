@@ -42,16 +42,16 @@ natural language specs:
 -/
 @[progress]
 theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
-    add self other ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = self.toPoint + other.toPoint ⦄ := by
+    add self other ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧
+      result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
   progress*
   · exact h_self_valid.1
   · exact h_other_valid.1
   · constructor
     · constructor
-      · exact ep_post_1
+      · exact ep_post1
       · have h_self_even : IsEven (self.toPoint) := by
           unfold RistrettoPoint.toPoint
           rw [← EdwardsPoint_IsSquare_iff_IsEven self h_self_valid.1]
@@ -62,10 +62,10 @@ theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_
           exact h_other_valid.2
         have h_eq_points : ep.toPoint = self.toPoint + other.toPoint := by
           unfold RistrettoPoint.toPoint
-          exact ep_post_2
-        rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post_1, h_eq_points]
+          exact ep_post2
+        rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post1, h_eq_points]
         exact even_add_closure_Ed25519 _ _ h_self_even h_other_even
-    · exact ep_post_2
+    · exact ep_post2
 
 /-
 Note:

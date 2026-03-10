@@ -36,9 +36,8 @@ natural language specs:
       scalar_to_nat(s) * scalar_to_nat(s') is congruent to 1 (mod \ell)
 -/
 
-lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0 := by
-  unfold backend.serial.u64.scalar.Scalar52.ZERO backend.serial.u64.scalar.Scalar52.ZERO_body
-  decide
+-- ZERO now returns Result; this lemma is unused, kept for reference
+-- lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0
 
 /-- **Spec and proof concerning `scalar.Scalar.invert`**:
 - Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)
@@ -49,11 +48,11 @@ lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0 := b
 @[progress]
 theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
     invert s ⦃ s' =>
-    U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by
+      U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by
   unfold invert
   progress*
-  rw [← s_post_1]
-  have := Nat.ModEq.mul_left (Scalar52_as_Nat s) res_post_1
+  rw [← s_post1]
+  have := Nat.ModEq.mul_left (Scalar52_as_Nat s) s'_post1
   exact Nat.ModEq.trans this s1_post
 
 

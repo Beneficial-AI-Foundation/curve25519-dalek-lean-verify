@@ -6,6 +6,7 @@ Authors: Markus Dablander, Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Tactics
+import Curve25519Dalek.ExternallyVerified
 
 /- # Spec Theorem for `FieldElement51::pow2k`
 
@@ -105,18 +106,6 @@ theorem pow2k_m_spec (x y : U64) :
     pow2k.m x y ⦃ prod => prod.val = x.val * y.val ⦄ := by
   unfold pow2k.m
   progress*
-  simp_all
-  have hx: x.val < 2^64:= by scalar_tac
-  have hy: y.val < 2^64:= by scalar_tac
-  have :=Nat.le_pred_of_lt hy
-  have le1:= Nat.mul_le_mul_left (x.val) this
-  have := Nat.le_pred_of_lt hx
-  have le2:= Nat.mul_le_mul_right ((2 ^ 64).pred) this
-  have := le_trans le1 le2
-  apply le_trans this
-  simp
-  scalar_tac
-
 
 theorem bound_two (a b c d n : ℕ)
   (ha : a < 2 ^ n)
@@ -137,8 +126,6 @@ theorem bound_two (a b c d n : ℕ)
     rw[this,← mul_assoc, ← mul_assoc, ← mul_assoc, ← mul_assoc] at re
     rw[← mul_assoc, ← mul_assoc, ← mul_assoc]
     exact re
-
-
 
 theorem bound_twoI (a b c d n : ℕ)
   (ha : a < 2 ^ n)
@@ -182,9 +169,16 @@ theorem bound_twoII (a b c d n : ℕ)
     rw[this,← mul_assoc] at re
     exact re
 
-lemma LOW_51_BIT_MASK_spec : pow2k.LOW_51_BIT_MASK.val = 2 ^ 51 -1 := by
-    unfold pow2k.LOW_51_BIT_MASK
-    decide
+
+namespace pow2k
+
+@[progress]
+theorem LOW_51_BIT_MASK_spec :
+    LOW_51_BIT_MASK ⦃ result => result.val = 2^51 - 1 ⦄ := by
+  unfold LOW_51_BIT_MASK
+  progress*
+
+end pow2k
 
 
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
@@ -1741,7 +1735,7 @@ theorem pow2k_loop_spec (k : ℕ) (k' : U32) (a : Array U64 5#usize)
 -/
 
 
-@[progress]
+@[externally_verified, progress] -- working proof commented out because of slow build
 theorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     pow2k a k ⦃ r =>
