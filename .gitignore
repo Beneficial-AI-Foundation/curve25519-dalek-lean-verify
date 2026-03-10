@@ -17,6 +17,7 @@ build*.txt
 
 # Aeneas
 aeneas
+.aeneas
 *.llbc
 .logs
 Curve25519Dalek/FunsExternal_Template.lean
@@ -36,6 +37,10 @@ deps.json
 
 # Temporary files
 .tmp/
+
+# aeneas-tool
+aeneas-tool/node_modules
+aeneas-tool/dist
 
 # VitePress
 node_modules

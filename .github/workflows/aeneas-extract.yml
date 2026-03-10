@@ -9,11 +9,8 @@ on:
     branches: [ '**' ]
     paths:
       - 'curve25519-dalek/**'
-      - 'extract-functions.txt'
-      - 'aeneas-tweaks.txt'
-      - 'aeneas-toolchain'
-      - 'scripts/setup-aeneas.sh'
-      - 'scripts/extract-lean.sh'
+      - 'aeneas-config.yml'
+      - 'aeneas-tool/**'
       - 'Curve25519Dalek/Funs.lean'
       - 'Curve25519Dalek/Types.lean'
       - '.github/workflows/aeneas-extract.yml'
@@ -40,11 +37,22 @@ jobs:
       - name: Initialize opam
         run: opam init --disable-sandboxing -y -a
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Build aeneas-tool
+        run: |
+          cd aeneas-tool
+          npm ci
+          npm run build
+
       - name: Cache OCaml environment
         uses: actions/cache@v4
         with:
           path: ~/.opam
-          key: ${{ runner.os }}-opam-5.2.0-${{ hashFiles('scripts/setup-aeneas.sh') }}
+          key: ${{ runner.os }}-opam-5.2.0-v2
           restore-keys: |
             ${{ runner.os }}-opam-5.2.0-
             ${{ runner.os }}-opam-
@@ -56,13 +64,13 @@ jobs:
         id: cache-aeneas
         uses: actions/cache@v4
         with:
-          path: aeneas
-          key: ${{ runner.os }}-aeneas-${{ hashFiles('aeneas-toolchain') }}
+          path: .aeneas
+          key: ${{ runner.os }}-aeneas-${{ hashFiles('aeneas-config.yml') }}
           restore-keys: |
             ${{ runner.os }}-aeneas-
 
-      - name: Setup Aeneas (installs OCaml, dependencies, builds Aeneas & Charon)
-        run: ./scripts/setup-aeneas.sh
+      - name: Install Aeneas
+        run: node aeneas-tool/dist/index.js install
 
       - name: Cache Rust build artifacts
         uses: actions/cache@v4
@@ -78,9 +86,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Run Aeneas extraction
-        run: |
-          eval $(opam env)
-          ./scripts/extract-lean.sh
+        run: node aeneas-tool/dist/index.js extract
 
       - name: Check for modifications in generated files
         id: check-diff
