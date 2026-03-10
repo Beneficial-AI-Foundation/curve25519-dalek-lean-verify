@@ -72,21 +72,16 @@ theorem ct_eq_spec
       result = Choice.one ↔
         (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
         (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by
-  have h_s := h_self_valid.1
-  have h_o := h_other_valid.1
   unfold ct_eq
-  have lb {f : ℕ → ℕ} (h : ∀ i, i < 5 → f i < 2^53) : ∀ i, i < 5 → f i < 2^54 :=
-    fun i hi => Nat.lt_trans (h i hi) (by norm_num)
-  have := lb h_s.X_bounds
-  have := lb h_s.Y_bounds
-  have := lb h_o.X_bounds
-  have := lb h_o.Y_bounds
-  progress as ⟨_, h2⟩
-  progress as ⟨_, h4⟩
-  progress as ⟨_, h6⟩
-  progress as ⟨_, h8⟩
-  progress as ⟨h9, h10⟩
-  progress as ⟨h11, h12⟩
+  progress*
+  all_goals (try (
+    have lb {f : ℕ → ℕ} (h : ∀ i, i < 5 → f i < 2^53) : ∀ i, i < 5 → f i < 2^54 :=
+      fun i hi => Nat.lt_trans (h i hi) (by norm_num)
+    first
+    | exact lb h_self_valid.1.X_bounds
+    | exact lb h_self_valid.1.Y_bounds
+    | exact lb h_other_valid.1.X_bounds
+    | exact lb h_other_valid.1.Y_bounds))
   unfold subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
   have tbm (x y : backend.serial.u64.field.FieldElement51) :
       x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
@@ -96,20 +91,19 @@ theorem ct_eq_spec
     have hx : U8x32_as_Nat xb = Field51_as_Nat x % p := by rw [←Nat.mod_eq_of_lt hxl, hxm]
     have hy : U8x32_as_Nat yb = Field51_as_Nat y % p := by rw [←Nat.mod_eq_of_lt hyl, hym]
     exact ⟨fun h => by rw [←hx, ←hy, h], fun h => U8x32_as_Nat_injective (by rw [hx, hy, h])⟩
-  rw [tbm] at h10 h12
+  rw [tbm] at c_post c1_post
+  rw [X1Y2_post1, Y1X2_post1] at c_post
+  rw [X1X2_post1, Y1Y2_post1] at c1_post
   have vo (c : subtle.Choice) : c.val = 1#u8 ↔ c = Choice.one := by
     rcases c with ⟨_, hv | hv⟩
-    all_goals simp [hv, Choice.one]
+    all_goals (subst hv; simp only [Choice.one, subtle.Choice.mk.injEq])
   split
-  · rename_i h_or
-    exact ⟨fun _ => h_or.elim
-      (fun hv => .inl ((h2.symm.trans (h10.mp ((vo h9).mp hv))).trans h4))
-      (fun hv => .inr ((h6.symm.trans (h12.mp ((vo h11).mp hv))).trans h8)),
-      fun _ => rfl⟩
-  · rename_i h_not
-    push_neg at h_not
-    exact ⟨nofun, fun h_or => h_or.elim
-      (fun hmod => absurd ((vo h9).mpr (h10.mpr (h2.trans (hmod.trans h4.symm)))) h_not.1)
-      (fun hmod => absurd ((vo h11).mpr (h12.mpr (h6.trans (hmod.trans h8.symm)))) h_not.2)⟩
+  · rename_i h
+    exact ⟨fun _ => h.elim (.inl ∘ c_post.mp ∘ (vo c).mp) (.inr ∘ c1_post.mp ∘ (vo c1).mp), fun _ => rfl⟩
+  · rename_i h
+    push_neg at h
+    exact ⟨nofun, fun hm => hm.elim
+      (fun hm => absurd ((vo c).mpr (c_post.mpr hm)) h.1)
+      (fun hm => absurd ((vo c1).mpr (c1_post.mpr hm)) h.2)⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq
