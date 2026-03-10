@@ -70,38 +70,48 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   unfold FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
   progress*  -- This eliminates ct_eq
 
-  have h_ONE_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53 := by
-    intro i hi
-    unfold FieldElement51.ONE
-    interval_cases i <;> decide
+  -- have h_ONE_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 54 := by
+  --   intro i hi
+  --   unfold FieldElement51.ONE
+  --   interval_cases i <;> decide
 
-  have h_MINUS_ONE_bounds : ∀ i < 5, FieldElement51.MINUS_ONE[i]!.val < 2 ^ 54 := by
-    intro i hi
-    unfold FieldElement51.MINUS_ONE
-    interval_cases i <;> decide
+  -- have h_MINUS_ONE_bounds : ∀ i < 5, FieldElement51.MINUS_ONE[i]!.val < 2 ^ 54 := by
+  --   intro i hi
+  --   unfold FieldElement51.MINUS_ONE
+  --   interval_cases i <;> decide
 
-  have h_u_sub_bounds : ∀ i < 5, u[i]!.val < 2 ^ 63 := by
-    intro i hi
-    have := u_post_2 i hi
-    omega
+  -- have h_u_sub_bounds : ∀ i < 5, u[i]!.val < 2 ^ 63 := by
+  --   intro i hi
+  --   have := u_post_2 i hi
+  --   omega
 
-  have h_ONE_sub_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 54 := by
-    intro i hi
-    have := h_ONE_bounds i hi
-    omega
+  -- have h_ONE_sub_bounds : ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 54 := by
+  --   intro i hi
+  --   have := h_ONE_bounds i hi
+  --   omega
 
-  have h_u_add_bounds : ∀ i < 5, u[i]!.val < 2 ^ 53 := by
-    intro i hi
-    have := u_post_2 i hi
-    omega
+  -- have h_u_add_bounds : ∀ i < 5, u[i]!.val < 2 ^ 53 := by
+  --   intro i hi
+  --   have := u_post_2 i hi
+  --   omega
 
   unfold Bool.Insts.CoreConvertFromChoice.from
   simp
   split
   · simp
   · progress*
-    · grind only
-    · grind only
+    ·
+      have h_ONE_bounds : ∀ i < 5, one[i]!.val < 2 ^ 54 := by
+        intro i hi
+        interval_cases i
+        sorry
+        sorry
+        sorry
+        sorry
+        sorry
+      grind only
+    · sorry
+      -- grind only
     · have h_res := res_post_1 res_post_2 res_post_3
       obtain ⟨Z_inv, x_val, y_val, x_is_neg, h_Zinv, h_X, h_Y, h_neg, h_curve, h_y_val, h_sign, h_T⟩ := h_res
       use Z_inv
