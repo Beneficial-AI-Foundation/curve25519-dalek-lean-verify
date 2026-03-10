@@ -310,16 +310,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   split
   case isTrue hlt =>
     -- Progress through the loop body to the 1st halt point, name c0 c1 c2 c3 c4
-    iterate 12 progress
-    progress as ⟨ c0, _ ⟩
-    iterate 5 progress
-    progress as ⟨ c1, _ ⟩
-    iterate 5 progress
-    progress as ⟨ c2, _ ⟩
-    iterate 5 progress
-    progress as ⟨ c3, _ ⟩
-    iterate 5 progress
-    progress as ⟨ c4, _ ⟩
+    (iterate 12 progress); progress as ⟨ c0, _ ⟩; (iterate 5 progress); progress as ⟨ c1, _ ⟩
+    (iterate 5 progress); progress as ⟨ c2, _ ⟩; (iterate 5 progress); progress as ⟨ c3, _ ⟩
+    (iterate 5 progress); progress as ⟨ c4, _ ⟩
     /-
     Stage 1: The 5 intermediate products (c0-c4) have been computed
 
@@ -361,40 +354,37 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     clear * - pow2k_loop_spec k a ha hlt
       c0 c1 c2 c3 c4 hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4' a_pow_two
     -- Continue to the 2nd halt point
-    progress as ⟨ _, i30_post_1, _ ⟩
-    progress as ⟨ _, i31_post ⟩
-    progress as ⟨ _, i32_post ⟩
-    progress as ⟨ c1', c1'_post ⟩
-    progress as ⟨ _, i33_post ⟩
+    (iterate 3 progress); progress as ⟨ c1', _ ⟩
+    progress
     progress as ⟨ _, mask_post ⟩
-    progress as ⟨ _, i34_post_1, _ ⟩
-    progress as ⟨ _, a1_post ⟩
-    progress as ⟨ _, i35_post_1, _ ⟩
-    progress as ⟨ _, i36_post ⟩
-    progress as ⟨ _, i37_post ⟩
-    progress as ⟨ c2', c2'_post ⟩
-    progress as ⟨ _, i38_post ⟩
-    progress as ⟨ _, i39_post_1, _ ⟩
-    progress as ⟨ _, a2_post ⟩
-    progress as ⟨ _, i40_post_1, _ ⟩
-    progress as ⟨ _, i41_post ⟩
-    progress as ⟨ _, i42_post ⟩
-    progress as ⟨ c3', c3'_post ⟩
-    progress as ⟨ _, i43_post ⟩
-    progress as ⟨ _, i44_post_1, _ ⟩
-    progress as ⟨ _, a3_post ⟩
-    progress as ⟨ _, i45_post_1, _ ⟩
-    progress as ⟨ _, i46_post ⟩
-    progress as ⟨ _, i47_post ⟩
-    progress as ⟨ c4', c4'_post ⟩
-    progress as ⟨ _, i48_post ⟩
-    progress as ⟨ _, i49_post_1, _ ⟩
-    progress as ⟨ _, a4_post ⟩
-    progress as ⟨ _, i50_post_1, _ ⟩
-    progress as ⟨ carry, carry_post ⟩
-    progress as ⟨ _, i51_post ⟩
-    progress as ⟨ _, i52_post_1, _ ⟩
-    progress as ⟨ a', a'_post ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ c2', _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ c3', _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ c4', _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ carry, _ ⟩
+    progress as ⟨ _, _ ⟩
+    progress as ⟨ _, _, _ ⟩
+    progress as ⟨ a', _ ⟩
     /-
     Stage 2: Carry propagation
 
@@ -427,10 +417,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     -- Interleaved carry chain: each step needs the previous carry-fits bound for omega
     -- to eliminate the % 2^64 from the U128→U64→U128 cast chain.
     have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0'
+    subst_vars
     -- c1' = c1 + carry from c0
     have hc1'_eq : c1'.val = c1.val + c0.val / 2 ^ 51 := by
-      simp only [c1'_post, i32_post, i31_post, i30_post_1, UScalar.cast_val_eq,
-        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
     have hc1'_bound : c1'.val < 2 ^ 115 := by
       rw [hc1'_eq]; apply carry_chain_lt_pow2_115 _ _ 59 _ hcarry0_fits (by omega)
@@ -439,8 +429,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have hcarry1_fits : c1'.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c1'.val hc1'_bound
     -- c2' = c2 + carry from c1'
     have hc2'_eq : c2'.val = c2.val + c1'.val / 2 ^ 51 := by
-      simp only [c2'_post, i37_post, i36_post, i35_post_1, UScalar.cast_val_eq,
-        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
     have hc2'_bound : c2'.val < 2 ^ 115 := by
       rw [hc2'_eq]; apply carry_chain_lt_pow2_115 _ _ 41 _ hcarry1_fits (by omega)
@@ -449,8 +438,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have hcarry2_fits : c2'.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c2'.val hc2'_bound
     -- c3' = c3 + carry from c2'
     have hc3'_eq : c3'.val = c3.val + c2'.val / 2 ^ 51 := by
-      simp only [c3'_post, i42_post, i41_post, i40_post_1, UScalar.cast_val_eq,
-        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
     have hc3'_bound : c3'.val < 2 ^ 115 := by
       rw [hc3'_eq]; apply carry_chain_lt_pow2_115 _ _ 23 _ hcarry2_fits (by omega)
@@ -459,8 +447,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     have hcarry3_fits : c3'.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c3'.val hc3'_bound
     -- c4' = c4 + carry from c3'
     have hc4'_eq : c4'.val = c4.val + c3'.val / 2 ^ 51 := by
-      simp only [c4'_post, i47_post, i46_post, i45_post_1, UScalar.cast_val_eq,
-        UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+      simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
     have hc4'_bound : c4'.val < 2 ^ 115 := by
       rw [hc4'_eq]; apply carry_chain_lt_pow2_115 _ _ 5 _ hcarry3_fits (by omega)
@@ -471,40 +458,42 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     -- Each ha'_i traces: a'[i]! → chain of set operations → AND with mask → ci % 2^51
     -- Strategy: use set_of_ne_getElem! to peel through non-matching sets, set_of_eq at the match
     have ha'_0 : a'[0]!.val = c0.val % 2 ^ 51 := by
-      simp only [a'_post, Array.set_of_ne_getElem! _ _ 0 4 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a4_post, Array.set_of_ne_getElem! _ _ 0 3 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a3_post, Array.set_of_ne_getElem! _ _ 0 2 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a2_post, Array.set_of_ne_getElem! _ _ 0 1 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a1_post, Array.set_of_eq _ _ 0 (by scalar_tac)]
-      simp only [i34_post_1, UScalar.val_and, i33_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod];
+      simp only [*, Array.set_of_ne_getElem! _ _ 0 4 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 0 3 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 0 2 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 0 1 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_eq _ _ 0 (by scalar_tac), UScalar.val_and, *, UScalar.cast_val_eq,
+        UScalarTy.numBits]
+      simp only [Nat.and_two_pow_sub_one_eq_mod] at *;
       omega
     have ha'_1 : a'[1]!.val = c1'.val % 2 ^ 51 := by
-      simp only [a'_post, Array.set_of_ne_getElem! _ _ 1 4 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a4_post, Array.set_of_ne_getElem! _ _ 1 3 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a3_post, Array.set_of_ne_getElem! _ _ 1 2 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a2_post, Array.set_of_eq _ _ 1 (by scalar_tac)]
-      simp only [i39_post_1, UScalar.val_and, i38_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+      simp only [*, Array.set_of_ne_getElem! _ _ 1 4 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 1 3 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 1 2 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_eq _ _ 1 (by scalar_tac),
+        UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+      omega
     have ha'_2 : a'[2]!.val = c2'.val % 2 ^ 51 := by
-      simp only [a'_post, Array.set_of_ne_getElem! _ _ 2 4 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a4_post, Array.set_of_ne_getElem! _ _ 2 3 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a3_post, Array.set_of_eq _ _ 2 (by scalar_tac)]
-      simp only [i44_post_1, UScalar.val_and, i43_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+      simp only [*, Array.set_of_ne_getElem! _ _ 2 4 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_ne_getElem! _ _ 2 3 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_eq _ _ 2 (by scalar_tac),
+        UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
+      simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+      omega
     have ha'_3 : a'[3]!.val = c3'.val % 2 ^ 51 := by
-      simp only [a'_post, Array.set_of_ne_getElem! _ _ 3 4 (by scalar_tac) (by scalar_tac) (by omega)]
-      simp only [a4_post, Array.set_of_eq _ _ 3 (by scalar_tac)]
-      simp only [i49_post_1, UScalar.val_and, i48_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod]; omega
+      simp only [*, Array.set_of_ne_getElem! _ _ 3 4 (by scalar_tac) (by scalar_tac) (by omega),
+        Array.set_of_eq _ _ 3 (by scalar_tac), UScalar.val_and, UScalar.cast_val_eq,
+        UScalarTy.numBits]
+      simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+      omega
     have ha'_4 : a'[4]!.val = c4'.val % 2 ^ 51 := by
-      simp only [a'_post, Array.set_of_eq _ _ 4 (by scalar_tac)]
-      simp only [i52_post_1, UScalar.val_and, i51_post, UScalar.cast_val_eq, UScalarTy.numBits]
-      simp_all only [Nat.and_two_pow_sub_one_eq_mod]
+      simp only [*, Array.set_of_eq _ _ 4 (by scalar_tac), UScalar.val_and, UScalar.cast_val_eq,
+        UScalarTy.numBits]
+      simp only [Nat.and_two_pow_sub_one_eq_mod] at *
       omega
     have hcarry_val : carry.val = c4'.val / 2 ^ 51 := by
-      simp only [carry_post, i50_post_1, UScalar.cast_val_eq, UScalarTy.numBits,
-        Nat.shiftRight_eq_div_pow]
+      simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
       omega
     -- Clear Stage 2 postconditions
     clear * - pow2k_loop_spec k a ha hlt c0 c1 c2 c3 c4
