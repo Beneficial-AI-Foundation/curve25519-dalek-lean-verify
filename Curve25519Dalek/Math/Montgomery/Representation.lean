@@ -150,11 +150,11 @@ section MontgomeryPoint
     This is a one-way conversion, since the Montgomery
     model does not retain sign information.
 -/
+def v_squared (u : CurveField) : CurveField := u ^ 3 + Curve25519.A * u ^ 2 + u
+
 noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
-    let v_squared := u ^ 3 + Curve25519.A * u ^ 2 + u
-    match h_call: curve25519_dalek.math.sqrt_checked v_squared with
-    | (v_abs, was_square) =>
-    let v := v_abs
+    match h_call: curve25519_dalek.math.sqrt_checked (v_squared u) with
+    | (v, was_square) =>
     if h_invalid : !was_square || (u ==0) then
       T_point
     else
@@ -164,7 +164,7 @@ noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
         obtain ⟨h_sq_not,  h_y_eq_false⟩ := h_invalid
         simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
         have curve_eq : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u := by
-          apply sqrt_checked_spec v_squared
+          apply sqrt_checked_spec (v_squared u)
           · exact h_call
           · exact h_sq_not
         apply (nonsingular_iff u v).mpr
