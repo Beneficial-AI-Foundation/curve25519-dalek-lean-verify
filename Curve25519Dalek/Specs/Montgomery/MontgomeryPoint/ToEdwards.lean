@@ -207,13 +207,47 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
               have : Field51_as_Nat u % p = p - 1 := by
                 omega
               exact this
-            -- have h3 : Field51_as_Nat u % p = Field51_as_Nat one % p := by
-              -- simp only [Nat.self_sub_mod]
+            have h3 : Field51_as_Nat u % p = Field51_as_Nat fe % p := by
               -- simp only [FieldElement51.MINUS_ONE_spec, Nat.self_sub_mod]
-              -- exact h2
-              -- sorry
-            sorry
-          sorry
+              grind
+
+            have h4 :
+            Field51_as_Nat u =
+            Field51_as_Nat fe := by
+              have hu_lt : Field51_as_Nat u < 2^255 := by
+                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.sum_range_zero]
+                have h0 := u_post2 0 (by norm_num)
+                have h1 := u_post2 1 (by norm_num)
+                have h2' := u_post2 2 (by norm_num)
+                have h3' := u_post2 3 (by norm_num)
+                have h4' := u_post2 4 (by norm_num)
+                simp only [Array.getElem!_Nat_eq, Nat.zero_add] at *
+                omega
+              have hp_val : p = 2^255 - 19 := by rfl
+              have hMINUS_ONE_val : Field51_as_Nat fe = p - 1 := by
+                grind only
+              grind only
+
+            obtain ⟨ub, hub_eq, hub_rest⟩ := spec_imp_exists (to_bytes_spec u)
+            obtain ⟨hub_mod, hub_lt⟩ := hub_rest
+            obtain ⟨mb, hmb_eq, hmb_rest⟩ := spec_imp_exists (to_bytes_spec fe)
+            obtain ⟨hmb_mod, hmb_lt⟩ := hmb_rest
+            rw [hub_eq, hmb_eq]
+            simp only [ok.injEq]
+            apply U8x32_as_Nat_injective
+            have h_u_canon : U8x32_as_Nat ub = Field51_as_Nat u % p := by
+              rw [← Nat.mod_eq_of_lt hub_lt]; exact hub_mod
+            have h_m_canon : U8x32_as_Nat mb = Field51_as_Nat fe % p := by
+              rw [← Nat.mod_eq_of_lt hmb_lt]; exact hmb_mod
+            rw [h_u_canon, h_m_canon, h4]
+
+          have h_x_one : x = Choice.one := x_post.mpr h_eq_bytes
+          have h_x_val : x.val = 1#u8 := by rw [h_x_one]; rfl
+          absurd h_x_val
+          assumption
+        have h_fe3_inv := fe3_post1 h_fe2_ne_zero
+        have h_fe1_eq : Field51_as_Nat fe2 % p = (Field51_as_Nat u + 1) % p := by
+          grind only
         sorry
 
 
