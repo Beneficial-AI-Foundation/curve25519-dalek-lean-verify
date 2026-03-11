@@ -60,7 +60,6 @@ lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 
   simp only [spec_ok]
   decide
 
-
 @[progress]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
@@ -209,9 +208,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             have h3 : Field51_as_Nat u % p = Field51_as_Nat fe % p := by
               grind
 
-            have h4 :
-            Field51_as_Nat u =
-            Field51_as_Nat fe := by
+            have h4 : Field51_as_Nat u = Field51_as_Nat fe := by
               have hu_lt : Field51_as_Nat u < 2^255 := by
                 simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.sum_range_zero]
                 have h0 := u_post2 0 (by norm_num)
@@ -247,9 +244,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
         have h_fe2_eq : Field51_as_Nat fe2 % p = (Field51_as_Nat u + 1) % p := by
           grind only
 
-
         have h_fe1_eq : Field51_as_Nat fe1 % p = (Field51_as_Nat u + p - 1) % p := by
-          -- have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
           rw [one_post1] at fe1_post2
           have key : (Field51_as_Nat fe1 + 1 + (p - 1)) % p = (Field51_as_Nat u + (p - 1)) % p := by
             rw [Nat.add_mod (Field51_as_Nat fe1 + 1), fe1_post2, ← Nat.add_mod]
@@ -265,39 +260,27 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           exact u_post1
 
         calc Field51_as_Nat ep.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p
-
             = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
               simp only [Nat.mul_mod (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv), h_affine_y]
               simp [Nat.mul_mod]
 
             _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-                have h :
-                  y_val % p = (Field51_as_Nat fe1 * Field51_as_Nat fe3) % p :=
-                  h_y_val_eq
-                have :=
-                  congrArg (fun x => x * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p) h
-
-                simpa [Nat.mul_mod] using this
+              have h : y_val % p = (Field51_as_Nat fe1 * Field51_as_Nat fe3) % p := h_y_val_eq
+              have := congrArg (fun x => x * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p) h
+              simpa [Nat.mul_mod] using this
 
             _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * (Field51_as_Nat u % p + 1) % p := by
-                have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := by
-                  exact h_u_eq
-                simp [h_mp, Nat.mul_mod, Nat.add_mod]
+              have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := h_u_eq
+              simp [h_mp, Nat.mul_mod, Nat.add_mod]
 
             _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * Field51_as_Nat fe2 % p := by
-
-              have h1 : (Field51_as_Nat u % p + 1) % p =
-              Field51_as_Nat fe2 % p := by
+              have h1 : (Field51_as_Nat u % p + 1) % p = Field51_as_Nat fe2 % p := by
                 have := Nat.add_mod (Field51_as_Nat u) 1 p
                 simp at this
                 simp [h_fe2_eq]
-
               have h2 :
-              Field51_as_Nat fe1 * Field51_as_Nat fe3 *
-                  (Field51_as_Nat u % p + 1) % p
-                =
-              Field51_as_Nat fe1 * Field51_as_Nat fe3 *
-                  (Field51_as_Nat fe2 % p) % p := by
+                  Field51_as_Nat fe1 * Field51_as_Nat fe3 * (Field51_as_Nat u % p + 1) % p =
+                  Field51_as_Nat fe1 * Field51_as_Nat fe3 * (Field51_as_Nat fe2 % p) % p := by
                 simp [Nat.mul_mod]
                 grind only
               rw [Nat.mul_mod]
@@ -305,17 +288,19 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
               rw [← Nat.mul_mod]
 
             _ = Field51_as_Nat fe1 * (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p := by
-                ring_nf
+              ring_nf
 
             _ = Field51_as_Nat fe1 * 1 % p := by
               have h_mul : (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p = 1 := by
                 have := h_fe3_inv
                 simpa [Nat.mul_mod] using this
-              have : Field51_as_Nat fe1 * (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p = Field51_as_Nat fe1 * 1 % p := by
+              have : Field51_as_Nat fe1 * (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p =
+                  Field51_as_Nat fe1 * 1 % p := by
                 simp [Nat.mul_mod, h_mul]
               grind only
+
             _ = Field51_as_Nat fe1 % p := by
-                ring_nf
+              ring_nf
 
             _ = (Field51_as_Nat u + p - 1) % p := h_fe1_eq
 
