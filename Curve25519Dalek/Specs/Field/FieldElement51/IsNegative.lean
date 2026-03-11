@@ -40,13 +40,6 @@ Spec:
   `c.val = 1 ↔ (Field51_as_Nat(r) % p) % 2 = 1`.
 -/
 
-/-- Helper: characterize when a `subtle.Choice` encodes the value 1. -/
-lemma Choice.val_eq_one_iff (c : subtle.Choice) :
-  c.val = 1#u8 ↔ c = Choice.one := by
-  cases c with
-  | mk val valid =>
-    simp [Choice.one]
-
 /-- **Spec and proof concerning `FieldElement51.is_negative`.** -/
 
 theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
