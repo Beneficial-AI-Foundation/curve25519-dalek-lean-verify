@@ -107,26 +107,24 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   split
   · simp
   · progress*
-    -- · sorry
-    -- ·
-      -- sorry
-      -- grind only
-    · have h_res := result_post1 result_post2
-      sorry
-    --   obtain ⟨Z_inv, x_val, y_val, x_is_neg, h_Zinv, h_X, h_Y, h_neg, h_curve, h_y_val, h_sign, h_T⟩ := h_res
-      -- use Z_inv
-      -- constructor
-      -- · exact h_Zinv
-    --   ·
-    --     have h_expand : Field51_as_Nat fe1 = Field51_as_Nat u + Field51_as_Nat FieldElement51.ONE := by
-    --         unfold Field51_as_Nat
-    --         rw [← Finset.sum_add_distrib]
-    --         apply Finset.sum_congr rfl
-    --         intro i hi
-    --         have h_limb := fe1_post_1 i (Finset.mem_range.mp hi)
-    --         simp only at h_limb
-    --         rw [h_limb]
-    --         ring
+    · rename_i ep
+      have h_res := result_post1 ep result_post2
+      obtain ⟨Z_inv, x_val, y_val, x_is_neg, h_Zinv, h_X, h_Y, h_neg, h_curve, h_y_val, h_sign, h_T⟩ := h_res
+      use Z_inv
+      constructor
+      · exact h_Zinv
+      ·
+        have h_expand : Field51_as_Nat fe2 = Field51_as_Nat u + Field51_as_Nat one := by
+          unfold Field51_as_Nat
+          rw [← Finset.sum_add_distrib]
+          apply Finset.sum_congr rfl
+          intro i hi
+          have h_limb := fe2_post1 i (Finset.mem_range.mp hi)
+          simp only at h_limb
+          rw [h_limb]
+          ring
+        sorry
+
     --     have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
     --     have h_affine_y : Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv % p = y_val := h_Y
     --     have h_bytes_equiv : U8x32_as_Nat y_bytes1 % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p := by
