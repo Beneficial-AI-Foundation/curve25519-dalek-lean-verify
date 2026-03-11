@@ -55,7 +55,7 @@ natural language specs:
 -/
 
 @[progress]
-lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
+private lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   decide
