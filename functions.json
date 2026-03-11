@@ -7850,7 +7850,7 @@
    "dependencies":
    ["curve25519_dalek.ristretto.decompress.step_1",
     "curve25519_dalek.ristretto.decompress.step_2"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
