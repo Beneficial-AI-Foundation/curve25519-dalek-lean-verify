@@ -8,9 +8,7 @@
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
     "docs:rust": "bash scripts/build-rust-docs.sh",
-    "src-diff": "node scripts/src-diff.js",
-    "aeneas": "node aeneas-tool/dist/index.js",
-    "aeneas:build": "cd aeneas-tool && npm run build"
+    "src-diff": "node scripts/src-diff.js"
   },
   "devDependencies": {
     "@types/cytoscape-dagre": "^2.3.4",
