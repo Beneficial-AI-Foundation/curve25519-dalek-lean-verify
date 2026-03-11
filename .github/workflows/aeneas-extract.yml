@@ -42,7 +42,7 @@ jobs:
           node-version: '22'
 
       - name: Install aeneas-cli
-        run: npm install -g github:oliver-butterley/aeneas-cli#dev-version-0.1
+        run: npm install -g aeneas-cli@0.1.0
 
       - name: Cache OCaml environment
         uses: actions/cache@v5
