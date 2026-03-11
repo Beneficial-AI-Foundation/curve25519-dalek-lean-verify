@@ -50,6 +50,19 @@ noncomputable instance : DecidableEq CurveField := inferInstance
 theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
   exact (ZMod.natCast_eq_natCast_iff a b p).mpr h
 
+
+theorem lift_mod_eq_iff (a b : ℕ) : (a ≡ b  [MOD p]) ↔  (a : CurveField) = (b : CurveField) := by
+  rw[Nat.ModEq]
+  exact (ZMod.natCast_eq_natCast_iff a b p).symm
+
+theorem lift_mod_add (a b : ℕ) : (a : CurveField) + (b : CurveField) = ((a +b):CurveField) := by rfl
+
+theorem lift_mod_mul (a b : ℕ) : (a : CurveField) * (b : CurveField) = ((a * b):CurveField) := by rfl
+
+theorem mod_nat_mul_mod (a b : ℕ) : (a) * (b % p) ≡ a * b [MOD p] := by
+  exact ((Nat.mod_modEq b p).mul_left (a ))
+
+
 /-- A Montgomery curve structure defined by parameters A and B.
     The curve equation is: B·v² = u³ + A·u² + u -/
 def Curve25519.A := (486662 : CurveField)
@@ -144,23 +157,16 @@ def get_v : Point → CurveField
   | .zero => 0
   | .some (y := v) .. => v
 
-@[simp]
-theorem get_u_zero : get_u (0: Point) = 0 := rfl
+@[simp] theorem get_u_zero : get_u (0: Point) = 0 := rfl
+@[simp] theorem get_v_zero : get_v (0: Point) = 0 := rfl
 
-@[simp]
-theorem get_v_zero : get_v (0: Point) = 0 := rfl
+@[simp] theorem get_u_T : get_u T_point = 0 := rfl
+@[simp] theorem get_v_T : get_v T_point = 0 := rfl
 
-@[simp]
-theorem get_u_T : get_u T_point = 0 := rfl
-@[simp]
-theorem get_v_T : get_v T_point = 0 := rfl
-
-@[simp]
-theorem neg_u_coord (P : Point) :
+@[simp] theorem neg_u_coord (P : Point) :
     get_u (-P) = get_u P := by cases P <;> rfl
 
-@[simp]
-theorem neg_v_coord (P : Point) :
+@[simp] theorem neg_v_coord (P : Point) :
     get_v (-P) = -(get_v P) := by
   cases P
   · rfl
@@ -185,79 +191,77 @@ theorem mk_point_def (P : Point) (hP : P ≠ 0) :
     cases P
     · contradiction
     · unfold mk_point
-      simp only
+      simp
 
 
 theorem get_u_v_inj (P Q : Point) (nonP : P ≠ 0) (nonQ : Q ≠ 0) (hu : get_u P = get_u Q) (hv : get_v P = get_v Q) :
   P=Q := by
   cases P
-  · simp only [zero_def, ne_eq, not_true_eq_false] at nonP
+  · simp[zero_def] at nonP
   · cases Q
-    · simp only [zero_def, ne_eq, not_true_eq_false] at nonQ
+    · simp[zero_def] at nonQ
     · unfold get_u at hu
       unfold get_v at hv
-      simp_all only [ne_eq, not_false_eq_true, reduceCtorEq]
+      simp_all
 
 theorem get_u_v_inj_neg (P Q : Point) (nonP : P ≠ 0) (nonQ : Q ≠ 0) (hu : get_u P = get_u Q) (hv : get_v P = -get_v Q) :
   P=-Q := by
   cases P
-  · simp only [zero_def, ne_eq, not_true_eq_false] at nonP
+  · simp[zero_def] at nonP
   · cases Q
-    · simp only [zero_def, ne_eq, not_true_eq_false] at nonQ
+    · simp[zero_def] at nonQ
     · unfold get_u at hu
       unfold get_v at hv
-      simp_all only [MontgomeryCurveCurve25519, ne_eq, reduceCtorEq, not_false_eq_true, neg_some,
-        WeierstrassCurve.Affine.negY, zero_mul, sub_zero]
-
+      simp_all[MontgomeryCurveCurve25519]
 
 theorem mk_point_T {P : Point} (hP : P ≠ 0) (hu : get_u P = 0) (hv : get_v P = 0) :
   P=T_point:= by
   unfold T_point
   rcases P
-  · simp only [zero_def, ne_eq, not_true_eq_false] at hP
-  · simp only [some.injEq]
+  · simp[zero_def] at hP
+  · simp
     unfold get_u at hu
     unfold get_v at hv
-    simp_all only [ne_eq, reduceCtorEq, not_false_eq_true, and_self]
+    simp_all
 
 theorem mk_point_neq_zero {u v : CurveField} (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
- mk_point h ≠ 0 := by unfold mk_point; simp only [ne_eq, reduceCtorEq, not_false_eq_true]
+ mk_point h ≠ 0 := by unfold mk_point; simp
 
-@[simp]
-theorem get_u_mk_point {u v : CurveField}
+@[simp] theorem get_u_mk_point {u v : CurveField}
     (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
     get_u (mk_point h) = u := rfl
 
-@[simp]
-theorem get_v_mk_point {u v : CurveField}
+@[simp] theorem get_v_mk_point {u v : CurveField}
     (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
     get_v (mk_point h) = v := rfl
 
-@[simp]
-theorem mk_point_neq_T_of_u {u v : CurveField}
+@[simp] theorem mk_point_neq_T_of_u {u v : CurveField}
     (hu : u ≠ 0)
     (h : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
     (mk_point h) ≠ T_point  := by
     unfold mk_point T_point
-    simp only [ne_eq, some.injEq, hu, false_and, not_false_eq_true]
+    simp[hu]
 
-@[simp]
-theorem mk_point_neq {u₁ v₁ u₂ v₂ : CurveField}
+@[simp] theorem mk_point_neq {u₁ v₁ u₂ v₂ : CurveField}
     (hu : u₁ ≠ u₂)
     (h₁ : v₁ ^ 2 = u₁ ^ 3 + Curve25519.A * u₁ ^ 2 + u₁)
     (h₂ : v₂ ^ 2 = u₂ ^ 3 + Curve25519.A * u₂ ^ 2 + u₂) :
     (mk_point h₁) ≠ (mk_point h₂)  := by
     unfold mk_point
-    simp only [ne_eq, some.injEq, hu, false_and, not_false_eq_true]
+    simp[hu]
 
-@[simp]
-theorem mk_point_neq_neg {u₁ v₁ u₂ v₂ : CurveField}
+
+@[simp] theorem mk_point_neq_neg {u₁ v₁ u₂ v₂ : CurveField}
     (hu : u₁ ≠ u₂)
     (h₁ : v₁ ^ 2 = u₁ ^ 3 + Curve25519.A * u₁ ^ 2 + u₁)
     (h₂ : v₂ ^ 2 = u₂ ^ 3 + Curve25519.A * u₂ ^ 2 + u₂) :
     (mk_point h₁) ≠ (-mk_point h₂)  := by
     unfold mk_point
-    simp only [neg_some, WeierstrassCurve.Affine.negY, ne_eq, some.injEq, hu, false_and, not_false_eq_true]
+    simp[hu]
+
+
+
+
 
 /-! ### Group Law Properties -/
 
@@ -285,9 +289,9 @@ theorem uADD (P Q : Point)
         exact PQ
       have := @WeierstrassCurve.Affine.Point.add_some CurveField _ MontgomeryCurveCurve25519 _ x₁ x₂ y₁ y₂ hxy  nonS₁ nonS₂
       simp only [MontgomeryCurveCurve25519, this, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.slope,
-        WeierstrassCurve.Affine.negY, zero_mul, sub_zero, sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero,
-        not_false_eq_true, zero_pow, mul_ite, mul_zero, ite_self, add_zero, WeierstrassCurve.Affine.addY,
-        WeierstrassCurve.Affine.negAddY, ite_mul, neg_add_rev]
+    WeierstrassCurve.Affine.negY, zero_mul, sub_zero, sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero,
+    not_false_eq_true, zero_pow, mul_ite, mul_zero, ite_self, add_zero, WeierstrassCurve.Affine.addY,
+    WeierstrassCurve.Affine.negAddY, ite_mul, neg_add_rev]
       have :  WeierstrassCurve.Affine.Point.some nonS₁ - WeierstrassCurve.Affine.Point.some nonS₂
       =  WeierstrassCurve.Affine.Point.some nonS₁ + - WeierstrassCurve.Affine.Point.some nonS₂ := by grind
       rw[this, neg_some]
@@ -302,8 +306,8 @@ theorem uADD (P Q : Point)
       simp only [WeierstrassCurve.Affine.negY, this, WeierstrassCurve.Affine.addX, WeierstrassCurve.Affine.addY,
         WeierstrassCurve.Affine.negAddY, neg_add_rev]
       simp only [WeierstrassCurve.Affine.slope, WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519, zero_mul,
-        sub_zero, neg_neg, sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_ite,
-        mul_zero, ite_self, add_zero]
+    sub_zero, neg_neg, sub_neg_eq_add, ite_pow, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_ite,
+    mul_zero, ite_self, add_zero]
       by_cases eq: x₁ = x₂
       · simp only [eq, ↓reduceIte, sub_self, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, mul_zero]
         simp only [eq, WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519, zero_mul, sub_zero, neg_neg,
@@ -318,7 +322,7 @@ theorem uADD (P Q : Point)
         have eq1:¬ y₁ - y₂ = 0 :=by grind
         simp only [eq1, false_or] at this
         have eq1:¬ y₁ + y₂ = 0 :=by grind
-        simp only [eq1] at this
+        simp[eq1] at this
       · simp only [eq, ↓reduceIte]
         have :(x₁-x₂)≠ 0:=by grind
         field_simp
@@ -328,11 +332,17 @@ theorem uADD (P Q : Point)
         rw [nonsingular_iff, WeierstrassCurve.Affine.equation_iff, MontgomeryCurveCurve25519] at nonS₂
         simp only [zero_mul, add_zero, one_mul] at nonS₂
         have :  y₁^4= (y₁)^2 * y₁^2:=by grind
-        rw [this]
+        rw[this]
         have :  y₂^4= (y₂)^2 * y₂^2:=by grind
-        rw [this]
-        simp only [nonS₁, nonS₂]
+        rw[this]
+        simp[nonS₁,nonS₂]
         ring_nf
+
+
+
+
+
+
 
 lemma non_IsQuase : ¬ IsSquare ((Curve25519.A^2 -4)) := by
   unfold Curve25519.A
@@ -352,6 +362,8 @@ lemma A_plus_two_square :  IsSquare (Curve25519.A + 2) := by
   apply ((@legendreSym.eq_one_iff p _ (486664)) (by  grind)).mp
   norm_num [p]
 
+
+
 lemma quadratic_ne_zero (x : CurveField) : ¬ x ^ 2 + Curve25519.A * x + 1 = 0 := by
   intro h
   have : x ^ 2 + Curve25519.A * x +1 = (x+ Curve25519.A/2)^2 + 1- Curve25519.A^2/4 := by grind
@@ -363,33 +375,13 @@ lemma quadratic_ne_zero (x : CurveField) : ¬ x ^ 2 + Curve25519.A * x + 1 = 0 :
   rw[← this]
   ring_nf
 
+
 theorem DBL_neq_zero (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
   2 • P ≠ 0 := by
   intro h
   have hneg : P = -P := by grind
   · rcases P
-    · simp only [zero_def, ne_eq, not_true_eq_false] at PZero
-    · rename_i x y nonP
-      simp only [MontgomeryCurveCurve25519, neg_some, WeierstrassCurve.Affine.negY, zero_mul, sub_zero, some.injEq,
-        true_and] at hneg
-      have eq: 2 * y = 0:= by grind
-      simp only [mul_eq_zero] at eq
-      have : (2:CurveField) ≠ 0 := by decide
-      simp only [this, false_or] at eq
-      simp only [WeierstrassCurve.Affine.Nonsingular, MontgomeryCurveCurve25519, eq, WeierstrassCurve.Affine.equation_iff,
-        ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul, mul_zero, add_zero, one_mul] at nonP
-      field_simp at nonP
-      simp only [zero_eq_mul] at nonP
-      have := quadratic_ne_zero x
-      field_simp at this
-      simp only [this, or_false] at nonP
-      simp only [nonP.left, eq, T_point, ne_eq, not_true_eq_false] at nPT
-
-theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
-  4 * get_u (2 • P) * get_u (P) * ((get_u P)^2 +  Curve25519.A * get_u P + 1) = ((get_u P) ^ 2 - 1)^2 := by
-  by_cases hneg : P = -P
-  · rcases P
-    · simp only [zero_def, ne_eq, not_true_eq_false] at PZero
+    · simp[zero_def] at PZero
     · rename_i x y nonP
       simp only [MontgomeryCurveCurve25519, neg_some, WeierstrassCurve.Affine.negY, zero_mul, sub_zero, some.injEq,
         true_and] at hneg
@@ -404,14 +396,35 @@ theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
       have := quadratic_ne_zero x
       field_simp at this
       simp[this] at nonP
-      simp only [nonP.left, eq, T_point, ne_eq, not_true_eq_false] at nPT
+      simp[T_point, eq, nonP.left] at nPT
+
+
+theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
+  4 * get_u (2 • P) * get_u (P) * ((get_u P)^2 +  Curve25519.A * get_u P + 1) = ((get_u P) ^ 2 - 1)^2 := by
+  by_cases hneg : P = -P
+  · rcases P
+    · simp[zero_def] at PZero
+    · rename_i x y nonP
+      simp only [MontgomeryCurveCurve25519, neg_some, WeierstrassCurve.Affine.negY, zero_mul, sub_zero, some.injEq,
+        true_and] at hneg
+      have eq: 2 * y = 0:= by grind
+      simp only [mul_eq_zero] at eq
+      have : (2:CurveField) ≠ 0 := by decide
+      simp only [this, false_or] at eq
+      simp only [WeierstrassCurve.Affine.Nonsingular, MontgomeryCurveCurve25519, eq, WeierstrassCurve.Affine.equation_iff,
+        ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul, mul_zero, add_zero, one_mul] at nonP
+      field_simp at nonP
+      simp only [zero_eq_mul] at nonP
+      have := quadratic_ne_zero x
+      field_simp at this
+      simp[this] at nonP
+      simp[T_point, eq, nonP.left] at nPT
   · have : 2 • P = P + P := by grind
     rw[this]
     unfold get_u
     rcases P
-    · simp only [mul_zero, ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, add_zero, zero_add, mul_one, zero_sub,
-        even_two, Even.neg_pow, one_pow, zero_ne_one]
-      simp only [zero_def, ne_eq, not_true_eq_false] at PZero
+    · simp
+      simp[zero_def] at PZero
     · rename_i x y nonS
       have : y≠ MontgomeryCurveCurve25519.negY x y := by
         simp only [WeierstrassCurve.Affine.negY, MontgomeryCurveCurve25519, zero_mul, sub_zero, ne_eq]
@@ -435,6 +448,10 @@ theorem uDBL (P : Point) (PZero : P ≠ 0) (nPT : P ≠ T_point) :
         simp only [MontgomeryCurveCurve25519, zero_mul, add_zero, one_mul] at this
         simp only [this]
         ring_nf
+
+
+
+
 
 /-- Addition is associative for points.
 This follows directly from mathlib's AddCommGroup instance for Weierstrass curve points. -/

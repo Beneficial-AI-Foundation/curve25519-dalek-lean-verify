@@ -180,11 +180,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem add_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    add self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -223,11 +225,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    ∃ c, add self other = ok c ∧\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint := by ...",
+   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    add self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
-   "spec_docstring":
-   "/-- Spec for `add`.\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -302,11 +303,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec\n    (self : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid) :\n    neg self ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = -self.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the negation of the input (in the context of elliptic curve negation)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Neg<curve25519_dalek::edwards::EdwardsPoint> for &0 (curve25519_dalek::edwards::EdwardsPoint)}::neg",
@@ -317,7 +320,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg"]},
@@ -2122,7 +2125,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)\n  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :\n  as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n    let X := Field51_as_Nat q.X\n    let Y := Field51_as_Nat q.Y\n    let Z := Field51_as_Nat q.Z\n    let T := Field51_as_Nat q.T\n    let X' := Field51_as_Nat e.X\n    let Y' := Field51_as_Nat e.Y\n    let Z' := Field51_as_Nat e.Z\n    let T' := Field51_as_Nat e.T\n    X' % p = (X * T) % p ∧\n    Y' % p = (Y * Z) % p ∧\n    Z' % p = (Z * T) % p ∧\n    T' % p = (X * Y) % p ∧\n    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n  (h_q_Valid : q.IsValid) :\n  as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n    let X := Field51_as_Nat q.X\n    let Y := Field51_as_Nat q.Y\n    let Z := Field51_as_Nat q.Z\n    let T := Field51_as_Nat q.T\n    let X' := Field51_as_Nat e.X\n    let Y' := Field51_as_Nat e.Y\n    let Z' := Field51_as_Nat e.Z\n    let T' := Field51_as_Nat e.T\n    X' % p = (X * T) % p ∧\n    Y' % p = (Y * Z) % p ∧\n    Z' % p = (Z * T) % p ∧\n    T' % p = (X * Y) % p ∧\n    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ∧\n    e.IsValid ∧\n    e.toPoint = q.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
@@ -4431,11 +4434,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem square_spec (self : Scalar52)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    square self ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
@@ -5112,11 +5118,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem eq_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    eq self other ⦃ result =>\n    result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Eq.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.PartialEqEdwardsPoint.eq`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is `true` if and only if the two points represent the same point on the curve\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::eq",
@@ -5282,7 +5290,7 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
@@ -5892,7 +5900,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧\n      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :\n    as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let T := Field51_as_Nat e.T\n      let A := Field51_as_Nat pn.Y_plus_X\n      let B := Field51_as_Nat pn.Y_minus_X\n      let Z' := Field51_as_Nat pn.Z\n      let C := Field51_as_Nat pn.T2d\n      A % p = (Y + X) % p ∧\n      (B + X) % p = Y % p ∧\n      Z' % p = Z % p ∧\n      C % p = (T * (2 * d)) % p ⦄ := by ...",
+   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (he : e.IsValid) :\n    as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let T := Field51_as_Nat e.T\n      let A := Field51_as_Nat pn.Y_plus_X\n      let B := Field51_as_Nat pn.Y_minus_X\n      let Z' := Field51_as_Nat pn.Z\n      let C := Field51_as_Nat pn.T2d\n      A % p = (Y + X) % p ∧\n      (B + X) % p = Y % p ∧\n      Z' % p = Z % p ∧\n      C % p = (T * (2 * d)) % p ∧\n      (∀ i < 5, (pn.Y_plus_X[i]!).val < 2 ^ 54 ∧\n      ∀ i < 5, (pn.Y_minus_X[i]!).val < 2 ^ 52 ∧\n      ∀ i < 5, (pn.Z[i]!).val < 2 ^ 53 ∧\n      ∀ i < 5, (pn.T2d[i]!).val < 2 ^ 52) ∧\n      pn.IsValid' ∧\n      e.toPoint = pn.toPointI\n       ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean",
    "spec_docstring":

@@ -98,16 +98,6 @@ Natural language specs:
     - The computation is deterministic (no randomness) and suitable for
       hashing to the Montgomery curve in constant time.
 -/
-theorem lift_mod_eq_iff (a b : ℕ) : (a ≡ b  [MOD p]) ↔  (a : CurveField) = (b : CurveField) := by
-  rw[Nat.ModEq]
-  exact (ZMod.natCast_eq_natCast_iff a b p).symm
-
-theorem lift_mod_add (a b : ℕ) : (a : CurveField) + (b : CurveField) = ((a +b):CurveField) := by rfl
-
-theorem lift_mod_mul (a b : ℕ) : (a : CurveField) * (b : CurveField) = ((a * b):CurveField) := by rfl
-
-theorem mod_nat_mul_mod (a b : ℕ) : (a) * (b % p) ≡ a * b [MOD p] := by
-  exact ((Nat.mod_modEq b p).mul_left (a ))
 
 private theorem ne_zero_iff_eq_one (p1 : subtle.Choice) (hp1 : ¬p1 = Choice.zero) :
     p1 = Choice.one := by
