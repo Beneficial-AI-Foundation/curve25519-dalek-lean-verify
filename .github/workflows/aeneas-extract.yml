@@ -24,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: true
 
@@ -37,7 +37,7 @@ jobs:
         run: opam init --disable-sandboxing -y -a
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
 
@@ -45,7 +45,7 @@ jobs:
         run: npm install -g github:oliver-butterley/aeneas-cli#dev-version-0.1
 
       - name: Cache OCaml environment
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.opam
           key: ${{ runner.os }}-opam-5.2.0-v2
@@ -58,7 +58,7 @@ jobs:
 
       - name: Cache Aeneas repository
         id: cache-aeneas
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .aeneas
           key: ${{ runner.os }}-aeneas-${{ hashFiles('aeneas-config.yml') }}
@@ -69,7 +69,7 @@ jobs:
         run: aeneas-cli install
 
       - name: Cache Rust build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/bin/
