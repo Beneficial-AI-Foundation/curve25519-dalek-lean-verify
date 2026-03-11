@@ -43,9 +43,6 @@ open ZMod
 
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
 
-/-- Helper lemma for modular arithmetic lifting -/
-theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
-  exact (ZMod.natCast_eq_natCast_iff a b p).mpr h
 
 /-- A Twisted Edwards curve structure defined by parameters a and d. -/
 structure EdwardsCurve (F : Type) where
