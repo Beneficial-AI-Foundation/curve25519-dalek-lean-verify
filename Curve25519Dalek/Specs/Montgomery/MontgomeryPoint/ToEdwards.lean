@@ -75,9 +75,10 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   unfold to_edwards
   progress*
   unfold FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
-  progress*  -- This eliminates ct_eq
+  progress*
   unfold Bool.Insts.CoreConvertFromChoice.from
-  simp
+  simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod, Nat.mod_mul_mod, dvd_refl,
+    Nat.mod_mod_of_dvd]
   split
   · simp
   · progress*
@@ -87,8 +88,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       use Z_inv
       constructor
       · exact h_Zinv
-      ·
-        have h_expand : Field51_as_Nat fe2 = Field51_as_Nat u + Field51_as_Nat one := by
+      · have h_expand : Field51_as_Nat fe2 = Field51_as_Nat u + Field51_as_Nat one := by
           unfold Field51_as_Nat
           rw [← Finset.sum_add_distrib]
           apply Finset.sum_congr rfl
@@ -99,7 +99,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           ring
 
         have h_ONE : Field51_as_Nat one = 1 := by grind only
-        -- FieldElement51.ONE_spec
         have h_affine_y : Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p = y_val := h_Y
         have h_bytes_equiv : U8x32_as_Nat y_bytes1 % 2^255 % p = U8x32_as_Nat y_bytes % 2^255 % p := by
           rw [y_bytes1_post]
@@ -208,7 +207,6 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
                 omega
               exact this
             have h3 : Field51_as_Nat u % p = Field51_as_Nat fe % p := by
-              -- simp only [FieldElement51.MINUS_ONE_spec, Nat.self_sub_mod]
               grind
 
             have h4 :
@@ -246,156 +244,85 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
           absurd h_x_val
           assumption
         have h_fe3_inv := fe3_post1 h_fe2_ne_zero
-        have h_fe1_eq : Field51_as_Nat fe2 % p = (Field51_as_Nat u + 1) % p := by
+        have h_fe2_eq : Field51_as_Nat fe2 % p = (Field51_as_Nat u + 1) % p := by
           grind only
-        sorry
 
 
+        have h_fe1_eq : Field51_as_Nat fe1 % p = (Field51_as_Nat u + p - 1) % p := by
+          -- have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
+          rw [one_post1] at fe1_post2
+          have key : (Field51_as_Nat fe1 + 1 + (p - 1)) % p = (Field51_as_Nat u + (p - 1)) % p := by
+            rw [Nat.add_mod (Field51_as_Nat fe1 + 1), fe1_post2, ← Nat.add_mod]
+          have hleft : (Field51_as_Nat fe1 + 1 + (p - 1)) % p = Field51_as_Nat fe1 % p := by
+            have h : Field51_as_Nat fe1 + 1 + (p - 1) = Field51_as_Nat fe1 + p := by omega
+            rw [h, Nat.add_mod, Nat.mod_self, add_zero]
+            exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
+          have hright : (Field51_as_Nat u + (p - 1)) % p = (Field51_as_Nat u + p - 1) % p := by
+            grind only
+          rw [← hleft, key]; exact hright
 
+        have h_u_eq : Field51_as_Nat u % p = U8x32_as_Nat mp % 2^255 % p := by
+          exact u_post1
 
+        calc Field51_as_Nat ep.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p
 
+            = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
+              simp only [Nat.mul_mod (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv), h_affine_y]
+              simp [Nat.mul_mod]
 
+            _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
+                have h :
+                  y_val % p = (Field51_as_Nat fe1 * Field51_as_Nat fe3) % p :=
+                  h_y_val_eq
+                have :=
+                  congrArg (fun x => x * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p) h
 
+                simpa [Nat.mul_mod] using this
 
+            _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * (Field51_as_Nat u % p + 1) % p := by
+                have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := by
+                  exact h_u_eq
+                simp [h_mp, Nat.mul_mod, Nat.add_mod]
 
+            _ = (Field51_as_Nat fe1 * Field51_as_Nat fe3) * Field51_as_Nat fe2 % p := by
 
+              have h1 : (Field51_as_Nat u % p + 1) % p =
+              Field51_as_Nat fe2 % p := by
+                have := Nat.add_mod (Field51_as_Nat u) 1 p
+                simp at this
+                simp [h_fe2_eq]
 
+              have h2 :
+              Field51_as_Nat fe1 * Field51_as_Nat fe3 *
+                  (Field51_as_Nat u % p + 1) % p
+                =
+              Field51_as_Nat fe1 * Field51_as_Nat fe3 *
+                  (Field51_as_Nat fe2 % p) % p := by
+                simp [Nat.mul_mod]
+                grind only
+              rw [Nat.mul_mod]
+              rw [h1]
+              rw [← Nat.mul_mod]
 
+            _ = Field51_as_Nat fe1 * (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p := by
+                ring_nf
 
+            _ = Field51_as_Nat fe1 * 1 % p := by
+              have h_mul : (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p = 1 := by
+                have := h_fe3_inv
+                simpa [Nat.mul_mod] using this
+              have : Field51_as_Nat fe1 * (Field51_as_Nat fe3 * Field51_as_Nat fe2) % p = Field51_as_Nat fe1 * 1 % p := by
+                simp [Nat.mul_mod, h_mul]
+              grind only
+            _ = Field51_as_Nat fe1 % p := by
+                ring_nf
 
+            _ = (Field51_as_Nat u + p - 1) % p := h_fe1_eq
 
-
-
-
-
-
-
-
-
-    --         have h4 :
-    --         Field51_as_Nat u =
-    --         Field51_as_Nat FieldElement51.MINUS_ONE := by
-    --             have hu_lt : Field51_as_Nat u < 2^255 := by
-    --               simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.sum_range_zero]
-    --               have h0 := u_post_2 0 (by norm_num)
-    --               have h1 := u_post_2 1 (by norm_num)
-    --               have h2' := u_post_2 2 (by norm_num)
-    --               have h3' := u_post_2 3 (by norm_num)
-    --               have h4' := u_post_2 4 (by norm_num)
-    --               simp only [Array.getElem!_Nat_eq, Nat.zero_add] at *
-    --               omega
-    --             have hp_val : p = 2^255 - 19 := by rfl
-    --             have hMINUS_ONE_val : Field51_as_Nat FieldElement51.MINUS_ONE = p - 1 :=
-    --               FieldElement51.MINUS_ONE_spec
-    --             grind only
-    --         obtain ⟨ub, hub_eq, hub_rest⟩ := spec_imp_exists (to_bytes_spec u)
-    --         obtain ⟨hub_mod, hub_lt⟩ := hub_rest
-    --         obtain ⟨mb, hmb_eq, hmb_rest⟩ := spec_imp_exists (to_bytes_spec MINUS_ONE)
-    --         obtain ⟨hmb_mod, hmb_lt⟩ := hmb_rest
-    --         rw [hub_eq, hmb_eq]
-    --         simp only [ok.injEq]
-    --         apply U8x32_as_Nat_injective
-    --         have h_u_canon : U8x32_as_Nat ub = Field51_as_Nat u % p := by
-    --           rw [← Nat.mod_eq_of_lt hub_lt]; exact hub_mod
-    --         have h_m_canon : U8x32_as_Nat mb = Field51_as_      -- have h_ONE_bounds : ∀ i < 5, one[i]!.val < 2 ^ 54 := by
-      --   intro i hi
-      --   interval_cases i
-      --   sorry
-      --   sorry
-      --   sorry
-      --   sorry
-      --   sorry
-      -- grind only
--- Nat MINUS_ONE % p := by
-    --           rw [← Nat.mod_eq_of_lt hmb_lt]; exact hmb_mod
-    --         rw [h_u_canon, h_m_canon, h4]
-
-    --       have h_x_one : x = Choice.one := x_post.mpr h_eq_bytes
-    --       have h_x_val : x.val = 1#u8 := by rw [h_x_one]; rfl
-    --       absurd h_x_val
-    --       assumption
-
-    --     have h_fe2_inv := fe2_post_1 h_fe1_ne_zero
-    --     have h_fe1_eq : Field51_as_Nat fe1 % p = (Field51_as_Nat u + 1) % p := by
-    --       have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
-    --       rw [h_expand, h_ONE]
-
-    --     have h_fe_eq : Field51_as_Nat fe % p = (Field51_as_Nat u + p - 1) % p := by
-    --       have h_ONE : Field51_as_Nat FieldElement51.ONE = 1 := FieldElement51.ONE_spec
-    --       rw [h_ONE] at fe_post_2
-    --       have key : (Field51_as_Nat fe + 1 + (p - 1)) % p = (Field51_as_Nat u + (p - 1)) % p := by
-    --         rw [Nat.add_mod (Field51_as_Nat fe + 1), fe_post_2, ← Nat.add_mod]
-    --       have hleft : (Field51_as_Nat fe + 1 + (p - 1)) % p = Field51_as_Nat fe % p := by
-    --         have h : Field51_as_Nat fe + 1 + (p - 1) = Field51_as_Nat fe + p := by omega
-    --         rw [h, Nat.add_mod, Nat.mod_self, add_zero]
-    --         exact Nat.mod_eq_of_lt (Nat.mod_lt _ (by decide))
-    --       have hright : (Field51_as_Nat u + (p - 1)) % p = (Field51_as_Nat u + p - 1) % p := by
-    --         grind only
-    --       rw [← hleft, key]; exact hright
-
-    --     have h_u_eq : Field51_as_Nat u % p = U8x32_as_Nat mp % 2^255 % p := by
-    --       exact u_post_1
-
-    --     calc Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p
-
-    --         = y_val * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-    --           simp only [Nat.mul_mod (Field51_as_Nat res_post_2.Y * Field51_as_Nat Z_inv), h_affine_y]
-    --           simp [Nat.mul_mod]
-
-    --         _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p := by
-    --             have h :
-    --               y_val % p = (Field51_as_Nat fe * Field51_as_Nat fe2) % p :=
-    --               h_y_val_eq
-    --             have :=
-    --               congrArg (fun x => x * (U8x32_as_Nat mp % 2 ^ 255 + 1) % p) h
-
-    --             simpa [Nat.mul_mod] using this
-
-    --         _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * (Field51_as_Nat u % p + 1) % p := by
-    --             have h_mp : Field51_as_Nat u % p = U8x32_as_Nat mp % 2 ^ 255 % p := by
-    --               exact h_u_eq
-    --             simp [h_mp, Nat.mul_mod, Nat.add_mod]
-
-    --         _ = (Field51_as_Nat fe * Field51_as_Nat fe2) * Field51_as_Nat fe1 % p := by
-
-    --           have h1 : (Field51_as_Nat u % p + 1) % p =
-    --           Field51_as_Nat fe1 % p := by
-    --             have := Nat.add_mod (Field51_as_Nat u) 1 p
-    --             simp at this
-    --             simp [h_fe1_eq]
-
-    --           have h2 :
-    --           Field51_as_Nat fe * Field51_as_Nat fe2 *
-    --               (Field51_as_Nat u % p + 1) % p
-    --             =
-    --           Field51_as_Nat fe * Field51_as_Nat fe2 *
-    --               (Field51_as_Nat fe1 % p) % p := by
-    --             simp [Nat.mul_mod]
-    --             grind only
-    --           rw [Nat.mul_mod]
-    --           rw [h1]
-    --           rw [← Nat.mul_mod]
-
-    --         _ = Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p := by
-    --             ring_nf
-
-    --         _ = Field51_as_Nat fe * 1 % p := by
-    --           have h_mul : (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p = 1 := by
-    --             have := h_fe2_inv
-    --             simpa [Nat.mul_mod] using this
-    --           have : Field51_as_Nat fe * (Field51_as_Nat fe2 * Field51_as_Nat fe1) % p = Field51_as_Nat fe * 1 % p := by
-    --             simp [Nat.mul_mod, h_mul]
-    --           grind only
-    --         _ = Field51_as_Nat fe % p := by
-    --             ring_nf
-
-    --         _ = (Field51_as_Nat u + p - 1) % p := h_fe_eq
-
-    --         _ = (U8x32_as_Nat mp % 2^ 255 + p - 1) % p := by
-    --           have hp1 : 1 ≤ p := by decide
-    --           rw [Nat.add_sub_assoc hp1, Nat.add_sub_assoc hp1]
-    --           rw [Nat.add_mod (Field51_as_Nat u), Nat.add_mod (U8x32_as_Nat mp % 2 ^ 255),
-    --               Nat.mod_eq_of_lt (show p - 1 < p from by omega), h_u_eq]
-
+            _ = (U8x32_as_Nat mp % 2^ 255 + p - 1) % p := by
+              have hp1 : 1 ≤ p := by decide
+              rw [Nat.add_sub_assoc hp1, Nat.add_sub_assoc hp1]
+              rw [Nat.add_mod (Field51_as_Nat u), Nat.add_mod (U8x32_as_Nat mp % 2 ^ 255),
+                  Nat.mod_eq_of_lt (show p - 1 < p from by omega), h_u_eq]
 
 end curve25519_dalek.montgomery.MontgomeryPoint
