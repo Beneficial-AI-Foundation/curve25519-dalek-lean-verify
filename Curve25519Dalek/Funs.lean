@@ -425,6 +425,7 @@ def
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'a (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 61:8-64:9 -/
+@[rust_loop]
 def
   backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop
   (self : backend.serial.u64.field.FieldElement51)
@@ -568,11 +569,11 @@ def backend.serial.curve_models.CompletedPoint.as_extended
 
 /-- [curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from]: loop 0:
    Source: 'curve25519-dalek/src/window.rs', lines 102:16-139:26 -/
+@[rust_loop]
 def
   window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop
-  (P : edwards.EdwardsPoint)
-  (points : Array backend.serial.curve_models.ProjectiveNielsPoint 8#usize)
-  (iter : core.ops.range.Range Std.Usize) :
+  (iter : core.ops.range.Range Std.Usize) (P : edwards.EdwardsPoint)
+  (points : Array backend.serial.curve_models.ProjectiveNielsPoint 8#usize) :
   Result (Array backend.serial.curve_models.ProjectiveNielsPoint 8#usize)
   := do
   let (o, iter1) ←
@@ -589,7 +590,7 @@ def
     let i ← j + 1#usize
     let a ← Array.update points i pnp1
     window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop
-      P a iter1
+      iter1 P a
 partial_fixpoint
 
 /-- [curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from]:
@@ -603,15 +604,16 @@ def
   let points := Array.repeat 8#usize pnp
   let points1 ←
     window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop
-      P points { start := 0#usize, «end» := 7#usize }
+      { start := 0#usize, «end» := 7#usize } P points
   ok points1
 
 /-- [curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select]: loop 0:
    Source: 'curve25519-dalek/src/window.rs', lines 65:16-138:20 -/
+@[rust_loop]
 def window.LookupTable.select_loop
   {T : Type} (subtleConditionallySelectableInst :
-  subtle.ConditionallySelectable T) (self : window.LookupTable T)
-  (xabs : Std.I16) (t : T) (iter : core.ops.range.Range Std.Usize) :
+  subtle.ConditionallySelectable T) (iter : core.ops.range.Range Std.Usize)
+  (self : window.LookupTable T) (xabs : Std.I16) (t : T) :
   Result T
   := do
   let (o, iter1) ←
@@ -625,8 +627,8 @@ def window.LookupTable.select_loop
     let i2 ← j - 1#usize
     let t1 ← Array.index_usize self i2
     let t2 ← subtleConditionallySelectableInst.conditional_assign t t1 c
-    window.LookupTable.select_loop subtleConditionallySelectableInst self xabs
-      t2 iter1
+    window.LookupTable.select_loop subtleConditionallySelectableInst iter1 self
+      xabs t2
 partial_fixpoint
 
 /-- [curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select]:
@@ -648,8 +650,8 @@ def window.LookupTable.select
   let xabs ← lift (i3 ^^^ xmask)
   let t ← traitsIdentityInst.identity
   let t1 ←
-    window.LookupTable.select_loop subtleConditionallySelectableInst self xabs
-      t { start := 1#usize, «end» := 9#usize }
+    window.LookupTable.select_loop subtleConditionallySelectableInst
+      { start := 1#usize, «end» := 9#usize } self xabs t
   let i4 ← lift (xmask &&& 1#i16)
   let i5 ← lift (IScalar.hcast .U8 i4)
   let neg_mask ← subtle.Choice.Insts.CoreConvertFromU8.from i5
@@ -676,6 +678,7 @@ def scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1012:8-1016:9 -/
+@[rust_loop]
 def scalar.Scalar.as_radix_16_loop0
   (self : scalar.Scalar) (output : Array Std.I8 64#usize) (i : Std.Usize) :
   Result (Array Std.I8 64#usize)
@@ -698,6 +701,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16]: loop 1:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1021:8-1026:9 -/
+@[rust_loop]
 def scalar.Scalar.as_radix_16_loop1
   (output : Array Std.I8 64#usize) (i : Std.Usize) :
   Result (Array Std.I8 64#usize)
@@ -835,6 +839,7 @@ def backend.serial.u64.field.FieldElement51.pow2k.m
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 474:8-556:9 -/
+@[rust_loop]
 def backend.serial.u64.field.FieldElement51.pow2k_loop
   (k : Std.U32) (a : Array Std.U64 5#usize) :
   Result (Array Std.U64 5#usize)
@@ -941,6 +946,7 @@ def backend.serial.u64.field.FieldElement51.pow2k
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 570:8-573:9 -/
+@[rust_loop]
 def backend.serial.u64.field.FieldElement51.square2_loop
   (square : backend.serial.u64.field.FieldElement51) (i : Std.Usize) :
   Result backend.serial.u64.field.FieldElement51
@@ -1191,6 +1197,7 @@ def
 
 /-- [curve25519_dalek::backend::serial::scalar_mul::variable_base::mul]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs', lines 36:4-49:5 -/
+@[rust_loop]
 def backend.serial.scalar_mul.variable_base.mul_loop
   (lookup_table : window.LookupTable
   backend.serial.curve_models.ProjectiveNielsPoint)
@@ -2307,9 +2314,8 @@ def backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
    Source: 'curve25519-dalek/src/backend/serial/u64/constants.rs', lines 194:0-194:76 -/
 @[global_simps, irreducible]
 def backend.serial.u64.constants.EIGHT_TORSION
-  : Result (Array edwards.EdwardsPoint 8#usize) := do
-  let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
-  ok a
+  : Result (Array edwards.EdwardsPoint 8#usize) :=
+  backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
 
 /-- [curve25519_dalek::backend::serial::u64::field::{core::clone::Clone for curve25519_dalek::backend::serial::u64::field::FieldElement51}::clone]:
    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 42:15-42:20 -/
@@ -2702,6 +2708,7 @@ def backend.serial.u64.scalar.Scalar52.ZERO
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 69:8-80:9 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.from_bytes_loop
   (bytes : Array Std.U8 32#usize) (words : Array Std.U64 4#usize)
   (i : Std.Usize) :
@@ -2837,6 +2844,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 218:14-218:19 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
   (carry : Std.U64) (mask : Std.U64) (i : Std.Usize) :
@@ -2880,6 +2888,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 202:8-206:9 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.sub_loop
   (a : backend.serial.u64.scalar.Scalar52)
   (b : backend.serial.u64.scalar.Scalar52)
@@ -3112,6 +3121,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_mul
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 184:8-188:9 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.add_loop
   (a : backend.serial.u64.scalar.Scalar52)
   (b : backend.serial.u64.scalar.Scalar52)
@@ -3156,6 +3166,7 @@ def backend.serial.u64.scalar.Scalar52.add
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 100:8-111:9 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop
   (bytes : Array Std.U8 64#usize) (words : Array Std.U64 8#usize)
   (i : Std.Usize) :
@@ -3540,6 +3551,7 @@ def backend.serial.u64.scalar.Scalar52.as_montgomery
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]: loop 0:
    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 348:8-351:9 -/
+@[rust_loop]
 def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
   (self : backend.serial.u64.scalar.Scalar52) (limbs : Array Std.U128 9#usize)
   (i : Std.Usize) :
@@ -4670,6 +4682,7 @@ def edwards.EdwardsPoint.mul_base_clamped
 
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2]: loop 0:
    Source: 'curve25519-dalek/src/edwards.rs', lines 1335:8-1339:9 -/
+@[rust_loop]
 def edwards.EdwardsPoint.mul_by_pow_2_loop
   (k : Std.U32) (s : backend.serial.curve_models.ProjectivePoint) (i : Std.U32)
   :
@@ -5422,6 +5435,7 @@ def IdentityMontgomeryProjectivePoint.identity
 
 /-- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul]: loop 0:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 429:14-434:56 -/
+@[rust_loop]
 def
   Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop
   (affine_u : backend.serial.u64.field.FieldElement51)
@@ -6685,18 +6699,15 @@ def ristretto.RistrettoPoint.coset4
   Result (Array edwards.EdwardsPoint 4#usize)
   := do
   let a ← backend.serial.u64.constants.EIGHT_TORSION
-  let ep ←
-    Array.index_usize a 2#usize
+  let ep ← Array.index_usize a 2#usize
   let ep1 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep
-  let ep2 ←
-    Array.index_usize a 4#usize
+  let ep2 ← Array.index_usize a 4#usize
   let ep3 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep2
-  let ep4 ←
-    Array.index_usize a 6#usize
+  let ep4 ← Array.index_usize a 6#usize
   let ep5 ←
     edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
       ep4
@@ -7015,9 +7026,8 @@ def Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint :
    Source: 'curve25519-dalek/src/ristretto.rs', lines 988:4-998:5 -/
 def ristretto.RistrettoPoint.mul_base
   (scalar : scalar.Scalar) : Result ristretto.RistrettoPoint := do
-  let a ← constants.RISTRETTO_BASEPOINT_POINT
-  SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
-    a
+  let rp ← constants.RISTRETTO_BASEPOINT_POINT
+  SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar rp
 
 /-- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 1192:4-1198:5 -/
@@ -7254,9 +7264,11 @@ def scalar.Scalar.Insts.CoreOpsArithNegScalar : core.ops.arith.Neg
 
 /-- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 393:8-395:9 -/
+@[rust_loop]
 def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop
-  (a : scalar.Scalar) (b : scalar.Scalar) (choice : subtle.Choice)
-  (bytes : Array Std.U8 32#usize) (iter : core.ops.range.Range Std.Usize) :
+  (iter : core.ops.range.Range Std.Usize) (a : scalar.Scalar)
+  (b : scalar.Scalar) (choice : subtle.Choice) (bytes : Array Std.U8 32#usize)
+  :
   Result (Array Std.U8 32#usize)
   := do
   let (o, iter1) ←
@@ -7269,8 +7281,8 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop
     let i3 ←
       U8.Insts.SubtleConditionallySelectable.conditional_select i1 i2 choice
     let a1 ← Array.update bytes i i3
-    scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop a
-      b choice a1 iter1
+    scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop
+      iter1 a b choice a1
 partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select]:
@@ -7281,8 +7293,8 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select
   := do
   let bytes := Array.repeat 32#usize 0#u8
   let bytes1 ←
-    scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop a
-      b choice bytes { start := 0#usize, «end» := 32#usize }
+    scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop
+      { start := 0#usize, «end» := 32#usize } a b choice bytes
   ok { bytes := bytes1 }
 
 /-- Trait implementation: [curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}]
@@ -7472,6 +7484,7 @@ def scalar.Scalar.to_bytes
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert::square_multiply]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1193:12-1196:13 -/
+@[rust_loop]
 def scalar.Scalar52.montgomery_invert.square_multiply_loop
   (y : backend.serial.u64.scalar.Scalar52) (squarings : Std.Usize)
   (i : Std.Usize) :
@@ -7570,6 +7583,7 @@ def scalar.Scalar.invert (self : scalar.Scalar) : Result scalar.Scalar := do
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 808:8-818:9 -/
+@[rust_loop]
 def scalar.Scalar.batch_invert_loop0
   (inputs : Slice scalar.Scalar) (n : Std.Usize)
   (scratch : alloc.vec.Vec backend.serial.u64.scalar.Scalar52)
@@ -7596,6 +7610,7 @@ partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]: loop 1:
    Source: 'curve25519-dalek/src/scalar.rs', lines 832:8-839:9 -/
+@[rust_loop]
 def scalar.Scalar.batch_invert_loop1
   (inputs : Slice scalar.Scalar)
   (scratch : alloc.vec.Vec backend.serial.u64.scalar.Scalar52)
@@ -7648,6 +7663,7 @@ def scalar.Scalar.batch_invert
 
 /-- [curve25519_dalek::scalar::read_le_u64_into]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1379:4-1392:5 -/
+@[rust_loop]
 def scalar.read_le_u64_into_loop
   (src : Slice Std.U8) (dst : Slice Std.U64) (i : Std.Usize) :
   Result (Slice Std.U64)
@@ -7692,6 +7708,7 @@ def scalar.read_le_u64_into
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::non_adjacent_form]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 947:8-980:9 -/
+@[rust_loop]
 def scalar.Scalar.non_adjacent_form_loop
   (w : Std.Usize) (naf : Array Std.I8 256#usize)
   (x_u64 : Array Std.U64 5#usize) (width : Std.U64) (window_mask : Std.U64)
@@ -7787,10 +7804,11 @@ def scalar.Scalar.to_radix_2w_size_hint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_2w]: loop 0:
    Source: 'curve25519-dalek/src/scalar.rs', lines 1099:8-1121:9 -/
+@[rust_loop]
 def scalar.Scalar.as_radix_2w_loop
-  (w : Std.Usize) (scalar64x4 : Array Std.U64 4#usize) (radix : Std.U64)
-  (window_mask : Std.U64) (carry : Std.U64) (digits : Array Std.I8 64#usize)
-  (iter : core.ops.range.Range Std.Usize) :
+  (iter : core.ops.range.Range Std.Usize) (w : Std.Usize)
+  (scalar64x4 : Array Std.U64 4#usize) (radix : Std.U64)
+  (window_mask : Std.U64) (carry : Std.U64) (digits : Array Std.I8 64#usize) :
   Result (Std.U64 × (Array Std.I8 64#usize))
   := do
   let (o, iter1) ←
@@ -7833,8 +7851,8 @@ def scalar.Scalar.as_radix_2w_loop
     let i8 ← i5 - i7
     let i9 ← lift (IScalar.cast .I8 i8)
     let a ← Array.update digits i i9
-    scalar.Scalar.as_radix_2w_loop w scalar64x4 radix window_mask carry1 a
-      iter2
+    scalar.Scalar.as_radix_2w_loop iter2 w scalar64x4 radix window_mask carry1
+      a
 partial_fixpoint
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_2w]:
@@ -7861,8 +7879,9 @@ def scalar.Scalar.as_radix_2w
     let digits_count ← i1 / w
     let scalar64x41 := index_mut_back s2
     let (carry, digits1) ←
-      scalar.Scalar.as_radix_2w_loop w scalar64x41 radix window_mask 0#u64
-        digits { start := 0#usize, «end» := digits_count }
+      scalar.Scalar.as_radix_2w_loop
+        { start := 0#usize, «end» := digits_count } w scalar64x41 radix
+        window_mask 0#u64 digits
     if w = 8#usize
     then
       let i2 ← lift (UScalar.hcast .I8 carry)
