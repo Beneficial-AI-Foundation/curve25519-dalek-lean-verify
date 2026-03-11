@@ -63,7 +63,7 @@ theorem from_bytes_wide_loop_spec
     --newly processed word at index i
     from_bytes_wide_loop bytes words i ⦃ words' =>
     words_as_Nat words' = words_as_Nat words
-      + ∑ j ∈ Finset.Ico i.val 8, word_j_from_bytes bytes j * 2 ^ (64 * j) ⦄ := by
+      + ∑ j ∈ Finset.Ico i.val 8, word_j_from_bytes bytes j * 2 ^ (8 * j) ⦄ := by
   -- We can use the BitList to help us with this proof.
   sorry
 
@@ -80,7 +80,7 @@ theorem from_bytes_wide_spec ( b : Array U8 64#usize ) :
   -- 1. To prove U8x64_as_Nat b = words_as_Nat words1
   --    - From from_bytes_wide_loop_spec, we know that
   --      words_as_Nat words1 = words_as_Nat words
-  --        + ∑ j ∈ Finset.Ico i.val 8, word_j_from_bytes bytes j * 2 ^ (64 * j)
+  --        + ∑ j ∈ Finset.Ico i.val 8, word_j_from_bytes bytes j * 2 ^ (8 * j)
   --    - Since i.val = 0, the RHS = U8x64_as_Nat b.
   --    - Thus, we have U8x64_as_Nat b = words_as_Nat words1.
 
