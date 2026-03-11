@@ -1,5 +1,5 @@
 # Aeneas extraction configuration
-# Used by aeneas-tool to run charon and aeneas for Lean code generation
+# Used by aeneas-cli to run charon and aeneas for Lean code generation
 
 aeneas:
   commit: "b6dfa65d"

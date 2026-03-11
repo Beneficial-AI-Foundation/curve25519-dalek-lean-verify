@@ -10,7 +10,6 @@ on:
     paths:
       - 'curve25519-dalek/**'
       - 'aeneas-config.yml'
-      - 'aeneas-tool/**'
       - 'Curve25519Dalek/Funs.lean'
       - 'Curve25519Dalek/Types.lean'
       - '.github/workflows/aeneas-extract.yml'
@@ -25,7 +24,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           submodules: true
 
@@ -38,18 +37,15 @@ jobs:
         run: opam init --disable-sandboxing -y -a
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: '22'
 
-      - name: Build aeneas-tool
-        run: |
-          cd aeneas-tool
-          npm ci
-          npm run build
+      - name: Install aeneas-cli
+        run: npm install -g aeneas-cli@0.1.0
 
       - name: Cache OCaml environment
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.opam
           key: ${{ runner.os }}-opam-5.2.0-v2
@@ -62,7 +58,7 @@ jobs:
 
       - name: Cache Aeneas repository
         id: cache-aeneas
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: .aeneas
           key: ${{ runner.os }}-aeneas-${{ hashFiles('aeneas-config.yml') }}
@@ -70,10 +66,10 @@ jobs:
             ${{ runner.os }}-aeneas-
 
       - name: Install Aeneas
-        run: node aeneas-tool/dist/index.js install
+        run: aeneas-cli install
 
       - name: Cache Rust build artifacts
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cargo/bin/
@@ -86,7 +82,7 @@ jobs:
             ${{ runner.os }}-cargo-
 
       - name: Run Aeneas extraction
-        run: node aeneas-tool/dist/index.js extract
+        run: aeneas-cli extract
 
       - name: Check for modifications in generated files
         id: check-diff
