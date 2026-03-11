@@ -3551,39 +3551,38 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "\n\ntheorem pow2k_spec (a : Array U64 5#usize) (k : U32) (hk : 0 < k.val)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    pow2k a k ⦃ r =>\n    Field51_as_Nat r ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n    (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄\n := by ...",
+   "theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)\n    (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    pow2k self k ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.pow2k`**:\n- No panic (always returns successfully) when k > 0\n- The result, when converted to a natural number, is congruent to the input raised to the (2^k)-th power modulo p\n- Input bounds: each limb < 2^54\n- Output bounds: each limb < 2^52\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L462-L567",
+   "lines": "L462-L559",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": true,
+   "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop"]},
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem LOW_51_BIT_MASK_spec :\n    LOW_51_BIT_MASK ⦃ result => result.val = 2^51 - 1 ⦄ := by ...",
+   "theorem LOW_51_BIT_MASK_spec :\n    LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK",
-   "lines": "L519-L519",
+   "lines": "L514-L514",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK",
    "is_relevant": true,
@@ -3593,10 +3592,12 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem m_spec (x y : U64) :\n    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3608,25 +3609,27 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :\n    pow2k_loop k a ⦃ (result : Std.Array U64 5#usize) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat a)^(2^k.val) [MOD p] ∧\n      (if k.val = 0 then result = a else ∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L488-L500",
+   "lines": "L474-L556",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
@@ -3684,14 +3687,14 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
-   "lines": "L570-L572",
+   "lines": "L562-L564",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
@@ -3706,14 +3709,14 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L575-L584",
+   "lines": "L567-L576",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -3729,7 +3732,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L578-L581",
+   "lines": "L570-L573",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop",
    "is_relevant": true,
