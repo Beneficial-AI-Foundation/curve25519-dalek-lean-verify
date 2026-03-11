@@ -1,0 +1,226 @@
+# Aeneas extraction configuration
+# Used by aeneas-tool to run charon and aeneas for Lean code generation
+
+aeneas:
+  commit: "1620d2ad2d8358e87674593b59dc960e73379113"
+  repo: "https://github.com/AeneasVerif/aeneas.git"
+
+crate:
+  dir: "curve25519-dalek"
+  name: "curve25519_dalek"
+
+charon:
+  preset: aeneas
+  package: "curve25519-dalek"
+  cargo_args:
+    - "--no-default-features"
+    - "--features"
+    - "alloc,zeroize"
+  start_from:
+    - "curve25519_dalek::backend::serial::curve_models"
+    - "curve25519_dalek::backend::serial::u64::field"
+    - "curve25519_dalek::backend::serial::u64::scalar"
+    - "curve25519_dalek::edwards"
+    - "curve25519_dalek::field"
+    - "curve25519_dalek::montgomery"
+    - "curve25519_dalek::ristretto"
+    - "curve25519_dalek::scalar"
+  exclude:
+    # Debug impls
+    - "curve25519_dalek::backend::serial::curve_models::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::backend::serial::u64::field::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::backend::serial::u64::scalar::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::montgomery::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::scalar::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::ristretto::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::edwards::{impl core::fmt::Debug for _}"
+    - "curve25519_dalek::edwards::affine::{impl core::fmt::Debug for _}"
+    # Hash impls
+    - "curve25519_dalek::montgomery::{impl core::hash::Hash for _}"
+    - "curve25519_dalek::scalar::{impl core::hash::Hash for _}"
+    - "curve25519_dalek::ristretto::{impl core::hash::Hash for _}"
+    - "curve25519_dalek::edwards::{impl core::hash::Hash for _}"
+    # Copy/Clone impls
+    - "curve25519_dalek::backend::serial::curve_models::{impl core::marker::Copy for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}"
+    - "curve25519_dalek::backend::serial::curve_models::{impl core::clone::Clone for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}"
+    # Sum/Product impls (require Iterator/IntoIterator traits)
+    - "curve25519_dalek::scalar::{impl core::iter::traits::accum::Sum<_> for _}"
+    - "curve25519_dalek::scalar::{impl core::iter::traits::accum::Product<_> for _}"
+    - "curve25519_dalek::edwards::{impl core::iter::traits::accum::Sum<_> for _}"
+    - "curve25519_dalek::ristretto::{impl core::iter::traits::accum::Sum<_> for _}"
+    # Zeroize impls
+    - "curve25519_dalek::ristretto::{impl zeroize::Zeroize for _}"
+    - "curve25519_dalek::edwards::{impl zeroize::Zeroize for _}"
+    # MultiscalarMul trait declarations
+    - "curve25519_dalek::traits::MultiscalarMul"
+    - "curve25519_dalek::traits::VartimeMultiscalarMul"
+    - "curve25519_dalek::traits::VartimePrecomputedMultiscalarMul"
+    # MultiscalarMul impls
+    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::MultiscalarMul for _}"
+    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::MultiscalarMul for _}"
+    - "curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::MultiscalarMul for _}"
+    # Vartime free functions
+    - "curve25519_dalek::backend::vartime_double_base_mul"
+    - "curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul"
+    # VartimeMultiscalarMul / VartimePrecomputedMultiscalarMul impls
+    - "curve25519_dalek::backend::pippenger_optional_multiscalar_mul"
+    - "curve25519_dalek::backend::straus_optional_multiscalar_mul"
+    - "curve25519_dalek::backend::VartimePrecomputedStraus"
+    - "curve25519_dalek::backend::serial::scalar_mul::pippenger::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
+    - "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+    - "curve25519_dalek::backend::serial::scalar_mul::straus::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
+    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
+    - "curve25519_dalek::edwards::VartimeEdwardsPrecomputation"
+    - "curve25519_dalek::edwards::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimeMultiscalarMul for _}"
+    - "curve25519_dalek::ristretto::VartimeRistrettoPrecomputation"
+    - "curve25519_dalek::ristretto::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+    - "curve25519_dalek::backend::{impl curve25519_dalek::traits::VartimePrecomputedMultiscalarMul for _}"
+  opaque: []
+
+aeneas_args:
+  backend: lean
+  options:
+    - loops-to-rec
+    - split-files
+  dest: "Curve25519Dalek"
+
+# Post-extraction tweaks applied to generated Lean files.
+# Substitutions are applied IN ORDER using literal find/replace (all occurrences).
+tweaks:
+  files:
+    - "Funs.lean"
+    - "Types.lean"
+  substitutions:
+    # --- Avoid linter complaints ---
+
+    - find: "set_option linter.unusedVariables false"
+      replace: |-
+        set_option linter.unusedVariables false
+        set_option linter.style.whitespace false
+        set_option linter.style.setOption false
+
+    # --- Convert single-line comments before noncomputable section ---
+
+    - find: "/- You can remove the following line by using the CLI option `-all-computable`: -/"
+      replace: "-- You can remove the following line by using the CLI option `-all-computable`: "
+
+    - find: "/- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/"
+      replace: "-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option"
+
+    # --- Increase maxRecDepth for to_bytes ---
+    # Must appear BEFORE the /- → /-- tweak so the FIND matches raw /- form
+
+    - find: |-
+        /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+           Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
+        def backend.serial.u64.field.FieldElement51.to_bytes
+      replace: |-
+        set_option maxRecDepth 4096 in
+        /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
+           Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
+        def backend.serial.u64.field.FieldElement51.to_bytes
+
+    # --- Convert Aeneas block comments to doc comments ---
+
+    - find: "/- "
+      replace: "/-- "
+
+    # --- Fix shift syntax error ---
+
+    - find: "  let i41 ← lift (U64.shr i36 20#i32)"
+      replace: "  let i41 ← (i36 >>> 20#i32)"
+
+    # --- Fix parameter name shadowing: variable `scalar` shadows namespace ---
+
+    - find: "  let scalar_digits ← scalar.Scalar.as_radix_16 scalar"
+      replace: "  let scalar_digits ← scalar.as_radix_16"
+
+    - find: "  let scalar_bytes ← scalar.Scalar.as_bytes scalar"
+      replace: "  let scalar_bytes ← scalar.as_bytes"
+
+    # --- Fix EIGHT_TORSION return type ---
+
+    - find: |-
+        def backend.serial.u64.constants.EIGHT_TORSION
+          : Array edwards.EdwardsPoint 8#usize := do
+          let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+          a
+      replace: |-
+        def backend.serial.u64.constants.EIGHT_TORSION
+          : Result (Array edwards.EdwardsPoint 8#usize) := do
+          let a ← backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN
+          ok a
+
+    # --- Fix RISTRETTO_BASEPOINT_POINT return type ---
+
+    - find: |-
+        @[global_simps, irreducible]
+        def constants.RISTRETTO_BASEPOINT_POINT : ristretto.RistrettoPoint := do
+          let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+          ep
+      replace: |-
+        @[global_simps, irreducible]
+        def constants.RISTRETTO_BASEPOINT_POINT : Result ristretto.RistrettoPoint := do
+          let ep ← backend.serial.u64.constants.ED25519_BASEPOINT_POINT
+          ok ep
+
+    # --- Fix coset4 to use result of EIGHT_TORSION ---
+
+    - find: |-
+        def ristretto.RistrettoPoint.coset4
+          (self : ristretto.RistrettoPoint) :
+          Result (Array edwards.EdwardsPoint 4#usize)
+          := do
+          let ep ←
+            Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 2#usize
+          let ep1 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep
+          let ep2 ←
+            Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 4#usize
+          let ep3 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep2
+          let ep4 ←
+            Array.index_usize backend.serial.u64.constants.EIGHT_TORSION 6#usize
+          let ep5 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep4
+          ok (Array.make 4#usize [ self, ep1, ep3, ep5 ])
+      replace: |-
+        def ristretto.RistrettoPoint.coset4
+          (self : ristretto.RistrettoPoint) :
+          Result (Array edwards.EdwardsPoint 4#usize)
+          := do
+          let a ← backend.serial.u64.constants.EIGHT_TORSION
+          let ep ←
+            Array.index_usize a 2#usize
+          let ep1 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep
+          let ep2 ←
+            Array.index_usize a 4#usize
+          let ep3 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep2
+          let ep4 ←
+            Array.index_usize a 6#usize
+          let ep5 ←
+            edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add self
+              ep4
+          ok (Array.make 4#usize [ self, ep1, ep3, ep5 ])
+
+    # --- Fix mul_base to use result of RISTRETTO_BASEPOINT_POINT ---
+
+    - find: |-
+        def ristretto.RistrettoPoint.mul_base
+          (scalar : scalar.Scalar) : Result ristretto.RistrettoPoint := do
+          SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
+            constants.RISTRETTO_BASEPOINT_POINT
+      replace: |-
+        def ristretto.RistrettoPoint.mul_base
+          (scalar : scalar.Scalar) : Result ristretto.RistrettoPoint := do
+          let a ← constants.RISTRETTO_BASEPOINT_POINT
+          SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul scalar
+            a
