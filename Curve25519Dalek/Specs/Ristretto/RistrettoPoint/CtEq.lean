@@ -3,7 +3,6 @@ Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
-import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
@@ -73,6 +72,38 @@ theorem ct_eq_spec
       result = Choice.one ↔
         (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
         (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by
-  sorry
+  unfold ct_eq
+  progress*
+  all_goals (try (
+    have lb {f : ℕ → ℕ} (h : ∀ i, i < 5 → f i < 2^53) : ∀ i, i < 5 → f i < 2^54 :=
+      fun i hi => Nat.lt_trans (h i hi) (by norm_num)
+    first
+    | exact lb h_self_valid.1.X_bounds
+    | exact lb h_self_valid.1.Y_bounds
+    | exact lb h_other_valid.1.X_bounds
+    | exact lb h_other_valid.1.Y_bounds))
+  unfold subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
+  have tbm (x y : backend.serial.u64.field.FieldElement51) :
+      x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
+    have ⟨xb, hxe, hxm, hxl⟩ := spec_imp_exists (to_bytes_spec x)
+    have ⟨yb, hye, hym, hyl⟩ := spec_imp_exists (to_bytes_spec y)
+    simp only [hxe, hye, ok.injEq]
+    have hx : U8x32_as_Nat xb = Field51_as_Nat x % p := by rw [←Nat.mod_eq_of_lt hxl, hxm]
+    have hy : U8x32_as_Nat yb = Field51_as_Nat y % p := by rw [←Nat.mod_eq_of_lt hyl, hym]
+    exact ⟨fun h => by rw [←hx, ←hy, h], fun h => U8x32_as_Nat_injective (by rw [hx, hy, h])⟩
+  rw [tbm] at c_post c1_post
+  rw [X1Y2_post1, Y1X2_post1] at c_post
+  rw [X1X2_post1, Y1Y2_post1] at c1_post
+  have vo (c : subtle.Choice) : c.val = 1#u8 ↔ c = Choice.one := by
+    rcases c with ⟨_, hv | hv⟩
+    all_goals (subst hv; simp only [Choice.one, subtle.Choice.mk.injEq])
+  split
+  · rename_i h
+    exact ⟨fun _ => h.elim (.inl ∘ c_post.mp ∘ (vo c).mp) (.inr ∘ c1_post.mp ∘ (vo c1).mp), fun _ => rfl⟩
+  · rename_i h
+    push_neg at h
+    exact ⟨nofun, fun hm => hm.elim
+      (fun hm => absurd ((vo c).mpr (c_post.mpr hm)) h.1)
+      (fun hm => absurd ((vo c1).mpr (c1_post.mpr hm)) h.2)⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq
