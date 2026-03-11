@@ -4434,11 +4434,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem square_spec (self : Scalar52)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    square self ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
