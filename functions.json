@@ -4954,7 +4954,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n\n      (∀ ep, result = some ep →\n        let y_encoded := (U8x32_as_Nat cey) % (2^255)\n        let x_sign_bit := cey[31]!.val.testBit 7\n\n        (∃ Z_inv x_val y_val x_is_neg,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧\n          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧\n          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧\n\n          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧\n\n          y_val % p = y_encoded % p ∧\n\n          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧\n\n          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) ⦄ := by ...",
+   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n\n      (∀ ep, result = some ep →\n        let y_encoded := (U8x32_as_Nat cey) % (2^255)\n        let x_sign_bit := cey[31]!.val.testBit 7\n\n        (∃ Z_inv x_val y_val x_is_neg,\n          field.FieldElement51.invert ep.Z = ok Z_inv ∧\n          (Field51_as_Nat ep.X * Field51_as_Nat Z_inv) % p = x_val ∧\n          (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p = y_val ∧\n          field.FieldElement51.is_negative ep.X = ok x_is_neg ∧\n\n          (y_val * y_val % p = (x_val * x_val + 1 + d * x_val * x_val * y_val * y_val) % p) ∧\n\n          y_val % p = y_encoded % p ∧\n\n          (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧\n\n          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p)) ∧\n\n        ep.IsValid) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean",
    "spec_docstring":
@@ -7270,14 +7270,13 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n    to_edwards mp sign ⦃ opt_e =>\n    let u := U8x32_as_Nat mp\n\n    ((u + 1) % p = 0 → opt_e = none) ∧\n\n    ((u + 1) % p ≠ 0 →\n      (opt_e = none ∨ -- can still return none if y cannot be decompressed into a valid Edwards point\n       ∃ e x_sign,\n       opt_e = some e ∧\n       field.FieldElement51.is_negative e.X = ok x_sign ∧\n       let y := Field51_as_Nat e.Y\n\n       y * (u + 1) % p = (u - 1) % p ∧\n       (x_sign.val = 1#u8 ↔ sign.val.testBit 0))) ⦄ := by ...",
+   "theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :\n      to_edwards mp sign ⦃ result =>\n        (∀ ep, result = some ep →\n          ∃ Z_inv,\n            field.FieldElement51.invert ep.Z = ok Z_inv ∧\n            let u := U8x32_as_Nat mp % 2^255\n            let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p\n            (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧ ep.IsValid )\n      ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ToEdwards.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.MontgomeryPoint.to_edwards`**:\n- Returns None if u ≡ -1 (mod p)\n- Returns None if the y-coordinate cannot be decompressed to a valid Edwards point\n- Otherwise, returns Some(EdwardsPoint) where:\n  - The y-coordinate satisfies: y * (u + 1) ≡ (u-1) (mod p)\n  - The sign of x matches the input sign parameter\nwhere p = 2^255 - 19\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards",
