@@ -205,43 +205,6 @@ private lemma lift_sq_mod {a b c : ℕ}
   have h := lift_mod_eq _ _ hme; push_cast at h; exact h
 
 /-
-/-- MINUS_ONE.toField = -1 in CurveField. -/
-private lemma MINUS_ONE_toField :
-    backend.serial.u64.constants.MINUS_ONE.toField = (-1 : CurveField) := by
-  unfold toField; rw [backend.serial.u64.constants.MINUS_ONE_spec]
-  have : (p - 1 : ℕ) + 1 = p := by unfold p; omega
-  have h := lift_mod_eq _ _
-    (show (p - 1 + 1) % p = 0 % p from by rw [this, Nat.mod_self, Nat.zero_mod])
-  push_cast at h; linear_combination h
-
-/-- EDWARDS_D.toField = Ed25519.d in CurveField. -/
-private lemma EDWARDS_D_toField :
-    backend.serial.u64.constants.EDWARDS_D.toField = Ed25519.d := by
-  unfold toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
-
-/-- ONE_MINUS_EDWARDS_D_SQUARED.toField = 1 - Ed25519.d² in CurveField. -/
-private lemma ONE_MINUS_EDWARDS_D_SQUARED_toField :
-    backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED.toField =
-    1 - Ed25519.d ^ 2 := by
-  unfold toField
-  have h_sum : (Field51_as_Nat backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED +
-      d ^ 2) % p = 1 % p := by
-    rw [backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_spec]; norm_num [d, p]
-  have h := lift_mod_eq _ _ h_sum; push_cast at h
-  change _ = 1 - (d : CurveField) ^ 2; linear_combination h
-
-/-- EDWARDS_D_MINUS_ONE_SQUARED.toField = (Ed25519.d - 1)² in CurveField. -/
-private lemma EDWARDS_D_MINUS_ONE_SQUARED_toField :
-    backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED.toField =
-    (Ed25519.d - 1) ^ 2 := by
-  unfold toField
-  rw [backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec]
-  have h := lift_mod_eq _ _ (Nat.mod_mod_of_dvd ((d - 1) ^ 2) (dvd_refl p))
-  rw [h]; push_cast [Nat.cast_sub (show 1 ≤ d from by unfold d; omega)]
-  simp only [Ed25519]
--/
-
-/-
 natural language description:
 
 • Takes a field element s and maps it to a valid RistrettoPoint using the Elligator map:
@@ -305,8 +268,8 @@ theorem elligator_ristretto_flavor_spec
         rw [← Finset.sum_add_distrib]
         apply Finset.sum_congr rfl
         intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
-      rw [h_nat]; push_cast
       have hsq := lift_mod_eq _ _ s_sq_post1
+      rw [h_nat]; push_cast
       push_cast at hsq; rw [hsq, one_post1]
       simp only [Nat.cast_one]
     have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
@@ -690,8 +653,8 @@ theorem elligator_ristretto_flavor_spec
       rw [← Finset.sum_add_distrib]
       apply Finset.sum_congr rfl
       intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
-    rw [h_nat]; push_cast
     have hsq := lift_mod_eq _ _ s_sq_post1
+    rw [h_nat]; push_cast
     push_cast at hsq; rw [hsq, one_post1]
     simp only [Nat.cast_one]
   -- Shared postcondition lifts (used by h_cp_T_ne, h_cp_Z_ne, h_cp_curve)
@@ -753,6 +716,103 @@ theorem elligator_ristretto_flavor_spec
     have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
       linear_combination h_Nt_add_F
     rw [this, h_crd_F, h_cr_F, h_rm1_F]; unfold toField; rw [d_minus_one_sq_post1]; rfl
+  have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
+    unfold toField
+    have hme := r_post1.trans (Nat.ModEq.mul_left
+      (Field51_as_Nat i) r_0_sq_post1)
+    have h := lift_mod_eq _ _ hme; push_cast at h; exact h
+  have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
+    rw [i_post1]; rfl
+  have h_s1_sq_c2_cases (h_s1_ne : s1.toField ≠ 0) :
+      (s1.toField ^ 2 * D.toField = N_s.toField ∧ c2.toField = -1) ∨
+      (s1.toField ^ 2 * D.toField = r.toField * N_s.toField ∧
+        c2.toField = r.toField) := by
+    by_cases h_sq_flag : x.1.val = 1#u8
+    · -- IS a square: s1 = x.2, s1²D = N_s, c2 = -1
+      left
+      have h_nsq : not_sq.val ≠ 1#u8 := by
+        have := not_sq_post.mp h_sq_flag; subst this; decide
+      constructor
+      · rw [show s1.toField = x.2.toField from by
+          unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
+        have h_eq : (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
+            Field51_as_Nat N_s % p := by
+          by_cases hN0 : Field51_as_Nat N_s % p = 0
+          · rw [(N_post_x hN0).2]; simp only [ne_eq, OfNat.ofNat_ne_zero,
+              not_false_eq_true, zero_pow, zero_mul, Nat.zero_mod, hN0]
+          · have hD_mod : Field51_as_Nat D % p ≠ 0 := by
+              intro hD0
+              exact absurd (N_post1_D ⟨hN0, hD0⟩).1 (by rw [h_sq_flag]; decide)
+            have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
+                Field51_as_Nat N_s % p := by
+              by_contra hNSq
+              exact absurd (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
+                (by rw [h_sq_flag]; decide)
+            exact (N_post2_D ⟨hN0, hD_mod, hSq⟩).2
+        exact lift_sq_mod h_eq
+      · unfold toField; rw [cond_f51_eq_neg c2_post h_nsq]; rw [c_post1]
+        have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
+        have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
+    · -- NOT a square: s1 = s_prime1, s1²D = r·N_s, c2 = r
+      right
+      have h_nsq : not_sq.val = 1#u8 := by
+        rcases not_sq with ⟨val, hv | hv⟩
+        · exact absurd (not_sq_post.mpr (by simp only [hv, Choice.zero])) h_sq_flag
+        · exact hv
+      constructor
+      · rw [show s1.toField = s_prime1.toField from by
+          unfold toField; rw [cond_f51_eq s1_post h_nsq]]
+        have h_sp1_sq : s_prime1.toField ^ 2 = s_prime.toField ^ 2 := by
+          by_cases hc : s_prime_is_pos.val = 1#u8
+          · rw [show s_prime1.toField = s_prime_neg.toField from by
+              unfold toField; rw [cond_f51_eq s_prime1_post hc]]
+            rw [show s_prime_neg.toField = -s_prime.toField from by
+              unfold toField
+              have h := lift_mod_eq _ 0 s_prime_neg_post1
+              push_cast at h; linear_combination h]
+            exact neg_sq _
+          · rw [show s_prime1.toField = s_prime.toField from by
+              unfold toField; rw [cond_f51_eq_neg s_prime1_post hc]]
+        rw [h_sp1_sq]
+        have h_sp_F : s_prime.toField = x.2.toField * s.toField := by
+          unfold toField; have h := lift_mod_eq _ _ s_prime_post1
+          push_cast at h; exact h
+        rw [h_sp_F, mul_pow]
+        have hN0 : Field51_as_Nat N_s % p ≠ 0 := by
+          intro h0; exact absurd (N_post_x h0).1 h_sq_flag
+        have hD_mod : Field51_as_Nat D % p ≠ 0 := by
+          intro hD0; apply h_s1_ne
+          have h_dz := (N_post1_D ⟨hN0, hD0⟩).2
+          have h_spz : Field51_as_Nat s_prime % p = 0 := by
+            have h := s_prime_post1
+            simp only [Nat.ModEq] at h
+            rw [Nat.mul_mod, h_dz, zero_mul, Nat.zero_mod] at h; exact h
+          have h_snz : Field51_as_Nat s_prime_neg % p = 0 := by
+            have h := s_prime_neg_post1
+            simp only [Nat.ModEq, Nat.zero_mod] at h
+            rwa [Nat.add_mod, h_spz, zero_add, Nat.mod_mod] at h
+          have h_s1z : Field51_as_Nat s_prime1 % p = 0 := by
+            by_cases hc : s_prime_is_pos.val = 1#u8
+            · rw [cond_f51_eq s_prime1_post hc]; exact h_snz
+            · rw [cond_f51_eq_neg s_prime1_post hc]; exact h_spz
+          exact toField_of_mod_zero (by rw [cond_f51_eq s1_post h_nsq]; exact h_s1z)
+        have hNSq : ¬∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
+            Field51_as_Nat N_s % p := by
+          intro hSq; exact absurd (N_post2_D ⟨hN0, hD_mod, hSq⟩).1 h_sq_flag
+        have h6 := (N_post3_D ⟨hN0, hD_mod, hNSq⟩).2
+        have h_disc_D : x.2.toField ^ 2 * D.toField =
+            field.FieldElement51.SQRT_M1_val.toField * N_s.toField := by
+          unfold toField
+          have lhs_me := ((Nat.mod_modEq (Field51_as_Nat x.2) p).symm.pow 2).mul
+            (Nat.mod_modEq (Field51_as_Nat D) p).symm
+          have rhs_me := (Nat.mod_modEq
+            (Field51_as_Nat field.FieldElement51.SQRT_M1_val) p).symm.mul
+            (Nat.mod_modEq (Field51_as_Nat N_s) p).symm
+          have hme := lhs_me.trans (h6.trans rhs_me.symm)
+          have h := lift_mod_eq _ _ hme; push_cast at h; exact h
+        rw [h_i_val] at h_r_F
+        linear_combination s.toField ^ 2 * h_disc_D - N_s.toField * h_r_F
+      · unfold toField; rw [cond_f51_eq c2_post h_nsq]
   -- Step 2: Prove cp_T.toField ≠ 0
   -- Elligator invariant: the denominator 1 + s² is never zero in 𝔽_p
   -- for the specific s produced by the algorithm.
@@ -787,74 +847,13 @@ theorem elligator_ristretto_flavor_spec
     · -- D ≢ 0 (mod p): prove the disjunction and apply the lemma
       have h_disj : s1.toField ^ 2 * D.toField = N_s.toField ∨
           s1.toField ^ 2 * D.toField = r.toField * N_s.toField := by
-        by_cases h_sq_flag : x.1.val = 1#u8
-        · -- IS a square: not_sq=0, s1 = x.2
-          left
-          have h_nsq : not_sq.val ≠ 1#u8 := by
-            have := not_sq_post.mp h_sq_flag; subst this; decide
-          rw [show s1.toField = x.2.toField from by
-            unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
-          have h_eq : (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-              Field51_as_Nat N_s % p := by
-            by_cases hN0 : Field51_as_Nat N_s % p = 0
-            · rw [(N_post_x hN0).2]; simp only [ne_eq, OfNat.ofNat_ne_zero,
-              not_false_eq_true, zero_pow, zero_mul, Nat.zero_mod, hN0]
-            · have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p := by
-                by_contra hNSq
-                have := (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
-                rw [h_sq_flag] at this; exact absurd this (by decide)
-              exact (N_post2_D ⟨hN0, hD_mod, hSq⟩).2
-          exact lift_sq_mod h_eq
-        · -- NOT a square: not_sq=1, s1 = s_prime1
-          right
-          have h_nsq : not_sq.val = 1#u8 := by
-            rcases not_sq with ⟨val, hv | hv⟩
-            · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
-            · exact hv
-          rw [show s1.toField = s_prime1.toField from by
-            unfold toField; rw [cond_f51_eq s1_post h_nsq]]
-          have h_sp1_sq : s_prime1.toField ^ 2 = s_prime.toField ^ 2 := by
-            by_cases hc : s_prime_is_pos.val = 1#u8
-            · rw [show s_prime1.toField = s_prime_neg.toField from by
-                unfold toField; rw [cond_f51_eq s_prime1_post hc]]
-              rw [show s_prime_neg.toField = -s_prime.toField from by
-                unfold toField
-                have h := lift_mod_eq _ 0 s_prime_neg_post1
-                push_cast at h; linear_combination h]
-              exact neg_sq _
-            · rw [show s_prime1.toField = s_prime.toField from by
-                unfold toField; rw [cond_f51_eq_neg s_prime1_post hc]]
-          rw [h_sp1_sq]
-          have h_sp_F : s_prime.toField = x.2.toField * s.toField := by
-            unfold toField; have h := lift_mod_eq _ _ s_prime_post1
-            push_cast at h; exact h
-          rw [h_sp_F, mul_pow]
-          have hN0 : Field51_as_Nat N_s % p ≠ 0 := by
-            intro h0; have := (N_post_x h0).1; exact absurd this h_sq_flag
-          have hNSq : ¬∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
-              Field51_as_Nat N_s % p := by
-            intro hSq; have := (N_post2_D ⟨hN0, hD_mod, hSq⟩).1
-            exact absurd this h_sq_flag
-          have h6 := (N_post3_D ⟨hN0, hD_mod, hNSq⟩).2
-          have h_disc_D : x.2.toField ^ 2 * D.toField =
-              field.FieldElement51.SQRT_M1_val.toField * N_s.toField := by
-            unfold toField
-            have lhs_me := ((Nat.mod_modEq (Field51_as_Nat x.2) p).symm.pow 2).mul
-              (Nat.mod_modEq (Field51_as_Nat D) p).symm
-            have rhs_me := (Nat.mod_modEq
-              (Field51_as_Nat field.FieldElement51.SQRT_M1_val) p).symm.mul
-              (Nat.mod_modEq (Field51_as_Nat N_s) p).symm
-            have hme := lhs_me.trans (h6.trans rhs_me.symm)
-            have h := lift_mod_eq _ _ hme; push_cast at h; exact h
-          have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
-            unfold toField
-            have hme := r_post1.trans (Nat.ModEq.mul_left
-              (Field51_as_Nat i) r_0_sq_post1)
-            have h := lift_mod_eq _ _ hme; push_cast at h; exact h
-          have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
-            rw [i_post1]; rfl
-          rw [h_i_val] at h_r_F
-          linear_combination s.toField ^ 2 * h_disc_D - N_s.toField * h_r_F
+        have h_s1_ne : s1.toField ≠ 0 := by
+          intro hs1
+          rw [hs1] at h_s1_sq_eq_m1
+          simp at h_s1_sq_eq_m1
+        rcases h_s1_sq_c2_cases h_s1_ne with hA | hB
+        · exact Or.inl hA.1
+        · exact Or.inr hB.1
       exact absurd h_s1_sq_eq_m1
         (elligator_s1_sq_ne_neg_one r.toField N_s.toField D.toField s1.toField
           h_ns_eq_F h_D_eq_F h_disj)
@@ -944,103 +943,7 @@ theorem elligator_ristretto_flavor_spec
     · exact Or.inl hs
     · right
       -- Derive s1²·D constraint with c2 info
-      have h_disj' :
-          (s1.toField ^ 2 * D.toField = N_s.toField ∧ c2.toField = -1) ∨
-          (s1.toField ^ 2 * D.toField = r.toField * N_s.toField ∧
-           c2.toField = r.toField) := by
-        by_cases h_sq_flag : x.1.val = 1#u8
-        · -- IS a square: s1 = x.2, s1²D = N_s, c2 = -1
-          left
-          have h_nsq : not_sq.val ≠ 1#u8 := by
-            have := not_sq_post.mp h_sq_flag; subst this; decide
-          constructor
-          · rw [show s1.toField = x.2.toField from by
-              unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
-            have h_eq : (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-                Field51_as_Nat N_s % p := by
-              by_cases hN0 : Field51_as_Nat N_s % p = 0
-              · rw [(N_post_x hN0).2]; simp only [ne_eq, OfNat.ofNat_ne_zero,
-                  not_false_eq_true, zero_pow, zero_mul, Nat.zero_mod, hN0]
-              · have hD_mod : Field51_as_Nat D % p ≠ 0 := by
-                  intro hD0
-                  exact absurd (N_post1_D ⟨hN0, hD0⟩).1 (by rw [h_sq_flag]; decide)
-                have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
-                    Field51_as_Nat N_s % p := by
-                  by_contra hNSq
-                  exact absurd (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
-                    (by rw [h_sq_flag]; decide)
-                exact (N_post2_D ⟨hN0, hD_mod, hSq⟩).2
-            exact lift_sq_mod h_eq
-          · unfold toField; rw [cond_f51_eq_neg c2_post h_nsq]; rw [c_post1]
-            have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
-            have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
-        · -- NOT a square: s1 = s_prime1, s1²D = r·N_s, c2 = r
-          right
-          have h_nsq : not_sq.val = 1#u8 := by
-            rcases not_sq with ⟨val, hv | hv⟩
-            · exact absurd (not_sq_post.mpr (by simp only [hv, Choice.zero])) h_sq_flag
-            · exact hv
-          constructor
-          · rw [show s1.toField = s_prime1.toField from by
-              unfold toField; rw [cond_f51_eq s1_post h_nsq]]
-            have h_sp1_sq : s_prime1.toField ^ 2 = s_prime.toField ^ 2 := by
-              by_cases hc : s_prime_is_pos.val = 1#u8
-              · rw [show s_prime1.toField = s_prime_neg.toField from by
-                  unfold toField; rw [cond_f51_eq s_prime1_post hc]]
-                rw [show s_prime_neg.toField = -s_prime.toField from by
-                  unfold toField
-                  have h := lift_mod_eq _ 0 s_prime_neg_post1
-                  push_cast at h; linear_combination h]
-                exact neg_sq _
-              · rw [show s_prime1.toField = s_prime.toField from by
-                  unfold toField; rw [cond_f51_eq_neg s_prime1_post hc]]
-            rw [h_sp1_sq]
-            have h_sp_F : s_prime.toField = x.2.toField * s.toField := by
-              unfold toField; have h := lift_mod_eq _ _ s_prime_post1
-              push_cast at h; exact h
-            rw [h_sp_F, mul_pow]
-            have hN0 : Field51_as_Nat N_s % p ≠ 0 := by
-              intro h0; exact absurd (N_post_x h0).1 h_sq_flag
-            have hD_mod : Field51_as_Nat D % p ≠ 0 := by
-              intro hD0; apply hs
-              have h_dz := (N_post1_D ⟨hN0, hD0⟩).2
-              have h_spz : Field51_as_Nat s_prime % p = 0 := by
-                have h := s_prime_post1
-                simp only [Nat.ModEq] at h
-                rw [Nat.mul_mod, h_dz, zero_mul, Nat.zero_mod] at h; exact h
-              have h_snz : Field51_as_Nat s_prime_neg % p = 0 := by
-                have h := s_prime_neg_post1
-                simp only [Nat.ModEq, Nat.zero_mod] at h
-                rwa [Nat.add_mod, h_spz, zero_add, Nat.mod_mod] at h
-              have h_s1z : Field51_as_Nat s_prime1 % p = 0 := by
-                by_cases hc : s_prime_is_pos.val = 1#u8
-                · rw [cond_f51_eq s_prime1_post hc]; exact h_snz
-                · rw [cond_f51_eq_neg s_prime1_post hc]; exact h_spz
-              exact toField_of_mod_zero (by rw [cond_f51_eq s1_post h_nsq]; exact h_s1z)
-            have hNSq : ¬∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
-                Field51_as_Nat N_s % p := by
-              intro hSq; exact absurd (N_post2_D ⟨hN0, hD_mod, hSq⟩).1 h_sq_flag
-            have h6 := (N_post3_D ⟨hN0, hD_mod, hNSq⟩).2
-            have h_disc_D : x.2.toField ^ 2 * D.toField =
-                field.FieldElement51.SQRT_M1_val.toField * N_s.toField := by
-              unfold toField
-              have lhs_me := ((Nat.mod_modEq (Field51_as_Nat x.2) p).symm.pow 2).mul
-                (Nat.mod_modEq (Field51_as_Nat D) p).symm
-              have rhs_me := (Nat.mod_modEq
-                (Field51_as_Nat field.FieldElement51.SQRT_M1_val) p).symm.mul
-                (Nat.mod_modEq (Field51_as_Nat N_s) p).symm
-              have hme := lhs_me.trans (h6.trans rhs_me.symm)
-              have h := lift_mod_eq _ _ hme; push_cast at h; exact h
-            have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
-              unfold toField
-              have hme := r_post1.trans (Nat.ModEq.mul_left
-                (Field51_as_Nat i) r_0_sq_post1)
-              have h := lift_mod_eq _ _ hme; push_cast at h; exact h
-            have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
-              rw [i_post1]; rfl
-            rw [h_i_val] at h_r_F
-            linear_combination s.toField ^ 2 * h_disc_D - N_s.toField * h_r_F
-          · unfold toField; rw [cond_f51_eq c2_post h_nsq]
+      have h_disj' := h_s1_sq_c2_cases hs
       -- Case split on square/non-square
       rcases h_disj' with ⟨hA, h_c1⟩ | ⟨hB, h_c1⟩
       · -- Case A: s1²D = N_s, c2 = -1
@@ -1112,17 +1015,9 @@ theorem elligator_ristretto_flavor_spec
       linear_combination h_sub - hsq
     have h_cp_Z_F : cp_Z.toField = N_t.toField * fe.toField := by
       unfold toField; have h := lift_mod_eq _ _ cp_Z_post1; push_cast at h; exact h
-    -- Bridge helpers: lift r to spec
-    have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
-      unfold toField
-      have hme := r_post1.trans (Nat.ModEq.mul_left
-        (Field51_as_Nat i) r_0_sq_post1)
-      have h := lift_mod_eq _ _ hme; push_cast at h; exact h
     have h_sm1 : i.toField = sqrt_m1 := by
       unfold toField sqrt_m1; rw [i_post1]
       exact lift_mod_eq _ _ (by unfold SQRT_M1_raw Field51_as_Nat; decide)
-    have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
-      rw [i_post1]; rfl
     have h_r_bridge : r.toField = elligator_r s.toField := by
       rw [h_r_F, h_sm1]; unfold elligator_r; rfl
     -- Bridge identities: connect implementation variables to spec step functions
@@ -1134,28 +1029,51 @@ theorem elligator_ristretto_flavor_spec
       rw [h_D_eq_F, h_r_bridge]
       unfold elligator_D
       rw [show Ed25519.d = (_root_.d : CurveField) from rfl]; ring
+    have h_is_square_of_flag (h_sq_flag : x.1.val = 1#u8) :
+        elligator_is_square s.toField := by
+      change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
+      rw [← h_D_bridge, ← h_Ns_bridge]
+      by_cases hN0 : Field51_as_Nat N_s % p = 0
+      · exact ⟨0, by rw [show N_s.toField = (0 : CurveField) from
+            toField_of_mod_zero hN0]; ring⟩
+      · by_cases hD_mod : Field51_as_Nat D % p = 0
+        · exact absurd (N_post1_D ⟨hN0, hD_mod⟩).1
+            (by rw [h_sq_flag]; decide)
+        · have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
+              Field51_as_Nat N_s % p := by
+            by_contra hNSq
+            exact absurd (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
+              (by rw [h_sq_flag]; decide)
+          exact ⟨x.2.toField,
+            lift_sq_mod (N_post2_D ⟨hN0, hD_mod, hSq⟩).2⟩
+    have h_not_is_square_of_flag (h_sq_flag : x.1.val ≠ 1#u8) :
+        ¬ elligator_is_square s.toField := by
+      change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
+      rw [← h_D_bridge, ← h_Ns_bridge]
+      by_cases hN0 : Field51_as_Nat N_s % p = 0
+      · exact absurd (N_post_x hN0).1 h_sq_flag
+      · by_cases hD_mod : Field51_as_Nat D % p = 0
+        · intro ⟨x, hx⟩; apply hN0
+          rw [toField_of_mod_zero hD_mod, mul_zero] at hx
+          unfold toField at hx
+          exact Nat.dvd_iff_mod_eq_zero.mp
+            ((ZMod.natCast_eq_zero_iff _ _).mp hx.symm)
+        · intro ⟨x, hx⟩; apply h_sq_flag
+          exact (N_post2_D ⟨hN0, hD_mod, ⟨ZMod.val x, by
+            unfold toField at hx
+            exact ((Nat.ModEq.mul_left (ZMod.val x ^ 2)
+              (Nat.mod_modEq (Field51_as_Nat D) p).symm).symm.trans
+              ((ZMod.natCast_eq_natCast_iff _ _ p).mp (by
+                push_cast
+                simp only [ZMod.natCast_val, ZMod.cast_id', id_eq]
+                exact hx)))⟩⟩).1
     have h_c2_bridge : c2.toField = elligator_c s.toField := by
       unfold elligator_c
       by_cases h_sq_flag : x.1.val = 1#u8
       · -- Square case: c2 = -1
         have h_nsq : not_sq.val ≠ 1#u8 := by
           have := not_sq_post.mp h_sq_flag; subst this; decide
-        have h_is_sq : elligator_is_square s.toField := by
-          change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
-          rw [← h_D_bridge, ← h_Ns_bridge]
-          by_cases hN0 : Field51_as_Nat N_s % p = 0
-          · exact ⟨0, by rw [show N_s.toField = (0 : CurveField) from
-                toField_of_mod_zero hN0]; ring⟩
-          · by_cases hD_mod : Field51_as_Nat D % p = 0
-            · exact absurd (N_post1_D ⟨hN0, hD_mod⟩).1
-                (by rw [h_sq_flag]; decide)
-            · have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
-                  Field51_as_Nat N_s % p := by
-                by_contra hNSq
-                exact absurd (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
-                  (by rw [h_sq_flag]; decide)
-              exact ⟨x.2.toField,
-                lift_sq_mod (N_post2_D ⟨hN0, hD_mod, hSq⟩).2⟩
+        have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
         rw [if_pos h_is_sq]
         unfold toField; rw [cond_f51_eq_neg c2_post h_nsq]; rw [c_post1]
         have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
@@ -1165,26 +1083,7 @@ theorem elligator_ristretto_flavor_spec
           rcases not_sq with ⟨val, hv | hv⟩
           · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
           · exact hv
-        have h_not_sq : ¬ elligator_is_square s.toField := by
-          change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
-          rw [← h_D_bridge, ← h_Ns_bridge]
-          by_cases hN0 : Field51_as_Nat N_s % p = 0
-          · exact absurd (N_post_x hN0).1 h_sq_flag
-          · by_cases hD_mod : Field51_as_Nat D % p = 0
-            · intro ⟨x, hx⟩; apply hN0
-              rw [toField_of_mod_zero hD_mod, mul_zero] at hx
-              unfold toField at hx
-              exact Nat.dvd_iff_mod_eq_zero.mp
-                ((ZMod.natCast_eq_zero_iff _ _).mp hx.symm)
-            · intro ⟨x, hx⟩; apply h_sq_flag
-              exact (N_post2_D ⟨hN0, hD_mod, ⟨ZMod.val x, by
-                unfold toField at hx
-                exact ((Nat.ModEq.mul_left (ZMod.val x ^ 2)
-                  (Nat.mod_modEq (Field51_as_Nat D) p).symm).symm.trans
-                  ((ZMod.natCast_eq_natCast_iff _ _ p).mp (by
-                    push_cast
-                    simp only [ZMod.natCast_val, ZMod.cast_id', id_eq]
-                    exact hx)))⟩⟩).1
+        have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
         rw [if_neg h_not_sq]
         rw [show c2.toField = r.toField from by
           unfold toField; rw [cond_f51_eq c2_post h_nsq]]
@@ -1195,22 +1094,7 @@ theorem elligator_ristretto_flavor_spec
       · -- Square case: s1 = x.2
         have h_nsq : not_sq.val ≠ 1#u8 := by
           have := not_sq_post.mp h_sq_flag; subst this; decide
-        have h_is_sq : elligator_is_square s.toField := by
-          change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
-          rw [← h_D_bridge, ← h_Ns_bridge]
-          by_cases hN0 : Field51_as_Nat N_s % p = 0
-          · exact ⟨0, by rw [show N_s.toField = (0 : CurveField) from
-                toField_of_mod_zero hN0]; ring⟩
-          · by_cases hD_mod : Field51_as_Nat D % p = 0
-            · exact absurd (N_post1_D ⟨hN0, hD_mod⟩).1
-                (by rw [h_sq_flag]; decide)
-            · have hSq : ∃ x, x ^ 2 * (Field51_as_Nat D % p) % p =
-                  Field51_as_Nat N_s % p := by
-                by_contra hNSq
-                exact absurd (N_post3_D ⟨hN0, hD_mod, hNSq⟩).1
-                  (by rw [h_sq_flag]; decide)
-              exact ⟨x.2.toField,
-                lift_sq_mod (N_post2_D ⟨hN0, hD_mod, hSq⟩).2⟩
+        have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
         rw [if_pos h_is_sq]
         rw [show s1.toField = x.2.toField from by
           unfold toField; rw [cond_f51_eq_neg s1_post h_nsq]]
@@ -1246,26 +1130,7 @@ theorem elligator_ristretto_flavor_spec
           rcases not_sq with ⟨val, hv | hv⟩
           · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
           · exact hv
-        have h_not_sq : ¬ elligator_is_square s.toField := by
-          change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
-          rw [← h_D_bridge, ← h_Ns_bridge]
-          by_cases hN0 : Field51_as_Nat N_s % p = 0
-          · exact absurd (N_post_x hN0).1 h_sq_flag
-          · by_cases hD_mod : Field51_as_Nat D % p = 0
-            · intro ⟨x, hx⟩; apply hN0
-              rw [toField_of_mod_zero hD_mod, mul_zero] at hx
-              unfold toField at hx
-              exact Nat.dvd_iff_mod_eq_zero.mp
-                ((ZMod.natCast_eq_zero_iff _ _).mp hx.symm)
-            · intro ⟨x, hx⟩; apply h_sq_flag
-              exact (N_post2_D ⟨hN0, hD_mod, ⟨ZMod.val x, by
-                unfold toField at hx
-                exact ((Nat.ModEq.mul_left (ZMod.val x ^ 2)
-                  (Nat.mod_modEq (Field51_as_Nat D) p).symm).symm.trans
-                  ((ZMod.natCast_eq_natCast_iff _ _ p).mp (by
-                    push_cast
-                    simp only [ZMod.natCast_val, ZMod.cast_id', id_eq]
-                    exact hx)))⟩⟩).1
+        have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
         rw [if_neg h_not_sq]
         rw [show s1.toField = s_prime1.toField from by
           unfold toField; rw [cond_f51_eq s1_post h_nsq]]
