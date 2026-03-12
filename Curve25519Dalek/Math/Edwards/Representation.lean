@@ -393,12 +393,64 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     let Z := pn.Z.toField; let T2d := pn.T2d.toField
     2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
+
+
+@[mk_iff]
+structure ProjectiveNielsPoint.IsValid' (pn : ProjectiveNielsPoint) : Prop where
+  /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 52 2 ^ 53 2 ^ 52. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 54
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 52
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 52
+  /-- The Z coordinate is non-zero. -/
+  Z_ne_zero : pn.Z.toField ≠ 0
+  /-- The curve equation (scaled by 4 to avoid 1/2). -/
+  on_curve :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
+    4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
+      16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
+  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z) i.e., 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+    let Z := pn.Z.toField; let T2d := pn.T2d.toField
+    2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
+
+
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
   decidable_of_iff _ (isValid_iff pn).symm
+
+instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) : Decidable pn.IsValid' :=
+  decidable_of_iff _ (isValid'_iff pn).symm
+
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
 noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsValid) :
+    Point Ed25519 :=
+  let YpX := pn.Y_plus_X.toField
+  let YmX := pn.Y_minus_X.toField
+  let Z := pn.Z.toField
+  { x := (YpX - YmX) / (2 * Z)
+    y := (YpX + YmX) / (2 * Z)
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have h2 : (2 : CurveField) ≠ 0 := by decide
+      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
+      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
+      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
+      have hcurve := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [h2z2, h2z4]
+      ring_nf
+      ring_nf at hcurve
+      linear_combination hcurve }
+
+
+
+/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+noncomputable def ProjectiveNielsPoint.toPointI' (pn : ProjectiveNielsPoint) (h : pn.IsValid') :
     Point Ed25519 :=
   let YpX := pn.Y_plus_X.toField
   let YmX := pn.Y_minus_X.toField
@@ -424,6 +476,9 @@ noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h :
 noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
   if h : pn.IsValid then pn.toPoint' h else 0
 
+noncomputable def ProjectiveNielsPoint.toPointI (pn : ProjectiveNielsPoint) : Point Ed25519 :=
+  if h : pn.IsValid' then pn.toPointI' h else 0
+
 /-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
 theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h : pn.IsValid) :
     (pn.toPoint).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
@@ -431,6 +486,15 @@ theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h :
   unfold toPoint
   rw [dif_pos h]
   simp only [toPoint']
+  trivial
+
+/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+theorem ProjectiveNielsPoint.toPoint_of_isValid' {pn : ProjectiveNielsPoint} (h : pn.IsValid') :
+    (pn.toPointI).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
+    (pn.toPointI).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
+  unfold toPointI
+  rw [dif_pos h]
+  simp only [toPointI']
   trivial
 
 /-! ## Coercions -/
