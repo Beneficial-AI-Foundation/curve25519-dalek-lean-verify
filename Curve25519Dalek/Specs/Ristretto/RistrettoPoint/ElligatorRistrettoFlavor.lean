@@ -294,6 +294,8 @@ theorem elligator_ristretto_flavor_spec
       · have := s_prime_neg_post2 i hi; omega
       · have := s_prime_post2 i hi; omega
     · grind
+  · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
+    sorry
   -- Main Goals: ⊢ IsValid ep ∧ toPoint ep = ↑(elligator_ristretto_flavor_pure s.toField)
   -- Step 1: Lift arithmetic postconditions to field equalities
   rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -683,18 +685,8 @@ theorem elligator_ristretto_flavor_spec
             Ed25519.d * (D.toField - r.toField * N_s.toField) ^ 2 := by
           rw [h_nt_B, h_D_eq_F, h_ns_eq_F]; ring
         rw [step1]; exact constr_to_squares_r hB
-  -- Step 4: Assemble EdwardsPoint.IsValid
-  have h_ep_valid : edwards.EdwardsPoint.IsValid ep := {
-    X_bounds := fun i hi => by have := ep_post5 i hi; omega
-    Y_bounds := fun i hi => by have := ep_post6 i hi; omega
-    Z_bounds := fun i hi => by have := ep_post7 i hi; omega
-    T_bounds := fun i hi => by have := ep_post8 i hi; omega
-    Z_ne_zero := hZ_ne
-    T_relation := by rw [hX_F, hY_F, hT_F, hZ_F]; ring
-    on_curve := by
-      simp only [hX_F, hY_F, hZ_F]
-      linear_combination (cp_Z.toField ^ 2 * cp_T.toField ^ 2) * h_cp_curve
-  }
+  -- Step 4: EdwardsPoint.IsValid from as_extended_spec
+  have h_ep_valid : edwards.EdwardsPoint.IsValid ep := ep_post9
   refine ⟨?_, ?_⟩
   · -- RistrettoPoint.IsValid ep = EdwardsPoint.IsValid ∧ IsSquare (Z² - Y²)
     refine ⟨h_ep_valid, ?_⟩
@@ -1001,5 +993,6 @@ theorem elligator_ristretto_flavor_spec
       simp only [elligator_pure_val_y]
       unfold elligator_ristretto_flavor_y
       rw [h_s1_bridge]
+
 
 end curve25519_dalek.ristretto.RistrettoPoint

@@ -345,7 +345,7 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     have h_sq_eq : s.toField ^ 2 =
         (compress_den_inv P * (1 - compress_y_final P)) ^ 2 := by
       -- Step 1: Lift constant squared facts to ZMod
-      have h_fe_sq := lift_fe_sq fe fe_post1
+      have h_fe_sq := lift_fe_sq fe fe_post2
       have h_rm_sq := lift_rm_sq ristretto_magic ristretto_magic_post1
       -- Affine ↔ projective bridge for P
       have hpx' : P.x = self.X.toField / self.Z.toField := by
