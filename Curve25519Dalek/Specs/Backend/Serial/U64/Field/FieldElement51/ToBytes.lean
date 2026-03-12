@@ -73,14 +73,6 @@ theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
   2 ^ 4 * limb.val
   := by
   bvify 64 at *
-  /- Small trick when bvify doesn't work: we can prove the property we
-     want about bit-vectors, then convert it back to natural numbers with
-     `natify` and `simp_scalar`. In particular, `simp_scalar` is good at simplifying
-     things like `x % 2 ^ 32` when `x < 2^32`, etc. -/
-  have : BitVec.ofNat 64 (limb.val <<< 4) = limb.bv <<< 4 := by
-    natify
-    simp_scalar
-  simp [this]
   bv_decide
 
 
