@@ -1,0 +1,54 @@
+name: Lean Call Graph
+
+on:
+  push:
+    branches: [master, la/add_callgraph]
+    paths:
+      - 'Curve25519Dalek/**'
+      - 'Curve25519Dalek.lean'
+      - 'Utils/**'
+      - 'Utils.lean'
+      - 'lakefile.toml'
+      - 'lean-toolchain'
+      - '.github/workflows/callgraph.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: callgraph
+  cancel-in-progress: true
+
+jobs:
+  generate:
+    uses: Beneficial-AI-Foundation/scip-callgraph/.github/workflows/generate-lean-callgraph.yml@main
+    with:
+      deploy_mode: subpath
+      subpath: callgraph
+      github_branch: master
+
+  cache-callgraph:
+    needs: generate
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download callgraph artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: callgraph-viewer
+          path: callgraph
+
+      - name: Fix asset paths for subpath deployment
+        run: |
+          sed -i 's|"/callgraph/|"/curve25519-dalek-lean-verify/callgraph/|g' callgraph/index.html
+          sed -i 's|href="/assets/|href="/curve25519-dalek-lean-verify/callgraph/assets/|g' callgraph/index.html
+          sed -i 's|src="/assets/|src="/curve25519-dalek-lean-verify/callgraph/assets/|g' callgraph/index.html
+          echo "Fixed asset paths for /curve25519-dalek-lean-verify/callgraph/"
+
+      - name: Save callgraph to cache
+        uses: actions/cache/save@v4
+        with:
+          path: callgraph
+          key: callgraph-${{ github.sha }}-${{ github.run_id }}
