@@ -133,6 +133,26 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
 
 
 
+private theorem part1_spec_tail (sum i5 : U128) (p : U64)
+    (h_p_val : p.val = (sum.val * constants.LFACTOR) % (2 ^ 52))
+    (h_p_bound : p.val < 2^52)
+    (h_add : sum.val + i5.val ≤ U128.max)
+    (h_i5_eq : i5.val = p.val * (constants.L[0]!).val) :
+    (do
+      let i6 ← sum + i5
+      let i7 ← i6 >>> 52#i32
+      ok (i7, p)) ⦃ result =>
+      let (carry, p') := result
+      p'.val = (sum.val * constants.LFACTOR) % (2 ^ 52) ∧
+      carry.val = (sum.val + p'.val * (constants.L[0]!).val) / (2 ^ 52) ∧
+      carry.val < 2 ^ 77 ∧
+      p'.val < 2 ^ 52 ⦄ := by
+  progress as ⟨i6, i6_post⟩
+  progress as ⟨i7, i7_post⟩
+  refine ⟨h_p_val, ?_, ?_, h_p_bound⟩
+  · rw [i7_post, i6_post, h_i5_eq]; simp only [Nat.shiftRight_eq_div_pow]
+  · rw [i7_post, i6_post]; simp only [Nat.shiftRight_eq_div_pow]; scalar_tac
+
 @[progress]
 private theorem part1_spec (sum : U128)
     (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
@@ -174,19 +194,16 @@ private theorem part1_spec (sum : U128)
       · apply Nat.add_le_add_left; apply Nat.mul_le_mul_right; apply Nat.le_pred_of_lt h_p_bound
       · exact h_bound
 
-  sorry
-  /- OLD PROOF (deep recursion after Aeneas update — constants.L now Result):
   progress as ⟨i4, i4_post⟩
   progress as ⟨i5, i5_post⟩
-  progress as ⟨i6, i6_post⟩
-  progress as ⟨i7, i7_post_1, i7_post_2⟩
-  refine ⟨h_p_val, ?_, ?_, h_p_bound⟩
-  · -- Main Equation 2
-    rw [i7_post_1, i6_post, i5_post, i4_post]; rw [Nat.shiftRight_eq_div_pow];
-    simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
-     Array.getElem!_Nat_eq]
-  · rw [i7_post_1, i6_post, i5_post, i4_post]; simp only [Nat.shiftRight_eq_div_pow]; scalar_tac
-  -/
+  have h_add_safe' : sum.val + i5.val ≤ U128.max := by
+    rw [i5_post, i4_post]
+    convert h_add_safe using 2
+    simp only [Array.getElem!_Nat_eq]
+  have h_i5_eq : i5.val = p.val * (constants.L[0]!).val := by
+    rw [i5_post, i4_post]
+    simp only [Array.getElem!_Nat_eq]
+  exact part1_spec_tail sum i5 p h_p_val h_p_bound h_add_safe' h_i5_eq
 
 @[progress]
 private theorem part2_spec (sum : U128) :

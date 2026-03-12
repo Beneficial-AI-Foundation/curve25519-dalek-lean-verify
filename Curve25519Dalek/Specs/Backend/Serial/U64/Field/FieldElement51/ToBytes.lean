@@ -91,8 +91,12 @@ theorem decompose_or_limbs (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
   ((limb1.val <<< 4) % 2 ^ 8) := by
   bvify 64 at *
   -- The idea is to do something similar to the proof above
+  have : BitVec.ofNat 64 (limb1.val <<< 4 % U64.size) = limb1.bv <<< 4 := by
+    natify
+    simp_scalar
+  rw [this]
+  bv_decide
 
-  sorry
 
 /-! ## Spec for `to_bytes` -/
 
