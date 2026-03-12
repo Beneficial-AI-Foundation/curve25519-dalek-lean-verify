@@ -11,8 +11,6 @@ on:
       - 'lakefile.toml'
       - 'lean-toolchain'
       - '.github/workflows/callgraph.yml'
-  schedule:
-    - cron: '0 6 * * *'
   workflow_dispatch:
 
 permissions:
