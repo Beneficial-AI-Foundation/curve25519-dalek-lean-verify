@@ -28,6 +28,7 @@ jobs:
     with:
       deploy_mode: subpath
       subpath: callgraph
+      github_branch: master
 
   cache-callgraph:
     needs: generate
