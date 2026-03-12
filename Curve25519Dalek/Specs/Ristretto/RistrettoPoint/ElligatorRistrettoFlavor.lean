@@ -204,6 +204,103 @@ private lemma lift_sq_mod {a b c : ℕ}
     (Nat.mod_modEq b p).symm |>.trans h
   have h := lift_mod_eq _ _ hme; push_cast at h; exact h
 
+/-- Shared field-lift bundle for the Elligator construction.
+Used in both the intermediate `CompletedPoint.IsValid` proof and the final semantic bridge. -/
+private lemma lift_bridge_bundle
+    (cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
+      c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
+      N_t d_minus_one_sq : backend.serial.u64.field.FieldElement51)
+    (h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq)
+    (s_sq_post1 : Field51_as_Nat s_sq ≡ Field51_as_Nat s1 ^ 2 [MOD p])
+    (one_post1 : Field51_as_Nat one = 1)
+    (h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one)
+    (one_minus_d_sq_post1 : Field51_as_Nat one_minus_d_sq = (1 + p - _root_.d ^ 2 % p) % p)
+    (N_s_post1 : Field51_as_Nat N_s ≡ Field51_as_Nat r_plus_one * Field51_as_Nat one_minus_d_sq [MOD p])
+    (h_rpd_nat : Field51_as_Nat r_plus_d = Field51_as_Nat r + Field51_as_Nat d)
+    (d_post1 : Field51_as_Nat d = _root_.d)
+    (c_minus_dr_post2 : (Field51_as_Nat c_minus_dr + Field51_as_Nat d_times_r) % p = Field51_as_Nat c % p)
+    (d_times_r_post1 : Field51_as_Nat d_times_r ≡ Field51_as_Nat d * Field51_as_Nat r [MOD p])
+    (c_post1 : Field51_as_Nat c = p - 1)
+    (D_post1 : Field51_as_Nat D ≡ Field51_as_Nat c_minus_dr * Field51_as_Nat r_plus_d [MOD p])
+    (r_minus_one_post2 : (Field51_as_Nat r_minus_one + Field51_as_Nat one) % p = Field51_as_Nat r % p)
+    (c_r_minus_one_post1 : Field51_as_Nat c_r_minus_one ≡ Field51_as_Nat c2 * Field51_as_Nat r_minus_one [MOD p])
+    (c_r_minus_one_d_post1 :
+      Field51_as_Nat c_r_minus_one_d ≡ Field51_as_Nat c_r_minus_one * Field51_as_Nat d_minus_one_sq [MOD p])
+    (N_t_post2 : (Field51_as_Nat N_t + Field51_as_Nat D) % p = Field51_as_Nat c_r_minus_one_d % p)
+    (d_minus_one_sq_post1 : Field51_as_Nat d_minus_one_sq = (_root_.d - 1) ^ 2 % p) :
+    cp_T.toField = 1 + s1.toField ^ 2 ∧
+    r_plus_one.toField = r.toField + 1 ∧
+    one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 ∧
+    N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) ∧
+    r_plus_d.toField = r.toField + Ed25519.d ∧
+    c_minus_dr.toField = -1 - Ed25519.d * r.toField ∧
+    D.toField = (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) ∧
+    r_minus_one.toField = r.toField - 1 ∧
+    c_r_minus_one.toField = c2.toField * r_minus_one.toField ∧
+    c_r_minus_one_d.toField = c_r_minus_one.toField * d_minus_one_sq.toField ∧
+    N_t.toField + D.toField = c_r_minus_one_d.toField ∧
+    N_t.toField =
+      c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
+  have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
+    unfold toField
+    have hsq := lift_mod_eq _ _ s_sq_post1
+    rw [h_cp_T_nat]; push_cast
+    push_cast at hsq; rw [hsq, one_post1]
+    simp only [Nat.cast_one]
+  have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
+    unfold toField
+    rw [h_rpo_nat]; push_cast; rw [one_post1]; simp only [Nat.cast_one]
+  have h_omds_F : one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 := by
+    unfold toField; rw [one_minus_d_sq_post1]
+    have h_sum : ((1 + p - _root_.d ^ 2 % p) % p + _root_.d ^ 2) % p = 1 % p := by
+      norm_num [_root_.d, p]
+    have h := lift_mod_eq _ _ h_sum; push_cast at h
+    change _ = 1 - (_root_.d : CurveField) ^ 2; linear_combination h
+  have h_ns_eq_F : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
+    have hN : N_s.toField = r_plus_one.toField * one_minus_d_sq.toField := by
+      unfold toField; have h := lift_mod_eq _ _ N_s_post1; push_cast at h; exact h
+    rw [hN, h_rpo_F, h_omds_F]
+  have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
+    unfold toField
+    rw [h_rpd_nat]; push_cast; rw [d_post1]; rfl
+  have h_cmdr_F : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
+    have hD_sub : c_minus_dr.toField + d_times_r.toField = c.toField := by
+      unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post2; push_cast at h; exact h
+    have hD_dr : d_times_r.toField = d.toField * r.toField := by
+      unfold toField; have h := lift_mod_eq _ _ d_times_r_post1; push_cast at h; exact h
+    have hc_F : c.toField = -1 := by
+      unfold toField; rw [c_post1]
+      have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
+      have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
+    have hd_F : d.toField = Ed25519.d := by
+      unfold toField; rw [d_post1]; rfl
+    rw [hc_F] at hD_sub; rw [hd_F] at hD_dr
+    linear_combination hD_sub - hD_dr
+  have h_D_eq_F : D.toField =
+      (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
+    have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
+      unfold toField; have h := lift_mod_eq _ _ D_post1; push_cast at h; exact h
+    rw [hD, h_cmdr_F, h_rpd_F]
+  have h_rm1_F : r_minus_one.toField = r.toField - 1 := by
+    unfold toField; have h := lift_mod_eq _ _ r_minus_one_post2
+    push_cast at h; rw [one_post1, Nat.cast_one] at h; linear_combination h
+  have h_cr_F : c_r_minus_one.toField = c2.toField * r_minus_one.toField := by
+    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post1
+    push_cast at h; exact h
+  have h_crd_F : c_r_minus_one_d.toField = c_r_minus_one.toField *
+      d_minus_one_sq.toField := by
+    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post1
+    push_cast at h; exact h
+  have h_Nt_add_F : N_t.toField + D.toField = c_r_minus_one_d.toField := by
+    unfold toField; have h := lift_mod_eq _ _ N_t_post2; push_cast at h; exact h
+  have h_Nt_eq_F : N_t.toField =
+      c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
+    have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
+      linear_combination h_Nt_add_F
+    rw [this, h_crd_F, h_cr_F, h_rm1_F]; unfold toField; rw [d_minus_one_sq_post1]; rfl
+  exact ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
+    h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
+
 /-
 natural language description:
 
@@ -260,76 +357,32 @@ theorem elligator_ristretto_flavor_spec
     · grind
   · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
     rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-    -- Bridge hypotheses (lifted postconditions to field equalities)
-    have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
-      unfold toField
-      have h_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
-        unfold Field51_as_Nat
-        rw [← Finset.sum_add_distrib]
-        apply Finset.sum_congr rfl
-        intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
-      have hsq := lift_mod_eq _ _ s_sq_post1
-      rw [h_nat]; push_cast
-      push_cast at hsq; rw [hsq, one_post1]
-      simp only [Nat.cast_one]
-    have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
-      unfold toField
-      have h_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
-        unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
-        intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
-      rw [h_nat]; push_cast; rw [one_post1]; simp only [Nat.cast_one]
-    have h_omds_F : one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 := by
-      unfold toField; rw [one_minus_d_sq_post1]
-      have h_sum : ((1 + p - _root_.d ^ 2 % p) % p + _root_.d ^ 2) % p = 1 % p := by
-        norm_num [_root_.d, p]
-      have h := lift_mod_eq _ _ h_sum; push_cast at h
-      change _ = 1 - (_root_.d : CurveField) ^ 2; linear_combination h
-    have h_ns_eq_F : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
-      have hN : N_s.toField = r_plus_one.toField * one_minus_d_sq.toField := by
-        unfold toField; have h := lift_mod_eq _ _ N_s_post1; push_cast at h; exact h
-      rw [hN, h_rpo_F, h_omds_F]
-    have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
-      unfold toField
-      have h_nat : Field51_as_Nat r_plus_d =
-          Field51_as_Nat r + Field51_as_Nat d := by
-        unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
-        intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add];
-      rw [h_nat]; push_cast; rw [d_post1]; rfl
-    have h_cmdr_F : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
-      have hD_sub : c_minus_dr.toField + d_times_r.toField = c.toField := by
-        unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post2; push_cast at h; exact h
-      have hD_dr : d_times_r.toField = d.toField * r.toField := by
-        unfold toField; have h := lift_mod_eq _ _ d_times_r_post1; push_cast at h; exact h
-      have hc_F : c.toField = -1 := by
-        unfold toField; rw [c_post1]
-        have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
-        have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
-      have hd_F : d.toField = Ed25519.d := by
-        unfold toField; rw [d_post1]; rfl
-      rw [hc_F] at hD_sub; rw [hd_F] at hD_dr
-      linear_combination hD_sub - hD_dr
-    have h_D_eq_F : D.toField =
-        (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
-      have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
-        unfold toField; have h := lift_mod_eq _ _ D_post1; push_cast at h; exact h
-      rw [hD, h_cmdr_F, h_rpd_F]
-    have h_rm1_F : r_minus_one.toField = r.toField - 1 := by
-      unfold toField; have h := lift_mod_eq _ _ r_minus_one_post2
-      push_cast at h; rw [one_post1, Nat.cast_one] at h; linear_combination h
-    have h_cr_F : c_r_minus_one.toField = c2.toField * r_minus_one.toField := by
-      unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post1
-      push_cast at h; exact h
-    have h_crd_F : c_r_minus_one_d.toField = c_r_minus_one.toField *
-        d_minus_one_sq.toField := by
-      unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post1
-      push_cast at h; exact h
-    have h_Nt_add_F : N_t.toField + D.toField = c_r_minus_one_d.toField := by
-      unfold toField; have h := lift_mod_eq _ _ N_t_post2; push_cast at h; exact h
-    have h_Nt_eq_F : N_t.toField =
-        c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
-      have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
-        linear_combination h_Nt_add_F
-      rw [this, h_crd_F, h_cr_F, h_rm1_F]; unfold toField; rw [d_minus_one_sq_post1]; rfl
+    have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
+    have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
+    have h_rpd_nat : Field51_as_Nat r_plus_d =
+        Field51_as_Nat r + Field51_as_Nat d := by
+      unfold Field51_as_Nat
+      rw [← Finset.sum_add_distrib]
+      apply Finset.sum_congr rfl
+      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add]
+    rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
+        N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
+        c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
+        h_cp_T_nat s_sq_post1 one_post1 h_rpo_nat
+        one_minus_d_sq_post1 N_s_post1 h_rpd_nat d_post1
+        c_minus_dr_post2 d_times_r_post1 c_post1 D_post1
+        r_minus_one_post2 c_r_minus_one_post1 c_r_minus_one_d_post1
+        N_t_post2 d_minus_one_sq_post1 with
+      ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
+        h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
     -- Prove cp_T.toField ≠ 0
     have h_cp_T_ne : cp_T.toField ≠ 0 := by
       rw [h_cp_T_F]
@@ -646,76 +699,32 @@ theorem elligator_ristretto_flavor_spec
     unfold toField; have h := lift_mod_eq _ _ ep_post3; push_cast at h; exact h
   have hT_F : ep.T.toField = cp_X.toField * cp_Y.toField := by
     unfold toField; have h := lift_mod_eq _ _ ep_post4; push_cast at h; exact h
-  have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
-    unfold toField
-    have h_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
-      unfold Field51_as_Nat
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
-    have hsq := lift_mod_eq _ _ s_sq_post1
-    rw [h_nat]; push_cast
-    push_cast at hsq; rw [hsq, one_post1]
-    simp only [Nat.cast_one]
-  -- Shared postcondition lifts (used by h_cp_T_ne, h_cp_Z_ne, h_cp_curve)
-  have h_rpo_F : r_plus_one.toField = r.toField + 1 := by
-    unfold toField
-    have h_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
-      unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
-    rw [h_nat]; push_cast; rw [one_post1]; simp only [Nat.cast_one]
-  have h_omds_F : one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 := by
-    unfold toField; rw [one_minus_d_sq_post1]
-    have h_sum : ((1 + p - _root_.d ^ 2 % p) % p + _root_.d ^ 2) % p = 1 % p := by
-      norm_num [_root_.d, p]
-    have h := lift_mod_eq _ _ h_sum; push_cast at h
-    change _ = 1 - (_root_.d : CurveField) ^ 2; linear_combination h
-  have h_ns_eq_F : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) := by
-    have hN : N_s.toField = r_plus_one.toField * one_minus_d_sq.toField := by
-      unfold toField; have h := lift_mod_eq _ _ N_s_post1; push_cast at h; exact h
-    rw [hN, h_rpo_F, h_omds_F]
-  have h_rpd_F : r_plus_d.toField = r.toField + Ed25519.d := by
-    unfold toField
-    have h_nat : Field51_as_Nat r_plus_d =
-        Field51_as_Nat r + Field51_as_Nat d := by
-      unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add];
-    rw [h_nat]; push_cast; rw [d_post1]; rfl
-  have h_cmdr_F : c_minus_dr.toField = -1 - Ed25519.d * r.toField := by
-    have hD_sub : c_minus_dr.toField + d_times_r.toField = c.toField := by
-      unfold toField; have h := lift_mod_eq _ _ c_minus_dr_post2; push_cast at h; exact h
-    have hD_dr : d_times_r.toField = d.toField * r.toField := by
-      unfold toField; have h := lift_mod_eq _ _ d_times_r_post1; push_cast at h; exact h
-    have hc_F : c.toField = -1 := by
-      unfold toField; rw [c_post1]
-      have h_sum : (p - 1 + 1) % p = 0 % p := by norm_num [p]
-      have h := lift_mod_eq _ _ h_sum; push_cast at h; linear_combination h
-    have hd_F : d.toField = Ed25519.d := by
-      unfold toField; rw [d_post1]; rfl
-    rw [hc_F] at hD_sub; rw [hd_F] at hD_dr
-    linear_combination hD_sub - hD_dr
-  have h_D_eq_F : D.toField =
-      (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) := by
-    have hD : D.toField = c_minus_dr.toField * r_plus_d.toField := by
-      unfold toField; have h := lift_mod_eq _ _ D_post1; push_cast at h; exact h
-    rw [hD, h_cmdr_F, h_rpd_F]
-  have h_rm1_F : r_minus_one.toField = r.toField - 1 := by
-    unfold toField; have h := lift_mod_eq _ _ r_minus_one_post2
-    push_cast at h; rw [one_post1, Nat.cast_one] at h; linear_combination h
-  have h_cr_F : c_r_minus_one.toField = c2.toField * r_minus_one.toField := by
-    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_post1
-    push_cast at h; exact h
-  have h_crd_F : c_r_minus_one_d.toField = c_r_minus_one.toField *
-      d_minus_one_sq.toField := by
-    unfold toField; have h := lift_mod_eq _ _ c_r_minus_one_d_post1
-    push_cast at h; exact h
-  have h_Nt_add_F : N_t.toField + D.toField = c_r_minus_one_d.toField := by
-    unfold toField; have h := lift_mod_eq _ _ N_t_post2; push_cast at h; exact h
-  have h_Nt_eq_F : N_t.toField =
-      c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
-    have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
-      linear_combination h_Nt_add_F
-    rw [this, h_crd_F, h_cr_F, h_rm1_F]; unfold toField; rw [d_minus_one_sq_post1]; rfl
+  have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
+    unfold Field51_as_Nat
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
+  have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
+    unfold Field51_as_Nat
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
+  have h_rpd_nat : Field51_as_Nat r_plus_d =
+      Field51_as_Nat r + Field51_as_Nat d := by
+    unfold Field51_as_Nat
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add]
+  rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
+      N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
+      c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
+      h_cp_T_nat s_sq_post1 one_post1 h_rpo_nat
+      one_minus_d_sq_post1 N_s_post1 h_rpd_nat d_post1
+      c_minus_dr_post2 d_times_r_post1 c_post1 D_post1
+      r_minus_one_post2 c_r_minus_one_post1 c_r_minus_one_d_post1
+      N_t_post2 d_minus_one_sq_post1 with
+    ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
+      h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
   have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
     unfold toField
     have hme := r_post1.trans (Nat.ModEq.mul_left
