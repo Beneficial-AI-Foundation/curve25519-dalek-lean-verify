@@ -204,6 +204,18 @@ private lemma lift_sq_mod {a b c : ℕ}
     (Nat.mod_modEq b p).symm |>.trans h
   have h := lift_mod_eq _ _ hme; push_cast at h; exact h
 
+/-- Lift pointwise field-element addition to `Field51_as_Nat` addition. -/
+private lemma field51_as_nat_eq_add
+    {z x y : backend.serial.u64.field.FieldElement51}
+    (hpost : ∀ i : Nat, i < 5 → ((z[i]!) : Nat) = ((x[i]!) : Nat) + ((y[i]!) : Nat)) :
+    Field51_as_Nat z = Field51_as_Nat x + Field51_as_Nat y := by
+  unfold Field51_as_Nat
+  rw [← Finset.sum_add_distrib]
+  apply Finset.sum_congr rfl
+  intro i hi
+  rw [Finset.mem_range] at hi
+  rw [hpost i hi, mul_add]
+
 /-- Shared field-lift bundle for the Elligator construction.
 Used in both the intermediate `CompletedPoint.IsValid` proof and the final semantic bridge. -/
 private lemma lift_bridge_bundle
@@ -358,21 +370,12 @@ theorem elligator_ristretto_flavor_spec
   · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
     rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
-      unfold Field51_as_Nat
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
+      exact field51_as_nat_eq_add cp_T_post1
     have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
-      unfold Field51_as_Nat
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
+      exact field51_as_nat_eq_add r_plus_one_post1
     have h_rpd_nat : Field51_as_Nat r_plus_d =
         Field51_as_Nat r + Field51_as_Nat d := by
-      unfold Field51_as_Nat
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add]
+      exact field51_as_nat_eq_add r_plus_d_post1
     rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
         N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
         c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
@@ -700,21 +703,12 @@ theorem elligator_ristretto_flavor_spec
   have hT_F : ep.T.toField = cp_X.toField * cp_Y.toField := by
     unfold toField; have h := lift_mod_eq _ _ ep_post4; push_cast at h; exact h
   have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
-    unfold Field51_as_Nat
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro i hi; rw [Finset.mem_range] at hi; rw [cp_T_post1 i hi, mul_add]
+    exact field51_as_nat_eq_add cp_T_post1
   have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by
-    unfold Field51_as_Nat
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_one_post1 i hi, mul_add]
+    exact field51_as_nat_eq_add r_plus_one_post1
   have h_rpd_nat : Field51_as_Nat r_plus_d =
       Field51_as_Nat r + Field51_as_Nat d := by
-    unfold Field51_as_Nat
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
-    intro i hi; rw [Finset.mem_range] at hi; rw [r_plus_d_post1 i hi, mul_add]
+    exact field51_as_nat_eq_add r_plus_d_post1
   rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
       N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
       c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
