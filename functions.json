@@ -388,7 +388,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "-- proven in Verus\ntheorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Sub.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
@@ -403,7 +403,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub",
@@ -6633,7 +6633,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄\n := by ...",
+   "-- needs updating for WP spec form + timeout issues\ntheorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.pow22501`**:\n- No panic (always returns (r1, r2) successfully)\n- Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)\n  Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)\n-/",
@@ -6647,7 +6647,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
