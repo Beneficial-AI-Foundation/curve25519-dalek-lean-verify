@@ -31,6 +31,11 @@ natural language specs:
     • Field51_as_Nat(constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p).
 -/
 
+/-- The concrete field element returned by SQRT_AD_MINUS_ONE (extracted from the Result wrapper). -/
+def SQRT_AD_MINUS_ONE_raw : backend.serial.u64.field.FieldElement51 :=
+  Array.make 5#usize [2241493124984347#u64, 425987919032274#u64, 2207028919301688#u64,
+    1220490630685848#u64, 974799131293748#u64]
+
 /-- **Spec and proof concerning `backend.serial.u64.constants.SQRT_AD_MINUS_ONE`**:
 - Field51_as_Nat(constants.SQRT_AD_MINUS_ONE) is a square root of (a*d - 1) modulo p, i.e.
   `(Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p)`.
@@ -39,9 +44,10 @@ natural language specs:
 theorem SQRT_AD_MINUS_ONE_spec :
     SQRT_AD_MINUS_ONE ⦃ result =>
     (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧
-    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
-  unfold SQRT_AD_MINUS_ONE field.FieldElement51.from_limbs
+    (∀ i < 5, result[i]!.val < 2^51) ∧
+    result = SQRT_AD_MINUS_ONE_raw ⦄ := by
+  unfold SQRT_AD_MINUS_ONE field.FieldElement51.from_limbs SQRT_AD_MINUS_ONE_raw
   simp only [spec_ok]
-  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide, trivial⟩
 
 end curve25519_dalek.backend.serial.u64.constants
