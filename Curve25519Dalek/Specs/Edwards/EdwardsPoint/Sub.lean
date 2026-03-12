@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Math.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::sub`
@@ -41,7 +42,8 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
-@[progress]
+@[progress, externally_verified]
+-- proven in Verus
 theorem sub_spec
     (self other : edwards.EdwardsPoint)
     (h_self_valid : self.IsValid)
