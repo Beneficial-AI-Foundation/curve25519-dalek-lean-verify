@@ -4971,11 +4971,14 @@
    "dependencies":
    ["curve25519_dalek.edwards.decompress.step_1",
     "curve25519_dalek.edwards.decompress.step_2"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes ⦃ (result : core.result.Result CompressedEdwardsY core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cey : CompressedEdwardsY, result = .Ok cey ∧ cey.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/FromSlice.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.from_slice`**:\n    • The operation never panics (always returns `ok` at the Aeneas level)\n    • If bytes.length = 32: the result is Ok(cey) where cey.val = bytes.val\n    • If bytes.length ≠ 32: the result is Err(())\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::from_slice",
