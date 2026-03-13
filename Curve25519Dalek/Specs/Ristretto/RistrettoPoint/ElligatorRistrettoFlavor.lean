@@ -246,7 +246,7 @@ private lemma non_square_quad_zero {d x y : CurveField}
   exact ⟨hx, sq_eq_zero_iff.mp (by rw [hx] at h; simpa using h)⟩
 
 /-- Conditional field element assignment: if choice flag = 1, result = first operand. -/
-private lemma cond_f51_eq {z x y : backend.serial.u64.field.FieldElement51}
+private lemma cond_f51_eq {z x y : FieldElement51}
     {c : subtle.Choice}
     (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
     (hc : c.val = 1#u8) : Field51_as_Nat z = Field51_as_Nat x := by
@@ -256,7 +256,7 @@ private lemma cond_f51_eq {z x y : backend.serial.u64.field.FieldElement51}
       List.getElem!_eq_getElem?_getD, h]
 
 /-- Conditional field element assignment: if choice flag ≠ 1, result = second operand. -/
-private lemma cond_f51_eq_neg {z x y : backend.serial.u64.field.FieldElement51}
+private lemma cond_f51_eq_neg {z x y : FieldElement51}
     {c : subtle.Choice}
     (hpost : ∀ i < 5, z[i]! = if c.val = 1#u8 then x[i]! else y[i]!)
     (hc : ¬(c.val = 1#u8)) : Field51_as_Nat z = Field51_as_Nat y := by
@@ -266,7 +266,7 @@ private lemma cond_f51_eq_neg {z x y : backend.serial.u64.field.FieldElement51}
       List.getElem!_eq_getElem?_getD, h]
 
 /-- If Field51_as_Nat x ≡ 0 (mod p), then x.toField = 0. -/
-private lemma toField_of_mod_zero {x : backend.serial.u64.field.FieldElement51}
+private lemma toField_of_mod_zero {x : FieldElement51}
     (h : Field51_as_Nat x % p = 0) : x.toField = 0 := by
   unfold toField
   exact (ZMod.natCast_eq_zero_iff _ _).mpr (Nat.dvd_iff_mod_eq_zero.mpr h)
@@ -281,7 +281,7 @@ private lemma lift_sq_mod {a b c : ℕ}
 
 /-- Lift pointwise field-element addition to `Field51_as_Nat` addition. -/
 private lemma field51_as_nat_eq_add
-    {z x y : backend.serial.u64.field.FieldElement51}
+    {z x y : FieldElement51}
     (hpost : ∀ i : Nat, i < 5 → ((z[i]!) : Nat) = ((x[i]!) : Nat) + ((y[i]!) : Nat)) :
     Field51_as_Nat z = Field51_as_Nat x + Field51_as_Nat y := by
   unfold Field51_as_Nat
@@ -291,43 +291,81 @@ private lemma field51_as_nat_eq_add
   rw [Finset.mem_range] at hi
   rw [hpost i hi, mul_add]
 
+/-- Arithmetic postconditions needed to lift the intermediate Elligator values into
+`CurveField` equalities. -/
+private structure ElligatorLiftPosts
+    (cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
+      c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
+      N_t d_minus_one_sq : FieldElement51) : Prop where
+  cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq
+  s_sq_eq : Field51_as_Nat s_sq ≡ Field51_as_Nat s1 ^ 2 [MOD p]
+  one_eq : Field51_as_Nat one = 1
+  r_plus_one_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one
+  one_minus_d_sq_eq : Field51_as_Nat one_minus_d_sq = (1 + p - _root_.d ^ 2 % p) % p
+  N_s_mul :
+    Field51_as_Nat N_s ≡ Field51_as_Nat r_plus_one * Field51_as_Nat one_minus_d_sq [MOD p]
+  r_plus_d_nat : Field51_as_Nat r_plus_d = Field51_as_Nat r + Field51_as_Nat d
+  d_eq : Field51_as_Nat d = _root_.d
+  c_minus_dr_sub :
+    (Field51_as_Nat c_minus_dr + Field51_as_Nat d_times_r) % p = Field51_as_Nat c % p
+  d_times_r_mul : Field51_as_Nat d_times_r ≡ Field51_as_Nat d * Field51_as_Nat r [MOD p]
+  c_minus_one : Field51_as_Nat c = p - 1
+  D_mul : Field51_as_Nat D ≡ Field51_as_Nat c_minus_dr * Field51_as_Nat r_plus_d [MOD p]
+  r_minus_one_sub : (Field51_as_Nat r_minus_one + Field51_as_Nat one) % p = Field51_as_Nat r % p
+  c_r_minus_one_mul :
+    Field51_as_Nat c_r_minus_one ≡ Field51_as_Nat c2 * Field51_as_Nat r_minus_one [MOD p]
+  c_r_minus_one_d_mul :
+    Field51_as_Nat c_r_minus_one_d ≡
+      Field51_as_Nat c_r_minus_one * Field51_as_Nat d_minus_one_sq [MOD p]
+  N_t_add : (Field51_as_Nat N_t + Field51_as_Nat D) % p = Field51_as_Nat c_r_minus_one_d % p
+  d_minus_one_sq_eq : Field51_as_Nat d_minus_one_sq = (_root_.d - 1) ^ 2 % p
+
+/-- Lifted `CurveField` equalities derived from `ElligatorLiftPosts`. -/
+private structure ElligatorLiftFacts
+    (cp_T r_plus_one one_minus_d_sq N_s r_plus_d c_minus_dr D r_minus_one c_r_minus_one
+      c_r_minus_one_d N_t s1 r c2 d_minus_one_sq : FieldElement51) : Prop where
+  cp_T_eq : cp_T.toField = 1 + s1.toField ^ 2
+  r_plus_one_eq : r_plus_one.toField = r.toField + 1
+  one_minus_d_sq_eq : one_minus_d_sq.toField = 1 - Ed25519.d ^ 2
+  N_s_eq : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2)
+  r_plus_d_eq : r_plus_d.toField = r.toField + Ed25519.d
+  c_minus_dr_eq : c_minus_dr.toField = -1 - Ed25519.d * r.toField
+  D_eq : D.toField = (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d)
+  r_minus_one_eq : r_minus_one.toField = r.toField - 1
+  c_r_minus_one_eq : c_r_minus_one.toField = c2.toField * r_minus_one.toField
+  c_r_minus_one_d_eq : c_r_minus_one_d.toField = c_r_minus_one.toField * d_minus_one_sq.toField
+  N_t_add_eq : N_t.toField + D.toField = c_r_minus_one_d.toField
+  N_t_eq : N_t.toField = c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField
+
 /-- Shared field-lift bundle for the Elligator construction.
 Used in both the intermediate `CompletedPoint.IsValid` proof and the final semantic bridge. -/
 private lemma lift_bridge_bundle
     (cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
       c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
-      N_t d_minus_one_sq : backend.serial.u64.field.FieldElement51)
-    (h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq)
-    (s_sq_post1 : Field51_as_Nat s_sq ≡ Field51_as_Nat s1 ^ 2 [MOD p])
-    (one_post1 : Field51_as_Nat one = 1)
-    (h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one)
-    (one_minus_d_sq_post1 : Field51_as_Nat one_minus_d_sq = (1 + p - _root_.d ^ 2 % p) % p)
-    (N_s_post1 : Field51_as_Nat N_s ≡ Field51_as_Nat r_plus_one * Field51_as_Nat one_minus_d_sq [MOD p])
-    (h_rpd_nat : Field51_as_Nat r_plus_d = Field51_as_Nat r + Field51_as_Nat d)
-    (d_post1 : Field51_as_Nat d = _root_.d)
-    (c_minus_dr_post2 : (Field51_as_Nat c_minus_dr + Field51_as_Nat d_times_r) % p = Field51_as_Nat c % p)
-    (d_times_r_post1 : Field51_as_Nat d_times_r ≡ Field51_as_Nat d * Field51_as_Nat r [MOD p])
-    (c_post1 : Field51_as_Nat c = p - 1)
-    (D_post1 : Field51_as_Nat D ≡ Field51_as_Nat c_minus_dr * Field51_as_Nat r_plus_d [MOD p])
-    (r_minus_one_post2 : (Field51_as_Nat r_minus_one + Field51_as_Nat one) % p = Field51_as_Nat r % p)
-    (c_r_minus_one_post1 : Field51_as_Nat c_r_minus_one ≡ Field51_as_Nat c2 * Field51_as_Nat r_minus_one [MOD p])
-    (c_r_minus_one_d_post1 :
-      Field51_as_Nat c_r_minus_one_d ≡ Field51_as_Nat c_r_minus_one * Field51_as_Nat d_minus_one_sq [MOD p])
-    (N_t_post2 : (Field51_as_Nat N_t + Field51_as_Nat D) % p = Field51_as_Nat c_r_minus_one_d % p)
-    (d_minus_one_sq_post1 : Field51_as_Nat d_minus_one_sq = (_root_.d - 1) ^ 2 % p) :
-    cp_T.toField = 1 + s1.toField ^ 2 ∧
-    r_plus_one.toField = r.toField + 1 ∧
-    one_minus_d_sq.toField = 1 - Ed25519.d ^ 2 ∧
-    N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2) ∧
-    r_plus_d.toField = r.toField + Ed25519.d ∧
-    c_minus_dr.toField = -1 - Ed25519.d * r.toField ∧
-    D.toField = (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d) ∧
-    r_minus_one.toField = r.toField - 1 ∧
-    c_r_minus_one.toField = c2.toField * r_minus_one.toField ∧
-    c_r_minus_one_d.toField = c_r_minus_one.toField * d_minus_one_sq.toField ∧
-    N_t.toField + D.toField = c_r_minus_one_d.toField ∧
-    N_t.toField =
-      c2.toField * (r.toField - 1) * (Ed25519.d - 1) ^ 2 - D.toField := by
+      N_t d_minus_one_sq : FieldElement51)
+    (lift_posts :
+      ElligatorLiftPosts cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
+        c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
+        N_t d_minus_one_sq) :
+    ElligatorLiftFacts cp_T r_plus_one one_minus_d_sq N_s r_plus_d c_minus_dr D r_minus_one
+      c_r_minus_one c_r_minus_one_d N_t s1 r c2 d_minus_one_sq := by
+  let h_cp_T_nat := lift_posts.cp_T_nat
+  let s_sq_post1 := lift_posts.s_sq_eq
+  let one_post1 := lift_posts.one_eq
+  let h_rpo_nat := lift_posts.r_plus_one_nat
+  let one_minus_d_sq_post1 := lift_posts.one_minus_d_sq_eq
+  let N_s_post1 := lift_posts.N_s_mul
+  let h_rpd_nat := lift_posts.r_plus_d_nat
+  let d_post1 := lift_posts.d_eq
+  let c_minus_dr_post2 := lift_posts.c_minus_dr_sub
+  let d_times_r_post1 := lift_posts.d_times_r_mul
+  let c_post1 := lift_posts.c_minus_one
+  let D_post1 := lift_posts.D_mul
+  let r_minus_one_post2 := lift_posts.r_minus_one_sub
+  let c_r_minus_one_post1 := lift_posts.c_r_minus_one_mul
+  let c_r_minus_one_d_post1 := lift_posts.c_r_minus_one_d_mul
+  let N_t_post2 := lift_posts.N_t_add
+  let d_minus_one_sq_post1 := lift_posts.d_minus_one_sq_eq
   have h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2 := by
     unfold toField
     have hsq := lift_mod_eq _ _ s_sq_post1
@@ -385,8 +423,20 @@ private lemma lift_bridge_bundle
     have : N_t.toField = c_r_minus_one_d.toField - D.toField := by
       linear_combination h_Nt_add_F
     rw [this, h_crd_F, h_cr_F, h_rm1_F]; unfold toField; rw [d_minus_one_sq_post1]; rfl
-  exact ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
-    h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
+  exact {
+    cp_T_eq := h_cp_T_F
+    r_plus_one_eq := h_rpo_F
+    one_minus_d_sq_eq := h_omds_F
+    N_s_eq := h_ns_eq_F
+    r_plus_d_eq := h_rpd_F
+    c_minus_dr_eq := h_cmdr_F
+    D_eq := h_D_eq_F
+    r_minus_one_eq := h_rm1_F
+    c_r_minus_one_eq := h_cr_F
+    c_r_minus_one_d_eq := h_crd_F
+    N_t_add_eq := h_Nt_add_F
+    N_t_eq := h_Nt_eq_F
+  }
 
 /-- Package the square/non-square consequences for the selected Elligator value `s1`. -/
 private lemma elligator_s1_sq_c2_cases
@@ -1052,7 +1102,7 @@ natural language specs:
 • The output matches the pure mathematical Elligator map applied to the field value of s
 -/
 
-set_option maxHeartbeats 1200000 in -- needed for complex progress
+set_option maxHeartbeats 900000 in -- needed for complex progress
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
@@ -1061,7 +1111,7 @@ set_option maxHeartbeats 1200000 in -- needed for complex progress
 -/
 @[progress]
 theorem elligator_ristretto_flavor_spec
-    (s : backend.serial.u64.field.FieldElement51)
+    (s : FieldElement51)
     (h_s_valid : s.IsValid) :
     elligator_ristretto_flavor s ⦃ result =>
     result.IsValid ∧
@@ -1099,16 +1149,35 @@ theorem elligator_ristretto_flavor_spec
     have h_rpd_nat : Field51_as_Nat r_plus_d =
         Field51_as_Nat r + Field51_as_Nat d := by
       exact field51_as_nat_eq_add r_plus_d_post1
-    rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
-        N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
-        c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
-        h_cp_T_nat s_sq_post1 one_post1 h_rpo_nat
-        one_minus_d_sq_post1 N_s_post1 h_rpd_nat d_post1
-        c_minus_dr_post2 d_times_r_post1 c_post1 D_post1
-        r_minus_one_post2 c_r_minus_one_post1 c_r_minus_one_d_post1
-        N_t_post2 d_minus_one_sq_post1 with
-      ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
-        h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
+    have h_lift_posts :
+        ElligatorLiftPosts cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
+          c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
+          N_t d_minus_one_sq := {
+      cp_T_nat := h_cp_T_nat
+      s_sq_eq := s_sq_post1
+      one_eq := one_post1
+      r_plus_one_nat := h_rpo_nat
+      one_minus_d_sq_eq := one_minus_d_sq_post1
+      N_s_mul := N_s_post1
+      r_plus_d_nat := h_rpd_nat
+      d_eq := d_post1
+      c_minus_dr_sub := c_minus_dr_post2
+      d_times_r_mul := d_times_r_post1
+      c_minus_one := c_post1
+      D_mul := D_post1
+      r_minus_one_sub := r_minus_one_post2
+      c_r_minus_one_mul := c_r_minus_one_post1
+      c_r_minus_one_d_mul := c_r_minus_one_d_post1
+      N_t_add := N_t_post2
+      d_minus_one_sq_eq := d_minus_one_sq_post1
+    }
+    have h_lift_facts := lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
+      N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one
+      c_r_minus_one_d N_t d_minus_one_sq h_lift_posts
+    let h_cp_T_F := h_lift_facts.cp_T_eq
+    let h_ns_eq_F := h_lift_facts.N_s_eq
+    let h_D_eq_F := h_lift_facts.D_eq
+    let h_Nt_eq_F := h_lift_facts.N_t_eq
     have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
       unfold toField
       have hme := r_post1.trans (Nat.ModEq.mul_left (Field51_as_Nat i) r_0_sq_post1)
@@ -1173,16 +1242,35 @@ theorem elligator_ristretto_flavor_spec
   have h_rpd_nat : Field51_as_Nat r_plus_d =
       Field51_as_Nat r + Field51_as_Nat d := by
     exact field51_as_nat_eq_add r_plus_d_post1
-  rcases lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
-      N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2
-      c_r_minus_one c_r_minus_one_d N_t d_minus_one_sq
-      h_cp_T_nat s_sq_post1 one_post1 h_rpo_nat
-      one_minus_d_sq_post1 N_s_post1 h_rpd_nat d_post1
-      c_minus_dr_post2 d_times_r_post1 c_post1 D_post1
-      r_minus_one_post2 c_r_minus_one_post1 c_r_minus_one_d_post1
-      N_t_post2 d_minus_one_sq_post1 with
-    ⟨h_cp_T_F, h_rpo_F, h_omds_F, h_ns_eq_F, h_rpd_F, h_cmdr_F,
-      h_D_eq_F, h_rm1_F, h_cr_F, h_crd_F, h_Nt_add_F, h_Nt_eq_F⟩
+  have h_lift_posts :
+      ElligatorLiftPosts cp_T one s_sq s1 r_plus_one r one_minus_d_sq N_s r_plus_d d
+        c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one c_r_minus_one_d
+        N_t d_minus_one_sq := {
+    cp_T_nat := h_cp_T_nat
+    s_sq_eq := s_sq_post1
+    one_eq := one_post1
+    r_plus_one_nat := h_rpo_nat
+    one_minus_d_sq_eq := one_minus_d_sq_post1
+    N_s_mul := N_s_post1
+    r_plus_d_nat := h_rpd_nat
+    d_eq := d_post1
+    c_minus_dr_sub := c_minus_dr_post2
+    d_times_r_mul := d_times_r_post1
+    c_minus_one := c_post1
+    D_mul := D_post1
+    r_minus_one_sub := r_minus_one_post2
+    c_r_minus_one_mul := c_r_minus_one_post1
+    c_r_minus_one_d_mul := c_r_minus_one_d_post1
+    N_t_add := N_t_post2
+    d_minus_one_sq_eq := d_minus_one_sq_post1
+  }
+  have h_lift_facts := lift_bridge_bundle cp_T one s_sq s1 r_plus_one r one_minus_d_sq
+    N_s r_plus_d d c_minus_dr d_times_r c D r_minus_one c2 c_r_minus_one
+    c_r_minus_one_d N_t d_minus_one_sq h_lift_posts
+  let h_cp_T_F := h_lift_facts.cp_T_eq
+  let h_ns_eq_F := h_lift_facts.N_s_eq
+  let h_D_eq_F := h_lift_facts.D_eq
+  let h_Nt_eq_F := h_lift_facts.N_t_eq
   have h_r_F : r.toField = i.toField * s.toField ^ 2 := by
     unfold toField
     have hme := r_post1.trans (Nat.ModEq.mul_left
