@@ -39,8 +39,83 @@ It maps an arbitrary field element s to a valid Ristretto point.
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.math
 open Edwards curve25519_dalek.backend.serial.u64.constants
+open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint
+
+/-- Postconditions exported by the `sqrt_ratio_i` call used inside Elligator. -/
+private structure ElligatorSqrtRatioPosts
+    (N_s D : FieldElement51) (x : subtle.Choice × FieldElement51) : Prop where
+  zero_case : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0
+  d_zero_case :
+    Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
+      x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0
+  square_case :
+    (Field51_as_Nat N_s % p ≠ 0 ∧
+        Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
+          Field51_as_Nat N_s % p) →
+      x.1.val = 1#u8 ∧
+        (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
+          Field51_as_Nat N_s % p
+  nonsquare_case :
+    (Field51_as_Nat N_s % p ≠ 0 ∧
+        Field51_as_Nat D % p ≠ 0 ∧
+        ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
+      x.1.val = 0#u8 ∧
+        (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
+            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
+            (Field51_as_Nat N_s % p) % p
+
+/-- Relations connecting `s_prime`, `s_prime_neg`, and the branch-selected `s_prime1`. -/
+private structure ElligatorSPrimePosts
+    (s s_prime s_prime_neg s_prime1 : FieldElement51)
+    (x : subtle.Choice × FieldElement51) (s_prime_is_pos : subtle.Choice) : Prop where
+  mul_eq : Field51_as_Nat s_prime ≡ Field51_as_Nat x.2 * Field51_as_Nat s [MOD p]
+  neg_eq : Field51_as_Nat s_prime + Field51_as_Nat s_prime_neg ≡ 0 [MOD p]
+  select :
+    ∀ i : Nat, i < 5 →
+      s_prime1[i]! = if s_prime_is_pos.val = 1#u8 then s_prime_neg[i]! else s_prime[i]!
+
+/-- Postconditions for the branch choice that determines `not_sq` and the selected `c2`. -/
+private structure ElligatorChoicePosts
+    (c r c2 : FieldElement51)
+    (x : subtle.Choice × FieldElement51) (not_sq : subtle.Choice) : Prop where
+  not_sq_flag : x.1.val = 1#u8 ↔ not_sq = Choice.zero
+  c2_select :
+    ∀ i : Nat, i < 5 →
+      c2[i]! = if not_sq.val = 1#u8 then r[i]! else c[i]!
+  c_minus_one : Field51_as_Nat c = p - 1
+
+/-- Parity/sign metadata used when normalizing `s_prime` to the canonical Edwards sign. -/
+private structure ElligatorS1Posts
+    (s_prime1 s1 : FieldElement51)
+    (x : subtle.Choice × FieldElement51) (not_sq : subtle.Choice) : Prop where
+  select :
+    ∀ i : Nat, i < 5 →
+      s1[i]! = if not_sq.val = 1#u8 then s_prime1[i]! else x.2[i]!
+
+/-- Sign witnesses used to relate `c1`, `s_prime_is_pos`, and `abs_edwards`. -/
+private structure ElligatorSignPosts
+    (s_prime : FieldElement51) (c1 s_prime_is_pos : subtle.Choice) : Prop where
+  odd_flag : c1.val = 1#u8 ↔ Field51_as_Nat s_prime % p % 2 = 1
+  pos_flag : c1.val = 1#u8 ↔ s_prime_is_pos = Choice.zero
+
+/-- Arithmetic postconditions for the completed-point coordinates built by Elligator. -/
+private structure ElligatorCompletedPointPosts
+    (one s_sq cp_X cp_Y cp_Z cp_T fe s_plus_s s1 D N_t : FieldElement51) : Prop where
+  s_sq_eq : Field51_as_Nat s_sq ≡ Field51_as_Nat s1 ^ 2 [MOD p]
+  s_plus_s_eq :
+    ∀ i : Nat, i < 5 →
+      ((s_plus_s[i]!) : Nat) = ((s1[i]!) : Nat) + ((s1[i]!) : Nat)
+  cp_X_mul : Field51_as_Nat cp_X ≡ Field51_as_Nat s_plus_s * Field51_as_Nat D [MOD p]
+  cp_X_bound : ∀ i : Nat, i < 5 → ((cp_X[i]!) : Nat) < 2 ^ 52
+  cp_Z_mul : Field51_as_Nat cp_Z ≡ Field51_as_Nat N_t * Field51_as_Nat fe [MOD p]
+  cp_Z_bound : ∀ i : Nat, i < 5 → ((cp_Z[i]!) : Nat) < 2 ^ 52
+  cp_Y_bound : ∀ i : Nat, i < 5 → ((cp_Y[i]!) : Nat) < 2 ^ 52
+  cp_Y_sub : (Field51_as_Nat cp_Y + Field51_as_Nat s_sq) % p = Field51_as_Nat one % p
+  cp_T_bound : ∀ i : Nat, i < 5 → ((cp_T[i]!) : Nat) < 2 ^ 54
+  fe_sq : ↑(Field51_as_Nat fe) ^ 2 % ↑p = (a * ↑_root_.d - 1) % ↑p
+  one_eq : Field51_as_Nat one = 1
 
 /-- **Elligator invariant**: the value s1 produced by the Elligator map never satisfies s1² = -1.
 This ensures the denominator 1 + s1² is never zero in 𝔽_p.
@@ -315,47 +390,29 @@ private lemma lift_bridge_bundle
 
 /-- Package the square/non-square consequences for the selected Elligator value `s1`. -/
 private lemma elligator_s1_sq_c2_cases
-    (s c r N_s D i s_prime s_prime_neg s_prime1 s1 c2 :
-      backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
+    (s c r N_s D i s_prime s_prime_neg s_prime1 s1 c2 : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
     (s_prime_is_pos not_sq : subtle.Choice)
-    (N_post_x : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post1_D :
-      Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
-        x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
-    (N_post3_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧
-          ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
-        x.1.val = 0#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
-              (Field51_as_Nat N_s % p) % p)
-    (s_prime_post1 : Field51_as_Nat s_prime ≡ Field51_as_Nat x.2 * Field51_as_Nat s [MOD p])
-    (s_prime_neg_post1 : Field51_as_Nat s_prime + Field51_as_Nat s_prime_neg ≡ 0 [MOD p])
-    (s_prime1_post :
-      ∀ i : Nat, i < 5 →
-        s_prime1[i]! = if s_prime_is_pos.val = 1#u8 then s_prime_neg[i]! else s_prime[i]!)
-    (not_sq_post : x.1.val = 1#u8 ↔ not_sq = Choice.zero)
-    (s1_post :
-      ∀ i : Nat, i < 5 →
-        s1[i]! = if not_sq.val = 1#u8 then s_prime1[i]! else x.2[i]!)
-    (c2_post :
-      ∀ i : Nat, i < 5 →
-        c2[i]! = if not_sq.val = 1#u8 then r[i]! else c[i]!)
-    (c_post1 : Field51_as_Nat c = p - 1)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
+    (s_prime_posts : ElligatorSPrimePosts s s_prime s_prime_neg s_prime1 x s_prime_is_pos)
+    (choice_posts : ElligatorChoicePosts c r c2 x not_sq)
+    (s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq)
     (h_r_F : r.toField = i.toField * s.toField ^ 2)
     (h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField)
     (h_s1_ne : s1.toField ≠ 0) :
     (s1.toField ^ 2 * D.toField = N_s.toField ∧ c2.toField = (-1 : CurveField)) ∨
     (s1.toField ^ 2 * D.toField = r.toField * N_s.toField ∧ c2.toField = r.toField) := by
+  let N_post_x := sqrt_posts.zero_case
+  let N_post1_D := sqrt_posts.d_zero_case
+  let N_post2_D := sqrt_posts.square_case
+  let N_post3_D := sqrt_posts.nonsquare_case
+  let s_prime_post1 := s_prime_posts.mul_eq
+  let s_prime_neg_post1 := s_prime_posts.neg_eq
+  let s_prime1_post := s_prime_posts.select
+  let not_sq_post := choice_posts.not_sq_flag
+  let c2_post := choice_posts.c2_select
+  let c_post1 := choice_posts.c_minus_one
+  let s1_post := s1_posts.select
   by_cases h_sq_flag : x.1.val = 1#u8
   · left
     have h_nsq : not_sq.val ≠ 1#u8 := by
@@ -466,54 +523,15 @@ private lemma elligator_s1_sq_c2_cases
 /-- Package the full `CompletedPoint.IsValid` proof for the Elligator completed point. -/
 private lemma elligator_completed_point_valid
     (s one c r N_s D i s_prime s_prime_neg s_prime1 s1 s_sq c2 N_t cp_X cp_Y cp_Z cp_T fe s_plus_s :
-      backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
+      FieldElement51)
+    (x : subtle.Choice × FieldElement51)
     (s_prime_is_pos not_sq : subtle.Choice)
-    (N_post_x : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post1_D :
-      Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
-        x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
-    (N_post3_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧
-          ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
-        x.1.val = 0#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
-              (Field51_as_Nat N_s % p) % p)
-    (s_prime_post1 : Field51_as_Nat s_prime ≡ Field51_as_Nat x.2 * Field51_as_Nat s [MOD p])
-    (s_prime_neg_post1 : Field51_as_Nat s_prime + Field51_as_Nat s_prime_neg ≡ 0 [MOD p])
-    (s_prime1_post :
-      ∀ i : Nat, i < 5 →
-        s_prime1[i]! = if s_prime_is_pos.val = 1#u8 then s_prime_neg[i]! else s_prime[i]!)
-    (not_sq_post : x.1.val = 1#u8 ↔ not_sq = Choice.zero)
-    (s1_post :
-      ∀ i : Nat, i < 5 →
-        s1[i]! = if not_sq.val = 1#u8 then s_prime1[i]! else x.2[i]!)
-    (c2_post :
-      ∀ i : Nat, i < 5 →
-        c2[i]! = if not_sq.val = 1#u8 then r[i]! else c[i]!)
-    (s_sq_post1 : Field51_as_Nat s_sq ≡ Field51_as_Nat s1 ^ 2 [MOD p])
-    (s_plus_s_post1 :
-      ∀ i : Nat, i < 5 →
-        ((s_plus_s[i]!) : Nat) = ((s1[i]!) : Nat) + ((s1[i]!) : Nat))
-    (cp_X_post1 : Field51_as_Nat cp_X ≡ Field51_as_Nat s_plus_s * Field51_as_Nat D [MOD p])
-    (cp_X_post2 : ∀ i : Nat, i < 5 → ((cp_X[i]!) : Nat) < 2 ^ 52)
-    (cp_Z_post1 : Field51_as_Nat cp_Z ≡ Field51_as_Nat N_t * Field51_as_Nat fe [MOD p])
-    (cp_Z_post2 : ∀ i : Nat, i < 5 → ((cp_Z[i]!) : Nat) < 2 ^ 52)
-    (cp_Y_post1 : ∀ i : Nat, i < 5 → ((cp_Y[i]!) : Nat) < 2 ^ 52)
-    (cp_Y_post2 : (Field51_as_Nat cp_Y + Field51_as_Nat s_sq) % p = Field51_as_Nat one % p)
-    (cp_T_post2 : ∀ i : Nat, i < 5 → ((cp_T[i]!) : Nat) < 2 ^ 54)
-    (fe_post1 : ↑(Field51_as_Nat fe) ^ 2 % ↑p = (a * ↑_root_.d - 1) % ↑p)
-    (c_post1 : Field51_as_Nat c = p - 1)
-    (one_post1 : Field51_as_Nat one = 1)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
+    (s_prime_posts : ElligatorSPrimePosts s s_prime s_prime_neg s_prime1 x s_prime_is_pos)
+    (choice_posts : ElligatorChoicePosts c r c2 x not_sq)
+    (s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq)
+    (completed_point_posts :
+      ElligatorCompletedPointPosts one s_sq cp_X cp_Y cp_Z cp_T fe s_plus_s s1 D N_t)
     (h_cp_T_F : cp_T.toField = 1 + s1.toField ^ 2)
     (h_ns_eq_F : N_s.toField = (r.toField + 1) * (1 - Ed25519.d ^ 2))
     (h_D_eq_F : D.toField = (-1 - Ed25519.d * r.toField) * (r.toField + Ed25519.d))
@@ -523,13 +541,34 @@ private lemma elligator_completed_point_valid
     (h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField) :
     (({ X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T } :
       backend.serial.curve_models.CompletedPoint)).IsValid := by
+  let N_post_x := sqrt_posts.zero_case
+  let N_post1_D := sqrt_posts.d_zero_case
+  let N_post2_D := sqrt_posts.square_case
+  let N_post3_D := sqrt_posts.nonsquare_case
+  let s_prime_post1 := s_prime_posts.mul_eq
+  let s_prime_neg_post1 := s_prime_posts.neg_eq
+  let s_prime1_post := s_prime_posts.select
+  let not_sq_post := choice_posts.not_sq_flag
+  let c2_post := choice_posts.c2_select
+  let c_post1 := choice_posts.c_minus_one
+  let s1_post := s1_posts.select
+  let s_sq_post1 := completed_point_posts.s_sq_eq
+  let s_plus_s_post1 := completed_point_posts.s_plus_s_eq
+  let cp_X_post1 := completed_point_posts.cp_X_mul
+  let cp_X_post2 := completed_point_posts.cp_X_bound
+  let cp_Z_post1 := completed_point_posts.cp_Z_mul
+  let cp_Z_post2 := completed_point_posts.cp_Z_bound
+  let cp_Y_post1 := completed_point_posts.cp_Y_bound
+  let cp_Y_post2 := completed_point_posts.cp_Y_sub
+  let cp_T_post2 := completed_point_posts.cp_T_bound
+  let fe_post1 := completed_point_posts.fe_sq
+  let one_post1 := completed_point_posts.one_eq
   have h_s1_cases :
       s1.toField ≠ 0 →
         (s1.toField ^ 2 * D.toField = N_s.toField ∧ c2.toField = (-1 : CurveField)) ∨
         (s1.toField ^ 2 * D.toField = r.toField * N_s.toField ∧ c2.toField = r.toField) :=
     elligator_s1_sq_c2_cases s c r N_s D i s_prime s_prime_neg s_prime1 s1 c2 x
-      s_prime_is_pos not_sq N_post_x N_post1_D N_post2_D N_post3_D s_prime_post1
-      s_prime_neg_post1 s_prime1_post not_sq_post s1_post c2_post c_post1 h_r_F h_i_val
+      s_prime_is_pos not_sq sqrt_posts s_prime_posts choice_posts s1_posts h_r_F h_i_val
   have h_cp_T_ne : cp_T.toField ≠ 0 := by
     rw [h_cp_T_F]
     intro h_zero
@@ -714,30 +753,16 @@ private lemma elligator_completed_point_valid
 
 /-- If the extracted `sqrt_ratio_i` flag is square, the pure Elligator squareness predicate holds. -/
 private lemma elligator_is_square_of_flag
-    (s N_s D : backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
-    (N_post1_D :
-      Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
-        x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
-    (N_post3_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧
-          ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
-        x.1.val = 0#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
-              (Field51_as_Nat N_s % p) % p)
+    (s N_s D : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
     (h_Ns_bridge : N_s.toField = elligator_Ns s.toField)
     (h_D_bridge : D.toField = elligator_D s.toField)
     (h_sq_flag : x.1.val = 1#u8) :
     elligator_is_square s.toField := by
+  let N_post1_D := sqrt_posts.d_zero_case
+  let N_post2_D := sqrt_posts.square_case
+  let N_post3_D := sqrt_posts.nonsquare_case
   change ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
   rw [← h_D_bridge, ← h_Ns_bridge]
   by_cases hN0 : Field51_as_Nat N_s % p = 0
@@ -756,20 +781,15 @@ private lemma elligator_is_square_of_flag
 
 /-- If the extracted `sqrt_ratio_i` flag is non-square, the pure Elligator squareness predicate fails. -/
 private lemma elligator_not_is_square_of_flag
-    (s N_s D : backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
-    (N_post_x : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
+    (s N_s D : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
     (h_Ns_bridge : N_s.toField = elligator_Ns s.toField)
     (h_D_bridge : D.toField = elligator_D s.toField)
     (h_sq_flag : x.1.val ≠ 1#u8) :
     ¬ elligator_is_square s.toField := by
+  let N_post_x := sqrt_posts.zero_case
+  let N_post2_D := sqrt_posts.square_case
   change ¬ ∃ x : ZMod p, x ^ 2 * elligator_D s.toField = elligator_Ns s.toField
   rw [← h_D_bridge, ← h_Ns_bridge]
   by_cases hN0 : Field51_as_Nat N_s % p = 0
@@ -794,18 +814,17 @@ private lemma elligator_not_is_square_of_flag
 
 /-- Bridge the implementation's branch-selected `c2` to the pure `elligator_c` definition. -/
 private lemma elligator_c_bridge
-    (s c r c2 : backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
+    (s c r c2 : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
     (not_sq : subtle.Choice)
-    (not_sq_post : x.1.val = 1#u8 ↔ not_sq = Choice.zero)
-    (c2_post :
-      ∀ i : Nat, i < 5 →
-        c2[i]! = if not_sq.val = 1#u8 then r[i]! else c[i]!)
-    (c_post1 : Field51_as_Nat c = p - 1)
+    (choice_posts : ElligatorChoicePosts c r c2 x not_sq)
     (h_r_bridge : r.toField = elligator_r s.toField)
     (h_is_square_of_flag : x.1.val = 1#u8 → elligator_is_square s.toField)
     (h_not_is_square_of_flag : x.1.val ≠ 1#u8 → ¬ elligator_is_square s.toField) :
     c2.toField = elligator_c s.toField := by
+  let not_sq_post := choice_posts.not_sq_flag
+  let c2_post := choice_posts.c2_select
+  let c_post1 := choice_posts.c_minus_one
   unfold elligator_c
   by_cases h_sq_flag : x.1.val = 1#u8
   · have h_nsq : not_sq.val ≠ 1#u8 := by
@@ -833,38 +852,23 @@ private lemma elligator_c_bridge
 
 /-- Bridge the square branch of the implementation's selected `s1` to the pure `elligator_s`. -/
 private lemma elligator_s_bridge_square
-    (s N_s D s_prime1 s1 : backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
+    (s N_s D s_prime1 s1 : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
     (not_sq : subtle.Choice)
-    (N_post_x : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post1_D :
-      Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
-        x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
-    (N_post3_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧
-          ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
-        x.1.val = 0#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
-              (Field51_as_Nat N_s % p) % p)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
     (not_sq_post : x.1.val = 1#u8 ↔ not_sq = Choice.zero)
-    (s1_post :
-      ∀ i : Nat, i < 5 →
-        s1[i]! = if not_sq.val = 1#u8 then s_prime1[i]! else x.2[i]!)
+    (s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq)
     (h_Ns_bridge : N_s.toField = elligator_Ns s.toField)
     (h_D_bridge : D.toField = elligator_D s.toField)
     (h_is_square_of_flag : x.1.val = 1#u8 → elligator_is_square s.toField)
     (x_post2 : Field51_as_Nat x.2 % p % 2 = 0)
     (h_sq_flag : x.1.val = 1#u8) :
     s1.toField = elligator_s s.toField := by
+  let N_post_x := sqrt_posts.zero_case
+  let N_post1_D := sqrt_posts.d_zero_case
+  let N_post2_D := sqrt_posts.square_case
+  let N_post3_D := sqrt_posts.nonsquare_case
+  let s1_post := s1_posts.select
   unfold elligator_s
   have h_nsq : not_sq.val ≠ 1#u8 := by
     have := not_sq_post.mp h_sq_flag
@@ -909,40 +913,14 @@ private lemma elligator_s_bridge_square
 
 /-- Bridge the non-square branch of the implementation's selected `s1` to the pure `elligator_s`. -/
 private lemma elligator_s_bridge_nonsquare
-    (s N_s D i s_prime s_prime_neg s_prime1 s1 :
-      backend.serial.u64.field.FieldElement51)
-    (x : subtle.Choice × backend.serial.u64.field.FieldElement51)
+    (s N_s D i s_prime s_prime_neg s_prime1 s1 : FieldElement51)
+    (x : subtle.Choice × FieldElement51)
     (c1 s_prime_is_pos not_sq : subtle.Choice)
-    (N_post_x : Field51_as_Nat N_s % p = 0 → x.1.val = 1#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post1_D :
-      Field51_as_Nat N_s % p ≠ 0 ∧ Field51_as_Nat D % p = 0 →
-        x.1.val = 0#u8 ∧ Field51_as_Nat x.2 % p = 0)
-    (N_post2_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧ ∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p) →
-        x.1.val = 1#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat N_s % p)
-    (N_post3_D :
-      (Field51_as_Nat N_s % p ≠ 0 ∧
-          Field51_as_Nat D % p ≠ 0 ∧
-          ¬∃ x0, x0 ^ 2 * (Field51_as_Nat D % p) % p = Field51_as_Nat N_s % p) →
-        x.1.val = 0#u8 ∧
-          (Field51_as_Nat x.2 % p) ^ 2 * (Field51_as_Nat D % p) % p =
-            Field51_as_Nat field.FieldElement51.SQRT_M1_val % p *
-              (Field51_as_Nat N_s % p) % p)
-    (s_prime_post1 : Field51_as_Nat s_prime ≡ Field51_as_Nat x.2 * Field51_as_Nat s [MOD p])
-    (s_prime_neg_post1 : Field51_as_Nat s_prime + Field51_as_Nat s_prime_neg ≡ 0 [MOD p])
-    (s_prime1_post :
-      ∀ i : Nat, i < 5 →
-        s_prime1[i]! = if s_prime_is_pos.val = 1#u8 then s_prime_neg[i]! else s_prime[i]!)
+    (sqrt_posts : ElligatorSqrtRatioPosts N_s D x)
+    (s_prime_posts : ElligatorSPrimePosts s s_prime s_prime_neg s_prime1 x s_prime_is_pos)
     (not_sq_post : x.1.val = 1#u8 ↔ not_sq = Choice.zero)
-    (s1_post :
-      ∀ i : Nat, i < 5 →
-        s1[i]! = if not_sq.val = 1#u8 then s_prime1[i]! else x.2[i]!)
-    (c1_post : c1.val = 1#u8 ↔ Field51_as_Nat s_prime % p % 2 = 1)
-    (s_prime_is_pos_post : c1.val = 1#u8 ↔ s_prime_is_pos = Choice.zero)
+    (s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq)
+    (sign_posts : ElligatorSignPosts s_prime c1 s_prime_is_pos)
     (h_Ns_bridge : N_s.toField = elligator_Ns s.toField)
     (h_D_bridge : D.toField = elligator_D s.toField)
     (h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField)
@@ -950,6 +928,16 @@ private lemma elligator_s_bridge_nonsquare
     (h_not_is_square_of_flag : x.1.val ≠ 1#u8 → ¬ elligator_is_square s.toField)
     (h_sq_flag : x.1.val ≠ 1#u8) :
     s1.toField = elligator_s s.toField := by
+  let N_post_x := sqrt_posts.zero_case
+  let N_post1_D := sqrt_posts.d_zero_case
+  let N_post2_D := sqrt_posts.square_case
+  let N_post3_D := sqrt_posts.nonsquare_case
+  let s_prime_post1 := s_prime_posts.mul_eq
+  let s_prime_neg_post1 := s_prime_posts.neg_eq
+  let s_prime1_post := s_prime_posts.select
+  let s1_post := s1_posts.select
+  let c1_post := sign_posts.odd_flag
+  let s_prime_is_pos_post := sign_posts.pos_flag
   unfold elligator_s
   have h_nsq : not_sq.val = 1#u8 := by
     rcases not_sq with ⟨val, hv | hv⟩
@@ -1130,12 +1118,43 @@ theorem elligator_ristretto_flavor_spec
     have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
       rw [i_post1]
       rfl
+    have h_sqrt_posts : ElligatorSqrtRatioPosts N_s D x := {
+      zero_case := N_post_x
+      d_zero_case := N_post1_D
+      square_case := N_post2_D
+      nonsquare_case := N_post3_D
+    }
+    have h_s_prime_posts : ElligatorSPrimePosts s s_prime s_prime_neg s_prime1 x s_prime_is_pos := {
+      mul_eq := s_prime_post1
+      neg_eq := s_prime_neg_post1
+      select := s_prime1_post
+    }
+    have h_choice_posts : ElligatorChoicePosts c r c2 x not_sq := {
+      not_sq_flag := not_sq_post
+      c2_select := c2_post
+      c_minus_one := c_post1
+    }
+    have h_s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq := {
+      select := s1_post
+    }
+    have h_completed_point_posts :
+        ElligatorCompletedPointPosts one s_sq cp_X cp_Y cp_Z cp_T fe s_plus_s s1 D N_t := {
+      s_sq_eq := s_sq_post1
+      s_plus_s_eq := s_plus_s_post1
+      cp_X_mul := cp_X_post1
+      cp_X_bound := cp_X_post2
+      cp_Z_mul := cp_Z_post1
+      cp_Z_bound := cp_Z_post2
+      cp_Y_bound := cp_Y_post1
+      cp_Y_sub := cp_Y_post2
+      cp_T_bound := cp_T_post2
+      fe_sq := fe_post1
+      one_eq := one_post1
+    }
     exact elligator_completed_point_valid s one c r N_s D i s_prime s_prime_neg
       s_prime1 s1 s_sq c2 N_t cp_X cp_Y cp_Z cp_T fe s_plus_s x s_prime_is_pos not_sq
-      N_post_x N_post1_D N_post2_D N_post3_D s_prime_post1 s_prime_neg_post1
-      s_prime1_post not_sq_post s1_post c2_post s_sq_post1 s_plus_s_post1
-      cp_X_post1 cp_X_post2 cp_Z_post1 cp_Z_post2 cp_Y_post1 cp_Y_post2 cp_T_post2
-      fe_post1 c_post1 one_post1 h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
+      h_sqrt_posts h_s_prime_posts h_choice_posts h_s1_posts h_completed_point_posts
+      h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
   -- Main Goals: ⊢ IsValid ep ∧ toPoint ep = ↑(elligator_ristretto_flavor_pure s.toField)
   -- Step 1: Lift arithmetic postconditions to field equalities
   rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
@@ -1171,12 +1190,47 @@ theorem elligator_ristretto_flavor_spec
     have h := lift_mod_eq _ _ hme; push_cast at h; exact h
   have h_i_val : i.toField = field.FieldElement51.SQRT_M1_val.toField := by
     rw [i_post1]; rfl
+  have h_sqrt_posts : ElligatorSqrtRatioPosts N_s D x := {
+    zero_case := N_post_x
+    d_zero_case := N_post1_D
+    square_case := N_post2_D
+    nonsquare_case := N_post3_D
+  }
+  have h_s_prime_posts : ElligatorSPrimePosts s s_prime s_prime_neg s_prime1 x s_prime_is_pos := {
+    mul_eq := s_prime_post1
+    neg_eq := s_prime_neg_post1
+    select := s_prime1_post
+  }
+  have h_choice_posts : ElligatorChoicePosts c r c2 x not_sq := {
+    not_sq_flag := not_sq_post
+    c2_select := c2_post
+    c_minus_one := c_post1
+  }
+  have h_s1_posts : ElligatorS1Posts s_prime1 s1 x not_sq := {
+    select := s1_post
+  }
+  have h_sign_posts : ElligatorSignPosts s_prime c1 s_prime_is_pos := {
+    odd_flag := c1_post
+    pos_flag := s_prime_is_pos_post
+  }
+  have h_completed_point_posts :
+      ElligatorCompletedPointPosts one s_sq cp_X cp_Y cp_Z cp_T fe s_plus_s s1 D N_t := {
+    s_sq_eq := s_sq_post1
+    s_plus_s_eq := s_plus_s_post1
+    cp_X_mul := cp_X_post1
+    cp_X_bound := cp_X_post2
+    cp_Z_mul := cp_Z_post1
+    cp_Z_bound := cp_Z_post2
+    cp_Y_bound := cp_Y_post1
+    cp_Y_sub := cp_Y_post2
+    cp_T_bound := cp_T_post2
+    fe_sq := fe_post1
+    one_eq := one_post1
+  }
   have h_cp_valid := elligator_completed_point_valid s one c r N_s D i s_prime s_prime_neg
     s_prime1 s1 s_sq c2 N_t cp_X cp_Y cp_Z cp_T fe s_plus_s x s_prime_is_pos not_sq
-    N_post_x N_post1_D N_post2_D N_post3_D s_prime_post1 s_prime_neg_post1
-    s_prime1_post not_sq_post s1_post c2_post s_sq_post1 s_plus_s_post1
-    cp_X_post1 cp_X_post2 cp_Z_post1 cp_Z_post2 cp_Y_post1 cp_Y_post2 cp_T_post2
-    fe_post1 c_post1 one_post1 h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
+    h_sqrt_posts h_s_prime_posts h_choice_posts h_s1_posts h_completed_point_posts
+    h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
   have h_cp_T_ne : cp_T.toField ≠ 0 := h_cp_valid.T_ne_zero
   have h_cp_Z_ne : cp_Z.toField ≠ 0 := h_cp_valid.Z_ne_zero
   have hZ_ne : ep.Z.toField ≠ 0 := by
@@ -1255,25 +1309,24 @@ theorem elligator_ristretto_flavor_spec
       rw [show Ed25519.d = (_root_.d : CurveField) from rfl]; ring
     have h_is_square_of_flag :
         x.1.val = 1#u8 → elligator_is_square s.toField :=
-      elligator_is_square_of_flag s N_s D x N_post1_D N_post2_D N_post3_D
+      elligator_is_square_of_flag s N_s D x h_sqrt_posts
         h_Ns_bridge h_D_bridge
     have h_not_is_square_of_flag :
         x.1.val ≠ 1#u8 → ¬ elligator_is_square s.toField :=
-      elligator_not_is_square_of_flag s N_s D x N_post_x N_post2_D
+      elligator_not_is_square_of_flag s N_s D x h_sqrt_posts
         h_Ns_bridge h_D_bridge
     have h_c2_bridge : c2.toField = elligator_c s.toField :=
-      elligator_c_bridge s c r c2 x not_sq not_sq_post c2_post c_post1 h_r_bridge
+      elligator_c_bridge s c r c2 x not_sq h_choice_posts h_r_bridge
         h_is_square_of_flag h_not_is_square_of_flag
     have h_s1_bridge : s1.toField = elligator_s s.toField := by
       unfold elligator_s
       by_cases h_sq_flag : x.1.val = 1#u8
-      · exact elligator_s_bridge_square s N_s D s_prime1 s1 x not_sq N_post_x N_post1_D
-          N_post2_D N_post3_D not_sq_post s1_post
+      · exact elligator_s_bridge_square s N_s D s_prime1 s1 x not_sq h_sqrt_posts
+          not_sq_post h_s1_posts
           h_Ns_bridge h_D_bridge h_is_square_of_flag x_post2 h_sq_flag
       · exact elligator_s_bridge_nonsquare s N_s D i s_prime s_prime_neg s_prime1 s1 x
-          c1 s_prime_is_pos not_sq N_post_x N_post1_D N_post2_D N_post3_D
-          s_prime_post1 s_prime_neg_post1 s_prime1_post not_sq_post s1_post c1_post
-          s_prime_is_pos_post h_Ns_bridge h_D_bridge h_i_val h_sm1
+          c1 s_prime_is_pos not_sq h_sqrt_posts h_s_prime_posts not_sq_post h_s1_posts
+          h_sign_posts h_Ns_bridge h_D_bridge h_i_val h_sm1
           h_not_is_square_of_flag h_sq_flag
     have h_Nt_bridge : N_t.toField = elligator_Nt s.toField := by
       rw [h_Nt_eq_F, h_r_bridge, h_D_bridge, h_c2_bridge]
