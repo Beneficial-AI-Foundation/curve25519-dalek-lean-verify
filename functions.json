@@ -388,7 +388,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "-- proven in Verus\ntheorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Sub.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
@@ -403,7 +403,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub",
