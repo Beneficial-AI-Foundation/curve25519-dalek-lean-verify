@@ -46,9 +46,6 @@ instance : NeZero (2 : CurveField) := ⟨by decide⟩
 open scoped Classical in
 noncomputable instance : DecidableEq CurveField := inferInstance
 
-/-- Helper lemma for modular arithmetic lifting -/
-theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) := by
-  exact (ZMod.natCast_eq_natCast_iff a b p).mpr h
 
 
 theorem lift_mod_eq_iff (a b : ℕ) : (a ≡ b  [MOD p]) ↔  (a : CurveField) = (b : CurveField) := by

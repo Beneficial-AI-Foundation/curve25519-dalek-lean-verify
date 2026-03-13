@@ -77,6 +77,10 @@ namespace Edwards
 /-- The finite field F_p where p = 2^255 - 19. -/
 abbrev CurveField : Type := ZMod p
 
+/-- Helper lemma for modular arithmetic lifting -/
+theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) :=
+  (ZMod.natCast_eq_natCast_iff a b p).mpr h
+
 end Edwards
 
 /-! ## Field Element Conversions -/
