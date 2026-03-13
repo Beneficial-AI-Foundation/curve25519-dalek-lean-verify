@@ -412,20 +412,30 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     have r:= r.trans this
     simp[r]
 
-set_option maxHeartbeats 2000000000 in
--- scalar_tac haevy
+private lemma eq_U8x32_as_Nat_eq_helper (xs ys : List U8)
+    (hlen : xs.length = ys.length)
+    (heq : Nat.ofDigits 256 (xs.map (·.val)) = Nat.ofDigits 256 (ys.map (·.val)))
+    : xs = ys := by
+  have h_vals := Nat.ofDigits_inj_of_len_eq (by lia)
+    (by simp [hlen])
+    (by intro x hx; simp only [List.mem_map] at hx; obtain ⟨u, _, rfl⟩ := hx; exact u.hBounds)
+    (by intro y hy; simp only [List.mem_map] at hy; obtain ⟨u, _, rfl⟩ := hy; exact u.hBounds)
+    heq
+  exact (Function.Injective.list_map (fun a b h => UScalar.eq_of_val_eq h)) h_vals
+
+private lemma foldr_eq_ofDigits (l : List U8) :
+    l.foldr (fun (b : U8) (acc : Nat) => b.val + 256 * acc) 0 =
+    Nat.ofDigits 256 (l.map (·.val)) := by
+  induction l with
+  | nil => simp
+  | cons h t ih => simp [Nat.ofDigits_cons, ih]
+
 lemma eq_U8x32_as_Nat_eq {a b : Aeneas.Std.Array U8 32#usize}
     (hab : U8x32_as_Nat a = U8x32_as_Nat b) : a = b := by
-    apply Subtype.ext
-    apply List.ext_getElem
-    repeat simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]
-    intro i h1 h2
-    interval_cases i
-    all_goals(simp only [U8x32_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-      Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
-      List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-      one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-      Nat.lt_add_one] at hab; scalar_tac)
+  rw [U8x32_as_Nat_eq_foldr, U8x32_as_Nat_eq_foldr] at hab
+  rw [foldr_eq_ofDigits, foldr_eq_ofDigits] at hab
+  have h_list := eq_U8x32_as_Nat_eq_helper a.val b.val (by simp [a.property, b.property]) hab
+  exact Subtype.ext h_list
 
 /-
 Natural language description:
