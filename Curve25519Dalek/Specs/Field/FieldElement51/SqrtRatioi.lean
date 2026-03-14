@@ -35,14 +35,11 @@ open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.field.FieldElement51
 
-/-- The SQRT_M1 constant as a plain FieldElement51 (extracted from Result wrapper).
-    This is the concrete value of `constants.SQRT_M1` for use in pure mathematical proofs. -/
-def SQRT_M1_val : backend.serial.u64.field.FieldElement51 :=
-  Array.make 5#usize [1718705420411056#u64, 234908883556509#u64, 2233514472574048#u64,
-    2117202627021982#u64, 765476049583133#u64]
+/-- The SQRT_M1 constant as a plain FieldElement51 (alias for `constants.SQRT_M1_raw`). -/
+def SQRT_M1_val := backend.serial.u64.constants.SQRT_M1_raw
 
 theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
-  unfold SQRT_M1_val; decide
+  unfold SQRT_M1_val constants.SQRT_M1_raw; decide
 
 theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [Nat.ModEq]
 
@@ -551,7 +548,7 @@ theorem sqrt_ratio_i_spec'
     apply spec_imp_exists
     unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
     progress*
-    sorry
+    all_goals sorry
     /-
     have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
       ≡ (Field51_as_Nat SQRT_M1_val) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))

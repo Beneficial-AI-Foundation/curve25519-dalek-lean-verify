@@ -2636,7 +2636,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_spec : EDWARDS_D ⦃ result => Field51_as_Nat result = d ⦄ := by ...",
+   "theorem EDWARDS_D_spec :\n    EDWARDS_D ⦃ result =>\n    Field51_as_Nat result = d ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean",
    "spec_docstring":
@@ -2676,7 +2676,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :\n    EDWARDS_D_MINUS_ONE_SQUARED ⦃ result => Field51_as_Nat result = (d - 1) ^ 2 % p ⦄ := by ...",
+   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :\n    EDWARDS_D_MINUS_ONE_SQUARED ⦃ result =>\n    Field51_as_Nat result = (d - 1) ^ 2 % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D_MINUS_ONE_SQUARED.lean",
    "spec_docstring":
@@ -2796,7 +2796,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MINUS_ONE_spec :\n    MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by ...",
+   "theorem MINUS_ONE_spec :\n    MINUS_ONE ⦃ result =>\n    Field51_as_Nat result = p - 1 ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MINUS_ONE.lean",
    "spec_docstring":
@@ -2859,7 +2859,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :\n    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>\n      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by ...",
+   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :\n    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>\n    Field51_as_Nat result = (1 + p - (d^2 % p)) % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ONE_MINUS_EDWARDS_D_SQUARED.lean",
    "spec_docstring":
@@ -2917,7 +2917,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem SQRT_AD_MINUS_ONE_spec :\n    SQRT_AD_MINUS_ONE ⦃ result => (Field51_as_Nat result)^2 % p = (a * d - 1) % p ⦄ := by ...",
+   "theorem SQRT_AD_MINUS_ONE_spec :\n    SQRT_AD_MINUS_ONE ⦃ result =>\n    (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result = SQRT_AD_MINUS_ONE_raw ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_AD_MINUS_ONE.lean",
    "spec_docstring":
@@ -2939,7 +2939,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result =>\n      (Field51_as_Nat result)^2 % p = p - 1 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
+   "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result =>\n    result = SQRT_M1_raw ∧\n    (Field51_as_Nat result)^2 % p = p - 1 ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_M1.lean",
    "spec_docstring":
@@ -3411,7 +3411,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ONE_spec : ONE ⦃ result => Field51_as_Nat result = 1 ⦄ := by ...",
+   "theorem ONE_spec :\n    ONE ⦃ result =>\n    Field51_as_Nat result = 1 ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ONE.lean",
    "spec_docstring":
@@ -8756,10 +8756,10 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (s : backend.serial.u64.field.FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",
+   "theorem elligator_ristretto_flavor_spec\n    (s : FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
@@ -8775,7 +8775,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.SQRT_M1",
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D",
