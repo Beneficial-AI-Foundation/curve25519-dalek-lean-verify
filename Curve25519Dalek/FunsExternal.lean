@@ -469,13 +469,10 @@ def U64.Insts.SubtleConditionallySelectable.conditional_select
 /-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
 @[progress]
 theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec (a b : U64) (choice : subtle.Choice) :
-    U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ (res : U64) =>
-      (choice = Choice.one → res = b) ∧
-      (choice = Choice.zero → res = a) ⦄ := by
+    U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ res =>
+    res = if choice.val = 1#u8 then b else a ⦄ := by
   unfold U64.Insts.SubtleConditionallySelectable.conditional_select
-  cases Choice.eq_zero_or_one choice with
-  | inl h => rw [h]; simp [Choice.zero, Choice.one]
-  | inr h => rw [h]; simp [Choice.zero, Choice.one]
+  split <;> simp_all
 
 /- [subtle::{subtle::ConditionallySelectable for u64}::conditional_assign]:
    Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 521:12-521:74

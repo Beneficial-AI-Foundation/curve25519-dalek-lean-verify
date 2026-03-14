@@ -87,6 +87,29 @@ After all 5 limbs, the full sum telescopes to:
 
 -/
 
+namespace curve25519_dalek
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
+
+/- Replace the spec currently in FunsExternal.lean with an alternative phrased in terms of
+`Choice.one`/`Choice.zero`.
+TODO: make this change throughout the code or revert this.
+TODO: arrange that `FunsExternal.lean` contains only the defintions and the associated spec theorems
+are place in a different file. -/
+
+attribute [-progress] U64.Insts.SubtleConditionallySelectable.conditional_select_spec
+/-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
+@[progress]
+theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec' (a b : U64) (choice : subtle.Choice) :
+    U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ (res : U64) =>
+      (choice = Choice.one → res = b) ∧
+      (choice = Choice.zero → res = a) ⦄ := by
+  unfold U64.Insts.SubtleConditionallySelectable.conditional_select
+  cases Choice.eq_zero_or_one choice with
+  | inl h => rw [h]; simp [Choice.zero, Choice.one]
+  | inr h => rw [h]; simp [Choice.zero, Choice.one]
+
+end curve25519_dalek
+
 attribute [-simp] Int.reducePow Nat.reducePow
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
