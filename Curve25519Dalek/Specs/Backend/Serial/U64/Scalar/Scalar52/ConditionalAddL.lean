@@ -107,10 +107,11 @@ theorem Scalar52_as_Nat_bounded (s : Scalar52) (hs : ∀ i < 5, s[i]!.val < 2 ^ 
   simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
   grind
 
--- TODO: adjust to private aux lemma
-theorem U64.val_and_mask_lt (a : U64) (mask : U64) (hmask : mask.val = 2 ^ 52 - 1) :
-    (a &&& mask).val < 2 ^ 52 :=
-  Nat.lt_of_le_of_lt Nat.and_le_right (by grind)
+/-- A single limb's weighted contribution is at most Scalar52_as_Nat -/
+theorem Scalar52_limb_le_nat (s : Scalar52) (i : Nat) (hi : i < 5) :
+    2 ^ (52 * i) * s[i]!.val ≤ Scalar52_as_Nat s := by
+  simp only [Scalar52_as_Nat, Finset.sum_range_succ]
+  interval_cases i <;> omega
 
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
@@ -131,8 +132,6 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hi' : i.val < 5 := by grind
     have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
     have hL_i : constants.L[i.val]!.val < 2 ^ 52 := L_limbs_bounded i.val hi'
-    have hcarry_div : carry.val / 2 ^ 52 < 2 := by omega
-    have hcarry_shift : carry.val >>> 52 < 2 := by simp only [Nat.shiftRight_eq_div_pow]; omega
     progress as ⟨i1, hi1⟩  -- L[i]
     progress as ⟨addend, haddend_one, haddend_zero⟩  -- conditional_select
     have hi1_eq : i1.val = constants.L[i.val]!.val := by simp [hi1]
@@ -141,7 +140,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       | inl h => have := haddend_zero h; subst this; decide
       | inr h => have := haddend_one h; subst this; omega
     progress as ⟨i2, hi2⟩  -- carry >>> 52
-    have hi2_bound : i2.val < 2 := by simpa [hi2] using hcarry_shift
+    have hi2_bound : i2.val < 2 := by simp [hi2, Nat.shiftRight_eq_div_pow]; omega
     progress as ⟨i3, hi3⟩  -- self[i]
     have hi3_eq : i3.val = self[i.val]!.val := by simp [hi3]
     have hi3_bound : i3.val < 2 ^ 52 := by rw [hi3_eq]; exact hself_i
@@ -153,29 +152,21 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hcarry1_bound : carry1.val < 2 ^ 53 := by simp [hcarry1]; omega
     progress as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
     progress as ⟨i5, hi5⟩  -- carry1 &&& mask
-    have hi5_bound : i5.val < 2 ^ 52 := by
-      have hi5_eq : i5.val = (carry1 &&& mask).val := by simp [hi5]
-      rw [hi5_eq]
-      have hband : (carry1 &&& mask).val = carry1.val &&& mask.val := by
-        simp only [HAnd.hAnd, AndOp.and, UScalar.and, UScalar.val]
-        exact BitVec.toNat_and carry1.bv mask.bv
-      rw [hband, hmask]
-      have hand_le : carry1.val &&& (2 ^ 52 - 1) ≤ 2 ^ 52 - 1 := Nat.and_le_right
-      omega
+    have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
+      simp [hi5, UScalar.val_and, hmask]
+    have hi5_bound : i5.val < 2 ^ 52 := by rw [hi5_mod]; exact Nat.mod_lt _ (by omega)
     have hi_plus1_ok : i.val + 1 < 2 ^ 64 := by omega
     progress as ⟨i6, hi6⟩  -- i + 1
     have hi6_bound : i6.val ≤ 5 := by simp [hi6]; omega
-    -- Clear addend hypotheses before hself1_limbs to prevent simp_all loops
     have hself1_limbs : ∀ j < 5, (Aeneas.Std.Array.set self i i5)[j]!.val < 2 ^ 52 := by
       intro j hj
       by_cases hjc : j = i.val
       · rw [hjc]
         have := Array.set_of_eq self i5 i (by grind)
         simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
-        simp only [this]
-        exact hi5_bound
-      · have hne := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
-        have hself_j := hself j hj
+        simp only [this]; exact hi5_bound
+      · have := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
+        have := hself j hj
         clear haddend_one haddend_zero
         simp_all
     rw [← h_imb] at hself1_limbs
@@ -183,21 +174,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     refine ⟨hres_limbs, ?_⟩
     rw [h_imb] at hres_inv
     simp only [hi6] at hres_inv
-    have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
-      have hi5_eq : i5.val = (carry1 &&& mask).val := by simp [hi5]
-      rw [hi5_eq]
-      have hband : (carry1 &&& mask).val = carry1.val &&& mask.val := by
-        simp only [HAnd.hAnd, AndOp.and, UScalar.and, UScalar.val]
-        exact BitVec.toNat_and carry1.bv mask.bv
-      rw [hband, hmask]
-      exact Nat.and_two_pow_sub_one_eq_mod carry1.val 52
-    have hcarry1_eq : carry1.val = i2.val + i3.val + addend.val := by
-      simp [hcarry1, hi4]
-    have hi2_eq : i2.val = carry.val / 2 ^ 52 := by
-      simp [hi2, Nat.shiftRight_eq_div_pow]
-    have hi3_val : i3.val = self[i.val]!.val := by simp [hi3_eq]
     have hcarry1_expand : carry1.val = carry.val / 2 ^ 52 + self[i.val]!.val + addend.val := by
-      rw [hcarry1_eq, hi2_eq, hi3_val]
+      simp [hcarry1, hi4, hi2, Nat.shiftRight_eq_div_pow, hi3_eq]
     have hcarry1_split : i5.val + 2 ^ 52 * (carry1.val / 2 ^ 52) = carry1.val := by
       rw [hi5_mod]; have := Nat.mod_add_div carry1.val (2 ^ 52); omega
     have hpow_split : 2 ^ (52 * (i.val + 1)) = 2 ^ (52 * i.val) * 2 ^ 52 := by
@@ -206,20 +184,16 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         Scalar52_as_Nat self - 2 ^ (52 * i.val) * self[i.val]!.val + 2 ^ (52 * i.val) * i5.val := by
       clear haddend_one haddend_zero haddend_bound hres_inv hres_limbs res
       unfold Scalar52_as_Nat
-      have heq : ∀ j < 5, j ≠ i.val → (Aeneas.Std.Array.set self i i5)[j]!.val = self[j]!.val := by
-        intro j hj hne
-        have hlen : self.length = 5 := by simp [Aeneas.Std.Array.length]
-        have := Array.set_of_ne self i5 j i (by simp [hlen]; omega) (by grind) (by omega)
-        simp_all
-      have heq_i : (Aeneas.Std.Array.set self i i5)[i.val]!.val = i5.val := by
-        have := Array.set_of_eq self i5 i (by grind)
-        simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
-        simp_all
       have h_acc : ∀ j, j < 5 → (Aeneas.Std.Array.set self i i5)[j]!.val =
           if j = i.val then i5.val else self[j]!.val := by
         intro j hj; by_cases h : j = i.val
-        · subst h; simp only [ite_true]; exact heq_i
-        · simp only [h, ite_false]; exact heq j hj h
+        · subst h; simp only [ite_true]
+          have := Array.set_of_eq self i5 i (by grind)
+          simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
+          simp_all
+        · simp only [h, ite_false]
+          have := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
+          simp_all
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
       interval_cases i.val <;> simp (config := { decide := true }) only [h_acc 0 (by omega),
         h_acc 1 (by omega), h_acc 2 (by omega), h_acc 3 (by omega), h_acc 4 (by omega),
@@ -240,9 +214,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           2 ^ (52 * i.val) * self[i.val]!.val := by
         have : addend.val = 0 := haddend_val; grind
       rw [hself1_nat, hpow_split] at hres_inv
-      have hself_nat_bound : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
-        simp only [Scalar52_as_Nat, Finset.sum_range_succ]
-        interval_cases i.val <;> omega
+      have := Scalar52_limb_le_nat self i.val hi'
       omega
     | inr hc1 =>
       have haddend_val : addend.val = constants.L[i.val]!.val := by
@@ -255,9 +227,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           2 ^ (52 * i.val) * (carry.val / 2 ^ 52) + 2 ^ (52 * i.val) * self[i.val]!.val +
           2 ^ (52 * i.val) * constants.L[i.val]!.val := by
         have : addend.val = constants.L[i.val]!.val := haddend_val; grind
-      have : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
-        simp only [Scalar52_as_Nat, Finset.sum_range_succ]
-        interval_cases i.val <;> omega
+      have := Scalar52_limb_le_nat self i.val hi'
       omega
   case isFalse hge =>
     have : i.val = 5 := by grind
