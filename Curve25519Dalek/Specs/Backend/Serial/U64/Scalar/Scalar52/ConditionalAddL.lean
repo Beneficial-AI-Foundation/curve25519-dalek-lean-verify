@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
@@ -68,6 +68,18 @@ After all 5 limbs, the full sum telescopes to:
     = Scalar52_as_Nat(self) + condition * Scalar52_as_Nat(L)
 ```
 
+**Natural language spec**:
+
+    • Input: limbs bounded by 2^52
+    • If condition is 1 and input ∈ [2^260 - L, 2^260):
+        - Output value: u' + 2^260 = u + L
+        - Output canonical: u' < L
+        - Output limbs: < 2^52
+    • If condition is 0:
+        - Output value: u' = u
+        - Output limbs: < 2^52
+    • Carry value: not used by caller
+
 -/
 
 set_option linter.hashCommand false
@@ -77,27 +89,6 @@ set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
-
-/-
-natural language description:
-
-    • Takes an input Scalar52 u and a binary condition c.
-    • If condition is true (1), adds L modulo 2^260 and returns the result u' and a carry value;
-      if false (0), returns the scalar unchanged.
-    • This function is only used in `sub` where the carry value is ignored.
-
-natural language specs (tailored for use in `sub`):
-
-    • Input: limbs bounded by 2^52
-    • If condition is 1 (and input ∈ [2^260 - L, 2^260)):
-        - Output value: u' + 2^260 = u + L, equivalently u' = u + L - 2^260
-        - Output bounded: u' < L
-        - Output limbs: < 2^52
-    • If condition is 0:
-        - Output value: u' = u
-        - Output limbs: < 2^52
-    • Carry value: not specified (not used by caller)
--/
 
 -- TODO: move to a central location where we have facts related to constants.L
 /-- L limbs are bounded -/
@@ -121,14 +112,6 @@ theorem U64.val_and_mask_lt (a : U64) (mask : U64) (hmask : mask.val = 2 ^ 52 - 
     (a &&& mask).val < 2 ^ 52 :=
   Nat.lt_of_le_of_lt Nat.and_le_right (by grind)
 
--- Loop spec: proves that after iterating from limb i to 4, the result satisfies
--- the value invariant (see module doc). The preconditions are:
---   hself: all limbs < 2^52 — ensures no u64 overflow in the addition
---   hcarry: carry < 2^53 — maintained as a loop invariant (see "No overflow" above)
---   hi: i ≤ 5 — loop index in range
--- At each step, the proof shows carry' = (carry>>52) + self[i] + addend < 2^53,
--- then splits carry' into low bits (new self[i]) and high bits (new carry>>52).
-set_option maxHeartbeats 5000000 in -- Needed for complex loop invariant proof
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
     (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
