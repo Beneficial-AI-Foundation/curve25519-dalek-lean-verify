@@ -290,18 +290,11 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
 termination_by 5 - i.val
 decreasing_by grind
 
-
--- Main spec: uses the loop spec to derive the high-level postcondition.
--- The additional preconditions (hself', hself'', hself''') come from the calling
--- context in `sub`, where condition=1 means a borrow occurred and the input
--- satisfies self ∈ [2^260 - L, 2^260). These ensure the final result is < L.
-set_option maxHeartbeats 2000000 in -- Increased heartbeats needed for complex arithmetic proofs
-/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):
+/-- **Spec for `scalar.Scalar52.conditional_add_l`**
 - Requires input limbs bounded by 2^52
 - When condition is 1, requires input value in [2^260 - L, 2^260)
 - When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
 - When condition is 0: result unchanged with limbs < 2^52
-- Carry value not specified (not used by sub)
 -/
 @[progress]
 theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
@@ -321,20 +314,19 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
   · -- result < L
     cases Choice.val_eq_zero_or_one condition with
     | inl =>
-      have : condition = Choice.zero := Choice.eq_zero_of_val condition (by assumption)
+      have := Choice.eq_zero_of_val condition (by assumption)
       have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =
           Scalar52_as_Nat self := by simp [*]
       grind
     | inr =>
-      have : condition = Choice.one := Choice.eq_one_of_val condition (by assumption)
+      have := Choice.eq_one_of_val condition (by assumption)
       have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
       grind [Finset.Ico_self]
   · -- condition = Choice.one case
     have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
     grind [Finset.Ico_self, L_lt]
   · -- condition = Choice.zero case
-    intro hc
-    -- have : condition.val = 0#u8 := by rw [hc]; rfl
+    intro _
     have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
       simp [*]
     grind [L_lt]
