@@ -4081,11 +4081,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)\n    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)\n    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :\n    conditional_add_l self condition ⦃ result =>\n    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 < L) ∧\n    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧\n    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by ...",
+   "theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)\n    (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)\n    (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :\n    conditional_add_l self condition ⦃ (result : U64 × Scalar52) =>\n      (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧\n      (Scalar52_as_Nat result.2 < L) ∧\n      (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧\n      (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring":
-   "/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n- Carry value not specified (not used by sub)\n-/",
+   "/-- **Spec for `scalar.Scalar52.conditional_add_l`**\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
@@ -4103,7 +4103,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)\n    (carry : U64) (mask : U64) (i : Usize)\n    (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : carry.val < 2 ^ 53) :\n    conditional_add_l_loop self condition carry mask i ⦃ result =>\n    (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =\n      Scalar52_as_Nat self + (if condition.val = 1#u8 then Scalar52_as_Nat constants.L else 0) +\n      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -\n      (if condition.val = 1#u8 then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val else 0)) ⦄ := by ...",
+   "theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)\n    (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5) (hcarry : carry.val < 2 ^ 53) :\n    conditional_add_l_loop self condition carry mask i ⦃ (result : U64 × Scalar52) =>\n      (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧\n      (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =\n        Scalar52_as_Nat self + (if condition = Choice.one then Scalar52_as_Nat constants.L else 0) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -\n        (if condition = Choice.one then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val\n          else 0)) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring": null,
