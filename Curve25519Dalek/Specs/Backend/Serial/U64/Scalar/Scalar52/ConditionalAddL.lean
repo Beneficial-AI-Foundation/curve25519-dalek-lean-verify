@@ -135,7 +135,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hi5_bound : i5.val < 2 ^ 52 := by rw [hi5_mod]; exact Nat.mod_lt _ (by omega)
     have hi_plus1_ok : i.val + 1 < 2 ^ 64 := by omega
     progress as ⟨i6, hi6⟩  -- i + 1
-    have hi6_bound : i6.val ≤ 5 := by grind
+    have hi6_bound : i6.val ≤ 5 := by simp [hi6]; omega
     have hself1_limbs : ∀ j < 5, (Aeneas.Std.Array.set self i i5)[j]!.val < 2 ^ 52 := by
       intro j hj
       by_cases hjc : j = i.val
