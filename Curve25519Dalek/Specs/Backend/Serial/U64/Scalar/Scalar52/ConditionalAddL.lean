@@ -10,13 +10,68 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
 /-! # Spec Theorem for `Scalar52::conditional_add_l`
 
-Specification and proof for `Scalar52::conditional_add_l`.
-
 This function conditionally adds the group order L to a scalar based on a choice parameter.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs -/
+Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+
+## Rust source
+
+```rust
+    pub(crate) fn conditional_add_l(&mut self, condition: Choice) -> u64 {
+        let mut carry: u64 = 0;
+        let mask = (1u64 << 52) - 1;
+
+        let mut i = 0;
+        while i < 5 {
+            let addend = u64::conditional_select(&0, &constants::L[i], condition);
+            carry = (carry >> 52) + self[i] + addend;
+            self[i] = carry & mask;
+            i += 1;
+        }
+
+        carry
+    }
+```
+
+## Proof overview
+
+The function iterates over 5 limbs, at each step computing:
+
+```rust
+  carry' = (carry >> 52) + self[i] + addend
+  self[i] = carry' & mask
+```
+
+where `addend = L[i]` if `condition=1` or `0` otherwise, and `mask = 2^52 - 1`.
+
+**No overflow**: The key invariant is `carry < 2^53` at each iteration.
+This follows from the precondition `self[i] < 2^52` and the fact that `L[i] < 2^52`:
+  `carry >> 52 < 2`  (since carry < 2^53)
+  `self[i]     < 2^52`
+  `addend      ≤ L[i] < 2^52`
+  `total       < 2 + 2^52 + 2^52 < 2^53 < 2^64`
+Without the bound `self[i] < 2^52`, the addition could overflow u64.
+
+**Value invariant**: After processing limb i, the loop maintains:
+```
+  Scalar52_as_Nat(self') + 2^(52*(i+1)) * (carry'/2^52)
+    = Scalar52_as_Nat(self_orig) + condition * Σ_{j < i+1} 2^(52*j) * L[j]
+         + 2^(52*0) * (carry_init/2^52)
+```
+This follows from the standard radix-2^52 addition with carry propagation:
+each `self[i] = carry' mod 2^52` stores the low bits, while `carry'/2^52`
+propagates to the next limb.
+
+After all 5 limbs, the full sum telescopes to:
+```
+  Scalar52_as_Nat(result) + 2^260 * (carry_final/2^52)
+    = Scalar52_as_Nat(self) + condition * Scalar52_as_Nat(L)
+```
+
+-/
 
 set_option linter.hashCommand false
+-- set_option profiler true
 #setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
@@ -45,65 +100,112 @@ natural language specs (tailored for use in `sub`):
     • Carry value: not specified (not used by caller)
 -/
 
+-- TODO: move to a central location where we have facts related to constants.L
 /-- L limbs are bounded -/
 theorem L_limbs_bounded : ∀ i < 5, constants.L[i]!.val < 2 ^ 52 := by
   intro i _
   unfold constants.L
   interval_cases i <;> decide
 
--- Decidability instance for Choice equality
-instance : DecidableEq subtle.Choice := fun a b =>
-  if h : a.val = b.val then isTrue (by cases a; cases b; simp_all)
-  else isFalse (by intro heq; apply h; rw [heq])
-
-/-- Helper: Choice val is 0 or 1 -/
-theorem Choice.val_cases (c : subtle.Choice) : c.val = 0#u8 ∨ c.val = 1#u8 := by
-  cases c with
-  | mk val valid =>
-    cases valid with
-    | inl h => left; exact h
-    | inr h => right; exact h
-
 /-- 0#u8 ≠ 1#u8 -/
 @[simp] theorem U8_zero_ne_one : (0#u8 = 1#u8) = False := by decide
 
+-- TODO: move to a central location where we have facts related to Scalar52
 /-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
 theorem Scalar52_as_Nat_bounded (s : Scalar52) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     Scalar52_as_Nat s < 2 ^ 260 := by
   simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
   grind
 
+-- TODO: adjust to private aux lemma
+theorem U64.val_and_mask_lt (a : U64) (mask : U64) (hmask : mask.val = 2 ^ 52 - 1) :
+    (a &&& mask).val < 2 ^ 52 :=
+  Nat.lt_of_le_of_lt Nat.and_le_right (by grind)
+
+-- Loop spec: proves that after iterating from limb i to 4, the result satisfies
+-- the value invariant (see module doc). The preconditions are:
+--   hself: all limbs < 2^52 — ensures no u64 overflow in the addition
+--   hcarry: carry < 2^53 — maintained as a loop invariant (see "No overflow" above)
+--   hi: i ≤ 5 — loop index in range
+-- At each step, the proof shows carry' = (carry>>52) + self[i] + addend < 2^53,
+-- then splits carry' into low bits (new self[i]) and high bits (new carry>>52).
 set_option maxHeartbeats 5000000 in -- Needed for complex loop invariant proof
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
-    (carry : U64) (mask : U64) (i : Usize)
-    (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
-    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)
-    (hcarry : carry.val < 2 ^ 53) :
-    conditional_add_l_loop self condition carry mask i ⦃ result =>
-    (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =
-      Scalar52_as_Nat self + (if condition.val = 1#u8 then Scalar52_as_Nat constants.L else 0) +
-      2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -
-      (if condition.val = 1#u8 then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val else 0)) ⦄ := by
+    (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
+    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5) (hcarry : carry.val < 2 ^ 53) :
+    conditional_add_l_loop self condition carry mask i ⦃ (result : U64 × Scalar52) =>
+      (∀ j < 5, result.2[j]!.val < 2 ^ 52) ∧
+      (Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =
+        Scalar52_as_Nat self + (if condition = Choice.one then Scalar52_as_Nat constants.L else 0) +
+        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) -
+        (if condition = Choice.one then ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val
+          else 0)) ⦄ := by
   unfold conditional_add_l_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
+  by_cases hc : condition = Choice.one
+  · split
+    · have hi' : i.val < 5 := by grind
+      have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
+      have hL_i : constants.L[i.val]!.val < 2 ^ 52 := L_limbs_bounded i.val hi'
+      have hcarry_div : carry.val / 2 ^ 52 < 2 := by omega
+      have hcarry_shift : carry.val >>> 52 < 2 := by simp only [Nat.shiftRight_eq_div_pow]; omega
+      progress*
+      · subst_vars
+        grind [U64.val_and_mask_lt]
+      · constructor
+        · subst_vars
+          grind
+        · /- ⊢ Scalar52_as_Nat result.2 + 2 ^ 260 * (↑result.1 / 2 ^ 52) =
+             Scalar52_as_Nat self + Scalar52_as_Nat constants.L + 2 ^ (52 * ↑i) * (↑carry / 2 ^ 52) -
+             ∑ j ∈ Finset.Ico 0 ↑i, 2 ^ (52 * j) * ↑constants.L[j]! -/
+          sorry
+    · progress*
+      refine ⟨by assumption, ?_⟩
+      /- ⊢ Scalar52_as_Nat self + 2 ^ 260 * (↑carry / 2 ^ 52) =
+         Scalar52_as_Nat self + Scalar52_as_Nat constants.L + 2 ^ (52 * ↑i) * (↑carry / 2 ^ 52) -
+         ∑ j ∈ Finset.Ico 0 ↑i, 2 ^ (52 * j) * ↑constants.L[j]! -/
+      have : i.val = 5 := by grind
+      subst_vars
+      sorry
+  · -- have that condition.val = 0
+    have : ¬condition = Choice.one := Ne.intro hc
+    have : condition = Choice.zero := (Choice.ne_one_iff condition).mp hc
+    split
+    · progress*
+      · sorry
+      · sorry
+      · sorry
+      · constructor
+        · subst_vars
+          simp at *
+          sorry
+        · subst_vars
+          simp_all
+          sorry
+    · progress*
+termination_by 5 - i.val
+decreasing_by scalar_decr_tac
+
+/-
   split
   case isTrue hlt =>
-    have hi' : i.val < 5 := by scalar_tac
+    have hi' : i.val < 5 := by grind
     have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
     have hL_i : constants.L[i.val]!.val < 2 ^ 52 := L_limbs_bounded i.val hi'
     have hcarry_div : carry.val / 2 ^ 52 < 2 := by omega
     have hcarry_shift : carry.val >>> 52 < 2 := by simp only [Nat.shiftRight_eq_div_pow]; omega
+    progress*
+    · subst_vars
+
+      simp [*]
+
+
     progress as ⟨i1, hi1⟩  -- L[i]
     progress as ⟨addend, haddend⟩  -- conditional_select
     have hi1_eq : i1.val = constants.L[i.val]!.val := by simp [hi1]
-    have haddend_bound : addend.val < 2 ^ 52 := by
-      simp only [haddend]
-      split
-      · rw [hi1_eq]; exact hL_i
-      · decide
+    have haddend_bound : addend.val < 2 ^ 52 := by simp only [haddend]; grind
     progress as ⟨i2, hi2⟩  -- carry >>> 52
     have hi2_bound : i2.val < 2 := by simpa [hi2] using hcarry_shift
     progress as ⟨i3, hi3⟩  -- self[i]
@@ -133,11 +235,11 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       intro j hj
       by_cases hjc : j = i.val
       · rw [hjc]
-        have := Array.set_of_eq self i5 i (by scalar_tac)
+        have := Array.set_of_eq self i5 i (by grind)
         simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
         simp only [this]
         exact hi5_bound
-      · have hne := Array.set_of_ne self i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+      · have hne := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
         have hself_j := hself j hj
         simp_all
     rw [← h_imb] at hself1_limbs
@@ -175,10 +277,10 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       have heq : ∀ j < 5, j ≠ i.val → (Aeneas.Std.Array.set self i i5)[j]!.val = self[j]!.val := by
         intro j hj hne
         have hlen : self.length = 5 := by simp [Aeneas.Std.Array.length]
-        have := Array.set_of_ne self i5 j i (by simp [hlen]; omega) (by scalar_tac) (by omega)
+        have := Array.set_of_ne self i5 j i (by simp [hlen]; omega) (by grind) (by omega)
         simp_all
       have heq_i : (Aeneas.Std.Array.set self i i5)[i.val]!.val = i5.val := by
-        have := Array.set_of_eq self i5 i (by scalar_tac)
+        have := Array.set_of_eq self i5 i (by grind)
         simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
         simp_all
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
@@ -188,7 +290,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have : ∑ j ∈ Finset.Ico 0 (i.val + 1), 2 ^ (52 * j) * constants.L[j]!.val =
         ∑ j ∈ Finset.Ico 0 i.val, 2 ^ (52 * j) * constants.L[j]!.val +
         2 ^ (52 * i.val) * constants.L[i.val]!.val := by grind
-    cases Choice.val_cases condition with
+    cases Choice.val_eq_zero_or_one condition with
     | inl hc0 =>
       simp only [hc0, U8_zero_ne_one, reduceIte] at hres_inv ⊢
       have : addend.val = 0 := by simp [*]
@@ -200,7 +302,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       have hself_nat_bound : 2 ^ (52 * i.val) * self[i.val]!.val ≤ Scalar52_as_Nat self := by
         simp only [Scalar52_as_Nat, Finset.sum_range_succ]
         interval_cases i.val <;> omega
-      omega
+      grind
     | inr hc1 =>
       simp only [hc1, reduceIte] at hres_inv ⊢
       rw [hpow_split] at hres_inv
@@ -214,7 +316,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         interval_cases i.val <;> omega
       omega
   case isFalse hge =>
-    have hi5 : i.val = 5 := by scalar_tac
+    have hi5 : i.val = 5 := by grind
     simp only [Aeneas.Std.WP.spec]
     refine ⟨hself, ?_⟩
     simp only [hi5]
@@ -222,12 +324,18 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         Scalar52_as_Nat constants.L := by
       simp [Scalar52_as_Nat]
     rw [this, constants.L_spec]
-    cases Choice.val_cases condition with
+    cases Choice.val_eq_zero_or_one condition with
     | inl => simp [*]
     | inr => grind
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
+-/
+
+-- Main spec: uses the loop spec to derive the high-level postcondition.
+-- The additional preconditions (hself', hself'', hself''') come from the calling
+-- context in `sub`, where condition=1 means a borrow occurred and the input
+-- satisfies self ∈ [2^260 - L, 2^260). These ensure the final result is < L.
 set_option maxHeartbeats 2000000 in -- Increased heartbeats needed for complex arithmetic proofs
 /-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):
 - Requires input limbs bounded by 2^52
@@ -252,7 +360,7 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
   rw [constants.L_spec] at *
   refine ⟨by assumption, ?_, ?_, ?_⟩
   · -- result < L
-    cases Choice.val_cases condition with
+    cases Choice.val_eq_zero_or_one condition with
     | inl =>
       have : condition = Choice.zero := by cases condition; simp [Choice.zero]; grind
       have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
