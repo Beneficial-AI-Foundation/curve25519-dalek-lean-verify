@@ -427,10 +427,12 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid') :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint - other.toPointI ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
