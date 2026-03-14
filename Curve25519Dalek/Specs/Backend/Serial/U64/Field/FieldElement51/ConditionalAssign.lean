@@ -25,28 +25,27 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
 
 /-! ## Spec for `conditional_assign` -/
 
-/--
-**Spec for `backend.serial.u64.field.FieldElement51.conditional_assign`**:
-- No panic (always returns successfully)
+/-- **Spec for `backend.serial.u64.field.FieldElement51.conditional_assign`**:
 - For each limb i, the result limb equals `other[i]` when `choice = 1`,
   and equals `self[i]` when `choice = 0` (constant-time conditional select)
 - Consequently, when `choice = Choice.one`, the whole result equals `other`;
-  when `choice = Choice.zero`, the result equals `self`.
--/
+  when `choice = Choice.zero`, the result equals `self`. -/
 @[progress]
 theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
     conditional_assign self other choice ⦃ (res : FieldElement51) =>
-      (∀ i < 5, res[i]! = (if choice.val = 1#u8 then other[i]! else self[i]!)) ⦄ := by
+      (∀ i < 5, res[i]! = (if choice = Choice.one then other[i]! else self[i]!)) ⦄ := by
   unfold conditional_assign
   unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
-  by_cases hc : choice.val = 1#u8
-  · simp only [hc, reduceIte]
-    progress*
+  by_cases hc : choice = Choice.one
+  · progress*
+    subst_vars
     intro i _
     interval_cases i <;> simp [*]
-  · simp only [hc, reduceIte]
+  · have := (Choice.ne_one_iff choice).mp hc
     progress*
     simp [*]
+
+
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
