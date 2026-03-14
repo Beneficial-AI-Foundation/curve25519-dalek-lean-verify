@@ -96,6 +96,7 @@ import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.FromSlice
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step1
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
