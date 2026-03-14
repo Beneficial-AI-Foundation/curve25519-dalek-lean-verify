@@ -68,6 +68,12 @@ def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
 
+
+/-! ## Basic properties of the defined quantities -/
+
+theorem L_lt : L < 2 ^ 260 := by
+  unfold L; grind
+
 /-! ## Primality and CurveField -/
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩

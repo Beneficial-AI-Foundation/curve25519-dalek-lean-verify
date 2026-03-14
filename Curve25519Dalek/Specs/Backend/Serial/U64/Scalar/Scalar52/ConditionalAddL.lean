@@ -288,7 +288,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     | inl h => simp [h]
     | inr h => grind
 termination_by 5 - i.val
-decreasing_by scalar_decr_tac
+decreasing_by grind
 
 
 -- Main spec: uses the loop spec to derive the high-level postcondition.
@@ -309,11 +309,11 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
     (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)
     (hself'' : condition = Choice.one → Scalar52_as_Nat self < 2 ^ 260)
     (hself''' : condition = Choice.zero → Scalar52_as_Nat self < L) :
-    conditional_add_l self condition ⦃ result =>
-    (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧
-    (Scalar52_as_Nat result.2 < L) ∧
-    (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧
-    (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by
+    conditional_add_l self condition ⦃ (result : U64 × Scalar52) =>
+      (∀ i < 5, result.2[i]!.val < 2 ^ 52) ∧
+      (Scalar52_as_Nat result.2 < L) ∧
+      (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧
+      (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by
   unfold conditional_add_l
   progress*
   rw [constants.L_spec] at *
@@ -321,28 +321,22 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
   · -- result < L
     cases Choice.val_eq_zero_or_one condition with
     | inl =>
-      have : condition = Choice.zero := by cases condition; simp [Choice.zero]; grind
-      have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
-        simp_all
+      have : condition = Choice.zero := Choice.eq_zero_of_val condition (by assumption)
+      have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) =
+          Scalar52_as_Nat self := by simp [*]
       grind
     | inr =>
-      have : condition = Choice.one := by cases condition; simp [Choice.one]; grind
+      have : condition = Choice.one := Choice.eq_one_of_val condition (by assumption)
       have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
-      simp only [Finset.Ico_self] at *
-      grind
+      grind [Finset.Ico_self]
   · -- condition = Choice.one case
-    intro hc
-    have : condition.val = 1#u8 := by rw [hc]; rfl
     have : Scalar52_as_Nat result.2 < 2 ^ 260 := Scalar52_as_Nat_bounded result.2 (by assumption)
-    have : L < 2 ^ 260 := by unfold L; grind
-    simp only [Finset.Ico_self] at *
-    grind
+    grind [Finset.Ico_self, L_lt]
   · -- condition = Choice.zero case
     intro hc
-    have : condition.val = 0#u8 := by rw [hc]; rfl
+    -- have : condition.val = 0#u8 := by rw [hc]; rfl
     have : Scalar52_as_Nat result.2 + 2 ^ 260 * (result.1.val / 2 ^ 52) = Scalar52_as_Nat self := by
-      simp_all
-    have : L < 2 ^ 260 := by unfold L; grind
-    grind
+      simp [*]
+    grind [L_lt]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
