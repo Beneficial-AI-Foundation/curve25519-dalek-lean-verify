@@ -84,34 +84,12 @@ After all 5 limbs, the full sum telescopes to:
 
 set_option linter.hashCommand false
 #setup_aeneas_simps
+
 attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
-
--- TODO: move to a central location where we have facts related to constants.L
-/-- L limbs are bounded -/
-theorem L_limbs_bounded : ∀ i < 5, constants.L[i]!.val < 2 ^ 52 := by
-  intro i _
-  unfold constants.L
-  interval_cases i <;> decide
-
-/-- 0#u8 ≠ 1#u8 -/
-@[simp] theorem U8_zero_ne_one : (0#u8 = 1#u8) = False := by decide
-
--- TODO: move to a central location where we have facts related to Scalar52
-/-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
-theorem Scalar52_as_Nat_bounded (s : Scalar52) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
-    Scalar52_as_Nat s < 2 ^ 260 := by
-  simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-  grind
-
-/-- A single limb's weighted contribution is at most Scalar52_as_Nat -/
-theorem Scalar52_limb_le_nat (s : Scalar52) (i : Nat) (hi : i < 5) :
-    2 ^ (52 * i) * s[i]!.val ≤ Scalar52_as_Nat s := by
-  simp only [Scalar52_as_Nat, Finset.sum_range_succ]
-  interval_cases i <;> omega
 
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
@@ -131,7 +109,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
   case isTrue hlt =>
     have hi' : i.val < 5 := by grind
     have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
-    have hL_i : constants.L[i.val]!.val < 2 ^ 52 := L_limbs_bounded i.val hi'
+    have hL_i : constants.L[i.val]!.val < 2 ^ 52 := constants.L_limbs_spec i hi'
     progress as ⟨i1, hi1⟩  -- L[i]
     progress as ⟨addend, haddend_one, haddend_zero⟩  -- conditional_select
     have hi1_eq : i1.val = constants.L[i.val]!.val := by simp [hi1]
@@ -157,14 +135,14 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hi5_bound : i5.val < 2 ^ 52 := by rw [hi5_mod]; exact Nat.mod_lt _ (by omega)
     have hi_plus1_ok : i.val + 1 < 2 ^ 64 := by omega
     progress as ⟨i6, hi6⟩  -- i + 1
-    have hi6_bound : i6.val ≤ 5 := by simp [hi6]; omega
+    have hi6_bound : i6.val ≤ 5 := by grind
     have hself1_limbs : ∀ j < 5, (Aeneas.Std.Array.set self i i5)[j]!.val < 2 ^ 52 := by
       intro j hj
       by_cases hjc : j = i.val
       · rw [hjc]
         have := Array.set_of_eq self i5 i (by grind)
         simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
-        simp only [this]; exact hi5_bound
+        simpa [this]
       · have := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
         have := hself j hj
         clear haddend_one haddend_zero
@@ -186,14 +164,8 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       unfold Scalar52_as_Nat
       have h_acc : ∀ j, j < 5 → (Aeneas.Std.Array.set self i i5)[j]!.val =
           if j = i.val then i5.val else self[j]!.val := by
-        intro j hj; by_cases h : j = i.val
-        · subst h; simp only [ite_true]
-          have := Array.set_of_eq self i5 i (by grind)
-          simp only [UScalar.ofNat_self_val, Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
-          simp_all
-        · simp only [h, ite_false]
-          have := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
-          simp_all
+        intro j _
+        by_cases j = i.val <;> simp [*]
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
       interval_cases i.val <;> simp (config := { decide := true }) only [h_acc 0 (by omega),
         h_acc 1 (by omega), h_acc 2 (by omega), h_acc 3 (by omega), h_acc 4 (by omega),
