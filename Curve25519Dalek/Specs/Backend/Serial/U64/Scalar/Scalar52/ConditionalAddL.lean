@@ -277,15 +277,13 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
         interval_cases i.val <;> omega
       omega
   case isFalse hge =>
-    have hi5 : i.val = 5 := by grind
-    simp only [Aeneas.Std.WP.spec]
-    refine ⟨hself, ?_⟩
-    simp only [hi5]
+    have : i.val = 5 := by grind
+    progress*
+    refine ⟨by assumption, ?_⟩
     have : ∑ j ∈ Finset.Ico 0 5, 2 ^ (52 * j) * constants.L[j]!.val =
         Scalar52_as_Nat constants.L := by simp [Scalar52_as_Nat]
-    rw [this, constants.L_spec]
     cases Choice.eq_zero_or_one condition with
-    | inl h => simp [h]
+    | inl h => simp [*]
     | inr h => grind
 termination_by 5 - i.val
 decreasing_by grind
