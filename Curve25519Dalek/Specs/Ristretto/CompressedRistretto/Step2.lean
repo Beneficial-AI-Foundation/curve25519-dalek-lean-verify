@@ -167,26 +167,6 @@ private lemma decompress_step2_forward (s : ZMod p) (P : Point Ed25519)
     -- I^2 = I_math^2
     have hI_sq_eq : I ^ 2 = I_math ^ 2 :=
       mul_right_cancel₀ h_ne' (by rw [hI_sq, hI_math_sq])
-    -- abs_edwards(-x) = abs_edwards(x) helper
-    have abs_edwards_neg : ∀ (x : ZMod p), abs_edwards (-x) = abs_edwards x := by
-      intro x
-      by_cases hx : x = 0
-      · simp only [hx, neg_zero]
-      · unfold abs_edwards is_negative
-        have h_neg_val : (-x : ZMod p).val = p - x.val := by
-          rw [ZMod.neg_val]; exact if_neg hx
-        rw [h_neg_val]
-        have hxlt : x.val < p := x.val_lt
-        have hp_odd : p % 2 = 1 := by decide
-        have hxv : x.val ≠ 0 := by rwa [ne_eq, ZMod.val_eq_zero]
-        have hxpos : 0 < x.val := Nat.pos_of_ne_zero hxv
-        have h_par : (p - x.val) % 2 ≠ x.val % 2 := by omega
-        by_cases hpx : x.val % 2 = 1
-        · have : (p - x.val) % 2 = 0 := by omega
-          simp only [beq_iff_eq] at *; simp only [this, zero_ne_one, ↓reduceIte, hpx]
-        · have hpx0 : x.val % 2 = 0 := by omega
-          have : (p - x.val) % 2 = 1 := by omega
-          simp only [beq_iff_eq] at *; simp only [this, ↓reduceIte, neg_neg, hpx0, zero_ne_one]
     constructor
     · -- P.x = abs_edwards (2 * s * I * u2)
       rw [h_Px']
@@ -195,9 +175,7 @@ private lemma decompress_step2_forward (s : ZMod p) (P : Point Ed25519)
         have h1 : (2 * s * I * u2) ^ 2 = 4 * s ^ 2 * I ^ 2 * u2 ^ 2 := by ring
         have h2 : (2 * s * (I_math * u2)) ^ 2 = 4 * s ^ 2 * I_math ^ 2 * u2 ^ 2 := by ring
         rw [h1, h2, hI_sq_eq]
-      rcases sq_eq_sq_iff_eq_or_eq_neg.mp h_x_sq with h_eq | h_neg
-      · rw [h_eq]
-      · rw [h_neg]; exact (abs_edwards_neg _).symm
+      exact (abs_edwards_eq_of_sq_eq h_x_sq).symm
     · -- P.y = u1 * (I^2 * u2 * v)
       rw [h_Py']
       -- Rewrite I_math * (I_math * u2) * v to I_math^2 * u2 * v, then to I^2 * u2 * v
@@ -474,6 +452,65 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
         invsqrt.2.toField u1.toField u2.toField v.toField
         (by simp only [Ed25519]) hu1_val hu2_val hv_val hI
+  have h_step2_success_of_decompress (P : Point Ed25519)
+      (h_decomp : ristretto.decompress_step2 s.toField = some P) :
+      invsqrt.1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧
+        RistrettoPoint.toPoint { X := x1, Y := y, Z := one, T := t } = P := by
+    have h_fwd := decompress_step2_forward s.toField P h_decomp
+      u1.toField u2.toField v.toField W hu1_val hu2_val hv_val hW_eq
+    obtain ⟨h_sq, h_W_ne, h_neg_fwd, h_y_ne_fwd, h_coords⟩ := h_fwd
+    have h_ok1 : invsqrt.1.val = 1#u8 := by
+      have h_nz := h_ne_bridge.mpr h_W_ne
+      have h_ex := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
+      exact (invsqrt_case2 ⟨h_nz, h_ex⟩).1
+    have hI := hI_sq_W h_ok1
+    have ⟨h_Px, h_Py⟩ := h_coords invsqrt.2.toField hI
+    have hx1_eq_Px : x1.toField = P.x := by rw [hx1_abs, hx_simp]; exact h_Px.symm
+    have hy_eq_Py : y.toField = P.y := by rw [hy_simp]; exact h_Py.symm
+    have h_c : c.val = 0#u8 := by
+      rcases c.valid with h | h
+      · exact h
+      · exfalso
+        have h_t_neg : Field51_as_Nat t % p % 2 = 1 := c_post.mp h
+        have h_t_field : P.x * P.y = t.toField := by
+          rw [← hx1_eq_Px, ← hy_eq_Py, ht_field]
+        have : is_negative t.toField = false := h_t_field ▸ h_neg_fwd
+        simp only [is_negative, FieldElement51.toField, ZMod.val_natCast,
+          beq_eq_false_iff_ne] at this
+        exact this h_t_neg
+    have h_c1 : c1.val = 0#u8 := by
+      rcases c1.valid with h | h
+      · exact h
+      · exfalso
+        have h_y_zero : Field51_as_Nat y % p = 0 := c1_post.mp h
+        have : y.toField = 0 := by
+          simp only [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
+          exact h_y_zero
+        rw [hy_eq_Py] at this
+        exact h_y_ne_fwd this
+    have h_valid := h_valid_point (by rw [← hW_eq]; exact hI)
+    have hPt := edwards.EdwardsPoint.toPoint_of_isValid h_valid
+    refine ⟨h_ok1, h_c, h_c1, ?_⟩
+    ext
+    · simp only [RistrettoPoint.toPoint, hPt.1, hONE, div_one, hx1_eq_Px]
+    · simp only [RistrettoPoint.toPoint, hPt.2, hONE, div_one, hy_eq_Py]
+  have h_decompress_of_step2_success (P : Point Ed25519)
+      (h_success : invsqrt.1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧
+        RistrettoPoint.toPoint { X := x1, Y := y, Z := one, T := t } = P) :
+      ristretto.decompress_step2 s.toField = some P := by
+    rcases h_success with ⟨h_ok1, h_c, h_c1, h_pt⟩
+    have hI_sq := hI_sq_W h_ok1
+    have h_valid := h_valid_point (by rw [← hW_eq]; exact hI_sq)
+    have ⟨hPx, hPy⟩ := toPoint_coords h_valid hONE h_pt
+    have h_neg := is_negative_Pxy_false hPx hPy ht_field h_c c_post
+    have h_y_ne := Py_ne_zero hPy h_c1 c1_post
+    have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
+      rw [← hW_eq]; exact hI_sq
+    exact decompress_step2_backward s.toField invsqrt.2.toField
+      u1.toField u2.toField v.toField hu1_val hu2_val hv_val hIW P
+      h_neg h_y_ne
+      (by rw [hPx, hx1_abs, hx_simp])
+      (by rw [hPy, hy_simp])
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · -- Goal 1: ok1 ↔ (v * u2² ≠ 0 ∧ IsSquare(v * u2²))
     constructor
@@ -495,74 +532,10 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
   · -- Goal 4: ∀ P, decompress_step2 ... ↔ ...
     intro P
     constructor
-    · -- → direction: decompress_step2 s.toField = some P → ok1=1 ∧ c=0 ∧ c1=0 ∧ pt.toPoint = P
-      intro h_decomp
-      have h_fwd := decompress_step2_forward s.toField P h_decomp
-        u1.toField u2.toField v.toField W hu1_val hu2_val hv_val hW_eq
-      obtain ⟨h_sq, h_W_ne, h_neg_fwd, h_y_ne_fwd, h_coords⟩ := h_fwd
-      -- Step 1: ok1 = 1 (from IsSquare W ∧ W ≠ 0)
-      have h_ok1 : invsqrt.1.val = 1#u8 := by
-        have h_nz := h_ne_bridge.mpr h_W_ne
-        have h_ex := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
-        exact (invsqrt_case2 ⟨h_nz, h_ex⟩).1
-      -- Step 2: Get I_rust² * W = 1
-      have hI := hI_sq_W h_ok1
-      -- Step 3: Get coordinate equalities from h_coords
-      have ⟨h_Px, h_Py⟩ := h_coords invsqrt.2.toField hI
-      -- Step 4: Bridge Rust intermediates to P's coordinates
-      have hx1_eq_Px : x1.toField = P.x := by rw [hx1_abs, hx_simp]; exact h_Px.symm
-      have hy_eq_Py : y.toField = P.y := by rw [hy_simp]; exact h_Py.symm
-      -- Step 5: c = 0
-      have h_c : c.val = 0#u8 := by
-        rcases c.valid with h | h
-        · exact h
-        · exfalso
-          have h_t_neg : Field51_as_Nat t % p % 2 = 1 := c_post.mp h
-          have h_t_field : P.x * P.y = t.toField := by
-            rw [← hx1_eq_Px, ← hy_eq_Py, ht_field]
-          have : is_negative t.toField = false := h_t_field ▸ h_neg_fwd
-          simp only [is_negative, FieldElement51.toField, ZMod.val_natCast,
-            beq_eq_false_iff_ne] at this
-          exact this h_t_neg
-      -- Step 6: c1 = 0
-      have h_c1 : c1.val = 0#u8 := by
-        rcases c1.valid with h | h
-        · exact h
-        · exfalso
-          have h_y_zero : Field51_as_Nat y % p = 0 := c1_post.mp h
-          have : y.toField = 0 := by
-            simp only [FieldElement51.toField, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
-            exact h_y_zero
-          rw [hy_eq_Py] at this
-          exact h_y_ne_fwd this
-      -- Step 7: toPoint = P
-      have h_valid := h_valid_point (by rw [← hW_eq]; exact hI)
-      have hPt := edwards.EdwardsPoint.toPoint_of_isValid h_valid
-      refine ⟨h_ok1, h_c, h_c1, ?_⟩
-      ext
-      · -- x coordinate
-        simp only [RistrettoPoint.toPoint, hPt.1, hONE, div_one, hx1_eq_Px]
-      · -- y coordinate
-        simp only [RistrettoPoint.toPoint, hPt.2, hONE, div_one, hy_eq_Py]
-    · -- ← direction: ok1=1 ∧ c=0 ∧ c1=0 ∧ pt.toPoint = P → decompress_step2 s.toField = some P
-      intro ⟨h_ok1, h_c, h_c1, h_pt⟩
-      have hI_sq := hI_sq_W h_ok1
-      -- Step B: Prove EdwardsPoint validity
-      have h_valid := h_valid_point (by rw [← hW_eq]; exact hI_sq)
-      -- Step C: Extract P.x and P.y from h_pt
-      have ⟨hPx, hPy⟩ := toPoint_coords h_valid hONE h_pt
-      -- Step D: is_negative (P.x * P.y) = false (from c = 0)
-      have h_neg := is_negative_Pxy_false hPx hPy ht_field h_c c_post
-      -- Step E: P.y ≠ 0 (from c1 = 0)
-      have h_y_ne := Py_ne_zero hPy h_c1 c1_post
-      -- Step F: Apply decompress_step2_backward
-      have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
-        rw [← hW_eq]; exact hI_sq
-      exact decompress_step2_backward s.toField invsqrt.2.toField
-        u1.toField u2.toField v.toField hu1_val hu2_val hv_val hIW P
-        h_neg h_y_ne
-        (by rw [hPx, hx1_abs, hx_simp])
-        (by rw [hPy, hy_simp])
+    · intro h_decomp
+      exact h_step2_success_of_decompress P h_decomp
+    · intro h_success
+      exact h_decompress_of_step2_success P h_success
   · -- Goal 5: ok1=1 ∧ c=0 ∧ c1=0 → RistrettoPoint.IsValid pt
     intro ⟨h_ok1, _, _⟩
     have hI := hI_sq_W h_ok1
