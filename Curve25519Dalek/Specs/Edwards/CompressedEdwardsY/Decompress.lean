@@ -5,6 +5,7 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `CompressedEdwardsY::decompress`
@@ -74,7 +75,9 @@ theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
 
           (x_sign_bit ↔ x_is_neg.val = 1#u8) ∧
 
-          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p))) ⦄ := by
+          (Field51_as_Nat ep.T % p = (Field51_as_Nat ep.X * Field51_as_Nat ep.Y) % p)) ∧
+
+        ep.IsValid) ⦄ := by
   sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY

@@ -84,6 +84,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
+import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
@@ -95,6 +96,7 @@ import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.FromSlice
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step1
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
@@ -104,6 +106,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Compress
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ConditionalSelect
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Double
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Eq
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.IsSmallOrder
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
@@ -111,6 +114,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBaseClamped
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Neg
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Sub
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery

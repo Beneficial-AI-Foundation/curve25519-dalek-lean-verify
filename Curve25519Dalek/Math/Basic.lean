@@ -112,6 +112,7 @@ The bound `< 2^54` is the universal validity condition that:
 /-- A FieldElement51 is valid when all 5 limbs are bounded by 2^54.
     This is the bound accepted as input by field operations and encompasses
     all valid intermediate values between reductions. -/
+@[grind unfold]
 def FieldElement51.IsValid (fe : FieldElement51) : Prop := ∀ i < 5, fe[i]!.val < 2^54
 
 instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
@@ -145,20 +146,15 @@ private def sqrt_ad_minus_one_val : Nat :=
 Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).
 Since a = -1, this is sqrt(-d - 1).
 -/
-@[irreducible]
 def sqrt_ad_minus_one : ZMod p := sqrt_ad_minus_one_val
 
-/--
-Key Property: `sqrt_ad_minus_one` is actually the square root of `-d - 1`.
-Use this lemma in proofs instead of unfolding the definition.
--/
-lemma sqrt_ad_minus_one_sq : sqrt_ad_minus_one^2 = -d - 1 := by
-  -- We use `decide` to check this once at compile time,
-  -- or defer with sorry if the kernel computation is too heavy.
-  -- For verification, we can assume this matches the Rust constant.
-  -- The calculation is heavy, so we mark it as proven for the spec.
-  -- In a full proof, you might check this via a separate verified script.
-  sorry
+/-- Unfold `sqrt_ad_minus_one` to the raw Nat cast. Proved before `@[irreducible]` takes effect. -/
+lemma sqrt_ad_minus_one_eq_val : sqrt_ad_minus_one = (sqrt_ad_minus_one_val : ZMod p) := rfl
+
+/-- Key Property: `sqrt_ad_minus_one` is actually the square root of `-d - 1`. -/
+lemma sqrt_ad_minus_one_sq : sqrt_ad_minus_one^2 = -d - 1 := by decide
+
+attribute [irreducible] sqrt_ad_minus_one
 
 /--
 Helper: The constant is non-zero.

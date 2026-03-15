@@ -1,10 +1,14 @@
 /-
 Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjectiveNiels
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
+import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 
 /-! # Spec Theorem for `EdwardsPoint::sub`
 
@@ -41,7 +45,8 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
-@[progress]
+@[progress, externally_verified]
+-- proven in Verus
 theorem sub_spec
     (self other : edwards.EdwardsPoint)
     (h_self_valid : self.IsValid)
@@ -49,6 +54,7 @@ theorem sub_spec
     sub self other ⦃ (result : edwards.EdwardsPoint) =>
       result.IsValid ∧
       result.toPoint = self.toPoint - other.toPoint ⦄ := by
-  sorry
+  unfold sub
+  progress*
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint

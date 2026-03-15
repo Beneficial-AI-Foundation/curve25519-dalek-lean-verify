@@ -36,9 +36,11 @@ natural language specs:
 -/
 @[progress]
 theorem MINUS_ONE_spec :
-    MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by
+    MINUS_ONE ⦃ result =>
+    Field51_as_Nat result = p - 1 ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold MINUS_ONE field.FieldElement51.from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.constants
