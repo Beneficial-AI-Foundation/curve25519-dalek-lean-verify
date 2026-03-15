@@ -59,32 +59,59 @@ pub fn to_bytes(self) -> [u8; 32] {
 }
 ```
 
-## Proof Overview
+## Bit layout
 
-TODO
+Each limb holds 52 bits. Since 52 = 6×8 + 4, each limb fills 6 full bytes plus 4 bits that
+spill into a shared byte with the adjacent limb. The two shared bytes are s[6] and s[19],
+constructed via OR of the overflow bits from one limb and the start bits of the next.
+
+  | Limb | Bits  | Bytes                              | Shared |
+  |------|-------|------------------------------------|--------|
+  |  0   | 0–51  | s[0]–s[5], lower nibble of s[6]    | s[6]   |
+  |  1   | 0–51  | upper nibble of s[6], s[7]–s[12]   | s[6]   |
+  |  2   | 0–51  | s[13]–s[18], lower nibble of s[19] | s[19]  |
+  |  3   | 0–51  | upper nibble of s[19], s[20]–s[25] | s[19]  |
+  |  4   | 0–47  | s[26]–s[31] (48 bits)              | none   |
+
+Limb 4 uses only 48 of its 52 bits because the precondition `Scalar52_as_Nat self < L < 2^253`
+implies `self[4] < 2^(253−208) = 2^45 < 2^48`.
+
+Total: limbs hold 5×52 = 260 bits, but the value fits in 32×8 = 256 bits.
+
+## Proof overview
+
+We prove 5 results, one for each limb, describing the rows of the above table in terms of `BitList`.
+
 
 -/
+
+set_option linter.style.setOption false
+set_option maxHeartbeats 2000000
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open List BitList
 
-/-
-natural language description:
 
-    • Takes an unpacked scalar u (five 52-bit limbs stored in U64 values) and
-      returns a 32-byte array b that represents the same 256-bit integer value modulo L
-      in little-endian byte representation.
+/-- Interpret a Scalar52 (five u64 limbs used to represent 52 bits each) as a natural number -/
+def Scalar52_as_Nat' (limbs : Array U64 5#usize) : Nat :=
+  ∑ i : Fin 5, 2^(52 * i.val) * (limbs[i]!).val
 
-natural language specs:
-
-    • u8x32_to_nat(b) ≡ scalar_to_nat(u) (mod L)
--/
-
-
+-- Note: this is a strengthening of `Scalar52_top_limb_lt_of_as_Nat_lt` in Aux.lean (which gives
+-- < 2^51 from < 2^259). This tighter bound should be moved to the central location.
+/-- If `Scalar52_as_Nat a < L`, then the top limb `a[4]` is bounded by `2^45`.
+This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < L < 2^253`. -/
+theorem Scalar52_top_limb_lt_of_canonical (a : Array U64 5#usize) (h : Scalar52_as_Nat' a < L) :
+  a[4].val < 2 ^ 45 := by
+  unfold Scalar52_as_Nat' at h
+  have : 2 ^ 208 * a[(4 : Fin 5)].val ≤ ∑ (j : Fin 5), 2 ^ (52 * j.val) * a[j].val := by
+    have := Finset.single_le_sum (f := fun j : Fin 5 => 2 ^ (52 * j.val) * a[j].val)
+      (fun j _ => Nat.zero_le _) (Finset.mem_univ (4 : Fin 5))
+    simpa using this
+  have : L < 2 ^ 253 := by unfold L; omega
+  grind
 
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
-- No panic (always returns successfully)
 - The result byte array represents the same number as the input unpacked scalar modulo L
 - The result is in canonical form (less than L) -/
 @[progress] -- proven in Verus
@@ -96,6 +123,10 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i : Fin 5, self[i].val < 2 ^ 52
     unfold to_bytes
     progress*
     have : U8x32_as_Nat result = Scalar52_as_Nat self := by
+      -- We first prove
+
+      -- As `BitList`, self[0] corresponds to s[0]–s[5] and the lower nibble of s[6]
+      --
       sorry
     refine ⟨this, ?_⟩
     rw [this]
