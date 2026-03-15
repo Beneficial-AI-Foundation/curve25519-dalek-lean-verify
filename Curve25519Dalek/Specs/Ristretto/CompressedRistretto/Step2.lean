@@ -441,6 +441,39 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     rw [hy_field, hDy_simp]
   have hx_simp : x.toField = 2 * s.toField * invsqrt.2.toField * u2.toField := by
     rw [hx_field, hs_plus_s, hDx]; ring
+  have h_valid_point
+      (hI : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1) :
+      edwards.EdwardsPoint.IsValid { X := x1, Y := y, Z := one, T := t } := by
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+    · -- X_bounds
+      change ∀ i < 5, x1[i]!.val < 2 ^ 53
+      intro i hi; rw [x1_post i hi]; split
+      · have := x_negated_post2 i hi; omega
+      · have := x_post2 i hi; omega
+    · -- Y_bounds
+      change ∀ i < 5, y[i]!.val < 2 ^ 53
+      intro i hi; have := y_post2 i hi; omega
+    · -- Z_bounds
+      change ∀ i < 5, one[i]!.val < 2 ^ 53
+      intro i hi; have := one_post2 i hi; omega
+    · -- T_bounds
+      change ∀ i < 5, t[i]!.val < 2 ^ 53
+      intro i hi; have := t_post2 i hi; omega
+    · -- Z_ne_zero
+      change one.toField ≠ 0
+      rw [hONE]; exact one_ne_zero
+    · -- T_relation
+      change x1.toField * y.toField = t.toField * one.toField
+      rw [ht_field, hONE, mul_one]
+    · -- on_curve
+      dsimp only
+      simp only [hONE, one_pow, mul_one]
+      have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
+        rw [hx1_abs]; exact abs_edwards_sq x.toField
+      rw [h_x1_sq, hx_simp, hy_simp]
+      exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
+        invsqrt.2.toField u1.toField u2.toField v.toField
+        (by simp only [Ed25519]) hu1_val hu2_val hv_val hI
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · -- Goal 1: ok1 ↔ (v * u2² ≠ 0 ∧ IsSquare(v * u2²))
     constructor
@@ -503,40 +536,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
           rw [hy_eq_Py] at this
           exact h_y_ne_fwd this
       -- Step 7: toPoint = P
-      have h_valid : edwards.EdwardsPoint.IsValid
-          { X := x1, Y := y, Z := one, T := t } := by
-        refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-        · -- X_bounds
-          change ∀ i < 5, x1[i]!.val < 2 ^ 53
-          intro i hi; rw [x1_post i hi]; split
-          · have := x_negated_post2 i hi; omega
-          · have := x_post2 i hi; omega
-        · -- Y_bounds
-          change ∀ i < 5, y[i]!.val < 2 ^ 53
-          intro i hi; have := y_post2 i hi; omega
-        · -- Z_bounds
-          change ∀ i < 5, one[i]!.val < 2 ^ 53
-          intro i hi; have := one_post2 i hi; omega
-        · -- T_bounds
-          change ∀ i < 5, t[i]!.val < 2 ^ 53
-          intro i hi; have := t_post2 i hi; omega
-        · -- Z_ne_zero
-          change one.toField ≠ 0
-          rw [hONE]; exact one_ne_zero
-        · -- T_relation
-          change x1.toField * y.toField = t.toField * one.toField
-          rw [ht_field, hONE, mul_one]
-        · -- on_curve
-          dsimp only
-          simp only [hONE, one_pow, mul_one]
-          have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
-            rw [hx1_abs]; exact abs_edwards_sq x.toField
-          rw [h_x1_sq, hx_simp, hy_simp]
-          have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
-            rw [← hW_eq]; exact hI
-          exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-            invsqrt.2.toField u1.toField u2.toField v.toField
-            (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
+      have h_valid := h_valid_point (by rw [← hW_eq]; exact hI)
       have hPt := edwards.EdwardsPoint.toPoint_of_isValid h_valid
       refine ⟨h_ok1, h_c, h_c1, ?_⟩
       ext
@@ -546,52 +546,9 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
         simp only [RistrettoPoint.toPoint, hPt.2, hONE, div_one, hy_eq_Py]
     · -- ← direction: ok1=1 ∧ c=0 ∧ c1=0 ∧ pt.toPoint = P → decompress_step2 s.toField = some P
       intro ⟨h_ok1, h_c, h_c1, h_pt⟩
-      -- Derive key facts from ok1=1
-      have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := by
-        intro h_zero; exact absurd h_ok1 (by rw [(invsqrt_case1 h_zero).1]; decide)
-      have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
-        by_contra h_nex
-        exact absurd h_ok1 (by rw [(invsqrt_case3 ⟨h_nz, h_nex⟩).1]; decide)
-      have hIsSquare_W : IsSquare W := (h_sq_bridge.mp h_ex).2
-      have hW_ne : W ≠ 0 := h_ne_bridge.mp h_nz
       have hI_sq := hI_sq_W h_ok1
-      have hI_sq_inv : invsqrt.2.toField ^ 2 = W⁻¹ :=
-        eq_inv_of_mul_eq_one_left hI_sq
       -- Step B: Prove EdwardsPoint validity
-      have h_valid : edwards.EdwardsPoint.IsValid
-          { X := x1, Y := y, Z := one, T := t } := by
-        refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-        · -- X_bounds
-          change ∀ i < 5, x1[i]!.val < 2 ^ 53
-          intro i hi; rw [x1_post i hi]; split
-          · have := x_negated_post2 i hi; omega
-          · have := x_post2 i hi; omega
-        · -- Y_bounds
-          change ∀ i < 5, y[i]!.val < 2 ^ 53
-          intro i hi; have := y_post2 i hi; omega
-        · -- Z_bounds
-          change ∀ i < 5, one[i]!.val < 2 ^ 53
-          intro i hi; have := one_post2 i hi; omega
-        · -- T_bounds
-          change ∀ i < 5, t[i]!.val < 2 ^ 53
-          intro i hi; have := t_post2 i hi; omega
-        · -- Z_ne_zero
-          change one.toField ≠ 0
-          rw [hONE]; exact one_ne_zero
-        · -- T_relation
-          change x1.toField * y.toField = t.toField * one.toField
-          rw [ht_field, hONE, mul_one]
-        · -- on_curve
-          dsimp only
-          simp only [hONE, one_pow, mul_one]
-          have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
-            rw [hx1_abs]; exact abs_edwards_sq x.toField
-          rw [h_x1_sq, hx_simp, hy_simp]
-          have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
-            rw [← hW_eq]; exact hI_sq
-          exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-            invsqrt.2.toField u1.toField u2.toField v.toField
-            (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
+      have h_valid := h_valid_point (by rw [← hW_eq]; exact hI_sq)
       -- Step C: Extract P.x and P.y from h_pt
       have ⟨hPx, hPy⟩ := toPoint_coords h_valid hONE h_pt
       -- Step D: is_negative (P.x * P.y) = false (from c = 0)
@@ -612,31 +569,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     unfold RistrettoPoint.IsValid
     refine ⟨?_, ?_⟩
     · -- Part 1: EdwardsPoint.IsValid { X := x1, Y := y, Z := one, T := t }
-      refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-      · change ∀ i < 5, x1[i]!.val < 2 ^ 53
-        intro i hi; rw [x1_post i hi]; split
-        · have := x_negated_post2 i hi; omega
-        · have := x_post2 i hi; omega
-      · change ∀ i < 5, y[i]!.val < 2 ^ 53
-        intro i hi; have := y_post2 i hi; omega
-      · change ∀ i < 5, one[i]!.val < 2 ^ 53
-        intro i hi; have := one_post2 i hi; omega
-      · change ∀ i < 5, t[i]!.val < 2 ^ 53
-        intro i hi; have := t_post2 i hi; omega
-      · change one.toField ≠ 0
-        rw [hONE]; exact one_ne_zero
-      · change x1.toField * y.toField = t.toField * one.toField
-        rw [ht_field, hONE, mul_one]
-      · dsimp only
-        simp only [hONE, one_pow, mul_one]
-        have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
-          rw [hx1_abs]; exact abs_edwards_sq x.toField
-        rw [h_x1_sq, hx_simp, hy_simp]
-        have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
-          rw [← hW_eq]; exact hI
-        exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-          invsqrt.2.toField u1.toField u2.toField v.toField
-          (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
+      exact h_valid_point (by rw [← hW_eq]; exact hI)
     · -- Part 2: IsSquare (Z² - Y²), i.e., IsSquare (1 - y²)
       dsimp only
       simp only [hONE, one_pow]
