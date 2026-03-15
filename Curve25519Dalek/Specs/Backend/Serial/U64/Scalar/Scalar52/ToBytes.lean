@@ -91,7 +91,7 @@ set_option maxHeartbeats 2000000
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open List BitList
-
+attribute [local simp] Array.length_eq
 
 /-- Interpret a Scalar52 (five u64 limbs used to represent 52 bits each) as a natural number -/
 def Scalar52_as_Nat' (limbs : Array U64 5#usize) : Nat :=
@@ -122,11 +122,70 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i : Fin 5, self[i].val < 2 ^ 52
       U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
     progress*
+
+    -- It appears that `getElem` requires a lot of heartbeats, this attempts to solve the issue
+    have hresult : result.val.length = 32 := result.length_eq
+    have : 0 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 1 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 2 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 3 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 4 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 5 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 6 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 7 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 8 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 9 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 10 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 11 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 12 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 13 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 14 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 15 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 16 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 17 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 18 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 19 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 20 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 21 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 22 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 23 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 24 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 25 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 26 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 27 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 28 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 29 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 30 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    have : 31 < result.val.length := by simp only [hresult, Nat.reduceLT]
+    -- End of `getElem` mitigation attempt
+
     have : U8x32_as_Nat result = Scalar52_as_Nat self := by
       -- We first prove
 
       -- As `BitList`, self[0] corresponds to s[0]–s[5] and the lower nibble of s[6]
-      --
+      have hlimb0 : (ofU64 self[0]).take 52 ≈ₗ
+          ofU8 result[0] ++ ofU8 result[1] ++ ofU8 result[2] ++
+          ofU8 result[3] ++ ofU8 result[4] ++ ofU8 result[5] ++
+          (ofU8 result[6]).take 4 := by sorry
+      -- As `BitList`, self[1] corresponds to upper nibble of s[6] and s[7]–s[12]
+      have hlimb1 : (ofU64 self[1]).take 52 ≈ₗ
+          (ofU8 result[6]).drop 4 ++
+          ofU8 result[7] ++ ofU8 result[8] ++ ofU8 result[9] ++
+          ofU8 result[10] ++ ofU8 result[11] ++ ofU8 result[12] := by sorry
+      -- As `BitList`, self[2] corresponds to s[13]–s[18] and the lower nibble of s[19]
+      have hlimb2 : (ofU64 self[2]).take 52 ≈ₗ
+          ofU8 result[13] ++ ofU8 result[14] ++ ofU8 result[15] ++
+          ofU8 result[16] ++ ofU8 result[17] ++ ofU8 result[18] ++
+          (ofU8 result[19]).take 4 := by sorry
+      -- As `BitList`, self[3] corresponds to upper nibble of s[19] and s[20]–s[25]
+      have hlimb3 : (ofU64 self[3]).take 52 ≈ₗ
+          (ofU8 result[19]).drop 4 ++
+          ofU8 result[20] ++ ofU8 result[21] ++ ofU8 result[22] ++
+          ofU8 result[23] ++ ofU8 result[24] ++ ofU8 result[25] := by sorry
+      -- As `BitList`, self[4] corresponds to s[26]–s[31] (48 bits, top limb < 2^45)
+      have hlimb4 : (ofU64 self[4]).take 48 ≈ₗ
+          ofU8 result[26] ++ ofU8 result[27] ++ ofU8 result[28] ++
+          ofU8 result[29] ++ ofU8 result[30] ++ ofU8 result[31] := by sorry
       sorry
     refine ⟨this, ?_⟩
     rw [this]
