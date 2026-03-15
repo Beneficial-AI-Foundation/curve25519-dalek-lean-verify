@@ -12,6 +12,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
+import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
@@ -250,7 +251,7 @@ natural language specs:
 -/
 
 
-set_option maxHeartbeats 400000 in -- needed for complex decompress step2 unfold
+set_option maxHeartbeats 400000 in -- increased for progress* through many sub-calls
 /-- **Spec for `step_2`**
 Reflects the Rust implementation:
 1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.
@@ -271,7 +272,7 @@ a) The Rust flags must be set to success (1, 0, 0)
 b) The Rust point `pt` must match the mathematical point `P`
 And conversely.
 -/
-@[progress, externally_verified]
+@[progress]
 theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     step_2 s ⦃ (ok1, c, c1, pt) =>
@@ -285,118 +286,70 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
       (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧
     (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
-  sorry
-  /- OLD PROOF (broken: ONE/EDWARDS_D now return Result, progress variable naming cascade):
-  unfold step_2 field.FieldElement51.invsqrt
-  progress
-  rename_i ss_mod ss_bound
-  progress as ⟨u1_sub⟩
-  · intro i hi; have := ss_bound i hi; omega
-  rename_i u1_bounds u1_post
-  progress as ⟨ u2 , u2_post, u2_bounds ⟩
-  · intro i hi; have := ss_bound i hi; omega
-  progress as ⟨ u3 , u3_post, u3_bounds ⟩
-  progress as ⟨ u4 , u4_post, u4_bounds ⟩
-  progress as ⟨u5, u5_post, u5_bounds⟩
-  · intro i hi; have := u1_bounds i hi; omega
-  progress as ⟨u6, u6_post, u6_bounds⟩
-  · intro i hi; have := u4_bounds i hi; omega
-  · intro i hi; have := u5_bounds i hi; omega
-  progress as ⟨u7, u7_bounds, u7_post⟩
-  · intro i hi; have := u6_bounds i hi; omega
-  · intro i hi; have := u3_bounds i hi; omega
-  progress as ⟨u8, u8_post, u8_bounds⟩
-  · intro i hi; have := u7_bounds i hi; omega
-  · intro i hi; have := u3_bounds i hi; omega
-  progress as ⟨invsqrt_res, invsqrt_bounds, invsqrt_nonneg, invsqrt_post1, invsqrt_post2⟩
-  · intro i hi; have := u8_bounds i hi; omega
-  progress as ⟨u10, u10_post, u10_bounds⟩
-  · intro i hi; have := invsqrt_bounds i hi; omega
-  progress as ⟨fe4, fe4_post, fe4_bounds⟩
-  · intro i hi; have := u10_bounds i hi; omega
-  · intro i hi; have := u7_bounds i hi; omega
-  progress as ⟨Dy, Dy_post, Dy_bounds⟩
-  · intro i hi; have := invsqrt_bounds i hi; omega
-  · intro i hi; have := fe4_bounds i hi; omega
-  progress as ⟨fe5, fe5_post, fe5_bounds⟩
-  · intro i hi; have := h_s i hi; omega
-  · intro i hi; have := h_s i hi; omega
-  progress as ⟨x, x_post, x_bounds⟩
-  · intro i hi; have := u10_bounds i hi; omega
-  progress as ⟨x_neg, x_neg_post⟩
-  progress as ⟨x_1, x_1_mod, x_1_bounds⟩
-  · intro i hi; have := x_bounds i hi; omega
-  progress as ⟨x1, x1_post⟩
-  progress as ⟨y, y_post, y_bounds⟩
-  · intro i hi; have := u1_bounds i hi; omega
-  · intro i hi; have := Dy_bounds i hi; omega
-  progress as ⟨t, t_post, t_bounds⟩
-  · intro i hi
-    rw [x1_post i hi]
-    split
-    · have := x_1_bounds i hi; omega
-    · have := x_bounds i hi; omega
-  · intro i hi; have := y_bounds i hi; omega
-  progress as ⟨c, c_post⟩
-  progress as ⟨c1, c1_post⟩
-  -- Shared setup for Goals 1 and 4
-  have h_one : Field51_as_Nat FieldElement51.ONE % p = 1 := by
-    simp only [FieldElement51.ONE_spec]; decide
-  rename_i invsqrt_case3 invsqrt_case4
-  simp only [h_one, ne_eq, one_ne_zero, not_false_eq_true, true_and,
-    mul_one] at invsqrt_post1 invsqrt_post2 invsqrt_case3 invsqrt_case4
-  -- Shared bridges for Goals 1 and 4
+  unfold step_2
+  progress*
+  rename_i invsqrt _ invsqrt_bounds invsqrt_nonneg invsqrt_case1 invsqrt_case2 invsqrt_case3
+    _ _ _ _ _ _ _ _ _ _ _
+  -- Shared setup: ONE field value
+  have hONE : one.toField = (1 : CurveField) := by
+    unfold FieldElement51.toField; rw [one_post1]; simp
+  -- Field bridges: lift Nat-level mod equalities to CurveField
+  have hss : ss.toField = s.toField ^ 2 := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ ss_post1; push_cast at this; exact this
+  have hu1_add : u1.toField + ss.toField = one.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_post2; push_cast at this; exact this
+  have hu1_val : u1.toField = 1 - s.toField ^ 2 := by
+    rw [hONE] at hu1_add; rw [hss] at hu1_add; linear_combination hu1_add
+  have hu2_nat : Field51_as_Nat u2 = Field51_as_Nat one + Field51_as_Nat ss := by
+    unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro i hi; rw [Finset.mem_range] at hi; rw [u2_post1 i hi, mul_add]
+  have hu2_val : u2.toField = 1 + s.toField ^ 2 := by
+    unfold FieldElement51.toField; rw [hu2_nat]; push_cast
+    rw [one_post1]; push_cast
+    have hss' := hss; unfold FieldElement51.toField at hss'; rw [hss']
+  have hu2_sqr : u2_sqr.toField = u2.toField ^ 2 := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ u2_sqr_post1; push_cast at this; exact this
+  have hfe_d : fe.toField = Ed25519.d := by
+    unfold FieldElement51.toField; rw [fe_post1]; rfl
+  have hfe_neg_add : fe.toField + neg_d.toField = 0 := by
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ (show (Field51_as_Nat fe + Field51_as_Nat neg_d) % p = 0 % p by
+      rw [Nat.zero_mod]; exact neg_d_post1)
+    push_cast at this; exact this
+  have hneg_d : neg_d.toField = -Ed25519.d := by
+    linear_combination hfe_neg_add - hfe_d
+  have hu1_sq : u1_sq.toField = u1.toField ^ 2 := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_sq_post1; push_cast at this; exact this
+  have hneg_d_u1_sq : neg_d_u1_sq.toField = neg_d.toField * u1_sq.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ neg_d_u1_sq_post1; push_cast at this; exact this
+  have hv_add : v.toField + u2_sqr.toField = neg_d_u1_sq.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ v_post2; push_cast at this; exact this
+  have hv_val : v.toField = (-Ed25519.d) * u1.toField ^ 2 - u2.toField ^ 2 := by
+    rw [hneg_d, hu1_sq] at hneg_d_u1_sq; rw [hu2_sqr, hneg_d_u1_sq] at hv_add
+    linear_combination hv_add
+  have hv_u2_sqr : v_u2_sqr.toField = v.toField * u2_sqr.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ v_u2_sqr_post1; push_cast at this; exact this
+  -- Set W = the combined expression
   set W := (-Ed25519.d * (1 - s.toField ^ 2) ^ 2 - (1 + s.toField ^ 2) ^ 2) *
            (1 + s.toField ^ 2) ^ 2 with hW_def
-  have h_u8_field : u8.toField = W := by
-    -- Lift each Nat-level hypothesis to a CurveField equality
-    have hss : ss.toField = s.toField ^ 2 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ ss_mod; push_cast at this; exact this
-    have hu1_add : u1.toField + ss.toField = 1 := by
-      unfold FieldElement51.toField
-      have := lift_mod_eq _ _ u1_post; push_cast at this
-      simpa [FieldElement51.ONE_spec] using this
-    have hu2_nat : Field51_as_Nat u2 = Field51_as_Nat FieldElement51.ONE + Field51_as_Nat ss := by
-      unfold Field51_as_Nat
-      rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl
-      intro i hi; rw [Finset.mem_range] at hi; rw [u2_post i hi, mul_add]
-    have hu2 : u2.toField = 1 + ss.toField := by
-      unfold FieldElement51.toField; rw [hu2_nat]; push_cast; simp only [FieldElement51.ONE_spec,
-        Nat.cast_one]
-    have hu3 : u3.toField = u2.toField ^ 2 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u3_post; push_cast at this; exact this
-    have hd : (backend.serial.u64.constants.EDWARDS_D).toField = Ed25519.d := by
-      unfold FieldElement51.toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
-    have hu4_add : (backend.serial.u64.constants.EDWARDS_D).toField + u4.toField = 0 := by
-      unfold FieldElement51.toField
-      have := lift_mod_eq _ _ (show (Field51_as_Nat backend.serial.u64.constants.EDWARDS_D +
-        Field51_as_Nat u4) % p = 0 % p by rw [Nat.zero_mod]; exact u4_post)
-      push_cast at this; exact this
-    have hu5 : u5.toField = u1.toField ^ 2 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u5_post; push_cast at this; exact this
-    have hu6 : u6.toField = u4.toField * u5.toField := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u6_post; push_cast at this; exact this
-    have hu7_add : u7.toField + u3.toField = u6.toField := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u7_post; push_cast at this; exact this
-    have hu8 : u8.toField = u7.toField * u3.toField := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u8_post; push_cast at this; exact this
-    -- Derive intermediate equalities
-    have hu1 : u1.toField = 1 - ss.toField := by linear_combination hu1_add
-    have hu4 : u4.toField = -Ed25519.d := by linear_combination hu4_add - hd
-    have hu7 : u7.toField = u6.toField - u3.toField := by linear_combination hu7_add
-    -- Chain rewrites to express u8.toField in terms of s.toField and Ed25519.d
-    rw [hu8, hu7, hu6, hu4, hu5, hu3, hu2, hu1, hss]
-  -- Bridge: u8 % p ≠ 0 ↔ W ≠ 0
-  have h_ne_bridge : Field51_as_Nat u8 % p ≠ 0 ↔ W ≠ 0 := by
-    rw [← h_u8_field, FieldElement51.toField]
+  have h_v_u2_sqr_field : v_u2_sqr.toField = W := by
+    rw [hv_u2_sqr, hu2_sqr, hv_val, hu2_val, hW_def, hu1_val]
+  have hW_eq : W = v.toField * u2.toField ^ 2 := by
+    rw [hW_def, hu2_val, hv_val, hu1_val]
+    simp only [neg_mul, mul_eq_mul_right_iff, sub_right_inj, ne_eq, OfNat.ofNat_ne_zero,
+      not_false_eq_true, pow_eq_zero_iff]
+    left; rw [hu2_val]
+  -- Bridge: v_u2_sqr % p ≠ 0 ↔ W ≠ 0
+  have h_ne_bridge : Field51_as_Nat v_u2_sqr % p ≠ 0 ↔ W ≠ 0 := by
+    rw [← h_v_u2_sqr_field, FieldElement51.toField]
     simp only [ne_eq, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
-  -- Bridge: Nat-level ∃ x ↔ u8%p ≠ 0 ∧ IsSquare W
-  have h_sq_bridge : (∃ x : Nat, (x ^ 2 * (Field51_as_Nat u8 % p)) % p = 1) ↔
-      (Field51_as_Nat u8 % p ≠ 0 ∧ IsSquare W) := by
-    set w := Field51_as_Nat u8 % p with hw_def
+  -- Bridge: Nat-level ∃ x ↔ v_u2_sqr%p ≠ 0 ∧ IsSquare W
+  have h_sq_bridge : (∃ x : Nat, (x ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1) ↔
+      (Field51_as_Nat v_u2_sqr % p ≠ 0 ∧ IsSquare W) := by
+    set w := Field51_as_Nat v_u2_sqr % p with hw_def
     have h_w_eq : (w : CurveField) = W := by
-      rw [← h_u8_field, FieldElement51.toField, hw_def, ZMod.natCast_mod]
+      rw [← h_v_u2_sqr_field, FieldElement51.toField, hw_def, ZMod.natCast_mod]
     have h_1mod : (1 : ℕ) % p = 1 := by decide
     constructor
     · -- → : n²·w ≡ 1 (mod p) → w ≠ 0 ∧ IsSquare W
@@ -410,7 +363,6 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       have hn_ne : (n : CurveField) ≠ 0 := by intro h; simp only [h, ne_eq, OfNat.ofNat_ne_zero,
         not_false_eq_true, zero_pow, zero_mul, zero_ne_one] at h_zmod
       refine ⟨h_nz, ⟨(n : CurveField)⁻¹, ?_⟩⟩
-      -- W = ((↑n)²)⁻¹ = (↑n⁻¹)² = ↑n⁻¹ · ↑n⁻¹
       suffices h : W = ((n : CurveField) ^ 2)⁻¹ by rw [← inv_pow, sq] at h; exact h
       exact mul_left_cancel₀ (pow_ne_zero 2 hn_ne)
         (h_zmod.trans (mul_inv_cancel₀ (pow_ne_zero 2 hn_ne)).symm)
@@ -425,41 +377,41 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       exact (ZMod.natCast_eq_natCast_iff _ _ _).mp (by
         push_cast [ZMod.val_natCast] at h_zmod ⊢; simp only [ZMod.natCast_val, ZMod.cast_id',
           id_eq]; grind only [cases eager Prod])
-  -- Shared field bridges for Goals 4 and 5
-  have hu10 : u10.toField = invsqrt_res.2.toField * u2.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ u10_post; push_cast at this; exact this
-  have hfe4 : fe4.toField = u10.toField * u7.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ fe4_post; push_cast at this; exact this
-  have hDy_field : Dy.toField = invsqrt_res.2.toField * fe4.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ Dy_post; push_cast at this; exact this
-  have hfe5_nat : Field51_as_Nat fe5 = Field51_as_Nat s + Field51_as_Nat s := by
-    unfold Field51_as_Nat
-    rw [← Finset.sum_add_distrib]
+  -- Shared field bridges for coordinate expressions
+  have hDx : Dx.toField = invsqrt.2.toField * u2.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ Dx_post1; push_cast at this; exact this
+  have hDx_v : Dx_v.toField = Dx.toField * v.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ Dx_v_post1; push_cast at this; exact this
+  have hDy_field : Dy.toField = invsqrt.2.toField * Dx_v.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ Dy_post1; push_cast at this; exact this
+  have hs_plus_s_nat : Field51_as_Nat s_plus_s = Field51_as_Nat s + Field51_as_Nat s := by
+    unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]
     apply Finset.sum_congr rfl
-    intro i hi; rw [Finset.mem_range] at hi; rw [fe5_post i hi, mul_add]
-  have hfe5 : fe5.toField = 2 * s.toField := by
-    unfold FieldElement51.toField; rw [hfe5_nat]; push_cast; ring
-  have hx_field : x.toField = fe5.toField * u10.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ x_post; push_cast at this; exact this
+    intro i hi; rw [Finset.mem_range] at hi; rw [s_plus_s_post1 i hi, mul_add]
+  have hs_plus_s : s_plus_s.toField = 2 * s.toField := by
+    unfold FieldElement51.toField; rw [hs_plus_s_nat]; push_cast; ring
+  have hx_field : x.toField = s_plus_s.toField * Dx.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ x_post1; push_cast at this; exact this
   have hy_field : y.toField = u1.toField * Dy.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ y_post; push_cast at this; exact this
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ y_post1; push_cast at this; exact this
   have ht_field : t.toField = x1.toField * y.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ t_post; push_cast at this; exact this
-  have hx_1_neg : x_1.toField = -x.toField := by
+    unfold FieldElement51.toField; have := lift_mod_eq _ _ t_post1; push_cast at this; exact this
+  have hx_negated_neg : x_negated.toField = -x.toField := by
     unfold FieldElement51.toField
-    have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_1) % p = 0 % p by rw [Nat.zero_mod]; exact x_1_mod)
-    push_cast at h; grind only [cases eager Prod]
-  have hx1_nat : Field51_as_Nat x1 = if x_neg.val = 1#u8 then Field51_as_Nat x_1 else Field51_as_Nat x := by
+    have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_negated) % p = 0 % p by
+      rw [Nat.zero_mod]; exact x_negated_post1)
+    push_cast at h; grind
+  have hx1_nat : Field51_as_Nat x1 = if x_neg.val = 1#u8 then Field51_as_Nat x_negated else Field51_as_Nat x := by
     unfold Field51_as_Nat
     split <;> rename_i h
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
       have := x1_post i hi; rw [if_pos h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
       have := x1_post i hi; rw [if_neg h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
-  have hx1_select : x1.toField = if x_neg.val = 1#u8 then x_1.toField else x.toField := by
+  have hx1_select : x1.toField = if x_neg.val = 1#u8 then x_negated.toField else x.toField := by
     unfold FieldElement51.toField; rw [hx1_nat]; split <;> rfl
   have hx1_abs : x1.toField = math.abs_edwards x.toField := by
-    rw [hx1_select, hx_1_neg, math.abs_edwards, math.is_negative]
+    rw [hx1_select, hx_negated_neg, math.abs_edwards, math.is_negative]
     by_cases hxn : x_neg.val = 1#u8
     · rw [if_pos hxn]
       have : (x.toField.val % 2 == 1) = true := by
@@ -471,80 +423,38 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
         rw [Bool.eq_false_iff]; intro h; rw [beq_iff_eq] at h
         exact hxn (x_neg_post.mpr (by unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
       simp only [this, Bool.false_eq_true, ↓reduceIte]
-  have hI_sq_W : invsqrt_res.1.val = 1#u8 → invsqrt_res.2.toField ^ 2 * W = 1 := by
+  have hI_sq_W : invsqrt.1.val = 1#u8 → invsqrt.2.toField ^ 2 * W = 1 := by
     intro h_ok1
-    have h_nz : Field51_as_Nat u8 % p ≠ 0 := by
-      intro h_zero; exact absurd h_ok1 (by rw [(invsqrt_post2 h_zero).1]; decide)
-    have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat u8 % p)) % p = 1 := by
-      by_contra h_nex; exact absurd h_ok1 (by rw [(invsqrt_case4 ⟨h_nz, h_nex⟩).1]; decide)
-    have h_sq := (invsqrt_case3 ⟨h_nz, h_ex⟩).2
-    rw [← h_u8_field]; unfold FieldElement51.toField
-    have h := lift_mod_eq ((Field51_as_Nat invsqrt_res.2 % p) ^ 2 * (Field51_as_Nat u8 % p)) 1
+    have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := by
+      intro h_zero; exact absurd h_ok1 (by rw [(invsqrt_case1 h_zero).1]; decide)
+    have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
+      by_contra h_nex; exact absurd h_ok1 (by rw [(invsqrt_case3 ⟨h_nz, h_nex⟩).1]; decide)
+    have h_sq := (invsqrt_case2 ⟨h_nz, h_ex⟩).2
+    rw [← h_v_u2_sqr_field]; unfold FieldElement51.toField
+    have h := lift_mod_eq ((Field51_as_Nat invsqrt.2 % p) ^ 2 * (Field51_as_Nat v_u2_sqr % p)) 1
       (by rw [show (1 : Nat) % p = 1 from by decide]; exact h_sq)
     push_cast at h; simp only [ZMod.natCast_mod] at h; exact h
-  have hss_field : ss.toField = s.toField ^ 2 := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ ss_mod; push_cast at this; exact this
-  have hu1_val : u1.toField = 1 - s.toField ^ 2 := by
-    have : u1.toField + ss.toField = 1 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_post; push_cast at this
-      simpa [FieldElement51.ONE_spec] using this
-    rw [hss_field] at this
-    linear_combination this
-  have hu2_val : u2.toField = 1 + s.toField ^ 2 := by
-    have : Field51_as_Nat u2 = Field51_as_Nat FieldElement51.ONE + Field51_as_Nat ss := by
-      unfold Field51_as_Nat; rw [← Finset.sum_add_distrib]
-      apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi; rw [u2_post i hi, mul_add]
-    unfold FieldElement51.toField; rw [this]; push_cast
-    rw [FieldElement51.ONE_spec]; push_cast
-    have hss := hss_field; unfold FieldElement51.toField at hss; rw [hss]
-  have hu7_val : u7.toField = (-Ed25519.d) * u1.toField ^ 2 - u2.toField ^ 2 := by
-    have hu3 : u3.toField = u2.toField ^ 2 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u3_post; push_cast at this; exact this
-    have hd : (backend.serial.u64.constants.EDWARDS_D).toField = Ed25519.d := by
-      unfold FieldElement51.toField; rw [backend.serial.u64.constants.EDWARDS_D_spec]; rfl
-    have hu4 : u4.toField = -Ed25519.d := by
-      have : (backend.serial.u64.constants.EDWARDS_D).toField + u4.toField = 0 := by
-        unfold FieldElement51.toField
-        have := lift_mod_eq _ _ (show (Field51_as_Nat backend.serial.u64.constants.EDWARDS_D +
-          Field51_as_Nat u4) % p = 0 % p by rw [Nat.zero_mod]; exact u4_post)
-        push_cast at this; exact this
-      linear_combination this - hd
-    have hu5 : u5.toField = u1.toField ^ 2 := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u5_post; push_cast at this; exact this
-    have hu6 : u6.toField = u4.toField * u5.toField := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u6_post; push_cast at this; exact this
-    have hu7_add : u7.toField + u3.toField = u6.toField := by
-      unfold FieldElement51.toField; have := lift_mod_eq _ _ u7_post; push_cast at this; exact this
-    rw [hu4, hu5] at hu6; rw [hu3, hu6] at hu7_add
-    linear_combination hu7_add
-  have hW_eq : W = u7.toField * u2.toField ^ 2 := by
-    rw [hW_def, hu2_val, hu7_val, hu1_val];
-    simp only [neg_mul, mul_eq_mul_right_iff, sub_right_inj, ne_eq, OfNat.ofNat_ne_zero,
-      not_false_eq_true, pow_eq_zero_iff]
-    left; rw [hu2_val]
   -- Simplified coordinate expressions
-  have hDy_simp : Dy.toField = invsqrt_res.2.toField ^ 2 * u2.toField * u7.toField := by
-    rw [hDy_field, hfe4, hu10]; ring
-  have hy_simp : y.toField = u1.toField * (invsqrt_res.2.toField ^ 2 * u2.toField * u7.toField) := by
+  have hDy_simp : Dy.toField = invsqrt.2.toField ^ 2 * u2.toField * v.toField := by
+    rw [hDy_field, hDx_v, hDx]; ring
+  have hy_simp : y.toField = u1.toField * (invsqrt.2.toField ^ 2 * u2.toField * v.toField) := by
     rw [hy_field, hDy_simp]
-  have hx_simp : x.toField = 2 * s.toField * invsqrt_res.2.toField * u2.toField := by
-    rw [hx_field, hfe5, hu10]; ring
-  have hONE : FieldElement51.ONE.toField = (1 : CurveField) := by
-    unfold FieldElement51.toField; rw [FieldElement51.ONE_spec]; simp
+  have hx_simp : x.toField = 2 * s.toField * invsqrt.2.toField * u2.toField := by
+    rw [hx_field, hs_plus_s, hDx]; ring
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · -- Goal 1: ok1 ↔ (v * u2² ≠ 0 ∧ IsSquare(v * u2²))
     constructor
     · intro h_ok
-      have h_nz : Field51_as_Nat u8 % p ≠ 0 := by
-        intro h_zero; exact absurd h_ok (by rw [(invsqrt_post2 h_zero).1]; decide)
-      have h_ex : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat u8 % p)) % p = 1 := by
+      have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := by
+        intro h_zero; exact absurd h_ok (by rw [(invsqrt_case1 h_zero).1]; decide)
+      have h_ex : ∃ x : Nat, (x ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
         by_contra h_nex
-        exact absurd h_ok (by rw [(invsqrt_case4 ⟨h_nz, h_nex⟩).1]; decide)
+        exact absurd h_ok (by rw [(invsqrt_case3 ⟨h_nz, h_nex⟩).1]; decide)
       exact ⟨h_ne_bridge.mp h_nz, (h_sq_bridge.mp h_ex).2⟩
     · -- ← direction
       intro ⟨h_ne, h_sq⟩
-      have h_nz : Field51_as_Nat u8 % p ≠ 0 := h_ne_bridge.mpr h_ne
-      exact (invsqrt_case3 ⟨h_nz, h_sq_bridge.mpr ⟨h_nz, h_sq⟩⟩).1
+      have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := h_ne_bridge.mpr h_ne
+      exact (invsqrt_case2 ⟨h_nz, h_sq_bridge.mpr ⟨h_nz, h_sq⟩⟩).1
   · -- Goal 2: c ↔ math.is_negative t.toField
     simp only [c_post, math.is_negative, FieldElement51.toField, ZMod.val_natCast, beq_iff_eq]
   · -- Goal 3: c1 ↔ y.toField = 0
@@ -554,23 +464,22 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     constructor
     · -- → direction: decompress_step2 s.toField = some P → ok1=1 ∧ c=0 ∧ c1=0 ∧ pt.toPoint = P
       intro h_decomp
-      -- Use forward helper (sorry'd) to get data in Ed25519.d form
       have h_fwd := decompress_step2_forward s.toField P h_decomp
-        u1.toField u2.toField u7.toField W hu1_val hu2_val hu7_val hW_eq
+        u1.toField u2.toField v.toField W hu1_val hu2_val hv_val hW_eq
       obtain ⟨h_sq, h_W_ne, h_neg_fwd, h_y_ne_fwd, h_coords⟩ := h_fwd
       -- Step 1: ok1 = 1 (from IsSquare W ∧ W ≠ 0)
-      have h_ok1 : invsqrt_res.1.val = 1#u8 := by
+      have h_ok1 : invsqrt.1.val = 1#u8 := by
         have h_nz := h_ne_bridge.mpr h_W_ne
         have h_ex := h_sq_bridge.mpr ⟨h_nz, h_sq⟩
-        exact (invsqrt_case3 ⟨h_nz, h_ex⟩).1
+        exact (invsqrt_case2 ⟨h_nz, h_ex⟩).1
       -- Step 2: Get I_rust² * W = 1
       have hI := hI_sq_W h_ok1
       -- Step 3: Get coordinate equalities from h_coords
-      have ⟨h_Px, h_Py⟩ := h_coords invsqrt_res.2.toField hI
+      have ⟨h_Px, h_Py⟩ := h_coords invsqrt.2.toField hI
       -- Step 4: Bridge Rust intermediates to P's coordinates
       have hx1_eq_Px : x1.toField = P.x := by rw [hx1_abs, hx_simp]; exact h_Px.symm
       have hy_eq_Py : y.toField = P.y := by rw [hy_simp]; exact h_Py.symm
-      -- Step 5: c = 0 (is_negative (P.x * P.y) = false → t not negative → c ≠ 1)
+      -- Step 5: c = 0
       have h_c : c.val = 0#u8 := by
         rcases c.valid with h | h
         · exact h
@@ -582,7 +491,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
           simp only [is_negative, FieldElement51.toField, ZMod.val_natCast,
             beq_eq_false_iff_ne] at this
           exact this h_t_neg
-      -- Step 6: c1 = 0 (P.y ≠ 0 → y not zero → c1 ≠ 1)
+      -- Step 6: c1 = 0
       have h_c1 : c1.val = 0#u8 := by
         rcases c1.valid with h | h
         · exact h
@@ -593,29 +502,29 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
             exact h_y_zero
           rw [hy_eq_Py] at this
           exact h_y_ne_fwd this
-      -- Step 7: toPoint = P (coordinates match + Z = 1)
+      -- Step 7: toPoint = P
       have h_valid : edwards.EdwardsPoint.IsValid
-          { X := x1, Y := y, Z := FieldElement51.ONE, T := t } := by
+          { X := x1, Y := y, Z := one, T := t } := by
         refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
         · -- X_bounds
           change ∀ i < 5, x1[i]!.val < 2 ^ 53
           intro i hi; rw [x1_post i hi]; split
-          · have := x_1_bounds i hi; omega
-          · have := x_bounds i hi; omega
+          · have := x_negated_post2 i hi; omega
+          · have := x_post2 i hi; omega
         · -- Y_bounds
           change ∀ i < 5, y[i]!.val < 2 ^ 53
-          intro i hi; have := y_bounds i hi; omega
+          intro i hi; have := y_post2 i hi; omega
         · -- Z_bounds
-          change ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53
-          intro i hi; unfold FieldElement51.ONE; interval_cases i <;> decide
+          change ∀ i < 5, one[i]!.val < 2 ^ 53
+          intro i hi; have := one_post2 i hi; omega
         · -- T_bounds
           change ∀ i < 5, t[i]!.val < 2 ^ 53
-          intro i hi; have := t_bounds i hi; omega
+          intro i hi; have := t_post2 i hi; omega
         · -- Z_ne_zero
-          change FieldElement51.ONE.toField ≠ 0
+          change one.toField ≠ 0
           rw [hONE]; exact one_ne_zero
         · -- T_relation
-          change x1.toField * y.toField = t.toField * FieldElement51.ONE.toField
+          change x1.toField * y.toField = t.toField * one.toField
           rw [ht_field, hONE, mul_one]
         · -- on_curve
           dsimp only
@@ -623,11 +532,11 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
           have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
             rw [hx1_abs]; exact abs_edwards_sq x.toField
           rw [h_x1_sq, hx_simp, hy_simp]
-          have hIW : invsqrt_res.2.toField ^ 2 * (u7.toField * u2.toField ^ 2) = 1 := by
+          have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
             rw [← hW_eq]; exact hI
           exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-            invsqrt_res.2.toField u1.toField u2.toField u7.toField
-            (by simp only [Ed25519]) hu1_val hu2_val hu7_val hIW
+            invsqrt.2.toField u1.toField u2.toField v.toField
+            (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
       have hPt := edwards.EdwardsPoint.toPoint_of_isValid h_valid
       refine ⟨h_ok1, h_c, h_c1, ?_⟩
       ext
@@ -638,51 +547,51 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     · -- ← direction: ok1=1 ∧ c=0 ∧ c1=0 ∧ pt.toPoint = P → decompress_step2 s.toField = some P
       intro ⟨h_ok1, h_c, h_c1, h_pt⟩
       -- Derive key facts from ok1=1
-      have h_nz : Field51_as_Nat u8 % p ≠ 0 := by
-        intro h_zero; exact absurd h_ok1 (by rw [(invsqrt_post2 h_zero).1]; decide)
-      have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat u8 % p)) % p = 1 := by
+      have h_nz : Field51_as_Nat v_u2_sqr % p ≠ 0 := by
+        intro h_zero; exact absurd h_ok1 (by rw [(invsqrt_case1 h_zero).1]; decide)
+      have h_ex : ∃ z : Nat, (z ^ 2 * (Field51_as_Nat v_u2_sqr % p)) % p = 1 := by
         by_contra h_nex
-        exact absurd h_ok1 (by rw [(invsqrt_case4 ⟨h_nz, h_nex⟩).1]; decide)
+        exact absurd h_ok1 (by rw [(invsqrt_case3 ⟨h_nz, h_nex⟩).1]; decide)
       have hIsSquare_W : IsSquare W := (h_sq_bridge.mp h_ex).2
       have hW_ne : W ≠ 0 := h_ne_bridge.mp h_nz
-      have hI_sq := hI_sq_W h_ok1  -- I_rust^2 * W = 1
-      have hI_sq_inv : invsqrt_res.2.toField ^ 2 = W⁻¹ :=
+      have hI_sq := hI_sq_W h_ok1
+      have hI_sq_inv : invsqrt.2.toField ^ 2 = W⁻¹ :=
         eq_inv_of_mul_eq_one_left hI_sq
       -- Step B: Prove EdwardsPoint validity
       have h_valid : edwards.EdwardsPoint.IsValid
-          { X := x1, Y := y, Z := FieldElement51.ONE, T := t } := by
+          { X := x1, Y := y, Z := one, T := t } := by
         refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
         · -- X_bounds
           change ∀ i < 5, x1[i]!.val < 2 ^ 53
           intro i hi; rw [x1_post i hi]; split
-          · have := x_1_bounds i hi; omega
-          · have := x_bounds i hi; omega
+          · have := x_negated_post2 i hi; omega
+          · have := x_post2 i hi; omega
         · -- Y_bounds
           change ∀ i < 5, y[i]!.val < 2 ^ 53
-          intro i hi; have := y_bounds i hi; omega
+          intro i hi; have := y_post2 i hi; omega
         · -- Z_bounds
-          change ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53
-          intro i hi; unfold FieldElement51.ONE; interval_cases i <;> decide
+          change ∀ i < 5, one[i]!.val < 2 ^ 53
+          intro i hi; have := one_post2 i hi; omega
         · -- T_bounds
           change ∀ i < 5, t[i]!.val < 2 ^ 53
-          intro i hi; have := t_bounds i hi; omega
+          intro i hi; have := t_post2 i hi; omega
         · -- Z_ne_zero
-          change FieldElement51.ONE.toField ≠ 0
+          change one.toField ≠ 0
           rw [hONE]; exact one_ne_zero
         · -- T_relation
-          change x1.toField * y.toField = t.toField * FieldElement51.ONE.toField
+          change x1.toField * y.toField = t.toField * one.toField
           rw [ht_field, hONE, mul_one]
-        · -- on_curve (curve equation via decompress_helper)
+        · -- on_curve
           dsimp only
           simp only [hONE, one_pow, mul_one]
           have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
             rw [hx1_abs]; exact abs_edwards_sq x.toField
           rw [h_x1_sq, hx_simp, hy_simp]
-          have hIW : invsqrt_res.2.toField ^ 2 * (u7.toField * u2.toField ^ 2) = 1 := by
+          have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
             rw [← hW_eq]; exact hI_sq
           exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-            invsqrt_res.2.toField u1.toField u2.toField u7.toField
-            (by simp only [Ed25519]) hu1_val hu2_val hu7_val hIW
+            invsqrt.2.toField u1.toField u2.toField v.toField
+            (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
       -- Step C: Extract P.x and P.y from h_pt
       have ⟨hPx, hPy⟩ := toPoint_coords h_valid hONE h_pt
       -- Step D: is_negative (P.x * P.y) = false (from c = 0)
@@ -690,10 +599,10 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       -- Step E: P.y ≠ 0 (from c1 = 0)
       have h_y_ne := Py_ne_zero hPy h_c1 c1_post
       -- Step F: Apply decompress_step2_backward
-      have hIW : invsqrt_res.2.toField ^ 2 * (u7.toField * u2.toField ^ 2) = 1 := by
+      have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
         rw [← hW_eq]; exact hI_sq
-      exact decompress_step2_backward s.toField invsqrt_res.2.toField
-        u1.toField u2.toField u7.toField hu1_val hu2_val hu7_val hIW P
+      exact decompress_step2_backward s.toField invsqrt.2.toField
+        u1.toField u2.toField v.toField hu1_val hu2_val hv_val hIW P
         h_neg h_y_ne
         (by rw [hPx, hx1_abs, hx_simp])
         (by rw [hPy, hy_simp])
@@ -702,42 +611,42 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     have hI := hI_sq_W h_ok1
     unfold RistrettoPoint.IsValid
     refine ⟨?_, ?_⟩
-    · -- Part 1: EdwardsPoint.IsValid { X := x1, Y := y, Z := ONE, T := t }
+    · -- Part 1: EdwardsPoint.IsValid { X := x1, Y := y, Z := one, T := t }
       refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
       · change ∀ i < 5, x1[i]!.val < 2 ^ 53
         intro i hi; rw [x1_post i hi]; split
-        · have := x_1_bounds i hi; omega
-        · have := x_bounds i hi; omega
+        · have := x_negated_post2 i hi; omega
+        · have := x_post2 i hi; omega
       · change ∀ i < 5, y[i]!.val < 2 ^ 53
-        intro i hi; have := y_bounds i hi; omega
-      · change ∀ i < 5, FieldElement51.ONE[i]!.val < 2 ^ 53
-        intro i hi; unfold FieldElement51.ONE; interval_cases i <;> decide
+        intro i hi; have := y_post2 i hi; omega
+      · change ∀ i < 5, one[i]!.val < 2 ^ 53
+        intro i hi; have := one_post2 i hi; omega
       · change ∀ i < 5, t[i]!.val < 2 ^ 53
-        intro i hi; have := t_bounds i hi; omega
-      · change FieldElement51.ONE.toField ≠ 0
+        intro i hi; have := t_post2 i hi; omega
+      · change one.toField ≠ 0
         rw [hONE]; exact one_ne_zero
-      · change x1.toField * y.toField = t.toField * FieldElement51.ONE.toField
+      · change x1.toField * y.toField = t.toField * one.toField
         rw [ht_field, hONE, mul_one]
       · dsimp only
         simp only [hONE, one_pow, mul_one]
         have h_x1_sq : x1.toField ^ 2 = x.toField ^ 2 := by
           rw [hx1_abs]; exact abs_edwards_sq x.toField
         rw [h_x1_sq, hx_simp, hy_simp]
-        have hIW : invsqrt_res.2.toField ^ 2 * (u7.toField * u2.toField ^ 2) = 1 := by
+        have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
           rw [← hW_eq]; exact hI
         exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
-          invsqrt_res.2.toField u1.toField u2.toField u7.toField
-          (by simp only [Ed25519]) hu1_val hu2_val hu7_val hIW
+          invsqrt.2.toField u1.toField u2.toField v.toField
+          (by simp only [Ed25519]) hu1_val hu2_val hv_val hIW
     · -- Part 2: IsSquare (Z² - Y²), i.e., IsSquare (1 - y²)
       dsimp only
       simp only [hONE, one_pow]
-      have hIW : invsqrt_res.2.toField ^ 2 * (u7.toField * u2.toField ^ 2) = 1 := by
+      have hIW : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1 := by
         rw [← hW_eq]; exact hI
       have hW_ne : W ≠ 0 := by
         intro h; rw [h, mul_zero] at hI; exact one_ne_zero hI.symm
       have hu2_ne : u2.toField ≠ 0 := by
         intro h; exact hW_ne (by rw [hW_eq, h]; ring)
-      -- Key identity: y · u2 = u1 (from I² · (u7 · u2²) = 1)
+      -- Key identity: y · u2 = u1 (from I² · (v · u2²) = 1)
       have hyu2 : y.toField * u2.toField = u1.toField := by
         rw [hy_simp]; linear_combination u1.toField * hIW
       -- Witness: 1 - y² = (2s/u2)²
@@ -754,6 +663,5 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       rw [this, hyu2, hu1_val, hu2_val]
       -- (1+s²)² - (1-s²)² = 4s²
       ring
-  -/
 
 end curve25519_dalek.ristretto.decompress
