@@ -45,30 +45,12 @@ open curve25519_dalek.edwards
 /-! ## Independent sub-lemmas for `sub_spec_aux_54_52_53_52`
 
 These lemmas factor out the key proof steps used in the main theorem:
-1. `Field51_as_Nat_of_limb_add`: converts limb-wise addition to `Field51_as_Nat` sum
+1. `pointwise_add_Field51_as_Nat` (from Aux.lean): converts limb-wise addition to `Field51_as_Nat` sum
 2. `sub_X_modular_relation` / `sub_Y_modular_relation` / `sub_Z_modular_relation` / `sub_T_modular_relation`:
    pure modular arithmetic lemmas for each coordinate relation
 3. `double_limb_tight_bounds`: derives tight bounds for doubled limb values
 -/
 
-
-/-- `Field51_as_Nat` distributes over limb-wise addition:
-    if `c[i] = a[i] + b[i]` for all limbs, then `Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b`. -/
-private lemma Field51_as_Nat_of_limb_add (a b c : Array U64 5#usize)
-    (h : ∀ i, i < 5 → c[i]!.val = a[i]!.val + b[i]!.val) :
-    Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b := by
-  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
-    Nat.reduceLT, Nat.lt_add_one]
-  have h0 := h 0 (by omega)
-  have h1 := h 1 (by omega)
-  have h2 := h 2 (by omega)
-  have h3 := h 3 (by omega)
-  have h4 := h 4 (by omega)
-  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
-    Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
-  scalar_tac
 
 /-- X relation for sub: `X' + Y·YpX ≡ (Y+X)·YmX + X·YpX (mod p)`.
     Here X' = PM - MP, PM = (Y+X)·other.Y_minus_X, MP = (Y-X)·other.Y_plus_X.
@@ -216,10 +198,10 @@ theorem sub_spec_aux_54_52_53_52
   obtain ⟨fe3, h_fe3_ok, h_fe3, fe3_bounds⟩ := CompletedPoint.add_spec_53_52 hzz2_tight TT2d_bounds
   simp only [h_fe3_ok, bind_tc_ok]
   -- Derive Field51_as_Nat equalities from limb-wise addition results
-  have h_sum_YX := (Field51_as_Nat_of_limb_add self.Y self.X Y_plus_X h_Y_plus_X).symm
-  have h_fe1_nat := Field51_as_Nat_of_limb_add PM MP fe1 h_fe1
-  have h_ZZ2_nat := Field51_as_Nat_of_limb_add ZZ ZZ ZZ2 h_ZZ2
-  have h_fe3_nat := Field51_as_Nat_of_limb_add ZZ2 TT2d fe3 h_fe3
+  have h_sum_YX := (pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X h_Y_plus_X).symm
+  have h_fe1_nat := pointwise_add_Field51_as_Nat PM MP fe1 h_fe1
+  have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 h_ZZ2
+  have h_fe3_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe3 h_fe3
   -- Arithmetic proofs using extracted modular relation lemmas
   constructor
   · -- X relation: (X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p
@@ -258,7 +240,7 @@ theorem sub_spec_aux_54_52_53_52
 
 theorem sub_spec_bounds'
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
-    (other : ProjectiveNielsPoint) (hother : other.IsValid') :
+    (other : ProjectiveNielsPoint) (hother : other.IsValid) :
     ∃ c, sub self other = ok c ∧
     let X := Field51_as_Nat self.X
     let Y := Field51_as_Nat self.Y
@@ -540,12 +522,12 @@ private lemma sub_toPoint_eq_proof
     (Z1 Z2 x1 y1 x2 y2 : Edwards.CurveField)
     (hZ1_ne : Z1 ≠ 0) (hZ2_ne : Z2 ≠ 0)
     (h_self_x : self.toPoint.x = x1) (h_self_y : self.toPoint.y = y1)
-    (h_other_x : other.toPointI.x = x2) (h_other_y : other.toPointI.y = y2)
+    (h_other_x : other.toPoint.x = x2) (h_other_y : other.toPoint.y = y2)
     (hX_factored : c.X.toField = 2 * Z1 * Z2 * (x1 * y2 - y1 * x2))
     (hY_factored : c.Y.toField = 2 * Z1 * Z2 * (y1 * y2 - x1 * x2))
     (hZ_factored : c.Z.toField = 2 * Z1 * Z2 * (1 - Ed25519.d * x1 * x2 * y1 * y2))
     (hT_factored : c.T.toField = 2 * Z1 * Z2 * (1 + Ed25519.d * x1 * x2 * y1 * y2)) :
-    c.toPoint = self.toPoint - other.toPointI := by
+    c.toPoint = self.toPoint - other.toPoint := by
   have h2 : (2 : Edwards.CurveField) ≠ 0 := by decide
   have ⟨h_cx, h_cy⟩ := CompletedPoint.toPoint_of_isValid h_c_valid
   ext
@@ -559,9 +541,9 @@ private lemma sub_toPoint_eq_proof
     rw [h_cy, hY_factored, hT_factored]
     simp only [sub_eq_add_neg]
     rw [add_y]
-    have := Edwards.neg_x other.toPointI
+    have := Edwards.neg_x other.toPoint
     rw [this]
-    have := Edwards.neg_y other.toPointI
+    have := Edwards.neg_y other.toPoint
     rw [this]
     simp only [h_self_x, h_self_y, h_other_x, h_other_y, Ed25519]
     field_simp [h2, hZ1_ne, hZ2_ne]
@@ -576,7 +558,7 @@ private lemma sub_toPoint_eq_proof
 private lemma sub_isValid_and_toPoint
     (c : CompletedPoint)
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
-    (other : ProjectiveNielsPoint) (hother : other.IsValid')
+    (other : ProjectiveNielsPoint) (hother : other.IsValid)
     (hX_F' : c.X.toField = (self.Y.toField + self.X.toField) * other.Y_minus_X.toField -
         (self.Y.toField - self.X.toField) * other.Y_plus_X.toField)
     (hY_F' : c.Y.toField = (self.Y.toField + self.X.toField) * other.Y_minus_X.toField +
@@ -589,7 +571,7 @@ private lemma sub_isValid_and_toPoint
     (hcY_bounds : ∀ i < 5, c.Y[i]!.val < 2 ^ 54)
     (hcZ_bounds : ∀ i < 5, c.Z[i]!.val < 2 ^ 54)
     (hcT_bounds : ∀ i < 5, c.T[i]!.val < 2 ^ 54) :
-    c.IsValid ∧ c.toPoint = self.toPoint - other.toPointI := by
+    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint := by
   -- Setup self's affine coordinates
   set X1 := self.X.toField with hX1_def
   set Y1 := self.Y.toField with hY1_def
@@ -670,12 +652,12 @@ private lemma sub_isValid_and_toPoint
       on_curve := h_c_on_curve
     }
     have ⟨h_selfx, h_selfy⟩ := EdwardsPoint.toPoint_of_isValid hself
-    have ⟨h_otherx, h_othery⟩ := ProjectiveNielsPoint.toPoint_of_isValid' hother
+    have ⟨h_otherx, h_othery⟩ := ProjectiveNielsPoint.toPoint_of_isValid hother
     have h_self_x : self.toPoint.x = x1 := by simp only [h_selfx, hx1_def, hX1_def, hZ1_def]
     have h_self_y : self.toPoint.y = y1 := by simp only [h_selfy, hy1_def, hY1_def, hZ1_def]
-    have h_other_x : other.toPointI.x = x2 := by
+    have h_other_x : other.toPoint.x = x2 := by
       simp only [h_otherx, hx2_def, hYpX_def, hYmX_def, hZ2_def]
-    have h_other_y : other.toPointI.y = y2 := by
+    have h_other_y : other.toPoint.y = y2 := by
       simp only [h_othery, hy2_def, hYpX_def, hYmX_def, hZ2_def]
     exact sub_toPoint_eq_proof c self other h_c_valid Z1 Z2 x1 y1 x2 y2
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
@@ -684,9 +666,9 @@ private lemma sub_isValid_and_toPoint
 @[progress]
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
-    (other : ProjectiveNielsPoint) (hother : other.IsValid') :
+    (other : ProjectiveNielsPoint) (hother : other.IsValid) :
     Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>
-    c.IsValid ∧ c.toPoint = self.toPoint - other.toPointI ⦄ := by
+    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by
   obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     sub_spec_bounds' self hself other hother
   simp only [spec]
