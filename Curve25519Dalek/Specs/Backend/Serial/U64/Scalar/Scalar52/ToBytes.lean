@@ -36,26 +36,31 @@ natural language specs:
 -/
 
 /-- The limb bound follows from Equiv. -/
-theorem limb_bound_of_equiv (b : Array U8 32#usize) (u : Scalar52)
-    (hequiv : ∀ i : Fin 5,
-      ofU64 u[i]! ≈ₗ (ofByteArray b).extract (52 * i.val) (52 * i.val + 52)) :
-    U8x32_as_Nat b < L := by
-    -- Since Scalar52_as_Nat u < L
+theorem as_nat_bound_of_equiv (self : Scalar52) (result : Array U8 32#usize)
+    (h : ∀ i : Fin 4,
+      ofU64 self[i]! ≈ₗ (ofByteArray result).extract (52 * i.val) (52 * i.val + 52))
+    (h' : (ofU64 self[4]).extract 0 48 ≈ₗ (ofByteArray result).extract 208 256)
+    (hbound : Scalar52_as_Nat self < L) :
+    U8x32_as_Nat result < L := by
     sorry
 
 /-- Equiv implies the limb value equals the slice value. -/
-theorem scalar52_eq_of_bitList (b : Array U8 32#usize) (u : Scalar52)
-    (hequiv : ∀ i : Fin 5,
-      ofU64 u[i]! ≈ₗ (ofByteArray b).extract (52 * i.val) (52 * i.val + 52)) :
-    U8x32_as_Nat b = Scalar52_as_Nat u := by
+theorem scalar52_eq_of_bitList (self : Scalar52) (result : Array U8 32#usize)
+    (h : ∀ i : Fin 4,
+      ofU64 self[i]! ≈ₗ (ofByteArray result).extract (52 * i.val) (52 * i.val + 52))
+    (h' : (ofU64 self[4]).extract 0 48 ≈ₗ (ofByteArray result).extract 208 256)
+    (hbound : Scalar52_as_Nat self < L) :
+    U8x32_as_Nat result = Scalar52_as_Nat self := by
     sorry
 
 /-- The pure List Bool spec for to_bytes, using `BitList.Equiv` (≈ₗ). -/
 @[progress]
-theorem to_bytes_bitList_spec (u : Scalar52) :
-    to_bytes u ⦃ (b : Array U8 32#usize) =>
-      ∀ i : Fin 5,
-        ofU64 u[i]! ≈ₗ (ofByteArray b).extract (52 * i.val) (52 * i.val + 52) ⦄ := by
+theorem to_bytes_bitList_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
+    (h' : Scalar52_as_Nat self < L) :
+    to_bytes self ⦃ (result : Array U8 32#usize) =>
+      (∀ i : Fin 4,
+        ofU64 self[i]! ≈ₗ (ofByteArray result).extract (52 * i.val) (52 * i.val + 52)) ∧
+        (ofU64 self[4]).extract 0 48 ≈ₗ (ofByteArray result).extract 208 256 ⦄ := by
     sorry
 
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
@@ -63,16 +68,16 @@ theorem to_bytes_bitList_spec (u : Scalar52) :
 - The result byte array represents the same number as the input unpacked scalar modulo L
 - The result is in canonical form (less than L) -/
 @[externally_verified, progress] -- proven in Verus
-theorem to_bytes_spec (u : Scalar52) :
-    to_bytes u ⦃ b =>
-    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat b < L ⦄ := by
+theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
+    (h' : Scalar52_as_Nat self < L) :
+    to_bytes self ⦃ (result : Std.Array U8 32#usize) =>
+      U8x32_as_Nat result = Scalar52_as_Nat self ∧
+      U8x32_as_Nat result < L ⦄ := by
     progress*
     constructor
-    · -- To prove U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L]
-      rw [scalar52_eq_of_bitList b u _]
-      assumption
-    · -- To prove U8x32_as_Nat b < L
-      exact limb_bound_of_equiv b u ‹_›
+    · -- To prove U8x32_as_Nat result = Scalar52_as_Nat self
+      rw [scalar52_eq_of_bitList self result _]; repeat assumption
+    · -- To prove U8x32_as_Nat result < L
+      apply as_nat_bound_of_equiv self result _ _ _; repeat assumption
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
