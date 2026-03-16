@@ -2614,7 +2614,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧\n      4 • result.toPoint ≠ 0 ∧\n      result.Z.toField ^ 2 - result.Y.toField ^ 2 =\n        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ⦄ := by ...",
+   "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧\n      4 • result.toPoint ≠ 0 ∧\n      result.Z.toField ^ 2 - result.Y.toField ^ 2 =\n        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ∧\n      result.toPoint = _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -4620,7 +4620,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧ _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ⦄ := by ...",
+   "theorem RISTRETTO_BASEPOINT_POINT_spec :\n    RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧ _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ∧\n      result.toPoint = _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
@@ -8816,7 +8816,7 @@
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
     "curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    mul_base s ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
@@ -8833,7 +8833,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT",
     "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul"]},
