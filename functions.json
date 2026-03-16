@@ -8860,7 +8860,7 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)\n    (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :\n    step_2 s ⦃ (ok1, c, c1, pt) =>\n    (let s_val := s.toField\n     let u1 := 1 - s_val ^ 2\n     let u2 := 1 + s_val ^ 2\n     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2\n     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧\n     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧\n     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧\n    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔\n      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧\n    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by ...",
@@ -8877,7 +8877,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",

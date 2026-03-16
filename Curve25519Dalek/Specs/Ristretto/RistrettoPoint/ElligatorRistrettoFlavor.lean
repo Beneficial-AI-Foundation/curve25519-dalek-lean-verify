@@ -27,14 +27,19 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQ
 
 Specification and proof for `RistrettoPoint::elligator_ristretto_flavor`.
 
-This function implements the Ristretto Elligator map, which is the MAP function
-defined in the
+This function implements the Ristretto MAP function from the
+[Ristretto specification (RFC draft, Section 4.3.4)](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4).
 
-- [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4).
+It maps an arbitrary field element r_0 ∈ 𝔽_p (p = 2^255 - 19) to a valid Ristretto point
+(an even Edwards curve point). The construction uses Elligator 2 to find a point on the
+Jacobi quartic t^2 = s^4 + 2As^2 + 1, then applies a 2-isogeny to the twisted Edwards
+curve -x^2 + y^2 = 1 + dx^2y^2. The image of this isogeny is exactly the set of even
+points 2E(𝔽_p), which is the Ristretto quotient group.
 
-It maps an arbitrary field element s to a valid Ristretto point.
+This is a private helper called exclusively by `from_uniform_bytes` (hash-to-point),
+which maps two independent field elements through this function and adds the results.
 
-**Source**: curve25519-dalek/src/ristretto.rs
+**Source**: curve25519-dalek/src/ristretto.rs (lines 676-728)
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.math
@@ -1089,17 +1094,69 @@ private lemma elligator_s_bridge_nonsquare
 /-
 natural language description:
 
-• Takes a field element s and maps it to a valid RistrettoPoint using the Elligator map:
+    • Takes a field element r_0 and maps it to a valid RistrettoPoint using the
+      Ristretto Elligator map (RFC draft Section 4.3.4):
+      https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4
 
-  https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4
+    • This is the MAP function used by `from_uniform_bytes` (hash-to-point): it splits
+      64 bytes into two halves, maps each through `elligator_ristretto_flavor`, and adds
+      the two resulting points to get a uniformly distributed Ristretto group element.
 
-  Arithmetics are performed in the field 𝔽ₚ where p = 2^255 - 19.
+    • The algorithm works through the Jacobi quartic as an intermediate representation,
+      using Elligator 2 to find a point on the quartic, then applying a 2-isogeny to
+      land on the Edwards curve. The key steps are:
+
+      Step 1: Compute r = sqrt(-1) * r_0^2.
+              Since sqrt(-1) is a non-square in F_p, r is a non-square (unless r_0 = 0).
+
+      Step 2: Compute the Elligator ratio N_s / D where:
+              N_s = (r + 1)(1 - d^2)
+              D   = (-1 - d*r)(r + d)
+              These define the s^2-coordinate ratio on the Jacobi quartic.
+
+      Step 3: Attempt sqrt(N_s / D) via sqrt_ratio_i:
+              If N_s/D is a square:     was_square = 1, s = +sqrt(N_s/D), c = -1
+              If N_s/D is not a square: was_square = 0, s = +sqrt(i * N_s/D)
+
+      Step 4: Compute s' = s * r_0, then force s' to be non-positive (canonical sign).
+              This is done via conditional_assign with the negated value.
+
+      Step 5: Select the final s and c based on was_square:
+              If was_square:     s = s (from sqrt),       c = -1
+              If not was_square: s = -|s * r_0| (= s'),   c = r = i * r_0^2
+
+      Step 6: Compute the Jacobi quartic t-coordinate numerator:
+              N_t = c * (r - 1) * (d - 1)^2 - D
+
+      Step 7: Construct the output in CompletedPoint (P1xP1) form, representing the
+              Jacobi-to-Edwards isogeny. The four coordinates are:
+              X_cp = 2*s*D               (numerator of x)
+              T_cp = 1 + s^2             (denominator of x)
+              Y_cp = 1 - s^2             (numerator of y)
+              Z_cp = N_t * sqrt(a*d - 1) (denominator of y, involving the isogeny constant)
+
+      Step 8: Convert CompletedPoint to extended Edwards coordinates via as_extended:
+              X' = X_cp * T_cp,  Y' = Y_cp * Z_cp,  Z' = Z_cp * T_cp,  T' = X_cp * Y_cp
+
+    • The output is always an even Edwards point because:
+      1 - y^2 = 1 - ((1-s^2)/(1+s^2))^2 = (2s/(1+s^2))^2
+      which is manifestly a perfect square in F_p (IsSquare(1 - y^2) holds).
+
+    • The denominator 1 + s^2 is never zero because the Elligator map never produces
+      s such that s^2 = -1. This is proven via a discriminant argument: in both the
+      square and non-square cases, assuming s^2 = -1 leads to a quadratic in r whose
+      discriminant 4d(d-1)^2(d+1) is a non-square mod p (since d is a non-square and
+      d+1 is a square, their product d(d+1) is a non-square).
 
 natural language specs:
 
-• The function always succeeds (no panic) for all valid field element inputs s
-• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
-• The output matches the pure mathematical Elligator map applied to the field value of s
+    • The function always succeeds (no panic) for all valid field element inputs r_0
+    • The output is a valid RistrettoPoint:
+        - It lies on the twisted Edwards curve -x^2 + y^2 = 1 + d*x^2*y^2
+        - It is an even point: IsSquare(Z^2 - Y^2) holds (equivalently IsSquare(1 - y^2))
+    • The output matches the pure mathematical Elligator map:
+        result.toPoint = (elligator_ristretto_flavor_pure r_0.toField).val
+      bridging the 51-bit limb implementation to the abstract ZMod p computation
 -/
 
 set_option maxHeartbeats 900000 in -- needed for complex progress
