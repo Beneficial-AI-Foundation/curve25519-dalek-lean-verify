@@ -5,6 +5,8 @@ Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 /-! # Spec Theorem for `CompletedPoint::as_extended`
 
@@ -20,6 +22,8 @@ it computes an equivalent representation (X':Y':Z':T') in extended coordinates
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.backend.serial.u64.field
+
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -55,10 +59,7 @@ twisted Edwards ℙ³ coordinates.
 -/
 @[progress]
 theorem as_extended_spec (q : CompletedPoint)
-  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)
-  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
-  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
-  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
+  (h_q_Valid : q.IsValid) :
   as_extended q ⦃ (e : edwards.EdwardsPoint) =>
     let X := Field51_as_Nat q.X
     let Y := Field51_as_Nat q.Y
@@ -75,10 +76,59 @@ theorem as_extended_spec (q : CompletedPoint)
     (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ⦄ := by
+    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ∧
+    e.IsValid ∧
+    e.toPoint = q.toPoint ⦄ := by
   unfold as_extended
+  have := h_q_Valid.X_valid
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  have := h_q_Valid.Y_valid
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  have := h_q_Valid.Z_valid
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  have := h_q_Valid.T_valid
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
   progress*
   rw [← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
-  simp_all
+  simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
+    Array.getElem!_Nat_eq, getElem!_pos, Nat.reducePow, implies_true, true_and]
+  rw[Montgomery.lift_mod_eq_iff] at fe_post1
+  rw[Montgomery.lift_mod_eq_iff] at fe1_post1
+  rw[Montgomery.lift_mod_eq_iff] at fe2_post1
+  rw[Montgomery.lift_mod_eq_iff] at fe3_post1
+  have :({ X := fe, Y := fe1, Z := fe2, T := fe3 }:edwards.EdwardsPoint).IsValid := by
+    constructor
+    · grind
+    · grind
+    · grind
+    · grind
+    · have := h_q_Valid.T_ne_zero
+      unfold FieldElement51.toField at this
+      have := h_q_Valid.Z_ne_zero
+      unfold FieldElement51.toField at this
+      unfold FieldElement51.toField
+      simp only [fe2_post1, Nat.cast_mul, ne_eq, mul_eq_zero, not_or]
+      grind
+    · simp only
+      unfold FieldElement51.toField
+      grind
+    · simp only
+      have :=  h_q_Valid.on_curve
+      unfold FieldElement51.toField at this
+      simp only at this
+      unfold FieldElement51.toField
+      grind
+  simp only [this, true_and]
+  unfold toPoint   edwards.EdwardsPoint.toPoint
+  simp only [this, ↓reduceDIte, h_q_Valid]
+  unfold edwards.EdwardsPoint.toPoint'
+  simp only [Edwards.Point.mk.injEq]
+  unfold FieldElement51.toField
+  have := h_q_Valid.T_ne_zero
+  unfold FieldElement51.toField at this
+  have := h_q_Valid.Z_ne_zero
+  unfold FieldElement51.toField at this
+  simp_all only [Nat.cast_mul, ne_eq]
+  grind
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

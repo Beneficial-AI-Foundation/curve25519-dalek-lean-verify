@@ -10,10 +10,13 @@ namespace curve25519_dalek
    Source: '/rustc/library/core/src/result.rs', lines 831:4-833:53
    Name pattern: [core::result::{core::result::Result<@T, @E>}::map] -/
 @[rust_fun "core::result::{core::result::Result<@T, @E>}::map"]
-axiom core.result.Result.map
+def core.result.Result.map
   {T : Type} {E : Type} {U : Type} {F : Type} (opsfunctionFnOnceFTupleTUInst :
   core.ops.function.FnOnce F T U) :
-  core.result.Result T E → F → Result (core.result.Result U E)
+  core.result.Result T E → F → Result (core.result.Result U E) :=
+  fun r f => match r with
+    | .Ok t => do let u ← opsfunctionFnOnceFTupleTUInst.call_once f t; ok (.Ok u)
+    | .Err e => ok (.Err e)
 
 /- [core::slice::index::{core::slice::index::SliceIndex<@Slice<T>, @Slice<T>> for core::ops::range::RangeFull}::index_mut]:
    Source: '/rustc/library/core/src/slice/index.rs', lines 660:4-660:51

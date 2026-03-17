@@ -87,8 +87,6 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (U8x32_as_Nat res < 2 ^255)  ⦄ := by
   unfold as_affine at *
   progress*
-  · exact hW
-  · exact hU
   · constructor
     · rename_i fe_inv h_mul_U_Winv
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid

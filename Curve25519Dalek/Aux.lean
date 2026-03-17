@@ -56,6 +56,25 @@ theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
 
+/-- Convert GetElem (Nat index) to getElem! for Aeneas Array -/
+theorem Array.getElem_eq_getElem! (bs : Array U64 5#usize) (i : Nat) (hi : i < bs.length) :
+    (bs[i] : U64) = bs[i]! := by
+  rw [Array.getElem!_Nat_eq, ← Array.val_getElem!_eq' bs i hi]
+
+/-- Convert GetElem (Usize index) to getElem! for Aeneas Array -/
+theorem Array.getElem_usize_eq_getElem! (bs : Array U64 5#usize) (i : Usize)
+    (hi : i.val < bs.length) :
+    (bs[i] : U64) = bs[i.val]! := by
+  simp only [Array.getElem!_Nat_eq]
+  show bs.val[i.val] = bs.val[i.val]!
+  exact List.Inhabited_getElem_eq_getElem! bs.val i.val hi
+
+/-- Like set_of_ne but returns getElem! on both sides -/
+theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i < bs.length)
+    (hj : j < bs.length) (h : i ≠ j) :
+    (bs.set j#usize a)[i]! = bs[i]! := by
+  rw [Array.set_of_ne bs a i j hi hj h, Array.getElem_eq_getElem! bs i hi]
+
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
     (bs.set i#usize a)[i]! = a := by grind
@@ -198,6 +217,51 @@ lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
   · grind
   · simp
 
+/-! ## UScalar cast lemmas for carry propagation
+
+These lemmas capture the Nat interpretation of casting patterns used in
+field element carry propagation:
+- `((x >> 51) as u64) as u128` extracts carry: `(x / 2^51) % 2^64`
+- `(x as u64) & MASK` extracts remainder: `x % 2^51`
+-/
+
+/-- Casting U128 to U64 truncates to lower 64 bits -/
+@[simp]
+theorem U128_cast_U64_val (x : U128) : (UScalar.cast .U64 x).val = x.val % 2^64 := by
+  simp only [UScalar.cast_val_eq, UScalarTy.numBits]
+
+/-- Casting U64 to U128 preserves value (widening) -/
+@[simp]
+theorem U64_cast_U128_val (x : U64) : (UScalar.cast .U128 x).val = x.val := by
+  simp only [UScalar.cast_val_eq, UScalarTy.numBits]
+  have hx : x.val < 2^64 := x.hBounds
+  have h64_lt_128 : (64 : ℕ) ≤ 128 := by omega
+  have : 2^64 ≤ 2^128 := Nat.pow_le_pow_right (by omega) h64_lt_128
+  omega
+
+/-- The double-cast pattern `((x : U128).cast U64).cast U128` gives `x % 2^64` -/
+@[simp]
+theorem U128_cast_U64_cast_U128_val (x : U128) :
+    (UScalar.cast .U128 (UScalar.cast .U64 x)).val = x.val % 2^64 := by
+  simp only [U64_cast_U128_val, U128_cast_U64_val]
+
+/-- When `x < 2^115`, the carry `x / 2^51` fits in U64 without truncation -/
+theorem carry_fits_U64 (x : ℕ) (hx : x < 2 ^ 115) : x / 2 ^ 51 < 2 ^ 64 := by
+  have h1 : (2 : ℕ) ^ 115 / 2 ^ 51 = 2 ^ 64 := by decide
+  calc x / 2 ^ 51 ≤ (2 ^ 115 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
+    _ < 2 ^ 64 := by decide
+
+/-- When the shift result fits in U64, the double-cast preserves it exactly -/
+theorem double_cast_of_lt (x : ℕ) (hx : x < 2 ^ 64) :
+    x % 2 ^ 64 % 2 ^ 128 = x := by
+  have h1 : x % 2 ^ 64 = x := Nat.mod_eq_of_lt hx
+  have h2 : x < 2 ^ 128 := by omega
+  simp [h1, Nat.mod_eq_of_lt h2]
+
+/-- Key lemma: when `c < 2^115`, the carry extraction `(c / 2^51) % 2^64` equals `c / 2^51` -/
+theorem carry_mod_eq (c : ℕ) (hc : c < 2 ^ 115) : (c / 2 ^ 51) % 2 ^ 64 = c / 2 ^ 51 := by
+  exact Nat.mod_eq_of_lt (carry_fits_U64 c hc)
+
 /-! ## Bitwise OR equals addition for disjoint ranges -/
 
 /-- Nat.bit decomposition: every natural number is `bit (testBit 0) (n / 2)`. -/
@@ -212,7 +276,7 @@ private lemma bit_decomp (a : Nat) : a = Nat.bit (a.testBit 0) (a / 2) := by
 lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     a ||| (b * 2 ^ k) = a + b * 2 ^ k := by
   induction k generalizing a b with
-  | zero => simp at ha; subst ha; simp
+  | zero => simp_all
   | succ k ih =>
     have ha_div : a / 2 < 2 ^ k := by
       rw [Nat.div_lt_iff_lt_mul (by norm_num)]
@@ -229,3 +293,22 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     rcases Nat.mod_two_eq_zero_or_one a with h | h
     · rw [Nat.testBit_zero]; simp [h]; omega
     · rw [Nat.testBit_zero]; simp [h]; omega
+
+/-- If `x + n * m = y` then `x ≡ y [MOD m]`. -/
+lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
+    Nat.ModEq m x y := by
+  have : x % m = (x + n * m) % m := by rw [Nat.add_mul_mod_self_right]
+  rw [Nat.ModEq, this, h]
+
+
+/-- Converts pointwise limb-wise addition to `Field51_as_Nat` addition. -/
+lemma pointwise_add_Field51_as_Nat (a b c : Array U64 5#usize)
+    (h : ∀ i < 5, c[i]!.val = a[i]!.val + b[i]!.val) :
+    Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b := by
+  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+    Nat.reduceLT, Nat.lt_add_one]
+  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+    Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  scalar_tac

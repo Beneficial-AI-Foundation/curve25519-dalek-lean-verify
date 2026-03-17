@@ -83,6 +83,106 @@ namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
+/-! ## Independent sub-lemmas for `as_projective_spec`
+
+These lemmas factor out the key proof steps used in the main theorem:
+1. `as_projective_lift_to_field_eqs`: Lift modular arithmetic to field equalities
+2. `as_projective_on_curve`: Prove the projective on-curve equation from the completed on-curve equation
+3. `as_projective_isValid_and_toPoint`: Combined validity and point equality proof
+-/
+
+/-- Lift the three modular arithmetic results from `as_projective_spec_aux` to
+    field equalities in `CurveField`. Each modular relation `a % p = b % p`
+    is lifted via `lift_mod_eq` and then simplified via `push_cast`. -/
+private lemma as_projective_lift_to_field_eqs
+    (proj : ProjectivePoint)
+    (q : CompletedPoint)
+    (hX_arith : Field51_as_Nat proj.X % p = (Field51_as_Nat q.X * Field51_as_Nat q.T) % p)
+    (hY_arith : Field51_as_Nat proj.Y % p = (Field51_as_Nat q.Y * Field51_as_Nat q.Z) % p)
+    (hZ_arith : Field51_as_Nat proj.Z % p = (Field51_as_Nat q.Z * Field51_as_Nat q.T) % p) :
+    proj.X.toField = q.X.toField * q.T.toField ∧
+    proj.Y.toField = q.Y.toField * q.Z.toField ∧
+    proj.Z.toField = q.Z.toField * q.T.toField := by
+  constructor
+  · unfold toField
+    have h := lift_mod_eq _ _ hX_arith
+    push_cast at h
+    exact h
+  constructor
+  · unfold toField
+    have h := lift_mod_eq _ _ hY_arith
+    push_cast at h
+    exact h
+  · unfold toField
+    have h := lift_mod_eq _ _ hZ_arith
+    push_cast at h
+    exact h
+
+/-- Prove the projective on-curve equation from the completed on-curve equation.
+    Given that `proj.X = q.X * q.T`, `proj.Y = q.Y * q.Z`, `proj.Z = q.Z * q.T`,
+    the projective curve equation `a * X'² * Z'² + Y'² * Z'² = Z'⁴ + d * X'² * Y'²`
+    follows from the completed curve equation
+    `a * X² * T² + Y² * Z² = Z² * T² + d * X² * Y²`
+    by scaling both sides by `(Z * T)²`. -/
+private lemma as_projective_on_curve
+    (pX pY pZ qX qY qZ qT : Edwards.CurveField)
+    (hX_F : pX = qX * qT)
+    (hY_F : pY = qY * qZ)
+    (hZ_F : pZ = qZ * qT)
+    (h_curve : Ed25519.a * qX ^ 2 * qT ^ 2 + qY ^ 2 * qZ ^ 2 =
+               qZ ^ 2 * qT ^ 2 + Ed25519.d * qX ^ 2 * qY ^ 2) :
+    Ed25519.a * pX ^ 2 * pZ ^ 2 + pY ^ 2 * pZ ^ 2 =
+    pZ ^ 4 + Ed25519.d * pX ^ 2 * pY ^ 2 := by
+  simp only [hX_F, hY_F, hZ_F]
+  simp only [Ed25519] at h_curve ⊢
+  linear_combination (qZ ^ 2 * qT ^ 2) * h_curve
+
+/-- Combined proof of validity and point equality for `as_projective`.
+    Given the field equalities, bounds, and the input's validity, this lemma proves
+    that the output `ProjectivePoint` is valid and represents the same affine point
+    as the input `CompletedPoint`. -/
+private lemma as_projective_isValid_and_toPoint
+    (proj : ProjectivePoint)
+    (q : CompletedPoint) (hq_valid : q.IsValid)
+    (hX_F : proj.X.toField = q.X.toField * q.T.toField)
+    (hY_F : proj.Y.toField = q.Y.toField * q.Z.toField)
+    (hZ_F : proj.Z.toField = q.Z.toField * q.T.toField)
+    (hpX_bounds : ∀ i < 5, proj.X[i]!.val < 2 ^ 52)
+    (hpY_bounds : ∀ i < 5, proj.Y[i]!.val < 2 ^ 52)
+    (hpZ_bounds : ∀ i < 5, proj.Z[i]!.val < 2 ^ 52) :
+    proj.IsValid ∧ proj.toPoint = q.toPoint := by
+  -- Prove proj.Z.toField ≠ 0
+  have hpZ_ne : proj.Z.toField ≠ 0 := by
+    rw [hZ_F]
+    apply mul_ne_zero hq_valid.Z_ne_zero hq_valid.T_ne_zero
+  -- Prove on-curve using the extracted lemma
+  have h_on_curve : Ed25519.a * proj.X.toField ^ 2 * proj.Z.toField ^ 2 +
+      proj.Y.toField ^ 2 * proj.Z.toField ^ 2 =
+      proj.Z.toField ^ 4 + Ed25519.d * proj.X.toField ^ 2 * proj.Y.toField ^ 2 :=
+    as_projective_on_curve proj.X.toField proj.Y.toField proj.Z.toField
+      q.X.toField q.Y.toField q.Z.toField q.T.toField
+      hX_F hY_F hZ_F hq_valid.on_curve
+  -- Construct IsValid
+  have h_proj_valid : proj.IsValid := {
+    X_bounds := hpX_bounds
+    Y_bounds := hpY_bounds
+    Z_bounds := hpZ_bounds
+    Z_ne_zero := hpZ_ne
+    on_curve := h_on_curve
+  }
+  constructor
+  · exact h_proj_valid
+  · -- Prove proj.toPoint = q.toPoint
+    have ⟨h_px, h_py⟩ := ProjectivePoint.toPoint_of_isValid h_proj_valid
+    have ⟨h_qx, h_qy⟩ := CompletedPoint.toPoint_of_isValid hq_valid
+    ext
+    · -- x coordinate: X'/Z' = (X*T)/(Z*T) = X/Z
+      rw [h_px, hX_F, hZ_F, h_qx]
+      field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
+    · -- y coordinate: Y'/Z' = (Y*Z)/(Z*T) = Y/T
+      rw [h_py, hY_F, hZ_F, h_qy]
+      field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
+
 /--
 Verification of the `as_projective` function.
 The theorem states that converting a valid CompletedPoint to ProjectivePoint:
@@ -99,88 +199,17 @@ theorem as_projective_spec
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54 := hq_valid.Y_valid
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 := hq_valid.Z_valid
   have h_qT_bounds : ∀ i < 5, (q.T[i]!).val < 2 ^ 54 := hq_valid.T_valid
-
   -- Use auxiliary spec
   obtain ⟨proj, h_run, hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩ :=
     spec_imp_exists (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
-
   use proj
   constructor
   · exact h_run
-
   -- Lift arithmetic to field equalities
-  have hX_F : proj.X.toField = q.X.toField * q.T.toField := by
-    unfold toField
-    have h := lift_mod_eq _ _ hX_arith
-    push_cast at h
-    exact h
-
-  have hY_F : proj.Y.toField = q.Y.toField * q.Z.toField := by
-    unfold toField
-    have h := lift_mod_eq _ _ hY_arith
-    push_cast at h
-    exact h
-
-  have hZ_F : proj.Z.toField = q.Z.toField * q.T.toField := by
-    unfold toField
-    have h := lift_mod_eq _ _ hZ_arith
-    push_cast at h
-    exact h
-
-  -- Prove proj.Z.toField ≠ 0
-  have hpZ_ne : proj.Z.toField ≠ 0 := by
-    rw [hZ_F]
-    apply mul_ne_zero hq_valid.Z_ne_zero hq_valid.T_ne_zero
-
-  constructor
-  · -- Prove proj.IsValid
-    exact {
-      X_bounds := hpX_bounds
-      Y_bounds := hpY_bounds
-      Z_bounds := hpZ_bounds
-      Z_ne_zero := hpZ_ne
-      on_curve := by
-        -- proj represents (X*T/(Z*T), Y*Z/(Z*T)) = (X/Z, Y/T) = q's affine point
-        -- Need to show: a*(X')²*(Z')² + (Y')²*(Z')² = (Z')⁴ + d*(X')²*(Y')²
-        simp only [hX_F, hY_F, hZ_F]
-        have h_curve := hq_valid.on_curve
-        simp only [Ed25519] at h_curve ⊢
-        ring_nf
-        ring_nf at h_curve
-        -- The curve equation for CompletedPoint is:
-        -- a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
-        -- After substitution: a*(X*T)²*(Z*T)² + (Y*Z)²*(Z*T)² = (Z*T)⁴ + d*(X*T)²*(Y*Z)²
-        -- Which simplifies to: (Z*T)² * (a*X²*T² + Y²*Z²) = (Z*T)² * (Z²*T² + d*X²*Y²)
-        -- This follows from h_curve
-        linear_combination (q.Z.toField ^ 2 * q.T.toField ^ 2) * h_curve
-    }
-
-  · -- Prove proj.toPoint = q.toPoint
-    have h_proj_valid : proj.IsValid := {
-      X_bounds := hpX_bounds
-      Y_bounds := hpY_bounds
-      Z_bounds := hpZ_bounds
-      Z_ne_zero := hpZ_ne
-      on_curve := by
-        simp only [hX_F, hY_F, hZ_F]
-        have h_curve := hq_valid.on_curve
-        simp only [Ed25519] at h_curve ⊢
-        linear_combination (q.Z.toField ^ 2 * q.T.toField ^ 2) * h_curve
-    }
-
-    have ⟨h_px, h_py⟩ := ProjectivePoint.toPoint_of_isValid h_proj_valid
-    have ⟨h_qx, h_qy⟩ := CompletedPoint.toPoint_of_isValid hq_valid
-
-    ext
-    · -- x coordinate: proj.toPoint.x = q.toPoint.x
-      -- proj.toPoint.x = X'/Z' = (X*T)/(Z*T) = X/Z (when T ≠ 0)
-      -- q.toPoint.x = X/Z
-      rw [h_px, hX_F, hZ_F, h_qx]
-      field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
-    · -- y coordinate: proj.toPoint.y = q.toPoint.y
-      -- proj.toPoint.y = Y'/Z' = (Y*Z)/(Z*T) = Y/T (when Z ≠ 0)
-      -- q.toPoint.y = Y/T
-      rw [h_py, hY_F, hZ_F, h_qy]
-      field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
+  have ⟨hX_F, hY_F, hZ_F⟩ :=
+    as_projective_lift_to_field_eqs proj q hX_arith hY_arith hZ_arith
+  -- Prove validity and point equality
+  exact as_projective_isValid_and_toPoint proj q hq_valid
+    hX_F hY_F hZ_F hpX_bounds hpY_bounds hpZ_bounds
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

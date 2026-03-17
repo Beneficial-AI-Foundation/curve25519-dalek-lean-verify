@@ -1,15 +1,18 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Alessandro D'Angelo
+Authors: Markus Dablander, Alessandro D'Angelo, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
+import Curve25519Dalek.Math.Montgomery.Curve
+import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
+import Curve25519Dalek.Aux
 
 /-! # Spec Theorem for `EdwardsPoint::as_projective_niels`
 
@@ -23,6 +26,8 @@ Source: curve25519-dalek/src/edwards.rs
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.field.FieldElement51
   curve25519_dalek.backend.serial.u64.constants
+open curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint
+open curve25519_dalek.montgomery
 namespace curve25519_dalek.edwards.EdwardsPoint
 
 /-
@@ -57,8 +62,7 @@ where p = 2^255 - 19
 -/
 @[externally_verified, progress]
 theorem as_projective_niels_spec (e : EdwardsPoint)
-    (h_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53 ∧ e.Y[i]!.val < 2 ^ 53 ∧
-      e.Z[i]!.val < 2 ^ 53 ∧ e.T[i]!.val < 2 ^ 53) :
+    (he : e.IsValid) :
     as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>
       let X := Field51_as_Nat e.X
       let Y := Field51_as_Nat e.Y
@@ -71,17 +75,65 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
       A % p = (Y + X) % p ∧
       (B + X) % p = Y % p ∧
       Z' % p = Z % p ∧
-      C % p = (T * (2 * d)) % p ⦄ := by
+      C % p = (T * (2 * d)) % p ∧
+      (∀ i < 5, (pn.Y_plus_X[i]!).val < 2 ^ 54 ∧
+      ∀ i < 5, (pn.Y_minus_X[i]!).val < 2 ^ 52 ∧
+      ∀ i < 5, (pn.Z[i]!).val < 2 ^ 53 ∧
+      ∀ i < 5, (pn.T2d[i]!).val < 2 ^ 52) ∧
+      pn.IsValid ∧
+      e.toPoint = pn.toPoint
+       ⦄ := by
   unfold as_projective_niels
   progress*
-  refine ⟨?_, ?_, ?_⟩
-  · apply congrArg (· % p)
-    unfold Field51_as_Nat
-    rw [← Finset.sum_add_distrib]
-    apply Finset.sum_congr rfl
+  · exact he.Y_bounds
+  · have:= he.X_bounds
+    exact this
+  · have:= he.T_bounds
     grind
-  · assumption
-  · simp_all [Nat.ModEq]
-
+  · refine ⟨?_, ?_, ?_, ?_⟩
+    · congr 1; exact pointwise_add_Field51_as_Nat e.Y e.X fe fe_post1
+    · assumption
+    · simp_all [Nat.ModEq]
+    · constructor
+      · have := he.Z_bounds
+        simp_all
+      · have := pointwise_add_Field51_as_Nat e.Y e.X fe fe_post1
+        rw[← Nat.ModEq,Montgomery.lift_mod_eq_iff] at fe1_post2
+        have : (Field51_as_Nat fe1)= (Field51_as_Nat e.Y) -((Field51_as_Nat e.X):Edwards.CurveField) := by grind
+        rw[Montgomery.lift_mod_eq_iff] at fe3_post1
+        have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 }:backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
+          constructor
+          · simp_all
+          · simp_all
+          · have := he.Z_bounds
+            simp_all
+          · simp_all
+          · have := he.Z_ne_zero
+            simp_all
+          · unfold toField
+            simp_all
+            have := he.on_curve
+            simp only at this
+            unfold toField at this
+            grind
+          · unfold toField
+            simp_all
+            have := he.T_relation
+            simp only  at this
+            unfold toField at this
+            ring_nf
+            have:Edwards.Ed25519.d=d:=rfl
+            grind
+        simp only [this, true_and]
+        unfold toPoint curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint
+        simp only [he, ↓reduceDIte, this]
+        unfold toPoint' curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint' toField
+        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
+          Nat.cast_add, sub_add_cancel, Nat.cast_mul, ZMod.natCast_mod, Nat.cast_ofNat, add_sub_sub_cancel,
+          add_add_sub_cancel, Edwards.Point.mk.injEq]
+        have := he.Z_ne_zero
+        unfold toField at this
+        field_simp
+        grind
 
 end curve25519_dalek.edwards.EdwardsPoint
