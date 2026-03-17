@@ -100,6 +100,7 @@ import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.FromSlice
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step1
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Step2
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsAffineNiels
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjectiveNiels
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Compress
