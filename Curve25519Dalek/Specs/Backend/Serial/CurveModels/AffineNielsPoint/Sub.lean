@@ -63,9 +63,6 @@ natural language specs:
   - T' ≡ ( 2·Z + T·N.xy2d ) (mod p)
 -/
 
-set_option maxHeartbeats 1000000 in
--- simp_all is heavy
-
 
 @[progress]
 theorem sub_spec
@@ -111,11 +108,7 @@ T' % p = ((2 * Z) + (T * XY2D)) % p ⦄
   constructor
   · rw[← Nat.ModEq]
     rw[← Nat.ModEq] at fe1_bounds
-    have :  Field51_as_Nat self.Y + Field51_as_Nat self.X =Field51_as_Nat Y_plus_X := by
-      simp[Field51_as_Nat, Finset.sum_range_succ ]
-      simp_all
-      scalar_tac
-    rw[this]
+    rw[← pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X h_Y_plus_X]
     have := Nat.ModEq.mul_right (Field51_as_Nat other.y_plus_x) h_Y_minus_X
     have := Nat.ModEq.symm (Nat.ModEq.add_left (Field51_as_Nat fe1) this)
     rw[add_mul, ← add_assoc] at this
@@ -128,19 +121,11 @@ T' % p = ((2 * Z) + (T * XY2D)) % p ⦄
     exact h_MP
   constructor
   · rw[← Nat.ModEq]
-    have :  Field51_as_Nat fe2 = Field51_as_Nat PM + Field51_as_Nat MP := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this]
+    rw[pointwise_add_Field51_as_Nat PM MP fe2 h_fe2]
     have := Nat.ModEq.add h_PM h_MP
     have := Nat.ModEq.add_right (Field51_as_Nat self.X * Field51_as_Nat other.y_plus_x) this
     apply Nat.ModEq.trans this
-    have :  Field51_as_Nat self.Y + Field51_as_Nat self.X =Field51_as_Nat Y_plus_X := by
-      simp[Field51_as_Nat, Finset.sum_range_succ ]
-      simp_all
-      scalar_tac
-    rw[this, add_assoc]
+    rw[← pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X h_Y_plus_X, add_assoc]
     apply Nat.ModEq.add_left
     rw[← add_mul]
     apply Nat.ModEq.mul_right
@@ -152,22 +137,12 @@ T' % p = ((2 * Z) + (T * XY2D)) % p ⦄
     have :=  Nat.ModEq.add_left  (Field51_as_Nat fe3) h_Txy2d
     have := Nat.ModEq.trans (Nat.ModEq.symm this) fe3_bounds
     apply Nat.ModEq.trans this
-    have :  Field51_as_Nat Z2 = Field51_as_Nat self.Z + Field51_as_Nat self.Z := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this, (by scalar_tac :∀ a, a + a = 2 * a)]
+    rw[pointwise_add_Field51_as_Nat self.Z self.Z Z2 hZ2,
+       (by scalar_tac :∀ a, a + a = 2 * a)]
   · rw[← Nat.ModEq]
-    have :  Field51_as_Nat MPPM = Field51_as_Nat Z2 + Field51_as_Nat Txy2d := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this]
-    have :  Field51_as_Nat Z2 = Field51_as_Nat self.Z + Field51_as_Nat self.Z := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    simp[this, (by scalar_tac :∀ a, a + a = 2 * a)]
+    rw[pointwise_add_Field51_as_Nat Z2 Txy2d MPPM h_MPPM,
+       pointwise_add_Field51_as_Nat self.Z self.Z Z2 hZ2]
+    simp only [(by scalar_tac :∀ a, a + a = 2 * a)]
     apply Nat.ModEq.add_left _ h_Txy2d
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint

@@ -430,7 +430,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid') :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint - other.toPointI ⦄ := by ...",
+   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring": null,
@@ -5903,7 +5903,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (he : e.IsValid) :\n    as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let T := Field51_as_Nat e.T\n      let A := Field51_as_Nat pn.Y_plus_X\n      let B := Field51_as_Nat pn.Y_minus_X\n      let Z' := Field51_as_Nat pn.Z\n      let C := Field51_as_Nat pn.T2d\n      A % p = (Y + X) % p ∧\n      (B + X) % p = Y % p ∧\n      Z' % p = Z % p ∧\n      C % p = (T * (2 * d)) % p ∧\n      (∀ i < 5, (pn.Y_plus_X[i]!).val < 2 ^ 54 ∧\n      ∀ i < 5, (pn.Y_minus_X[i]!).val < 2 ^ 52 ∧\n      ∀ i < 5, (pn.Z[i]!).val < 2 ^ 53 ∧\n      ∀ i < 5, (pn.T2d[i]!).val < 2 ^ 52) ∧\n      pn.IsValid' ∧\n      e.toPoint = pn.toPointI\n       ⦄ := by ...",
+   "theorem as_projective_niels_spec (e : EdwardsPoint)\n    (he : e.IsValid) :\n    as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let T := Field51_as_Nat e.T\n      let A := Field51_as_Nat pn.Y_plus_X\n      let B := Field51_as_Nat pn.Y_minus_X\n      let Z' := Field51_as_Nat pn.Z\n      let C := Field51_as_Nat pn.T2d\n      A % p = (Y + X) % p ∧\n      (B + X) % p = Y % p ∧\n      Z' % p = Z % p ∧\n      C % p = (T * (2 * d)) % p ∧\n      (∀ i < 5, (pn.Y_plus_X[i]!).val < 2 ^ 54 ∧\n      ∀ i < 5, (pn.Y_minus_X[i]!).val < 2 ^ 52 ∧\n      ∀ i < 5, (pn.Z[i]!).val < 2 ^ 53 ∧\n      ∀ i < 5, (pn.T2d[i]!).val < 2 ^ 52) ∧\n      pn.IsValid ∧\n      e.toPoint = pn.toPoint\n       ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsProjectiveNiels.lean",
    "spec_docstring":
