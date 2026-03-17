@@ -48,21 +48,16 @@ natural language specs:
 • The result is a valid RistrettoPoint
 • The result = b + ... + b represents the Ristretto basepoint b added to itself s-times
 -/
-@[externally_verified, progress] -- previously the proof worked in Lean
+@[progress]
 theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :
     mul_base s ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by
   unfold mul_base
     SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul
-    Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul
-    SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
-    Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul
-    Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul
-    backend.variable_base_mul
-    backend.get_selected_backend
-  progress*
-  -- We need a spec theroem for `backend.serial.scalar_mul.variable_base.mul`
-  sorry
+  let* ⟨ rp, rp_post1, rp_post2, rp_post3, rp_post4, rp_post5 ⟩ ←
+    constants.RISTRETTO_BASEPOINT_POINT_spec
+  progress
+  refine ⟨ by assumption , by grind ⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint

@@ -48,14 +48,15 @@ theorem ED25519_BASEPOINT_POINT_spec :
       result.toPoint ≠ 0 ∧
       4 • result.toPoint ≠ 0 ∧
       result.Z.toField ^ 2 - result.Y.toField ^ 2 =
-        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ⦄ := by
+        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ∧
+      result.toPoint = _root_.Edwards.basepoint ⦄ := by
   unfold ED25519_BASEPOINT_POINT
   progress*
   set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
   have h_valid : ep.IsValid := by simp only [ep, *]; decide
   have h_bp : ep.toPoint = _root_.Edwards.basepoint := by simp only [ep, *]; decide
   rw [h_bp]
-  refine ⟨h_valid, ?_, ?_, ?_, ?_⟩
+  refine ⟨h_valid, ?_, ?_, ?_, ?_, rfl⟩
   · exact _root_.Edwards.basepoint_order_L
   · exact _root_.Edwards.basepoint_ne_zero
   · exact _root_.Edwards.four_nsmul_basepoint_ne_zero
