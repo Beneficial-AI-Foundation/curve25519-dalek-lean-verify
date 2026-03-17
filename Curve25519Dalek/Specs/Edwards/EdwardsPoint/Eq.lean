@@ -77,16 +77,7 @@ theorem eq_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_oth
       · intro h
         rw[h, Choice.one]
       · apply Choice.eq_one
-    rw[← this, c_post]
-    unfold toPoint
-    simp only [h_self_valid, ↓reduceDIte, h_other_valid]
-    simp only [toPoint', Edwards.Point.mk.injEq]
-    simp only [Montgomery.lift_mod_eq_iff, Nat.cast_mul]
-    unfold FieldElement51.toField
-    have := h_other_valid.Z_ne_zero
-    unfold FieldElement51.toField  at this
-    have := h_self_valid.Z_ne_zero
-    unfold FieldElement51.toField  at this
-    field_simp
+    rw[← this]
+    exact c_post2 h_self_valid h_other_valid
 
 end curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint

@@ -48,7 +48,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)
-    (hscalar : U8x32_as_Nat scalar.bytes < L) (hself : self.IsValid) :
+    (hscalar : U8x32_as_Nat scalar.bytes < 2 ^ 255) (hself : self.IsValid) :
     mul self scalar ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by
@@ -121,7 +121,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)
-    (hself : U8x32_as_Nat self.bytes < L) (hpoint : point.IsValid) :
+    (hself : U8x32_as_Nat self.bytes < 2 ^ 255) (hpoint : point.IsValid) :
     mul self point ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧ result.toPoint = (U8x32_as_Nat self.bytes) • point.toPoint ⦄ := by
   exact Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec point self hself hpoint
