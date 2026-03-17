@@ -80,17 +80,32 @@ for f in "${FILES[@]}"; do
     # Extract per-definition JSON lines (for detailed analysis)
     grep '^{' "$RAW_FILE" > "$DETAILS_FILE" 2>/dev/null || true
 
-    # Parse cumulative times from end of output (still text format)
-    IMPORT=$(grep -oP '^\s*import \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    SIMP=$(grep -oP '^\s*simp \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TYPECLASS=$(grep -oP '^\s*typeclass inference \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    ELABORATION=$(grep -oP '^\s*elaboration \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TACTIC=$(grep -oP '^\s*tactic execution \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    GRIND=$(grep -oP '^\s*grind \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    INTERP=$(grep -oP '^\s*interpretation \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    PARSING=$(grep -oP '^\s*parsing \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    TYPE_CHECK=$(grep -oP '^\s*type checking \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
-    INSTANTIATE=$(grep -oP '^\s*instantiate metavars \K[\d.e+]+s' "$RAW_FILE" | tail -1 | tr -d 's' || echo "0")
+    # Parse cumulative times from end of output (POSIX-compatible, works on Linux/macOS/Windows)
+    # Lean --profile outputs lines like "	simp 5.22s" or "	typeclass inference 340ms"
+    # This awk block converts everything to seconds and emits shell variable assignments.
+    IMPORT=0; SIMP=0; TYPECLASS=0; ELABORATION=0; TACTIC=0
+    GRIND=0; INTERP=0; PARSING=0; TYPE_CHECK=0; INSTANTIATE=0
+    eval "$(awk '
+    /^\t/ {
+        val = $NF
+        # Convert to seconds: strip unit suffix
+        if (val ~ /ms$/) { gsub(/ms$/, "", val); val = val / 1000 }
+        else if (val ~ /s$/) { gsub(/s$/, "", val) }
+        else { next }
+
+        # Match metric name from the leading fields
+        line = $0; sub(/^[\t ]+/, "", line); sub(/[ \t]+[^ \t]+$/, "", line)
+        if (line == "import") printf "IMPORT=%s\n", val
+        else if (line == "simp") printf "SIMP=%s\n", val
+        else if (line == "typeclass inference") printf "TYPECLASS=%s\n", val
+        else if (line == "elaboration") printf "ELABORATION=%s\n", val
+        else if (line == "tactic execution") printf "TACTIC=%s\n", val
+        else if (line == "grind") printf "GRIND=%s\n", val
+        else if (line == "interpretation") printf "INTERP=%s\n", val
+        else if (line == "parsing") printf "PARSING=%s\n", val
+        else if (line == "type checking") printf "TYPE_CHECK=%s\n", val
+        else if (line == "instantiate metavars") printf "INSTANTIATE=%s\n", val
+    }' "$RAW_FILE")"
 
     # Write JSON entry
     if ! $FIRST; then echo "," >> "$JSON_FILE"; fi
