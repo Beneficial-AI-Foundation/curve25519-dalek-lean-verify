@@ -449,6 +449,47 @@ private theorem field51_as_Nat_eq_of_pointwise_eq
   intro i hi
   exact congrArg (fun t => 2 ^ (51 * i) * t) (hxy i (by simpa only [Finset.mem_range] using hi))
 
+/-- Whole-element consequence of a limbwise `conditional_assign` postcondition. -/
+private theorem field51_as_Nat_conditional_assign
+    (x y z : backend.serial.u64.field.FieldElement51)
+    (c : subtle.Choice)
+    (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
+    Field51_as_Nat z =
+      if c.val = 1#u8 then Field51_as_Nat y else Field51_as_Nat x := by
+  by_cases h : c.val = 1#u8
+  · simp only [h, ↓reduceIte]
+    refine field51_as_Nat_eq_of_pointwise_eq ?_
+    intro i hi
+    have hz := z_post i hi
+    simp only [h, ↓reduceIte] at hz
+    simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+      congrArg UScalar.val hz
+  · simp only [h, ↓reduceIte]
+    refine field51_as_Nat_eq_of_pointwise_eq ?_
+    intro i hi
+    have hz := z_post i hi
+    simp only [h, ↓reduceIte] at hz
+    simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+      congrArg UScalar.val hz
+
+/-- `conditional_negate` preserves the represented square modulo `p`. -/
+private theorem conditional_negate_sq
+    (r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (r_is_negative : subtle.Choice)
+    (x_post_1 : Field51_as_Nat r1 + Field51_as_Nat x ≡ 0 [MOD p])
+    (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
+    Field51_as_Nat r2 ^ 2 ≡ Field51_as_Nat r1 ^ 2 [MOD p] := by
+  have hr2 :=
+    field51_as_Nat_conditional_assign r1 x r2 r_is_negative r2_post
+  by_cases h : r_is_negative.val = 1#u8
+  · have hr2x : Field51_as_Nat r2 = Field51_as_Nat x := by
+      simpa only [h] using hr2
+    rw [hr2x]
+    exact (nat_sq_of_add_modeq_zero x_post_1).symm
+  · have hr2r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
+      simpa only [h] using hr2
+    rw [hr2r1]
+
 /-- After `conditional_negate`, the result `r2` is always non-negative (even mod p). -/
 private theorem conditional_negate_nonneg
     (r1 x r2 : backend.serial.u64.field.FieldElement51)
@@ -457,23 +498,17 @@ private theorem conditional_negate_nonneg
     (x_post_1 : Field51_as_Nat r1 + Field51_as_Nat x ≡ 0 [MOD p])
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
     Field51_as_Nat r2 % p % 2 = 0 := by
+  have hr2 :=
+    field51_as_Nat_conditional_assign r1 x r2 r_is_negative r2_post
   by_cases h : r_is_negative.val = 1#u8
-  · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] at r2_post
-    have : Field51_as_Nat r2 = Field51_as_Nat x := by
-      refine field51_as_Nat_eq_of_pointwise_eq ?_
-      intro i hi
-      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-        congrArg UScalar.val (r2_post i hi)
-    rw [this]
+  · have hr2x : Field51_as_Nat r2 = Field51_as_Nat x := by
+      simpa only [h] using hr2
+    rw [hr2x]
     exact nonneg_of_neg_mod_p (Field51_as_Nat r1) (Field51_as_Nat x)
       ((modEq_zero_iff _ _).mp x_post_1) (r_is_negative_post.mp h)
-  · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] at r2_post
-    have : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-      refine field51_as_Nat_eq_of_pointwise_eq ?_
-      intro i hi
-      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-        congrArg UScalar.val (r2_post i hi)
-    rw [this]
+  · have hr2r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
+      simpa only [h] using hr2
+    rw [hr2r1]
     have := Nat.mod_two_eq_zero_or_one (Field51_as_Nat r1 % p)
     have := mt r_is_negative_post.mpr h
     omega
@@ -676,17 +711,12 @@ theorem sqrt_ratio_i_spec'
             rw [r_prime_eq0]; simp only [Nat.zero_mod]
           have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
             intro h; exact absurd (r_is_negative_post.mp h) (by omega)
-          simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-            refine field51_as_Nat_eq_of_pointwise_eq ?_
-            intro i hi
-            have hr2 : r2[i]!.val = r1[i]!.val := by
-              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-                congrArg UScalar.val (r2_post i hi)
-            have hr1 : r1[i]!.val = r_prime[i]!.val := by
-              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-                congrArg UScalar.val (r1_post i hi)
-            exact hr2.trans hr1
+            calc
+              Field51_as_Nat r2 = Field51_as_Nat r1 := by
+                simpa only [h_not_neg, ↓reduceIte] using
+                  field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
+              _ = Field51_as_Nat r_prime := r1_eq
           rw [this]
           exact r_prime_eq0
         · intro i hi
@@ -725,25 +755,10 @@ theorem sqrt_ratio_i_spec'
         intro hu hv x hx
         refine ⟨trivial, ?_, ?_⟩
         · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
-          by_cases h_neg : r_is_negative.val = 1#u8
-          · simp only [h_neg, ite_true] at r2_post
-            have r2_eq_neg : Field51_as_Nat r2 = Field51_as_Nat r_neg := by
-              refine field51_as_Nat_eq_of_pointwise_eq ?_
-              intro i hi
-              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-                congrArg UScalar.val (r2_post i hi)
-            rw [r2_eq_neg]
-            have h_sum := r_neg_post1
-            rw [r1_eq] at h_sum
-            exact ((nat_sq_of_add_modeq_zero h_sum).symm.mul_right _).trans r_prime_sq_v_u
-          · simp only [h_neg, ite_false] at r2_post
-            have r2_eq_r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-              refine field51_as_Nat_eq_of_pointwise_eq ?_
-              intro i hi
-              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
-                congrArg UScalar.val (r2_post i hi)
-            rw [r2_eq_r1, r1_eq]
-            exact r_prime_sq_v_u
+          have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
+            (by simpa only [r1_eq] using r_neg_post1) r2_post
+          rw [r1_eq] at r2_eq_sq
+          exact r2_eq_sq.mul_right _ |>.trans r_prime_sq_v_u
         · intro i hi
           by_cases h : r_is_negative.val = 1#u8
           · simp only [h, ite_true] at r2_post
@@ -841,15 +856,13 @@ theorem sqrt_ratio_i_spec'
             rw [r_prime_eq0]; simp only [Nat.zero_mod]
           have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
             intro h; exact absurd (r_is_neg_rprime.mp h) (by omega)
-          simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           have r2_eq_rprime : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-            refine field51_as_Nat_eq_of_pointwise_eq ?_
-            intro i hi
-            have hr2 : r2[i]!.val = r1[i]!.val := by
-              simpa using congrArg UScalar.val (r2_post i hi)
-            have hr1 : r1[i]!.val = r_prime[i]!.val := by
-              simpa using congrArg UScalar.val (r1_post i hi)
-            exact hr2.trans hr1
+            calc
+              Field51_as_Nat r2 = Field51_as_Nat r1 := by
+                simpa only [h_not_neg, ↓reduceIte] using
+                  field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
+              _ = Field51_as_Nat r_prime := r1_eq_rprime
+          simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           refine ⟨?_, ?_, ?_, ?_, ?_⟩
           · intro _
             refine ⟨(Choice.val_eq_one_iff Choice.one).mpr rfl, ?_, ?_⟩
@@ -975,30 +988,9 @@ theorem sqrt_ratio_i_spec'
           · intro hu hv hno_qr
             refine ⟨rfl, ?_, ?_⟩
             · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
-              have r2_eq_sq : Field51_as_Nat r2 ^ 2 ≡
-                  Field51_as_Nat r_prime ^ 2 [MOD p] := by
-                by_cases h_neg : r_is_negative.val = 1#u8
-                · simp only [h_neg, ite_true] at r2_post
-                  have r2_eq_r_neg : Field51_as_Nat r2 =
-                      Field51_as_Nat r_neg := by
-                    refine field51_as_Nat_eq_of_pointwise_eq ?_
-                    intro i hi
-                    simpa using congrArg UScalar.val (r2_post i hi)
-                  rw [r2_eq_r_neg]
-                  exact nat_sq_of_add_modeq_zero
-                    (by rw [add_comm]; exact r_neg_post1)
-                · simp only [h_neg, if_neg, not_false_eq_true]
-                    at r2_post
-                  have r2_eq_rprime : Field51_as_Nat r2 =
-                      Field51_as_Nat r_prime := by
-                    refine field51_as_Nat_eq_of_pointwise_eq ?_
-                    intro i hi
-                    have hr2 : r2[i]!.val = r1[i]!.val := by
-                      simpa using congrArg UScalar.val (r2_post i hi)
-                    have hr1 : r1[i]!.val = r_prime[i]!.val := by
-                      simpa using congrArg UScalar.val (r1_post i hi)
-                    exact hr2.trans hr1
-                  rw [r2_eq_rprime]
+              have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
+                (by simpa [r1_eq_rprime] using r_neg_post1) r2_post
+              rw [r1_eq_rprime] at r2_eq_sq
               exact r2_eq_sq.mul_right _ |>.trans rprime_v
             · intro i hi
               by_cases h : r_is_negative.val = 1#u8
@@ -1062,15 +1054,12 @@ theorem sqrt_ratio_i_spec'
                 simp only [Nat.ModEq] at r_eq0; rw [r_eq0]; simp only [Nat.zero_mod]
               have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
                 intro h; exact absurd (r_is_negative_post.mp h) (by omega)
-              simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
               have : Field51_as_Nat r2 = Field51_as_Nat r := by
-                refine field51_as_Nat_eq_of_pointwise_eq ?_
-                intro i hi
-                have hr2 : r2[i]!.val = r1[i]!.val := by
-                  simpa using congrArg UScalar.val (r2_post i hi)
-                have hr1 : r1[i]!.val = r[i]!.val := by
-                  simpa using congrArg UScalar.val (r1_post i hi)
-                exact hr2.trans hr1
+                calc
+                  Field51_as_Nat r2 = Field51_as_Nat r1 := by
+                    simpa [h_not_neg] using
+                      field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
+                  _ = Field51_as_Nat r := r1_eq_r
               rw [this]; exact r_eq0
             · intro i hi
               by_cases h : r_is_negative.val = 1#u8
@@ -1099,26 +1088,9 @@ theorem sqrt_ratio_i_spec'
             refine ⟨?_, ?_, ?_⟩
             · exact (Choice.val_eq_one_iff Choice.one).mpr rfl
             · rw [mod_sq_mod_mul_eq, ← Nat.ModEq]
-              have r2_eq_sq : Field51_as_Nat r2 ^ 2 ≡
-                  Field51_as_Nat r ^ 2 [MOD p] := by
-                by_cases h_neg : r_is_negative.val = 1#u8
-                · simp only [h_neg, ite_true] at r2_post
-                  have r2_eq_r_neg : Field51_as_Nat r2 = Field51_as_Nat r_neg := by
-                    refine field51_as_Nat_eq_of_pointwise_eq ?_
-                    intro i hi
-                    simpa using congrArg UScalar.val (r2_post i hi)
-                  rw [r2_eq_r_neg]
-                  exact (nat_sq_of_add_modeq_zero (by rw [add_comm]; exact r_neg_post1))
-                · simp only [h_neg, if_neg, not_false_eq_true] at r2_post
-                  have r2_eq_r : Field51_as_Nat r2 = Field51_as_Nat r := by
-                    refine field51_as_Nat_eq_of_pointwise_eq ?_
-                    intro i hi
-                    have hr2 : r2[i]!.val = r1[i]!.val := by
-                      simpa using congrArg UScalar.val (r2_post i hi)
-                    have hr1 : r1[i]!.val = r[i]!.val := by
-                      simpa using congrArg UScalar.val (r1_post i hi)
-                    exact hr2.trans hr1
-                  rw [r2_eq_r]
+              have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
+                (by simpa [r1_eq_r] using r_neg_post1) r2_post
+              rw [r1_eq_r] at r2_eq_sq
               exact r2_eq_sq.mul_right _ |>.trans r_sq_v_u
             · intro i hi
               by_cases h : r_is_negative.val = 1#u8
@@ -1187,15 +1159,13 @@ theorem sqrt_ratio_i_spec'
               simp only [Nat.zero_mod]
             have h_not_neg : ¬(r_is_negative.val = 1#u8) := by
               intro h; exact absurd (r_is_negative_post.mp h) (by omega)
-            simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
             have r2_eq_r : Field51_as_Nat r2 = Field51_as_Nat r := by
-              refine field51_as_Nat_eq_of_pointwise_eq ?_
-              intro i hi
-              have hr2 : r2[i]!.val = r1[i]!.val := by
-                simpa using congrArg UScalar.val (r2_post i hi)
-              have hr1 : r1[i]!.val = r[i]!.val := by
-                simpa using congrArg UScalar.val (r1_post i hi)
-              exact hr2.trans hr1
+              calc
+                Field51_as_Nat r2 = Field51_as_Nat r1 := by
+                  simpa [h_not_neg] using
+                    field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
+                _ = Field51_as_Nat r := r1_eq_r
+            simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
             refine ⟨rfl, ?_, ?_⟩
             · rw [r2_eq_r]; exact r_zero
             · intro i hi
@@ -1329,30 +1299,9 @@ theorem sqrt_ratio_i_spec'
                 · have := h.mul_right (Field51_as_Nat u)
                   have := eq_check.trans this
                   simp only at this
-                  have r2_eq_sq : Field51_as_Nat r2 ^ 2 ≡
-                      Field51_as_Nat r ^ 2 [MOD p] := by
-                    by_cases h_neg : r_is_negative.val = 1#u8
-                    · simp only [h_neg, ite_true] at r2_post
-                      have r2_eq_r_neg : Field51_as_Nat r2 =
-                          Field51_as_Nat r_neg := by
-                        refine field51_as_Nat_eq_of_pointwise_eq ?_
-                        intro i hi
-                        simpa using congrArg UScalar.val (r2_post i hi)
-                      rw [r2_eq_r_neg]
-                      exact nat_sq_of_add_modeq_zero
-                        (by rw [add_comm]; exact r_neg_post1)
-                    · simp only [h_neg, if_neg, not_false_eq_true]
-                        at r2_post
-                      have r2_eq_r : Field51_as_Nat r2 =
-                          Field51_as_Nat r := by
-                        refine field51_as_Nat_eq_of_pointwise_eq ?_
-                        intro i hi
-                        have hr2 : r2[i]!.val = r1[i]!.val := by
-                          simpa using congrArg UScalar.val (r2_post i hi)
-                        have hr1 : r1[i]!.val = r[i]!.val := by
-                          simpa using congrArg UScalar.val (r1_post i hi)
-                        exact hr2.trans hr1
-                      rw [r2_eq_r]
+                  have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
+                    (by simpa [r1_eq_r] using r_neg_post1) r2_post
+                  rw [r1_eq_r] at r2_eq_sq
                   exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
                 · rcases h with h | h
                   · have := h.mul_right (Field51_as_Nat u)
