@@ -299,3 +299,16 @@ lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
     Nat.ModEq m x y := by
   have : x % m = (x + n * m) % m := by rw [Nat.add_mul_mod_self_right]
   rw [Nat.ModEq, this, h]
+
+
+/-- Converts pointwise limb-wise addition to `Field51_as_Nat` addition. -/
+lemma pointwise_add_Field51_as_Nat (a b c : Array U64 5#usize)
+    (h : ∀ i < 5, c[i]!.val = a[i]!.val + b[i]!.val) :
+    Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b := by
+  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+    Nat.reduceLT, Nat.lt_add_one]
+  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+    Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  scalar_tac
