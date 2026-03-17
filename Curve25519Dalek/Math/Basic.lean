@@ -145,6 +145,57 @@ open Edwards ZMod
 def sqrt_m1 : ZMod p :=
   19681161376707505956807079304988542015446066515923890162744021073123829784752
 
+lemma p_sub_one_cast : (↑(p - 1) : ZMod p) = -1 := by
+  rw [Nat.cast_sub (by decide : 1 ≤ p), ZMod.natCast_self, zero_sub, Nat.cast_one]
+
+private lemma sqrt_m1_sq_nat :
+    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
+  decide
+
+/-- `sqrt_m1` really is a square root of `-1` in `ZMod p`. -/
+lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
+  unfold sqrt_m1
+  have h : (((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℕ)) : ZMod p) =
+      ((p - 1 : ℕ) : ZMod p) := by
+    exact (ZMod.natCast_eq_natCast_iff _ _ _).2 (by simpa [Nat.ModEq] using sqrt_m1_sq_nat)
+  push_cast at h
+  rwa [p_sub_one_cast] at h
+
+/-- `sqrt_m1` is not itself a square; otherwise there would be an element of order `8` in `F_pˣ`. -/
+lemma sqrt_m1_not_square : ¬ IsSquare sqrt_m1 := by
+  rintro ⟨y, hy⟩
+  rw [← pow_two] at hy
+  have y4 : y ^ 4 = -1 := by
+    rw [show 4 = 2 * 2 by norm_num, pow_mul, ← hy, sqrt_m1_sq]
+  have hy_ne_zero : y ≠ 0 := by
+    intro hy0
+    rw [hy0, zero_pow (by norm_num)] at y4
+    norm_num at y4
+  have y8 : y ^ 8 = 1 := by
+    rw [show 8 = 4 * 2 by norm_num, pow_mul, y4]
+    norm_num
+  have h_order : orderOf y = 8 := by
+    refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 ?_
+    intro q hprime hdvd
+    have hq : q = 2 := by
+      rw [show 8 = 2 ^ 3 by norm_num] at hdvd
+      exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
+    rw [hq, show 8 / 2 = 4 by norm_num, y4]
+    intro h_eq
+    have h_two : (2 : ZMod p) = 0 := by
+      have := congrArg (fun z : ZMod p => z + 1) h_eq
+      have h_zero : (0 : ZMod p) = 2 := by simpa using this
+      exact h_zero.symm
+    have h_dvd : p ∣ 2 := (ZMod.natCast_eq_zero_iff 2 p).mp h_two
+    norm_num [p] at h_dvd
+  have order_div : 8 ∣ (p - 1) := by
+    simpa [ZMod.card, h_order] using ZMod.orderOf_dvd_card_sub_one hy_ne_zero
+  have not_dvd : ¬ 8 ∣ (p - 1) := by
+    intro h8
+    have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h8
+    norm_num [p] at mod_zero
+  exact not_dvd order_div
+
 /-! ## Isogeny Constants
     We use `@[irreducible]` to prevent the simplifier from unfolding
     these massive literals, which crashes the server.
@@ -244,7 +295,7 @@ lemma abs_edwards_val_even' (x : ZMod p) : (abs_edwards x).val % 2 = 0 := by
   omega
 
 /-- abs_edwards always produces a non-negative (even val) result. -/
-lemma abs_edwards_val_even (hp_odd : p % 2 = 1) (b : ZMod p) :
+lemma abs_edwards_val_even (_ : p % 2 = 1) (b : ZMod p) :
     (abs_edwards b).val % 2 = 0 :=
   abs_edwards_val_even' b
 
@@ -314,68 +365,21 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
       have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
         intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
         norm_num [p] at h_char
-
-
       have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
       have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
       have h_i_ne0 : sqrt_m1 ≠ 0 := by
         unfold sqrt_m1;
         try decide
-
-
       have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
         FiniteField.isSquare_iff h_char_ne_2 hz
       simp only [h_pow_card] at euler
-
       have h_x_pow : x ^ (p / 2) = -1 := by
         have dic := FiniteField.pow_dichotomy h_char_ne_2 hx_ne0
         rw [h_pow_card] at dic
         cases dic with
         | inl h1 => rw [← euler hx_ne0] at h1; contradiction
         | inr h_neg => exact h_neg
-
-      have not_sq_i : ¬ IsSquare sqrt_m1 := by
-        rintro ⟨y, hy⟩; rw [← pow_two] at hy;
-        have y4 : y^4 = -1 := by
-          rw [show 4 = 2 * 2 by rfl, pow_mul, ← hy]
-          rw [← sub_eq_zero, sub_neg_eq_add]
-          unfold sqrt_m1
-
-          -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
-          -- kernel struggles with 78-digit number literals. Need to
-          -- precompute these as top-level lemmas to avoid crashing the elaborator.
-
-          -- change ((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 + 1 : ℤ) : ZMod p) = 0
-          -- rw [intCast_zmod_eq_zero_iff_dvd]
-          -- try decide
-          sorry
-
-        have y8 : y^8 = 1 := by
-          rw [show 8 = 4 * 2 by rfl, pow_mul, y4];
-          norm_num
-
-        -- We are arguing by contradiction using 'by absurd: sqrt_m1 is a square'
-        have order_div : 8 ∣ (p - 1) := by
-          have h_order : orderOf y = 8 := by
-            refine orderOf_eq_of_pow_and_pow_div_prime (by norm_num) y8 fun q hprime hdvd => ?_
-            have hq_is_2 : q = 2 := by
-              rw [show 8 = 2^3 by rfl] at hdvd
-              exact (Nat.prime_dvd_prime_iff_eq hprime Nat.prime_two).mp (hprime.dvd_of_dvd_pow hdvd)
-            rw [hq_is_2, show 8 / 2 = 4 by rfl, y4]
-            try grind
-
-          rw [← h_order]
-          apply ZMod.orderOf_dvd_card_sub_one
-          try grind
-
-
-        have not_dvd : ¬ 8 ∣ (p - 1) := by
-          intro h
-          have mod_zero : (p - 1) % 8 = 0 := Nat.mod_eq_zero_of_dvd h
-          norm_num [p] at mod_zero
-
-        try grind
-
+      have not_sq_i : ¬ IsSquare sqrt_m1 := sqrt_m1_not_square
       have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
         have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
         rw [h_pow_card] at dic
@@ -384,11 +388,9 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
           rw [← euler h_i_ne0] at h1
           grind
         | inr h_neg => exact h_neg
-
       rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
       rw [mul_pow, h_x_pow, h_i_pow]
       norm_num
-
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 

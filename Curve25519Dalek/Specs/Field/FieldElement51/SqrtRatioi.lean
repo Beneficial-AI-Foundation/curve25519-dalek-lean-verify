@@ -43,6 +43,16 @@ theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
 
 theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [Nat.ModEq]
 
+private theorem modEq_zero_of_pow_modEq_zero {a k : ℕ}
+    (h : a ^ k ≡ 0 [MOD p]) :
+    a ≡ 0 [MOD p] := by
+  rw [Nat.modEq_zero_iff_dvd] at h ⊢
+  exact prime_25519.dvd_of_dvd_pow h
+
+private theorem sqrt_m1_sq_modEq :
+    Field51_as_Nat SQRT_M1_val ^ 2 ≡ p - 1 [MOD p] := by
+  simp [Nat.ModEq, SQRT_M1_val_spec]
+
 theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔  a % p = 1 := by
   simp only [Nat.ModEq]
   have :1 % p= 1:= by unfold p; decide
@@ -178,59 +188,41 @@ theorem aux1 {a b c : ℕ} : a * b * c = a * c * b := by grind
 theorem SQRT_M1_not_square (x : ℕ) :
   ¬ (x ^ 4 ≡ p - 1 [MOD p]) := by
   intro hx
-  by_cases hpx: p ∣ x
-  · -- BEGIN TASK
-    rw[← Nat.modEq_zero_iff_dvd] at hpx
-    have := (hpx.pow 4).symm
-    have := this.trans hx
-    unfold p at this
-    rw[Nat.ModEq] at this
-    simp at this
-    -- END TASK
-  ·  -- BEGIN TASK
-    have eq1:= hx.pow ((p-1)/4)
-    rw[← pow_mul] at eq1
-    have : 4 * ((p - 1) / 4) = p -1 := by
-      unfold p
-      simp
-    rw[this] at eq1
-    have := coprime_of_prime_not_dvd prime_25519 hpx
-    have fermat:= (Nat.ModEq.pow_card_sub_one_eq_one prime_25519 this ).symm.trans eq1
-    have :(p-1)^2 ≡ 1[MOD p]:= by
-      have : (p - 1) ^ 2 = p*(p - 2)+1 := by
-        unfold p
-        simp
-      rw[this, Nat.ModEq]
-      norm_num
-    have := this.pow  (2 ^ 252 - 3)
-    rw[← pow_mul, (by simp :  1^ (2 ^ 252 - 3) =1)] at this
-    have := this.mul_right (p-1)
-    rw[pow_add_one, (by simp : 1 * (p-1)= p-1)] at this
-    have eq1:  2* (2 ^ 252 - 3)+1 =(p-1)/4  := by
-      unfold p
-      simp
-    rw[eq1] at this
-    have := fermat.trans this
-    unfold p at this
-    rw[Nat.ModEq] at this
-    simp at this
-    -- END TASK
-
-lemma gcd_one_of_p {a : ℕ}
-   (ha : ¬a ≡ 0 [MOD p]) : p.gcd a = 1 := by
-    rw[Nat.modEq_zero_iff_dvd] at ha
-    have := coprime_of_prime_not_dvd prime_25519 ha
-    apply Nat.Coprime.symm at this
-    apply Nat.Coprime.gcd_eq_one at this
-    apply this
+  have hx_z : ((x : ZMod p) ^ 4) = (-1 : ZMod p) := by
+    have hcast : (((x ^ 4 : ℕ)) : ZMod p) = ((p - 1 : ℕ) : ZMod p) := by
+      exact (ZMod.natCast_eq_natCast_iff _ _ _).2 (by simpa [Nat.ModEq] using hx)
+    push_cast at hcast
+    rwa [_root_.curve25519_dalek.math.p_sub_one_cast] at hcast
+  have hx_sq :
+      (((x : ZMod p) ^ 2) ^ 2) = _root_.curve25519_dalek.math.sqrt_m1 ^ 2 := by
+    calc
+      (((x : ZMod p) ^ 2) ^ 2) = ((x : ZMod p) ^ 4) := by
+        rw [show 4 = 2 * 2 by norm_num, pow_mul]
+      _ = (-1 : ZMod p) := hx_z
+      _ = _root_.curve25519_dalek.math.sqrt_m1 ^ 2 := by
+        rw [_root_.curve25519_dalek.math.sqrt_m1_sq]
+  have hsquare : IsSquare (_root_.curve25519_dalek.math.sqrt_m1) := by
+    rcases sq_eq_sq_iff_eq_or_eq_neg.mp hx_sq with hroot | hroot
+    · refine ⟨(x : ZMod p), ?_⟩
+      simpa [pow_two] using hroot.symm
+    · refine ⟨(x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1, ?_⟩
+      calc
+        _root_.curve25519_dalek.math.sqrt_m1 =
+            (-_root_.curve25519_dalek.math.sqrt_m1) * (-1 : ZMod p) := by
+          ring
+        _ = ((x : ZMod p) ^ 2) * (_root_.curve25519_dalek.math.sqrt_m1 ^ 2) := by
+          rw [hroot, _root_.curve25519_dalek.math.sqrt_m1_sq]
+        _ = ((x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1) *
+              ((x : ZMod p) * _root_.curve25519_dalek.math.sqrt_m1) := by
+          ring
+  exact _root_.curve25519_dalek.math.sqrt_m1_not_square hsquare
 
 lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
   a ≡ 0 [MOD p] := by
   have eq:= ha.mul_right (Field51_as_Nat SQRT_M1_val)
   simp only [mul_assoc, zero_mul] at eq
   have : Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val ≡ p-1 [MOD p] := by
-    unfold SQRT_M1_val
-    decide
+    simpa only [pow_two] using sqrt_m1_sq_modEq
   have eq:= ((this.mul_left a).symm.trans eq).add_right a
   rw[(by simp : 0 +a =a)] at eq
   have : a * (p - 1) + a= p * a := by
@@ -311,11 +303,10 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         rw[this]
         have : (p-1)/4 *2 =(p-1)/2 := by unfold p; grind
         rw[this]
-  have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) *
-          (a ^ ((p -1) / 4) + Field51_as_Nat SQRT_M1_val)
-           =
-          a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) *(Field51_as_Nat SQRT_M1_val) + (p-1) * Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val
-           := by
+  have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) * (a ^ ((p -1) / 4)
+          + Field51_as_Nat SQRT_M1_val) = a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4)
+          * (Field51_as_Nat SQRT_M1_val) + (p-1) *
+          Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val := by
         rw[mul_add, add_mul,add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
         rw[← add_assoc]
         simp only [add_assoc,
@@ -390,8 +381,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         have :  1 + (p-1) =p := by unfold p; grind
         simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
         have :p - 1  ≡Field51_as_Nat SQRT_M1_val ^2  [MOD p]:= by
-              unfold SQRT_M1_val
-              decide
+              exact sqrt_m1_sq_modEq.symm
         have r:= r.trans this
         simp[r]
     · have r:= hl.add_right (Field51_as_Nat SQRT_M1_val)
@@ -1071,8 +1061,7 @@ theorem sqrt_ratio_i_spec'
             have u_eq := u_eq.pow 2
             simp only [← pow_mul] at u_eq
             have : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡
-                p - 1 [MOD p] := by
-              unfold SQRT_M1_val; decide
+                p - 1 [MOD p] := sqrt_m1_sq_modEq
             exact SQRT_M1_not_square _ (u_eq.trans this)
           · intro hu hv hno_qr
             refine ⟨rfl, ?_, ?_⟩
@@ -1306,27 +1295,8 @@ theorem sqrt_ratio_i_spec'
                 have := mul_zero_eq_or prime_25519 h
                 rcases this with h | h
                 · exact hu ((modEq_zero_iff _ _).mp h)
-                · have : Field51_as_Nat v ≡ 0 [MOD p] := by
-                    have hp : Nat.Prime p := Fact.out
-                    rw [show (7 : ℕ) = 1 + 6 from rfl, pow_add] at h
-                    rcases mul_zero_eq_or prime_25519 h with h1 | h1
-                    · simp only [pow_one] at h1; exact h1
-                    · rw [show (6 : ℕ) = 1 + 5 from rfl, pow_add] at h1
-                      rcases mul_zero_eq_or prime_25519 h1 with h2 | h2
-                      · simp only [pow_one] at h2; exact h2
-                      · rw [show (5 : ℕ) = 1 + 4 from rfl, pow_add] at h2
-                        rcases mul_zero_eq_or prime_25519 h2 with h3 | h3
-                        · simp only [pow_one] at h3; exact h3
-                        · rw [show (4 : ℕ) = 1 + 3 from rfl, pow_add] at h3
-                          rcases mul_zero_eq_or prime_25519 h3 with h4 | h4
-                          · simp only [pow_one] at h4; exact h4
-                          · rw [show (3 : ℕ) = 1 + 2 from rfl, pow_add] at h4
-                            rcases mul_zero_eq_or prime_25519 h4 with h5 | h5
-                            · simp only [pow_one] at h5; exact h5
-                            · rw [show (2 : ℕ) = 1 + 1 from rfl, pow_add] at h5
-                              rcases mul_zero_eq_or prime_25519 h5 with h6 | h6
-                              · simp only [pow_one] at h6; exact h6
-                              · simp only [pow_one] at h6; exact h6
+                · have : Field51_as_Nat v ≡ 0 [MOD p] :=
+                      modEq_zero_of_pow_modEq_zero h
                   exact hv ((modEq_zero_iff _ _).mp this)
               have := pow_div_four_eq_four_cases h_uv7_ne
               rcases this with h | h
@@ -1393,7 +1363,6 @@ theorem sqrt_ratio_i_spec'
               r_is_negative_post r_neg_post1 r2_post
 
 
-set_option maxHeartbeats 400000 in -- heavy progress computations
 @[progress] -- proof complete before aeneas update
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
