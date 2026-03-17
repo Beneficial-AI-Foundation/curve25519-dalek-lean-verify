@@ -8832,7 +8832,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :\n    mul_base s ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
+   "theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255) :\n    mul_base s ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul_Base.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `ristretto.RistrettoPoint.mul_base`**:\n• The function always succeeds (no panic) for canonical input Scalars s\n• The result is a valid RistrettoPoint\n• The result = b + ... + b represents the Ristretto basepoint b added to itself s-times\n-/",
