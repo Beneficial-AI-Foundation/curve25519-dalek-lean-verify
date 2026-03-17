@@ -65,8 +65,8 @@ theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
   have h1  := h.mul_left a
   have h2  := h.mul_right b
   simp only [zero_mul] at h2
-  have h1' : a * a + a * b ≡ 0 [MOD p] := by simpa [Nat.mul_add, pow_two] using h1
-  have h2' : a * b + b * b ≡ 0 [MOD p] := by simpa [Nat.add_mul, pow_two] using h2
+  have h1' : a * a + a * b ≡ 0 [MOD p] := by simpa only [Nat.mul_add, mul_zero] using h1
+  have h2' : a * b + b * b ≡ 0 [MOD p] := by simpa only [Nat.add_mul] using h2
   have hsum : a * b + a * a ≡ a * b + b * b [MOD p] := by
     rw[add_comm]
     apply Nat.ModEq.symm at h2'
@@ -107,15 +107,15 @@ theorem eq_to_bytes_eq_Field51_as_Nat
   obtain ⟨ru, hu, hru_mod, _⟩ := spec_imp_exists (to_bytes_spec u)
   obtain ⟨rv, hv, hrv_mod, _⟩ := spec_imp_exists (to_bytes_spec v)
   have hrr : ru = rv := by
-    have : ok ru = ok rv := by simpa [hu, hv] using h
+    have : ok ru = ok rv := by simpa only [ok.injEq, hu, hv] using h
     cases this
     rfl
   have huv_mod : Nat.ModEq p (Field51_as_Nat u) (Field51_as_Nat v) := by
     have h1 : Nat.ModEq p (U8x32_as_Nat rv) (Field51_as_Nat u) := by
-      simpa [hrr] using hru_mod
+      simpa only [hrr] using hru_mod
     have h2 : Nat.ModEq p (U8x32_as_Nat rv) (Field51_as_Nat v) := hrv_mod
     exact (Nat.ModEq.symm h1).trans h2
-  simpa [Nat.ModEq] using huv_mod
+  simpa only [Nat.ModEq] using huv_mod
 
 lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
     u = 0 := by
@@ -439,6 +439,16 @@ private theorem nonneg_of_neg_mod_p (a b : ℕ)
     have := Nat.mod_two_eq_zero_or_one (b % p)
     omega
 
+/-- Whole-element `Field51_as_Nat` equality from pointwise limb-value equality. -/
+private theorem field51_as_Nat_eq_of_pointwise_eq
+    {x y : backend.serial.u64.field.FieldElement51}
+    (hxy : ∀ i < 5, x[i]!.val = y[i]!.val) :
+    Field51_as_Nat x = Field51_as_Nat y := by
+  unfold Field51_as_Nat
+  apply Finset.sum_congr rfl
+  intro i hi
+  exact congrArg (fun t => 2 ^ (51 * i) * t) (hxy i (by simpa only [Finset.mem_range] using hi))
+
 /-- After `conditional_negate`, the result `r2` is always non-negative (even mod p). -/
 private theorem conditional_negate_nonneg
     (r1 x r2 : backend.serial.u64.field.FieldElement51)
@@ -448,15 +458,21 @@ private theorem conditional_negate_nonneg
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
     Field51_as_Nat r2 % p % 2 = 0 := by
   by_cases h : r_is_negative.val = 1#u8
-  · simp [h] at r2_post
+  · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] at r2_post
     have : Field51_as_Nat r2 = Field51_as_Nat x := by
-      simp [Field51_as_Nat, Finset.sum_range_succ]; simp_all
+      refine field51_as_Nat_eq_of_pointwise_eq ?_
+      intro i hi
+      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+        congrArg UScalar.val (r2_post i hi)
     rw [this]
     exact nonneg_of_neg_mod_p (Field51_as_Nat r1) (Field51_as_Nat x)
       ((modEq_zero_iff _ _).mp x_post_1) (r_is_negative_post.mp h)
-  · simp [h] at r2_post
+  · simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] at r2_post
     have : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-      simp [Field51_as_Nat, Finset.sum_range_succ]; simp_all
+      refine field51_as_Nat_eq_of_pointwise_eq ?_
+      intro i hi
+      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+        congrArg UScalar.val (r2_post i hi)
     rw [this]
     have := Nat.mod_two_eq_zero_or_one (Field51_as_Nat r1 % p)
     have := mt r_is_negative_post.mpr h
@@ -629,15 +645,10 @@ theorem sqrt_ratio_i_spec'
     · simp only [Choice.one, ↓reduceIte] at r1_post
       simp only [Choice.one]
       have r1_eq : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-        simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-            Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
-            List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
-            Option.getD_some, one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul,
-            Nat.reduceLT, Nat.lt_add_one]
-        simp only [Array.getElem!_Nat_eq] at r1_post
-        expand r1_post with 5
-        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-          getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+        refine field51_as_Nat_eq_of_pointwise_eq ?_
+        intro i hi
+        simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+          congrArg UScalar.val (r1_post i hi)
       simp only [← modEq_zero_iff]
       have h_bytes_fe6 : check.to_bytes = fe6.to_bytes :=
         flipped_sign_sqrt_post.mp ((Choice.val_eq_one_iff _).mp first_choice)
@@ -667,14 +678,15 @@ theorem sqrt_ratio_i_spec'
             intro h; exact absurd (r_is_negative_post.mp h) (by omega)
           simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           have : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-            simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton]
-            expand r2_post with 5
-            simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-              getElem!_pos, Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
-              Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val, Nat.ofNat_pos,
-              Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            have hr2 : r2[i]!.val = r1[i]!.val := by
+              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+                congrArg UScalar.val (r2_post i hi)
+            have hr1 : r1[i]!.val = r_prime[i]!.val := by
+              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+                congrArg UScalar.val (r1_post i hi)
+            exact hr2.trans hr1
           rw [this]
           exact r_prime_eq0
         · intro i hi
@@ -716,20 +728,20 @@ theorem sqrt_ratio_i_spec'
           by_cases h_neg : r_is_negative.val = 1#u8
           · simp only [h_neg, ite_true] at r2_post
             have r2_eq_neg : Field51_as_Nat r2 = Field51_as_Nat r_neg := by
-              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                Finset.sum_singleton]
-              expand r2_post with 5
-              simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
+              refine field51_as_Nat_eq_of_pointwise_eq ?_
+              intro i hi
+              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+                congrArg UScalar.val (r2_post i hi)
             rw [r2_eq_neg]
             have h_sum := r_neg_post1
             rw [r1_eq] at h_sum
             exact ((nat_sq_of_add_modeq_zero h_sum).symm.mul_right _).trans r_prime_sq_v_u
           · simp only [h_neg, ite_false] at r2_post
             have r2_eq_r1 : Field51_as_Nat r2 = Field51_as_Nat r1 := by
-              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                Finset.sum_singleton]
-              expand r2_post with 5
-              simp only [r2_post_0, r2_post_1, r2_post_2, r2_post_3, r2_post_4]
+              refine field51_as_Nat_eq_of_pointwise_eq ?_
+              intro i hi
+              simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+                congrArg UScalar.val (r2_post i hi)
             rw [r2_eq_r1, r1_eq]
             exact r_prime_sq_v_u
         · intro i hi
@@ -806,17 +818,10 @@ theorem sqrt_ratio_i_spec'
             · rcases h2 with ⟨k, hk⟩; rw [hk]; exact Nat.mul_mod_right p k
           simp only [Choice.one, ↓reduceIte] at r1_post
           have r1_eq_rprime : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-            simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
-              List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-              one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-              Nat.lt_add_one]
-            simp only [Array.getElem!_Nat_eq] at r1_post
-            expand r1_post with 5
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-              Nat.reduceLT, Nat.lt_add_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+              congrArg UScalar.val (r1_post i hi)
           have hu : Nat.ModEq p (Field51_as_Nat u) 0 := by
             rw [Nat.ModEq, Nat.zero_mod]; exact h_u_zero
           have := hu.mul_right (Field51_as_Nat v3)
@@ -838,16 +843,13 @@ theorem sqrt_ratio_i_spec'
             intro h; exact absurd (r_is_neg_rprime.mp h) (by omega)
           simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           have r2_eq_rprime : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-            simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton]
-            simp only [Array.getElem!_Nat_eq] at r2_post r1_post
-            expand r2_post with 5
-            expand r1_post with 5
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-              Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
-              Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
-              Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            have hr2 : r2[i]!.val = r1[i]!.val := by
+              simpa using congrArg UScalar.val (r2_post i hi)
+            have hr1 : r1[i]!.val = r_prime[i]!.val := by
+              simpa using congrArg UScalar.val (r1_post i hi)
+            exact hr2.trans hr1
           refine ⟨?_, ?_, ?_, ?_, ?_⟩
           · intro _
             refine ⟨(Choice.val_eq_one_iff Choice.one).mpr rfl, ?_, ?_⟩
@@ -884,17 +886,9 @@ theorem sqrt_ratio_i_spec'
             fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
           simp only [Choice.one, ↓reduceIte] at r1_post
           have r1_eq_rprime : Field51_as_Nat r1 = Field51_as_Nat r_prime := by
-            simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
-              List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-              one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-              Nat.lt_add_one]
-            simp only [Array.getElem!_Nat_eq] at r1_post
-            expand r1_post with 5
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-              Nat.reduceLT, Nat.lt_add_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            simpa using congrArg UScalar.val (r1_post i hi)
           rw [r1_eq_rprime] at r_is_negative_post r_neg_post1
           refine ⟨?_, ?_, ?_, ?_, ?_⟩
           · intro hu; exfalso
@@ -926,16 +920,13 @@ theorem sqrt_ratio_i_spec'
               intro h; exact absurd (r_is_negative_post.mp h) (by omega)
             simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
             have r2_eq_rprime : Field51_as_Nat r2 = Field51_as_Nat r_prime := by
-              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                Finset.sum_singleton]
-              simp only [Array.getElem!_Nat_eq] at r2_post r1_post
-              expand r2_post with 5
-              expand r1_post with 5
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
-                Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
-                Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+              refine field51_as_Nat_eq_of_pointwise_eq ?_
+              intro i hi
+              have hr2 : r2[i]!.val = r1[i]!.val := by
+                simpa using congrArg UScalar.val (r2_post i hi)
+              have hr1 : r1[i]!.val = r_prime[i]!.val := by
+                simpa using congrArg UScalar.val (r1_post i hi)
+              exact hr2.trans hr1
             refine ⟨rfl, ?_, ?_⟩
             · rw [r2_eq_rprime]; exact rprime_zero
             · intro i hi
@@ -990,15 +981,9 @@ theorem sqrt_ratio_i_spec'
                 · simp only [h_neg, ite_true] at r2_post
                   have r2_eq_r_neg : Field51_as_Nat r2 =
                       Field51_as_Nat r_neg := by
-                    simp only [Field51_as_Nat, Finset.sum_range_succ,
-                      Finset.range_one, Finset.sum_singleton]
-                    expand r2_post with 5
-                    simp_all only [Array.getElem!_Nat_eq,
-                      List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                      getElem!_pos, iff_true, Nat.reduceMul,
-                      UScalar.neq_to_neq_val, true_iff, Nat.ofNat_pos,
-                      Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
-                      mul_zero, pow_zero, one_mul, mul_one]
+                    refine field51_as_Nat_eq_of_pointwise_eq ?_
+                    intro i hi
+                    simpa using congrArg UScalar.val (r2_post i hi)
                   rw [r2_eq_r_neg]
                   exact nat_sq_of_add_modeq_zero
                     (by rw [add_comm]; exact r_neg_post1)
@@ -1006,13 +991,13 @@ theorem sqrt_ratio_i_spec'
                     at r2_post
                   have r2_eq_rprime : Field51_as_Nat r2 =
                       Field51_as_Nat r_prime := by
-                    simp only [Field51_as_Nat, Finset.sum_range_succ,
-                      Finset.range_one, Finset.sum_singleton]
-                    expand r2_post with 5
-                    simp_all only [Array.getElem!_Nat_eq,
-                      List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                      getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                      Nat.reduceLT, Nat.lt_add_one]
+                    refine field51_as_Nat_eq_of_pointwise_eq ?_
+                    intro i hi
+                    have hr2 : r2[i]!.val = r1[i]!.val := by
+                      simpa using congrArg UScalar.val (r2_post i hi)
+                    have hr1 : r1[i]!.val = r_prime[i]!.val := by
+                      simpa using congrArg UScalar.val (r1_post i hi)
+                    exact hr2.trans hr1
                   rw [r2_eq_rprime]
               exact r2_eq_sq.mul_right _ |>.trans rprime_v
             · intro i hi
@@ -1058,17 +1043,9 @@ theorem sqrt_ratio_i_spec'
           have h01 : ¬(0#u8 = 1#u8) := by decide
           simp only [Choice.zero, h01, ite_false] at r1_post
           have r1_eq_r : Field51_as_Nat r1 = Field51_as_Nat r := by
-            simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
-              List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-              one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-              Nat.lt_add_one]
-            simp only [Array.getElem!_Nat_eq] at r1_post
-            expand r1_post with 5
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-              Nat.reduceLT, Nat.lt_add_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            simpa using congrArg UScalar.val (r1_post i hi)
           rw [r1_eq_r] at r_neg_post1 r_is_negative_post
           simp only [← modEq_zero_iff]
           refine ⟨?_, ?_, ?_, ?_, ?_⟩
@@ -1087,14 +1064,13 @@ theorem sqrt_ratio_i_spec'
                 intro h; exact absurd (r_is_negative_post.mp h) (by omega)
               simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
               have : Field51_as_Nat r2 = Field51_as_Nat r := by
-                simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                  Finset.sum_singleton]
-                expand r2_post with 5
-                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                  Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
-                  Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
-                  Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+                refine field51_as_Nat_eq_of_pointwise_eq ?_
+                intro i hi
+                have hr2 : r2[i]!.val = r1[i]!.val := by
+                  simpa using congrArg UScalar.val (r2_post i hi)
+                have hr1 : r1[i]!.val = r[i]!.val := by
+                  simpa using congrArg UScalar.val (r1_post i hi)
+                exact hr2.trans hr1
               rw [this]; exact r_eq0
             · intro i hi
               by_cases h : r_is_negative.val = 1#u8
@@ -1128,25 +1104,20 @@ theorem sqrt_ratio_i_spec'
                 by_cases h_neg : r_is_negative.val = 1#u8
                 · simp only [h_neg, ite_true] at r2_post
                   have r2_eq_r_neg : Field51_as_Nat r2 = Field51_as_Nat r_neg := by
-                    simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                      Finset.sum_singleton]
-                    expand r2_post with 5
-                    simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                      UScalar.ofNatCore_val_eq, getElem!_pos, iff_true, Nat.reduceMul,
-                      UScalar.neq_to_neq_val, true_iff, Nat.not_eq, ne_eq, zero_ne_one,
-                      not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
-                      UScalar.val_not_eq_imp_not_eq, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                      Nat.reduceLT, Nat.lt_add_one, mul_zero, pow_zero, one_mul, mul_one]
+                    refine field51_as_Nat_eq_of_pointwise_eq ?_
+                    intro i hi
+                    simpa using congrArg UScalar.val (r2_post i hi)
                   rw [r2_eq_r_neg]
                   exact (nat_sq_of_add_modeq_zero (by rw [add_comm]; exact r_neg_post1))
                 · simp only [h_neg, if_neg, not_false_eq_true] at r2_post
                   have r2_eq_r : Field51_as_Nat r2 = Field51_as_Nat r := by
-                    simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                      Finset.sum_singleton]
-                    expand r2_post with 5
-                    simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                      UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
-                      Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+                    refine field51_as_Nat_eq_of_pointwise_eq ?_
+                    intro i hi
+                    have hr2 : r2[i]!.val = r1[i]!.val := by
+                      simpa using congrArg UScalar.val (r2_post i hi)
+                    have hr1 : r1[i]!.val = r[i]!.val := by
+                      simpa using congrArg UScalar.val (r1_post i hi)
+                    exact hr2.trans hr1
                   rw [r2_eq_r]
               exact r2_eq_sq.mul_right _ |>.trans r_sq_v_u
             · intro i hi
@@ -1178,17 +1149,9 @@ theorem sqrt_ratio_i_spec'
           have h01 : ¬(0#u8 = 1#u8) := by decide
           simp only [Choice.zero, h01, ite_false] at r1_post
           have r1_eq_r : Field51_as_Nat r1 = Field51_as_Nat r := by
-            simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
-              List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one,
-              Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-              one_mul, mul_one, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-              Nat.lt_add_one]
-            simp only [Array.getElem!_Nat_eq] at r1_post
-            expand r1_post with 5
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-              UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-              Nat.reduceLT, Nat.lt_add_one]
+            refine field51_as_Nat_eq_of_pointwise_eq ?_
+            intro i hi
+            simpa using congrArg UScalar.val (r1_post i hi)
           have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
             fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
           have h_check_ne_fe6 : ¬(check.to_bytes = fe6.to_bytes) :=
@@ -1226,16 +1189,13 @@ theorem sqrt_ratio_i_spec'
               intro h; exact absurd (r_is_negative_post.mp h) (by omega)
             simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
             have r2_eq_r : Field51_as_Nat r2 = Field51_as_Nat r := by
-              simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-                Finset.sum_singleton]
-              simp only [Array.getElem!_Nat_eq] at r2_post r1_post
-              expand r2_post with 5
-              expand r1_post with 5
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                Nat.reducePow, Nat.add_one_sub_one, Nat.reduceSub, Nat.reduceMul,
-                Nat.reduceAdd, zero_ne_one, mul_zero, UScalar.neq_to_neq_val,
-                Nat.reduceLT, Nat.lt_add_one, pow_zero, one_mul, mul_one]
+              refine field51_as_Nat_eq_of_pointwise_eq ?_
+              intro i hi
+              have hr2 : r2[i]!.val = r1[i]!.val := by
+                simpa using congrArg UScalar.val (r2_post i hi)
+              have hr1 : r1[i]!.val = r[i]!.val := by
+                simpa using congrArg UScalar.val (r1_post i hi)
+              exact hr2.trans hr1
             refine ⟨rfl, ?_, ?_⟩
             · rw [r2_eq_r]; exact r_zero
             · intro i hi
@@ -1375,19 +1335,9 @@ theorem sqrt_ratio_i_spec'
                     · simp only [h_neg, ite_true] at r2_post
                       have r2_eq_r_neg : Field51_as_Nat r2 =
                           Field51_as_Nat r_neg := by
-                        simp only [Field51_as_Nat, Finset.sum_range_succ,
-                          Finset.range_one, Finset.sum_singleton]
-                        expand r2_post with 5
-                        simp_all only [Array.getElem!_Nat_eq,
-                          List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                          getElem!_pos, Nat.reduceMul,
-                          UScalar.neq_to_neq_val, true_iff, Nat.not_eq,
-                          ne_eq, zero_ne_one, not_false_eq_true,
-                          one_ne_zero, zero_lt_one, not_lt_zero, or_false,
-                          or_self, UScalar.val_not_eq_imp_not_eq,
-                          Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT,
-                          Nat.lt_add_one, mul_zero, pow_zero, one_mul,
-                          mul_one]
+                        refine field51_as_Nat_eq_of_pointwise_eq ?_
+                        intro i hi
+                        simpa using congrArg UScalar.val (r2_post i hi)
                       rw [r2_eq_r_neg]
                       exact nat_sq_of_add_modeq_zero
                         (by rw [add_comm]; exact r_neg_post1)
@@ -1395,13 +1345,13 @@ theorem sqrt_ratio_i_spec'
                         at r2_post
                       have r2_eq_r : Field51_as_Nat r2 =
                           Field51_as_Nat r := by
-                        simp only [Field51_as_Nat, Finset.sum_range_succ,
-                          Finset.range_one, Finset.sum_singleton]
-                        expand r2_post with 5
-                        simp_all only [Array.getElem!_Nat_eq,
-                          List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                          getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat,
-                          Nat.reduceLT, Nat.lt_add_one]
+                        refine field51_as_Nat_eq_of_pointwise_eq ?_
+                        intro i hi
+                        have hr2 : r2[i]!.val = r1[i]!.val := by
+                          simpa using congrArg UScalar.val (r2_post i hi)
+                        have hr1 : r1[i]!.val = r[i]!.val := by
+                          simpa using congrArg UScalar.val (r1_post i hi)
+                        exact hr2.trans hr1
                       rw [r2_eq_r]
                   exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
                 · rcases h with h | h
