@@ -149,7 +149,7 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
     have hi_val := h_bytes_zero i hi
     interval_cases i
     all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate, List.getElem_cons_succ,
-      List.getElem_cons_zero]; scalar_tac
+      List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
   rw [← hru_eq]
   exact hu
 
@@ -263,9 +263,9 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         simp only [add_assoc,
           (by grind :
               (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) = ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-        have : p-1 +1 =p := by unfold p; scalar_tac
+        have : p-1 +1 =p := by unfold p; grind
         rw[this]
-        have : (p-1)/2 *2 =p-1 := by unfold p; scalar_tac
+        have : (p-1)/2 *2 =p-1 := by unfold p; grind
         rw[this]
       rw[this]
       rw[Nat.modEq_zero_iff_dvd] at ha
@@ -276,19 +276,19 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         simp
       have := (fermat.add this).add_right (p-1)
       apply this.trans
-      have : 1 + 0 + (p - 1) =p := by unfold p; scalar_tac
+      have : 1 + 0 + (p - 1) =p := by unfold p; grind
       rw[this]
       rw[Nat.modEq_zero_iff_dvd]
     have := mul_zero_eq_or prime_25519 this
     rcases this with r | l
     · have r:= r.add_right 1
       rw[add_assoc] at r
-      have : p-1 +1 =p := by unfold p; scalar_tac
+      have : p-1 +1 =p := by unfold p; grind
       simp[this] at r
       simp[r]
     · have r:= l.add_right (p-1)
       rw[add_assoc] at r
-      have :  1 + (p-1) =p := by unfold p; scalar_tac
+      have :  1 + (p-1) =p := by unfold p; grind
       simp[this] at r
       simp[r]
 
@@ -307,9 +307,9 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         simp only [add_assoc,
           (by grind :
               (p - 1) * a ^ ((p - 1) / 4) + a ^ ((p - 1) / 4) = ((p - 1) + 1) * a ^ ((p - 1) / 4))]
-        have : p-1 +1 =p := by unfold p; scalar_tac
+        have : p-1 +1 =p := by unfold p; grind
         rw[this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
+        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; grind
         rw[this]
   have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) *
           (a ^ ((p -1) / 4) + Field51_as_Nat SQRT_M1_val)
@@ -323,9 +323,9 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
               (p - 1) * (Field51_as_Nat SQRT_M1_val) * a ^ ((p - 1) / 4) +
                   a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val =
                 ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val)]
-        have : p-1 +1 =p := by unfold p; scalar_tac
+        have : p-1 +1 =p := by unfold p; grind
         rw [this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; scalar_tac
+        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; grind
         rw[this, ← add_assoc]
   have : (a ^ ((p -1) / 4) + (p-1)) *
           (a ^ ((p -1) / 4) + 1) *
@@ -357,9 +357,9 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
                 (by grind :
                     (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) =
                       ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-              have : p-1 +1 =p := by unfold p; scalar_tac
+              have : p-1 +1 =p := by unfold p; grind
               rw[this]
-              have : (p-1)/2 *2 =p-1 := by unfold p; scalar_tac
+              have : (p-1)/2 *2 =p-1 := by unfold p; grind
               rw[this]
             rw[this]
             rw[Nat.modEq_zero_iff_dvd] at ha
@@ -370,7 +370,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
               simp
             have := (fermat.add this).add_right (p-1)
             apply this.trans
-            have : 1 + 0 + (p - 1) =p := by unfold p; scalar_tac
+            have : 1 + 0 + (p - 1) =p := by unfold p; grind
             rw[this]
             rw[Nat.modEq_zero_iff_dvd]
           apply this
@@ -382,12 +382,12 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
       rcases this with hl | hl
       · have r:= hl.add_right 1
         rw[add_assoc] at r
-        have : p-1 +1 =p := by unfold p; scalar_tac
+        have : p-1 +1 =p := by unfold p; grind
         simp[this] at r
         simp[r]
       · have r:= hl.add_right (p-1)
         rw[add_assoc] at r
-        have :  1 + (p-1) =p := by unfold p; scalar_tac
+        have :  1 + (p-1) =p := by unfold p; grind
         simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
         have :p - 1  ≡Field51_as_Nat SQRT_M1_val ^2  [MOD p]:= by
               unfold SQRT_M1_val
@@ -396,18 +396,20 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         simp[r]
     · have r:= hl.add_right (Field51_as_Nat SQRT_M1_val)
       rw[add_assoc] at r
-      have : (p-1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =p * (Field51_as_Nat SQRT_M1_val) := by unfold p; scalar_tac
+      have : (p-1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =
+        p * (Field51_as_Nat SQRT_M1_val) := by unfold p; grind
       simp[this] at r
       simp[r]
   · have r:= hl.add_right ((p-1)*Field51_as_Nat SQRT_M1_val)
     rw[add_assoc] at r
-    have :  Field51_as_Nat SQRT_M1_val + (p-1) * Field51_as_Nat SQRT_M1_val=p * (Field51_as_Nat SQRT_M1_val) := by unfold p; scalar_tac
+    have :  Field51_as_Nat SQRT_M1_val + (p-1) * Field51_as_Nat SQRT_M1_val
+      = p * (Field51_as_Nat SQRT_M1_val) := by unfold p; grind
     simp only [this, zero_add, Nat.add_modulus_mul_modEq_iff] at r
-    have :(p - 1)* (Field51_as_Nat SQRT_M1_val)  ≡Field51_as_Nat SQRT_M1_val ^3  [MOD p]:= by
+    have : (p - 1) * (Field51_as_Nat SQRT_M1_val)  ≡Field51_as_Nat SQRT_M1_val ^3  [MOD p]:= by
               unfold SQRT_M1_val
               decide
     have r:= r.trans this
-    simp[r]
+    simp [r]
 
 private theorem nonneg_of_neg_mod_p (a b : ℕ)
     (h_sum : (a + b) % p = 0) (h_a_odd : a % p % 2 = 1) :
@@ -472,6 +474,26 @@ private theorem field51_as_Nat_conditional_assign
     simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
       congrArg UScalar.val hz
 
+/-- Whole-element consequence of taking the right branch in `conditional_assign`. -/
+private theorem field51_as_Nat_conditional_assign_eq_right
+    (x y z : backend.serial.u64.field.FieldElement51)
+    (c : subtle.Choice)
+    (hc : c.val = 1#u8)
+    (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
+    Field51_as_Nat z = Field51_as_Nat y := by
+  simpa only [hc, ↓reduceIte] using
+    field51_as_Nat_conditional_assign x y z c z_post
+
+/-- Whole-element consequence of taking the left branch in `conditional_assign`. -/
+private theorem field51_as_Nat_conditional_assign_eq_left
+    (x y z : backend.serial.u64.field.FieldElement51)
+    (c : subtle.Choice)
+    (hc : c.val ≠ 1#u8)
+    (z_post : ∀ i < 5, z[i]! = if c.val = 1#u8 then y[i]! else x[i]!) :
+    Field51_as_Nat z = Field51_as_Nat x := by
+  simpa only [hc, ↓reduceIte] using
+    field51_as_Nat_conditional_assign x y z c z_post
+
 /-- `conditional_negate` preserves the represented square modulo `p`. -/
 private theorem conditional_negate_sq
     (r1 x r2 : backend.serial.u64.field.FieldElement51)
@@ -513,7 +535,198 @@ private theorem conditional_negate_nonneg
     have := mt r_is_negative_post.mpr h
     omega
 
-set_option maxHeartbeats 800000 in -- heavy nested proof.
+/-- Limb bounds after `conditional_negate`: either the negated value or the original value. -/
+private theorem conditional_negate_bounds_of_eq
+    (base r1 x r2 : backend.serial.u64.field.FieldElement51)
+    (r_is_negative : subtle.Choice)
+    (r1_post : ∀ i < 5, r1[i]! = base[i]!)
+    (base_bounds : ∀ i < 5, base[i]!.val < 2 ^ 52)
+    (x_bounds : ∀ i < 5, x[i]!.val ≤ 2 ^ 52)
+    (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
+    ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 := by
+  intro i hi
+  by_cases h : r_is_negative.val = 1#u8
+  · have hr2x : r2[i]!.val = x[i]!.val := by
+      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] using
+        congrArg UScalar.val (r2_post i hi)
+    rw [hr2x]
+    have hx := x_bounds i hi
+    omega
+  · have hr2r1 : r2[i]!.val = r1[i]!.val := by
+      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h, ↓reduceIte] using
+        congrArg UScalar.val (r2_post i hi)
+    have hr1base : r1[i]!.val = base[i]!.val := by
+      simpa only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD] using
+        congrArg UScalar.val (r1_post i hi)
+    have hbase := base_bounds i hi
+    omega
+
+/-- Main algebraic bridge before the branch split in `sqrt_ratio_i`. -/
+private theorem check_eq_v_of_sqrt_ratio_data
+    (u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check :
+      backend.serial.u64.field.FieldElement51)
+    (check_post1 :
+      Field51_as_Nat check ≡ Field51_as_Nat v * Field51_as_Nat fe5 [MOD p])
+    (fe5_post1 :
+      Field51_as_Nat fe5 ≡ Field51_as_Nat r ^ 2 [MOD p])
+    (r_post1 :
+      Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
+    (fe4_post1 :
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+    (fe3_post1 :
+      Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
+    (fe2_post1 :
+      Field51_as_Nat fe2 ≡ Field51_as_Nat u * Field51_as_Nat v3 [MOD p])
+    (v7_post1 :
+      Field51_as_Nat v7 ≡ Field51_as_Nat fe1 * Field51_as_Nat v [MOD p])
+    (fe1_post1 :
+      Field51_as_Nat fe1 ≡ Field51_as_Nat v3 ^ 2 [MOD p])
+    (v3_post1 :
+      Field51_as_Nat v3 ≡ Field51_as_Nat fe * Field51_as_Nat v [MOD p])
+    (fe_post1 :
+      Field51_as_Nat fe ≡ Field51_as_Nat v ^ 2 [MOD p]) :
+    Field51_as_Nat check ≡
+      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
+        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
+  apply check_post1.trans
+  have := fe5_post1.mul_left (Field51_as_Nat v)
+  apply this.trans
+  have := r_post1.pow 2
+  rw [mul_pow] at this
+  have := this.mul_left (Field51_as_Nat v)
+  apply this.trans
+  rw [← Nat.ModEq] at fe4_post1
+  have eq1 := Nat.ModEq.pow 2 fe4_post1
+  rw [← pow_mul] at eq1
+  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post1
+  have eq2 := Nat.ModEq.trans eq1 this
+  rw [mul_pow] at eq2
+  have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post1
+  have eq_v3 := Nat.ModEq.trans v3_post1 this
+  rw [pow_add_one] at eq_v3
+  have := Nat.ModEq.pow 2 eq_v3
+  rw [← pow_mul] at this
+  have := Nat.ModEq.trans fe1_post1 this
+  have := Nat.ModEq.mul_right (Field51_as_Nat v) this
+  rw [pow_add_one] at this
+  have := Nat.ModEq.trans v7_post1 this
+  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
+  rw [← pow_mul] at this
+  have := Nat.ModEq.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) this
+  have eq3 := Nat.ModEq.trans eq2 this
+  have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
+  have := Nat.ModEq.trans fe2_post1 this
+  have eq4 := Nat.ModEq.pow 2 this
+  rw [mul_pow] at eq4
+  have := Nat.ModEq.mul eq4 eq3
+  have := Nat.ModEq.mul_left (Field51_as_Nat v) this
+  apply Nat.ModEq.trans this
+  have :
+      Field51_as_Nat v *
+        (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
+            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)))) =
+      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
+        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) := by
+    simp only [Nat.reduceAdd, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
+    ring
+  rw [this]
+
+/-- Main algebraic bridge before the branch split in `sqrt_ratio_i`. -/
+private theorem check_eq_mod_of_sqrt_ratio_data
+    (u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check r_prime :
+      backend.serial.u64.field.FieldElement51)
+    (r_prime_post1 :
+      Field51_as_Nat r_prime ≡
+        Field51_as_Nat SQRT_M1_val * Field51_as_Nat r [MOD p])
+    (check_post1 :
+      Field51_as_Nat check ≡ Field51_as_Nat v * Field51_as_Nat fe5 [MOD p])
+    (fe5_post1 :
+      Field51_as_Nat fe5 ≡ Field51_as_Nat r ^ 2 [MOD p])
+    (r_post1 :
+      Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
+    (fe4_post1 :
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+    (fe3_post1 :
+      Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
+    (fe2_post1 :
+      Field51_as_Nat fe2 ≡ Field51_as_Nat u * Field51_as_Nat v3 [MOD p])
+    (v7_post1 :
+      Field51_as_Nat v7 ≡ Field51_as_Nat fe1 * Field51_as_Nat v [MOD p])
+    (fe1_post1 :
+      Field51_as_Nat fe1 ≡ Field51_as_Nat v3 ^ 2 [MOD p])
+    (v3_post1 :
+      Field51_as_Nat v3 ≡ Field51_as_Nat fe * Field51_as_Nat v [MOD p])
+    (fe_post1 :
+      Field51_as_Nat fe ≡ Field51_as_Nat v ^ 2 [MOD p]) :
+    Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
+      Field51_as_Nat SQRT_M1_val ^ 2 * Field51_as_Nat check [MOD p] := by
+  have eq1_mod :
+      Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
+        Field51_as_Nat SQRT_M1_val ^ 2 *
+          (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
+            Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)) [MOD p] := by
+    have := r_prime_post1.pow 2
+    rw [mul_pow] at this
+    have := this.mul_right (Field51_as_Nat v)
+    apply this.trans
+    rw [mul_assoc]
+    apply Nat.ModEq.mul_left
+    have := Nat.ModEq.pow 2 r_post1
+    rw [mul_pow] at this
+    have := this.mul_right (Field51_as_Nat v)
+    apply this.trans
+    rw [← Nat.ModEq] at fe4_post1
+    have eq1 := fe4_post1.pow 2
+    rw [← pow_mul] at eq1
+    have := fe3_post1.pow ((2 ^ 252 - 3) * 2)
+    have eq2 := eq1.trans this
+    rw [mul_pow] at eq2
+    have := fe_post1.mul_right (Field51_as_Nat v)
+    have eq_v3 := v3_post1.trans this
+    rw [pow_add_one] at eq_v3
+    have := eq_v3.pow 2
+    rw [← pow_mul] at this
+    have := fe1_post1.trans this
+    have := this.mul_right (Field51_as_Nat v)
+    rw [pow_add_one] at this
+    have := v7_post1.trans this
+    have := this.pow ((2 ^ 252 - 3) * 2)
+    rw [← pow_mul] at this
+    have := this.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2))
+    have eq3 := eq2.trans this
+    have := eq_v3.mul_left (Field51_as_Nat u)
+    have := fe2_post1.trans this
+    have eq4 := this.pow 2
+    rw [mul_pow] at eq4
+    have := eq4.mul eq3
+    have := this.mul_right (Field51_as_Nat v)
+    apply this.trans
+    have :
+        Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
+            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) *
+          Field51_as_Nat v =
+        (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
+          ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
+            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
+            Field51_as_Nat v) := by
+      simp
+      ring
+    rw [this]
+    rw [← pow_add, ← pow_mul, ← pow_add, pow_add_one,
+      (by
+        simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub] :
+          (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1 =
+            7 * 2 ^ 253 - 35)]
+  have check_eq_v :=
+    check_eq_v_of_sqrt_ratio_data u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check
+      check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
+      v7_post1 fe1_post1 v3_post1 fe_post1
+  have := Nat.ModEq.mul_left (Field51_as_Nat SQRT_M1_val ^ 2) check_eq_v
+  exact eq1_mod.trans this.symm
+
+set_option maxHeartbeats 400000 in -- heavy nested proof.
 /-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
 i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
 
@@ -563,107 +776,14 @@ theorem sqrt_ratio_i_spec'
   -- Bridge: i = SQRT_M1_raw, fold back to SQRT_M1_val
   rw [i_post1] at r_prime_post1 fe7_post1
   rw [show constants.SQRT_M1_raw = SQRT_M1_val from rfl] at r_prime_post1 fe7_post1
-  have eq1_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-    ≡ (Field51_as_Nat SQRT_M1_val) ^2 * (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))
-    [MOD p]:= by
-    have := r_prime_post1.pow 2
-    rw[mul_pow] at this
-    have := this.mul_right (Field51_as_Nat v)
-    apply this.trans
-    rw[mul_assoc]
-    apply Nat.ModEq.mul_left
-    have := Nat.ModEq.pow 2 r_post1
-    rw[mul_pow] at this
-    have := this.mul_right (Field51_as_Nat v)
-    apply this.trans
-    rw[← Nat.ModEq] at fe4_post1
-    have eq1:= fe4_post1.pow 2
-    rw[← pow_mul] at eq1
-    have :=fe3_post1.pow ((2 ^ 252 - 3) * 2)
-    have eq2:= eq1.trans  this
-    rw[mul_pow] at eq2
-    have := fe_post1.mul_right (Field51_as_Nat v)
-    have eq_v3:= v3_post1.trans this
-    rw[pow_add_one] at eq_v3
-    have := eq_v3.pow 2
-    rw[← pow_mul] at this
-    have := fe1_post1.trans  this
-    have := this.mul_right (Field51_as_Nat v)
-    rw[pow_add_one] at this
-    have := v7_post1.trans  this
-    have := this.pow ((2 ^ 252 - 3) * 2)
-    rw[← pow_mul] at this
-    have := this.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2))
-    have eq3:= eq2.trans  this
-    have := eq_v3.mul_left (Field51_as_Nat u)
-    have := fe2_post1.trans  this
-    have eq4:= this.pow 2
-    rw[mul_pow] at eq4
-    have := eq4.mul  eq3
-    have := this.mul_right (Field51_as_Nat v)
-    apply this.trans
-    have :  Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-     (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) * Field51_as_Nat v
-      =  (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
-      ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-       Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
-      Field51_as_Nat v)
-        := by
-        simp
-        ring
-    rw[this]
-    clear this
-    rw[← pow_add, ← pow_mul, ← pow_add, pow_add_one,
-    (by simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub]:
-     (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1= 7 * 2 ^ 253 - 35)]
-  have check_eq_v: Field51_as_Nat check ≡
-    Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
-    apply check_post1.trans
-    have := fe5_post1.mul_left (Field51_as_Nat v)
-    apply this.trans
-    have := r_post1.pow 2
-    rw[mul_pow] at this
-    have := this.mul_left (Field51_as_Nat v)
-    apply this.trans
-    rw[← Nat.ModEq] at fe4_post1
-    have eq1:= Nat.ModEq.pow 2 fe4_post1
-    rw[← pow_mul] at eq1
-    have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post1
-    have eq2:= Nat.ModEq.trans eq1 this
-    rw[mul_pow] at eq2
-    have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post1
-    have eq_v3:= Nat.ModEq.trans v3_post1 this
-    rw[pow_add_one] at eq_v3
-    have := Nat.ModEq.pow 2 eq_v3
-    rw[← pow_mul] at this
-    have := Nat.ModEq.trans fe1_post1 this
-    have := Nat.ModEq.mul_right (Field51_as_Nat v) this
-    rw[pow_add_one] at this
-    have := Nat.ModEq.trans v7_post1 this
-    have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
-    rw[← pow_mul] at this
-    have := Nat.ModEq.mul_left  ((Field51_as_Nat u)^ ((2 ^ 252 - 3) * 2)) this
-    have eq3:= Nat.ModEq.trans eq2 this
-    have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
-    have := Nat.ModEq.trans fe2_post1 this
-    have eq4:= Nat.ModEq.pow 2 this
-    rw[mul_pow] at eq4
-    have := Nat.ModEq.mul eq4 eq3
-    have := Nat.ModEq.mul_left (Field51_as_Nat v) this
-    apply Nat.ModEq.trans this
-    have :  Field51_as_Nat v *
-      (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-      (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))))
-      =  Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)
-        := by
-        simp only [Nat.reduceAdd, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
-        ring
-    rw[this]
-  have check_eq_mod: (Field51_as_Nat r_prime)^2 *  (Field51_as_Nat v)
-    ≡ (Field51_as_Nat SQRT_M1_val) ^2 *Field51_as_Nat check [MOD p] := by
-    have := Nat.ModEq.mul_left ((Field51_as_Nat SQRT_M1_val) ^2) check_eq_v
-    apply Nat.ModEq.trans eq1_mod
-    apply Nat.ModEq.symm this
+  have check_eq_v :=
+    check_eq_v_of_sqrt_ratio_data u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check
+      check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
+      v7_post1 fe1_post1 v3_post1 fe_post1
+  have check_eq_mod :=
+    check_eq_mod_of_sqrt_ratio_data u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check r_prime
+      r_prime_post1 check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
+      v7_post1 fe1_post1 v3_post1 fe_post1
   have :=nat_sqrt_m1_sq_of_add_modeq_zero fe6_post1
   have check_eq_r_v:= check_post1.trans (fe5_post1.mul_left (Field51_as_Nat v))
   rw[mul_comm] at check_eq_r_v
@@ -719,23 +839,8 @@ theorem sqrt_ratio_i_spec'
               _ = Field51_as_Nat r_prime := r1_eq
           rw [this]
           exact r_prime_eq0
-        · intro i hi
-          by_cases h : r_is_negative.val = 1#u8
-          · simp only [h, ite_true] at r2_post
-            have := r2_post i hi
-            have := r_neg_post2 i hi
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-              getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
-            have := r_neg_post2 i hi
-            omega
-          · simp only [h, ite_false] at r2_post
-            have := r2_post i hi
-            have := r1_post i hi
-            have := r_prime_post2 i hi
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-              getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
-              getElem?_pos, Option.getD_some, ge_iff_le]
-            have := r2_post i hi; have := r_prime_post2 i hi; omega
+        · exact conditional_negate_bounds_of_eq r_prime r1 r_neg r2 r_is_negative
+            r1_post r_prime_post2 r_neg_post2 r2_post
       · -- case 2: u ≠ 0, v = 0 → contradiction
         intro hu hv
         exfalso; apply hu
@@ -759,23 +864,8 @@ theorem sqrt_ratio_i_spec'
             (by simpa only [r1_eq] using r_neg_post1) r2_post
           rw [r1_eq] at r2_eq_sq
           exact r2_eq_sq.mul_right _ |>.trans r_prime_sq_v_u
-        · intro i hi
-          by_cases h : r_is_negative.val = 1#u8
-          · simp only [h, ite_true] at r2_post
-            have := r2_post i hi
-            have := r_neg_post2 i hi
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-              getElem!_pos, true_iff, getElem?_pos, Option.getD_some, ge_iff_le]
-            have := r_neg_post2 i hi
-            omega
-          · simp only [h, ite_false] at r2_post
-            have := r2_post i hi
-            have := r1_post i hi
-            have := r_prime_post2 i hi
-            simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-              getElem!_pos, false_iff, Nat.mod_two_not_eq_one, UScalar.neq_to_neq_val,
-              getElem?_pos, Option.getD_some, ge_iff_le]
-            have := r2_post i hi; have := r_prime_post2 i hi; omega
+        · exact conditional_negate_bounds_of_eq r_prime r1 r_neg r2 r_is_negative
+            r1_post r_prime_post2 r_neg_post2 r2_post
       · -- case 4: no QR → contradiction
         intro hu hv hno_qr
         exfalso
@@ -862,16 +952,15 @@ theorem sqrt_ratio_i_spec'
                 simpa only [h_not_neg, ↓reduceIte] using
                   field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
               _ = Field51_as_Nat r_prime := r1_eq_rprime
+          have hr2_bounds : ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 :=
+            conditional_negate_bounds_of_eq r_prime r1 r_neg r2 r_is_negative
+              r1_post r_prime_post2 r_neg_post2 r2_post
           simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
           refine ⟨?_, ?_, ?_, ?_, ?_⟩
           · intro _
             refine ⟨(Choice.val_eq_one_iff Choice.one).mpr rfl, ?_, ?_⟩
             · rw [r2_eq_rprime]; exact r_prime_eq0
-            · intro i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNatCore_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
-              have := r2_post i hi; have := r1_post i hi; have := r_prime_post2 i hi
-              omega
+            · exact hr2_bounds
           · intro hu; exfalso; exact hu h_u_zero
           · intro hu; exfalso; exact hu h_u_zero
           · intro hu; exfalso; exact hu h_u_zero
@@ -992,22 +1081,8 @@ theorem sqrt_ratio_i_spec'
                 (by simpa [r1_eq_rprime] using r_neg_post1) r2_post
               rw [r1_eq_rprime] at r2_eq_sq
               exact r2_eq_sq.mul_right _ |>.trans rprime_v
-            · intro i hi
-              by_cases h : r_is_negative.val = 1#u8
-              · simp only [h, ite_true] at r2_post
-                have := r2_post i hi; have := r_neg_post2 i hi
-                simp_all only [Array.getElem!_Nat_eq,
-                  List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                  getElem!_pos, UScalar.neq_to_neq_val, true_iff,
-                  getElem?_pos, Option.getD_some, ge_iff_le]
-                have := r_neg_post2 i hi; omega
-              · simp only [h, if_neg, not_false_eq_true] at r2_post
-                simp_all only [Array.getElem!_Nat_eq,
-                  List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                  getElem!_pos, UScalar.neq_to_neq_val, false_iff,
-                  Nat.mod_two_not_eq_one, getElem?_pos, Option.getD_some]
-                have := r2_post i hi; have := r1_post i hi
-                have := r_prime_post2 i hi; omega
+            · exact conditional_negate_bounds_of_eq r_prime r1 r_neg r2 r_is_negative
+                r1_post r_prime_post2 r_neg_post2 r2_post
           · rw [← r1_eq_rprime] at r_is_negative_post r_neg_post1
             exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
               r_is_negative_post r_neg_post1 r2_post
@@ -1061,25 +1136,8 @@ theorem sqrt_ratio_i_spec'
                       field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
                   _ = Field51_as_Nat r := r1_eq_r
               rw [this]; exact r_eq0
-            · intro i hi
-              by_cases h : r_is_negative.val = 1#u8
-              · simp only [h, ite_true] at r2_post
-                have := r2_post i hi; have := r_neg_post2 i hi
-                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
-                  true_iff, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero,
-                  zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
-                  getElem?_pos, Option.getD_some, ge_iff_le]
-                have := r_neg_post2 i hi; omega
-              · simp only [h, if_neg, not_false_eq_true] at r2_post
-                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  getElem!_pos, UScalar.neq_to_neq_val,
-                  UScalar.ofNatCore_val_eq, false_iff, Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq, zero_ne_one,
-                  not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
-                  UScalar.val_not_eq_imp_not_eq, List.Vector.length_val, getElem?_pos,
-                  Option.getD_some]
-                have := r2_post i hi; have := r_post2 i hi
-                omega
+            · exact conditional_negate_bounds_of_eq r r1 r_neg r2 r_is_negative
+                r1_post r_post2 r_neg_post2 r2_post
           · intro hu hv; exfalso; apply hu
             have h_v0 := hv.mul_left (Field51_as_Nat r ^ 2)
             simp only [mul_zero] at h_v0
@@ -1092,25 +1150,8 @@ theorem sqrt_ratio_i_spec'
                 (by simpa [r1_eq_r] using r_neg_post1) r2_post
               rw [r1_eq_r] at r2_eq_sq
               exact r2_eq_sq.mul_right _ |>.trans r_sq_v_u
-            · intro i hi
-              by_cases h : r_is_negative.val = 1#u8
-              · simp only [h, ite_true] at r2_post
-                have := r2_post i hi; have := r_neg_post2 i hi
-                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
-                  true_iff, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero,
-                  zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
-                  getElem?_pos, Option.getD_some, ge_iff_le]
-                have := r_neg_post2 i hi; omega
-              · simp only [h, if_neg, not_false_eq_true] at r2_post
-                simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                  UScalar.ofNatCore_val_eq, getElem!_pos, UScalar.neq_to_neq_val,
-                  false_iff, Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq, zero_ne_one,
-                  not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
-                  UScalar.val_not_eq_imp_not_eq, getElem?_pos, Option.getD_some]
-                have := r2_post i hi
-                have := r2_post i hi; have := r_post2 i hi;
-                omega
+            · exact conditional_negate_bounds_of_eq r r1 r_neg r2 r_is_negative
+                r1_post r_post2 r_neg_post2 r2_post
           · intro hu hv hno_qr; exfalso
             exact absurd r_sq_v_u (hno_qr _)
           · rw [← r1_eq_r] at r_is_negative_post r_neg_post1
@@ -1165,15 +1206,13 @@ theorem sqrt_ratio_i_spec'
                   simpa [h_not_neg] using
                     field51_as_Nat_conditional_assign r1 r_neg r2 r_is_negative r2_post
                 _ = Field51_as_Nat r := r1_eq_r
+            have hr2_bounds : ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 :=
+              conditional_negate_bounds_of_eq r r1 r_neg r2 r_is_negative
+                r1_post r_post2 r_neg_post2 r2_post
             simp only [h_not_neg, if_neg, not_false_eq_true] at r2_post
             refine ⟨rfl, ?_, ?_⟩
             · rw [r2_eq_r]; exact r_zero
-            · intro i hi
-              simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
-                UScalar.ofNatCore_val_eq, getElem!_pos, getElem?_pos, Option.getD_some]
-              have := r2_post i hi; have := r1_post i hi
-              have := r_post2 i hi
-              omega
+            · exact hr2_bounds
           · intro hu hv xx hxx; exfalso
             rw [← Nat.ModEq] at hxx
             have p_eq : 2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) =
@@ -1347,29 +1386,8 @@ theorem sqrt_ratio_i_spec'
                     have := U8x32_as_Nat_injective check_eq_fe7
                     exact False.elim (h_check_ne_fe7
                       (by rw [hcheck_tb, hu_tb, this]))
-            · intro i hi
-              by_cases h : r_is_negative.val = 1#u8
-              · simp only [h, ite_true] at r2_post
-                have := r2_post i hi; have := r_neg_post2 i hi
-                simp_all only [Array.getElem!_Nat_eq,
-                  List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                  getElem!_pos, UScalar.neq_to_neq_val, true_iff,
-                  Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
-                  one_ne_zero, zero_lt_one, not_lt_zero, or_false,
-                  or_self, UScalar.val_not_eq_imp_not_eq,
-                  getElem?_pos, Option.getD_some, ge_iff_le]
-                have := r_neg_post2 i hi; omega
-              · simp only [h, if_neg, not_false_eq_true] at r2_post
-                simp_all only [Array.getElem!_Nat_eq,
-                  List.Vector.length_val, UScalar.ofNatCore_val_eq,
-                  getElem!_pos, UScalar.neq_to_neq_val, false_iff,
-                  Nat.mod_two_not_eq_one, Nat.not_eq, ne_eq,
-                  zero_ne_one, not_false_eq_true, one_ne_zero,
-                  zero_lt_one, not_lt_zero, or_false, or_self,
-                  UScalar.val_not_eq_imp_not_eq, getElem?_pos,
-                  Option.getD_some]
-                have := r2_post i hi; have := r1_post i hi
-                have := r_post2 i hi; omega
+            · exact conditional_negate_bounds_of_eq r r1 r_neg r2 r_is_negative
+                r1_post r_post2 r_neg_post2 r2_post
           · rw [← r1_eq_r] at r_is_negative_post r_neg_post1
             exact conditional_negate_nonneg r1 r_neg r2 r_is_negative
               r_is_negative_post r_neg_post1 r2_post
