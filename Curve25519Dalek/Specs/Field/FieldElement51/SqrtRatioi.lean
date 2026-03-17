@@ -409,59 +409,6 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     have r:= r.trans this
     simp[r]
 
-set_option maxHeartbeats 2000000000 in
--- scalar_tac haevy
-lemma eq_U8x32_as_Nat_eq {a b : Aeneas.Std.Array U8 32#usize}
-    (hab : U8x32_as_Nat a = U8x32_as_Nat b) : a = b := by
-    apply Subtype.ext
-    apply List.ext_getElem
-    repeat simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]
-    intro i h1 h2
-    interval_cases i
-    all_goals(simp only [U8x32_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-      Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
-      List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
-      one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
-      Nat.lt_add_one] at hab; scalar_tac)
-
-/-
-Natural language description:
-
-    This function takes two field elements u and v and returns
-
-    - (Choice(1), +sqrt(u/v))       if v is nonzero and u/v is square;
-    - (Choice(1), zero)             if u is zero;
-    - (Choice(0), zero)             if v is zero and u is nonzero;
-    - (Choice(0), +sqrt(i * u/v))   if u/v is nonsquare (so i*u/v is square).
-
-Here i represents a square root of -1 in the field (mod p) and is stored as the constant SQRT_M1.
-Every returned square root is nonnegative.
-
-Natural language specs:
-
-    • The function succeeds (no panic) for all field element inputs
-    • The result (c, r) satisfies four mutually exclusive cases:
-
-      - If u = 0 (mod p), then (c, r) = (Choice(1), 0)
-
-      - If u ≠ 0 (mod p) and v = 0 (mod p), then (c, r) = (Choice(0), 0)
-
-      - If u ≠ 0 (mod p) and v ≠ 0 (mod p) and (u/v) is a square, then (c, r) = (Choice(1), sqrt(u/v))
-
-      - If u ≠ 0 (mod p) and v ≠ 0 (mod p) and (u/v) is not a square, then (c, r) = (Choice(0), sqrt(SQRT_M1 * u/v))
-
-    • In all cases, r is non-negative
--/
-
-/- **Spec and proof concerning `field.FieldElement51.sqrt_ratio_i`**:
-- No panic for field element inputs u and v (always returns (c, r) successfully)
-- The result satisfies exactly one of four mutually exclusive cases:
-  1. If u ≡ 0 (mod p), then c.val = 1 and r ≡ 0 (mod p)
-  2. If u ≢ 0 (mod p) and v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)
-  3. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 1 and r^2 ≡ u * v^(-1) (mod p)
-  4. If u ≢ 0 (mod p) and v ≢ 0 (mod p) and ¬∃ x, x^2 ≡ u * v^(-1) (mod p), then c.val = 0 and r^2 ≡ SQRT_M1 * u * v^(-1) (mod p)
--/
-
 private theorem nonneg_of_neg_mod_p (a b : ℕ)
     (h_sum : (a + b) % p = 0) (h_a_odd : a % p % 2 = 1) :
     b % p % 2 = 0 := by
@@ -515,7 +462,20 @@ private theorem conditional_negate_nonneg
     have := mt r_is_negative_post.mpr h
     omega
 
-set_option maxHeartbeats 800000 in -- nested and non trivial proof.
+set_option maxHeartbeats 800000 in -- heavy nested proof.
+/-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
+i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
+
+Returns `(Choice(1), +sqrt(u/v))` if u/v is square, `(Choice(1), 0)` if u=0,
+`(Choice(0), 0)` if v=0 and u≠0, `(Choice(0), +sqrt(i*u/v))` if u/v is nonsquare.
+
+Postconditions (4 mutually exclusive cases + non-negativity):
+1. u ≡ 0 → c=1, r≡0
+2. u≢0, v≡0 → c=0, r≡0
+3. u≢0, v≢0, ∃x, x²v≡u → c=1, r²v≡u
+4. u≢0, v≢0, ¬∃x, x²v≡u → c=0, r²v≡SQRT_M1·u
+5. r is non-negative (r % p % 2 = 0)
+-/
 theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
@@ -1328,7 +1288,7 @@ theorem sqrt_ratio_i_spec'
                 rw [this] at check_eq_u
                 have := Nat.mod_eq_of_lt hrcheck_lt
                 rw [this] at check_eq_u
-                have := eq_U8x32_as_Nat_eq check_eq_u
+                have := U8x32_as_Nat_injective check_eq_u
                 exact h_check_ne_u (by rw [hcheck_tb, hu_tb, this])
               · have := hl.mul_right (xx ^ 2 * Field51_as_Nat v)
                 simp only [← mul_assoc] at this
@@ -1354,7 +1314,7 @@ theorem sqrt_ratio_i_spec'
                 rw [this] at check_eq_fe6
                 have := Nat.mod_eq_of_lt hrcheck_lt
                 rw [this] at check_eq_fe6
-                have := eq_U8x32_as_Nat_eq check_eq_fe6
+                have := U8x32_as_Nat_injective check_eq_fe6
                 exact h_check_ne_fe6
                   (by rw [hcheck_tb, hu_tb, this])
           · intro hu hv hx
@@ -1485,7 +1445,7 @@ theorem sqrt_ratio_i_spec'
                     rw [this] at check_eq_fe7
                     have := Nat.mod_eq_of_lt hrcheck_lt
                     rw [this] at check_eq_fe7
-                    have := eq_U8x32_as_Nat_eq check_eq_fe7
+                    have := U8x32_as_Nat_injective check_eq_fe7
                     exact False.elim (h_check_ne_fe7
                       (by rw [hcheck_tb, hu_tb, this]))
             · intro i hi
