@@ -56,10 +56,11 @@ natural language specs:
 theorem RISTRETTO_BASEPOINT_POINT_spec :
     RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧ _root_.L • result.toPoint = 0 ∧
-      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ⦄ := by
+      result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ∧
+      result.toPoint = _root_.Edwards.basepoint ⦄ := by
     unfold RISTRETTO_BASEPOINT_POINT RistrettoPoint.IsValid RistrettoPoint.toPoint
     progress*
-    refine ⟨by grind, ?_, by grind, by grind, by grind⟩
+    refine ⟨by grind, ?_, by grind, by grind, by grind, by grind⟩
     · use 34737626771194858627071295502606372355980995399692169211837275202373938891970
       grind
 
