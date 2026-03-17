@@ -47,19 +47,6 @@ natural language specs:
       - Each limb of the result is bounded by 2^52
 -/
 
-/- Helper lemmas/theorems -/
-
--- Helper theorem to cancel R [mod L] on right retrieved from Curve25519Dalek.Specs.Scalar.Scalar.Reduce.lean
--- NOTE: We should refactoring such helper theorems into a common file to avoid duplication
-theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
-  have hcoprime : Nat.Coprime R L := by
-    unfold R L Nat.Coprime
-    simp
-  have h1 := Nat.Coprime.symm hcoprime
-  exact Nat.ModEq.cancel_right_of_coprime h1 h
-
-/- End of helper lemmas/theorems -/
-
 /-- **Spec and proof concerning `scalar.Scalar52.mul`**:
 - No panic (always returns successfully)
 - The result represents the product of the two input scalars modulo L
