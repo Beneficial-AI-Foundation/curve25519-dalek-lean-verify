@@ -1,10 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Liao Zhang, Oliver Butterley
+Authors: Liao Zhang, Oliver Butterley, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
@@ -41,8 +42,11 @@ natural language specs:
 theorem identity_spec :
     identity ⦃ (q : EdwardsPoint) =>
       Field51_as_Nat q.X = 0 ∧ Field51_as_Nat q.Y = 1 ∧
-      Field51_as_Nat q.Z = 1 ∧ Field51_as_Nat q.T = 0 ⦄ := by
-  unfold identity
+      Field51_as_Nat q.Z = 1 ∧ Field51_as_Nat q.T = 0 ∧
+      q.IsValid ⦄ := by
+  unfold identity ZERO ONE
   progress*
+  simp only [*]
+  decide
 
 end curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity
