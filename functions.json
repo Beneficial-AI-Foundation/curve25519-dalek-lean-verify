@@ -10665,7 +10665,8 @@
    "spec_statement":
    "theorem reduce_spec (s : Scalar) :\n    reduce s ⦃ (s' : Scalar) =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Reduce.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.Scalar.reduce`**:\n- No panic (always returns successfully)\n- The result scalar s' is congruent to the input scalar s modulo L (the group order)\n- The result scalar s' is in canonical form (less than L)\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce",
