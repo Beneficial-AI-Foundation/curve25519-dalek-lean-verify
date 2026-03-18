@@ -71,9 +71,6 @@ natural language specs:
 -- Helper lemma: bridge from toField ≠ 0 to Field51_as_Nat % p ≠ 0
 -- ========================================================================
 
-/-- Convert `fe.toField ≠ 0` (field-level nonzero) to `Field51_as_Nat fe % p ≠ 0`
-    (natural-number-level nonzero modulo p). This bridges the `IsValid.Z_ne_zero`
-    predicate with the `invert` spec's precondition. -/
 private lemma field51_modP_ne_zero_of_toField_ne_zero
     (fe : backend.serial.u64.field.FieldElement51)
     (h : fe.toField ≠ 0) :
@@ -121,13 +118,11 @@ private lemma xy2d_mod_arith (xy2d_nat fe_nat d2_nat x_nat y_nat Z_nat X_nat Y_n
     (h_xZ : x_nat * Z_nat ≡ X_nat [MOD p])
     (h_yZ : y_nat * Z_nat ≡ Y_nat [MOD p]) :
     xy2d_nat * Z_nat * Z_nat ≡ X_nat * Y_nat * (2 * d) [MOD p] := by
-  -- First: xy2d ≡ x * y * (2 * d)
   have h_step1 : xy2d_nat ≡ x_nat * y_nat * (2 * d) [MOD p] := by
     calc xy2d_nat
         ≡ fe_nat * d2_nat [MOD p] := h_xy2d
       _ ≡ (x_nat * y_nat) * d2_nat [MOD p] := Nat.ModEq.mul_right _ h_fe
       _ ≡ (x_nat * y_nat) * (2 * d) [MOD p] := Nat.ModEq.mul_left _ h_d2
-  -- Then: xy2d * Z * Z ≡ (x * Z) * (y * Z) * (2d) ≡ X * Y * (2d)
   calc xy2d_nat * Z_nat * Z_nat
       ≡ x_nat * y_nat * (2 * d) * Z_nat * Z_nat [MOD p] :=
         Nat.ModEq.mul_right _ (Nat.ModEq.mul_right _ h_step1)
@@ -139,9 +134,6 @@ private lemma xy2d_mod_arith (xy2d_nat fe_nat d2_nat x_nat y_nat Z_nat X_nat Y_n
 -- Main spec theorem
 -- ========================================================================
 
--- The proof chains 8 progress steps (invert, 3 muls, EDWARDS_D2, 1 mul, add, sub)
--- followed by modular arithmetic reasoning, requiring extra heartbeats.
-set_option maxHeartbeats 1000000 in
 
 /-- **Spec and proof concerning `edwards.EdwardsPoint.as_affine_niels`**:
 - No panic (always returns successfully)
@@ -175,42 +167,23 @@ theorem as_affine_niels_spec
   let ypx := Field51_as_Nat an.y_plus_x
   let ymx := Field51_as_Nat an.y_minus_x
   let xy2d_val := Field51_as_Nat an.xy2d
-  -- Modular arithmetic relations
   (ypx * Z) % p = (Y + X) % p ∧
   (ymx * Z + X) % p = Y % p ∧
   (xy2d_val * Z * Z) % p = (X * Y * (2 * d)) % p ∧
-  -- Output bounds (all < 2^54 / 2^52 / 2^52)
   (∀ i < 5, an.y_plus_x[i]!.val < 2 ^ 54) ∧
   (∀ i < 5, an.y_minus_x[i]!.val < 2 ^ 52) ∧
   (∀ i < 5, an.xy2d[i]!.val < 2 ^ 52) ⦄
 := by
-  -- Extract individual bounds from IsValid
   have h_X_bounds := hself.X_bounds
   have h_Y_bounds := hself.Y_bounds
   have h_Z_bounds := hself.Z_bounds
-  -- Bridge: toField ≠ 0 → Field51_as_Nat % p ≠ 0
   have h_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0 :=
     field51_modP_ne_zero_of_toField_ne_zero self.Z hself.Z_ne_zero
   unfold as_affine_niels
-  -- Use progress* to resolve all 8 monadic steps at once:
-  --   invert, 3 muls, EDWARDS_D2, 1 mul, add, sub
   progress*
-  -- ---------------------------------------------------------------
-  -- After progress*, the context contains:
-  --   recip, recip_post1 (inverse), recip_post2 (zero→zero), recip_post3 (bounds)
-  --   x, x_post1 (≡ X * recip [MOD p]), x_post2 (bounds)
-  --   y, y_post1 (≡ Y * recip [MOD p]), y_post2 (bounds)
-  --   fe, fe_post1 (≡ x * y [MOD p]), fe_post2 (bounds)
-  --   fe1, fe1_post1 (= (2*d) % p), fe1_post2 (bounds)
-  --   xy2d, xy2d_post1 (≡ fe * fe1 [MOD p]), xy2d_post2 (bounds)
-  --   fe2, fe2_post1 (pointwise add), fe2_post2 (bounds < 2^54)
-  --   fe3, fe3_post1 (bounds < 2^52), fe3_post2 (sub relation)
-  -- ---------------------------------------------------------------
-  · -- Key intermediate result: recip * Z ≡ 1 [MOD p]
-    have h_recip_Z : Field51_as_Nat recip * Field51_as_Nat self.Z ≡ 1 [MOD p] := by
-      rw [Nat.ModEq, Nat.mul_mod, show (1 : ℕ) % p = 1 from by native_decide]
+  · have h_recip_Z : Field51_as_Nat recip * Field51_as_Nat self.Z ≡ 1 [MOD p] := by
+      rw [Nat.ModEq, Nat.mul_mod, show (1 : ℕ) % p = 1 from by decide]
       exact recip_post1 h_Z_nonzero
-    -- Derived: x * Z ≡ X [MOD p]
     have h_xZ : Field51_as_Nat x * Field51_as_Nat self.Z ≡ Field51_as_Nat self.X [MOD p] := by
       calc Field51_as_Nat x * Field51_as_Nat self.Z
           ≡ Field51_as_Nat self.X * Field51_as_Nat recip * Field51_as_Nat self.Z [MOD p] :=
@@ -218,7 +191,6 @@ theorem as_affine_niels_spec
         _ = Field51_as_Nat self.X * (Field51_as_Nat recip * Field51_as_Nat self.Z) := by ring
         _ ≡ Field51_as_Nat self.X * 1 [MOD p] := Nat.ModEq.mul_left _ h_recip_Z
         _ = Field51_as_Nat self.X := by ring
-    -- Derived: y * Z ≡ Y [MOD p]
     have h_yZ : Field51_as_Nat y * Field51_as_Nat self.Z ≡ Field51_as_Nat self.Y [MOD p] := by
       calc Field51_as_Nat y * Field51_as_Nat self.Z
           ≡ Field51_as_Nat self.Y * Field51_as_Nat recip * Field51_as_Nat self.Z [MOD p] :=
@@ -226,21 +198,14 @@ theorem as_affine_niels_spec
         _ = Field51_as_Nat self.Y * (Field51_as_Nat recip * Field51_as_Nat self.Z) := by ring
         _ ≡ Field51_as_Nat self.Y * 1 [MOD p] := Nat.ModEq.mul_left _ h_recip_Z
         _ = Field51_as_Nat self.Y := by ring
-    -- Derived: Field51_as_Nat fe2 = Field51_as_Nat y + Field51_as_Nat x (pointwise addition)
     have h_ypx_val : Field51_as_Nat fe2 = Field51_as_Nat y + Field51_as_Nat x :=
       pointwise_add_Field51_as_Nat y x fe2 fe2_post1
-    -- d2 ≡ 2 * d [MOD p]
     have h_d2_mod : Field51_as_Nat fe1 ≡ 2 * d [MOD p] := by
       rw [Nat.ModEq, fe1_post1, Nat.mod_mod_of_dvd]; simp
-    -- Assemble all six conjuncts
     exact ⟨
-      -- (1) (ypx * Z) % p = (Y + X) % p
       (ypx_mod_arith _ _ _ _ _ _ h_ypx_val h_yZ h_xZ),
-      -- (2) (ymx * Z + X) % p = Y % p
       (ymx_mod_arith _ _ _ _ _ _ fe3_post2 h_xZ h_yZ),
-      -- (3) (xy2d * Z * Z) % p = (X * Y * (2 * d)) % p
       (xy2d_mod_arith _ _ _ _ _ _ _ _ xy2d_post1 fe_post1 h_d2_mod h_xZ h_yZ),
-      -- (4)–(6) Output bounds
       fe2_post2, fe3_post1, xy2d_post2⟩
 
 end curve25519_dalek.edwards.EdwardsPoint
