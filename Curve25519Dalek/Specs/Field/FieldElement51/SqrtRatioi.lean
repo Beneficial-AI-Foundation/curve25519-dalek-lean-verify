@@ -712,21 +712,25 @@ private theorem modEq_zero_of_sqrt_m1_mul_self {a : ℕ}
 private abbrev sqrt_ratio_i_cases
     (u v r2 : backend.serial.u64.field.FieldElement51)
     (c : subtle.Choice) : Prop :=
-  let u_nat := Field51_as_Nat u % p
-  let v_nat := Field51_as_Nat v % p
-  let r_nat := Field51_as_Nat r2 % p
-  let i_nat := Field51_as_Nat SQRT_M1_val % p
-  (u_nat = 0 →
-      c.val = 1#u8 ∧ r_nat = 0 ∧ (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
-    (u_nat ≠ 0 ∧ v_nat = 0 →
-      c.val = 0#u8 ∧ r_nat = 0 ∧ (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat) →
-      c.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat ∧
+  (Field51_as_Nat u % p = 0 →
+      c.val = 1#u8 ∧ Field51_as_Nat r2 % p = 0 ∧
         (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
-    ((u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ ¬∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat) →
-      c.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = (i_nat * u_nat) % p ∧
+    (Field51_as_Nat u % p ≠ 0 ∧ Field51_as_Nat v % p = 0 →
+      c.val = 0#u8 ∧ Field51_as_Nat r2 % p = 0 ∧
         (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
-    (r_nat % 2 = 0)
+    (Field51_as_Nat u % p ≠ 0 ∧ Field51_as_Nat v % p ≠ 0 ∧
+        (∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat u % p) →
+      c.val = 1#u8 ∧
+        ((Field51_as_Nat r2 % p) ^ 2 * (Field51_as_Nat v % p)) % p =
+          Field51_as_Nat u % p ∧
+        (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    ((Field51_as_Nat u % p ≠ 0 ∧ Field51_as_Nat v % p ≠ 0 ∧
+        ¬∃ x : Nat, (x ^ 2 * (Field51_as_Nat v % p)) % p = Field51_as_Nat u % p) →
+      c.val = 0#u8 ∧
+        ((Field51_as_Nat r2 % p) ^ 2 * (Field51_as_Nat v % p)) % p =
+          ((Field51_as_Nat SQRT_M1_val % p) * (Field51_as_Nat u % p)) % p ∧
+        (∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1)) ∧
+    (Field51_as_Nat r2 % p % 2 = 0)
 
 section sqrt_ratio_i_branch_solvers
 
@@ -1398,8 +1402,7 @@ theorem sqrt_ratio_i_spec'
   have check_eq_r_v:= check_post1.trans (fe5_post1.mul_left (Field51_as_Nat v))
   rw[mul_comm] at check_eq_r_v
   by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
-  · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok, Array.getElem!_Nat_eq,
-      List.getElem!_eq_getElem?_getD, ne_eq]
+  · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
     let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1425,8 +1428,7 @@ theorem sqrt_ratio_i_spec'
     by_cases second_choice : flipped_sign_sqrt_i.val = 1#u8
     · -- A: second_choice = true (c = Choice.one, r1 = r_prime)
       simp only [first_choice, second_choice, or_true, or_false,
-        ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
-        List.getElem!_eq_getElem?_getD, ne_eq]
+        ↓reduceIte, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1489,8 +1491,7 @@ theorem sqrt_ratio_i_spec'
               r2_post r_is_negative_post
     · -- B: second_choice = false (c = Choice.zero, r1 = r)
       simp only [first_choice, second_choice, or_false,
-        ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
-        List.getElem!_eq_getElem?_getD, ne_eq]
+        ↓reduceIte, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
