@@ -119,6 +119,13 @@ theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_sp
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
 def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
 
+/-- A `subtle.Choice` has `.val = 1` iff it equals `Choice.one`. -/
+lemma Choice.val_eq_one_iff (c : subtle.Choice) :
+    c.val = 1#u8 ↔ c = Choice.one := by
+  cases c with
+  | mk val valid =>
+    simp [Choice.one]
+
 /- [subtle::{subtle::Choice}::unwrap_u8]:
    Name pattern: [subtle::{subtle::Choice}::unwrap_u8]
    Returns 0u8 if Choice.zero (0), 1u8 if Choice.one (1) -/

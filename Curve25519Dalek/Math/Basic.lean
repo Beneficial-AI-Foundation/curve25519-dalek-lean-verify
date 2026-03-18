@@ -38,6 +38,16 @@ def d : Nat := 37095705934669439343138083508754565189542113879843219016388785533
 /-- The constant a in the defining equation for the twisted Edwards curve: ax^2 + y^2 = 1 + dx^2y^2 -/
 def a : Int := -1
 
+/-! ## Scalar Montgomery arithmetic helpers -/
+
+/-- Cancel `R` from both sides of a congruence mod `L`.
+    Used in Montgomery-form scalar specs (Scalar.reduce, Scalar52.mul). -/
+lemma cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
+  have hcoprime : Nat.Coprime R L := by
+    unfold R L
+    exact Nat.Coprime.pow_left 260 (by norm_num [Nat.Coprime])
+  exact Nat.ModEq.cancel_right_of_coprime hcoprime.symm h
+
 /-! ## Auxiliary definitions for interpreting arrays as natural numbers -/
 
 /-- Interpret a Field51 (five u64 limbs used to represent 51 bits each) as a natural number -/
@@ -76,6 +86,10 @@ namespace Edwards
 
 /-- The finite field F_p where p = 2^255 - 19. -/
 abbrev CurveField : Type := ZMod p
+
+/-- Helper lemma for modular arithmetic lifting -/
+theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : CurveField) :=
+  (ZMod.natCast_eq_natCast_iff a b p).mpr h
 
 end Edwards
 

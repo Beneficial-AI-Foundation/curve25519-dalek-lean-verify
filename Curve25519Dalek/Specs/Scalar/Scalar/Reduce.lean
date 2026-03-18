@@ -46,13 +46,6 @@ natural language specs:
 - The result scalar s' is congruent to the input scalar s modulo L (the group order)
 - The result scalar s' is in canonical form (less than L)
 -/
-theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
-  have hcoprime : Nat.Coprime R L := by
-    unfold R L Nat.Coprime
-    simp
-  have h1 := Nat.Coprime.symm hcoprime
-  exact Nat.ModEq.cancel_right_of_coprime h1 h
-
 @[progress]
 theorem reduce_spec (s : Scalar) :
     reduce s ⦃ (s' : Scalar) =>
