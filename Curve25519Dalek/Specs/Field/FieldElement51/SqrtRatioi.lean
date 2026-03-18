@@ -1316,7 +1316,7 @@ private theorem solve_second_choice_false_choice3_false
 
 end sqrt_ratio_i_branch_solvers
 
-set_option maxHeartbeats 300000 in -- heavy nested proof.
+set_option maxHeartbeats 250000 in -- the proof works even with 230k heartbeats, but not much less.
 /-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
 i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
 
@@ -1402,7 +1402,9 @@ theorem sqrt_ratio_i_spec'
   have check_eq_r_v:= check_post1.trans (fe5_post1.mul_left (Field51_as_Nat v))
   rw[mul_comm] at check_eq_r_v
   by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
-  · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok]
+  · simp only [show flipped_sign_sqrt.val = 1#u8 ∨ flipped_sign_sqrt_i.val = 1#u8 from
+        Or.inl first_choice, show correct_sign_sqrt.val = 1#u8 ∨ flipped_sign_sqrt.val = 1#u8 from
+        Or.inr first_choice, if_true, bind_tc_ok]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
     let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1427,8 +1429,7 @@ theorem sqrt_ratio_i_spec'
   · -- second branch: first_choice = false
     by_cases second_choice : flipped_sign_sqrt_i.val = 1#u8
     · -- A: second_choice = true (c = Choice.one, r1 = r_prime)
-      simp only [first_choice, second_choice, or_true, or_false,
-        ↓reduceIte, bind_tc_ok]
+      simp only [first_choice, false_or, or_false, if_pos second_choice, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1490,8 +1491,7 @@ theorem sqrt_ratio_i_spec'
               r_prime_post1 r1_post r_prime_post2 r_neg_post1 r_neg_post2
               r2_post r_is_negative_post
     · -- B: second_choice = false (c = Choice.zero, r1 = r)
-      simp only [first_choice, second_choice, or_false,
-        ↓reduceIte, bind_tc_ok]
+      simp only [if_neg second_choice, first_choice, false_or, or_false, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
