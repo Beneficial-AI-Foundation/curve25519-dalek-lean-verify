@@ -73,7 +73,7 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   simp only [add_zero, this] at h4
   have h5:=h.add_right ((p - 1) * b)
   have h6:=h4.trans h5
-  simp at h6
+  simp only [zero_add] at h6
   exact h6.trans (h1.symm)
 
 theorem eq_to_bytes_eq_Field51_as_Nat
@@ -709,7 +709,7 @@ private theorem modEq_zero_of_sqrt_m1_mul_self {a : ℕ}
     exact Nat.mul_mod_right p k
 
 /-- Bundled postcondition for a fully normalized `sqrt_ratio_i` result. -/
-private def sqrt_ratio_i_cases
+private abbrev sqrt_ratio_i_cases
     (u v r2 : backend.serial.u64.field.FieldElement51)
     (c : subtle.Choice) : Prop :=
   let u_nat := Field51_as_Nat u % p
@@ -1173,7 +1173,7 @@ private theorem solve_second_choice_false_choice3_false
     by_cases hxx0 : xx ≡ 0 [MOD p]
     · have := ((hxx0.pow 2).mul_right
           (Field51_as_Nat v)).symm.trans hxx
-      simp at this
+      simp only [ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
       exact hu this.symm
     · have := pow_div_two_eq_neg_one_or_one hxx0
       rcases this with hl | hl
@@ -1205,7 +1205,7 @@ private theorem solve_second_choice_false_choice3_false
             1 [MOD p] := by
           unfold SQRT_M1_val; decide
         have := fermat.trans (this.mul_right (Field51_as_Nat fe6))
-        simp at this
+        simp only [one_mul] at this
         obtain ⟨ru, hu_tb, hru_mod, hru_lt⟩ :=
           spec_imp_exists (to_bytes_spec fe6)
         obtain ⟨rcheck, hcheck_tb, hrcheck_mod, hrcheck_lt⟩ :=
@@ -1399,8 +1399,7 @@ theorem sqrt_ratio_i_spec'
   rw[mul_comm] at check_eq_r_v
   by_cases first_choice :  flipped_sign_sqrt.val = 1#u8
   · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok, Array.getElem!_Nat_eq,
-      List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
-      Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+      List.getElem!_eq_getElem?_getD, ne_eq]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
     let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1418,11 +1417,7 @@ theorem sqrt_ratio_i_spec'
       have r_prime_sq_v_u : Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
           Field51_as_Nat u [MOD p] :=
         (check_eq_mod.trans (check_fe6.mul_left _)).trans u_m.symm
-      simpa [sqrt_ratio_i_cases, and_imp] using
-        solve_first_choice_true
-          (u := u) (v := v) (v3 := v3) (fe2 := fe2) (fe4 := fe4) (r := r)
-          (fe5 := fe5) (check := check) (fe6 := fe6) (r_prime := r_prime)
-          (r1 := r1) (r_neg := r_neg) (r2 := r2) (r_is_negative := r_is_negative)
+      exact solve_first_choice_true
           check_fe6 r_prime_sq_v_u check_post1 fe6_post1 fe2_post1 r_post1
           r_prime_post1 r1_post r_prime_post2 r_neg_post1 r_neg_post2
           r2_post r_is_negative_post
@@ -1431,8 +1426,7 @@ theorem sqrt_ratio_i_spec'
     · -- A: second_choice = true (c = Choice.one, r1 = r_prime)
       simp only [first_choice, second_choice, or_true, or_false,
         ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
-        List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
-        Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+        List.getElem!_eq_getElem?_getD, ne_eq]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1464,11 +1458,7 @@ theorem sqrt_ratio_i_spec'
             (check_eq_u.mul_left (Field51_as_Nat SQRT_M1_val)).symm.trans
               (check_1.trans u_m.symm)
           simp only [Choice.one, ↓reduceIte] at r1_post
-          simpa [sqrt_ratio_i_cases, and_imp] using
-            solve_second_choice_true_choice3_true
-              (u := u) (v := v) (v3 := v3) (fe2 := fe2) (fe4 := fe4) (r := r)
-              (r_prime := r_prime) (r1 := r1) (r_neg := r_neg) (r2 := r2)
-              (r_is_negative := r_is_negative)
+          exact solve_second_choice_true_choice3_true
               sqrt_m1_u fe2_post1 r_post1 r_prime_post1 r1_post
               r_prime_post2 r_neg_post2 r2_post r_is_negative_post
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
@@ -1493,20 +1483,14 @@ theorem sqrt_ratio_i_spec'
           have h_check_ne_u : ¬(check.to_bytes = u.to_bytes) :=
             fun h => choice3 (by rw [correct_sign_sqrt_post.mpr h]; rfl)
           simp only [Choice.one, ↓reduceIte] at r1_post
-          simpa [sqrt_ratio_i_cases, and_imp] using
-            solve_second_choice_true_choice3_false
-              (u := u) (v := v) (fe := fe) (v3 := v3) (fe2 := fe2) (fe4 := fe4)
-              (r := r) (check := check) (r_prime := r_prime)
-              (r1 := r1) (r_neg := r_neg) (r2 := r2)
-              (r_is_negative := r_is_negative)
+          exact solve_second_choice_true_choice3_false
               u_eq1 rprime_v h_check_ne_u v3_post1 fe2_post1 r_post1
               r_prime_post1 r1_post r_prime_post2 r_neg_post1 r_neg_post2
               r2_post r_is_negative_post
     · -- B: second_choice = false (c = Choice.zero, r1 = r)
       simp only [first_choice, second_choice, or_false,
         ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
-        List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
-        Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
+        List.getElem!_eq_getElem?_getD, ne_eq]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
       let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
@@ -1528,11 +1512,7 @@ theorem sqrt_ratio_i_spec'
           have r_sq_v_u := check_eq_r_v.symm.trans check_eq_u
           have h01 : ¬(0#u8 = 1#u8) := by decide
           simp only [Choice.zero, h01, ite_false] at r1_post
-          simpa [sqrt_ratio_i_cases, and_imp] using
-            solve_second_choice_false_choice3_true
-              (u := u) (v := v) (v3 := v3) (fe2 := fe2) (fe4 := fe4) (r := r)
-              (r1 := r1) (r_neg := r_neg) (r2 := r2)
-              (r_is_negative := r_is_negative)
+          exact solve_second_choice_false_choice3_true
               r_sq_v_u fe2_post1 r_post1 r1_post r_post2 r_neg_post1
               r_neg_post2 r2_post r_is_negative_post
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
@@ -1545,8 +1525,7 @@ theorem sqrt_ratio_i_spec'
             fun h => first_choice (by rw [flipped_sign_sqrt_post.mpr h]; rfl)
           have h_check_ne_fe7 : ¬(check.to_bytes = fe7.to_bytes) :=
             fun h => second_choice (by rw [flipped_sign_sqrt_i_post.mpr h]; rfl)
-          simpa [sqrt_ratio_i_cases, and_imp] using
-            solve_second_choice_false_choice3_false
+          exact solve_second_choice_false_choice3_false
               check_eq_v check_eq_r_v u_m v3_post1 fe2_post1 r_post1
               fe7_post1 r1_post r_post2 r_neg_post1 r_neg_post2
               r2_post r_is_negative_post
