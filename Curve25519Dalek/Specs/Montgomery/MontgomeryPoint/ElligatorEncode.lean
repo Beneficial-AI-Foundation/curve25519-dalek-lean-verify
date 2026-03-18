@@ -37,6 +37,7 @@ used by hash-to-curve algorithms (RFC 9380, §6.7.3).
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
+open curve25519_dalek.math
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.constants
 open curve25519_dalek.field.FieldElement51

@@ -140,6 +140,77 @@ namespace curve25519_dalek.math
 
 open Edwards ZMod
 
+/-- Nat.ModEq against zero as a remainder equality. -/
+theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔ a % n = 0 := by
+  simp [Nat.ModEq]
+
+/-- Nat.ModEq against one modulo the field prime `p`. -/
+theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔ a % p = 1 := by
+  simp only [Nat.ModEq]
+  have : 1 % p = 1 := by
+    unfold p
+    decide
+  rw [this]
+
+/-- Rewrite `a^n * a` into the more convenient successor exponent form. -/
+theorem pow_add_one (a n : ℕ) : a ^ n * a = a ^ (n + 1) := by
+  grind
+
+/-- Squaring preserves equality modulo `p` after moving one term across zero. -/
+theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
+    (h : a + b ≡ 0 [MOD p]) :
+    a ^ 2 ≡ b ^ 2 [MOD p] := by
+  have h1 := h.mul_left a
+  have h2 := h.mul_right b
+  simp only [zero_mul] at h2
+  have h1' : a * a + a * b ≡ 0 [MOD p] := by
+    simpa only [Nat.mul_add, mul_zero] using h1
+  have h2' : a * b + b * b ≡ 0 [MOD p] := by
+    simpa only [Nat.add_mul] using h2
+  have hsum : a * b + a * a ≡ a * b + b * b [MOD p] := by
+    rw [add_comm]
+    apply Nat.ModEq.symm at h2'
+    exact Nat.ModEq.trans h1' h2'
+  apply Nat.ModEq.add_left_cancel' at hsum
+  simpa only [pow_two] using hsum
+
+/-- Squaring after reduction modulo `p` agrees with squaring first modulo `p`. -/
+theorem mod_sq_mod (a p : ℕ) : (a % p) ^ 2 ≡ a ^ 2 [MOD p] := by
+  exact (Nat.mod_modEq a p).pow 2
+
+/-- Multiplication after reduction modulo `p` agrees with multiplication first modulo `p`. -/
+theorem mod_mul_mod (a b : ℕ) : (a % p) * (b % p) ≡ a * b [MOD p] := by
+  exact ((Nat.mod_modEq a p).mul_right (b % p)).trans ((Nat.mod_modEq b p).mul_left a)
+
+/-- Square-then-multiply form of `mod_sq_mod`. -/
+theorem mod_sq_mod_mul (a b p : ℕ) : (a % p) ^ 2 * b ≡ a ^ 2 * b [MOD p] := by
+  exact (Nat.ModEq.mul_right b (mod_sq_mod a p))
+
+/-- Equality form of `mod_sq_mod_mul`. -/
+theorem mod_sq_mod_mul_eq (a b p : ℕ) : ((a % p) ^ 2 * b) % p = (a ^ 2 * b) % p := by
+  rw [← Nat.ModEq]
+  exact mod_sq_mod_mul a b p
+
+/-- Equality form of `mod_sq_mod`. -/
+theorem mod_sq_mod_eq (a p : ℕ) : ((a % p) ^ 2) % p = (a ^ 2) % p := by
+  exact (Nat.mod_modEq a p).pow 2
+
+/-- Alias for `mod_sq_mod_eq`. -/
+theorem sq_mod_eq_mod_sq (a p : ℕ) : ((a % p) ^ 2) % p = (a ^ 2) % p :=
+  mod_sq_mod_eq a p
+
+/-- Zero divisors do not exist modulo a prime. -/
+theorem mul_zero_eq_or {a b p : ℕ} {hp : p.Prime}
+    (hab : a * b ≡ 0 [MOD p]) :
+    a ≡ 0 [MOD p] ∨ b ≡ 0 [MOD p] := by
+  rw [Nat.ModEq] at hab
+  have h_dvd : p ∣ a * b := Nat.dvd_of_mod_eq_zero hab
+  obtain ha | hb := hp.dvd_mul.mp h_dvd
+  · left
+    exact Nat.mod_eq_zero_of_dvd ha
+  · right
+    exact Nat.mod_eq_zero_of_dvd hb
+
 /-- SQRT_M1: The square root of -1 in the field (used for Elligator inverse sqrt).
     Value: 19681161...84752 -/
 def sqrt_m1 : ZMod p :=
