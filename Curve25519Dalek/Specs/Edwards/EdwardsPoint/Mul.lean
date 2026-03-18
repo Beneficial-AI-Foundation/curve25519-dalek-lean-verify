@@ -12,7 +12,7 @@ import Curve25519Dalek.ExternallyVerified
 
 Specifications and proofs for scalar multiplication of Edwards points.
 
-Two trait implementations are covered here:
+Three trait implementations are covered here:
 
 - `Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul` — the core implementation:
   `&EdwardsPoint * &Scalar → EdwardsPoint`, delegating to `backend::variable_base_mul`.
@@ -45,9 +45,9 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[externally_verified, progress] -- proven in Verus
+@[progress, externally_verified] -- proven in Verus
 theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
-    (h_s_canonical : U8x32_as_Nat s.bytes < L)
+    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
     mul e s ⦃ result =>
     result.IsValid ∧
@@ -81,7 +81,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
-    (h_s_canonical : U8x32_as_Nat s.bytes < L)
+    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
     mul s e ⦃ result =>
     result.IsValid ∧
@@ -89,3 +89,72 @@ theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
   exact Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul_spec e s h_s_canonical h_e_valid
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint
+
+namespace curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint
+
+/-
+natural language description:
+
+• Takes a valid Edwards point (self : edwards.EdwardsPoint) and a canonical scalar (rhs : scalar.Scalar)
+• Returns the scalar multiple [rhs]self, i.e., the point added to itself rhs times
+• This is the non-borrow variant (`&'a EdwardsPoint * Scalar` rather than `&EdwardsPoint * &Scalar`);
+  it simply delegates to Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul
+  with the same arguments, so no independent computation takes place
+
+natural language specs:
+
+• The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s
+• The result is a valid EdwardsPoint
+• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
+-/
+
+/-- **Spec and proof concerning `SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul`**:
+• The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s
+• The result is a valid EdwardsPoint
+• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
+-/
+@[progress]
+theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
+    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
+    (h_e_valid : e.IsValid) :
+      mul e s ⦃ result =>
+      result.IsValid ∧
+      result.toPoint = ((U8x32_as_Nat s.bytes)) • e.toPoint ⦄ := by
+  exact curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul_spec s e h_s_canonical h_e_valid
+
+end curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint
+
+namespace curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint
+
+/-
+natural language description:
+
+• Takes a canonical scalar (self : scalar.Scalar) and a valid Edwards point (rhs : edwards.EdwardsPoint)
+• Returns the scalar multiple [self]rhs, i.e., the point added to itself self times
+• This is the fully non-borrow variant (`Scalar * EdwardsPoint` rather than `&Scalar * &EdwardsPoint`);
+  it simply delegates to Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul
+  with the same arguments, so no independent computation takes place
+
+natural language specs:
+
+• The function always succeeds (no panic) for canonical input Scalars s and valid input EdwardsPoints e
+• The result is a valid EdwardsPoint
+• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
+-/
+
+/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul`**:
+• The function always succeeds (no panic) for canonical input Scalars s and valid input EdwardsPoints e
+• The result is a valid EdwardsPoint
+• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
+-/
+@[progress]
+theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
+    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
+    (h_e_valid : e.IsValid) :
+    mul s e ⦃ result =>
+      result.IsValid ∧
+      result.toPoint = ((U8x32_as_Nat s.bytes)) • e.toPoint ⦄ := by
+  exact  SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul_spec e s h_s_canonical h_e_valid
+
+
+end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint

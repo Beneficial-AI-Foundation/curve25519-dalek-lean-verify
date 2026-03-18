@@ -49,7 +49,7 @@ natural language specs:
 • The result = b + ... + b represents the Ristretto basepoint b added to itself s-times
 -/
 @[progress]
-theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < L) :
+theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255) :
     mul_base s ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = (U8x32_as_Nat s.bytes) • _root_.Edwards.basepoint ⦄ := by
