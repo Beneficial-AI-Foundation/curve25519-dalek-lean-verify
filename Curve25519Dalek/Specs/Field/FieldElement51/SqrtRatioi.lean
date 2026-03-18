@@ -66,10 +66,10 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
       rw [Nat.sub_mul _ _ _, Nat.one_mul]
   have h3 : 0 ≡ p * b  [MOD p] := by
       simp [Nat.ModEq]
-  have : p *b =  b + (p-1) *b  := by unfold p; grind
+  have : p *b =  b + (p-1) *b  := by unfold p; omega
   rw[this] at h3
   have h4:=h3.add_left a
-  have : a + (b + (p - 1) * b) =(a + b) + (p - 1) * b := by grind
+  have : a + (b + (p - 1) * b) =(a + b) + (p - 1) * b := by omega
   simp only [add_zero, this] at h4
   have h5:=h.add_right ((p - 1) * b)
   have h6:=h4.trans h5
@@ -172,7 +172,7 @@ lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val �
   rw[(by simp : 0 +a =a)] at eq
   have : a * (p - 1) + a= p * a := by
     unfold p
-    grind
+    omega
   rw[this] at eq
   have : p * a ≡ 0  [MOD p] := by
     rw[Nat.ModEq]
@@ -184,14 +184,14 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
       have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
         = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
-        rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
+        rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
         simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
         simp only [add_assoc,
-          (by grind :
+          (by ring :
               (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) = ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-        have : p-1 +1 =p := by unfold p; grind
+        have : p-1 +1 =p := by unfold p; omega
         rw[this]
-        have : (p-1)/2 *2 =p-1 := by unfold p; grind
+        have : (p-1)/2 *2 =p-1 := by unfold p; omega
         rw[this]
       rw[this]
       rw[Nat.modEq_zero_iff_dvd] at ha
@@ -202,19 +202,19 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
         simp
       have := (fermat.add this).add_right (p-1)
       apply this.trans
-      have : 1 + 0 + (p - 1) =p := by unfold p; grind
+      have : 1 + 0 + (p - 1) =p := by unfold p; omega
       rw[this]
       rw[Nat.modEq_zero_iff_dvd]
     have := mul_zero_eq_or (hp := prime_25519) this
     rcases this with r | l
     · have r:= r.add_right 1
       rw[add_assoc] at r
-      have : p-1 +1 =p := by unfold p; grind
+      have : p-1 +1 =p := by unfold p; omega
       simp[this] at r
       simp[r]
     · have r:= l.add_right (p-1)
       rw[add_assoc] at r
-      have :  1 + (p-1) =p := by unfold p; grind
+      have :  1 + (p-1) =p := by unfold p; omega
       simp[this] at r
       simp[r]
 
@@ -228,29 +228,29 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
            =
           a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4) + (p-1)
            := by
-        rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
+        rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
         simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
         simp only [add_assoc,
-          (by grind :
+          (by ring :
               (p - 1) * a ^ ((p - 1) / 4) + a ^ ((p - 1) / 4) = ((p - 1) + 1) * a ^ ((p - 1) / 4))]
-        have : p-1 +1 =p := by unfold p; grind
+        have : p-1 +1 =p := by unfold p; omega
         rw[this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; grind
+        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; omega
         rw[this]
   have eq2:  (a ^ ((p -1) / 4) + (p-1)* (Field51_as_Nat SQRT_M1_val)) * (a ^ ((p -1) / 4)
           + Field51_as_Nat SQRT_M1_val) = a ^ ((p -1)/2 ) + p * a ^ ((p -1) / 4)
           * (Field51_as_Nat SQRT_M1_val) + (p-1) *
           Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val := by
-        rw[mul_add, add_mul,add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
+        rw[mul_add, add_mul,add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
         rw[← add_assoc]
         simp only [add_assoc,
-          (by grind :
+          (by ring :
               (p - 1) * (Field51_as_Nat SQRT_M1_val) * a ^ ((p - 1) / 4) +
                   a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val =
                 ((p - 1) + 1) * a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val)]
-        have : p-1 +1 =p := by unfold p; grind
+        have : p-1 +1 =p := by unfold p; omega
         rw [this]
-        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; grind
+        have : (p-1)/4 *2 =(p-1)/2 := by unfold p; omega
         rw[this, ← add_assoc]
   have : (a ^ ((p -1) / 4) + (p-1)) *
           (a ^ ((p -1) / 4) + 1) *
@@ -276,15 +276,15 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
           have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
             have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
               = a ^ ((p -1) ) + p * a ^ ((p -1) / 2) + (p-1) := by
-              rw[mul_add, add_mul, (by grind : ∀ a, a * a = a^2), ← pow_mul]
+              rw[mul_add, add_mul, (fun a => by ring : ∀ a, a * a = a^2), ← pow_mul]
               simp only [mul_one, ← add_assoc, Nat.add_right_cancel_iff]
               simp only [add_assoc,
-                (by grind :
+                (by ring :
                     (p - 1) * a ^ ((p - 1) / 2) + a ^ ((p - 1) / 2) =
                       ((p - 1) + 1) * a ^ ((p - 1) / 2))]
-              have : p-1 +1 =p := by unfold p; grind
+              have : p-1 +1 =p := by unfold p; omega
               rw[this]
-              have : (p-1)/2 *2 =p-1 := by unfold p; grind
+              have : (p-1)/2 *2 =p-1 := by unfold p; omega
               rw[this]
             rw[this]
             rw[Nat.modEq_zero_iff_dvd] at ha
@@ -295,7 +295,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
               simp
             have := (fermat.add this).add_right (p-1)
             apply this.trans
-            have : 1 + 0 + (p - 1) =p := by unfold p; grind
+            have : 1 + 0 + (p - 1) =p := by unfold p; omega
             rw[this]
             rw[Nat.modEq_zero_iff_dvd]
           apply this
@@ -307,12 +307,12 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
       rcases this with hl | hl
       · have r:= hl.add_right 1
         rw[add_assoc] at r
-        have : p-1 +1 =p := by unfold p; grind
+        have : p-1 +1 =p := by unfold p; omega
         simp[this] at r
         simp[r]
       · have r:= hl.add_right (p-1)
         rw[add_assoc] at r
-        have :  1 + (p-1) =p := by unfold p; grind
+        have :  1 + (p-1) =p := by unfold p; omega
         simp only [this, zero_add, Nat.add_modulus_modEq_iff] at r
         have :p - 1  ≡Field51_as_Nat SQRT_M1_val ^2  [MOD p]:= by
               exact sqrt_m1_sq_modEq.symm
@@ -321,13 +321,13 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     · have r:= hl.add_right (Field51_as_Nat SQRT_M1_val)
       rw[add_assoc] at r
       have : (p-1) * Field51_as_Nat SQRT_M1_val + Field51_as_Nat SQRT_M1_val =
-        p * (Field51_as_Nat SQRT_M1_val) := by unfold p; grind
+        p * (Field51_as_Nat SQRT_M1_val) := by unfold p; omega
       simp[this] at r
       simp[r]
   · have r:= hl.add_right ((p-1)*Field51_as_Nat SQRT_M1_val)
     rw[add_assoc] at r
     have :  Field51_as_Nat SQRT_M1_val + (p-1) * Field51_as_Nat SQRT_M1_val
-      = p * (Field51_as_Nat SQRT_M1_val) := by unfold p; grind
+      = p * (Field51_as_Nat SQRT_M1_val) := by unfold p; omega
     simp only [this, zero_add, Nat.add_modulus_mul_modEq_iff] at r
     have : (p - 1) * (Field51_as_Nat SQRT_M1_val)  ≡Field51_as_Nat SQRT_M1_val ^3  [MOD p]:= by
               unfold SQRT_M1_val
