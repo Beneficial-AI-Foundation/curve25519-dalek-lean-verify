@@ -1081,7 +1081,7 @@ private theorem solve_second_choice_false_choice3_true
 
 end sqrt_ratio_i_branch_solvers
 
-set_option maxHeartbeats 400000 in -- heavy nested proof.
+set_option maxHeartbeats 300000 in -- heavy nested proof.
 /-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
 i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
 
@@ -1127,7 +1127,31 @@ theorem sqrt_ratio_i_spec'
   apply spec_imp_exists
   unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
   simp only [progress_simps]
-  progress*
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ← square_spec
+  let* ⟨ v3, v3_post1, v3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ← square_spec
+  let* ⟨ v7, v7_post1, v7_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe2, fe2_post1, fe2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe3, fe3_post1, fe3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe4, fe4_post1, fe4_post2 ⟩ ← pow_p58_spec
+  let* ⟨ r, r_post1, r_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe5, fe5_post1, fe5_post2 ⟩ ← square_spec
+  let* ⟨ check, check_post1, check_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← constants.SQRT_M1_spec
+  let* ⟨ correct_sign_sqrt, correct_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
+  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+  let* ⟨ flipped_sign_sqrt, flipped_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
+  let* ⟨ fe7, fe7_post1, fe7_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ flipped_sign_sqrt_i, flipped_sign_sqrt_i_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
+  let* ⟨ r_prime, r_prime_post1, r_prime_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   -- Bridge: i = SQRT_M1_raw, fold back to SQRT_M1_val
   rw [i_post1] at r_prime_post1 fe7_post1
   rw [show constants.SQRT_M1_raw = SQRT_M1_val from rfl] at r_prime_post1 fe7_post1
@@ -1146,12 +1170,15 @@ theorem sqrt_ratio_i_spec'
   · simp only [first_choice, true_or, ↓reduceIte, or_true, bind_tc_ok, Array.getElem!_Nat_eq,
       List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
       Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
-    progress*
+    let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
+    let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
+    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
     · intro i hi
       simp only [Choice.one, ↓reduceIte] at r1_post
       rw [r1_post i hi]
       have := r_prime_post2 i hi
       omega
+    let* ⟨ r2, r2_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     · simp only [Choice.one, ↓reduceIte] at r1_post
       have h_bytes_fe6 : check.to_bytes = fe6.to_bytes :=
         flipped_sign_sqrt_post.mp ((Choice.val_eq_one_iff _).mp first_choice)
@@ -1175,12 +1202,15 @@ theorem sqrt_ratio_i_spec'
         ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
         Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
-      progress*
+      let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
+      let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         simp only [Choice.one, ↓reduceIte] at r1_post
         rw [r1_post i hi]
         have := r_prime_post2 i hi
         omega
+      let* ⟨ r2, r2_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       · -- main block A: by_cases on correct_sign_sqrt
         by_cases choice3 : correct_sign_sqrt.val = 1#u8
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
@@ -1246,13 +1276,16 @@ theorem sqrt_ratio_i_spec'
         ↓reduceIte, bind_tc_ok, Array.getElem!_Nat_eq,
         List.getElem!_eq_getElem?_getD, ne_eq, and_imp,
         Nat.mul_mod_mod, forall_exists_index, not_exists, Nat.mod_mul_mod]
-      progress*
+      let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
+      let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         have h01 : ¬(0#u8 = 1#u8) := by decide
         simp only [Choice.zero, h01, ite_false] at r1_post
         rw [r1_post i hi]
         have := r_post2 i hi
         omega
+      let* ⟨ r2, r2_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       · -- main block B: by_cases on correct_sign_sqrt
         by_cases choice3 : correct_sign_sqrt.val = 1#u8
         · simp only [choice3, ↓reduceIte, bind_tc_ok, Aeneas.Std.WP.spec_ok]
