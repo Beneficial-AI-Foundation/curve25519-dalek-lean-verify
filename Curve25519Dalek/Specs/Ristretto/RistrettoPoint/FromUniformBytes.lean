@@ -20,8 +20,8 @@ halfs and adding the resulting two Ristretto points via elliptic curve addition.
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
 
-open Aeneas Aeneas.Std Result core.ops.range Aeneas.Std.WP
-
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.math
 namespace curve25519_dalek.ristretto.RistrettoPoint
 
 /-
@@ -43,20 +43,76 @@ Natural language specs:
 
 - The function always succeeds (no panic) for arbitrary 64-byte inputs
 - The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
+- The output point equals elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))
+  in the Ed25519 group, where from_bytes maps 32 bytes to a field element (low 255 bits mod p)
+  and elligator is the Ristretto-flavored Elligator map
 -/
 
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.from_uniform_bytes`**:
 - The function always succeeds (no panic) for arbitrary 64-byte inputs
 - The output is a mathematically valid Ristretto point (i.e., an even Edwards point that lies on the curve)
+- The output point mathematically equals `elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))`
 -/
 @[progress]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
-    from_uniform_bytes bytes ⦃ (rist : RistrettoPoint) =>
-      rist.IsValid ⦄ := by
+    from_uniform_bytes bytes ⦃ (result : RistrettoPoint) =>
+      result.IsValid ∧
+      let s₁ : ZMod p := ((U8x32_as_Nat (⟨(List.range 32).map (fun i => bytes[i]!), by simp⟩ : Array U8 32#usize) % 2^255 : ℕ) : ZMod p)
+      let s₂ : ZMod p := ((U8x32_as_Nat (⟨(List.range 32).map (fun i => bytes[32 + i]!), by simp⟩ : Array U8 32#usize) % 2^255 : ℕ) : ZMod p)
+      result.toPoint = (elligator_ristretto_flavor_pure s₁).val + (elligator_ristretto_flavor_pure s₂).val ⦄ := by
   unfold from_uniform_bytes
   unfold Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add
   progress*
-  · simp_all [Array.to_slice_mut]
-  · simp_all [Array.to_slice_mut]
+  ·  simp_all only [Array.to_slice_mut, Array.val_to_slice, List.slice_zero_j, Slice.length, List.length_take,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLeDiff, inf_of_le_left, tsub_zero, Array.repeat_val,
+    List.reduceReplicate, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd]
+  ·  simp_all only [Array.to_slice_mut, Array.val_to_slice, List.slice_zero_j, Slice.length, List.length_take,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.reduceLeDiff, inf_of_le_left, tsub_zero, Array.repeat_val,
+    List.reduceReplicate, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd]
+  · constructor
+    · exact result_post1
+    · rw [result_post2, R_1_post2, R_2_post2]
+      simp only [backend.serial.u64.field.FieldElement51.toField]
+      have h1 := (Montgomery.lift_mod_eq_iff _ _).mp r_1_post1
+      have h2 := (Montgomery.lift_mod_eq_iff _ _).mp r_2_post1
+      rw [h1, h2]
+      simp_all only [Array.to_slice_mut, Array.val_to_slice,
+        List.slice_zero_j, Slice.length, List.length_take, List.Vector.length_val,
+        tsub_zero]
+      -- After simp_all: s1_post1 : ↑s2 = List.take 32 ↑bytes
+      --                  s4_post1 : ↑s5 = List.slice 32 64 ↑bytes
+      -- Step 1: Prove length conditions for from_slice_val
+      have hlen1 : s2.val.length = (32#usize).val := by
+        have := congrArg List.length s1_post1
+        simp only [List.length_take, List.Vector.length_val, UScalar.ofNatCore_val_eq] at this ⊢
+        omega
+      have hlen2 : s5.val.length = (32#usize).val := by
+        have := congrArg List.length s4_post1
+        simp only [List.slice_length, List.Vector.length_val, UScalar.ofNatCore_val_eq] at this ⊢
+        omega
+      -- Step 2: Prove from_slice arrays equal spec arrays (via Subtype.ext + val equality)
+      have heq1 : (Array.repeat 32#usize 0#u8).from_slice s2 =
+          (⟨List.map (fun i => bytes[i]!) (List.range 32), by simp⟩ : Array U8 32#usize) :=
+        Subtype.ext (by
+          rw [Array.from_slice_val _ _ hlen1, show s2.val = (↑s2 : List _) from rfl, s1_post1]
+          apply List.ext_getElem
+          · simp only [List.length_take, List.length_map, List.length_range, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; omega
+          · intro i hi1 hi2
+            simp only [List.getElem_map, List.getElem_range, Array.getElem!_Nat_eq,
+              List.getElem_take]
+            symm; apply getElem!_pos)
+      have heq2 : (Array.repeat 32#usize 0#u8).from_slice s5 =
+          (⟨List.map (fun i => bytes[32 + i]!) (List.range 32), by simp⟩ : Array U8 32#usize) :=
+        Subtype.ext (by
+          rw [Array.from_slice_val _ _ hlen2, show s5.val = (↑s5 : List _) from rfl, s4_post1]
+          apply List.ext_getElem
+          · simp only [List.slice_length, List.length_map, List.length_range, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; omega
+          · intro i hi1 hi2
+            simp only [List.getElem_map, List.getElem_range, Array.getElem!_Nat_eq,
+              List.slice, List.getElem_drop, List.getElem_take]
+            symm; apply getElem!_pos)
+      rw [heq1, heq2]
 
 end curve25519_dalek.ristretto.RistrettoPoint
