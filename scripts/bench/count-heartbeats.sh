@@ -15,6 +15,8 @@ git grep -n 'set_option.*maxHeartbeats' -- '*.lean' 2>/dev/null | \
     sed 's/.*maxHeartbeats[[:space:]]*\([0-9]*\).*/\1 &/' | \
     sort -rn | \
     while read val line; do
+        # Skip lines where sed couldn't extract a numeric value
+        case "$val" in ''|*[!0-9]*) continue ;; esac
         # Format large numbers
         if [ "$val" -ge 1000000000000 ]; then
             human="$((val / 1000000000000))T"
