@@ -3046,7 +3046,7 @@
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
    "is_relevant": true,
    "is_ignored": false,
-   "is_hidden": false,
+   "is_hidden": true,
    "is_extraction_artifact": false,
    "fully_verified": false,
    "externally_verified": false,
