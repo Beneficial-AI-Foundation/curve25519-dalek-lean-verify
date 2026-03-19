@@ -21,6 +21,9 @@ This function returns zero on input zero.
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+  (mul_spec)
 namespace curve25519_dalek.field.FieldElement51
 
 /-
@@ -52,13 +55,16 @@ lemma coprime_of_prime_not_dvd {a p : ℕ}
   · have : p ∣ a := by simpa [hgp2] using gcd_dvd_left a p
     exact (hpa this).elim
 
+set_option exponentiation.threshold 100000
+
 /-- **Spec and proof concerning `field.FieldElement51.invert`**:
 - No panic for field element inputs r (always returns r' successfully)
 - If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)
 - If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)
 -/
-@[progress, externally_verified]
-theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
+@[progress]
+theorem invert_spec (r : backend.serial.u64.field.FieldElement51)
+    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>
       let r_nat := Field51_as_Nat r % p
       let r'_nat := Field51_as_Nat r' % p
@@ -66,61 +72,27 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : �
       (r_nat = 0 → r'_nat = 0) ∧
       (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by
   unfold invert
-  sorry
-  -- TODO solve the problem with progress in the file and update the proof.
-  /-
-  progress*
-  · intro i hi; have := __discr_post_3 i hi; omega
-  · intro i hi; have := t20_post_1 i hi; omega
-  · intro i hi; have := __discr_post_4 i hi; omega
-  constructor
-  · intro hne
-    have ht20m := Nat.ModEq.mul_right (Field51_as_Nat __discr.2) t20_post_2
-    have hres1 := Nat.ModEq.trans res_post_1  ht20m
-    rw[← Nat.ModEq] at __discr_post_2
-    have ht21m := Nat.ModEq.mul_left  (Field51_as_Nat __discr.1 ^ 32) __discr_post_2
-    have hres2 := Nat.ModEq.trans hres1 ht21m
-    rw[← Nat.ModEq] at __discr_post_1
-    have hp1p:= Nat.ModEq.pow 32 __discr_post_1
-    have ht21m := Nat.ModEq.mul_right (Field51_as_Nat r ^ 11) hp1p
-    have hres2 := Nat.ModEq.trans hres2 ht21m
-    rw[← pow_mul, ← pow_add, Nat.ModEq] at hres2
-    simp[hres2]
-    have one:= pow_one (Field51_as_Nat r)
-    have := pow_add (Field51_as_Nat r)  57896044618658097711785492504343953926634992332820282019728792003956564819947 1
-    rw[one] at this
-    simp[← this]
-    have : 57896044618658097711785492504343953926634992332820282019728792003956564819948 =p-1 := by
-      unfold p
-      simp
-    rw[this]
-    apply Nat.ModEq.pow_card_sub_one_eq_one prime_25519
-    apply coprime_of_prime_not_dvd prime_25519
-    intro hp
-    apply hne
-    apply Nat.dvd_iff_mod_eq_zero.mp
-    exact hp
-  · constructor
-    · intro h0
-      have ht20m := Nat.ModEq.mul_right (Field51_as_Nat __discr.2) t20_post_2
-      have hres1 := Nat.ModEq.trans res_post_1  ht20m
-      rw[← Nat.ModEq] at __discr_post_2
-      have ht21m := Nat.ModEq.mul_left  (Field51_as_Nat __discr.1 ^ 32) __discr_post_2
-      have hres2 := Nat.ModEq.trans hres1 ht21m
-      rw[← Nat.ModEq] at __discr_post_1
-      have hp1p:= Nat.ModEq.pow 32 __discr_post_1
-      have ht21m := Nat.ModEq.mul_right (Field51_as_Nat r ^ 11) hp1p
-      have hres2 := Nat.ModEq.trans hres2 ht21m
-      rw[← pow_mul,← pow_add, Nat.ModEq] at hres2
-      simp[hres2]
-      have : 0 = 0 %p:= by decide
-      rw[this, ← Nat.ModEq]
-      rw[this, ← Nat.ModEq] at h0
-      have := Nat.ModEq.pow 57896044618658097711785492504343953926634992332820282019728792003956564819947 h0
-      simp at this
-      apply this
-    · simp_all
-  -/
+  -- invert = pow22501 → pow2k(t19, 5) → mul(t20, t3)
+  progress with pow22501_spec as ⟨ t19, ht19_mod, ht3_mod, ht19b, ht3b ⟩
+  progress with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
+  progress with mul_spec as ⟨ res, hres, hresb ⟩
+  -- Chain: t20 ≡ r^((2^250-1)*32), res ≡ r^((2^250-1)*32 + 11) = r^(p-2)
+  -- The exponent (2^250-1)*2^5 + 11 = 2^255-21 = p-2 is verified by kernel reduction.
+  have hpow : Field51_as_Nat res ≡ Field51_as_Nat r ^ (p - 2) [MOD p] :=
+    chain_mul (chain_pow2k ht19_mod ht20) ht3_mod hres
+  refine ⟨fun hne => ?_, fun h0 => ?_, hresb⟩
+  · -- Nonzero case: res * r ≡ r^(p-2) * r = r^(p-1) ≡ 1 (mod p) by Fermat
+    rw [Nat.ModEq] at hpow
+    rw [hpow, ← Nat.mul_mod, ← pow_succ,
+      show p - 2 + 1 = p - 1 from by unfold p; omega]
+    have := Nat.ModEq.pow_card_sub_one_eq_one prime_25519
+      (coprime_of_prime_not_dvd prime_25519 (fun h => hne (Nat.dvd_iff_mod_eq_zero.mp h)))
+    rwa [Nat.ModEq, Nat.mod_eq_of_lt (by unfold p; omega : (1 : ℕ) < p)] at this
+  · -- Zero case: r ≡ 0 (mod p) means p ∣ r, hence p ∣ r^(p-2), so r^(p-2) % p = 0
+    rw [Nat.ModEq] at hpow
+    rw [hpow]
+    exact (Nat.dvd_iff_mod_eq_zero).mp
+      (dvd_pow (Nat.dvd_of_mod_eq_zero h0) (by unfold p; omega))
 
 
 end curve25519_dalek.field.FieldElement51
