@@ -143,19 +143,6 @@ lemma compress_z_inv_eq_one (P : Point Ed25519)
 
 private lemma p_sub_one_lt : p - 1 < p := by decide
 
-lemma p_sub_one_cast : (↑(p - 1) : ZMod p) = -1 := by
-  rw [Nat.cast_sub (by decide : 1 ≤ p), ZMod.natCast_self, zero_sub, Nat.cast_one]
-
-private lemma sqrt_m1_sq_nat :
-    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
-  decide
-
-/-- √(-1) squared equals -1 in F_p. -/
-lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
-  unfold sqrt_m1
-  have h := lift_mod_eq _ (p - 1) (by rw [Nat.mod_eq_of_lt p_sub_one_lt])
-  push_cast at h; rwa [p_sub_one_cast] at h
-
 private lemma iad_sq_nat :
     54469307008909316920995813868745141605393597292927456921205312896311721017578 ^ 2 *
     (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
