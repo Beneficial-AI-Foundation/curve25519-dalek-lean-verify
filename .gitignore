@@ -14,6 +14,7 @@ build*.txt
 
 # Lean
 .lake
+_out
 
 # Aeneas
 aeneas
