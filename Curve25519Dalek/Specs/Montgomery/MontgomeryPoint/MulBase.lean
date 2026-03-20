@@ -57,16 +57,14 @@ theorem mul_base_spec (scalar : scalar.Scalar) :
     Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
      := by
     unfold mul_base
-    sorry
-    /- OLD PROOF (broken: ED25519_BASEPOINT_POINT now returns Result, ep_post_1/res_post_2 renamed):
-    progress*
-    · exact ep_post_1.Y_bounds
-    · exact ep_post_1.Z_bounds
+    progress with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
+    progress with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
+    · exact ep_valid.Y_bounds
+    · exact ep_valid.Z_bounds
     · simp_all only
-      have := res_post_2 1
+      have := res_hom 1
       simp only [one_smul] at this
       rw[← this]
-      apply  Montgomery.comm_mul_fromEdwards
-    -/
+      apply Montgomery.comm_mul_fromEdwards
 
 end curve25519_dalek.montgomery.MontgomeryPoint

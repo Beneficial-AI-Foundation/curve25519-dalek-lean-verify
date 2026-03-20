@@ -95,7 +95,13 @@ import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Specs.Constants.BASEPOINT_ORDER_PRIVATE
 import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.ConditionalSelect
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.CtEq
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Eq
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Identity
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.ToEdwards
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
+import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.CtEq
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Decompress
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.FromSlice
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Identity
