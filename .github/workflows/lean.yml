@@ -101,6 +101,7 @@ jobs:
           python3 scripts/enrich_functions.py \
             --functions functions.json \
             --atoms lean_atoms.json \
+            --config scripts/functions_config.json \
             --output functions.json
 
       - name: Upload functions.json
