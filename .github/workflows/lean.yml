@@ -78,8 +78,8 @@ jobs:
 
       - name: Generate functions.json via probe-aeneas
         run: |
-          probe-aeneas listfuns --lean-project . --lake -o functions.json
-          probe-aeneas extract --lean-project . --lake
+          probe-aeneas listfuns --lean-project . -o functions.json
+          probe-aeneas extract --lean-project .
           python3 scripts/enrich_functions.py \
             --functions functions.json \
             --atoms .verilib/probes/aeneas_*.json \
