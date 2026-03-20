@@ -677,8 +677,6 @@ theorem add_T_point (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   rw [Edwards.add_y]
   have ha : Edwards.Ed25519.a = -1 := rfl
   rw [ha]
-  have h_denom : 1 - Edwards.Ed25519.d * e₁.x * e₂.x * e₁.y * e₂.y ≠ 0 :=
-    (Edwards.Ed25519.denomsNeZero e₁ e₂).2
   have hy_e₁ : e₁.y = -1 := by grind
   have hx_e₁:= exceptEdwardsPoint he₁
   simp only [hy_e₁, neg_mul, one_mul, hx_e₁, mul_zero, zero_mul, sub_zero, mul_neg, mul_one, neg_zero, div_one,
@@ -693,8 +691,6 @@ theorem add_T_point' (e₁ e₂ : Edwards.Point Edwards.Ed25519)
   rw [Edwards.add_y]
   have ha : Edwards.Ed25519.a = -1 := rfl
   rw [ha]
-  have h_denom : 1 - Edwards.Ed25519.d * e₁.x * e₂.x * e₁.y * e₂.y ≠ 0 :=
-    (Edwards.Ed25519.denomsNeZero e₁ e₂).2
   have hy_e₁ : e₂.y = -1 := by grind
   have hx_e₁:= exceptEdwardsPoint he₁
   simp only [hy_e₁, mul_neg, mul_one, neg_mul, one_mul, hx_e₁, mul_zero, sub_zero, zero_mul, neg_zero, div_one,

@@ -5,23 +5,28 @@ Scripts for profiling Lean file compilation times.
 ## Quick Start
 
 ```bash
-# Profile specific files or folders
-./scripts/bench/profile-lean.sh Curve25519Dalek/Specs/Field/
+# Profile all files with elevated maxHeartbeats (finds slow files)
+./scripts/bench/bench.sh profile
 
-# Profile the whole project
-./scripts/bench/profile-lean.sh --all
-
-# View results
-./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json
-
-# Save report to file
-./scripts/bench/profile-report.sh benchmarks/profile-*/profile.json -o report.txt
+# Before/after comparison workflow
+./scripts/bench/bench.sh baseline    # 1. Record baseline (before refactoring)
+# ... refactor proofs ...
+./scripts/bench/bench.sh compare     # 2. Compare (shows diff)
 ```
+
+### Prerequisites
+
+- **lakeprof** (for baseline/compare only — not needed for profile):
+  ```bash
+  uv tool install --from git+https://github.com/Kha/lakeprof lakeprof
+  ```
+- **jq** (for reports): `brew install jq` or `apt install jq`
 
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
+| `bench.sh` | Main entry point: baseline/compare/profile workflow |
 | `profile-lean.sh` | Profile files with `lean --profile --json`, outputs JSON |
 | `profile-report.sh` | Display/save profile results from JSON |
 | `count-heartbeats.sh` | Quick tech debt scan via maxHeartbeats |

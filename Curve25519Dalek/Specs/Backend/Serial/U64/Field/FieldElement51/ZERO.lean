@@ -36,7 +36,8 @@ natural language specs:
 -/
 @[progress]
 theorem ZERO_spec : ZERO ⦃ (result : FieldElement51) =>
-    Field51_as_Nat result = 0 ⦄ := by
+    Field51_as_Nat result = 0 ∧
+    (∀ i< 5, (result[i]!.val) < 2^51 )⦄ := by
   unfold ZERO
   progress*
   simp only [*]

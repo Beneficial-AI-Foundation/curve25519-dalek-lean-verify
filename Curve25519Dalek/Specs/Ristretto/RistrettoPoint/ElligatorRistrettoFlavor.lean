@@ -443,6 +443,18 @@ private lemma lift_bridge_bundle
     N_t_eq := h_Nt_eq_F
   }
 
+/-- When the square flag holds, `not_sq` is `Choice.zero`, so `not_sq.val ≠ 1#u8`. -/
+private lemma not_sq_val_ne_one {not_sq : subtle.Choice} {P : Prop}
+    (h_post : P ↔ not_sq = Choice.zero) (h : P) : not_sq.val ≠ 1#u8 := by
+  have heq := h_post.mp h; subst heq; decide
+
+/-- When the square flag fails, `not_sq` is `Choice.one`, so `not_sq.val = 1#u8`. -/
+private lemma not_sq_val_eq_one {not_sq : subtle.Choice} {P : Prop}
+    (h_post : P ↔ not_sq = Choice.zero) (h : ¬P) : not_sq.val = 1#u8 := by
+  rcases not_sq with ⟨val, hv | hv⟩
+  · exact absurd (h_post.mpr (by simp only [Choice.zero, hv])) h
+  · exact hv
+
 /-- Package the square/non-square consequences for the selected Elligator value `s1`. -/
 private lemma elligator_s1_sq_c2_cases
     (s c r N_s D i s_prime s_prime_neg s_prime1 s1 c2 : FieldElement51)
@@ -470,10 +482,7 @@ private lemma elligator_s1_sq_c2_cases
   let s1_post := s1_posts.select
   by_cases h_sq_flag : x.1.val = 1#u8
   · left
-    have h_nsq : not_sq.val ≠ 1#u8 := by
-      have := not_sq_post.mp h_sq_flag
-      subst this
-      decide
+    have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
     constructor
     · rw [show s1.toField = x.2.toField from by
         unfold toField
@@ -500,10 +509,7 @@ private lemma elligator_s1_sq_c2_cases
       push_cast at h
       linear_combination h
   · right
-    have h_nsq : not_sq.val = 1#u8 := by
-      rcases not_sq with ⟨val, hv | hv⟩
-      · exact absurd (not_sq_post.mpr (by simp only [hv, Choice.zero])) h_sq_flag
-      · exact hv
+    have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
     constructor
     · rw [show s1.toField = s_prime1.toField from by
         unfold toField
@@ -882,10 +888,7 @@ private lemma elligator_c_bridge
   let c_post1 := choice_posts.c_minus_one
   unfold elligator_c
   by_cases h_sq_flag : x.1.val = 1#u8
-  · have h_nsq : not_sq.val ≠ 1#u8 := by
-      have := not_sq_post.mp h_sq_flag
-      subst this
-      decide
+  · have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
     have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
     rw [if_pos h_is_sq]
     unfold toField
@@ -894,10 +897,7 @@ private lemma elligator_c_bridge
     have h := lift_mod_eq _ _ h_sum
     push_cast at h
     linear_combination h
-  · have h_nsq : not_sq.val = 1#u8 := by
-      rcases not_sq with ⟨val, hv | hv⟩
-      · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
-      · exact hv
+  · have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
     have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
     rw [if_neg h_not_sq]
     rw [show c2.toField = r.toField from by
@@ -925,10 +925,7 @@ private lemma elligator_s_bridge_square
   let N_post3_D := sqrt_posts.nonsquare_case
   let s1_post := s1_posts.select
   unfold elligator_s
-  have h_nsq : not_sq.val ≠ 1#u8 := by
-    have := not_sq_post.mp h_sq_flag
-    subst this
-    decide
+  have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
   have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
   rw [if_pos h_is_sq]
   rw [show s1.toField = x.2.toField from by
@@ -994,10 +991,7 @@ private lemma elligator_s_bridge_nonsquare
   let c1_post := sign_posts.odd_flag
   let s_prime_is_pos_post := sign_posts.pos_flag
   unfold elligator_s
-  have h_nsq : not_sq.val = 1#u8 := by
-    rcases not_sq with ⟨val, hv | hv⟩
-    · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
-    · exact hv
+  have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
   have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
   rw [if_neg h_not_sq]
   rw [show s1.toField = s_prime1.toField from by
@@ -1174,7 +1168,43 @@ theorem elligator_ristretto_flavor_spec
     result.IsValid ∧
     result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by
   unfold elligator_ristretto_flavor
-  progress*
+  simp only [progress_simps]
+  let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
+  let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
+  let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ← ONE_MINUS_EDWARDS_D_SQUARED_spec
+  let* ⟨ d_minus_one_sq, d_minus_one_sq_post1, d_minus_one_sq_post2 ⟩ ← EDWARDS_D_MINUS_ONE_SQUARED_spec
+  let* ⟨ c, c_post1, c_post2 ⟩ ← MINUS_ONE_spec
+  let* ⟨ one, one_post1, one_post2 ⟩ ← ONE_spec
+  let* ⟨ r_0_sq, r_0_sq_post1, r_0_sq_post2 ⟩ ← square_spec
+  let* ⟨ r, r_post1, r_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ r_plus_one, r_plus_one_post1, r_plus_one_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ N_s, N_s_post1, N_s_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ d_times_r, d_times_r_post1, d_times_r_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ c_minus_dr, c_minus_dr_post1, c_minus_dr_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ r_plus_d, r_plus_d_post1, r_plus_d_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ D, D_post1, D_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ _, _, _, _, _, _, _ ⟩ ← field.FieldElement51.sqrt_ratio_i_spec
+  let* ⟨ s_prime, s_prime_post1, s_prime_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ c1, c1_post ⟩ ← field.FieldElement51.is_negative_spec
+  let* ⟨ s_prime_is_pos, s_prime_is_pos_post ⟩ ← subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec
+  let* ⟨ s_prime_neg, s_prime_neg_post1, s_prime_neg_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+  let* ⟨ s_prime1, s_prime1_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  let* ⟨ not_sq, not_sq_post ⟩ ← subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec
+  let* ⟨ s1, s1_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  let* ⟨ c2, c2_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  let* ⟨ r_minus_one, r_minus_one_post1, r_minus_one_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ c_r_minus_one, c_r_minus_one_post1, c_r_minus_one_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   · -- ∀ i < 5, ↑c2[i]! < 2 ^ 54
     intro i hi
     have h := c2_post i hi
@@ -1182,6 +1212,18 @@ theorem elligator_ristretto_flavor_spec
     split
     · have := r_post2 i hi; omega
     · have := c_post2 i hi; omega
+  let* ⟨ c_r_minus_one_d, c_r_minus_one_d_post1, c_r_minus_one_d_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ N_t, N_t_post1, N_t_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ s_sq, s_sq_post1, s_sq_post2 ⟩ ← square_spec
+  · intro i hi; simp only [s1_post i hi]; split
+    · simp only [s_prime1_post i hi]; split
+      · have := s_prime_neg_post2 i hi; omega
+      · have := s_prime_post2 i hi; omega
+    · grind
+  let* ⟨ s_plus_s, s_plus_s_post1, s_plus_s_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   · intro i hi; simp only [s1_post i hi]; split
     · simp only [s_prime1_post i hi]; split
       · have := s_prime_neg_post2 i hi; omega
@@ -1192,13 +1234,20 @@ theorem elligator_ristretto_flavor_spec
       · have := s_prime_neg_post2 i hi; omega
       · have := s_prime_post2 i hi; omega
     · grind
-  · intro i hi; simp only [s1_post i hi]; split
-    · simp only [s_prime1_post i hi]; split
-      · have := s_prime_neg_post2 i hi; omega
-      · have := s_prime_post2 i hi; omega
-    · grind
+  let* ⟨ cp_X, cp_X_post1, cp_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe, fe_post1, fe_post2, fe_post3 ⟩ ← SQRT_AD_MINUS_ONE_spec
+  let* ⟨ cp_Z, cp_Z_post1, cp_Z_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ cp_Y, cp_Y_post1, cp_Y_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ cp_T, cp_T_post1, cp_T_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ ep, ep_post1, ep_post2, ep_post3, ep_post4, ep_post5, ep_post6, ep_post7, ep_post8, ep_post9, ep_post10 ⟩ ←
+    backend.serial.curve_models.CompletedPoint.as_extended_spec
   · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
-    rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+    rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D
+      _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
     have h_cp_T_nat : Field51_as_Nat cp_T = Field51_as_Nat one + Field51_as_Nat s_sq := by
       exact field51_as_nat_eq_add cp_T_post1
     have h_rpo_nat : Field51_as_Nat r_plus_one = Field51_as_Nat r + Field51_as_Nat one := by

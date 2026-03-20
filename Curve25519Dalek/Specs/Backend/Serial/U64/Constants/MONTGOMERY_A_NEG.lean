@@ -42,7 +42,8 @@ natural language specs:
 -/
 @[progress]
 theorem MONTGOMERY_A_NEG_spec :
-    MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ⦄ := by
+    MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ∧
+    (∀ i< 5, (result[i]!).val < 2^ 51) ⦄ := by
   unfold MONTGOMERY_A_NEG field.FieldElement51.from_limbs
   simp only [spec_ok]
   decide
