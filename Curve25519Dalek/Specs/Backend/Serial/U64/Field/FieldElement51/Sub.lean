@@ -41,7 +41,6 @@ natural language specs:
       Field51_as_Nat(sub(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
 -/
 
-set_option maxHeartbeats 400000 in
 set_option maxRecDepth 4096 in
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.sub`**:
 - No panic (always returns successfully when bounds are satisfied)
@@ -114,7 +113,7 @@ theorem sub_spec (a b : Array U64 5#usize)
   -- Normalize Array.getElem! to List.getElem! in hypotheses to match goal
   simp only [Array.getElem!_Nat_eq] at h0 h1 h2 h3 h4
   rw [h0, h1, h2, h3, h4]
-  -- Rearrange: ∑ 2^k*(a_k + c_k) = (∑ 2^k*a_k) + (∑ 2^k*c_k)
+  -- Rearrange: ∑ 2^k * (a_k + c_k) = (∑ 2^k * a_k) + (∑ 2^k * c_k)
   have hrearr : ∀ (x0 x1 x2 x3 x4 : ℕ),
       2 ^ 0 * (x0 + 36028797018963664) + 2 ^ 51 * (x1 + 36028797018963952) +
       2 ^ 102 * (x2 + 36028797018963952) + 2 ^ 153 * (x3 + 36028797018963952) +
