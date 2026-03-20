@@ -53,8 +53,6 @@ natural language specs:
 - T' ≡ 2Z² - Y² + X² (mod p)
 -/
 
-set_option maxHeartbeats 200000 in
--- simp_all is heavy
 /-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.double`**:
 - No panic (always returns successfully)
 - Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
@@ -181,7 +179,26 @@ open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 
-set_option maxHeartbeats 1000000 in -- heavy computations with big numbers
+private lemma double_lift_to_field_eqs (c : CompletedPoint) (q : ProjectivePoint)
+    (hX_arith : Field51_as_Nat c.X % p = (2 * Field51_as_Nat q.X * Field51_as_Nat q.Y) % p)
+    (hY_arith : Field51_as_Nat c.Y % p = (Field51_as_Nat q.Y ^ 2 + Field51_as_Nat q.X ^ 2) % p)
+    (hZ_arith : (Field51_as_Nat c.Z + Field51_as_Nat q.X ^ 2) % p = Field51_as_Nat q.Y ^ 2 % p)
+    (hT_arith : (Field51_as_Nat c.T + Field51_as_Nat c.Z) % p = (2 * Field51_as_Nat q.Z ^ 2) % p) :
+    c.X.toField = 2 * q.X.toField * q.Y.toField ∧
+    c.Y.toField = q.Y.toField ^ 2 + q.X.toField ^ 2 ∧
+    c.Z.toField = q.Y.toField ^ 2 - q.X.toField ^ 2 ∧
+    c.T.toField = 2 * q.Z.toField ^ 2 - c.Z.toField := by
+  refine ⟨?_, ?_, ?_, ?_⟩
+  · unfold FieldElement51.toField
+    have h := lift_mod_eq _ _ hX_arith; push_cast at h; exact h
+  · unfold FieldElement51.toField
+    have h := lift_mod_eq _ _ hY_arith; push_cast at h; exact h
+  · unfold FieldElement51.toField
+    have h := lift_mod_eq _ _ hZ_arith; push_cast at h; exact eq_sub_of_add_eq h
+  · unfold FieldElement51.toField at *
+    have h := lift_mod_eq _ _ hT_arith; push_cast at h; exact eq_sub_of_add_eq h
+
+attribute [local irreducible] p in
 /--
 Verification of the `double` function.
 The theorem states that the Rust implementation of point doubling corresponds
@@ -191,50 +208,19 @@ theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :
     ∃ c, ProjectivePoint.double q = ok c ∧
     c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
-  -- Extract bounds from validity (< 2^52) and lift to double_spec_aux requirements
   have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53 :=
     fun i hi => Nat.lt_trans (hq_valid.X_bounds i hi) (by norm_num : 2^52 < 2^53)
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53 :=
     fun i hi => Nat.lt_trans (hq_valid.Y_bounds i hi) (by norm_num : 2^52 < 2^53)
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 :=
     fun i hi => Nat.lt_trans (hq_valid.Z_bounds i hi) (by norm_num : 2^52 < 2^54)
-  -- Use double_spec_aux to get the arithmetic properties and bounds
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
           hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     spec_imp_exists (ProjectivePoint.double_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds)
   use c
   constructor
   · exact h_run
-  -- Now we have:
-  -- - c : CompletedPoint (the result)
-  -- - hX_arith : Field51_as_Nat c.X % p = (2 * Field51_as_Nat q.X * Field51_as_Nat q.Y) % p
-  -- - hY_arith : Field51_as_Nat c.Y % p = (Y^2 + X^2) % p
-  -- - hZ_arith : (Field51_as_Nat c.Z + X^2) % p = Y^2 % p
-  -- - hT_arith : (Field51_as_Nat c.T + c.Z) % p = (2 * Z^2) % p
-  -- - hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds : output limb bounds
-
-  -- Lift to field equalities
-  -- Note: toField is (Field51_as_Nat · : CurveField)
-  have hX_F : c.X.toField = 2 * q.X.toField * q.Y.toField := by
-    unfold FieldElement51.toField
-    have h := lift_mod_eq _ _ hX_arith
-    push_cast at h
-    exact h
-  have hY_F : c.Y.toField = q.Y.toField^2 + q.X.toField^2 := by
-    unfold FieldElement51.toField
-    have h := lift_mod_eq _ _ hY_arith
-    push_cast at h
-    exact h
-  have hZ_F : c.Z.toField = q.Y.toField^2 - q.X.toField^2 := by
-    unfold FieldElement51.toField
-    have h := lift_mod_eq _ _ hZ_arith
-    push_cast at h
-    exact eq_sub_of_add_eq h
-  have hT_F : c.T.toField = 2 * q.Z.toField^2 - c.Z.toField := by
-    unfold FieldElement51.toField at *
-    have h := lift_mod_eq _ _ hT_arith
-    push_cast at h
-    exact eq_sub_of_add_eq h
+  obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ := double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
   -- Setup curve identity from input validity
   have h_q_curve := hq_valid.on_curve
   have h_qZ_ne : q.Z.toField ≠ 0 := hq_valid.Z_ne_zero
