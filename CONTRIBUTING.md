@@ -42,6 +42,23 @@ Key points:
 - Postconditions as a conjunction inside `⦃ ... ⦄`
 - Proof body indented at one level (2 spaces)
 
+### Prefer Explicit Spec Names in `progress`
+
+Use `progress with <spec_name>` instead of bare `progress` or `progress*`.
+The explicit form skips spec lookup, cutting simp time by over half and
+typeclass inference by roughly a third.
+
+```lean
+-- Preferred: explicit spec name (fast)
+progress with mul_spec as ⟨ res, hres, hresb ⟩
+
+-- Avoid: bare progress* (slow — searches the full @[progress] set)
+progress*
+```
+
+Use `progress*?` in the info view to discover the spec name Lean resolves,
+then write the explicit form in committed code.
+
 Some older specs use the existential form (`∃ result, f = ok result ∧ ...`).
 Both forms are acceptable, but **new specs should prefer the WP style**.
 
