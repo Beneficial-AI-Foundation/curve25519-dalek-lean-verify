@@ -99,13 +99,9 @@ appreciated — see existing specs for examples.
 If extraction produces incorrect output, fix it via `aeneas-tweaks.txt` or
 upstream Rust changes, then re-extract.
 
-### Sync Status
+### Verification Metadata
 
-After adding or modifying any spec file, run:
-
-```bash
-lake exe syncstatus
-```
-
-and commit the updated `functions.json` and `status.csv`. CI will reject PRs
-where these are out of date.
+`functions.json` and verification statistics are generated automatically by CI
+using `probe-aeneas`. There is no manual `syncstatus` step. The CI pipeline
+runs `probe-aeneas listfuns` + `probe-aeneas extract`, enriches the output with
+`scripts/enrich_functions.py`, and uploads `functions.json` as a build artifact.

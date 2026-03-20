@@ -90,7 +90,7 @@ export function useGraphData(rawFunctions: Ref<FunctionRecord[]>) {
 
     for (const func of functions) {
       allFuncsMap.set(func.lean_name, func)
-      // Filter out hidden functions and extraction artifacts (matches status.csv criteria)
+      // Filter out hidden functions and extraction artifacts
       const isFiltered = func.is_hidden || func.is_extraction_artifact
       if (isFiltered) {
         hiddenSet.add(func.lean_name)
