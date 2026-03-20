@@ -295,37 +295,23 @@ theorem double_spec
   have hcY_valid : c.Y.IsValid := fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
   have hcZ_valid : c.Z.IsValid := fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
   have hcT_valid : c.T.IsValid := fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have h_c_valid : c.IsValid := {
+    X_valid := hcX_valid
+    Y_valid := hcY_valid
+    Z_valid := hcZ_valid
+    T_valid := hcT_valid
+    Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
+    T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
+    on_curve := by
+      simp only [hX_F, hY_F, hZ_F, hT_F]
+      simp only [Ed25519] at h_curve_field ⊢
+      linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
+  }
   constructor
-  · -- Prove c.IsValid (bounds, Z_ne_zero, T_ne_zero, on_curve)
-    exact {
-      X_valid := hcX_valid
-      Y_valid := hcY_valid
-      Z_valid := hcZ_valid
-      T_valid := hcT_valid
-      Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
-      T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
-      on_curve := by
-        simp only [hX_F, hY_F, hZ_F, hT_F]
-        simp only [Ed25519] at h_curve_field ⊢
-        linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
-    }
+  · exact h_c_valid
   · -- Prove c.toPoint = q.toPoint + q.toPoint
-    have h_c_valid : c.IsValid := {
-      X_valid := hcX_valid
-      Y_valid := hcY_valid
-      Z_valid := hcZ_valid
-      T_valid := hcT_valid
-      Z_ne_zero := by rw [hZ_F, h_YX_factor, h_yx_sq]; apply mul_ne_zero hz2 h_denom_plus
-      T_ne_zero := by rw [hT_F, hZ_F, h_denom_factor]; apply mul_ne_zero hz2 h_denom_minus
-      on_curve := by
-        simp only [hX_F, hY_F, hZ_F, hT_F]
-        simp only [Ed25519] at h_curve_field ⊢
-        linear_combination (4 * (Y ^ 2 + X ^ 2) ^ 2) * h_curve_field
-    }
-    -- Unfold toPoint for c and q
     have ⟨h_cx, h_cy⟩ := CompletedPoint.toPoint_of_isValid h_c_valid
     have ⟨h_qx, h_qy⟩ := ProjectivePoint.toPoint_of_isValid hq_valid
-    -- Show equality via the addition formula
     ext
     · -- x coordinate: c.toPoint.x = (q.toPoint + q.toPoint).x
       -- c.toPoint.x = 2XY / (Y² - X²)
@@ -353,7 +339,7 @@ theorem double_spec
             rw [h_qx, h_qy]; ring
     · -- y coordinate: c.toPoint.y = (q.toPoint + q.toPoint).y
       -- c.toPoint.y = (Y² + X²) / (2Z² - (Y² - X²))
-      -- (q + q).y = (y² - a*x²) / (1 - d*x²y²) = (y² + x²) / (1 - d*x²y²) since a = -1
+      -- (q + q).y = (y² - a * x²) / (1 - d * x²y²) = (y² + x²) / (1 - d * x²y²) since a = -1
       rw [h_cy, hY_F, hT_F, hZ_F]  -- LHS: c.Y.toField / c.T.toField
       rw [add_y]  -- RHS: expand addition formula
       -- Helper: Y² + X² = Z² * (y² + x²)
