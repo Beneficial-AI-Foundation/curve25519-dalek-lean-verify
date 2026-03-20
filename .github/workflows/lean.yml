@@ -104,11 +104,28 @@ jobs:
             --config scripts/functions_config.json \
             --output functions.json
 
+      - name: Validate pipeline against lake exe listfuns
+        continue-on-error: true
+        run: |
+          lake exe listfuns > functions_old.json
+          python3 scripts/validate_pipeline.py \
+            --old functions_old.json \
+            --new functions.json \
+            --report validation_report.txt
+
       - name: Upload functions.json
         uses: actions/upload-artifact@v4
         with:
           name: functions-json
           path: functions.json
+          retention-days: 30
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: validation_report.txt
           retention-days: 30
 
       - name: Verify build success
