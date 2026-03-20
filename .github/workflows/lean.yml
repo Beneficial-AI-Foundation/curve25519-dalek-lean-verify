@@ -70,7 +70,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin/probe-aeneas
-          key: probe-aeneas-${{ runner.os }}-${{ hashFiles('.github/workflows/lean.yml') }}
+          key: probe-aeneas-${{ runner.os }}-v1
 
       - name: Install probe-aeneas
         if: steps.cache-probe-aeneas.outputs.cache-hit != 'true'
@@ -81,7 +81,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.local/bin/probe-lean
-          key: probe-lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('.github/workflows/lean.yml') }}
+          key: probe-lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-v1
 
       - name: Install probe-lean
         if: steps.cache-probe-lean.outputs.cache-hit != 'true'
