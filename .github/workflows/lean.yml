@@ -76,13 +76,31 @@ jobs:
         if: steps.cache-probe-aeneas.outputs.cache-hit != 'true'
         run: cargo install --git https://github.com/Beneficial-AI-Foundation/probe-aeneas
 
-      - name: Generate functions.json via probe-aeneas
+      - name: Cache probe-lean binary
+        id: cache-probe-lean
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/bin/probe-lean
+          key: probe-lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('.github/workflows/lean.yml') }}
+
+      - name: Install probe-lean
+        if: steps.cache-probe-lean.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 https://github.com/Beneficial-AI-Foundation/probe-lean.git /tmp/probe-lean
+          cd /tmp/probe-lean && lake build
+          mkdir -p ~/.local/bin
+          cp .lake/build/bin/probe-lean ~/.local/bin/
+
+      - name: Add local bin to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Generate functions.json
         run: |
           probe-aeneas listfuns --lean-project . -o functions.json
-          probe-aeneas extract --lean-project .
+          probe-lean extract . -l Curve25519Dalek -m Curve25519Dalek -o lean_atoms.json
           python3 scripts/enrich_functions.py \
             --functions functions.json \
-            --atoms .verilib/probes/aeneas_*.json \
+            --atoms lean_atoms.json \
             --output functions.json
 
       - name: Upload functions.json

@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
 """Enrich a basic functions.json (from probe-aeneas listfuns) with verification
-data from a probe-aeneas extract atoms JSON.
+data from a probe-lean extract atoms JSON.
 
 Usage:
     python3 scripts/enrich_functions.py \
         --functions functions.json \
-        --atoms aeneas_curve25519-dalek_*.json \
+        --atoms lean_atoms.json \
         --output functions.json
 
-The externally_verified status is read from the atom's attributes array
-(populated by probe-lean's source-level attribute scanner).
+The atoms JSON is the direct output of `probe-lean extract`.
+Aeneas-specific heuristics (is_hidden patterns) are applied here rather than
+in probe-aeneas, keeping probe-lean as the sole extraction tool.
 """
 
 import argparse
@@ -71,6 +72,20 @@ def compute_fully_verified(
     return True
 
 
+def apply_is_hidden(fn: dict, atom_attrs: list[str]) -> None:
+    """Apply Aeneas-specific is_hidden heuristics.
+
+    Matches the logic from probe-aeneas enrich_lean_atom_flags:
+    hidden if .Insts. in name, or ends with .mutual, or has rust_trait_impl attr.
+    Merges with any is_hidden already set by gen_functions (from functions.json).
+    """
+    name = fn["lean_name"]
+    has_insts = ".Insts." in name
+    is_mutual = name.endswith(".mutual")
+    has_trait_attr = "rust_trait_impl" in atom_attrs
+    fn["is_hidden"] = fn.get("is_hidden", False) or has_insts or is_mutual or has_trait_attr
+
+
 def enrich(functions: dict, atoms: dict[str, dict]) -> dict:
     fv_cache: dict[str, bool] = {}
 
@@ -90,6 +105,7 @@ def enrich(functions: dict, atoms: dict[str, dict]) -> dict:
             fn.setdefault("spec_statement", None)
             fn.setdefault("is_relevant", False)
             fn.setdefault("is_ignored", False)
+            apply_is_hidden(fn, [])
             continue
 
         primary_key = atom.get("primary-spec")
@@ -120,6 +136,8 @@ def enrich(functions: dict, atoms: dict[str, dict]) -> dict:
 
         fn["fully_verified"] = compute_fully_verified(lean_name, atoms, fv_cache)
 
+        apply_is_hidden(fn, atom.get("attributes", []))
+
     return functions
 
 
@@ -128,7 +146,7 @@ def main() -> None:
     parser.add_argument("--functions", required=True, type=Path,
                         help="Basic functions.json from probe-aeneas listfuns")
     parser.add_argument("--atoms", required=True, type=Path,
-                        help="Merged atoms JSON from probe-aeneas extract")
+                        help="Atoms JSON from probe-lean extract")
     parser.add_argument("--output", required=True, type=Path,
                         help="Output enriched functions.json path")
     args = parser.parse_args()
