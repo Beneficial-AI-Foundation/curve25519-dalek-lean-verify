@@ -1,0 +1,104 @@
+name: Validate Pipeline
+
+# Temporary workflow: compares the new probe-based pipeline against the old
+# lake exe listfuns baseline. Delete this workflow once PR #681 is approved.
+
+on:
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+env:
+  LEAN_ABORT_ON_PANIC: 1
+
+jobs:
+  validate:
+    name: Compare old vs new pipeline
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Cache Lean build
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .lake
+            build
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
+            ${{ runner.os }}-lean-
+
+      - name: Download dependency caches
+        run: lake exe cache get
+
+      - name: Build Lean project
+        run: lake build
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache probe-aeneas binary
+        id: cache-probe-aeneas
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/probe-aeneas
+          key: probe-aeneas-${{ runner.os }}-v1
+
+      - name: Install probe-aeneas
+        if: steps.cache-probe-aeneas.outputs.cache-hit != 'true'
+        run: cargo install --git https://github.com/Beneficial-AI-Foundation/probe-aeneas
+
+      - name: Cache probe-lean binary
+        id: cache-probe-lean
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/bin/probe-lean
+          key: probe-lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-v1
+
+      - name: Install probe-lean
+        if: steps.cache-probe-lean.outputs.cache-hit != 'true'
+        run: |
+          git clone --depth 1 https://github.com/Beneficial-AI-Foundation/probe-lean.git /tmp/probe-lean
+          cd /tmp/probe-lean && lake build
+          mkdir -p ~/.local/bin
+          cp .lake/build/bin/probe-lean ~/.local/bin/
+
+      - name: Add local bin to PATH
+        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Generate new functions.json (probe pipeline)
+        run: |
+          probe-aeneas listfuns --lean-project . -o functions_new.json
+          probe-lean extract . -l Curve25519Dalek -m Curve25519Dalek -o lean_atoms.json
+          python3 scripts/enrich_functions.py \
+            --functions functions_new.json \
+            --atoms lean_atoms.json \
+            --config scripts/functions_config.json \
+            --output functions_new.json
+
+      - name: Generate old functions.json (lake exe listfuns)
+        run: lake exe listfuns > functions_old.json
+
+      - name: Run validation
+        run: |
+          python3 scripts/validate_pipeline.py \
+            --old functions_old.json \
+            --new functions_new.json \
+            --report validation_report.txt
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report
+          path: validation_report.txt
+          retention-days: 30
