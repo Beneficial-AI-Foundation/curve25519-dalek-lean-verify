@@ -1,34 +1,64 @@
 name: Lean Call Graph
 
 on:
-  push:
-    branches: [master, la/add_callgraph]
-    paths:
-      - 'Curve25519Dalek/**'
-      - 'Curve25519Dalek.lean'
-      - 'Utils/**'
-      - 'Utils.lean'
-      - 'lakefile.toml'
-      - 'lean-toolchain'
-      - '.github/workflows/callgraph.yml'
+  # Triggered after lean.yml completes (provides atoms.json artifact)
+  workflow_run:
+    workflows: ["Lean Verification"]
+    types: [completed]
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
 concurrency:
   group: callgraph
   cancel-in-progress: true
 
 jobs:
+  prepare-atoms:
+    name: Download atoms from lean.yml
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download probe artifacts from lean.yml
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: probe-artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Fetch atoms.json from cache (workflow_dispatch fallback)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            functions.json
+            atoms.json
+          key: probe-outputs-never-match
+          restore-keys: probe-outputs-
+
+      - name: Upload atoms for reusable workflow
+        uses: actions/upload-artifact@v4
+        with:
+          name: pre-built-atoms
+          path: atoms.json
+          retention-days: 1
+          if-no-files-found: error
+
   generate:
+    needs: prepare-atoms
     uses: Beneficial-AI-Foundation/scip-callgraph/.github/workflows/generate-lean-callgraph.yml@main
     with:
       deploy_mode: subpath
       subpath: callgraph
       github_branch: master
+      pre_built_atoms: pre-built-atoms
 
   cache-callgraph:
     needs: generate

@@ -1,40 +1,46 @@
 name: Deploy VitePress site to GitHub Pages
 
 on:
-  # Runs on pushes targeting the default branch
+  # Triggered after lean.yml completes (provides functions.json artifact)
+  workflow_run:
+    workflows: ["Lean Verification"]
+    types: [completed]
+
+  # Non-Lean file changes (site, scripts, docs) — uses cached functions.json
   push:
     branches: [master]
+    paths:
+      - 'site/**'
+      - 'scripts/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/deploy-docs.yml'
 
-  # Check build on pull requests
-  pull_request:
-
-  # Run when issues are created, edited, or updated
+  # Dashboard updates for issue/PR activity — uses cached functions.json
   issues:
     types: [opened, edited, deleted, closed, reopened, labeled, unlabeled]
-
-  # Run when pull requests are opened or edited
   pull_request_target:
     types: [opened, edited, synchronize, reopened]
 
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
   pages: write
   id-token: write
+  actions: read
 
-# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
-# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
 concurrency:
   group: pages
   cancel-in-progress: false
 
 jobs:
-  # Build job
   build:
     runs-on: ubuntu-latest
+    # Skip if lean.yml failed (workflow_run fires on any completion)
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -63,6 +69,60 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # --- functions.json acquisition (3-tier: artifact → cache → fetch) ---
+
+      - name: Get functions.json from lean.yml artifact
+        id: artifact
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4
+        with:
+          name: probe-artifacts
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Get functions.json from cache
+        id: cache
+        if: github.event_name != 'workflow_run' || steps.artifact.outcome != 'success'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            functions.json
+            atoms.json
+          key: probe-outputs-never-match
+          restore-keys: probe-outputs-
+
+      - name: Fetch functions.json from deployed site
+        if: >-
+          (github.event_name != 'workflow_run' || steps.artifact.outcome != 'success') &&
+          steps.cache.outputs.cache-hit != 'true'
+        run: |
+          curl -sSfL \
+            https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/functions.json \
+            -o functions.json \
+          || echo '{"functions":[]}' > functions.json
+          echo "Fetched functions.json from deployed site ($(wc -c < functions.json) bytes)"
+
+      - name: Verify functions.json exists
+        run: |
+          if [ ! -f functions.json ]; then
+            echo '{"functions":[]}' > functions.json
+            echo "⚠ No functions.json available — using empty placeholder"
+          else
+            echo "✓ functions.json ready ($(wc -c < functions.json) bytes)"
+          fi
+
+      # --- site build ---
+
+      - name: Update stats history
+        run: |
+          python3 scripts/update_stats_history.py \
+            --functions-json functions.json \
+            --fetch-url https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/stats_history.jsonl \
+            --fill-missing \
+            --since 2025-01-01 \
+            --max-commits 5000
+
       - name: Build Rust docs
         run: npm run docs:rust
 
@@ -87,15 +147,33 @@ jobs:
             echo "No callgraph cache found — deploying without callgraph"
           fi
 
+      - name: Copy outputs to site
+        run: |
+          if [ -f outputs/stats_history.jsonl ]; then
+            mkdir -p site/.vitepress/dist/outputs
+            cp outputs/stats_history.jsonl site/.vitepress/dist/outputs/
+            echo "✓ stats_history.jsonl added to site/outputs/"
+          else
+            echo "No stats_history.jsonl found"
+          fi
+          if [ -f functions.json ]; then
+            mkdir -p site/.vitepress/dist/outputs
+            cp functions.json site/.vitepress/dist/outputs/
+            echo "✓ functions.json added to site/outputs/"
+          fi
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: site/.vitepress/dist
 
-  # Deployment job
   deploy:
-    # Deploy on push to master, when issues are updated, or when PRs are updated
-    if: (github.event_name == 'push' && github.ref == 'refs/heads/master') || github.event_name == 'issues' || github.event_name == 'pull_request_target' || github.event_name == 'workflow_dispatch'
+    if: >-
+      (github.event_name == 'workflow_run' && github.event.workflow_run.head_branch == 'master' && github.event.workflow_run.conclusion == 'success') ||
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      github.event_name == 'issues' ||
+      github.event_name == 'pull_request_target' ||
+      github.event_name == 'workflow_dispatch'
     needs: build
     runs-on: ubuntu-latest
     name: Deploy

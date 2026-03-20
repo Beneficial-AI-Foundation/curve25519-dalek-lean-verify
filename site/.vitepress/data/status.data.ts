@@ -1,9 +1,18 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import { parse } from 'csv-parse/sync'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+interface FunctionRecord {
+  lean_name: string
+  rust_name: string | null
+  source: string | null
+  lines: string | null
+  spec_file: string | null
+  is_hidden: boolean
+  is_extraction_artifact: boolean
+  specified: boolean
+  verified: boolean
+  externally_verified: boolean
+}
 
 export interface StatusEntry {
   function: string
@@ -13,7 +22,6 @@ export interface StatusEntry {
   extracted: string
   verified: string
   notes: string
-  ignored?: string
   'ai-proveable'?: string
 }
 
@@ -26,7 +34,6 @@ export interface StatusData {
     specified: number
     verified: number
     externally_verified: number
-    ignored: number
     ai_proveable: number
   }
 }
@@ -34,37 +41,47 @@ export interface StatusData {
 declare const data: StatusData
 export { data }
 
-export default {
-  watch: ['../../../status.csv'],
-  load(): StatusData {
-    // Read the CSV file from the project root
-    // During build, process.cwd() is the project root
-    const csvPath = path.join(process.cwd(), 'status.csv')
-    const csvContent = fs.readFileSync(csvPath, 'utf-8')
-
-    // Parse CSV
-    const records = parse(csvContent, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-      relax_column_count: true
-    }) as StatusEntry[]
-
-    // Calculate statistics
-    const stats = {
-      total: records.length,
-      extracted: records.filter(r => r.extracted === 'extracted').length,
-      draft_spec: records.filter(r => r.verified === 'draft spec').length,
-      specified: records.filter(r => r.verified === 'specified').length,
-      verified: records.filter(r => r.verified === 'verified').length,
-      externally_verified: records.filter(r => r.verified === 'externally verified').length,
-      ignored: records.filter(r => r.ignored === 'ignored').length,
-      ai_proveable: records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
-    }
+function toStatusEntry(fn: FunctionRecord): StatusEntry {
+  let verifiedStr = ''
+  if (fn.verified) verifiedStr = 'verified'
+  else if (fn.externally_verified) verifiedStr = 'externally verified'
+  else if (fn.specified) verifiedStr = 'specified'
 
     return {
-      entries: records,
-      stats
+    function: fn.rust_name ?? fn.lean_name,
+    source: fn.source ?? '',
+    lines: fn.lines ?? '',
+    spec_theorem: fn.spec_file ?? '',
+    extracted: 'extracted',
+    verified: verifiedStr,
+    notes: '',
+    'ai-proveable': ''
+  }
+}
+
+export default {
+  watch: ['../../../functions.json'],
+  load(): StatusData {
+    const functionsPath = path.join(process.cwd(), 'functions.json')
+    const content = fs.readFileSync(functionsPath, 'utf-8')
+    const parsed = JSON.parse(content) as { functions: FunctionRecord[] }
+
+    const visible = parsed.functions.filter(
+      fn => !fn.is_hidden && !fn.is_extraction_artifact
+    )
+
+    const entries = visible.map(toStatusEntry)
+
+    const stats = {
+      total: visible.length,
+      extracted: visible.length,
+      draft_spec: 0,
+      specified: visible.filter(fn => fn.specified).length,
+      verified: visible.filter(fn => fn.verified).length,
+      externally_verified: visible.filter(fn => fn.externally_verified).length,
+      ai_proveable: 0
     }
+
+    return { entries, stats }
   }
 }

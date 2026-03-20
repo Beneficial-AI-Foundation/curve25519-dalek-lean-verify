@@ -12,7 +12,6 @@ interface RawFunctionRecord {
   is_relevant: boolean
   is_extraction_artifact: boolean
   is_hidden: boolean
-  is_ignored: boolean
   specified: boolean
   verified: boolean
   fully_verified: boolean

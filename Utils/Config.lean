@@ -1,8 +1,11 @@
 /-
   Config: Project-specific configuration for Utils tools.
 
-  This file centralizes all project-specific values. To adapt these tools
-  for a different Aeneas-generated project, modify the values here.
+  **DEPRECATED**: This file is superseded by auto-detection heuristics in
+  `probe-aeneas listfuns`. It is retained temporarily for backward compatibility
+  with `lake exe listfuns` / `lake exe syncstatus` on master. Do not add new
+  entries; they will be ignored by the probe pipeline. This file will be removed
+  once master migrates to the probe-based workflow.
 -/
 import Lean
 
