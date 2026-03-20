@@ -63,6 +63,63 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Cache probe-aeneas binary
+        id: cache-probe-aeneas
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin/probe-aeneas
+          key: probe-aeneas-${{ runner.os }}-${{ hashFiles('.github/workflows/deploy-docs.yml') }}
+
+      - name: Install probe-aeneas
+        if: steps.cache-probe-aeneas.outputs.cache-hit != 'true'
+        run: cargo install --git https://github.com/Beneficial-AI-Foundation/probe-aeneas
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Cache Lean build
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            .lake
+            build
+          key: ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-${{ hashFiles('Curve25519Dalek/**/*.lean', 'Utils/**/*.lean') }}
+          restore-keys: |
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-${{ hashFiles('lakefile.toml') }}-${{ hashFiles('lake-manifest.json') }}-
+            ${{ runner.os }}-lean-${{ hashFiles('lean-toolchain') }}-
+            ${{ runner.os }}-lean-
+
+      - name: Download dependency caches
+        run: lake exe cache get
+
+      - name: Build Lean project
+        run: lake build
+
+      - name: Generate functions.json via probe-aeneas
+        run: |
+          probe-aeneas listfuns --lean-project . --lake -o functions.json
+          probe-aeneas extract --lean-project . --lake
+          python3 scripts/enrich_functions.py \
+            --functions functions.json \
+            --atoms .verilib/probes/aeneas_*.json \
+            --output functions.json
+
+      - name: Update stats history
+        run: |
+          python3 scripts/update_stats_history.py \
+            --functions-json functions.json \
+            --fetch-url https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/stats_history.jsonl \
+            --fill-missing \
+            --since 2025-01-01 \
+            --max-commits 5000
+
       - name: Build Rust docs
         run: npm run docs:rust
 
@@ -85,6 +142,16 @@ jobs:
             echo "✓ Callgraph added to site/callgraph/"
           else
             echo "No callgraph cache found — deploying without callgraph"
+          fi
+
+      - name: Copy outputs to site
+        run: |
+          if [ -f outputs/stats_history.jsonl ]; then
+            mkdir -p site/.vitepress/dist/outputs
+            cp outputs/stats_history.jsonl site/.vitepress/dist/outputs/
+            echo "✓ stats_history.jsonl added to site/outputs/"
+          else
+            echo "No stats_history.jsonl found"
           fi
 
       - name: Upload artifact

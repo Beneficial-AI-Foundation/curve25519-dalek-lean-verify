@@ -1,9 +1,19 @@
 import fs from 'fs'
 import path from 'path'
-import { fileURLToPath } from 'url'
-import { parse } from 'csv-parse/sync'
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+interface FunctionRecord {
+  lean_name: string
+  rust_name: string | null
+  source: string | null
+  lines: string | null
+  spec_file: string | null
+  is_hidden: boolean
+  is_extraction_artifact: boolean
+  is_ignored: boolean
+  specified: boolean
+  verified: boolean
+  externally_verified: boolean
+}
 
 export interface StatusEntry {
   function: string
@@ -34,37 +44,49 @@ export interface StatusData {
 declare const data: StatusData
 export { data }
 
+function toStatusEntry(fn: FunctionRecord): StatusEntry {
+  let verifiedStr = ''
+  if (fn.verified) verifiedStr = 'verified'
+  else if (fn.externally_verified) verifiedStr = 'externally verified'
+  else if (fn.specified) verifiedStr = 'specified'
+
+  return {
+    function: fn.rust_name ?? fn.lean_name,
+    source: fn.source ?? '',
+    lines: fn.lines ?? '',
+    spec_theorem: fn.spec_file ?? '',
+    extracted: 'extracted',
+    verified: verifiedStr,
+    notes: '',
+    ignored: fn.is_ignored ? 'ignored' : '',
+    'ai-proveable': ''
+  }
+}
+
 export default {
-  watch: ['../../../status.csv'],
+  watch: ['../../../functions.json'],
   load(): StatusData {
-    // Read the CSV file from the project root
-    // During build, process.cwd() is the project root
-    const csvPath = path.join(process.cwd(), 'status.csv')
-    const csvContent = fs.readFileSync(csvPath, 'utf-8')
+    const functionsPath = path.join(process.cwd(), 'functions.json')
+    const content = fs.readFileSync(functionsPath, 'utf-8')
+    const parsed = JSON.parse(content) as { functions: FunctionRecord[] }
 
-    // Parse CSV
-    const records = parse(csvContent, {
-      columns: true,
-      skip_empty_lines: true,
-      trim: true,
-      relax_column_count: true
-    }) as StatusEntry[]
+    const visible = parsed.functions.filter(
+      fn => !fn.is_hidden && !fn.is_extraction_artifact
+    )
 
-    // Calculate statistics
+    const entries = visible.map(toStatusEntry)
+
     const stats = {
-      total: records.length,
-      extracted: records.filter(r => r.extracted === 'extracted').length,
-      draft_spec: records.filter(r => r.verified === 'draft spec').length,
-      specified: records.filter(r => r.verified === 'specified').length,
-      verified: records.filter(r => r.verified === 'verified').length,
-      externally_verified: records.filter(r => r.verified === 'externally verified').length,
-      ignored: records.filter(r => r.ignored === 'ignored').length,
-      ai_proveable: records.filter(r => r['ai-proveable'] && r['ai-proveable'].trim() !== '').length
+      total: visible.length,
+      extracted: visible.length,
+      draft_spec: 0,
+      specified: visible.filter(fn => fn.specified).length,
+      verified: visible.filter(fn => fn.verified).length,
+      externally_verified: visible.filter(fn => fn.externally_verified).length,
+      ignored: visible.filter(fn => fn.is_ignored).length,
+      ai_proveable: 0
     }
 
-    return {
-      entries: records,
-      stats
-    }
+    return { entries, stats }
   }
 }

@@ -56,9 +56,9 @@ From this we have chosen a subset of functions which isn't all of those in this 
 
 ## Status tracking
 
-- The file `status.csv` is the source of truth for tracking progress of the project, updates to this file should be made when functions are extracted, have specs added or if verification is complete
-- The column `extracted` can be empty of have the value `extracted`
-- The column `verified`  can be empty or have the values `draft spec`, `specified` or `verified`
+- Verification metadata (`functions.json`) is generated automatically by CI via `probe-aeneas`
+- No manual sync step is required — CI runs the full pipeline on every push
+- `functions.json` contains per-function status: extracted, specified, verified, externally_verified
     - ✏️ **draft spec** - Draft spec (in natural language) has been added
     - 📋 **specified** - Formal specification in Lean added
     - ✅ **verified** - Function has been formally verified (spec theorem has been proven)
@@ -71,7 +71,7 @@ Open GitHub issues and pull requests are automatically linked to functions in th
 
 ## CI
 
-- CI will automatically update the project site when the file `status.csv` is updated
+- CI automatically generates `functions.json` and deploys the project site
 - Whilst fixes to Aeneas are in progress we sometimes make modifications to the Rust source code in order to enable extraction, the changes are recorded in `src-modifications.diff` and CI checks that this file is updated
 - The CI runs Aeneas on the source code and checks that the generated files, `Types.lean` and `Funs.lean` haven't been modified since extraction (not active, to be activated soon)
 - CI checks that the Lean project builds without errors. It permits the presence of `sorry` since this often represents work in progress
@@ -93,7 +93,7 @@ Open GitHub issues and pull requests are automatically linked to functions in th
 - `scripts/` - Convenience scripts
 <!-- - `Curve25519Dalek.lean` - Main entry point for the Lean project -->
 <!-- - `lakefile.toml` - Lean project configuration -->
-- `status.csv` - Verification progress tracking
+- `functions.json` - Verification metadata (CI-generated)
 - `src-modifications.diff` - Modifications to the upstream Rust code
 
 [dalek]: https://github.com/dalek-cryptography/curve25519-dalek
