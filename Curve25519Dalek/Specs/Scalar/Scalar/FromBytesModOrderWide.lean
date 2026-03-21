@@ -43,12 +43,13 @@ theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :
     U8x32_as_Nat s.bytes < L ⦄ := by
   unfold from_bytes_mod_order_wide
   progress*
-  constructor
-  · -- BEGIN TASK
-    simp_all [Nat.ModEq]
-    -- END TASK
-  · -- BEGIN TASK
-    simp_all [Nat.ModEq]
-    -- END TASK
+  · rw [s_post1]; apply Nat.mod_lt; unfold L; grind
+  · constructor
+    · -- BEGIN TASK
+      simp_all [Nat.ModEq]
+      -- END TASK
+    · -- BEGIN TASK
+      simp_all [Nat.ModEq]
+      -- END TASK
 
 end curve25519_dalek.scalar.Scalar

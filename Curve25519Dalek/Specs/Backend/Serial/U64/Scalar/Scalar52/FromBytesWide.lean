@@ -39,7 +39,8 @@ natural language specs:
 @[externally_verified, progress] -- proven in Verus
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     from_bytes_wide b ⦃ u =>
-    Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by
+    Scalar52_as_Nat u = U8x64_as_Nat b % L ∧
+    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
     sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
