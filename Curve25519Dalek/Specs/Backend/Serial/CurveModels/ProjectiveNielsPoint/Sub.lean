@@ -180,63 +180,42 @@ theorem sub_spec_aux_54_52_53_52
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
   unfold sub
-  progress as ⟨Y_plus_X, h_Y_plus_X, Y_plus_X_bounds⟩
-  progress as ⟨Y_minus_X, Y_minus_X_bounds, h_Y_minus_X⟩
-  progress as ⟨PM, h_PM, PM_bounds⟩
-  progress as ⟨MP, h_MP, MP_bounds⟩
-  progress as ⟨TT2d, h_TT2d, TT2d_bounds⟩
-  progress as ⟨ZZ, h_ZZ, ZZ_bounds⟩
-  progress as ⟨ZZ2, h_ZZ2, ZZ2_bounds⟩
-  progress as ⟨fe, h_fe, fe_bounds⟩
-  -- fe1 = PM + MP: use tighter add spec (< 2^52) + (< 2^52) → < 2^53
-  obtain ⟨fe1, h_fe1_ok, h_fe1, fe1_bounds⟩ := CompletedPoint.add_spec_52_52 PM_bounds MP_bounds
-  simp only [h_fe1_ok, bind_tc_ok]
-  -- fe2 = ZZ2 - TT2d: sub operation
-  progress as ⟨fe2, h_fe2, fe2_bounds⟩
-  -- fe3 = ZZ2 + TT2d: use tighter add spec (< 2^53) + (< 2^52) → < 2^54
-  have hzz2_tight := double_limb_tight_bounds ZZ ZZ2 h_ZZ2 ZZ_bounds
-  obtain ⟨fe3, h_fe3_ok, h_fe3, fe3_bounds⟩ := CompletedPoint.add_spec_53_52 hzz2_tight TT2d_bounds
-  simp only [h_fe3_ok, bind_tc_ok]
-  -- Derive Field51_as_Nat equalities from limb-wise addition results
-  have h_sum_YX := (pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X h_Y_plus_X).symm
-  have h_fe1_nat := pointwise_add_Field51_as_Nat PM MP fe1 h_fe1
-  have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 h_ZZ2
-  have h_fe3_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe3 h_fe3
-  -- Arithmetic proofs using extracted modular relation lemmas
-  constructor
-  · -- X relation: (X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p
-    rw [← Nat.ModEq]
-    exact sub_X_modular_relation h_sum_YX h_Y_minus_X h_PM h_MP fe_bounds
-  constructor
-  · -- Y relation: (Y' + X * YpX) % p = (((Y + X) * YmX) + Y * YpX) % p
-    rw [← Nat.ModEq]
-    exact sub_Y_modular_relation h_sum_YX h_Y_minus_X h_PM h_MP h_fe1_nat
-  constructor
-  · -- Z relation: (Z' + (T * T2d)) % p = (2 * Z * Z₀) % p
-    rw [← Nat.ModEq]
-    exact sub_Z_modular_relation h_TT2d h_ZZ h_ZZ2_nat fe2_bounds
-  constructor
-  · -- T relation: T' % p = ((2 * Z * Z₀) + (T * T2d)) % p
-    rw [← Nat.ModEq]
-    exact sub_T_modular_relation h_TT2d h_ZZ h_ZZ2_nat h_fe3_nat
-  -- Output bounds (all < 2^54)
-  constructor
-  · -- X bounds: fe from sub gives < 2^52 < 2^54
-    intro i hi
-    apply lt_trans (h_fe i hi)
-    norm_num
-  constructor
-  · -- Y bounds: fe1 from add_spec_52_52 gives < 2^53 < 2^54
-    intro i hi
-    apply lt_trans (fe1_bounds i hi)
-    norm_num
-  constructor
-  · -- Z bounds: fe2 from sub gives < 2^52 < 2^54
-    intro i hi
-    apply lt_trans (h_fe2 i hi)
-    norm_num
-  · -- T bounds: fe3 from add_spec_53_52 gives < 2^54
-    exact fe3_bounds
+  simp only [progress_simps]
+  let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ PM, PM_post1, PM_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ MP, MP_post1, MP_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ TT2d, TT2d_post1, TT2d_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ ZZ, ZZ_post1, ZZ_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ ZZ2, ZZ2_post1, ZZ2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe2, fe2_post1, fe2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ fe3, fe3_post1, fe3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  have h_sum_YX := (pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X Y_plus_X_post1).symm
+  have h_fe1_nat := pointwise_add_Field51_as_Nat PM MP fe1 fe1_post1
+  have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 ZZ2_post1
+  have h_fe3_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe3 fe3_post1
+  exact ⟨
+    by rw [← Nat.ModEq]; exact sub_X_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 fe_post2,
+    by rw [← Nat.ModEq]; exact sub_Y_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 h_fe1_nat,
+    by rw [← Nat.ModEq]; exact sub_Z_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat fe2_post2,
+    by rw [← Nat.ModEq]; exact sub_T_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat h_fe3_nat,
+    fun i hi => lt_trans (fe_post1 i hi) (by norm_num),
+    fe1_post2,
+    fun i hi => lt_trans (fe2_post1 i hi) (by norm_num),
+    fe3_post2⟩
 
 theorem sub_spec_bounds'
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
