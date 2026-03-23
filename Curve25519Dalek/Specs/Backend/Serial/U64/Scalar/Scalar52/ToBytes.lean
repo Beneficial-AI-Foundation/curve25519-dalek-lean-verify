@@ -173,6 +173,26 @@ private theorem toNat_replicate_false (k : Nat) : toNat (List.replicate k false)
   | zero => simp [toNat]
   | succ k ih => simp [List.replicate_succ, toNat, ih]
 
+/-- If the bottom `k` bits of a U64 are all false (from a shift-left), then `val % 2^k = 0`. -/
+private theorem val_mod_of_replicate_prefix (x : U64) (k : Nat)
+    (rest : List Bool)
+    (hx : ofU64 x = List.replicate k false ++ rest) :
+    x.val % 2 ^ k = 0 := by
+  have h := congr_arg toNat hx
+  rw [toNat_ofU64, toNat_append, toNat_replicate_false, length_replicate, Nat.zero_add] at h
+  rw [h]; exact Nat.mul_comm _ _ ▸ Nat.mul_mod_right _ _
+
+/-- If a U64 is a right-shift of `y` by `shift` bits and `y < 2^(shift+bits)`, then `x < 2^bits`. -/
+private theorem val_lt_of_shift_right (x y : U64) (shift bits : Nat)
+    (hx : ofU64 x = (ofU64 y).drop shift ++ List.replicate shift false)
+    (hy : y.val < 2 ^ (shift + bits)) :
+    x.val < 2 ^ bits := by
+  have h := congr_arg toNat hx
+  rw [toNat_ofU64, toNat_append, toNat_drop, toNat_ofU64,
+    toNat_replicate_false, length_drop, ofU64_length] at h
+  simp only [Nat.zero_mul, Nat.add_zero] at h
+  rw [h]; exact Nat.div_lt_of_lt_mul (by rwa [← Nat.pow_add])
+
 /-- Right-shifting a U64 by k drops the bottom k bits (LSB-first).
     The result is `(ofU64 x).drop k` padded with k zeros at the top. -/
 theorem U64.ShiftRight_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
@@ -395,7 +415,30 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]⟩
     -- Shared byte 6: OR of (self[0] >> 48) and (self[1] << 4)
     have hb6 : ofU8 result[6]! = ((ofU64 (↑self : List U64)[0]!).drop 48).take 4 ++
-        ((ofU64 (↑self : List U64)[1]!).drop 0).take 4 := by sorry
+        ((ofU64 (↑self : List U64)[1]!).drop 0).take 4 := by
+      -- i15 = self[1] << 4: zeros in bottom 4 bits
+      have hx_mod : i15.val % 2 ^ 4 = 0 :=
+        val_mod_of_replicate_prefix i15 4 _ i15_post
+      -- i13 = self[0] >> 48: fits in 4 bits (since self[0] < 2^52)
+      have hy_lt : i13.val < 2 ^ 4 :=
+        val_lt_of_shift_right i13 i 48 4 i13_post (by
+          have := h 0 (by omega); rw [i_post]
+          simp only [Array.getElem!_Nat_eq] at this; exact this)
+      -- Derive BitList form of i16 = i13 ||| i15 via OR non-overlap
+      have h_or : ofU64 i16 = (ofU64 i13).take 4 ++ (ofU64 i15).drop 4 := by
+        have h16_eq : i16 = i15 ||| i13 := by
+          have hbv : i16.bv = (i15 ||| i13).bv := by
+            simp only [i16_post2, UScalar.bv_or]; ext i; simp [Bool.or_comm]
+          have hval : i16.val = (i15 ||| i13).val := congrArg BitVec.toNat hbv
+          scalar_tac
+        rw [h16_eq]; exact ofU64_or_non_overlapping i15 i13 4 (by omega) hx_mod hy_lt
+      -- Resolve result[6]! to cast(i16), apply cast, then expand i16 via h_or
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, h_or]
+      -- (take 4 ++ drop 4).take 8 = take 4 ++ (drop 4).take 4
+      rw [List.take_append (i := 8)]
+      simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
+        List.take_take, List.take_append_of_le_length]
 
     -- Limb 0: s[0]–s[5] and lower nibble of s[6]
     have hlimb0 : (ofU64 (↑self : List U64)[0]!).take 52 ≈ₗ
