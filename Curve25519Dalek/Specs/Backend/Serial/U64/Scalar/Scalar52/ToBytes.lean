@@ -567,13 +567,9 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     have h_list : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52 := by
       intro i hi; have := h i hi
       simp only [Array.getElem!_Nat_eq] at this; exact this
-    have : U8x32_as_Nat result = Scalar52_as_Nat self :=
-      scalar52_eq_of_bitList_bytes self result h_list h'
-        hb0 hb1 hb2 hb3 hb4 hb5 hb6
-        hb7 hb8 hb9 hb10 hb11 hb12
-        hb13 hb14 hb15 hb16 hb17 hb18 hb19
-        hb20 hb21 hb22 hb23 hb24 hb25
-        hb26 hb27 hb28 hb29 hb30 hb31
+    have := scalar52_eq_of_bitList_bytes self result h_list h'
+      hb0 hb1 hb2 hb3 hb4 hb5 hb6 hb7 hb8 hb9 hb10 hb11 hb12 hb13 hb14 hb15 hb16 hb17 hb18 hb19 hb20
+      hb21 hb22 hb23 hb24 hb25 hb26 hb27 hb28 hb29 hb30 hb31
     exact ⟨this, this ▸ h'⟩
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
