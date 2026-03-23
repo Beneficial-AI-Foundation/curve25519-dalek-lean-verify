@@ -377,108 +377,96 @@ theorem scalar52_eq_of_bitList_limbs
     List.getElem?_eq_getElem, Option.getD_some, hls, hlr, Nat.reduceLT] at *
   grind
 
-
-/-- Bridge from 32 byte-level BitList equalities to the Nat-level equality.
-    Each simple byte states `ofU8 result[k]! = (ofU64 self[j]).drop s |>.take 8`.
-    Shared bytes 6 and 19 split into two 4-bit slices from adjacent limbs.
-    Combines the byte facts into 5 limb-level equivalences, then applies
-    `scalar52_eq_of_bitList_limbs`. -/
+/-- In the language of `BitList`, if the 32 bytes are as defined in the function, then
+`U8x32_as_Nat result = Scalar52_as_Nat self` as required. -/
 theorem scalar52_eq_of_bitList_bytes
     (self : Scalar52) (result : Aeneas.Std.Array U8 32#usize)
-    (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52)
-    (h' : Scalar52_as_Nat self < L)
-    -- Limb 0 → bytes 0–5
+    (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L)
     (hb0 : ofU8 result[0]! = (ofU64 (↑self : List U64)[0]!).extract 0 8)
     (hb1 : ofU8 result[1]! = (ofU64 (↑self : List U64)[0]!).extract 8 16)
     (hb2 : ofU8 result[2]! = (ofU64 (↑self : List U64)[0]!).extract 16 24)
     (hb3 : ofU8 result[3]! = (ofU64 (↑self : List U64)[0]!).extract 24 32)
     (hb4 : ofU8 result[4]! = (ofU64 (↑self : List U64)[0]!).extract 32 40)
     (hb5 : ofU8 result[5]! = (ofU64 (↑self : List U64)[0]!).extract 40 48)
-    -- Shared byte 6
     (hb6 : ofU8 result[6]! = (ofU64 (↑self : List U64)[0]!).extract 48 52 ++
-                                (ofU64 (↑self : List U64)[1]!).extract 0 4)
-    -- Limb 1 → bytes 7–12
+                             (ofU64 (↑self : List U64)[1]!).extract 0 4)
     (hb7 : ofU8 result[7]! = (ofU64 (↑self : List U64)[1]!).extract 4 12)
     (hb8 : ofU8 result[8]! = (ofU64 (↑self : List U64)[1]!).extract 12 20)
     (hb9 : ofU8 result[9]! = (ofU64 (↑self : List U64)[1]!).extract 20 28)
     (hb10 : ofU8 result[10]! = (ofU64 (↑self : List U64)[1]!).extract 28 36)
     (hb11 : ofU8 result[11]! = (ofU64 (↑self : List U64)[1]!).extract 36 44)
     (hb12 : ofU8 result[12]! = (ofU64 (↑self : List U64)[1]!).extract 44 52)
-    -- Limb 2 → bytes 13–18
     (hb13 : ofU8 result[13]! = (ofU64 (↑self : List U64)[2]!).extract 0 8)
     (hb14 : ofU8 result[14]! = (ofU64 (↑self : List U64)[2]!).extract 8 16)
     (hb15 : ofU8 result[15]! = (ofU64 (↑self : List U64)[2]!).extract 16 24)
     (hb16 : ofU8 result[16]! = (ofU64 (↑self : List U64)[2]!).extract 24 32)
     (hb17 : ofU8 result[17]! = (ofU64 (↑self : List U64)[2]!).extract 32 40)
     (hb18 : ofU8 result[18]! = (ofU64 (↑self : List U64)[2]!).extract 40 48)
-    -- Shared byte 19
     (hb19 : ofU8 result[19]! = (ofU64 (↑self : List U64)[2]!).extract 48 52 ++
-                                (ofU64 (↑self : List U64)[3]!).extract 0 4)
-    -- Limb 3 → bytes 20–25
+                               (ofU64 (↑self : List U64)[3]!).extract 0 4)
     (hb20 : ofU8 result[20]! = (ofU64 (↑self : List U64)[3]!).extract 4 12)
     (hb21 : ofU8 result[21]! = (ofU64 (↑self : List U64)[3]!).extract 12 20)
     (hb22 : ofU8 result[22]! = (ofU64 (↑self : List U64)[3]!).extract 20 28)
     (hb23 : ofU8 result[23]! = (ofU64 (↑self : List U64)[3]!).extract 28 36)
     (hb24 : ofU8 result[24]! = (ofU64 (↑self : List U64)[3]!).extract 36 44)
     (hb25 : ofU8 result[25]! = (ofU64 (↑self : List U64)[3]!).extract 44 52)
-    -- Limb 4 → bytes 26–31
     (hb26 : ofU8 result[26]! = (ofU64 (↑self : List U64)[4]!).extract 0 8)
     (hb27 : ofU8 result[27]! = (ofU64 (↑self : List U64)[4]!).extract 8 16)
     (hb28 : ofU8 result[28]! = (ofU64 (↑self : List U64)[4]!).extract 16 24)
     (hb29 : ofU8 result[29]! = (ofU64 (↑self : List U64)[4]!).extract 24 32)
     (hb30 : ofU8 result[30]! = (ofU64 (↑self : List U64)[4]!).extract 32 40)
     (hb31 : ofU8 result[31]! = (ofU64 (↑self : List U64)[4]!).extract 40 48) :
-    U8x32_as_Nat result = Scalar52_as_Nat self :=
-  scalar52_eq_of_bitList_limbs self result h
+    U8x32_as_Nat result = Scalar52_as_Nat self := by
+  apply scalar52_eq_of_bitList_limbs self result h
     (by have := h 4 (by omega); have := Scalar52_top_limb_lt_of_canonical' self h'; grind)
-    -- hlimb0
-    (by rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
-        rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
-            List.extract_append_extract _ 0 16 24 (by omega) (by omega),
-            List.extract_append_extract _ 0 24 32 (by omega) (by omega),
-            List.extract_append_extract _ 0 32 40 (by omega) (by omega),
-            List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-        rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
-        rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-        simp [List.extract_eq_drop_take])
-    -- hlimb1
-    (by rw [hb6, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
-        rw [hb7, hb8, hb9, hb10, hb11, hb12]
-        rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
-            List.extract_append_extract _ 0 12 20 (by omega) (by omega),
-            List.extract_append_extract _ 0 20 28 (by omega) (by omega),
-            List.extract_append_extract _ 0 28 36 (by omega) (by omega),
-            List.extract_append_extract _ 0 36 44 (by omega) (by omega),
-            List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-        simp [List.extract_eq_drop_take])
-    -- hlimb2
-    (by rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
-        rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
-            List.extract_append_extract _ 0 16 24 (by omega) (by omega),
-            List.extract_append_extract _ 0 24 32 (by omega) (by omega),
-            List.extract_append_extract _ 0 32 40 (by omega) (by omega),
-            List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-        rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
-        rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
-        simp [List.extract_eq_drop_take])
-    -- hlimb3
-    (by rw [hb19, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
-        rw [hb20, hb21, hb22, hb23, hb24, hb25]
-        rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
-            List.extract_append_extract _ 0 12 20 (by omega) (by omega),
-            List.extract_append_extract _ 0 20 28 (by omega) (by omega),
-            List.extract_append_extract _ 0 28 36 (by omega) (by omega),
-            List.extract_append_extract _ 0 36 44 (by omega) (by omega),
-            List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
-        simp [List.extract_eq_drop_take])
-    -- hlimb4
-    (by rw [hb26, hb27, hb28, hb29, hb30, hb31]
-        rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
-            List.extract_append_extract _ 0 16 24 (by omega) (by omega),
-            List.extract_append_extract _ 0 24 32 (by omega) (by omega),
-            List.extract_append_extract _ 0 32 40 (by omega) (by omega),
-            List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
-        simp [List.extract_eq_drop_take])
+  · -- hlimb0
+    rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
+    rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
+        List.extract_append_extract _ 0 16 24 (by omega) (by omega),
+        List.extract_append_extract _ 0 24 32 (by omega) (by omega),
+        List.extract_append_extract _ 0 32 40 (by omega) (by omega),
+        List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
+    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
+    simp [List.extract_eq_drop_take]
+  · -- hlimb1
+    rw [hb6, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb7, hb8, hb9, hb10, hb11, hb12]
+    rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
+        List.extract_append_extract _ 0 12 20 (by omega) (by omega),
+        List.extract_append_extract _ 0 20 28 (by omega) (by omega),
+        List.extract_append_extract _ 0 28 36 (by omega) (by omega),
+        List.extract_append_extract _ 0 36 44 (by omega) (by omega),
+        List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
+    simp [List.extract_eq_drop_take]
+  · -- hlimb2
+    rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
+    rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
+        List.extract_append_extract _ 0 16 24 (by omega) (by omega),
+        List.extract_append_extract _ 0 24 32 (by omega) (by omega),
+        List.extract_append_extract _ 0 32 40 (by omega) (by omega),
+        List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
+    rw [List.take_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [List.extract_append_extract _ 0 48 52 (by omega) (by omega)]
+    simp [List.extract_eq_drop_take]
+  · -- hlimb3
+    rw [hb19, List.drop_left' (by simp [List.extract_eq_drop_take, ofU64_length])]
+    rw [hb20, hb21, hb22, hb23, hb24, hb25]
+    rw [List.extract_append_extract _ 0 4 12 (by omega) (by omega),
+        List.extract_append_extract _ 0 12 20 (by omega) (by omega),
+        List.extract_append_extract _ 0 20 28 (by omega) (by omega),
+        List.extract_append_extract _ 0 28 36 (by omega) (by omega),
+        List.extract_append_extract _ 0 36 44 (by omega) (by omega),
+        List.extract_append_extract _ 0 44 52 (by omega) (by omega)]
+    simp [List.extract_eq_drop_take]
+  · -- hlimb4
+    rw [hb26, hb27, hb28, hb29, hb30, hb31]
+    rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
+        List.extract_append_extract _ 0 16 24 (by omega) (by omega),
+        List.extract_append_extract _ 0 24 32 (by omega) (by omega),
+        List.extract_append_extract _ 0 32 40 (by omega) (by omega),
+        List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
+    simp [List.extract_eq_drop_take]
 
 -- Remove @[progress] from the old Nat-level shift specs and add to the new BitList specs.
 -- The cast (progress_pure_def) and OR (lift) keep their original progress behavior;
