@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.ExternallyVerified
+set_option linter.hashCommand false
 #setup_aeneas_simps
 
 /-! # Spec Theorem for `Scalar52::to_bytes`
@@ -484,7 +485,24 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
 
     -- Shared byte 19: OR of (self[2] >> 48) and (self[3] << 4)
     have hb19 : ofU8 result[19]! = ((ofU64 (↑self : List U64)[2]!).drop 48).take 4 ++
-        ((ofU64 (↑self : List U64)[3]!).drop 0).take 4 := by sorry
+        ((ofU64 (↑self : List U64)[3]!).drop 0).take 4 := by
+      have hx_mod : i45.val % 2 ^ 4 = 0 :=
+        val_mod_of_replicate_prefix i45 4 _ i45_post
+      have hy_lt : i43.val < 2 ^ 4 :=
+        val_lt_of_shift_right i43 i30 48 4 i43_post (by
+          have := h 2 (by omega); rw [i30_post]
+          simp only [Array.getElem!_Nat_eq] at this; exact this)
+      have h_or : ofU64 i46 = (ofU64 i43).take 4 ++ (ofU64 i45).drop 4 := by
+        have h46_eq : i46 = i45 ||| i43 := by
+          have hbv : i46.bv = (i45 ||| i43).bv := by
+            simp only [i46_post2, UScalar.bv_or]; ext i; simp [Bool.or_comm]
+          have hval : i46.val = (i45 ||| i43).val := congrArg BitVec.toNat hbv
+          scalar_tac
+        rw [h46_eq]; exact ofU64_or_non_overlapping i45 i43 4 (by omega) hx_mod hy_lt
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
+      simp [length_take, length_drop, ofU64_length, i43_post, i45_post,
+        List.take_take, List.take_append_of_le_length]
 
     -- Byte-level BitList facts for limb 3 (bytes 20–25): each byte = 8-bit slice of self[3]
     have ⟨hb20, hb21, hb22, hb23, hb24, hb25⟩ :
