@@ -228,7 +228,8 @@
    "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    add self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/- Spec for `add`.\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -429,8 +430,7 @@
    ["curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub"]},
   {"verified": true,
    "specified": true,
-   "spec_statement":
-   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "spec_statement": null,
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring": null,
@@ -1076,10 +1076,9 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
-   "spec_statement":
-   "theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :\n    mul P scalar ⦃ res =>\n      let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n      MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄ := by ...",
+   "spec_statement": null,
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/montgomery.rs",
@@ -1093,7 +1092,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
     "curve25519_dalek.IdentityMontgomeryProjectivePoint.identity",
@@ -1160,11 +1159,10 @@
    ["curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul"]},
   {"verified": true,
    "specified": true,
-   "spec_statement":
-   "theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
+   "spec_statement": "\n/-\nNatural language description:",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the reverse operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MontgomeryPoint::mul with swapped arguments\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
+   "/- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul]:\n   Source: 'curve25519-dalek/src/montgomery.rs', lines 462:4-464:5\n-/",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1236,13 +1234,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)\n    (h_e_valid : e.IsValid) :\n      mul e s ⦃ result =>\n      result.IsValid ∧\n      result.toPoint = ((U8x32_as_Nat s.bytes)) • e.toPoint ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::scalar::Scalar, curve25519_dalek::edwards::EdwardsPoint> for &'a (curve25519_dalek::edwards::EdwardsPoint)}::mul",
@@ -4603,13 +4599,11 @@
    "dependencies":
    ["curve25519_dalek.backend.get_selected_backend",
     "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem BASEPOINT_ORDER_PRIVATE_spec :\n    U8x32_as_Nat BASEPOINT_ORDER_PRIVATE.bytes = L := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Constants/BASEPOINT_ORDER_PRIVATE.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `constants.BASEPOINT_ORDER_PRIVATE`**:\n    • The byte representation of BASEPOINT_ORDER_PRIVATE, interpreted as a little-endian\n      natural number via U8x32_as_Nat, equals the group order L.\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/constants.rs",
    "rust_name": "curve25519_dalek::constants::BASEPOINT_ORDER_PRIVATE",
    "lines": "L75-L81",
@@ -4618,7 +4612,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
@@ -4881,14 +4875,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (q : edwards.CompressedEdwardsY) =>\n      U8x32_as_Nat q = 1 ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Identity.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting CompressedEdwardsY encodes the value 1 (the Y-coordinate of the identity point)\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::CompressedEdwardsY}::identity",
@@ -4899,7 +4890,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
   {"verified": false,
@@ -4921,13 +4912,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem ct_eq_spec\n    (self other : CompressedEdwardsY) :\n    ct_eq self other ⦃ (result : subtle.Choice) =>\n      result = Choice.one ↔ self = other ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/CtEq.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one iff the two CompressedEdwardsY values are equal\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::CompressedEdwardsY}::ct_eq",
@@ -4938,7 +4927,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.edwards.CompressedEdwardsY.as_bytes"]},
   {"verified": true,
@@ -4963,7 +4952,7 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n      let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)\n      let x_sign_bit := cey[31]!.val.testBit 7\n      -- Decompression succeeds iff y is a valid Edwards y-coordinate\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      -- When successful:\n      (∀ ep, result = some ep →\n        -- is_well_formed_edwards_point\n        ep.IsValid ∧\n        -- Y matches the encoded y-coordinate (ZMod and Nat levels)\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧\n        -- Z = 1 (ZMod and Nat levels)\n        ep.Z.toField = 1 ∧\n        Field51_as_Nat ep.Z % p = 1 ∧\n        ep.T.toField = ep.X.toField * ep.Y.toField ∧\n        -- X sign matches bit 255\n        -- (when y² ≠ 1, i.e. the non-degenerate case where x ≠ 0)\n        (y ^ 2 ≠ 1 →\n          (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by ...",
+   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n      let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)\n      let x_sign_bit := cey[31]!.val.testBit 7\n      -- Decompression succeeds iff y is a valid Edwards y-coordinate\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      -- When successful:\n      (∀ ep, result = some ep →\n        -- is_well_formed_edwards_point\n        ep.IsValid ∧\n        -- Y matches the encoded y-coordinate (ZMod and Nat levels)\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧\n        -- Z = 1 (ZMod and Nat levels)\n        ep.Z.toField = 1 ∧",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean",
    "spec_docstring":
@@ -5868,13 +5857,11 @@
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem as_affine_niels_spec\n  (self : EdwardsPoint)\n  (hself : self.IsValid) :\n  as_affine_niels self ⦃ an =>\n  let X := Field51_as_Nat self.X\n  let Y := Field51_as_Nat self.Y\n  let Z := Field51_as_Nat self.Z\n  let ypx := Field51_as_Nat an.y_plus_x\n  let ymx := Field51_as_Nat an.y_minus_x\n  let xy2d_val := Field51_as_Nat an.xy2d\n  (ypx * Z) % p = (Y + X) % p ∧\n  (ymx * Z + X) % p = Y % p ∧\n  (xy2d_val * Z * Z) % p = (X * Y * (2 * d)) % p ∧\n  (∀ i < 5, an.y_plus_x[i]!.val < 2 ^ 54) ∧\n  (∀ i < 5, an.y_minus_x[i]!.val < 2 ^ 52) ∧\n  (∀ i < 5, an.xy2d[i]!.val < 2 ^ 52) ⦄\n := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/AsAffineNiels.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.as_affine_niels`**:\n- No panic (always returns successfully)\n- Given input:\n  • an EdwardsPoint `self` satisfying `self.IsValid`\n    (coordinates X, Y, Z, T with limbs < 2^53, Z ≠ 0 in the field,\n    extended coordinate relation XY = TZ, and the curve equation),\nthe output AffineNielsPoint (y_plus_x, y_minus_x, xy2d) computed by\n`as_affine_niels self` satisfies modulo p:\n- y_plus_x · Z ≡ Y + X (mod p)\n- y_minus_x · Z + X ≡ Y (mod p)\n- xy2d · Z² ≡ X · Y · (2 · d) (mod p)\nwhere p = 2^255 - 19.\n\nThese are the standard affine Niels conversion formulas obtained by dehomogenizing\nthe extended coordinates and computing y ± x and 2dxy.\n\nOutput bounds (from field element arithmetic):\n- y_plus_x: all limbs < 2^54\n- y_minus_x: all limbs < 2^52\n- xy2d: all limbs < 2^52\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_affine_niels",
@@ -5978,13 +5965,12 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    is_small_order self ⦃ result =>\n    (result ↔ h • self.toPoint = 0) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsSmallOrder.lean",
-   "spec_docstring":
-   "/-- **Spec for `edwards.EdwardsPoint.is_small_order`**:\n- Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])\n- This is determined by checking if multiplying by the cofactor yields the identity element\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order",
@@ -5995,19 +5981,17 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor",
     "curve25519_dalek.traits.IsIdentity.Blanket.is_identity",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem is_torsion_free_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    is_torsion_free self ⦃ result =>\n    (result ↔ L • self.toPoint = 0) ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/IsTorsionFree.lean",
-   "spec_docstring":
-   "/-- **Spec for `edwards.EdwardsPoint.is_torsion_free`**:\n- Returns `true` if and only if the point is torsion-free (is in the prime-order subgroup)\n- This is determined by checking if multiplying by the basepoint order L yields the identity element\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_torsion_free",
@@ -6129,13 +6113,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem mul_clamped_spec (self : EdwardsPoint) (bytes : Array U8 32#usize)\n    (h_self_valid : self.IsValid) :\n    mul_clamped self bytes ⦃ (result : EdwardsPoint) =>\n      EdwardsPoint.IsValid result ∧\n      (∃ clamped_scalar,\n      h ∣ U8x32_as_Nat clamped_scalar ∧\n      U8x32_as_Nat clamped_scalar < 2 ^ 255 ∧\n      2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧\n      result.toPoint = (((U8x32_as_Nat clamped_scalar)) • self.toPoint)) ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulClamped.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_clamped`**:\n- No panic (always returns successfully)\n- Clamps input bytes with `scalar.clamp_integer`\n- Delegates to `Scalar * EdwardsPoint` multiplication with the clamped scalar\n- The returned EdwardsPoint matches the scalar multiplication result\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped",
@@ -6269,13 +6251,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    eq self other ⦃ result =>\n    result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Eq.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.PartialEqAffinePoint.eq`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is `true` if and only if the two points represent the same point on the curve\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::eq",
@@ -6366,14 +6346,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (q : AffinePoint) =>\n      Field51_as_Nat q.x = 0 ∧ Field51_as_Nat q.y = 1 ∧\n      q.IsValid ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Identity.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:\n- No panic (always returns successfully)\n- The resulting AffinePoint is the identity element with coordinates (x=0, y=1)\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::affine::AffinePoint}::identity",
@@ -6384,7 +6361,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO",
@@ -6409,14 +6386,11 @@
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem conditional_select_spec\n    (a b : edwards.affine.AffinePoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : edwards.affine.AffinePoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/ConditionalSelect.lean",
-   "spec_docstring":
-   "/--\n**Spec and proof concerning `edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select`**:\n- No panic (always returns successfully)\n- Returns `b` when `choice = 1` and `a` when `choice = 0`\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_select",
@@ -6427,7 +6401,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select"]},
@@ -6450,13 +6424,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem ct_eq_spec (self other : AffinePoint) :\n  ct_eq self other ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat self.x) ≡ (Field51_as_Nat other.x) [MOD p] ∧\n    (Field51_as_Nat self.y) ≡ (Field51_as_Nat other.y) [MOD p]) ∧\n  (self.IsValid → other.IsValid → (c = Choice.one ↔ self.toPoint = other.toPoint)) ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/CtEq.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in coordinates\n- When both points are valid, this is equivalent to toPoint equality\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{subtle::ConstantTimeEq for curve25519_dalek::edwards::affine::AffinePoint}::ct_eq",
@@ -6513,14 +6485,11 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)\n  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)\n  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :\n    to_edwards self ⦃ result =>\n      result.X = self.x ∧ result.Y = self.y ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T % p = (Field51_as_Nat self.x * Field51_as_Nat self.y) % p ∧\n      (∀ i < 5, result.T[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, result.Z[i]!.val < 2 ^ 53) ∧\n      result.IsValid ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/ToEdwards.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:\n- No panic when the input AffinePoint is valid (coordinate limbs < 2^54)\n- The resulting EdwardsPoint has X = self.x, Y = self.y\n- Z has field value 1, T ≡ x · y (mod p)\n- T limbs < 2^52, Z limbs < 2^53\n- If coordinate limbs are < 2^53, the resulting EdwardsPoint is valid (IsValid)\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::to_edwards",
@@ -6580,10 +6549,10 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>\n      let r_nat := Field51_as_Nat r % p\n      let r'_nat := Field51_as_Nat r' % p\n      (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n      (r_nat = 0 → r'_nat = 0) ∧\n      (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by ...",
+   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>\n      let r_nat := Field51_as_Nat r % p",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Invert.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.invert`**:\n- No panic for field element inputs r (always returns r' successfully)\n- If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)\n- If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)\n-/",
@@ -6597,7 +6566,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -6661,10 +6630,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.pow22501`**:\n- No panic (always returns (r1, r2) successfully)\n- Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)\n  Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)\n-/",
@@ -6678,15 +6647,15 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n      (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
@@ -6700,15 +6669,14 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.field.FieldElement51.pow22501",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
-   "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat SQRT_M1_val % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
+   "spec_statement": null,
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/field.rs",
@@ -7021,10 +6989,9 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    mul P rhs ⦃ res =>\n    let m:= (U8x32_as_Nat rhs.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
+   "theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.MulMontgomeryPointSharedBScalarMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul",
@@ -7217,7 +7184,7 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ result =>\n    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄\n := by ...",
@@ -7234,7 +7201,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.mul_base",
     "curve25519_dalek.edwards.EdwardsPoint.to_montgomery"]},
@@ -7512,13 +7479,13 @@
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
     "curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
-   "spec_statement":
-   "theorem elligator_encode_spec\n    (r_0 : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r_0[i]!).val ≤ 2 ^ 52 - 1) :\n    elligator_encode r_0 ⦃ res =>\n    -- Field arithmetic interpretation of input and outputs\n    let r     : ZMod p := (Field51_as_Nat r_0 : ZMod p)\n    let d_1   : ZMod p := 1 + 2 * r ^ 2\n    let d     : ZMod p := -Curve25519.A * d_1⁻¹\n    let eps   : ZMod p := d * (d ^ 2 + Curve25519.A * d + 1)\n    let point  := res.1\n    let eps_is_sq := res.2\n    -- The returned Choice correctly identifies whether eps is a square\n    (eps_is_sq.val = 1#u8 ↔ IsSquare eps) ∧\n    -- The returned MontgomeryPoint encodes the Elligator 2 u-coordinate\n    (eps_is_sq.val = 1#u8 →\n      (U8x32_as_Nat point : ZMod p) = d) ∧\n    (eps_is_sq.val = 0#u8 →\n      (U8x32_as_Nat point : ZMod p) = -d - Curve25519.A) ∧\n    -- In the QR case, u lies on the Montgomery curve\n    (eps_is_sq.val = 1#u8 →\n      let u : ZMod p := (U8x32_as_Nat point : ZMod p)\n      u * (u ^ 2 + Curve25519.A * u + 1) = eps) ∧\n    -- In the NQR case, u lies on the quadratic twist\n    (eps_is_sq.val = 0#u8 →\n      let u : ZMod p := (U8x32_as_Nat point : ZMod p)\n      IsSquare (-(u * (u ^ 2 + Curve25519.A * u + 1)))) ⦄ := by ...",
+   "spec_statement": null,
    "spec_file":
    "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/ElligatorEncode.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- Derive `d0 = ↑(Field51_as_Nat d)` from the field arithmetic chain. -/\nlemma d0_eq_d_of_inv (r0 : CurveField)\n    (d0 : CurveField) (hd0 : d0 = -Curve25519.A * (1 + 2 * r0 ^ 2)⁻¹)\n    (d_val fe1_val d1_val A_neg_val : ℕ)\n    (change_A : (A_neg_val : CurveField) = -Curve25519.A)\n    (change_d_1 : (d1_val : CurveField) = 1 + 2 * r0 ^ 2)\n    (hd : d_val ≡ A_neg_val * fe1_val [MOD p])\n    (hfe1_inv : (fe1_val : CurveField) = (d1_val : CurveField)⁻¹) :\n    d0 = (d_val : CurveField) := by\n  rw [hd0]\n  rw [lift_mod_eq_iff] at hd\n  simp only [neg_mul, hd, Nat.cast_mul, change_A, neg_inj, mul_eq_mul_left_iff]\n  rw [hfe1_inv, change_d_1]\n  simp only [true_or]\n\n/-! ## Square root lemmas -/\n\nlemma two_mul_is_square : IsSquare ((2:CurveField) *(Field51_as_Nat SQRT_M1_val)):= by\n  have eq1: ((Field51_as_Nat SQRT_M1_val):CurveField) =\n  19681161376707505956807079304988542015446066515923890162744021073123829784752 := by\n    unfold SQRT_M1_val\n    decide\n  simp[eq1]\n  ring_nf\n  apply (@legendreSym.eq_one_iff p _ (39362322753415011913614158609977084030892133031847780325488042146247659569504) (by grind)).mp\n  norm_num [p]\n\nlemma two_did_is_square : IsSquare (-(2:CurveField) /(Field51_as_Nat SQRT_M1_val)):= by",
    "source": "curve25519-dalek/src/montgomery.rs",
    "rust_name": "curve25519_dalek::montgomery::elligator_encode",
    "lines": "L263-L284",
@@ -7528,7 +7495,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": false,
+   "externally_verified": true,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE",
     "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -8790,8 +8757,7 @@
    "theorem elligator_ristretto_flavor_spec\n    (s : FieldElement51)\n    (h_s_valid : s.IsValid) :\n    elligator_ristretto_flavor s ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:\n• The function always succeeds (no panic) for all valid field element inputs\n• The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)\n• The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging\n  the implementation to the pure mathematical Elligator map defined in Representation.lean\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
@@ -8823,12 +8789,11 @@
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"verified": true,
    "specified": true,
-   "spec_statement":
-   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint =\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_lower bytes))).val +\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_upper bytes))).val\n      ⦄ := by ...",
+   "spec_statement": null,
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes`**\n\nThe function always succeeds for arbitrary 64-byte inputs. The output is a mathematically valid\nRistretto point equal to\n`elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))`. -/",
+   "/-- Returns first 32 bytes of a 64-byte array -/\n@[reducible]\ndef bytes_lower (bytes : Array U8 64#usize) : Array U8 32#usize :=\n  ⟨(List.range 32).map (fun i => bytes[i]!), by simp⟩\n\n/-- Returns last 32 bytes of a 64-byte array -/\n@[reducible]\ndef bytes_upper (bytes : Array U8 64#usize) : Array U8 32#usize :=",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
@@ -9523,13 +9488,11 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)\n    (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)\n    (h_e_valid : e.IsValid) :\n    mul s e ⦃ result =>\n      result.IsValid ∧\n      result.toPoint = ((U8x32_as_Nat s.bytes)) • e.toPoint ⦄ := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul`**:\n• The function always succeeds (no panic) for canonical input Scalars s and valid input EdwardsPoints e\n• The result is a valid EdwardsPoint\n• The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)\n-/",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Mul<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
@@ -9566,10 +9529,9 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :\n    mul scalar P ⦃ res =>\n    let m:= (U8x32_as_Nat scalar.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
+   "theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :\n    mul P rhs ⦃ res =>\n    let m:= (U8x32_as_Nat rhs.bytes) % 2^255\n    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄\n := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/Mul.lean",
-   "spec_docstring":
-   "/-- **Spec and proof concerning `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`**:\n- No panic (always returns successfully given valid inputs)\n- Implements scalar multiplication via delegation to the underlying operation\n- The result is mathematically equivalent to [scalar]point\n- Mathematical properties of the result:\n  * The result encodes the u-coordinate of the scalar multiplication [scalar]point\n  * Mathematically equivalent to MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul\n  * If point has u-coordinate u₀ and scalar is n (as an integer ≤ 2^255), then the result\n    encodes u₀([n]point), the u-coordinate of the n-fold sum of point on the Montgomery curve\n  * The Montgomery ladder maintains the invariant that x0 and x1 represent points\n    differing by point throughout the computation\n  * The computation maintains constant-time guarantees inherited from the underlying\n    Montgomery ladder implementation\n  * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::montgomery::{core::ops::arith::Mul<curve25519_dalek::montgomery::MontgomeryPoint, curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::scalar::Scalar}::mul",
