@@ -378,6 +378,92 @@ theorem scalar52_eq_of_bitList_limbs
   grind
 
 
+/-- Bridge from 32 byte-level BitList equalities to the Nat-level equality.
+    Each simple byte states `ofU8 result[k]! = (ofU64 self[j]).drop s |>.take 8`.
+    Shared bytes 6 and 19 split into two 4-bit slices from adjacent limbs.
+    Combines the byte facts into 5 limb-level equivalences, then applies
+    `scalar52_eq_of_bitList_limbs`. -/
+theorem scalar52_eq_of_bitList_bytes
+    (self : Scalar52) (result : Aeneas.Std.Array U8 32#usize)
+    (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52)
+    (h' : Scalar52_as_Nat self < L)
+    -- Limb 0 → bytes 0–5
+    (hb0  : ofU8 result[0]!  = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8)
+    (hb1  : ofU8 result[1]!  = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8)
+    (hb2  : ofU8 result[2]!  = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8)
+    (hb3  : ofU8 result[3]!  = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8)
+    (hb4  : ofU8 result[4]!  = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8)
+    (hb5  : ofU8 result[5]!  = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8)
+    -- Shared byte 6
+    (hb6  : ofU8 result[6]!  = ((ofU64 (↑self : List U64)[0]!).drop 48).take 4 ++
+                                ((ofU64 (↑self : List U64)[1]!).drop  0).take 4)
+    -- Limb 1 → bytes 7–12
+    (hb7  : ofU8 result[7]!  = ((ofU64 (↑self : List U64)[1]!).drop  4).take 8)
+    (hb8  : ofU8 result[8]!  = ((ofU64 (↑self : List U64)[1]!).drop 12).take 8)
+    (hb9  : ofU8 result[9]!  = ((ofU64 (↑self : List U64)[1]!).drop 20).take 8)
+    (hb10 : ofU8 result[10]! = ((ofU64 (↑self : List U64)[1]!).drop 28).take 8)
+    (hb11 : ofU8 result[11]! = ((ofU64 (↑self : List U64)[1]!).drop 36).take 8)
+    (hb12 : ofU8 result[12]! = ((ofU64 (↑self : List U64)[1]!).drop 44).take 8)
+    -- Limb 2 → bytes 13–18
+    (hb13 : ofU8 result[13]! = ((ofU64 (↑self : List U64)[2]!).drop  0).take 8)
+    (hb14 : ofU8 result[14]! = ((ofU64 (↑self : List U64)[2]!).drop  8).take 8)
+    (hb15 : ofU8 result[15]! = ((ofU64 (↑self : List U64)[2]!).drop 16).take 8)
+    (hb16 : ofU8 result[16]! = ((ofU64 (↑self : List U64)[2]!).drop 24).take 8)
+    (hb17 : ofU8 result[17]! = ((ofU64 (↑self : List U64)[2]!).drop 32).take 8)
+    (hb18 : ofU8 result[18]! = ((ofU64 (↑self : List U64)[2]!).drop 40).take 8)
+    -- Shared byte 19
+    (hb19 : ofU8 result[19]! = ((ofU64 (↑self : List U64)[2]!).drop 48).take 4 ++
+                                ((ofU64 (↑self : List U64)[3]!).drop  0).take 4)
+    -- Limb 3 → bytes 20–25
+    (hb20 : ofU8 result[20]! = ((ofU64 (↑self : List U64)[3]!).drop  4).take 8)
+    (hb21 : ofU8 result[21]! = ((ofU64 (↑self : List U64)[3]!).drop 12).take 8)
+    (hb22 : ofU8 result[22]! = ((ofU64 (↑self : List U64)[3]!).drop 20).take 8)
+    (hb23 : ofU8 result[23]! = ((ofU64 (↑self : List U64)[3]!).drop 28).take 8)
+    (hb24 : ofU8 result[24]! = ((ofU64 (↑self : List U64)[3]!).drop 36).take 8)
+    (hb25 : ofU8 result[25]! = ((ofU64 (↑self : List U64)[3]!).drop 44).take 8)
+    -- Limb 4 → bytes 26–31
+    (hb26 : ofU8 result[26]! = ((ofU64 (↑self : List U64)[4]!).drop  0).take 8)
+    (hb27 : ofU8 result[27]! = ((ofU64 (↑self : List U64)[4]!).drop  8).take 8)
+    (hb28 : ofU8 result[28]! = ((ofU64 (↑self : List U64)[4]!).drop 16).take 8)
+    (hb29 : ofU8 result[29]! = ((ofU64 (↑self : List U64)[4]!).drop 24).take 8)
+    (hb30 : ofU8 result[30]! = ((ofU64 (↑self : List U64)[4]!).drop 32).take 8)
+    (hb31 : ofU8 result[31]! = ((ofU64 (↑self : List U64)[4]!).drop 40).take 8) :
+    U8x32_as_Nat result = Scalar52_as_Nat self :=
+  scalar52_eq_of_bitList_limbs self result h
+    (by have := h 4 (by omega); have := Scalar52_top_limb_lt_of_canonical' self h'; grind)
+    -- hlimb0
+    (by rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
+        rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.take_left' (by simp [ofU64_length]),
+            List.drop_take_append_drop_take, List.drop_zero])
+    -- hlimb1
+    (by rw [hb6, List.drop_left' (by simp [List.length_take, List.length_drop, ofU64_length])]
+        rw [hb7, hb8, hb9, hb10, hb11, hb12]
+        rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take]
+        simp [List.drop_zero])
+    -- hlimb2
+    (by rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
+        rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.take_left' (by simp [ofU64_length]),
+            List.drop_take_append_drop_take, List.drop_zero])
+    -- hlimb3
+    (by rw [hb19, List.drop_left' (by simp [List.length_take, List.length_drop, ofU64_length])]
+        rw [hb20, hb21, hb22, hb23, hb24, hb25]
+        rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take]
+        simp [List.drop_zero])
+    -- hlimb4
+    (by rw [hb26, hb27, hb28, hb29, hb30, hb31]
+        rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+            List.drop_take_append_drop_take]
+        simp [List.drop_zero])
+
 -- Remove @[progress] from the old Nat-level shift specs and add to the new BitList specs.
 -- The cast (progress_pure_def) and OR (lift) keep their original progress behavior;
 -- use ofU8_cast_eq_ofU64_take and ofU64_or_non_overlapping manually after progress.
@@ -441,21 +527,11 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
         List.take_take, List.take_append_of_le_length]
 
-    -- Limb 0: s[0]–s[5] and lower nibble of s[6]
-    have hlimb0 : (ofU64 (↑self : List U64)[0]!).take 52 ≈ₗ
-        ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++ ofU8 result[3]! ++
-        ofU8 result[4]! ++ ofU8 result[5]! ++ (ofU8 result[6]!).take 4 := by
-      rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
-      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.take_left' (by simp [ofU64_length]),
-          List.drop_take_append_drop_take, List.drop_zero]
-
-    -- Byte-level BitList facts for limb 1 (bytes 7–12): each byte = 8-bit slice of self[1]
+    -- Byte-level BitList facts for limb 1 (bytes 7–12)
     have ⟨hb7, hb8, hb9, hb10, hb11, hb12⟩ :
-        ofU8 result[7]!  = ((ofU64 (↑self : List U64)[1]!).drop  4).take 8 ∧
-        ofU8 result[8]!  = ((ofU64 (↑self : List U64)[1]!).drop 12).take 8 ∧
-        ofU8 result[9]!  = ((ofU64 (↑self : List U64)[1]!).drop 20).take 8 ∧
+        ofU8 result[7]! = ((ofU64 (↑self : List U64)[1]!).drop 4).take 8 ∧
+        ofU8 result[8]! = ((ofU64 (↑self : List U64)[1]!).drop 12).take 8 ∧
+        ofU8 result[9]! = ((ofU64 (↑self : List U64)[1]!).drop 20).take 8 ∧
         ofU8 result[10]! = ((ofU64 (↑self : List U64)[1]!).drop 28).take 8 ∧
         ofU8 result[11]! = ((ofU64 (↑self : List U64)[1]!).drop 36).take 8 ∧
         ofU8 result[12]! = ((ofU64 (↑self : List U64)[1]!).drop 44).take 8 := by
@@ -466,11 +542,10 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i24_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i26_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i28_post]; simp [ofU64_length]⟩
-
-    -- Byte-level BitList facts for limb 2 (bytes 13–18): each byte = 8-bit slice of self[2]
+    -- Byte-level BitList facts for limb 2 (bytes 13–18)
     have ⟨hb13, hb14, hb15, hb16, hb17, hb18⟩ :
-        ofU8 result[13]! = ((ofU64 (↑self : List U64)[2]!).drop  0).take 8 ∧
-        ofU8 result[14]! = ((ofU64 (↑self : List U64)[2]!).drop  8).take 8 ∧
+        ofU8 result[13]! = ((ofU64 (↑self : List U64)[2]!).drop 0).take 8 ∧
+        ofU8 result[14]! = ((ofU64 (↑self : List U64)[2]!).drop 8).take 8 ∧
         ofU8 result[15]! = ((ofU64 (↑self : List U64)[2]!).drop 16).take 8 ∧
         ofU8 result[16]! = ((ofU64 (↑self : List U64)[2]!).drop 24).take 8 ∧
         ofU8 result[17]! = ((ofU64 (↑self : List U64)[2]!).drop 32).take 8 ∧
@@ -482,7 +557,6 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i37_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i39_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i41_post]; simp [ofU64_length]⟩
-
     -- Shared byte 19: OR of (self[2] >> 48) and (self[3] << 4)
     have hb19 : ofU8 result[19]! = ((ofU64 (↑self : List U64)[2]!).drop 48).take 4 ++
         ((ofU64 (↑self : List U64)[3]!).drop 0).take 4 := by
@@ -503,10 +577,9 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
       simp [length_take, length_drop, ofU64_length, i43_post, i45_post,
         List.take_take, List.take_append_of_le_length]
-
-    -- Byte-level BitList facts for limb 3 (bytes 20–25): each byte = 8-bit slice of self[3]
+    -- Byte-level BitList facts for limb 3 (bytes 20–25)
     have ⟨hb20, hb21, hb22, hb23, hb24, hb25⟩ :
-        ofU8 result[20]! = ((ofU64 (↑self : List U64)[3]!).drop  4).take 8 ∧
+        ofU8 result[20]! = ((ofU64 (↑self : List U64)[3]!).drop 4).take 8 ∧
         ofU8 result[21]! = ((ofU64 (↑self : List U64)[3]!).drop 12).take 8 ∧
         ofU8 result[22]! = ((ofU64 (↑self : List U64)[3]!).drop 20).take 8 ∧
         ofU8 result[23]! = ((ofU64 (↑self : List U64)[3]!).drop 28).take 8 ∧
@@ -519,11 +592,10 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i54_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i56_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i58_post]; simp [ofU64_length]⟩
-
-    -- Byte-level BitList facts for limb 4 (bytes 26–31): each byte = 8-bit slice of self[4]
+    -- Byte-level BitList facts for limb 4 (bytes 26–31)
     have ⟨hb26, hb27, hb28, hb29, hb30, hb31⟩ :
-        ofU8 result[26]! = ((ofU64 (↑self : List U64)[4]!).drop  0).take 8 ∧
-        ofU8 result[27]! = ((ofU64 (↑self : List U64)[4]!).drop  8).take 8 ∧
+        ofU8 result[26]! = ((ofU64 (↑self : List U64)[4]!).drop 0).take 8 ∧
+        ofU8 result[27]! = ((ofU64 (↑self : List U64)[4]!).drop 8).take 8 ∧
         ofU8 result[28]! = ((ofU64 (↑self : List U64)[4]!).drop 16).take 8 ∧
         ofU8 result[29]! = ((ofU64 (↑self : List U64)[4]!).drop 24).take 8 ∧
         ofU8 result[30]! = ((ofU64 (↑self : List U64)[4]!).drop 32).take 8 ∧
@@ -535,62 +607,17 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i67_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i69_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i71_post]; simp [ofU64_length]⟩
-
-    -- Limb 1: upper nibble of s[6] and s[7]–s[12]
-    have hlimb1 : (ofU64 (↑self : List U64)[1]!).take 52 ≈ₗ
-        (ofU8 result[6]!).drop 4 ++
-        ofU8 result[7]! ++ ofU8 result[8]! ++ ofU8 result[9]! ++
-        ofU8 result[10]! ++ ofU8 result[11]! ++ ofU8 result[12]! := by
-      rw [hb6, List.drop_left' (by simp [List.length_take, List.length_drop, ofU64_length])]
-      rw [hb7, hb8, hb9, hb10, hb11, hb12]
-      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take]
-      simp [List.drop_zero]
-
-    -- Limb 2: s[13]–s[18] and lower nibble of s[19]
-    have hlimb2 : (ofU64 (↑self : List U64)[2]!).take 52 ≈ₗ
-        ofU8 result[13]! ++ ofU8 result[14]! ++ ofU8 result[15]! ++
-        ofU8 result[16]! ++ ofU8 result[17]! ++ ofU8 result[18]! ++
-        (ofU8 result[19]!).take 4 := by
-      rw [hb13, hb14, hb15, hb16, hb17, hb18, hb19]
-      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.take_left' (by simp [ofU64_length]),
-          List.drop_take_append_drop_take, List.drop_zero]
-
-    -- Limb 3: upper nibble of s[19] and s[20]–s[25]
-    have hlimb3 : (ofU64 (↑self : List U64)[3]!).take 52 ≈ₗ
-        (ofU8 result[19]!).drop 4 ++
-        ofU8 result[20]! ++ ofU8 result[21]! ++ ofU8 result[22]! ++
-        ofU8 result[23]! ++ ofU8 result[24]! ++ ofU8 result[25]! := by
-      rw [hb19, List.drop_left' (by simp [List.length_take, List.length_drop, ofU64_length])]
-      rw [hb20, hb21, hb22, hb23, hb24, hb25]
-      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take]
-      simp [List.drop_zero]
-
-    -- Limb 4: s[26]–s[31] (48 bits, no shared byte)
-    have hlimb4 : (ofU64 (↑self : List U64)[4]!).take 48 ≈ₗ
-        ofU8 result[26]! ++ ofU8 result[27]! ++ ofU8 result[28]! ++
-        ofU8 result[29]! ++ ofU8 result[30]! ++ ofU8 result[31]! := by
-      rw [hb26, hb27, hb28, hb29, hb30, hb31]
-      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
-          List.drop_take_append_drop_take]
-      simp [List.drop_zero]
-
-    -- Bridge: combine limb equivalences into the Nat-level equality
-    -- Convert h from Array getElem! to List getElem! to match bridge lemma signature
+    -- Bridge: byte-level facts → limb-level facts → Nat equality
     have h_list : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52 := by
       intro i hi; have := h i hi
       simp only [Array.getElem!_Nat_eq] at this; exact this
     have : U8x32_as_Nat result = Scalar52_as_Nat self :=
-      scalar52_eq_of_bitList_limbs self result h_list
-        (by grind [Scalar52_top_limb_lt_of_canonical' self h']) hlimb0 hlimb1 hlimb2 hlimb3 hlimb4
-    refine ⟨this, ?_⟩
-    rw [this]
-    exact h'
+      scalar52_eq_of_bitList_bytes self result h_list h'
+        hb0 hb1 hb2 hb3 hb4 hb5 hb6
+        hb7 hb8 hb9 hb10 hb11 hb12
+        hb13 hb14 hb15 hb16 hb17 hb18 hb19
+        hb20 hb21 hb22 hb23 hb24 hb25
+        hb26 hb27 hb28 hb29 hb30 hb31
+    exact ⟨this, this ▸ h'⟩
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
