@@ -24,38 +24,38 @@ Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 pub fn to_bytes(self) -> [u8; 32] {
     let mut s = [0u8; 32];
 
-    s[ 0] =  (self.0[ 0] >>  0)                      as u8;
-    s[ 1] =  (self.0[ 0] >>  8)                      as u8;
-    s[ 2] =  (self.0[ 0] >> 16)                      as u8;
-    s[ 3] =  (self.0[ 0] >> 24)                      as u8;
-    s[ 4] =  (self.0[ 0] >> 32)                      as u8;
-    s[ 5] =  (self.0[ 0] >> 40)                      as u8;
+    s[ 0] = (self.0[ 0] >> 0) as u8;
+    s[ 1] = (self.0[ 0] >> 8) as u8;
+    s[ 2] = (self.0[ 0] >> 16) as u8;
+    s[ 3] = (self.0[ 0] >> 24) as u8;
+    s[ 4] = (self.0[ 0] >> 32) as u8;
+    s[ 5] = (self.0[ 0] >> 40) as u8;
     s[ 6] = ((self.0[ 0] >> 48) | (self.0[ 1] << 4)) as u8;
-    s[ 7] =  (self.0[ 1] >>  4)                      as u8;
-    s[ 8] =  (self.0[ 1] >> 12)                      as u8;
-    s[ 9] =  (self.0[ 1] >> 20)                      as u8;
-    s[10] =  (self.0[ 1] >> 28)                      as u8;
-    s[11] =  (self.0[ 1] >> 36)                      as u8;
-    s[12] =  (self.0[ 1] >> 44)                      as u8;
-    s[13] =  (self.0[ 2] >>  0)                      as u8;
-    s[14] =  (self.0[ 2] >>  8)                      as u8;
-    s[15] =  (self.0[ 2] >> 16)                      as u8;
-    s[16] =  (self.0[ 2] >> 24)                      as u8;
-    s[17] =  (self.0[ 2] >> 32)                      as u8;
-    s[18] =  (self.0[ 2] >> 40)                      as u8;
+    s[ 7] = (self.0[ 1] >> 4) as u8;
+    s[ 8] = (self.0[ 1] >> 12) as u8;
+    s[ 9] = (self.0[ 1] >> 20) as u8;
+    s[10] = (self.0[ 1] >> 28) as u8;
+    s[11] = (self.0[ 1] >> 36) as u8;
+    s[12] = (self.0[ 1] >> 44) as u8;
+    s[13] = (self.0[ 2] >> 0) as u8;
+    s[14] = (self.0[ 2] >> 8) as u8;
+    s[15] = (self.0[ 2] >> 16) as u8;
+    s[16] = (self.0[ 2] >> 24) as u8;
+    s[17] = (self.0[ 2] >> 32) as u8;
+    s[18] = (self.0[ 2] >> 40) as u8;
     s[19] = ((self.0[ 2] >> 48) | (self.0[ 3] << 4)) as u8;
-    s[20] =  (self.0[ 3] >>  4)                      as u8;
-    s[21] =  (self.0[ 3] >> 12)                      as u8;
-    s[22] =  (self.0[ 3] >> 20)                      as u8;
-    s[23] =  (self.0[ 3] >> 28)                      as u8;
-    s[24] =  (self.0[ 3] >> 36)                      as u8;
-    s[25] =  (self.0[ 3] >> 44)                      as u8;
-    s[26] =  (self.0[ 4] >>  0)                      as u8;
-    s[27] =  (self.0[ 4] >>  8)                      as u8;
-    s[28] =  (self.0[ 4] >> 16)                      as u8;
-    s[29] =  (self.0[ 4] >> 24)                      as u8;
-    s[30] =  (self.0[ 4] >> 32)                      as u8;
-    s[31] =  (self.0[ 4] >> 40)                      as u8;
+    s[20] = (self.0[ 3] >> 4) as u8;
+    s[21] = (self.0[ 3] >> 12) as u8;
+    s[22] = (self.0[ 3] >> 20) as u8;
+    s[23] = (self.0[ 3] >> 28) as u8;
+    s[24] = (self.0[ 3] >> 36) as u8;
+    s[25] = (self.0[ 3] >> 44) as u8;
+    s[26] = (self.0[ 4] >> 0) as u8;
+    s[27] = (self.0[ 4] >> 8) as u8;
+    s[28] = (self.0[ 4] >> 16) as u8;
+    s[29] = (self.0[ 4] >> 24) as u8;
+    s[30] = (self.0[ 4] >> 32) as u8;
+    s[31] = (self.0[ 4] >> 40) as u8;
 
     s
 }
@@ -67,13 +67,13 @@ Each limb holds 52 bits. Since 52 = 6×8 + 4, each limb fills 6 full bytes plus 
 spill into a shared byte with the adjacent limb. The two shared bytes are s[6] and s[19],
 constructed via OR of the overflow bits from one limb and the start bits of the next.
 
-  | Limb | Bits  | Bytes                              | Shared |
+  | Limb | Bits | Bytes | Shared |
   |------|-------|------------------------------------|--------|
-  |  0   | 0–51  | s[0]–s[5], lower nibble of s[6]    | s[6]   |
-  |  1   | 0–51  | upper nibble of s[6], s[7]–s[12]   | s[6]   |
-  |  2   | 0–51  | s[13]–s[18], lower nibble of s[19] | s[19]  |
-  |  3   | 0–51  | upper nibble of s[19], s[20]–s[25] | s[19]  |
-  |  4   | 0–47  | s[26]–s[31] (48 bits)              | none   |
+  | 0 | 0–51 | s[0]–s[5], lower nibble of s[6] | s[6] |
+  | 1 | 0–51 | upper nibble of s[6], s[7]–s[12] | s[6] |
+  | 2 | 0–51 | s[13]–s[18], lower nibble of s[19] | s[19] |
+  | 3 | 0–51 | upper nibble of s[19], s[20]–s[25] | s[19] |
+  | 4 | 0–47 | s[26]–s[31] (48 bits) | none |
 
 Limb 4 uses only 48 of its 52 bits because the precondition `Scalar52_as_Nat self < L < 2^253`
 implies `self[4] < 2^(253−208) = 2^45 < 2^48`.
@@ -388,42 +388,42 @@ theorem scalar52_eq_of_bitList_bytes
     (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L)
     -- Limb 0 → bytes 0–5
-    (hb0  : ofU8 result[0]!  = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8)
-    (hb1  : ofU8 result[1]!  = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8)
-    (hb2  : ofU8 result[2]!  = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8)
-    (hb3  : ofU8 result[3]!  = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8)
-    (hb4  : ofU8 result[4]!  = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8)
-    (hb5  : ofU8 result[5]!  = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8)
+    (hb0 : ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop 0).take 8)
+    (hb1 : ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop 8).take 8)
+    (hb2 : ofU8 result[2]! = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8)
+    (hb3 : ofU8 result[3]! = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8)
+    (hb4 : ofU8 result[4]! = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8)
+    (hb5 : ofU8 result[5]! = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8)
     -- Shared byte 6
-    (hb6  : ofU8 result[6]!  = ((ofU64 (↑self : List U64)[0]!).drop 48).take 4 ++
-                                ((ofU64 (↑self : List U64)[1]!).drop  0).take 4)
+    (hb6 : ofU8 result[6]! = ((ofU64 (↑self : List U64)[0]!).drop 48).take 4 ++
+                                ((ofU64 (↑self : List U64)[1]!).drop 0).take 4)
     -- Limb 1 → bytes 7–12
-    (hb7  : ofU8 result[7]!  = ((ofU64 (↑self : List U64)[1]!).drop  4).take 8)
-    (hb8  : ofU8 result[8]!  = ((ofU64 (↑self : List U64)[1]!).drop 12).take 8)
-    (hb9  : ofU8 result[9]!  = ((ofU64 (↑self : List U64)[1]!).drop 20).take 8)
+    (hb7 : ofU8 result[7]! = ((ofU64 (↑self : List U64)[1]!).drop 4).take 8)
+    (hb8 : ofU8 result[8]! = ((ofU64 (↑self : List U64)[1]!).drop 12).take 8)
+    (hb9 : ofU8 result[9]! = ((ofU64 (↑self : List U64)[1]!).drop 20).take 8)
     (hb10 : ofU8 result[10]! = ((ofU64 (↑self : List U64)[1]!).drop 28).take 8)
     (hb11 : ofU8 result[11]! = ((ofU64 (↑self : List U64)[1]!).drop 36).take 8)
     (hb12 : ofU8 result[12]! = ((ofU64 (↑self : List U64)[1]!).drop 44).take 8)
     -- Limb 2 → bytes 13–18
-    (hb13 : ofU8 result[13]! = ((ofU64 (↑self : List U64)[2]!).drop  0).take 8)
-    (hb14 : ofU8 result[14]! = ((ofU64 (↑self : List U64)[2]!).drop  8).take 8)
+    (hb13 : ofU8 result[13]! = ((ofU64 (↑self : List U64)[2]!).drop 0).take 8)
+    (hb14 : ofU8 result[14]! = ((ofU64 (↑self : List U64)[2]!).drop 8).take 8)
     (hb15 : ofU8 result[15]! = ((ofU64 (↑self : List U64)[2]!).drop 16).take 8)
     (hb16 : ofU8 result[16]! = ((ofU64 (↑self : List U64)[2]!).drop 24).take 8)
     (hb17 : ofU8 result[17]! = ((ofU64 (↑self : List U64)[2]!).drop 32).take 8)
     (hb18 : ofU8 result[18]! = ((ofU64 (↑self : List U64)[2]!).drop 40).take 8)
     -- Shared byte 19
     (hb19 : ofU8 result[19]! = ((ofU64 (↑self : List U64)[2]!).drop 48).take 4 ++
-                                ((ofU64 (↑self : List U64)[3]!).drop  0).take 4)
+                                ((ofU64 (↑self : List U64)[3]!).drop 0).take 4)
     -- Limb 3 → bytes 20–25
-    (hb20 : ofU8 result[20]! = ((ofU64 (↑self : List U64)[3]!).drop  4).take 8)
+    (hb20 : ofU8 result[20]! = ((ofU64 (↑self : List U64)[3]!).drop 4).take 8)
     (hb21 : ofU8 result[21]! = ((ofU64 (↑self : List U64)[3]!).drop 12).take 8)
     (hb22 : ofU8 result[22]! = ((ofU64 (↑self : List U64)[3]!).drop 20).take 8)
     (hb23 : ofU8 result[23]! = ((ofU64 (↑self : List U64)[3]!).drop 28).take 8)
     (hb24 : ofU8 result[24]! = ((ofU64 (↑self : List U64)[3]!).drop 36).take 8)
     (hb25 : ofU8 result[25]! = ((ofU64 (↑self : List U64)[3]!).drop 44).take 8)
     -- Limb 4 → bytes 26–31
-    (hb26 : ofU8 result[26]! = ((ofU64 (↑self : List U64)[4]!).drop  0).take 8)
-    (hb27 : ofU8 result[27]! = ((ofU64 (↑self : List U64)[4]!).drop  8).take 8)
+    (hb26 : ofU8 result[26]! = ((ofU64 (↑self : List U64)[4]!).drop 0).take 8)
+    (hb27 : ofU8 result[27]! = ((ofU64 (↑self : List U64)[4]!).drop 8).take 8)
     (hb28 : ofU8 result[28]! = ((ofU64 (↑self : List U64)[4]!).drop 16).take 8)
     (hb29 : ofU8 result[29]! = ((ofU64 (↑self : List U64)[4]!).drop 24).take 8)
     (hb30 : ofU8 result[30]! = ((ofU64 (↑self : List U64)[4]!).drop 32).take 8)
@@ -487,8 +487,8 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
 
     -- Byte-level BitList facts for limb 0 (bytes 0–5): each byte = 8-bit slice of self[0]
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5⟩ :
-        ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8 ∧
-        ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8 ∧
+        ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop 0).take 8 ∧
+        ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop 8).take 8 ∧
         ofU8 result[2]! = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8 ∧
         ofU8 result[3]! = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8 ∧
         ofU8 result[4]! = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8 ∧
