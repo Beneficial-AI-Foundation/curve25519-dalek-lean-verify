@@ -355,10 +355,7 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     -- Byte-level BitList facts: each byte equals a slice of the corresponding limb
     have hb0 : ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8 := by
       subst_vars
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i1_post]
-      simp
+      simp_lists [ofU8_cast_eq_ofU64_take, drop_zero, replicate_zero, append_nil, *]
     have hb1 : ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8 := by
       subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
       rw [ofU8_cast_eq_ofU64_take, i3_post]; simp [ofU64_length]
