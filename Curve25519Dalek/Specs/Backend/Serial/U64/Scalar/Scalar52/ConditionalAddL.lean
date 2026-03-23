@@ -10,12 +10,11 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
 set_option exponentiation.threshold 260
 set_option linter.hashCommand false
-
 #setup_aeneas_simps
 
 /-! # Spec Theorem for `Scalar52::conditional_add_l`
 
-This function conditionally adds the group order L to a scalar based on a choice parameter.
+This function conditionally adds the group order `L` to a scalar based on a `choice` parameter.
 
 Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
@@ -92,9 +91,7 @@ open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
 /- Replace the spec currently in FunsExternal.lean with an alternative phrased in terms of
 `Choice.one`/`Choice.zero`.
-TODO: make this change throughout the code or revert this.
-TODO: arrange that `FunsExternal.lean` contains only the defintions and the associated spec theorems
-are place in a different file. -/
+TODO: make this change throughout the code or revert this. -/
 
 attribute [-progress] U64.Insts.SubtleConditionallySelectable.conditional_select_spec
 /-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
