@@ -36,12 +36,13 @@ natural language specs:
 - Both the unpacked r and the packed s represent the same natural number modulo L
 - The packed scalar is in canonical form (less than L) -/
 @[progress]
-theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :
-    pack u ⦃ s =>
-    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat s.bytes < L ⦄ := by
+theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) (hu : ∀ i < 5, u[i]!.val < 2 ^ 52)
+    (hu' : Scalar52_as_Nat u < L) :
+    pack u ⦃ (s : Scalar) =>
+      U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧
+      U8x32_as_Nat s.bytes < L ⦄ := by
   unfold pack
-  progress
-  grind
+  progress*
+  exact ⟨by simp [Nat.ModEq, *], by assumption⟩
 
 end curve25519_dalek.scalar.Scalar52
