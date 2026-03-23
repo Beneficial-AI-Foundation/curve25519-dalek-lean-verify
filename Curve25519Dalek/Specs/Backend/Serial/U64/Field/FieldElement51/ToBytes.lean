@@ -185,6 +185,27 @@ def bytes_match_limbs (L : Array U64 5#usize) (s : Array U8 32#usize) : Prop :=
   s.val[30].val = L.val[4].val >>> 36 % 2^8 ∧
   s.val[31].val = L.val[4].val >>> 44 % 2^8
 
+/-- AND with a mask whose value is 2^51-1 gives a value < 2^51. -/
+private lemma and_mask_lt_pow (x mask : U64) (hm : mask.val = 2 ^ 51 - 1) :
+    (x &&& mask).val < 2^51 := by
+  rw [UScalar.val_and, hm]
+  have := @Nat.and_le_right x.val (2^51 - 1)
+  omega
+
+/-- For a U8 value < 128, AND with 128 is 0 (bit 7 is clear). -/
+private lemma u8_and_128_eq_zero_of_lt (x : U8) (h : x.val < 128) :
+    (x &&& 128#u8).val = 0 := by
+  bvify 8 at *
+  bv_decide
+
+/-- A 64-bit value AND'd with 2^51-1, then shifted right by 44, fits in 7 bits. -/
+private lemma masked_shift44_lt_128 (x : BitVec 64) :
+    ((x &&& (BitVec.ofNat 64 (2^51 - 1))) >>> 44).toNat < 128 := by
+  simp only [BitVec.toNat_ushiftRight, BitVec.toNat_and, BitVec.toNat_ofNat,
+    Nat.shiftRight_eq_div_pow]
+  have := @Nat.and_le_right x.toNat (2^51 - 1)
+  norm_num at *; omega
+
 /-! ## Spec for `to_bytes` -/
 
 set_option maxHeartbeats 600000 in -- heavy progress*
@@ -409,7 +430,32 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ i115, i115_post ⟩ ← Array.index_usize_spec
   let* ⟨ i116, i116_post1, i116_post2 ⟩ ← UScalar.and_spec
   let* ⟨ ⟩ ← massert_spec
-  · sorry
+  · -- Resolve array lookups to concrete variables
+    have h99 : i99 = i38 := by simp only [i99_post, limbs9_post, Array.set_val_eq,
+      UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val, Nat.lt_add_one,
+      getElem!_pos, List.getElem_set_self]
+    have h115_eq : i115 = i114 := by simp only [i115_post, s32_post, Array.set_val_eq,
+      UScalar.ofNatCore_val_eq, List.length_set, List.Vector.length_val, Nat.lt_add_one,
+      getElem!_pos, List.getElem_set_self]
+    -- Compute mask value: low_51_bit_mask = (1 <<< 51) - 1 = 2^51 - 1
+    have hmask : low_51_bit_mask.val = 2^51 - 1 := by
+      simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
+        UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
+    -- i38 < 2^51 via helper (clean context, no scanning 164 hypotheses)
+    have h38 : i38.val < 2^51 := by
+      rw [i38_post1]; exact and_mask_lt_pow i37 low_51_bit_mask hmask
+    -- i113 = i99 >>> 44 = i38 >>> 44 < 128 (since i38 < 2^51)
+    have h113 : i113.val < 128 := by
+      rw [i113_post1, h99, Nat.shiftRight_eq_div_pow]; omega
+    -- i114 = cast U8 i113, preserves value since < 128 < 256
+    have h114_bound : i114.val < 128 := by
+      simp only [i114_post, U64_cast_U8, Nat.reducePow]
+      exact Nat.lt_of_le_of_lt (Nat.mod_le _ _) h113
+    -- i116 = (i115 &&& 128) = (i114 &&& 128) = 0 via helper
+    have h116_val : i116.val = 0 := by
+      simp only [i116_post1, h115_eq]
+      exact u8_and_128_eq_zero_of_lt i114 h114_bound
+    exact UScalar.eq_of_val_eq h116_val
   sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
