@@ -137,9 +137,6 @@ theorem decompose_or_limbs_shift4 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
     natify; simp_scalar
   rw [this]; bv_decide
 
-
-/-! ## Spec for `to_bytes` -/
-
 /-- Byte-by-byte packing formula for 5 × 51-bit limbs into 32 LE bytes.
     Matches the Rust source (field.rs:419-452) and the Lean extraction.
     The 4 boundary bytes (6, 12, 19, 25) combine bits from adjacent limbs.
@@ -148,42 +145,76 @@ theorem decompose_or_limbs_shift4 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
     The full `to_bytes` function first reduces and canonicalizes before packing. -/
 def bytes_match_limbs (L : Array U64 5#usize) (s : Array U8 32#usize) : Prop :=
   -- Limb 0 (bits 0-50) → bytes 0-6
-  s.val[0].val  = L.val[0].val % 2^8 ∧
-  s.val[1].val  = L.val[0].val >>> 8 % 2^8 ∧
-  s.val[2].val  = L.val[0].val >>> 16 % 2^8 ∧
-  s.val[3].val  = L.val[0].val >>> 24 % 2^8 ∧
-  s.val[4].val  = L.val[0].val >>> 32 % 2^8 ∧
-  s.val[5].val  = L.val[0].val >>> 40 % 2^8 ∧
-  s.val[6].val  = (L.val[0].val >>> 48 ||| L.val[1].val <<< 3) % 2^8 ∧
+  s.val[0]!.val = L.val[0]!.val % 2^8 ∧
+  s.val[1]!.val = L.val[0]!.val >>> 8 % 2^8 ∧
+  s.val[2]!.val = L.val[0]!.val >>> 16 % 2^8 ∧
+  s.val[3]!.val = L.val[0]!.val >>> 24 % 2^8 ∧
+  s.val[4]!.val = L.val[0]!.val >>> 32 % 2^8 ∧
+  s.val[5]!.val = L.val[0]!.val >>> 40 % 2^8 ∧
+  s.val[6]!.val = (L.val[0]!.val >>> 48 ||| L.val[1]!.val <<< 3 % U64.size) % 2^8 ∧
   -- Limb 1 (bits 51-101) → bytes 7-12
-  s.val[7].val  = L.val[1].val >>> 5 % 2^8 ∧
-  s.val[8].val  = L.val[1].val >>> 13 % 2^8 ∧
-  s.val[9].val  = L.val[1].val >>> 21 % 2^8 ∧
-  s.val[10].val = L.val[1].val >>> 29 % 2^8 ∧
-  s.val[11].val = L.val[1].val >>> 37 % 2^8 ∧
-  s.val[12].val = (L.val[1].val >>> 45 ||| L.val[2].val <<< 6) % 2^8 ∧
+  s.val[7]!.val = L.val[1]!.val >>> 5 % 2^8 ∧
+  s.val[8]!.val = L.val[1]!.val >>> 13 % 2^8 ∧
+  s.val[9]!.val = L.val[1]!.val >>> 21 % 2^8 ∧
+  s.val[10]!.val = L.val[1]!.val >>> 29 % 2^8 ∧
+  s.val[11]!.val = L.val[1]!.val >>> 37 % 2^8 ∧
+  s.val[12]!.val = (L.val[1]!.val >>> 45 ||| L.val[2]!.val <<< 6 % U64.size) % 2^8 ∧
   -- Limb 2 (bits 102-152) → bytes 13-19
-  s.val[13].val = L.val[2].val >>> 2 % 2^8 ∧
-  s.val[14].val = L.val[2].val >>> 10 % 2^8 ∧
-  s.val[15].val = L.val[2].val >>> 18 % 2^8 ∧
-  s.val[16].val = L.val[2].val >>> 26 % 2^8 ∧
-  s.val[17].val = L.val[2].val >>> 34 % 2^8 ∧
-  s.val[18].val = L.val[2].val >>> 42 % 2^8 ∧
-  s.val[19].val = (L.val[2].val >>> 50 ||| L.val[3].val <<< 1) % 2^8 ∧
+  s.val[13]!.val = L.val[2]!.val >>> 2 % 2^8 ∧
+  s.val[14]!.val = L.val[2]!.val >>> 10 % 2^8 ∧
+  s.val[15]!.val = L.val[2]!.val >>> 18 % 2^8 ∧
+  s.val[16]!.val = L.val[2]!.val >>> 26 % 2^8 ∧
+  s.val[17]!.val = L.val[2]!.val >>> 34 % 2^8 ∧
+  s.val[18]!.val = L.val[2]!.val >>> 42 % 2^8 ∧
+  s.val[19]!.val = (L.val[2]!.val >>> 50 ||| L.val[3]!.val <<< 1 % U64.size) % 2^8 ∧
   -- Limb 3 (bits 153-203) → bytes 20-25
-  s.val[20].val = L.val[3].val >>> 7 % 2^8 ∧
-  s.val[21].val = L.val[3].val >>> 15 % 2^8 ∧
-  s.val[22].val = L.val[3].val >>> 23 % 2^8 ∧
-  s.val[23].val = L.val[3].val >>> 31 % 2^8 ∧
-  s.val[24].val = L.val[3].val >>> 39 % 2^8 ∧
-  s.val[25].val = (L.val[3].val >>> 47 ||| L.val[4].val <<< 4) % 2^8 ∧
+  s.val[20]!.val = L.val[3]!.val >>> 7 % 2^8 ∧
+  s.val[21]!.val = L.val[3]!.val >>> 15 % 2^8 ∧
+  s.val[22]!.val = L.val[3]!.val >>> 23 % 2^8 ∧
+  s.val[23]!.val = L.val[3]!.val >>> 31 % 2^8 ∧
+  s.val[24]!.val = L.val[3]!.val >>> 39 % 2^8 ∧
+  s.val[25]!.val = (L.val[3]!.val >>> 47 ||| L.val[4]!.val <<< 4 % U64.size) % 2^8 ∧
   -- Limb 4 (bits 204-254) → bytes 26-31
-  s.val[26].val = L.val[4].val >>> 4 % 2^8 ∧
-  s.val[27].val = L.val[4].val >>> 12 % 2^8 ∧
-  s.val[28].val = L.val[4].val >>> 20 % 2^8 ∧
-  s.val[29].val = L.val[4].val >>> 28 % 2^8 ∧
-  s.val[30].val = L.val[4].val >>> 36 % 2^8 ∧
-  s.val[31].val = L.val[4].val >>> 44 % 2^8
+  s.val[26]!.val = L.val[4]!.val >>> 4 % 2^8 ∧
+  s.val[27]!.val = L.val[4]!.val >>> 12 % 2^8 ∧
+  s.val[28]!.val = L.val[4]!.val >>> 20 % 2^8 ∧
+  s.val[29]!.val = L.val[4]!.val >>> 28 % 2^8 ∧
+  s.val[30]!.val = L.val[4]!.val >>> 36 % 2^8 ∧
+  s.val[31]!.val = L.val[4]!.val >>> 44 % 2^8
+
+
+/-- Byte packing correctness: when all limbs < 2^51 and bytes match the packing formula,
+    the little-endian byte interpretation equals the radix-2^51 limb interpretation. -/
+theorem byte_packing_eq (L : Array U64 5#usize) (s : Array U8 32#usize)
+    (hL : ∀ i < 5, (L.val[i]! : U64).val < 2 ^ 51)
+    (hbytes : bytes_match_limbs L s) :
+    U8x32_as_Nat s = Field51_as_Nat L := by
+  unfold bytes_match_limbs at hbytes
+  obtain ⟨hs0, hs1, hs2, hs3, hs4, hs5, hs6, hs7, hs8, hs9, hs10, hs11, hs12,
+          hs13, hs14, hs15, hs16, hs17, hs18, hs19, hs20, hs21, hs22, hs23,
+          hs24, hs25, hs26, hs27, hs28, hs29, hs30, hs31⟩ := hbytes
+  have hL0 : (L.val[0]! : U64).val < 2 ^ 51 := hL 0 (by omega)
+  have hL1 : (L.val[1]! : U64).val < 2 ^ 51 := hL 1 (by omega)
+  have hL2 : (L.val[2]! : U64).val < 2 ^ 51 := hL 2 (by omega)
+  have hL3 : (L.val[3]! : U64).val < 2 ^ 51 := hL 3 (by omega)
+  have hL4 : (L.val[4]! : U64).val < 2 ^ 51 := hL 4 (by omega)
+  have hd6 := decompose_or_limbs_shift3 L.val[0]! L.val[1]! hL0
+  have hd12 := decompose_or_limbs_shift6 L.val[1]! L.val[2]! hL1
+  have hd19 := decompose_or_limbs_shift1 L.val[2]! L.val[3]! hL2
+  have hd25 := decompose_or_limbs_shift4 L.val[3]! L.val[4]! hL3
+  have hr0 := recompose_decomposed_limb L.val[0]! hL0
+  have hr1 := recompose_decomposed_limb_shift3 L.val[1]! hL1
+  have hr2 := recompose_decomposed_limb_shift6 L.val[2]! hL2
+  have hr3 := recompose_decomposed_limb_shift1 L.val[3]! hL3
+  have hr4 := recompose_decomposed_limb_shift4 L.val[4]! hL4
+  unfold U8x32_as_Nat Field51_as_Nat
+  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
+    Array.getElem!_Nat_eq, Nat.reduceMul,
+    hs0, hs1, hs2, hs3, hs4, hs5, hs6, hs7, hs8, hs9, hs10, hs11, hs12,
+    hs13, hs14, hs15, hs16, hs17, hs18, hs19, hs20, hs21, hs22, hs23,
+    hs24, hs25, hs26, hs27, hs28, hs29, hs30, hs31,
+    hd6, hd12, hd19, hd25]
+  linarith
 
 /-- AND with a mask whose value is 2^51-1 gives a value < 2^51. -/
 private lemma and_mask_lt_pow (x mask : U64) (hm : mask.val = 2 ^ 51 - 1) :
@@ -267,7 +298,13 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       have : (i13 : U64).val < (2^64 : ℕ) := by agrind
       rw [i14_post1, Nat.shiftRight_eq_div_pow]; agrind
     have h15 : (i15 : U64).val < (2^52 : ℕ) := by
-      simp only [i15_post, limbs_post, Array.set_val_eq] at *; simp_all
+      simp only [i15_post, limbs_post, Array.set_val_eq] at *;
+      simp_all only [Array.getElem!_Nat_eq,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
+        Nat.ofNat_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, Nat.one_lt_ofNat,
+        Nat.reduceLT, Nat.lt_add_one, Nat.reduceShiftLeft, U64.ofNat_bv, BitVec.reduceHShiftLeft,
+        List.length_set, List.getElem_set_self, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
+        one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self, ↓List.getElem!_set_ne]
     grind only [= U64.max_eq]
   let* ⟨ limbs1, limbs1_post ⟩ ← Array.update_spec
   let* ⟨ i17, i17_post ⟩ ← Array.index_usize_spec
@@ -310,7 +347,8 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       have : (i31 : U64).val < (2^64 : ℕ) := by agrind
       rw [i32_post1, Nat.shiftRight_eq_div_pow]; omega
     have h33 : (i33 : U64).val < (2^52 : ℕ) := by
-      simp only [i33_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, limbs_post, Array.set_val_eq] at *; simp_all
+      simp only [i33_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post,
+        limbs1_post, limbs_post, Array.set_val_eq] at *; simp_all
     grind only [= U64.max_eq]
   let* ⟨ limbs7, limbs7_post ⟩ ← Array.update_spec
   let* ⟨ i35, i35_post ⟩ ← Array.index_usize_spec
