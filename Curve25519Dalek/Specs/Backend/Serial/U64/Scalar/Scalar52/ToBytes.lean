@@ -484,7 +484,6 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     progress*
     -- subst_vars
     -- simp only [ofU8_cast_eq_ofU64_take] at *
-
     -- Byte-level BitList facts for limb 0 (bytes 0–5): each byte = 8-bit slice of self[0]
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5⟩ :
         ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop 0).take 8 ∧
@@ -526,7 +525,6 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       rw [List.take_append (i := 8)]
       simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
         List.take_take, List.take_append_of_le_length]
-
     -- Byte-level BitList facts for limb 1 (bytes 7–12)
     have ⟨hb7, hb8, hb9, hb10, hb11, hb12⟩ :
         ofU8 result[7]! = ((ofU64 (↑self : List U64)[1]!).drop 4).take 8 ∧
