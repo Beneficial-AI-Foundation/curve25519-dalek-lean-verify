@@ -352,6 +352,29 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     -- subst_vars
     -- simp only [ofU8_cast_eq_ofU64_take] at *
 
+    -- Byte-level BitList facts: each byte equals a slice of the corresponding limb
+    have hb0 : ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8 := by
+      subst_vars
+      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+      simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i1_post]
+      simp
+    have hb1 : ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8 := by
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i3_post]; simp [ofU64_length]
+    have hb2 : ofU8 result[2]! = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8 := by
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i5_post]; simp [ofU64_length]
+    have hb3 : ofU8 result[3]! = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8 := by
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i7_post]; simp [ofU64_length]
+    have hb4 : ofU8 result[4]! = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8 := by
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i9_post]; simp [ofU64_length]
+    have hb5 : ofU8 result[5]! = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8 := by
+      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+      rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]
+
     -- Limb-level BitList equivalences (one per row of the bit layout table)
 
     -- Limb 0: s[0]–s[5] and lower nibble of s[6]
@@ -359,9 +382,7 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
         ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++
         ofU8 result[3]! ++ ofU8 result[4]! ++ ofU8 result[5]! ++
         (ofU8 result[6]!).take 4 := by
-      subst_vars
-      simp
-
+      subst_vars; simp
       sorry
 
     -- Limb 1: upper nibble of s[6] and s[7]–s[12]
@@ -394,7 +415,12 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     -- Bridge: combine limb equivalences into the Nat-level equality
     have hlimb_bounds : ∀ i : Fin 5, self[i].val < 2 ^ 52 := by
       intro ⟨i, hi⟩
-      simpa [hi] using h i hi
+      have hls : self.val.length = 5 := self.property
+      show (self.val[i]'(by omega)).val < 2 ^ 52
+      have := h i hi
+      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+        List.getElem?_eq_getElem, Option.getD_some, hls, show i < 5 from hi] at this
+      exact this
     have : U8x32_as_Nat result = Scalar52_as_Nat self :=
       scalar52_eq_of_bitList_limbs self result hlimb_bounds
         (by have := Scalar52_top_limb_lt_of_canonical self h'; omega)
