@@ -58,7 +58,42 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
 attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
 
 
-theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
+-- Byte reconstruction for split limbs at each boundary.
+-- Boundary byte k uses (limb_lo >>> hi_shift ||| limb_hi <<< lo_shift).
+-- The 4 boundaries have lo_shifts: 3, 6, 1, 4.
+
+theorem recompose_decomposed_limb_shift3 (limb : U64) (h : limb.val < 2 ^ 51) :
+  limb.val <<< 3 % 2 ^ 8
+  + 2 ^ 8 * (limb.val >>> 5 % 2 ^ 8)
+  + 2 ^ 16 * (limb.val >>> 13 % 2 ^ 8)
+  + 2 ^ 24 * (limb.val >>> 21 % 2 ^ 8)
+  + 2 ^ 32 * (limb.val >>> 29 % 2 ^ 8)
+  + 2 ^ 40 * (limb.val >>> 37 % 2 ^ 8)
+  + 2 ^ 48 * (limb.val >>> 45 % 2 ^ 8) =
+  2 ^ 3 * limb.val := by bvify 64 at *; bv_decide
+
+theorem recompose_decomposed_limb_shift6 (limb : U64) (h : limb.val < 2 ^ 51) :
+  limb.val <<< 6 % 2 ^ 8
+  + 2 ^ 8 * (limb.val >>> 2 % 2 ^ 8)
+  + 2 ^ 16 * (limb.val >>> 10 % 2 ^ 8)
+  + 2 ^ 24 * (limb.val >>> 18 % 2 ^ 8)
+  + 2 ^ 32 * (limb.val >>> 26 % 2 ^ 8)
+  + 2 ^ 40 * (limb.val >>> 34 % 2 ^ 8)
+  + 2 ^ 48 * (limb.val >>> 42 % 2 ^ 8)
+  + 2 ^ 56 * (limb.val >>> 50 % 2 ^ 8) =
+  2 ^ 6 * limb.val := by bvify 64 at *; bv_decide
+
+theorem recompose_decomposed_limb_shift1 (limb : U64) (h : limb.val < 2 ^ 51) :
+  limb.val <<< 1 % 2 ^ 8
+  + 2 ^ 8 * (limb.val >>> 7 % 2 ^ 8)
+  + 2 ^ 16 * (limb.val >>> 15 % 2 ^ 8)
+  + 2 ^ 24 * (limb.val >>> 23 % 2 ^ 8)
+  + 2 ^ 32 * (limb.val >>> 31 % 2 ^ 8)
+  + 2 ^ 40 * (limb.val >>> 39 % 2 ^ 8)
+  + 2 ^ 48 * (limb.val >>> 47 % 2 ^ 8) =
+  2 ^ 1 * limb.val := by bvify 64 at *; bv_decide
+
+theorem recompose_decomposed_limb_shift4 (limb : U64) (h : limb.val < 2 ^ 51) :
   limb.val <<< 4 % 2 ^ 8
   + 2 ^ 8 * (limb.val >>> 4 % 2 ^ 8)
   + 2 ^ 16 * (limb.val >>> 12 % 2 ^ 8)
@@ -66,70 +101,91 @@ theorem recompose_decomposed_limb_split (limb : U64) (h : limb.val < 2 ^ 51) :
   + 2 ^ 32 * (limb.val >>> 28 % 2 ^ 8)
   + 2 ^ 40 * (limb.val >>> 36 % 2 ^ 8)
   + 2 ^ 48 * (limb.val >>> 44 % 2 ^ 8) =
-  2 ^ 4 * limb.val
-  := by
-  bvify 64 at *
-  bv_decide
+  2 ^ 4 * limb.val := by bvify 64 at *; bv_decide
 
-
--- This is specific to the problem below
-theorem decompose_or_limbs (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
-  ((limb0.val >>> 48 ||| limb1.val <<< 4 % U64.size) % 2 ^ 8) =
-  (limb0.val >>> 48 % 2 ^ 8) +
-  ((limb1.val <<< 4) % 2 ^ 8) := by
+-- OR decomposition at boundary bytes: the shifted halves occupy disjoint bit ranges.
+-- One lemma per boundary shift.
+theorem decompose_or_limbs_shift3 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
+  ((limb0.val >>> 48 ||| limb1.val <<< 3 % U64.size) % 2 ^ 8) =
+  (limb0.val >>> 48 % 2 ^ 8) + ((limb1.val <<< 3) % 2 ^ 8) := by
   bvify 64 at *
-  -- The idea is to do something similar to the proof above
+  have : BitVec.ofNat 64 (limb1.val <<< 3 % U64.size) = limb1.bv <<< 3 := by
+    natify; simp_scalar
+  rw [this]; bv_decide
+
+theorem decompose_or_limbs_shift6 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
+  ((limb0.val >>> 45 ||| limb1.val <<< 6 % U64.size) % 2 ^ 8) =
+  (limb0.val >>> 45 % 2 ^ 8) + ((limb1.val <<< 6) % 2 ^ 8) := by
+  bvify 64 at *
+  have : BitVec.ofNat 64 (limb1.val <<< 6 % U64.size) = limb1.bv <<< 6 := by
+    natify; simp_scalar
+  rw [this]; bv_decide
+
+theorem decompose_or_limbs_shift1 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
+  ((limb0.val >>> 50 ||| limb1.val <<< 1 % U64.size) % 2 ^ 8) =
+  (limb0.val >>> 50 % 2 ^ 8) + ((limb1.val <<< 1) % 2 ^ 8) := by
+  bvify 64 at *
+  have : BitVec.ofNat 64 (limb1.val <<< 1 % U64.size) = limb1.bv <<< 1 := by
+    natify; simp_scalar
+  rw [this]; bv_decide
+
+theorem decompose_or_limbs_shift4 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 51) :
+  ((limb0.val >>> 47 ||| limb1.val <<< 4 % U64.size) % 2 ^ 8) =
+  (limb0.val >>> 47 % 2 ^ 8) + ((limb1.val <<< 4) % 2 ^ 8) := by
+  bvify 64 at *
   have : BitVec.ofNat 64 (limb1.val <<< 4 % U64.size) = limb1.bv <<< 4 := by
-    natify
-    simp_scalar
-  rw [this]
-  bv_decide
+    natify; simp_scalar
+  rw [this]; bv_decide
 
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 2000000 in -- heavy progress*
-/-- Byte-by-byte specification for `to_bytes` -/
-theorem to_bytes_spec' (limbs : Array U64 5#usize) :
-    to_bytes limbs ⦃ result =>
-    ∀ (i : Fin 32), result.val[i.val].val = match i.val with
-      | 0  => limbs.val[0].val >>> 0 % 2^8
-      | 1  => limbs.val[0].val >>> 8 % 2^8
-      | 2  => limbs.val[0].val >>> 16 % 2^8
-      | 3  => limbs.val[0].val >>> 24 % 2^8
-      | 4  => limbs.val[0].val >>> 32 % 2^8
-      | 5  => limbs.val[0].val >>> 40 % 2^8
-      | 6  => (limbs.val[0].val >>> 48 ||| limbs.val[1].val <<< 4) % 2^8
-      | 7  => limbs.val[1].val >>> 4 % 2^8
-      | 8  => limbs.val[1].val >>> 12 % 2^8
-      | 9  => limbs.val[1].val >>> 20 % 2^8
-      | 10 => limbs.val[1].val >>> 28 % 2^8
-      | 11 => limbs.val[1].val >>> 36 % 2^8
-      | 12 => limbs.val[1].val >>> 44 % 2^8
-      | 13 => limbs.val[2].val >>> 0 % 2^8
-      | 14 => limbs.val[2].val >>> 8 % 2^8
-      | 15 => limbs.val[2].val >>> 16 % 2^8
-      | 16 => limbs.val[2].val >>> 24 % 2^8
-      | 17 => limbs.val[2].val >>> 32 % 2^8
-      | 18 => limbs.val[2].val >>> 40 % 2^8
-      | 19 => (limbs.val[2].val >>> 48 ||| limbs.val[3].val <<< 4) % 2^8
-      | 20 => limbs.val[3].val >>> 4 % 2^8
-      | 21 => limbs.val[3].val >>> 12 % 2^8
-      | 22 => limbs.val[3].val >>> 20 % 2^8
-      | 23 => limbs.val[3].val >>> 28 % 2^8
-      | 24 => limbs.val[3].val >>> 36 % 2^8
-      | 25 => limbs.val[3].val >>> 44 % 2^8
-      | 26 => limbs.val[4].val >>> 0 % 2^8
-      | 27 => limbs.val[4].val >>> 8 % 2^8
-      | 28 => limbs.val[4].val >>> 16 % 2^8
-      | 29 => limbs.val[4].val >>> 24 % 2^8
-      | 30 => limbs.val[4].val >>> 32 % 2^8
-      | 31 => limbs.val[4].val >>> 40 % 2^8
-      | _  => 0 ⦄ := by
-  unfold to_bytes
-  simp only [progress_simps]
-  progress*?
-  sorry
+/-- Byte-by-byte packing formula for 5 × 51-bit limbs into 32 LE bytes.
+    Matches the Rust source (field.rs:419-452) and the Lean extraction.
+    The 4 boundary bytes (6, 12, 19, 25) combine bits from adjacent limbs.
+
+    NOTE: This describes the byte packing of CANONICALIZED limbs (each < 2^51).
+    The full `to_bytes` function first reduces and canonicalizes before packing. -/
+def bytes_match_limbs (L : Array U64 5#usize) (s : Array U8 32#usize) : Prop :=
+  -- Limb 0 (bits 0-50) → bytes 0-6
+  s.val[0].val  = L.val[0].val % 2^8 ∧
+  s.val[1].val  = L.val[0].val >>> 8 % 2^8 ∧
+  s.val[2].val  = L.val[0].val >>> 16 % 2^8 ∧
+  s.val[3].val  = L.val[0].val >>> 24 % 2^8 ∧
+  s.val[4].val  = L.val[0].val >>> 32 % 2^8 ∧
+  s.val[5].val  = L.val[0].val >>> 40 % 2^8 ∧
+  s.val[6].val  = (L.val[0].val >>> 48 ||| L.val[1].val <<< 3) % 2^8 ∧
+  -- Limb 1 (bits 51-101) → bytes 7-12
+  s.val[7].val  = L.val[1].val >>> 5 % 2^8 ∧
+  s.val[8].val  = L.val[1].val >>> 13 % 2^8 ∧
+  s.val[9].val  = L.val[1].val >>> 21 % 2^8 ∧
+  s.val[10].val = L.val[1].val >>> 29 % 2^8 ∧
+  s.val[11].val = L.val[1].val >>> 37 % 2^8 ∧
+  s.val[12].val = (L.val[1].val >>> 45 ||| L.val[2].val <<< 6) % 2^8 ∧
+  -- Limb 2 (bits 102-152) → bytes 13-19
+  s.val[13].val = L.val[2].val >>> 2 % 2^8 ∧
+  s.val[14].val = L.val[2].val >>> 10 % 2^8 ∧
+  s.val[15].val = L.val[2].val >>> 18 % 2^8 ∧
+  s.val[16].val = L.val[2].val >>> 26 % 2^8 ∧
+  s.val[17].val = L.val[2].val >>> 34 % 2^8 ∧
+  s.val[18].val = L.val[2].val >>> 42 % 2^8 ∧
+  s.val[19].val = (L.val[2].val >>> 50 ||| L.val[3].val <<< 1) % 2^8 ∧
+  -- Limb 3 (bits 153-203) → bytes 20-25
+  s.val[20].val = L.val[3].val >>> 7 % 2^8 ∧
+  s.val[21].val = L.val[3].val >>> 15 % 2^8 ∧
+  s.val[22].val = L.val[3].val >>> 23 % 2^8 ∧
+  s.val[23].val = L.val[3].val >>> 31 % 2^8 ∧
+  s.val[24].val = L.val[3].val >>> 39 % 2^8 ∧
+  s.val[25].val = (L.val[3].val >>> 47 ||| L.val[4].val <<< 4) % 2^8 ∧
+  -- Limb 4 (bits 204-254) → bytes 26-31
+  s.val[26].val = L.val[4].val >>> 4 % 2^8 ∧
+  s.val[27].val = L.val[4].val >>> 12 % 2^8 ∧
+  s.val[28].val = L.val[4].val >>> 20 % 2^8 ∧
+  s.val[29].val = L.val[4].val >>> 28 % 2^8 ∧
+  s.val[30].val = L.val[4].val >>> 36 % 2^8 ∧
+  s.val[31].val = L.val[4].val >>> 44 % 2^8
+
+/-! ## Spec for `to_bytes` -/
 
 set_option maxHeartbeats 500000 in -- heavy progress*
 /-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
@@ -334,45 +390,5 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ ⟩ ← massert_spec
   · sorry
   sorry
-
-  -- progress*
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   expand fe_post_1 with 5; scalar_tac
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   sorry
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   sorry
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   sorry
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   sorry
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   sorry
-  --   -- END TASK
-  -- · -- BEGIN TASK
-  --   refine ⟨?_, ?_⟩
-  --   · sorry
-  --   · sorry
-  --   -- END TASK
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

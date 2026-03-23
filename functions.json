@@ -3219,10 +3219,12 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)\n    (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)\n    (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :\n    sub_assign self _rhs ⦃ (result : backend.serial.u64.field.FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat result + Field51_as_Nat _rhs) % p = Field51_as_Nat self % p ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3234,7 +3236,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub"]},
