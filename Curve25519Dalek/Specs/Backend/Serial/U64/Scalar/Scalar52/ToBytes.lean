@@ -352,25 +352,21 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     -- subst_vars
     -- simp only [ofU8_cast_eq_ofU64_take] at *
 
-    -- Byte-level BitList facts: each byte equals a slice of the corresponding limb
-    have hb0 : ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8 := by
-      subst_vars
-      simp_lists [ofU8_cast_eq_ofU64_take, drop_zero, replicate_zero, append_nil, *]
-    have hb1 : ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8 := by
+    -- Byte-level BitList facts for limb 0 (bytes 0–5): each byte = 8-bit slice of self[0]
+    have ⟨hb0, hb1, hb2, hb3, hb4, hb5⟩ :
+        ofU8 result[0]! = ((ofU64 (↑self : List U64)[0]!).drop  0).take 8 ∧
+        ofU8 result[1]! = ((ofU64 (↑self : List U64)[0]!).drop  8).take 8 ∧
+        ofU8 result[2]! = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8 ∧
+        ofU8 result[3]! = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8 ∧
+        ofU8 result[4]! = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8 ∧
+        ofU8 result[5]! = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8 := by
       subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i3_post]; simp [ofU64_length]
-    have hb2 : ofU8 result[2]! = ((ofU64 (↑self : List U64)[0]!).drop 16).take 8 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i5_post]; simp [ofU64_length]
-    have hb3 : ofU8 result[3]! = ((ofU64 (↑self : List U64)[0]!).drop 24).take 8 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i7_post]; simp [ofU64_length]
-    have hb4 : ofU8 result[4]! = ((ofU64 (↑self : List U64)[0]!).drop 32).take 8 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i9_post]; simp [ofU64_length]
-    have hb5 : ofU8 result[5]! = ((ofU64 (↑self : List U64)[0]!).drop 40).take 8 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]
+      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i1_post]; simp,
+             by rw [ofU8_cast_eq_ofU64_take, i3_post]; simp [ofU64_length],
+             by rw [ofU8_cast_eq_ofU64_take, i5_post]; simp [ofU64_length],
+             by rw [ofU8_cast_eq_ofU64_take, i7_post]; simp [ofU64_length],
+             by rw [ofU8_cast_eq_ofU64_take, i9_post]; simp [ofU64_length],
+             by rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]⟩
 
     -- Limb-level BitList equivalences (one per row of the bit layout table)
 
