@@ -34,9 +34,12 @@ natural language specs:
 - The constant, when converted to a natural number, equals 1
 -/
 @[progress]
-theorem ONE_spec : ONE ⦃ result => Field51_as_Nat result = 1 ⦄ := by
+theorem ONE_spec :
+    ONE ⦃ result =>
+    Field51_as_Nat result = 1 ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

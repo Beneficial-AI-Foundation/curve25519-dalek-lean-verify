@@ -373,6 +373,7 @@ theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid)
       16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
 
     Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+/-
 @[mk_iff]
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^53. -/
@@ -393,10 +394,9 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     let Z := pn.Z.toField; let T2d := pn.T2d.toField
     2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
-
-
+-/
 @[mk_iff]
-structure ProjectiveNielsPoint.IsValid' (pn : ProjectiveNielsPoint) : Prop where
+structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
   /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 52 2 ^ 53 2 ^ 52. -/
   Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 54
   Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 52
@@ -419,8 +419,8 @@ structure ProjectiveNielsPoint.IsValid' (pn : ProjectiveNielsPoint) : Prop where
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
   decidable_of_iff _ (isValid_iff pn).symm
 
-instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) : Decidable pn.IsValid' :=
-  decidable_of_iff _ (isValid'_iff pn).symm
+--instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) : Decidable pn.IsValid' :=
+--  decidable_of_iff _ (isValid'_iff pn).symm
 
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
@@ -448,8 +448,10 @@ noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h :
 
 
 
-/-- Convert a ProjectiveNielsPoint to the affine point it represents.
+/- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+
+/-
 noncomputable def ProjectiveNielsPoint.toPointI' (pn : ProjectiveNielsPoint) (h : pn.IsValid') :
     Point Ed25519 :=
   let YpX := pn.Y_plus_X.toField
@@ -470,14 +472,15 @@ noncomputable def ProjectiveNielsPoint.toPointI' (pn : ProjectiveNielsPoint) (h 
       ring_nf
       ring_nf at hcurve
       linear_combination hcurve }
+-/
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
     Returns 0 if the point is not valid. -/
 noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
   if h : pn.IsValid then pn.toPoint' h else 0
 
-noncomputable def ProjectiveNielsPoint.toPointI (pn : ProjectiveNielsPoint) : Point Ed25519 :=
-  if h : pn.IsValid' then pn.toPointI' h else 0
+--noncomputable def ProjectiveNielsPoint.toPointI (pn : ProjectiveNielsPoint) : Point Ed25519 :=
+--  if h : pn.IsValid' then pn.toPointI' h else 0
 
 /-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
 theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h : pn.IsValid) :
@@ -488,7 +491,8 @@ theorem ProjectiveNielsPoint.toPoint_of_isValid {pn : ProjectiveNielsPoint} (h :
   simp only [toPoint']
   trivial
 
-/-- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+/- Unfolding lemma for ProjectiveNielsPoint.toPoint. -/
+/-
 theorem ProjectiveNielsPoint.toPoint_of_isValid' {pn : ProjectiveNielsPoint} (h : pn.IsValid') :
     (pn.toPointI).x = (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField) ∧
     (pn.toPointI).y = (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField) := by
@@ -496,6 +500,7 @@ theorem ProjectiveNielsPoint.toPoint_of_isValid' {pn : ProjectiveNielsPoint} (h 
   rw [dif_pos h]
   simp only [toPointI']
   trivial
+-/
 
 /-! ## Coercions -/
 

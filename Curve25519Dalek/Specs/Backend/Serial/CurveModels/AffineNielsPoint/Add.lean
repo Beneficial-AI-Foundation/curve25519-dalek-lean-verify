@@ -60,10 +60,6 @@ natural language specs:
   - T' ≡ ( 2·Z − T·N.xy2d ) (mod p)
 -/
 
-set_option maxHeartbeats 1000000 in
--- simp_all is heavy
-
-
 @[progress]
 theorem add_spec
   (self : edwards.EdwardsPoint)
@@ -93,78 +89,65 @@ Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
 (T' + (T * XY2D)) % p = (2 * Z) % p ⦄
 := by
   unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add
-  progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
-  progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  progress  as ⟨ PP , h_PP , PP_bounds⟩
-  progress  as ⟨ MM, h_MM, MM_bounds⟩
-  progress  as ⟨ Txy2d, h_Txy2d, Txy2d_bounds⟩
-  progress as ⟨Z2, h_Z2,  Z2_bounds⟩
-  progress as ⟨PPMM, h_PPMM,  PPMM_bounds⟩
-  progress as ⟨fe, h_fe,  fe_bounds⟩
-  have hzz: ∀ i < 5, Z2[i]!.val < 2 ^ 54 := by simp_all
-  obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := CompletedPoint.add_spec' hzz  Txy2d_bounds
+  simp only [progress_simps]
+  let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ PP, PP_post1, PP_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ MM, MM_post1, MM_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ Txy2d, Txy2d_post1, Txy2d_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ Z2, Z2_post1, Z2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  obtain ⟨fe2, h_fe2_ok, fe2_post1, fe2_post2⟩ := CompletedPoint.add_spec' Z2_post2 Txy2d_post2
   simp only [h_fe2_ok, bind_tc_ok]
-  progress as ⟨fe3, h_fe3, fe3_bounds⟩
+  let* ⟨ fe3, fe3_post1, fe3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
   constructor
-  · rw[← Nat.ModEq]
-    rw[← Nat.ModEq] at PPMM_bounds
-    have :  Field51_as_Nat self.Y + Field51_as_Nat self.X =Field51_as_Nat Y_plus_X := by
-      simp[Field51_as_Nat, Finset.sum_range_succ ]
-      simp_all
-      scalar_tac
-    rw[this]
-    have := Nat.ModEq.mul_right (Field51_as_Nat other.y_minus_x) h_Y_minus_X
-    have := Nat.ModEq.symm (Nat.ModEq.add_left (Field51_as_Nat PPMM) this)
-    rw[add_mul, ← add_assoc] at this
+  · rw [← Nat.ModEq]
+    rw [← Nat.ModEq] at fe_post2
+    rw [← pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X Y_plus_X_post1]
+    have := Nat.ModEq.mul_right (Field51_as_Nat other.y_minus_x) Y_minus_X_post2
+    have := Nat.ModEq.symm (Nat.ModEq.add_left (Field51_as_Nat fe) this)
+    rw [add_mul, ← add_assoc] at this
     apply Nat.ModEq.trans this
     apply Nat.ModEq.add_right
-    apply  Nat.ModEq.symm
-    apply Nat.ModEq.trans (Nat.ModEq.symm h_PP)
-    apply Nat.ModEq.trans (Nat.ModEq.symm PPMM_bounds)
+    apply Nat.ModEq.symm
+    apply Nat.ModEq.trans (Nat.ModEq.symm PP_post1)
+    apply Nat.ModEq.trans (Nat.ModEq.symm fe_post2)
     apply Nat.ModEq.add_left
-    exact h_MM
+    exact MM_post1
   constructor
-  · rw[← Nat.ModEq]
-    have :  Field51_as_Nat fe = Field51_as_Nat PP + Field51_as_Nat MM := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this]
-    have := Nat.ModEq.add h_PP h_MM
+  · rw [← Nat.ModEq]
+    rw [pointwise_add_Field51_as_Nat PP MM fe1 fe1_post1]
+    have := Nat.ModEq.add PP_post1 MM_post1
     have := Nat.ModEq.add_right (Field51_as_Nat self.X * Field51_as_Nat other.y_minus_x) this
     apply Nat.ModEq.trans this
-    have :  Field51_as_Nat self.Y + Field51_as_Nat self.X =Field51_as_Nat Y_plus_X := by
-      simp[Field51_as_Nat, Finset.sum_range_succ ]
-      simp_all
-      scalar_tac
-    rw[this, add_assoc]
+    rw [← pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X Y_plus_X_post1, add_assoc]
     apply Nat.ModEq.add_left
-    rw[← add_mul]
+    rw [← add_mul]
     apply Nat.ModEq.mul_right
-    rw[← Nat.ModEq] at h_Y_minus_X
-    exact h_Y_minus_X
-  constructor
-  · rw[← Nat.ModEq]
-    have :  Field51_as_Nat fe2 = Field51_as_Nat Z2 + Field51_as_Nat Txy2d := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this]
-    have :  Field51_as_Nat Z2 = Field51_as_Nat self.Z + Field51_as_Nat self.Z := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    simp[this, (by scalar_tac :∀ a, a + a = 2 * a)]
-    apply Nat.ModEq.add_left _ h_Txy2d
-  · rw[← Nat.ModEq]
-    rw[← Nat.ModEq] at fe3_bounds
-    have :=  Nat.ModEq.add_left  (Field51_as_Nat fe3) h_Txy2d
-    have := Nat.ModEq.trans (Nat.ModEq.symm this) fe3_bounds
+    rw [← Nat.ModEq] at Y_minus_X_post2
+    exact Y_minus_X_post2
+  refine ⟨?_, ?_⟩
+  · rw [← Nat.ModEq]
+    rw [pointwise_add_Field51_as_Nat Z2 Txy2d fe2 fe2_post1,
+       pointwise_add_Field51_as_Nat self.Z self.Z Z2 Z2_post1]
+    simp only [(by omega : ∀ a, a + a = 2 * a)]
+    apply Nat.ModEq.add_left _ Txy2d_post1
+  · rw [← Nat.ModEq]
+    rw [← Nat.ModEq] at fe3_post2
+    have := Nat.ModEq.add_left (Field51_as_Nat fe3) Txy2d_post1
+    have := Nat.ModEq.trans (Nat.ModEq.symm this) fe3_post2
     apply Nat.ModEq.trans this
-    have :  Field51_as_Nat Z2 = Field51_as_Nat self.Z + Field51_as_Nat self.Z := by
-      simp[Field51_as_Nat, Finset.sum_range_succ]
-      simp_all
-      scalar_tac
-    rw[this, (by scalar_tac :∀ a, a + a = 2 * a)]
+    rw [pointwise_add_Field51_as_Nat self.Z self.Z Z2 Z2_post1,
+       (by omega : ∀ a, a + a = 2 * a)]
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint

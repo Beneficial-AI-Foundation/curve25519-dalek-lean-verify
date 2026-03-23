@@ -69,23 +69,15 @@ theorem eq_spec
       self.y_minus_x.to_bytes = other.y_minus_x.to_bytes ∧
       self.xy2d.to_bytes = other.xy2d.to_bytes) ⦄ := by
   unfold eq
-  progress as ⟨b, b_post⟩
-  split
-  · progress as ⟨b1, b1_post⟩
-    split
-    · progress as ⟨res, res_post⟩
-      constructor
-      · intro h; exact ⟨b_post.mp ‹_›, b1_post.mp ‹_›, res_post.mp h⟩
-      · intro ⟨_, _, h3⟩; exact res_post.mpr h3
-    · rename_i hb1
-      simp only [spec_ok]
-      constructor
-      · intro h; exact absurd h Bool.false_ne_true
-      · intro ⟨_, h2, _⟩; exact absurd (b1_post.mpr h2) (by omega)
-  · rename_i hb
-    simp only [spec_ok]
-    constructor
-    · intro h; exact absurd h Bool.false_ne_true
-    · intro ⟨h1, _⟩; exact absurd (b_post.mpr h1) (by omega)
+  let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+  spec_split
+  · let* ⟨ b1, b1_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+    spec_split
+    · let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
+      agrind
+    · simp only [progress_simps]
+      agrind
+  · simp only [progress_simps]
+    agrind
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint

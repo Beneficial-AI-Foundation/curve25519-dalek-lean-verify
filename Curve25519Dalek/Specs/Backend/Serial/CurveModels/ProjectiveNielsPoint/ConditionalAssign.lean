@@ -59,7 +59,6 @@ the output ProjectiveNielsPoint computed by `conditional_assign self other choic
 - Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self
 - The operation is performed in constant time for all field elements
 -/
-
 theorem conditional_assign_spec
     (self other : backend.serial.curve_models.ProjectiveNielsPoint)
     (choice : subtle.Choice) :

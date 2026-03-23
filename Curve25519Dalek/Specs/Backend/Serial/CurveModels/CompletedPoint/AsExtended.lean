@@ -81,14 +81,26 @@ theorem as_extended_spec (q : CompletedPoint)
     e.toPoint = q.toPoint ⦄ := by
   unfold as_extended
   have := h_q_Valid.X_valid
-  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
   have := h_q_Valid.Y_valid
-  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
   have := h_q_Valid.Z_valid
-  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
   have := h_q_Valid.T_valid
-  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
-  progress*
+  simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
+  simp only [progress_simps]
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe2, fe2_post1, fe2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ fe3, fe3_post1, fe3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   rw [← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
   simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some,
     Array.getElem!_Nat_eq, getElem!_pos, Nat.reducePow, implies_true, true_and]

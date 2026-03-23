@@ -164,6 +164,13 @@ theorem Choice.eq_zero_of_val (c : subtle.Choice) (h : c.val = 0#u8) : c = Choic
 theorem Choice.eq_one_of_val (c : subtle.Choice) (h : c.val = 1#u8) : c = Choice.one := by
   cases c; simpa [Choice.one]
 
+/-- A `subtle.Choice` has `.val = 1` iff it equals `Choice.one`. -/
+lemma Choice.val_eq_one_iff (c : subtle.Choice) :
+    c.val = 1#u8 ↔ c = Choice.one := by
+  cases c with
+  | mk val valid =>
+    simp [Choice.one]
+
 /- [subtle::{subtle::Choice}::unwrap_u8]:
    Name pattern: [subtle::{subtle::Choice}::unwrap_u8]
    Returns 0u8 if Choice.zero (0), 1u8 if Choice.one (1) -/

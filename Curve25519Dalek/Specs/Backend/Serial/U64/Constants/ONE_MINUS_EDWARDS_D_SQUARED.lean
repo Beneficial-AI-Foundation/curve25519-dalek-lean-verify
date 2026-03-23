@@ -43,9 +43,10 @@ natural language specs:
 @[progress]
 theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :
     ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>
-      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ⦄ := by
+    Field51_as_Nat result = (1 + p - (d^2 % p)) % p ∧
+    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
   unfold ONE_MINUS_EDWARDS_D_SQUARED field.FieldElement51.from_limbs
   simp only [spec_ok]
-  decide
+  exact ⟨by decide, fun i hi => by interval_cases i <;> decide⟩
 
 end curve25519_dalek.backend.serial.u64.constants

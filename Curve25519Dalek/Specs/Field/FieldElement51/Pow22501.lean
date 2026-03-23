@@ -5,7 +5,6 @@ Authors: Markus Dablander, Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -16,329 +15,100 @@ Specification and proof for `FieldElement51::pow22501`.
 This function computes (r^(2^250-1), r^11) for a field element r in 𝔽_p where p = 2^255 - 19.
 
 **Source**: curve25519-dalek/src/field.rs
-
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+  (mul_spec)
 namespace curve25519_dalek.field.FieldElement51
 
 set_option exponentiation.threshold 100000
-/-
-Natural language description:
 
-    • Computes a pair of powers: (r^(2^250-1), r^11) for a field element r in 𝔽_p where p = 2^255 - 19
-    • The field element is represented in radix 2^51 form with five u64 limbs
-    • This is a helper function used in computing field inversions and other exponentiations
+/-! ### Helper lemmas for exponent chain reasoning
 
-Natural language specs:
+These compose `Nat.ModEq` steps for square, multiply, and power-of-two chains.
+Used here and re-used by `PowP58` and `Invert` which import this file. -/
 
-    • The function succeeds (no panic)
-    • For any field element r, the result (r1, r2) satisfies:
-      - Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)
-      - Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)
--/
+lemma chain_sq {a r b e m : ℕ}
+    (ha : a ≡ r ^ e [MOD m]) (hb : b ≡ a ^ 2 [MOD m]) :
+    b ≡ r ^ (2 * e) [MOD m] :=
+  hb.trans ((ha.pow 2).trans (by rw [← pow_mul, mul_comm]))
+
+lemma chain_mul {r a b c ea eb m : ℕ}
+    (ha : a ≡ r ^ ea [MOD m]) (hb : b ≡ r ^ eb [MOD m]) (hc : c ≡ a * b [MOD m]) :
+    c ≡ r ^ (ea + eb) [MOD m] :=
+  hc.trans ((ha.mul hb).trans (by rw [← pow_add]))
+
+lemma chain_pow2k {r a b e k m : ℕ}
+    (ha : a ≡ r ^ e [MOD m]) (hb : b ≡ a ^ (2 ^ k) [MOD m]) :
+    b ≡ r ^ (e * 2 ^ k) [MOD m] :=
+  hb.trans ((ha.pow (2 ^ k)).trans (by rw [← pow_mul]))
 
 /-- **Spec and proof concerning `field.FieldElement51.pow22501`**:
 - No panic (always returns (r1, r2) successfully)
 - Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)
   Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)
 -/
-@[progress, externally_verified]
--- needs updating for WP spec form + timeout issues
-theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51) (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
+@[progress]
+theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)
+    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     pow22501 r ⦃ result =>
     let r1 := result.1
     let r2 := result.2
     Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧
     Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧
     (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧
-    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄
-    := by
-    unfold pow22501
-    sorry
-/- OLD PROOF (needs updating for WP spec form + timeout issues)
-    unfold pow22501
-    progress*
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t0_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (fe_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t1_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t0_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t2_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t3_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t2_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t4_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t5_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t6_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t5_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t7_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t8_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t7_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t9_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t10_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t9_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t11_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t12_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t7_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t13_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t14_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t13_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t15_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t16_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t15_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t17_post_2 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t18_post_1 i hi)
-      simp
-      --- END TASK
-    · -- BEGIN TASK
-      intro i hi
-      apply lt_trans (t13_post_2 i hi)
-      simp
-      --- END TASK
-    use t19
-    use t3
-    simp
-    constructor
-    · -- BEGIN TASK
-      simp_all
-      rw[← Nat.ModEq]
-      apply Nat.ModEq.trans t19_post_1
-      have := Nat.ModEq.mul_right (Field51_as_Nat t13) t18_post_2
-      apply Nat.ModEq.trans this
-      have one:= pow_one (Field51_as_Nat t15)
-      have ht151:= pow_add (Field51_as_Nat t15) 1267650600228229401496703205376 1
-      rw[one] at ht151
-      have ht150:= Nat.ModEq.mul_right (Field51_as_Nat t15) t16_post_2
-      rw[← ht151] at ht150
-      have ht1715:= Nat.ModEq.trans t17_post_1 ht150
-      have ht1715p:= Nat.ModEq.pow 1125899906842624 ht1715
-      rw[← pow_mul] at ht1715p
-      have one13:= pow_one (Field51_as_Nat t13)
-      have ht131:= pow_add (Field51_as_Nat t13) 1125899906842624 1
-      rw[one13] at ht131
-      have ht130:= Nat.ModEq.mul_right (Field51_as_Nat t13) t14_post_2
-      rw[← ht131] at ht130
-      have ht1513:= Nat.ModEq.trans t15_post_1 ht130
-      have ht1513p:= Nat.ModEq.pow ((1267650600228229401496703205376 + 1) * 1125899906842624) ht1513
-      have ht1713:= Nat.ModEq.trans ht1715p ht1513p
-      have := Nat.ModEq.mul_right (Field51_as_Nat t13) ht1713
-      apply Nat.ModEq.trans this
-      rw[← pow_mul]
-      have := pow_add (Field51_as_Nat t13) ((1125899906842624 + 1) * ((1267650600228229401496703205376 + 1) *
-      1125899906842624)) 1
-      rw[one13] at this
-      rw[← this]
-      have one7:= pow_one (Field51_as_Nat t7)
-      have ht91:= pow_add (Field51_as_Nat t7) 1024 1
-      rw[one7] at ht91
-      have ht90:= Nat.ModEq.mul_right (Field51_as_Nat t7) t8_post_2
-      rw[← ht91] at ht90
-      have ht97:= Nat.ModEq.trans t9_post_1 ht90
-      have ht97p:= Nat.ModEq.pow 1048576 ht97
-      have ht107:= Nat.ModEq.trans t10_post_2 ht97p
-      have ht110:= Nat.ModEq.mul ht107 ht97
-      have ht117:= Nat.ModEq.trans  t11_post_1 ht110
-      have ht11p:= Nat.ModEq.pow 1024 ht117
-      have ht127:= Nat.ModEq.trans t12_post_2 ht11p
-      rw[← pow_mul, ← pow_add, ← pow_mul] at ht127
-      have ht1270:= Nat.ModEq.mul_right (Field51_as_Nat t7) ht127
-      have ht127p:= pow_add (Field51_as_Nat t7) ((((1024 + 1) * 1048576 + (1024 + 1)) * 1024)) 1
-      rw[one7] at ht127p
-      rw[← ht127p] at ht1270
-      have ht137:= Nat.ModEq.trans t13_post_1 ht1270
-      have one5:= pow_one (Field51_as_Nat t5)
-      have ht51:= pow_add (Field51_as_Nat t5) 32 1
-      rw[one5] at ht51
-      have ht70:= Nat.ModEq.mul_right (Field51_as_Nat t5) t6_post_2
-      rw[← ht51] at ht70
-      have ht75:= Nat.ModEq.trans t7_post_1 ht70
-      have ht3p:= Nat.ModEq.pow 2 t3_post_1
-      rw[mul_pow] at ht3p
-      have ht43:= Nat.ModEq.trans t4_post_1 ht3p
-      have ht520:= Nat.ModEq.mul_left (Field51_as_Nat t2) ht43
-      have ht52:= Nat.ModEq.trans t5_post_1 ht520
-      rw[← mul_assoc, mul_comm, ← mul_assoc] at ht52
-      have one2:= pow_one (Field51_as_Nat t2)
-      have ht21:= pow_add (Field51_as_Nat t2) 2 1
-      rw[one2] at ht21
-      rw[← ht21] at ht52
-      have hfep:= Nat.ModEq.pow 2 fe_post_1
-      have hfep1:= Nat.ModEq.trans t1_post_1 hfep
-      have ht20:= Nat.ModEq.mul_left (Field51_as_Nat r) hfep1
-      have ht2fep1:= Nat.ModEq.trans t2_post_1 ht20
-      rw[← pow_mul] at  ht2fep1
-      have hr:= Nat.ModEq.pow (2*2) t0_post_1
-      have ht200:= Nat.ModEq.mul_left (Field51_as_Nat r) hr
-      have ht201:= Nat.ModEq.trans ht2fep1 ht200
-      clear ht200 hr ht2fep1 ht20 hfep1 hfep ht21
-      rw[← pow_mul] at ht201
-      have oner:= pow_one (Field51_as_Nat r)
-      have ht202:= pow_add (Field51_as_Nat r) 1 (2 * (2 * 2))
-      rw[oner] at ht202
-      rw[← ht202] at ht201
-      have ht203:= Nat.ModEq.pow (2+1) ht201
-      rw[← pow_mul] at ht203
-      have ht0r:= Nat.ModEq.pow 2 t0_post_1
-      clear ht201 ht202
-      have := Nat.ModEq.mul ht203 ht0r
-      have ht50:= Nat.ModEq.trans ht52 this
-      rw[← pow_mul,← pow_add] at ht50
-      clear this ht0r ht203 one2 ht52 ht520 ht43 ht3p
-      have ht700:= Nat.ModEq.pow (32 + 1) ht50
-      have ht7r:= Nat.ModEq.trans ht75 ht700
-      clear ht700 ht50 ht75 ht70 ht51 one5
-      rw[← pow_mul] at ht7r
-      have ht130:= Nat.ModEq.pow ((((1024 + 1) * 1048576 + (1024 + 1)) * 1024 + 1)) ht7r
-      have ht13r:= Nat.ModEq.trans ht137 ht130
-      rw[← pow_mul] at ht13r
-      have ht13rp:= Nat.ModEq.pow ((1125899906842624 + 1) * ((1267650600228229401496703205376 + 1) * 1125899906842624) + 1) ht13r
-      apply Nat.ModEq.trans ht13rp
-      simp[← pow_mul]
-      apply Nat.ModEq.rfl
-      --- END TASK
-    constructor
-    · -- BEGIN TASK
-      rw[← Nat.ModEq]
-      apply Nat.ModEq.trans t3_post_1
-      have := (Nat.ModEq.mul_left (Field51_as_Nat t0) t2_post_1 )
-      apply Nat.ModEq.trans this
-      rw[mul_comm, mul_assoc]
-      have fep:= Nat.ModEq.pow 2 fe_post_1
-      have :=Nat.ModEq.trans t1_post_1 fep
-      have := Nat.ModEq.mul_right (Field51_as_Nat t0) this
-      rw[← pow_mul] at this
-      have one:= pow_one (Field51_as_Nat t0)
-      have ht00:= pow_add (Field51_as_Nat t0) (2*2) 1
-      rw[one] at ht00
-      rw[← ht00] at this
-      have ht0p:= Nat.ModEq.pow (2*2+1) t0_post_1
-      have :=Nat.ModEq.trans this ht0p
-      have := Nat.ModEq.mul_left (Field51_as_Nat r) this
-      apply Nat.ModEq.trans this
-      rw[← pow_mul]
-      have one:= pow_one (Field51_as_Nat r)
-      have := pow_add (Field51_as_Nat r)  1 (2 * (2 * 2 + 1))
-      rw[one] at this
-      rw[← this]
-      --- END TASK
-    constructor
-    · -- BEGIN TASK
-      intro i hi
-      simp_all
-      --- END TASK
-    ·  -- BEGIN TASK
-      intro i hi
-      simp_all
-      --- END TASK
-    -/
+    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by
+  unfold pow22501
+  -- Step through the 21 field operations with explicit spec theorems.
+  -- Bounds preconditions are auto-solved by progress.
+  progress with square_spec as ⟨ t0, ht0, ht0b ⟩
+  progress with square_spec as ⟨ fe, hfe, hfeb ⟩
+  progress with square_spec as ⟨ t1, ht1, ht1b ⟩
+  progress with mul_spec as ⟨ t2, ht2, ht2b ⟩
+  progress with mul_spec as ⟨ t3, ht3, ht3b ⟩
+  progress with square_spec as ⟨ t4, ht4, ht4b ⟩
+  progress with mul_spec as ⟨ t5, ht5, ht5b ⟩
+  progress with pow2k_spec as ⟨ t6, ht6, ht6b ⟩
+  progress with mul_spec as ⟨ t7, ht7, ht7b ⟩
+  progress with pow2k_spec as ⟨ t8, ht8, ht8b ⟩
+  progress with mul_spec as ⟨ t9, ht9, ht9b ⟩
+  progress with pow2k_spec as ⟨ t10, ht10, ht10b ⟩
+  progress with mul_spec as ⟨ t11, ht11, ht11b ⟩
+  progress with pow2k_spec as ⟨ t12, ht12, ht12b ⟩
+  progress with mul_spec as ⟨ t13, ht13, ht13b ⟩
+  progress with pow2k_spec as ⟨ t14, ht14, ht14b ⟩
+  progress with mul_spec as ⟨ t15, ht15, ht15b ⟩
+  progress with pow2k_spec as ⟨ t16, ht16, ht16b ⟩
+  progress with mul_spec as ⟨ t17, ht17, ht17b ⟩
+  progress with pow2k_spec as ⟨ t18, ht18, ht18b ⟩
+  progress with mul_spec as ⟨ t19, ht19, ht19b ⟩
+  -- Chain modular congruences: each step computes the exponent of r.
+  -- Exponents: t0→2, fe→4, t1→8, t2→9, t3→11, t4→22, t5→31,
+  --   t6→992, t7→1023, ..., t19→(2^250-1)
+  have exp_r : Field51_as_Nat r ≡ (Field51_as_Nat r) ^ 1 [MOD p] := by rw [pow_one]
+  have exp_t0 := chain_sq exp_r ht0
+  have exp_fe := chain_sq exp_t0 hfe
+  have exp_t1 := chain_sq exp_fe ht1
+  have exp_t2 := chain_mul exp_r exp_t1 ht2
+  have exp_t3 := chain_mul exp_t0 exp_t2 ht3
+  have exp_t4 := chain_sq exp_t3 ht4
+  have exp_t5 := chain_mul exp_t2 exp_t4 ht5
+  have exp_t6 := chain_pow2k exp_t5 ht6
+  have exp_t7 := chain_mul exp_t6 exp_t5 ht7
+  have exp_t8 := chain_pow2k exp_t7 ht8
+  have exp_t9 := chain_mul exp_t8 exp_t7 ht9
+  have exp_t10 := chain_pow2k exp_t9 ht10
+  have exp_t11 := chain_mul exp_t10 exp_t9 ht11
+  have exp_t12 := chain_pow2k exp_t11 ht12
+  have exp_t13 := chain_mul exp_t12 exp_t7 ht13
+  have exp_t14 := chain_pow2k exp_t13 ht14
+  have exp_t15 := chain_mul exp_t14 exp_t13 ht15
+  have exp_t16 := chain_pow2k exp_t15 ht16
+  have exp_t17 := chain_mul exp_t16 exp_t15 ht17
+  have exp_t18 := chain_pow2k exp_t17 ht18
+  have exp_t19 := chain_mul exp_t18 exp_t13 ht19
+  exact ⟨exp_t19, exp_t3, ht19b, ht3b⟩
 
 end curve25519_dalek.field.FieldElement51

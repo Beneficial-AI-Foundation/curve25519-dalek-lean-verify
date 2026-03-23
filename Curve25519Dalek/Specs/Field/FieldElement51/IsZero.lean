@@ -40,13 +40,6 @@ Spec:
   `c.val = 1 ↔ Field51_as_Nat(r) % p = 0`.
 -/
 
-/-- Spec and proof concerning `FieldElement51.is_zero`. -/
-lemma Choice.val_eq_one_iff (c : subtle.Choice) :
-  c.val = 1#u8 ↔ c = Choice.one := by
-  cases c with
-  | mk val valid =>
-    simp [Choice.one]
-
 /-- Arrays are equal if their slices are equal. -/
 lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
     (h : h1.to_slice = h2.to_slice) :
