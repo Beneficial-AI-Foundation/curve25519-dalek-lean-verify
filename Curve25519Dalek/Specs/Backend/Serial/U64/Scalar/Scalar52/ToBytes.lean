@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.ExternallyVerified
+#setup_aeneas_simps
 
 /-! # Spec Theorem for `Scalar52::to_bytes`
 
@@ -92,6 +93,145 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open List BitList
 attribute [local simp] Array.length_eq
+
+/-! ## BitList spec theorems for scalar operations
+
+These theorems express the four key operations (shift right, cast U64→U8, shift left, bitwise OR)
+in terms of `BitList` operations (`drop`, `take`, `replicate`, `zipWith`).
+
+They mirror the Nat-level spec theorems from Aeneas but with BitList postconditions:
+- Right shift by k ↔ `drop k` (plus zero padding at top)
+- Cast U64→U8 ↔ `take 8`
+- Left shift by k ↔ `replicate k false ++` (plus truncation)
+- Bitwise OR ↔ `zipWith (· || ·)`
+-/
+
+
+private lemma testBit_add_mul_pow_low (b q k i : Nat) (hb : b < 2^k) (hi : i < k) :
+    (b + 2^k * q).testBit i = b.testBit i := by
+  have h1 : (b + 2^k * q) % 2^k = b := by
+    rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hb]
+  have h2 := Nat.testBit_mod_two_pow (b + 2^k * q) k i
+  rw [h1] at h2; simp [hi] at h2; exact h2.symm
+
+private lemma testBit_add_mul_pow_high (b q k i : Nat) (hb : b < 2^k) (hi : k ≤ i) :
+    (b + 2^k * q).testBit i = (2^k * q).testBit i := by
+  set n := i - k
+  have hi_eq : i = n + k := by omega
+  rw [hi_eq, Nat.testBit_add, Nat.testBit_add]
+  congr 1
+  rw [Nat.add_mul_div_left _ _ (by positivity : (0 : Nat) < 2^k),
+      Nat.div_eq_of_lt hb, Nat.zero_add,
+      Nat.mul_div_cancel_left _ (by positivity : (0 : Nat) < 2^k)]
+
+/-- Non-overlapping OR equals addition: if `a` has zeros in the bottom `k` bits
+    and `b` fits in `k` bits, then `a ||| b = a + b`. -/
+private theorem nat_or_eq_add (a b k : Nat) (ha : a % 2 ^ k = 0) (hb : b < 2 ^ k) :
+    a ||| b = a + b := by
+  have ha_low : ∀ j, j < k → a.testBit j = false := by
+    intro j hj
+    have h1 := Nat.testBit_mod_two_pow a k j
+    rw [ha] at h1; simp_all
+  have hb_high : ∀ j, j ≥ k → b.testBit j = false := by
+    intro j hj
+    exact Nat.testBit_lt_two_pow (Nat.lt_of_lt_of_le hb (Nat.pow_le_pow_right (by omega) hj))
+  have ha_eq : a = 2^k * (a / 2^k) := by have := Nat.div_add_mod a (2^k); omega
+  apply Nat.eq_of_testBit_eq; intro i
+  rw [Nat.testBit_or]
+  by_cases hi : i < k
+  · rw [ha_low i hi, Bool.false_or, ha_eq, Nat.add_comm]
+    exact (testBit_add_mul_pow_low b (a / 2^k) k i hb hi).symm
+  · rw [hb_high i (by omega), Bool.or_false, ha_eq, Nat.add_comm]
+    exact (testBit_add_mul_pow_high b (a / 2^k) k i hb (by omega)).symm
+
+/-- `ofNat k 0 = replicate k false` (all-zeros bit list). -/
+private theorem ofNat_zero (w : Nat) : ofNat w 0 = List.replicate w false := by
+  induction w with
+  | zero => simp [ofNat]
+  | succ w ih => simp [ofNat, ih, List.replicate_succ]
+
+/-- `toNat (replicate k false) = 0`. -/
+private theorem toNat_replicate_false (k : Nat) : toNat (List.replicate k false) = 0 := by
+  induction k with
+  | zero => simp [toNat]
+  | succ k ih => simp [List.replicate_succ, toNat, ih]
+
+/-- Right-shifting a U64 by k drops the bottom k bits (LSB-first).
+    The result is `(ofU64 x).drop k` padded with k zeros at the top. -/
+theorem U64.ShiftRight_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
+    (hy0 : 0 ≤ y.val) (hy1 : y.val < 64) :
+    (x >>> y) ⦃ z => ofU64 z = (ofU64 x).drop y.toNat ++ List.replicate y.toNat false ⦄ := by
+  have hk : y.toNat < 64 := by scalar_tac
+  have hx64 : x.val < 2 ^ 64 := x.hmax
+  have h := U64.ShiftRight_IScalar_spec x y hy0 hy1
+  exact WP.spec_mono h fun z ⟨hval, _⟩ => by
+    change ofNat 64 z.val = (ofNat 64 x.val).drop y.toNat ++ List.replicate y.toNat false
+    rw [hval, Nat.shiftRight_eq_div_pow, ofNat_drop y.toNat 64 x.val (by omega)]
+    have hlt : x.val / 2 ^ y.toNat < 2 ^ (64 - y.toNat) :=
+      Nat.div_lt_of_lt_mul (by
+        have : 2 ^ y.toNat * 2 ^ (64 - y.toNat) = 2 ^ 64 := by
+          rw [← Nat.pow_add]; congr 1; omega
+        linarith)
+    conv_lhs => rw [show (64 : Nat) = (64 - y.toNat) + y.toNat from by omega]
+    rw [ofNat_split (64 - y.toNat) y.toNat (x.val / 2 ^ y.toNat)]
+    congr 1
+    rw [Nat.div_eq_of_lt hlt, ofNat_zero]
+
+/-- Casting a U64 to U8 takes the bottom 8 bits.
+    After `subst_vars` inlines cast equalities, `simp [ofU8_cast_eq_ofU64_take]` converts
+    all `ofU8 (UScalar.cast .U8 x)` occurrences to `(ofU64 x).take 8`. -/
+@[simp]
+theorem ofU8_cast_eq_ofU64_take (x : U64) :
+    ofU8 (UScalar.cast .U8 x) = (ofU64 x).take 8 := by
+  change ofNat 8 (UScalar.cast .U8 x).val = (ofNat 64 x.val).take 8
+  rw [UScalar.cast_val_eq, UScalarTy.U8_numBits_eq, ofNat_mod,
+    ofNat_take 8 64 x.val (by omega)]
+
+/-- Left-shifting a U64 by k prepends k zero bits at the bottom (LSB-first)
+    and truncates to 64 bits. -/
+theorem U64.ShiftLeft_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
+    (hy0 : 0 ≤ y.val) (hy1 : y.val < 64) :
+    (x <<< y) ⦃ z => ofU64 z = List.replicate y.toNat false ++
+      (ofU64 x).take (64 - y.toNat) ⦄ := by
+  have hk : y.toNat < 64 := by scalar_tac
+  have h := U64.ShiftLeft_IScalar_spec x y hy0 hy1
+  exact WP.spec_mono h fun z ⟨hval, _⟩ => by
+    change ofNat 64 z.val =
+      List.replicate y.toNat false ++ (ofNat 64 x.val).take (64 - y.toNat)
+    rw [hval, Nat.shiftLeft_eq]
+    have hsize : U64.size = 2 ^ 64 := by scalar_tac
+    rw [hsize, ofNat_mod]
+    conv_lhs => rw [show (64 : Nat) = y.toNat + (64 - y.toNat) from by omega]
+    rw [ofNat_split y.toNat (64 - y.toNat) (x.val * 2 ^ y.toNat)]
+    congr 1
+    · -- Bottom k bits of x.val * 2^k are all zero
+      conv_lhs => rw [← ofNat_mod y.toNat (x.val * 2 ^ y.toNat)]
+      rw [Nat.mul_comm, Nat.mul_mod_right, ofNat_zero]
+    · -- Upper bits are just x.val
+      rw [Nat.mul_div_cancel _ (by positivity)]
+      exact (ofNat_take (64 - y.toNat) 64 x.val (by omega)).symm
+
+/-- Bitwise OR on non-overlapping values: if `x` has zeros in the bottom `k` bits
+    and `y` fits in `k` bits, then OR concatenates the respective bit slices.
+    This is the pattern used for shared bytes s[6] and s[19], where
+    `x = self[j+1] << 4` (zeros in bits 0–3) and `y = self[j] >> 48` (fits in 16 bits). -/
+theorem ofU64_or_non_overlapping (x y : U64) (k : Nat) (hk : k ≤ 64)
+    (hx : x.val % 2 ^ k = 0) (hy : y.val < 2 ^ k) :
+    ofU64 (x ||| y) = (ofU64 y).take k ++ (ofU64 x).drop k := by
+  have hor_eq : (x ||| y).val = x.val + y.val := by
+    simp only [UScalar.val_or]
+    exact nat_or_eq_add x.val y.val k hx hy
+  change ofNat 64 (x ||| y).val = (ofNat 64 y.val).take k ++ (ofNat 64 x.val).drop k
+  rw [hor_eq, show x.val + y.val = y.val + 2 ^ k * (x.val / 2 ^ k) from by
+    have := Nat.div_add_mod x.val (2 ^ k); omega]
+  conv_lhs => rw [show (64 : Nat) = k + (64 - k) from by omega]
+  rw [ofNat_split k (64 - k)]
+  congr 1
+  · conv_lhs => rw [← ofNat_mod k (y.val + 2 ^ k * (x.val / 2 ^ k))]
+    rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hy]
+    exact (ofNat_take k 64 y.val (by omega)).symm
+  · rw [Nat.add_mul_div_left _ _ (by positivity), Nat.div_eq_of_lt hy, Nat.zero_add]
+    exact (ofNat_drop k 64 x.val (by omega)).symm
 
 -- Note: this is a strengthening of `Scalar52_top_limb_lt_of_as_Nat_lt` in Aux.lean (which gives
 -- < 2^51 from < 2^259). This tighter bound should be moved to the central location.
@@ -191,10 +331,13 @@ theorem scalar52_eq_of_bitList_limbs
   grind
 
 
--- U64.ShiftRight_IScalar_spec
--- UScalar.cast.progress_spec
--- U64.ShiftLeft_IScalar_spec
--- UScalar.or_spec
+-- Remove @[progress] from the old Nat-level shift specs and add to the new BitList specs.
+-- The cast (progress_pure_def) and OR (lift) keep their original progress behavior;
+-- use ofU8_cast_eq_ofU64_take and ofU64_or_non_overlapping manually after progress.
+attribute [-progress] U64.ShiftRight_IScalar_spec
+attribute [-progress] U64.ShiftLeft_IScalar_spec
+attribute [progress] U64.ShiftRight_IScalar_bitList_spec
+attribute [progress] U64.ShiftLeft_IScalar_bitList_spec
 
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
 - The result byte array represents the same number as the input unpacked scalar modulo L
@@ -206,6 +349,8 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
     progress*
+    -- subst_vars
+    -- simp only [ofU8_cast_eq_ofU64_take] at *
 
     -- Limb-level BitList equivalences (one per row of the bit layout table)
 
@@ -214,6 +359,9 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
         ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++
         ofU8 result[3]! ++ ofU8 result[4]! ++ ofU8 result[5]! ++
         (ofU8 result[6]!).take 4 := by
+      subst_vars
+      simp
+
       sorry
 
     -- Limb 1: upper nibble of s[6] and s[7]–s[12]
