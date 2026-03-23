@@ -106,15 +106,32 @@ They mirror the Nat-level spec theorems from Aeneas but with BitList postconditi
 - Bitwise OR ↔ `zipWith (· || ·)`
 -/
 
+-- TODO: move this to a reasonable place
+/-- Concatenating adjacent extracts yields the combined extract. -/
+theorem List.extract_append_extract {α : Type*} (l : List α) (a b c : Nat)
+    (hab : a ≤ b) (hbc : b ≤ c) :
+    l.extract a b ++ l.extract b c = l.extract a c := by
+  simp only [List.extract_eq_drop_take]
+  conv_rhs => rw [show c - a = (b - a) + (c - b) from by omega]
+  rw [List.take_add]
+  congr 1
+  rw [List.drop_drop, show a + (b - a) = b from by omega]
 
-private lemma testBit_add_mul_pow_low (b q k i : Nat) (hb : b < 2^k) (hi : i < k) :
+-- TODO: move this to a reasonable place
+/-- Concatenating adjacent drop/take slices: lengths version.
+    `(l.drop a).take m ++ (l.drop (a+m)).take n = (l.drop a).take (m+n)` -/
+theorem List.drop_take_append_drop_take {α : Type*} (l : List α) (a m n : Nat) :
+    (l.drop a).take m ++ (l.drop (a + m)).take n = (l.drop a).take (m + n) := by
+  rw [List.take_add, List.drop_drop]
+
+private lemma testBit_add_mul_pow_low (b q k i : Nat) (hb : b < 2 ^ k) (hi : i < k) :
     (b + 2^k * q).testBit i = b.testBit i := by
   have h1 : (b + 2^k * q) % 2^k = b := by
     rw [Nat.add_mul_mod_self_left, Nat.mod_eq_of_lt hb]
   have h2 := Nat.testBit_mod_two_pow (b + 2^k * q) k i
   rw [h1] at h2; simp [hi] at h2; exact h2.symm
 
-private lemma testBit_add_mul_pow_high (b q k i : Nat) (hb : b < 2^k) (hi : k ≤ i) :
+private lemma testBit_add_mul_pow_high (b q k i : Nat) (hb : b < 2 ^ k) (hi : k ≤ i) :
     (b + 2^k * q).testBit i = (2^k * q).testBit i := by
   set n := i - k
   have hi_eq : i = n + k := by omega
@@ -367,16 +384,19 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
              by rw [ofU8_cast_eq_ofU64_take, i7_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i9_post]; simp [ofU64_length],
              by rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]⟩
-
-    -- Limb-level BitList equivalences (one per row of the bit layout table)
+    -- Shared byte 6: OR of (self[0] >> 48) and (self[1] << 4)
+    have hb6 : ofU8 result[6]! = ((ofU64 (↑self : List U64)[0]!).drop 48).take 4 ++
+        ((ofU64 (↑self : List U64)[1]!).drop 0).take 4 := by sorry
 
     -- Limb 0: s[0]–s[5] and lower nibble of s[6]
-    have hlimb0 : (ofU64 self[0]).take 52 ≈ₗ
-        ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++
-        ofU8 result[3]! ++ ofU8 result[4]! ++ ofU8 result[5]! ++
-        (ofU8 result[6]!).take 4 := by
-      subst_vars; simp
-      sorry
+    have hlimb0 : (ofU64 (self : List U64)[0]!).take 52 ≈ₗ
+        ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++ ofU8 result[3]! ++
+        ofU8 result[4]! ++ ofU8 result[5]! ++ (ofU8 result[6]!).take 4 := by
+      rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
+      rw [List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+          List.drop_take_append_drop_take, List.drop_take_append_drop_take,
+          List.drop_take_append_drop_take, List.take_left' (by simp [ofU64_length]),
+          List.drop_take_append_drop_take, List.drop_zero]
 
     -- Limb 1: upper nibble of s[6] and s[7]–s[12]
     have hlimb1 : (ofU64 self[1]).take 52 ≈ₗ
