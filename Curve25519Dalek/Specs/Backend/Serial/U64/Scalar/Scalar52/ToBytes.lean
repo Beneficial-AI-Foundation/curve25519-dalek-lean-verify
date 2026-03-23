@@ -486,77 +486,43 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
     progress*
-    -- Simple bytes (30 of 32): each byte = 8-bit slice of its limb
-    have ⟨hb0, hb1, hb2, hb3, hb4, hb5⟩ :
+    -- Simple bytes (30 of 32): each byte = 8-bit extract of its limb
+    have ⟨hb0, hb1, hb2, hb3, hb4, hb5, hb7, hb8, hb9, hb10, hb11, hb12, hb13, hb14, hb15, hb16,
+        hb17, hb18, hb20, hb21, hb22, hb23, hb24, hb25, hb26, hb27, hb28, hb29, hb30, hb31⟩ :
         ofU8 result[0]! = (ofU64 (↑self : List U64)[0]!).extract 0 8 ∧
         ofU8 result[1]! = (ofU64 (↑self : List U64)[0]!).extract 8 16 ∧
         ofU8 result[2]! = (ofU64 (↑self : List U64)[0]!).extract 16 24 ∧
         ofU8 result[3]! = (ofU64 (↑self : List U64)[0]!).extract 24 32 ∧
         ofU8 result[4]! = (ofU64 (↑self : List U64)[0]!).extract 32 40 ∧
-        ofU8 result[5]! = (ofU64 (↑self : List U64)[0]!).extract 40 48 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i1_post]; simp,
-             by rw [ofU8_cast_eq_ofU64_take, i3_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i5_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i7_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i9_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i11_post]; simp [ofU64_length]⟩
-    have ⟨hb7, hb8, hb9, hb10, hb11, hb12⟩ :
+        ofU8 result[5]! = (ofU64 (↑self : List U64)[0]!).extract 40 48 ∧
         ofU8 result[7]! = (ofU64 (↑self : List U64)[1]!).extract 4 12 ∧
         ofU8 result[8]! = (ofU64 (↑self : List U64)[1]!).extract 12 20 ∧
         ofU8 result[9]! = (ofU64 (↑self : List U64)[1]!).extract 20 28 ∧
         ofU8 result[10]! = (ofU64 (↑self : List U64)[1]!).extract 28 36 ∧
         ofU8 result[11]! = (ofU64 (↑self : List U64)[1]!).extract 36 44 ∧
-        ofU8 result[12]! = (ofU64 (↑self : List U64)[1]!).extract 44 52 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i18_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i20_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i22_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i24_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i26_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i28_post]; simp [ofU64_length]⟩
-    have ⟨hb13, hb14, hb15, hb16, hb17, hb18⟩ :
+        ofU8 result[12]! = (ofU64 (↑self : List U64)[1]!).extract 44 52 ∧
         ofU8 result[13]! = (ofU64 (↑self : List U64)[2]!).extract 0 8 ∧
         ofU8 result[14]! = (ofU64 (↑self : List U64)[2]!).extract 8 16 ∧
         ofU8 result[15]! = (ofU64 (↑self : List U64)[2]!).extract 16 24 ∧
         ofU8 result[16]! = (ofU64 (↑self : List U64)[2]!).extract 24 32 ∧
         ofU8 result[17]! = (ofU64 (↑self : List U64)[2]!).extract 32 40 ∧
-        ofU8 result[18]! = (ofU64 (↑self : List U64)[2]!).extract 40 48 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i31_post]; simp,
-             by rw [ofU8_cast_eq_ofU64_take, i33_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i35_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i37_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i39_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i41_post]; simp [ofU64_length]⟩
-    have ⟨hb20, hb21, hb22, hb23, hb24, hb25⟩ :
+        ofU8 result[18]! = (ofU64 (↑self : List U64)[2]!).extract 40 48 ∧
         ofU8 result[20]! = (ofU64 (↑self : List U64)[3]!).extract 4 12 ∧
         ofU8 result[21]! = (ofU64 (↑self : List U64)[3]!).extract 12 20 ∧
         ofU8 result[22]! = (ofU64 (↑self : List U64)[3]!).extract 20 28 ∧
         ofU8 result[23]! = (ofU64 (↑self : List U64)[3]!).extract 28 36 ∧
         ofU8 result[24]! = (ofU64 (↑self : List U64)[3]!).extract 36 44 ∧
-        ofU8 result[25]! = (ofU64 (↑self : List U64)[3]!).extract 44 52 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i48_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i50_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i52_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i54_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i56_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i58_post]; simp [ofU64_length]⟩
-    have ⟨hb26, hb27, hb28, hb29, hb30, hb31⟩ :
+        ofU8 result[25]! = (ofU64 (↑self : List U64)[3]!).extract 44 52 ∧
         ofU8 result[26]! = (ofU64 (↑self : List U64)[4]!).extract 0 8 ∧
         ofU8 result[27]! = (ofU64 (↑self : List U64)[4]!).extract 8 16 ∧
         ofU8 result[28]! = (ofU64 (↑self : List U64)[4]!).extract 16 24 ∧
         ofU8 result[29]! = (ofU64 (↑self : List U64)[4]!).extract 24 32 ∧
         ofU8 result[30]! = (ofU64 (↑self : List U64)[4]!).extract 32 40 ∧
         ofU8 result[31]! = (ofU64 (↑self : List U64)[4]!).extract 40 48 := by
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      exact ⟨by rw [ofU8_cast_eq_ofU64_take, i61_post]; simp,
-             by rw [ofU8_cast_eq_ofU64_take, i63_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i65_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i67_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i69_post]; simp [ofU64_length],
-             by rw [ofU8_cast_eq_ofU64_take, i71_post]; simp [ofU64_length]⟩
+      refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
+              ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> {
+        subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
+        rw [ofU8_cast_eq_ofU64_take]; simp [ofU64_length, *] }
     -- Shared bytes (2 of 32)
     have hb6 : ofU8 result[6]! = (ofU64 (↑self : List U64)[0]!).extract 48 52 ++
         (ofU64 (↑self : List U64)[1]!).extract 0 4 := by
