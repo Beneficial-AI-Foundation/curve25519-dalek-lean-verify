@@ -187,7 +187,7 @@ def bytes_match_limbs (L : Array U64 5#usize) (s : Array U8 32#usize) : Prop :=
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 500000 in -- heavy progress*
+set_option maxHeartbeats 600000 in -- heavy progress*
 /-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.
@@ -217,24 +217,24 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ q, q_post1, q_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
   let* ⟨ i3, i3_post ⟩ ← U64.add_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ q1, q1_post1, q1_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i4, i4_post ⟩ ← Array.index_usize_spec
   let* ⟨ i5, i5_post ⟩ ← U64.add_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ q2, q2_post1, q2_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
   let* ⟨ i7, i7_post ⟩ ← U64.add_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ q3, q3_post1, q3_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
   let* ⟨ i9, i9_post ⟩ ← U64.add_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ q4, q4_post1, q4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i10, i10_post ⟩ ← U64.mul_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ i11, i11_post ⟩ ← U64.add_spec
-  · sorry
+  · expand fe_post1 with 5; scalar_tac
   let* ⟨ limbs, limbs_post ⟩ ← Array.update_spec
   let* ⟨ i12, i12_post1, i12_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ low_51_bit_mask, low_51_bit_mask_post1, low_51_bit_mask_post2 ⟩ ← U64.sub_spec
@@ -242,7 +242,12 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
   let* ⟨ i16, i16_post ⟩ ← U64.add_spec
-  · sorry
+  · have h14 : (i14 : U64).val < (2^13 : ℕ) := by
+      have : (i13 : U64).val < (2^64 : ℕ) := by agrind
+      rw [i14_post1, Nat.shiftRight_eq_div_pow]; agrind
+    have h15 : (i15 : U64).val < (2^52 : ℕ) := by
+      simp only [i15_post, limbs_post, Array.set_val_eq] at *; simp_all
+    grind only [= U64.max_eq]
   let* ⟨ limbs1, limbs1_post ⟩ ← Array.update_spec
   let* ⟨ i17, i17_post ⟩ ← Array.index_usize_spec
   let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
@@ -251,7 +256,12 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ i20, i20_post1, i20_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
   let* ⟨ i22, i22_post ⟩ ← U64.add_spec
-  · sorry
+  · have h20 : (i20 : U64).val < (2^13 : ℕ) := by
+      have : (i19 : U64).val < (2^64 : ℕ) := by agrind
+      rw [i20_post1, Nat.shiftRight_eq_div_pow]; agrind
+    have h21 : (i21 : U64).val < (2^52 : ℕ) := by
+      simp only [i21_post, limbs2_post, limbs1_post, limbs_post, Array.set_val_eq] at *; simp_all
+    grind only [= U64.max_eq]
   let* ⟨ limbs3, limbs3_post ⟩ ← Array.update_spec
   let* ⟨ i23, i23_post ⟩ ← Array.index_usize_spec
   let* ⟨ i24, i24_post1, i24_post2 ⟩ ← UScalar.and_spec
@@ -260,7 +270,13 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ i26, i26_post1, i26_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i27, i27_post ⟩ ← Array.index_usize_spec
   let* ⟨ i28, i28_post ⟩ ← U64.add_spec
-  · sorry
+  · have h26 : (i26 : U64).val < (2^13 : ℕ) := by
+      have : (i25 : U64).val < (2^64 : ℕ) := by agrind
+      rw [i26_post1, Nat.shiftRight_eq_div_pow]; omega
+    have h27 : (i27 : U64).val < (2^52 : ℕ) := by
+      simp only [i27_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, limbs_post,
+        Array.set_val_eq] at *; simp_all
+    grind only [= U64.max_eq]
   let* ⟨ limbs5, limbs5_post ⟩ ← Array.update_spec
   let* ⟨ i29, i29_post ⟩ ← Array.index_usize_spec
   let* ⟨ i30, i30_post1, i30_post2 ⟩ ← UScalar.and_spec
@@ -269,7 +285,12 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   let* ⟨ i32, i32_post1, i32_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i33, i33_post ⟩ ← Array.index_usize_spec
   let* ⟨ i34, i34_post ⟩ ← U64.add_spec
-  · sorry
+  · have h32 : (i32 : U64).val < (2^13 : ℕ) := by
+      have : (i31 : U64).val < (2^64 : ℕ) := by agrind
+      rw [i32_post1, Nat.shiftRight_eq_div_pow]; omega
+    have h33 : (i33 : U64).val < (2^52 : ℕ) := by
+      simp only [i33_post, limbs6_post, limbs5_post, limbs4_post, limbs3_post, limbs2_post, limbs1_post, limbs_post, Array.set_val_eq] at *; simp_all
+    grind only [= U64.max_eq]
   let* ⟨ limbs7, limbs7_post ⟩ ← Array.update_spec
   let* ⟨ i35, i35_post ⟩ ← Array.index_usize_spec
   let* ⟨ i36, i36_post1, i36_post2 ⟩ ← UScalar.and_spec
