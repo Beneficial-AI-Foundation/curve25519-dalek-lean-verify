@@ -1,7 +1,7 @@
 /-
 Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Oliver Butterley, Markus Dablander, Theodore Ehrenborg, Alessandro D'Angelo, Liao Zhang
+Authors: Oliver Butterley, Liao Zhang
 -/
 import Aeneas
 import Curve25519Dalek.Funs
