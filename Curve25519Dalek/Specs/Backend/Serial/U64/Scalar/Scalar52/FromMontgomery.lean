@@ -31,10 +31,7 @@ natural language specs:
     • scalar_to_nat(u) * R = scalar_to_nat(m) mod L
 -/
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
-
-/-- Strange that this result is required, how can the argument be made smoother? -/
+/-- Strange that this result is required, how can the argument be made smoother where this is used?. -/
 theorem set_getElem!_eq (l : List U128) (a : U128) (i : ℕ) (h : i < l.length) :
     (l.set i (a))[i]! = a := by
   simp_all only [List.getElem!_set]
@@ -89,8 +86,11 @@ theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.v
   progress*
   · intro i hi
     by_cases h_lt : i < 5
-    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp [*]; grind
-    · have h_ge : 5 ≤ i := by grind
+    · rw [limbs1_post1 i h_lt (Nat.zero_le i)]; specialize h_bounds i h_lt; simp only [Array.getElem!_Nat_eq,
+      UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq, Nat.reduceLeDiff,
+      UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
+      agrind
+    · have h_ge : 5 ≤ i := by agrind
       rw [limbs1_post2 i hi h_ge]
       simp only [Array.repeat] at ⊢
       simp only [getElem!, List.getElem?_replicate]
