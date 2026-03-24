@@ -63,26 +63,21 @@ theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
       apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by decide)
       try simp_all [Nat.ModEq]
     try simp_all
-  · refine ⟨?_, ?_, ?_⟩
-    · -- Inverse property
-      rw [Nat.ModEq] at *
-      have h := calc (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) % L
-          = (Scalar52_as_Nat self * R % L) * (Scalar52_as_Nat result * R % L) % L := by simp
-        _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
-        _ = R * R % L := by
-          simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
-          try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val,
-            UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]
-      have : (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) =
-          Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by grind
-      rw [this] at h
-      have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
-        have coprime : Nat.Coprime (R ^ 2) L := by try decide
-        apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by grind)
-      exact this h
-    · -- Limb bounds (requires from_montgomery_spec to provide limb bounds)
-      sorry
-    · -- Canonical (requires from_montgomery_spec to provide Scalar52_as_Nat result < L)
-      sorry
+  · refine ⟨?_, by assumption, by assumption⟩
+    rw [Nat.ModEq] at *
+    have h := calc (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) % L
+        = (Scalar52_as_Nat self * R % L) * (Scalar52_as_Nat result * R % L) % L := by simp
+      _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
+      _ = R * R % L := by
+        simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
+        try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val,
+          UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]
+    have : (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) =
+        Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by grind
+    rw [this] at h
+    have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
+      have coprime : Nat.Coprime (R ^ 2) L := by try decide
+      apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by grind)
+    exact this h
 
 end curve25519_dalek.scalar.Scalar52
