@@ -10578,13 +10578,13 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.is_canonical"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    invert s ⦃ s' =>\n      U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by ...",
+   "theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :\n    invert self ⦃ (result : Scalar) =>\n      U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L] ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Invert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar.invert`**:\n- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result s' satisfies the multiplicative inverse property:\n  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar.invert`**:\n- Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result s' satisfies the multiplicative inverse property:\n  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert",
@@ -10755,10 +10755,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)\n    (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    invert self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ⦄ := by ...",
+   "theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)\n    (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    invert self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      Scalar52_as_Nat result < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "spec_docstring":
