@@ -4189,11 +4189,11 @@
   {"verified": false,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ u =>\n    Scalar52_as_Nat u = U8x64_as_Nat b % L ⦄ := by ...",
+   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ (u : Scalar52) =>\n        Scalar52_as_Nat u = U8x64_as_Nat b % L ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes_wide`**:\n- No panic (always returns successfully)\n- The result represents the input byte array reduced modulo L (canonical form) -/",
+   "/-- **Spec theorem for `scalar.Scalar52.from_bytes_wide`**:\n- The result represents the input byte array reduced modulo L (canonical form) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4547,14 +4547,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_bytes_spec (u : Scalar52) :\n    to_bytes u ⦃ b =>\n    U8x32_as_Nat b ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat b < L ⦄ := by ...",
+   "theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)\n    (h' : Scalar52_as_Nat self < L) :\n    to_bytes self ⦃ (result : Std.Array U8 32#usize) =>\n      U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ToBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- No panic (always returns successfully)\n- The result byte array represents the same number as the input unpacked scalar modulo L\n- The result is in canonical form (less than L) -/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:\n- The result byte array represents the same number as the input unpacked scalar modulo L\n- The result is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
@@ -4564,8 +4564,8 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": true,
+   "fully_verified": true,
+   "externally_verified": false,
    "dependencies": []},
   {"verified": true,
    "specified": true,
@@ -10540,11 +10540,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_mod_order_wide_spec (b : Array U8 64#usize) :\n    from_bytes_mod_order_wide b ⦃ s =>\n    U8x32_as_Nat s.bytes ≡ U8x64_as_Nat b [MOD L] ∧\n    U8x32_as_Nat s.bytes < L ⦄ := by ...",
+   "theorem from_bytes_mod_order_wide_spec (input : Array U8 64#usize) :\n    from_bytes_mod_order_wide input ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x64_as_Nat input [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Scalar/Scalar/FromBytesModOrderWide.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar.from_bytes_mod_order_wide`**:\n- No panic (always returns successfully)\n- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L\n- The result scalar s is less than L (the group order) -/",
+   "/-- **Spec theorem for `scalar.Scalar.from_bytes_mod_order_wide`**:\n- The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L\n- The result scalar s is less than L (the group order) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide",
@@ -10578,7 +10578,7 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.is_canonical"]},
-  {"verified": true,
+  {"verified": false,
    "specified": true,
    "spec_statement":
    "theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :\n    invert s ⦃ s' =>\n      U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by ...",
@@ -10758,11 +10758,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0) (hu : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') ≡ 1 [MOD L] ⦄ := by ...",
+   "theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)\n    (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    invert self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar u must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result u' satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(u) * Scalar52_as_Nat(u') ≡ 1 (mod L)\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar self must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
@@ -10862,11 +10862,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pack_spec (u : backend.serial.u64.scalar.Scalar52) :\n    pack u ⦃ s =>\n    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧\n    U8x32_as_Nat s.bytes < L ⦄ := by ...",
+   "theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L) :\n    pack self ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ Scalar52_as_Nat self [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Pack.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.pack`**:\n- No panic (always returns successfully)\n- Both the unpacked r and the packed s represent the same natural number modulo L\n- The packed scalar is in canonical form (less than L) -/",
+   "/-- **Spec theorem for `scalar.Scalar52.pack`**:\n- Both the unpacked r and the packed s represent the same natural number modulo L\n- The packed scalar is in canonical form (less than L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack",
@@ -10876,7 +10876,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes"]},
