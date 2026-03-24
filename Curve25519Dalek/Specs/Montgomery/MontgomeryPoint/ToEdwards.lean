@@ -230,7 +230,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
         have : Field51_as_Nat u % p = p - 1 := by omega
         exact this
       have h3 : Field51_as_Nat u % p = Field51_as_Nat fe % p := by
-        grind
+        simp [*]
       have h4 : Field51_as_Nat u = Field51_as_Nat fe := by
         have hu_lt : Field51_as_Nat u < 2^255 := by
           simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.sum_range_zero]
