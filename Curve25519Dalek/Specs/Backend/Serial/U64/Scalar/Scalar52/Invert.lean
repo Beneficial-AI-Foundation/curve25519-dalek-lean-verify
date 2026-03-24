@@ -54,8 +54,7 @@ theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
     (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :
     invert self ⦃ (result : Scalar52) =>
       (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧
-      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
-      Scalar52_as_Nat result < L ⦄ := by
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result < L ⦄ := by
   unfold invert
   progress*
   · by_contra _
