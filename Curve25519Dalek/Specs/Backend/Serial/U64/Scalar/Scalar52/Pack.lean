@@ -17,6 +17,7 @@ Source: curve25519-dalek/src/scalar.rs
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
+  curve25519_dalek.backend.serial.u64.scalar
 namespace curve25519_dalek.scalar.Scalar52
 
 /-
@@ -31,21 +32,18 @@ natural language specs:
     • unpack(s) = r
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.pack`**:
-- No panic (always returns successfully)
+/-- **Spec theorem for `scalar.Scalar52.pack`**:
 - Both the unpacked r and the packed s represent the same natural number modulo L
 - The packed scalar is in canonical form (less than L) -/
 @[progress]
-theorem pack_spec (u : backend.serial.u64.scalar.Scalar52)
-    (h : ∀ i < 5, u[i]!.val < 2 ^ 52)
-    (h' : Scalar52_as_Nat u < L) :
-    pack u ⦃ s =>
-    U8x32_as_Nat s.bytes ≡ Scalar52_as_Nat u [MOD L] ∧
-    U8x32_as_Nat s.bytes < L ⦄ := by
+theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L) :
+    pack self ⦃ (result : Scalar) =>
+      U8x32_as_Nat result.bytes ≡ Scalar52_as_Nat self [MOD L] ∧
+      U8x32_as_Nat result.bytes < L ⦄ := by
   unfold pack
-  progress
+  progress*
   constructor
-  · rw [a_post1]
+  · simp only [*, Nat.ModEq]
   · assumption
 
 end curve25519_dalek.scalar.Scalar52
