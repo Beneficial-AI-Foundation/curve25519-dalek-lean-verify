@@ -80,7 +80,7 @@ theorem mul_spec (self _rhs : scalar.Scalar) :
     fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
   have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  progress as ⟨s2, hs2_cong, hs2_bounds⟩
+  progress as ⟨s2, hs2_cong, hs2_lt⟩
   progress as ⟨hpack, hpack_cong, hpack_lt⟩
   refine ⟨?_, hpack_lt⟩
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
