@@ -1999,7 +1999,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by ...",
+   "theorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
@@ -5861,7 +5861,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
+   "theorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates\n- When both points are valid, this is equivalent to toPoint equality\n-/",
