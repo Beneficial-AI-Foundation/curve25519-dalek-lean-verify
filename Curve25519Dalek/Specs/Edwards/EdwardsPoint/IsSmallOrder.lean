@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByCofactor
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
-import Curve25519Dalek.Math.Edwards.Representation
 
 /-! # Spec Theorem for `EdwardsPoint::is_small_order`
 
@@ -41,58 +40,39 @@ natural language specs:
 - Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
 - This is determined by checking if multiplying by the cofactor yields the identity element
 -/
-@[progress, externally_verified]
+@[progress]
 theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
     is_small_order self ⦃ result =>
     (result ↔ h • self.toPoint = 0) ⦄ := by
-  sorry
-  /- OLD PROOF (broken: ONE/ZERO now return Result, ONE_body/ZERO_body removed,
-     ep_post_1/t_post_N/ep_post_2/c_post naming changed, timeouts at field_simp):
-  unfold is_small_order
-  unfold traits.IsIdentity.Blanket.is_identity edwards.EdwardsPoint.Insts.SubtleConstantTimeEq
-    edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity
-    core.convert.IntoFrom.into Bool.Insts.CoreConvertFromChoice
-    Bool.Insts.CoreConvertFromChoice.from
-  progress*
-  · intro i hi; have := ep_post_1.X_bounds i hi; scalar_tac
-  · intro i hi; have := ep_post_1.Y_bounds i hi; scalar_tac
-  · intro i hi; have := ep_post_1.Z_bounds i hi; scalar_tac
-  · intro i _; simp_all only [ONE, ONE_body, ZERO, ZERO_body]; interval_cases i <;> decide
-  · intro i _; simp_all only [ONE, ONE_body, ZERO, ZERO_body]; interval_cases i <;> decide
-  · intro i _; simp_all only [ONE, ONE_body, ZERO, ZERO_body]; interval_cases i <;> decide
-  · rw [decide_eq_true_eq]
-    have val_eq_one_iff : c.val = 1#u8 ↔ c = Choice.one := by cases c; simp [Choice.one]
-    have hZERO : Field51_as_Nat ZERO = 0 := by simp [ZERO]; decide
-    have hONE : Field51_as_Nat ONE = 1 := by simp [ONE]; decide
-    constructor
-    · -- Forward: c.val = 1#u8 → 8 • self.toPoint = 0
-      intro hc
-      rw [val_eq_one_iff, c_post] at hc
-      simp only [t_post_1, t_post_2, t_post_3, hZERO, hONE, mul_one, zero_mul] at hc
-      obtain ⟨hX_eq, hY_eq⟩ := hc
-      have hX_F : ep.X.toField = 0 := by unfold toField; exact lift_mod_eq _ _ hX_eq
-      have hY_F : ep.Y.toField = ep.Z.toField := by
-        unfold toField; simp only [one_mul] at hY_eq; exact lift_mod_eq _ _ hY_eq
-      have : ep.toPoint = 0 := by
-        have ⟨hpx, hpy⟩ := EdwardsPoint.toPoint_of_isValid ep_post_1
-        ext <;> simp [hpx, hpy, hX_F, hY_F, ep_post_1.Z_ne_zero]
-      grind
-    · -- Backward: 8 • self.toPoint = 0 → c.val = 1#u8
-      intro hsmall
-      rw [val_eq_one_iff, c_post]
-      have hep_zero : ep.toPoint = 0 := by
-        simp only [ep_post_2] at hsmall ⊢; exact hsmall
-      have ⟨hpx, hpy⟩ := EdwardsPoint.toPoint_of_isValid ep_post_1
-      have hX_zero : ep.X.toField / ep.Z.toField = 0 := by simp [← hpx, hep_zero]
-      have hY_one : ep.Y.toField / ep.Z.toField = 1 := by simp [← hpy, hep_zero]
-      simp only [t_post_1, t_post_2, t_post_3, hZERO, hONE, mul_one, zero_mul]
-      have hX_field : ep.X.toField = 0 := by
-        field_simp [ep_post_1.Z_ne_zero] at hX_zero; exact hX_zero
-      have hY_field : ep.Y.toField = ep.Z.toField := by
-        field_simp [ep_post_1.Z_ne_zero] at hY_one; exact hY_one
-      unfold toField at hX_field hY_field
-      exact ⟨(ZMod.natCast_eq_natCast_iff _ 0 p).mp hX_field,
-             by simp only [one_mul]; exact (ZMod.natCast_eq_natCast_iff _ _ p).mp hY_field⟩
-  -/
+  unfold is_small_order curve25519_dalek.traits.IsIdentity.Blanket.is_identity
+  progress with mul_by_cofactor_spec as ⟨ep, hep_valid, hep_point⟩
+  progress with Insts.Curve25519_dalekTraitsIdentity.identity_spec as
+    ⟨t, ht_X, ht_Y, ht_Z, ht_T, ht_valid⟩
+  progress with Insts.SubtleConstantTimeEq.ct_eq_spec as ⟨c, hc1, hc2⟩
+  -- Grind bridges the Array/List coercion gap (ep.X[i]! vs (↑ep.X)[i]!) and < → ≤.
+  -- Grind-free alternative per goal:
+  --   intro i hi; have := hep_valid.X_bounds i hi
+  --   simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+  --     UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]; omega
+  · have := hep_valid.X_bounds; grind
+  · have := hep_valid.Y_bounds; grind
+  · have := hep_valid.Z_bounds; grind
+  · have := ht_valid.X_bounds; grind
+  · have := ht_valid.Y_bounds; grind
+  · have := ht_valid.Z_bounds; grind
+  · simp only [Bool.Insts.CoreConvertFromChoice.from, spec_ok]
+    have ht_zero : t.toPoint = 0 := by
+      have ⟨htpx, htpy⟩ := EdwardsPoint.toPoint_of_isValid ht_valid
+      ext
+      · simp [htpx, toField, ht_X] -- closes Point.x 0 via Mathlib simp lemmas
+      · simp [htpy, toField, ht_Y, ht_Z] -- closes Point.y 0 via Mathlib simp lemmas
+    have hc_iff : c = Choice.one ↔ ep.toPoint = t.toPoint :=
+      hc2 hep_valid ht_valid
+    rw [ht_zero] at hc_iff
+    rw [hep_point] at hc_iff
+    simp only [decide_eq_true_eq]
+    have val_iff : c.val = 1#u8 ↔ c = Choice.one := by
+      cases c with | mk val valid => simp only [Choice.one, subtle.Choice.mk.injEq]
+    exact val_iff.trans hc_iff
 
 end curve25519_dalek.edwards.EdwardsPoint

@@ -87,12 +87,14 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
       have := ha i hi; have := hb i hi; omega
     apply le_trans (le_of_lt this)
-    scalar_tac
-  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
+    grind only [= U64.max_eq]
+  obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := spec_imp_exists
+    (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec
+      a b 0#usize (by simp) add_lt)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
     exists_eq_left']
   constructor
-  · simp_all
+  · grind
   · intro i hi
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
       have := ha i hi; have := hb i hi; omega
@@ -119,12 +121,12 @@ theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 52 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
-    apply le_trans (le_of_lt this); scalar_tac
+    apply le_trans (le_of_lt this); grind only [= U64.max_eq]
   obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
-  · simpa using hw_eq i hi (by scalar_tac)
-  · have h := hw_eq i hi (by scalar_tac)
+  · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
+  · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
     have ha' := ha i hi; have hb' := hb i hi
     have hsum : (a[i]!).val + (b[i]!).val < 2 ^ 53 := by omega
     simp_all
@@ -141,12 +143,12 @@ theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 53 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
-    apply le_trans (le_of_lt this); scalar_tac
+    apply le_trans (le_of_lt this); grind only [= U64.max_eq]
   obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
-  · simpa using hw_eq i hi (by scalar_tac)
-  · have h := hw_eq i hi (by scalar_tac)
+  · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
+  · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
     have ha' := ha i hi; have hb' := hb i hi
     have hsum : (a[i]!).val + (b[i]!).val < 2 ^ 54 := by omega
     simp_all
@@ -253,7 +255,7 @@ private lemma add_T_mod_arith (fe3 ZZ2 ZZ TT2d selfZ otherZ selfT otherT2d : ℕ
   have := Nat.ModEq.trans (Nat.ModEq.symm this) h_fe3
   apply Nat.ModEq.trans this
   rw [h_ZZ2_eq]
-  simp only [(by scalar_tac : ∀ a, a + a = 2 * a)]
+  simp only [(by omega : ∀ a, a + a = 2 * a)]
   have := Nat.ModEq.mul_left 2 h_ZZ
   rw [mul_assoc]
   exact this
@@ -303,37 +305,42 @@ theorem add_spec_aux_54_52_53_52
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
   unfold add
-  progress as ⟨Y_plus_X , h_Y_plus_X, Y_plus_X_bounds ⟩
-  progress as ⟨Y_minus_X,   Y_minus_X_bounds, h_Y_minus_X⟩
-  progress  as ⟨ PP , h_PP , PP_bounds⟩
-  progress  as ⟨ MM, h_MM, MM_bounds⟩
-  progress  as ⟨ TT2d, h_TT2d, TT2d_bounds⟩
-  progress  as ⟨ ZZ, h_ZZ, ZZ_bounds⟩
-  progress as ⟨ZZ2, h_ZZ2,  ZZ2_bounds⟩
-  progress as ⟨fe, h_fe,  fe_bounds⟩
-  -- Use tighter add spec for Y = PP + MM: (< 2^52) + (< 2^52) → < 2^53
-  obtain ⟨fe1, h_fe1_ok, h_fe1, fe1_bounds⟩ := add_spec_52_52 PP_bounds MM_bounds
-  simp only [h_fe1_ok, bind_tc_ok]
-  -- ZZ2 < 2^53 (from add of two < 2^52 values)
-  have hzz2_tight := zz2_tight_bounds ZZ_bounds h_ZZ2
-  -- Use tighter add spec: (< 2^53) + (< 2^52) → < 2^54
-  obtain ⟨fe2, h_fe2_ok, h_fe2, fe2_bounds⟩ := add_spec_53_52 hzz2_tight TT2d_bounds
-  simp only [h_fe2_ok, bind_tc_ok]
-  progress as ⟨fe3, h_fe3, fe3_bounds⟩
-  -- Derive Field51_as_Nat equalities from pointwise addition results
-  have h_YpX_nat := pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X h_Y_plus_X
-  have h_fe1_nat := pointwise_add_Field51_as_Nat PP MM fe1 h_fe1
-  have h_fe2_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe2 h_fe2
-  have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 h_ZZ2
+  simp only [progress_simps]
+  let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ PP, PP_post1, PP_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ MM, MM_post1, MM_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ TT2d, TT2d_post1, TT2d_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ ZZ, ZZ_post1, ZZ_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
+  let* ⟨ ZZ2, ZZ2_post1, ZZ2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe2, fe2_post1, fe2_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
+  let* ⟨ fe3, fe3_post1, fe3_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
+  have h_YpX_nat := pointwise_add_Field51_as_Nat self.Y self.X Y_plus_X Y_plus_X_post1
+  have h_fe1_nat := pointwise_add_Field51_as_Nat PP MM fe1 fe1_post1
+  have h_fe2_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe2 fe2_post1
+  have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 ZZ2_post1
   exact ⟨
-    add_X_mod_arith _ _ _ _ _ _ _ _ _ h_YpX_nat h_Y_minus_X h_PP h_MM fe_bounds,
-    add_Y_mod_arith _ _ _ _ _ _ _ _ _ h_fe1_nat h_YpX_nat h_Y_minus_X h_PP h_MM,
-    add_Z_mod_arith _ _ _ _ _ _ _ _ h_fe2_nat h_ZZ2_nat h_ZZ h_TT2d,
-    add_T_mod_arith _ _ _ _ _ _ _ _ h_ZZ2_nat h_ZZ h_TT2d fe3_bounds,
-    fun i hi => lt_trans (h_fe i hi) (by norm_num),
-    fun i hi => lt_trans (fe1_bounds i hi) (by norm_num),
-    fe2_bounds,
-    fun i hi => lt_trans (h_fe3 i hi) (by norm_num)⟩
+    add_X_mod_arith _ _ _ _ _ _ _ _ _ h_YpX_nat Y_minus_X_post2 PP_post1 MM_post1 fe_post2,
+    add_Y_mod_arith _ _ _ _ _ _ _ _ _ h_fe1_nat h_YpX_nat Y_minus_X_post2 PP_post1 MM_post1,
+    add_Z_mod_arith _ _ _ _ _ _ _ _ h_fe2_nat h_ZZ2_nat ZZ_post1 TT2d_post1,
+    add_T_mod_arith _ _ _ _ _ _ _ _ h_ZZ2_nat ZZ_post1 TT2d_post1 fe3_post2,
+    fun i hi => lt_trans (fe_post1 i hi) (by norm_num),
+    fe1_post2,
+    fe2_post2,
+    fun i hi => lt_trans (fe3_post1 i hi) (by norm_num)⟩
 
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint

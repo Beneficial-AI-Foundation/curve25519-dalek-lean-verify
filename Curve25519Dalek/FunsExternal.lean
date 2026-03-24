@@ -2,6 +2,8 @@
 import Aeneas
 import Curve25519Dalek.Types
 
+set_option linter.style.whitespace false
+
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
 namespace curve25519_dalek
@@ -118,6 +120,49 @@ theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_sp
 /- Convenience definitions for Choice values -/
 def Choice.zero : subtle.Choice := { val := 0#u8, valid := Or.inl rfl }
 def Choice.one : subtle.Choice := { val := 1#u8, valid := Or.inr rfl }
+
+-- TODO: move to a central location where we have facts related to subtle.Choice
+-- Decidability instance for Choice equality
+instance : DecidableEq subtle.Choice := fun a b =>
+  if h : a.val = b.val then isTrue (by cases a; cases b; simp_all)
+  else isFalse (by intro heq; apply h; rw [heq])
+
+-- TODO: move to a central location where we have facts related to subtle.Choice
+/-- Choice `val` is 0 or 1 -/
+theorem Choice.val_eq_zero_or_one (c : subtle.Choice) : c.val = 0#u8 ∨ c.val = 1#u8 := by
+  cases c with
+  | _ _ valid =>
+    cases valid with
+    | inl h => left; exact h
+    | inr h => right; exact h
+
+-- TODO: move to a central location where we have facts related to subtle.Choice
+/-- Choice is either `Choice.one` or `Choice.zero` -/
+theorem Choice.eq_zero_or_one (c : subtle.Choice) : c = Choice.zero ∨ c = Choice.one := by
+  cases c with
+  | _ _ valid =>
+    cases valid with
+    | inl h => left; simpa [Choice.zero]
+    | inr h => right; simpa [Choice.one]
+
+@[simp] theorem Choice.one_ne_zero : Choice.one ≠ Choice.zero := by decide
+@[simp] theorem Choice.zero_ne_one : Choice.zero ≠ Choice.one := by decide
+
+@[simp] theorem Choice.ne_one_iff (c : subtle.Choice) : c ≠ Choice.one ↔ c = Choice.zero := by
+  cases Choice.eq_zero_or_one c with
+  | inl h => simp [h]
+  | inr h => simp [h]
+
+@[simp] theorem Choice.ne_zero_iff (c : subtle.Choice) : c ≠ Choice.zero ↔ c = Choice.one := by
+  cases Choice.eq_zero_or_one c with
+  | inl h => simp [h]
+  | inr h => simp [h]
+
+theorem Choice.eq_zero_of_val (c : subtle.Choice) (h : c.val = 0#u8) : c = Choice.zero := by
+  cases c; simpa [Choice.zero]
+
+theorem Choice.eq_one_of_val (c : subtle.Choice) (h : c.val = 1#u8) : c = Choice.one := by
+  cases c; simpa [Choice.one]
 
 /-- A `subtle.Choice` has `.val = 1` iff it equals `Choice.one`. -/
 lemma Choice.val_eq_one_iff (c : subtle.Choice) :

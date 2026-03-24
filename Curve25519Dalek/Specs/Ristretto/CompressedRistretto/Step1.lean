@@ -101,6 +101,7 @@ theorem step_1_spec (c : CompressedRistretto) :
   progress as ⟨ct_flag, hct⟩        -- ct_eq: ct_flag = Choice.one ↔ s_bytes.to_slice = s2
   progress as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
   -- Prove conjunction
+  have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
   · -- tight bounds from from_bytes_spec
     exact h_tight
@@ -119,7 +120,6 @@ theorem step_1_spec (c : CompressedRistretto) :
         have := congrArg Subtype.val h_slice
         simp only [Array.to_slice] at this; exact this
       exact Subtype.ext h_lists
-    have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
     constructor
     · -- forward: slices equal → U8x32_as_Nat a < p
       intro h_slice; rw [← array_eq_of_slice_eq h_slice]; exact hbc2
@@ -143,7 +143,6 @@ theorem step_1_spec (c : CompressedRistretto) :
     obtain ⟨h1, h2⟩ := h_cond
     rw [decide_eq_true_eq, not_le] at h1
     rw [bne_iff_ne, not_not] at h2
-    have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
     have h_lt_255 : U8x32_as_Nat a < 2 ^ 255 := lt_trans h1 p_lt_pow255
     have h_arr_eq : s_bytes = a := by
       have h_cong : U8x32_as_Nat s_bytes ≡ U8x32_as_Nat a [MOD p] := by
@@ -180,7 +179,6 @@ theorem step_1_spec (c : CompressedRistretto) :
           simp only [Array.to_slice] at this; exact this
         exact Subtype.ext h_lists
       rw [← h_arr_eq]; exact hbc2
-    have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
     have h_lt_255 : U8x32_as_Nat a < 2 ^ 255 := lt_trans h_lt p_lt_pow255
     -- Derive U8x32_as_Nat a % 2 = 0 from h_neg (via parity chain)
     have h_even : U8x32_as_Nat a % 2 = 0 := by

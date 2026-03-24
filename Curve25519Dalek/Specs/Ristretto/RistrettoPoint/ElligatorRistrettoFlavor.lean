@@ -443,6 +443,18 @@ private lemma lift_bridge_bundle
     N_t_eq := h_Nt_eq_F
   }
 
+/-- When the square flag holds, `not_sq` is `Choice.zero`, so `not_sq.val ≠ 1#u8`. -/
+private lemma not_sq_val_ne_one {not_sq : subtle.Choice} {P : Prop}
+    (h_post : P ↔ not_sq = Choice.zero) (h : P) : not_sq.val ≠ 1#u8 := by
+  have heq := h_post.mp h; subst heq; decide
+
+/-- When the square flag fails, `not_sq` is `Choice.one`, so `not_sq.val = 1#u8`. -/
+private lemma not_sq_val_eq_one {not_sq : subtle.Choice} {P : Prop}
+    (h_post : P ↔ not_sq = Choice.zero) (h : ¬P) : not_sq.val = 1#u8 := by
+  rcases not_sq with ⟨val, hv | hv⟩
+  · exact absurd (h_post.mpr (by simp only [Choice.zero, hv])) h
+  · exact hv
+
 /-- Package the square/non-square consequences for the selected Elligator value `s1`. -/
 private lemma elligator_s1_sq_c2_cases
     (s c r N_s D i s_prime s_prime_neg s_prime1 s1 c2 : FieldElement51)
@@ -470,10 +482,7 @@ private lemma elligator_s1_sq_c2_cases
   let s1_post := s1_posts.select
   by_cases h_sq_flag : x.1.val = 1#u8
   · left
-    have h_nsq : not_sq.val ≠ 1#u8 := by
-      have := not_sq_post.mp h_sq_flag
-      subst this
-      decide
+    have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
     constructor
     · rw [show s1.toField = x.2.toField from by
         unfold toField
@@ -500,10 +509,7 @@ private lemma elligator_s1_sq_c2_cases
       push_cast at h
       linear_combination h
   · right
-    have h_nsq : not_sq.val = 1#u8 := by
-      rcases not_sq with ⟨val, hv | hv⟩
-      · exact absurd (not_sq_post.mpr (by simp only [hv, Choice.zero])) h_sq_flag
-      · exact hv
+    have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
     constructor
     · rw [show s1.toField = s_prime1.toField from by
         unfold toField
@@ -882,10 +888,7 @@ private lemma elligator_c_bridge
   let c_post1 := choice_posts.c_minus_one
   unfold elligator_c
   by_cases h_sq_flag : x.1.val = 1#u8
-  · have h_nsq : not_sq.val ≠ 1#u8 := by
-      have := not_sq_post.mp h_sq_flag
-      subst this
-      decide
+  · have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
     have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
     rw [if_pos h_is_sq]
     unfold toField
@@ -894,10 +897,7 @@ private lemma elligator_c_bridge
     have h := lift_mod_eq _ _ h_sum
     push_cast at h
     linear_combination h
-  · have h_nsq : not_sq.val = 1#u8 := by
-      rcases not_sq with ⟨val, hv | hv⟩
-      · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
-      · exact hv
+  · have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
     have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
     rw [if_neg h_not_sq]
     rw [show c2.toField = r.toField from by
@@ -925,10 +925,7 @@ private lemma elligator_s_bridge_square
   let N_post3_D := sqrt_posts.nonsquare_case
   let s1_post := s1_posts.select
   unfold elligator_s
-  have h_nsq : not_sq.val ≠ 1#u8 := by
-    have := not_sq_post.mp h_sq_flag
-    subst this
-    decide
+  have h_nsq : not_sq.val ≠ 1#u8 := not_sq_val_ne_one not_sq_post h_sq_flag
   have h_is_sq : elligator_is_square s.toField := h_is_square_of_flag h_sq_flag
   rw [if_pos h_is_sq]
   rw [show s1.toField = x.2.toField from by
@@ -994,10 +991,7 @@ private lemma elligator_s_bridge_nonsquare
   let c1_post := sign_posts.odd_flag
   let s_prime_is_pos_post := sign_posts.pos_flag
   unfold elligator_s
-  have h_nsq : not_sq.val = 1#u8 := by
-    rcases not_sq with ⟨val, hv | hv⟩
-    · exact absurd (not_sq_post.mpr (by simp only [Choice.zero, hv])) h_sq_flag
-    · exact hv
+  have h_nsq : not_sq.val = 1#u8 := not_sq_val_eq_one not_sq_post h_sq_flag
   have h_not_sq : ¬ elligator_is_square s.toField := h_not_is_square_of_flag h_sq_flag
   rw [if_neg h_not_sq]
   rw [show s1.toField = s_prime1.toField from by

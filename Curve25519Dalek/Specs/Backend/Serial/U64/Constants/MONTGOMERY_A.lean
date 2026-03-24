@@ -37,7 +37,8 @@ natural language specs:
 -/
 @[progress]
 theorem MONTGOMERY_A_spec :
-    MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ⦄ := by
+    MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ∧
+    (∀ i < 5, (result[i]!).val < 2 ^51)⦄ := by
   unfold MONTGOMERY_A field.FieldElement51.from_limbs
   simp only [spec_ok]
   decide
