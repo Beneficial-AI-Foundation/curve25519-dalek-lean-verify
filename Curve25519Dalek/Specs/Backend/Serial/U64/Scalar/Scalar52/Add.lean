@@ -69,43 +69,48 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     have := hb i (by agrind)
     scalar_tac
   · intro hi
-    have : i.val = 4 := by grind
-    have : a[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
-    have : b[4]!.val < 2 ^ 51 := by grind [Scalar52_top_limb_lt_of_as_Nat_lt]
-    simp [*]
+    have : i.val = 4 := by agrind
+    have : a[4]!.val < 2 ^ 51 := by agrind [Scalar52_top_limb_lt_of_as_Nat_lt]
+    have : b[4]!.val < 2 ^ 51 := by agrind [Scalar52_top_limb_lt_of_as_Nat_lt]
+    simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,
+      gt_iff_lt, *]
     have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by agrind); omega
     simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, UScalar.lt_equiv,
       UScalar.ofNatCore_val_eq, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, UScalar.val_and,
-      List.Vector.length_val, Nat.lt_add_one, getElem!_pos, gt_iff_lt] at *; grind
+      List.Vector.length_val, Nat.lt_add_one, getElem!_pos, gt_iff_lt] at *; agrind
   · intro j hj
     have : carry.val >>> 52 ≤ 1 := by have := hcarry' i (by agrind); omega
     have := ha i (by agrind)
     have := hb i (by agrind)
     simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, UScalar.lt_equiv,
       UScalar.ofNatCore_val_eq, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, UScalar.val_and,
-      gt_iff_lt] at *; grind
+      gt_iff_lt] at *; agrind
   · intro j hj
     by_cases hc : j = i
     · rw [hc]
       have := Array.set_of_eq sum i5 i (by agrind)
       simp only [Array.getElem!_Nat_eq, Array.set_val_eq, gt_iff_lt] at this ⊢
-      simp_all
-      grind
-    · have := Array.set_of_ne sum i5 j i (by agrind) (by agrind) (by grind)
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+        getElem!_pos, List.getElem!_eq_getElem?_getD, UScalarTy.U64_numBits_eq,
+        Bvify.U64.UScalar_bv, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
+        UScalar.ofNat_self_val, List.length_set, List.getElem_set_self, Array.set_val_eq,
+        getElem?_pos, Option.getD_some]
+      agrind
+    · have := Array.set_of_ne sum i5 j i (by agrind) (by agrind) (by agrind)
       have := hsum j (by agrind)
       simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
         getElem!_pos, List.getElem!_eq_getElem?_getD, UScalarTy.U64_numBits_eq,
         Bvify.U64.UScalar_bv, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod,
-        UScalar.ofNat_self_val, Array.set_val_eq, List.length_set, gt_iff_lt]; grind
+        UScalar.ofNat_self_val, Array.set_val_eq, List.length_set, gt_iff_lt]; agrind
   · intro j hj _
-    have hne : j ≠ i := by grind
+    have hne : j ≠ i := by agrind
     have := Array.set_of_ne' sum i5 j i (by agrind) (by omega)
     have := hsum' j hj (by omega)
     simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
       getElem!_pos, UScalar.lt_equiv, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv,
       UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod, Order.add_one_le_iff, ne_eq,
-      Array.set_val_eq, List.length_set]; grind
-  · refine ⟨by grind, ?_, ?_⟩
+      Array.set_val_eq, List.length_set]; agrind
+  · refine ⟨by agrind, ?_, ?_⟩
     · intro j hj
       have := sum'_post2 j (by omega)
       have := Array.set_of_ne sum i5 j i (by scalar_tac) (by scalar_tac) (by omega)
@@ -120,28 +125,28 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
       have : ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * sum'[j]!.val =
           ∑ j ∈ Finset.Ico (i.val + 1) 5, 2 ^ (52 * j) * ((a)[j]!.val + (b)[j]!.val) +
           2 ^ (52 * (i.val + 1)) * (↑carry1 / 2 ^ 52) := by
-        have : 4503599627370496 = 2 ^ 52 := by grind
+        have : 4503599627370496 = 2 ^ 52 := by agrind
         simp_all
       have : 2 ^ (52 * i.val) * (carry1.val % 2 ^ 52) +
           2 ^ (52 * (i.val + 1)) * (carry1.val / 2 ^ 52) = 2 ^ (52 * i.val) * carry1.val := by
-        have : carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) = carry1.val := by grind
-        grind
+        have : carry1.val % 2 ^ 52 + 2 ^ 52 * (carry1.val / 2 ^ 52) = carry1.val := by agrind
+        agrind
       calc ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * sum'[j]!
         _ = 2 ^ (52 * ↑i) * sum'[i]! +
             ∑ j ∈ Finset.Ico (↑i + 1) 5, 2 ^ (52 * j) * sum'[j]! := by
-          have hi : i.val < 5 := by scalar_tac
+          have hi : i.val < 5 := by agrind
           simp [Finset.sum_eq_sum_Ico_succ_bot hi]
         _ = ∑ j ∈ Finset.Ico (↑i) 5, 2 ^ (52 * j) * (↑a[j]! + ↑b[j]!) +
             2 ^ (52 * ↑i) * (↑carry / 2 ^ 52) := by
-          have hi : i.val < 5 := by scalar_tac
+          have hi : i.val < 5 := by agrind
           rw [Finset.sum_eq_sum_Ico_succ_bot hi]
-          grind
-  · refine ⟨by grind, by grind, ?_⟩
+          agrind
+  · refine ⟨by agrind, by agrind, ?_⟩
     have : i.val = 5 := by scalar_tac
     simp only [this, le_refl, Finset.Ico_eq_empty_of_le, Array.getElem!_Nat_eq,
       List.getElem!_eq_getElem?_getD, Finset.sum_empty, Nat.reduceMul, zero_add, zero_eq_mul,
       Nat.pow_eq_zero, OfNat.ofNat_ne_zero, ne_eq, not_false_eq_true, and_true, Nat.div_eq_zero_iff,
-      false_or, gt_iff_lt]; grind
+      false_or, gt_iff_lt]; agrind
   termination_by 5 - i.val
   decreasing_by scalar_decr_tac
 
@@ -159,9 +164,9 @@ theorem add_spec (a b : Scalar52)
   unfold add
   progress*
   · have : L < 2 ^ 259 := by unfold L; agrind
-    grind
+    agrind
   · have : L < 2 ^ 259 := by unfold L; agrind
-    grind
+    agrind
   · intro j _
     unfold ZERO
     interval_cases j <;> decide
@@ -176,7 +181,7 @@ theorem add_spec (a b : Scalar52)
       _ = ∑ i ∈ Finset.Ico 0 5, (2 ^ (52 * i) * a[i]!.val + 2 ^ (52 * i) * b[i]!.val) := by grind
       _ = _ := by simp [Scalar52_as_Nat, Finset.sum_add_distrib]
     omega
-  · grind [constants.L_spec]
+  · agrind [constants.L_spec]
   · refine ⟨?_, by assumption, by assumption⟩
     rw [constants.L_spec] at *
     have h1 : Scalar52_as_Nat v ≡ Scalar52_as_Nat sum [MOD L] := by
@@ -191,6 +196,6 @@ theorem add_spec (a b : Scalar52)
       simp only [Finset.range_eq_Ico] at v_post3 ⊢
       conv_lhs => rw [sum_post3]
       simp [Finset.sum_add_distrib, Nat.mul_add]
-    grind
+    agrind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -5,8 +5,7 @@ Authors: Markus Dablander, Lim Jin Xing, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
-set_option linter.hashCommand false
-#setup_aeneas_simps
+
 
 /-! # Spec Theorem for `Scalar52::to_bytes`
 
@@ -84,8 +83,6 @@ We express each of the 32 byte assignments as a `BitList.extract` equality, use
 then convert to `Nat` via `toNat` and close with `grind`.
 -/
 
-set_option linter.style.setOption false
-set_option maxHeartbeats 2000000
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -421,6 +418,7 @@ attribute [-progress] U64.ShiftLeft_IScalar_spec
 attribute [progress] U64.ShiftRight_IScalar_bitList_spec
 attribute [progress] U64.ShiftLeft_IScalar_bitList_spec
 
+set_option maxHeartbeats 1600000 in -- heavy progress and simps
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
 - The result byte array represents the same number as the input unpacked scalar modulo L
 - The result is in canonical form (less than L) -/

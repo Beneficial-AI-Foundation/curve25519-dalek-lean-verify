@@ -63,10 +63,10 @@ theorem from_montgomery_loop_spec (self : Scalar52) (limbs : Array U128 9#usize)
       · rw [result_post3 j (by simp_all), a_post, i2_post, i1_post, ← hc]
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
         apply set_getElem!_eq
-        simp; grind
+        simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq]; agrind
       · exact result_post1 j hj (by omega)
     · rw [result_post2 j hj hj']
-      have : i ≠ j := by grind
+      have : i ≠ j := by agrind
       simp [*]
     · intro j _
       have := result_post3 j (by omega)
