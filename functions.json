@@ -4099,7 +4099,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring":
-   "/-- **Spec for `scalar.Scalar52.conditional_add_l`**\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
+   "/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",

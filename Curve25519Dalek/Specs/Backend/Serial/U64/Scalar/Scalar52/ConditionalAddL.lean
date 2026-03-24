@@ -114,12 +114,9 @@ theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec' (a b : 
 
 end curve25519_dalek
 
-attribute [-simp] Int.reducePow Nat.reducePow
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-set_option maxHeartbeats 400000 in -- Needed for complex loop invariant proof
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
     (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
@@ -175,7 +172,10 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       · have := Array.set_of_ne self i5 j i (by grind) (by grind) (by omega)
         have := hself j hj
         clear haddend_one haddend_zero
-        simp_all
+        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+          getElem!_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, UScalar.val_and,
+          Nat.and_two_pow_sub_one_eq_mod, Order.add_one_le_iff, UScalar.ofNat_self_val,
+          Array.set_val_eq, List.length_set, gt_iff_lt]; grind
     rw [← h_imb] at hself1_limbs
     progress as ⟨res, hres_limbs, hres_inv⟩
     refine ⟨hres_limbs, ?_⟩
@@ -194,7 +194,9 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       have h_acc : ∀ j, j < 5 → (Aeneas.Std.Array.set self i i5)[j]!.val =
           if j = i.val then i5.val else self[j]!.val := by
         intro j _
-        by_cases j = i.val <;> simp [*]
+        by_cases h : j = i.val <;> simp only [Array.getElem!_Nat_eq, Array.set_val_eq,
+          List.getElem_set, List.length_set, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+          getElem!_pos, ↓reduceIte, *]; grind
       simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
       interval_cases i.val <;> simp (config := { decide := true }) only [h_acc 0 (by omega),
         h_acc 1 (by omega), h_acc 2 (by omega), h_acc 3 (by omega), h_acc 4 (by omega),
