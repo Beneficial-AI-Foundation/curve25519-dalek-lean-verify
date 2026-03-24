@@ -8,9 +8,16 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
+/-! # Spec Theorem for `Scalar52::conditional_add_l`
+
+Specification and proof for `Scalar52::conditional_add_l`.
+
+This function conditionally adds the group order L to a scalar based on a choice parameter.
+
+Source: curve25519-dalek/src/backend/serial/u64/scalar.rs -/
+
+attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
-set_option linter.hashCommand false
-#setup_aeneas_simps
 
 /-! # Spec Theorem for `Scalar52::conditional_add_l`
 
@@ -112,6 +119,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
+set_option maxHeartbeats 400000 in -- Needed for complex loop invariant proof
 @[progress]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
     (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
@@ -128,7 +136,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   split
   case isTrue hlt =>
-    have hi' : i.val < 5 := by grind
+    have hi' : i.val < 5 := by agrind
     have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
     have hL_i : constants.L[i.val]!.val < 2 ^ 52 := constants.L_limbs_spec i hi'
     progress as ⟨i1, hi1⟩  -- L[i]
@@ -234,7 +242,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
 termination_by 5 - i.val
 decreasing_by grind
 
-/-- **Spec for `scalar.Scalar52.conditional_add_l`**
+/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):
 - Requires input limbs bounded by 2^52
 - When condition is 1, requires input value in [2^260 - L, 2^260)
 - When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
