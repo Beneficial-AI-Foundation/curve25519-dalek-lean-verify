@@ -50,9 +50,6 @@ open Aeneas Aeneas.Std Result
 open Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-set_option linter.hashCommand false
--- This activates/deactives some simps to reason about lists
-#setup_aeneas_simps
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
@@ -62,8 +59,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 def Scalar52_partial_as_Nat (limbs : Array U64 5#usize) (n : Nat) : Nat :=
   ∑ j ∈ Finset.range n, 2 ^ (52 * j) * (limbs[j]!).val
 
-set_option maxHeartbeats 4000000 in
--- proof could be better
+set_option maxHeartbeats 300000 in -- proof could be better
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub_loop`**:
 
 The loop computes the subtraction a - b with borrow propagation.
@@ -96,11 +92,11 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
   split
   case isTrue hlt =>
-    have hi' : i.val < 5 := by scalar_tac
+    have hi' : i.val < 5 := by agrind
     have ha_i : a[i.val]!.val < 2 ^ 52 := ha i.val hi'
     have hb_i : b[i.val]!.val < 2 ^ 52 := hb i.val hi'
     have hborrow_bit : borrow.val >>> 63 ≤ 1 := by
-      have hbv : borrow.val < 2 ^ 64 := by scalar_tac
+      have hbv : borrow.val < 2 ^ 64 := by agrind
       omega
     -- Step through the operations manually
     progress as ⟨i1, hi1⟩  -- a[i]
@@ -116,7 +112,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
     progress as ⟨i6, hi6⟩  -- i + 1
     -- Set up the recursive call hypotheses
     have hborrow1_bound : borrow1.val / 2 ^ 63 ≤ 1 := by
-      have hb1 : borrow1.val < 2 ^ 64 := by scalar_tac
+      have hb1 : borrow1.val < 2 ^ 64 := by agrind
       omega
     -- i5 = borrow1 &&& mask = borrow1 % 2^52
     have hi5_mod : i5.val = borrow1.val % 2 ^ 52 := by
@@ -131,7 +127,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       by_cases hjc : j = i.val
       · grind
       · have hj' : j < i.val := by omega
-        have hne := Array.set_of_ne difference i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+        have hne := Array.set_of_ne difference i5 j i (by agrind) (by agrind) (by omega)
         simp only [Array.getElem!_Nat_eq, Array.set_val_eq] at hne ⊢
         have hdiff_j := hdiff j hj'
         simp only [Array.getElem!_Nat_eq] at hdiff_j
@@ -140,7 +136,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       intro j hji hj5
       simp only [hi6] at hji
       have hne : j ≠ i.val := by omega
-      have := Array.set_of_ne' difference i5 j i (by scalar_tac) (by omega)
+      have := Array.set_of_ne' difference i5 j i (by agrind) (by omega)
       simp only [Array.getElem!_Nat_eq, Array.set_val_eq] at this ⊢
       have hr := hdiff_rest j (by omega) hj5
       simp only [Array.getElem!_Nat_eq] at hr
@@ -167,10 +163,10 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       have hdiff'_lt : ∀ j < i.val,
           (Aeneas.Std.Array.set difference i i5)[j]!.val = difference[j]!.val := by
         intro j hj
-        have h := Array.set_of_ne difference i5 j i (by scalar_tac) (by scalar_tac) (by omega)
+        have h := Array.set_of_ne difference i5 j i (by agrind) (by agrind) (by omega)
         grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val]
       have hdiff'_eq : (Aeneas.Std.Array.set difference i i5)[i.val]!.val = i5.val := by
-        have h := Array.set_of_eq difference i5 i (by scalar_tac)
+        have h := Array.set_of_eq difference i5 i (by agrind)
         grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val]
       have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) * (Aeneas.Std.Array.set difference i i5)[j]!.val
                           = ∑ j ∈ Finset.range i.val, 2^(52*j) * difference[j]!.val := by
@@ -249,7 +245,6 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
 termination_by 5 - i.val
 decreasing_by scalar_decr_tac
 
-set_option maxHeartbeats 5000000 in -- the usual heavy stuff
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.sub`**:
 - Requires bounded limbs for both inputs
 - Requires both inputs to be bounded from above
