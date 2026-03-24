@@ -90,9 +90,7 @@ theorem square_spec (self : Scalar52)
     grind only [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
   have h_result_R_a_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a * R [MOD L] := by
     rw [← Nat.ModEq] at aa_post1
-    have h_temp : Scalar52_as_Nat aa * R * R ≡ Scalar52_wide_as_Nat a * R [MOD L] := by
-      exact Nat.ModEq.mul_right R aa_post1
-    exact Nat.ModEq.trans h_result_R_aa_R_R h_temp
+    exact Nat.ModEq.trans h_result_R_aa_R_R (Nat.ModEq.mul_right R aa_post1)
   have h_result_R_self_sq_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat self * Scalar52_as_Nat self * R [MOD L] := by
     rw [a_post1] at h_result_R_a_R
     exact h_result_R_a_R

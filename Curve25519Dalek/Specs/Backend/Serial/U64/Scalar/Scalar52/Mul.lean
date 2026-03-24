@@ -77,9 +77,7 @@ theorem mul_spec (a b : Scalar52)
   -- iii. res * R ≡ a1 * R [MOD L]
   have h_res_R_a1_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
     rw [← Nat.ModEq] at ab_post1
-    have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
-      exact Nat.ModEq.mul_right R ab_post1
-    exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
+    exact Nat.ModEq.trans h_res_R_ab_R_R (Nat.ModEq.mul_right R ab_post1)
   -- iv. res * R ≡ a * b * R [MOD L]
   have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
     rw [a1_post1] at h_res_R_a1_R
