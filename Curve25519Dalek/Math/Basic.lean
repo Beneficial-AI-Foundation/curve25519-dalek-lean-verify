@@ -78,6 +78,29 @@ def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
 
+/-! ## Basic properties of the defined quantities -/
+
+theorem L_lt : L < 2 ^ 260 := by
+  unfold L; grind
+
+/-! ### Scalar52_as_Nat lemmas -/
+
+attribute [-simp] Int.reducePow Nat.reducePow
+
+/-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
+theorem Scalar52_as_Nat_bounded (s : Aeneas.Std.Array U64 5#usize) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
+    Scalar52_as_Nat s < 2 ^ 260 := by
+  simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+  have h0 := hs 0 (by omega); have h1 := hs 1 (by omega); have h2 := hs 2 (by omega)
+  have h3 := hs 3 (by omega); have h4 := hs 4 (by omega)
+  omega
+
+/-- A single limb's weighted contribution is at most Scalar52_as_Nat -/
+theorem Scalar52_limb_le_nat (s : Aeneas.Std.Array U64 5#usize) (i : Nat) (hi : i < 5) :
+    2 ^ (52 * i) * s[i]!.val ≤ Scalar52_as_Nat s := by
+  simp only [Scalar52_as_Nat, Finset.sum_range_succ]
+  interval_cases i <;> omega
+
 /-! ## Primality and CurveField -/
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩

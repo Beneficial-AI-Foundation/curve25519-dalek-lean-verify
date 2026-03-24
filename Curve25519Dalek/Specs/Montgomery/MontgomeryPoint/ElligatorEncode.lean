@@ -643,7 +643,7 @@ theorem elligator_encode_spec
     have cases_zero : (pp.1.val = 0#u8 → ↑(U8x32_as_Nat a) = -d0 - Curve25519.A) := by
       intro h_zero
       simp [h_zero] at hp1
-      have := ne_zero_if_eq_one _ hp1
+      have : p1.val = 1#u8 := by simp [hp1, Choice.one]
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, this, ↓reduceIte] at hu1
       have :Field51_as_Nat u1=  Field51_as_Nat u_neg:=by
         simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,

@@ -16,9 +16,6 @@ All bit lists are **LSB-first**: the head of the list is bit 0 (least significan
 
 open Aeneas Aeneas.Std
 
-attribute [grind =] Nat.add_mod Nat.mul_mod_mul_left Nat.mod_eq_of_lt
-attribute [grind .] Nat.mod_lt
-
 namespace BitList
 open List
 
@@ -372,7 +369,7 @@ theorem toNat_take (k : Nat) (bs : List Bool) :
     | nil => simp [toNat]
     | cons b bs =>
       have := Bool.toNat_le b
-      grind [toNat]
+      grind [toNat, = Nat.add_mod, = Nat.mul_mod_mul_left, = Nat.mod_eq_of_lt]
 
 /-- Dropping k bits gives the value divided by 2^k. -/
 private theorem add_mul_two_div (a m : Nat) (ha : a < 2) :

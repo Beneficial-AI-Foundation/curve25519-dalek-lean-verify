@@ -51,7 +51,11 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
     have := ha 2 (by simp); have := hb 2 (by simp)
     have := ha 3 (by simp); have := hb 3 (by simp)
     have := ha 4 (by simp); have := hb 4 (by simp)
+
     interval_cases i
-    all_goals simp [*]; grind
+    all_goals simp [*]; grind =>
+        instantiate only [=_ Array.getElem!_Nat_eq]
+        instantiate approx
+        lia
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
