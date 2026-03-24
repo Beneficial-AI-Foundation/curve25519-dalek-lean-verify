@@ -116,8 +116,8 @@ private theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔  a % p = 1 := by
   have :1 % p= 1:= by unfold p; decide
   rw[this]
 
-private theorem mod_mul_mod (a b : ℕ) : (a % p) * (b % p) ≡ a * b [MOD p] := by
- exact ((Nat.mod_modEq a p).mul_right (b % p)).trans  ((Nat.mod_modEq b p).mul_left a)
+private theorem mod_mul_mod (a b : ℕ) : (a % p) * (b % p) ≡ a * b [MOD p] :=
+  ((Nat.mod_modEq a p).mul_right (b % p)).trans ((Nat.mod_modEq b p).mul_left a)
 
 lemma ne_zero_if_eq_one (p1 : subtle.Choice) (hp1 : ¬p1 = Choice.zero) : p1.val = 1#u8 := by
   have h_eq_one : p1 = Choice.one := ne_zero_iff_eq_one p1 hp1
