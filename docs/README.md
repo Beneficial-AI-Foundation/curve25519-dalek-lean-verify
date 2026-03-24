@@ -1,42 +1,124 @@
-# Curve25519-Dalek Documentation
+# Setting Up Verso-Blueprint 
 
-This directory contains the Verso-Blueprint documentation for the Curve25519-Dalek Lean verification project.
+This guide explains how to set up Verso-Blueprint documentation for a Lean 4 project.
 
-## Building the Documentation
+## Prerequisites
 
-From the repository root, run:
-
-```bash
-./scripts/build-blueprint.sh
-```
-
-This will:
-1. Build the `curve25519docs` executable
-2. Generate HTML documentation in `_out/blueprint/html-multi/`
-
-## Viewing Locally
-
-After building, serve the documentation locally:
-
-```bash
-python3 -m http.server 8080 -d _out/blueprint/html-multi
-```
-
-Then open http://localhost:8080 in your browser.
+- A working Lean 4 project with `lakefile.toml`
+- `elan` installed
 
 ## Directory Structure
 
-- `Curve25519DalekDocsMain.lean` - Entry point for the docs executable
-- `Curve25519DalekDocs.lean` - Library root
-- `Curve25519DalekDocs/` - Documentation modules
-  - `Contents.lean` - Main documentation content
+```
+your-project/
+├── lakefile.toml          # Main project lakefile
+├── lean-toolchain
+├── YourLib/               # Your Lean source files
+│   └── *.lean
+└── docs/
+    ├── lakefile.toml      # Docs project lakefile
+    ├── lean-toolchain
+    ├── Main.lean
+    └── YourDocs/          # Documentation source files
+        └── *.lean
+```
 
-## Adding Documentation
+## Step 1: Set Up the Docs Project
 
-To add new documentation sections:
+Create `docs/lakefile.toml`:
 
-1. Create a new `.lean` file in `Curve25519DalekDocs/`
-2. Import it in `Curve25519DalekDocs.lean`
-3. Include it in `Contents.lean` using `{include 1 Curve25519DalekDocs.YourModule}`
+```toml
+name = "YourDocs"
+defaultTargets = ["YourDocs", "docs"]
 
-See the [Verso documentation](https://github.com/leanprover/verso) for more details on the markup syntax.
+[[require]]
+name = "verso"
+git = "https://github.com/leanprover/verso"
+rev = "main"  # or a specific commit
+
+[[lean_lib]]
+name = "YourDocs"
+
+[[lean_exe]]
+name = "docs"
+root = "Main"
+```
+
+Create `docs/lean-toolchain` with the same Lean version as your main project.
+
+## Step 2: Build the Docs Project
+
+```bash
+cd docs
+lake build
+```
+
+This will fetch Verso and its dependencies, including `subverso`.
+
+## Step 3: Add Subverso to the Main Project
+
+Look up the `subverso` commit from `docs/lake-manifest.json`:
+
+```bash
+grep -A2 '"name": "subverso"' docs/lake-manifest.json
+```
+
+Add `subverso` (not `verso`) to your main project's `lakefile.toml`:
+
+```toml
+[[require]]
+name = "subverso"
+git = "https://github.com/leanprover/subverso"
+rev = "<commit-from-lake-manifest>"
+```
+
+## Step 4: Build the Main Project
+
+Build with `--keep-toolchain` to prevent the lean-toolchain from updating to subverso's version:
+
+```bash
+lake build --keep-toolchain
+```
+
+## Step 5: Configure Example Project Path
+
+In your documentation Lean files, set the `verso.exampleProject` option to point to your main project:
+
+```lean
+set_option verso.exampleProject "."
+```
+
+The path is relative to the workspace root when running `lake -d docs build` from the main project directory.
+
+## Building Documentation
+
+From the main project root:
+
+```bash
+lake -d docs build docs
+```
+
+Or create a build script (e.g., `scripts/build-blueprint.sh`):
+
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+
+out_root="${1:-_out/blueprint}"
+mkdir -p "$out_root"
+
+lake -d docs build docs
+"docs/.lake/build/bin/docs" --output "$out_root"
+
+echo "Output: $(readlink -f "$out_root")"
+```
+
+## Serving the Documentation
+
+```bash
+python3 -m http.server 8080 -d _out/blueprint
+```
+
+Then open http://localhost:8080 in your browser.

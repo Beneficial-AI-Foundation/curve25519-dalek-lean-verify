@@ -1,0 +1,14 @@
+name = "Curve25519DalekDocs"
+defaultTargets = ["Curve25519DalekDocs", "docs"]
+
+[[require]]
+name = "verso"
+git = "https://github.com/ejgallego/verso"
+rev = "bp"
+
+[[lean_lib]]
+name = "Curve25519DalekDocs"
+
+[[lean_exe]]
+name = "docs"
+root = "Main"

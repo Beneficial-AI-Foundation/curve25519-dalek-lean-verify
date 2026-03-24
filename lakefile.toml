@@ -2,6 +2,7 @@ name = "Curve25519Dalek"
 version = "0.1.0"
 keywords = ["formal verification"]
 defaultTargets = ["Curve25519Dalek"]
+weakLeanArgs = []                                                                                                                                                
 
 [leanOptions]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
@@ -24,9 +25,9 @@ git = "https://github.com/oliver-butterley/PrimeCert.git"
 rev = "ef2148a816e1e8d534c8446dac7f2dafcb4b4888"
 
 [[require]]
-name = "verso"
-git = "https://github.com/ejgallego/verso"
-rev = "bp"
+name = "subverso"
+git = "https://github.com/leanprover/subverso.git"
+rev = "no-modules/69981335508430ec0fc09241f535aa353c1e978e"
 
 [[lean_lib]]
 name = "Curve25519Dalek"
@@ -44,12 +45,3 @@ name = "syncstatus"
 root = "Utils.SyncStatus"
 supportInterpreter = true
 
-[[lean_lib]]
-name = "Curve25519DalekDocs"
-srcDir = "docs"
-
-[[lean_exe]]
-name = "curve25519docs"
-srcDir = "docs"
-root = "Curve25519DalekDocsMain"
-supportInterpreter = true
