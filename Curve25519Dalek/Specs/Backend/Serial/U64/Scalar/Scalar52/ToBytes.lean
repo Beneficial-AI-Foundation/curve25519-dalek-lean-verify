@@ -5,7 +5,6 @@ Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.BitList
-import Curve25519Dalek.ExternallyVerified
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
@@ -67,13 +66,13 @@ Each limb holds 52 bits. Since 52 = 6×8 + 4, each limb fills 6 full bytes plus 
 spill into a shared byte with the adjacent limb. The two shared bytes are s[6] and s[19],
 constructed via OR of the overflow bits from one limb and the start bits of the next.
 
-  | Limb | Bits | Bytes | Shared |
-  |------|-------|------------------------------------|--------|
-  | 0 | 0–51 | s[0]–s[5], lower nibble of s[6] | s[6] |
-  | 1 | 0–51 | upper nibble of s[6], s[7]–s[12] | s[6] |
-  | 2 | 0–51 | s[13]–s[18], lower nibble of s[19] | s[19] |
-  | 3 | 0–51 | upper nibble of s[19], s[20]–s[25] | s[19] |
-  | 4 | 0–47 | s[26]–s[31] (48 bits) | none |
+  | Limb | Bits | Bytes                              | Shared |
+  |------|------|------------------------------------|--------|
+  |  0   | 0–51 | s[0]–s[5], lower nibble of s[6]    | s[6]   |
+  |  1   | 0–51 | upper nibble of s[6], s[7]–s[12]   | s[6]   |
+  |  2   | 0–51 | s[13]–s[18], lower nibble of s[19] | s[19]  |
+  |  3   | 0–51 | upper nibble of s[19], s[20]–s[25] | s[19]  |
+  |  4   | 0–47 | s[26]–s[31] (48 bits)              | none   |
 
 Limb 4 uses only 48 of its 52 bits because the precondition `Scalar52_as_Nat self < L < 2^253`
 implies `self[4] < 2^(253−208) = 2^45 < 2^48`.
@@ -82,9 +81,9 @@ Total: limbs hold 5×52 = 260 bits, but the value fits in 32×8 = 256 bits.
 
 ## Proof overview
 
-We prove 5 results, one for each limb, describing the rows of the above table in terms of `BitList`.
-
-
+We express each of the 32 byte assignments as a `BitList.extract` equality, use
+`List.extract_append_extract` to merge adjacent extracts into limb-level equivalences,
+then convert to `Nat` via `toNat` and close with `grind`.
 -/
 
 set_option linter.style.setOption false
@@ -104,10 +103,9 @@ They mirror the Nat-level spec theorems from Aeneas but with BitList postconditi
 - Right shift by k ↔ `drop k` (plus zero padding at top)
 - Cast U64→U8 ↔ `take 8`
 - Left shift by k ↔ `replicate k false ++` (plus truncation)
-- Bitwise OR ↔ `zipWith (· || ·)`
+- Bitwise OR (non-overlapping) ↔ concatenation of `take`/`drop` slices
 -/
 
--- TODO: move this to a reasonable place
 /-- Concatenating adjacent extracts yields the combined extract. -/
 theorem List.extract_append_extract {α : Type*} (l : List α) (a b c : Nat)
     (hab : a ≤ b) (hbc : b ≤ c) :
@@ -117,13 +115,6 @@ theorem List.extract_append_extract {α : Type*} (l : List α) (a b c : Nat)
   rw [List.take_add]
   congr 1
   rw [List.drop_drop, show a + (b - a) = b from by omega]
-
--- TODO: move this to a reasonable place
-/-- Concatenating adjacent drop/take slices: lengths version.
-    `(l.drop a).take m ++ (l.drop (a+m)).take n = (l.drop a).take (m+n)` -/
-theorem List.drop_take_append_drop_take {α : Type*} (l : List α) (a m n : Nat) :
-    (l.drop a).take m ++ (l.drop (a + m)).take n = (l.drop a).take (m + n) := by
-  rw [List.take_add, List.drop_drop]
 
 private lemma testBit_add_mul_pow_low (b q k i : Nat) (hb : b < 2 ^ k) (hi : i < k) :
     (b + 2^k * q).testBit i = b.testBit i := by
@@ -271,37 +262,28 @@ theorem ofU64_or_non_overlapping (x y : U64) (k : Nat) (hk : k ≤ 64)
   · rw [Nat.add_mul_div_left _ _ (by positivity), Nat.div_eq_of_lt hy, Nat.zero_add]
     exact (ofNat_drop k 64 x.val (by omega)).symm
 
+/-- Convert an OR `bv` postcondition (as produced by `progress` on `lift (x ||| y)`)
+    into BitList form, given non-overlap preconditions. Absorbs OR commutativity. -/
+theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64)
+    (hx : x.val % 2 ^ k = 0) (hy : y.val < 2 ^ k)
+    (hbv : z.bv = y.bv ||| x.bv) :
+    ofU64 z = (ofU64 y).take k ++ (ofU64 x).drop k := by
+  have heq : z = x ||| y := by
+    have : z.bv = (x ||| y).bv := by
+      rw [hbv, UScalar.bv_or]; ext i; simp [Bool.or_comm]
+    have := congrArg BitVec.toNat this; scalar_tac
+  rw [heq]; exact ofU64_or_non_overlapping x y k hk hx hy
+
 -- Note: this is a strengthening of `Scalar52_top_limb_lt_of_as_Nat_lt` in Aux.lean (which gives
 -- < 2^51 from < 2^259). This tighter bound should be moved to the central location.
 /-- If `Scalar52_as_Nat a < L`, then the top limb `a[4]` is bounded by `2^45`.
 This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < L < 2^253`. -/
 theorem Scalar52_top_limb_lt_of_canonical (a : Array U64 5#usize) (h : Scalar52_as_Nat a < L) :
-  a[4].val < 2 ^ 45 := by
-  unfold Scalar52_as_Nat at h
-  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add] at h
-  have : L < 2 ^ 253 := by unfold L; omega
-  grind
-
-/-- If `Scalar52_as_Nat a < L`, then the top limb `a[4]` is bounded by `2^45`.
-This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < L < 2^253`. -/
-theorem Scalar52_top_limb_lt_of_canonical' (a : Array U64 5#usize) (h : Scalar52_as_Nat a < L) :
   (a : List U64)[4]!.val < 2 ^ 45 := by
   unfold Scalar52_as_Nat at h
   simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add] at h
   have : L < 2 ^ 253 := by unfold L; omega
   grind
-
-/-- Two bit lists of the same length with the same `toNat` value are equal. -/
-theorem eq_of_toNat_eq_of_length_eq (bs₁ bs₂ : List Bool)
-    (h : toNat bs₁ = toNat bs₂) (hl : bs₁.length = bs₂.length) : bs₁ = bs₂ := by
-  conv_lhs => rw [← ofNat_toNat bs₁]
-  conv_rhs => rw [← ofNat_toNat bs₂]
-  rw [hl, h]
-
-/-- Two bit lists of the same length with the same `toNat` value are Equiv. -/
-theorem Equiv.of_toNat_eq_of_length_eq (bs₁ bs₂ : List Bool)
-    (h : toNat bs₁ = toNat bs₂) (hl : bs₁.length = bs₂.length) : bs₁ ≈ₗ bs₂ := by
-  rw [eq_of_toNat_eq_of_length_eq bs₁ bs₂ h hl]
 
 /-- At a shared byte (s[6] or s[19]), the lower and upper nibble contributions recombine:
     `(x % 2^4) * 2^a + (x / 2^4) * 2^(a+4) = x * 2^a`. -/
@@ -311,15 +293,6 @@ theorem shared_byte_recombine (x a : Nat) :
   have : x / 2 ^ 4 * (2 ^ 4 * 2 ^ a) = x / 2 ^ 4 * 2 ^ 4 * 2 ^ a := by ring
   rw [this, ← Nat.add_mul]
   congr 1; omega
-
-/-- Casting a right-shifted U64 to U8 gives the corresponding 8-bit slice as a BitList.
-    Given `z.val = x.val / 2^k % 2^8` (which holds after shift-right by k then cast to U8),
-    we get `ofU8 z = ((ofU64 x).drop k).take 8`. -/
-theorem ofU8_val_eq_ofU64_drop_take (z : U8) (x : U64) (k : Nat)
-    (hk : k + 8 ≤ 64) (hval : z.val = x.val / 2 ^ k % 2 ^ 8) :
-    ofU8 z = ((ofU64 x).drop k).take 8 := by
-  change ofNat 8 z.val = ((ofNat 64 x.val).drop k).take 8
-  rw [hval, ofNat_mod, ofNat_drop k 64 x.val (by omega), ofNat_take 8 (64 - k) _ (by omega)]
 
 /-- Bridge from 5 BitList limb equivalences to the Nat-level equality
     `U8x32_as_Nat result = Scalar52_as_Nat self`. -/
@@ -418,7 +391,7 @@ theorem scalar52_eq_of_bitList_bytes
     (hb31 : ofU8 result[31]! = (ofU64 (↑self : List U64)[4]!).extract 40 48) :
     U8x32_as_Nat result = Scalar52_as_Nat self := by
   apply scalar52_eq_of_bitList_limbs self result h
-    (by have := h 4 (by omega); have := Scalar52_top_limb_lt_of_canonical' self h'; grind)
+    (by have := h 4 (by omega); have := Scalar52_top_limb_lt_of_canonical self h'; grind)
   · -- hlimb0
     rw [hb0, hb1, hb2, hb3, hb4, hb5, hb6]
     rw [List.extract_append_extract _ 0 8 16 (by omega) (by omega),
@@ -523,47 +496,32 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
               ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> {
         subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
         rw [ofU8_cast_eq_ofU64_take]; simp [ofU64_length, *] }
-    -- Shared bytes (2 of 32)
+    -- Shared bytes (2 of 32): OR of adjacent limb nibbles
     have hb6 : ofU8 result[6]! = (ofU64 (↑self : List U64)[0]!).extract 48 52 ++
         (ofU64 (↑self : List U64)[1]!).extract 0 4 := by
-      have hx_mod : i15.val % 2 ^ 4 = 0 :=
-        val_mod_of_replicate_prefix i15 4 _ i15_post
-      have hy_lt : i13.val < 2 ^ 4 :=
-        val_lt_of_shift_right i13 i 48 4 i13_post (by
+      have h_or := ofU64_of_or_bv i15 i13 i16 4 (by omega)
+        (val_mod_of_replicate_prefix i15 4 _ i15_post)
+        (val_lt_of_shift_right i13 i 48 4 i13_post (by
           have := h 0 (by omega); rw [i_post]
-          simp only [Array.getElem!_Nat_eq] at this; exact this)
-      have h_or : ofU64 i16 = (ofU64 i13).take 4 ++ (ofU64 i15).drop 4 := by
-        have h16_eq : i16 = i15 ||| i13 := by
-          have hbv : i16.bv = (i15 ||| i13).bv := by
-            simp only [i16_post2, UScalar.bv_or]; ext i; simp [Bool.or_comm]
-          have hval : i16.val = (i15 ||| i13).val := congrArg BitVec.toNat hbv
-          scalar_tac
-        rw [h16_eq]; exact ofU64_or_non_overlapping i15 i13 4 (by omega) hx_mod hy_lt
+          simp only [Array.getElem!_Nat_eq] at this; exact this))
+        i16_post2
       subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, h_or]
-      rw [List.take_append (i := 8)]
+      rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
       simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
         List.take_take, List.take_append_of_le_length]
     have hb19 : ofU8 result[19]! = (ofU64 (↑self : List U64)[2]!).extract 48 52 ++
         (ofU64 (↑self : List U64)[3]!).extract 0 4 := by
-      have hx_mod : i45.val % 2 ^ 4 = 0 :=
-        val_mod_of_replicate_prefix i45 4 _ i45_post
-      have hy_lt : i43.val < 2 ^ 4 :=
-        val_lt_of_shift_right i43 i30 48 4 i43_post (by
+      have h_or := ofU64_of_or_bv i45 i43 i46 4 (by omega)
+        (val_mod_of_replicate_prefix i45 4 _ i45_post)
+        (val_lt_of_shift_right i43 i30 48 4 i43_post (by
           have := h 2 (by omega); rw [i30_post]
-          simp only [Array.getElem!_Nat_eq] at this; exact this)
-      have h_or : ofU64 i46 = (ofU64 i43).take 4 ++ (ofU64 i45).drop 4 := by
-        have h46_eq : i46 = i45 ||| i43 := by
-          have hbv : i46.bv = (i45 ||| i43).bv := by
-            simp only [i46_post2, UScalar.bv_or]; ext i; simp [Bool.or_comm]
-          have hval : i46.val = (i45 ||| i43).val := congrArg BitVec.toNat hbv
-          scalar_tac
-        rw [h46_eq]; exact ofU64_or_non_overlapping i45 i43 4 (by omega) hx_mod hy_lt
+          simp only [Array.getElem!_Nat_eq] at this; exact this))
+        i46_post2
       subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
       rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
       simp [length_take, length_drop, ofU64_length, i43_post, i45_post,
         List.take_take, List.take_append_of_le_length]
-    -- Bridge: byte-level facts → limb-level facts → Nat equality
+    -- byte-level facts → limb-level facts → Nat equality
     have h_list : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52 := by
       intro i hi; have := h i hi
       simp only [Array.getElem!_Nat_eq] at this; exact this
