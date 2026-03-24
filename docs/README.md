@@ -44,7 +44,9 @@ name = "docs"
 root = "Main"
 ```
 
-Create `docs/lean-toolchain` with the same Lean version as your main project.
+Create `docs/lean-toolchain` matching the Lean version that Verso targets (check the
+`lean-toolchain` in the Verso repo/branch you depend on). This may differ from your
+main project's toolchain.
 
 ## Step 2: Build the Docs Project
 
@@ -63,14 +65,21 @@ Look up the `subverso` commit from `docs/lake-manifest.json`:
 grep -A2 '"name": "subverso"' docs/lake-manifest.json
 ```
 
-Add `subverso` (not `verso`) to your main project's `lakefile.toml`:
+Add `subverso` (not `verso`) to your main project's `lakefile.toml`. If your main
+project uses an older Lean toolchain than Verso, use a **demodulized** release by
+prefixing the commit hash with `no-modules/`:
 
 ```toml
 [[require]]
 name = "subverso"
 git = "https://github.com/leanprover/subverso"
-rev = "<commit-from-lake-manifest>"
+rev = "no-modules/<commit-from-lake-manifest>"
 ```
+
+The `no-modules/` prefix selects subverso's demodulized branch, which strips the
+Lean module system dependency so it compiles with older Lean versions. If your main
+project is on the same Lean version as Verso, use the commit hash directly without
+the prefix.
 
 ## Step 4: Build the Main Project
 
@@ -92,10 +101,13 @@ The path is relative to the workspace root when running `lake -d docs build` fro
 
 ## Building Documentation
 
-From the main project root:
+From the main project root, use `ELAN_TOOLCHAIN` to select the docs project's Lean
+version (check `docs/lean-toolchain`). This is necessary when the docs project uses a
+different Lean version than the main project — `lake -d docs` does not automatically
+switch toolchains.
 
 ```bash
-lake -d docs build docs
+ELAN_TOOLCHAIN=leanprover/lean4:v4.29.0-rc3 lake -d docs build docs
 ```
 
 Or create a build script (e.g., `scripts/build-blueprint.sh`):
@@ -106,10 +118,11 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+docs_toolchain=$(cat docs/lean-toolchain)
 out_root="${1:-_out/blueprint}"
 mkdir -p "$out_root"
 
-lake -d docs build docs
+ELAN_TOOLCHAIN="$docs_toolchain" lake -d docs build docs
 "docs/.lake/build/bin/docs" --output "$out_root"
 
 echo "Output: $(readlink -f "$out_root")"
@@ -117,8 +130,10 @@ echo "Output: $(readlink -f "$out_root")"
 
 ## Serving the Documentation
 
+The docs executable writes into an `html-multi` subdirectory:
+
 ```bash
-python3 -m http.server 8080 -d _out/blueprint
+python3 -m http.server 8080 -d _out/blueprint/html-multi
 ```
 
 Then open http://localhost:8080 in your browser.
