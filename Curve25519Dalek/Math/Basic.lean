@@ -104,6 +104,7 @@ theorem Scalar52_limb_le_nat (s : Aeneas.Std.Array U64 5#usize) (i : Nat) (hi : 
 /-! ## Primality and CurveField -/
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
+instance : Fact (Nat.Prime L) := ⟨PrimeCert.prime_ed25519_order⟩
 
 namespace Edwards
 

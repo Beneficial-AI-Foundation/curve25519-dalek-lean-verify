@@ -22,9 +22,7 @@ attribute [-simp] Int.reducePow Nat.reducePow
 /-- Helper: x * y < 2^124 -/
 private theorem bounds_mul {x y : Nat} (hx : x < 2 ^ 62) (hy : y < 2 ^ 62) :
     x * y < 2^124 := by
-  calc
-    x * y < 2^62 * 2^62 := Nat.mul_lt_mul_of_le_of_lt (Nat.le_of_lt hx) hy (by decide)
-    _ = 2^124 := by norm_num
+  nlinarith [hx, hy]
 
 /-- Helper: x * x < 2^124 (Special case for squares) -/
 private theorem bounds_sq {x : Nat} (hx : x < 2 ^ 62) : x * x < 2^124 := bounds_mul hx hx
@@ -32,21 +30,12 @@ private theorem bounds_sq {x : Nat} (hx : x < 2 ^ 62) : x * x < 2^124 := bounds_
 /-- Helper: 2 * x * y < 2^125 -/
 private theorem bounds_mul2 {x y : Nat} (hx : x < 2 ^ 62) (hy : y < 2 ^ 62) :
     2 * x * y < 2^125 := by
-  rw [Nat.mul_assoc]
-  calc
-    2 * (x * y) < 2 * 2^124 := by
-      apply Nat.mul_lt_mul_of_pos_left
-      · exact bounds_mul hx hy
-      · decide
-    _ = 2^125 := by norm_num
+  nlinarith [hx, hy]
 
 /-- Helper: a + b < 2^127 -/
 private theorem bounds_add {a b : Nat} (ha : a < 2 ^ 126) (hb : b < 2 ^ 126) :
     a + b < 2^127 := by
-  calc
-    a + b < 2^126 + 2^126 := Nat.add_lt_add ha hb
-    _ = 2 * 2^126 := by ring
-    _ = 2^127 := by norm_num
+  nlinarith [ha,hb]
 
 
 /-! ## Spec for `square_internal` -/
