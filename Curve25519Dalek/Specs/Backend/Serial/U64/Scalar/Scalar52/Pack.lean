@@ -9,8 +9,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 
 /-! # Spec Theorem for `Scalar52::pack`
 
-Specification and proof for `Scalar52::pack`.
-
 This function packs the element into a compact representation.
 
 Source: curve25519-dalek/src/scalar.rs
@@ -36,7 +34,8 @@ natural language specs:
 - Both the unpacked r and the packed s represent the same natural number modulo L
 - The packed scalar is in canonical form (less than L) -/
 @[progress]
-theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L) :
+theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
+    (h' : Scalar52_as_Nat self < L) :
     pack self ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ Scalar52_as_Nat self [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
