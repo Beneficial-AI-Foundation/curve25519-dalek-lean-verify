@@ -53,7 +53,6 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
   bvify 64 at *
   bv_decide
 
-
 -- TODO: move to standard library
 attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
 
