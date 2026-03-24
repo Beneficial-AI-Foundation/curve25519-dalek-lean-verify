@@ -10,7 +10,6 @@ import Curve25519Dalek.Tactics
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
 set_option linter.style.setOption false
-set_option linter.flexible false
 set_option maxHeartbeats 2000000
 set_option exponentiation.threshold 500
 
