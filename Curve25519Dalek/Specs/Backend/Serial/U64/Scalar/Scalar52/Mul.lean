@@ -11,11 +11,9 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
 /-! # Spec Theorem for `Scalar52::mul`
 
-Specification and proof for `Scalar52::mul`.
-
 This function performs regular scalar multiplication (not Montgomery multiplication).
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
 -/
 
@@ -47,44 +45,35 @@ natural language specs:
       - Each limb of the result is bounded by 2^52
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar52.mul`**:
-- No panic (always returns successfully)
+/-- **Spec theorem for `scalar.Scalar52.mul`**:
 - The result represents the product of the two input scalars modulo L
 - Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)
-- Output limbs are bounded by 2^52
--/
+- Output limbs are bounded by 2^52 -/
 @[progress]
 theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     mul a b ⦃ ( result : Scalar52 ) =>
       Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
-      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
+      Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold mul
   progress*
-  -- -- 2. To prove ∀ i < 5, ↑constants.RR[i]! < 2 ^ 62
   · unfold constants.RR; decide
-  refine ⟨?_, by grind⟩
-  -- 3a. To prove Scalar52_as_Nat res ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L]
-  -- i. res * R ≡ ab * RR [MOD L]
-  have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
-    rw [a2_post1] at result_post1
-    rw [Nat.ModEq]
-    exact result_post1
-  -- ii. res * R ≡ ab * R * R [MOD L]
-  have h_res_R_ab_R_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
-    have := curve25519_dalek.backend.serial.u64.constants.RR_spec
-    grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
-  -- iii. res * R ≡ a1 * R [MOD L]
-  have h_res_R_a1_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
-    rw [← Nat.ModEq] at ab_post1
-    have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
-      exact Nat.ModEq.mul_right R ab_post1
-    exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
-  -- iv. res * R ≡ a * b * R [MOD L]
-  have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
-    rw [a1_post1] at h_res_R_a1_R
-    exact h_res_R_a1_R
-  -- v. res ≡ a * b [MOD L]
-  grind [cancelR]
+  · refine ⟨?_, by grind⟩
+    have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
+      rw [a2_post1] at result_post1
+      rw [Nat.ModEq]
+      exact result_post1
+    have h_res_R_ab_R_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
+      have := curve25519_dalek.backend.serial.u64.constants.RR_spec
+      grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
+    have h_res_R_a1_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a1 * R  [MOD L] := by
+      rw [← Nat.ModEq] at ab_post1
+      have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
+        exact Nat.ModEq.mul_right R ab_post1
+      exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
+    have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
+      rw [a1_post1] at h_res_R_a1_R
+      exact h_res_R_a1_R
+    grind [cancelR]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
