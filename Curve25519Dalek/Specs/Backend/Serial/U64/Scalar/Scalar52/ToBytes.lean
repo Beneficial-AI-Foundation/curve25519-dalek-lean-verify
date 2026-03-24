@@ -166,30 +166,26 @@ private theorem toNat_replicate_false (k : Nat) : toNat (List.replicate k false)
   | succ k ih => simp [List.replicate_succ, toNat, ih]
 
 /-- If the bottom `k` bits of a U64 are all false (from a shift-left), then `val % 2^k = 0`. -/
-private theorem val_mod_of_replicate_prefix (x : U64) (k : Nat)
-    (rest : List Bool)
-    (hx : ofU64 x = List.replicate k false ++ rest) :
-    x.val % 2 ^ k = 0 := by
-  have h := congr_arg toNat hx
-  rw [toNat_ofU64, toNat_append, toNat_replicate_false, length_replicate, Nat.zero_add] at h
-  rw [h]; exact Nat.mul_comm _ _ ▸ Nat.mul_mod_right _ _
+private theorem val_mod_of_replicate_prefix (x : U64) (k : Nat) (rest : List Bool)
+    (hx : ofU64 x = List.replicate k false ++ rest) : x.val % 2 ^ k = 0 := by
+  have := congr_arg toNat hx
+  grind [Nat.mul_comm, Nat.mul_mod_right, toNat_ofU64, toNat_append, toNat_replicate_false]
 
 /-- If a U64 is a right-shift of `y` by `shift` bits and `y < 2^(shift+bits)`, then `x < 2^bits`. -/
 private theorem val_lt_of_shift_right (x y : U64) (shift bits : Nat)
     (hx : ofU64 x = (ofU64 y).drop shift ++ List.replicate shift false)
-    (hy : y.val < 2 ^ (shift + bits)) :
-    x.val < 2 ^ bits := by
+    (hy : y.val < 2 ^ (shift + bits)) : x.val < 2 ^ bits := by
   have h := congr_arg toNat hx
   rw [toNat_ofU64, toNat_append, toNat_drop, toNat_ofU64,
     toNat_replicate_false, length_drop, ofU64_length] at h
   simp only [Nat.zero_mul, Nat.add_zero] at h
   rw [h]; exact Nat.div_lt_of_lt_mul (by rwa [← Nat.pow_add])
 
-/-- Right-shifting a U64 by k drops the bottom k bits (LSB-first).
-    The result is `(ofU64 x).drop k` padded with k zeros at the top. -/
+/-- Right-shifting a U64 by `k` drops the bottom `k` bits (`BitList` spec). -/
 theorem U64.ShiftRight_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
     (hy0 : 0 ≤ y.val) (hy1 : y.val < 64) :
-    (x >>> y) ⦃ z => ofU64 z = (ofU64 x).drop y.toNat ++ List.replicate y.toNat false ⦄ := by
+    (x >>> y) ⦃ (z : UScalar UScalarTy.U64) =>
+      ofU64 z = (ofU64 x).drop y.toNat ++ List.replicate y.toNat false ⦄ := by
   have hk : y.toNat < 64 := by scalar_tac
   have hx64 : x.val < 2 ^ 64 := x.hmax
   have h := U64.ShiftRight_IScalar_spec x y hy0 hy1
@@ -206,27 +202,22 @@ theorem U64.ShiftRight_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
     congr 1
     rw [Nat.div_eq_of_lt hlt, ofNat_zero]
 
-/-- Casting a U64 to U8 takes the bottom 8 bits.
-    After `subst_vars` inlines cast equalities, `simp [ofU8_cast_eq_ofU64_take]` converts
-    all `ofU8 (UScalar.cast .U8 x)` occurrences to `(ofU64 x).take 8`. -/
+-- TODO: move to BitList file
+/-- Casting a U64 to U8 takes the bottom 8 bits. -/
 @[simp]
-theorem ofU8_cast_eq_ofU64_take (x : U64) :
-    ofU8 (UScalar.cast .U8 x) = (ofU64 x).take 8 := by
+theorem ofU8_cast_eq_ofU64_take (x : U64) : ofU8 (UScalar.cast .U8 x) = (ofU64 x).take 8 := by
   change ofNat 8 (UScalar.cast .U8 x).val = (ofNat 64 x.val).take 8
-  rw [UScalar.cast_val_eq, UScalarTy.U8_numBits_eq, ofNat_mod,
-    ofNat_take 8 64 x.val (by omega)]
+  rw [UScalar.cast_val_eq, UScalarTy.U8_numBits_eq, ofNat_mod, ofNat_take 8 64 x.val (by omega)]
 
-/-- Left-shifting a U64 by k prepends k zero bits at the bottom (LSB-first)
-    and truncates to 64 bits. -/
+/-- Left-shifting a U64 by `k` prepends `k` zero bits at the bottom and truncates to 64 bits. -/
 theorem U64.ShiftLeft_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
-    (hy0 : 0 ≤ y.val) (hy1 : y.val < 64) :
-    (x <<< y) ⦃ z => ofU64 z = List.replicate y.toNat false ++
-      (ofU64 x).take (64 - y.toNat) ⦄ := by
-  have hk : y.toNat < 64 := by scalar_tac
-  have h := U64.ShiftLeft_IScalar_spec x y hy0 hy1
+    (hy : 0 ≤ y.val) (hy' : y.val < 64) :
+    (x <<< y) ⦃ (z : UScalar UScalarTy.U64) =>
+      ofU64 z = List.replicate y.toNat false ++ (ofU64 x).take (64 - y.toNat) ⦄ := by
+  have : y.toNat < 64 := by scalar_tac
+  have h := U64.ShiftLeft_IScalar_spec x y hy hy'
   exact WP.spec_mono h fun z ⟨hval, _⟩ => by
-    change ofNat 64 z.val =
-      List.replicate y.toNat false ++ (ofNat 64 x.val).take (64 - y.toNat)
+    change ofNat 64 z.val = List.replicate y.toNat false ++ (ofNat 64 x.val).take (64 - y.toNat)
     rw [hval, Nat.shiftLeft_eq]
     have hsize : U64.size = 2 ^ 64 := by scalar_tac
     rw [hsize, ofNat_mod]
@@ -240,10 +231,8 @@ theorem U64.ShiftLeft_IScalar_bitList_spec {ty1} (x : U64) (y : IScalar ty1)
       rw [Nat.mul_div_cancel _ (by positivity)]
       exact (ofNat_take (64 - y.toNat) 64 x.val (by omega)).symm
 
-/-- Bitwise OR on non-overlapping values: if `x` has zeros in the bottom `k` bits
-    and `y` fits in `k` bits, then OR concatenates the respective bit slices.
-    This is the pattern used for shared bytes s[6] and s[19], where
-    `x = self[j+1] << 4` (zeros in bits 0–3) and `y = self[j] >> 48` (fits in 16 bits). -/
+/-- Bitwise OR on non-overlapping values: if `x` has zeros in the bottom `k` bits and `y` fits in
+`k` bits, then OR concatenates the respective bit slices. -/
 theorem ofU64_or_non_overlapping (x y : U64) (k : Nat) (hk : k ≤ 64)
     (hx : x.val % 2 ^ k = 0) (hy : y.val < 2 ^ k) :
     ofU64 (x ||| y) = (ofU64 y).take k ++ (ofU64 x).drop k := by
@@ -262,11 +251,10 @@ theorem ofU64_or_non_overlapping (x y : U64) (k : Nat) (hk : k ≤ 64)
   · rw [Nat.add_mul_div_left _ _ (by positivity), Nat.div_eq_of_lt hy, Nat.zero_add]
     exact (ofNat_drop k 64 x.val (by omega)).symm
 
-/-- Convert an OR `bv` postcondition (as produced by `progress` on `lift (x ||| y)`)
-    into BitList form, given non-overlap preconditions. Absorbs OR commutativity. -/
-theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64)
-    (hx : x.val % 2 ^ k = 0) (hy : y.val < 2 ^ k)
-    (hbv : z.bv = y.bv ||| x.bv) :
+/-- Convert an OR `bv` postcondition (as produced by `progress` on `lift (x ||| y)`) into BitList
+form, given non-overlap preconditions. -/
+private theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64) (hx : x.val % 2 ^ k = 0)
+    (hy : y.val < 2 ^ k) (hbv : z.bv = y.bv ||| x.bv) :
     ofU64 z = (ofU64 y).take k ++ (ofU64 x).drop k := by
   have heq : z = x ||| y := by
     have : z.bv = (x ||| y).bv := by
@@ -274,7 +262,7 @@ theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64)
     have := congrArg BitVec.toNat this; scalar_tac
   rw [heq]; exact ofU64_or_non_overlapping x y k hk hx hy
 
--- Note: this is a strengthening of `Scalar52_top_limb_lt_of_as_Nat_lt` in Aux.lean (which gives
+-- TODO: this is a strengthening of `Scalar52_top_limb_lt_of_as_Nat_lt` in Aux.lean (which gives
 -- < 2^51 from < 2^259). This tighter bound should be moved to the central location.
 /-- If `Scalar52_as_Nat a < L`, then the top limb `a[4]` is bounded by `2^45`.
 This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < L < 2^253`. -/
@@ -287,39 +275,27 @@ theorem Scalar52_top_limb_lt_of_canonical (a : Array U64 5#usize) (h : Scalar52_
 
 /-- At a shared byte (s[6] or s[19]), the lower and upper nibble contributions recombine:
     `(x % 2^4) * 2^a + (x / 2^4) * 2^(a+4) = x * 2^a`. -/
-theorem shared_byte_recombine (x a : Nat) :
+private theorem shared_byte_recombine (x a : Nat) :
     (x % 2 ^ 4) * 2 ^ a + (x / 2 ^ 4) * 2 ^ (a + 4) = x * 2 ^ a := by
   conv_lhs => rw [show (2 : Nat) ^ (a + 4) = 2 ^ 4 * 2 ^ a from by ring]
   have : x / 2 ^ 4 * (2 ^ 4 * 2 ^ a) = x / 2 ^ 4 * 2 ^ 4 * 2 ^ a := by ring
   rw [this, ← Nat.add_mul]
-  congr 1; omega
+  grind
 
-/-- Bridge from 5 BitList limb equivalences to the Nat-level equality
-    `U8x32_as_Nat result = Scalar52_as_Nat self`. -/
-theorem scalar52_eq_of_bitList_limbs
-    (self : Scalar52) (result : Aeneas.Std.Array U8 32#usize)
-    (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52)
-    (h4_bound : (↑self : List U64)[4]!.val < 2 ^ 48)
-    (hlimb0 : (ofU64 (↑self : List U64)[0]!).take 52 ≈ₗ
-        ofU8 result[0]! ++ ofU8 result[1]! ++ ofU8 result[2]! ++
-        ofU8 result[3]! ++ ofU8 result[4]! ++ ofU8 result[5]! ++
-        (ofU8 result[6]!).take 4)
-    (hlimb1 : (ofU64 (↑self : List U64)[1]!).take 52 ≈ₗ
-        (ofU8 result[6]!).drop 4 ++
-        ofU8 result[7]! ++ ofU8 result[8]! ++ ofU8 result[9]! ++
-        ofU8 result[10]! ++ ofU8 result[11]! ++ ofU8 result[12]!)
-    (hlimb2 : (ofU64 (↑self : List U64)[2]!).take 52 ≈ₗ
-        ofU8 result[13]! ++ ofU8 result[14]! ++ ofU8 result[15]! ++
-        ofU8 result[16]! ++ ofU8 result[17]! ++ ofU8 result[18]! ++
-        (ofU8 result[19]!).take 4)
-    (hlimb3 : (ofU64 (↑self : List U64)[3]!).take 52 ≈ₗ
-        (ofU8 result[19]!).drop 4 ++
-        ofU8 result[20]! ++ ofU8 result[21]! ++ ofU8 result[22]! ++
-        ofU8 result[23]! ++ ofU8 result[24]! ++ ofU8 result[25]!)
-    (hlimb4 : (ofU64 (↑self : List U64)[4]!).take 48 ≈ₗ
-        ofU8 result[26]! ++ ofU8 result[27]! ++ ofU8 result[28]! ++
-        ofU8 result[29]! ++ ofU8 result[30]! ++ ofU8 result[31]!) :
-    U8x32_as_Nat result = Scalar52_as_Nat self := by
+/-- Bridge from 5 BitList limb equivalences to the Nat-level equality. -/
+private theorem scalar52_eq_of_bitList_limbs (a : Scalar52) (b : Aeneas.Std.Array U8 32#usize)
+    (h : ∀ i < 5, (a : List U64)[i]!.val < 2 ^ 52) (h' : (a : List U64)[4]!.val < 2 ^ 48)
+    (hlimb0 : (ofU64 (a : List U64)[0]!).take 52 ≈ₗ ofU8 b[0]! ++ ofU8 b[1]! ++ ofU8 b[2]! ++
+        ofU8 b[3]! ++ ofU8 b[4]! ++ ofU8 b[5]! ++ (ofU8 b[6]!).take 4)
+    (hlimb1 : (ofU64 (a : List U64)[1]!).take 52 ≈ₗ (ofU8 b[6]!).drop 4 ++
+        ofU8 b[7]! ++ ofU8 b[8]! ++ ofU8 b[9]! ++ ofU8 b[10]! ++ ofU8 b[11]! ++ ofU8 b[12]!)
+    (hlimb2 : (ofU64 (a : List U64)[2]!).take 52 ≈ₗ ofU8 b[13]! ++ ofU8 b[14]! ++ ofU8 b[15]! ++
+        ofU8 b[16]! ++ ofU8 b[17]! ++ ofU8 b[18]! ++ (ofU8 b[19]!).take 4)
+    (hlimb3 : (ofU64 (a : List U64)[3]!).take 52 ≈ₗ (ofU8 b[19]!).drop 4 ++
+        ofU8 b[20]! ++ ofU8 b[21]! ++ ofU8 b[22]! ++ ofU8 b[23]! ++ ofU8 b[24]! ++ ofU8 b[25]!)
+    (hlimb4 : (ofU64 (a : List U64)[4]!).take 48 ≈ₗ ofU8 b[26]! ++ ofU8 b[27]! ++ ofU8 b[28]! ++
+        ofU8 b[29]! ++ ofU8 b[30]! ++ ofU8 b[31]!) :
+    U8x32_as_Nat b = Scalar52_as_Nat a := by
   -- Convert each BitList equivalence to a Nat identity
   have h0 := hlimb0.toNat_eq
   have h1 := hlimb1.toNat_eq
@@ -338,57 +314,57 @@ theorem scalar52_eq_of_bitList_limbs
   have hb1 := h 1 (by omega)
   have hb2 := h 2 (by omega)
   have hb3 := h 3 (by omega)
-  have hb6 := shared_byte_recombine result[6]!.val 48
-  have hb19 := shared_byte_recombine result[19]!.val 152
+  have hb6 := shared_byte_recombine b[6]!.val 48
+  have hb19 := shared_byte_recombine b[19]!.val 152
   -- Normalize all getElem! to getElem so self[i]! (from Scalar52_as_Nat) and
   -- self[i] (from hlimb hypotheses) become the same term.
   -- Aeneas disables List.getElem!_eq_getElem?_getD, so we must apply it explicitly.
   -- We provide explicit length facts so simp can discharge getElem? side conditions.
-  have hls : self.val.length = 5 := self.property
-  have hlr : result.val.length = 32 := result.property
+  have hls : a.val.length = 5 := a.property
+  have hlr : b.val.length = 32 := b.property
   simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
     List.getElem?_eq_getElem, Option.getD_some, hls, hlr, Nat.reduceLT] at *
   grind
 
-/-- In the language of `BitList`, if the 32 bytes are as defined in the function, then
+/-- If the 32 bytes are as defined in the function (in the language of `BitList`), then
 `U8x32_as_Nat result = Scalar52_as_Nat self` as required. -/
 theorem scalar52_eq_of_bitList_bytes
     (self : Scalar52) (result : Aeneas.Std.Array U8 32#usize)
-    (h : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L)
-    (hb0 : ofU8 result[0]! = (ofU64 (↑self : List U64)[0]!).extract 0 8)
-    (hb1 : ofU8 result[1]! = (ofU64 (↑self : List U64)[0]!).extract 8 16)
-    (hb2 : ofU8 result[2]! = (ofU64 (↑self : List U64)[0]!).extract 16 24)
-    (hb3 : ofU8 result[3]! = (ofU64 (↑self : List U64)[0]!).extract 24 32)
-    (hb4 : ofU8 result[4]! = (ofU64 (↑self : List U64)[0]!).extract 32 40)
-    (hb5 : ofU8 result[5]! = (ofU64 (↑self : List U64)[0]!).extract 40 48)
-    (hb6 : ofU8 result[6]! = (ofU64 (↑self : List U64)[0]!).extract 48 52 ++
-                             (ofU64 (↑self : List U64)[1]!).extract 0 4)
-    (hb7 : ofU8 result[7]! = (ofU64 (↑self : List U64)[1]!).extract 4 12)
-    (hb8 : ofU8 result[8]! = (ofU64 (↑self : List U64)[1]!).extract 12 20)
-    (hb9 : ofU8 result[9]! = (ofU64 (↑self : List U64)[1]!).extract 20 28)
-    (hb10 : ofU8 result[10]! = (ofU64 (↑self : List U64)[1]!).extract 28 36)
-    (hb11 : ofU8 result[11]! = (ofU64 (↑self : List U64)[1]!).extract 36 44)
-    (hb12 : ofU8 result[12]! = (ofU64 (↑self : List U64)[1]!).extract 44 52)
-    (hb13 : ofU8 result[13]! = (ofU64 (↑self : List U64)[2]!).extract 0 8)
-    (hb14 : ofU8 result[14]! = (ofU64 (↑self : List U64)[2]!).extract 8 16)
-    (hb15 : ofU8 result[15]! = (ofU64 (↑self : List U64)[2]!).extract 16 24)
-    (hb16 : ofU8 result[16]! = (ofU64 (↑self : List U64)[2]!).extract 24 32)
-    (hb17 : ofU8 result[17]! = (ofU64 (↑self : List U64)[2]!).extract 32 40)
-    (hb18 : ofU8 result[18]! = (ofU64 (↑self : List U64)[2]!).extract 40 48)
-    (hb19 : ofU8 result[19]! = (ofU64 (↑self : List U64)[2]!).extract 48 52 ++
-                               (ofU64 (↑self : List U64)[3]!).extract 0 4)
-    (hb20 : ofU8 result[20]! = (ofU64 (↑self : List U64)[3]!).extract 4 12)
-    (hb21 : ofU8 result[21]! = (ofU64 (↑self : List U64)[3]!).extract 12 20)
-    (hb22 : ofU8 result[22]! = (ofU64 (↑self : List U64)[3]!).extract 20 28)
-    (hb23 : ofU8 result[23]! = (ofU64 (↑self : List U64)[3]!).extract 28 36)
-    (hb24 : ofU8 result[24]! = (ofU64 (↑self : List U64)[3]!).extract 36 44)
-    (hb25 : ofU8 result[25]! = (ofU64 (↑self : List U64)[3]!).extract 44 52)
-    (hb26 : ofU8 result[26]! = (ofU64 (↑self : List U64)[4]!).extract 0 8)
-    (hb27 : ofU8 result[27]! = (ofU64 (↑self : List U64)[4]!).extract 8 16)
-    (hb28 : ofU8 result[28]! = (ofU64 (↑self : List U64)[4]!).extract 16 24)
-    (hb29 : ofU8 result[29]! = (ofU64 (↑self : List U64)[4]!).extract 24 32)
-    (hb30 : ofU8 result[30]! = (ofU64 (↑self : List U64)[4]!).extract 32 40)
-    (hb31 : ofU8 result[31]! = (ofU64 (↑self : List U64)[4]!).extract 40 48) :
+    (h : ∀ i < 5, (self : List U64)[i]!.val < 2 ^ 52) (h' : Scalar52_as_Nat self < L)
+    (hb0 : ofU8 result[0]! = (ofU64 (self : List U64)[0]!).extract 0 8)
+    (hb1 : ofU8 result[1]! = (ofU64 (self : List U64)[0]!).extract 8 16)
+    (hb2 : ofU8 result[2]! = (ofU64 (self : List U64)[0]!).extract 16 24)
+    (hb3 : ofU8 result[3]! = (ofU64 (self : List U64)[0]!).extract 24 32)
+    (hb4 : ofU8 result[4]! = (ofU64 (self : List U64)[0]!).extract 32 40)
+    (hb5 : ofU8 result[5]! = (ofU64 (self : List U64)[0]!).extract 40 48)
+    (hb6 : ofU8 result[6]! = (ofU64 (self : List U64)[0]!).extract 48 52 ++
+                             (ofU64 (self : List U64)[1]!).extract 0 4)
+    (hb7 : ofU8 result[7]! = (ofU64 (self : List U64)[1]!).extract 4 12)
+    (hb8 : ofU8 result[8]! = (ofU64 (self : List U64)[1]!).extract 12 20)
+    (hb9 : ofU8 result[9]! = (ofU64 (self : List U64)[1]!).extract 20 28)
+    (hb10 : ofU8 result[10]! = (ofU64 (self : List U64)[1]!).extract 28 36)
+    (hb11 : ofU8 result[11]! = (ofU64 (self : List U64)[1]!).extract 36 44)
+    (hb12 : ofU8 result[12]! = (ofU64 (self : List U64)[1]!).extract 44 52)
+    (hb13 : ofU8 result[13]! = (ofU64 (self : List U64)[2]!).extract 0 8)
+    (hb14 : ofU8 result[14]! = (ofU64 (self : List U64)[2]!).extract 8 16)
+    (hb15 : ofU8 result[15]! = (ofU64 (self : List U64)[2]!).extract 16 24)
+    (hb16 : ofU8 result[16]! = (ofU64 (self : List U64)[2]!).extract 24 32)
+    (hb17 : ofU8 result[17]! = (ofU64 (self : List U64)[2]!).extract 32 40)
+    (hb18 : ofU8 result[18]! = (ofU64 (self : List U64)[2]!).extract 40 48)
+    (hb19 : ofU8 result[19]! = (ofU64 (self : List U64)[2]!).extract 48 52 ++
+                               (ofU64 (self : List U64)[3]!).extract 0 4)
+    (hb20 : ofU8 result[20]! = (ofU64 (self : List U64)[3]!).extract 4 12)
+    (hb21 : ofU8 result[21]! = (ofU64 (self : List U64)[3]!).extract 12 20)
+    (hb22 : ofU8 result[22]! = (ofU64 (self : List U64)[3]!).extract 20 28)
+    (hb23 : ofU8 result[23]! = (ofU64 (self : List U64)[3]!).extract 28 36)
+    (hb24 : ofU8 result[24]! = (ofU64 (self : List U64)[3]!).extract 36 44)
+    (hb25 : ofU8 result[25]! = (ofU64 (self : List U64)[3]!).extract 44 52)
+    (hb26 : ofU8 result[26]! = (ofU64 (self : List U64)[4]!).extract 0 8)
+    (hb27 : ofU8 result[27]! = (ofU64 (self : List U64)[4]!).extract 8 16)
+    (hb28 : ofU8 result[28]! = (ofU64 (self : List U64)[4]!).extract 16 24)
+    (hb29 : ofU8 result[29]! = (ofU64 (self : List U64)[4]!).extract 24 32)
+    (hb30 : ofU8 result[30]! = (ofU64 (self : List U64)[4]!).extract 32 40)
+    (hb31 : ofU8 result[31]! = (ofU64 (self : List U64)[4]!).extract 40 48) :
     U8x32_as_Nat result = Scalar52_as_Nat self := by
   apply scalar52_eq_of_bitList_limbs self result h
     (by have := h 4 (by omega); have := Scalar52_top_limb_lt_of_canonical self h'; grind)
@@ -441,9 +417,7 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
     simp [List.extract_eq_drop_take]
 
--- Remove @[progress] from the old Nat-level shift specs and add to the new BitList specs.
--- The cast (progress_pure_def) and OR (lift) keep their original progress behavior;
--- use ofU8_cast_eq_ofU64_take and ofU64_or_non_overlapping manually after progress.
+-- Remove @[progress] from the Nat-level shift specs and add to the BitList specs.
 attribute [-progress] U64.ShiftRight_IScalar_spec
 attribute [-progress] U64.ShiftLeft_IScalar_spec
 attribute [progress] U64.ShiftRight_IScalar_bitList_spec
@@ -462,67 +436,67 @@ theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     -- Simple bytes (30 of 32): each byte = 8-bit extract of its limb
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5, hb7, hb8, hb9, hb10, hb11, hb12, hb13, hb14, hb15, hb16,
         hb17, hb18, hb20, hb21, hb22, hb23, hb24, hb25, hb26, hb27, hb28, hb29, hb30, hb31⟩ :
-        ofU8 result[0]! = (ofU64 (↑self : List U64)[0]!).extract 0 8 ∧
-        ofU8 result[1]! = (ofU64 (↑self : List U64)[0]!).extract 8 16 ∧
-        ofU8 result[2]! = (ofU64 (↑self : List U64)[0]!).extract 16 24 ∧
-        ofU8 result[3]! = (ofU64 (↑self : List U64)[0]!).extract 24 32 ∧
-        ofU8 result[4]! = (ofU64 (↑self : List U64)[0]!).extract 32 40 ∧
-        ofU8 result[5]! = (ofU64 (↑self : List U64)[0]!).extract 40 48 ∧
-        ofU8 result[7]! = (ofU64 (↑self : List U64)[1]!).extract 4 12 ∧
-        ofU8 result[8]! = (ofU64 (↑self : List U64)[1]!).extract 12 20 ∧
-        ofU8 result[9]! = (ofU64 (↑self : List U64)[1]!).extract 20 28 ∧
-        ofU8 result[10]! = (ofU64 (↑self : List U64)[1]!).extract 28 36 ∧
-        ofU8 result[11]! = (ofU64 (↑self : List U64)[1]!).extract 36 44 ∧
-        ofU8 result[12]! = (ofU64 (↑self : List U64)[1]!).extract 44 52 ∧
-        ofU8 result[13]! = (ofU64 (↑self : List U64)[2]!).extract 0 8 ∧
-        ofU8 result[14]! = (ofU64 (↑self : List U64)[2]!).extract 8 16 ∧
-        ofU8 result[15]! = (ofU64 (↑self : List U64)[2]!).extract 16 24 ∧
-        ofU8 result[16]! = (ofU64 (↑self : List U64)[2]!).extract 24 32 ∧
-        ofU8 result[17]! = (ofU64 (↑self : List U64)[2]!).extract 32 40 ∧
-        ofU8 result[18]! = (ofU64 (↑self : List U64)[2]!).extract 40 48 ∧
-        ofU8 result[20]! = (ofU64 (↑self : List U64)[3]!).extract 4 12 ∧
-        ofU8 result[21]! = (ofU64 (↑self : List U64)[3]!).extract 12 20 ∧
-        ofU8 result[22]! = (ofU64 (↑self : List U64)[3]!).extract 20 28 ∧
-        ofU8 result[23]! = (ofU64 (↑self : List U64)[3]!).extract 28 36 ∧
-        ofU8 result[24]! = (ofU64 (↑self : List U64)[3]!).extract 36 44 ∧
-        ofU8 result[25]! = (ofU64 (↑self : List U64)[3]!).extract 44 52 ∧
-        ofU8 result[26]! = (ofU64 (↑self : List U64)[4]!).extract 0 8 ∧
-        ofU8 result[27]! = (ofU64 (↑self : List U64)[4]!).extract 8 16 ∧
-        ofU8 result[28]! = (ofU64 (↑self : List U64)[4]!).extract 16 24 ∧
-        ofU8 result[29]! = (ofU64 (↑self : List U64)[4]!).extract 24 32 ∧
-        ofU8 result[30]! = (ofU64 (↑self : List U64)[4]!).extract 32 40 ∧
-        ofU8 result[31]! = (ofU64 (↑self : List U64)[4]!).extract 40 48 := by
+        ofU8 result[0]! = (ofU64 (self : List U64)[0]!).extract 0 8 ∧
+        ofU8 result[1]! = (ofU64 (self : List U64)[0]!).extract 8 16 ∧
+        ofU8 result[2]! = (ofU64 (self : List U64)[0]!).extract 16 24 ∧
+        ofU8 result[3]! = (ofU64 (self : List U64)[0]!).extract 24 32 ∧
+        ofU8 result[4]! = (ofU64 (self : List U64)[0]!).extract 32 40 ∧
+        ofU8 result[5]! = (ofU64 (self : List U64)[0]!).extract 40 48 ∧
+        ofU8 result[7]! = (ofU64 (self : List U64)[1]!).extract 4 12 ∧
+        ofU8 result[8]! = (ofU64 (self : List U64)[1]!).extract 12 20 ∧
+        ofU8 result[9]! = (ofU64 (self : List U64)[1]!).extract 20 28 ∧
+        ofU8 result[10]! = (ofU64 (self : List U64)[1]!).extract 28 36 ∧
+        ofU8 result[11]! = (ofU64 (self : List U64)[1]!).extract 36 44 ∧
+        ofU8 result[12]! = (ofU64 (self : List U64)[1]!).extract 44 52 ∧
+        ofU8 result[13]! = (ofU64 (self : List U64)[2]!).extract 0 8 ∧
+        ofU8 result[14]! = (ofU64 (self : List U64)[2]!).extract 8 16 ∧
+        ofU8 result[15]! = (ofU64 (self : List U64)[2]!).extract 16 24 ∧
+        ofU8 result[16]! = (ofU64 (self : List U64)[2]!).extract 24 32 ∧
+        ofU8 result[17]! = (ofU64 (self : List U64)[2]!).extract 32 40 ∧
+        ofU8 result[18]! = (ofU64 (self : List U64)[2]!).extract 40 48 ∧
+        ofU8 result[20]! = (ofU64 (self : List U64)[3]!).extract 4 12 ∧
+        ofU8 result[21]! = (ofU64 (self : List U64)[3]!).extract 12 20 ∧
+        ofU8 result[22]! = (ofU64 (self : List U64)[3]!).extract 20 28 ∧
+        ofU8 result[23]! = (ofU64 (self : List U64)[3]!).extract 28 36 ∧
+        ofU8 result[24]! = (ofU64 (self : List U64)[3]!).extract 36 44 ∧
+        ofU8 result[25]! = (ofU64 (self : List U64)[3]!).extract 44 52 ∧
+        ofU8 result[26]! = (ofU64 (self : List U64)[4]!).extract 0 8 ∧
+        ofU8 result[27]! = (ofU64 (self : List U64)[4]!).extract 8 16 ∧
+        ofU8 result[28]! = (ofU64 (self : List U64)[4]!).extract 16 24 ∧
+        ofU8 result[29]! = (ofU64 (self : List U64)[4]!).extract 24 32 ∧
+        ofU8 result[30]! = (ofU64 (self : List U64)[4]!).extract 32 40 ∧
+        ofU8 result[31]! = (ofU64 (self : List U64)[4]!).extract 40 48 := by
       refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
               ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;> {
         subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
         rw [ofU8_cast_eq_ofU64_take]; simp [ofU64_length, *] }
     -- Shared bytes (2 of 32): OR of adjacent limb nibbles
-    have hb6 : ofU8 result[6]! = (ofU64 (↑self : List U64)[0]!).extract 48 52 ++
-        (ofU64 (↑self : List U64)[1]!).extract 0 4 := by
+    have ⟨hb6, hb19⟩ : ofU8 result[6]! = (ofU64 (self : List U64)[0]!).extract 48 52 ++
+        (ofU64 (self : List U64)[1]!).extract 0 4 ∧
+        ofU8 result[19]! = (ofU64 (self : List U64)[2]!).extract 48 52 ++
+        (ofU64 (self : List U64)[3]!).extract 0 4:= by
       have h_or := ofU64_of_or_bv i15 i13 i16 4 (by omega)
         (val_mod_of_replicate_prefix i15 4 _ i15_post)
         (val_lt_of_shift_right i13 i 48 4 i13_post (by
           have := h 0 (by omega); rw [i_post]
           simp only [Array.getElem!_Nat_eq] at this; exact this))
         i16_post2
-      subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
-      simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
-        List.take_take, List.take_append_of_le_length]
-    have hb19 : ofU8 result[19]! = (ofU64 (↑self : List U64)[2]!).extract 48 52 ++
-        (ofU64 (↑self : List U64)[3]!).extract 0 4 := by
-      have h_or := ofU64_of_or_bv i45 i43 i46 4 (by omega)
+      have h_or' := ofU64_of_or_bv i45 i43 i46 4 (by omega)
         (val_mod_of_replicate_prefix i45 4 _ i45_post)
         (val_lt_of_shift_right i43 i30 48 4 i43_post (by
           have := h 2 (by omega); rw [i30_post]
           simp only [Array.getElem!_Nat_eq] at this; exact this))
         i46_post2
       subst_vars; simp only [Array.getElem!_Nat_eq, Array.set_val_eq]; simp_lists
-      rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
-      simp [length_take, length_drop, ofU64_length, i43_post, i45_post,
-        List.take_take, List.take_append_of_le_length]
+      constructor
+      · rw [ofU8_cast_eq_ofU64_take, h_or, List.take_append (i := 8)]
+        simp [length_take, length_drop, ofU64_length, i13_post, i15_post,
+          List.take_take, List.take_append_of_le_length]
+      · rw [ofU8_cast_eq_ofU64_take, h_or', List.take_append (i := 8)]
+        simp [length_take, length_drop, ofU64_length, i43_post, i45_post,
+          List.take_take, List.take_append_of_le_length]
     -- byte-level facts → limb-level facts → Nat equality
-    have h_list : ∀ i < 5, (↑self : List U64)[i]!.val < 2 ^ 52 := by
+    have h_list : ∀ i < 5, (self : List U64)[i]!.val < 2 ^ 52 := by
       intro i hi; have := h i hi
       simp only [Array.getElem!_Nat_eq] at this; exact this
     have := scalar52_eq_of_bitList_bytes self result h_list h'
