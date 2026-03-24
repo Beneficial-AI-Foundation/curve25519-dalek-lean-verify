@@ -41,8 +41,6 @@ theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold pack
   progress*
-  constructor
-  · simp only [*, Nat.ModEq]
-  · assumption
+  exact ⟨by simp only [*, Nat.ModEq], by assumption⟩
 
 end curve25519_dalek.scalar.Scalar52

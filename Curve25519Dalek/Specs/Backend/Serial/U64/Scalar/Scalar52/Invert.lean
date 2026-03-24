@@ -12,7 +12,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-set_option linter.style.whitespace false
 set_option exponentiation.threshold 260
 
 /-! # Spec Theorem for `Scalar52::invert`
@@ -59,7 +58,7 @@ theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
   progress*
   · by_contra _
     have : Scalar52_as_Nat self % L = 0 % L := by
-      apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by decide)
+      apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by rfl)
       try simp_all [Nat.ModEq]
     try simp_all
   · refine ⟨?_, by assumption, by assumption⟩

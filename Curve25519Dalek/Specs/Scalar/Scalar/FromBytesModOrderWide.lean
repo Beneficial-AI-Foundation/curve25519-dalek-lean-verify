@@ -41,8 +41,6 @@ theorem from_bytes_mod_order_wide_spec (input : Array U8 64#usize) :
   unfold from_bytes_mod_order_wide
   progress*
   · grind [L]
-  · constructor
-    · simp_all [Nat.ModEq]
-    · simp_all [Nat.ModEq]
+  · all_goals simp_all [Nat.ModEq]
 
 end curve25519_dalek.scalar.Scalar
