@@ -143,7 +143,7 @@ theorem add_spec (a b : Scalar52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
     add a b ⦃ (v : Scalar52) =>
       Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
-      Scalar52_as_Nat v < L ⦄ := by
+      Scalar52_as_Nat v < L ∧ ∀ i < 5, v[i]!.val < 2 ^ 52 ⦄ := by
   unfold add
   progress*
   · have : L < 2 ^ 259 := by unfold L; grind
@@ -165,7 +165,7 @@ theorem add_spec (a b : Scalar52)
       _ = _ := by simp [Scalar52_as_Nat, Finset.sum_add_distrib]
     omega
   · grind [constants.L_spec]
-  · constructor
+  · refine ⟨?_, ?_, ?_⟩
     · rw [constants.L_spec] at *
       have h1 : Scalar52_as_Nat v ≡ Scalar52_as_Nat sum [MOD L] := by
         have hL_mod : L ≡ 0 [MOD L] := by
@@ -180,6 +180,7 @@ theorem add_spec (a b : Scalar52)
         conv_lhs => rw [sum_post3]
         simp [Finset.sum_add_distrib, Nat.mul_add]
       grind
+    · assumption
     · assumption
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
