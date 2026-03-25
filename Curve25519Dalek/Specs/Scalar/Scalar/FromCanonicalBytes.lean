@@ -62,7 +62,8 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
   progress as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
   · rw [ha, high_bit_zero_of_lt_L b hb] at he
-    simp_all; bv_tac
+    simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,
+      UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, iff_true, and_true]; bv_tac
   · simp_all
   · intro _
     rw [hg]

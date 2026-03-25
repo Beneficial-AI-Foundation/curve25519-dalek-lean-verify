@@ -67,88 +67,37 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
     have : i = squarings := by
       have h_ge : squarings.val ≤ i.val := Nat.le_of_sub_eq_zero h_rem
       have h_val_eq : i.val = squarings.val := Nat.le_antisymm hi h_ge
-      cases i; cases squarings; simp_all
+      cases i; cases squarings;
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+        getElem!_pos, Nat.reducePow, le_refl, tsub_self, UScalar.mk.injEq,
+        UScalarTy.Usize_numBits_eq]
       exact BitVec.eq_of_toNat_eq h_val_eq
     unfold montgomery_invert.square_multiply_loop
-    simp [this, pow2]
+    simp only [this, lt_self_iff_false, ↓reduceIte, pow2, pow_zero, tsub_self, mul_one, pow_one,
+      Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, spec_ok, true_and]
     intro i hi; simpa using h_y_bound i hi
   | succ n ih =>
     unfold montgomery_invert.square_multiply_loop
-    simp
+    simp only [UScalar.lt_equiv, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+      Nat.reducePow]
     split
     · progress as ⟨y1, hy1_eq, hy1_bound⟩
       progress as ⟨i1, h_val_i1⟩
-      have h_i1_bound : i1.val ≤ squarings.val := by simp [h_val_i1]; scalar_tac
-      have h_rem_next : squarings.val - i1.val = n := by simp [h_val_i1]; scalar_tac
+      have h_i1_bound : i1.val ≤ squarings.val := by
+        simp only [h_val_i1, Order.add_one_le_iff]; agrind
+      have h_rem_next : squarings.val - i1.val = n := by simp only [h_val_i1]; agrind
       progress as ⟨res, h_math_ih, h_res_bound⟩
       refine ⟨?_, h_res_bound⟩
       · have h_pow_split : pow2 (n + 1) - 1 = (pow2 n - 1) + pow2 n := by
-          simp [pow2, Nat.pow_succ, Nat.mul_succ]
+          simp only [pow2, Nat.pow_succ, Nat.mul_succ, mul_one]
           have : 1 ≤ 2^n := Nat.one_le_pow n 2 (by decide)
           omega
         rw [h_pow_split, Nat.pow_add]
         unfold pow2 at *; try ring_nf at ⊢ h_math_ih
         rw [Nat.mul_mod, h_math_ih, ← Nat.mul_mod, ← Nat.mul_pow, Nat.pow_mod, ← hy1_eq, ← Nat.pow_mod]
-        try ring_nf
+        ring_nf
     · have : squarings.val - i.val = n + 1 := by assumption
-      scalar_tac
-/- OLD PROOF (before Aeneas WP migration):
-  induction h_rem : (squarings.val - i.val) generalizing i y with
-  | zero =>
-    have : i = squarings := by
-      have h_ge : squarings.val ≤ i.val := Nat.le_of_sub_eq_zero h_rem
-      have h_val_eq : i.val = squarings.val := Nat.le_antisymm hi h_ge
-      cases i; cases squarings; simp_all
-      exact BitVec.eq_of_toNat_eq h_val_eq
-
-    unfold montgomery_invert.square_multiply_loop
-    simp [this]
-    simp [pow2]
-    intro i hi; simpa using h_y_bound i hi
-
-  | succ n ih =>
-    unfold montgomery_invert.square_multiply_loop
-    simp
-    split
-    · -- Case 1: Loop Continues (i < squarings)
-      -- 1. Perform the square
-      progress with montgomery_square_spec as ⟨y1, hy1_eq, hy1_bound⟩
-
-      have h_no_overflow : i.val + 1 ≤ Usize.max := by
-        have : i.val < squarings.val := by scalar_tac
-        scalar_tac
-
-      obtain ⟨i1, h_call_i1, h_val_i1⟩ := @Usize.add_spec i 1#usize h_no_overflow
-      rw [h_call_i1]
-      simp only [bind_tc_ok]
-
-      have h_i1_bound : i1.val ≤ squarings.val := by
-        simp [h_val_i1]; scalar_tac
-
-      have h_rem_next : squarings.val - i1.val = n := by
-        simp [h_val_i1]
-        scalar_tac
-
-      obtain ⟨res, h_call_loop, h_math_ih, h_res_bound⟩ :=
-        ih y1 i1 h_i1_bound hy1_bound h_rem_next
-
-      refine ⟨res, h_call_loop, ?_, h_res_bound⟩
-      · -- Proof of Equality
-        have h_pow_split : pow2 (n + 1) - 1 = (pow2 n - 1) + pow2 n := by
-          simp [pow2, Nat.pow_succ, Nat.mul_succ]
-          have : 1 ≤ 2^n := Nat.one_le_pow n 2 (by decide)
-          omega
-
-        rw [h_pow_split, Nat.pow_add]
-        unfold pow2 at *; try ring_nf at ⊢ h_math_ih
-        rw [Nat.mul_mod, h_math_ih, ← Nat.mul_mod, ← Nat.mul_pow, Nat.pow_mod, ← hy1_eq, ← Nat.pow_mod]
-        try ring_nf
-
-    · -- Case 2: Loop Terminates (i >= squarings)
-      -- This contradicts the induction hypothesis (squarings - i = n + 1 >= 1)
-      have : squarings.val - i.val = n + 1 := by assumption
-      scalar_tac
--/
+      agrind
 
 
 /--
@@ -178,32 +127,9 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     h_mul_math.symm
   rw [h_pow_split, ← Nat.mul_assoc, Nat.mul_mod, h_mul_eq, ← Nat.mul_mod]
   unfold pow2 at *
-  try ring_nf
+  ring_nf
   rw [Nat.mul_comm (Scalar52_as_Nat loop_res), Nat.mul_assoc, Nat.mul_mod, h_loop_math]
   rw [← Nat.mul_mod]
-/- OLD PROOF (before Aeneas WP migration):
-  unfold montgomery_invert.square_multiply
-  progress with square_multiply_loop_spec as ⟨ h_loop_res, h_loop_math, h_loop_bound ⟩
 
-  simp only [tsub_zero] at h_loop_math
-  progress as ⟨ h_mul_res, h_mul_math, h_mul_bound ⟩
-  refine ⟨?_, h_mul_bound⟩
-
-  have h_pow_split : R ^ (pow2 squarings.val) = R * R ^ (pow2 squarings.val - 1) := by
-    rw [← Nat.pow_succ']; congr 1
-    have : 1 ≤ pow2 squarings.val := Nat.one_le_pow _ _ (by decide)
-    omega
-
-  have h_mul_eq : (Scalar52_as_Nat h_mul_res * R) % L =
-                  (Scalar52_as_Nat h_loop_res * Scalar52_as_Nat x) % L :=
-    h_mul_math.symm
-
-  rw [h_pow_split, ← Nat.mul_assoc, Nat.mul_mod, h_mul_eq, ← Nat.mul_mod]
-  unfold pow2 at *
-  try ring_nf
-
-  rw [Nat.mul_comm (Scalar52_as_Nat h_loop_res), Nat.mul_assoc, Nat.mul_mod, h_loop_math]
-  rw [← Nat.mul_mod]
--/
 
 end curve25519_dalek.scalar.Scalar52

@@ -1103,11 +1103,11 @@ theorem edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_ass
 
    Conditionally swaps two ProjectivePoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
-
 def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
   : Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) :=
   if choice.val = 1#u8 then ok (b, a) else ok (a, b)
+  
 /-
 def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)

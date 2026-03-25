@@ -55,9 +55,13 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     · have := List.mem_range.mp hi
       interval_cases i <;> omega
   · subst_vars
-    simp [*]
+    simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq, List.set_set,
+      List.getElem!_eq_getElem?_getD]
     rw [Finset.sum_range_succ]
-    simp [*]
+    simp only [Nat.reduceMul, List.length_set, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.lt_add_one, getElem?_pos, List.getElem_set_self, Option.getD_some, Array.set_val_eq,
+      getElem!_pos, UScalar.val_or, ne_eq, OfNat.zero_ne_ofNat, not_false_eq_true,
+      List.getElem_set_ne, UScalar.val_and, i5_post1, i3_post1]
     have : (bytes : List U8)[31].val &&& 127 ||| 64 ≤ 127 := by
       have h : ((bytes : List U8)[31].bv &&& 127 ||| 64) ≤ 127 := by bv_decide
       bound
@@ -67,7 +71,14 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
       _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) + 2 ^ 248 * 127 := by gcongr
       _ < 2 ^ 255 := by decide
   · have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
-    simp [Finset.sum_range_succ, *]
-    scalar_tac
+    simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq, List.set_set,
+      List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton,
+      mul_zero, pow_zero, List.length_set, List.Vector.length_val, Nat.ofNat_pos, getElem?_pos,
+      ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, List.getElem_set_ne, List.getElem_set_self,
+      Option.getD_some, getElem!_pos, UScalar.val_and, one_mul, mul_one, Nat.one_lt_ofNat,
+      OfNat.ofNat_ne_one, zero_ne_one, Nat.reduceMul, Nat.reduceLT, Nat.reduceEqDiff,
+      OfNat.zero_ne_ofNat, Nat.succ_ne_self, Nat.lt_add_one, UScalar.val_or, ge_iff_le, result_post,
+      bytes2_post, bytes1_post, i1_post1, i_post, i5_post1, i4_post, i3_post1, i2_post]
+    agrind
 
 end curve25519_dalek.scalar

@@ -244,7 +244,27 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
       ∀ i : Fin 5,
         ofU64 result[i]! ≈ₗ (ofByteArray bytes).extract (51 * i.val) (51 * i.val + 51) ⦄ := by
   unfold from_bytes
-  progress*
+  let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ low_51_bit_mask, low_51_bit_mask_post1, low_51_bit_mask_post2 ⟩ ← U64.sub_spec
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ i1, i1_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ i2, i2_post ⟩ ← u64_and_mask51_bitList_spec
+  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ i3, i3_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ i4, i4_post ⟩ ← u64_shr_bitList_spec
+  let* ⟨ i5, i5_post ⟩ ← u64_and_mask51_bitList_spec
+  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ i6, i6_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ i7, i7_post ⟩ ← u64_shr_bitList_spec
+  let* ⟨ i8, i8_post ⟩ ← u64_and_mask51_bitList_spec
+  let* ⟨ s3, s3_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ i9, i9_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ i10, i10_post ⟩ ← u64_shr_bitList_spec
+  let* ⟨ i11, i11_post ⟩ ← u64_and_mask51_bitList_spec
+  let* ⟨ s4, s4_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ i12, i12_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ i13, i13_post ⟩ ← u64_shr_bitList_spec
+  let* ⟨ i14, i14_post ⟩ ← u64_and_mask51_bitList_spec
   have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by
     intro _ hsx; simp [hsx, Array.to_slice]
   intro i; fin_cases i
@@ -262,7 +282,7 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2^51) ⦄ := by
-  progress*
+  let* ⟨ result, result_post ⟩ ← from_bytes_bitList_spec
   constructor
   · rw [field51_eq_of_bitList result bytes _]
     assumption

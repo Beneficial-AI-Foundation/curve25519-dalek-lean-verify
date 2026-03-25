@@ -49,10 +49,15 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val �
       (∀ j < 5, j < i.val → result[j]! = square[j]!) ⦄ := by
   unfold square2_loop
   split
-  · progress*
+  · let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i2, i2_post ⟩ ← U64.mul_spec
+    let* ⟨ a, a_post ⟩ ← Array.update_spec
+    let* ⟨ i3, i3_post ⟩ ← Usize.add_spec
+    let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
     · refine ⟨fun j _ _ ↦ ?_, by grind⟩
       obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> grind
-  · progress*
+  · simp only [progress_simps]
+    grind
   termination_by 5 - i.val
   decreasing_by scalar_tac
 
@@ -68,7 +73,8 @@ theorem square2_spec (self : Array U64 5#usize) (h_bounds : ∀ i < 5, self[i]!.
       Field51_as_Nat result ≡ (2 * (Field51_as_Nat self) ^ 2) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 53) ⦄ := by
   unfold square2
-  progress*
+  let* ⟨ square, square_post2, square_post1 ⟩ ← pow2k_spec
+  let* ⟨ result, result_post1, result_post2 ⟩ ← square2_loop_spec
   refine ⟨?_, by grind⟩
   have : Field51_as_Nat result = 2 * Field51_as_Nat square := by
     unfold Field51_as_Nat

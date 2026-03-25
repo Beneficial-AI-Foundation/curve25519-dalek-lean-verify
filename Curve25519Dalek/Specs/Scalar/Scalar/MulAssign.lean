@@ -58,19 +58,17 @@ natural language specs:
 • The result is canonical: U8x32_as_Nat result.bytes < ℓ
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`**:
+/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`**:
 • Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),
   consistent with Scalar invariant #2
 • The function always succeeds (no panic)
 • The result satisfies:
   `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`
-• The result is canonical: `U8x32_as_Nat result.bytes < L`
--/
+• The result is canonical: `U8x32_as_Nat result.bytes < L` -/
 @[progress]
-theorem mul_assign_spec (self _rhs : scalar.Scalar) :
-    mul_assign self _rhs ⦃ result =>
-      U8x32_as_Nat result.bytes ≡
-        U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
+theorem mul_assign_spec (self _rhs : Scalar) :
+    mul_assign self _rhs ⦃ (result : Scalar) =>
+      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul_assign
   unfold scalar.Scalar.unpack
@@ -80,13 +78,12 @@ theorem mul_assign_spec (self _rhs : scalar.Scalar) :
     fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
   have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  progress as ⟨s2, hs2_cong, hs2_bounds⟩
+  progress as ⟨s2, hs2_cong, hs2_lt⟩
   progress as ⟨hpack, hpack_cong, hpack_lt⟩
-  refine ⟨?_, hpack_lt⟩
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
              U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
     rw [hs_nat, hs1_nat]
-  exact Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong)
+  exact ⟨Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong), hpack_lt⟩
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar
 
@@ -111,14 +108,12 @@ natural language specs:
   result ≡ (self * rhs) [MOD L], result < L
 -/
 
-/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:
-• Same spec as the core `mul_assign`; proof delegates via `progress*`
--/
+/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:
+• Same spec as the core `mul_assign`. -/
 @[progress]
-theorem mul_assign_spec (self rhs : scalar.Scalar) :
-    mul_assign self rhs ⦃ result =>
-      U8x32_as_Nat result.bytes ≡
-        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
+theorem mul_assign_spec (self rhs : Scalar) :
+    mul_assign self rhs ⦃ (result : Scalar) =>
+      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul_assign
   progress*
