@@ -26,7 +26,8 @@ def core.result.Result.map
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::index_mut] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::index_mut"]
 def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result ((Slice T) × (Slice T →
@@ -48,7 +49,8 @@ theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::index] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::index"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::index"]
 def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index
   {T : Type} : core.ops.range.RangeFull → Slice T → Result (Slice T) :=
   fun _ s => ok s
@@ -66,7 +68,8 @@ theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked_mut"]
 axiom
   core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked_mut
   {T : Type} :
@@ -79,7 +82,8 @@ axiom
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::get_unchecked"]
 axiom
   core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked
   {T : Type} :
@@ -92,7 +96,8 @@ axiom
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::get_mut] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::get_mut"]
 def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result ((Option (Slice T)) ×
@@ -115,7 +120,8 @@ theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mu
    Name pattern: [core::slice::index::{core::slice::index::SliceIndex<
    core::ops::range::RangeFull, [@T], [@T]>}::get] -/
 @[rust_fun
-  "core::slice::index::{core::slice::index::SliceIndex<core::ops::range::RangeFull, [@T], [@T]>}::get"]
+  "core::slice::index::{core::slice::index::SliceIndex<\
+    core::ops::range::RangeFull, [@T], [@T]>}::get"]
 def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
   {T : Type} :
   core.ops.range.RangeFull → Slice T → Result (Option (Slice T)) :=
@@ -783,8 +789,8 @@ private def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condi
    curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
    Copied here locally (private, ' suffix) since
    ProjectiveNielsPoint.conditional_swap depends on it -/
-private def
-  backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
+namespace backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+private def conditional_select'
   (a b : backend.serial.curve_models.ProjectiveNielsPoint)
   (choice : subtle.Choice) :
   Result backend.serial.curve_models.ProjectiveNielsPoint := do
@@ -801,13 +807,14 @@ private def
     backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
       a.T2d b.T2d choice
   ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
+end backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
 
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for
    curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select]:
    Copied here locally (private, ' suffix) since
    AffineNielsPoint.conditional_swap depends on it -/
-private def
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
+namespace backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+private def conditional_select'
   (a b : backend.serial.curve_models.AffineNielsPoint)
   (choice : subtle.Choice) :
   Result backend.serial.curve_models.AffineNielsPoint := do
@@ -821,6 +828,7 @@ private def
     backend.serial.u64.field.ConditionallySelectableFieldElement51.conditional_select'
       a.xy2d b.xy2d choice
   ok { y_plus_x := fe, y_minus_x := fe1, xy2d := fe2 }
+end backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
 
 /- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for
    curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_swap]:
@@ -858,18 +866,14 @@ end backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySe
 /- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for
    curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1 -/
-def
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'
+namespace backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+def conditional_swap'
   (a b : backend.serial.curve_models.AffineNielsPoint)
   (choice : subtle.Choice) :
   Result (backend.serial.curve_models.AffineNielsPoint ×
     backend.serial.curve_models.AffineNielsPoint) := do
-  let a_new ←
-   backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
-     a b choice
-  let b_new ←
-   backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select'
-     b a choice
+  let a_new ← conditional_select' a b choice
+  let b_new ← conditional_select' b a choice
   ok (a_new, b_new)
 
 /-- **Spec theorem for `AffineNielsPoint.conditional_swap'`**:
@@ -879,14 +883,14 @@ def
 - Implements constant-time conditional swap for AffineNielsPoint
 -/
 @[progress]
-theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec
+theorem conditional_swap'_spec
   (a b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice)
-  (h_a : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap' a b choice ⦃ c =>
-    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'
+  (h_a : ∃ res, conditional_select' a b choice = ok res)
+  (h_b : ∃ res, conditional_select' b a choice = ok res) :
+  conditional_swap' a b choice ⦃ c =>
+    conditional_select' a b choice = ok c.1 ∧
+    conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold conditional_swap'
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
@@ -896,14 +900,12 @@ theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySe
    Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 314:0-328:1
 
    Public wrapper for conditional_swap' -/
-def
- backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
+def conditional_swap
   (a b : backend.serial.curve_models.AffineNielsPoint)
   (choice : subtle.Choice) :
   Result (backend.serial.curve_models.AffineNielsPoint ×
     backend.serial.curve_models.AffineNielsPoint) :=
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'
-    a b choice
+  conditional_swap' a b choice
 
 /-- **Spec theorem for public `AffineNielsPoint.conditional_swap`**:
 - No panic (if both conditional_select operations succeed)
@@ -912,15 +914,16 @@ def
 - Implements constant-time conditional swap for AffineNielsPoint
 -/
 @[progress]
-theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+theorem conditional_swap_spec
   (a b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice)
-  (h_a : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
-    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap
-  apply backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec <;> assumption
+  (h_a : ∃ res, conditional_select' a b choice = ok res)
+  (h_b : ∃ res, conditional_select' b a choice = ok res) :
+  conditional_swap a b choice ⦃ c =>
+    conditional_select' a b choice = ok c.1 ∧
+    conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold conditional_swap
+  apply conditional_swap'_spec <;> assumption
+end backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
 
 /-- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_select]:
   It is in Funs.lean previously, we copy it here locally (with private and ' suffix) since edwards.affine.AffinePoint conditional_swap depends on it -/
