@@ -3765,8 +3765,7 @@
    "theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    to_bytes self ⦃ result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
-   "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:\n\nThis function converts a field element to its canonical 32-byte little-endian representation.\nThe implementation performs reduction modulo p = 2^255-19 to ensure the result is in\ncanonical form.\n\nThe algorithm:\n1. Reduces the field element using `reduce` to ensure all limbs are within bounds\n2. Performs a final conditional reduction to ensure the result is < p\n3. Packs the 5 limbs (each 51 bits) into 32 bytes in little-endian format\n\nSpecification:\n- The function succeeds (no panic)\n- The natural number interpretation of the byte array is congruent to the field element value modulo p\n- The byte array represents the unique canonical form (0 ≤ value < p)\n-/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
@@ -10936,10 +10935,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ result =>\n    h ∣ U8x32_as_Nat result ∧\n    U8x32_as_Nat result < 2^255 ∧\n    2^254 ≤ U8x32_as_Nat result ⦄ := by ...",
+   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>\n      h ∣ U8x32_as_Nat result ∧\n      U8x32_as_Nat result < 2^255 ∧\n      2^254 ≤ U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/ClampInteger.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.clamp_integer`**:\n- No panic\n- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)\n- as_nat_32_u8 result < 2^255\n- 2^254 ≤ as_nat_32_u8 result\n-/",
+   "/-- **Spec and proof concerning `scalar.clamp_integer`**:\n- No panic\n- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)\n- as_nat_32_u8 result < 2^255\n- 2^254 ≤ as_nat_32_u8 result -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name": "curve25519_dalek::scalar::clamp_integer",
    "lines": "L1415-L1420",
