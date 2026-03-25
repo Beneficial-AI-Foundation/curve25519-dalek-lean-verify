@@ -24,6 +24,9 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 ## TODO
 - Complete proof
+- move general helpers lemmas to a more central location
+- move to standard library the following:
+  attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -55,6 +58,8 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
 
 -- TODO: move to standard library
 attribute [simp_scalar] BitVec.toNat_shiftLeft
+
+-- TODO: move general helpers lemmas to a more central location
 
 
 -- Byte reconstruction for split limbs at each boundary.
@@ -327,7 +332,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     have h15 : (i15 : U64).val < (2^52 : ℕ) := by
       simp only [i15_post, limbs_post, Array.set_val_eq] at *;
       simp_all only [Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
         Nat.ofNat_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, Nat.one_lt_ofNat,
         Nat.reduceLT, Nat.lt_add_one, Nat.reduceShiftLeft, U64.ofNat_bv, BitVec.reduceHShiftLeft,
         List.length_set, List.getElem_set_self, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
@@ -514,7 +519,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       rw [i113_post1, h99, Nat.shiftRight_eq_div_pow]; omega
     -- i114 = cast U8 i113, preserves value since < 128 < 256
     have h114_bound : i114.val < 128 := by
-      simp only [i114_post, U64_cast_U8, Nat.reducePow]
+      simp only [i114_post, U64_cast_U8]
       exact Nat.lt_of_le_of_lt (Nat.mod_le _ _) h113
     -- i116 = (i115 &&& 128) = (i114 &&& 128) = 0 via helper
     have h116_val : i116.val = 0 := by
@@ -582,11 +587,14 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     i31_post i32_post1 i33_post i34_post limbs7_post
     i35_post i36_post1 limbs8_post
     i37_post i38_post1 limbs9_post
+  -- Mask value: &&&(2^51-1) → %2^51 conversion for hl proofs
+  have hmask : low_51_bit_mask.val = 2 ^ 51 - 1 := by
+    simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
+      UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
+  -- Remove raw mask hypotheses that conflict with hmask in simp's `*`
+  -- (both rewrite low_51_bit_mask.val; hmask gives symbolic 2^51-1, they give concrete junk)
+  clear low_51_bit_mask_post1 i12_post1
   -- Apply the standalone canonical reduction lemma.
-  -- Need to show the WP chain variables match the lemma's Nat parameters.
-  -- This requires resolving: q4.val = q-chain formula, limbs9[k]!.val = carry-chain formula.
-  -- The `simp` with _post hypotheses + Nat.shiftRight_eq_div_pow + UScalar.val_and
-  -- + land_pow_two_sub_one_eq_mod resolves the chain.
   have hcanon := canonical_reduction_mod_p
     fe[0]!.val fe[1]!.val fe[2]!.val fe[3]!.val fe[4]!.val
     (fe_post1 0 (by omega)) (fe_post1 1 (by omega)) (fe_post1 2 (by omega))
@@ -598,22 +606,43 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
         i8_post, i6_post, i4_post, i2_post,
         Nat.shiftRight_eq_div_pow]; agrind)
     limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
-    (by sorry) -- hl0: resolve carry chain for limb 0
-    (by sorry) -- hl1: resolve carry chain for limb 1
-    (by sorry) -- hl2: resolve carry chain for limb 2
-    (by sorry) -- hl3: resolve carry chain for limb 3
-    (by sorry) -- hl4: resolve carry chain for limb 4
+    -- hl0..hl4: each resolves a limb's carry chain (array updates → &&&→% via hmask, >>>→/)
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, one_ne_zero, OfNat.ofNat_ne_zero,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, zero_ne_one, OfNat.ofNat_ne_one,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff, zero_ne_one,
+    OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, land_pow_two_sub_one_eq_mod, *])
   -- Unfold Field51_as_Nat/p/ModEq everywhere so hcanon (explicit sums) and
   -- fe_post2 (Field51_as_Nat) are in the same form. Then omega chains them.
   obtain ⟨hmod, hlt⟩ := hcanon
   constructor
   · simp only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
-      Finset.sum_empty, p, Nat.reduceMul, Nat.reducePow, zero_add, one_mul,
-      Array.getElem!_Nat_eq] at *
+      Finset.sum_empty, p, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq] at *
     omega
   · simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
-      Finset.sum_empty, p, Nat.reduceMul, Nat.reducePow, zero_add, one_mul,
-      Array.getElem!_Nat_eq] at *
+      Finset.sum_empty, p, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq] at *
     omega
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
