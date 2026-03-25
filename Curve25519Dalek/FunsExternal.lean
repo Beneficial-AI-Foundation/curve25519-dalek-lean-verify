@@ -1,4 +1,8 @@
--- [curve25519_dalek]: external functions.
+/-
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Oliver Butterley, Zhang-Liao, Alessandro D'Angelo, Hoang Le Truong, Markus Ferdinand Dablander
+-/
 import Aeneas
 import Curve25519Dalek.Types
 
@@ -1107,7 +1111,7 @@ def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_s
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
   : Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) :=
   if choice.val = 1#u8 then ok (b, a) else ok (a, b)
-  
+
 /-
 def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
