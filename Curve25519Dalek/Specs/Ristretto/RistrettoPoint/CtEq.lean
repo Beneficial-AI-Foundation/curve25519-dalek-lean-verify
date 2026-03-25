@@ -45,7 +45,8 @@ natural language description:
     then checks:
       c  = FE51.ct_eq(X1Y2, Y1X2)   -- X1·Y2 == Y1·X2 (mod p)?
       c1 = FE51.ct_eq(X1X2, Y1Y2)   -- X1·X2 == Y1·Y2 (mod p)?
-    and returns bitor(c, c1), i.e., Choice.one if either condition holds (as either is sufficient for equality)
+    and returns bitor(c, c1), i.e., Choice.one if either condition holds
+    (as either is sufficient for equality)
 
     Note: only X and Y coordinates are used because the Z coordinates cancel out
     in the projective cross-product ratios.
@@ -53,14 +54,18 @@ natural language description:
 natural language specs:
 
     The result is Choice.one if and only if
-      Field51_as_Nat(r1.X) * Field51_as_Nat(r2.Y) ≡ Field51_as_Nat(r1.Y) * Field51_as_Nat(r2.X) (mod p)
+      Field51_as_Nat(r1.X) * Field51_as_Nat(r2.Y)
+        ≡ Field51_as_Nat(r1.Y) * Field51_as_Nat(r2.X) (mod p)
     OR
-      Field51_as_Nat(r1.X) * Field51_as_Nat(r2.X) ≡ Field51_as_Nat(r1.Y) * Field51_as_Nat(r2.Y) (mod p)
+      Field51_as_Nat(r1.X) * Field51_as_Nat(r2.X)
+        ≡ Field51_as_Nat(r1.Y) * Field51_as_Nat(r2.Y) (mod p)
 -/
 
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq`**:
+/-- **Spec and proof concerning
+`ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully given valid inputs)
-- The result is Choice.one iff the two points satisfy the multiplicative Ristretto equivalence condition:
+- The result is Choice.one iff the two points satisfy the multiplicative
+  Ristretto equivalence condition:
   X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)
 -/
 @[progress]
@@ -70,8 +75,10 @@ theorem ct_eq_spec
     (h_other_valid : other.IsValid) :
     ct_eq self other ⦃ (result : subtle.Choice) =>
       result = Choice.one ↔
-        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
-        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by
+        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡
+          (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
+        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡
+          (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by
   unfold ct_eq
   progress*
   all_goals (try (
@@ -96,10 +103,12 @@ theorem ct_eq_spec
   rw [X1X2_post1, Y1Y2_post1] at c1_post
   have vo (c : subtle.Choice) : c.val = 1#u8 ↔ c = Choice.one := by
     rcases c with ⟨_, hv | hv⟩
-    all_goals (subst hv; simp only [Choice.one, subtle.Choice.mk.injEq])
+    all_goals (subst hv;
+               simp only [Choice.one, subtle.Choice.mk.injEq])
   split
   · rename_i h
-    exact ⟨fun _ => h.elim (.inl ∘ c_post.mp ∘ (vo c).mp) (.inr ∘ c1_post.mp ∘ (vo c1).mp), fun _ => rfl⟩
+    exact ⟨fun _ => h.elim (.inl ∘ c_post.mp ∘ (vo c).mp)
+        (.inr ∘ c1_post.mp ∘ (vo c1).mp), fun _ => rfl⟩
   · rename_i h
     push_neg at h
     exact ⟨nofun, fun hm => hm.elim

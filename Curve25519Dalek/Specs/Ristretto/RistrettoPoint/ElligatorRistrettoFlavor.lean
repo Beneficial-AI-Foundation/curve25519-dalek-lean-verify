@@ -28,7 +28,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQ
 Specification and proof for `RistrettoPoint::elligator_ristretto_flavor`.
 
 This function implements the Ristretto MAP function from the
-[Ristretto specification (RFC draft, Section 4.3.4)](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4).
+[Ristretto specification (RFC draft, Section 4.3.4)](
+https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-04#section-4.3.4).
 
 It maps an arbitrary field element r_0 ∈ 𝔽_p (p = 2^255 - 19) to a valid Ristretto point
 (an even Edwards curve point). The construction uses Elligator 2 to find a point on the
@@ -228,7 +229,8 @@ private lemma constr_to_squares {dd s Df Ns : CurveField}
   linear_combination
     -((2 - 2 * dd) * Df + (1 + dd) * (Ns + s ^ 2 * Df)) * h
 
-/-- Bridge lemma (case B): when s²D = r·Nₛ, converts `(D+rNₛ)² + d(D-rNₛ)²` to `D²((1+s²)² + d(1-s²)²)`. -/
+/-- Bridge lemma (case B): when s²D = r·Nₛ, converts
+`(D+rNₛ)² + d(D-rNₛ)²` to `D²((1+s²)² + d(1-s²)²)`. -/
 private lemma constr_to_squares_r {dd s r Df Ns : CurveField}
     (h : s ^ 2 * Df = r * Ns) :
     (Df + r * Ns) ^ 2 + dd * (Df - r * Ns) ^ 2 =
@@ -812,7 +814,8 @@ private lemma elligator_completed_point_valid
       omega,
     h_cp_Z_ne, h_cp_T_ne, h_cp_curve⟩
 
-/-- If the extracted `sqrt_ratio_i` flag is square, the pure Elligator squareness predicate holds. -/
+/-- If the extracted `sqrt_ratio_i` flag is square,
+the pure Elligator squareness predicate holds. -/
 private lemma elligator_is_square_of_flag
     (s N_s D : FieldElement51)
     (x : subtle.Choice × FieldElement51)
@@ -840,7 +843,8 @@ private lemma elligator_is_square_of_flag
       exact ⟨x.2.toField,
         lift_sq_mod (N_post2_D ⟨hN0, hD_mod, hSq⟩).2⟩
 
-/-- If the extracted `sqrt_ratio_i` flag is non-square, the pure Elligator squareness predicate fails. -/
+/-- If the extracted `sqrt_ratio_i` flag is non-square,
+the pure Elligator squareness predicate fails. -/
 private lemma elligator_not_is_square_of_flag
     (s N_s D : FieldElement51)
     (x : subtle.Choice × FieldElement51)
@@ -1171,8 +1175,10 @@ theorem elligator_ristretto_flavor_spec
   simp only [progress_simps]
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
   let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
-  let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ← ONE_MINUS_EDWARDS_D_SQUARED_spec
-  let* ⟨ d_minus_one_sq, d_minus_one_sq_post1, d_minus_one_sq_post2 ⟩ ← EDWARDS_D_MINUS_ONE_SQUARED_spec
+  let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ←
+    ONE_MINUS_EDWARDS_D_SQUARED_spec
+  let* ⟨ d_minus_one_sq, d_minus_one_sq_post1, d_minus_one_sq_post2 ⟩ ←
+    EDWARDS_D_MINUS_ONE_SQUARED_spec
   let* ⟨ c, c_post1, c_post2 ⟩ ← MINUS_ONE_spec
   let* ⟨ one, one_post1, one_post2 ⟩ ← ONE_spec
   let* ⟨ r_0_sq, r_0_sq_post1, r_0_sq_post2 ⟩ ← square_spec
@@ -1197,7 +1203,8 @@ theorem elligator_ristretto_flavor_spec
   let* ⟨ s_prime_is_pos, s_prime_is_pos_post ⟩ ← subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec
   let* ⟨ s_prime_neg, s_prime_neg_post1, s_prime_neg_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
-  let* ⟨ s_prime1, s_prime1_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  let* ⟨ s_prime1, s_prime1_post ⟩ ←
+    FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
   let* ⟨ not_sq, not_sq_post ⟩ ← subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec
   let* ⟨ s1, s1_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
   let* ⟨ c2, c2_post ⟩ ← FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec
@@ -1243,7 +1250,8 @@ theorem elligator_ristretto_flavor_spec
     Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec
   let* ⟨ cp_T, cp_T_post1, cp_T_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
-  let* ⟨ ep, ep_post1, ep_post2, ep_post3, ep_post4, ep_post5, ep_post6, ep_post7, ep_post8, ep_post9, ep_post10 ⟩ ←
+  let* ⟨ ep, ep_post1, ep_post2, ep_post3, ep_post4, ep_post5,
+          ep_post6, ep_post7, ep_post8, ep_post9, ep_post10 ⟩ ←
     backend.serial.curve_models.CompletedPoint.as_extended_spec
   · -- CompletedPoint.IsValid { X := cp_X, Y := cp_Y, Z := cp_Z, T := cp_T }
     rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D
@@ -1332,7 +1340,8 @@ theorem elligator_ristretto_flavor_spec
       h_cp_T_F h_ns_eq_F h_D_eq_F h_Nt_eq_F h_r_F h_i_val
   -- Main Goals: ⊢ IsValid ep ∧ toPoint ep = ↑(elligator_ristretto_flavor_pure s.toField)
   -- Step 1: Lift arithmetic postconditions to field equalities
-  rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  rename_i x _ x_post1 x_post2 N_post_x N_post1_D N_post2_D N_post3_D
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   have hX_F : ep.X.toField = cp_X.toField * cp_T.toField := by
     unfold toField; have h := lift_mod_eq _ _ ep_post1; push_cast at h; exact h
   have hY_F : ep.Y.toField = cp_Y.toField * cp_Z.toField := by
