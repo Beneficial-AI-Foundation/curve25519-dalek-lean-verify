@@ -32,13 +32,13 @@ Natural language description:
 - The result `neg` represents the additive inverse of the input `self` in 𝔽_p.
 - All the limbs of the result are ≤ 2^(51 + ε).
 - Requires that input limbs of `self` are bounded to avoid underflow. -/
-@[progress]
+@[step]
 theorem negate_spec (self : FieldElement51) (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :
     negate self ⦃ (neg : FieldElement51) =>
       Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧
       ∀ i < 5, neg[i]!.val < 2 ^ 52 ⦄ := by
   unfold negate
-  progress*
+  step*
   constructor
   · have : 16 * p =
       36028797018963664 * 2 ^ 0 +

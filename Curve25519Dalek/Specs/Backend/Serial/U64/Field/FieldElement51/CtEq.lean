@@ -39,7 +39,7 @@ Spec:
 - No panic (always returns successfully)
 - Returns `Choice.one` iff the canonical encodings (32-byte LE) are equal
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
     ct_eq a b ⦃ c =>
     (c = Choice.one ↔ a.to_bytes = b.to_bytes ) ⦄ := by
@@ -47,9 +47,9 @@ theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
   have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
   have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)
   rw [ha_ok, hb_ok]
-  simp only [progress_simps]
-  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.progress_spec
+  simp only [step_simps]
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.step_spec
   let* ⟨ c, c_post ⟩ ← Slice.Insts.SubtleConstantTimeEq.ct_eq_spec
   simp_all only [Array.to_slice, Slice.eq_iff]
   exact ⟨fun h => Subtype.ext h, fun h => h ▸ rfl⟩
