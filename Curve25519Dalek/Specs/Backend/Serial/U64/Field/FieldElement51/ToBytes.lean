@@ -238,8 +238,8 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 6000000 in -- heavy progress*
-/- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
+set_option maxHeartbeats 800000 in -- heavy progress*
+/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.
 The implementation performs reduction modulo p = 2^255-19 to ensure the result is in
@@ -493,6 +493,71 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       simp only [i116_post1, h115_eq]
       exact u8_and_128_eq_zero_of_lt i114 h114_bound
     exact UScalar.eq_of_val_eq h116_val
-  sorry
+  -- Final goal: U8x32_as_Nat s32 ≡ Field51_as_Nat self [MOD p] ∧ U8x32_as_Nat s32 < p
+  -- Mask value (reused from massert proof; re-derive for this goal)
+  have hmask : low_51_bit_mask.val = 2^51 - 1 := by
+    simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
+      UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
+  -- (A) Byte packing: U8x32_as_Nat s32 = Field51_as_Nat limbs9
+  -- Array resolution: limbs9[0]!=i18, [1]!=i24, [2]!=i30, [3]!=i36, [4]!=i38
+  have h_l0 : limbs9.val[0]! = i18 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
+      limbs4_post, limbs3_post, limbs2_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      not_false_eq_true, one_ne_zero, OfNat.ofNat_ne_zero, Nat.ofNat_pos]
+  have h_l1 : limbs9.val[1]! = i24 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
+      limbs4_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, OfNat.ofNat_ne_one]
+  have h_l2 : limbs9.val[2]! = i30 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, Nat.reduceEqDiff, Nat.succ_ne_self]
+  have h_l3 : limbs9.val[3]! = i36 := by
+    simp only [limbs9_post, limbs8_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, Nat.succ_ne_self]
+  have h_l4 : limbs9.val[4]! = i38 := by
+    simp only [limbs9_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, UScalar.ofNatCore_val_eq, Nat.lt_add_one]
+  have hlimbs : ∀ i < 5, (limbs9.val[i]! : U64).val < 2 ^ 51 := by
+    intro i hi; interval_cases i
+    · rw [h_l0, i18_post1]; exact and_mask_lt_pow i17 low_51_bit_mask hmask
+    · rw [h_l1, i24_post1]; exact and_mask_lt_pow i23 low_51_bit_mask hmask
+    · rw [h_l2, i30_post1]; exact and_mask_lt_pow i29 low_51_bit_mask hmask
+    · rw [h_l3, i36_post1]; exact and_mask_lt_pow i35 low_51_bit_mask hmask
+    · rw [h_l4, i38_post1]; exact and_mask_lt_pow i37 low_51_bit_mask hmask
+  have hbytes : bytes_match_limbs limbs9 s32 := by
+    sorry -- mechanical: resolve each of the 32 byte equalities through the s/i chains
+  have hpack := byte_packing_eq limbs9 s32 hlimbs hbytes
+  rw [hpack]
+  -- (B) Canonical reduction in clean context
+  clear *-
+    fe_post1 fe_post2
+    i_post i1_post q_post1 i2_post i3_post q1_post1
+    i4_post i5_post q2_post1 i6_post i7_post q3_post1
+    i8_post i9_post q4_post1
+    i10_post i11_post limbs_post
+    i12_post1 low_51_bit_mask_post1
+    i13_post i14_post1 i15_post i16_post limbs1_post
+    i17_post i18_post1 limbs2_post
+    i19_post i20_post1 i21_post i22_post limbs3_post
+    i23_post i24_post1 limbs4_post
+    i25_post i26_post1 i27_post i28_post limbs5_post
+    i29_post i30_post1 limbs6_post
+    i31_post i32_post1 i33_post i34_post limbs7_post
+    i35_post i36_post1 limbs8_post
+    i37_post i38_post1 limbs9_post
+  refine ⟨?_, ?_⟩
+  · -- ModEq: Field51_as_Nat limbs9 ≡ Field51_as_Nat self [MOD p]
+    sorry
+  · -- Canonicity: Field51_as_Nat limbs9 < p
+    sorry
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
