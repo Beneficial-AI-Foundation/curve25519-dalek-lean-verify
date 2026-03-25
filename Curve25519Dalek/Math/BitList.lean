@@ -16,9 +16,6 @@ All bit lists are **LSB-first**: the head of the list is bit 0 (least significan
 
 open Aeneas Aeneas.Std
 
-attribute [grind =] Nat.add_mod Nat.mul_mod_mul_left Nat.mod_eq_of_lt
-attribute [grind .] Nat.mod_lt
-
 namespace BitList
 open List
 
@@ -372,7 +369,7 @@ theorem toNat_take (k : Nat) (bs : List Bool) :
     | nil => simp [toNat]
     | cons b bs =>
       have := Bool.toNat_le b
-      grind [toNat]
+      grind [toNat, = Nat.add_mod, = Nat.mul_mod_mul_left, = Nat.mod_eq_of_lt]
 
 /-- Dropping k bits gives the value divided by 2^k. -/
 private theorem add_mul_two_div (a m : Nat) (ha : a < 2) :
@@ -460,5 +457,58 @@ theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length
     have hlen : (bs.take (k * n)).length = k * n := by
       rw [length_take]; omega
     rw [hlen, ih hkn]
+
+/-! ## Scalar52 limb-array to bit list -/
+
+/-- Convert a list of U64 limbs (each representing `w` bits) to a flat bit list. -/
+def ofLimbList (w : Nat) (limbs : List U64) : List Bool :=
+  (limbs.map (fun l => ofNat w l.val)).flatten
+
+/-- Convert a Scalar52 (5 limbs × 52 bits) to a 260-bit list. -/
+def ofScalar52 (arr : Array U64 5#usize) : List Bool :=
+  ofLimbList 52 arr.val
+
+theorem ofLimbList_length (w : Nat) (limbs : List U64) :
+    (ofLimbList w limbs).length = w * limbs.length := by
+  induction limbs with
+  | nil => simp [ofLimbList]
+  | cons x xs ih =>
+    unfold ofLimbList
+    simp only [map_cons, flatten_cons, length_append, ofNat_length]
+    change w + (ofLimbList w xs).length = w * (xs.length + 1)
+    rw [ih]; ring
+
+theorem ofScalar52_length (arr : Array U64 5#usize) :
+    (ofScalar52 arr).length = 260 := by
+  simp [ofScalar52, ofLimbList_length, arr.property]
+
+/-- The value of a Scalar52's bits equals `Scalar52_as_Nat`. -/
+theorem toNat_ofScalar52 (arr : Array U64 5#usize)
+    (h : ∀ i : Fin 5, arr[i]!.val < 2 ^ 52) :
+    toNat (ofScalar52 arr) = Scalar52_as_Nat arr := by
+  unfold ofScalar52 ofLimbList Scalar52_as_Nat
+  have hlen : arr.val.length = 5 := arr.property
+  -- Destructure into 5 elements
+  match arr, hlen with
+  | ⟨[a0, a1, a2, a3, a4], _⟩, _ =>
+  simp only [map_cons, map_nil, flatten_cons, flatten_nil, append_nil]
+  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+  simp only [Array.getElem!_Nat_eq, List.getElem!_cons_zero, List.getElem!_cons_succ]
+  rw [toNat_append, toNat_append, toNat_append, toNat_append]
+  simp only [ofNat_length]
+  have h0 : a0.val < 2 ^ 52 := by have := h ⟨0, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  have h1 : a1.val < 2 ^ 52 := by have := h ⟨1, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  have h2 : a2.val < 2 ^ 52 := by have := h ⟨2, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  have h3 : a3.val < 2 ^ 52 := by have := h ⟨3, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  have h4 : a4.val < 2 ^ 52 := by have := h ⟨4, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  rw [toNat_ofNat 52 a0.val h0, toNat_ofNat 52 a1.val h1,
+    toNat_ofNat 52 a2.val h2, toNat_ofNat 52 a3.val h3,
+    toNat_ofNat 52 a4.val h4]
+  ring
+
+/-- The value of a 32-byte array's bits equals `U8x32_as_Nat`. -/
+theorem toNat_ofByteArray' (arr : Array U8 32#usize) :
+    toNat (ofByteArray arr) = U8x32_as_Nat arr :=
+  toNat_ofByteArray arr
 
 end BitList

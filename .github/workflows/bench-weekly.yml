@@ -1,0 +1,55 @@
+name: Benchmark (Weekly)
+
+on:
+  schedule:
+    # Every Monday at 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install lakeprof
+        run: |
+          uv tool install --from git+https://github.com/Kha/lakeprof lakeprof
+
+      - name: Run benchmark
+        env:
+          BENCH_AUTH_TOKEN: ${{ secrets.BENCH_AUTH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUNNER_SRC="${{ vars.BENCHWARMER_RUNNER_PATH || 'runner' }}"
+          bash "$RUNNER_SRC/bench.sh" \
+            "${{ vars.BENCH_LIBRARY_NAME }}" \
+            "${{ secrets.BENCH_API_ENDPOINT }}"
+
+      - name: Fetch report and open issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+          COMMIT_HASH=$(git rev-parse HEAD)
+          REPORT_URL="${{ secrets.BENCH_API_ENDPOINT }}/${REPO_NAME}/${COMMIT_HASH}/report/weekly"
+
+          ISSUE_BODY=$(curl -sf "$REPORT_URL" | jq -r .markdown)
+          DATE=$(date +%Y-%m-%d)
+
+          gh issue create \
+            --title "Weekly Benchmark Report - $DATE" \
+            --body "$ISSUE_BODY"
