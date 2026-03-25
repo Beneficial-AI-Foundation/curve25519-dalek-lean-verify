@@ -775,16 +775,33 @@ Do not include any text outside the JSON array.
 # File discovery
 # ---------------------------------------------------------------------------
 
-_DEFAULT_EXCLUDE_DIRS: set[str] = {".lake", "build", "_build", "node_modules"}
+_DEFAULT_EXCLUDE_DIRS: set[str] = {".lake", "build", "_build", "node_modules", "Utils"}
+_DEFAULT_EXCLUDE_FILES: set[str] = {
+    "Curve25519Dalek.lean",
+    "Curve25519Dalek/TypesExternal.lean",
+    "Utils.lean"
+}
 
 
-def find_lean_files(root: Path, exclude_dirs: set[str] | None = None) -> list[Path]:
+def find_lean_files(
+    root: Path,
+    exclude_dirs: set[str] | None = None,
+    exclude_files: set[str] | None = None,
+) -> list[Path]:
     """Return all .lean files under root, excluding dependency/build directories."""
     excluded = exclude_dirs if exclude_dirs is not None else _DEFAULT_EXCLUDE_DIRS
+    excluded_files = exclude_files if exclude_files is not None else _DEFAULT_EXCLUDE_FILES
     results = []
     for p in root.rglob("*.lean"):
         # Skip if any path component is in the excluded set
         if any(part in excluded for part in p.parts):
+            continue
+        # Skip excluded specific files (matched by relative path from root)
+        try:
+            rel = p.relative_to(root).as_posix()
+        except ValueError:
+            rel = p.as_posix()
+        if rel in excluded_files:
             continue
         results.append(p)
     return sorted(results)
@@ -875,6 +892,13 @@ def build_parser() -> argparse.ArgumentParser:
             f"(default: {','.join(sorted(_DEFAULT_EXCLUDE_DIRS))})"
         ),
     )
+    p.add_argument(
+        "--exclude-files", metavar="FILE,...",
+        help=(
+            "Comma-separated file paths (relative to project root) to exclude when using --all "
+            f"(default: {','.join(sorted(_DEFAULT_EXCLUDE_FILES))})"
+        ),
+    )
     return p
 
 
@@ -893,10 +917,14 @@ def main(argv: Optional[list[str]] = None) -> int:
     if args.exclude:
         exclude_dirs = set(args.exclude.split(","))
 
+    exclude_files: set[str] | None = None
+    if args.exclude_files:
+        exclude_files = set(args.exclude_files.split(","))
+
     paths: list[Path] = []
     if args.lint_all:
         root = Path(args.root)
-        paths = find_lean_files(root, exclude_dirs)
+        paths = find_lean_files(root, exclude_dirs, exclude_files)
     elif args.files:
         paths = [Path(f) for f in args.files]
     else:
