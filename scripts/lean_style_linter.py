@@ -58,7 +58,7 @@ RULE_DOCS: dict[str, str] = {
     "R012": "The result binding in ⦃ ... ⦄ must carry a type annotation",
     "R013": "Every `namespace X` must have a matching `end X`",
     "R014": "Arguments / preconditions must be indented 4 spaces",
-    "R015": "Postconditions inside ⦃ ... ⦄ must be indented 6 spaces",
+    "R015": "Postconditions inside ⦃ ... ⦄ must be indented 6 spaces (plus 2 per nesting level)",
     "R016": "Proof body lines must be indented 2 spaces",
     "R017": "Spec file names must be UpperCamelCase",
     # Context-sensitive (agent) rules
@@ -440,11 +440,11 @@ def check_progress_theorems(lines: list[str], file_path: str) -> list[Violation]
                 # Skip if this line also ends the block with ⦄ inline (e.g. "result = mp ⦄ := by")
                 if "⦄" in sig_ln and (":= by" in sig_ln or re.search(r":=\s*$", sig_ln.rstrip())):
                     continue  # combined close+proof-start line; skip indent check
-                if actual_indent != 6:
+                if actual_indent < 6 or (actual_indent - 6) % 2 != 0:
                     vs.append(Violation(
                         "R015", thm_idx + j + 1, None,
                         f"Postcondition lines inside ⦃ ... ⦄ should be indented "
-                        f"6 spaces (found {actual_indent})",
+                        f"6 spaces (plus 2 per nesting level); found {actual_indent}",
                         file_path,
                     ))
             else:
