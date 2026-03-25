@@ -785,11 +785,14 @@ private def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.condi
       a.W b.W choice
   ok { U := fe, W := fe1 }
 
+namespace backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for
    curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select]:
    Copied here locally (private, ' suffix) since
    ProjectiveNielsPoint.conditional_swap depends on it -/
-namespace backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+
+
 private def conditional_select'
   (a b : backend.serial.curve_models.ProjectiveNielsPoint)
   (choice : subtle.Choice) :
@@ -809,11 +812,12 @@ private def conditional_select'
   ok { Y_plus_X := fe, Y_minus_X := fe1, Z := fe2, T2d := fe3 }
 end backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
 
+namespace backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+
 /-- [curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for
    curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select]:
    Copied here locally (private, ' suffix) since
    AffineNielsPoint.conditional_swap depends on it -/
-namespace backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
 private def conditional_select'
   (a b : backend.serial.curve_models.AffineNielsPoint)
   (choice : subtle.Choice) :
@@ -925,10 +929,13 @@ theorem conditional_swap_spec
   apply conditional_swap'_spec <;> assumption
 end backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
 
-/-- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_select]:
-  It is in Funs.lean previously, we copy it here locally (with private and ' suffix) since edwards.affine.AffinePoint conditional_swap depends on it -/
-private def
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select'
+namespace edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable
+
+/-- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for
+  curve25519_dalek::edwards::affine::AffinePoint}::conditional_select]:
+  It is in Funs.lean previously, we copy it here locally (with private and
+  ' suffix) since edwards.affine.AffinePoint conditional_swap depends on it -/
+private def conditional_select'
   (a b : edwards.affine.AffinePoint)
   (choice : subtle.Choice) :
   Result edwards.affine.AffinePoint := do
@@ -941,13 +948,12 @@ private def
   ok { x := fe, y := fe1 }
 
 /-- Implementation of conditional_swap for edwards.affine.AffinePoint -/
-def
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'
+def conditional_swap'
   (a b : edwards.affine.AffinePoint)
   (choice : subtle.Choice) :
   Result (edwards.affine.AffinePoint × edwards.affine.AffinePoint) := do
-  let a_new ← edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
-  let b_new ← edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  let a_new ← conditional_select' a b choice
+  let b_new ← conditional_select' b a choice
   ok (a_new, b_new)
 
 /-- **Spec theorem for `edwards.affine.AffinePoint.conditional_swap'`**:
@@ -957,25 +963,24 @@ def
 - Implements constant-time conditional swap for edwards.affine.AffinePoint
 -/
 @[progress]
-theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec
+theorem conditional_swap'_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
-  (h_a : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap' a b choice ⦃ c =>
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'
+  (h_a : ∃ res, conditional_select' a b choice = ok res)
+  (h_b : ∃ res, conditional_select' b a choice = ok res) :
+  conditional_swap' a b choice ⦃ c =>
+    conditional_select' a b choice = ok c.1 ∧
+    conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold conditional_swap'
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
 /-- Implementation of conditional_assign for edwards.affine.AffinePoint -/
-def
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'
+def conditional_assign'
   (a b : edwards.affine.AffinePoint)
   (choice : subtle.Choice) :
   Result edwards.affine.AffinePoint :=
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  conditional_select' a b choice
 
 /-- **Spec theorem for `edwards.affine.AffinePoint.conditional_assign'`**:
 - No panic (if conditional_select succeeds)
@@ -984,14 +989,16 @@ def
 - Implements constant-time conditional assignment for edwards.affine.AffinePoint
 -/
 @[progress]
-theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'_spec
+theorem conditional_assign'_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
-  (h : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign' a b choice ⦃ res =>
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
-  unfold edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'
+  (h : ∃ res, conditional_select' a b choice = ok res) :
+  conditional_assign' a b choice ⦃ res =>
+    conditional_select' a b choice = ok res ⦄ := by
+  unfold conditional_assign'
   obtain ⟨res, h_eq⟩ := h
   simp [h_eq, spec_ok]
+
+end edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable
 
 namespace scalar.Scalar.Insts.SubtleConditionallySelectable
 
@@ -1172,7 +1179,8 @@ theorem conditional_assign_spec
 
 end edwards.EdwardsPoint.Insts.SubtleConditionallySelectable
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for
+   curve25519_dalek::montgomery::ProjectivePoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 311:0-322:1
 
    Conditionally swaps two ProjectivePoint values in constant time.
@@ -1187,11 +1195,16 @@ def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_s
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result (montgomery.ProjectivePoint × montgomery.ProjectivePoint) := do
-  let a_new ← montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
-  let b_new ← montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  let a_new ←
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+      a b choice
+  let b_new ←
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+      b a choice
   ok (a_new, b_new)
 
-/-- **Spec theorem for `montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap`**:
+/-- **Spec theorem for `montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable
+  .conditional_swap`**:
 - No panic (if both conditional_select operations succeed)
 - Conditionally swaps two ProjectivePoint values in constant time
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
@@ -1199,19 +1212,27 @@ def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_s
 @[progress]
 theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
-  (h_a : ∃ res, montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
-    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+  (h_a : ∃ res,
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+      a b choice = ok res)
+  (h_b : ∃ res,
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+      b a choice = ok res) :
+  montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+      a b choice ⦃ c =>
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+        a b choice = ok c.1 ∧
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select'
+        b a choice = ok c.2 ⦄ := by
+  unfold
+    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 -/
 /-- Trait implementation: [subtle::{subtle::ConditionallySelectable for u8}]
-   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs', lines 511:8-537:10
-   Name pattern: [subtle::ConditionallySelectable<u8>] -/
+   Source: '/cargo/registry/src/index.crates.io-1949cf8c6b5b557f/subtle-2.6.1/src/lib.rs',
+   lines 511:8-537:10. Name pattern: [subtle::ConditionallySelectable<u8>] -/
 @[reducible, rust_trait_impl "subtle::ConditionallySelectable<u8>"]
 private def subtle.ConditionallySelectableU8' : subtle.ConditionallySelectable U8 := {
   coremarkerCopyInst := core.marker.CopyU8
@@ -1220,10 +1241,14 @@ private def subtle.ConditionallySelectableU8' : subtle.ConditionallySelectable U
   conditional_swap := U8.Insts.SubtleConditionallySelectable.conditional_swap
 }
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
+namespace montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for
+   curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 88:4-90:5
-   It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) for conditional_swap -/
-private def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select'
+   It is in Funs.Lean previously, we copy it here locally (with private and
+   ' suffix) for conditional_swap -/
+private def conditional_select'
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint
@@ -1233,68 +1258,75 @@ private def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.condi
       subtle.ConditionallySelectableU8' a b choice
   ok a1
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for
+   curve25519_dalek::montgomery::MontgomeryPoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
 
    Conditionally swaps two MontgomeryPoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
-def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap
+def conditional_swap
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result (montgomery.MontgomeryPoint × montgomery.MontgomeryPoint) := do
-  let a_new ← montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
-  let b_new ← montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  let a_new ← conditional_select' a b choice
+  let b_new ← conditional_select' b a choice
   ok (a_new, b_new)
 
-/-- **Spec theorem for `montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap`**:
+/-- **Spec theorem for `montgomery.MontgomeryPoint.conditional_swap`**:
 - No panic (always succeeds)
 - Conditionally swaps two MontgomeryPoint values in constant time
 - Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
 - Implements constant-time conditional swap for MontgomeryPoint
 -/
 @[progress]
-theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+theorem conditional_swap_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
-  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ res =>
+  conditional_swap a b choice ⦃ res =>
     res = (if choice.val = 1#u8 then (b, a) else (a, b)) ⦄ := by
-  unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap
-  unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select'
+  unfold conditional_swap
+  unfold conditional_select'
   unfold Array.Insts.SubtleConditionallySelectable.conditional_select
   split <;> simp_all [bind_tc_ok, spec_ok]
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for
+   curve25519_dalek::montgomery::MontgomeryPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 87:0-91:1
 
    Conditionally assigns b to a in constant time.
    This is a wrapper around conditional_select. -/
-def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
+def conditional_assign
   (a : montgomery.MontgomeryPoint) (b : montgomery.MontgomeryPoint)
   (choice : subtle.Choice) :
   Result montgomery.MontgomeryPoint :=
-  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  conditional_select' a b choice
 
-/-- **Spec theorem for `montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign`**:
+/-- **Spec theorem for `montgomery.MontgomeryPoint.conditional_assign`**:
 - No panic (if conditional_select succeeds)
 - Returns the result of conditional_select(a, b, choice)
 - This is a wrapper around conditional_select
 - Implements constant-time conditional assignment for MontgomeryPoint
 -/
 @[progress]
-theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+theorem conditional_assign_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice)
-  (h : ∃ res, montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
-  montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
-    montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
-  unfold montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  (h : ∃ res, conditional_select' a b choice = ok res) :
+  conditional_assign a b choice ⦃ res =>
+    conditional_select' a b choice = ok res ⦄ := by
+  unfold conditional_assign
   obtain ⟨res, h_eq⟩ := h
   simp [h_eq, spec_ok]
 
-/- [curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
+end montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable
+
+/- [curve25519_dalek::montgomery::{core::cmp::PartialEq<
+   curve25519_dalek::montgomery::MontgomeryPoint> for
+   curve25519_dalek::montgomery::MontgomeryPoint}::ne]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 93:0-97:1 -/
 axiom montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.ne
   : montgomery.MontgomeryPoint → montgomery.MontgomeryPoint → Result Bool
 
-/-- [curve25519_dalek::montgomery::{core::cmp::Eq for curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
+/-- [curve25519_dalek::montgomery::{core::cmp::Eq for
+   curve25519_dalek::montgomery::MontgomeryPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 99:0-99:30
 
    Marker method required by the Eq trait to assert that the type has total equality.
@@ -1315,43 +1347,51 @@ theorem montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_s
   unfold montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   simp [spec_ok]
 
-/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
+namespace montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable
+
+/-- [curve25519_dalek::montgomery::{subtle::ConditionallySelectable for
+   curve25519_dalek::montgomery::ProjectivePoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 311:0-322:1
 
    Conditionally assigns b to a in constant time.
    This is a wrapper around conditional_select. -/
-def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign
+def conditional_assign
   (a : montgomery.ProjectivePoint) (b : montgomery.ProjectivePoint)
   (choice : subtle.Choice) :
   Result montgomery.ProjectivePoint :=
-  montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  conditional_select' a b choice
 
-/-- **Spec theorem for `montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign`**:
+/-- **Spec theorem for `montgomery.ProjectivePoint.conditional_assign`**:
 - No panic (if conditional_select succeeds)
 - Returns b if choice.val = 1, otherwise returns a
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for ProjectivePoint
 -/
 @[progress]
-theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+theorem conditional_assign_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
-  (h : ∃ res, montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
-  montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
-    montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
-  unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign
+  (h : ∃ res, conditional_select' a b choice = ok res) :
+  conditional_assign a b choice ⦃ res =>
+    conditional_select' a b choice = ok res ⦄ := by
+  unfold conditional_assign
   obtain ⟨res, h_eq⟩ := h
   simp [h_eq, spec_ok]
 
-/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_swap]:
+end montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable
+
+namespace edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable
+
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for
+   curve25519_dalek::edwards::affine::AffinePoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1
 
    Conditionally swaps two edwards.affine.AffinePoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
-def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap
+def conditional_swap
   (a b : edwards.affine.AffinePoint)
   (choice : subtle.Choice) :
   Result (edwards.affine.AffinePoint × edwards.affine.AffinePoint) :=
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap' a b choice
+  conditional_swap' a b choice
 
 /-- **Spec theorem for `edwards.affine.AffinePoint.conditional_swap`**:
 - No panic (if both conditional_select operations succeed)
@@ -1360,26 +1400,27 @@ def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_s
 - Implements constant-time conditional swap for edwards.affine.AffinePoint
 -/
 @[progress]
-theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+theorem conditional_swap_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
-  (h_a : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap
-  apply edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec <;> assumption
+  (h_a : ∃ res, conditional_select' a b choice = ok res)
+  (h_b : ∃ res, conditional_select' b a choice = ok res) :
+  conditional_swap a b choice ⦃ c =>
+    conditional_select' a b choice = ok c.1 ∧
+    conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold conditional_swap
+  apply conditional_swap'_spec <;> assumption
 
-/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_assign]:
+/- [curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for
+   curve25519_dalek::edwards::affine::AffinePoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 23:0-30:1
 
    Conditionally assigns b to a in constant time.
    If choice.val = 1, assigns b; otherwise keeps a unchanged. -/
-def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign
+def conditional_assign
   (a b : edwards.affine.AffinePoint)
   (choice : subtle.Choice) :
   Result edwards.affine.AffinePoint :=
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign' a b choice
+  conditional_assign' a b choice
 
 /-- **Spec theorem for `edwards.affine.AffinePoint.conditional_assign`**:
 - No panic (if conditional_select succeeds)
@@ -1388,41 +1429,53 @@ def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_a
 - Implements constant-time conditional assignment for edwards.affine.AffinePoint
 -/
 @[progress]
-theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+theorem conditional_assign_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
-  (h : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
-  edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
-    edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
-  unfold edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign
-  apply edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'_spec
+  (h : ∃ res, conditional_select' a b choice = ok res) :
+  conditional_assign a b choice ⦃ res =>
+    conditional_select' a b choice = ok res ⦄ := by
+  unfold conditional_assign
+  apply conditional_assign'_spec
   assumption
 
-/- [curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::ne]:
+end edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable
+
+/- [curve25519_dalek::edwards::affine::{core::cmp::PartialEq<
+   curve25519_dalek::edwards::affine::AffinePoint> for
+   curve25519_dalek::edwards::affine::AffinePoint}::ne]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 47:0-51:1 -/
 axiom edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.ne
   : edwards.affine.AffinePoint → edwards.affine.AffinePoint → Result Bool
 
-/- [curve25519_dalek::edwards::affine::{core::cmp::Eq for curve25519_dalek::edwards::affine::AffinePoint}::assert_receiver_is_total_eq]:
+/- [curve25519_dalek::edwards::affine::{core::cmp::Eq for
+   curve25519_dalek::edwards::affine::AffinePoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/edwards/affine.rs', lines 53:0-53:26 -/
 axiom edwards.affine.AffinePoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : edwards.affine.AffinePoint → Result Unit
 
-/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::CompressedEdwardsY> for curve25519_dalek::edwards::CompressedEdwardsY}::ne]:
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<
+   curve25519_dalek::edwards::CompressedEdwardsY> for
+   curve25519_dalek::edwards::CompressedEdwardsY}::ne]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 172:26-172:35 -/
 axiom edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.ne
   : edwards.CompressedEdwardsY → edwards.CompressedEdwardsY → Result Bool
 
-/- [curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::ne]:
+/- [curve25519_dalek::edwards::{core::cmp::PartialEq<
+   curve25519_dalek::edwards::EdwardsPoint> for
+   curve25519_dalek::edwards::EdwardsPoint}::ne]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 506:0-510:1 -/
 axiom edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.ne
   : edwards.EdwardsPoint → edwards.EdwardsPoint → Result Bool
 
-/- [curve25519_dalek::edwards::{core::cmp::Eq for curve25519_dalek::edwards::EdwardsPoint}::assert_receiver_is_total_eq]:
+/- [curve25519_dalek::edwards::{core::cmp::Eq for
+   curve25519_dalek::edwards::EdwardsPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/edwards.rs', lines 512:0-512:27 -/
 axiom edwards.EdwardsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : edwards.EdwardsPoint → Result Unit
 
-/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::CompressedRistretto> for curve25519_dalek::ristretto::CompressedRistretto}::ne]:
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<
+   curve25519_dalek::ristretto::CompressedRistretto> for
+   curve25519_dalek::ristretto::CompressedRistretto}::ne]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 220:26-220:35 -/
 axiom
   ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.ne
@@ -1430,21 +1483,27 @@ axiom
   ristretto.CompressedRistretto → ristretto.CompressedRistretto → Result
     Bool
 
-/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::ne]:
+/- [curve25519_dalek::ristretto::{core::cmp::PartialEq<
+   curve25519_dalek::ristretto::RistrettoPoint> for
+   curve25519_dalek::ristretto::RistrettoPoint}::ne]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 858:0-862:1 -/
 axiom ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.ne
   : ristretto.RistrettoPoint → ristretto.RistrettoPoint → Result Bool
 
-/- [curve25519_dalek::ristretto::{core::cmp::Eq for curve25519_dalek::ristretto::RistrettoPoint}::assert_receiver_is_total_eq]:
+/- [curve25519_dalek::ristretto::{core::cmp::Eq for
+   curve25519_dalek::ristretto::RistrettoPoint}::assert_receiver_is_total_eq]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 881:0-881:29 -/
 axiom ristretto.RistrettoPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
   : ristretto.RistrettoPoint → Result Unit
 
+namespace ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable
+
 /-- Private conditional_select for ristretto.RistrettoPoint.
-   It is in Funs.Lean previously, we copy it here locally (with private and ' suffix) since
-   ristretto.RistrettoPoint conditional_swap and conditional_assign depend on it.
+   It is in Funs.Lean previously, we copy it here locally (with private and
+   ' suffix) since ristretto.RistrettoPoint conditional_swap and
+   conditional_assign depend on it.
    Note: ristretto.RistrettoPoint is defined as edwards.EdwardsPoint -/
-private def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select'
+private def conditional_select'
   (a : ristretto.RistrettoPoint) (b : ristretto.RistrettoPoint)
   (choice : subtle.Choice) :
   Result ristretto.RistrettoPoint
@@ -1454,17 +1513,18 @@ private def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditi
       a b choice
   ok ep
 
-/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_swap]:
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for
+   curve25519_dalek::ristretto::RistrettoPoint}::conditional_swap]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1
 
    Conditionally swaps two ristretto.RistrettoPoint values in constant time.
    If choice.val = 1, swaps the points; otherwise leaves them unchanged. -/
-def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+def conditional_swap
   (a b : ristretto.RistrettoPoint)
   (choice : subtle.Choice) :
   Result (ristretto.RistrettoPoint × ristretto.RistrettoPoint) := do
-  let a_new ← ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
-  let b_new ← ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice
+  let a_new ← conditional_select' a b choice
+  let b_new ← conditional_select' b a choice
   ok (a_new, b_new)
 
 /-- **Spec theorem for `ristretto.RistrettoPoint.conditional_swap`**:
@@ -1474,28 +1534,29 @@ def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swa
 - Implements constant-time conditional swap for ristretto.RistrettoPoint
 -/
 @[progress]
-theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
+theorem conditional_swap_spec
   (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
-  (h_a : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
-  (h_b : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok res) :
-  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ c =>
-    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok c.1 ∧
-    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' b a choice = ok c.2 ⦄ := by
-  unfold ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap
+  (h_a : ∃ res, conditional_select' a b choice = ok res)
+  (h_b : ∃ res, conditional_select' b a choice = ok res) :
+  conditional_swap a b choice ⦃ c =>
+    conditional_select' a b choice = ok c.1 ∧
+    conditional_select' b a choice = ok c.2 ⦄ := by
+  unfold conditional_swap
   obtain ⟨a_new, h_a_eq⟩ := h_a
   obtain ⟨b_new, h_b_eq⟩ := h_b
   simp [h_a_eq, h_b_eq, bind_tc_ok, spec_ok, and_self]
 
-/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_assign]:
+/- [curve25519_dalek::ristretto::{subtle::ConditionallySelectable for
+   curve25519_dalek::ristretto::RistrettoPoint}::conditional_assign]:
    Source: 'curve25519-dalek/src/ristretto.rs', lines 1167:0-1199:1
 
    Conditionally assigns b to a in constant time.
    If choice.val = 1, assigns b; otherwise keeps a unchanged. -/
-def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+def conditional_assign
   (a b : ristretto.RistrettoPoint)
   (choice : subtle.Choice) :
   Result ristretto.RistrettoPoint :=
-  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice
+  conditional_select' a b choice
 
 /-- **Spec theorem for `ristretto.RistrettoPoint.conditional_assign`**:
 - No panic (if conditional_select succeeds)
@@ -1504,13 +1565,15 @@ def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_ass
 - Implements constant-time conditional assignment for ristretto.RistrettoPoint
 -/
 @[progress]
-theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+theorem conditional_assign_spec
   (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
-  (h : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
-  ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign a b choice ⦃ res =>
-    ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res ⦄ := by
-  unfold ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
+  (h : ∃ res, conditional_select' a b choice = ok res) :
+  conditional_assign a b choice ⦃ res =>
+    conditional_select' a b choice = ok res ⦄ := by
+  unfold conditional_assign
   obtain ⟨res, h_eq⟩ := h
   simp [h_eq, spec_ok]
+
+end ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable
 
 end curve25519_dalek
