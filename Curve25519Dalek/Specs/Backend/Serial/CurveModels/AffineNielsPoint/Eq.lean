@@ -38,12 +38,12 @@ natural language specs:
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51
 
 /-- Helper: the Bool `eq` returns true iff the canonical byte encodings are equal. -/
-@[progress]
+@[step]
 theorem eq_spec_aux (a b : backend.serial.u64.field.FieldElement51) :
     eq a b ⦃ r =>
     (r = true ↔ a.to_bytes = b.to_bytes) ⦄ := by
   unfold eq
-  progress*
+  step*
   unfold Bool.Insts.CoreConvertFromChoice.from
   simp only [spec, theta, wp_return]
   have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by
@@ -60,7 +60,7 @@ namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Co
 - Returns true iff all three coordinate comparisons return true
 - Short-circuits to false as soon as a comparison fails
 -/
-@[progress]
+@[step]
 theorem eq_spec
     (self other : backend.serial.curve_models.AffineNielsPoint) :
     eq self other ⦃ b =>
@@ -75,9 +75,9 @@ theorem eq_spec
     spec_split
     · let* ⟨ b, b_post ⟩ ← u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux
       agrind
-    · simp only [progress_simps]
+    · simp only [step_simps]
       agrind
-  · simp only [progress_simps]
+  · simp only [step_simps]
     agrind
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint
