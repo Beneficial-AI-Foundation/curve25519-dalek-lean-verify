@@ -567,7 +567,16 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     · rw [h_l3, i36_post1]; exact and_mask_lt_pow i35 low_51_bit_mask hmask
     · rw [h_l4, i38_post1]; exact and_mask_lt_pow i37 low_51_bit_mask hmask
   have hbytes : bytes_match_limbs limbs9 s32 := by
-    sorry -- mechanical: resolve each of the 32 byte equalities through the s/i chains
+    unfold bytes_match_limbs
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
+            ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    simp only [
+      Array.set_val_eq, getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, List.getElem_set_ne, ne_eq, not_false_eq_true,
+      UScalar.ofNatCore_val_eq, U64_cast_U8, UScalar.val_or,
+      Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos,
+      Nat.reduceEqDiff, Nat.succ_ne_self,
+      one_ne_zero, OfNat.ofNat_ne_one, OfNat.ofNat_ne_zero, *]
   have hpack := byte_packing_eq limbs9 s32 hlimbs hbytes
   rw [hpack]
   -- (B) Canonical reduction in clean context
