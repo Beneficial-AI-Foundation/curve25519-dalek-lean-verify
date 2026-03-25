@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -21,7 +21,7 @@ namespace curve25519_dalek.scalar.Scalar
 theorem Scalar_ext (a b : Scalar) : a.bytes = b.bytes → a = b := by
   cases a with | mk _ =>
   cases b with | mk _ =>
-  grind
+  intro h; exact congrArg Scalar.mk h
 
 /-- If `U8x32_as_Nat` of a Scalar equals `0` then is it `ZERO`. -/
 lemma U8x32_as_Nat_eq_zero_iff_ZERO (s : Scalar) : U8x32_as_Nat s.bytes = 0 ↔ s = ZERO := by
@@ -30,9 +30,8 @@ lemma U8x32_as_Nat_eq_zero_iff_ZERO (s : Scalar) : U8x32_as_Nat s.bytes = 0 ↔ 
     decide
   constructor
   · intro _
-    have : s.bytes = ZERO.bytes := U8x32_as_Nat_injective (by grind)
-    apply Scalar_ext
-    grind
-  · grind
+    have : s.bytes = ZERO.bytes := U8x32_as_Nat_injective (by omega)
+    exact Scalar_ext s ZERO this
+  · intro h; subst h; exact this
 
 end curve25519_dalek.scalar.Scalar
