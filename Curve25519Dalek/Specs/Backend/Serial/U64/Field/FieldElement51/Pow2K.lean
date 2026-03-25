@@ -298,7 +298,7 @@ private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4
     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 =
     a0 + 2^51*a1 + 2^102*a2 + 2^153*a3 + 2^204*a4 + 2^255*carry := by omega
 
-set_option maxHeartbeats 2000000 in
+set_option maxHeartbeats 1400000 in
 -- Required for progress*
 @[progress]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)

@@ -41,15 +41,18 @@ Spec:
 -/
 
 /-- **Spec and proof concerning `FieldElement51.is_negative`.** -/
-
 theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
-   U8x32_as_Nat bytes  % 2 = (bytes.val[0]).val %2 := by
-   rw[← Nat.ModEq]
-   apply Nat.ModEq.symm
-   rw[Nat.modEq_iff_dvd]
-   unfold U8x32_as_Nat
-   simp[Finset.sum_range_succ]
-   scalar_tac
+    U8x32_as_Nat bytes  % 2 = (bytes.val[0]).val %2 := by
+  rw[← Nat.ModEq]
+  apply Nat.ModEq.symm
+  rw[Nat.modEq_iff_dvd]
+  unfold U8x32_as_Nat
+  simp only [Nat.cast_ofNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+    Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos, Option.getD_some,
+    one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT, Nat.lt_add_one,
+    Nat.cast_add, Nat.cast_mul]
+  scalar_tac
 
 @[progress]
 theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
@@ -60,7 +63,8 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
   progress as ⟨b0⟩
   progress as ⟨i1, h_i1⟩
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
-  simp_all
+  simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
+    UScalar.val_and, Nat.and_one_is_mod, UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, U8.ofNat_bv]
   have : i1.val < 2 := by
     rw [h_i1]
     apply Nat.mod_lt
@@ -71,18 +75,24 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     all_goals simp
   rcases h01 with zero | one
   · progress*
-    simp_all
+    simp_all only [UScalar.ofNatCore_val_eq, ReduceNat.reduceNatEq, U8.ofNat_bv,
+      UScalarTy.U8_numBits_eq, Nat.ofNat_pos, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
+      one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
+      false_iff, Nat.mod_two_not_eq_one]
     rw [Nat.ModEq] at h_mod
     rw [← h_mod]
     have := Nat.mod_eq_of_lt h_lt
-    simp [this, first_bit]
+    simp only [this, first_bit]
     exact h_i1
   · progress*
-    simp_all
+    simp_all only [UScalar.ofNatCore_val_eq, ReduceNat.reduceNatEq, U8.ofNat_bv,
+      UScalarTy.U8_numBits_eq, Nat.one_lt_ofNat, Nat.not_eq, ne_eq, one_ne_zero, not_false_eq_true,
+      zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq,
+      true_iff]
     rw [Nat.ModEq] at h_mod
     rw [← h_mod]
     have := Nat.mod_eq_of_lt h_lt
-    simp [this, first_bit]
+    simp only [this, first_bit]
     exact h_i1
 
 end curve25519_dalek.field.FieldElement51

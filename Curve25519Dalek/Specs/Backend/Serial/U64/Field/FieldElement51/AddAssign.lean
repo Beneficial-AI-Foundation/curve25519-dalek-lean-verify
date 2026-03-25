@@ -35,14 +35,20 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
       (∀ j < 5, j < i.val → result[j]! = self[j]!) ⦄ := by
   unfold add_assign_loop
   split
-  · progress*
+  · let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
+    let* ⟨ i3, i3_post ⟩ ← U64.add_spec
+    let* ⟨ a, a_post ⟩ ← Array.update_spec
+    let* ⟨ i4, i4_post ⟩ ← Usize.add_spec
+    let* ⟨ result, result_post1, result_post2 ⟩ ← add_assign_loop_spec
     constructor
     · intro j _ _
       obtain _ | _ := (show j = i ∨ i + 1 ≤ j by omega) <;> simp_all
     · intro j hj _
       have := result_post2 j hj (by omega)
       simp_all
-  · progress*
+  · simp only [progress_simps]
+    grind
   termination_by 5 - i.val
   decreasing_by scalar_tac
 

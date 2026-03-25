@@ -1999,7 +1999,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by ...",
+   "theorem conditional_assign_spec\n    (self other : backend.serial.curve_models.AffineNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.y_plus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_plus_x[i]!.val else self.y_plus_x[i]!.val) ∧\n    (∀ i < 5, result.y_minus_x[i]!.val =\n      if choice.val = 1#u8 then other.y_minus_x[i]!.val else self.y_minus_x[i]!.val) ∧\n    (∀ i < 5, result.xy2d[i]!.val =\n      if choice.val = 1#u8 then other.xy2d[i]!.val else self.xy2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
@@ -3219,10 +3219,12 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)\n    (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)\n    (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :\n    sub_assign self _rhs ⦃ (result : backend.serial.u64.field.FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat result + Field51_as_Nat _rhs) % p = Field51_as_Nat self % p ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/SubAssign.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3234,7 +3236,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub"]},
@@ -4097,7 +4099,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/ConditionalAddL.lean",
    "spec_docstring":
-   "/-- **Spec for `scalar.Scalar52.conditional_add_l`**\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
+   "/-- **Spec for `scalar.Scalar52.conditional_add_l`** (tailored for use in `sub`):\n- Requires input limbs bounded by 2^52\n- When condition is 1, requires input value in [2^260 - L, 2^260)\n- When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52\n- When condition is 0: result unchanged with limbs < 2^52\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
@@ -5859,7 +5861,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
+   "theorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates\n- When both points are valid, this is equivalent to toPoint equality\n-/",
@@ -10832,7 +10834,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "\ntheorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    montgomery_invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    montgomery_invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "spec_docstring":

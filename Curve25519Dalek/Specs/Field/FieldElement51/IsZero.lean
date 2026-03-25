@@ -44,9 +44,9 @@ Spec:
 lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
     (h : h1.to_slice = h2.to_slice) :
     h1 = h2 := by
-  simp [Array.to_slice] at h
+  simp only [Array.to_slice] at h
   cases h1; cases h2
-  simp at h
+  simp only at h
   cases h
   rfl
 
@@ -100,14 +100,18 @@ theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
       exact h_mod
     have bytes_eq : bytes = Array.repeat 32#usize 0#u8 := by
       unfold U8x32_as_Nat at h_bytes_zero
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_eq_zero_iff,
+        Finset.mem_range, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos,
+        Option.getD_some, mul_eq_zero, Nat.pow_eq_zero, OfNat.ofNat_ne_zero, ne_eq, false_or,
+        false_and]
       apply Subtype.ext
       apply List.ext_getElem
-      repeat simp
+      repeat simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Array.repeat_val,
+        List.reduceReplicate, List.length_cons, List.length_nil, zero_add, Nat.reduceAdd]
       intro i hi _
       have hi_val := h_bytes_zero i hi
       interval_cases i
-      all_goals simp [Array.repeat, List.replicate]; scalar_tac
+      all_goals simp only [List.getElem_cons_succ, List.getElem_cons_zero]; agrind
     have h_slice_eq : Array.to_slice bytes =
         Array.to_slice (Array.repeat 32#usize 0#u8) := by rw [bytes_eq]
     exact (Choice.val_eq_one_iff result).mpr (h_ct_eq.mpr h_slice_eq)

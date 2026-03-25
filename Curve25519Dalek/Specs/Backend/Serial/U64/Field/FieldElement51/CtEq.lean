@@ -47,7 +47,10 @@ theorem ct_eq_spec (a b : backend.serial.u64.field.FieldElement51) :
   have ⟨a_bytes, ha_ok, _⟩ := spec_imp_exists (to_bytes_spec a)
   have ⟨b_bytes, hb_ok, _⟩ := spec_imp_exists (to_bytes_spec b)
   rw [ha_ok, hb_ok]
-  progress*
+  simp only [progress_simps]
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.progress_spec
+  let* ⟨ c, c_post ⟩ ← Slice.Insts.SubtleConstantTimeEq.ct_eq_spec
   simp_all only [Array.to_slice, Slice.eq_iff]
   exact ⟨fun h => Subtype.ext h, fun h => h ▸ rfl⟩
 
