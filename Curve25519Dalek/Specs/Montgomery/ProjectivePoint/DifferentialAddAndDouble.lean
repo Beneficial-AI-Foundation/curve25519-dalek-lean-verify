@@ -136,15 +136,18 @@ theorem differential_add_and_double_spec
         (Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
          Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
          Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) →
-        (Field51_as_Nat res.1.U / Field51_as_Nat res.1.W = Montgomery.get_u (2 • P_affine)) ∧
-        (Field51_as_Nat res.2.U / Field51_as_Nat res.2.W = Montgomery.get_u (P_affine + Q_affine))) ∧
+        (Field51_as_Nat res.1.U / Field51_as_Nat res.1.W =
+          Montgomery.get_u (2 • P_affine)) ∧
+        (Field51_as_Nat res.2.U / Field51_as_Nat res.2.W =
+          Montgomery.get_u (P_affine + Q_affine))) ∧
       (∃  (P_affine Q_affine : Montgomery.Point),
         (Montgomery.get_u P_affine = Field51_as_Nat P.U / Field51_as_Nat P.W ∧
          Montgomery.get_u Q_affine = Field51_as_Nat Q.U / Field51_as_Nat Q.W ∧
          Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) )
       ⦄ := by
   unfold differential_add_and_double
-  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a, hpmq_lt, hnon_pmq, heq_pmq⟩:=  h_ladder_state
+  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a,
+    hpmq_lt, hnon_pmq, heq_pmq⟩ := h_ladder_state
   progress*
   · exact hP_valid.U_bounds
   · exact hP_valid.W_bounds
@@ -166,60 +169,83 @@ theorem differential_add_and_double_spec
     rw[← Nat.ModEq, lift_mod_eq_iff] at t1_post2
     rw[← Nat.ModEq, lift_mod_eq_iff] at t3_post2
     rw[← Nat.ModEq, lift_mod_eq_iff] at t10_post2
-    have ht6: ((Field51_as_Nat t6): CurveField) = ↑(Field51_as_Nat t0 ^ 2)- ↑(Field51_as_Nat t1 ^ 2):= by
+    have ht6: ((Field51_as_Nat t6): CurveField) =
+        ↑(Field51_as_Nat t0 ^ 2) - ↑(Field51_as_Nat t1 ^ 2) := by
       clear *- t6_post2 t5_post1 t4_post1
       grind => ring
-    have ht1: ((Field51_as_Nat t1): CurveField) = ↑(Field51_as_Nat P.U)- ↑(Field51_as_Nat P.W):= by
+    have ht1: ((Field51_as_Nat t1): CurveField) =
+        ↑(Field51_as_Nat P.U) - ↑(Field51_as_Nat P.W) := by
       clear *- t1_post2
       grind only
     have ht0: ((Field51_as_Nat t0):CurveField)= Field51_as_Nat P.U+ Field51_as_Nat P.W:= by
-      simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+      simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+        List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+    Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
     Nat.reduceLT, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
       clear *-  t0_post1
-      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+        UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
     Nat.cast_add, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
       ring_nf
     have ht2: ((Field51_as_Nat t2):CurveField)= Field51_as_Nat Q.U+ Field51_as_Nat Q.W:= by
-      simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+      simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+        List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq,
+        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+        Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
         Nat.reduceLT, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
       clear *-  t2_post1
-      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+        UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
         Nat.cast_add, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
       ring_nf
     have ht3: ((Field51_as_Nat t3):CurveField)= Field51_as_Nat Q.U- Field51_as_Nat Q.W:= by
       grind only
     have ht9: ((Field51_as_Nat t9):CurveField)= Field51_as_Nat t7+ Field51_as_Nat t8:= by
-      simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+      simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+        List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq,
+        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+        Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
         Nat.reduceLT, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
       clear *-  t9_post1
-      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+        UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
         Nat.cast_add, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
       ring_nf
     have ht15: ((Field51_as_Nat t15):CurveField)= Field51_as_Nat t13+ Field51_as_Nat t5:= by
-      simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+      simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+        List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+        Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq,
+        Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+        Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
         Nat.reduceLT, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_ofNat]
       clear *-  t15_post1
-      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+      simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+        UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
         Nat.cast_add, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
       ring_nf
-    have ht10_eq:((Field51_as_Nat t10):CurveField)  = ↑(Field51_as_Nat t7) - (Field51_as_Nat t8) := by grind
+    have ht10_eq : ((Field51_as_Nat t10) : CurveField) =
+        ↑(Field51_as_Nat t7) - (Field51_as_Nat t8) := by grind
     have non_t6: Field51_as_Nat t6 ≠ (0:CurveField):= by
-          simp only [ Nat.cast_pow, ht6, (by grind: ∀ a b: CurveField, a^2-b^2=(a-b)*(a+b)),ne_eq, mul_eq_zero, not_or]
+          simp only [Nat.cast_pow, ht6,
+            (by grind : ∀ a b : CurveField, a ^ 2 - b ^ 2 = (a - b) * (a + b)),
+            ne_eq, mul_eq_zero, not_or]
           constructor
-          · simp only [ht0, ht1, add_sub_sub_cancel,  (by grind: ∀ a:CurveField, a+a= 2*a), mul_eq_zero, not_or]
+          · simp only [ht0, ht1, add_sub_sub_cancel,
+              (by grind : ∀ a : CurveField, a + a = 2 * a), mul_eq_zero, not_or]
             have :=hP_valid.W_ne_zero
             unfold FieldElement51.toField at this
             simp only [this, not_false_eq_true, and_true, ne_eq]
             decide
-          · simp only [ht0, ht1, add_add_sub_cancel,  (by grind: ∀ a:CurveField, a+a= 2*a), mul_eq_zero, not_or]
+          · simp only [ht0, ht1, add_add_sub_cancel,
+              (by grind : ∀ a : CurveField, a + a = 2 * a), mul_eq_zero, not_or]
             constructor
             · decide
             · apply not_eq_T_point
@@ -253,7 +279,8 @@ theorem differential_add_and_double_spec
       exact this
     have non_t17: (Field51_as_Nat t17) ≠ (0 :CurveField):= by
           intro h
-          simp only [t17_post1, Nat.cast_mul, t12_post1, Nat.cast_pow, ht10_eq, mul_eq_zero, ne_eq, OfNat.ofNat_ne_zero,
+          simp only [t17_post1, Nat.cast_mul, t12_post1, Nat.cast_pow,
+            ht10_eq, mul_eq_zero, ne_eq, OfNat.ofNat_ne_zero,
             not_false_eq_true, pow_eq_zero_iff] at h
           rcases h with h | h
           · unfold FieldElement51.toField at hnon_pmq
@@ -332,7 +359,8 @@ theorem differential_add_and_double_spec
             simp only [hpq] at DBL
             field_simp  at DBL
             field_simp
-            simp only [t14_post1, Nat.cast_mul, t4_post1, Nat.cast_pow, t5_post1, ht1, t16_post1, ht6]
+            simp only [t14_post1, Nat.cast_mul, t4_post1, Nat.cast_pow,
+              t5_post1, ht1, t16_post1, ht6]
             simp only [ht0, ht15, t13_post1, Nat.cast_mul, ht6, Nat.cast_pow, ht1, t5_post1]
             field_simp
             have : Field51_as_Nat fe= (Curve25519.A +2)/4 := by
@@ -363,11 +391,13 @@ theorem differential_add_and_double_spec
               rw[hp_a, hq_a]
               unfold FieldElement51.toField
               rw[eq]
-            have ADD:= Montgomery.uADD Pa Qa non_Pa non_Qa Pa_non_T_point Qa_non_T_point non_eq_pq non_eq_pq_neg
+            have ADD := Montgomery.uADD Pa Qa non_Pa non_Qa
+              Pa_non_T_point Qa_non_T_point non_eq_pq non_eq_pq_neg
             simp only [hpq] at ADD
             field_simp  at ADD
             field_simp
-            simp[t11_post1, ht9, t7_post1,ht0, t8_post1, ht3, ht1, ht2, t17_post1, t12_post1, ht10_eq]
+            simp [t11_post1, ht9, t7_post1, ht0, t8_post1, ht3, ht1, ht2,
+              t17_post1, t12_post1, ht10_eq]
             field_simp
             clear *- ADD
             set PU:=Field51_as_Nat P.U with HPU
