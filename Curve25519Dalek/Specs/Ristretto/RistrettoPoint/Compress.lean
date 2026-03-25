@@ -25,9 +25,11 @@ Specification and proof for `RistrettoPoint::compress`.
 This function implements the Ristretto compression (ENCODE) function, which maps a
 RistrettoPoint to its canonical 32-byte representation. The function is defined in the
 
-- [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
+- [Ristretto specification]
+  (https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
 
-It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a unique, canonical byte representation.
+It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a
+unique, canonical byte representation.
 >>
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
@@ -179,7 +181,8 @@ private lemma cond_neg_scale_of_neg_flag_match (Z y x : ZMod p) (flag : subtle.C
 private lemma lift_fe_sq (fe : FieldElement51) (h : Field51_as_Nat fe ^ 2 % p = p - 1) :
     fe.toField ^ 2 = -1 := by
   unfold FieldElement51.toField
-  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1) (by rwa [Nat.mod_eq_of_lt (show p - 1 < p from by decide)])
+  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1)
+    (by rwa [Nat.mod_eq_of_lt (show p - 1 < p from by decide)])
   push_cast at h; rwa [p_sub_one_cast] at h
 
 private lemma lift_rm_sq (rm : FieldElement51)
@@ -191,7 +194,9 @@ private lemma lift_rm_sq (rm : FieldElement51)
     rw [← ZMod.intCast_mod _ p, h, Int.cast_one]
   push_cast at this; exact this
 
-set_option maxHeartbeats 800000 in -- maxHeartbeats increased: compress has many sub-calls, progress* needs more time after Aeneas update
+-- maxHeartbeats increased: compress has many sub-calls,
+-- progress* needs more time after Aeneas update
+set_option maxHeartbeats 800000 in
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
 • The output is a valid CompressedRistretto 32-byte representation
@@ -255,7 +260,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     simpa only [h_a_eq] using h_s1_parity
   -- Build the shared implementation-to-pure bridge once.
   -- Both final goals consume h_key : s1.toField = compress_s self.toPoint.
-  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   have hvalid := h.1
   have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
   have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0
