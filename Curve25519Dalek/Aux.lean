@@ -50,8 +50,8 @@ theorem Array.set_of_ne (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i <
   exact List.getElem!_set_ne bs j i a (by omega)
 
 /-- Setting the j part of an array doesn't change the i part if i ≠ j -/
-theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize) (hi : i < bs.length)
-    (h : i ≠ j) :
+theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize)
+    (hi : i < bs.length) (h : i ≠ j) :
     (bs.set j a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
@@ -118,7 +118,8 @@ list representation of the input array -/
 lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
     U8x32_as_Nat a = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val) := by
     unfold U8x32_as_Nat
-    rw [Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val), Finset.sum_range]
+    rw [Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val),
+      Finset.sum_range]
     simp only [pow_mul]
     change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
     simp [Nat.mul_comm]
@@ -198,8 +199,10 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (L1 := L)
     (L2 := L')
     (by rw [List.length_ofFn, List.length_ofFn])
-    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
-    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
+    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl;
+        exact Aeneas.Std.UScalar.hBounds (a[i]!))
+    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl;
+        exact Aeneas.Std.UScalar.hBounds (a'[i]!))
     (h_funs_eq)
   simp only [L, L', List.ofFn_inj] at h_inj
   apply Subtype.ext
@@ -305,10 +308,11 @@ lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
 lemma pointwise_add_Field51_as_Nat (a b c : Array U64 5#usize)
     (h : ∀ i < 5, c[i]!.val = a[i]!.val + b[i]!.val) :
     Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b := by
-  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+    Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
+    Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
     Nat.reduceLT, Nat.lt_add_one]
-  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
-    Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    getElem!_pos, Nat.ofNat_pos, Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
   scalar_tac
