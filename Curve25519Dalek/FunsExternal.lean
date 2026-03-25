@@ -37,8 +37,8 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
 /-- RangeFull index_mut (`s[..]`) returns the slice and the identity function. -/
 @[simp, progress]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut_spec
-  {T : Type} (s : Slice T) :
-  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut () s ⦃ p =>
+    {T : Type} (s : Slice T) :
+    core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut () s ⦃ p =>
     p.1 = s ∧ p.2 = id ⦄ := by
   unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
   simp [spec_ok]
@@ -108,8 +108,8 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
     if Some, or keeps it if None. -/
 @[simp, progress]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut_spec
-  {T : Type} (s : Slice T) :
-  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut () s ⦃ p =>
+    {T : Type} (s : Slice T) :
+    core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut () s ⦃ p =>
     p.1 = some s ∧ (∀ opt, p.2 opt = opt.getD s) ⦄ := by
   unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
   simp [spec_ok]
@@ -130,8 +130,8 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
 /-- RangeFull get (`s[..]`) always returns Some(s) for slices. -/
 @[simp, progress]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_spec
-  {T : Type} (s : Slice T) :
-  core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get () s ⦃ opt =>
+    {T : Type} (s : Slice T) :
+    core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get () s ⦃ opt =>
     opt = some s ⦄ := by
   unfold core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
   simp [spec_ok]
@@ -304,8 +304,8 @@ def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result sub
 
 @[progress]
 theorem subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec (a : subtle.Choice) :
-  subtle.Choice.Insts.CoreOpsBitNotChoice.not a ⦃ b =>
-  (a.val = 1#u8 ↔ b = Choice.zero) ⦄ := by
+    subtle.Choice.Insts.CoreOpsBitNotChoice.not a ⦃ b =>
+    (a.val = 1#u8 ↔ b = Choice.zero) ⦄ := by
   unfold subtle.Choice.Insts.CoreOpsBitNotChoice.not
   split
   · -- Case: a = b
@@ -338,8 +338,8 @@ def U16.Insts.SubtleConstantTimeEq.ct_eq (a : U16) (b : U16) : Result subtle.Cho
 -/
 @[progress]
 theorem U16.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U16) :
-  U16.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
-  (c = Choice.one ↔ a = b) ⦄ := by
+    U16.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
+    (c = Choice.one ↔ a = b) ⦄ := by
   unfold U16.Insts.SubtleConstantTimeEq.ct_eq
   split
   · -- Case: a = b
@@ -407,8 +407,8 @@ def U8.Insts.SubtleConstantTimeEq.ct_eq (a : U8) (b : U8) : Result subtle.Choice
 -/
 @[progress]
 theorem U8.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U8) :
-  U8.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
-  (c = Choice.one ↔ a = b) ⦄ := by
+    U8.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
+    (c = Choice.one ↔ a = b) ⦄ := by
   unfold U8.Insts.SubtleConstantTimeEq.ct_eq
   split
   · -- Case: a = b
@@ -446,12 +446,12 @@ def subtle.ConditionallySelectable.conditional_assign.default
 -/
 @[progress]
 theorem subtle.ConditionallySelectable.conditional_assign.default_spec
-  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
-  (a b : Self) (choice : subtle.Choice)
-  (h : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res) :
-  subtle.ConditionallySelectable.conditional_assign.default
-    ConditionallySelectableInst a b choice ⦃ res =>
-  ConditionallySelectableInst.conditional_select a b choice = ok res ⦄ := by
+    {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
+    (a b : Self) (choice : subtle.Choice)
+    (h : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res) :
+    subtle.ConditionallySelectable.conditional_assign.default
+      ConditionallySelectableInst a b choice ⦃ res =>
+    ConditionallySelectableInst.conditional_select a b choice = ok res ⦄ := by
   unfold subtle.ConditionallySelectable.conditional_assign.default
   obtain ⟨res, h_eq⟩ := h
   simp only [h_eq, spec_ok]
@@ -481,12 +481,12 @@ def subtle.ConditionallySelectable.conditional_swap.default
 -/
 @[progress]
 theorem subtle.ConditionallySelectable.conditional_swap.default_spec
-  {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
-  (a b : Self) (choice : subtle.Choice)
-  (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
-  (h_b : ∃ res, ConditionallySelectableInst.conditional_select b a choice = ok res) :
-  subtle.ConditionallySelectable.conditional_swap.default
-    ConditionallySelectableInst a b choice ⦃ c =>
+    {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
+    (a b : Self) (choice : subtle.Choice)
+    (h_a : ∃ res, ConditionallySelectableInst.conditional_select a b choice = ok res)
+    (h_b : ∃ res, ConditionallySelectableInst.conditional_select b a choice = ok res) :
+    subtle.ConditionallySelectable.conditional_swap.default
+      ConditionallySelectableInst a b choice ⦃ c =>
     ConditionallySelectableInst.conditional_select a b choice = ok c.1 ∧
     ConditionallySelectableInst.conditional_select b a choice = ok c.2 ⦄ := by
   unfold subtle.ConditionallySelectable.conditional_swap.default
