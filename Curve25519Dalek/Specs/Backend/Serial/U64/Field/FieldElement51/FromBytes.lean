@@ -202,7 +202,7 @@ theorem u64_and_mask51_bitList_spec (x mask : U64)
 
 /-- load8_at in List Bool terms, as a progress-compatible spec. -/
 @[progress]
-theorem load8_at_bitList_progress_spec (input : Slice U8) (i : Usize)
+theorem load8_at_bitList_step_spec (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ result =>
       ofU64 result ≈ₗ
@@ -246,23 +246,23 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
   unfold from_bytes
   let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ low_51_bit_mask, low_51_bit_mask_post1, low_51_bit_mask_post2 ⟩ ← U64.sub_spec
-  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ i1, i1_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ i1, i1_post ⟩ ← load8_at_bitList_step_spec
   let* ⟨ i2, i2_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ i3, i3_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ s1, s1_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ i3, i3_post ⟩ ← load8_at_bitList_step_spec
   let* ⟨ i4, i4_post ⟩ ← u64_shr_bitList_spec
   let* ⟨ i5, i5_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ i6, i6_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ i6, i6_post ⟩ ← load8_at_bitList_step_spec
   let* ⟨ i7, i7_post ⟩ ← u64_shr_bitList_spec
   let* ⟨ i8, i8_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s3, s3_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ i9, i9_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ s3, s3_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ i9, i9_post ⟩ ← load8_at_bitList_step_spec
   let* ⟨ i10, i10_post ⟩ ← u64_shr_bitList_spec
   let* ⟨ i11, i11_post ⟩ ← u64_and_mask51_bitList_spec
-  let* ⟨ s4, s4_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ i12, i12_post ⟩ ← load8_at_bitList_progress_spec
+  let* ⟨ s4, s4_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ i12, i12_post ⟩ ← load8_at_bitList_step_spec
   let* ⟨ i13, i13_post ⟩ ← u64_shr_bitList_spec
   let* ⟨ i14, i14_post ⟩ ← u64_and_mask51_bitList_spec
   have hs : ∀ sx, sx = bytes.to_slice → ofByteList sx.val = ofByteList bytes.val := by

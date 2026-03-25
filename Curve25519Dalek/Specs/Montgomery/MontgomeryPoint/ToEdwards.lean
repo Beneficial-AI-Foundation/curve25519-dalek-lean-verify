@@ -54,13 +54,13 @@ natural language specs:
     where p = 2^255 - 19
 -/
 
-@[progress]
+@[step]
 private lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   decide
 
-@[progress]
+@[step]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>
         (∀ ep, result = some ep →
@@ -71,11 +71,11 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
             (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧ ep.IsValid )
       ⦄ := by
   unfold to_edwards
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ u, u_post1, u_post2 ⟩ ← from_bytes_spec
   let* ⟨ fe, fe_post ⟩ ← MINUS_ONE_spec
   unfold FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ x, x_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   unfold Bool.Insts.CoreConvertFromChoice.from
   simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod, Nat.mod_mul_mod, dvd_refl,

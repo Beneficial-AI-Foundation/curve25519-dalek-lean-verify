@@ -99,11 +99,11 @@ theorem from_spec (x : Std.U64) :
     U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
   simp only [progress_simps]
-  let* ⟨ x_bytes, x_bytes_post ⟩ ← core.num.U64.to_le_bytes.progress_spec
-  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.progress_spec
-  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.progress_spec
+  let* ⟨ x_bytes, x_bytes_post ⟩ ← core.num.U64.to_le_bytes.step_spec
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.step_spec
+  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.step_spec
   simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice, List.length_map, Nat.reduceMod,
     BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val, UScalar.ofNatCore_val_eq, List.reduceReplicate,
     List.slice_zero_j, List.take_succ_cons, List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
@@ -119,4 +119,3 @@ theorem from_spec (x : Std.U64) :
   simp [U8x32_as_Nat, Finset.sum_range_succ, x_bytes_post]
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64
-
