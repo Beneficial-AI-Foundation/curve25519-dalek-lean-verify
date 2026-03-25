@@ -69,7 +69,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
       (u * Z) % p = (u * Y + (Z + Y)) % p) ∧
     (∀ n : ℕ, fromEdwards (n • e.toPoint) = n • (MontgomeryPoint.mkPoint mp)) ⦄ := by
   unfold to_montgomery
-  progress* <;> try grind
+  (progress*; try grind)
   · constructor
     · split_ifs
       · rename_i h_zy

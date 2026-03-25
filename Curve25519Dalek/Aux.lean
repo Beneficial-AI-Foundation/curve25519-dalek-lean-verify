@@ -66,7 +66,7 @@ theorem Array.getElem_usize_eq_getElem! (bs : Array U64 5#usize) (i : Usize)
     (hi : i.val < bs.length) :
     (bs[i] : U64) = bs[i.val]! := by
   simp only [Array.getElem!_Nat_eq]
-  show bs.val[i.val] = bs.val[i.val]!
+  change bs.val[i.val] = bs.val[i.val]!
   exact List.Inhabited_getElem_eq_getElem! bs.val i.val hi
 
 /-- Like set_of_ne but returns getElem! on both sides -/

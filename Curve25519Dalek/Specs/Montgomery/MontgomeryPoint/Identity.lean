@@ -47,7 +47,8 @@ theorem identity_spec :
     U8x32_as_Nat (Array.repeat 32#usize 0#u8) = 0 by simpa
   constructor
   · intro i
-    fin_cases i <;> simp_all <;> decide
+    fin_cases i <;> simp_all only [Fin.zero_eta, Fin.isValue, Fin.getElem_fin, Nat.reduceAdd,
+      Fin.coe_ofNat_eq_mod, Nat.zero_mod] <;> decide
   · unfold U8x32_as_Nat
     simp only [Finset.sum_eq_zero_iff, Finset.mem_range]
     intro i hi

@@ -1,0 +1,104 @@
+name: Benchmark (PR)
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  benchmark:
+    # Only run on PR comments that are exactly "!bench" from org members
+    if: >
+      github.event.issue.pull_request &&
+      github.event.comment.body == '!bench' &&
+      contains(fromJSON('["MEMBER","OWNER","COLLABORATOR"]'), github.event.comment.author_association)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get PR branch
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_JSON=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.issue.number }})
+          echo "ref=$(echo "$PR_JSON" | jq -r .head.ref)" >> "$GITHUB_OUTPUT"
+          echo "sha=$(echo "$PR_JSON" | jq -r .head.sha)" >> "$GITHUB_OUTPUT"
+          echo "base_sha=$(echo "$PR_JSON" | jq -r .base.sha)" >> "$GITHUB_OUTPUT"
+
+      - name: React to comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions \
+            -f content='+1'
+
+      - name: Post status comment
+        id: status_comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          COMMENT_ID=$(gh api repos/${{ github.repository }}/issues/${{ github.event.issue.number }}/comments \
+            -f body="Benchmark running for \`${{ steps.pr.outputs.sha }}\`..." \
+            --jq .id)
+          echo "id=$COMMENT_ID" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR head
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.pr.outputs.ref }}
+
+      - name: Install elan
+        run: |
+          curl -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+
+      - name: Install lakeprof
+        run: |
+          uv tool install --from git+https://github.com/Kha/lakeprof lakeprof
+
+      - name: Run benchmark
+        env:
+          BENCH_AUTH_TOKEN: ${{ secrets.BENCH_AUTH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          RUNNER_SRC="${{ vars.BENCHWARMER_RUNNER_PATH || 'runner' }}"
+          bash "$RUNNER_SRC/bench.sh" \
+            "${{ vars.BENCH_LIBRARY_NAME }}" \
+            "${{ secrets.BENCH_API_ENDPOINT }}"
+
+      - name: Fetch report and update comment
+        if: success()
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          REPO_NAME=$(gh repo view --json nameWithOwner -q .nameWithOwner)
+          HEAD_SHA=${{ steps.pr.outputs.sha }}
+          BASE_SHA=${{ steps.pr.outputs.base_sha }}
+          REPORT_URL="${{ secrets.BENCH_API_ENDPOINT }}/${REPO_NAME}/${HEAD_SHA}/report/pr?base=${BASE_SHA}"
+
+          RESPONSE=$(curl -s --show-error -w "\nHTTP_STATUS:%{http_code}" "$REPORT_URL")
+          HTTP_STATUS=$(echo "$RESPONSE" | tail -1 | sed 's/HTTP_STATUS://')
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          if [[ "$HTTP_STATUS" -ne 200 ]]; then
+            echo "Server returned HTTP $HTTP_STATUS"
+            echo "$BODY"
+            exit 1
+          fi
+
+          COMMENT=$(echo "$BODY" | jq -r .markdown)
+
+          if [[ -z "$COMMENT" || "$COMMENT" == "null" ]]; then
+            echo "Report returned empty markdown"
+            echo "$BODY"
+            exit 1
+          fi
+
+          gh api repos/${{ github.repository }}/issues/comments/${{ steps.status_comment.outputs.id }} \
+            -X PATCH -f body="$COMMENT"
