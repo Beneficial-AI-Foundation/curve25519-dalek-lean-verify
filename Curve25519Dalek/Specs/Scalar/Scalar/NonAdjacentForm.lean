@@ -45,7 +45,8 @@ natural language specs:
     • \sum_{i=0}^{255} naf[i] 2^i = scalar_to_nat(s)
     • \forall i \in \{0,…,255}: naf[i] \neq 0 => naf[i] is odd and |naf[i]| < 2^{w-1}
     • naf[255] \neq 0
-    • \forall i \in \{0,…, 255 – w + 1\}: the sequence (naf[i], …, naf[i + w - 1]) contains at most one nonzero entry
+    • \forall i \in \{0,…, 255 – w + 1\}: the sequence (naf[i], …, naf[i + w - 1])
+      contains at most one nonzero entry
 -/
 
 

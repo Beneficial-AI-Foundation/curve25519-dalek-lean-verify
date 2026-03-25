@@ -32,9 +32,11 @@ natural language specs:
 - The resulting RistrettoPoint has coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
 
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof concerning
+`ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
 - No panic (always returns successfully)
-- The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
+- The resulting RistrettoPoint is the identity element with coordinates
+  (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
 @[progress]
 theorem identity_spec :

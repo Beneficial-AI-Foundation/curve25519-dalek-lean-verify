@@ -115,7 +115,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self rhs : scalar.Scalar) :
-    mul self rhs ⦃ result =>
+    mul self rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
@@ -151,7 +151,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self rhs : scalar.Scalar) :
-    mul self rhs ⦃ result =>
+    mul self rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
@@ -187,7 +187,7 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self rhs : scalar.Scalar) :
-    mul self rhs ⦃ result =>
+    mul self rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by

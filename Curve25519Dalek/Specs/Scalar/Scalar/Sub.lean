@@ -69,7 +69,7 @@ natural language specs:
 theorem sub_spec (self rhs : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L)
     (h_rhs : U8x32_as_Nat rhs.bytes < L) :
-    sub self rhs ⦃ result =>
+    sub self rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes + U8x32_as_Nat rhs.bytes ≡
         U8x32_as_Nat self.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
@@ -120,7 +120,7 @@ natural language specs:
 theorem sub_spec (self rhs : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L)
     (h_rhs : U8x32_as_Nat rhs.bytes < L) :
-    sub self rhs ⦃ result =>
+    sub self rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes + U8x32_as_Nat rhs.bytes ≡
         U8x32_as_Nat self.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by

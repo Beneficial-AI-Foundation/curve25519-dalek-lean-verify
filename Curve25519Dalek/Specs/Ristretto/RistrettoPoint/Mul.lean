@@ -15,10 +15,13 @@ Specifications and proofs for scalar multiplication of Ristretto points.
 Two trait implementations are covered here:
 
 - `Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`:
-  `&RistrettoPoint * &Scalar → RistrettoPoint`, delegating to `edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul`.
+  `&RistrettoPoint * &Scalar → RistrettoPoint`, delegating to
+  `edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul`.
 
-- `Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul` — the commutative variant:
-  `&Scalar * &RistrettoPoint → RistrettoPoint`, independently delegating to `SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul`.
+- `Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`
+  — the commutative variant:
+  `&Scalar * &RistrettoPoint → RistrettoPoint`, independently delegating to
+  `SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul`.
 
 **Source**: curve25519-dalek/src/ristretto.rs
 -/
@@ -29,10 +32,11 @@ namespace curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedASca
 /-
 natural language description:
 
-• Takes a valid Ristretto point (self : RistrettoPoint) and a canonical scalar (scalar : scalar.Scalar)
+• Takes a valid Ristretto point (self : RistrettoPoint) and a canonical scalar
+  (scalar : scalar.Scalar)
 • Returns the scalar multiple [scalar]self, i.e., the point added to itself scalar times
-• Delegates to edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul since RistrettoPoint
-  is represented as an underlying EdwardsPoint
+• Delegates to edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul
+  since RistrettoPoint is represented as an underlying EdwardsPoint
 
 natural language specs:
 
@@ -41,7 +45,8 @@ natural language specs:
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
 
-/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`**:
+/-- **Spec and proof concerning
+`Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`**:
 • The function always succeeds (no panic) for valid input RistrettoPoints r and canonical Scalars s
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
@@ -61,7 +66,8 @@ theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)
       rw [EdwardsPoint_IsSquare_iff_IsEven ep ep_post1, ep_post2]
       obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp
         ((EdwardsPoint_IsSquare_iff_IsEven self hself.1).mp hself.2)
-      exact (IsEven_iff_in_doubling_image _).mpr ⟨U8x32_as_Nat scalar.bytes • Q, by grind [nsmul_add]⟩
+      exact (IsEven_iff_in_doubling_image _).mpr
+        ⟨U8x32_as_Nat scalar.bytes • Q, by grind [nsmul_add]⟩
     · simpa [RistrettoPoint.toPoint]
 
 /-
@@ -70,28 +76,33 @@ Note:
 One RistrettoPoint r corresponds to an equivalence class of several
 mathematical curve points.
 
-The command r.toPoint thus maps r to one of these concrete representatives on the curve (to the representative
-that currently just so happens to represent r).
+The command r.toPoint thus maps r to one of these concrete representatives on the curve
+(to the representative that currently just so happens to represent r).
 
 The equation
 
 result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint
 
-thus assures that the concrete representative of the input RistrettoPoints r on the curve sums up to
-the concrete representative of the output Ristretto point on the curve if mathematically added to itself s times.
-Since the addition on RistrettoPoints is mathematically well-defined (i.e., it does not depend on the choice of representatives), the condition
+thus assures that the concrete representative of the input RistrettoPoints r on the curve
+sums up to the concrete representative of the output Ristretto point on the curve if
+mathematically added to itself s times.
+Since the addition on RistrettoPoints is mathematically well-defined (i.e., it does not
+depend on the choice of representatives), the condition
 
 result.toPoint = (U8x32_as_Nat s.bytes) • r.toPoint
 
-thus indeed implies that the output RistrettoPoint (seen as an equivalence class) is the mathematically correct sum
-of r + ... + r (s-times), even though we are only working at the level of (fairly arbitrary) representatives.
+thus indeed implies that the output RistrettoPoint (seen as an equivalence class) is the
+mathematically correct sum of r + ... + r (s-times), even though we are only working at
+the level of (fairly arbitrary) representatives.
 
-The fact that the addition of RistrettoPoints is indeed well-defined and does not depend on the chosen
-representatives follows from standard results in abstract algebra: in any set of left cosets G/N, the product
+The fact that the addition of RistrettoPoints is indeed well-defined and does not depend
+on the chosen representatives follows from standard results in abstract algebra: in any
+set of left cosets G/N, the product
 
 (aN)(bN)=(ab)N
 
-constitutes a well-defined operation that does not depend on the chosen representatives a, b iff N is a normal subgroup;
+constitutes a well-defined operation that does not depend on the chosen representatives
+a, b iff N is a normal subgroup;
 and in an Abelian group (our elliptic curve group is Abelian), every subgroup is normal.
 -/
 
@@ -109,13 +120,16 @@ natural language description:
 
 natural language specs:
 
-• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r
+• The function always succeeds (no panic) for canonical input Scalars s and valid input
+  RistrettoPoints r
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
 
-/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`**:
-• The function always succeeds (no panic) for canonical input Scalars s and valid input RistrettoPoints r
+/-- **Spec and proof concerning
+`Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`**:
+• The function always succeeds (no panic) for canonical input Scalars s and valid input
+  RistrettoPoints r
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
@@ -124,6 +138,7 @@ theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)
     (hself : U8x32_as_Nat self.bytes < 2 ^ 255) (hpoint : point.IsValid) :
     mul self point ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧ result.toPoint = (U8x32_as_Nat self.bytes) • point.toPoint ⦄ := by
-  exact Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec point self hself hpoint
+  exact Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec
+    point self hself hpoint
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint

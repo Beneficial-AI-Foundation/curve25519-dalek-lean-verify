@@ -13,8 +13,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 
-set_option exponentiation.threshold 260
-
 /-! # Spec Theorem for `Scalar::neg`
 
 Specification and proof for the
@@ -42,6 +40,8 @@ satisfied by publicly observable scalars in the library.
 
 **Source**: curve25519-dalek/src/scalar.rs (lines 375:4-379:5)
 -/
+
+set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar
@@ -94,7 +94,7 @@ private lemma ZERO_limb_bounds :
 @[progress]
 theorem neg_spec (self : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L) :
-    neg self ⦃ result =>
+    neg self ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes + U8x32_as_Nat self.bytes ≡ 0 [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold neg
@@ -160,7 +160,7 @@ natural language specs:
 @[progress]
 theorem neg_spec (self : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L) :
-    neg self ⦃ result =>
+    neg self ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes + U8x32_as_Nat self.bytes ≡ 0 [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold neg

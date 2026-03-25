@@ -37,12 +37,15 @@ natural language description:
 natural language specs:
 
     The Boolean result is true if and only if
-      Field51_as_Nat(self.X) * Field51_as_Nat(other.Y) ≡ Field51_as_Nat(self.Y) * Field51_as_Nat(other.X) (mod p)
+      Field51_as_Nat(self.X) * Field51_as_Nat(other.Y)
+        ≡ Field51_as_Nat(self.Y) * Field51_as_Nat(other.X) (mod p)
     OR
-      Field51_as_Nat(self.X) * Field51_as_Nat(other.X) ≡ Field51_as_Nat(self.Y) * Field51_as_Nat(other.Y) (mod p)
+      Field51_as_Nat(self.X) * Field51_as_Nat(other.X)
+        ≡ Field51_as_Nat(self.Y) * Field51_as_Nat(other.Y) (mod p)
 -/
 
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq`**:
+/-- **Spec and proof concerning
+`ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq`**:
 - No panic (always returns successfully given valid inputs)
 - Returns true iff the two points satisfy the multiplicative Ristretto equivalence condition:
   X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)
@@ -54,8 +57,10 @@ theorem eq_spec
     (h_other_valid : other.IsValid) :
     eq self other ⦃ (result : Bool) =>
       (result = true ↔
-        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
-        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by
+        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡
+          (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
+        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡
+          (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by
   unfold eq
   progress*
   unfold Bool.Insts.CoreConvertFromChoice.from
