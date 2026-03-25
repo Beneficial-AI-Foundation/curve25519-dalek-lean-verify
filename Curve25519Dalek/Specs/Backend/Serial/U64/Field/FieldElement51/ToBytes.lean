@@ -236,6 +236,34 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
   have := @Nat.and_le_right x.toNat (2^51 - 1)
   norm_num at *; omega
 
+/-- Canonical reduction: the q-computation + conditional subtraction + carry chain
+    produces a value that is congruent mod p and canonical (< p).
+
+    The algorithm computes q = ⌊(F + 19) / 2^255⌋ ∈ {0,1}, then adds 19*q to limb 0
+    and carry-propagates with masking to 51 bits. The result satisfies:
+    - Field51_as_Nat(output) ≡ Field51_as_Nat(input) [MOD p]
+    - Field51_as_Nat(output) < p
+
+    Ported from Verus `lemma_to_bytes_reduction` in dalek-lite. -/
+private lemma canonical_reduction_mod_p
+    (f0 f1 f2 f3 f4 : ℕ)
+    (hf0 : f0 < 2 ^ 52) (hf1 : f1 < 2 ^ 52) (hf2 : f2 < 2 ^ 52)
+    (hf3 : f3 < 2 ^ 52) (hf4 : f4 < 2 ^ 52)
+    -- q = quotient bit from carry chain on (F + 19)
+    (q : ℕ)
+    (hq : q = (((((f0 + 19) / 2 ^ 51 + f1) / 2 ^ 51 + f2) / 2 ^ 51 + f3) / 2 ^ 51 + f4) / 2 ^ 51)
+    -- output limbs = carry-propagate(input + 19*q) masked to 51 bits
+    (l0 l1 l2 l3 l4 : ℕ)
+    (hl0 : l0 = (f0 + 19 * q) % 2 ^ 51)
+    (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
+    (hl2 : l2 = (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
+    (hl3 : l3 = (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
+    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
+    (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
+      (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
+    l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
+  sorry
+
 /-! ## Spec for `to_bytes` -/
 
 set_option maxHeartbeats 800000 in -- heavy progress*
@@ -554,10 +582,38 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     i31_post i32_post1 i33_post i34_post limbs7_post
     i35_post i36_post1 limbs8_post
     i37_post i38_post1 limbs9_post
-  refine ⟨?_, ?_⟩
-  · -- ModEq: Field51_as_Nat limbs9 ≡ Field51_as_Nat self [MOD p]
-    sorry
-  · -- Canonicity: Field51_as_Nat limbs9 < p
-    sorry
+  -- Apply the standalone canonical reduction lemma.
+  -- Need to show the WP chain variables match the lemma's Nat parameters.
+  -- This requires resolving: q4.val = q-chain formula, limbs9[k]!.val = carry-chain formula.
+  -- The `simp` with _post hypotheses + Nat.shiftRight_eq_div_pow + UScalar.val_and
+  -- + land_pow_two_sub_one_eq_mod resolves the chain.
+  have hcanon := canonical_reduction_mod_p
+    fe[0]!.val fe[1]!.val fe[2]!.val fe[3]!.val fe[4]!.val
+    (fe_post1 0 (by omega)) (fe_post1 1 (by omega)) (fe_post1 2 (by omega))
+    (fe_post1 3 (by omega)) (fe_post1 4 (by omega))
+    q4.val
+    (by -- hq: q4.val = q-chain formula
+      simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,
+        q1_post1, i3_post, q_post1, i1_post, i_post,
+        i8_post, i6_post, i4_post, i2_post,
+        Nat.shiftRight_eq_div_pow]; agrind)
+    limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
+    (by sorry) -- hl0: resolve carry chain for limb 0
+    (by sorry) -- hl1: resolve carry chain for limb 1
+    (by sorry) -- hl2: resolve carry chain for limb 2
+    (by sorry) -- hl3: resolve carry chain for limb 3
+    (by sorry) -- hl4: resolve carry chain for limb 4
+  -- Unfold Field51_as_Nat/p/ModEq everywhere so hcanon (explicit sums) and
+  -- fe_post2 (Field51_as_Nat) are in the same form. Then omega chains them.
+  obtain ⟨hmod, hlt⟩ := hcanon
+  constructor
+  · simp only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, p, Nat.reduceMul, Nat.reducePow, zero_add, one_mul,
+      Array.getElem!_Nat_eq] at *
+    omega
+  · simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, p, Nat.reduceMul, Nat.reducePow, zero_add, one_mul,
+      Array.getElem!_Nat_eq] at *
+    omega
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51
