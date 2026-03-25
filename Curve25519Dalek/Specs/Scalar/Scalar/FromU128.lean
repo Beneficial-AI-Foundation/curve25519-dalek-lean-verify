@@ -35,8 +35,9 @@ private lemma fromLEBytes_toNat_lt_two_pow (tail : List (BitVec 8)) :
   | nil =>
     simp [BitVec.fromLEBytes]
   | cons h t ih =>
-    simp only [List.length_cons, BitVec.fromLEBytes, BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft,
-      Nat.ofNat_pos, mul_lt_mul_iff_right₀, lt_add_iff_pos_right, zero_lt_one, BitVec.toNat_mod_cancel_of_lt]
+    simp only [List.length_cons, BitVec.fromLEBytes, BitVec.toNat_or, BitVec.toNat_setWidth,
+      BitVec.toNat_shiftLeft, Nat.ofNat_pos, mul_lt_mul_iff_right₀, lt_add_iff_pos_right,
+      zero_lt_one, BitVec.toNat_mod_cancel_of_lt]
     have hshift : (BitVec.fromLEBytes t).toNat <<< 8 = (BitVec.fromLEBytes t).toNat * 2^8 := by
       simp[Nat.shiftLeft_eq]
     rw [hshift]
@@ -54,7 +55,8 @@ private lemma hdigits_bv_step (head : BitVec 8) (tail : List (BitVec 8)) :
     simp[Nat.shiftLeft_eq]
     ring_nf
   rw [hshift]
-  have hbound : BitVec.toNat head + 256 * (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * (tail.length + 1)) := by
+  have hbound :
+      BitVec.toNat head + 256 * (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * (tail.length + 1)) := by
     have hh : BitVec.toNat head < 2 ^ 8 := by scalar_tac
     have ht : (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * tail.length) := by
       simp[fromLEBytes_toNat_lt_two_pow]
@@ -84,8 +86,9 @@ lemma hdigits_aux (l : List Byte) :
   induction l with
   | nil => simp [BitVec.fromLEBytes]
   | cons head tail ih =>
-      simp only [Nat.reducePow, List.map_cons, Nat.ofDigits, Nat.cast_id, List.length_cons, BitVec.fromLEBytes,
-        BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft, Nat.ofNat_pos, mul_lt_mul_iff_right₀,
+      simp only [Nat.reducePow, List.map_cons, Nat.ofDigits, Nat.cast_id,
+        List.length_cons, BitVec.fromLEBytes, BitVec.toNat_or, BitVec.toNat_setWidth,
+        BitVec.toNat_shiftLeft, Nat.ofNat_pos, mul_lt_mul_iff_right₀,
         lt_add_iff_pos_right, zero_lt_one, BitVec.toNat_mod_cancel_of_lt]
       simp only [Nat.reducePow] at ih
       rw [ih]
@@ -170,7 +173,7 @@ private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length =
 -/
 @[progress]
 theorem from_spec (x : Std.U128) :
-    «from» x ⦃ result =>
+    «from» x ⦃ (result : Scalar) =>
     U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
   simp only [progress_simps]
@@ -179,9 +182,10 @@ theorem from_spec (x : Std.U128) :
   let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.progress_spec
   let* ⟨ s2, s2_post ⟩ ← Array.to_slice.progress_spec
   let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.progress_spec
-  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice, List.length_map, Nat.reduceMod,
-    BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val, UScalar.ofNatCore_val_eq, List.reduceReplicate,
-    List.slice_zero_j, List.take_succ_cons, List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
+  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice,
+    List.length_map, Nat.reduceMod, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
+    UScalar.ofNatCore_val_eq, List.reduceReplicate, List.slice_zero_j, List.take_succ_cons,
+    List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
   have eq1:=U128_ofDigits_toLEBytes x
   rw[← x_bytes_post] at eq1
