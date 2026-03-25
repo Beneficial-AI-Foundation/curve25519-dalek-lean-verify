@@ -66,9 +66,8 @@ natural language specs:
 theorem add_spec (self _rhs : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L)
     (h_rhs : U8x32_as_Nat _rhs.bytes < L) :
-    add self _rhs ⦃ result =>
-      U8x32_as_Nat result.bytes ≡
-        U8x32_as_Nat self.bytes + U8x32_as_Nat _rhs.bytes [MOD L] ∧
+    add self _rhs ⦃ (result : scalar.Scalar) =>
+      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes + U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold add
   unfold scalar.Scalar.unpack
@@ -80,8 +79,7 @@ theorem add_spec (self _rhs : scalar.Scalar)
   progress as ⟨hpack, hpack_cong, hpack_lt⟩
   refine ⟨?_, hpack_lt⟩
   have heq : Scalar52_as_Nat s + Scalar52_as_Nat s1 =
-             U8x32_as_Nat self.bytes + U8x32_as_Nat _rhs.bytes := by
-    rw [hs_nat, hs1_nat]
+             U8x32_as_Nat self.bytes + U8x32_as_Nat _rhs.bytes := by rw [hs_nat, hs1_nat]
   exact Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong)
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar

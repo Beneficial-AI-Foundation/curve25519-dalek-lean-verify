@@ -68,9 +68,8 @@ natural language specs:
 -/
 @[progress]
 theorem mul_spec (self _rhs : scalar.Scalar) :
-    mul self _rhs ⦃ result =>
-      U8x32_as_Nat result.bytes ≡
-        U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
+    mul self _rhs ⦃ (result : scalar.Scalar) =>
+      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul
   unfold scalar.Scalar.unpack
@@ -80,13 +79,12 @@ theorem mul_spec (self _rhs : scalar.Scalar) :
     fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
   have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  progress as ⟨s2, hs2_cong, hs2_bounds⟩
+  progress as ⟨s2, hs2_cong, hs2_lt⟩
   progress as ⟨hpack, hpack_cong, hpack_lt⟩
-  refine ⟨?_, hpack_lt⟩
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
              U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
     rw [hs_nat, hs1_nat]
-  exact Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong)
+  exact ⟨Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong), hpack_lt⟩
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar
 

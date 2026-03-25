@@ -33,27 +33,24 @@ natural language description:
 natural language specs:
 
     • \forall Scalars s with scalar_to_nat(s) ≢ 0 (mod \ell):
-      scalar_to_nat(s) * scalar_to_nat(s') is congruent to 1 (mod \ell)
--/
-
--- ZERO now returns Result; this lemma is unused, kept for reference
--- lemma ZERO_eq : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO = 0
+      scalar_to_nat(s) * scalar_to_nat(s') is congruent to 1 (mod \ell) -/
 
 /-- **Spec and proof concerning `scalar.Scalar.invert`**:
 - Precondition: The input scalar s must be non-zero modulo L (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
 - The result s' satisfies the multiplicative inverse property:
-  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L)
--/
+  U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L) -/
 @[progress]
-theorem invert_spec (s : Scalar) (h : U8x32_as_Nat s.bytes % L ≠ 0) :
-    invert s ⦃ s' =>
-      U8x32_as_Nat s.bytes * U8x32_as_Nat s'.bytes ≡ 1 [MOD L] ⦄ := by
+theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :
+    invert self ⦃ (result : Scalar) =>
+      U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L] ⦄ := by
   unfold invert
   progress*
-  rw [← s_post1]
-  have := Nat.ModEq.mul_left (Scalar52_as_Nat s) s'_post1
-  exact Nat.ModEq.trans this s1_post
-
+  calc U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes
+      ≡ Scalar52_as_Nat s * U8x32_as_Nat result.bytes [MOD L] := by
+        exact Nat.ModEq.mul_right _ (by rw [s_post1])
+    _ ≡ Scalar52_as_Nat s * Scalar52_as_Nat s1 [MOD L] := by
+        exact Nat.ModEq.mul_left _ result_post1
+    _ ≡ 1 [MOD L] := s1_post1
 
 end curve25519_dalek.scalar.Scalar
