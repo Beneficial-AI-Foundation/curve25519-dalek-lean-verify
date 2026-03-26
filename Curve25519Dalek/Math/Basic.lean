@@ -18,6 +18,7 @@ field element bridge (FieldElement51), and field utility functions (sqrt, is_neg
 
 open Aeneas.Std Result
 
+
 /-! ## Constants -/
 
 /-- Curve25519 is the elliptic curve over the prime field with order p -/
@@ -40,6 +41,7 @@ def a : Int := -1
 
 /-! ## Scalar Montgomery arithmetic helpers -/
 
+set_option exponentiation.threshold 260 in
 /-- Cancel `R` from both sides of a congruence mod `L`.
     Used in Montgomery-form scalar specs (Scalar.reduce, Scalar52.mul). -/
 lemma cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD L] := by
@@ -104,6 +106,7 @@ theorem Scalar52_limb_le_nat (s : Aeneas.Std.Array U64 5#usize) (i : Nat) (hi : 
 /-! ## Primality and CurveField -/
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩
+instance : Fact (Nat.Prime L) := ⟨PrimeCert.prime_ed25519_order⟩
 
 namespace Edwards
 

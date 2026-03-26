@@ -171,21 +171,20 @@ private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length =
   (i.e., U8x32_as_Nat result.bytes = x.val)
 • The result is automatically canonical (less than L) since x.val < 2^128 < L
 -/
-@[progress]
+@[step]
 theorem from_spec (x : Std.U128) :
     «from» x ⦃ (result : Scalar) =>
     U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
-  simp only [progress_simps]
-  let* ⟨ x_bytes, x_bytes_post ⟩ ← core.num.U128.to_le_bytes.progress_spec
-  let* ⟨ s, s_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.progress_spec
-  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.progress_spec
-  let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.progress_spec
-  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice,
-    List.length_map, Nat.reduceMod, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
-    UScalar.ofNatCore_val_eq, List.reduceReplicate, List.slice_zero_j, List.take_succ_cons,
-    List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
+  simp only [step_simps]
+  step with core.num.U128.to_le_bytes.step_spec as ⟨ x_bytes, x_bytes_post ⟩
+  let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.step_spec
+  let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
+  let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.step_spec
+  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice, List.length_map, Nat.reduceMod,
+    BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val, UScalar.ofNatCore_val_eq, List.reduceReplicate,
+    List.slice_zero_j, List.take_succ_cons, List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
   have eq1:=U128_ofDigits_toLEBytes x
   rw[← x_bytes_post] at eq1

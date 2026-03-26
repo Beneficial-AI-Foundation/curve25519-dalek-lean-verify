@@ -50,7 +50,6 @@ Natural language specs:
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 - When both points are valid, this is equivalent to toPoint equality
 -/
-
 @[progress]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   -- Bounds are needed for the internal field multiplications

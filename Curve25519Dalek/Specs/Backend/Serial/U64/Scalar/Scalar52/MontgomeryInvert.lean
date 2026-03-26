@@ -10,7 +10,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 
 import Mathlib.Data.Int.ModEq
-import PrimeCert.PrimeList
 
 /-! # Spec Theorem for `Scalar52::montgomery_invert`
 
@@ -22,14 +21,7 @@ This function computes the multiplicative inverse using Montgomery form.
 
 -/
 
--- Primality Certification for L := 2^252 + 27742317777372353535851937790883648493
-instance : Fact (Nat.Prime L) := by
-  unfold L
-  exact ⟨PrimeCert.prime_ed25519_order⟩
-
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64.scalar
-open curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
 
 namespace curve25519_dalek.scalar.Scalar52
@@ -50,12 +42,12 @@ lemma isMont_mul (R : ZMod L) (hR : R ≠ 0) {u_val x y res : ZMod L} {k j : ℕ
   unfold IsMont at *
   rw [h_eq, hx, hy]; field_simp [hR]; generalize h_r : R = r
   have hr_ne_zero : r ≠ 0 := by rw [← h_r]; exact hR
-  try ring_nf; rw [mul_assoc, ← pow_add, mul_assoc]
-
+  ring_nf
+  rw [mul_assoc, ← pow_add, mul_assoc]
   -- Refine to peel off the 'u' part
   refine congr_arg₂ (· * ·) rfl ?_
   nth_rw 3 [← zpow_one r]; rw [← zpow_add₀ hr_ne_zero]; rw [← zpow_add₀ hr_ne_zero];
-  apply congr_arg; simp only [Nat.cast_add]; try ring
+  apply congr_arg; simp only [Nat.cast_add]; ring
 
 /-- Lemma: Montgomery Squaring preserves the invariant. -/
 lemma isMont_sq (R : ZMod L) (hR : R ≠ 0) {u_val x res : ZMod L} {k : ℕ}
@@ -75,17 +67,13 @@ lemma isMont_loop (R : ZMod L) (hR : R ≠ 0) {u_val y x res : ZMod L} {k j N : 
   field_simp [hR]
   generalize h_r : R = r
   have hr_ne_zero : r ≠ 0 := by rw [← h_r]; exact hR
-
-  --simp only rw [zpow_natCast];
-  try ring_nf
-
+  ring_nf
   rw [← pow_add, mul_assoc, mul_assoc]
   refine congr_arg₂ (· * ·) ?_ ?_
   · apply congr_arg; ring
-  · --
-    rw [← zpow_natCast (r ^ _)]; rw [← zpow_mul, ← zpow_add₀ hr_ne_zero]
+  · rw [← zpow_natCast (r ^ _)]; rw [← zpow_mul, ← zpow_add₀ hr_ne_zero]
     nth_rw 1 [← zpow_natCast r]; rw [← zpow_add₀ hr_ne_zero]
-    apply congr_arg; simp only [Nat.cast_add, Nat.cast_mul]; try ring
+    apply congr_arg; simp only [Nat.cast_add, Nat.cast_mul]; ring
 
 -- Helper for Multiplication (Nat ModEq)
 lemma run_mul (RZ : ZMod L) (uZ : ZMod L)
@@ -123,10 +111,6 @@ lemma run_loop_nat (RZ : ZMod L) (uZ : ZMod L)
 
 end MontgomeryInvert_Helpers
 
-set_option maxHeartbeats 2000000 in -- progress* failed with normal heartbeats
-set_option exponentiation.threshold 262 in
-set_option maxRecDepth 3000 in -- otherwise the run_loop calls are too deep
-
 /-
 natural language description:
 
@@ -146,13 +130,13 @@ natural language specs:
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
+set_option maxHeartbeats 400000 in -- heavy progress and simp
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
 - Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 - No panic (always returns successfully for non-zero inputs)
 - The result u' satisfies the property that Montgomery multiplication of u and u'
   yields R mod L (the Montgomery representation of 1)
 -/
-
 @[progress]
 theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :
@@ -165,8 +149,7 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   simp only [*] at *
   simp only [Nat.reduceAdd, Nat.reducePow] at *
   -- 1. Setup
-  have hL_gt_1 : 1 < L := by unfold L; try decide
-  letI : Fact (Nat.Prime L) := by infer_instance
+  have hL_gt_1 : 1 < L := by unfold L; decide
   letI : Fact (1 < L) := ⟨hL_gt_1⟩
   have hR_inv : Invertible (R : ZMod L) := by
     apply invertibleOfCoprime
@@ -261,33 +244,32 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y26 _11 u' _ 3 8 step_y26 step_11 u'_post1
   -- CONCLUSION
   unfold IsMont at step_res
-  refine ⟨?_, ?_⟩
-  · apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
-    rw [h_uZ, h_RZ, step_res]
-    have h_eqn : N_huge = 2^126 := by rw [← h_huge]; norm_num
-    rw [h_eqn]
-    have h_exp_val :
-      (((((((((((((((((((((((((((16 * 2^126 + 5)
-      * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
-      * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
-      * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
-      = L - 2 := by rw [L]; norm_num
-    rw [h_exp_val]
-    rw [← mul_assoc, ← pow_succ']
-    have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
-    rw [h_fermat_exp]
-    rw [← h_uZ]
-    have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
-      rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
-    rw [ZMod.pow_card_sub_one_eq_one hu_ne]
-    rw [one_mul]
-    rw [← pow_two]
-    have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
-      have h_ge : 2 ≤ L := by decide
-      rw [Int.ofNat_sub h_ge]
-      try ring
-    rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
-    field_simp
-  · intro i hi; have bounds := u'_post2 i hi; exact bounds
+  refine ⟨?_, by exact fun i hi => u'_post2 i hi⟩
+  apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
+  rw [h_uZ, h_RZ, step_res]
+  have h_eqn : N_huge = 2^126 := by rw [← h_huge]; norm_num
+  rw [h_eqn]
+  have h_exp_val :
+    (((((((((((((((((((((((((((16 * 2^126 + 5)
+    * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
+    * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
+    * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
+    = L - 2 := by rw [L]; norm_num
+  rw [h_exp_val]
+  rw [← mul_assoc, ← pow_succ']
+  have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
+  rw [h_fermat_exp]
+  rw [← h_uZ]
+  have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
+    rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
+  rw [ZMod.pow_card_sub_one_eq_one hu_ne]
+  rw [one_mul]
+  rw [← pow_two]
+  have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
+    have h_ge : 2 ≤ L := by decide
+    rw [Int.ofNat_sub h_ge]
+    ring
+  rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
+  field_simp
 
 end curve25519_dalek.scalar.Scalar52

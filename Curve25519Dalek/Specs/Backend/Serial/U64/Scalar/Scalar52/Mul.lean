@@ -21,7 +21,7 @@ open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option exponentiation.threshold 262
-set_option linter.style.emptyLine false
+
 /-
 natural language description:
 

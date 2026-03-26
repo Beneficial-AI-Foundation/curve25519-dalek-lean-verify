@@ -225,8 +225,7 @@ private theorem part2_spec (sum : U128) :
     rw [h_w_val]; apply Nat.mod_lt; norm_num
   have h_carry_bound : carry.val < 2^76 := by
     rw [h_carry_val]; apply Nat.div_lt_of_lt_mul
-    have h : sum.val < 2^128 := sum.hBounds
-    calc sum.val < 2^128 := h
+    calc sum.val < 2^128 := sum.hBounds
          _ = 2^76 * 2^52 := by norm_num
   exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 

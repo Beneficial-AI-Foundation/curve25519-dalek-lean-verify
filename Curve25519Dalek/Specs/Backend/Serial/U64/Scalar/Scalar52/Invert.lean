@@ -41,8 +41,7 @@ natural language specs:
       scalar_to_nat(u) * scalar_to_nat(u') is congruent to 1 (mod \ell)
 -/
 
--- Stack overflow from deeply nested progress* chain; increase recursion depth
-set_option maxRecDepth 4096 in
+
 /-- **Spec and proof concerning `scalar.Scalar52.invert`**:
 - Precondition: The unpacked input scalar self must be non-zero modulo L (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
@@ -71,11 +70,11 @@ theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
         try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val,
           UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]
     have : (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) =
-        Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by grind
+        Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by agrind
     rw [this] at h
     have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
       have coprime : Nat.Coprime (R ^ 2) L := by try decide
-      apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by grind)
+      apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by agrind)
     exact this h
 
 end curve25519_dalek.scalar.Scalar52

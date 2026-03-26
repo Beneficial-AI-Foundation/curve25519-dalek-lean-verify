@@ -135,17 +135,17 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
 
-@[progress]
+@[step]
 theorem m_spec (x y : U64) :
     m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
   unfold pow2k.m
-  progress*
+  step*
 
-@[progress]
+@[step]
 theorem LOW_51_BIT_MASK_spec :
     LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
   unfold LOW_51_BIT_MASK
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
 
@@ -298,9 +298,9 @@ private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4
     c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 =
     a0 + 2^51*a1 + 2^102*a2 + 2^153*a3 + 2^204*a4 + 2^255*carry := by omega
 
-set_option maxHeartbeats 2000000 in
--- Required for progress*
-@[progress]
+set_option maxHeartbeats 14000000 in
+-- Required for step*
+@[step]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
     pow2k_loop k a ⦃ (result : Std.Array U64 5#usize) =>
@@ -310,9 +310,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   split
   case isTrue hlt =>
     -- Progress through the code to the 1st halt point, name c0 c1 c2 c3 c4
-    (iterate 12 progress); progress as ⟨ c0, _ ⟩; (iterate 5 progress); progress as ⟨ c1, _ ⟩
-    (iterate 5 progress); progress as ⟨ c2, _ ⟩; (iterate 5 progress); progress as ⟨ c3, _ ⟩
-    (iterate 5 progress); progress as ⟨ c4, _ ⟩
+    (iterate 12 step); step as ⟨ c0, _ ⟩; (iterate 5 step); step as ⟨ c1, _ ⟩
+    (iterate 5 step); step as ⟨ c2, _ ⟩; (iterate 5 step); step as ⟨ c3, _ ⟩
+    (iterate 5 step); step as ⟨ c4, _ ⟩
     /-
     Stage 1: The 5 intermediate products (c0-c4) have been computed
 
@@ -354,10 +354,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     clear * - pow2k_loop_spec k a ha hlt
       c0 c1 c2 c3 c4 hc0 hc1 hc2 hc3 hc4 hc0' hc1' hc2' hc3' hc4' a_pow_two
     -- Progress through the code to the 2nd halt point, name c1' c2' c3' c4', carry, a'
-    (iterate 3 progress); progress as ⟨ c1', _ ⟩; progress; progress as ⟨ _, mask_post ⟩
-    (iterate 5 progress); progress as ⟨ c2', _ ⟩; (iterate 6 progress); progress as ⟨ c3', _ ⟩
-    (iterate 6 progress); progress as ⟨ c4', _ ⟩; (iterate 4 progress); progress as ⟨ carry, _ ⟩
-    (iterate 2 progress); progress as ⟨ a', _ ⟩
+    (iterate 3 step); step as ⟨ c1', _ ⟩; step; step as ⟨ _, mask_post ⟩
+    (iterate 5 step); step as ⟨ c2', _ ⟩; (iterate 6 step); step as ⟨ c3', _ ⟩
+    (iterate 6 step); step as ⟨ c4', _ ⟩; (iterate 4 step); step as ⟨ carry, _ ⟩
+    (iterate 2 step); step as ⟨ a', _ ⟩
     /-
     Stage 2: Carry propagation
 
@@ -475,13 +475,13 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       hc3'_eq hc3'_bound hcarry3_fits hc4'_eq hc4'_bound hcarry4_fits
       ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 hcarry_val
     -- Continue until the end of the function
-    progress as ⟨ _, _ ⟩
-    progress as ⟨ _, _ ⟩
-    progress as ⟨ i55, _ ⟩
-    progress as ⟨ a6, a6_post ⟩
-    progress as ⟨ i56, _ ⟩
-    progress as ⟨ i57, i57_post_1, _ ⟩
-    progress as ⟨ i58, _ ⟩
+    step as ⟨ _, _ ⟩
+    step as ⟨ _, _ ⟩
+    step as ⟨ i55, _ ⟩
+    step as ⟨ a6, a6_post ⟩
+    step as ⟨ i56, _ ⟩
+    step as ⟨ i57, i57_post_1, _ ⟩
+    step as ⟨ i58, _ ⟩
     -- TODO: Progress needs to apply `U64.add_spec` but gets stuck trying to solve the precondition
     apply spec_bind
     · apply U64.add_spec
@@ -493,10 +493,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       have : U64.max = 2 ^ 64 - 1 := by simp only [U64.max_eq]; norm_num
       omega
     intro i59 i59_post
-    progress as ⟨ a7, a7_post ⟩
-    progress as ⟨ i60, _ ⟩
-    progress as ⟨ _, i61_post_1, _ ⟩
-    progress as ⟨ a'', a''_post ⟩
+    step as ⟨ a7, a7_post ⟩
+    step as ⟨ i60, _ ⟩
+    step as ⟨ _, i61_post_1, _ ⟩
+    step as ⟨ a'', a''_post ⟩
     /-
     Stage 3: Final reduction (Rust l.534–545)
 
@@ -551,7 +551,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       simp only [a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by grind) (by grind) (by omega)]
       simp only [a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by grind) (by grind) (by omega)]
     --
-    progress as ⟨ k1, k1_post_1, k1_post_2 ⟩
+    step as ⟨ k1, k1_post_1, k1_post_2 ⟩
     -- Limb bounds for a'': all < 2^52
     have ha''_lt : ∀ i < 5, a''[i]!.val < 2 ^ 52 := by
       intro i hi; interval_cases i
@@ -570,7 +570,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     --
     have ha''_54 : ∀ i < 5, a''[i]!.val < 2 ^ 54 :=
       fun i hi => by have := ha''_lt i hi; omega
-    progress with pow2k_loop_spec as ⟨ res, res_post_1, res_post_2 ⟩
+    step with pow2k_loop_spec as ⟨ res, res_post_1, res_post_2 ⟩
     -- Clear everything no longer needed
     clear * - pow2k_loop_spec k a ha hlt a'' carry a' ha''_0 ha''_1 ha''_2 ha''_3 ha''_4 ha''_lt
       ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 c0 c1 c2 c3 c4 c1' c2' c3' c4' a_pow_two
@@ -625,20 +625,20 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         simp only [hk1, ite_false] at res_post_2
         exact res_post_2
   case isFalse hge =>
-    progress*
+    step*
     have : k.val = 0 := by grind
     simpa [this] using Nat.ModEq.trans rfl rfl
   termination_by k.val
   decreasing_by grind
 
-@[progress]
+@[step]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
     pow2k self k ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
-  progress*
+  step*
   exact ⟨by assumption, by grind⟩
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

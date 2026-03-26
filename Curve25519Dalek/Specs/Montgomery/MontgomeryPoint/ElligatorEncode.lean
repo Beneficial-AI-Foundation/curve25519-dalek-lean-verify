@@ -116,8 +116,8 @@ private theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔  a % p = 1 := by
   have :1 % p= 1:= by unfold p; decide
   rw[this]
 
-private theorem mod_mul_mod (a b : ℕ) : (a % p) * (b % p) ≡ a * b [MOD p] := by
- exact ((Nat.mod_modEq a p).mul_right (b % p)).trans  ((Nat.mod_modEq b p).mul_left a)
+private theorem mod_mul_mod (a b : ℕ) : (a % p) * (b % p) ≡ a * b [MOD p] :=
+  ((Nat.mod_modEq a p).mul_right (b % p)).trans ((Nat.mod_modEq b p).mul_left a)
 
 lemma ne_zero_if_eq_one (p1 : subtle.Choice) (hp1 : ¬p1 = Choice.zero) : p1.val = 1#u8 := by
   have h_eq_one : p1 = Choice.one := ne_zero_iff_eq_one p1 hp1
@@ -655,7 +655,9 @@ theorem elligator_encode_spec
     -- ── Implementation bridging: NQR case → u = -d0 - A ──
     have cases_zero : (pp.1.val = 0#u8 → ↑(U8x32_as_Nat a) = -d0 - Curve25519.A) := by
       intro h_zero
-      simp [h_zero] at hp1
+      simp only [h_zero, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one,
+        not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
+        UScalar.val_not_eq_imp_not_eq, false_iff, Choice.ne_zero_iff] at hp1
       have : p1.val = 1#u8 := by simp [hp1, Choice.one]
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, this, ↓reduceIte] at hu1
       have :Field51_as_Nat u1=  Field51_as_Nat u_neg:=by
@@ -710,7 +712,11 @@ theorem elligator_encode_spec
         simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
           h_one, ↓reduceIte] at hAtemp
         have :Field51_as_Nat Atemp=  Field51_as_Nat zero:=by
-          simp [Field51_as_Nat,Finset.sum_range_succ]
+          simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+            Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+            List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem?_pos,
+            Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+            Nat.reduceLT, Nat.lt_add_one]
           clear *- hAtemp
           simp_all
         rw[zero_eq] at this
