@@ -28,6 +28,8 @@ jobs:
   lint:
     name: Style Lint
     runs-on: ubuntu-latest
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -64,10 +66,8 @@ jobs:
 
       - name: Run LLM-based context-sensitive checks
         if: >-
-          secrets.ANTHROPIC_API_KEY != '' &&
+          env.ANTHROPIC_API_KEY != '' &&
           (github.event_name == 'workflow_dispatch' && inputs.agent == 'true')
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python3 scripts/lean_style_linter.py \
             --all \

@@ -3,8 +3,7 @@
 Lean 4 Style Linter for curve25519-dalek-lean-verify.
 
 Checks Lean files against the project style guide (style.md).
-Context-free rules are checked via regex/line-scanning.
-Context-sensitive rules (A-prefixed) are delegated to an LLM agent when --agent is used.
+All rules are checked via regex/line-scanning.
 
 Usage:
     # Lint specific files:
@@ -12,9 +11,6 @@ Usage:
 
     # Lint all Lean files:
     python3 scripts/lean_style_linter.py --all
-
-    # Include LLM-based context-sensitive checks (requires ANTHROPIC_API_KEY):
-    python3 scripts/lean_style_linter.py --agent path/to/File.lean
 
     # Output as JSON (for CI integration):
     python3 scripts/lean_style_linter.py --format json --all
@@ -32,7 +28,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import sys
 from dataclasses import dataclass
@@ -61,17 +56,14 @@ RULE_DOCS: dict[str, str] = {
     "R015": "Postconditions inside ⦃ ... ⦄ must be indented 6 spaces (plus 2 per nesting level)",
     "R016": "Proof body lines must be indented 2 spaces",
     "R017": "Spec file names must be UpperCamelCase",
-    # Context-sensitive (agent) rules
-    "A001": "[Agent] Author names must not be AI systems",
-    "A002": "[Agent] Spec argument names must match the Rust function parameters",
-    "A003": "[Agent] Module docstring must accurately describe the function",
+    "A001": "Author names must not be AI systems",
 }
 
 # Which rules are errors (vs warnings)
 ERROR_RULES: set[str] = {
     "R001", "R002", "R003", "R004", "R005",
     "R009", "R010", "R011", "R013",
-    "A001", "A002",
+    "A001",
 }
 
 # ---------------------------------------------------------------------------
@@ -629,11 +621,14 @@ def lint_file_context_free(path: Path) -> list[Violation]:
     if spec:
         vs.extend(check_filename(path))
 
+    # A001 — authors must not be AI systems
+    vs.extend(check_authors_not_ai(raw_lines, file_str))
+
     return vs
 
 
 # ---------------------------------------------------------------------------
-# Agent-based context-sensitive checks (A001–A003)
+# A001 — author AI name check
 # ---------------------------------------------------------------------------
 
 _AI_NAME_PATTERNS = [
@@ -644,11 +639,8 @@ _AI_NAME_PATTERNS = [
 _AI_NAMES_RE = re.compile("|".join(_AI_NAME_PATTERNS), re.IGNORECASE)
 
 
-def _check_authors_heuristic(lines: list[str], file_path: str) -> list[Violation]:
-    """
-    Heuristic A001 check: flag author lines that contain known AI system names.
-    This is fast enough to run without calling the API.
-    """
+def check_authors_not_ai(lines: list[str], file_path: str) -> list[Violation]:
+    """A001: flag Authors: lines that contain known AI system names."""
     vs = []
     for i, line in enumerate(lines):
         stripped = line.strip()
@@ -661,113 +653,6 @@ def _check_authors_heuristic(lines: list[str], file_path: str) -> list[Violation
                     f"'{m.group(0)}'. AIs cannot be listed as authors.",
                     file_path,
                 ))
-    return vs
-
-
-def lint_file_agent(path: Path) -> list[Violation]:
-    """
-    Run context-sensitive checks via the Anthropic API.
-    Requires the ANTHROPIC_API_KEY environment variable.
-    """
-    vs: list[Violation] = []
-    file_str = str(path)
-
-    try:
-        import anthropic  # type: ignore
-    except ImportError:
-        vs.append(Violation(
-            "A000", 0, None,
-            "anthropic Python package not installed; cannot run agent checks. "
-            "Install with: pip install anthropic",
-            file_str,
-        ))
-        return vs
-
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
-    if not api_key:
-        vs.append(Violation(
-            "A000", 0, None,
-            "ANTHROPIC_API_KEY environment variable is not set; skipping agent checks.",
-            file_str,
-        ))
-        return vs
-
-    try:
-        content = path.read_text(encoding="utf-8")
-    except Exception as exc:
-        return [Violation("A000", 0, None, f"Cannot read file: {exc}", file_str)]
-
-    # Quick heuristic (no API call needed)
-    vs.extend(_check_authors_heuristic(content.splitlines(), file_str))
-
-    # ---- Build the prompt for the LLM ----
-    prompt = f"""\
-You are a Lean 4 code style checker. Inspect the following Lean file for violations
-of these context-sensitive style rules:
-
-A001: Author names must not be AI systems.
-      The Authors: header line must list only human names.
-      AIs (Claude, ChatGPT, Copilot, Gemini, etc.) cannot be listed as authors.
-
-A002: Spec theorem argument names must match the corresponding Rust function parameters.
-      Each @[progress] theorem encodes a spec for a Rust function.
-      Verify that the argument names in the Lean theorem are identical to the parameter
-      names used in the original Rust function (if you can infer it from the docstring
-      or function name).
-
-A003: The module docstring (/-! ... -/) must accurately describe the function it covers.
-      It should state what the function computes, mention the Source path, and not
-      contradict what the theorem actually asserts.
-
-Return a JSON array of violation objects (empty array if no violations). Each object must have:
-  - "rule": one of "A001", "A002", "A003"
-  - "line": the 1-based line number (0 if file-level)
-  - "message": a concise human-readable description of the problem
-
-Do not include any text outside the JSON array.
-
---- BEGIN FILE: {path.name} ---
-{content[:8000]}
---- END FILE ---
-"""
-
-    try:
-        client = anthropic.Anthropic(api_key=api_key)
-    except Exception as exc:
-        vs.append(Violation(
-            "A000", 0, None,
-            f"Could not create Anthropic client: {exc}",
-            file_str,
-        ))
-        return vs
-
-    try:
-        response = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=1024,
-            messages=[{"role": "user", "content": prompt}],
-        )
-        block = response.content[0]
-        raw = (block.text if hasattr(block, "text") else "").strip()  # type: ignore[union-attr]
-        # Extract JSON even if the model wrapped it in markdown
-        json_match = re.search(r"\[.*\]", raw, re.DOTALL)
-        if json_match:
-            findings = json.loads(json_match.group(0))
-            for f in findings:
-                vs.append(Violation(
-                    f.get("rule", "A000"),
-                    int(f.get("line", 0)),
-                    None,
-                    f.get("message", "(no message)"),
-                    file_str,
-                ))
-    except Exception as exc:
-        vs.append(Violation(
-            "A000", 0, None,
-            f"Agent check failed: {exc}",
-            file_str,
-        ))
-
     return vs
 
 
@@ -852,10 +737,6 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument(
         "--all", dest="lint_all", action="store_true",
         help="Lint every .lean file in the project",
-    )
-    p.add_argument(
-        "--agent", action="store_true",
-        help="Also run context-sensitive LLM-based checks (requires ANTHROPIC_API_KEY)",
     )
     p.add_argument(
         "--spec-only", action="store_true",
@@ -949,10 +830,6 @@ def main(argv: Optional[list[str]] = None) -> int:
         # Context-free
         vs = lint_file_context_free(path)
 
-        # Context-sensitive (agent)
-        if args.agent:
-            vs.extend(lint_file_agent(path))
-
         # Apply rule filters
         if enabled is not None:
             vs = [v for v in vs if v.rule in enabled]
@@ -963,7 +840,6 @@ def main(argv: Optional[list[str]] = None) -> int:
             spec_rules = {
                 "R007", "R008", "R009", "R010", "R011",
                 "R012", "R013", "R014", "R015", "R016", "R017",
-                "A002", "A003",
             }
             vs = [v for v in vs if v.rule in spec_rules]
 
