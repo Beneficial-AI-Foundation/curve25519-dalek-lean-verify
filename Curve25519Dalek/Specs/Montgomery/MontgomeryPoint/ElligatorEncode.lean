@@ -127,7 +127,8 @@ lemma ne_zero_if_eq_one (p1 : subtle.Choice) (hp1 : ¬p1 = Choice.zero) : p1.val
 lemma nat_486662_eq_A : (486662 : ℕ) = Curve25519.A := by unfold Curve25519.A; decide
 
 /-- 486662 is Curve25519.A at the CurveField level. -/
-lemma curveField_486662_eq_A : (486662 : CurveField) = Curve25519.A := by unfold Curve25519.A; decide
+lemma curveField_486662_eq_A : (486662 : CurveField) = Curve25519.A := by
+  unfold Curve25519.A; decide
 
 /-- Curve25519.A is nonzero in CurveField. -/
 lemma A_ne_zero : (Curve25519.A : CurveField) ≠ 0 := by unfold Curve25519.A; decide
@@ -188,7 +189,9 @@ lemma two_mul_is_square : IsSquare ((2:CurveField) *(Field51_as_Nat SQRT_M1_val)
     decide
   simp[eq1]
   ring_nf
-  apply (@legendreSym.eq_one_iff p _ (39362322753415011913614158609977084030892133031847780325488042146247659569504) (by grind)).mp
+  apply (@legendreSym.eq_one_iff p _
+    (39362322753415011913614158609977084030892133031847780325488042146247659569504)
+    (by grind)).mp
   norm_num [p]
 
 lemma two_did_is_square : IsSquare (-(2:CurveField) /(Field51_as_Nat SQRT_M1_val)):= by
@@ -276,7 +279,8 @@ private lemma elligator_qr_output_eq_d0
     (a_val : CurveField) = d0 := by
   rw[lift_mod_eq_iff] at ha_chain
   rw[hd0, ha_chain]
-  simp only [Nat.cast_mul, change_A, neg_mul, ← change_d_1, neg_inj, mul_eq_mul_left_iff, A_ne_zero, or_false]
+  simp only [Nat.cast_mul, change_A, neg_mul, ← change_d_1, neg_inj,
+    mul_eq_mul_left_iff, A_ne_zero, or_false]
   by_cases h: (d_1_val) ≡ 0 [MOD p]
   · simp only [← modEq_zero_iff] at hfe1_0
     have := hfe1_0 h
@@ -363,7 +367,8 @@ private lemma choice_one_of_isSquare_eps
   · by_cases hd_1_zero : d_1_val % p = 0
     · have := hfe1_0 hd_1_zero
       rw[← modEq_zero_iff] at this
-      have := change_heps.trans ((hd.trans (this.mul_left A_neg_val)).mul_right (d_val ^ 2 + A1_val * d_val + 1))
+      have := change_heps.trans
+        ((hd.trans (this.mul_left A_neg_val)).mul_right (d_val ^ 2 + A1_val * d_val + 1))
       simp only [mul_zero, hA, zero_mul] at this
       rw[← modEq_zero_iff] at heps_zero
       simp only [this, not_true_eq_false] at heps_zero
@@ -572,9 +577,11 @@ theorem elligator_encode_spec
       have := hAtemp i hi
       rw[this]
       by_cases h:pp.1.val = 1#u8
-      · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
+      · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
         grind
-      · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
+      · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
         grind
     progress as ⟨ u_neg, hu_neg, hu_neg_b⟩
     progress as ⟨ p1, hp1⟩
@@ -601,7 +608,8 @@ theorem elligator_encode_spec
     have change_d_1:Field51_as_Nat d_1= 1 + 2 * r0 ^ 2 :=by
       rw[hr0]
       rw[lift_mod_eq_iff] at hfe_eq_add_1
-      simp only [hfe_eq_add_1, Nat.cast_add, Nat.cast_one, Nat.cast_mul, Nat.cast_ofNat, Nat.cast_pow]
+      simp only [hfe_eq_add_1, Nat.cast_add, Nat.cast_one,
+        Nat.cast_mul, Nat.cast_ofNat, Nat.cast_pow]
     have eq_zero_d_1: (Field51_as_Nat d_1) ≡ 0 [MOD p] → Field51_as_Nat eps % p = 0 :=
       fun h => eps_zero_of_d1_zero (Field51_as_Nat d_1) (Field51_as_Nat fe1) (Field51_as_Nat A_neg)
         (Field51_as_Nat d) (Field51_as_Nat inner) (Field51_as_Nat eps) hfe1_0 hd heps h
@@ -617,21 +625,26 @@ theorem elligator_encode_spec
     have cases_one: (pp.1.val = 1#u8 → ↑(U8x32_as_Nat a) = d0) := by
       intro h_one
       simp only [h_one, true_iff] at hp1
-      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, hp1, Choice.zero, Nat.not_eq,
-        UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false,
+      simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, hp1, Choice.zero,
+        Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true,
+        one_ne_zero, zero_lt_one, not_lt_zero, or_false,
         or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte] at hu1
       have :Field51_as_Nat u1=  Field51_as_Nat u:=by
-        simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+        simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
           Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
           one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
         clear *- hu1
-        simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem?_pos, Option.getD_some, Nat.ofNat_pos,
+        simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq,
+          getElem?_pos, Option.getD_some, Nat.ofNat_pos,
         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
       rw[this, udA ] at ha
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h_one, ↓reduceIte] at hAtemp
       have :Field51_as_Nat Atemp=  Field51_as_Nat zero:=by
-        simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
+        simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+          one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
         simp_all
       rw[zero_eq] at this
       simp only [this, add_zero] at ha
@@ -646,8 +659,10 @@ theorem elligator_encode_spec
       have : p1.val = 1#u8 := by simp [hp1, Choice.one]
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, this, ↓reduceIte] at hu1
       have :Field51_as_Nat u1=  Field51_as_Nat u_neg:=by
-        simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
+        simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+          one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
         clear *- hu1
         simp_all
       rw[this ] at ha
@@ -658,14 +673,17 @@ theorem elligator_encode_spec
       rw[this, udA]
       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h_zero] at hAtemp
       have :Field51_as_Nat Atemp=  Field51_as_Nat A1:=by
-        simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
+        simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+          one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
         clear *- hAtemp
         simp_all
       rw[this]
       simp only [Nat.cast_add]
       exact elligator_nqr_neg_sum_eq d0 r0 hd0
-        (Field51_as_Nat d) (Field51_as_Nat A1) (Field51_as_Nat A_neg) (Field51_as_Nat fe1) (Field51_as_Nat d_1)
+        (Field51_as_Nat d) (Field51_as_Nat A1) (Field51_as_Nat A_neg)
+        (Field51_as_Nat fe1) (Field51_as_Nat d_1)
         hA hd change_A change_d_1 hfe1_non hfe1_0
     -- ── Sub-lemma: IsSquare ↔ ──
     have iff_sq: (pp.1.val = 1#u8 ↔ IsSquare (d0 * (d0 ^ 2 + Curve25519.A * d0 + 1))) := by
@@ -674,18 +692,23 @@ theorem elligator_encode_spec
         intro h_one
         -- Derive d0 = Field51_as_Nat d in CurveField
         simp only [h_one, true_iff] at hp1
-        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, hp1, Choice.zero, Nat.not_eq,
-          UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one, not_lt_zero, or_false,
+        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, hp1, Choice.zero,
+          Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true,
+          one_ne_zero, zero_lt_one, not_lt_zero, or_false,
           or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte] at hu1
         have :Field51_as_Nat u1=  Field51_as_Nat u:=by
-          simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-            Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-            Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+          simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+            List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+            Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+            List.Vector.length_val, UScalar.ofNatCore_val_eq,
+            Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+            Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
             Nat.reduceLT, Nat.lt_add_one]
           clear *- hu1
           simp_all
         rw[this, udA ] at ha
-        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, h_one, ↓reduceIte] at hAtemp
+        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+          h_one, ↓reduceIte] at hAtemp
         have :Field51_as_Nat Atemp=  Field51_as_Nat zero:=by
           simp [Field51_as_Nat,Finset.sum_range_succ]
           clear *- hAtemp
@@ -698,7 +721,8 @@ theorem elligator_encode_spec
         rw[lift_mod_eq_iff] at ha
         rw[ha]
         rw[lift_mod_eq_iff] at change_heps
-        simp only [hA, Nat.cast_mul, Nat.cast_add, Nat.cast_pow, Nat.cast_ofNat, Nat.cast_one] at change_heps
+        simp only [hA, Nat.cast_mul, Nat.cast_add, Nat.cast_pow,
+          Nat.cast_ofNat, Nat.cast_one] at change_heps
         have : (486662 : CurveField) = Curve25519.A := curveField_486662_eq_A
         rw[this] at change_heps
         rw[← change_heps]
