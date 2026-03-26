@@ -78,7 +78,7 @@ All spec theorems should be stated using `⦃ ... ⦄` Aeneas WP syntax. The can
 /-- **Spec theorem for `full::rust::function::name::including::module`**
 
 Concise natural language description of the spec. -/
-@[progress]
+@[step]
 theorem fun_name_spec (a : argType) (b : argType) (h1 : pre_condition1) 
     (h2 : pre_condition2) :
     fun_name a b ⦃ (result : resultType) =>
@@ -87,7 +87,7 @@ theorem fun_name_spec (a : argType) (b : argType) (h1 : pre_condition1)
   sorry
 ```
 
-- Add the attribute `@[progress]` so the Aeneas progress tactic can find them. Start a new line after the attributes.
+- Add the attribute `@[step]` so the Aeneas step tactic can find them. Start a new line after the attributes.
 - The theorem name should be the name of the function with the suffix `_spec`. Note the identifier of the spec theorem should be the __full name__ of the function with this suffix.
 - Open namespaces properly so that the identifier prefix is not cluttering the spec theorem code and yet the spec theorem identifier is the full identifier of the function with suffix as required. I.e., for a spec theorem for `crate_name.mod_name.type_name.fun_name` the theorem will be as in the example above and it is required to open `namespace crate_name.mod_name.type_name` earlier in the file and `end` it later in the file.
 - Arguments and preconditions (i.e., `(a : argType) (b : argType)`, `(h : pre_condition)`, ... ) are placed after the name and on following lines.
@@ -96,7 +96,7 @@ theorem fun_name_spec (a : argType) (b : argType) (h1 : pre_condition1)
 - Postconditions should be written as a logical conjunction via `post_condition_1 ∧ post_condition_2 ∧ ...` inside `⦃ ... ⦄`.
 - The arguments of the spec theorem should be named exactly like the corresponding entities in the original function definition for `fun_name`.
 - Indentation Structure:
-  - `@[progress]` tag and `theorem fun_name_spec` statement: 0 spaces
+  - `@[step]` tag and `theorem fun_name_spec` statement: 0 spaces
   - Arguments, preconditions and line with function application: 4 spaces
   - Postconditions `post_condition_i ∧`: 6 spaces
   - Proof body: 2 spaces
