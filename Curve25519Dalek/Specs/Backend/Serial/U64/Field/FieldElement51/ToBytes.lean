@@ -241,6 +241,7 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
   have := @Nat.and_le_right x.toNat (2^51 - 1)
   norm_num at *; omega
 
+set_option maxHeartbeats 800000 in
 /-- Canonical reduction: the q-computation + conditional subtraction + carry chain
     produces a value that is congruent mod p and canonical (< p).
 
@@ -267,7 +268,8 @@ private lemma canonical_reduction_mod_p
     (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
       (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
     l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
-  sorry
+  have hqle : q ≤ 2 := by subst hq; omega
+  interval_cases q <;> subst_vars <;> constructor <;> sorry
 
 /-! ## Spec for `to_bytes` -/
 
