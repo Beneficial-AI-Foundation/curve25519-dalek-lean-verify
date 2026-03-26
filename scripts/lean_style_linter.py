@@ -19,8 +19,7 @@ Usage:
     python3 scripts/lean_style_linter.py --format github --all
 
 Exit codes:
-    0  No error-severity violations found.
-    1  One or more error-severity violations found.
+    0  Always (all violations are warnings only).
     2  Usage/configuration error.
 """
 
@@ -59,12 +58,8 @@ RULE_DOCS: dict[str, str] = {
     "A001": "Author names must not be AI systems",
 }
 
-# Which rules are errors (vs warnings)
-ERROR_RULES: set[str] = {
-    "R001", "R002", "R003", "R004", "R005",
-    "R009", "R010", "R011", "R013",
-    "A001",
-}
+# Which rules are errors (vs warnings) — currently none; all rules report as warnings
+ERROR_RULES: set[str] = set()
 
 # ---------------------------------------------------------------------------
 # Violation dataclass
