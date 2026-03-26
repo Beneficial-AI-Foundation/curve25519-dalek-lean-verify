@@ -32,11 +32,11 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.APLUS2_OVER_FOUR
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ED25519_BASEPOINT_POINT
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQUARED
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EIGHT_TORSION
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
