@@ -6,6 +6,8 @@
 If extraction produces incorrect output, fix it via `aeneas-tweaks.txt` or
 upstream Rust changes, then re-extract.
 
+To learn more about Aeneas and how it extracts Rust into Lean, see the [Aeneas documentation](https://github.com/AeneasVerif/aeneas/tree/main/documentation).
+
 ## Sync Status
 
 After adding or modifying any spec file, run:
@@ -16,6 +18,16 @@ lake exe syncstatus
 
 and commit the updated `functions.json` and `status.csv`. CI will reject PRs
 where these are out of date.
+
+## Updating the Import File after Adding, Removing, or Renaming `.lean` Files
+
+After adding, removing, or renaming any `.lean` file, run:
+
+```bash
+lake exe mk_all
+```
+
+to regenerate `Curve25519Dalek.lean`, the root import file that lists every module in the project.
 
 ## PR Workflow and Formatting
 
