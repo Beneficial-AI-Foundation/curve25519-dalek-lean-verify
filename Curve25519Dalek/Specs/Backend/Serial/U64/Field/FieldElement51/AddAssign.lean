@@ -47,7 +47,7 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
     · intro j hj _
       have := result_post2 j hj (by omega)
       simp_all
-  · simp only [progress_simps]
+  · simp only [step_simps]
     grind
   termination_by 5 - i.val
   decreasing_by scalar_tac
@@ -59,13 +59,13 @@ theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i
 - Returns a field element where each limb is the sum of corresponding input limbs
 - Input bounds: both inputs have limbs < 2^53
 - Output bounds: output has limbs < 2^54 -/
-@[progress]
+@[step]
 theorem add_assign_spec (self _rhs : Array U64 5#usize)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 53) (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 53) :
     add_assign self _rhs ⦃ (result : FieldElement51) =>
       (∀ i < 5, (result[i]!).val = (self[i]!).val + (_rhs[i]!).val) ∧
       (∀ i < 5, result[i]!.val < 2 ^ 54) ⦄ := by
   unfold add_assign
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51

@@ -20,12 +20,6 @@ open scalar
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
-/-! ## Auxiliary theorems -/
-
-/- This allows `bvify` to automatically do the conversion `a ∣ b ↔ b % a = 0`,
-   which can then be lifted to something which uses bit-vectors -/
-attribute [bvify_simps] Nat.dvd_iff_mod_eq_zero
-
 /-! ## Spec for `clamp_integer` -/
 
 namespace curve25519_dalek.scalar
@@ -34,16 +28,15 @@ namespace curve25519_dalek.scalar
 - No panic
 - (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)
 - as_nat_32_u8 result < 2^255
-- 2^254 ≤ as_nat_32_u8 result
--/
-@[progress]
+- 2^254 ≤ as_nat_32_u8 result -/
+@[step]
 theorem clamp_integer_spec (bytes : Array U8 32#usize) :
-    clamp_integer bytes ⦃ result =>
-    h ∣ U8x32_as_Nat result ∧
-    U8x32_as_Nat result < 2^255 ∧
-    2^254 ≤ U8x32_as_Nat result ⦄ := by
+    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
+      h ∣ U8x32_as_Nat result ∧
+      U8x32_as_Nat result < 2^255 ∧
+      2^254 ≤ U8x32_as_Nat result ⦄ := by
   unfold clamp_integer h
-  progress*
+  step*
   unfold U8x32_as_Nat
   refine ⟨?_, ?_, ?_⟩
   · apply Finset.dvd_sum
@@ -71,14 +64,7 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
       _ ≤ ∑ x ∈ Finset.range 31, 2 ^ (8 * x) * (2^8 - 1) + 2 ^ 248 * 127 := by gcongr
       _ < 2 ^ 255 := by decide
   · have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
-    simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq, List.set_set,
-      List.getElem!_eq_getElem?_getD, Finset.sum_range_succ, Finset.range_one, Finset.sum_singleton,
-      mul_zero, pow_zero, List.length_set, List.Vector.length_val, Nat.ofNat_pos, getElem?_pos,
-      ne_eq, OfNat.ofNat_ne_zero, not_false_eq_true, List.getElem_set_ne, List.getElem_set_self,
-      Option.getD_some, getElem!_pos, UScalar.val_and, one_mul, mul_one, Nat.one_lt_ofNat,
-      OfNat.ofNat_ne_one, zero_ne_one, Nat.reduceMul, Nat.reduceLT, Nat.reduceEqDiff,
-      OfNat.zero_ne_ofNat, Nat.succ_ne_self, Nat.lt_add_one, UScalar.val_or, ge_iff_le, result_post,
-      bytes2_post, bytes1_post, i1_post1, i_post, i5_post1, i4_post, i3_post1, i2_post]
-    agrind
+    simp [Finset.sum_range_succ]
+    grind
 
 end curve25519_dalek.scalar
