@@ -6,6 +6,15 @@ Authors: Oliver Butterley, Zhang-Liao, Alessandro D'Angelo, Hoang Le Truong, Mar
 import Aeneas
 import Curve25519Dalek.Types
 
+/-!
+# External function definitions for `curve25519_dalek`
+
+Manual Lean definitions for functions from external crates (`core`, `subtle`,
+`zeroize`, ...) and private copies of extracted `curve25519_dalek` functions needed
+as local dependencies, together with associated spec theorems, helper lemmas,
+and trait instance structures.
+-/
+
 set_option linter.style.whitespace false
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
