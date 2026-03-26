@@ -3359,7 +3359,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
@@ -3482,7 +3482,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
@@ -3654,7 +3654,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    reduce limbs ⦃ (result : FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ⦄ := by ...",
+   "theorem reduce_spec (limbs : Array U64 5#usize) :\n    reduce limbs ⦃ (result : FieldElement51) =>\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]) ∧\n      Field51_as_Nat result < 2 * p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
@@ -3759,13 +3759,14 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :\n    to_bytes self ⦃ result =>\n    U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧\n    U8x32_as_Nat result < p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/ToBytes.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:\n\nThis function converts a field element to its canonical 32-byte little-endian representation.\nThe implementation performs reduction modulo p = 2^255-19 to ensure the result is in\ncanonical form.\n\nThe algorithm:\n1. Reduces the field element using `reduce` to ensure all limbs are within bounds\n2. Performs a final conditional reduction to ensure the result is < p\n3. Packs the 5 limbs (each 51 bits) into 32 bytes in little-endian format\n\nSpecification:\n- The function succeeds (no panic)\n- The natural number interpretation of the byte array is congruent to the field element value modulo p\n- The byte array represents the unique canonical form (0 ≤ value < p)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
@@ -3776,8 +3777,8 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": true,
+   "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce"]},
   {"verified": false,
@@ -6297,7 +6298,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -6478,7 +6479,7 @@
    "is_ignored": true,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq"]},
@@ -6649,7 +6650,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},
@@ -6668,7 +6669,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes"]},

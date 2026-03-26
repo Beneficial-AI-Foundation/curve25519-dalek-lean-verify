@@ -241,7 +241,7 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
   have := @Nat.and_le_right x.toNat (2^51 - 1)
   norm_num at *; omega
 
-set_option maxHeartbeats 800000 in
+set_option maxHeartbeats 800000 in -- heavy step and simps.
 /-- Canonical reduction: the q-computation + conditional subtraction + carry chain
     produces a value that is congruent mod p and canonical (< p).
 
@@ -290,7 +290,7 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
