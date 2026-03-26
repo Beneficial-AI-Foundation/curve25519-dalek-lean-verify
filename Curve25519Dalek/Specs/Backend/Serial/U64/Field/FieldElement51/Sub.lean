@@ -87,7 +87,7 @@ theorem sub_spec (a b : Array U64 5#usize)
   let* ⟨ i17, i17_post ⟩ ← U64.add_spec
   let* ⟨ i18, i18_post ⟩ ← Array.index_usize_spec
   let* ⟨ i19, i19_post_1, i19_post_2 ⟩ ← U64.sub_spec
-  let* ⟨ res, res_post_1, res_post_2, _ ⟩ ← reduce_spec
+  let* ⟨ res, res_post_1, res_post_2 ⟩ ← reduce_spec
   refine ⟨by assumption, ?_⟩
   -- modular arithmetic property
   have htmp : Field51_as_Nat res + Field51_as_Nat b ≡

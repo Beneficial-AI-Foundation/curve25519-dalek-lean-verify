@@ -255,6 +255,8 @@ private lemma canonical_reduction_mod_p
     (f0 f1 f2 f3 f4 : ℕ)
     (hf0 : f0 < 2 ^ 52) (hf1 : f1 < 2 ^ 52) (hf2 : f2 < 2 ^ 52)
     (hf3 : f3 < 2 ^ 52) (hf4 : f4 < 2 ^ 52)
+    -- The combined value must be < 2p (from reduce_spec)
+    (hF : f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4 < 2 * (2 ^ 255 - 19))
     -- q = quotient bit from carry chain on (F + 19)
     (q : ℕ)
     (hq : q = (((((f0 + 19) / 2 ^ 51 + f1) / 2 ^ 51 + f2) / 2 ^ 51 + f3) / 2 ^ 51 + f4) / 2 ^ 51)
@@ -268,8 +270,41 @@ private lemma canonical_reduction_mod_p
     (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
       (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
     l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
-  have hqle : q ≤ 2 := by subst hq; omega
-  interval_cases q <;> subst_vars <;> constructor <;> sorry
+  -- Abbreviate F
+  set F := f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4 with hF_def
+  -- === Q-chain: carry variables for the (F+19) computation that determines q ===
+  -- (operand order: carry + fi, matching the nesting in hq)
+  set d0 := (f0 + 19) / 2 ^ 51
+  set d1 := (d0 + f1) / 2 ^ 51
+  set d2 := (d1 + f2) / 2 ^ 51
+  set d3 := (d2 + f3) / 2 ^ 51
+  -- After set, hq simplifies to: q = (d3 + f4) / 2^51
+  -- Q-chain telescoping steps (each is just Nat.mod_add_div)
+  have hqt0 : (f0 + 19) % 2 ^ 51 + d0 * 2 ^ 51 = f0 + 19 := by omega
+  have hqt1 : (d0 + f1) % 2 ^ 51 + d1 * 2 ^ 51 = d0 + f1 := by omega
+  have hqt2 : (d1 + f2) % 2 ^ 51 + d2 * 2 ^ 51 = d1 + f2 := by omega
+  have hqt3 : (d2 + f3) % 2 ^ 51 + d3 * 2 ^ 51 = d2 + f3 := by omega
+  have hqt4 : (d3 + f4) % 2 ^ 51 + q * 2 ^ 51 = d3 + f4 := by rw [hq]; omega
+  -- Q-chain: limbs of (F+19) are each < 2^51
+  have hqm0 := Nat.mod_lt (f0 + 19) (show 0 < 2 ^ 51 by norm_num)
+  have hqm1 := Nat.mod_lt (d0 + f1) (show 0 < 2 ^ 51 by norm_num)
+  have hqm2 := Nat.mod_lt (d1 + f2) (show 0 < 2 ^ 51 by norm_num)
+  have hqm3 := Nat.mod_lt (d2 + f3) (show 0 < 2 ^ 51 by norm_num)
+  have hqm4 := Nat.mod_lt (d3 + f4) (show 0 < 2 ^ 51 by norm_num)
+  -- Q-chain telescoping: Lq + q * 2^255 = F + 19 (where Lq < 2^255)
+  have hqtel : (f0 + 19) % 2 ^ 51 + 2 ^ 51 * ((d0 + f1) % 2 ^ 51) +
+      2 ^ 102 * ((d1 + f2) % 2 ^ 51) + 2 ^ 153 * ((d2 + f3) % 2 ^ 51) +
+      2 ^ 204 * ((d3 + f4) % 2 ^ 51) + q * 2 ^ 255 = F + 19 := by omega
+  -- q ≤ 1 (from Lq + q*2^255 = F+19, Lq ≥ 0, F < 2p < 2^256)
+  have hqle : q ≤ 1 := by omega
+  -- === Main chain: carry variables for the (F + 19*q) reduction ===
+  -- (operand order: fi + carry, matching the nesting in hl0..hl4)
+  set c0 := (f0 + 19 * q) / 2 ^ 51
+  set c1 := (f1 + c0) / 2 ^ 51
+  set c2 := (f2 + c1) / 2 ^ 51
+  set c3 := (f3 + c2) / 2 ^ 51
+  set c4 := (f4 + c3) / 2 ^ 51
+  sorry
 
 /-! ## Spec for `to_bytes` -/
 
@@ -297,7 +332,9 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
   simp only [step_simps]
-  let* ⟨ fe, fe_post1, fe_post2 ⟩ ← reduce_spec
+  have ⟨fe, hfe_ok, fe_post1, fe_post2, hFlt2p⟩ := spec_imp_exists (reduce_spec self)
+  rw [hfe_ok]
+  simp only [step_simps]
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ i1, i1_post ⟩ ← U64.add_spec
   let* ⟨ q, q_post1, q_post2 ⟩ ← U64.ShiftRight_IScalar_spec
@@ -583,7 +620,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   rw [hpack]
   -- (B) Canonical reduction in clean context
   clear *-
-    fe_post1 fe_post2
+    fe_post1 fe_post2 hFlt2p
     i_post i1_post q_post1 i2_post i3_post q1_post1
     i4_post i5_post q2_post1 i6_post i7_post q3_post1
     i8_post i9_post q4_post1
@@ -610,6 +647,8 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     fe[0]!.val fe[1]!.val fe[2]!.val fe[3]!.val fe[4]!.val
     (fe_post1 0 (by omega)) (fe_post1 1 (by omega)) (fe_post1 2 (by omega))
     (fe_post1 3 (by omega)) (fe_post1 4 (by omega))
+    (by simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq, p] at hFlt2p ⊢; omega)
     q4.val
     (by -- hq: q4.val = q-chain formula
       simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,

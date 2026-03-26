@@ -31,12 +31,13 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 set_option maxHeartbeats 500000 in -- heavy step, scalar_tac and simp_all's
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - All the limbs of the result are small, ≤ 2^(51 + ε)
-- The result is equal to the input mod p. -/
+- The result is equal to the input mod p.
+- The result value is < 2p. -/
 @[step]
 theorem reduce_spec (limbs : Array U64 5#usize) :
     reduce limbs ⦃ (result : FieldElement51) =>
-      ((∀ i < 5, result[i]!.val < 2 ^ 52) ∧
-       Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p]) ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
+      Field51_as_Nat limbs ≡ Field51_as_Nat result [MOD p] ∧
       Field51_as_Nat result < 2 * p ⦄ := by
   unfold reduce
   step*
