@@ -29,7 +29,8 @@ natural language specs:
 - The resulting CompressedRistretto is 32 zero bytes
 -/
 
-/-- **Spec and proof concerning `ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof concerning
+`ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity`**:
 - No panic (always returns successfully)
 - The resulting CompressedRistretto is 32 zero bytes
 -/

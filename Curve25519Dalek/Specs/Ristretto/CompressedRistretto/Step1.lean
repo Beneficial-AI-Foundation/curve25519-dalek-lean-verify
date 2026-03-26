@@ -12,8 +12,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
 
--- import Curve25519Dalek/FunsExternal.lean
-
 /-! # Spec Theorem for `ristretto.decompress.step_1`
 
 Specification and proof for `ristretto.decompress.step_1`.
@@ -34,7 +32,8 @@ natural language description:
     • Extracts the (identical) byte array representation b from the compressed point c
     • Parses the bytes in b into a field element s using from_bytes b
     • Converts s back to bytes b' via to_bytes s (which always produces canonical output in [0, p))
-    • Performs constant-time equality check between b and b' to determine whether the original encoding b is canonical (i.e., whether U8x32_as_Nat(b) < p)
+    • Performs constant-time equality check between b and b' to determine whether the original
+      encoding b is canonical (i.e., whether U8x32_as_Nat(b) < p)
     • Checks if s is negative (i.e., if the least significant bit of b' is 1)
 
       Returns a tuple containing:
@@ -66,8 +65,10 @@ Reflects the Rust implementation:
 3.  Computes `s_is_negative` (checks sign).
 
 It proves two things:
-1.  **Low-Level Correctness**: The flags match the specific bitwise conditions (`< p`, `is_negative`).
-2.  **High-Level Correctness**: The function returns a valid result **iff** `decompress_step1` would return `some`.
+1.  **Low-Level Correctness**: The flags match the specific bitwise conditions
+    (`< p`, `is_negative`).
+2.  **High-Level Correctness**: The function returns a valid result **iff**
+    `decompress_step1` would return `some`.
 
 Namely:
 1. Existence: The function always succeeds
@@ -79,13 +80,13 @@ Namely:
 @[progress]
 theorem step_1_spec (c : CompressedRistretto) :
     step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>
-    (∀ i < 5, s[i]!.val < 2^51) ∧
-    s.IsValid ∧
-    (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧
-    (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
-    (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
-    (ristretto.decompress_step1 c = some s.toField ↔
-      (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by
+      (∀ i < 5, s[i]!.val < 2^51) ∧
+      s.IsValid ∧
+      (s.toField = ((U8x32_as_Nat c % 2^255 : ℕ) : ZMod p)) ∧
+      (s_encoding_is_canonical.val = 1#u8 ↔ U8x32_as_Nat c < p) ∧
+      (s_is_negative.val = 1#u8 ↔ math.is_negative s.toField) ∧
+      (ristretto.decompress_step1 c = some s.toField ↔
+        (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by
   unfold step_1
   -- Step through the do-block bindings
   progress as ⟨a, ha⟩               -- as_bytes: ha : a = c

@@ -191,7 +191,8 @@ natural language description:
     • Computes u2 = 1 + ss
     • Computes u2_sqr = u2²
     • Computes v = (-EDWARDS_D) · u1² - u2²
-    • Computes I = invsqrt(v · u2²), obtaining (ok1, I) where ok1 indicates if the inverse square root exists
+    • Computes I = invsqrt(v · u2²), obtaining (ok1, I) where ok1 indicates if the inverse
+      square root exists
     • Computes Dx = I · u2
     • Computes Dy = I · Dx · v
     • Computes x = 2s · Dx
@@ -223,9 +224,11 @@ natural language specs:
       solution. When w = 0, r² · 0 = 0 ≠ 1, so no solution exists and
       ok1 = 0. Since Mathlib's `IsSquare 0 = True` (0 = 0²), the spec
       requires the conjunct `w ≠ 0` alongside `IsSquare w`.
-    • c is true if and only if t is negative, where t = x1 · y is the T coordinate of the output point
+    • c is true if and only if t is negative, where t = x1 · y is the T coordinate of the
+      output point
     • c1 is true if and only if y = 0
-    • The output point pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0 (all checks pass)
+    • The output point pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0
+      (all checks pass)
 -/
 
 
@@ -237,7 +240,8 @@ Reflects the Rust implementation:
 
 It proves:
 1.  **Low-Level Correctness**: The flags correspond exactly to their mathematical definitions.
-2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2` **iff** the flags indicate success.
+2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2`
+    **iff** the flags indicate success.
 
 Namely:
     • The function always succeeds (no panic) for any valid field element `s`
@@ -287,7 +291,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     rw [one_post1]; push_cast
     have hss' := hss; unfold FieldElement51.toField at hss'; rw [hss']
   have hu2_sqr : u2_sqr.toField = u2.toField ^ 2 := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ u2_sqr_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ u2_sqr_post1; push_cast at this; exact this
   have hfe_d : fe.toField = Ed25519.d := by
     unfold FieldElement51.toField; rw [fe_post1]; rfl
   have hfe_neg_add : fe.toField + neg_d.toField = 0 := by
@@ -298,16 +303,19 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
   have hneg_d : neg_d.toField = -Ed25519.d := by
     linear_combination hfe_neg_add - hfe_d
   have hu1_sq : u1_sq.toField = u1.toField ^ 2 := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_sq_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ u1_sq_post1; push_cast at this; exact this
   have hneg_d_u1_sq : neg_d_u1_sq.toField = neg_d.toField * u1_sq.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ neg_d_u1_sq_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ neg_d_u1_sq_post1; push_cast at this; exact this
   have hv_add : v.toField + u2_sqr.toField = neg_d_u1_sq.toField := by
     unfold FieldElement51.toField; have := lift_mod_eq _ _ v_post2; push_cast at this; exact this
   have hv_val : v.toField = (-Ed25519.d) * u1.toField ^ 2 - u2.toField ^ 2 := by
     rw [hneg_d, hu1_sq] at hneg_d_u1_sq; rw [hu2_sqr, hneg_d_u1_sq] at hv_add
     linear_combination hv_add
   have hv_u2_sqr : v_u2_sqr.toField = v.toField * u2_sqr.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ v_u2_sqr_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ v_u2_sqr_post1; push_cast at this; exact this
   -- Set W = the combined expression
   set W := (-Ed25519.d * (1 - s.toField ^ 2) ^ 2 - (1 + s.toField ^ 2) ^ 2) *
            (1 + s.toField ^ 2) ^ 2 with hW_def
@@ -379,13 +387,17 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_negated) % p = 0 % p by
       rw [Nat.zero_mod]; exact x_negated_post1)
     push_cast at h; grind
-  have hx1_nat : Field51_as_Nat x1 = if x_neg.val = 1#u8 then Field51_as_Nat x_negated else Field51_as_Nat x := by
+  have hx1_nat :
+      Field51_as_Nat x1 =
+        if x_neg.val = 1#u8 then Field51_as_Nat x_negated else Field51_as_Nat x := by
     unfold Field51_as_Nat
     split <;> rename_i h
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-      have := x1_post i hi; rw [if_pos h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+      have := x1_post i hi; rw [if_pos h] at this
+      exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-      have := x1_post i hi; rw [if_neg h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+      have := x1_post i hi; rw [if_neg h] at this
+      exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
   have hx1_select : x1.toField = if x_neg.val = 1#u8 then x_negated.toField else x.toField := by
     unfold FieldElement51.toField; rw [hx1_nat]; split <;> rfl
   have hx1_abs : x1.toField = math.abs_edwards x.toField := by
@@ -399,7 +411,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     · rw [if_neg hxn]
       have : (x.toField.val % 2 == 1) = false := by
         rw [Bool.eq_false_iff]; intro h; rw [beq_iff_eq] at h
-        exact hxn (x_neg_post.mpr (by unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
+        exact hxn (x_neg_post.mpr (by
+          unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
       simp only [this, Bool.false_eq_true, ↓reduceIte]
   have hI_sq_W : invsqrt.1.val = 1#u8 → invsqrt.2.toField ^ 2 * W = 1 := by
     intro h_ok1

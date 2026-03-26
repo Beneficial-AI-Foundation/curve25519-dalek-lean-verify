@@ -17,7 +17,10 @@ import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.DifferentialAddAndDouble
 /-! # Spec Theorem for `MontgomeryPoint::mul`
 
 Specification and proof for
-`curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul`.
+`curve25519_dalek::montgomery::{core::ops::arith::Mul<
+  &0 (curve25519_dalek::scalar::Scalar),
+  curve25519_dalek::montgomery::MontgomeryPoint>
+  for &1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul`.
 
 This function performs scalar multiplication of a Montgomery point using the Montgomery ladder
 algorithm. It implements constant-time scalar multiplication by processing scalar bits from
@@ -118,7 +121,8 @@ theorem mul_loop_spec
         sorry
 
 
-/-- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
+/-- **Spec and proof concerning
+`montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
 - Implements the Montgomery ladder for constant-time scalar multiplication
 - Processes scalar bits from bit 254 down to bit 0 using Algorithm 8 (Costello-Smith 2017)
@@ -138,16 +142,22 @@ theorem mul_loop_spec
 -/
 lemma aux_eq_mul (scalar : scalar.Scalar) : U8x32_as_Nat scalar.bytes =
 (∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
-        2 ^ (8 * ((254 :ℤ ) / 8).toNat) * ((scalar.bytes[((254 :ℤ )/ 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) ))
+        2 ^ (8 * ((254 :ℤ ) / 8).toNat) *
+          ((scalar.bytes[((254 :ℤ )/ 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) ))
         + 2^ 255 * ((scalar.bytes[31]!).val/ 2^7)
         := by
-        simp only [U8x32_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
-    Nat.reduceLT, add_assoc, Nat.lt_add_one, Int.reduceDiv, Int.reduceToNat, getElem!_pos, Int.reduceMod,
-    Nat.add_left_cancel_iff]
+        simp only [U8x32_as_Nat, Array.getElem!_Nat_eq,
+          List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+          Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+          List.Vector.length_val, UScalar.ofNatCore_val_eq,
+          Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one,
+          Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+          Nat.reduceLT, add_assoc, Nat.lt_add_one, Int.reduceDiv,
+          Int.reduceToNat, getElem!_pos, Int.reduceMod,
+          Nat.add_left_cancel_iff]
         have :=Nat.mod_add_div ((scalar.bytes)[31]!).val 128
-        simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos] at this
+        simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+          UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos] at this
         conv_lhs =>
           rw [← this, mul_add, ← mul_assoc]
         simp
@@ -168,7 +178,8 @@ lemma aux_lt_mul (i : ℕ) (scalar : scalar.Scalar) :
 
 lemma aux_lt254_mul (scalar : scalar.Scalar) :
 ∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
-        2 ^ (8 * ((254 :ℤ ) / 8).toNat) * ((scalar.bytes[((254 :ℤ ) / 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) )
+        2 ^ (8 * ((254 :ℤ ) / 8).toNat) *
+          ((scalar.bytes[((254 :ℤ ) / 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) )
         <  2^ 255
         := by
   have eq1 := aux_lt_mul 31  scalar
@@ -176,16 +187,20 @@ lemma aux_lt254_mul (scalar : scalar.Scalar) :
   have :(((scalar.bytes)[31]!).val) % 128 ≤  127 := by grind
   have := Nat.mul_le_mul_left (2 ^ 248) this
   have := add_lt_add_of_lt_of_le eq1 this
-  simp only [Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reduceMul,
-    Nat.reducePow, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Int.reduceMod, gt_iff_lt]
-  simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, List.Vector.length_val,
-    UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Nat.reduceMul, Nat.reduceAdd] at this
+  simp only [Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reduceMul, Nat.reducePow,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.lt_add_one, getElem!_pos, Int.reduceMod, gt_iff_lt]
+  simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+    Nat.reducePow, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.lt_add_one, getElem!_pos, Nat.reduceMul, Nat.reduceAdd] at this
   apply this
 
 
 lemma aux_eq_mod_mul (scalar : scalar.Scalar) : (U8x32_as_Nat scalar.bytes) % 2^ 255 =
   (∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
-        2 ^ (8 * ((254 :ℤ ) / 8).toNat) * ((scalar.bytes[((254 :ℤ ) / 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) )):= by
+        2 ^ (8 * ((254 :ℤ ) / 8).toNat) *
+          ((scalar.bytes[((254 :ℤ ) / 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) )) := by
        rw[aux_eq_mul,  Nat.add_mul_mod_self_left]
        apply Nat.mod_eq_of_lt
        apply aux_lt254_mul
@@ -243,7 +258,8 @@ lemma mul_spec_mkPoint_from_affine
   rw [res_field, loop_inv, mul_spec_toField_eq x P hmod_x]
 
 
-/- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
+/- **Spec and proof concerning
+`montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
 - Implements the Montgomery ladder for constant-time scalar multiplication
 - Processes scalar bits from bit 254 down to bit 0 using Algorithm 8 (Costello-Smith 2017)
@@ -276,12 +292,16 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
   progress as ⟨ c, ct, cf⟩
   progress as ⟨ y, hy⟩
   by_cases h: c.2.2 = true
-  · simp_all only [Nat.reducePow, forall_const, Bool.true_eq_false, IsEmpty.forall_iff, Bool.toNat_true, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq,
-      one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self,
+  · simp_all only [Nat.reducePow, forall_const, Bool.true_eq_false,
+      IsEmpty.forall_iff, Bool.toNat_true, Nat.not_eq,
+      UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true,
+      zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self,
       UScalar.val_not_eq_imp_not_eq, ↓reduceDIte]
     by_cases hi: y= 1#u8
     · simp only [hi, ↓reduceDIte, bind_tc_ok]
-      unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap  zeroize.Zeroize.Blanket.zeroize
+      unfold
+        montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+        zeroize.Zeroize.Blanket.zeroize
       simp only [↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
       progress*
         -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
@@ -297,25 +317,34 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       apply hi
       scalar_tac
   · have : c.2.2 = false := by grind
-    simp_all only [Nat.reducePow, Bool.false_eq_true, ne_eq, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq,
-      List.getElem!_eq_getElem?_getD, Nat.reduceMul, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one,
-      getElem!_pos, Int.reduceMod, Nat.reduceAdd, Bool.toNat_false, mul_zero, add_zero, IsEmpty.forall_iff, forall_const,
-      not_false_eq_true, Nat.not_eq, zero_ne_one, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
+    simp_all only [Nat.reducePow, Bool.false_eq_true, ne_eq,
+      Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq,
+      List.getElem!_eq_getElem?_getD, Nat.reduceMul, List.Vector.length_val,
+      UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,
+      Int.reduceMod, Nat.reduceAdd, Bool.toNat_false, mul_zero, add_zero,
+      IsEmpty.forall_iff, forall_const, not_false_eq_true, Nat.not_eq,
+      zero_ne_one, one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
       UScalar.val_not_eq_imp_not_eq, ↓reduceDIte]
     have :  y = 0#u8 := by scalar_tac
     simp only [this, ↓reduceDIte, bind_tc_ok]
-    unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap  zeroize.Zeroize.Blanket.zeroize
-    simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one,
-    not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
-      bind_tc_ok]
+    unfold
+      montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+      zeroize.Zeroize.Blanket.zeroize
+    simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one,
+      not_false_eq_true, one_ne_zero, zero_lt_one,
+      not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
+      ↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
     progress*
       -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
       -- We first construct the loop invariant with the simplified scalar.
     refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 ?_
     rw [cf.right.right.right.right.right]
     have := aux_eq_mod_mul scalar
-    simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
-    Nat.reduceMul, List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Int.reduceMod, Nat.reduceAdd, Nat.reducePow] at this
+    simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat,
+      Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+      Nat.reduceMul, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.lt_add_one, getElem!_pos, Int.reduceMod,
+      Nat.reduceAdd] at this
     rw [← this]
     ring_nf
 
@@ -366,9 +395,13 @@ theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :
 
 end curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint
 
-namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint
+namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts
+namespace CoreOpsArithMulSharedBScalarMontgomeryPoint
 
-/- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&'b (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::mul]:
+/- [curve25519_dalek::montgomery::{core::ops::arith::Mul<
+     &'b (curve25519_dalek::scalar::Scalar),
+     curve25519_dalek::montgomery::MontgomeryPoint>
+   for curve25519_dalek::montgomery::MontgomeryPoint}::mul]:
    Source: 'curve25519-dalek/src/macros.rs', lines 93:12-95:13
 -/
 
@@ -409,7 +442,8 @@ theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
   unfold mul
   progress*
 
-end curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint
+end CoreOpsArithMulSharedBScalarMontgomeryPoint
+end curve25519_dalek.montgomery.MontgomeryPoint.Insts
 
 namespace curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint
 

@@ -44,13 +44,15 @@ natural language specs:
 theorem core.array.TryFromArrayCopySlice.try_from_spec
     {T : Type} (N : Usize) (copyInst : core.marker.Copy T) (s : Slice T)
     (hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
-    core.array.TryFromArrayCopySlice.try_from N copyInst s ⦃ (result : core.result.Result (Array T N) core.array.TryFromSliceError) =>
-      (s.length = N → ∃ a : Array T N, result = .Ok a ∧ a.val = s.val) ∧
-      (s.length ≠ N → result = .Err ()) ⦄ := by
+    core.array.TryFromArrayCopySlice.try_from N copyInst s
+      ⦃ (result : core.result.Result (Array T N) core.array.TryFromSliceError) =>
+        (s.length = N → ∃ a : Array T N, result = .Ok a ∧ a.val = s.val) ∧
+        (s.length ≠ N → result = .Err ()) ⦄ := by
   unfold core.array.TryFromArrayCopySlice.try_from
   split
   · split
-    · simp_all only [ok.injEq, forall_const, ne_eq, not_true_eq_false, IsEmpty.forall_iff, and_true, spec_ok, core.result.Result.Ok.injEq, exists_eq_left']
+    · simp_all only [ok.injEq, forall_const, ne_eq, not_true_eq_false, IsEmpty.forall_iff,
+        and_true, spec_ok, core.result.Result.Ok.injEq, exists_eq_left']
     · simp_all only [reduceCtorEq]
     · simp_all only [reduceCtorEq]
   · simp only [spec_ok, reduceCtorEq, false_and, exists_false, implies_true, and_true]
@@ -64,9 +66,10 @@ theorem core.array.TryFromArrayCopySlice.try_from_spec
 @[progress]
 theorem from_slice_spec
     (bytes : Slice U8) :
-    from_slice bytes ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>
-      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧
-      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
+    from_slice bytes
+      ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>
+        (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧
+        (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
   unfold from_slice
   progress
   · exact List.mapM_clone_eq (fun _ _ => by rfl)
