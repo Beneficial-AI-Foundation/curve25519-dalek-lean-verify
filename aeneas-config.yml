@@ -2,7 +2,7 @@
 # Used by aeneas-cli to run charon and aeneas for Lean code generation
 
 aeneas:
-  commit: "b6dfa65d"
+  commit: "5918d471"
   repo: "https://github.com/AeneasVerif/aeneas.git"
 
 crate:
@@ -99,32 +99,6 @@ tweaks:
         set_option linter.unusedVariables false
         set_option linter.style.whitespace false
         set_option linter.style.setOption false
-
-    # --- Convert single-line comments before noncomputable section ---
-
-    - find: "/- You can remove the following line by using the CLI option `-all-computable`: -/"
-      replace: "-- You can remove the following line by using the CLI option `-all-computable`: "
-
-    - find: "/- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/"
-      replace: "-- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option"
-
-    # --- Increase maxRecDepth for to_bytes ---
-    # Must appear BEFORE the /- → /-- tweak so the FIND matches raw /- form
-
-    - find: |-
-        /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
-           Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
-        def backend.serial.u64.field.FieldElement51.to_bytes
-      replace: |-
-        set_option maxRecDepth 4096 in
-        /- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes]:
-           Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 376:4-458:5 -/
-        def backend.serial.u64.field.FieldElement51.to_bytes
-
-    # --- Convert Aeneas block comments to doc comments ---
-
-    - find: "/- "
-      replace: "/-- "
 
     # --- Fix shift syntax error ---
 
