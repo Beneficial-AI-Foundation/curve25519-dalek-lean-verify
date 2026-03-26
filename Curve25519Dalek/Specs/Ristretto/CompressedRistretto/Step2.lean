@@ -229,7 +229,7 @@ natural language specs:
 -/
 
 
-set_option maxHeartbeats 400000 in -- increased for progress* through many sub-calls
+set_option maxHeartbeats 400000 in -- increased for step* through many sub-calls
 /-- **Spec for `step_2`**
 Reflects the Rust implementation:
 1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.
@@ -250,7 +250,7 @@ a) The Rust flags must be set to success (1, 0, 0)
 b) The Rust point `pt` must match the mathematical point `P`
 And conversely.
 -/
-@[progress]
+@[step]
 theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     step_2 s ⦃ (ok1, c, c1, pt) =>
@@ -265,7 +265,7 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧
     (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
   unfold step_2
-  progress*
+  step*
   rename_i invsqrt _ invsqrt_bounds invsqrt_nonneg invsqrt_case1 invsqrt_case2 invsqrt_case3
     _ _ _ _ _ _ _ _ _ _ _
   -- Shared setup: ONE field value

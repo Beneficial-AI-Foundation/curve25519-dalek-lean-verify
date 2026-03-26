@@ -1153,14 +1153,14 @@ natural language specs:
       bridging the 51-bit limb implementation to the abstract ZMod p computation
 -/
 
-set_option maxHeartbeats 900000 in -- needed for complex progress
+set_option maxHeartbeats 900000 in -- needed for complex step
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)
 • The output point corresponds to `elligator_ristretto_flavor_pure s.toField`, bridging
   the implementation to the pure mathematical Elligator map defined in Representation.lean
 -/
-@[progress]
+@[step]
 theorem elligator_ristretto_flavor_spec
     (s : FieldElement51)
     (h_s_valid : s.IsValid) :
@@ -1168,7 +1168,7 @@ theorem elligator_ristretto_flavor_spec
     result.IsValid ∧
     result.toPoint = (elligator_ristretto_flavor_pure s.toField).val ⦄ := by
   unfold elligator_ristretto_flavor
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← SQRT_M1_spec
   let* ⟨ d, d_post1, d_post2 ⟩ ← EDWARDS_D_spec
   let* ⟨ one_minus_d_sq, one_minus_d_sq_post1, one_minus_d_sq_post2 ⟩ ← ONE_MINUS_EDWARDS_D_SQUARED_spec

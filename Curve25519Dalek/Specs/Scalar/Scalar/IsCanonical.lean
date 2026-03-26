@@ -37,12 +37,12 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
 -/
-@[progress]
+@[step]
 theorem is_canonical_spec (s : Scalar) :
     is_canonical s ⦃ (c : subtle.Choice) =>
       (c = Choice.one ↔ U8x32_as_Nat s.bytes < L) ⦄ := by
   unfold is_canonical
-  progress*
+  step*
   constructor
   · grind
   · intro h

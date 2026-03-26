@@ -28,7 +28,7 @@ end curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-set_option maxHeartbeats 500000 in -- heavy progress, scalar_tac and simp_all's
+set_option maxHeartbeats 500000 in -- heavy step, scalar_tac and simp_all's
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - All the limbs of the result are small, ≤ 2^(51 + ε)
 - The result is equal to the input mod p. -/

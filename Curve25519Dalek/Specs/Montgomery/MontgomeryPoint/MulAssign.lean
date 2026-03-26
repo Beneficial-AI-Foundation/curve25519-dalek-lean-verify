@@ -48,13 +48,13 @@ natural language specs:
 - Delegates to `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`
 - The returned MontgomeryPoint equals the Montgomery ladder result for the given scalar and point
 -/
-@[progress]
+@[step]
 theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     mul_assign P scalar ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
      := by
   unfold mul_assign
-  progress*
+  step*
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar

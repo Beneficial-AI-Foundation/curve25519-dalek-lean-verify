@@ -48,7 +48,7 @@ natural language specs:
 • The result is a valid RistrettoPoint
 • The result = b + ... + b represents the Ristretto basepoint b added to itself s-times
 -/
-@[progress]
+@[step]
 theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255) :
     mul_base s ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
@@ -57,7 +57,7 @@ theorem mul_base_spec (s : scalar.Scalar) (h_s_canonical : U8x32_as_Nat s.bytes 
     SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul
   let* ⟨ rp, rp_post1, rp_post2, rp_post3, rp_post4, rp_post5 ⟩ ←
     constants.RISTRETTO_BASEPOINT_POINT_spec
-  progress
+  step
   refine ⟨ by assumption , by grind ⟩
 
 end curve25519_dalek.ristretto.RistrettoPoint

@@ -1361,7 +1361,7 @@ theorem sqrt_ratio_i_spec'
     := by
   apply spec_imp_exists
   unfold sqrt_ratio_i subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ fe, fe_post1, fe_post2 ⟩ ← square_spec
   let* ⟨ v3, v3_post1, v3_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
@@ -1533,7 +1533,7 @@ theorem sqrt_ratio_i_spec'
               h_check_ne_u h_check_ne_fe6 h_check_ne_fe7
 
 
-@[progress]
+@[step]
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)

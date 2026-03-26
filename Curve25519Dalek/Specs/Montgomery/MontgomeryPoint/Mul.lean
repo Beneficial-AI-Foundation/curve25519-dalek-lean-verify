@@ -64,7 +64,7 @@ Natural language specs:
 -/
 
 
-@[progress]
+@[step]
 theorem mul_loop_spec
     (affine_u : backend.serial.u64.field.FieldElement51)
     (x0 x1 : montgomery.ProjectivePoint)
@@ -262,19 +262,19 @@ lemma mul_spec_mkPoint_from_affine
     unconditional arithmetic operations are performed)
 -/
 
-@[progress, externally_verified]
+@[step, externally_verified]
 theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     mul P scalar ⦃ res =>
       let m:= (U8x32_as_Nat scalar.bytes) % 2^255
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄ := by
   unfold mul  IdentityMontgomeryProjectivePoint.identity subtle.Choice.Insts.CoreConvertFromU8.from
-  progress as ⟨x , hmod_x, h_valid⟩
-  progress as ⟨ one, one_eq, one_bound⟩
-  progress as ⟨ zero, zero_eq, zero_bound⟩
-  progress as ⟨ one1, one1_eq, one_bound⟩
-  progress as ⟨ s, hs, hsb⟩
-  progress as ⟨ c, ct, cf⟩
-  progress as ⟨ y, hy⟩
+  step as ⟨x , hmod_x, h_valid⟩
+  step as ⟨ one, one_eq, one_bound⟩
+  step as ⟨ zero, zero_eq, zero_bound⟩
+  step as ⟨ one1, one1_eq, one_bound⟩
+  step as ⟨ s, hs, hsb⟩
+  step as ⟨ c, ct, cf⟩
+  step as ⟨ y, hy⟩
   by_cases h: c.2.2 = true
   · simp_all only [Nat.reducePow, forall_const, Bool.true_eq_false, IsEmpty.forall_iff, Bool.toNat_true, Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq,
       one_ne_zero, not_false_eq_true, zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self,
@@ -283,7 +283,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     · simp only [hi, ↓reduceDIte, bind_tc_ok]
       unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap  zeroize.Zeroize.Blanket.zeroize
       simp only [↓reduceIte, core.default.DefaultBool.default, bind_tc_ok]
-      progress*
+      step*
         -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
         -- We first construct the loop invariant with the simplified scalar.
       refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 ?_
@@ -308,7 +308,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one,
     not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
       bind_tc_ok]
-    progress*
+    step*
       -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
       -- We first construct the loop invariant with the simplified scalar.
     refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 ?_
@@ -355,14 +355,14 @@ Natural language specs:
     Montgomery ladder implementation
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
-@[progress]
+@[step]
 theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :
     mul scalar P ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
     := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint
 
@@ -400,14 +400,14 @@ Natural language specs:
     Montgomery ladder implementation
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
-@[progress]
+@[step]
 theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
     mul P rhs ⦃ res =>
     let m:= (U8x32_as_Nat rhs.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
  := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint
 
@@ -442,13 +442,13 @@ Natural language specs:
     Montgomery ladder implementation
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
-@[progress]
+@[step]
 theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :
     mul scalar P ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
  := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint

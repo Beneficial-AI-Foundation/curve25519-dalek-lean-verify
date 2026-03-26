@@ -91,7 +91,7 @@ private lemma ZERO_limb_bounds :
   `U8x32_as_Nat result.bytes + U8x32_as_Nat self.bytes ≡ 0 [MOD L]`
 • The result is canonical: `U8x32_as_Nat result.bytes < L`
 -/
-@[progress]
+@[step]
 theorem neg_spec (self : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L) :
     neg self ⦃ result =>
@@ -99,10 +99,10 @@ theorem neg_spec (self : scalar.Scalar)
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold neg
   unfold scalar.Scalar.unpack
-  progress as ⟨s, hs_nat, hs_bounds⟩
-  progress as ⟨self_R, hself_R_nat, hself_R_bounds⟩
+  step as ⟨s, hs_nat, hs_bounds⟩
+  step as ⟨self_R, hself_R_nat, hself_R_bounds⟩
   · exact R_limb_bounds
-  progress as ⟨self_mod_l, h_mont_eq, h_mod_bounds, h_mod_lt⟩
+  step as ⟨self_mod_l, h_mont_eq, h_mod_bounds, h_mod_lt⟩
   have hmod_le_L : Scalar52_as_Nat self_mod_l ≤ L := Nat.le_of_lt h_mod_lt
   have hZERO_lt : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO <
       Scalar52_as_Nat self_mod_l + L := by
@@ -110,8 +110,8 @@ theorem neg_spec (self : scalar.Scalar)
     linarith
   have hZERO_bounds : ∀ i < 5, backend.serial.u64.scalar.Scalar52.ZERO[i]!.val < 2 ^ 52 :=
     ZERO_limb_bounds
-  progress as ⟨s1, hs1_cong, hs1_lt, _⟩
-  progress as ⟨hpack, hpack_cong, hpack_lt⟩
+  step as ⟨s1, hs1_cong, hs1_lt, _⟩
+  step as ⟨hpack, hpack_cong, hpack_lt⟩
   refine ⟨?_, hpack_lt⟩
   have h_R_cong : Scalar52_as_Nat backend.serial.u64.constants.R ≡ R [MOD L] :=
     backend.serial.u64.constants.R_spec
@@ -155,15 +155,15 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithNegScalar.neg`**:
-• Same spec as the core `neg`; proof delegates via `progress*`
+• Same spec as the core `neg`; proof delegates via `step*`
 -/
-@[progress]
+@[step]
 theorem neg_spec (self : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L) :
     neg self ⦃ result =>
       U8x32_as_Nat result.bytes + U8x32_as_Nat self.bytes ≡ 0 [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold neg
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar

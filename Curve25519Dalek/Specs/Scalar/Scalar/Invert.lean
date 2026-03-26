@@ -40,12 +40,12 @@ natural language specs:
 - No panic (returns successfully for non-zero input)
 - The result s' satisfies the multiplicative inverse property:
   U8x32_as_Nat(s.bytes) * U8x32_as_Nat(s'.bytes) ≡ 1 (mod L) -/
-@[progress]
+@[step]
 theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :
     invert self ⦃ (result : Scalar) =>
       U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L] ⦄ := by
   unfold invert
-  progress*
+  step*
   calc U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes
       ≡ Scalar52_as_Nat s * U8x32_as_Nat result.bytes [MOD L] := by
         exact Nat.ModEq.mul_right _ (by rw [s_post1])

@@ -81,12 +81,12 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
     simp only [UScalar.lt_equiv, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
       Nat.reducePow]
     split
-    · progress as ⟨y1, hy1_eq, hy1_bound⟩
-      progress as ⟨i1, h_val_i1⟩
+    · step as ⟨y1, hy1_eq, hy1_bound⟩
+      step as ⟨i1, h_val_i1⟩
       have h_i1_bound : i1.val ≤ squarings.val := by
         simp only [h_val_i1, Order.add_one_le_iff]; agrind
       have h_rem_next : squarings.val - i1.val = n := by simp only [h_val_i1]; agrind
-      progress as ⟨res, h_math_ih, h_res_bound⟩
+      step as ⟨res, h_math_ih, h_res_bound⟩
       refine ⟨?_, h_res_bound⟩
       · have h_pow_split : pow2 (n + 1) - 1 = (pow2 n - 1) + pow2 n := by
           simp only [pow2, Nat.pow_succ, Nat.mul_succ, mul_one]
@@ -106,7 +106,7 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
 - Postcondition:
   The result `res` satisfies: res * R^(2^squarings) = y^(2^squarings) * x (mod L)
 -/
-@[progress]
+@[step]
 theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     (hy : ∀ i < 5, y[i]!.val < 2 ^ 62) (hx : ∀ i < 5, x[i]!.val < 2 ^ 62) :
     montgomery_invert.square_multiply y squarings x ⦃ res =>
@@ -114,9 +114,9 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     ((Scalar52_as_Nat y) ^ (pow2 squarings.val) * (Scalar52_as_Nat x)) % L ∧
     (∀ i < 5, res[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_invert.square_multiply
-  progress with square_multiply_loop_spec as ⟨loop_res, h_loop_math, h_loop_bound⟩
+  step with square_multiply_loop_spec as ⟨loop_res, h_loop_math, h_loop_bound⟩
   simp only [tsub_zero] at h_loop_math
-  progress as ⟨mul_res, h_mul_math, h_mul_bound⟩
+  step as ⟨mul_res, h_mul_math, h_mul_bound⟩
   refine ⟨?_, h_mul_bound⟩
   have h_pow_split : R ^ (pow2 squarings.val) = R * R ^ (pow2 squarings.val - 1) := by
     rw [← Nat.pow_succ']; congr 1

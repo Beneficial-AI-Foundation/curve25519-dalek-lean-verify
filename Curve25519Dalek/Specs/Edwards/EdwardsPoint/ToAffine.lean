@@ -52,7 +52,7 @@ where p = 2^255 - 19
   - If Z ≡ 0 (mod p): x ≡ 0 (mod p) and y ≡ 0 (mod p)
 where p = 2^255 - 19
 -/
-@[progress]
+@[step]
 theorem to_affine_spec (e : EdwardsPoint)
     (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)
     (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)
@@ -71,9 +71,9 @@ theorem to_affine_spec (e : EdwardsPoint)
         (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧
         (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by
     unfold to_affine
-    progress as ⟨Z_inv, h_inv_nonzero, h_inv_zero, h_inv_bounds⟩  -- invert e.Z
-    progress as ⟨x, hx_mod, hx_bounds⟩  -- mul e.X Z_inv
-    progress as ⟨y, hy_mod, hy_bounds⟩  -- mul e.Y Z_inv
+    step as ⟨Z_inv, h_inv_nonzero, h_inv_zero, h_inv_bounds⟩  -- invert e.Z
+    step as ⟨x, hx_mod, hx_bounds⟩  -- mul e.X Z_inv
+    step as ⟨y, hy_mod, hy_bounds⟩  -- mul e.Y Z_inv
     constructor
     · split_ifs with h_Z
       · -- Z ≡ 0 case

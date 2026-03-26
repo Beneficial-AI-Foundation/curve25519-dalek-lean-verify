@@ -33,13 +33,13 @@ natural language specs:
 /-- **Spec theorem for `scalar.Scalar.from_bytes_mod_order_wide`**:
 - The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L
 - The result scalar s is less than L (the group order) -/
-@[progress]
+@[step]
 theorem from_bytes_mod_order_wide_spec (input : Array U8 64#usize) :
     from_bytes_mod_order_wide input ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x64_as_Nat input [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold from_bytes_mod_order_wide
-  progress*
+  step*
   · grind [L]
   · all_goals simp_all [Nat.ModEq]
 

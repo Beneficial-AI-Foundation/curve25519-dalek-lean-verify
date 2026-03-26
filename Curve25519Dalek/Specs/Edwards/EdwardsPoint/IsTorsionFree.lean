@@ -58,16 +58,16 @@ private lemma field51_limb_le_of_sum_eq_one {f : backend.serial.u64.field.FieldE
 - Returns `true` if and only if the point is torsion-free (is in the prime-order subgroup)
 - This is determined by checking if multiplying by the basepoint order L yields the identity element
 -/
-@[progress, externally_verified]
+@[step, externally_verified]
 theorem is_torsion_free_spec (self : EdwardsPoint) (hself : self.IsValid) :
     is_torsion_free self ⦃ result =>
     (result ↔ L • self.toPoint = 0) ⦄ := by
   unfold is_torsion_free curve25519_dalek.traits.IsIdentity.Blanket.is_identity
-  progress as ⟨ep, hep_valid, hep_point⟩
+  step as ⟨ep, hep_valid, hep_point⟩
   · rw [curve25519_dalek.constants.BASEPOINT_ORDER_PRIVATE_spec]
     decide
-  progress as ⟨t, ht_X, ht_Y, ht_Z, ht_T, ht_valid⟩
-  progress as ⟨c, hc1, hc2⟩
+  step as ⟨t, ht_X, ht_Y, ht_Z, ht_T, ht_valid⟩
+  step as ⟨c, hc1, hc2⟩
   · have := hep_valid.X_bounds; grind
   · have := hep_valid.Y_bounds; grind
   · have := hep_valid.Z_bounds; grind

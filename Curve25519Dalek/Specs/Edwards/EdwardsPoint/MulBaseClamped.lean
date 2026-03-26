@@ -50,7 +50,7 @@ natural language specs:
 - Delegates to `edwards.EdwardsPoint.mul_base` with the clamped scalar
 - The returned EdwardsPoint matches the basepoint multiplication result
 -/
-@[progress]
+@[step]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     mul_base_clamped bytes ⦃ (result : EdwardsPoint) =>
       EdwardsPoint.IsValid result ∧
@@ -60,6 +60,6 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
       2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
       result.toPoint = ((U8x32_as_Nat clamped_scalar) • _root_.Edwards.basepoint)) ⦄ := by
     unfold mul_base_clamped
-    progress*
+    step*
 
 end curve25519_dalek.edwards.EdwardsPoint

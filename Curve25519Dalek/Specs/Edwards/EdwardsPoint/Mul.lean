@@ -45,7 +45,7 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[progress, externally_verified] -- proven in Verus
+@[step, externally_verified] -- proven in Verus
 theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
@@ -79,7 +79,7 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[progress]
+@[step]
 theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
     (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
@@ -113,7 +113,7 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[progress]
+@[step]
 theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
@@ -147,7 +147,7 @@ natural language specs:
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[progress]
+@[step]
 theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
     (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :

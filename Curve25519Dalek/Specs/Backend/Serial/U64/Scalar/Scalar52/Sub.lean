@@ -72,7 +72,7 @@ When the loop completes (i = 5), this gives:
 Where (borrow / 2^63) = 1 means A < B (underflow occurred), and the difference D
 represents (A - B) mod 2^260.
 -/
-@[progress]
+@[step]
 theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize)
     (ha : ∀ j < 5, a[j]!.val < 2 ^ 52)
     (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
@@ -99,17 +99,17 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       have hbv : borrow.val < 2 ^ 64 := by agrind
       omega
     -- Step through the operations manually
-    progress as ⟨i1, hi1⟩  -- a[i]
-    progress as ⟨i2, hi2⟩  -- b[i]
-    progress as ⟨i3, hi3_1, hi3_2⟩  -- borrow >>> 63
+    step as ⟨i1, hi1⟩  -- a[i]
+    step as ⟨i2, hi2⟩  -- b[i]
+    step as ⟨i3, hi3_1, hi3_2⟩  -- borrow >>> 63
     have hi3_bound : i3.val ≤ 1 := by grind
     have hi2_bound : i2.val < 2 ^ 52 := by simp only [hi2]; simp_all
     have hi4_ok : i2.val + i3.val < 2 ^ 64 := by omega
-    progress as ⟨i4, hi4⟩  -- i2 + i3
-    progress as ⟨borrow1, hborrow1⟩  -- wrapping_sub
-    progress as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
-    progress as ⟨i5, hi5_1, hi5_2⟩  -- borrow1 &&& mask
-    progress as ⟨i6, hi6⟩  -- i + 1
+    step as ⟨i4, hi4⟩  -- i2 + i3
+    step as ⟨borrow1, hborrow1⟩  -- wrapping_sub
+    step as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
+    step as ⟨i5, hi5_1, hi5_2⟩  -- borrow1 &&& mask
+    step as ⟨i6, hi6⟩  -- i + 1
     -- Set up the recursive call hypotheses
     have hborrow1_bound : borrow1.val / 2 ^ 63 ≤ 1 := by
       have hb1 : borrow1.val < 2 ^ 64 := by agrind
@@ -236,7 +236,7 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         grind
     -- Rewrite hypotheses from Array.set form to index_mut_back form
     rw [← h_imb] at hdiff1 hdiff1_rest hinv1
-    progress as ⟨result, hres1, hres2⟩
+    step as ⟨result, hres1, hres2⟩
     grind
   case isFalse hge =>
     refine ⟨by grind, ?_⟩
@@ -250,7 +250,7 @@ decreasing_by scalar_decr_tac
 - Requires both inputs to be bounded from above
 - The result represents (a - b) mod L
 - The result has bounded limbs and is canonical -/
-@[progress]
+@[step]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
@@ -262,11 +262,11 @@ theorem sub_spec (a b : Array U64 5#usize)
     (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold sub
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
-  -- First, progress through mask computation (two steps: shift then subtract)
-  progress  -- 1 <<< 52
-  progress  -- mask = i - 1
+  -- First, step through mask computation (two steps: shift then subtract)
+  step  -- 1 <<< 52
+  step  -- mask = i - 1
   -- Progress through the loop with all required hypotheses
-  progress as ⟨loop_res, hdiff_limbs, hdiff_inv⟩
+  step as ⟨loop_res, hdiff_limbs, hdiff_inv⟩
   · -- hdiff_rest: ZERO[j] = 0 for all j in 0..5
     intro j _ hj5
     interval_cases j <;> simp only [ZERO] <;> decide
@@ -279,9 +279,9 @@ theorem sub_spec (a b : Array U64 5#usize)
   obtain ⟨diff, borrow⟩ := loop_res
   -- diff_inv: A + (borrow/2^63) * 2^260 = B + D
   -- Progress through borrow >>> 63 and cast
-  progress as ⟨i1, hi1_eq, _⟩  -- borrow >>> 63
+  step as ⟨i1, hi1_eq, _⟩  -- borrow >>> 63
   have : i1.val ≤ 1 := by simp only [*, Nat.shiftRight_eq_div_pow]; grind
-  progress as ⟨i2, hi2⟩  -- cast to U8
+  step as ⟨i2, hi2⟩  -- cast to U8
   have hi2_eq_i1 : i2.val = i1.val := by simp only [UScalar.val]; grind
   -- Helper: Choice.one.val = 1
   have : Choice.one.val.val = 1 := by rfl
@@ -296,7 +296,7 @@ theorem sub_spec (a b : Array U64 5#usize)
     have hdiff_val : Scalar52_as_Nat diff = Scalar52_as_Nat a - Scalar52_as_Nat b := by grind
     have : Scalar52_as_Nat a ≥ Scalar52_as_Nat b := by grind
     -- Progress through conditional_add_l with Choice.zero
-    progress as ⟨cond_res, hres_limbs, hres_lt_L, _, hres_eq_zero⟩
+    step as ⟨cond_res, hres_limbs, hres_lt_L, _, hres_eq_zero⟩
     have hcz : (subtle.Choice.mk i2 (Or.inl hi2_zero)) = Choice.zero := by
       simp only [Choice.zero, hi2_zero]
     have hres_val := hres_eq_zero hcz
@@ -314,7 +314,7 @@ theorem sub_spec (a b : Array U64 5#usize)
         grind
       have : Scalar52_as_Nat diff < 2 ^ 260 := Scalar52_as_Nat_bounded diff hdiff_limbs
       -- Progress through conditional_add_l with Choice.one
-      progress as ⟨cond_res, hres_limbs, hres_lt_L, hres_eq_one, _⟩
+      step as ⟨cond_res, hres_limbs, hres_lt_L, hres_eq_one, _⟩
       refine ⟨?_, by grind, by grind⟩
       · -- Modular equivalence: res + B = A + L ≡ A [MOD L]
         have hL_mod : L ≡ 0 [MOD L] := by rw [Nat.ModEq, Nat.zero_mod, Nat.mod_self]

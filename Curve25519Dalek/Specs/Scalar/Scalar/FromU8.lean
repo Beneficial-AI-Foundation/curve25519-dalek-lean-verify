@@ -45,12 +45,12 @@ natural language specs:
   (i.e., U8x32_as_Nat result.bytes = x.val)
 • The result is automatically canonical (less than L) since x.val < 2^8 < L
 -/
-@[progress]
+@[step]
 theorem from_spec (x : Std.U8) :
     «from» x ⦃ result =>
     U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from»
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ s_bytes1, s_bytes1_post ⟩ ← Array.update_spec
   simp_all only
   simp [U8x32_as_Nat, Finset.sum_range_succ]

@@ -52,12 +52,12 @@ natural language specs:
 • The function always succeeds (no panic) for valid inputs
 • The result is `true` if and only if the two points represent the same point on the curve
 -/
-@[progress]
+@[step]
 theorem eq_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     eq self other ⦃ result =>
     result = true ↔ self.toPoint = other.toPoint ⦄ := by
   unfold eq
-  progress*
+  step*
   · have := h_self_valid.X_bounds
     grind
   · have := h_self_valid.Y_bounds

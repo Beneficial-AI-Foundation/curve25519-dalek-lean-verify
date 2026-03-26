@@ -246,7 +246,7 @@ theorem ofU64_or_non_overlapping (x y : U64) (k : Nat) (hk : k ≤ 64)
   · rw [Nat.add_mul_div_left _ _ (by positivity), Nat.div_eq_of_lt hy, Nat.zero_add]
     exact (ofNat_drop k 64 x.val (by omega)).symm
 
-/-- Convert an OR `bv` postcondition (as produced by `progress` on `lift (x ||| y)`) into BitList
+/-- Convert an OR `bv` postcondition (as produced by `step` on `lift (x ||| y)`) into BitList
 form, given non-overlap preconditions. -/
 private theorem ofU64_of_or_bv (x y z : U64) (k : Nat) (hk : k ≤ 64) (hx : x.val % 2 ^ k = 0)
     (hy : y.val < 2 ^ k) (hbv : z.bv = y.bv ||| x.bv) :
@@ -412,23 +412,23 @@ theorem scalar52_eq_of_bitList_bytes
         List.extract_append_extract _ 0 40 48 (by omega) (by omega)]
     simp [List.extract_eq_drop_take]
 
--- Remove @[progress] from the Nat-level shift specs and add to the BitList specs.
-attribute [-progress] U64.ShiftRight_IScalar_spec
-attribute [-progress] U64.ShiftLeft_IScalar_spec
-attribute [progress] U64.ShiftRight_IScalar_bitList_spec
-attribute [progress] U64.ShiftLeft_IScalar_bitList_spec
+-- Remove @[step] from the Nat-level shift specs and add to the BitList specs.
+attribute [-step] U64.ShiftRight_IScalar_spec
+attribute [-step] U64.ShiftLeft_IScalar_spec
+attribute [step] U64.ShiftRight_IScalar_bitList_spec
+attribute [step] U64.ShiftLeft_IScalar_bitList_spec
 
-set_option maxHeartbeats 1600000 in -- heavy progress and simps
+set_option maxHeartbeats 1600000 in -- heavy step and simps
 /-- **Spec and proof concerning `scalar.Scalar52.to_bytes`**:
 - The result byte array represents the same number as the input unpacked scalar modulo L
 - The result is in canonical form (less than L) -/
-@[progress]
+@[step]
 theorem to_bytes_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L) :
     to_bytes self ⦃ (result : Std.Array U8 32#usize) =>
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
     unfold to_bytes
-    progress*
+    step*
     -- Simple bytes (30 of 32): each byte = 8-bit extract of its limb
     have ⟨hb0, hb1, hb2, hb3, hb4, hb5, hb7, hb8, hb9, hb10, hb11, hb12, hb13, hb14, hb15, hb16,
         hb17, hb18, hb20, hb21, hb22, hb23, hb24, hb25, hb26, hb27, hb28, hb29, hb30, hb31⟩ :

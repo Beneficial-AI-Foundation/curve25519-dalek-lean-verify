@@ -66,21 +66,21 @@ natural language specs:
   `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`
 • The result is canonical: `U8x32_as_Nat result.bytes < L`
 -/
-@[progress]
+@[step]
 theorem mul_spec (self _rhs : scalar.Scalar) :
     mul self _rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul
   unfold scalar.Scalar.unpack
-  progress as ⟨s, hs_nat, hs_bounds⟩
-  progress as ⟨s1, hs1_nat, hs1_bounds⟩
+  step as ⟨s, hs_nat, hs_bounds⟩
+  step as ⟨s1, hs1_nat, hs1_bounds⟩
   have hs_62  : ∀ i < 5, s[i]!.val  < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
   have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  progress as ⟨s2, hs2_cong, hs2_lt⟩
-  progress as ⟨hpack, hpack_cong, hpack_lt⟩
+  step as ⟨s2, hs2_cong, hs2_lt⟩
+  step as ⟨hpack, hpack_cong, hpack_lt⟩
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
              U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
     rw [hs_nat, hs1_nat]
@@ -111,16 +111,16 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul`**:
-• Same spec as the core `mul`; proof delegates via `progress*`
+• Same spec as the core `mul`; proof delegates via `step*`
 -/
-@[progress]
+@[step]
 theorem mul_spec (self rhs : scalar.Scalar) :
     mul self rhs ⦃ result =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar
 
@@ -147,16 +147,16 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul`**:
-• Same spec as the core `mul`; proof delegates via `progress*`
+• Same spec as the core `mul`; proof delegates via `step*`
 -/
-@[progress]
+@[step]
 theorem mul_spec (self rhs : scalar.Scalar) :
     mul self rhs ⦃ result =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar
 
@@ -183,15 +183,15 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul`**:
-• Same spec as the core `mul`; proof delegates via `progress*`
+• Same spec as the core `mul`; proof delegates via `step*`
 -/
-@[progress]
+@[step]
 theorem mul_spec (self rhs : scalar.Scalar) :
     mul self rhs ⦃ result =>
       U8x32_as_Nat result.bytes ≡
         U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar

@@ -72,7 +72,7 @@ theorem neg_spec (self : ProjectiveNielsPoint) (self_bound : ∀ i < 5, self.T2d
       result.Z = self.Z ∧
       (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by
   unfold neg
-  progress*
+  step*
   simp_all [Nat.ModEq]
 
 end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint

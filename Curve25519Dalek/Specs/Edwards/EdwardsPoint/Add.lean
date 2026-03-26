@@ -44,7 +44,7 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
-@[progress]
+@[step]
 theorem add_spec
     (self other : edwards.EdwardsPoint)
     (h_self_valid : self.IsValid)
@@ -53,7 +53,7 @@ theorem add_spec
       result.IsValid ∧
       result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
-  progress*
+  step*
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint
 
@@ -80,12 +80,12 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
-@[progress]
+@[step]
 theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     add self other ⦃ result =>
     result.IsValid ∧
     result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
-  progress*
+  step*
 
 end curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint

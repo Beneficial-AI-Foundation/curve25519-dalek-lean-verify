@@ -37,7 +37,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.MINUS_ONE`**:
 - The constant, when converted to a natural number, equals 2^255 - 20 (i.e., p - 1)
 -/
-@[progress]
+@[step]
 theorem MINUS_ONE_spec : MINUS_ONE ⦃ result => Field51_as_Nat result = p - 1 ⦄ := by
     unfold MINUS_ONE from_limbs
     simp only [spec_ok];

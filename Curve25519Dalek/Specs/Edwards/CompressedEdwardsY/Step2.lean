@@ -62,7 +62,7 @@ Natural language specs (ported from Verus):
   - T.toField = X'.toField * Y.toField
   - T limbs < 2^52
 -/
-@[progress]
+@[step]
 theorem step_2_spec
     (repr : edwards.CompressedEdwardsY)
     (X : backend.serial.u64.field.FieldElement51)

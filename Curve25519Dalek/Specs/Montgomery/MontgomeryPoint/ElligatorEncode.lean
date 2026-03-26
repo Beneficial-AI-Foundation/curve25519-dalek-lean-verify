@@ -524,7 +524,7 @@ private lemma elligator_nqr_twist
     via conditional-select and conditional-assign operations
 -/
 
-@[progress]
+@[step]
 theorem elligator_encode_spec
     (r_0 : backend.serial.u64.field.FieldElement51)
     (h_bounds : ∀ i, i < 5 → (r_0[i]!).val ≤ 2 ^ 52 - 1) :
@@ -552,22 +552,22 @@ theorem elligator_encode_spec
       let u : ZMod p := (U8x32_as_Nat point : ZMod p)
       IsSquare (-(u * (u ^ 2 + Curve25519.A * u + 1)))) ⦄ := by
     unfold elligator_encode
-    progress as ⟨ one, one_eq, one_bound⟩
-    progress as ⟨fe, hfe_eq, hfe_b ⟩
-    progress as ⟨ d_1, hd_1, hd_1_b⟩
-    progress as ⟨ A_neg, h_a_neg, a_neg_bound⟩
-    progress as ⟨ fe1, hfe1_non, hfe1_0, hfe1_b⟩
-    progress as ⟨ d, hd, hd_b⟩
-    progress as ⟨ d_sq, hd_sq, hd_sq_b⟩
-    progress as ⟨ A1, hA, A_bound⟩
-    progress as ⟨ au, hau, hau_b⟩
-    progress as ⟨ fe2, hfe2, hfe2_b⟩
-    progress as ⟨ inner, hinner, hinner_b⟩
-    progress as⟨ eps, heps, heps_b⟩
-    progress as ⟨ pp, hp_b, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5⟩
-    progress as ⟨ zero, zero_eq, zero_bound⟩
-    progress as ⟨ Atemp, hAtemp⟩
-    progress as ⟨ u, hu, hu_b⟩
+    step as ⟨ one, one_eq, one_bound⟩
+    step as ⟨fe, hfe_eq, hfe_b ⟩
+    step as ⟨ d_1, hd_1, hd_1_b⟩
+    step as ⟨ A_neg, h_a_neg, a_neg_bound⟩
+    step as ⟨ fe1, hfe1_non, hfe1_0, hfe1_b⟩
+    step as ⟨ d, hd, hd_b⟩
+    step as ⟨ d_sq, hd_sq, hd_sq_b⟩
+    step as ⟨ A1, hA, A_bound⟩
+    step as ⟨ au, hau, hau_b⟩
+    step as ⟨ fe2, hfe2, hfe2_b⟩
+    step as ⟨ inner, hinner, hinner_b⟩
+    step as⟨ eps, heps, heps_b⟩
+    step as ⟨ pp, hp_b, hp_case_1, hp_case_2, hp_case_3, hp_case_4, hp_case_5⟩
+    step as ⟨ zero, zero_eq, zero_bound⟩
+    step as ⟨ Atemp, hAtemp⟩
+    step as ⟨ u, hu, hu_b⟩
     · intro i hi
       have := hAtemp i hi
       rw[this]
@@ -576,10 +576,10 @@ theorem elligator_encode_spec
         grind
       · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
         grind
-    progress as ⟨ u_neg, hu_neg, hu_neg_b⟩
-    progress as ⟨ p1, hp1⟩
-    progress as ⟨u1, hu1⟩
-    progress as ⟨a, ha, ha_lt⟩
+    step as ⟨ u_neg, hu_neg, hu_neg_b⟩
+    step as ⟨ p1, hp1⟩
+    step as ⟨u1, hu1⟩
+    step as ⟨a, ha, ha_lt⟩
     set r0 := ((Field51_as_Nat r_0):CurveField) with hr0
     set d0:= -Curve25519.A * (1 + 2 * r0 ^ 2)⁻¹ with hd0
     -- Structural Field51_as_Nat decomposition lemmas (using pointwise_add_Field51_as_Nat)

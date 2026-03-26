@@ -82,7 +82,7 @@ Natural language specs (ported from Verus):
   - If valid: (X.toField, Y.toField) satisfies the curve equation -x² + y² = 1 + dx²y²
   - X has even parity and limbs ≤ 2^53 - 1
 -/
-@[progress]
+@[step]
 theorem step_1_spec (cey : edwards.CompressedEdwardsY)
     (bytes : Aeneas.Std.Array U8 32#usize)
     (h_byter : cey.as_bytes = ok bytes) :

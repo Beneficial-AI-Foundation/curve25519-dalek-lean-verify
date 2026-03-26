@@ -40,7 +40,7 @@ natural language specs:
 - The value of constants.MONTGOMERY_A_NEG when converted to a natural number equals
   p - 486662 = 57896044618658097711785492504343953926634992332820282019728792003956564333287
 -/
-@[progress]
+@[step]
 theorem MONTGOMERY_A_NEG_spec :
     MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ∧
     (∀ i< 5, (result[i]!).val < 2^ 51) ⦄ := by

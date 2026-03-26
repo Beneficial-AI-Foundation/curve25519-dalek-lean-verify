@@ -46,14 +46,14 @@ natural language specs:
 - The result w satisfies the Montgomery multiplication property:
   (m * m') ≡ w * R (mod L), where R = 2^260 is the Montgomery constant
 -/
-@[progress]
+@[step]
 theorem montgomery_mul_spec (m m' : Scalar52)
     (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
     montgomery_mul m m' ⦃ w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
     (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_mul
-  progress*
+  step*
   constructor
   · simpa [a1_post1, eq_comm] using w_post1
   · intro i hi
