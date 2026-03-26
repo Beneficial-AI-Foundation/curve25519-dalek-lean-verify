@@ -2628,7 +2628,7 @@
    "spec_statement":
    "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧\n      4 • result.toPoint ≠ 0 ∧\n      result.Z.toField ^ 2 - result.Y.toField ^ 2 =\n        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ∧\n      result.toPoint = _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `backend.serial.u64.constants.ED25519_BASEPOINT_POINT`**:\n    • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)\n    • ED25519_BASEPOINT_POINT is of prime order L\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
