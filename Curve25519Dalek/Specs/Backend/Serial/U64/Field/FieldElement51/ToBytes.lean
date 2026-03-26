@@ -241,7 +241,6 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
   have := @Nat.and_le_right x.toNat (2^51 - 1)
   norm_num at *; omega
 
-set_option maxHeartbeats 800000 in -- heavy step and simps.
 /-- Canonical reduction: the q-computation + conditional subtraction + carry chain
     produces a value that is congruent mod p and canonical (< p).
 
@@ -249,18 +248,18 @@ set_option maxHeartbeats 800000 in -- heavy step and simps.
     and carry-propagates with masking to 51 bits. The result satisfies:
     - Field51_as_Nat(output) ≡ Field51_as_Nat(input) [MOD p]
     - Field51_as_Nat(output) < p
+    - output limbs = carry-propagate(input + 19*q) masked to 51 bits
+
+    Often when this lemma is applied f0,...,f4 are bounded by 2 ^ 52, but it's not needed for the
+    proof. The hypothesis hF stems from the fact that the lemma will be applied to the output of
+    reduce_spec
 
     Ported from Verus `lemma_to_bytes_reduction` in dalek-lite. -/
 private lemma canonical_reduction_mod_p
     (f0 f1 f2 f3 f4 : ℕ)
-    (hf0 : f0 < 2 ^ 52) (hf1 : f1 < 2 ^ 52) (hf2 : f2 < 2 ^ 52)
-    (hf3 : f3 < 2 ^ 52) (hf4 : f4 < 2 ^ 52)
-    -- The combined value must be < 2p (from reduce_spec)
     (hF : f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4 < 2 * (2 ^ 255 - 19))
-    -- q = quotient bit from carry chain on (F + 19)
     (q : ℕ)
     (hq : q = (((((f0 + 19) / 2 ^ 51 + f1) / 2 ^ 51 + f2) / 2 ^ 51 + f3) / 2 ^ 51 + f4) / 2 ^ 51)
-    -- output limbs = carry-propagate(input + 19*q) masked to 51 bits
     (l0 l1 l2 l3 l4 : ℕ)
     (hl0 : l0 = (f0 + 19 * q) % 2 ^ 51)
     (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
@@ -304,7 +303,38 @@ private lemma canonical_reduction_mod_p
   set c2 := (f2 + c1) / 2 ^ 51
   set c3 := (f3 + c2) / 2 ^ 51
   set c4 := (f4 + c3) / 2 ^ 51
-  sorry
+  -- Main chain telescoping: li + ci * 2^51 = si  (from Nat.mod_add_div)
+  have ht0 : l0 + c0 * 2 ^ 51 = f0 + 19 * q := by
+    rw [hl0, Nat.mul_comm c0]; exact Nat.mod_add_div _ _
+  have ht1 : l1 + c1 * 2 ^ 51 = f1 + c0 := by
+    rw [hl1, Nat.mul_comm c1]; exact Nat.mod_add_div _ _
+  have ht2 : l2 + c2 * 2 ^ 51 = f2 + c1 := by
+    rw [hl2, Nat.mul_comm c2]; exact Nat.mod_add_div _ _
+  have ht3 : l3 + c3 * 2 ^ 51 = f3 + c2 := by
+    rw [hl3, Nat.mul_comm c3]; exact Nat.mod_add_div _ _
+  have ht4 : l4 + c4 * 2 ^ 51 = f4 + c3 := by
+    rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
+  -- Main telescoping: L + c4 * 2^255 = F + 19*q
+  have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
+      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+  -- L < 2^255 (each limb < 2^51 from masking)
+  have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
+  have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
+  have hl2b : l2 < 2 ^ 51 := by rw [hl2]; exact Nat.mod_lt _ (by norm_num)
+  have hl3b : l3 < 2 ^ 51 := by rw [hl3]; exact Nat.mod_lt _ (by norm_num)
+  have hl4b : l4 < 2 ^ 51 := by rw [hl4]; exact Nat.mod_lt _ (by norm_num)
+  have hLb : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 := by
+    omega
+  -- Case split on q
+  interval_cases q
+  · -- q = 0: q-chain gives F+19 = Lq < 2^255, so F < p. Main chain: c4=0, L=F.
+    have hFp : F < 2 ^ 255 - 19 := by agrind
+    have hc4 : c4 = 0 := by agrind
+    constructor <;> agrind
+  · -- q = 1: q-chain gives F+19 ≥ 2^255. Main chain: c4=1, L = F-p.
+    have hFge : F + 19 ≥ 2 ^ 255 := by omega
+    have hc4 : c4 = 1 := by omega
+    constructor <;> omega
 
 /-! ## Spec for `to_bytes` -/
 
@@ -325,16 +355,14 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[externally_verified, step] -- proven in Verus
+@[step] -- proven in Verus
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
     U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
   simp only [step_simps]
-  have ⟨fe, hfe_ok, fe_post1, fe_post2, hFlt2p⟩ := spec_imp_exists (reduce_spec self)
-  rw [hfe_ok]
-  simp only [step_simps]
+  let* ⟨ fe, fe_post1, fe_post2, fe_post3 ⟩ ← reduce_spec
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ i1, i1_post ⟩ ← U64.add_spec
   let* ⟨ q, q_post1, q_post2 ⟩ ← U64.ShiftRight_IScalar_spec
@@ -620,7 +648,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   rw [hpack]
   -- (B) Canonical reduction in clean context
   clear *-
-    fe_post1 fe_post2 hFlt2p
+    fe_post1 fe_post2 fe_post3
     i_post i1_post q_post1 i2_post i3_post q1_post1
     i4_post i5_post q2_post1 i6_post i7_post q3_post1
     i8_post i9_post q4_post1
@@ -645,10 +673,8 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   -- Apply the standalone canonical reduction lemma.
   have hcanon := canonical_reduction_mod_p
     fe[0]!.val fe[1]!.val fe[2]!.val fe[3]!.val fe[4]!.val
-    (fe_post1 0 (by omega)) (fe_post1 1 (by omega)) (fe_post1 2 (by omega))
-    (fe_post1 3 (by omega)) (fe_post1 4 (by omega))
     (by simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
-      Finset.sum_empty, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq, p] at hFlt2p ⊢; omega)
+      Finset.sum_empty, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq, p] at fe_post3 ⊢; omega)
     q4.val
     (by -- hq: q4.val = q-chain formula
       simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,
