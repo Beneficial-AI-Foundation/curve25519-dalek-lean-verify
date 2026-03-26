@@ -389,8 +389,8 @@ theorem add_spec_bounds
     (∀ i < 5, c.X[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 54) := by
-  exact spec_imp_exists (CompletedPoint.add_spec_aux_54_52_53_52 self other
+    (∀ i < 5, c.T[i]!.val < 2 ^ 54) :=
+  spec_imp_exists (CompletedPoint.add_spec_aux_54_52_53_52 self other
     hself.X_bounds hself.Y_bounds hself.Z_bounds hself.T_bounds
     hother.Y_plus_X_bounds hother.Y_minus_X_bounds hother.Z_bounds hother.T2d_bounds)
 

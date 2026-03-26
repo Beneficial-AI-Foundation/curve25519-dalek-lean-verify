@@ -206,8 +206,8 @@ theorem load8_at_bitList_step_spec (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ result =>
       ofU64 result ≈ₗ
-        (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
-  exact spec_mono (load8_at_bitList_spec input i h) fun result heq => heq ▸ BitList.Equiv.refl _
+        (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ :=
+  spec_mono (load8_at_bitList_spec input i h) fun _ heq => heq ▸ BitList.Equiv.refl _
 
 /-! ## Bridge: List Bool spec implies Nat spec -/
 
