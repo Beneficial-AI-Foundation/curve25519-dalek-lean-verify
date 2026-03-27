@@ -229,6 +229,26 @@ private theorem part2_spec (sum : U128) :
          _ = 2^76 * 2^52 := by norm_num
   exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 
+/-- REDC bound: from the main equation `T + N*L = inter*R` and canonical bound `T < R*L`,
+    with `0 ≤ N < R`, the intermediate satisfies `inter < 2*L`.
+    Mirrors Verus `lemma_r4_bound_from_canonical`. -/
+private lemma redc_bound {inter T : Nat} {C : Int}
+    (h_eq : (T : Int) + C * ↑L = ↑inter * ↑R)
+    (h_T : T < R * L) (h_C_nn : 0 ≤ C) (h_C_lt : C < ↑R) :
+    inter < 2 * L := by
+  have hR_pos : 0 < R := by decide
+  have hL_pos : 0 < L := by decide
+  have h_cn := Int.toNat_of_nonneg h_C_nn
+  have h_c_lt : C.toNat < R := by
+    have := h_C_lt; rw [← h_cn] at this; exact_mod_cast this
+  have h_eq_nat : inter * R = T + C.toNat * L := by
+    have : (↑(inter * R) : Int) = ↑(T + C.toNat * L) := by
+      push_cast; rw [h_cn]; linarith [h_eq]
+    exact_mod_cast this
+  have h_bound : inter * R < 2 * L * R := by
+    rw [h_eq_nat]; have := (Nat.mul_lt_mul_right hL_pos).mpr h_c_lt; grind => lia
+  exact (Nat.mul_lt_mul_right hR_pos).mp h_bound
+
 set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
