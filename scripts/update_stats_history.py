@@ -98,13 +98,20 @@ def fetch_remote_history(url: str) -> list[dict]:
         return []
 
 
+def _has_verification_data(entry: dict) -> bool:
+    """Return True if the entry has any non-zero verification metrics."""
+    return (entry.get("verified", 0) > 0
+            or entry.get("specified", 0) > 0
+            or entry.get("externally_verified", 0) > 0)
+
+
 def merge_histories(local: list[dict], remote: list[dict]) -> list[dict]:
     seen: dict[str, dict] = {}
     for entry in local + remote:
         commit = entry.get("commit", "")
         if commit and commit not in seen:
             seen[commit] = entry
-    merged = list(seen.values())
+    merged = [e for e in seen.values() if _has_verification_data(e)]
     merged.sort(key=lambda x: x.get("date", ""))
     return merged
 

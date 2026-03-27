@@ -120,7 +120,7 @@ jobs:
             --functions-json functions.json \
             --fetch-url https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/stats_history.jsonl \
             --fill-missing \
-            --since 2025-01-01 \
+            --since 2026-01-12 \
             --max-commits 5000
 
       - name: Build Rust docs
