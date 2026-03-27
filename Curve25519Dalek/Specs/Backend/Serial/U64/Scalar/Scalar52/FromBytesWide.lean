@@ -33,7 +33,7 @@ natural language specs:
 
 /-- **Spec theorem for `scalar.Scalar52.from_bytes_wide`**:
 - The result represents the input byte array reduced modulo L (canonical form) -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem from_bytes_wide_spec (b : Array U8 64#usize) :
     from_bytes_wide b ⦃ (u : Scalar52) =>
         Scalar52_as_Nat u = U8x64_as_Nat b % L ∧

@@ -41,16 +41,16 @@ Natural language specs:
 - No panic for field element inputs r (always returns r' successfully)
 - Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)
 -/
-@[progress]
+@[step]
 theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)
     (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :
     pow_p58 r ⦃ r' =>
       Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧
       (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow_p58
-  progress with pow22501_spec as ⟨ t19, ht19_mod, _, ht19b, _ ⟩
-  progress with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
-  progress with mul_spec as ⟨ res, hres, hresb ⟩
+  step with pow22501_spec as ⟨ t19, ht19_mod, _, ht19b, _ ⟩
+  step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
+  step with mul_spec as ⟨ res, hres, hresb ⟩
   have exp_r : Field51_as_Nat r ≡ (Field51_as_Nat r) ^ 1 [MOD p] := by rw [pow_one]
   have exp_t20 := chain_pow2k ht19_mod ht20
   exact ⟨chain_mul exp_r exp_t20 hres, hresb⟩

@@ -38,14 +38,14 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting EdwardsPoint is the identity element with coordinates (X=0, Y=1, Z=1, T=0)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (q : EdwardsPoint) =>
       Field51_as_Nat q.X = 0 ∧ Field51_as_Nat q.Y = 1 ∧
       Field51_as_Nat q.Z = 1 ∧ Field51_as_Nat q.T = 0 ∧
       q.IsValid ⦄ := by
   unfold identity ZERO ONE
-  progress*
+  step*
   simp only [*]
   decide
 

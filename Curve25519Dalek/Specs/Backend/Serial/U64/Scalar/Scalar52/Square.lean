@@ -66,20 +66,20 @@ private theorem cancelR {a b : ℕ} (h : a * R ≡ b * R [MOD L]) : a ≡ b [MOD
 - Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)
 - Output limbs are bounded by 2^52
 -/
-@[progress]
+@[step]
 theorem square_spec (self : Scalar52)
     (hself : ∀ i < 5, self[i]!.val < 2 ^ 62) :
     square self ⦃ ( result : Scalar52 ) =>
       Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧
       ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold square
-  progress as ⟨a, a_post1, a_post2⟩
-  progress as ⟨aa, aa_post1, aa_post2, aa_post3⟩
+  step as ⟨a, a_post1, a_post2⟩
+  step as ⟨aa, aa_post1, aa_post2, aa_post3⟩
   have haa : ∀ i < 5, aa[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (aa_post2 i hi) (by norm_num)
-  progress as ⟨a1, a1_post1, a1_post2⟩
+  step as ⟨a1, a1_post1, a1_post2⟩
   · unfold constants.RR; decide
-  progress as ⟨result, result_post1, result_post2, result_post3⟩
+  step as ⟨result, result_post1, result_post2, result_post3⟩
   refine ⟨?_, result_post2⟩
   have h_result_R_aa_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat aa * Scalar52_as_Nat constants.RR [MOD L] := by
     rw [a1_post1] at result_post1

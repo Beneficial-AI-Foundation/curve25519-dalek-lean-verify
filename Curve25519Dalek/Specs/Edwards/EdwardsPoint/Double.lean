@@ -41,7 +41,7 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint
 -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
     double e ⦃ result =>
     result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by

@@ -46,13 +46,13 @@ natural language specs:
 - The result scalar s' is congruent to the input scalar s modulo L (the group order)
 - The result scalar s' is in canonical form (less than L)
 -/
-@[progress]
+@[step]
 theorem reduce_spec (s : Scalar) :
     reduce s ⦃ (s' : Scalar) =>
       U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧
       U8x32_as_Nat s'.bytes < L ⦄ := by
   unfold reduce
-  progress*
+  step*
   · unfold constants.R; decide
   simp only [and_true, *]
   rw [← x_post1]

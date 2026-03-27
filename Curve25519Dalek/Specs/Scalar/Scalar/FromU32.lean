@@ -95,7 +95,7 @@ theorem from_spec (x : Std.U32) :
     «from» x ⦃ result =>
     U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ x_bytes, x_bytes_post ⟩ ← core.num.U32.to_le_bytes.step_spec
   let* ⟨ s, s_post ⟩ ← Array.to_slice.step_spec
   let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.step_spec

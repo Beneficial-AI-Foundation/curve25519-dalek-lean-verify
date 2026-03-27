@@ -47,7 +47,7 @@ natural language specs:
 - Delegates to scalar multiplication with the Edwards basepoint constant
 - The returned EdwardsPoint equals the output of that scalar multiplication
 -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem mul_base_spec (scalar : scalar.Scalar) :
     mul_base scalar ⦃ res =>
     EdwardsPoint.IsValid res ∧

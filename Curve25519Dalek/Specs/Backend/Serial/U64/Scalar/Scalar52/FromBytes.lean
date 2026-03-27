@@ -37,7 +37,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The result represents the same number as the input byte array
 -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem from_bytes_spec (b : Array U8 32#usize) :
     from_bytes b ⦃ u =>
     Scalar52_as_Nat u = U8x32_as_Nat b ∧

@@ -63,7 +63,7 @@ natural language specs:
 - The result is Choice.one iff the two points satisfy the multiplicative Ristretto equivalence condition:
   X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec
     (self other : RistrettoPoint)
     (h_self_valid : self.IsValid)
@@ -73,7 +73,7 @@ theorem ct_eq_spec
         (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
         (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p] ⦄ := by
   unfold ct_eq
-  progress*
+  step*
   all_goals (try (
     have lb {f : ℕ → ℕ} (h : ∀ i, i < 5 → f i < 2^53) : ∀ i, i < 5 → f i < 2^54 :=
       fun i hi => Nat.lt_trans (h i hi) (by norm_num)

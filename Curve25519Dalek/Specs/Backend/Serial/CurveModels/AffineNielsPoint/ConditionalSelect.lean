@@ -50,7 +50,7 @@ theorem conditional_select_spec
     (∀ i < 5, result.xy2d[i]!.val =
       if choice.val = 1#u8 then b.xy2d[i]!.val else a.xy2d[i]!.val) ⦄ := by
   unfold conditional_select
-  progress*
+  step*
   grind
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable

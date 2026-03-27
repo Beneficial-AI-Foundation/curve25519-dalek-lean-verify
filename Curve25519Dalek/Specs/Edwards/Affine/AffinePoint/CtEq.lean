@@ -54,7 +54,7 @@ Natural language specs:
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in coordinates
 - When both points are valid, this is equivalent to toPoint equality
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec (self other : AffinePoint) :
   ct_eq self other ⦃ c =>
   (c = Choice.one ↔
@@ -62,9 +62,9 @@ theorem ct_eq_spec (self other : AffinePoint) :
     (Field51_as_Nat self.y) ≡ (Field51_as_Nat other.y) [MOD p]) ∧
   (self.IsValid → other.IsValid → (c = Choice.one ↔ self.toPoint = other.toPoint)) ⦄ := by
   unfold ct_eq
-  progress as ⟨_, hcx⟩
-  progress as ⟨_, hcy⟩
-  progress as ⟨_, hc⟩
+  step as ⟨_, hcx⟩
+  step as ⟨_, hcy⟩
+  step as ⟨_, hc⟩
   -- hcx : cx = Choice.one ↔ self.x.to_bytes = other.x.to_bytes
   -- hcy : cy = Choice.one ↔ self.y.to_bytes = other.y.to_bytes
   -- hc  : c = Choice.one ↔ cx = Choice.one ∧ cy = Choice.one

@@ -47,7 +47,7 @@ natural language specs:
 - The resulting ProjectiveNielsPoint is the identity element with coordinates
   (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     spec identity (fun (q : ProjectiveNielsPoint) =>
       Field51_as_Nat q.Y_plus_X = 1 ∧
@@ -55,6 +55,6 @@ theorem identity_spec :
       Field51_as_Nat q.Z = 1 ∧
       Field51_as_Nat q.T2d = 0) := by
   unfold identity
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity

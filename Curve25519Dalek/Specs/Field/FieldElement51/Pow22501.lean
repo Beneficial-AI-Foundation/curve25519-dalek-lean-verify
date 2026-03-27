@@ -50,7 +50,7 @@ lemma chain_pow2k {r a b e k m : ℕ}
 - Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)
   Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)
 -/
-@[progress]
+@[step]
 theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)
     (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     pow22501 r ⦃ result =>
@@ -62,28 +62,28 @@ theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)
     (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by
   unfold pow22501
   -- Step through the 21 field operations with explicit spec theorems.
-  -- Bounds preconditions are auto-solved by progress.
-  progress with square_spec as ⟨ t0, ht0, ht0b ⟩
-  progress with square_spec as ⟨ fe, hfe, hfeb ⟩
-  progress with square_spec as ⟨ t1, ht1, ht1b ⟩
-  progress with mul_spec as ⟨ t2, ht2, ht2b ⟩
-  progress with mul_spec as ⟨ t3, ht3, ht3b ⟩
-  progress with square_spec as ⟨ t4, ht4, ht4b ⟩
-  progress with mul_spec as ⟨ t5, ht5, ht5b ⟩
-  progress with pow2k_spec as ⟨ t6, ht6, ht6b ⟩
-  progress with mul_spec as ⟨ t7, ht7, ht7b ⟩
-  progress with pow2k_spec as ⟨ t8, ht8, ht8b ⟩
-  progress with mul_spec as ⟨ t9, ht9, ht9b ⟩
-  progress with pow2k_spec as ⟨ t10, ht10, ht10b ⟩
-  progress with mul_spec as ⟨ t11, ht11, ht11b ⟩
-  progress with pow2k_spec as ⟨ t12, ht12, ht12b ⟩
-  progress with mul_spec as ⟨ t13, ht13, ht13b ⟩
-  progress with pow2k_spec as ⟨ t14, ht14, ht14b ⟩
-  progress with mul_spec as ⟨ t15, ht15, ht15b ⟩
-  progress with pow2k_spec as ⟨ t16, ht16, ht16b ⟩
-  progress with mul_spec as ⟨ t17, ht17, ht17b ⟩
-  progress with pow2k_spec as ⟨ t18, ht18, ht18b ⟩
-  progress with mul_spec as ⟨ t19, ht19, ht19b ⟩
+  -- Bounds preconditions are auto-solved by step.
+  step with square_spec as ⟨ t0, ht0, ht0b ⟩
+  step with square_spec as ⟨ fe, hfe, hfeb ⟩
+  step with square_spec as ⟨ t1, ht1, ht1b ⟩
+  step with mul_spec as ⟨ t2, ht2, ht2b ⟩
+  step with mul_spec as ⟨ t3, ht3, ht3b ⟩
+  step with square_spec as ⟨ t4, ht4, ht4b ⟩
+  step with mul_spec as ⟨ t5, ht5, ht5b ⟩
+  step with pow2k_spec as ⟨ t6, ht6, ht6b ⟩
+  step with mul_spec as ⟨ t7, ht7, ht7b ⟩
+  step with pow2k_spec as ⟨ t8, ht8, ht8b ⟩
+  step with mul_spec as ⟨ t9, ht9, ht9b ⟩
+  step with pow2k_spec as ⟨ t10, ht10, ht10b ⟩
+  step with mul_spec as ⟨ t11, ht11, ht11b ⟩
+  step with pow2k_spec as ⟨ t12, ht12, ht12b ⟩
+  step with mul_spec as ⟨ t13, ht13, ht13b ⟩
+  step with pow2k_spec as ⟨ t14, ht14, ht14b ⟩
+  step with mul_spec as ⟨ t15, ht15, ht15b ⟩
+  step with pow2k_spec as ⟨ t16, ht16, ht16b ⟩
+  step with mul_spec as ⟨ t17, ht17, ht17b ⟩
+  step with pow2k_spec as ⟨ t18, ht18, ht18b ⟩
+  step with mul_spec as ⟨ t19, ht19, ht19b ⟩
   -- Chain modular congruences: each step computes the exponent of r.
   -- Exponents: t0→2, fe→4, t1→8, t2→9, t3→11, t4→22, t5→31,
   --   t6→992, t7→1023, ..., t19→(2^250-1)

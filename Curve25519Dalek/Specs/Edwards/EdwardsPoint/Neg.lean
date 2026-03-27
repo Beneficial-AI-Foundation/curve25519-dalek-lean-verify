@@ -42,7 +42,7 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the negation of the input (in the context of elliptic curve negation)
 -/
-@[progress]
+@[step]
 theorem neg_spec
     (self : edwards.EdwardsPoint)
     (h_self_valid : self.IsValid) :
@@ -54,7 +54,7 @@ theorem neg_spec
   have := h_self_valid.Y_bounds
   have := h_self_valid.Z_bounds
   have := h_self_valid.T_bounds
-  progress*
+  step*
   simp only [Montgomery.lift_mod_eq_iff, Nat.cast_add, Nat.cast_zero] at fe_post1
   rw[← FieldElement51.toField, ← FieldElement51.toField ] at fe_post1
   simp only [Montgomery.lift_mod_eq_iff, Nat.cast_add, Nat.cast_zero] at fe1_post1

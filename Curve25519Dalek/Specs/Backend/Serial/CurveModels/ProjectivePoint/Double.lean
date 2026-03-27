@@ -71,7 +71,7 @@ Output bounds: X', Z', T' limbs < 2^52, Y' limbs < 2^53.
 TODO: Investigate if c.Y can achieve the tighter < 2^52 bound. Currently c.Y = YY + XX
 where YY, XX < 2^52, giving Y < 2^53.
 -/
-@[progress]
+@[step]
 theorem double_spec_aux (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
@@ -93,7 +93,7 @@ theorem double_spec_aux (q : ProjectivePoint)
     (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ XX, XX_post1, XX_post2 ⟩ ← square_spec
   let* ⟨ YY, YY_post1, YY_post2 ⟩ ← square_spec
   let* ⟨ ZZ2, ZZ2_post1, ZZ2_post2 ⟩ ← square2_spec

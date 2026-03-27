@@ -40,7 +40,7 @@ natural language specs:
 
 /-- Spec for `core.array.TryFromArrayCopySlice.try_from`.
     If slice length matches N, returns `Ok` with the same values; otherwise `Err`. -/
-@[progress]
+@[step]
 theorem core.array.TryFromArrayCopySlice.try_from_spec
     {T : Type} (N : Usize) (copyInst : core.marker.Copy T) (s : Slice T)
     (hClone : List.mapM copyInst.cloneInst.clone s.val = ok s.val) :
@@ -61,14 +61,14 @@ theorem core.array.TryFromArrayCopySlice.try_from_spec
     • If bytes.length = 32: the result is Ok(cr) where cr.val = bytes.val
     • If bytes.length ≠ 32: the result is Err(())
 -/
-@[progress]
+@[step]
 theorem from_slice_spec
     (bytes : Slice U8) :
     from_slice bytes ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>
       (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧
       (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
   unfold from_slice
-  progress
+  step
   · exact List.mapM_clone_eq (fun _ _ => by rfl)
   · cases r
     · simp only [core.result.Result.map]

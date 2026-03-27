@@ -34,7 +34,7 @@ natural language specs:
 - The value of constants.EDWARDS_D_MINUS_ONE_SQUARED when converted to a natural number equals
   the canonical (reduced) representation of (d - 1)² (mod p) in [0, p-1].
 -/
-@[progress]
+@[step]
 theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :
     EDWARDS_D_MINUS_ONE_SQUARED ⦃ result =>
     Field51_as_Nat result = (d - 1) ^ 2 % p ∧

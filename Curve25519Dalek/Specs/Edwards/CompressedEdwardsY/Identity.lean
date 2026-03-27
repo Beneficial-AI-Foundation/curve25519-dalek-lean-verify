@@ -43,7 +43,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting CompressedEdwardsY encodes the value 1 (the Y-coordinate of the identity point)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (q : edwards.CompressedEdwardsY) =>
       U8x32_as_Nat q = 1 ⦄ := by

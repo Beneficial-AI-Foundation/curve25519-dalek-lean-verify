@@ -65,7 +65,7 @@ natural language specs:
   `U8x32_as_Nat result.bytes + U8x32_as_Nat rhs.bytes ≡ U8x32_as_Nat self.bytes [MOD L]`
 • The result is canonical: `U8x32_as_Nat result.bytes < L`
 -/
-@[progress]
+@[step]
 theorem sub_spec (self rhs : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L)
     (h_rhs : U8x32_as_Nat rhs.bytes < L) :
@@ -75,13 +75,13 @@ theorem sub_spec (self rhs : scalar.Scalar)
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold sub
   unfold scalar.Scalar.unpack
-  progress as ⟨s, hs_nat, hs_bounds⟩
-  progress as ⟨s1, hs1_nat, hs1_bounds⟩
+  step as ⟨s, hs_nat, hs_bounds⟩
+  step as ⟨s1, hs1_nat, hs1_bounds⟩
   have hs_lt   : Scalar52_as_Nat s  < Scalar52_as_Nat s1 + L := by
     rw [hs_nat]; omega
   have hs1_le_L : Scalar52_as_Nat s1 ≤ L := by rw [hs1_nat]; exact Nat.le_of_lt h_rhs
-  progress as ⟨s2, hs2_cong, hs2_lt, _⟩
-  progress as ⟨hpack, hpack_cong, hpack_lt⟩
+  step as ⟨s2, hs2_cong, hs2_lt, _⟩
+  step as ⟨hpack, hpack_cong, hpack_lt⟩
   refine ⟨?_, hpack_lt⟩
   have hcong : U8x32_as_Nat hpack.bytes + U8x32_as_Nat rhs.bytes ≡
                Scalar52_as_Nat s2 + Scalar52_as_Nat s1 [MOD L] := by
@@ -114,9 +114,9 @@ natural language specs:
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub`**:
-• Same spec as the core `sub`; proof delegates via `progress*`
+• Same spec as the core `sub`; proof delegates via `step*`
 -/
-@[progress]
+@[step]
 theorem sub_spec (self rhs : scalar.Scalar)
     (h_self : U8x32_as_Nat self.bytes < L)
     (h_rhs : U8x32_as_Nat rhs.bytes < L) :
@@ -125,6 +125,6 @@ theorem sub_spec (self rhs : scalar.Scalar)
         U8x32_as_Nat self.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold sub
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar

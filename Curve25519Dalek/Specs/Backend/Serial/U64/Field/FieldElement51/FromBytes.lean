@@ -114,12 +114,12 @@ private lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat) (_ : b0 < 256) (_ 
     or_mul_pow_two_eq_add _ _ 56 (by grind)]
 
 /-- The Nat-level spec for load8_at: the result is the little-endian combination of 8 bytes. -/
-@[progress]
+@[step]
 theorem load8_at_val_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ (result : U64) =>
       result.val = ∑ j ∈ Finset.range 8, input[i.val + j]!.val * 2 ^ (8 * j) ⦄ := by
   unfold from_bytes.load8_at
-  progress*
+  step*
   simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq, u8_val_mod_u64_numBits,
     Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
   rw [or_bytes_eq_sum _ _ _ _ _ _ _ _ (input.val[i.val]!).hmax (input.val[i.val + 1]!).hmax
@@ -140,7 +140,7 @@ private lemma sum_extract_eq (l : List U8) (i : Nat) (hi : i + 8 ≤ l.length) :
   rw [extract_getElem! l i j hj, show (256 : Nat) = 2 ^ 8 from by norm_num, ← Nat.pow_mul]
 
 /-- The List Bool spec for load8_at: the result bits are the 64 bits starting at byte position i. -/
-@[progress]
+@[step]
 theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ (result : U64) =>
       ofU64 result = (ofByteList input.val).extract (8 * i.val) (8 * i.val + 64) ⦄ := by
@@ -165,15 +165,15 @@ theorem load8_at_bitList_spec (input : Slice U8) (i : Usize) (h : i.val + 8 ≤ 
 These replace the Nat-level Aeneas specs with List Bool equivalents,
 so the proof of `from_bytes_bitList_spec` stays entirely in List Bool land. -/
 
--- Remove @[progress] from the Nat-level specs so the BitList versions are preferred.
-attribute [-progress] load8_at_val_spec load8_at_bitList_spec
+-- Remove @[step] from the Nat-level specs so the BitList versions are preferred.
+attribute [-step] load8_at_val_spec load8_at_bitList_spec
 
 /-- Right-shifting a U64 by k drops k bits from its List Bool representation. -/
-@[progress]
+@[step]
 theorem u64_shr_bitList_spec (x : U64) (k : I32) (hk0 : 0 ≤ k.val) (hk : k.val < 64) :
     (x >>> k) ⦃ (z : UScalar UScalarTy.U64) => ofU64 z ≈ₗ (ofU64 x).drop k.toNat ⦄ := by
   have hknat : k.toNat < 64 := by scalar_tac
-  progress as ⟨z, hval, _⟩
+  step as ⟨z, hval, _⟩
   simp only [ofU64]
   rw [hval, Nat.shiftRight_eq_div_pow, ofNat_drop k.toNat 64 x.val (by omega)]
   exact ofNat_equiv_of_lt _ 64 _ (by omega) (by
@@ -193,15 +193,15 @@ theorem u64_and_mask_bitList_spec (x mask : U64) (n : Nat)
   exact ofNat_equiv_of_lt n 64 (x.val % 2 ^ n) (by omega)
     (Nat.mod_lt _ (by positivity))
 
-/-- Specialized mask spec for 51-bit mask with literal precondition for progress*. -/
-@[progress]
+/-- Specialized mask spec for 51-bit mask with literal precondition for step*. -/
+@[step]
 theorem u64_and_mask51_bitList_spec (x mask : U64)
     (hmask : mask.val = 2251799813685247) :
     lift (x &&& mask) ⦃ (z : U64) => ofU64 z ≈ₗ (ofU64 x).take 51 ⦄ :=
   u64_and_mask_bitList_spec x mask 51 (by omega) (by omega)
 
-/-- load8_at in List Bool terms, as a progress-compatible spec. -/
-@[progress]
+/-- load8_at in List Bool terms, as a step-compatible spec. -/
+@[step]
 theorem load8_at_bitList_step_spec (input : Slice U8) (i : Usize)
     (h : i.val + 8 ≤ input.val.length) :
     from_bytes.load8_at input i ⦃ result =>
@@ -238,7 +238,7 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
 /-! ## The pure List Bool specification for from_bytes -/
 
 /-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
-@[progress]
+@[step]
 theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       ∀ i : Fin 5,
@@ -277,7 +277,7 @@ theorem from_bytes_bitList_spec (bytes : Array U8 32#usize) :
 
 /-! ## Final spec -/
 
-@[progress]
+@[step]
 theorem from_bytes_spec (bytes : Array U8 32#usize) :
     from_bytes bytes ⦃ (result : FieldElement51) =>
       Field51_as_Nat result ≡ (U8x32_as_Nat bytes % 2^255) [MOD p] ∧
@@ -289,6 +289,6 @@ theorem from_bytes_spec (bytes : Array U8 32#usize) :
   · intro i hi
     exact limb_bound_of_equiv result bytes ‹_› ⟨i, hi⟩
 
-attribute [-progress] from_bytes_bitList_spec
+attribute [-step] from_bytes_bitList_spec
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

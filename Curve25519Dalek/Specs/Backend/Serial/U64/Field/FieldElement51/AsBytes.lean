@@ -31,12 +31,12 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 /-- **Spec for `backend.serial.u64.field.FieldElement51.as_bytes`**:
 
 Function was deprecated since 4.1.4 and renamed to `to_bytes`. Simply calls the other function. -/
-@[progress]
+@[step]
 theorem as_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     as_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
     U8x32_as_Nat result < p ⦄ := by
   unfold as_bytes
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

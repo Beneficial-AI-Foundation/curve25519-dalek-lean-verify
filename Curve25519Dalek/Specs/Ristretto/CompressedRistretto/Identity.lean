@@ -33,7 +33,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting CompressedRistretto is 32 zero bytes
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (result : CompressedRistretto) =>
       ∀ i : Fin 32, result[i]! = 0#u8 ⦄ := by
