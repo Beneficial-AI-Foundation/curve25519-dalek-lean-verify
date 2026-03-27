@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -19,7 +19,7 @@ of `to_bytes(self)` as a `subtle.Choice`.
 Mathematically, this corresponds to the parity of the canonical representative
 of the residue modulo `p = 2^255 - 19`.
 
-**Source**: curve25519-dalek/src/field.rs
+Source: "curve25519-dalek/src/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -57,7 +57,7 @@ theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
 @[progress]
 theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     is_negative r ⦃ c =>
-    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by
+      (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by
   unfold is_negative
   progress as ⟨bytes, h_mod, h_lt⟩
   progress as ⟨b0⟩

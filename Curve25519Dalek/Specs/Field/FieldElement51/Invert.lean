@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -7,17 +7,18 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Math.Edwards.Curve
-/-! # Spec Theorem for `FieldElement51::invert`
+/-!
+# Spec Theorem for `FieldElement51::invert`
 
 Specification and proof for `FieldElement51::invert`.
 
 This function computes the multiplicative inverse of a field element r in 𝔽_p where p = 2^255 - 19.
-The inverse is computed as r^(p-2), since r^(p-2) * r = r^(p-1) = 1 (mod p) by Fermat's Little Theorem.
+The inverse is computed as r^(p-2), since r^(p-2) * r = r^(p-1) = 1 (mod p)
+by Fermat's Little Theorem.
 
 This function returns zero on input zero.
 
-**Source**: curve25519-dalek/src/field.rs
-
+Source: "curve25519-dalek/src/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -30,7 +31,8 @@ namespace curve25519_dalek.field.FieldElement51
 Natural language description:
 
     • Computes the multiplicative inverse r^(-1) of a field element r in 𝔽_p where p = 2^255 - 19
-    • The inverse is computed as r^(p-2) = r^(2^255-21) using the identity r^(p-2) * r = r^(p-1) = 1 (mod p)
+    • The inverse is computed as r^(p-2) = r^(2^255-21) using the identity
+      r^(p-2) * r = r^(p-1) = 1 (mod p)
     • The field element is represented in radix 2^51 form with five u64 limbs
     • Returns zero when the input is zero
 

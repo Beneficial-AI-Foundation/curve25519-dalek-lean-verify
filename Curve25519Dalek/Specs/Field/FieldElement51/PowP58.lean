@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -8,14 +8,15 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
-/-! # Spec Theorem for `FieldElement51::pow_p58`
+/-!
+# Spec Theorem for `FieldElement51::pow_p58`
 
 Specification and proof for `FieldElement51::pow_p58`.
 
 This function computes r^((p-5)/8) for a field element r in 𝔽_p where p = 2^255 - 19
 and thus (p-5)/8 = 2^252 -3
 
-**Source**: curve25519-dalek/src/field.rs
+Source: "curve25519-dalek/src/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
