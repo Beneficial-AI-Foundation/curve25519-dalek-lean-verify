@@ -237,7 +237,8 @@ set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 -/
 @[externally_verified, step] -- working proof commented out because of slow build
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
-    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
+    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127)
+    (h_canonical : Scalar52_wide_as_Nat a < R * L) :
     montgomery_reduce a ⦃ m =>
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧

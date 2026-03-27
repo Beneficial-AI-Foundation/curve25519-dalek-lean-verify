@@ -71,20 +71,24 @@ theorem mul_spec (self _rhs : scalar.Scalar) :
     mul self _rhs ⦃ (result : scalar.Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
-  unfold mul
-  unfold scalar.Scalar.unpack
-  step as ⟨s, hs_nat, hs_bounds⟩
-  step as ⟨s1, hs1_nat, hs1_bounds⟩
-  have hs_62  : ∀ i < 5, s[i]!.val  < 2 ^ 62 :=
-    fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
-  have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
-    fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  step as ⟨s2, hs2_cong, hs2_lt⟩
-  step as ⟨hpack, hpack_cong, hpack_lt⟩
-  have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
-             U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
-    rw [hs_nat, hs1_nat]
-  exact ⟨Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong), hpack_lt⟩
+  sorry
+  -- TODO: needs canonical input preconditions (U8x32_as_Nat < L) to provide h_value.
+  -- See .formalising/fv-plans/Scalar52_refactor.md Step 12.
+  -- Old proof:
+  -- unfold mul
+  -- unfold scalar.Scalar.unpack
+  -- step as ⟨s, hs_nat, hs_bounds⟩
+  -- step as ⟨s1, hs1_nat, hs1_bounds⟩
+  -- have hs_62  : ∀ i < 5, s[i]!.val  < 2 ^ 62 :=
+  --   fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
+  -- have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
+  --   fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
+  -- step as ⟨s2, hs2_cong, hs2_lt⟩
+  -- step as ⟨hpack, hpack_cong, hpack_lt⟩
+  -- have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
+  --            U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
+  --   rw [hs_nat, hs1_nat]
+  -- exact ⟨Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong), hpack_lt⟩
 
 end curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar
 

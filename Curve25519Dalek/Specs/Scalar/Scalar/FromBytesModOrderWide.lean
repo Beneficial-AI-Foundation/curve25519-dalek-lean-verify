@@ -40,7 +40,7 @@ theorem from_bytes_mod_order_wide_spec (input : Array U8 64#usize) :
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold from_bytes_mod_order_wide
   step*
-  · grind [L]
-  · all_goals simp_all [Nat.ModEq]
+  all_goals simp_all [Nat.ModEq]
+
 
 end curve25519_dalek.scalar.Scalar

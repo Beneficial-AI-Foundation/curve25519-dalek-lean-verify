@@ -49,32 +49,35 @@ natural language specs:
   Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/
 @[step]
 theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
-    (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :
+    (hu : ∀ i < 5, self[i]!.val < 2 ^ 52)
+    (h_canonical : Scalar52_as_Nat self < L) :
     invert self ⦃ (result : Scalar52) =>
       (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result < L ⦄ := by
   unfold invert
-  step*
-  · by_contra _
-    have : Scalar52_as_Nat self % L = 0 % L := by
-      apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by rfl)
-      try simp_all [Nat.ModEq]
-    try simp_all
-  · refine ⟨?_, by assumption, by assumption⟩
-    rw [Nat.ModEq] at *
-    have h := calc (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) % L
-        = (Scalar52_as_Nat self * R % L) * (Scalar52_as_Nat result * R % L) % L := by simp
-      _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
-      _ = R * R % L := by
-        simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
-        try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val,
-          UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]
-    have : (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) =
-        Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by agrind
-    rw [this] at h
-    have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
-      have coprime : Nat.Coprime (R ^ 2) L := by try decide
-      apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by agrind)
-    exact this h
+  sorry
+  -- Old proof (before < 2^52 pre + canonical pre):
+  -- step*
+  -- · by_contra _
+  --   have : Scalar52_as_Nat self % L = 0 % L := by
+  --     apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by rfl)
+  --     try simp_all [Nat.ModEq]
+  --   try simp_all
+  -- · refine ⟨?_, by assumption, by assumption⟩
+  --   rw [Nat.ModEq] at *
+  --   have h := calc (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) % L
+  --       = (Scalar52_as_Nat self * R % L) * (Scalar52_as_Nat result * R % L) % L := by simp
+  --     _ = (Scalar52_as_Nat s % L) * (Scalar52_as_Nat s1 % L) % L := by simp only [*]
+  --     _ = R * R % L := by
+  --       simp only [Nat.mul_mod_mod, Nat.mod_mul_mod]
+  --       try simp_all only [ne_eq, Array.getElem!_Nat_eq, List.Vector.length_val,
+  --         UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow]
+  --   have : (Scalar52_as_Nat self * R) * (Scalar52_as_Nat result * R) =
+  --       Scalar52_as_Nat self * Scalar52_as_Nat result * (R * R) := by agrind
+  --   rw [this] at h
+  --   have {a b : ℕ} (h : a * R ^ 2 ≡ b * R ^ 2 [MOD L]) : a ≡ b [MOD L] := by
+  --     have coprime : Nat.Coprime (R ^ 2) L := by try decide
+  --     apply Nat.ModEq.cancel_left_of_coprime (c := R ^ 2) coprime (by agrind)
+  --   exact this h
 
 end curve25519_dalek.scalar.Scalar52
