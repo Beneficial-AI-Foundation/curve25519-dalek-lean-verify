@@ -130,12 +130,6 @@ export function createCytoscapeStyles(borderColor: string) {
         'opacity': 0.15
       }
     },
-    {
-      selector: 'node[?isIgnored]',
-      style: {
-        'opacity': 0.3
-      }
-    }
   ]
 }
 

@@ -14,7 +14,7 @@ const ProgressChart = defineAsyncComponent(() =>
 
 const { stats } = data
 const { dataPoints } = progressData
-const activeTotal = stats.total - stats.ignored
+const activeTotal = stats.total
 </script>
 
 ## Current Status
@@ -38,10 +38,6 @@ const activeTotal = stats.total - stats.ignored
     <div class="stat-value">{{ stats.externally_verified }}</div>
     <div class="stat-label">Ext. Verified</div>
     <div class="stat-percent">{{ Math.round(stats.externally_verified / activeTotal * 100) }}%</div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-value">{{ stats.ignored }}</div>
-    <div class="stat-label">Ignored</div>
   </div>
 </div>
 

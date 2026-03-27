@@ -1,27 +1,19 @@
-name: Lean Verification
+name: Validate Pipeline
 
-# Single build+extract workflow. Downstream workflows (deploy-docs, callgraph)
-# consume the artifacts produced here via workflow_run triggers.
+# Temporary workflow: compares the new probe-based pipeline against the old
+# lake exe listfuns baseline. Delete this workflow once PR #681 is approved.
 
 on:
-  push:
-    branches: [ '**' ]
-    paths:
-      - 'Curve25519Dalek/**'
-      - 'Utils/**'
-      - 'lakefile.toml'
-      - 'lean-toolchain'
-      - '.github/workflows/lean.yml'
   pull_request:
-    branches: [ '**' ]
+    branches: [ master ]
   workflow_dispatch:
 
 env:
   LEAN_ABORT_ON_PANIC: 1
 
 jobs:
-  build:
-    name: Build Lean Project
+  validate:
+    name: Compare old vs new pipeline
     runs-on: ubuntu-latest
 
     steps:
@@ -33,13 +25,8 @@ jobs:
           curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> $GITHUB_PATH
 
-      - name: Verify elan installation
-        run: |
-          elan --version
-          lean --version
-
       - name: Cache Lean build
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: |
             .lake
@@ -68,31 +55,23 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
-      - name: Generate functions.json
-        run: probe-aeneas listfuns --lean-project . -o functions.json
+      - name: Generate new functions.json (single-command enriched pipeline)
+        run: probe-aeneas listfuns --lean-project . -o functions_new.json
 
-      - name: Generate atoms.json for callgraph
-        run: probe-lean extract -o atoms.json .
+      - name: Generate old functions.json (lake exe listfuns)
+        run: lake exe listfuns > functions_old.json
 
-      - name: Upload probe artifacts
+      - name: Run validation
+        run: |
+          python3 scripts/validate_pipeline.py \
+            --old functions_old.json \
+            --new functions_new.json \
+            --report validation_report.txt
+
+      - name: Upload validation report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: probe-artifacts
-          path: |
-            atoms.json
-            functions.json
+          name: validation-report
+          path: validation_report.txt
           retention-days: 30
-
-      - name: Cache probe outputs for non-Lean triggers
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            functions.json
-            atoms.json
-          key: probe-outputs-${{ github.sha }}
-
-      - name: Verify build success
-        run: |
-          echo "✓ Build successful!"
-          echo "  atoms.json: $(wc -c < atoms.json) bytes"
-          echo "  functions.json: $(wc -c < functions.json) bytes"
