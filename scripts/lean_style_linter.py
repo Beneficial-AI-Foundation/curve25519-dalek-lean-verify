@@ -9,7 +9,7 @@ Usage:
     # Lint specific files:
     python3 scripts/lean_style_linter.py path/to/File.lean ...
 
-    # Lint all Lean files:
+    # Lint all Lean files under Curve25519Dalek/Specs/:
     python3 scripts/lean_style_linter.py --all
 
     # Output as JSON (for CI integration):
@@ -799,7 +799,10 @@ def main(argv: Optional[list[str]] = None) -> int:
 
     paths: list[Path] = []
     if args.lint_all:
-        root = Path(args.root)
+        root = Path(args.root) / "Curve25519Dalek" / "Specs"
+        if not root.is_dir():
+            print(f"Error: Specs directory not found: {root}", file=sys.stderr)
+            return 2
         paths = find_lean_files(root, exclude_dirs, exclude_files)
     elif args.files:
         paths = [Path(f) for f in args.files]
