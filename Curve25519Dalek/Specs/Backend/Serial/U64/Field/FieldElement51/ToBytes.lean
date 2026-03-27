@@ -15,25 +15,26 @@ import Curve25519Dalek.ExternallyVerified
 
 Specification and proof for `FieldElement51::to_bytes`.
 
-Much of the proof and aux lemmas contributed by Son Ho.
-
 This function converts a field element to its canonical 32-byte little-endian representation.
 It performs reduction modulo 2^255-19 and encodes the result as bytes.
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
-## TODO
-- Complete proof
-- move general helpers lemmas to a more central location
-- move to standard library the following:
-  attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
--- TODO: generalize and add to the standard library
+/-
+## TODO
+- move general helpers lemmas to a more central location
+- move to standard library the following:
+  attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
+-/
+
+attribute [simp_scalar] BitVec.toNat_shiftLeft
+
 @[local simp]
 theorem U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2^8 := by
   simp only [UScalar.cast, UScalarTy.U64_numBits_eq, UScalarTy.U8_numBits_eq,
@@ -55,11 +56,6 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
   := by
   bvify 64 at *
   bv_decide
-
--- TODO: move to standard library
-attribute [simp_scalar] BitVec.toNat_shiftLeft
-
--- TODO: move general helpers lemmas to a more central location
 
 
 -- Byte reconstruction for split limbs at each boundary.
@@ -355,7 +351,7 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[step] -- proven in Verus
+@[step]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
