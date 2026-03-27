@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
@@ -9,15 +9,14 @@ import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
-
-
-/-! # identity
+/-!
+# Spec Theorem for `ProjectivePoint::identity`
 
 Specification and proof for `montgomery::ProjectivePoint::identity`.
 
 This function returns the identity element of the Montgomery curve in projective coordinates.
 
-**Source**: curve25519-dalek/src/montgomery.rs:L296-L301
+Source: "curve25519-dalek/src/montgomery.rs:L296-L301"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang, Hoang Le Truong
 -/
@@ -14,7 +14,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ElligatorEncode
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.APLUS2_OVER_FOUR
-/-! # differential_add_and_double
+/-!
+# Spec Theorem for `montgomery::differential_add_and_double`
 
 Specification for `montgomery::differential_add_and_double`.
 
@@ -23,7 +24,7 @@ and differential addition. Given projective points P, Q and the u-coordinate of 
 it computes [2]P and P+Q using formulas from Costello-Smith 2017.
 The addition part is 'differential' because it uses P-Q to efficiently compute P+Q
 
-**Source**: curve25519-dalek/src/montgomery.rs:L352-L390
+Source: "curve25519-dalek/src/montgomery.rs:L352-L390"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek

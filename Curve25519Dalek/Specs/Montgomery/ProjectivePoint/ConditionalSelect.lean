@@ -1,12 +1,12 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-
-/-! # ConditionalSelect
+/-!
+# Spec Theorem for `ProjectivePoint::conditional_select`
 
 Specification for `ProjectivePoint::conditional_select`.
 
@@ -15,7 +15,7 @@ It applies conditional selection to both the U and W coordinates independently u
 `FieldElement51::conditional_select`, which returns the first operand when `choice = 0`
 and the second operand when `choice = 1`.
 
-**Source**: curve25519-dalek/src/montgomery.rs:L311-L320
+Source: "curve25519-dalek/src/montgomery.rs:L311-L320"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
