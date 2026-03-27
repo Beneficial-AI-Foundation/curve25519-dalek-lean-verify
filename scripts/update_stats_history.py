@@ -28,16 +28,14 @@ logger = logging.getLogger(__name__)
 HISTORY_FILE = Path("outputs/stats_history.jsonl")
 
 
-def compute_stats(functions_json: Path) -> dict[str, int]:
-    """Compute verification counts from an enriched functions.json."""
-    with open(functions_json) as f:
-        data = json.load(f)
-
+def _stats_from_data(data: dict) -> dict[str, int] | None:
+    """Compute verification counts from a parsed functions.json dict."""
     fns = [
         fn for fn in data.get("functions", [])
         if not fn.get("is_hidden") and not fn.get("is_extraction_artifact")
     ]
-
+    if not fns:
+        return None
     return {
         "total": len(fns),
         "verified": sum(1 for f in fns if f.get("verified")),
@@ -46,6 +44,14 @@ def compute_stats(functions_json: Path) -> dict[str, int]:
         "extracted": len(fns),
         "fully_verified": sum(1 for f in fns if f.get("fully_verified")),
     }
+
+
+def compute_stats(functions_json: Path) -> dict[str, int]:
+    """Compute verification counts from an enriched functions.json file."""
+    with open(functions_json) as f:
+        data = json.load(f)
+    result = _stats_from_data(data)
+    return result if result is not None else {"total": 0, "verified": 0, "externally_verified": 0, "specified": 0, "extracted": 0, "fully_verified": 0}
 
 
 def read_history(path: Path) -> list[dict]:
@@ -134,24 +140,12 @@ def get_file_at_commit(commit: str, filepath: str) -> str | None:
 
 
 def stats_from_functions_json_text(text: str) -> dict[str, int] | None:
+    """Compute verification counts from a functions.json string."""
     try:
         data = json.loads(text)
     except json.JSONDecodeError:
         return None
-    fns = [
-        fn for fn in data.get("functions", [])
-        if not fn.get("is_hidden") and not fn.get("is_extraction_artifact")
-    ]
-    if not fns:
-        return None
-    return {
-        "total": len(fns),
-        "verified": sum(1 for f in fns if f.get("verified")),
-        "externally_verified": sum(1 for f in fns if f.get("externally_verified")),
-        "specified": sum(1 for f in fns if f.get("specified")),
-        "extracted": len(fns),
-        "fully_verified": sum(1 for f in fns if f.get("fully_verified")),
-    }
+    return _stats_from_data(data)
 
 
 def fill_missing_from_git(

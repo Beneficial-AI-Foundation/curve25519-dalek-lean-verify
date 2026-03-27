@@ -54,45 +54,25 @@ jobs:
         run: lake exe cache get
 
       - name: Build Lean project
-        run: lake build 2>&1 | tee build_output.txt
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache probe-lean binary
-        id: cache-probe-lean
-        uses: actions/cache@v4
-        with:
-          path: ~/.local/bin/probe-lean
-          key: probe-lean-${{ runner.os }}-${{ hashFiles('lean-toolchain') }}-v1
-
-      - name: Install probe-lean
-        if: steps.cache-probe-lean.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth 1 https://github.com/Beneficial-AI-Foundation/probe-lean.git /tmp/probe-lean
-          cd /tmp/probe-lean && lake build
-          mkdir -p ~/.local/bin
-          cp .lake/build/bin/probe-lean ~/.local/bin/
-
-      - name: Cache probe-aeneas binary
-        id: cache-probe-aeneas
-        uses: actions/cache@v4
-        with:
-          path: ~/.cargo/bin/probe-aeneas
-          key: probe-aeneas-${{ runner.os }}-v3
+        run: lake build
 
       - name: Install probe-aeneas
-        if: steps.cache-probe-aeneas.outputs.cache-hit != 'true'
-        run: cargo install --git https://github.com/Beneficial-AI-Foundation/probe-aeneas
-
-      - name: Add local bin to PATH
-        run: echo "$HOME/.local/bin" >> $GITHUB_PATH
-
-      - name: Extract atoms
-        run: probe-lean extract --from-file build_output.txt -o atoms.json .
+        run: |
+          mkdir -p ~/.local/bin
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          gh release download --repo Beneficial-AI-Foundation/probe-aeneas \
+            --pattern 'probe-aeneas-x86_64-unknown-linux-gnu.tar.xz' --clobber
+          tar xJf probe-aeneas-x86_64-unknown-linux-gnu.tar.xz
+          cp probe-aeneas-*/probe-aeneas ~/.local/bin/
+          rm -rf probe-aeneas-x86_64-unknown-linux-gnu.tar.xz probe-aeneas-*/
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Generate functions.json
-        run: probe-aeneas listfuns --lean-project . --atoms atoms.json -o functions.json
+        run: probe-aeneas listfuns --lean-project . -o functions.json
+
+      - name: Generate atoms.json for callgraph
+        run: probe-lean extract -o atoms.json .
 
       - name: Upload probe artifacts
         uses: actions/upload-artifact@v4
