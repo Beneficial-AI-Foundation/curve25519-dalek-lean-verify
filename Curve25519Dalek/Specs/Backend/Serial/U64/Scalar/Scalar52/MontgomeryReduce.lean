@@ -229,6 +229,26 @@ private theorem part2_spec (sum : U128) :
          _ = 2^76 * 2^52 := by norm_num
   exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 
+/-- From `Scalar52_wide_as_Nat a < R * L`, derive `a[8]!.val < 2^97`.
+    Keeps all exponents ≤ 416 (within threshold) by rewriting `2^260 * 2^253 = 2^416 * 2^97`. -/
+private lemma a8_bound_of_canonical (a : Aeneas.Std.Array U128 9#usize)
+    (h_canonical : Scalar52_wide_as_Nat a < R * L) : a[8]!.val < 2 ^ 97 := by
+  have h_limb := Scalar52_wide_limb_le_nat a 8 (by omega)
+  simp only [show 52 * 8 = 416 from rfl] at h_limb
+  have hL : L < 2 ^ 253 := by unfold L; omega
+  -- 2^260 * 2^253 = 2^416 * 2^97 (both = 2^513, but keep symbolic)
+  have key : (2 : Nat) ^ 260 * 2 ^ 253 = 2 ^ 416 * 2 ^ 97 := by
+    rw [← pow_add, ← pow_add]
+  -- Chain: 2^416 * a[8]! ≤ S52waN a < R * L = 2^260 * L < 2^260 * 2^253 = 2^416 * 2^97
+  have : 2 ^ 416 * a[8]!.val < 2 ^ 416 * 2 ^ 97 := by
+    calc 2 ^ 416 * a[8]!.val
+        ≤ Scalar52_wide_as_Nat a := h_limb
+      _ < R * L := h_canonical
+      _ = 2 ^ 260 * L := by dsimp [R]
+      _ < 2 ^ 260 * 2 ^ 253 := by apply Nat.mul_lt_mul_of_pos_left hL; positivity
+      _ = 2 ^ 416 * 2 ^ 97 := key
+  exact (Nat.mul_lt_mul_left (show 0 < 2 ^ 416 from by positivity)).mp this
+
 /-- REDC bound: from the main equation `T + N*L = inter*R` and canonical bound `T < R*L`,
     with `0 ≤ N < R`, the intermediate satisfies `inter < 2*L`.
     Mirrors Verus `lemma_r4_bound_from_canonical`. -/
@@ -346,8 +366,32 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
   obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
   let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
+  -- Derive tight r4 bound from h_canonical (Verus: lemma_carry8_bound)
+  have h_L4 : i21.val = 2 ^ 44 := by
+    have := i21_post; rw [this]; unfold constants.L; decide
+  have h_a8 : i46.val < 2 ^ 97 := by
+    have h1 := a8_bound_of_canonical a h_canonical
+    have h2 : i46.val = a[8]!.val := by simp only [i46_post, List.Vector.length_val,
+      UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Array.getElem!_Nat_eq]
+    agrind
+  have h_i48 : i48.val < 2 ^ 96 := by
+    sorry
+  have h_i49_bound : i49.val < 2 ^ 99 := by
+    sorry
+  have h_r4u128_tight : p2_3.1.val < 2 ^ 47 := by
+    sorry
+  have h_r4_tight : r4.val < 2 ^ 52 := by
+    have : r4.val ≤ p2_3.1.val := by rw [r4_post]; sorry
+    sorry
   let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
-  · sorry -- case ha: input limbs < 2^52 (needs r4 tight bound)
+  · -- case ha: input limbs < 2^52
+    sorry
+    --intro j hj
+    -- interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
+    --   List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+    --   getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+    --   Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+    -- <;> try assumption
   · -- case hb: L limbs < 2^52
     intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
       UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
