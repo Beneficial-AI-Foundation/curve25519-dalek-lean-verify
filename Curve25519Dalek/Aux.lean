@@ -1,15 +1,22 @@
+/-
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Oliver Butterley, Zhang-Liao, Markus Ferdinand Dablander, Hoang Le Truong,
+  Alessandro D'Angelo
+-/
 import Aeneas
 import Curve25519Dalek.Math.Basic
 import Mathlib.Data.Nat.Digits.Lemmas
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
 
-set_option linter.style.longLine false
-
 /-! # Auxiliary theorems
 
-Theorems which are useful for proving spec theorems in this project but aren't available upstream.
-This file is for theorems which depend only on Defs.lean, not on Funs.lean or Types.lean. -/
+Theorems which are useful for proving spec theorems in this project
+but aren't available upstream.
+This file is for theorems which depend only on Defs.lean,
+not on Funs.lean or Types.lean. -/
 
+-- Linter doesn't recognize this Aeneas macro
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
@@ -29,7 +36,7 @@ theorem U64_shiftRight_le (a : U64) : a.val >>> 51 ≤ 2 ^ 13 - 1 := by
 
 /-- Right shift by 51 is equivalent to division by 2^51 -/
 theorem Aeneas.Std.U64.shiftRight_51 (x : U64) : x.val >>> 51 = x.val / 2^51 := by
-  simp [Nat.shiftRight_eq_div_pow]
+  simp only [Nat.shiftRight_eq_div_pow]
 
 -- /-- Fundamental property of bit operations: a number can be split into lower and upper bits -/
 -- theorem Aeneas.Std.U64.split_51 (x : U64) :
@@ -50,8 +57,8 @@ theorem Array.set_of_ne (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i <
   exact List.getElem!_set_ne bs j i a (by omega)
 
 /-- Setting the j part of an array doesn't change the i part if i ≠ j -/
-theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64) (i : Nat) (j : Usize) (hi : i < bs.length)
-    (h : i ≠ j) :
+theorem Array.set_of_ne' (bs : Array U64 5#usize) (a : U64)
+    (i : Nat) (j : Usize) (hi : i < bs.length) (h : i ≠ j) :
     (bs.set j a)[i]! = bs[i] := by
   rw [Array.getElem!_Nat_eq, Array.set_val_eq, ← Array.val_getElem!_eq' bs i hi]
   exact List.getElem!_set_ne bs j i a (by omega)
@@ -70,14 +77,18 @@ theorem Array.getElem_usize_eq_getElem! (bs : Array U64 5#usize) (i : Usize)
   exact List.Inhabited_getElem_eq_getElem! bs.val i.val hi
 
 /-- Like set_of_ne but returns getElem! on both sides -/
-theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize) (a : U64) (i j : Nat) (hi : i < bs.length)
+theorem Array.set_of_ne_getElem! (bs : Array U64 5#usize)
+    (a : U64) (i j : Nat) (hi : i < bs.length)
     (hj : j < bs.length) (h : i ≠ j) :
     (bs.set j#usize a)[i]! = bs[i]! := by
   rw [Array.set_of_ne bs a i j hi hj h, Array.getElem_eq_getElem! bs i hi]
 
 /-- Setting the j part of an array gives exactly the i part if i = j -/
 theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < bs.length) :
-    (bs.set i#usize a)[i]! = a := by grind
+    (bs.set i#usize a)[i]! = a := by
+  grind only [usr Subtype.property, = getElem?_pos,
+    = Array.set_val_eq, = UScalar.ofNatCore_val_eq,
+    = List.getElem_set]
 
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
@@ -87,11 +98,15 @@ theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat by
   have : 2 ^ 7 ≤ bytes.val[31]!.val := by omega
   have : 2 ^ 255 ≤ U8x32_as_Nat bytes := by
     unfold U8x32_as_Nat
-    have : ∑ i ∈ Finset.range 32, 2^(8*i) * bytes.val[i]!.val =
-        ∑ i ∈ Finset.range 31, 2^(8*i) * bytes.val[i]!.val + 2^(8*31) * bytes.val[31]!.val := by
+    have : ∑ i ∈ Finset.range 32,
+        2 ^ (8 * i) * bytes.val[i]!.val =
+        ∑ i ∈ Finset.range 31,
+        2 ^ (8 * i) * bytes.val[i]!.val +
+        2 ^ (8 * 31) * bytes.val[31]!.val := by
       rw [Finset.sum_range_succ]
-    simp_all; grind
-  grind
+    simp_all only [ne_eq, Nat.reduceMul,
+      Array.getElem!_Nat_eq, ge_iff_le]; omega
+  omega
 
 /-- If a 32-byte array represents a value less than `L`, then the high bit (bit 7) of byte 31
 must be 0. -/
@@ -99,7 +114,7 @@ theorem high_bit_zero_of_lt_L (bytes : Array U8 32#usize) (h : U8x32_as_Nat byte
     bytes.val[31]!.val >>> 7 = 0 := by
   refine high_bit_zero_of_lt_255 bytes ?_
   have : L ≤ 2 ^ 255 := by decide
-  grind
+  omega
 
 /-- If `Scalar52_as_Nat a < 2^259`, then the top limb `a[4]` is bounded by `2^51`.
 This follows because `2^208 * a[4] ≤ Scalar52_as_Nat a < 2^259` implies `a[4] < 2^51`. -/
@@ -107,7 +122,7 @@ theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
     (h : Scalar52_as_Nat a < 2 ^ 259) : a[4]!.val < 2 ^ 51 := by
   unfold Scalar52_as_Nat at h
   have h4 : 2 ^ 208 * a[4]!.val ≤ ∑ j ∈ Finset.range 5, 2 ^ (52 * j) * a[j]!.val := by
-    have hmem : 4 ∈ Finset.range 5 := by simp
+    have hmem : 4 ∈ Finset.range 5 := by decide
     have := Finset.single_le_sum (f := fun j => 2 ^ (52 * j) * a[j]!.val)
       (fun j _ => Nat.zero_le _) hmem
     convert this using 2
@@ -115,13 +130,25 @@ theorem Scalar52_top_limb_lt_of_as_Nat_lt (a : Array U64 5#usize)
 
 /-- The function U8x32_as_Nat can be represented via Nat.ofDigits applied to an appropriate
 list representation of the input array -/
-lemma U8x32_as_Nat_is_NatofDigits (a : Aeneas.Std.Array U8 32#usize) :
-    U8x32_as_Nat a = Nat.ofDigits (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val) := by
-    unfold U8x32_as_Nat
-    rw [Nat.ofDigits_eq_sum_mapIdx (2 ^ 8) (List.ofFn fun i : Fin 32 => a[i]!.val), Finset.sum_range]
-    simp only [pow_mul]
-    change (List.ofFn fun i : Fin 32 => (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
-    simp [Nat.mul_comm]
+lemma U8x32_as_Nat_is_NatofDigits
+    (a : Aeneas.Std.Array U8 32#usize) :
+    U8x32_as_Nat a =
+    Nat.ofDigits (2 ^ 8)
+      (List.ofFn fun i : Fin 32 => a[i]!.val) := by
+  unfold U8x32_as_Nat
+  rw [Nat.ofDigits_eq_sum_mapIdx (2 ^ 8)
+    (List.ofFn fun i : Fin 32 => a[i]!.val),
+    Finset.sum_range]
+  simp only [pow_mul]
+  change (List.ofFn fun i : Fin 32 =>
+    (2 ^ 8) ^ (i : ℕ) * a[i]!.val).sum = _
+  simp only [Fin.getElem!_fin, Array.getElem!_Nat_eq,
+    List.ofFn_succ, Fin.isValue, Fin.coe_ofNat_eq_mod,
+    Nat.zero_mod, pow_zero, one_mul, Fin.val_succ,
+    zero_add, pow_one, Nat.reduceAdd, Fin.val_eq_zero,
+    List.ofFn_zero, List.sum_cons, List.sum_nil, add_zero,
+    List.mapIdx_cons, mul_one, Nat.mul_comm,
+    List.mapIdx_nil]
 
 /-! ## Bridge between U8x32_as_Nat and U8x32_as_Field
 
@@ -140,15 +167,17 @@ little-endian byte interpretation but in different types. The bridge goes throug
 private lemma ofDigits_eq_foldr (b : ℕ) (l : List ℕ) :
     Nat.ofDigits b l = l.foldr (fun d acc => d + b * acc) 0 := by
   induction l with
-  | nil => simp [Nat.ofDigits]
-  | cons h t ih => simp [Nat.ofDigits, ih]
+  | nil => simp only [Nat.ofDigits, List.foldr_nil]
+  | cons h t ih =>
+    simp only [Nat.ofDigits, Nat.cast_id, ih,
+      List.foldr_cons]
 
 /-- `Nat.cast` commutes with Horner evaluation on a byte list. -/
- lemma horner_natCast (l : List U8) :
+lemma horner_natCast (l : List U8) :
     ((l.foldr (fun (b : U8) (acc : ℕ) => b.val + 256 * acc) 0 : ℕ) : ZMod p) =
     l.foldr (fun (b : U8) (acc : ZMod p) => (b.val : ZMod p) + 256 * acc) 0 := by
   induction l with
-  | nil => simp
+  | nil => simp only [List.foldr_nil, Nat.cast_zero]
   | cons h t ih =>
     simp only [List.foldr_cons]
     push_cast [ih]
@@ -160,7 +189,12 @@ private lemma ofFn_val_eq_map_val (a : Aeneas.Std.Array U8 32#usize) :
     (List.ofFn fun i : Fin 32 => (a[i]! : U8).val) = a.val.map (fun b => b.val) := by
   simp only [Fin.getElem!_fin, Array.getElem!_Nat_eq]
   apply List.ext_getElem
-  · simp [a.property]
+  · simp only [List.ofFn_succ, Fin.isValue,
+      Fin.coe_ofNat_eq_mod, Nat.zero_mod, Fin.val_succ,
+      zero_add, Nat.reduceAdd, Fin.val_eq_zero,
+      List.ofFn_zero, List.length_cons, List.length_nil,
+      List.length_map, a.property,
+      UScalar.ofNatCore_val_eq]
   · intro i hi1 hi2
     simp only [List.getElem_ofFn, List.getElem_map]
     congr 1
@@ -184,7 +218,6 @@ lemma U8x32_as_Field_eq_cast (a : Aeneas.Std.Array U8 32#usize) :
   rw [U8x32_as_Nat_eq_foldr, horner_natCast]
   rfl
 
-
 /-- The function `U8x32_as_Nat` is injective: if two 32-byte arrays produce the same natural
 number representation, then the input arrays must be equal. -/
 lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
@@ -198,15 +231,19 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
     (L1 := L)
     (L2 := L')
     (by rw [List.length_ofFn, List.length_ofFn])
-    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
-    (by intro l hl; rw [List.mem_ofFn] at hl; obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
+    (by intro l hl; rw [List.mem_ofFn] at hl
+        obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a[i]!))
+    (by intro l hl; rw [List.mem_ofFn] at hl
+        obtain ⟨i, rfl⟩ := hl; exact Aeneas.Std.UScalar.hBounds (a'[i]!))
     (h_funs_eq)
   simp only [L, L', List.ofFn_inj] at h_inj
   apply Subtype.ext
   apply List.ext_get
-  · simp [List.Vector.length_val]
+  · simp only [List.Vector.length_val,
+      UScalar.ofNatCore_val_eq]
   · intro n h_a h_a'
-    have h_len : n < 32 := by grind
+    have h_len : n < 32 := by
+      rw [List.Vector.length_val] at h_a; exact h_a
     have h_congr := congr_fun h_inj ⟨n, h_len⟩
     simp_all only [Fin.getElem!_fin, Array.getElem!_Nat_eq, getElem!_pos, List.get_eq_getElem]
     exact UScalar.eq_of_val_eq h_congr
@@ -214,8 +251,9 @@ lemma U8x32_as_Nat_injective : Function.Injective U8x32_as_Nat := by
 lemma land_pow_two_sub_one_eq_mod (a n : Nat) :
     a &&& (2^n - 1) = a % 2^n := by
   induction n generalizing a
-  · grind
-  · simp
+  · simp only [pow_zero, tsub_self, Nat.and_zero,
+      Aeneas.ReduceNat.reduceNatEq]; omega
+  · simp only [Nat.and_two_pow_sub_one_eq_mod]
 
 /-! ## UScalar cast lemmas for carry propagation
 
@@ -256,7 +294,7 @@ theorem double_cast_of_lt (x : ℕ) (hx : x < 2 ^ 64) :
     x % 2 ^ 64 % 2 ^ 128 = x := by
   have h1 : x % 2 ^ 64 = x := Nat.mod_eq_of_lt hx
   have h2 : x < 2 ^ 128 := by omega
-  simp [h1, Nat.mod_eq_of_lt h2]
+  simp only [h1, Nat.mod_eq_of_lt h2]
 
 /-- Key lemma: when `c < 2^115`, the carry extraction `(c / 2^51) % 2^64` equals `c / 2^51` -/
 theorem carry_mod_eq (c : ℕ) (hc : c < 2 ^ 115) : (c / 2 ^ 51) % 2 ^ 64 = c / 2 ^ 51 := by
@@ -269,14 +307,18 @@ private lemma bit_decomp (a : Nat) : a = Nat.bit (a.testBit 0) (a / 2) := by
   rw [Nat.testBit_zero]
   unfold Nat.bit
   have := Nat.div_add_mod a 2
-  rcases Nat.mod_two_eq_zero_or_one a with h | h <;> simp [h] <;> omega
+  rcases Nat.mod_two_eq_zero_or_one a with h | h
+  · simp only [h, zero_ne_one, decide_false, cond_false]; omega
+  · simp only [h, decide_true, cond_true]; omega
 
 /-- OR of a value below `2^k` with a multiple of `2^k` equals their sum,
     because the bit ranges are disjoint. -/
 lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     a ||| (b * 2 ^ k) = a + b * 2 ^ k := by
   induction k generalizing a b with
-  | zero => simp_all
+  | zero =>
+    simp_all only [pow_zero, Nat.lt_one_iff, mul_one,
+      Nat.zero_or, zero_add]
   | succ k ih =>
     have ha_div : a / 2 < 2 ^ k := by
       rw [Nat.div_lt_iff_lt_mul (by norm_num)]
@@ -284,15 +326,19 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
     conv_lhs =>
       rw [bit_decomp a,
         show b * 2 ^ (k + 1) = Nat.bit false (b * 2 ^ k) from by
-          unfold Nat.bit; simp; ring]
+          unfold Nat.bit; simp only [cond_false]; ring]
     rw [Nat.lor_bit, Bool.or_false, ih (a / 2) b ha_div]
     unfold Nat.bit
     have h2 : b * 2 ^ (k + 1) = 2 * (b * 2 ^ k) := by ring
     have hmod := Nat.div_add_mod a 2
     rw [h2]
     rcases Nat.mod_two_eq_zero_or_one a with h | h
-    · rw [Nat.testBit_zero]; simp [h]; omega
-    · rw [Nat.testBit_zero]; simp [h]; omega
+    · rw [Nat.testBit_zero]
+      simp only [h, zero_ne_one, decide_false, cond_false]
+      omega
+    · rw [Nat.testBit_zero]
+      simp only [h, decide_true, cond_true]
+      omega
 
 /-- If `x + n * m = y` then `x ≡ y [MOD m]`. -/
 lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
@@ -300,15 +346,18 @@ lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
   have : x % m = (x + n * m) % m := by rw [Nat.add_mul_mod_self_right]
   rw [Nat.ModEq, this, h]
 
-
 /-- Converts pointwise limb-wise addition to `Field51_as_Nat` addition. -/
 lemma pointwise_add_Field51_as_Nat (a b c : Array U64 5#usize)
     (h : ∀ i < 5, c[i]!.val = a[i]!.val + b[i]!.val) :
     Field51_as_Nat c = Field51_as_Nat a + Field51_as_Nat b := by
-  simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
-    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul, mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
+  simp only [Field51_as_Nat, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
+    Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero,
+    List.Vector.length_val, UScalar.ofNatCore_val_eq,
+    Nat.ofNat_pos, getElem?_pos, Option.getD_some, one_mul,
+    mul_one, Nat.reducePow, Nat.one_lt_ofNat, Nat.reduceMul,
     Nat.reduceLT, Nat.lt_add_one]
-  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
+  simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+    UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
   scalar_tac
