@@ -48,13 +48,13 @@ Natural language specs:
 - Choice.one is returned iff the u-coordinates match modulo p
 - The comparison proceeds via `FieldElement51.from_bytes` and constant-time equality
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec (u v : MontgomeryPoint) :
     ct_eq u v ⦃ c =>
     (c = Choice.one ↔
       (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by
   unfold ct_eq
-  progress*
+  step*
   have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
       x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by
     have ⟨xb, hxb_eq, hxb_mod, hxb_lt⟩ := spec_imp_exists (to_bytes_spec x)

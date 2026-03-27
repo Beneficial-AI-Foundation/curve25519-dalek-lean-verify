@@ -15,22 +15,26 @@ import Curve25519Dalek.ExternallyVerified
 
 Specification and proof for `FieldElement51::to_bytes`.
 
-Much of the proof and aux lemmas contributed by Son Ho.
-
 This function converts a field element to its canonical 32-byte little-endian representation.
 It performs reduction modulo 2^255-19 and encodes the result as bytes.
 
 Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
--- TODO: generalize and add to the standard library
+/-
+## TODO
+- move general helpers lemmas to a more central location
+- move to standard library the following:
+  attribute [simp_scalar_simps] BitVec.toNat_shiftLeft
+-/
+
+attribute [simp_scalar] BitVec.toNat_shiftLeft
+
 @[local simp]
 theorem U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2^8 := by
   simp only [UScalar.cast, UScalarTy.U64_numBits_eq, UScalarTy.U8_numBits_eq,
@@ -52,9 +56,6 @@ theorem recompose_decomposed_limb (limb : U64) (h : limb.val < 2 ^ 51) :
   := by
   bvify 64 at *
   bv_decide
-
--- TODO: move to standard library
-attribute [simp_scalar] BitVec.toNat_shiftLeft
 
 
 -- Byte reconstruction for split limbs at each boundary.
@@ -236,10 +237,105 @@ private lemma masked_shift44_lt_128 (x : BitVec 64) :
   have := @Nat.and_le_right x.toNat (2^51 - 1)
   norm_num at *; omega
 
+/-- Canonical reduction: the q-computation + conditional subtraction + carry chain
+    produces a value that is congruent mod p and canonical (< p).
+
+    The algorithm computes q = ⌊(F + 19) / 2^255⌋ ∈ {0,1}, then adds 19*q to limb 0
+    and carry-propagates with masking to 51 bits. The result satisfies:
+    - Field51_as_Nat(output) ≡ Field51_as_Nat(input) [MOD p]
+    - Field51_as_Nat(output) < p
+    - output limbs = carry-propagate(input + 19*q) masked to 51 bits
+
+    Often when this lemma is applied f0,...,f4 are bounded by 2 ^ 52, but it's not needed for the
+    proof. The hypothesis hF stems from the fact that the lemma will be applied to the output of
+    reduce_spec
+
+    Ported from Verus `lemma_to_bytes_reduction` in dalek-lite. -/
+private lemma canonical_reduction_mod_p
+    (f0 f1 f2 f3 f4 : ℕ)
+    (hF : f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4 < 2 * (2 ^ 255 - 19))
+    (q : ℕ)
+    (hq : q = (((((f0 + 19) / 2 ^ 51 + f1) / 2 ^ 51 + f2) / 2 ^ 51 + f3) / 2 ^ 51 + f4) / 2 ^ 51)
+    (l0 l1 l2 l3 l4 : ℕ)
+    (hl0 : l0 = (f0 + 19 * q) % 2 ^ 51)
+    (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
+    (hl2 : l2 = (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
+    (hl3 : l3 = (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
+    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
+    (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
+      (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
+    l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
+  -- Abbreviate F
+  set F := f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4 with hF_def
+  -- === Q-chain: carry variables for the (F+19) computation that determines q ===
+  -- (operand order: carry + fi, matching the nesting in hq)
+  set d0 := (f0 + 19) / 2 ^ 51
+  set d1 := (d0 + f1) / 2 ^ 51
+  set d2 := (d1 + f2) / 2 ^ 51
+  set d3 := (d2 + f3) / 2 ^ 51
+  -- After set, hq simplifies to: q = (d3 + f4) / 2^51
+  -- Q-chain telescoping steps (each is just Nat.mod_add_div)
+  have hqt0 : (f0 + 19) % 2 ^ 51 + d0 * 2 ^ 51 = f0 + 19 := by omega
+  have hqt1 : (d0 + f1) % 2 ^ 51 + d1 * 2 ^ 51 = d0 + f1 := by omega
+  have hqt2 : (d1 + f2) % 2 ^ 51 + d2 * 2 ^ 51 = d1 + f2 := by omega
+  have hqt3 : (d2 + f3) % 2 ^ 51 + d3 * 2 ^ 51 = d2 + f3 := by omega
+  have hqt4 : (d3 + f4) % 2 ^ 51 + q * 2 ^ 51 = d3 + f4 := by rw [hq]; omega
+  -- Q-chain: limbs of (F+19) are each < 2^51
+  have hqm0 := Nat.mod_lt (f0 + 19) (show 0 < 2 ^ 51 by norm_num)
+  have hqm1 := Nat.mod_lt (d0 + f1) (show 0 < 2 ^ 51 by norm_num)
+  have hqm2 := Nat.mod_lt (d1 + f2) (show 0 < 2 ^ 51 by norm_num)
+  have hqm3 := Nat.mod_lt (d2 + f3) (show 0 < 2 ^ 51 by norm_num)
+  have hqm4 := Nat.mod_lt (d3 + f4) (show 0 < 2 ^ 51 by norm_num)
+  -- Q-chain telescoping: Lq + q * 2^255 = F + 19 (where Lq < 2^255)
+  have hqtel : (f0 + 19) % 2 ^ 51 + 2 ^ 51 * ((d0 + f1) % 2 ^ 51) +
+      2 ^ 102 * ((d1 + f2) % 2 ^ 51) + 2 ^ 153 * ((d2 + f3) % 2 ^ 51) +
+      2 ^ 204 * ((d3 + f4) % 2 ^ 51) + q * 2 ^ 255 = F + 19 := by omega
+  -- q ≤ 1 (from Lq + q*2^255 = F+19, Lq ≥ 0, F < 2p < 2^256)
+  have hqle : q ≤ 1 := by omega
+  -- === Main chain: carry variables for the (F + 19*q) reduction ===
+  -- (operand order: fi + carry, matching the nesting in hl0..hl4)
+  set c0 := (f0 + 19 * q) / 2 ^ 51
+  set c1 := (f1 + c0) / 2 ^ 51
+  set c2 := (f2 + c1) / 2 ^ 51
+  set c3 := (f3 + c2) / 2 ^ 51
+  set c4 := (f4 + c3) / 2 ^ 51
+  -- Main chain telescoping: li + ci * 2^51 = si  (from Nat.mod_add_div)
+  have ht0 : l0 + c0 * 2 ^ 51 = f0 + 19 * q := by
+    rw [hl0, Nat.mul_comm c0]; exact Nat.mod_add_div _ _
+  have ht1 : l1 + c1 * 2 ^ 51 = f1 + c0 := by
+    rw [hl1, Nat.mul_comm c1]; exact Nat.mod_add_div _ _
+  have ht2 : l2 + c2 * 2 ^ 51 = f2 + c1 := by
+    rw [hl2, Nat.mul_comm c2]; exact Nat.mod_add_div _ _
+  have ht3 : l3 + c3 * 2 ^ 51 = f3 + c2 := by
+    rw [hl3, Nat.mul_comm c3]; exact Nat.mod_add_div _ _
+  have ht4 : l4 + c4 * 2 ^ 51 = f4 + c3 := by
+    rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
+  -- Main telescoping: L + c4 * 2^255 = F + 19*q
+  have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
+      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+  -- L < 2^255 (each limb < 2^51 from masking)
+  have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
+  have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
+  have hl2b : l2 < 2 ^ 51 := by rw [hl2]; exact Nat.mod_lt _ (by norm_num)
+  have hl3b : l3 < 2 ^ 51 := by rw [hl3]; exact Nat.mod_lt _ (by norm_num)
+  have hl4b : l4 < 2 ^ 51 := by rw [hl4]; exact Nat.mod_lt _ (by norm_num)
+  have hLb : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 := by
+    omega
+  -- Case split on q
+  interval_cases q
+  · -- q = 0: q-chain gives F+19 = Lq < 2^255, so F < p. Main chain: c4=0, L=F.
+    have hFp : F < 2 ^ 255 - 19 := by agrind
+    have hc4 : c4 = 0 := by agrind
+    constructor <;> agrind
+  · -- q = 1: q-chain gives F+19 ≥ 2^255. Main chain: c4=1, L = F-p.
+    have hFge : F + 19 ≥ 2 ^ 255 := by omega
+    have hc4 : c4 = 1 := by omega
+    constructor <;> omega
+
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 6000000 in -- heavy progress*
-/- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
+set_option maxHeartbeats 800000 in -- heavy step*
+/-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.
 The implementation performs reduction modulo p = 2^255-19 to ensure the result is in
@@ -255,14 +351,14 @@ Specification:
 - The natural number interpretation of the byte array is congruent to the field element value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
-@[externally_verified, progress] -- proven in Verus
+@[step]
 theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     to_bytes self ⦃ result =>
     U8x32_as_Nat result ≡ Field51_as_Nat self [MOD p] ∧
     U8x32_as_Nat result < p ⦄ := by
   unfold to_bytes
   simp only [step_simps]
-  let* ⟨ fe, fe_post1, fe_post2 ⟩ ← reduce_spec
+  let* ⟨ fe, fe_post1, fe_post2, fe_post3 ⟩ ← reduce_spec
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ i1, i1_post ⟩ ← U64.add_spec
   let* ⟨ q, q_post1, q_post2 ⟩ ← U64.ShiftRight_IScalar_spec
@@ -299,7 +395,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     have h15 : (i15 : U64).val < (2^52 : ℕ) := by
       simp only [i15_post, limbs_post, Array.set_val_eq] at *;
       simp_all only [Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
+        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
         Nat.ofNat_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, Nat.one_lt_ofNat,
         Nat.reduceLT, Nat.lt_add_one, Nat.reduceShiftLeft, U64.ofNat_bv, BitVec.reduceHShiftLeft,
         List.length_set, List.getElem_set_self, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
@@ -486,13 +582,139 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       rw [i113_post1, h99, Nat.shiftRight_eq_div_pow]; omega
     -- i114 = cast U8 i113, preserves value since < 128 < 256
     have h114_bound : i114.val < 128 := by
-      simp only [i114_post, U64_cast_U8, Nat.reducePow]
+      simp only [i114_post, U64_cast_U8]
       exact Nat.lt_of_le_of_lt (Nat.mod_le _ _) h113
     -- i116 = (i115 &&& 128) = (i114 &&& 128) = 0 via helper
     have h116_val : i116.val = 0 := by
       simp only [i116_post1, h115_eq]
       exact u8_and_128_eq_zero_of_lt i114 h114_bound
     exact UScalar.eq_of_val_eq h116_val
-  sorry
+  -- Final goal: U8x32_as_Nat s32 ≡ Field51_as_Nat self [MOD p] ∧ U8x32_as_Nat s32 < p
+  -- Mask value (reused from massert proof; re-derive for this goal)
+  have hmask : low_51_bit_mask.val = 2^51 - 1 := by
+    simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
+      UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
+  -- (A) Byte packing: U8x32_as_Nat s32 = Field51_as_Nat limbs9
+  -- Array resolution: limbs9[0]!=i18, [1]!=i24, [2]!=i30, [3]!=i36, [4]!=i38
+  have h_l0 : limbs9.val[0]! = i18 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
+      limbs4_post, limbs3_post, limbs2_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      not_false_eq_true, one_ne_zero, OfNat.ofNat_ne_zero, Nat.ofNat_pos]
+  have h_l1 : limbs9.val[1]! = i24 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
+      limbs4_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, OfNat.ofNat_ne_one]
+  have h_l2 : limbs9.val[2]! = i30 := by
+    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, Nat.reduceEqDiff, Nat.succ_ne_self]
+  have h_l3 : limbs9.val[3]! = i36 := by
+    simp only [limbs9_post, limbs8_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, not_false_eq_true, Nat.succ_ne_self]
+  have h_l4 : limbs9.val[4]! = i38 := by
+    simp only [limbs9_post, Array.set_val_eq,
+      getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, UScalar.ofNatCore_val_eq, Nat.lt_add_one]
+  have hlimbs : ∀ i < 5, (limbs9.val[i]! : U64).val < 2 ^ 51 := by
+    intro i hi; interval_cases i
+    · rw [h_l0, i18_post1]; exact and_mask_lt_pow i17 low_51_bit_mask hmask
+    · rw [h_l1, i24_post1]; exact and_mask_lt_pow i23 low_51_bit_mask hmask
+    · rw [h_l2, i30_post1]; exact and_mask_lt_pow i29 low_51_bit_mask hmask
+    · rw [h_l3, i36_post1]; exact and_mask_lt_pow i35 low_51_bit_mask hmask
+    · rw [h_l4, i38_post1]; exact and_mask_lt_pow i37 low_51_bit_mask hmask
+  have hbytes : bytes_match_limbs limbs9 s32 := by
+    unfold bytes_match_limbs
+    refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
+            ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
+    simp only [
+      Array.set_val_eq, getElem!_pos, List.length_set, List.Vector.length_val,
+      List.getElem_set_self, List.getElem_set_ne, ne_eq, not_false_eq_true,
+      UScalar.ofNatCore_val_eq, U64_cast_U8, UScalar.val_or,
+      Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos,
+      Nat.reduceEqDiff, Nat.succ_ne_self,
+      one_ne_zero, OfNat.ofNat_ne_one, OfNat.ofNat_ne_zero, *]
+  have hpack := byte_packing_eq limbs9 s32 hlimbs hbytes
+  rw [hpack]
+  -- (B) Canonical reduction in clean context
+  clear *-
+    fe_post1 fe_post2 fe_post3
+    i_post i1_post q_post1 i2_post i3_post q1_post1
+    i4_post i5_post q2_post1 i6_post i7_post q3_post1
+    i8_post i9_post q4_post1
+    i10_post i11_post limbs_post
+    i12_post1 low_51_bit_mask_post1
+    i13_post i14_post1 i15_post i16_post limbs1_post
+    i17_post i18_post1 limbs2_post
+    i19_post i20_post1 i21_post i22_post limbs3_post
+    i23_post i24_post1 limbs4_post
+    i25_post i26_post1 i27_post i28_post limbs5_post
+    i29_post i30_post1 limbs6_post
+    i31_post i32_post1 i33_post i34_post limbs7_post
+    i35_post i36_post1 limbs8_post
+    i37_post i38_post1 limbs9_post
+  -- Mask value: &&&(2^51-1) → %2^51 conversion for hl proofs
+  have hmask : low_51_bit_mask.val = 2 ^ 51 - 1 := by
+    simp only [low_51_bit_mask_post1, i12_post1, U64.size, U64.numBits,
+      UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
+  -- Remove raw mask hypotheses that conflict with hmask in simp's `*`
+  -- (both rewrite low_51_bit_mask.val; hmask gives symbolic 2^51-1, they give concrete junk)
+  clear low_51_bit_mask_post1 i12_post1
+  -- Apply the standalone canonical reduction lemma.
+  have hcanon := canonical_reduction_mod_p
+    fe[0]!.val fe[1]!.val fe[2]!.val fe[3]!.val fe[4]!.val
+    (by simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq, p] at fe_post3 ⊢; omega)
+    q4.val
+    (by -- hq: q4.val = q-chain formula
+      simp only [q4_post1, i9_post, q3_post1, i7_post, q2_post1, i5_post,
+        q1_post1, i3_post, q_post1, i1_post, i_post,
+        i8_post, i6_post, i4_post, i2_post,
+        Nat.shiftRight_eq_div_pow]; agrind)
+    limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
+    -- hl0..hl4: each resolves a limb's carry chain (array updates → &&&→% via hmask, >>>→/)
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, one_ne_zero, OfNat.ofNat_ne_zero,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, zero_ne_one, OfNat.ofNat_ne_one,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
+    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
+    land_pow_two_sub_one_eq_mod, *])
+    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
+    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
+    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
+    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff, zero_ne_one,
+    OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, land_pow_two_sub_one_eq_mod, *])
+  -- Unfold Field51_as_Nat/p/ModEq everywhere so hcanon (explicit sums) and
+  -- fe_post2 (Field51_as_Nat) are in the same form. Then omega chains them.
+  obtain ⟨hmod, hlt⟩ := hcanon
+  constructor
+  · simp only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, p, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq] at *
+    omega
+  · simp only [Field51_as_Nat, Finset.sum_range_succ, Finset.range_zero,
+      Finset.sum_empty, p, Nat.reduceMul, zero_add, Array.getElem!_Nat_eq] at *
+    omega
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51

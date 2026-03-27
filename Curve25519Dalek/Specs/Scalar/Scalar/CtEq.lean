@@ -34,12 +34,12 @@ natural language specs:
 - Returns `Choice` representing equality in constant time
 - The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec (self other : scalar.Scalar) :
     ct_eq self other ⦃ (c : subtle.Choice) =>
       c = Choice.one ↔ self.bytes = other.bytes ⦄ := by
   unfold ct_eq
-  progress*
+  step*
   constructor
   · grind [Subtype.ext]
   · grind

@@ -55,7 +55,7 @@ where p = 2^255 - 19
 These formulas implement the (division-free) conversion from projective ℙ² coordinates to extended
 twisted Edwards ℙ³ coordinates.
 -/
-@[progress]
+@[step]
 theorem as_extended_spec (q : ProjectivePoint)
   (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)
   (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
@@ -74,7 +74,7 @@ Z' % p = (Z^2) % p ∧
 T' % p = (X * Y) % p ⦄
 := by
   unfold as_extended
-  progress*
+  step*
   rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq, ← Nat.ModEq]
   simp_all
 

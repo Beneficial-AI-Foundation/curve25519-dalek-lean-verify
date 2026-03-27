@@ -40,13 +40,13 @@ natural language specs:
 • The result is a valid Ristretto point
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
-@[progress]
+@[step]
 theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     add self other ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
-  progress*
+  step*
   · exact h_self_valid.1
   · exact h_other_valid.1
   · constructor

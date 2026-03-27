@@ -180,7 +180,7 @@ theorem sub_spec_aux_54_52_53_52
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
   unfold sub
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←
@@ -642,7 +642,7 @@ private lemma sub_isValid_and_toPoint
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
       hX_factored hY_factored hZ_factored hT_factored
 
-@[progress]
+@[step]
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :

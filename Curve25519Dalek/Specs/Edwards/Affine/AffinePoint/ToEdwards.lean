@@ -45,7 +45,7 @@ natural language specs:
         mathematical curve point: result.toPoint = self.toPoint
 -/
 
-@[progress]
+@[step]
 private lemma ONE_bounds_spec :
     ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
@@ -59,7 +59,7 @@ private lemma ONE_bounds_spec :
 - T limbs < 2^52, Z limbs < 2^53
 - If coordinate limbs are < 2^53, the resulting EdwardsPoint is valid (IsValid)
 -/
-@[progress]
+@[step]
 theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
   (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
   (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
@@ -73,8 +73,8 @@ theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
   unfold to_edwards
   have hx : ∀ i < 5, self.x[i]!.val < 2 ^ 54 := hself.x_valid
   have hy : ∀ i < 5, self.y[i]!.val < 2 ^ 54 := hself.y_valid
-  progress as ⟨T, hT_mod, hT_bounds⟩
-  progress as ⟨Z, hZ_val, hZ_bounds⟩
+  step as ⟨T, hT_mod, hT_bounds⟩
+  step as ⟨Z, hZ_val, hZ_bounds⟩
   have hZ_F : Z.toField = 1 := by
     unfold FieldElement51.toField; rw [hZ_val]; exact Nat.cast_one
   have hT_F : T.toField = self.x.toField * self.y.toField := by

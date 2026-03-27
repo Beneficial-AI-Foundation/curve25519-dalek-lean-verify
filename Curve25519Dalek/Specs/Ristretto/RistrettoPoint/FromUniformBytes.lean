@@ -70,7 +70,7 @@ def field_from_bytes (b : Array U8 32#usize) : ZMod p :=
 The function always succeeds for arbitrary 64-byte inputs. The output is a mathematically valid
 Ristretto point equal to
 `elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))`. -/
-@[progress]
+@[step]
 theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
     from_uniform_bytes bytes ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
@@ -80,7 +80,7 @@ theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :
       ⦄ := by
   unfold from_uniform_bytes
   unfold Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add
-  progress*
+  step*
   · simp_all only [Array.to_slice_mut, Array.val_to_slice,
       List.slice_zero_j, Slice.length, List.length_take,
       List.Vector.length_val, UScalar.ofNatCore_val_eq,

@@ -38,7 +38,7 @@ natural language specs:
       Field51_as_Nat(sub_assign(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
 -/
 
-@[progress]
+@[step]
 theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
     (ha : ∀ i < 5, self[i]!.val < 2 ^ 63)
     (hb : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
@@ -46,6 +46,6 @@ theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
       (∀ i < 5, result[i]!.val < 2 ^ 52) ∧
       (Field51_as_Nat result + Field51_as_Nat _rhs) % p = Field51_as_Nat self % p ⦄ := by
   unfold sub_assign
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51

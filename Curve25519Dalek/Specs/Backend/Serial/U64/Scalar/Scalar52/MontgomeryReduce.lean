@@ -139,13 +139,13 @@ private theorem part1_spec_tail (sum i5 : U128) (p : U64)
       carry.val = (sum.val + p'.val * (constants.L[0]!).val) / (2 ^ 52) ∧
       carry.val < 2 ^ 77 ∧
       p'.val < 2 ^ 52 ⦄ := by
-  progress as ⟨i6, i6_post⟩
-  progress as ⟨i7, i7_post⟩
+  step as ⟨i6, i6_post⟩
+  step as ⟨i7, i7_post⟩
   refine ⟨h_p_val, ?_, ?_, h_p_bound⟩
   · rw [i7_post, i6_post, h_i5_eq]; simp only [Nat.shiftRight_eq_div_pow]
   · rw [i7_post, i6_post]; simp only [Nat.shiftRight_eq_div_pow]; scalar_tac
 
-@[progress]
+@[step]
 private theorem part1_spec (sum : U128)
     (h_bound : sum.val + (2 ^ 52 - 1) * (constants.L[0]!).val ≤ U128.max) :
     montgomery_reduce.part1 sum ⦃ result =>
@@ -158,11 +158,11 @@ private theorem part1_spec (sum : U128)
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   have h_L_len : constants.L.val.length = 5 := by
     unfold constants.L; rfl
-  progress as ⟨i, i_post⟩
-  progress as ⟨i1, i1_post⟩
-  progress as ⟨i2, i2_post⟩
-  progress as ⟨i3, i3_post⟩
-  progress as ⟨p, p_post⟩
+  step as ⟨i, i_post⟩
+  step as ⟨i1, i1_post⟩
+  step as ⟨i2, i2_post⟩
+  step as ⟨i3, i3_post⟩
+  step as ⟨p, p_post⟩
   have h_p_val : p.val = (sum.val * constants.LFACTOR) % (2 ^ 52) := by
       rw [p_post]; simp only [UScalar.val_and]
       have h_mask : i3.val = 2^52 - 1 := by
@@ -181,8 +181,8 @@ private theorem part1_spec (sum : U128)
       apply Nat.le_trans (m := sum.val + (2^52 - 1) * (constants.L[0]!).val)
       · apply Nat.add_le_add_left; apply Nat.mul_le_mul_right; apply Nat.le_pred_of_lt h_p_bound
       · exact h_bound
-  progress as ⟨i4, i4_post⟩
-  progress as ⟨i5, i5_post⟩
+  step as ⟨i4, i4_post⟩
+  step as ⟨i5, i5_post⟩
   have h_add_safe' : sum.val + i5.val ≤ U128.max := by
     rw [i5_post, i4_post]
     convert h_add_safe using 2
@@ -192,7 +192,7 @@ private theorem part1_spec (sum : U128)
     simp only [Array.getElem!_Nat_eq]
   exact part1_spec_tail sum i5 p h_p_val h_p_bound h_add_safe' h_i5_eq
 
-@[progress]
+@[step]
 private theorem part2_spec (sum : U128) :
   montgomery_reduce.part2 sum ⦃ result =>
   let (carry, w) := result
@@ -202,12 +202,12 @@ private theorem part2_spec (sum : U128) :
   w.val < 2 ^ 52 ⦄ := by -- 2^128 / 2^52 = 2^76
   unfold montgomery_reduce.part2
   -- Rust: let w = (sum as u64) & ((1u64 << 52) - 1);
-  progress as ⟨w_cast, hw_cast⟩     -- Cast sum to u64
-  progress as ⟨mask1, hmask1⟩       -- 1 << 52
-  progress as ⟨mask, hmask⟩         -- (1 << 52) - 1
-  progress as ⟨w, hw⟩               -- Bitwise AND
+  step as ⟨w_cast, hw_cast⟩     -- Cast sum to u64
+  step as ⟨mask1, hmask1⟩       -- 1 << 52
+  step as ⟨mask, hmask⟩         -- (1 << 52) - 1
+  step as ⟨w, hw⟩               -- Bitwise AND
   -- Rust: (sum >> 52, w)
-  progress as ⟨carry, hcarry⟩       -- Shift right
+  step as ⟨carry, hcarry⟩       -- Shift right
   have h_w_val : w.val = sum.val % 2^52 := by
     rw [hw]; simp only [UScalar.val_and]
     have h_mask_val : mask.val = 2^52 - 1 := by
@@ -235,7 +235,7 @@ set_option maxHeartbeats 200000 in -- Progress will timout otherwise
 - The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
 -/
-@[externally_verified, progress] -- working proof commented out because of slow build
+@[externally_verified, step] -- working proof commented out because of slow build
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
     montgomery_reduce a ⦃ m =>
@@ -285,97 +285,97 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   -- unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
 
   -- -- === ROW 0: Compute n0 ===
-  -- progress as ⟨limbs0, h_limbs0⟩         -- Read a[0]
-  -- progress as ⟨carry0, n0, h_carry0, h_n0, h_n0_bound, h_carry0_bound⟩
+  -- step as ⟨limbs0, h_limbs0⟩         -- Read a[0]
+  -- step as ⟨carry0, n0, h_carry0, h_n0, h_n0_bound, h_carry0_bound⟩
 
   -- -- === ROW 1: Compute n1 ===
-  -- progress as ⟨limbs1, h_limbs1⟩         -- 1. Read a[1]
-  -- progress as ⟨n1_partial, h_n1_partial⟩ -- 2. Compute partial sum: n0 + limbs1
-  -- progress as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
-  -- progress as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
-  -- progress as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
+  -- step as ⟨limbs1, h_limbs1⟩         -- 1. Read a[1]
+  -- step as ⟨n1_partial, h_n1_partial⟩ -- 2. Compute partial sum: n0 + limbs1
+  -- step as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
+  -- step as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
+  -- step as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
   -- -- Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
-  -- progress as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
+  -- step as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
 
   -- -- === ROW 2: Compute n2 ===
-  -- progress as ⟨limbs2, h_limbs2⟩         -- 1. Read a[2]
-  -- progress as ⟨n2_partial, h_n2_partial⟩ -- 2. n1 + limbs2
-  -- progress as ⟨L2, h_L2⟩                 -- 3. Read L[2]
-  -- progress as ⟨prod2_0, h_prod2_0⟩       -- 4. carry0 * L[2]
-  -- progress as ⟨n2_accum, h_n2_accum⟩     -- 5. Add carry0 term: n2_partial + prod2_0
-  -- progress as ⟨prod2_1, h_prod2_1⟩       -- 6. carry1 * L[1] (Uses L1 from Row 1)
-  -- progress as ⟨sum2, h_sum2⟩             -- 7. Final Sum: n2_accum + prod2_1
-  -- progress as ⟨carry2, n2, h_carry2, h_n2, h_n2_bound, h_carry2_bound⟩
+  -- step as ⟨limbs2, h_limbs2⟩         -- 1. Read a[2]
+  -- step as ⟨n2_partial, h_n2_partial⟩ -- 2. n1 + limbs2
+  -- step as ⟨L2, h_L2⟩                 -- 3. Read L[2]
+  -- step as ⟨prod2_0, h_prod2_0⟩       -- 4. carry0 * L[2]
+  -- step as ⟨n2_accum, h_n2_accum⟩     -- 5. Add carry0 term: n2_partial + prod2_0
+  -- step as ⟨prod2_1, h_prod2_1⟩       -- 6. carry1 * L[1] (Uses L1 from Row 1)
+  -- step as ⟨sum2, h_sum2⟩             -- 7. Final Sum: n2_accum + prod2_1
+  -- step as ⟨carry2, n2, h_carry2, h_n2, h_n2_bound, h_carry2_bound⟩
 
   -- -- === ROW 3: Compute n3 ===
-  -- progress as ⟨limbs3, h_limbs3⟩         -- 1. Read a[3]
-  -- progress as ⟨n3_partial, h_n3_partial⟩ -- 2. n2 + limbs3
-  -- progress as ⟨prod3_1, h_prod3_1⟩       -- 3. carry1 * L[2] (Reuses L2 from Row 2)
-  -- progress as ⟨n3_accum, h_n3_accum⟩     -- 4. n3_partial + prod3_1
-  -- progress as ⟨prod3_2, h_prod3_2⟩       -- 5. carry2 * L[1] (Reuses L1 from Row 1)
-  -- progress as ⟨sum3, h_sum3⟩             -- 6. Final Sum: n3_accum + prod3_2
-  -- progress as ⟨carry3, n3, h_carry3, h_n3, h_n3_bound, h_carry3_bound⟩
+  -- step as ⟨limbs3, h_limbs3⟩         -- 1. Read a[3]
+  -- step as ⟨n3_partial, h_n3_partial⟩ -- 2. n2 + limbs3
+  -- step as ⟨prod3_1, h_prod3_1⟩       -- 3. carry1 * L[2] (Reuses L2 from Row 2)
+  -- step as ⟨n3_accum, h_n3_accum⟩     -- 4. n3_partial + prod3_1
+  -- step as ⟨prod3_2, h_prod3_2⟩       -- 5. carry2 * L[1] (Reuses L1 from Row 1)
+  -- step as ⟨sum3, h_sum3⟩             -- 6. Final Sum: n3_accum + prod3_2
+  -- step as ⟨carry3, n3, h_carry3, h_n3, h_n3_bound, h_carry3_bound⟩
 
   -- -- === ROW 4: Compute n4 ===
-  -- progress as ⟨limbs4, h_limbs4⟩         -- 1. Read a[4]
-  -- progress as ⟨n4_partial, h_n4_partial⟩ -- 2. n3 + limbs4
-  -- progress as ⟨L4, h_L4⟩                 -- 3. Read L[4]
-  -- progress as ⟨prod4_0, h_prod4_0⟩       -- 4. carry0 * L[4]
-  -- progress as ⟨n4_accum1, h_n4_accum1⟩   -- 5. Add: n4_partial + prod4_0
-  -- progress as ⟨prod4_2, h_prod4_2⟩       -- 6. carry2 * L[2] (Reuses L2)
-  -- progress as ⟨n4_accum2, h_n4_accum2⟩   -- 7. Add: n4_accum1 + prod4_2
-  -- progress as ⟨prod4_3, h_prod4_3⟩       -- 8. carry3 * L[1] (Reuses L1)
-  -- progress as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
-  -- progress as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
+  -- step as ⟨limbs4, h_limbs4⟩         -- 1. Read a[4]
+  -- step as ⟨n4_partial, h_n4_partial⟩ -- 2. n3 + limbs4
+  -- step as ⟨L4, h_L4⟩                 -- 3. Read L[4]
+  -- step as ⟨prod4_0, h_prod4_0⟩       -- 4. carry0 * L[4]
+  -- step as ⟨n4_accum1, h_n4_accum1⟩   -- 5. Add: n4_partial + prod4_0
+  -- step as ⟨prod4_2, h_prod4_2⟩       -- 6. carry2 * L[2] (Reuses L2)
+  -- step as ⟨n4_accum2, h_n4_accum2⟩   -- 7. Add: n4_accum1 + prod4_2
+  -- step as ⟨prod4_3, h_prod4_3⟩       -- 8. carry3 * L[1] (Reuses L1)
+  -- step as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
+  -- step as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
 
   -- -- === ROW 5: Compute Result Limb 0 (r0) ===
   -- -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
-  -- progress as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
-  -- progress as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
-  -- progress as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
-  -- progress as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
-  -- progress as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
-  -- progress as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
-  -- progress as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
-  -- progress as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
-  -- progress as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
+  -- step as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
+  -- step as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
+  -- step as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
+  -- step as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
+  -- step as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
+  -- step as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
+  -- step as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
+  -- step as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
+  -- step as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
 
   -- -- === ROW 6: Compute Result Limb 1 (r1) ===
   -- -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
-  -- progress as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
-  -- progress as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
-  -- progress as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
-  -- progress as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
-  -- progress as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
-  -- progress as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
-  -- progress as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
+  -- step as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
+  -- step as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
+  -- step as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
+  -- step as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
+  -- step as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
+  -- step as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
+  -- step as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
 
   -- -- === ROW 7: Compute Result Limb 2 (r2) ===
   -- -- Formula: S7 = n6 + a[7] + carry3 * L4
-  -- progress as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
-  -- progress as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
-  -- progress as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
-  -- progress as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
+  -- step as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
+  -- step as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
+  -- step as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
+  -- step as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
   -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
   -- -- The carry is 'n7' and the result 'r2'.
-  -- progress as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
+  -- step as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
 
   -- -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
   -- -- Formula: S8 = n7 + a[8] + carry4 * L4
-  -- progress as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
-  -- progress as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
-  -- progress as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
-  -- progress as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
+  -- step as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
+  -- step as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
+  -- step as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
+  -- step as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
   -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
   -- -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
-  -- progress as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
+  -- step as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
 
   -- -- =========================================================
   -- -- FINAL STEPS: Cast and Conditional Subtraction
   -- -- =========================================================
 
   -- -- Cast the final limb (r4_u128) to U64
-  -- progress as ⟨r4, h_r4⟩
+  -- step as ⟨r4, h_r4⟩
 
   -- have h_L4_exact : constants.L[4]!.val = 2^44 := by
   --     unfold constants.L
@@ -473,7 +473,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   --     try linarith
 
   -- -- Call the 'sub' function
-  -- progress as ⟨m, h_sub, h_bound, h_mod⟩
+  -- step as ⟨m, h_sub, h_bound, h_mod⟩
   -- · -- Case ha: Prove input limbs are < 2^52
   --   intro i hi
   --   interval_cases i

@@ -40,7 +40,7 @@ def SQRT_AD_MINUS_ONE_raw : backend.serial.u64.field.FieldElement51 :=
 - Field51_as_Nat(constants.SQRT_AD_MINUS_ONE) is a square root of (a*d - 1) modulo p, i.e.
   `(Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p)`.
 -/
-@[progress]
+@[step]
 theorem SQRT_AD_MINUS_ONE_spec :
     SQRT_AD_MINUS_ONE ⦃ result =>
     (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧

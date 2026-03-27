@@ -47,7 +47,7 @@ natural language specs:
 - Returns true iff the two points satisfy the multiplicative Ristretto equivalence condition:
   X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)
 -/
-@[progress]
+@[step]
 theorem eq_spec
     (self other : RistrettoPoint)
     (h_self_valid : self.IsValid)
@@ -57,7 +57,7 @@ theorem eq_spec
         (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨
         (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡ (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by
   unfold eq
-  progress*
+  step*
   unfold Bool.Insts.CoreConvertFromChoice.from
   simp only [spec, theta, wp_return]
   have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by

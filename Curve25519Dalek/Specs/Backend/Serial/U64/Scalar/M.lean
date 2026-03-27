@@ -22,10 +22,10 @@ namespace curve25519_dalek.backend.serial.u64.scalar
 
 /-- **Spec for `backend.serial.u64.scalar.m`**:
 - The result equals the product of the two input values -/
-@[progress]
+@[step]
 theorem m_spec (x y : U64) :
     m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
   unfold m
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.u64.scalar

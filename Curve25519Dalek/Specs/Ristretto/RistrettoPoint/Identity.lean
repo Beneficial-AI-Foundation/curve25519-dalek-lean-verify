@@ -36,7 +36,7 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (result : RistrettoPoint) =>
       Field51_as_Nat result.X = 0 ∧
@@ -44,7 +44,7 @@ theorem identity_spec :
       Field51_as_Nat result.Z = 1 ∧
       Field51_as_Nat result.T = 0 ⦄ := by
   unfold identity
-  progress
+  step
   tauto
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity

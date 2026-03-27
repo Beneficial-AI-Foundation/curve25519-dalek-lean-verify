@@ -46,14 +46,14 @@ natural language specs:
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
-@[progress]
+@[step]
 theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)
     (hscalar : U8x32_as_Nat scalar.bytes < 2 ^ 255) (hself : self.IsValid) :
     mul self scalar ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
       result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by
   unfold mul edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul
-  progress*
+  step*
   · exact hself.1
   · constructor
     · unfold RistrettoPoint.IsValid
@@ -119,7 +119,7 @@ natural language specs:
 • The result is a valid RistrettoPoint
 • The result = r + ... + r represents the input RistrettoPoint r added to itself s-times
 -/
-@[progress]
+@[step]
 theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)
     (hself : U8x32_as_Nat self.bytes < 2 ^ 255) (hpoint : point.IsValid) :
     mul self point ⦃ (result : RistrettoPoint) =>

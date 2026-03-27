@@ -51,7 +51,7 @@ natural language specs:
 • P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that the order of P divides 8)
 • For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P
 -/
-@[progress]
+@[step]
 theorem EIGHT_TORSION_spec :
     EIGHT_TORSION ⦃ result =>
       let P := result.val[1]
@@ -59,7 +59,7 @@ theorem EIGHT_TORSION_spec :
       (∀ (i : Fin 8), result.val[i].IsValid) ∧
       (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by
   unfold EIGHT_TORSION EIGHT_TORSION_INNER_DOC_HIDDEN
-  progress*
+  step*
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · simp only [Array.make, List.getElem_cons_succ, List.getElem_cons_zero, *]; decide
   · -- 4 • P.toPoint ≠ 0

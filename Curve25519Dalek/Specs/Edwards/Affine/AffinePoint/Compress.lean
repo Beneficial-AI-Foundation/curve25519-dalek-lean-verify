@@ -45,7 +45,7 @@ Natural language specs:
 - Requires: `y`-coordinate of the AffinePoint, when converted to 32 bytes, has leading bit zero
 - Returns a CompressedEdwardsY equal to the input AffinePoint
 -/
-@[externally_verified, progress] -- proven in Verus
+@[externally_verified, step] -- proven in Verus
 theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)
     (h : Field51_as_Nat self.y < 2 ^ 255) :
     compress self ⦃ result =>

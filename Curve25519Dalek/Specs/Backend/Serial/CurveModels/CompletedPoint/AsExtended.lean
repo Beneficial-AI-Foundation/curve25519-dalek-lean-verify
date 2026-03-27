@@ -57,7 +57,7 @@ where p = 2^255 - 19
 These formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended
 twisted Edwards ℙ³ coordinates.
 -/
-@[progress]
+@[step]
 theorem as_extended_spec (q : CompletedPoint)
   (h_q_Valid : q.IsValid) :
   as_extended q ⦃ (e : edwards.EdwardsPoint) =>
@@ -92,7 +92,7 @@ theorem as_extended_spec (q : CompletedPoint)
   have := h_q_Valid.T_valid
   simp only [FieldElement51.IsValid, Array.getElem!_Nat_eq,
     List.getElem!_eq_getElem?_getD, Nat.reducePow] at this
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ fe, fe_post1, fe_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ←

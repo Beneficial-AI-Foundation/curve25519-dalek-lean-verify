@@ -32,7 +32,7 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut
   fun _ s => ok (s, id)
 
 /-- RangeFull index_mut (`s[..]`) returns the slice and the identity function. -/
-@[simp, progress]
+@[simp, step]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut_spec
   {T : Type} (s : Slice T) :
   core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut () s ⦃ p =>
@@ -90,7 +90,7 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut
   fun _ s => ok (some s, fun opt => opt.getD s)
 
 /-- RangeFull get_mut (`s[..]`) returns Some(s) and a function that replaces the slice if Some, or keeps it if None. -/
-@[simp, progress]
+@[simp, step]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut_spec
   {T : Type} (s : Slice T) :
   core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut () s ⦃ p =>
@@ -109,7 +109,7 @@ def core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get
   fun _ s => ok (some s)
 
 /-- RangeFull get (`s[..]`) always returns Some(s) for slices. -/
-@[simp, progress]
+@[simp, step]
 theorem core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_spec
   {T : Type} (s : Slice T) :
   core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get () s ⦃ opt =>
@@ -201,7 +201,7 @@ def subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if both inputs are `Choice.one`
 -/
-@[progress]
+@[step]
 theorem subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand_spec (a b : subtle.Choice) :
     subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand a b ⦃ c =>
     (c = Choice.one ↔ a = Choice.one ∧ b = Choice.one) ⦄ := by
@@ -277,7 +277,7 @@ def subtle.Choice.Insts.CoreOpsBitNotChoice.not (c : subtle.Choice) : Result sub
     ok Choice.one
 
 
-@[progress]
+@[step]
 theorem subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec (a : subtle.Choice) :
   subtle.Choice.Insts.CoreOpsBitNotChoice.not a ⦃ b =>
   (a.val = 1#u8 ↔ b = Choice.zero) ⦄ := by
@@ -310,7 +310,7 @@ def U16.Insts.SubtleConstantTimeEq.ct_eq (a : U16) (b : U16) : Result subtle.Cho
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U16 values are equal
 -/
-@[progress]
+@[step]
 theorem U16.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U16) :
   U16.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
   (c = Choice.one ↔ a = b) ⦄ := by
@@ -357,7 +357,7 @@ axiom Slice.Insts.SubtleConstantTimeEq.ct_eq
 - Returns Choice.one (true) if and only if all corresponding elements are equal
 - Requires equal-length slices with valid bounds
 -/
-@[progress]
+@[step]
 axiom Slice.Insts.SubtleConstantTimeEq.ct_eq_spec
   {T : Type} (ConstantTimeEqInst : subtle.ConstantTimeEq T) (a b : Slice T)
   (ha : a.length < 2 ^ UScalarTy.Usize.numBits)
@@ -378,7 +378,7 @@ def U8.Insts.SubtleConstantTimeEq.ct_eq (a : U8) (b : U8) : Result subtle.Choice
 - No panic (always returns successfully)
 - Returns `Choice.one` if and only if the two U8 values are equal
 -/
-@[progress]
+@[step]
 theorem U8.Insts.SubtleConstantTimeEq.ct_eq_spec (a b : U8) :
   U8.Insts.SubtleConstantTimeEq.ct_eq a b ⦃ c =>
   (c = Choice.one ↔ a = b) ⦄ := by
@@ -415,7 +415,7 @@ def subtle.ConditionallySelectable.conditional_assign.default
 - No panic (if conditional_select succeeds)
 - Returns the result of conditional_select(a, b, choice)
 -/
-@[progress]
+@[step]
 theorem subtle.ConditionallySelectable.conditional_assign.default_spec
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
   (a b : Self) (choice : subtle.Choice)
@@ -448,7 +448,7 @@ def subtle.ConditionallySelectable.conditional_swap.default
 - If choice = Choice.one: swaps a and b
 - If choice = Choice.zero: leaves them unchanged
 -/
-@[progress]
+@[step]
 theorem subtle.ConditionallySelectable.conditional_swap.default_spec
   {Self : Type} (ConditionallySelectableInst : subtle.ConditionallySelectable Self)
   (a b : Self) (choice : subtle.Choice)
@@ -474,7 +474,7 @@ def U64.Insts.SubtleConditionallySelectable.conditional_select
   else ok a
 
 /-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
-@[progress]
+@[step]
 theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec (a b : U64) (choice : subtle.Choice) :
     U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ res =>
     res = if choice.val = 1#u8 then b else a ⦄ := by
@@ -525,7 +525,7 @@ def subtle.CtOption.new
 - Returns a CtOption with the given value and is_some flag
 - The returned CtOption's fields match the inputs exactly
 -/
-@[progress]
+@[step]
 theorem subtle.CtOption.new_spec {T : Type} (value : T) (is_some : subtle.Choice) :
   subtle.CtOption.new value is_some ⦃ opt =>
   opt.value = value ∧ opt.is_some = is_some ⦄ := by
@@ -564,7 +564,7 @@ def U8.Insts.SubtleConditionallySelectable.conditional_select
   else ok a
 
 /-- Progress spec for U8.Insts.SubtleConditionallySelectable.conditional_select -/
-@[progress]
+@[step]
 theorem U8.Insts.SubtleConditionallySelectable.conditional_select_spec (a b : U8) (choice : subtle.Choice) :
     U8.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ res =>
     res = if choice.val = 1#u8 then b else a ⦄ := by
@@ -643,7 +643,7 @@ def Array.Insts.SubtleConditionallySelectable.conditional_select
   else ok a
 
 /-- Progress spec for Array.Insts.SubtleConditionallySelectable.conditional_select -/
-@[progress]
+@[step]
 theorem Array.Insts.SubtleConditionallySelectable.conditional_select_spec {T : Type} {N : Usize}
     (inst : subtle.ConditionallySelectable T)
     (a b : Array T N) (choice : subtle.Choice) :
@@ -779,7 +779,7 @@ def
 - Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
 - Implements constant-time conditional swap for ProjectiveNielsPoint
 -/
-@[progress]
+@[step]
 theorem backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : backend.serial.curve_models.ProjectiveNielsPoint) (choice : subtle.Choice)
   (h_a : ∃ res, backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -810,7 +810,7 @@ def
 - Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
 - Implements constant-time conditional swap for AffineNielsPoint
 -/
-@[progress]
+@[step]
 theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec
   (a b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice)
   (h_a : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -840,7 +840,7 @@ def backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelect
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 - Implements constant-time conditional swap for AffineNielsPoint
 -/
-@[progress]
+@[step]
 theorem backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : backend.serial.curve_models.AffineNielsPoint) (choice : subtle.Choice)
   (h_a : ∃ res, backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -882,7 +882,7 @@ def
 - Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
 - Implements constant-time conditional swap for edwards.affine.AffinePoint
 -/
-@[progress]
+@[step]
 theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
   (h_a : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -909,7 +909,7 @@ def
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for edwards.affine.AffinePoint
 -/
-@[progress]
+@[step]
 theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
   (h : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -977,7 +977,7 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 - Implements constant-time conditional swap for scalar.Scalar
 -/
-@[progress]
+@[step]
 theorem scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : scalar.Scalar) (choice : subtle.Choice)
   (h_a : ∃ res, scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -1007,7 +1007,7 @@ def scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for scalar.Scalar
 -/
-@[progress]
+@[step]
 theorem scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : scalar.Scalar) (choice : subtle.Choice)
   (h : ∃ res, scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -1058,7 +1058,7 @@ def edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 - Implements constant-time conditional swap for edwards.EdwardsPoint
 -/
-@[progress]
+@[step]
 theorem edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : edwards.EdwardsPoint) (choice : subtle.Choice)
   (h_a : ∃ res, edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -1088,7 +1088,7 @@ def edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for edwards.EdwardsPoint
 -/
-@[progress]
+@[step]
 theorem edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : edwards.EdwardsPoint) (choice : subtle.Choice)
   (h : ∃ res, edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -1122,7 +1122,7 @@ def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_s
 - Conditionally swaps two ProjectivePoint values in constant time
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 -/
-@[progress]
+@[step]
 theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
   (h_a : ∃ res, montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -1178,7 +1178,7 @@ def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_s
 - Returns (a, b) if choice.val = 0#u8, or (b, a) if choice.val = 1#u8
 - Implements constant-time conditional swap for MontgomeryPoint
 -/
-@[progress]
+@[step]
 theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice) :
   montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap a b choice ⦃ res =>
@@ -1205,7 +1205,7 @@ def montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_a
 - This is a wrapper around conditional_select
 - Implements constant-time conditional assignment for MontgomeryPoint
 -/
-@[progress]
+@[step]
 theorem montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : montgomery.MontgomeryPoint) (choice : subtle.Choice)
   (h : ∃ res, montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -1234,7 +1234,7 @@ def montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq
 - Always returns ok ()
 - Marker method required by the Eq trait to assert total equality
 -/
-@[progress]
+@[step]
 theorem montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_spec
   (self : montgomery.MontgomeryPoint) :
   montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq self ⦃ _ => True ⦄ := by
@@ -1258,7 +1258,7 @@ def montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_a
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for ProjectivePoint
 -/
-@[progress]
+@[step]
 theorem montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : montgomery.ProjectivePoint) (choice : subtle.Choice)
   (h : ∃ res, montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -1285,7 +1285,7 @@ def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_s
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 - Implements constant-time conditional swap for edwards.affine.AffinePoint
 -/
-@[progress]
+@[step]
 theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
   (h_a : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -1313,7 +1313,7 @@ def edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_a
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for edwards.affine.AffinePoint
 -/
-@[progress]
+@[step]
 theorem edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : edwards.affine.AffinePoint) (choice : subtle.Choice)
   (h : ∃ res, edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :
@@ -1399,7 +1399,7 @@ def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swa
 - Returns (a, b) if choice.val = 0, or (b, a) if choice.val = 1
 - Implements constant-time conditional swap for ristretto.RistrettoPoint
 -/
-@[progress]
+@[step]
 theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec
   (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
   (h_a : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res)
@@ -1429,7 +1429,7 @@ def ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_ass
 - Equivalent to conditional_select(a, b, choice)
 - Implements constant-time conditional assignment for ristretto.RistrettoPoint
 -/
-@[progress]
+@[step]
 theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
   (a b : ristretto.RistrettoPoint) (choice : subtle.Choice)
   (h : ∃ res, ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select' a b choice = ok res) :

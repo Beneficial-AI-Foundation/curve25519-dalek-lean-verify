@@ -40,17 +40,17 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns `b` when `choice = 1` and `a` when `choice = 0`
 -/
-@[progress]
+@[step]
 theorem conditional_select_spec
     (a b : EdwardsPoint)
     (choice : subtle.Choice) :
     conditional_select a b choice ⦃ (result : EdwardsPoint) =>
       result = if choice.val = 1#u8 then b else a ⦄ := by
   unfold conditional_select
-  progress as ⟨feX, hfeX⟩
-  progress as ⟨feY, hfeY⟩
-  progress as ⟨feZ, hfeZ⟩
-  progress as ⟨feT, hfeT⟩
+  step as ⟨feX, hfeX⟩
+  step as ⟨feY, hfeY⟩
+  step as ⟨feZ, hfeZ⟩
+  step as ⟨feT, hfeT⟩
   have arr_ext : ∀ (x y : backend.serial.u64.field.FieldElement51),
       (∀ i < 5, x[i]! = y[i]!) → x = y := by
     intro x y h

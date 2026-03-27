@@ -41,14 +41,14 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns `b` when `choice = 1` and `a` when `choice = 0`
 -/
-@[progress]
+@[step]
 theorem conditional_select_spec
     (a b : RistrettoPoint)
     (choice : subtle.Choice) :
     conditional_select a b choice ⦃ (result : RistrettoPoint) =>
       result = if choice.val = 1#u8 then b else a ⦄ := by
   unfold conditional_select
-  progress
+  step
   assumption
 
 end curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable

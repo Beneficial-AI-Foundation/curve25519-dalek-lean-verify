@@ -152,7 +152,7 @@ def parseSpecSource (relevantLines : Array String) : SpecParts := Id.run do
           inDocstring := false
           docstringDone := true
       else if line.trimAsciiStart.toString.startsWith "@[" then
-        -- Skip attribute declarations (e.g., @[progress], @[simp])
+        -- Skip attribute declarations (e.g., @[step], @[simp])
         docstringDone := true
         continue
       else if line.trimAsciiStart.toString.startsWith "theorem" then

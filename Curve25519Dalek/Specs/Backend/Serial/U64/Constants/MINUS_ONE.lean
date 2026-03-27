@@ -34,7 +34,7 @@ natural language specs:
 - The value of constants.MINUS_ONE, when converted to a natural number, equals p − 1
   (the canonical representative of −1 modulo p in [0, p-1]).
 -/
-@[progress]
+@[step]
 theorem MINUS_ONE_spec :
     MINUS_ONE ⦃ result =>
     Field51_as_Nat result = p - 1 ∧

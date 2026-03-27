@@ -49,14 +49,14 @@ natural language specs:
 - The result represents the product of the two input scalars modulo L
 - Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)
 - Output limbs are bounded by 2^52 -/
-@[progress]
+@[step]
 theorem mul_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     mul a b ⦃ ( result : Scalar52 ) =>
       Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧
       Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by
   unfold mul
-  progress*
+  step*
   · unfold constants.RR; decide
   · refine ⟨?_, by grind⟩
     have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by

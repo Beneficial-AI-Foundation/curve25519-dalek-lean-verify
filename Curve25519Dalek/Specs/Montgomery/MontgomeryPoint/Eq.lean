@@ -42,13 +42,13 @@ natural language specs:
 - Returns true iff the u-coordinates are equal modulo p
 - Implemented via constant-time equality followed by Choice-to-Bool conversion
 -/
-@[progress]
+@[step]
 theorem eq_spec (u v : MontgomeryPoint) :
     eq u v ⦃ b =>
     (b = true ↔
       (U8x32_as_Nat u % 2 ^ 255) ≡ (U8x32_as_Nat v % 2 ^ 255) [MOD p]) ⦄ := by
     unfold eq
-    progress*
+    step*
     unfold Bool.Insts.CoreConvertFromChoice.from
     simp only [spec, theta, wp_return]
     have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by

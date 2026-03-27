@@ -50,34 +50,34 @@ lemma array_eq_of_to_slice_eq {α : Type} {n : Usize} {h1 h2 : Array α n}
   cases h
   rfl
 
-/-! ## Workaround for `progress` timeout
+/-! ## Workaround for `step` timeout
 
-The `progress` tactic runs `simp` on **all hypotheses** in the context. After `progress`
+The `step` tactic runs `simp` on **all hypotheses** in the context. After `step`
 processes `to_bytes`, the postconditions involving `U8x32_as_Nat` / `Field51_as_Nat` are
-expensive for `simp` to reduce (whnf timeout), causing any subsequent `progress` call to
+expensive for `simp` to reduce (whnf timeout), causing any subsequent `step` call to
 time out.
 
 Workaround:
 1. Use `simp only [lift, bind_tc_ok] at ⊢` to reduce the pure `Array.to_slice` binds
-   without touching hypotheses (bypasses `progress` for those steps).
-2. Wrap the expensive hypotheses in `Hold` (opaque to `simp`) before calling `progress`
+   without touching hypotheses (bypasses `step` for those steps).
+2. Wrap the expensive hypotheses in `Hold` (opaque to `simp`) before calling `step`
    on `ct_eq`.
 3. Recover with `change ... at` afterwards (`Hold P` is defeq to `P`).
 -/
 
 private def Hold (P : Prop) : Prop := P
 
-@[progress]
+@[step]
 theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :
     is_zero r ⦃ c =>
     (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by
   unfold is_zero
-  progress as ⟨bytes, h_to_bytes_mod, h_to_bytes_lt⟩
+  step as ⟨bytes, h_to_bytes_mod, h_to_bytes_lt⟩
   simp only [lift, bind_tc_ok] at ⊢
   have h_mod : Hold (U8x32_as_Nat bytes ≡ Field51_as_Nat r [MOD p]) := h_to_bytes_mod
   have h_lt : Hold (U8x32_as_Nat bytes < p) := h_to_bytes_lt
   clear h_to_bytes_mod h_to_bytes_lt
-  progress as ⟨result, h_ct_eq⟩
+  step as ⟨result, h_ct_eq⟩
   change U8x32_as_Nat bytes ≡ Field51_as_Nat r [MOD p] at h_mod
   change U8x32_as_Nat bytes < p at h_lt
   -- Step 6: prove the iff

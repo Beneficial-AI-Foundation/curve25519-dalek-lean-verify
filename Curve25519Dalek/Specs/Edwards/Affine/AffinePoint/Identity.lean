@@ -38,13 +38,13 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting AffinePoint is the identity element with coordinates (x=0, y=1)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (q : AffinePoint) =>
       Field51_as_Nat q.x = 0 ∧ Field51_as_Nat q.y = 1 ∧
       q.IsValid ⦄ := by
   unfold identity ZERO ONE
-  progress*
+  step*
   simp only [*]
   decide
 

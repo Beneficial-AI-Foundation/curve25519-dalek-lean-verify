@@ -48,18 +48,18 @@ natural language specs:
 - When the input bytes represent a non-canonical value (≥ L), the function returns a CtOption Scalar
   where is_some = Choice.zero (i.e., None)
 -/
-@[progress]
+@[step]
 theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
     from_canonical_bytes b ⦃ s =>
     (U8x32_as_Nat b < L → s.is_some = Choice.one ∧ s.value.bytes = b) ∧
     (L ≤ U8x32_as_Nat b → s.is_some = Choice.zero) ⦄ := by
   unfold from_canonical_bytes
-  progress as ⟨_, ha⟩
-  progress as ⟨_, he, _⟩
-  progress as ⟨_, _⟩
-  progress as ⟨_, hd⟩
-  progress as ⟨f, hf⟩
-  progress as ⟨_, _, hg⟩
+  step as ⟨_, ha⟩
+  step as ⟨_, he, _⟩
+  step as ⟨_, _⟩
+  step as ⟨_, hd⟩
+  step as ⟨f, hf⟩
+  step as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
   · rw [ha, high_bit_zero_of_lt_L b hb] at he
     simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,

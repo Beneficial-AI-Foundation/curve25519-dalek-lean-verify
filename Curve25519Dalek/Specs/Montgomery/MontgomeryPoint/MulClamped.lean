@@ -43,7 +43,7 @@ natural language specs:
 - Delegates to `montgomery.MulScalarMontgomeryPointMontgomeryPoint.mul`
 - The returned MontgomeryPoint matches the clamped scalar multiplication result
 -/
-@[progress]
+@[step]
 theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
     mul_clamped P bytes ⦃ res =>
       (∃ clamped_scalar,
@@ -53,7 +53,7 @@ theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
       let m:= (U8x32_as_Nat clamped_scalar)
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
   unfold mul_clamped
-  progress*
+  step*
   have := Nat.mod_eq_of_lt  a_post2
   rw[this] at res_post
   exact ⟨a, a_post1, a_post2, a_post3, res_post⟩

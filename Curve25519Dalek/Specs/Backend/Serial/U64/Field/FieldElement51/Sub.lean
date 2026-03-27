@@ -60,7 +60,7 @@ set_option maxRecDepth 4096 in
   replace these precise bounds with the slightly looser bounds
   a[i] < 2^63  and b[i] < 2^54
 -/
-@[progress]
+@[step]
 theorem sub_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 63) (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :
     sub a b ⦃ (d : FieldElement51) =>
