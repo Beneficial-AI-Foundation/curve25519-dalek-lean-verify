@@ -249,7 +249,7 @@ private lemma redc_bound {inter T : Nat} {C : Int}
     rw [h_eq_nat]; have := (Nat.mul_lt_mul_right hL_pos).mpr h_c_lt; grind => lia
   exact (Nat.mul_lt_mul_right hR_pos).mp h_bound
 
-set_option maxHeartbeats 200000 in -- Progress will timout otherwise
+set_option maxHeartbeats 1000000 in -- Progress will timout otherwise
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -264,7 +264,99 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat m < L) ⦄
     := by
-  sorry
+  unfold montgomery_reduce
+  unfold Insts.CoreOpsIndexIndexUsizeU64.index
+  simp only [step_simps]
+  -- ROW 0: part1(a[0])
+  let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  let* ⟨ result0, h_result0 ⟩ ← part1_spec
+  obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
+  -- ROW 1: part1(carry0 + a[1] + n0*L[1])
+  let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i2, i2_post ⟩ ← U128.add_spec
+  let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i4, i4_post ⟩ ← m_spec
+  let* ⟨ i5, i5_post ⟩ ← U128.add_spec
+  -- ROW 1: part1
+  let* ⟨ result1, h_result1 ⟩ ← part1_spec
+  obtain ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩ := h_result1
+  let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i7, i7_post ⟩ ← U128.add_spec
+  let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i9, i9_post ⟩ ← m_spec
+  let* ⟨ i10, i10_post ⟩ ← U128.add_spec
+  let* ⟨ i11, i11_post ⟩ ← m_spec
+  let* ⟨ i12, i12_post ⟩ ← U128.add_spec
+  -- ROW 2: part1
+  let* ⟨ result2, h_result2 ⟩ ← part1_spec
+  obtain ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩ := h_result2
+  let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i14, i14_post ⟩ ← U128.add_spec
+  let* ⟨ i15, i15_post ⟩ ← m_spec
+  let* ⟨ i16, i16_post ⟩ ← U128.add_spec
+  let* ⟨ i17, i17_post ⟩ ← m_spec
+  let* ⟨ i18, i18_post ⟩ ← U128.add_spec
+  -- ROW 3: part1
+  let* ⟨ result3, h_result3 ⟩ ← part1_spec
+  obtain ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩ := h_result3
+  let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i20, i20_post ⟩ ← U128.add_spec
+  let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i22, i22_post ⟩ ← m_spec
+  let* ⟨ i23, i23_post ⟩ ← U128.add_spec
+  let* ⟨ i24, i24_post ⟩ ← m_spec
+  let* ⟨ i25, i25_post ⟩ ← U128.add_spec
+  let* ⟨ i26, i26_post ⟩ ← m_spec
+  let* ⟨ i27, i27_post ⟩ ← U128.add_spec
+  -- ROW 4: part1
+  let* ⟨ result4, h_result4 ⟩ ← part1_spec
+  obtain ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩ := h_result4
+  let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i29, i29_post ⟩ ← U128.add_spec
+  let* ⟨ i30, i30_post ⟩ ← m_spec
+  let* ⟨ i31, i31_post ⟩ ← U128.add_spec
+  let* ⟨ i32, i32_post ⟩ ← m_spec
+  let* ⟨ i33, i33_post ⟩ ← U128.add_spec
+  let* ⟨ i34, i34_post ⟩ ← m_spec
+  let* ⟨ i35, i35_post ⟩ ← U128.add_spec
+  -- ROW 5: part2 → r0
+  let* ⟨ p2_0, h_p2_0 ⟩ ← part2_spec
+  obtain ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩ := h_p2_0
+  let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i37, i37_post ⟩ ← U128.add_spec
+  let* ⟨ i38, i38_post ⟩ ← m_spec
+  let* ⟨ i39, i39_post ⟩ ← U128.add_spec
+  let* ⟨ i40, i40_post ⟩ ← m_spec
+  let* ⟨ i41, i41_post ⟩ ← U128.add_spec
+  -- ROW 6: part2 → r1
+  let* ⟨ p2_1, h_p2_1 ⟩ ← part2_spec
+  obtain ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩ := h_p2_1
+  let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i43, i43_post ⟩ ← U128.add_spec
+  let* ⟨ i44, i44_post ⟩ ← m_spec
+  let* ⟨ i45, i45_post ⟩ ← U128.add_spec
+  -- ROW 7: part2 → r2
+  let* ⟨ p2_2, h_p2_2 ⟩ ← part2_spec
+  obtain ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩ := h_p2_2
+  let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i47, i47_post ⟩ ← U128.add_spec
+  let* ⟨ i48, i48_post ⟩ ← m_spec
+  let* ⟨ i49, i49_post ⟩ ← U128.add_spec
+  -- ROW 8: part2 → r3, r4_u128
+  let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
+  obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
+  let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
+  let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
+  · sorry -- case ha: input limbs < 2^52 (needs r4 tight bound)
+  · -- case hb: L limbs < 2^52
+    intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+      UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
+  · sorry -- case ha': intermediate < 2*L (needs main equation + redc_bound)
+  · -- case hb': Scalar52_as_Nat constants.L ≤ L
+    rw [constants.L_spec]
+  sorry -- final: postcondition
+
+
   -- -- ============================================================================================
   -- -- INFO 1: The proof below is commented out to speed up build. You need to increase Heartbeats to
   -- --     8000000 if you the proof is not commented, otherwise you'll get a deterministic timeout.
