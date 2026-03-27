@@ -95,7 +95,7 @@ jobs:
       - name: Fetch functions.json from deployed site
         if: >-
           (github.event_name != 'workflow_run' || steps.artifact.outcome != 'success') &&
-          steps.cache.outputs.cache-hit != 'true'
+          steps.cache.outputs.cache-matched-key == ''
         run: |
           curl -sSfL \
             https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/functions.json \
