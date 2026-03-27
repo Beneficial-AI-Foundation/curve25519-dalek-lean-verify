@@ -375,23 +375,26 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Array.getElem!_Nat_eq]
     agrind
   have h_i48 : i48.val < 2 ^ 96 := by
-    sorry
+    rw [i48_post, h_L4]
+    exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
   have h_i49_bound : i49.val < 2 ^ 99 := by
-    sorry
+    rw [i49_post, i47_post]; linarith [h_n7_bound, h_a8, h_i48]
   have h_r4u128_tight : p2_3.1.val < 2 ^ 47 := by
-    sorry
+    rw [h_r4u128_val, Nat.div_lt_iff_lt_mul (by positivity : 0 < 2 ^ 52)]
+    calc i49.val < 2 ^ 99 := h_i49_bound
+      _ = 2 ^ 47 * 2 ^ 52 := by rw [← pow_add]
   have h_r4_tight : r4.val < 2 ^ 52 := by
-    have : r4.val ≤ p2_3.1.val := by rw [r4_post]; sorry
-    sorry
+    have : r4.val ≤ p2_3.1.val := by
+      rw [r4_post]; simp only [U128_cast_U64_val]; exact Nat.mod_le _ _
+    linarith
   let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
   · -- case ha: input limbs < 2^52
-    sorry
-    --intro j hj
-    -- interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
-    --   List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
-    --   getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
-    --   Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
-    -- <;> try assumption
+    intro j hj
+    interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
+      List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+      getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+      Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+    <;> try assumption
   · -- case hb: L limbs < 2^52
     intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
       UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
