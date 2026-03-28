@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -533,7 +533,7 @@ private lemma elligator_nqr_twist
 theorem elligator_encode_spec
     (r_0 : backend.serial.u64.field.FieldElement51)
     (h_bounds : ∀ i, i < 5 → (r_0[i]!).val ≤ 2 ^ 52 - 1) :
-    elligator_encode r_0 ⦃ res =>
+    elligator_encode r_0 ⦃ (res : montgomery.MontgomeryPoint × subtle.Choice) =>
     -- Field arithmetic interpretation of input and outputs
     let r     : ZMod p := (Field51_as_Nat r_0 : ZMod p)
     let d_1   : ZMod p := 1 + 2 * r ^ 2

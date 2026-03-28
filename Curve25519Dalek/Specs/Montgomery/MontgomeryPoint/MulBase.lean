@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -10,6 +10,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToMontgomery
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.ExternallyVerified
+
 /-! # Spec Theorem for `MontgomeryPoint::mul_base`
 
 Specification and proof for
@@ -53,18 +54,17 @@ natural language specs:
 -/
 @[externally_verified, progress]
 theorem mul_base_spec (scalar : scalar.Scalar) :
-    mul_base scalar ⦃ result =>
-    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
-     := by
-    unfold mul_base
-    progress with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
-    progress with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
-    · exact ep_valid.Y_bounds
-    · exact ep_valid.Z_bounds
-    · simp_all only
-      have := res_hom 1
-      simp only [one_smul] at this
-      rw[← this]
-      apply Montgomery.comm_mul_fromEdwards
+    mul_base scalar ⦃ (result : montgomery.MontgomeryPoint) =>
+      Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄ := by
+  unfold mul_base
+  progress with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
+  progress with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
+  · exact ep_valid.Y_bounds
+  · exact ep_valid.Z_bounds
+  · simp_all only
+    have := res_hom 1
+    simp only [one_smul] at this
+    rw[← this]
+    apply Montgomery.comm_mul_fromEdwards
 
 end curve25519_dalek.montgomery.MontgomeryPoint

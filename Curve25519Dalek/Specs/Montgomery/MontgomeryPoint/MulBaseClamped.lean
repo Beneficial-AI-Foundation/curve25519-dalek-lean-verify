@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -8,6 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
 import Curve25519Dalek.Specs.Scalar.ClampInteger
+
 /-! # Spec Theorem for `MontgomeryPoint::mul_base_clamped`
 
 Specification and proof for
@@ -47,14 +48,14 @@ natural language specs:
 -/
 @[progress]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
-    mul_base_clamped bytes ⦃ result =>
-    (∃ clamped_scalar_nat,
-    h ∣ clamped_scalar_nat ∧
-    clamped_scalar_nat < 2 ^ 255 ∧
-    2 ^ 254 ≤ clamped_scalar_nat ∧
-     MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards _root_.Edwards.basepoint)) ⦄    := by
-   unfold mul_base_clamped
-   progress*
-   exact ⟨U8x32_as_Nat a, a_post1, a_post2, a_post3, result_post⟩
+    mul_base_clamped bytes ⦃ (result : montgomery.MontgomeryPoint) =>
+      (∃ clamped_scalar_nat,
+        h ∣ clamped_scalar_nat ∧
+        clamped_scalar_nat < 2 ^ 255 ∧
+        2 ^ 254 ≤ clamped_scalar_nat ∧
+        MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards _root_.Edwards.basepoint)) ⦄ := by
+  unfold mul_base_clamped
+  progress*
+  exact ⟨U8x32_as_Nat a, a_post1, a_post2, a_post3, result_post⟩
 
 end curve25519_dalek.montgomery.MontgomeryPoint

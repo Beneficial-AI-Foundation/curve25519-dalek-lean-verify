@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang, Hoang Le Truong
 -/
@@ -83,8 +83,9 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : self.U.IsValid)
     (hW : self.W.IsValid)
     (h_valid : self.W.toField ≠ 0) :
-    as_affine self ⦃ res => (U8x32_as_Field res = self.U.toField  / self.W.toField) ∧
-    (U8x32_as_Nat res < 2 ^255)  ⦄ := by
+    as_affine self ⦃ (res : montgomery.MontgomeryPoint) =>
+      (U8x32_as_Field res = self.U.toField / self.W.toField) ∧
+      (U8x32_as_Nat res < 2 ^ 255) ⦄ := by
   unfold as_affine at *
   progress*
   · constructor
