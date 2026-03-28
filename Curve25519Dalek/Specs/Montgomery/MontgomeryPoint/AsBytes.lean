@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `MontgomeryPoint::as_bytes`
+/-!
+# Spec theorem for `MontgomeryPoint::as_bytes`
 
 Specification and proof for `curve25519_dalek::montgomery::MontgomeryPoint::as_bytes`.
 
@@ -43,8 +44,8 @@ Formal specification:
 -/
 @[progress]
 theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :
-    montgomery.MontgomeryPoint.as_bytes mp ⦃ result =>
-    result = mp ⦄ := by
+    montgomery.MontgomeryPoint.as_bytes mp ⦃ (result : montgomery.MontgomeryPoint) =>
+      result = mp ⦄ := by
   unfold montgomery.MontgomeryPoint.as_bytes
   simp
 

@@ -1,20 +1,18 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-
-/-! # identity
-
-Specification and proof for `MontgomeryPoint::identity`.
+/-!
+# Spec theorem for `MontgomeryPoint::identity`
 
 This function returns the identity element of the Montgomery curve,
 which is represented as 32 zero bytes.
 
-**Source**: curve25519-dalek/src/montgomery.rs:L112-L117
+Source: "curve25519-dalek/src/montgomery.rs"
 -/
 
 open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek

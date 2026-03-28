@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
@@ -17,16 +17,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
 
-/-! # Spec Theorem for `MontgomeryPoint::to_edwards`
-
-Specification and proof for `MontgomeryPoint::to_edwards`.
+/-!
+# Spec theorem for `MontgomeryPoint::to_edwards`
 
 This function attempts to convert a MontgomeryPoint (u-coordinate only) to an
 EdwardsPoint on the twisted Edwards curve, using the birational map
 y = (u-1)/(u+1), followed by Edwards decompression with a specified sign bit.
 
-**Source**: curve25519-dalek/src/montgomery.rs:224-253
-
+Source: "curve25519-dalek/src/montgomery.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -60,6 +58,10 @@ private lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ 
   simp only [spec_ok]
   decide
 
+/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::to_edwards`**
+
+Converts a MontgomeryPoint to an EdwardsPoint via the birational map y = (u-1)/(u+1).
+Returns `None` when u ≡ -1 (mod p) (point is on the twist). -/
 @[step]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       to_edwards mp sign ⦃ result =>

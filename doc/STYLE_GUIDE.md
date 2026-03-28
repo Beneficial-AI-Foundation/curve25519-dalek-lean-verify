@@ -104,6 +104,3 @@ theorem fun_name_spec (a : argType) (b : argType) (h1 : pre_condition1)
 
 [mathlib-style]: https://leanprover-community.github.io/contribute/style.html
 [mathlib-naming]: https://leanprover-community.github.io/contribute/naming.html
-
-
-
