@@ -1,10 +1,9 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
-
 /-! # Spec Theorem for `Scalar::as_bytes`
 
 Specification and proof for `Scalar::as_bytes`.

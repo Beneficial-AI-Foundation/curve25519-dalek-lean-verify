@@ -1,11 +1,10 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-
 /-! # Spec Theorem for `Scalar::non_adjacent_form`
 
 Specification and proof for `Scalar::non_adjacent_form`.
@@ -48,6 +47,5 @@ natural language specs:
     • \forall i \in \{0,…, 255 – w + 1\}: the sequence (naf[i], …, naf[i + w - 1])
       contains at most one nonzero entry
 -/
-
 
 end curve25519_dalek.scalar.Scalar

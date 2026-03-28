@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -7,8 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
-
-
 /-! # Spec Theorem for `MontgomeryPoint::mul_assign`
 
 Specification and proof for
@@ -19,8 +17,6 @@ delegating to the MontgomeryPoint * Scalar implementation (the Montgomery ladder
 in the backend).
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 454:4-456:5
-
-
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -51,9 +47,8 @@ natural language specs:
 @[progress]
 theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
     mul_assign P scalar ⦃ res =>
-    let m:= (U8x32_as_Nat scalar.bytes) % 2^255
-    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
-     := by
+    let m := (U8x32_as_Nat scalar.bytes) % 2^255
+    MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄ := by
   unfold mul_assign
   progress*
 

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -9,7 +9,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
-
 import Mathlib.Data.Nat.ModEq
 /-! # Spec Theorem for `MontgomeryPoint::ct_eq`
 
@@ -22,7 +21,7 @@ delegating to FieldElement51 constant-time equality.
 
 **Source**: curve25519-dalek/src/montgomery.rs, lines 79:4-84:5
 
---/
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51

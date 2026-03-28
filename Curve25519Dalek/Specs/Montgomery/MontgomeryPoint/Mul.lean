@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -13,7 +13,6 @@ import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.DifferentialAddAndDouble
-
 /-! # Spec Theorem for `MontgomeryPoint::mul`
 
 Specification and proof for
@@ -30,7 +29,7 @@ most significant to least significant.
 
 ## TODO
 - Complete proof
---/
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Montgomery
@@ -79,7 +78,7 @@ theorem mul_loop_spec
     (idx0U : Field51_as_Nat x0.U = 1)
     :
     mul_loop affine_u x0 x1 scalar_bytes prev_bit i ⦃ res =>
-    (res.2.2 =true →
+    (res.2.2 = true →
       let q := (i.val / 8).toNat
       let r := (i.val % 8).toNat
       let m := ∑ i ∈ Finset.range q, 2^(8 * i) * (scalar_bytes[i]!).val
@@ -155,7 +154,7 @@ lemma aux_eq_mul (scalar : scalar.Scalar) : U8x32_as_Nat scalar.bytes =
           Nat.reduceLT, add_assoc, Nat.lt_add_one, Int.reduceDiv,
           Int.reduceToNat, getElem!_pos, Int.reduceMod,
           Nat.add_left_cancel_iff]
-        have :=Nat.mod_add_div ((scalar.bytes)[31]!).val 128
+        have := Nat.mod_add_div ((scalar.bytes)[31]!).val 128
         simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
           UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos] at this
         conv_lhs =>
@@ -168,9 +167,9 @@ lemma aux_lt_mul (i : ℕ) (scalar : scalar.Scalar) :
     induction i
     · simp
     · rename_i n hn
-      rw[Finset.sum_range_succ]
+      rw [Finset.sum_range_succ]
       have : (scalar.bytes[n]!).val ≤  2 ^8-1 := by scalar_tac
-      have :=mul_le_mul_right this  (2 ^ (8 * n))
+      have := mul_le_mul_right this (2 ^ (8 * n))
       have := add_lt_add_of_lt_of_le hn this
       apply lt_of_lt_of_le this
       ring_nf
@@ -201,7 +200,7 @@ lemma aux_eq_mod_mul (scalar : scalar.Scalar) : (U8x32_as_Nat scalar.bytes) % 2^
   (∑ x ∈ Finset.range ((254 :ℤ )/ 8).toNat, 2 ^ (8 * x) * (scalar.bytes[x]!).val +
         2 ^ (8 * ((254 :ℤ ) / 8).toNat) *
           ((scalar.bytes[((254 :ℤ ) / 8).toNat]!).val % 2 ^ (((254 :ℤ ) % 8).toNat+1) )) := by
-       rw[aux_eq_mul,  Nat.add_mul_mod_self_left]
+       rw [aux_eq_mul, Nat.add_mul_mod_self_left]
        apply Nat.mod_eq_of_lt
        apply aux_lt254_mul
 
@@ -281,7 +280,7 @@ lemma mul_spec_mkPoint_from_affine
 @[progress, externally_verified]
 theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     mul P scalar ⦃ res =>
-      let m:= (U8x32_as_Nat scalar.bytes) % 2^255
+      let m := (U8x32_as_Nat scalar.bytes) % 2^255
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄ := by
   unfold mul  IdentityMontgomeryProjectivePoint.identity subtle.Choice.Insts.CoreConvertFromU8.from
   progress as ⟨x , hmod_x, h_valid⟩
@@ -347,8 +346,6 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       Nat.reduceAdd] at this
     rw [← this]
     ring_nf
-
-
 
 end curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint
 
@@ -436,7 +433,7 @@ Natural language specs:
 @[progress]
 theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
     mul P rhs ⦃ res =>
-    let m:= (U8x32_as_Nat rhs.bytes) % 2^255
+    let m := (U8x32_as_Nat rhs.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
  := by
   unfold mul
