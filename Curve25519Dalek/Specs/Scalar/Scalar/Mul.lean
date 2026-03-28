@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -8,7 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
-/-! # Spec Theorem for `Scalar::mul`
+/-! # Spec theorem for `Scalar::mul`
 
 Specification and proof for the
 `Mul<&'a Scalar, Scalar> for &Scalar` trait implementation for Scalar.
@@ -29,7 +29,7 @@ Both inputs must satisfy Scalar invariant #2 (canonical form), i.e., their byte
 encodings represent integers strictly less than ℓ.  This invariant is always satisfied
 by publicly observable scalars in the library.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 325:4-327:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
@@ -7,12 +7,11 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromBytesWide
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
-
-/-! # Spec Theorem for `Scalar::from_bytes_mod_order_wide`
+/-! # Spec theorem for `Scalar::from_bytes_mod_order_wide`
 
 This function constructs a scalar from a wide byte array, reducing modulo the group order.
 
-Source: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

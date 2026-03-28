@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
@@ -11,13 +11,13 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
-/-! # Spec Theorem for `Scalar::reduce`
+/-! # Spec theorem for `Scalar::reduce`
 
 Specification and proof for `Scalar::reduce`.
 
 This function performs modular reduction.
 
-**Source**: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 set_option linter.style.whitespace false

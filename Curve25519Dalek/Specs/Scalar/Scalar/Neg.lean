@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -12,8 +12,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
-
-/-! # Spec Theorem for `Scalar::neg`
+/-! # Spec theorem for `Scalar::neg`
 
 Specification and proof for the
 `Neg<&'a Scalar> for &Scalar` trait implementation for Scalar.
@@ -38,7 +37,7 @@ The input must satisfy Scalar invariant #2 (canonical form), i.e., its byte
 encoding represents an integer strictly less than ℓ.  This invariant is always
 satisfied by publicly observable scalars in the library.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 375:4-379:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 set_option exponentiation.threshold 260

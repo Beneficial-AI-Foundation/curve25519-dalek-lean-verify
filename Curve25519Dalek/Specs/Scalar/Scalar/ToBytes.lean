@@ -1,17 +1,17 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 
-/-! # Spec Theorem for `Scalar::to_bytes`
+/-! # Spec theorem for `Scalar::to_bytes`
 
 Specification and proof for `Scalar::to_bytes`.
 
 This function converts the structure to a byte array.
 
-**Source**: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 
 ## TODO
 - Complete proof

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
@@ -7,14 +7,14 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Scalar.Scalar.IsCanonical
-
-/-! # Spec Theorem for `Scalar::from_canonical_bytes`
+/-! # Spec theorem for `Scalar::from_canonical_bytes`
 
 Specification and proof for `Scalar::from_canonical_bytes`.
 
 This function constructs a scalar from canonical bytes.
 
-Source: curve25519-dalek/src/scalar.rs -/
+Source: "curve25519-dalek/src/scalar.rs"
+-/
 
 theorem curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one (a : subtle.Choice)
     (h : a ≠ Choice.zero) : a = Choice.one := by
@@ -62,8 +62,9 @@ theorem from_canonical_bytes_spec (b : Array U8 32#usize) :
   progress as ⟨_, _, hg⟩
   refine ⟨fun hb ↦ ⟨?_, ?_⟩, ?_⟩
   · rw [ha, high_bit_zero_of_lt_L b hb] at he
-    simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos,
-      UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, iff_true, and_true]; bv_tac
+    simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.lt_add_one,
+      getElem!_pos, UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, iff_true, and_true]
+    bv_tac
   · simp_all
   · intro _
     rw [hg]

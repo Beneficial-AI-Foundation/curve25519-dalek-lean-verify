@@ -1,11 +1,11 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
-/-! # Spec Theorem for `Scalar::eq`
+/-! # Spec theorem for `Scalar::eq`
 
 Specification and proof for the `eq` (PartialEq) trait implementation for Scalar.
 
@@ -14,7 +14,7 @@ to constant-time equality (`ct_eq`) and converting the resulting `Choice` to `Bo
 Two Scalars are considered equal when they have the same byte representation,
 i.e., `self.bytes = other.bytes`.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 295:4-297:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

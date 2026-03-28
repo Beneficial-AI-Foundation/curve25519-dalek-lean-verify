@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
@@ -10,14 +10,13 @@ import Curve25519Dalek.TypesAux
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
-
-/-! # Spec Theorem for `Scalar::invert`
+/-! # Spec theorem for `Scalar::invert`
 
 Specification and proof for `Scalar::invert`.
 
 This function computes the multiplicative inverse.
 
-Source: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result

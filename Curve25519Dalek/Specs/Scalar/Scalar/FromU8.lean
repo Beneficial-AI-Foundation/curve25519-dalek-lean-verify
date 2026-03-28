@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -9,8 +9,7 @@ import Curve25519Dalek.Aux
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-
-/-! # Spec Theorem for `Scalar::from` (From<u8>)
+/-! # Spec theorem for `Scalar::from` (From<u8>)
 
 Specification and proof for the `From<u8>` trait implementation for Scalar.
 
@@ -19,7 +18,7 @@ little-endian bytes into the first byte of a 32-byte zero array.
 Because every `u8` value is less than 2^8, and 2^8 < L (the group order,
 ≈ 2²⁵²), the resulting `Scalar` is automatically in canonical form.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 491-495)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 namespace curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8
 
