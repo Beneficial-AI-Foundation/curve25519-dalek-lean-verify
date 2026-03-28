@@ -531,35 +531,25 @@ theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked 
   rw [inv_sqrt_checked_unfold arg h''] at h
   exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h h''
 
--- theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
---     (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
---     (hws : was_square = true) : I^2 * arg = 1 :=
---   inv_sqrt_checked_spec arg h hws harg
+theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
+    (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
+    (hws : was_square = true) : I^2 * arg = 1 :=
+  sorry
 
--- /--
--- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
--- Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`.
--- -/
--- theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
---     (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
---   have h_snd : (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
---     show (inv_sqrt_checked u).2 = (sqrt_checked u).2
---     unfold inv_sqrt_checked; rw [if_neg h_ne]
---   have h_sc_eq : sqrt_checked u = ((sqrt_checked u).1, (sqrt_checked u).2) := Prod.mk.eta.symm
---   have h_ws : (inv_sqrt_checked u).2 = true := by
---     rw [h_snd]; exact (sqrt_checked_iff_isSquare u h_sc_eq).mpr h
---   have h_eq : inv_sqrt_checked u = ((inv_sqrt_checked u).1, (inv_sqrt_checked u).2) :=
---     Prod.mk.eta.symm
---   exact inv_sqrt_checked_spec u h_eq h_ws h_ne
+/-- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
+Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`. -/
+theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
+    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
+  sorry
 
--- /-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
--- lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
---   delta inv_sqrt_checked; rw [if_pos rfl]
+/-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
+lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
+  delta inv_sqrt_checked; rw [if_pos rfl]
 
--- /-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
--- lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
---     (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
---   unfold inv_sqrt_checked; rw [if_neg hu]
+/-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
+lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
+    (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
+  sorry
 
 
 end curve25519_dalek.math
