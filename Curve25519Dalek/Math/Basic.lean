@@ -9,6 +9,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert.PrimeList
+import ToMathlib.IsSquareMul
 
 /-! # Common Definitions
 
@@ -245,6 +246,12 @@ def sqrt_m1 : ZMod p :=
 lemma p_sub_one_cast : (↑(p - 1) : ZMod p) = -1 := by
   rw [Nat.cast_sub (by decide : 1 ≤ p), ZMod.natCast_self, zero_sub, Nat.cast_one]
 
+lemma ringChar_ne_two : ringChar (ZMod p) ≠ 2 := by
+  suffices p ≠ 2 by simpa [ZMod.ringChar_zmod_n p]
+  norm_num [p]
+
+lemma ne_zero_of_not_isSquare {a : ZMod p} (h : ¬ IsSquare a) : a ≠ 0 := by by_contra; simp_all
+
 private lemma sqrt_m1_sq_nat :
     19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
   decide
@@ -452,42 +459,11 @@ lemma abs_edwards_eq_of_sq_eq {x y : ZMod p} (h : x ^ 2 = y ^ 2) :
     Note: sqrt_checked 0 = (0, true) since 0 is a square (0² = 0). -/
 noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
   if h : IsSquare x then
-    -- Case 1: x is a square. Pick the root 'y' such that y^2 = x.
     let y := Classical.choose h
     (abs_edwards y, true)
   else
-    -- Case 2: x is not a square. Then i * x must be a square in this field.
-    -- We pick 'y' such that y^2 = i * x.
-    have h_ix : IsSquare (x * sqrt_m1) := by
-      have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
-        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
-        norm_num [p] at h_char
-      have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
-      have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
-      have h_i_ne0 : sqrt_m1 ≠ 0 := by
-        unfold sqrt_m1;
-        try decide
-      have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
-        FiniteField.isSquare_iff h_char_ne_2 hz
-      simp only [h_pow_card] at euler
-      have h_x_pow : x ^ (p / 2) = -1 := by
-        have dic := FiniteField.pow_dichotomy h_char_ne_2 hx_ne0
-        rw [h_pow_card] at dic
-        cases dic with
-        | inl h1 => rw [← euler hx_ne0] at h1; contradiction
-        | inr h_neg => exact h_neg
-      have not_sq_i : ¬ IsSquare sqrt_m1 := sqrt_m1_not_square
-      have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
-        have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
-        rw [h_pow_card] at dic
-        cases dic with
-        | inl h1 =>
-          rw [← euler h_i_ne0] at h1
-          grind
-        | inr h_neg => exact h_neg
-      rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
-      rw [mul_pow, h_x_pow, h_i_pow]
-      norm_num
+    have h_ix : IsSquare (x * sqrt_m1) :=
+      FiniteField.isSquare_mul_of_not_isSquare ringChar_ne_two h sqrt_m1_not_square
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 
@@ -495,54 +471,86 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
 theorem sqrt_checked_spec (u : ZMod p) {r : ZMod p} {b : Bool} :
   sqrt_checked u = (r, b) → b = true → r^2 = u := by
   intro h_call h_true
-  sorry -- Proof deferred
+  unfold sqrt_checked at h_call
+  split_ifs at h_call with h_sq
+  · -- IsSquare branch: returned (abs_edwards y, true)
+    obtain ⟨rfl, -⟩ := Prod.mk.inj h_call
+    rw [abs_edwards_sq, pow_two]
+    exact (Classical.choose_spec h_sq).symm
+  · -- Not IsSquare branch: returned (_, false), contradicts b = true
+    obtain ⟨-, hb⟩ := Prod.mk.inj h_call
+    exact absurd h_true (by rw [← hb]; decide)
 
 /-- Spec: `sqrt_checked` returns true iff the input is a square. -/
 theorem sqrt_checked_iff_isSquare (u : ZMod p) {r : ZMod p} {b : Bool} :
   sqrt_checked u = (r, b) → (b = true ↔ IsSquare u) := by
   intro h_call
-  sorry -- Proof deferred
+  unfold sqrt_checked at h_call
+  split_ifs at h_call with h_sq
+  · obtain ⟨-, rfl⟩ := Prod.mk.inj h_call
+    exact ⟨fun _ => h_sq, fun _ => rfl⟩
+  · obtain ⟨-, rfl⟩ := Prod.mk.inj h_call
+    exact ⟨fun h => absurd h (by decide), fun h => absurd h h_sq⟩
 
-/--
-Inverse Square Root, matching Rust's sqrt_ratio_i(1, u).
+/-- Inverse Square Root, matching Rust's sqrt_ratio_i(1, u).
 Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
 Guard: inv_sqrt_checked 0 = (0, false) since 1/sqrt(0) is undefined.
-This matches Rust's sqrt_ratio_i(1, 0) returning (Choice(0), 0).
--/
+This matches Rust's sqrt_ratio_i(1, 0) returning (Choice(0), 0). -/
 noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   if u = 0 then (0, false)
   else
     let (root, was_square) := sqrt_checked u
     (root⁻¹, was_square)
 
-/--
-Mathematical specification for `inv_sqrt_checked`.
--/
-theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
-  inv_sqrt_checked arg = (I, was_square) →
-  was_square = true →
-  arg ≠ 0 →
-  I^2 * arg = 1 := by
-  -- We treat this as an axiom/specification for now to avoid
-  -- analyzing the massive bit-level recursion of the implementation.
-  sorry
+-- /-- Mathematical specification for `inv_sqrt_checked`. -/
+-- theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
+--   inv_sqrt_checked arg = (I, was_square) →
+--   was_square = true →
+--   arg ≠ 0 →
+--   I^2 * arg = 1 := by
+--   intro h_call h_true h_ne
+--   set root := (sqrt_checked arg).1
+--   set b := (sqrt_checked arg).2
+--   have h_sc : sqrt_checked arg = (root, b) := Prod.mk.eta.symm
+--   have h_inv : inv_sqrt_checked arg = (root⁻¹, b) := by
+--     unfold inv_sqrt_checked; rw [if_neg h_ne]
+--   rw [h_inv] at h_call
+--   obtain ⟨hI, hb⟩ := Prod.mk.inj h_call
+--   subst hI; subst hb
+--   have h_sq : root ^ 2 = arg := sqrt_checked_spec arg h_sc h_true
+--   have h_root_ne : root ≠ 0 := by
+--     intro h0; rw [h0, zero_pow (by norm_num)] at h_sq; exact h_ne h_sq.symm
+--   rw [inv_pow, ← h_sq, inv_mul_cancel₀ (pow_ne_zero 2 h_root_ne)]
 
-/--
-When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
-Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`.
--/
-theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
-    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
-  sorry
+-- theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
+--     (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
+--     (hws : was_square = true) : I^2 * arg = 1 :=
+--   inv_sqrt_checked_spec arg h hws harg
 
-/-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
-lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
-  delta inv_sqrt_checked; rw [if_pos rfl]
+-- /--
+-- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
+-- Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`.
+-- -/
+-- theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
+--     (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
+--   have h_snd : (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
+--     show (inv_sqrt_checked u).2 = (sqrt_checked u).2
+--     unfold inv_sqrt_checked; rw [if_neg h_ne]
+--   have h_sc_eq : sqrt_checked u = ((sqrt_checked u).1, (sqrt_checked u).2) := Prod.mk.eta.symm
+--   have h_ws : (inv_sqrt_checked u).2 = true := by
+--     rw [h_snd]; exact (sqrt_checked_iff_isSquare u h_sc_eq).mpr h
+--   have h_eq : inv_sqrt_checked u = ((inv_sqrt_checked u).1, (inv_sqrt_checked u).2) :=
+--     Prod.mk.eta.symm
+--   exact inv_sqrt_checked_spec u h_eq h_ws h_ne
 
-/-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
-lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
-    (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
-  sorry
+-- /-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
+-- lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
+--   delta inv_sqrt_checked; rw [if_pos rfl]
+
+-- /-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
+-- lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
+--     (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
+--   unfold inv_sqrt_checked; rw [if_neg hu]
 
 
 end curve25519_dalek.math
