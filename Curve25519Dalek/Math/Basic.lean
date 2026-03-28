@@ -500,32 +500,36 @@ noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   else (sqrt_checked u).map (·⁻¹) id -- return `sqrt_checked u` but invert the first component.
   -- The alternative using `let` here causes a nightmare later when working with the definition.
 
-/-- Reduction: `inv_sqrt_checked u` unfolds to `(root⁻¹, was_square)` when `u ≠ 0`. -/
+/-- Reduction: `inv_sqrt_checked u` unfolds to `(sqrt_checked u).map (·⁻¹) id` when `u ≠ 0`.
+Note: we avoid decomposing `sqrt_checked u` into a pair — doing so forces kernel reduction
+of its body on `ZMod p` (a 77-digit prime), causing a RAM overflow. -/
 private lemma inv_sqrt_checked_unfold (u : ZMod p) (hu : u ≠ 0) :
-    inv_sqrt_checked u = ((sqrt_checked u).1⁻¹, (sqrt_checked u).2) := by
-  -- delta inv_sqrt_checked
-  -- rw [if_neg hu]
-  --   unfold inv_sqrt_checked; rw [if_neg hu]
-  sorry
+    inv_sqrt_checked u = (sqrt_checked u).map (·⁻¹) id := by
+  delta inv_sqrt_checked
+  rw [if_neg hu]
 
--- /-- Pure algebra: if `root² = arg` and `root ≠ 0`, then `(root⁻¹)² * arg = 1`. -/
--- private lemma inv_sq_mul_eq_one {R : Type*} [Field R] {root arg : R}
---     (h_sq : root ^ 2 = arg) (h_ne : root ≠ 0) : (root⁻¹) ^ 2 * arg = 1 := by
---   rw [inv_pow, ← h_sq, inv_mul_cancel₀ (pow_ne_zero 2 h_ne)]
+/-- Abstract spec: for any function `f` satisfying `f_spec`, mapping `(·⁻¹)` over the first
+component yields the inverse. Proved in full generality to avoid kernel reduction of `ZMod p`. -/
+private theorem inv_sqrt_spec_abstract {F : Type*} [Field F] (f : F → F × Bool)
+    (f_spec : ∀ {r : F} {b : Bool} (x : F), f x = (r, b) → b = true → r ^ 2 = x)
+    {arg I : F} (h : (f arg).map (·⁻¹) id = (I, true)) (h_ne : arg ≠ 0) : I ^ 2 * arg = 1 := by
+  have hI : (f arg).1⁻¹ = I := by
+    have := congr_arg Prod.fst h
+    simp only [Prod.map_fst] at this
+    exact this
+  have hws : (f arg).2 = true := by
+    have := congr_arg Prod.snd h
+    simp only [Prod.map_snd, id] at this
+    exact this
+  have h_sc : f arg = ((f arg).1, (f arg).2) := Prod.mk.eta.symm
+  have h_sq : (f arg).1 ^ 2 = arg := f_spec arg h_sc hws
+  rw [← hI, inv_pow, h_sq, inv_mul_cancel₀ h_ne]
 
 /-- Mathematical specification for `inv_sqrt_checked`. -/
 theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked arg = (I, true))
     (h'' : arg ≠ 0) : I^2 * arg = 1 := by
-  -- have h_unfold := inv_sqrt_checked_unfold arg h''
-  -- rw [h_unfold] at h
-  -- obtain ⟨hI, hb⟩ := Prod.mk.inj h
-  -- subst hI; subst hb
-  -- have h_sc : sqrt_checked arg = ((sqrt_checked arg).1, (sqrt_checked arg).2) := Prod.mk.eta.symm
-  -- have h_sq : (sqrt_checked arg).1 ^ 2 = arg := sqrt_checked_spec arg h_sc h'
-  -- have h_root_ne : (sqrt_checked arg).1 ≠ 0 := by
-  --   intro h0; rw [h0, zero_pow (by norm_num)] at h_sq; exact h'' h_sq.symm
-  -- exact inv_sq_mul_eq_one h_sq h_root_ne
-  sorry
+  rw [inv_sqrt_checked_unfold arg h''] at h
+  exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h h''
 
 -- theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
 --     (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
