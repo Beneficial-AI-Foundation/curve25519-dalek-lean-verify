@@ -629,7 +629,7 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
               obtain ⟨⟨h_sq_not, h_neg_false⟩, h_y_eq_false⟩ := h_invalid
               simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
               have h_I_sq_mul : I^2 * (v * u2^2) = 1 := by
-                apply inv_sqrt_checked_spec arg
+                apply inv_sqrt_checked_spec' arg
                 · exact h_call
                 · exact h_sq_not
                 · -- arg ≠ 0: follows from was_square = true + inv_sqrt_checked's zero guard

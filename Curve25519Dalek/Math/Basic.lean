@@ -500,67 +500,55 @@ noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   else (sqrt_checked u).map (·⁻¹) id -- return `sqrt_checked u` but invert the first component.
   -- The alternative using `let` here causes a nightmare later when working with the definition.
 
-/-- Reduction: `inv_sqrt_checked u` unfolds to `(sqrt_checked u).map (·⁻¹) id` when `u ≠ 0`.
-Note: we avoid decomposing `sqrt_checked u` into a pair — doing so forces kernel reduction
-of its body on `ZMod p` (a 77-digit prime), causing a RAM overflow. -/
+/-- For `u ≠ 0`, `inv_sqrt_checked u` equals `(sqrt_checked u)` with the first component inverted. -/
 private lemma inv_sqrt_checked_unfold (u : ZMod p) (hu : u ≠ 0) :
     inv_sqrt_checked u = (sqrt_checked u).map (·⁻¹) id := by
-  delta inv_sqrt_checked
-  rw [if_neg hu]
+  delta inv_sqrt_checked; rw [if_neg hu]
 
-/-- Abstract: mapping `f` over the first component of a pair preserves the second component.
-Pure `Prod` fact — no field structure needed. -/
-private theorem inv_snd_abstract {F G : Type*} {f : F → F} {p : F × G} {q : F × G}
+/-- Mapping a function over the first component of a pair preserves the second component. -/
+private theorem inv_snd_abstract {α β γ : Type*} {f : α → γ} {p : α × β} {q : γ × β}
     (h : q = p.map f id) : q.2 = p.2 := by
   rw [h, Prod.map_snd, id]
 
-/-- Abstract spec: for any function `f` satisfying `f_spec`, mapping `(·⁻¹)` over the first
-component yields the inverse. Proved in full generality to avoid kernel reduction of `ZMod p`. -/
+/-- If `f` returns a square root when the boolean is `true`, then mapping `(·⁻¹)` over the first
+component yields an inverse square root. Proved abstractly to avoid kernel reduction of `ZMod p`. -/
 private theorem inv_sqrt_spec_abstract {F : Type*} [Field F] (f : F → F × Bool)
     (f_spec : ∀ {r : F} {b : Bool} (x : F), f x = (r, b) → b = true → r ^ 2 = x)
-    {arg I : F} (h : (f arg).map (·⁻¹) id = (I, true)) (h_ne : arg ≠ 0) : I ^ 2 * arg = 1 := by
-  have hI : (f arg).1⁻¹ = I := by
-    have := congr_arg Prod.fst h
-    simp only [Prod.map_fst] at this
-    exact this
-  have hws : (f arg).2 = true := by
-    have := congr_arg Prod.snd h
-    simp only [Prod.map_snd, id] at this
-    exact this
-  have h_sc : f arg = ((f arg).1, (f arg).2) := Prod.mk.eta.symm
-  have h_sq : (f arg).1 ^ 2 = arg := f_spec arg h_sc hws
-  rw [← hI, inv_pow, h_sq, inv_mul_cancel₀ h_ne]
+    {arg I : F} (h : (f arg).map (·⁻¹) id = (I, true)) (hne : arg ≠ 0) : I ^ 2 * arg = 1 := by
+  have hI : (f arg).1⁻¹ = I := by simpa only [Prod.map_fst] using congr_arg Prod.fst h
+  have hws : (f arg).2 = true := by simpa only [Prod.map_snd, id] using congr_arg Prod.snd h
+  have h_sq : (f arg).1 ^ 2 = arg := f_spec arg Prod.mk.eta.symm hws
+  rw [← hI, inv_pow, h_sq, inv_mul_cancel₀ hne]
 
-/-- Mathematical specification for `inv_sqrt_checked`. -/
+/-- If `inv_sqrt_checked arg = (I, true)` and `arg ≠ 0`, then `I` is an inverse square root:
+`I ^ 2 * arg = 1`. -/
 theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked arg = (I, true))
-    (h'' : arg ≠ 0) : I^2 * arg = 1 := by
-  rw [inv_sqrt_checked_unfold arg h''] at h
-  exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h h''
+    (hne : arg ≠ 0) : I ^ 2 * arg = 1 := by
+  rw [inv_sqrt_checked_unfold arg hne] at h
+  exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h hne
 
+/-- Variant of `inv_sqrt_checked_spec` with `was_square` as a separate hypothesis. -/
 theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
-    (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
-    (hws : was_square = true) : I^2 * arg = 1 := by
-  subst hws
-  exact inv_sqrt_checked_spec arg h harg
+    (h : inv_sqrt_checked arg = (I, was_square)) (hws : was_square = true) (hne : arg ≠ 0) :
+    I ^ 2 * arg = 1 := by
+  subst hws; exact inv_sqrt_checked_spec arg h hne
 
-/-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
+/-- `inv_sqrt_checked 0 = (0, false)`. -/
 lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
   delta inv_sqrt_checked; rw [if_pos rfl]
 
-/-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
+/-- For `u ≠ 0`, the boolean component of `inv_sqrt_checked u` equals that of `sqrt_checked u`. -/
 lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
     (inv_sqrt_checked u).2 = (sqrt_checked u).2 :=
   inv_snd_abstract (inv_sqrt_checked_unfold u hu)
 
-/-- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
-Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`. -/
-theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
+/-- If `u` is a nonzero square, `(inv_sqrt_checked u).1` is an inverse square root of `u`. -/
+theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (hne : u ≠ 0) :
     (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
   have h_ws : (inv_sqrt_checked u).2 = true := by
-    rw [inv_sqrt_checked_snd u h_ne]
+    rw [inv_sqrt_checked_snd u hne]
     exact (sqrt_checked_iff_isSquare u Prod.mk.eta.symm).mpr h
-  have h_pair : inv_sqrt_checked u = ((inv_sqrt_checked u).1, true) := Prod.ext rfl h_ws
-  exact inv_sqrt_checked_spec u h_pair h_ne
+  exact inv_sqrt_checked_spec u (Prod.ext rfl h_ws) hne
 
 
 end curve25519_dalek.math
