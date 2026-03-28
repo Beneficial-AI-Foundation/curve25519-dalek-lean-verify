@@ -508,6 +508,12 @@ private lemma inv_sqrt_checked_unfold (u : ZMod p) (hu : u ≠ 0) :
   delta inv_sqrt_checked
   rw [if_neg hu]
 
+/-- Abstract: mapping `f` over the first component of a pair preserves the second component.
+Pure `Prod` fact — no field structure needed. -/
+private theorem inv_snd_abstract {F G : Type*} {f : F → F} {p : F × G} {q : F × G}
+    (h : q = p.map f id) : q.2 = p.2 := by
+  rw [h, Prod.map_snd, id]
+
 /-- Abstract spec: for any function `f` satisfying `f_spec`, mapping `(·⁻¹)` over the first
 component yields the inverse. Proved in full generality to avoid kernel reduction of `ZMod p`. -/
 private theorem inv_sqrt_spec_abstract {F : Type*} [Field F] (f : F → F × Bool)
@@ -533,14 +539,9 @@ theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked 
 
 theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
     (h : inv_sqrt_checked arg = (I, was_square)) (harg : arg ≠ 0)
-    (hws : was_square = true) : I^2 * arg = 1 :=
-  sorry
-
-/-- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
-Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`. -/
-theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
-    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
-  sorry
+    (hws : was_square = true) : I^2 * arg = 1 := by
+  subst hws
+  exact inv_sqrt_checked_spec arg h harg
 
 /-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
 lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
@@ -548,8 +549,18 @@ lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), fal
 
 /-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
 lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
-    (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
-  sorry
+    (inv_sqrt_checked u).2 = (sqrt_checked u).2 :=
+  inv_snd_abstract (inv_sqrt_checked_unfold u hu)
+
+/-- When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
+Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`. -/
+theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
+    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
+  have h_ws : (inv_sqrt_checked u).2 = true := by
+    rw [inv_sqrt_checked_snd u h_ne]
+    exact (sqrt_checked_iff_isSquare u Prod.mk.eta.symm).mpr h
+  have h_pair : inv_sqrt_checked u = ((inv_sqrt_checked u).1, true) := Prod.ext rfl h_ws
+  exact inv_sqrt_checked_spec u h_pair h_ne
 
 
 end curve25519_dalek.math
