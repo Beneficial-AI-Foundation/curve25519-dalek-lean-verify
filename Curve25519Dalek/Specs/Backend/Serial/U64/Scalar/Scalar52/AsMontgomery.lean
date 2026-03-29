@@ -48,15 +48,17 @@ theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 52) :
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat m < L ⦄ := by
   unfold as_montgomery
-  sorry
-  -- Old proof (before < 2^52 pre + strengthened post):
-  -- step as ⟨m, pos, bounds⟩
-  -- · exact RR_lt
-  -- · refine ⟨?_, bounds⟩
-  --   suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
-  --     exact Nat.ModEq.cancel_right_of_coprime (by decide) this
-  --   have := Nat.ModEq.mul_left (Scalar52_as_Nat u) constants.RR_spec
-  --   have := (Nat.ModEq.trans this.symm pos).symm
-  --   grind
+  let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← montgomery_mul_spec
+  · exact RR_lt
+  · -- u < R (from limbs < 2^52), RR < L, so u * RR < R * L
+    have h_u_lt : Scalar52_as_Nat u < R := by unfold R; exact Scalar52_as_Nat_bounded u h
+    have h_RR_lt : Scalar52_as_Nat constants.RR < L := by unfold constants.RR Scalar52_as_Nat L; decide
+    exact Nat.mul_lt_mul_of_lt_of_lt h_u_lt h_RR_lt
+  refine ⟨ ?_, m_post2, m_post3 ⟩
+  suffices Scalar52_as_Nat m * R ≡ Scalar52_as_Nat u * R * R [MOD L] by
+    exact Nat.ModEq.cancel_right_of_coprime (by decide) this
+  have := Nat.ModEq.mul_left (Scalar52_as_Nat u) constants.RR_spec
+  have := (Nat.ModEq.trans this.symm m_post1).symm
+  grind
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

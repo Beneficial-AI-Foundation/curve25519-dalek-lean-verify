@@ -4066,7 +4066,7 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 52) :\n    as_montgomery u ⦃ m =>\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat m < L ⦄ := by ...",
@@ -4399,14 +4399,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat a * Scalar52_as_Nat b < R * L) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n      Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.mul`**:\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52 -/",
+   "/-- **Spec theorem for `scalar.Scalar52.mul`**:\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: The first `montgomery_reduce` needs `a*b < R*L` to guarantee the intermediate\n  result is < 2*L (see `MontgomeryReduce.lean` docstring). The second reduce is auto-satisfied\n  since its input is `ab * RR` where `ab < L` and `RR < L`, so `ab*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
@@ -4445,14 +4445,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.scalar.m"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem square_spec (self : Scalar52)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat self * Scalar52_as_Nat self < R * L) :\n    square self ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧\n      Scalar52_as_Nat result < L ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: Required by `montgomery_reduce` (see `MontgomeryReduce.lean`). The second\n  reduce is auto-satisfied since `aa < L` and `RR < L` give `aa*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
