@@ -24,6 +24,8 @@ This function computes the multiplicative inverse using Montgomery form.
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
 
+set_option exponentiation.threshold 1024
+
 namespace curve25519_dalek.scalar.Scalar52
 
 section MontgomeryInvert_Helpers
@@ -76,18 +78,19 @@ lemma isMont_loop (R : ZMod L) (hR : R ≠ 0) {u_val y x res : ZMod L} {k j N : 
     apply congr_arg; simp only [Nat.cast_add, Nat.cast_mul]; ring
 
 -- Helper for Multiplication (Nat ModEq)
-lemma run_mul (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_zero : RZ ≠ 0) (x y res : Scalar52) (k j : ℕ)
-      (hx : IsMont RZ uZ (Scalar52_as_Nat x) k)
-      (hy : IsMont RZ uZ (Scalar52_as_Nat y) j)
-      (h_post : Scalar52_as_Nat x * Scalar52_as_Nat y ≡ Scalar52_as_Nat res * R [MOD L]) :
-      IsMont RZ uZ (Scalar52_as_Nat res) (k + j) := by
-    apply isMont_mul RZ hRZ_ne_zero hx hy
-    apply (ZMod.natCast_eq_natCast_iff _ _ L).mpr at h_post; push_cast at h_post
-    rw [h_RZ] at h_post; rw [eq_mul_inv_iff_mul_eq₀ hRZ_ne_zero, ← h_post]
+lemma run_mul (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_zero : RZ ≠ 0)
+    (x y res : Scalar52) (k j : ℕ)
+    (hx : IsMont RZ uZ (Scalar52_as_Nat x) k)
+    (hy : IsMont RZ uZ (Scalar52_as_Nat y) j)
+    (h_post : Scalar52_as_Nat x * Scalar52_as_Nat y ≡ Scalar52_as_Nat res * R [MOD L]) :
+    IsMont RZ uZ (Scalar52_as_Nat res) (k + j) := by
+  apply isMont_mul RZ hRZ_ne_zero hx hy
+  apply (ZMod.natCast_eq_natCast_iff _ _ L).mpr at h_post; push_cast at h_post
+  rw [h_RZ] at h_post; rw [eq_mul_inv_iff_mul_eq₀ hRZ_ne_zero, ← h_post]
 
 -- Helper for Squaring (Strict Equality)
 lemma run_sq (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_zero : RZ ≠ 0)
- (x res : Scalar52) (k : ℕ)
+    (x res : Scalar52) (k : ℕ)
     (hx : IsMont RZ uZ (Scalar52_as_Nat x) k)
     (h_post : Scalar52_as_Nat x * Scalar52_as_Nat x % L = Scalar52_as_Nat res * R % L) :
     IsMont RZ uZ (Scalar52_as_Nat res) (2 * k) := by
@@ -96,7 +99,8 @@ lemma run_sq (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_ze
   rw [h_RZ] at h_post; rw [eq_mul_inv_iff_mul_eq₀ hRZ_ne_zero, ← h_post]
 
 -- Helper for Loops (Input: Nat Modulo Equality)
-lemma run_loop_nat (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_zero : RZ ≠ 0) (y x res : Scalar52) (k j N : ℕ)
+lemma run_loop_nat (RZ : ZMod L) (uZ : ZMod L) (h_RZ : (R : (ZMod L)) = RZ) (hRZ_ne_zero : RZ ≠ 0)
+    (y x res : Scalar52) (k j N : ℕ)
     (hy : IsMont RZ uZ (Scalar52_as_Nat y) k)
     (hx : IsMont RZ uZ (Scalar52_as_Nat x) j)
     (h_post : (Scalar52_as_Nat res * R ^ N) % L = (Scalar52_as_Nat y ^ N * Scalar52_as_Nat x) % L) :
@@ -141,102 +145,180 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
     (∀ i < 5, u'[i]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat u' < L ⦄ := by
-  sorry
-  -- Old proof (before value constraint + strengthened post):
-  -- unfold montgomery_invert
-  -- step*
-  -- unfold pow2 at *
-  -- simp only [*] at *
-  -- simp only [Nat.reduceAdd, Nat.reducePow] at *
-  -- -- 1. Setup
-  -- have hL_gt_1 : 1 < L := by unfold L; decide
-  -- letI : Fact (1 < L) := ⟨hL_gt_1⟩
-  -- have hR_inv : Invertible (R : ZMod L) := by
-  --   apply invertibleOfCoprime
-  --   unfold R
-  --   rw [Nat.coprime_pow_left_iff (n := 260) (by decide)]
-  --   rw [Nat.coprime_two_left]
-  --   exact Nat.Prime.odd_of_ne_two (Fact.out) (by unfold L; decide)
-  -- letI : Invertible (R : ZMod L) := hR_inv
-  -- have hR_ne_zero : (R : ZMod L) ≠ 0 := IsUnit.ne_zero (isUnit_of_invertible _)
-  -- -- 2. OPTIMIZATION: Generalize Variables
-  -- generalize h_uZ : (Scalar52_as_Nat u : ZMod L) = uZ
-  -- generalize h_RZ : (R : ZMod L) = RZ
-  -- have hRZ_ne_zero : RZ ≠ 0 := by rw [← h_RZ]; exact hR_ne_zero;
-  -- -- 4. Walk the Chain
-  -- have step_u : IsMont RZ uZ (Scalar52_as_Nat u) 1 := by
-  --   unfold IsMont; simp only [Nat.cast_one, sub_self, zpow_zero, mul_one, pow_one]; rw [h_uZ]
-  -- -- Pre-computation
-  -- have step_10   := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero u   _10   1 step_u  _10_post1
-  -- have step_100  := by apply run_sq RZ  uZ h_RZ hRZ_ne_zero _10 _100  2 step_10 _100_post1
-  -- have step_11   := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10  u    _11    2 1  step_10     step_u   _11_post1
-  -- have step_101  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _11   _101   2 3  step_10    step_11  _101_post1
-  -- have step_111  := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _101  _111   2 5  step_10   step_101  _111_post1
-  -- have step_1001 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _111  _1001  2 7  step_10   step_111 _1001_post1
-  -- have step_1011 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _10 _1001 _1011  2 9  step_10  step_1001 _1011_post1
-  -- have step_1111 := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _100 _1011 _1111 4 11 step_100 step_1011 _1111_post1
-  -- have step_y    := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _1111 u y 15 1 step_1111 step_u y_post1
-  -- -- SPECIAL HANDLING FOR y1
-  -- generalize h_huge : 85070591730234615865843651857942052864 = N_huge
-  -- have y1_post_safe : Scalar52_as_Nat y1 * R ^ N_huge % L = Scalar52_as_Nat y ^ N_huge * Scalar52_as_Nat _101 % L := by
-  --   rw [← h_huge]
-  --   exact y1_post1
-  -- have step_y1  := by apply run_loop_nat RZ  uZ h_RZ hRZ_ne_zero y _101 y1 16 5 N_huge step_y step_101 y1_post_safe
-  -- -- THE REST OF THE CHAIN (Small Exponents)
-  -- have step_y2  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y1  _11   y2  _  3  16   step_y1  step_11    y2_post1
-  -- have step_y3  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y2  _1111 y3  _  15 32   step_y2  step_1111  y3_post1
-  -- have step_y4  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y3  _1111 y4  _  15 32   step_y3  step_1111  y4_post1
-  -- have step_y5  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y4  _1001 y5  _  9  16   step_y4  step_1001  y5_post1
-  -- have step_y6  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y5  _11   y6  _  3  4    step_y5  step_11    y6_post1
-  -- have step_y7  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y6  _1111 y7  _  15 32   step_y6  step_1111  y7_post1
-  -- have step_y8  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y7  _101  y8  _  5  16   step_y7  step_101   y8_post1
-  -- have step_y9  := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y8  _101  y9  _  5  64   step_y8  step_101   y9_post1
-  -- have step_y10 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y9  _111  y10 _  7  8    step_y9  step_111  y10_post1
-  -- have step_y11 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y10 _1111 y11 _  15 32   step_y10 step_1111 y11_post1
-  -- have step_y12 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y11 _111  y12 _  7  32   step_y11 step_111  y12_post1
-  -- have step_y13 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y12 _11   y13 _  3  16   step_y12 step_11   y13_post1
-  -- have step_y14 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y13 _1011 y14 _  11 32   step_y13 step_1011 y14_post1
-  -- have step_y15 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y14 _1011 y15 _  11 64   step_y14 step_1011 y15_post1
-  -- have step_y16 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y15 _1001 y16 _  9  1024 step_y15 step_1001 y16_post1
-  -- have step_y17 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y16 _11   y17 _  3  16   step_y16 step_11   y17_post1
-  -- have step_y18 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y17 _11   y18 _  3  32   step_y17 step_11   y18_post1
-  -- have step_y19 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y18 _11   y19 _  3  32   step_y18 step_11   y19_post1
-  -- have step_y20 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y19 _1001 y20 _  9  32   step_y19 step_1001 y20_post1
-  -- have step_y21 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y20 _111  y21 _  7  16   step_y20 step_111  y21_post1
-  -- have step_y22 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y21 _1111 y22 _  15 64   step_y21 step_1111 y22_post1
-  -- have step_y23 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y22 _1011 y23 _  11 32   step_y22 step_1011 y23_post1
-  -- have step_y24 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y23 _101  y24 _  5  8    step_y23 step_101  y24_post1
-  -- have step_y25 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y24 _1111 y25 _  15 64   step_y24 step_1111 y25_post1
-  -- have step_y26 := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y25 _101  y26 _  5  8    step_y25 step_101  y26_post1
-  -- have step_res := by apply run_loop_nat RZ uZ h_RZ hRZ_ne_zero y26 _11 u' _ 3 8 step_y26 step_11 u'_post1
-  -- -- CONCLUSION
-  -- unfold IsMont at step_res
-  -- refine ⟨?_, by exact fun i hi => u'_post2 i hi⟩
-  -- apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
-  -- rw [h_uZ, h_RZ, step_res]
-  -- have h_eqn : N_huge = 2^126 := by rw [← h_huge]; norm_num
-  -- rw [h_eqn]
-  -- have h_exp_val :
-  --   (((((((((((((((((((((((((((16 * 2^126 + 5)
-  --   * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
-  --   * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
-  --   * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
-  --   = L - 2 := by rw [L]; norm_num
-  -- rw [h_exp_val]
-  -- rw [← mul_assoc, ← pow_succ']
-  -- have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
-  -- rw [h_fermat_exp]
-  -- rw [← h_uZ]
-  -- have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
-  --   rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
-  -- rw [ZMod.pow_card_sub_one_eq_one hu_ne]
-  -- rw [one_mul]
-  -- rw [← pow_two]
-  -- have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
-  --   have h_ge : 2 ≤ L := by decide
-  --   rw [Int.ofNat_sub h_ge]
-  --   ring
-  -- rw [h_exp, sub_eq_add_neg, zpow_add₀ hRZ_ne_zero, zpow_neg]; simp only [zpow_natCast, pow_card]
-  -- field_simp
+  unfold montgomery_invert
+  -- Helper: canonical inputs (< L) give product < L*L < R*L
+  have RL : L * L < R * L :=
+    Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega)
+  let* ⟨ _10, _10_post1, _10_post2, _10_post3 ⟩ ← montgomery_square_spec
+  let* ⟨ _100, _100_post1, _100_post2, _100_post3 ⟩ ← montgomery_square_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _10_post3 _10_post3) RL
+  -- u < R: by contradiction, if u ≥ R then u * u ≥ R * R > R * L, contradicting h_value
+  have h_LR : L < R := by unfold R L; omega
+  have h_u_lt_R : Scalar52_as_Nat u < R := by
+    by_contra hge; push_neg at hge
+    have := Nat.mul_le_mul hge (Nat.le_trans (Nat.le_of_lt h_LR) hge) -- R * L ≤ u * u
+    omega
+  let* ⟨ _11, _11_post1, _11_post2, _11_post3 ⟩ ← montgomery_mul_spec
+  · rw [mul_comm]; exact Nat.mul_lt_mul_of_lt_of_lt h_u_lt_R _10_post3
+  let* ⟨ _101, _101_post1, _101_post2, _101_post3 ⟩ ← montgomery_mul_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _10_post3 _11_post3) RL
+  let* ⟨ _111, _111_post1, _111_post2, _111_post3 ⟩ ← montgomery_mul_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _10_post3 _101_post3) RL
+  let* ⟨ _1001, _1001_post1, _1001_post2, _1001_post3 ⟩ ← montgomery_mul_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _10_post3 _111_post3) RL
+  let* ⟨ _1011, _1011_post1, _1011_post2, _1011_post3 ⟩ ← montgomery_mul_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _10_post3 _1001_post3) RL
+  let* ⟨ _1111, _1111_post1, _1111_post2, _1111_post3 ⟩ ← montgomery_mul_spec
+  · exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt _100_post3 _1011_post3) RL
+  let* ⟨ y, y_post1, y_post2, y_post3 ⟩ ← montgomery_mul_spec
+  · rw [mul_comm]; exact Nat.mul_lt_mul_of_lt_of_lt h_u_lt_R _1111_post3
+  let* ⟨ i, i_post ⟩ ← Usize.add_spec
+  let* ⟨ y1, y1_post1, y1_post2, y1_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i1, i1_post ⟩ ← Usize.add_spec
+  let* ⟨ y2, y2_post1, y2_post2, y2_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i2, i2_post ⟩ ← Usize.add_spec
+  let* ⟨ y3, y3_post1, y3_post2, y3_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y4, y4_post1, y4_post2, y4_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y5, y5_post2, y5_post3, y5_post1 ⟩ ← square_multiply_spec
+  let* ⟨ y6, y6_post2, y6_post3, y6_post1 ⟩ ← square_multiply_spec
+  let* ⟨ y7, y7_post1, y7_post2, y7_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i3, i3_post ⟩ ← Usize.add_spec
+  let* ⟨ y8, y8_post1, y8_post2, y8_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i4, i4_post ⟩ ← Usize.add_spec
+  let* ⟨ y9, y9_post1, y9_post2, y9_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y10, y10_post2, y10_post3, y10_post1 ⟩ ← square_multiply_spec
+  let* ⟨ y11, y11_post1, y11_post2, y11_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i5, i5_post ⟩ ← Usize.add_spec
+  let* ⟨ y12, y12_post1, y12_post2, y12_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y13, y13_post1, y13_post2, y13_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y14, y14_post1, y14_post2, y14_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i6, i6_post ⟩ ← Usize.add_spec
+  let* ⟨ y15, y15_post1, y15_post2, y15_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i7, i7_post ⟩ ← Usize.add_spec
+  let* ⟨ y16, y16_post1, y16_post2, y16_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y17, y17_post1, y17_post2, y17_post3 ⟩ ← square_multiply_spec
+  let* ⟨ i8, i8_post ⟩ ← Usize.add_spec
+  let* ⟨ y18, y18_post1, y18_post2, y18_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y19, y19_post1, y19_post2, y19_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y20, y20_post1, y20_post2, y20_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y21, y21_post1, y21_post2, y21_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y22, y22_post1, y22_post2, y22_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y23, y23_post1, y23_post2, y23_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y24, y24_post2, y24_post3, y24_post1 ⟩ ← square_multiply_spec
+  let* ⟨ y25, y25_post1, y25_post2, y25_post3 ⟩ ← square_multiply_spec
+  let* ⟨ y26, y26_post2, y26_post3, y26_post1 ⟩ ← square_multiply_spec
+  let* ⟨ i9, i9_post ⟩ ← Usize.add_spec
+  let* ⟨ u', u'_post1, u'_post2, u'_post3 ⟩ ← square_multiply_spec
+  refine ⟨ ?_, u'_post2, u'_post3  ⟩
+  generalize h_uZ : (Scalar52_as_Nat u : ZMod L) = uZ
+  have hR_inv : Invertible (R : ZMod L) := by
+    apply invertibleOfCoprime
+    unfold R
+    rw [Nat.coprime_pow_left_iff (n := 260) (by decide)]
+    rw [Nat.coprime_two_left]
+    exact Nat.Prime.odd_of_ne_two (Fact.out) (by unfold L; decide)
+  have hR_ne_zero : (R : ZMod L) ≠ 0 := IsUnit.ne_zero (isUnit_of_invertible _)
+  have step_u : IsMont (R : ZMod L) uZ (Scalar52_as_Nat u) 1 := by
+    unfold IsMont; simp only [Nat.cast_one, sub_self, zpow_zero, mul_one, pow_one]; rw [h_uZ]
+  -- Pre-computation chain (IsMont tracks: x = u^k * R^(1-k) in ZMod L)
+  have step_10   := run_sq  _ uZ rfl hR_ne_zero u    _10   1  step_u    _10_post1
+  have step_100  := run_sq  _ uZ rfl hR_ne_zero _10  _100  2  step_10   _100_post1
+  have step_11   := run_mul _ uZ rfl hR_ne_zero _10  u     _11    2  1  step_10   step_u
+    _11_post1
+  have step_101  := run_mul _ uZ rfl hR_ne_zero _10  _11   _101   2  3  step_10   step_11
+    _101_post1
+  have step_111  := run_mul _ uZ rfl hR_ne_zero _10  _101  _111   2  5  step_10   step_101
+    _111_post1
+  have step_1001 := run_mul _ uZ rfl hR_ne_zero _10  _111  _1001  2  7  step_10   step_111
+    _1001_post1
+  have step_1011 := run_mul _ uZ rfl hR_ne_zero _10  _1001 _1011  2  9  step_10   step_1001
+    _1011_post1
+  have step_1111 := run_mul _ uZ rfl hR_ne_zero _100 _1011 _1111  4  11 step_100  step_1011
+    _1111_post1
+  have step_y    := run_mul _ uZ rfl hR_ne_zero _1111 u    y      15 1  step_1111 step_u
+    y_post1
+  -- Loop chain: square_multiply_spec postconditions use 2^k and % L
+  -- y1 has huge exponent 2^126 — generalize to avoid Lean evaluating the numeral
+  simp only [i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post, i7_post, i8_post,
+    i9_post, Nat.reduceAdd] at *
+  generalize h_huge : (2 : ℕ) ^ 126 = N_huge at y1_post1
+  have step_y1  := run_loop_nat _ uZ rfl hR_ne_zero y  _101  y1  16 5  N_huge step_y    step_101
+    y1_post1
+  have step_y2  := run_loop_nat _ uZ rfl hR_ne_zero y1  _11   y2  _  3  16    step_y1   step_11
+    y2_post1
+  have step_y3  := run_loop_nat _ uZ rfl hR_ne_zero y2  _1111 y3  _  15 32    step_y2   step_1111
+    y3_post1
+  have step_y4  := run_loop_nat _ uZ rfl hR_ne_zero y3  _1111 y4  _  15 32    step_y3   step_1111
+    y4_post1
+  have step_y5  := run_loop_nat _ uZ rfl hR_ne_zero y4  _1001 y5  _  9  16    step_y4   step_1001
+    y5_post2
+  have step_y6  := run_loop_nat _ uZ rfl hR_ne_zero y5  _11   y6  _  3  4     step_y5   step_11
+    y6_post2
+  have step_y7  := run_loop_nat _ uZ rfl hR_ne_zero y6  _1111 y7  _  15 32    step_y6   step_1111
+    y7_post1
+  have step_y8  := run_loop_nat _ uZ rfl hR_ne_zero y7  _101  y8  _  5  16    step_y7   step_101
+    y8_post1
+  have step_y9  := run_loop_nat _ uZ rfl hR_ne_zero y8  _101  y9  _  5  64    step_y8   step_101
+    y9_post1
+  have step_y10 := run_loop_nat _ uZ rfl hR_ne_zero y9  _111  y10 _  7  8     step_y9   step_111
+    y10_post2
+  have step_y11 := run_loop_nat _ uZ rfl hR_ne_zero y10 _1111 y11 _  15 32    step_y10  step_1111
+    y11_post1
+  have step_y12 := run_loop_nat _ uZ rfl hR_ne_zero y11 _111  y12 _  7  32    step_y11  step_111
+    y12_post1
+  have step_y13 := run_loop_nat _ uZ rfl hR_ne_zero y12 _11   y13 _  3  16    step_y12  step_11
+    y13_post1
+  have step_y14 := run_loop_nat _ uZ rfl hR_ne_zero y13 _1011 y14 _  11 32    step_y13  step_1011
+    y14_post1
+  have step_y15 := run_loop_nat _ uZ rfl hR_ne_zero y14 _1011 y15 _  11 64    step_y14  step_1011
+    y15_post1
+  have step_y16 := run_loop_nat _ uZ rfl hR_ne_zero y15 _1001 y16 _  9  1024  step_y15  step_1001
+    y16_post1
+  have step_y17 := run_loop_nat _ uZ rfl hR_ne_zero y16 _11   y17 _  3  16    step_y16  step_11
+    y17_post1
+  have step_y18 := run_loop_nat _ uZ rfl hR_ne_zero y17 _11   y18 _  3  32    step_y17  step_11
+    y18_post1
+  have step_y19 := run_loop_nat _ uZ rfl hR_ne_zero y18 _11   y19 _  3  32    step_y18  step_11
+    y19_post1
+  have step_y20 := run_loop_nat _ uZ rfl hR_ne_zero y19 _1001 y20 _  9  32    step_y19  step_1001
+    y20_post1
+  have step_y21 := run_loop_nat _ uZ rfl hR_ne_zero y20 _111  y21 _  7  16    step_y20  step_111
+    y21_post1
+  have step_y22 := run_loop_nat _ uZ rfl hR_ne_zero y21 _1111 y22 _  15 64    step_y21  step_1111
+    y22_post1
+  have step_y23 := run_loop_nat _ uZ rfl hR_ne_zero y22 _1011 y23 _  11 32    step_y22  step_1011
+    y23_post1
+  have step_y24 := run_loop_nat _ uZ rfl hR_ne_zero y23 _101  y24 _  5  8     step_y23  step_101
+    y24_post2
+  have step_y25 := run_loop_nat _ uZ rfl hR_ne_zero y24 _1111 y25 _  15 64    step_y24  step_1111
+    y25_post1
+  have step_y26 := run_loop_nat _ uZ rfl hR_ne_zero y25 _101  y26 _  5  8     step_y25  step_101
+    y26_post2
+  have step_res := run_loop_nat _ uZ rfl hR_ne_zero y26 _11   u'  _  3  8     step_y26  step_11
+    u'_post1
+  -- Conclusion: IsMont says u' = u^(L-2) * R^(2-(L-2)) in ZMod L
+  -- Fermat's little theorem: u^(L-1) = 1 (mod L), so u * u' = R^2 (mod L)
+  unfold IsMont at step_res
+  apply (ZMod.natCast_eq_natCast_iff _ _ L).mp; push_cast
+  rw [h_uZ, step_res]
+  have h_eqn : N_huge = 2 ^ 126 := by rw [← h_huge]
+  rw [h_eqn]
+  have h_exp_val :
+    (((((((((((((((((((((((((((16 * 2^126 + 5)
+    * 16 + 3) * 32 + 15) * 32 + 15) * 16 + 9) * 4 + 3) * 32 + 15) * 16 + 5) * 64 + 5)
+    * 8 + 7) * 32 + 15) * 32 + 7) * 16 + 3) * 32 + 11) * 64 + 11) * 1024 + 9) * 16 + 3) * 32 + 3)
+    * 32 + 3) * 32 + 9) * 16 + 7) * 64 + 15) * 32 + 11) * 8 + 5) * 64 + 15) * 8 + 5) * 8 + 3)
+    = L - 2 := by rw [L]; norm_num
+  rw [h_exp_val, ← mul_assoc, ← pow_succ']
+  have h_fermat_exp : L - 2 + 1 = L - 1 := by rw [L]; norm_num
+  rw [h_fermat_exp, ← h_uZ]
+  have hu_ne : (Scalar52_as_Nat u : ZMod L) ≠ 0 := by
+    rw [Ne, CharP.cast_eq_zero_iff (ZMod L) L, Nat.dvd_iff_mod_eq_zero]; exact h
+  rw [ZMod.pow_card_sub_one_eq_one hu_ne, one_mul, ← pow_two]
+  have h_exp : 1 - ↑(L - 2) = (3 : ℤ) - ↑L := by
+    have h_ge : 2 ≤ L := by decide
+    rw [Int.ofNat_sub h_ge]; ring
+  rw [h_exp, sub_eq_add_neg, zpow_add₀ hR_ne_zero, zpow_neg]
+  simp only [zpow_natCast, pow_card]; field_simp
 
 end curve25519_dalek.scalar.Scalar52

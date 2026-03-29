@@ -61,9 +61,6 @@ natural language specs:
       - The result is canonical.
 -/
 
--- Helper function
-def pow2 (n : Nat) : Nat := 2^n
-
 /--
 Specification for the inner loop `square_multiply_loop`.
 It performs `squarings - i` remaining squarings on `y` (all in Montgomery form).
@@ -77,8 +74,8 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
     (h_y_bound : ∀ j < 5, y[j]!.val < 2 ^ 52)
     (h_y_canonical : Scalar52_as_Nat y < L) :
     montgomery_invert.square_multiply_loop y squarings i ⦃ res =>
-    (Scalar52_as_Nat res * R ^ (pow2 (squarings.val - i.val) - 1)) % L =
-    (Scalar52_as_Nat y) ^ (pow2 (squarings.val - i.val)) % L ∧
+    (Scalar52_as_Nat res * R ^ (2 ^ (squarings.val - i.val) - 1)) % L =
+    (Scalar52_as_Nat y) ^ (2 ^ (squarings.val - i.val)) % L ∧
     (∀ j < 5, res[j]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat res < L ⦄ := by
   induction h_rem : (squarings.val - i.val) generalizing i y with
@@ -91,7 +88,7 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
         getElem!_pos, le_refl, tsub_self, UScalar.mk.injEq, UScalarTy.Usize_numBits_eq]
       exact BitVec.eq_of_toNat_eq h_val_eq
     unfold montgomery_invert.square_multiply_loop
-    simp only [this, lt_self_iff_false, ↓reduceIte, pow2, pow_zero, tsub_self, mul_one, pow_one,
+    simp only [this, lt_self_iff_false, ↓reduceIte, pow_zero, tsub_self, mul_one, pow_one,
       Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, spec_ok, true_and]
     refine ⟨fun j hj => ?_, h_y_canonical⟩
     simpa using h_y_bound j hj
@@ -106,19 +103,15 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
           _ < R * L := Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega)
       let* ⟨ i1, i1_post ⟩ ← Usize.add_spec
       let* ⟨ res, res_post1, res_post2, res_post3 ⟩ ← ih
-      have h_sq_lt : ↑i < ↑squarings := by assumption
       refine ⟨ ?_, ?_, res_post3 ⟩
-      · have h_pow_split : pow2 (n + 1) - 1 = (pow2 n - 1) + pow2 n := by
-          simp only [pow2, Nat.pow_succ, Nat.mul_succ, mul_one]
+      · have h_pow_split : 2 ^ (n + 1) - 1 = (2 ^ n - 1) + 2 ^ n := by
           have : 1 ≤ 2^n := Nat.one_le_pow n 2 (by decide)
           omega
         rw [h_pow_split, Nat.pow_add]
-        unfold pow2 at *; try ring_nf at ⊢ res_post1
+        ring_nf at ⊢ res_post1
         rw [Nat.mul_mod, res_post1, ← Nat.mul_mod, ← Nat.mul_pow, Nat.pow_mod, ← y1_post1, ← Nat.pow_mod]
         ring_nf
-      intro i hi
-      grind only [usr Subtype.property, = getElem?_pos, = UScalar.ofNatCore_val_eq,
-        usr Isize.cMax_bound', usr Usize.cMax_bound', = Option.getD_some]
+      intro j hj; simpa using res_post2 j hj
     · have : squarings.val - i.val = n + 1 := by assumption
       agrind
 
@@ -136,8 +129,8 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
     (h_y_canonical : Scalar52_as_Nat y < L)
     (h_x_canonical : Scalar52_as_Nat x < L) :
     montgomery_invert.square_multiply y squarings x ⦃ res =>
-    (Scalar52_as_Nat res * R ^ (pow2 squarings.val)) % L =
-    ((Scalar52_as_Nat y) ^ (pow2 squarings.val) * (Scalar52_as_Nat x)) % L ∧
+    (Scalar52_as_Nat res * R ^ (2 ^ squarings.val)) % L =
+    ((Scalar52_as_Nat y) ^ (2 ^ squarings.val) * (Scalar52_as_Nat x)) % L ∧
     (∀ i < 5, res[i]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat res < L ⦄ := by
   unfold montgomery_invert.square_multiply
@@ -149,15 +142,14 @@ theorem square_multiply_spec (y : Scalar52) (squarings : Usize) (x : Scalar52)
         < L * L := Nat.mul_lt_mul_of_lt_of_lt h_loop_canonical h_x_canonical
       _ < R * L := Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega)
   refine ⟨?_, h_mul_bound, h_mul_canonical⟩
-  have h_pow_split : R ^ (pow2 squarings.val) = R * R ^ (pow2 squarings.val - 1) := by
+  have h_pow_split : R ^ (2 ^ squarings.val) = R * R ^ (2 ^ squarings.val - 1) := by
     rw [← Nat.pow_succ']; congr 1
-    have : 1 ≤ pow2 squarings.val := Nat.one_le_pow _ _ (by decide)
+    have : 1 ≤ 2 ^ squarings.val := Nat.one_le_pow _ _ (by decide)
     omega
   have h_mul_eq : (Scalar52_as_Nat mul_res * R) % L =
                   (Scalar52_as_Nat loop_res * Scalar52_as_Nat x) % L :=
     h_mul_math.symm
   rw [h_pow_split, ← Nat.mul_assoc, Nat.mul_mod, h_mul_eq, ← Nat.mul_mod]
-  unfold pow2 at *
   ring_nf
   rw [Nat.mul_comm (Scalar52_as_Nat loop_res), Nat.mul_assoc, Nat.mul_mod, h_loop_math]
   rw [← Nat.mul_mod]
