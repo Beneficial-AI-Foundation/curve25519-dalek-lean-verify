@@ -3,7 +3,6 @@ Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
--- import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
@@ -11,11 +10,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
-
-import Mathlib.Algebra.Polynomial.Eval.Algebra
-import Mathlib.Algebra.Polynomial.Eval.Coeff
-import Mathlib.Algebra.Polynomial.Eval.Defs
-import Mathlib.Algebra.Polynomial.Eval.Degree
 
 import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
@@ -29,12 +23,9 @@ This function performs Montgomery reduction.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64
-open Polynomial
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 set_option exponentiation.threshold 416
@@ -481,8 +472,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     rw [show L = Scalar52_as_Nat constants.L from constants.L_spec.symm]
     unfold Scalar52_as_Nat
     simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
-      Array.getElem!_Nat_eq]
-    agrind
+      Array.getElem!_Nat_eq]; agrind
   -- Name the intermediate result array for readability
   let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
   have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
