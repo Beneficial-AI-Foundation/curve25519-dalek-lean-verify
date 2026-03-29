@@ -4241,7 +4241,7 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    from_montgomery self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat result * R) % L = Scalar52_as_Nat self % L ∧\n      Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
@@ -4286,7 +4286,7 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m' < R * L) :\n    montgomery_mul m m' ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat w < L ⦄ := by ...",
@@ -4316,7 +4316,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n\n**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:\nThe Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single\nconditional subtraction. This is only correct when the intermediate result `inter < 2*L`:\n- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get\n  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.\n- A single subtraction of L then guarantees `result < L`.\n- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,\n  and the single subtraction would not produce a canonical result.\nAll callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,\n`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
@@ -4376,7 +4376,7 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem montgomery_square_spec (m : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m < R * L) :\n    montgomery_square m ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat w < L ⦄ := by ...",

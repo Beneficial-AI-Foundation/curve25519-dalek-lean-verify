@@ -90,12 +90,9 @@ theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.v
       UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq, Nat.reduceLeDiff,
       UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
       agrind
-    · have h_ge : 5 ≤ i := by agrind
-      rw [limbs1_post2 i hi h_ge]
-      simp only [Array.repeat] at ⊢
-      simp only [getElem!, List.getElem?_replicate]
-      simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
-        IsEmpty.forall_iff, not_lt, UScalar.ofNatCore_val_eq, reduceIte, Nat.ofNat_pos]
+    · rw [limbs1_post2 i hi (by omega)]
+      simp only [Array.repeat, getElem!, List.getElem?_replicate, *,
+        UScalar.ofNatCore_val_eq, reduceIte]; positivity
   · -- h_canonical: [self[0]..self[4], 0,0,0,0] has value = Scalar52_as_Nat self << R*L
     have h_cast : ∀ j < 5, (limbs1[j]!).val = (self[j]!).val := fun j hj => by
       simp [limbs1_post1 j hj (Nat.zero_le j)]
