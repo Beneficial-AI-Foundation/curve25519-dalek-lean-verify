@@ -8,11 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
-import Mathlib.Algebra.Polynomial.Eval.Algebra
-import Mathlib.Algebra.Polynomial.Eval.Coeff
-import Mathlib.Algebra.Polynomial.Eval.Defs
-import Mathlib.Algebra.Polynomial.Eval.Degree
-
 /-! # Spec Theorem for `Scalar52::montgomery_square`
 
 Specification and proof for `Scalar52::montgomery_square`.
@@ -55,8 +50,6 @@ theorem montgomery_square_spec (m : Scalar52)
     (∀ i < 5, w[i]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat w < L ⦄ := by
   unfold montgomery_square
-  sorry
-  -- Old proof (before value constraint + strengthened post):
-  -- step*
+  step*
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

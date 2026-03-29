@@ -241,8 +241,7 @@ private lemma a8_bound_of_canonical (a : Aeneas.Std.Array U128 9#usize)
   exact (Nat.mul_lt_mul_left (show 0 < 2 ^ 416 from by positivity)).mp this
 
 /-- REDC bound: from the main equation `T + N*L = inter*R` and canonical bound `T < R*L`,
-    with `0 ≤ N < R`, the intermediate satisfies `inter < 2*L`.
-    Mirrors Verus `lemma_r4_bound_from_canonical`. -/
+    with `0 ≤ N < R`, the intermediate satisfies `inter < 2*L`. -/
 private lemma redc_bound {inter T : Nat} {C : Int}
     (h_eq : (T : Int) + C * ↑L = ↑inter * ↑R)
     (h_T : T < R * L) (h_C_nn : 0 ≤ C) (h_C_lt : C < ↑R) :
@@ -307,7 +306,17 @@ set_option maxHeartbeats 800000 in -- Progress will timout otherwise
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
--/
+
+**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:
+The Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single
+conditional subtraction. This is only correct when the intermediate result `inter < 2*L`:
+- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get
+  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.
+- A single subtraction of L then guarantees `result < L`.
+- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,
+  and the single subtraction would not produce a canonical result.
+All callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,
+`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/
 @[step]
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
     (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127)
@@ -399,7 +408,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
   obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
   let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
-  -- Derive tight r4 bound from h_canonical (Verus: lemma_carry8_bound)
+  -- Derive tight r4 bound from h_canonical
   have h_L4 : i21.val = 2 ^ 44 := by
     have := i21_post; rw [this]; unfold constants.L; decide
   have h_a8 : i46.val < 2 ^ 97 := by

@@ -55,12 +55,8 @@ theorem montgomery_mul_spec (m m' : Scalar52)
     (∀ i < 5, w[i]!.val < 2 ^ 52) ∧
     Scalar52_as_Nat w < L ⦄ := by
   unfold montgomery_mul
-  sorry
-  -- Old proof (before value constraint + strengthened post):
-  -- step*
-  -- constructor
-  -- · simpa [a1_post1, eq_comm] using w_post1
-  -- · intro i hi
-  --   exact lt_trans (w_post2 i hi) (by norm_num)
+  step*
+  refine ⟨?_, w_post2, w_post3⟩
+  simpa [a1_post1, eq_comm] using w_post1
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
