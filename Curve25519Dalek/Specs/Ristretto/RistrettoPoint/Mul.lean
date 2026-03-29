@@ -54,7 +54,6 @@ theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)
       result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by
   unfold mul edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul
   step*
-  · exact hself.1
   · constructor
     · unfold RistrettoPoint.IsValid
       refine ⟨ep_post1, ?_⟩

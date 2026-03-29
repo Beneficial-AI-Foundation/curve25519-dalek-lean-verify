@@ -523,7 +523,8 @@ private lemma elligator_nqr_twist
   * The computation maintains constant-time guarantees: all branches are resolved
     via conditional-select and conditional-assign operations
 -/
-
+set_option maxHeartbeats 10000000 in
+-- haevy grind
 @[step]
 theorem elligator_encode_spec
     (r_0 : backend.serial.u64.field.FieldElement51)

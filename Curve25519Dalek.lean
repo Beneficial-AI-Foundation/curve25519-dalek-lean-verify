@@ -177,6 +177,8 @@ import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Specs.Scalar.Scalar.Add
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
+import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix16
+import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 import Curve25519Dalek.Specs.Scalar.Scalar.Eq
 import Curve25519Dalek.Specs.Scalar.Scalar.FromBytesModOrder
@@ -197,6 +199,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.One
 import Curve25519Dalek.Specs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Specs.Scalar.Scalar.Sub
 import Curve25519Dalek.Specs.Scalar.Scalar.ToBytes
+import Curve25519Dalek.Specs.Scalar.Scalar.ToRadix2wSizeHint
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Tactics
