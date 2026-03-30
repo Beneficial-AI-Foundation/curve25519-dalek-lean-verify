@@ -1153,7 +1153,7 @@ natural language specs:
       bridging the 51-bit limb implementation to the abstract ZMod p computation
 -/
 
-set_option maxHeartbeats 1800000 in -- needed for complex step
+set_option maxHeartbeats 1300000 in -- needed for complex step
 /-- **Spec and proof concerning `ristretto.RistrettoPoint.elligator_ristretto_flavor`**:
 • The function always succeeds (no panic) for all valid field element inputs
 • The output is indeed a valid RistrettoPoint (i.e., an even Edwards point that lies on the curve)

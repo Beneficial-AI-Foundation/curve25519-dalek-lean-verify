@@ -334,7 +334,7 @@ private lemma canonical_reduction_mod_p
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 8000000 in -- heavy step*
+set_option maxHeartbeats 1550000 in -- heavy step*
 /-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.
