@@ -1,18 +1,18 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-
-/-! # Spec Theorem for `EdwardsPoint::as_projective`
+/-!
+# Spec theorem for `EdwardsPoint::as_projective`
 
 Specification and proof for `EdwardsPoint::as_projective`.
 
 This function converts to projective coordinates.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

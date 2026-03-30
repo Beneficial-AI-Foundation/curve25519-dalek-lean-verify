@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -13,8 +13,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
 import Curve25519Dalek.Aux
-
-/-! # Spec Theorem for `EdwardsPoint::as_affine_niels`
+/-!
+# Spec theorem for `EdwardsPoint::as_affine_niels`
 
 Specification and proof for `EdwardsPoint::as_affine_niels`.
 
@@ -36,7 +36,7 @@ The concrete formulas are:
 - y_minus_x  = y − x
 - xy2d       = x · y · 2d
 
-**Source**: curve25519-dalek/src/edwards.rs, lines 543:4-553:5
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.field.FieldElement51

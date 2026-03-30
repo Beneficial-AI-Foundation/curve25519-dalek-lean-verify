@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -7,7 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Math.Montgomery.Curve
-/-! # Spec Theorem for `EdwardsPoint::eq`
+/-!
+# Spec theorem for `EdwardsPoint::eq`
 
 Specification and proof for the `eq` (PartialEq) trait implementation for Edwards points.
 
@@ -16,14 +17,12 @@ to constant-time equality (`ct_eq`) and converting the resulting `Choice` to `Bo
 Two extended Edwards points (X₁:Y₁:Z₁:T₁) and (X₂:Y₂:Z₂:T₂) are considered equal
 when they represent the same affine point, i.e., X₁·Z₂ = X₂·Z₁ and Y₁·Z₂ = Y₂·Z₁ (mod p).
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint
-
-
 
 /-- If `c.val = 1`, then `c = Choice.one` (by proof irrelevance on the `valid` field). -/
 @[simp]

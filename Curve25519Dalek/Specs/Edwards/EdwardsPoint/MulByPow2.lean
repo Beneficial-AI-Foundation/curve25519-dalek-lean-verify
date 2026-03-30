@@ -1,20 +1,20 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.ExternallyVerified
-
-/-! # Spec Theorem for `EdwardsPoint::mul_by_pow_2`
+/-!
+# Spec theorem for `EdwardsPoint::mul_by_pow_2`
 
 Specification and proof for `EdwardsPoint::mul_by_pow_2`.
 
 This function computes [2^k]e (the Edwards point e doubled k times for some natural k > 0)
 by successive doublings.
 
-**Source**: curve25519-dalek/src/edwards.rs:1328-1340
+Source: "curve25519-dalek/src/edwards.rs"
 
 ## TODO
 - Complete proof

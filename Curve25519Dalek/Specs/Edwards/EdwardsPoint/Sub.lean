@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -9,8 +9,8 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjectiveNiels
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
-
-/-! # Spec Theorem for `EdwardsPoint::sub`
+/-!
+# Spec theorem for `EdwardsPoint::sub`
 
 Specification and proof for the `Sub` trait implementation for Edwards points.
 
@@ -19,7 +19,7 @@ extended twisted Edwards coordinates: it converts the second operand to projecti
 form, performs the subtraction in completed point coordinates, and converts back to
 extended coordinates.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

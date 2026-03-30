@@ -1,16 +1,15 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
-
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
-
-/-! # Spec Theorem for `EdwardsPoint::compress`
+/-!
+# Spec theorem for `EdwardsPoint::compress`
 
 Specification and proof for `EdwardsPoint::compress`.
 
@@ -20,7 +19,7 @@ the y-coordinate and the sign bit of the x-coordinate. Note that the y-coordinat
 and the sign of the x coordinate are sufficient to reconstruct the full point (x,y)
 given the defining equation $ax^2 + y^2 = 1 + dx^2y^2$ of the Edwards curve which is quadratic in x.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -60,9 +59,6 @@ theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 
     compress self ⦃ result => True ⦄ := by
   unfold compress
   sorry
-
-
-
 
 
 end curve25519_dalek.edwards.EdwardsPoint

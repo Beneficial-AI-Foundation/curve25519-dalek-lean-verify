@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,15 +7,15 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
-
-/-! # Spec Theorem for `EdwardsPoint::to_affine`
+/-!
+# Spec theorem for `EdwardsPoint::to_affine`
 
 Specification and proof for `EdwardsPoint::to_affine`.
 
 This function converts an EdwardsPoint from extended twisted Edwards coordinates (X, Y, Z, T)
 to affine coordinates (x, y) by dehomogenizing: x = X/Z, y = Y/Z.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 
 ## TODO
 - Complete proof

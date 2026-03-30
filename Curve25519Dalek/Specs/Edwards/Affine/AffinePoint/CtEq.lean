@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -10,10 +10,9 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
-
 import Mathlib.Data.Nat.ModEq
-
-/-! # Spec Theorem for `AffinePoint::ct_eq`
+/-!
+# Spec theorem for `AffinePoint::ct_eq`
 
 Specification and proof for `AffinePoint::ct_eq`.
 
@@ -22,7 +21,7 @@ Unlike `EdwardsPoint::ct_eq`, which must cross-multiply by Z coordinates, affine
 store (x, y) directly, so equality reduces to coordinate-wise comparison via
 `FieldElement51::ct_eq` on x and y, combined with a bitwise AND.
 
-**Source**: curve25519-dalek/src/edwards/affine.rs
+Source: "curve25519-dalek/src/edwards/affine.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

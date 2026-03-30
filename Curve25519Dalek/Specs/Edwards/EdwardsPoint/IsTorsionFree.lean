@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -10,7 +10,8 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Identity
 import Curve25519Dalek.Specs.Constants.BASEPOINT_ORDER_PRIVATE
-/-! # Spec Theorem for `EdwardsPoint::is_torsion_free`
+/-!
+# Spec theorem for `EdwardsPoint::is_torsion_free`
 
 Specification and proof for `EdwardsPoint::is_torsion_free`.
 
@@ -18,7 +19,7 @@ This function determines whether an Edwards point is "torsion-free", i.e., is co
 in the prime-order subgroup. It does so by multiplying the point by the basepoint order L
 and checking whether the result is the identity element.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP Edwards

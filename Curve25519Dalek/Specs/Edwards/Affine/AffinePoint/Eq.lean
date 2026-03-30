@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.CtEq
-/-! # Spec Theorem for `AffinePoint::eq`
+/-!
+# Spec theorem for `AffinePoint::eq`
 
 Specification and proof for the `eq` (PartialEq) trait implementation for affine Edwards points.
 
@@ -15,14 +16,12 @@ to constant-time equality (`ct_eq`) and converting the resulting `Choice` to `Bo
 Two affine Edwards points (x₁, y₁) and (x₂, y₂) are considered equal when their
 coordinates are equal modulo p, i.e., x₁ ≡ x₂ (mod p) and y₁ ≡ y₂ (mod p).
 
-**Source**: curve25519-dalek/src/edwards/affine.rs
+Source: "curve25519-dalek/src/edwards/affine.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint
-
-
 
 /-- If `c.val = 1`, then `c = Choice.one` (by proof irrelevance on the `valid` field). -/
 @[simp]

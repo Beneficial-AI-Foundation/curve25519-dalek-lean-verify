@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -8,8 +8,8 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
 import Curve25519Dalek.Specs.Scalar.ClampInteger
-
-/-! # Spec Theorem for `EdwardsPoint::mul_clamped`
+/-!
+# Spec theorem for `EdwardsPoint::mul_clamped`
 
 Specification and proof for
 `curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped`.
@@ -23,7 +23,7 @@ which means the usual scalar canonicity invariant (`< L`) does not hold. However
 clamping guarantees `< 2^255`, which suffices for correctness of variable-base
 scalar multiplication (see the Rust source comment at line 892).
 
-**Source**: curve25519-dalek/src/edwards.rs, lines 891:4-903:5
+Source: "curve25519-dalek/src/edwards.rs"
 
 ## TODO
 - Complete proof (the intermediate `mul_spec` currently requires a canonical scalar `< L`,
@@ -34,11 +34,7 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64
 
-
-
 namespace curve25519_dalek.edwards.EdwardsPoint
-
-
 
 /-
 natural language description:

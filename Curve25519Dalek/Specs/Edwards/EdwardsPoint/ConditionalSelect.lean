@@ -1,12 +1,12 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-
-/-! # Spec Theorem for `EdwardsPoint::conditional_select`
+/-!
+# Spec theorem for `EdwardsPoint::conditional_select`
 
 Specification and proof for the `ConditionallySelectable` trait implementation for `EdwardsPoint`.
 
@@ -15,7 +15,7 @@ by applying `FieldElement51::conditional_select` component-wise to the coordinat
 
 Returns `b` when `choice = 1` and `a` when `choice = 0`, in constant time.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

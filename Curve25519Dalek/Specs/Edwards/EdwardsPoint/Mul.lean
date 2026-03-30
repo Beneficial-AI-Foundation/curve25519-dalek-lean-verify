@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,8 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.ExternallyVerified
-
-/-! # Spec Theorems for `EdwardsPoint::mul`
+/-!
+# Spec theorems for `EdwardsPoint::mul`
 
 Specifications and proofs for scalar multiplication of Edwards points.
 
@@ -20,7 +20,7 @@ Three trait implementations are covered here:
 - `Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul` — the commutative variant:
   `&Scalar * &EdwardsPoint → EdwardsPoint`, delegating to the above with swapped arguments.
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -155,6 +155,5 @@ theorem mul_spec (s : scalar.Scalar) (e : edwards.EdwardsPoint)
       result.IsValid ∧
       result.toPoint = ((U8x32_as_Nat s.bytes)) • e.toPoint ⦄ := by
   exact  SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul_spec e s h_s_canonical h_e_valid
-
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint

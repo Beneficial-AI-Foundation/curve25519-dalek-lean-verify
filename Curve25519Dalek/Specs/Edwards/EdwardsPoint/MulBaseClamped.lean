@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -9,8 +9,8 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulBase
 import Curve25519Dalek.Specs.Scalar.ClampInteger
-
-/-! # Spec Theorem for `EdwardsPoint::mul_base_clamped`
+/-!
+# Spec theorem for `EdwardsPoint::mul_base_clamped`
 
 Specification and proof for
 `curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped`.
@@ -18,7 +18,7 @@ Specification and proof for
 This function performs scalar multiplication by the Edwards basepoint after
 clamping the input bytes to a valid scalar, delegating to `EdwardsPoint.mul_base`.
 
-**Source**: curve25519-dalek/src/edwards.rs, lines 906:4-914:5
+Source: "curve25519-dalek/src/edwards.rs"
 
 ## TODO
 - Complete proof

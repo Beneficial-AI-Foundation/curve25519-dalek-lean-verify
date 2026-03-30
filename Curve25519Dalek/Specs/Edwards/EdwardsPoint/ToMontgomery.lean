@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -12,15 +12,16 @@ import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Math.Montgomery.Representation
-/-! # Spec Theorem for `EdwardsPoint::to_montgomery`
+/-!
+# Spec theorem for `EdwardsPoint::to_montgomery`
 
 Specification and proof for `EdwardsPoint::to_montgomery`.
 
 This function converts an EdwardsPoint from the twisted Edwards curve to the
-corresponding MontgomeryPoint (only the u-coordinate) on the Montgomery curve, using the birational map
-u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
+corresponding MontgomeryPoint (only the u-coordinate) on the Montgomery curve, using the birational
+map u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
 
-**Source**: curve25519-dalek/src/edwards.rs
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
