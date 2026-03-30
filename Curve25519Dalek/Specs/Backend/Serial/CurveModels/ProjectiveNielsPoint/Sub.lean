@@ -1,13 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
-
-
 /-! # Spec Theorem for `CompletedPoint::sub`
 
 Specification and proof for `CompletedPoint::sub`.
@@ -50,7 +48,6 @@ These lemmas factor out the key proof steps used in the main theorem:
    pure modular arithmetic lemmas for each coordinate relation
 3. `double_limb_tight_bounds`: derives tight bounds for doubled limb values
 -/
-
 
 /-- X relation for sub: `X' + Y·YpX ≡ (Y+X)·YmX + X·YpX (mod p)`.
     Here X' = PM - MP, PM = (Y+X)·other.Y_minus_X, MP = (Y-X)·other.Y_plus_X.
@@ -140,9 +137,6 @@ private lemma double_limb_tight_bounds (a b : Array U64 5#usize)
   calc b[i]!.val = a[i]!.val + a[i]!.val := h1
       _ < 2 ^ 52 + 2 ^ 52 := by omega
       _ = 2 ^ 53 := by norm_num
-
-
-
 
 /-- Auxiliary spec for sub proving arithmetic correctness and output bounds.
 Input bounds: EdwardsPoint coords < 2^53, ProjectiveNielsPoint (IsValid') bounds. -/
@@ -245,7 +239,6 @@ theorem sub_spec_bounds'
   spec_imp_exists (sub_spec_aux_54_52_53_52 self other
     hself.X_bounds hself.Y_bounds hself.Z_bounds hself.T_bounds
     hother.Y_plus_X_bounds hother.Y_minus_X_bounds hother.Z_bounds hother.T2d_bounds)
-
 
 /-! ## Independent sub-lemmas for the main theorem `sub_spec'`
 

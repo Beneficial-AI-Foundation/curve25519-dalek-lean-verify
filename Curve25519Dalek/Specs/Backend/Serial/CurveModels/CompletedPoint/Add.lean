@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong, Oliver Butterley
 -/
@@ -10,7 +10,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
-
 /-! # Spec Theorem for `CompletedPoint::add`
 
 Specification and proof for `CompletedPoint::add`.
@@ -259,7 +258,6 @@ private lemma add_T_mod_arith (fe3 ZZ2 ZZ TT2d selfZ otherZ selfT otherT2d : ℕ
   have := Nat.ModEq.mul_left 2 h_ZZ
   rw [mul_assoc]
   exact this
-
 
 /-- **Auxiliary spec for `add`** proving arithmetic correctness.
 Input bounds: EdwardsPoint coords < 2^53, ProjectiveNielsPoint coords < 2^53.

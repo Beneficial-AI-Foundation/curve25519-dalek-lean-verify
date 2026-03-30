@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -77,21 +77,21 @@ theorem double_spec_aux (q : ProjectivePoint)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54) :
     double q ⦃ c =>
-    let X := Field51_as_Nat q.X
-    let Y := Field51_as_Nat q.Y
-    let Z := Field51_as_Nat q.Z
-    let X' := Field51_as_Nat c.X
-    let Y' := Field51_as_Nat c.Y
-    let Z' := Field51_as_Nat c.Z
-    let T' := Field51_as_Nat c.T
-    X' % p = (2 * X * Y) % p ∧
-    Y' % p = (Y^2 + X^2) % p ∧
-    (Z' + X^2) % p = Y^2 % p ∧
-    (T' + Z') % p = (2 * Z^2) % p ∧
-    (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
-    (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
+      let X := Field51_as_Nat q.X
+      let Y := Field51_as_Nat q.Y
+      let Z := Field51_as_Nat q.Z
+      let X' := Field51_as_Nat c.X
+      let Y' := Field51_as_Nat c.Y
+      let Z' := Field51_as_Nat c.Z
+      let T' := Field51_as_Nat c.T
+      X' % p = (2 * X * Y) % p ∧
+      Y' % p = (Y^2 + X^2) % p ∧
+      (Z' + X^2) % p = Y^2 % p ∧
+      (T' + Z') % p = (2 * Z^2) % p ∧
+      (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
+      (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
   simp only [progress_simps]
   let* ⟨ XX, XX_post1, XX_post2 ⟩ ← square_spec
