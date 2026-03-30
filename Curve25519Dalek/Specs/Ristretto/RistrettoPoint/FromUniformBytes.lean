@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.ElligatorRistrettoFlavor
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Add
-
 /-! # Spec theorem for `RistrettoPoint::from_uniform_bytes`
 
 Specification and proof for `RistrettoPoint::from_uniform_bytes`.

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -10,7 +10,6 @@ import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
 import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
-
 /-! # Spec Theorem for `RistrettoPoint::mul_base`
 
 Specification and proof for `RistrettoPoint::mul_base`.

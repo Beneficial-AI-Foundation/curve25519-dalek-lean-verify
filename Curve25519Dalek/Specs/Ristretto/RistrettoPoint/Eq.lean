@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,7 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.CtEq
-
 /-! # Spec Theorem for `RistrettoPoint::eq`
 
 Specification and proof for the `PartialEq` trait implementation for `RistrettoPoint`.

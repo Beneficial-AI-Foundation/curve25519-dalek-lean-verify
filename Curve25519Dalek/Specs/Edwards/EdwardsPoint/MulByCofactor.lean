@@ -1,12 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.MulByPow2
 import Curve25519Dalek.Math.Edwards.Representation
-
 /-! # Spec Theorem for `EdwardsPoint::mul_by_cofactor`
 
 Specification and proof for `EdwardsPoint::mul_by_cofactor`.

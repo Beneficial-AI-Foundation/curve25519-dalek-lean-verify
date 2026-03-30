@@ -1,12 +1,11 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Sub
-
 /-! # Spec Theorem for `RistrettoPoint::sub`
 
 Specification and proof for the `Sub` trait implementation for Ristretto points.
@@ -64,6 +63,7 @@ theorem sub_spec
     apply even_add_closure_Ed25519
     · exact h_even self h_self_valid
     · obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp (h_even other h_other_valid)
-      exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by unfold RistrettoPoint.toPoint at hQ; rw [hQ]; abel⟩
+      exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by
+        unfold RistrettoPoint.toPoint at hQ; rw [hQ]; abel⟩
 
 end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint

@@ -1,10 +1,9 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-
 /-! # Spec Theorem for `CompressedRistretto::to_bytes`
 
 Specification and proof for `CompressedRistretto::to_bytes`.

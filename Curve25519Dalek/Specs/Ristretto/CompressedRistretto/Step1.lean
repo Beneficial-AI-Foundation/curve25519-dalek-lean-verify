@@ -1,17 +1,15 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
-
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.AsBytes
-
 /-! # Spec Theorem for `ristretto.decompress.step_1`
 
 Specification and proof for `ristretto.decompress.step_1`.
@@ -56,7 +54,6 @@ natural language specs:
     • The output field element s is valid (i.e., its limbs are appropriately bounded)
 
 -/
-
 
 /-- **Spec for `step_1`**
 Reflects the Rust implementation:

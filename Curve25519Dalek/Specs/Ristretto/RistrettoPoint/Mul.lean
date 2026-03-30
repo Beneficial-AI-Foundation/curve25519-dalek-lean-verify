@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -7,7 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
-
 /-! # Spec Theorems for `RistrettoPoint::mul`
 
 Specifications and proofs for scalar multiplication of Ristretto points.

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -56,11 +56,11 @@ theorem neg_spec
   have := h_self_valid.T_bounds
   progress*
   simp only [Montgomery.lift_mod_eq_iff, Nat.cast_add, Nat.cast_zero] at fe_post1
-  rw[← FieldElement51.toField, ← FieldElement51.toField ] at fe_post1
+  rw [← FieldElement51.toField, ← FieldElement51.toField] at fe_post1
   simp only [Montgomery.lift_mod_eq_iff, Nat.cast_add, Nat.cast_zero] at fe1_post1
-  rw[← FieldElement51.toField, ← FieldElement51.toField ] at fe1_post1
-  have fe_neg: fe.toField=-self.X.toField  := by grind
-  have fe1_neg: fe1.toField =-self.T.toField := by grind
+  rw [← FieldElement51.toField, ← FieldElement51.toField] at fe1_post1
+  have fe_neg : fe.toField = -self.X.toField := by grind
+  have fe1_neg : fe1.toField = -self.T.toField := by grind
   have : ({ X := fe, Y := self.Y, Z := self.Z, T := fe1 }:edwards.EdwardsPoint).IsValid := by
     constructor
     · grind
@@ -68,7 +68,7 @@ theorem neg_spec
     · grind
     · grind
     · have := h_self_valid.Z_ne_zero
-      simp[this]
+      simp [this]
     · have := h_self_valid.T_relation
       simp only
       rw[fe_neg, fe1_neg]
@@ -84,10 +84,6 @@ theorem neg_spec
   · simp only [Edwards.neg_x]
     field_simp
   · simp only [Edwards.neg_y]
-
-
-
-
 
 
 

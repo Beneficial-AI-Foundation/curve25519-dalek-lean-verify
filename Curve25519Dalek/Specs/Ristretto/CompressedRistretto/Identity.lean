@@ -1,10 +1,9 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
-
 /-! # Spec Theorem for `CompressedRistretto::identity`
 
 Specification and proof for the `Identity` trait implementation for `CompressedRistretto`.
