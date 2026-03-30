@@ -7,12 +7,99 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-/-! # Pow2K — V3: Fold Theorem Decomposition
+/-! # Specification for `FieldElement51::pow2k`.
 
-Refactoring of Pow2K.lean using the Aeneas "fold theorem" pattern.
-The monadic function `pow2k_loop` is decomposed into 3 helper functions.
-Each has a fold theorem and `@[step]` spec. The main proof uses
-`simp_rw [fold_*]` to collapse the inline code, then `step*` applies the specs.
+This function computes the 2^k-th power of a field element.
+
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
+
+## Source code
+
+```rust
+    /// Given `k > 0`, return `self^(2^k)`.
+    pub fn pow2k(&self, mut k: u32) -> FieldElement51 {
+        debug_assert!( k > 0 );
+        fn m(x: u64, y: u64) -> u128 { (x as u128) * (y as u128) }
+        let mut a: [u64; 5] = self.0;
+        while k > 0 {
+            let a3_19 = 19 * a[3];
+            let a4_19 = 19 * a[4];
+            let     c0: u128 = m(a[0],  a[0]) + 2*( m(a[1], a4_19) + m(a[2], a3_19) );
+            let mut c1: u128 = m(a[3], a3_19) + 2*( m(a[0],  a[1]) + m(a[2], a4_19) );
+            let mut c2: u128 = m(a[1],  a[1]) + 2*( m(a[0],  a[2]) + m(a[4], a3_19) );
+            let mut c3: u128 = m(a[4], a4_19) + 2*( m(a[0],  a[3]) + m(a[1],  a[2]) );
+            let mut c4: u128 = m(a[2],  a[2]) + 2*( m(a[0],  a[4]) + m(a[1],  a[3]) );
+            const LOW_51_BIT_MASK: u64 = (1u64 << 51) - 1;
+            c1 += ((c0 >> 51) as u64) as u128;  a[0] = (c0 as u64) & LOW_51_BIT_MASK;
+            c2 += ((c1 >> 51) as u64) as u128;  a[1] = (c1 as u64) & LOW_51_BIT_MASK;
+            c3 += ((c2 >> 51) as u64) as u128;  a[2] = (c2 as u64) & LOW_51_BIT_MASK;
+            c4 += ((c3 >> 51) as u64) as u128;  a[3] = (c3 as u64) & LOW_51_BIT_MASK;
+            let carry: u64 = (c4 >> 51) as u64;  a[4] = (c4 as u64) & LOW_51_BIT_MASK;
+            a[0] += carry * 19;
+            a[1] += a[0] >> 51;
+            a[0] &= LOW_51_BIT_MASK;
+            k -= 1;
+        }
+        FieldElement51(a)
+    }
+```
+
+## Proof strategy: Fold theorem decomposition
+
+The loop body is decomposed into 3 helper functions, each with a fold theorem and `@[step]` spec.
+
+### Stage 1 — Squaring (`square_stage`)
+
+Computes the 5 intermediate 128-bit products c0–c4 from the input limbs:
+  `c0 = a[0]² + 2·(a[1]·(19·a[4]) + a[2]·(19·a[3]))`
+  `c1 = (19·a[3])·a[3] + 2·(a[0]·a[1] + a[2]·(19·a[4]))`
+  `c2 = a[1]² + 2·(a[0]·a[2] + a[4]·(19·a[3]))`
+  `c3 = (19·a[4])·a[4] + 2·(a[0]·a[3] + a[1]·a[2])`
+  `c4 = a[2]² + 2·(a[0]·a[4] + a[1]·a[3])`
+
+Bounds: `c0 < 2^115`, ..., `c4 < 2^115`.
+Algebraic identity: `c0 + 2^51·c1 + 2^102·c2 + 2^153·c3 + 2^204·c4 ≡ (Field51_as_Nat a)² [MOD p]`.
+
+### Stage 2 — Carry propagation (`carry_prop_stage`)
+
+Propagates carries through c0–c4:
+```rust
+  c1 += (c0 >> 51) as u64;  a[0] = (c0 as u64) & LOW_51_BIT_MASK;
+  c2 += (c1 >> 51) as u64;  a[1] = (c1 as u64) & LOW_51_BIT_MASK;
+  c3 += (c2 >> 51) as u64;  a[2] = (c2 as u64) & LOW_51_BIT_MASK;
+  c4 += (c3 >> 51) as u64;  a[3] = (c3 as u64) & LOW_51_BIT_MASK;
+  carry = (c4 >> 51) as u64; a[4] = (c4 as u64) & LOW_51_BIT_MASK;
+```
+
+With carry-propagated accumulators `c1' = c1 + c0/2^51`, ..., `c4' = c4 + c3'/2^51`:
+  `a'[0] = c0 % 2^51`, `a'[1] = c1' % 2^51`, ..., `a'[4] = c4' % 2^51`
+  `carry = c4' / 2^51`
+
+Carry chain conservation: `c0 + 2^51·c1 + ... = a'[0] + 2^51·a'[1] + ... + 2^255·carry`.
+
+### Stage 3 — Final reduction (`final_reduce_stage`)
+
+Folds the carry back into the low limb:
+```rust
+  a[0] += carry * 19;
+  a[1] += a[0] >> 51;
+  a[0] &= LOW_51_BIT_MASK;
+```
+
+Output array values (writing `a''` for the result):
+  `a''[0] = (a'[0] + 19·carry) % 2^51`
+  `a''[1] = a'[1] + (a'[0] + 19·carry) / 2^51`
+  `a''[2..4] = a'[2..4]`
+
+Limb bounds: `a''[i] < 2^52` for all `i`.
+
+### Fold mechanism
+
+The fold theorems (`fold_square_stage`, `fold_carry_prop_stage`, `fold_final_reduce_stage`)
+prove that the inline monadic code equals calls to the helpers. Each is proved by
+`simp only [helper, bind_assoc_eq, bind_tc_ok]`. In `pow2k_loop_spec`, the three folds
+are applied via `simp_rw [fold_*]`, collapsing the 90-line loop body into 3 helper calls.
+Then `step*` applies the `@[step]` specs automatically.
 -/
 
 set_option linter.hashCommand false
@@ -25,7 +112,6 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.v3
 open curve25519_dalek.backend.serial.u64.field.FieldElement51 (pow2k pow2k_loop)
 open curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k (m LOW_51_BIT_MASK)
 
--- Re-prove step specs in our namespace
 @[step]
 theorem m_spec (x y : U64) :
     m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by
@@ -38,7 +124,7 @@ theorem LOW_51_BIT_MASK_spec :
 
 /-! ## Helper Functions -/
 
-/-- Stage 1: Compute the 5 intermediate products for field squaring. -/
+/-- Stage 1: Compute the 5 intermediate products for field squaring in radix-2^51. -/
 def square_stage (a : Array U64 5#usize) : Result (U128 × U128 × U128 × U128 × U128) := do
   let i ← Array.index_usize a 3#usize
   let a3_19 ← 19#u64 * i
@@ -79,7 +165,7 @@ def square_stage (a : Array U64 5#usize) : Result (U128 × U128 × U128 × U128 
   let c4 ← i25 + i29
   ok (c0, c1, c2, c3, c4)
 
-/-- Stage 2: Propagate carries through the 5 accumulators, producing reduced array + carry. -/
+/-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`. -/
 def carry_prop_stage (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128) :
     Result (Array U64 5#usize × U64 × U64) := do
   let i30 ← c0 >>> 51#i32
@@ -118,8 +204,7 @@ def carry_prop_stage (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128) :
   let a5 ← Array.update a4 4#usize i53
   ok (a5, carry, i34)
 
-/-- Stage 3: Final reduction — fold carry back via multiplication by 19.
-    Takes the mask (from carry_prop_stage's LOW_51_BIT_MASK call) as parameter. -/
+/-- Stage 3: Fold carry back via `carry * 19`. Takes mask from `carry_prop_stage`. -/
 def final_reduce_stage (a5 : Array U64 5#usize) (carry : U64) (i34 : U64) :
     Result (Array U64 5#usize) := do
   let i54 ← carry * 19#u64
@@ -347,10 +432,11 @@ private lemma c4_lt_tight (a0 a1 a2 a3 a4 : ℕ)
 
 @[step]
 theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
-    square_stage a ⦃ (result : U128 × U128 × U128 × U128 × U128) =>
-      let (c0, c1, c2, c3, c4) := result
-      c0.val = a[0]!.val * a[0]!.val + 2 * (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) ∧
-      c1.val = a[3]!.val * (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) ∧
+    square_stage a ⦃ ((c0, c1, c2, c3, c4) : U128 × U128 × U128 × U128 × U128) =>
+      c0.val = a[0]!.val * a[0]!.val + 2 *
+        (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) ∧
+      c1.val = a[3]!.val * (19 * a[3]!.val) + 2 *
+        (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) ∧
       c2.val = a[1]!.val * a[1]!.val + 2 * (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) ∧
       c3.val = a[4]!.val * (19 * a[4]!.val) + 2 * (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) ∧
       c4.val = a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) ∧
@@ -506,39 +592,39 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
   -- Array values after carry propagation
   -- Each ha'_i traces: a5[i] → chain of set operations → AND with mask → ci % 2^51
   have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by
-    simp only [*, Array.set_of_ne_getElem! _ _ 0 4 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 0 3 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 0 2 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 0 1 (by grind) (by grind) (by omega),
-      Array.set_of_eq _ _ 0 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+    simp only [*, Array.set_of_ne_getElem! _ _ 0 4 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 3 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 2 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 1 (by agrind) (by agrind) (by omega),
+      Array.set_of_eq _ _ 0 (by agrind), UScalar.val_and, UScalar.cast_val_eq,
       UScalarTy.numBits]
     simp only [Nat.and_two_pow_sub_one_eq_mod] at *
     omega
   have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by
-    simp only [*, Array.set_of_ne_getElem! _ _ 1 4 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 1 3 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 1 2 (by grind) (by grind) (by omega),
-      Array.set_of_eq _ _ 1 (by grind),
+    simp only [*, Array.set_of_ne_getElem! _ _ 1 4 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 1 3 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 1 2 (by agrind) (by agrind) (by omega),
+      Array.set_of_eq _ _ 1 (by agrind),
       UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
     simp only [Nat.and_two_pow_sub_one_eq_mod] at *
     omega
   have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by
-    simp only [*, Array.set_of_ne_getElem! _ _ 2 4 (by grind) (by grind) (by omega),
-      Array.set_of_ne_getElem! _ _ 2 3 (by grind) (by grind) (by omega),
-      Array.set_of_eq _ _ 2 (by grind), UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
+    simp only [*, Array.set_of_ne_getElem! _ _ 2 4 (by agrind) (by agrind) (by omega),
+      Array.set_of_ne_getElem! _ _ 2 3 (by agrind) (by agrind) (by omega),
+      Array.set_of_eq _ _ 2 (by agrind), UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
     simp only [Nat.and_two_pow_sub_one_eq_mod] at *
     omega
   have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by
-    simp only [*, Array.set_of_ne_getElem! _ _ 3 4 (by grind) (by grind) (by omega),
-      Array.set_of_eq _ _ 3 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+    simp only [*, Array.set_of_ne_getElem! _ _ 3 4 (by agrind) (by agrind) (by omega),
+      Array.set_of_eq _ _ 3 (by agrind), UScalar.val_and, UScalar.cast_val_eq,
       UScalarTy.numBits]
     simp only [Nat.and_two_pow_sub_one_eq_mod] at *
     omega
   have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by
-    simp only [*, Array.set_of_eq _ _ 4 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+    simp only [*, Array.set_of_eq _ _ 4 (by agrind), UScalar.val_and, UScalar.cast_val_eq,
       UScalarTy.numBits]
     simp only [Nat.and_two_pow_sub_one_eq_mod] at *
-    grind
+    agrind
   have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
     simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
@@ -563,7 +649,6 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
        calc c41.val / 2 ^ 51 ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
          _ < 6 * 2 ^ 57 := by decide⟩
 
--- Needed for array set chain simplification in final reduction
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations
 @[step]
@@ -603,29 +688,29 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
   -- Array values after final reduction
   -- a7[0]! = a6[0]! = i56 = a'[0]! + 19 * carry
   have ha7_0 : a7[0]!.val = a'[0]!.val + 19 * carry.val := by
-    simp [a7_post, Array.set_of_ne_getElem! _ _ 0 1 (by grind) (by grind) (by omega),
+    simp [a7_post, Array.set_of_ne_getElem! _ _ 0 1 (by agrind) (by agrind) (by omega),
       a6_post, h_i56]
   have ha8_0 : a8[0]!.val = (a'[0]!.val + 19 * carry.val) % 2 ^ 51 := by
-    simp only [a8_post, Array.set_of_eq _ _ 0 (by grind)]
+    simp only [a8_post, Array.set_of_eq _ _ 0 (by agrind)]
     simp only [i62_post1, UScalar.val_and, hmask]
     rw [show i61 = a7[0]! from by simp [i61_post]]
     rw [Nat.and_two_pow_sub_one_eq_mod, ha7_0]
   have ha8_1 : a8[1]!.val = a'[1]!.val + (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
-    simp only [a8_post, Array.set_of_ne_getElem! _ _ 1 0 (by grind) (by grind) (by omega),
-      a7_post, Array.set_of_eq _ _ 1 (by grind),
+    simp only [a8_post, Array.set_of_ne_getElem! _ _ 1 0 (by agrind) (by agrind) (by omega),
+      a7_post, Array.set_of_eq _ _ 1 (by agrind),
       i60_post, h_i59, h_i58]
   have ha8_2 : a8[2]!.val = a'[2]!.val := by
     simp only [a8_post,
-      a7_post, Array.set_of_ne_getElem! _ _ 2 1 (by grind) (by grind) (by omega),
-      a6_post, Array.set_of_ne_getElem! _ _ 2 0 (by grind) (by grind) (by omega)]
+      a7_post, Array.set_of_ne_getElem! _ _ 2 1 (by agrind) (by agrind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 2 0 (by agrind) (by agrind) (by omega)]
   have ha8_3 : a8[3]!.val = a'[3]!.val := by
     simp only [a8_post,
-      a7_post, Array.set_of_ne_getElem! _ _ 3 1 (by grind) (by grind) (by omega),
-      a6_post, Array.set_of_ne_getElem! _ _ 3 0 (by grind) (by grind) (by omega)]
+      a7_post, Array.set_of_ne_getElem! _ _ 3 1 (by agrind) (by agrind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 3 0 (by agrind) (by agrind) (by omega)]
   have ha8_4 : a8[4]!.val = a'[4]!.val := by
     simp only [a8_post,
-      a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by grind) (by grind) (by omega),
-      a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by grind) (by grind) (by omega)]
+      a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by agrind) (by agrind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by agrind) (by agrind) (by omega)]
   -- Limb bounds: all < 2^52
   have ha8_lt : ∀ i < 5, a8[i]!.val < 2 ^ 52 := by
     intro i hi; interval_cases i
@@ -642,9 +727,8 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
 
 /-! ## Main Proof -/
 
--- Needed for step* applying three decomposed stage specs and recursive call
 set_option maxHeartbeats 14000000 in
--- Required for step* through fold-decomposed loop body + recursive case
+-- Required for step* through fold-decomposed loop body
 @[step]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -654,16 +738,11 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   unfold pow2k_loop
   split
   case isTrue hlt =>
-    -- Fold the three stages
     simp_rw [fold_square_stage, fold_carry_prop_stage, fold_final_reduce_stage]
-    -- Apply square_stage spec
     step as ⟨ sq, sq_post ⟩
-    -- Apply carry_prop_stage spec; this generates ha' side-condition
     step as ⟨ cp, cp_post ⟩
-    -- Apply final_reduce_stage, k-1, and recursive call
     step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
-    · -- ha': ∀ i < 5, cp.1[i]! < 2^51 (side-condition for final_reduce_stage)
-      intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
+    · intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
       interval_cases i <;> simp only [*] <;> exact Nat.mod_lt _ (by positivity)
     step as ⟨ k1, k1_post1, k1_post2 ⟩
     step with pow2k_loop_spec as ⟨ result, result_post1, result_post2 ⟩
@@ -714,7 +793,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     · apply Nat.ModEq.trans result_post1 hpow |>.trans
       rw [← pow_mul]
       have hk_pos : k.val ≥ 1 := by omega
-      have : k1.val = k.val - 1 := by grind
+      have : k1.val = k.val - 1 := by agrind
       rw [this]
       have h2k : 2 * 2 ^ (k.val - 1) = 2 ^ k.val := by
         conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
@@ -727,10 +806,10 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         exact result_post2
   case isFalse hge =>
     step*
-    have : k.val = 0 := by grind
+    have : k.val = 0 := by agrind
     simpa [this] using Nat.ModEq.trans rfl rfl
   termination_by k.val
-  decreasing_by grind
+  decreasing_by agrind
 
 @[step]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
