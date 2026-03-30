@@ -4153,7 +4153,7 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.constants.L",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_bytes_spec (b : Array U8 32#usize) :\n    from_bytes b ⦃ u =>\n    Scalar52_as_Nat u = U8x32_as_Nat b ∧\n    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄\n := by ...",
@@ -4177,14 +4177,14 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_loop_spec (bytes : Array U8 32#usize)\n    (words : Array U64 4#usize) (i : Usize) (hi : i.val ≤ 4)\n    (h_prev : ∀ j, j < i.val → words[j]!.val = word_as_nat bytes j) :\n    from_bytes_loop bytes words i ⦃ words' =>\n      ∀ j, j < 4 → words'[j]!.val = word_as_nat bytes j ⦄ := by ...",
+   "theorem from_bytes_loop_spec (bytes : Array U8 32#usize)\n    (words : Array U64 4#usize) (i : Usize) (hi : i.val ≤ 4)\n    (h_prev : ∀ j, j < i.val → words[j]!.val = word_of_bytes bytes j) :\n    from_bytes_loop bytes words i ⦃ words' =>\n      words_as_Nat words' = U8x32_as_Nat bytes ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "spec_docstring":
-   "/-- **Loop spec**: Each iteration packs 8 bytes into one U64 word (little-endian).\nAfter the loop completes, `words[j] = word_as_nat bytes j` for all `j < 4`. -/",
+   "/-- Alternative loop spec with `words_as_Nat` postcondition. The completed loop packs all\n32 bytes into 4 words such that `words_as_Nat words = U8x32_as_Nat bytes`.\nDerived from `from_bytes_loop_helper` + `words_eq_bytes`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
@@ -4195,7 +4195,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": false,

@@ -37,7 +37,7 @@ abbrev word_of_bytes (bytes : Array U8 32#usize) (j : Nat) : Nat :=
 
 /-! ## Part 1: Loop spec — byte packing -/
 
-set_option maxHeartbeats 400000 in -- heavy step
+set_option maxHeartbeats 300000 in -- heavy step
 /-- **Loop spec**: Each iteration packs 8 bytes into one U64 word (little-endian).
 After the loop completes, `words[j] = word_of_bytes bytes j` for all `j < 4`. -/
 theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
@@ -598,155 +598,61 @@ theorem from_bytes_spec (b : Array U8 32#usize) :
   let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
   let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
-  -- Compute mask values early (before context grows too large for scalar_tac)
+  let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
+  -- Eliminate index_mut wrappers: converts opaque __discr.2 callbacks to concrete Array.set
+  simp only [Insts.CoreOpsIndexIndexMutUsizeU64.index_mut, Array.index_mut_usize,
+             bind_assoc_eq, bind_tc_ok]
+  -- All remaining ops are fast (no callbacks): index_usize, shift, AND, OR
+  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
+  let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
+  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
+  let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
+  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
+  let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
+  let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
+  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
+  let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
+  let* ⟨ x, x_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
+  -- Compute mask values
   have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
   have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
-  let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-  sorry
-
-  -- simp only [step_simps]
-  -- let* ⟨ words1, words1_post ⟩ ← from_bytes_loop_spec
-  -- let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
-  -- let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
-  -- -- Compute mask values early (before context grows too large for scalar_tac)
-  -- have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
-  -- have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
-  -- let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-
-  -- let* ⟨ _, wb0, wb0_post, _ ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
-  -- let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
-  -- let* ⟨ _, wb1, wb1_post, _ ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
-  -- let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
-  -- let* ⟨ _, wb2, wb2_post, _ ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
-  -- let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
-  -- let* ⟨ _, wb3, wb3_post, _ ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
-  -- let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ _, wb4, wb4_post, _ ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
-  -- -- Extract array elements
-  -- have helem0 : (wb4 i20)[0]! = i3 := by
-  --   simp only [wb4_post, wb3_post, wb2_post, wb1_post, wb0_post, UScalar.ofNatCore_val_eq, ne_eq,
-  --     OfNat.ofNat_ne_zero, not_false_eq_true, ↓Array.getElem!_Nat_set_ne, one_ne_zero, Array.length,
-  --     List.Vector.length_val, Nat.ofNat_pos, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem1 : (wb4 i20)[1]! = i8 := by
-  --   simp only [wb4_post, wb3_post, wb2_post, wb1_post, UScalar.ofNatCore_val_eq, ne_eq,
-  --     OfNat.ofNat_ne_one, not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Array.length,
-  --     List.Vector.length_val, Nat.one_lt_ofNat, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem2 : (wb4 i20)[2]! = i13 := by
-  --   simp only [wb4_post, wb3_post, wb2_post, UScalar.ofNatCore_val_eq, ne_eq, Nat.reduceEqDiff,
-  --     not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Nat.succ_ne_self, Array.length,
-  --     List.Vector.length_val, Nat.reduceLT, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem3 : (wb4 i20)[3]! = i18 := by
-  --   simp only [wb4_post, wb3_post, UScalar.ofNatCore_val_eq, ne_eq, Nat.succ_ne_self,
-  --     not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Array.length, List.Vector.length_val,
-  --     Nat.reduceLT, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem4 : (wb4 i20)[4]! = i20 := by
-  --   simp only [wb4_post, UScalar.ofNatCore_val_eq, Array.length, List.Vector.length_val,
-  --     Nat.lt_add_one, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- -- Convert AND→mod
-  -- simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod] at i3_post1 i8_post1 i13_post1 i18_post1
-  -- simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
-  -- -- Split goals
-  -- refine ⟨?_, ?_⟩
-  -- · -- Value preservation: Scalar52_as_Nat (wb4 i20) = U8x32_as_Nat b
-  --   sorry
-  -- · -- Limb bounds
-  --   clear *- helem0 helem1 helem2 helem3 helem4
-  --     i3 i8 i13 i18 i20 i3_post1 i8_post1 i13_post1 i18_post1 i20_post1 wb4
-  --   intro idx hidx
-  --   interval_cases idx <;> simp only [helem0, helem1, helem2, helem3, helem4] <;> sorry
-
-
-
-  -- -- Step through loop + mask computation
-  -- let* ⟨ words1, words1_post ⟩ ← from_bytes_loop_helper
-  -- let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
-  -- let* ⟨ i1, i1_post1, i1_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ top_mask, top_mask_post1, top_mask_post2 ⟩ ← U64.sub_spec
-  -- -- Limb 0: words1[0] & mask
-  -- let* ⟨ i2, i2_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ v0, wb0, v0_post1, v0_post2 ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i3, i3_post1, i3_post2 ⟩ ← UScalar.and_spec
-  -- -- Limb 1 setup: (words1[0] >> 52) | (words1[1] << 12)
-  -- let* ⟨ i4, i4_post1, i4_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i5, i5_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i6, i6_post1, i6_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i7, i7_post1, i7_post2 ⟩ ← UScalar.or_spec
-  -- -- Limb 1: (i7) & mask  +  index_mut for slot 1
-  -- let* ⟨ v1, wb1, v1_post1, v1_post2 ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i8, i8_post1, i8_post2 ⟩ ← UScalar.and_spec
-  -- -- Limb 2 setup: (words1[1] >> 40) | (words1[2] << 24)
-  -- let* ⟨ i9, i9_post1, i9_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i10, i10_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i11, i11_post1, i11_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i12, i12_post1, i12_post2 ⟩ ← UScalar.or_spec
-  -- -- Limb 2: (i12) & mask  +  index_mut for slot 2
-  -- let* ⟨ v2, wb2, v2_post1, v2_post2 ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i13, i13_post1, i13_post2 ⟩ ← UScalar.and_spec
-  -- -- Limb 3 setup: (words1[2] >> 28) | (words1[3] << 36)
-  -- let* ⟨ i14, i14_post1, i14_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ i15, i15_post ⟩ ← Array.index_usize_spec
-  -- let* ⟨ i16, i16_post1, i16_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
-  -- let* ⟨ i17, i17_post1, i17_post2 ⟩ ← UScalar.or_spec
-  -- -- Limb 3: (i17) & mask  +  index_mut for slot 3
-  -- let* ⟨ v3, wb3, v3_post1, v3_post2 ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i18, i18_post1, i18_post2 ⟩ ← UScalar.and_spec
-  -- -- Limb 4: (words1[3] >> 16) & top_mask
-  -- let* ⟨ i19, i19_post1, i19_post2 ⟩ ← U64.ShiftRight_IScalar_spec
-  -- let* ⟨ v4, wb4, v4_post1, v4_post2 ⟩ ← Scalar52_index_mut_step
-  -- let* ⟨ i20, i20_post1, i20_post2 ⟩ ← UScalar.and_spec
-  -- -- Concrete mask values
-  -- have hU64 : U64.size = 2 ^ 64 := by scalar_tac
-  -- have hmask : mask.val = 2 ^ 52 - 1 := by agrind
-  -- have htop : top_mask.val = 2 ^ 48 - 1 := by agrind
-  -- -- Extract each element of the result array via grind (handles Array.set/get)
-  -- have helem0 : (wb4 i20)[0]! = i3 := by
-  --   simp only [v4_post1, v3_post1, v2_post1, v1_post1, v0_post1, UScalar.ofNatCore_val_eq, ne_eq,
-  --     OfNat.ofNat_ne_zero, not_false_eq_true, ↓Array.getElem!_Nat_set_ne, one_ne_zero, Array.length,
-  --     List.Vector.length_val, Nat.ofNat_pos, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem1 : (wb4 i20)[1]! = i8 := by
-  --   simp only [v4_post1, v3_post1, v2_post1, v1_post1, UScalar.ofNatCore_val_eq, ne_eq,
-  --     OfNat.ofNat_ne_one, not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Array.length,
-  --     List.Vector.length_val, Nat.one_lt_ofNat, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem2 : (wb4 i20)[2]! = i13 := by
-  --   simp only [v4_post1, v3_post1, v2_post1, UScalar.ofNatCore_val_eq, ne_eq, Nat.reduceEqDiff,
-  --     not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Nat.succ_ne_self, Array.length,
-  --     List.Vector.length_val, Nat.reduceLT, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem3 : (wb4 i20)[3]! = i18 := by
-  --   simp only [v4_post1, v3_post1, UScalar.ofNatCore_val_eq, ne_eq, Nat.succ_ne_self,
-  --     not_false_eq_true, ↓Array.getElem!_Nat_set_ne, Array.length, List.Vector.length_val,
-  --     Nat.reduceLT, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- have helem4 : (wb4 i20)[4]! = i20 := by
-  --   simp only [v4_post1, UScalar.ofNatCore_val_eq, Array.length, List.Vector.length_val,
-  --     Nat.lt_add_one, and_self, ↓Array.getElem!_Nat_set_eq]
-  -- -- Convert AND to mod for each limb
-  -- simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod] at i3_post1 i8_post1 i13_post1 i18_post1
-  -- simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
-  -- -- Clear massive context before bounds proof
-  -- clear *- b helem0 helem1 helem2 helem3 helem4
-  --   i3 i8 i13 i18 i20 i3_post1 i8_post1 i13_post1 i18_post1 i20_post1
-  --   wb4 hmask htop
-  -- have hbound : ∀ idx < 5, (wb4 i20)[idx]!.val < 2 ^ 52 := by
-  --   intro idx hidx
-  --   interval_cases idx <;> simp only [helem0, helem1, helem2, helem3, helem4] <;> omega
-  -- -- Value preservation
-  -- refine ⟨?_, hbound⟩
-
+  -- Convert AND → mod for limb postconditions
+  simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod] at i3_post1 i8_post1 i13_post1 i18_post1
+  simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
+  refine ⟨?_, ?_⟩
+  · -- Value: Scalar52_as_Nat = U8x32_as_Nat b
+    refine (slice_state4_value words1 _ ?_).trans
+      words1_post
+    unfold slice_state4
+    unfold limb0_nat limb1_nat limb2_nat limb3_nat limb4_nat
+    refine ⟨?_, ?_, ?_, ?_, ?_⟩ <;>
+      simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
+        ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
+        Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
+        Nat.reduceLT, Nat.lt_add_one, i3_post1, i8_post1, i13_post1, i18_post1, i20_post1,
+        i7_post1, i12_post1, i17_post1, i4_post1, i9_post1, i14_post1, i19_post1, i6_post1,
+        i11_post1, i16_post1, i2_post, i5_post, i10_post, i15_post, UScalar.val_or,
+        Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq, Array.getElem!_Nat_eq]
+  · -- Bounds: ∀ i < 5, result[i]! < 2^52
+    intro idx hidx
+    interval_cases idx <;>
+      simp only [↓Array.getElem!_Nat_set_ne, ↓Array.getElem!_Nat_set_eq, UScalar.ofNatCore_val_eq,
+        ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero, one_ne_zero,
+        Nat.succ_ne_self, Array.length, List.Vector.length_val, Nat.ofNat_pos, and_self,
+        Nat.reduceLT, Nat.lt_add_one] <;>
+      omega
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
