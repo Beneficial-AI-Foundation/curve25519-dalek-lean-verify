@@ -11,6 +11,7 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Montgomery.Curve
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Math.Ristretto.Representation
+import Curve25519Dalek.Math.Scratch
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.AssertReceiverIsTotalEq
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.AffineNielsPoint.ConditionalAssign
@@ -62,6 +63,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Negate
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K_V2
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K_V3
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square2
