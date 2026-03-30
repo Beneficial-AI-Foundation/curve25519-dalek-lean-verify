@@ -236,7 +236,7 @@ theorem limb_bound_of_equiv (result : FieldElement51) (bytes : Array U8 32#usize
   simp [List.extract_eq_drop_take, length_take, length_drop, ofByteArray_length]
 
 /-! ## The pure List Bool specification for from_bytes -/
-set_option maxHeartbeats 227240 in
+set_option maxHeartbeats 230000 in
 -- heavy grind
 /-- The pure List Bool spec for from_bytes, using `BitList.Equiv` (≈ₗ). -/
 @[step]
