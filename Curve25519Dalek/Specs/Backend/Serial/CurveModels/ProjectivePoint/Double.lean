@@ -179,7 +179,7 @@ open Edwards
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.backend.serial.u64.field
 
-private lemma double_lift_to_field_eqs (c : CompletedPoint) (q : ProjectivePoint)
+lemma double_lift_to_field_eqs (c : CompletedPoint) (q : ProjectivePoint)
     (hX_arith : Field51_as_Nat c.X % p = (2 * Field51_as_Nat q.X * Field51_as_Nat q.Y) % p)
     (hY_arith : Field51_as_Nat c.Y % p = (Field51_as_Nat q.Y ^ 2 + Field51_as_Nat q.X ^ 2) % p)
     (hZ_arith : (Field51_as_Nat c.Z + Field51_as_Nat q.X ^ 2) % p = Field51_as_Nat q.Y ^ 2 % p)
