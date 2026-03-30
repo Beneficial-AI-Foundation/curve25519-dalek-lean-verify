@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -9,13 +9,15 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.ExternallyVerified
 
-/-! # Spec Theorem for `FieldElement51::mul`
+/-!
+# Spec Theorem for `FieldElement51::mul`
 
 Specification and proof for `FieldElement51::mul`.
 
 This function computes the product of two field elements.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
@@ -14,11 +14,12 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
 set_option exponentiation.threshold 260
 
-/-! # Spec Theorem for `Scalar52::invert`
+/-!
+# Spec Theorem for `Scalar52::invert`
 
 This function computes the multiplicative inverse.
 
-Source: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar

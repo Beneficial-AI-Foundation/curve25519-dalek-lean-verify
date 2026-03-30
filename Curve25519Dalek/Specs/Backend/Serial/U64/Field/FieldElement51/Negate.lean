@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alok Singh
 -/
@@ -7,13 +7,14 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 
-/-! # Spec Theorem for `FieldElement51::negate`
+/-!
+# Spec Theorem for `FieldElement51::negate`
 
 Specification and proof for `FieldElement51::negate`.
 
 Computes the additive inverse (negation) of a field element in 𝔽_p where p = 2^255 - 19.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

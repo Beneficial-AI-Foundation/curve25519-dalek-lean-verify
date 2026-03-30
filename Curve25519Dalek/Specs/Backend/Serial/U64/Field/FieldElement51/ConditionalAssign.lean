@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -7,7 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
 import Mathlib.Tactic
 
-/-! # ConditionalAssign
+/-!
+# ConditionalAssign
 
 Specification for `FieldElement51::conditional_assign`.
 
@@ -17,7 +18,7 @@ depending on the constant-time `Choice` flag. At the limb level, it uses
 conditional select: it returns the second operand when `choice = 1`, and
 returns the first operand when `choice = 0`.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 250:4-256:5)
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

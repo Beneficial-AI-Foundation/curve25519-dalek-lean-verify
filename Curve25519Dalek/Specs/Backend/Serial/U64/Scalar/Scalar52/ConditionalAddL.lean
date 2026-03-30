@@ -8,22 +8,25 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 
-/-! # Spec Theorem for `Scalar52::conditional_add_l`
+/-!
+# Spec Theorem for `Scalar52::conditional_add_l`
 
 Specification and proof for `Scalar52::conditional_add_l`.
 
 This function conditionally adds the group order L to a scalar based on a choice parameter.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
+-/
 
 attribute [-simp] Int.reducePow Nat.reducePow
 set_option exponentiation.threshold 260
 
-/-! # Spec Theorem for `Scalar52::conditional_add_l`
+/-!
+# Spec Theorem for `Scalar52::conditional_add_l`
 
 This function conditionally adds the group order `L` to a scalar based on a `choice` parameter.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## Rust source
 

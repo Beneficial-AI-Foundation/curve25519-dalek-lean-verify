@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -21,13 +21,14 @@ import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
 import Mathlib.Data.ZMod.Basic
 
-/-! # Spec Theorem for `Scalar52::montgomery_reduce`
+/-!
+# Spec Theorem for `Scalar52::montgomery_reduce`
 
 Specification and proof for `Scalar52::montgomery_reduce`.
 
 This function performs Montgomery reduction.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## TODO
 - Complete proof

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Oliver Butterley. All rights reserved.
+Copyright 2025 Oliver Butterley. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -12,7 +12,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 
 set_option exponentiation.threshold 260
 
-/-! # Sub
+/-!
+# Sub
 
 Specification and proof for `Scalar52::sub`.
 
@@ -20,7 +21,7 @@ This function computes the difference of two Scalar52 values modulo L (the group
 The function performs subtraction with borrow handling and conditional addition of L
 to ensure the result is non-negative.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs:L175-L198
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## Algorithm Summary
 

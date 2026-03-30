@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley, Theo Ehrenborg
 -/
@@ -10,13 +10,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
 set_option exponentiation.threshold 260
 
-/-! # Spec Theorem for `Scalar52::as_montgomery`
+/-!
+# Spec Theorem for `Scalar52::as_montgomery`
 
 Specification and proof for `Scalar52::as_montgomery`.
 
 This function converts to Montgomery form.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result

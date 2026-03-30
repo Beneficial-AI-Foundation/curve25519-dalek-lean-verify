@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
@@ -7,11 +7,12 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.ToBytes
 
-/-! # Spec Theorem for `Scalar52::pack`
+/-!
+# Spec Theorem for `Scalar52::pack`
 
 This function packs the element into a compact representation.
 
-Source: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar

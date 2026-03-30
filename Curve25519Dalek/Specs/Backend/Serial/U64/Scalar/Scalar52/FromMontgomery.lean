@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
@@ -8,11 +8,12 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
-/-! # Spec Theorem for `Scalar52::from_montgomery`
+/-!
+# Spec Theorem for `Scalar52::from_montgomery`
 
 This function converts from Montgomery form.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result

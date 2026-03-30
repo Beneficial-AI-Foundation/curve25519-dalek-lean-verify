@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
@@ -8,15 +8,15 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 
-/-! # Spec Theorem for `Scalar52::montgomery_invert::square_multiply`
+/-!
+# Spec Theorem for `Scalar52::montgomery_invert::square_multiply`
 
 Specification and proof for `Scalar52::montgomery_invert::square_multiply`.
 
 This is a helper function for the addition chain in the inversion algorithm.
 It performs repeated Montgomery squaring followed by a Montgomery multiplication.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52

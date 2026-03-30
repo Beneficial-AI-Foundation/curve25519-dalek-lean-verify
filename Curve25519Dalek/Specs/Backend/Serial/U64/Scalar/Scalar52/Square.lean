@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -10,14 +10,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-/-! # Spec Theorem for `Scalar52::square`
+/-!
+# Spec Theorem for `Scalar52::square`
 
 Specification and proof for `Scalar52::square`.
 
 This function performs regular scalar squaring (not Montgomery squaring).
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
