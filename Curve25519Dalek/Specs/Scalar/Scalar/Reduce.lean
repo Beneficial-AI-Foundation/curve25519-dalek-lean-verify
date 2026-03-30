@@ -51,20 +51,26 @@ theorem reduce_spec (s : Scalar) :
     reduce s ⦃ (s' : Scalar) =>
       U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧
       U8x32_as_Nat s'.bytes < L ⦄ := by
-  sorry
-  -- Old proof (broken: montgomery_reduce_spec now requires h_canonical):
-  -- unfold reduce
-  -- step*
-  -- · unfold constants.R; decide
-  -- simp only [and_true, *]
-  -- rw [← x_post1]
-  -- rw [← Nat.ModEq] at x_mod_l_post1
-  -- rw [xR_post1] at x_mod_l_post1
-  -- have Rs := constants.R_spec
-  -- rw [← Nat.ModEq] at Rs
-  -- have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
-  -- have := Nat.ModEq.trans x_mod_l_post1 this
-  -- apply cancelR
-  -- apply Nat.ModEq.trans (Nat.ModEq.mul_right R s'_post1) this
+  unfold reduce
+  let* ⟨ x, x_post1, x_post2 ⟩ ← unpack_spec
+  let* ⟨ xR, xR_post1, xR_post2 ⟩ ← scalar.Scalar52.mul_internal_spec
+  · unfold constants.R; decide
+  let* ⟨ x_mod_l, x_mod_l_post1, x_mod_l_post2, x_mod_l_post3 ⟩ ← scalar.Scalar52.montgomery_reduce_spec
+  · -- x < R (from limbs < 2^52), constants.R < L (it's R mod L), so x * R_const < R * L
+    rw [xR_post1]
+    have h_x_lt : Scalar52_as_Nat x < R := Scalar52_as_Nat_bounded x x_post2
+    have h_R_lt : Scalar52_as_Nat constants.R < L := by unfold constants.R Scalar52_as_Nat L; decide
+    exact Nat.mul_lt_mul_of_lt_of_lt h_x_lt h_R_lt
+  let* ⟨ s', s'_post1, s'_post2 ⟩ ← pack_spec
+  simp only [and_true, *]
+  rw [← x_post1]
+  rw [← Nat.ModEq] at x_mod_l_post1
+  rw [xR_post1] at x_mod_l_post1
+  have Rs := constants.R_spec
+  rw [← Nat.ModEq] at Rs
+  have := Nat.ModEq.mul_left (Scalar52_as_Nat x) Rs
+  have := Nat.ModEq.trans x_mod_l_post1 this
+  apply cancelR
+  apply Nat.ModEq.trans (Nat.ModEq.mul_right R s'_post1) this
 
 end curve25519_dalek.scalar.Scalar

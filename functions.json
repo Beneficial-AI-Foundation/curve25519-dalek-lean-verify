@@ -955,13 +955,13 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self _rhs : scalar.Scalar) :\n    mul self _rhs ⦃ (result : scalar.Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self _rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat _rhs.bytes < L) :\n    mul self _rhs ⦃ (result : scalar.Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L`\n-/",
+   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2 (scalar.rs:221: \"for all public non-legacy uses,\n  invariant #2 always holds\").\n  Mathematically only one `< L` is needed (the other is `< R` from limb bounds),\n  but both are required to reflect the Rust type invariant.\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L`\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1629,7 +1629,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -9471,7 +9471,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self rhs : Scalar) :\n    mul_assign self rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_assign_spec (self rhs : Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul_assign self rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/MulAssign.lean",
    "spec_docstring":
    "/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:\n• Same spec as the core `mul_assign`. -/",
@@ -9508,10 +9508,10 @@
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self _rhs : Scalar) :\n    mul_assign self _rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_assign_spec (self _rhs : Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat _rhs.bytes < L) :\n    mul_assign self _rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/MulAssign.lean",
    "spec_docstring":
    "/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L` -/",
@@ -9671,7 +9671,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -9864,7 +9864,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -10639,7 +10639,7 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.scalar.Scalar.is_canonical"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :\n    invert self ⦃ (result : Scalar) =>\n      U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L] ⦄ := by ...",
@@ -10736,7 +10736,7 @@
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem reduce_spec (s : Scalar) :\n    reduce s ⦃ (s' : Scalar) =>\n      U8x32_as_Nat s'.bytes ≡ U8x32_as_Nat s.bytes [MOD L] ∧\n      U8x32_as_Nat s'.bytes < L ⦄ := by ...",
@@ -10801,7 +10801,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem unpack_spec (self : Scalar) :\n    unpack self ⦃ (u : Scalar52 ) =>\n        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by ...",
+   "theorem unpack_spec (self : Scalar) :\n    unpack self ⦃ (u : Scalar52 ) =>\n        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.unpack`**:\n- No panic (always returns successfully)\n- Packing the result back yields the original scalar: pack(u) = s\n- Both the packed s and the unpacked u represent the same natural number\n-/",

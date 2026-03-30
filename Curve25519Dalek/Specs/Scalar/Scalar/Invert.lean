@@ -44,15 +44,16 @@ natural language specs:
 theorem invert_spec (self : Scalar) (h : U8x32_as_Nat self.bytes % L ≠ 0) :
     invert self ⦃ (result : Scalar) =>
       U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes ≡ 1 [MOD L] ⦄ := by
-  sorry
-  -- Old proof (broken: Scalar52.invert_spec now requires < 2^52 + canonical):
-  -- unfold invert
-  -- step*
-  -- calc U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes
-  --     ≡ Scalar52_as_Nat s * U8x32_as_Nat result.bytes [MOD L] := by
-  --       exact Nat.ModEq.mul_right _ (by rw [s_post1])
-  --   _ ≡ Scalar52_as_Nat s * Scalar52_as_Nat s1 [MOD L] := by
-  --       exact Nat.ModEq.mul_left _ result_post1
-  --   _ ≡ 1 [MOD L] := s1_post1
+  unfold invert
+  let* ⟨ s, s_post1, s_post2 ⟩ ← unpack_spec
+  let* ⟨ s1, s1_post1, s1_post2, s1_post3 ⟩ ← Scalar52.invert_spec
+  let* ⟨ result, result_post1, result_post2 ⟩ ← Scalar52.pack_spec
+  calc U8x32_as_Nat self.bytes * U8x32_as_Nat result.bytes
+      ≡ Scalar52_as_Nat s * U8x32_as_Nat result.bytes [MOD L] := by
+        exact Nat.ModEq.mul_right _ (by rw [s_post1])
+    _ ≡ Scalar52_as_Nat s * Scalar52_as_Nat s1 [MOD L] := by
+        exact Nat.ModEq.mul_left _ result_post1
+    _ ≡ 1 [MOD L] := s1_post1
+
 
 end curve25519_dalek.scalar.Scalar
