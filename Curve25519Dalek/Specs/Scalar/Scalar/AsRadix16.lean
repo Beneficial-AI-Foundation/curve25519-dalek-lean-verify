@@ -1,13 +1,11 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
-
-
 
 
 /-! # Spec Theorem for `as_radix_16`: loop 0
@@ -169,8 +167,6 @@ private lemma nibble_identity (b i : ℕ) :
   rw [h256, h16, hb]
   ring
 
-private lemma U8x32_as_Nat_eq_sum (bytes : Array U8 32#usize) :
-    U8x32_as_Nat bytes = ∑ k ∈ Finset.range 32, 2 ^ (8 * k) * (bytes[k]!).val := rfl
 
 @[step]
 private lemma I8x64_update_get (arr : Array Std.I8 64#usize) (j : Usize)
