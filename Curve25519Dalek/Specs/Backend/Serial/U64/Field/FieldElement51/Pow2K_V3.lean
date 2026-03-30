@@ -198,7 +198,152 @@ theorem fold_final_reduce_stage {α : Type} (a5 : Array U64 5#usize) (carry i34 
     (do let r ← final_reduce_stage a5 carry i34; f r) := by
   simp only [final_reduce_stage, bind_assoc_eq, bind_tc_ok]
 
-/-! ## Helper Specs (sorry'd — structure only) -/
+/-! ## Bounds Lemmas -/
+
+/-- c0 < 77 * 2^108 < 2^115 -/
+private lemma c0_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) < 2 ^ 115 := by
+  have : a0 * a0 < 2 ^ 108 := by nlinarith
+  have : a1 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (77 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
+  omega
+
+/-- c1 < 59 * 2^108 < 2^115 -/
+private lemma c1_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) < 2 ^ 115 := by
+  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a1 < 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : (59 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
+  omega
+
+/-- c2 < 41 * 2^108 < 2^115 -/
+private lemma c2_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) < 2 ^ 115 := by
+  have : a1 * a1 < 2 ^ 108 := by nlinarith
+  have : a0 * a2 < 2 ^ 108 := by nlinarith
+  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : (41 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
+  omega
+
+/-- c3 < 23 * 2^108 < 2^115 -/
+private lemma c3_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) < 2 ^ 115 := by
+  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a3 < 2 ^ 108 := by nlinarith
+  have : a1 * a2 < 2 ^ 108 := by nlinarith
+  have : (23 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
+  omega
+
+/-- c4 < 5 * 2^108 < 2^115 -/
+private lemma c4_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a2 * a2 + 2 * (a0 * a4 + a1 * a3) < 2 ^ 115 := by
+  have : a2 * a2 < 2 ^ 108 := by nlinarith
+  have : a0 * a4 < 2 ^ 108 := by nlinarith
+  have : a1 * a3 < 2 ^ 108 := by nlinarith
+  have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
+  omega
+
+/-- Squaring in radix-2^51, mod p, key algebraic identity. -/
+private lemma decompose (a0 a1 a2 a3 a4 : ℕ) :
+    (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2
+    ≡ a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) +
+      2^51 * (a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4))) +
+      2^102 * (a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3))) +
+      2^153 * (a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2)) +
+      2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) [MOD p] := by
+  have expand : (a0 + 2^51 * a1 + 2^102 * a2 + 2^153 * a3 + 2^204 * a4)^2 =
+    a0^2 +
+    2^51 * (2 * a0 * a1) +
+    2^102 * (a1^2 + 2 * a0 * a2) +
+    2^153 * (2 * a0 * a3 + 2 * a1 * a2) +
+    2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3) +
+    2^255 * ((2 * a1 * a4 + 2 * a2 * a3) +
+      2^51 * (a3^2 + 2 * a2 * a4) +
+      2^102 * (2 * a3 * a4) +
+      2^153 * a4^2) := by ring
+  rw [expand]
+  have key : (2 : ℕ)^255 ≡ 19 [MOD p] := by unfold p; rw [Nat.ModEq]; norm_num
+  have := Nat.ModEq.mul_right ((2 * a1 * a4 + 2 * a2 * a3) +
+    2^51 * (a3^2 + 2 * a2 * a4) + 2^102 * (2 * a3 * a4) + 2^153 * a4^2) key
+  have := Nat.ModEq.add_left (a0^2 +
+    2^51 * (2 * a0 * a1) +
+    2^102 * (a1^2 + 2 * a0 * a2) +
+    2^153 * (2 * a0 * a3 + 2 * a1 * a2) +
+    2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3)) this
+  apply Nat.ModEq.trans this
+  have : a0^2 + 2^51 * (2 * a0 * a1) + 2^102 * (a1^2 + 2 * a0 * a2) +
+      2^153 * (2 * a0 * a3 + 2 * a1 * a2) + 2^204 * (a2^2 + 2 * a0 * a4 + 2 * a1 * a3) +
+      19 * (2 * a1 * a4 + 2 * a2 * a3 + 2^51 * (a3^2 + 2 * a2 * a4) +
+      2^102 * (2 * a3 * a4) + 2^153 * a4^2) =
+        a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) +
+        2^51 * (a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4))) +
+        2^102 * (a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3))) +
+        2^153 * (a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2)) +
+        2^204 * (a2 * a2 + 2 * (a0 * a4 + a1 * a3)) := by ring
+  rw [this]
+
+/-- Carry chain conservation. -/
+private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4' : ℕ)
+    (ha0 : a0 = c0 % 2 ^ 51) (ha1 : a1 = c1' % 2 ^ 51) (ha2 : a2 = c2' % 2 ^ 51)
+    (ha3 : a3 = c3' % 2 ^ 51) (ha4 : a4 = c4' % 2 ^ 51)
+    (hc1' : c1' = c1 + c0 / 2 ^ 51) (hc2' : c2' = c2 + c1' / 2 ^ 51)
+    (hc3' : c3' = c3 + c2' / 2 ^ 51) (hc4' : c4' = c4 + c3' / 2 ^ 51)
+    (hcarry : carry = c4' / 2 ^ 51) :
+    c0 + 2^51*c1 + 2^102*c2 + 2^153*c3 + 2^204*c4 =
+    a0 + 2^51*a1 + 2^102*a2 + 2^153*a3 + 2^204*a4 + 2^255*carry := by omega
+
+/-- Generic carry chain bound. -/
+private lemma carry_chain_lt_pow2_115 (formula carry : ℕ) (K : ℕ)
+    (hf : formula < K * 2 ^ 108) (hc : carry < 2 ^ 64) (hK : K ≤ 127) :
+    formula + carry < 2 ^ 115 := by
+  have : K * 2 ^ 108 + 2 ^ 64 ≤ 128 * 2 ^ 108 := by omega
+  have : (128 : ℕ) * 2 ^ 108 = 2 ^ 115 := by decide
+  omega
+
+/-- Tight bound: c1 formula < 59 * 2^108 -/
+private lemma c1_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a3 * (19 * a3) + 2 * (a0 * a1 + a2 * (19 * a4)) < 59 * 2 ^ 108 := by
+  have : a3 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a1 < 2 ^ 108 := by nlinarith
+  have : a2 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c2 formula < 41 * 2^108 -/
+private lemma c2_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a1 * a1 + 2 * (a0 * a2 + a4 * (19 * a3)) < 41 * 2 ^ 108 := by
+  have : a1 * a1 < 2 ^ 108 := by nlinarith
+  have : a0 * a2 < 2 ^ 108 := by nlinarith
+  have : a4 * (19 * a3) < 19 * 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c3 formula < 23 * 2^108 -/
+private lemma c3_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a4 * (19 * a4) + 2 * (a0 * a3 + a1 * a2) < 23 * 2 ^ 108 := by
+  have : a4 * (19 * a4) < 19 * 2 ^ 108 := by nlinarith
+  have : a0 * a3 < 2 ^ 108 := by nlinarith
+  have : a1 * a2 < 2 ^ 108 := by nlinarith
+  omega
+
+/-- Tight bound: c4 formula < 5 * 2^108 -/
+private lemma c4_lt_tight (a0 a1 a2 a3 a4 : ℕ)
+    (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
+    a2 * a2 + 2 * (a0 * a4 + a1 * a3) < 5 * 2 ^ 108 := by
+  have : a2 * a2 < 2 ^ 108 := by nlinarith
+  have : a0 * a4 < 2 ^ 108 := by nlinarith
+  have : a1 * a3 < 2 ^ 108 := by nlinarith
+  omega
+
+/-! ## Helper Specs -/
 
 @[step]
 theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -210,7 +355,9 @@ theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2
       c3.val = a[4]!.val * (19 * a[4]!.val) + 2 * (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) ∧
       c4.val = a[2]!.val * a[2]!.val + 2 * (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) ∧
       c0.val < 2 ^ 115 ∧ c1.val < 2 ^ 115 ∧ c2.val < 2 ^ 115 ∧
-      c3.val < 2 ^ 115 ∧ c4.val < 2 ^ 115 ⦄ := by
+      c3.val < 2 ^ 115 ∧ c4.val < 2 ^ 115 ∧
+      c1.val < 59 * 2 ^ 108 ∧ c2.val < 41 * 2 ^ 108 ∧
+      c3.val < 23 * 2 ^ 108 ∧ c4.val < 5 * 2 ^ 108 ⦄ := by
   unfold square_stage
   simp only [step_simps]
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
@@ -250,20 +397,45 @@ theorem square_stage_spec (a : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2
   let* ⟨ i28, i28_post ⟩ ← U128.add_spec
   let* ⟨ i29, i29_post ⟩ ← U128.mul_spec
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
-  sorry
+  subst_vars
+  have hc0 : c0.val = a[0]!.val * a[0]!.val + 2 *
+      (a[1]!.val * (19 * a[4]!.val) + a[2]!.val * (19 * a[3]!.val)) := by simp [*]
+  have hc1 : c1.val = a[3]!.val *
+      (19 * a[3]!.val) + 2 * (a[0]!.val * a[1]!.val + a[2]!.val * (19 * a[4]!.val)) := by simp [*]
+  have hc2 : c2.val = a[1]!.val * a[1]!.val + 2 *
+      (a[0]!.val * a[2]!.val + a[4]!.val * (19 * a[3]!.val)) := by simp [*]
+  have hc3 : c3.val = a[4]!.val * (19 * a[4]!.val) + 2 *
+      (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
+  have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
+      (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
+  exact ⟨hc0, hc1, hc2, hc3, hc4,
+    by rw [hc0]; exact c0_lt_pow2_115 _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc1]; exact c1_lt_pow2_115 _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc2]; exact c2_lt_pow2_115 _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc3]; exact c3_lt_pow2_115 _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc4]; exact c4_lt_pow2_115 _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc1]; exact c1_lt_tight _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc2]; exact c2_lt_tight _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc3]; exact c3_lt_tight _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp)),
+    by rw [hc4]; exact c4_lt_tight _ _ _ _ _ (ha 0 (by simp)) (ha 1 (by simp)) (ha 2 (by simp)) (ha 3 (by simp)) (ha 4 (by simp))⟩
 
+set_option maxHeartbeats 8000000 in
+-- Required for step* through ~30 monadic operations
 @[step]
 theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
-    (hc0 : c0.val < 2 ^ 115) (hc1 : c1.val < 2 ^ 115) (hc2 : c2.val < 2 ^ 115)
-    (hc3 : c3.val < 2 ^ 115) (hc4 : c4.val < 2 ^ 115) :
-    carry_prop_stage a c0 c1 c2 c3 c4 ⦃ (result : Array U64 5#usize × U64 × U64) =>
-      let (a', carry, _mask) := result
+    (hc0 : c0.val < 2 ^ 115) (_hc1 : c1.val < 2 ^ 115) (_hc2 : c2.val < 2 ^ 115)
+    (_hc3 : c3.val < 2 ^ 115) (_hc4 : c4.val < 2 ^ 115)
+    (hc1_tight : c1.val < 59 * 2 ^ 108) (hc2_tight : c2.val < 41 * 2 ^ 108)
+    (hc3_tight : c3.val < 23 * 2 ^ 108) (hc4_tight : c4.val < 5 * 2 ^ 108) :
+    carry_prop_stage a c0 c1 c2 c3 c4 ⦃ ((a', carry, _mask) : Array U64 5#usize × U64 × U64) =>
       a'[0]!.val = c0.val % 2 ^ 51 ∧
       a'[1]!.val = (c1.val + c0.val / 2 ^ 51) % 2 ^ 51 ∧
       a'[2]!.val = (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
       a'[3]!.val = (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
       a'[4]!.val = (c4.val + (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
-      carry.val = (c4.val + (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51 ⦄ := by
+      carry.val = (c4.val + (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51 ∧
+      _mask.val = 2 ^ 51 - 1 ∧
+      carry.val < 6 * 2 ^ 57 ⦄ := by
   unfold carry_prop_stage
   simp only [step_simps]
   let* ⟨ i30, i30_post1, i30_post2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -300,11 +472,103 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
   let* ⟨ i52, i52_post ⟩ ← UScalar.cast.step_spec
   let* ⟨ i53, i53_post1, i53_post2 ⟩ ← UScalar.and_spec
   let* ⟨ a5, a5_post ⟩ ← Array.update_spec
-  sorry
+  -- Interleaved carry chain: each step needs the previous carry-fits bound
+  -- to eliminate the % 2^64 from the U128→U64→U128 cast chain.
+  have hcarry0_fits : c0.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c0.val hc0
+  -- c11 = c1 + carry from c0
+  have hc11_eq : c11.val = c1.val + c0.val / 2 ^ 51 := by
+    simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+  have hc11_bound : c11.val < 2 ^ 115 := by
+    rw [hc11_eq]; exact carry_chain_lt_pow2_115 _ _ 59 hc1_tight hcarry0_fits (by omega)
+  have hcarry1_fits : c11.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c11.val hc11_bound
+  -- c21 = c2 + carry from c11
+  have hc21_eq : c21.val = c2.val + c11.val / 2 ^ 51 := by
+    simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+  have hc21_bound : c21.val < 2 ^ 115 := by
+    rw [hc21_eq]; exact carry_chain_lt_pow2_115 _ _ 41 hc2_tight hcarry1_fits (by omega)
+  have hcarry2_fits : c21.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c21.val hc21_bound
+  -- c31 = c3 + carry from c21
+  have hc31_eq : c31.val = c3.val + c21.val / 2 ^ 51 := by
+    simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+  have hc31_bound : c31.val < 2 ^ 115 := by
+    rw [hc31_eq]; exact carry_chain_lt_pow2_115 _ _ 23 hc3_tight hcarry2_fits (by omega)
+  have hcarry3_fits : c31.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c31.val hc31_bound
+  -- c41 = c4 + carry from c31
+  have hc41_eq : c41.val = c4.val + c31.val / 2 ^ 51 := by
+    simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+  have hc41_bound : c41.val < 2 ^ 115 := by
+    rw [hc41_eq]; exact carry_chain_lt_pow2_115 _ _ 5 hc4_tight hcarry3_fits (by omega)
+  have hcarry4_fits : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 c41.val hc41_bound
+  -- Array values after carry propagation
+  -- Each ha'_i traces: a5[i] → chain of set operations → AND with mask → ci % 2^51
+  have ha5_0 : a5[0]!.val = c0.val % 2 ^ 51 := by
+    simp only [*, Array.set_of_ne_getElem! _ _ 0 4 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 3 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 2 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 0 1 (by grind) (by grind) (by omega),
+      Array.set_of_eq _ _ 0 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+      UScalarTy.numBits]
+    simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+    omega
+  have ha5_1 : a5[1]!.val = c11.val % 2 ^ 51 := by
+    simp only [*, Array.set_of_ne_getElem! _ _ 1 4 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 1 3 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 1 2 (by grind) (by grind) (by omega),
+      Array.set_of_eq _ _ 1 (by grind),
+      UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
+    simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+    omega
+  have ha5_2 : a5[2]!.val = c21.val % 2 ^ 51 := by
+    simp only [*, Array.set_of_ne_getElem! _ _ 2 4 (by grind) (by grind) (by omega),
+      Array.set_of_ne_getElem! _ _ 2 3 (by grind) (by grind) (by omega),
+      Array.set_of_eq _ _ 2 (by grind), UScalar.val_and, UScalar.cast_val_eq, UScalarTy.numBits]
+    simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+    omega
+  have ha5_3 : a5[3]!.val = c31.val % 2 ^ 51 := by
+    simp only [*, Array.set_of_ne_getElem! _ _ 3 4 (by grind) (by grind) (by omega),
+      Array.set_of_eq _ _ 3 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+      UScalarTy.numBits]
+    simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+    omega
+  have ha5_4 : a5[4]!.val = c41.val % 2 ^ 51 := by
+    simp only [*, Array.set_of_eq _ _ 4 (by grind), UScalar.val_and, UScalar.cast_val_eq,
+      UScalarTy.numBits]
+    simp only [Nat.and_two_pow_sub_one_eq_mod] at *
+    grind
+  have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
+    simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
+    omega
+  exact ⟨ha5_0,
+    by rw [ha5_1, hc11_eq],
+    by rw [ha5_2, hc21_eq, hc11_eq],
+    by rw [ha5_3, hc31_eq, hc21_eq, hc11_eq],
+    by rw [ha5_4, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
+    by rw [hcarry_val, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
+    by simp [*],
+    by rw [hcarry_val]
+       -- carry = c41/2^51 where c41 < 2^115
+       -- c41 = c4 + c31/2^51 < 5*2^108 + 2^64 < 6*2^108
+       -- carry = c41/2^51 < 6*2^108/2^51 = 6*2^57
+       have : c41.val < 2 ^ 115 := hc41_bound
+       have : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 _ hc41_bound
+       -- Tighter: c4 < 5*2^108, carry_from_c3 < 2^64
+       -- c41 = c4 + carry_from_c3 < 5*2^108 + 2^64 < 6*2^108
+       have hc41_tight : c41.val < 6 * 2 ^ 108 := by
+         rw [hc41_eq]; omega
+       have : (6 : ℕ) * 2 ^ 108 / 2 ^ 51 = 6 * 2 ^ 57 := by decide
+       calc c41.val / 2 ^ 51 ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
+         _ < 6 * 2 ^ 57 := by decide⟩
 
+-- Needed for array set chain simplification in final reduction
+set_option maxHeartbeats 8000000 in
+-- Required for step* through ~30 monadic operations
 @[step]
 theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
-    (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 2 ^ 13)
+    (ha' : ∀ i < 5, a'[i]!.val < 2 ^ 51) (hcarry : carry.val < 6 * 2 ^ 57)
     (hmask : i34.val = 2 ^ 51 - 1) :
     final_reduce_stage a' carry i34 ⦃ (result : Array U64 5#usize) =>
       result[0]!.val = (a'[0]!.val + 19 * carry.val) % 2 ^ 51 ∧
@@ -321,16 +585,66 @@ theorem final_reduce_stage_spec (a' : Array U64 5#usize) (carry i34 : U64)
   let* ⟨ i57, i57_post ⟩ ← Array.index_usize_spec
   let* ⟨ i58, i58_post1, i58_post2 ⟩ ← U64.ShiftRight_IScalar_spec
   let* ⟨ i59, i59_post ⟩ ← Array.index_usize_spec
+  -- Establish key facts before the add_spec (needed for overflow)
+  have h_i55 : i55.val = a'[0]!.val := by simp [*]
+  have h_i56 : i56.val = a'[0]!.val + 19 * carry.val := by
+    simp only [i56_post, h_i55, i54_post]; omega
+  have h_i57 : i57.val = a'[0]!.val + 19 * carry.val := by
+    simp [*]; omega
+  have h_i58 : i58.val = (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
+    simp only [i58_post1, Nat.shiftRight_eq_div_pow, h_i57]
+  have h_i59 : i59.val = a'[1]!.val := by
+    simp [*]
   let* ⟨ i60, i60_post ⟩ ← U64.add_spec
-  · sorry
   let* ⟨ a7, a7_post ⟩ ← Array.update_spec
   let* ⟨ i61, i61_post ⟩ ← Array.index_usize_spec
   let* ⟨ i62, i62_post1, i62_post2 ⟩ ← UScalar.and_spec
   let* ⟨ a8, a8_post ⟩ ← Array.update_spec
-  sorry
+  -- Array values after final reduction
+  -- a7[0]! = a6[0]! = i56 = a'[0]! + 19 * carry
+  have ha7_0 : a7[0]!.val = a'[0]!.val + 19 * carry.val := by
+    simp [a7_post, Array.set_of_ne_getElem! _ _ 0 1 (by grind) (by grind) (by omega),
+      a6_post, h_i56]
+  have ha8_0 : a8[0]!.val = (a'[0]!.val + 19 * carry.val) % 2 ^ 51 := by
+    simp only [a8_post, Array.set_of_eq _ _ 0 (by grind)]
+    simp only [i62_post1, UScalar.val_and, hmask]
+    rw [show i61 = a7[0]! from by simp [i61_post]]
+    rw [Nat.and_two_pow_sub_one_eq_mod, ha7_0]
+  have ha8_1 : a8[1]!.val = a'[1]!.val + (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
+    simp only [a8_post, Array.set_of_ne_getElem! _ _ 1 0 (by grind) (by grind) (by omega),
+      a7_post, Array.set_of_eq _ _ 1 (by grind),
+      i60_post, h_i59, h_i58]
+  have ha8_2 : a8[2]!.val = a'[2]!.val := by
+    simp only [a8_post,
+      a7_post, Array.set_of_ne_getElem! _ _ 2 1 (by grind) (by grind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 2 0 (by grind) (by grind) (by omega)]
+  have ha8_3 : a8[3]!.val = a'[3]!.val := by
+    simp only [a8_post,
+      a7_post, Array.set_of_ne_getElem! _ _ 3 1 (by grind) (by grind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 3 0 (by grind) (by grind) (by omega)]
+  have ha8_4 : a8[4]!.val = a'[4]!.val := by
+    simp only [a8_post,
+      a7_post, Array.set_of_ne_getElem! _ _ 4 1 (by grind) (by grind) (by omega),
+      a6_post, Array.set_of_ne_getElem! _ _ 4 0 (by grind) (by grind) (by omega)]
+  -- Limb bounds: all < 2^52
+  have ha8_lt : ∀ i < 5, a8[i]!.val < 2 ^ 52 := by
+    intro i hi; interval_cases i
+    · rw [ha8_0]; exact Nat.lt_of_lt_of_le (Nat.mod_lt _ (by positivity)) (by omega)
+    · rw [ha8_1]
+      have : a'[1]!.val < 2 ^ 51 := ha' 1 (by simp)
+      have : a'[0]!.val < 2 ^ 51 := ha' 0 (by simp)
+      have : (a'[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by omega
+      omega
+    · rw [ha8_2]; exact Nat.lt_of_lt_of_le (ha' 2 (by simp)) (by omega)
+    · rw [ha8_3]; exact Nat.lt_of_lt_of_le (ha' 3 (by simp)) (by omega)
+    · rw [ha8_4]; exact Nat.lt_of_lt_of_le (ha' 4 (by simp)) (by omega)
+  exact ⟨ha8_0, ha8_1, ha8_2, ha8_3, ha8_4, ha8_lt⟩
 
 /-! ## Main Proof -/
 
+-- Needed for step* applying three decomposed stage specs and recursive call
+set_option maxHeartbeats 14000000 in
+-- Required for step* through fold-decomposed loop body + recursive case
 @[step]
 theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) :
@@ -342,13 +656,75 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   case isTrue hlt =>
     -- Fold the three stages
     simp_rw [fold_square_stage, fold_carry_prop_stage, fold_final_reduce_stage]
-    -- Now step* should use square_stage_spec, carry_prop_stage_spec, final_reduce_stage_spec
-    step*
-    · simp [*]
-      sorry
-    · sorry
-    · sorry
-    · sorry
+    -- Apply square_stage spec
+    step as ⟨ sq, sq_post ⟩
+    -- Apply carry_prop_stage spec; this generates ha' side-condition
+    step as ⟨ cp, cp_post ⟩
+    -- Apply final_reduce_stage, k-1, and recursive call
+    step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
+    · -- ha': ∀ i < 5, cp.1[i]! < 2^51 (side-condition for final_reduce_stage)
+      intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
+      interval_cases i <;> simp only [*] <;> exact Nat.mod_lt _ (by positivity)
+    step as ⟨ k1, k1_post1, k1_post2 ⟩
+    step with pow2k_loop_spec as ⟨ result, result_post1, result_post2 ⟩
+    -- Extract carry prop postconditions
+    have ha'_0 := cp_post.1
+    have ha'_1 := cp_post.2.1
+    have ha'_2 := cp_post.2.2.1
+    have ha'_3 := cp_post.2.2.2.1
+    have ha'_4 := cp_post.2.2.2.2.1
+    have hcarry_val := cp_post.2.2.2.2.2.1
+    -- Squaring identity mod p
+    have a_pow_two : (sq.1.val + 2^51 * sq.2.1.val + 2^102 * sq.2.2.1.val +
+        2^153 * sq.2.2.2.1.val + 2^204 * sq.2.2.2.2.val)
+        ≡ (Field51_as_Nat a)^2 [MOD p] := by
+      have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
+      have := sq_post.1; have := sq_post.2.1; have := sq_post.2.2.1
+      have := sq_post.2.2.2.1; have := sq_post.2.2.2.2.1
+      simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
+        Finset.sum_singleton, mul_zero, pow_zero, one_mul]
+    -- Carry chain conservation
+    have h_chain := carry_chain_eq sq.1.val sq.2.1.val sq.2.2.1.val sq.2.2.2.1.val sq.2.2.2.2.val
+        _ _ _ _ _ _
+        (sq.2.1.val + sq.1.val / 2^51)
+        (sq.2.2.1.val + (sq.2.1.val + sq.1.val / 2^51) / 2^51)
+        (sq.2.2.2.1.val + (sq.2.2.1.val + (sq.2.1.val + sq.1.val / 2^51) / 2^51) / 2^51)
+        (sq.2.2.2.2.val + (sq.2.2.2.1.val + (sq.2.2.1.val + (sq.2.1.val + sq.1.val / 2^51) / 2^51) / 2^51) / 2^51)
+        rfl rfl rfl rfl rfl rfl rfl rfl rfl rfl
+    -- Field51_as_Nat of the reduced result
+    have hf_r : Field51_as_Nat red =
+        (cp.1[0]!.val + 19 * cp.2.1.val) + 2^51 * cp.1[1]!.val + 2^102 * cp.1[2]!.val +
+        2^153 * cp.1[3]!.val + 2^204 * cp.1[4]!.val := by
+      unfold Field51_as_Nat
+      simp only [Finset.sum_range_succ, Finset.sum_range_zero]
+      rw [red_post1, red_post2, red_post3, red_post4, red_post5]
+      have := Nat.mod_add_div (cp.1[0]!.val + 19 * cp.2.1.val) (2 ^ 51)
+      omega
+    -- h_key: Field51_as_Nat red + carry * p = c0 + 2^51*c1 + ...
+    have h_key : Field51_as_Nat red + cp.2.1.val * p =
+        sq.1.val + 2^51 * sq.2.1.val + 2^102 * sq.2.2.1.val +
+        2^153 * sq.2.2.2.1.val + 2^204 * sq.2.2.2.2.val := by
+      rw [hf_r, h_chain]
+      simp only [ha'_0, ha'_1, ha'_2, ha'_3, ha'_4, hcarry_val]
+      unfold p; omega
+    have hsq : Field51_as_Nat red ≡ (Field51_as_Nat a)^2 [MOD p] :=
+      (modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_pow_two
+    have hpow := Nat.ModEq.pow (2^k1.val) hsq
+    constructor
+    · apply Nat.ModEq.trans result_post1 hpow |>.trans
+      rw [← pow_mul]
+      have hk_pos : k.val ≥ 1 := by omega
+      have : k1.val = k.val - 1 := by grind
+      rw [this]
+      have h2k : 2 * 2 ^ (k.val - 1) = 2 ^ k.val := by
+        conv_rhs => rw [← Nat.sub_add_cancel hk_pos, Nat.pow_succ']
+      rw [h2k]
+    · simp only [show k.val ≠ 0 by omega]
+      by_cases hk1 : k1.val = 0
+      · simp only [hk1] at result_post2
+        rw [result_post2]; exact red_post6
+      · simp only [hk1, ite_false] at result_post2
+        exact result_post2
   case isFalse hge =>
     step*
     have : k.val = 0 := by grind
