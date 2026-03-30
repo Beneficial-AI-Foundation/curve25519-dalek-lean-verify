@@ -1,11 +1,12 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 
-/-! # Spec Theorem for `CompressedRistretto::from_slice`
+/-!
+# Spec theorem for `CompressedRistretto::from_slice`
 
 Specification and proof for the `from_slice` method on `CompressedRistretto`.
 
@@ -16,7 +17,7 @@ the slice into a 32-byte array via `TryFrom`. If the slice has exactly 32 bytes,
 The function never panics; it always succeeds at the Aeneas `Result` level. The inner
 `core.result.Result` signals success or failure of the byte-to-array conversion.
 
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

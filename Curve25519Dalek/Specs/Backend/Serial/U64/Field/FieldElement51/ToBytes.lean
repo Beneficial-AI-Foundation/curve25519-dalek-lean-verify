@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -11,7 +11,8 @@ import Curve25519Dalek.Tactics
 import Curve25519Dalek.ExternallyVerified
 
 
-/-! # to_bytes
+/-!
+# to_bytes
 
 Specification and proof for `FieldElement51::to_bytes`.
 
@@ -20,7 +21,7 @@ Much of the proof and aux lemmas contributed by Son Ho.
 This function converts a field element to its canonical 32-byte little-endian representation.
 It performs reduction modulo 2^255-19 and encodes the result as bytes.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 
 ## TODO
 - Complete proof

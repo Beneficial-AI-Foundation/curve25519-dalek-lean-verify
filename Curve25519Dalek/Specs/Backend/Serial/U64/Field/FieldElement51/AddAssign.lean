@@ -1,18 +1,19 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 
-/-! # AddAssign
+/-!
+# AddAssign
 
 Specification and proof for `FieldElement51::add_assign`.
 
 This function performs element-wise addition of field element limbs.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

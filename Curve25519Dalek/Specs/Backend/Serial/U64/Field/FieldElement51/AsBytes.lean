@@ -1,11 +1,12 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 
-/-! # Spec Theorem for `FieldElement51::as_bytes`
+/-!
+# Spec theorem for `FieldElement51::as_bytes`
 
 Specification and proof for `FieldElement51::as_bytes`.
 
@@ -19,7 +20,7 @@ natural language specs:
 
     • U8x32_as_Nat(b) ≡ Field51_as_Nat(fe) (mod p)
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

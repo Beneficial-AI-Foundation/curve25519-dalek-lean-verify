@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `FieldElement51::from_limbs`
+/-!
+# Spec theorem for `FieldElement51::from_limbs`
 
 Specification and proof for `FieldElement51::from_limbs`.
 
@@ -14,7 +15,7 @@ This function constructs a field element from an array of five u64 limbs.
 Since `FieldElement51` is just a type alias for `Array U64 5#usize`, this function
 is essentially the identity function wrapped in a `Result` type.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/field.rs
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo
 -/
@@ -7,7 +7,9 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
 import Mathlib.Tactic.IntervalCases
 
-/-! # Reduce -/
+/-!
+# Reduce
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek

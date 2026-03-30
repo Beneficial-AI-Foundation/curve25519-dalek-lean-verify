@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -18,7 +18,8 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
-/-! # Spec Theorem for `ristretto.decompress.step_2`
+/-!
+# Spec theorem for `ristretto.decompress.step_2`
 
 Specification and proof for `ristretto.decompress.step_2`.
 
@@ -26,7 +27,7 @@ This function performs the second step of Ristretto decompression, computing
 the affine coordinates (x, y) of a point on the Edwards curve from the field element s, then
 outputs extended Edwards coordinates (x, y, 1, xy)
 
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Edwards Aeneas.Std.WP

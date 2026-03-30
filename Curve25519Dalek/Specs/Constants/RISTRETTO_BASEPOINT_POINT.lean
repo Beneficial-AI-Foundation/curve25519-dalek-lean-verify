@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,14 +7,16 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint
 
-/-! # Spec Theorem for `constants::RISTRETTO_BASEPOINT_POINT`
+/-!
+# Spec theorem for `constants::RISTRETTO_BASEPOINT_POINT`
 
 Specification and proof for the constant `RISTRETTO_BASEPOINT_POINT`.
 
 This constant represents the Ristretto basepoint, which is the standard generator
 point for the Ristretto group.
 
-Source: curve25519-dalek/src/constants.rs -/
+Source: "curve25519-dalek/src/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Edwards
 open curve25519_dalek.backend.serial.u64.field (FieldElement51.toField)

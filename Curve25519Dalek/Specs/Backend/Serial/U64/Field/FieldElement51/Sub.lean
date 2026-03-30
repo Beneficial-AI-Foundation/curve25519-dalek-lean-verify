@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -8,15 +8,15 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Reduce
 import Mathlib.Data.Nat.ModEq
 
-/-! # Spec Theorem for `FieldElement51::sub`
+/-!
+# Spec theorem for `FieldElement51::sub`
 
 Specification and proof for `FieldElement51::sub`.
 
 This function performs field element subtraction. To avoid underflow, a multiple
 of p is added.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

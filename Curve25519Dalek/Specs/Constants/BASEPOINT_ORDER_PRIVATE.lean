@@ -1,12 +1,13 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::BASEPOINT_ORDER_PRIVATE`
+/-!
+# Spec theorem for `constants::BASEPOINT_ORDER_PRIVATE`
 
 Specification and proof for the constant `BASEPOINT_ORDER_PRIVATE`.
 
@@ -17,7 +18,8 @@ $$
 
 It is stored as a 32-byte little-endian encoding inside a `Scalar` struct.
 
-Source: curve25519-dalek/src/constants.rs -/
+Source: "curve25519-dalek/src/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result
 namespace curve25519_dalek.constants

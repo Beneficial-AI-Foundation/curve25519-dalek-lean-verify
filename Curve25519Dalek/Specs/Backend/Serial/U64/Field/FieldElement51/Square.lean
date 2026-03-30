@@ -1,17 +1,19 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Oliver Butterley
 -/
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 
-/-! # Spec Theorem for `FieldElement51::square`
+/-!
+# Spec theorem for `FieldElement51::square`
 
 Specification and proof for `FieldElement51::square`.
 
 This function computes the square of the element.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51

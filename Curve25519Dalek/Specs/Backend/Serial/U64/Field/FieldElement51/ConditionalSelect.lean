@@ -1,11 +1,12 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 
-/-! # ConditionalSelect
+/-!
+# ConditionalSelect
 
 Specification for `FieldElement51::conditional_select`.
 
@@ -14,7 +15,7 @@ constant-time `Choice` flag. At the limb level, it uses `u64`'s
 `ConditionallySelectable::conditional_select`, which returns the first
 operand when `choice = 0` and the second operand when `choice = 1`.
 
-Source: curve25519-dalek/src/backend/serial/u64/field.rs (lines 228:4-240:5)
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result

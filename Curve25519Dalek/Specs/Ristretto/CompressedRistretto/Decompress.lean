@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -9,7 +9,8 @@ import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step1
 import Curve25519Dalek.Specs.Ristretto.CompressedRistretto.Step2
 
-/-! # Spec Theorem for `CompressedRistretto::decompress`
+/-!
+# Spec theorem for `CompressedRistretto::decompress`
 
 Specification and proof for `CompressedRistretto::decompress`.
 
@@ -21,7 +22,7 @@ decode a (valid) 32-byte representation back to a RistrettoPoint. The function i
 It takes a CompressedRistretto (a 32-byte array) and attempts to produce the associated RistrettoPoint,
 returning None if the input byte array is not a valid canonical encoding.
 
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Edwards Aeneas.Std.WP
