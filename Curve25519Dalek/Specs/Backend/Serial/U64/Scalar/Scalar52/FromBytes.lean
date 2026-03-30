@@ -19,16 +19,11 @@ This function constructs an unpacked scalar from a byte array by:
 
 ## Proof structure
 
-The proof decomposes into three pieces matching the Rust code:
-
 1. `from_bytes_loop_spec`: The byte-packing loop correctly assembles 8 consecutive
    bytes into each U64 word as a little-endian integer.
 
-2. `words_eq_bytes`: The 4 packed words represent the same value as `U8x32_as_Nat`:
-   `∑ j < 4, words[j] * 2^(64*j) = U8x32_as_Nat bytes`
-
-3. `from_bytes_spec`: The bit-slicing phase extracts 5 limbs from 4 words,
-   preserving the value and producing limbs < 2^52.
+2. `from_bytes_spec`: Uses the loop spec, then proves the bit-slicing phase extracts
+   5 limbs preserving the value with all limbs < 2^52.
 -/
 
 set_option linter.style.whitespace false
@@ -36,37 +31,60 @@ set_option linter.style.whitespace false
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-/-! ## Helper definitions -/
-
-/-- The little-endian value of 8 consecutive bytes starting at position `8*j`. -/
-def word_as_nat (bytes : Array U8 32#usize) (j : Nat) : Nat :=
+/-- The little-endian value of 8 consecutive bytes starting at position `8*j` in a 32-byte array. -/
+abbrev word_of_bytes (bytes : Array U8 32#usize) (j : Nat) : Nat :=
   ∑ k ∈ Finset.range 8, bytes[8 * j + k]!.val * 2 ^ (8 * k)
 
 /-! ## Part 1: Loop spec — byte packing -/
 
+set_option maxHeartbeats 400000 in -- heavy step
 /-- **Loop spec**: Each iteration packs 8 bytes into one U64 word (little-endian).
-After the loop completes, `words[j] = word_as_nat bytes j` for all `j < 4`. -/
+After the loop completes, `words[j] = word_of_bytes bytes j` for all `j < 4`. -/
 @[step]
 theorem from_bytes_loop_spec (bytes : Array U8 32#usize)
     (words : Array U64 4#usize) (i : Usize) (hi : i.val ≤ 4)
-    (h_prev : ∀ j, j < i.val → words[j]!.val = word_as_nat bytes j) :
+    (h_prev : ∀ j, j < i.val → words[j]!.val = word_of_bytes bytes j) :
     from_bytes_loop bytes words i ⦃ words' =>
-      ∀ j, j < 4 → words'[j]!.val = word_as_nat bytes j ⦄ := by
-  sorry
+      ∀ j, j < 4 → words'[j]!.val = word_of_bytes bytes j ⦄ := by
+  induction h_rem : (4 - i.val) generalizing i words with
+  | zero =>
+    unfold from_bytes_loop
+    have hi4 : ¬ (i < 4#usize) := by scalar_tac
+    simp only [hi4, ↓reduceIte, spec_ok]
+    intro j hj; exact h_prev j (by omega)
+  | succ n ih =>
+    unfold from_bytes_loop
+    have hlt : i < 4#usize := by scalar_tac
+    simp only [hlt, ↓reduceIte]
+    step*
+    -- Goal: ∀ j < i+1, (words.set i i37)[j]! = word_of_bytes bytes j
+    subst a_post
+    intro j hj
+    by_cases heq : j = i.val
+    · -- j = i
+      subst heq
+      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+      rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
+        UScalar.ofNatCore_val_eq]; agrind),
+          List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
+            UScalar.ofNatCore_val_eq]; agrind)]
+      -- i37 = cascaded OR = byte sum via or_bytes_eq_sum
+      simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
+        u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
+      rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
+        (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
+        (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
+        (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
+        (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
+      simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty,
+        zero_add]
+      simp only [Array.getElem!_Nat_eq]; ring_nf
+    · -- j ≠ i: unchanged entry, use h_prev
+      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+      grind only [= List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
 
-/-! ## Part 2: Words-to-bytes equivalence -/
 
-/-- The 4 packed words represent the same value as the 32-byte little-endian interpretation. -/
-theorem words_eq_bytes (bytes : Array U8 32#usize) (words : Array U64 4#usize)
-    (h : ∀ j, j < 4 → words[j]!.val = word_as_nat bytes j) :
-    ∑ j ∈ Finset.range 4, words[j]!.val * 2 ^ (64 * j) = U8x32_as_Nat bytes := by
-  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add,
-    h 0 (by omega), h 1 (by omega), h 2 (by omega), h 3 (by omega)]
-  unfold word_as_nat U8x32_as_Nat
-  simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
-  ring
-
-/-! ## Part 3: Main spec -/
+/-! ## Part 2: Main spec -/
 
 /-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:
 - No panic (always returns successfully)
