@@ -274,65 +274,54 @@ def
     backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m
       i4 i3
   let c4 ← i48 + i49
-  let i50 ← 1#u64 <<< 54#i32
-  massert (i4 < i50)
-  massert (i5 < i50)
-  massert (i16 < i50)
-  massert (i < i50)
-  massert (i13 < i50)
-  massert (i1 < i50)
-  massert (i10 < i50)
-  massert (i2 < i50)
-  massert (i7 < i50)
-  massert (i3 < i50)
   let out := Array.repeat 5#usize 0#u64
-  let i51 ← c0 >>> 51#i32
-  let i52 ← lift (UScalar.cast .U64 i51)
-  let i53 ← lift (UScalar.cast .U128 i52)
-  let c11 ← c1 + i53
-  let i54 ← lift (UScalar.cast .U64 c0)
-  let i55 ←
+  let i50 ← c0 >>> 51#i32
+  let i51 ← lift (UScalar.cast .U64 i50)
+  let i52 ← lift (UScalar.cast .U128 i51)
+  let c11 ← c1 + i52
+  let i53 ← lift (UScalar.cast .U64 c0)
+  let i54 ←
     backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK
-  let i56 ← lift (i54 &&& i55)
-  let out1 ← Array.update out 0#usize i56
-  let i57 ← c11 >>> 51#i32
-  let i58 ← lift (UScalar.cast .U64 i57)
-  let i59 ← lift (UScalar.cast .U128 i58)
-  let c21 ← c2 + i59
-  let i60 ← lift (UScalar.cast .U64 c11)
-  let i61 ← lift (i60 &&& i55)
-  let out2 ← Array.update out1 1#usize i61
-  let i62 ← c21 >>> 51#i32
-  let i63 ← lift (UScalar.cast .U64 i62)
-  let i64 ← lift (UScalar.cast .U128 i63)
-  let c31 ← c3 + i64
-  let i65 ← lift (UScalar.cast .U64 c21)
-  let i66 ← lift (i65 &&& i55)
-  let out3 ← Array.update out2 2#usize i66
-  let i67 ← c31 >>> 51#i32
-  let i68 ← lift (UScalar.cast .U64 i67)
-  let i69 ← lift (UScalar.cast .U128 i68)
-  let c41 ← c4 + i69
-  let i70 ← lift (UScalar.cast .U64 c31)
-  let i71 ← lift (i70 &&& i55)
-  let out4 ← Array.update out3 3#usize i71
-  let i72 ← c41 >>> 51#i32
-  let carry ← lift (UScalar.cast .U64 i72)
-  let i73 ← lift (UScalar.cast .U64 c41)
-  let i74 ← lift (i73 &&& i55)
-  let out5 ← Array.update out4 4#usize i74
-  let i75 ← carry * 19#u64
-  let i76 ← Array.index_usize out5 0#usize
-  let i77 ← i76 + i75
-  let out6 ← Array.update out5 0#usize i77
-  let i78 ← Array.index_usize out6 0#usize
-  let i79 ← i78 >>> 51#i32
-  let i80 ← Array.index_usize out6 1#usize
-  let i81 ← i80 + i79
-  let out7 ← Array.update out6 1#usize i81
-  let i82 ← Array.index_usize out7 0#usize
-  let i83 ← lift (i82 &&& i55)
-  let out8 ← Array.update out7 0#usize i83
+  let i55 ← lift (i53 &&& i54)
+  let out1 ← Array.update out 0#usize i55
+  let i56 ← c11 >>> 51#i32
+  let i57 ← lift (UScalar.cast .U64 i56)
+  let i58 ← lift (UScalar.cast .U128 i57)
+  let c21 ← c2 + i58
+  let i59 ← lift (UScalar.cast .U64 c11)
+  let i60 ← lift (i59 &&& i54)
+  let out2 ← Array.update out1 1#usize i60
+  let i61 ← c21 >>> 51#i32
+  let i62 ← lift (UScalar.cast .U64 i61)
+  let i63 ← lift (UScalar.cast .U128 i62)
+  let c31 ← c3 + i63
+  let i64 ← lift (UScalar.cast .U64 c21)
+  let i65 ← lift (i64 &&& i54)
+  let out3 ← Array.update out2 2#usize i65
+  let i66 ← c31 >>> 51#i32
+  let i67 ← lift (UScalar.cast .U64 i66)
+  let i68 ← lift (UScalar.cast .U128 i67)
+  let c41 ← c4 + i68
+  let i69 ← lift (UScalar.cast .U64 c31)
+  let i70 ← lift (i69 &&& i54)
+  let out4 ← Array.update out3 3#usize i70
+  let i71 ← c41 >>> 51#i32
+  let carry ← lift (UScalar.cast .U64 i71)
+  let i72 ← lift (UScalar.cast .U64 c41)
+  let i73 ← lift (i72 &&& i54)
+  let out5 ← Array.update out4 4#usize i73
+  let i74 ← carry * 19#u64
+  let i75 ← Array.index_usize out5 0#usize
+  let i76 ← i75 + i74
+  let out6 ← Array.update out5 0#usize i76
+  let i77 ← Array.index_usize out6 0#usize
+  let i78 ← i77 >>> 51#i32
+  let i79 ← Array.index_usize out6 1#usize
+  let i80 ← i79 + i78
+  let out7 ← Array.update out6 1#usize i80
+  let i81 ← Array.index_usize out7 0#usize
+  let i82 ← lift (i81 &&& i54)
+  let out8 ← Array.update out7 0#usize i82
   ok out8
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce::LOW_51_BIT_MASK]

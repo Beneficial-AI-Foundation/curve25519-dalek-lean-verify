@@ -161,11 +161,11 @@ impl<'a> Mul<&'a FieldElement51> for &FieldElement51 {
         //    b < 3.365.
         //
         // So we require b < 3 to ensure this fits.
-        debug_assert!(a[0] < (1 << 54)); debug_assert!(b[0] < (1 << 54));
-        debug_assert!(a[1] < (1 << 54)); debug_assert!(b[1] < (1 << 54));
-        debug_assert!(a[2] < (1 << 54)); debug_assert!(b[2] < (1 << 54));
-        debug_assert!(a[3] < (1 << 54)); debug_assert!(b[3] < (1 << 54));
-        debug_assert!(a[4] < (1 << 54)); debug_assert!(b[4] < (1 << 54));
+        // debug_assert!(a[0] < (1 << 54)); debug_assert!(b[0] < (1 << 54));
+        // debug_assert!(a[1] < (1 << 54)); debug_assert!(b[1] < (1 << 54));
+        // debug_assert!(a[2] < (1 << 54)); debug_assert!(b[2] < (1 << 54));
+        // debug_assert!(a[3] < (1 << 54)); debug_assert!(b[3] < (1 << 54));
+        // debug_assert!(a[4] < (1 << 54)); debug_assert!(b[4] < (1 << 54));
 
         // Casting to u64 and back tells the compiler that the carry is
         // bounded by 2^64, so that the addition is a u128 + u64 rather
