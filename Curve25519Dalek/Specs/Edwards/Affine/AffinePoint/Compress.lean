@@ -1,12 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
-
 /-! # Spec Theorem for `AffinePoint::compress`
 
 Specification and proof for `edwards.affine.AffinePoint.compress`.
@@ -49,8 +48,8 @@ Natural language specs:
 theorem compress_spec (self : AffinePoint) -- (hself : self.IsValid)
     (h : Field51_as_Nat self.y < 2 ^ 255) :
     compress self ⦃ result =>
-    True -- result.IsValid ∧ result.toPoint = self.toPoint
-     ⦄ := by
+      True -- result.IsValid ∧ result.toPoint = self.toPoint
+      ⦄ := by
   sorry
 
 -- To do: update this when relevant definitions have been added.

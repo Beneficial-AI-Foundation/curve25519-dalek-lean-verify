@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Liao Zhang
 -/
@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Scalar.Scalar.Reduce
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
-
 /-! # Spec Theorem for `Scalar::is_canonical`
 
 Specification and proof for `Scalar::is_canonical`.
@@ -47,7 +46,8 @@ theorem is_canonical_spec (s : Scalar) :
   · grind
   · intro h
     rename_i s' _
-    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes := Nat.ModEq.eq_of_lt_of_lt s_post1 s_post2 h
+    have bytes_eq : U8x32_as_Nat s.bytes = U8x32_as_Nat s'.bytes :=
+      Nat.ModEq.eq_of_lt_of_lt s_post1 s_post2 h
     rw [c_post]
     apply U8x32_as_Nat_injective
     symm

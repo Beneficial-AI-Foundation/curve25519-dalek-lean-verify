@@ -1,11 +1,10 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
-
 /-! # read_le_u64_into
 
 Specification and proof for `read_le_u64_into`.

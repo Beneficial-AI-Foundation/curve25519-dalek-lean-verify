@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: AI Assistant
 -/
@@ -9,7 +9,6 @@ import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
-
 /-! # Spec Theorem for `CompressedEdwardsY::decompress::step_2`
 
 Specification and proof for the second step of `CompressedEdwardsY::decompress`.

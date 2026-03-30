@@ -1,11 +1,10 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
-
 /-! # Spec Theorem for `CompressedEdwardsY::ct_eq`
 
 Specification and proof for the `ConstantTimeEq` trait implementation for `CompressedEdwardsY`.

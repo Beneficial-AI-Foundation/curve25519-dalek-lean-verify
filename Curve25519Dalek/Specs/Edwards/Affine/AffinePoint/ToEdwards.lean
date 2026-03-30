@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
-
 /-! # Spec Theorem for `AffinePoint::to_edwards`
 
 Specification and proof for `edwards.affine.AffinePoint.to_edwards`.
@@ -61,8 +60,8 @@ private lemma ONE_bounds_spec :
 -/
 @[progress]
 theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
-  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
-  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
+    (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
+    (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
     to_edwards self ⦃ result =>
       result.X = self.x ∧ result.Y = self.y ∧
       Field51_as_Nat result.Z = 1 ∧

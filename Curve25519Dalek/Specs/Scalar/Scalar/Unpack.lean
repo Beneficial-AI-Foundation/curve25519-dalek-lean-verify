@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
@@ -40,9 +40,9 @@ natural language specs:
 -/
 @[progress]
 theorem unpack_spec (self : Scalar) :
-    unpack self ⦃ (u : Scalar52 ) =>
-        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧
-        ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by
+    unpack self ⦃ (u : Scalar52) =>
+      Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧
+      ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by
   unfold unpack
   progress*
 

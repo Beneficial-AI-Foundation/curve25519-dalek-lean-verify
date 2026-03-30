@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: AI Assistant
 -/
@@ -15,7 +15,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
-
 /-! # Spec Theorem for `CompressedEdwardsY::decompress::step_1`
 
 Specification for the first step of `CompressedEdwardsY::decompress`.

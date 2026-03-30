@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -7,7 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Scalar.Scalar.FromU128
-
 /-! # Spec Theorem for `Scalar::from` (From<u32>)
 
 Specification and proof for the `From<u32>` trait implementation for Scalar.
@@ -40,9 +39,9 @@ natural language specs:
 -/
 
 private lemma hdigits (x : Std.U32) :
-      Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
-        = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
-    rw[hdigits_aux]
+    Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
+      = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
+  rw [hdigits_aux]
 
 private lemma U32_ofDigits_toLEBytes (x : Std.U32) :
     Nat.ofDigits (2^8)
@@ -57,7 +56,7 @@ private lemma U32_ofDigits_toLEBytes (x : Std.U32) :
   have hdigits :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
-    rw[hdigits]
+    rw [hdigits]
   simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes, BitVec.toNat_cast,
     UScalar.bv_toNat] at hdigits
   rw [hdigits]
@@ -65,9 +64,9 @@ private lemma U32_ofDigits_toLEBytes (x : Std.U32) :
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List Std.U8) (h_len : bs.length = 4) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
     Nat.ofDigits (2^8) (List.ofFn (fun i : Fin 4 => (bs[i]!).val)) := by
-    unfold U8x32_as_Nat List.setSlice!
-    simp [Finset.sum_range_succ, h_len, Nat.ofDigits]
-    ring_nf
+  unfold U8x32_as_Nat List.setSlice!
+  simp [Finset.sum_range_succ, h_len, Nat.ofDigits]
+  ring_nf
 
 private lemma hmap (bs : List Std.U8) (h_len : bs.length = 4) :
     bs.map (·.val) = List.ofFn (fun i : Fin 4 => (bs[i]!).val) := by
@@ -81,8 +80,8 @@ private lemma hmap (bs : List Std.U8) (h_len : bs.length = 4) :
 private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length = 4) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
     Nat.ofDigits (2^8) (bs.map (·.val)) := by
-    rw[U8x32_as_Nat_setSlice_zeroI _ h_len, hmap]
-    exact h_len
+  rw [U8x32_as_Nat_setSlice_zeroI _ h_len, hmap]
+  exact h_len
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreConvertFromU32.from`**:
 • The function always succeeds (no panic)
@@ -93,7 +92,7 @@ private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length =
 @[step]
 theorem from_spec (x : Std.U32) :
     «from» x ⦃ (result : Scalar) =>
-    U8x32_as_Nat result.bytes = x.val ⦄ := by
+      U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
   simp only [progress_simps]
   let* ⟨ x_bytes, x_bytes_post ⟩ ← core.num.U32.to_le_bytes.step_spec
@@ -101,17 +100,17 @@ theorem from_spec (x : Std.U32) :
   let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.step_spec
   let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
   let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.step_spec
-  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice, List.length_map, Nat.reduceMod,
-    BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val, UScalar.ofNatCore_val_eq, List.reduceReplicate,
-    List.slice_zero_j, List.take_succ_cons, List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
+  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice,
+    List.length_map, Nat.reduceMod, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
+    UScalar.ofNatCore_val_eq, List.reduceReplicate, List.slice_zero_j, List.take_succ_cons,
+    List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
-  have eq1:=U32_ofDigits_toLEBytes x
-  rw[← x_bytes_post] at eq1
-  have :(x_bytes).length = 4:= by
-    simp
-  have :=U8x32_as_Nat_setSlice_zero x_bytes this
-  rw[eq1] at this
-  rw[← this]
+  have eq1 := U32_ofDigits_toLEBytes x
+  rw [← x_bytes_post] at eq1
+  have : (x_bytes).length = 4 := by simp
+  have := U8x32_as_Nat_setSlice_zero x_bytes this
+  rw [eq1] at this
+  rw [← this]
   unfold List.setSlice!
   simp [U8x32_as_Nat, Finset.sum_range_succ, x_bytes_post]
 

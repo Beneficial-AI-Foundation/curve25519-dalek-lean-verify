@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -20,9 +20,6 @@ Because every `u128` value is less than 2¹²⁸, and 2¹²⁸ < L (the group or
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-
-
-
 /-- Helper: The `Nat.ofDigits 256` of the LE bytes of a U128 equals its `.val`.
 
 This connects `x.bv.toLEBytes` (the LE byte decomposition) to `x.val` (the numeric value).
@@ -32,8 +29,7 @@ The proof uses `BitVec.fromLEBytes_toLEBytes` (round-trip property) plus the fac
 private lemma fromLEBytes_toNat_lt_two_pow (tail : List (BitVec 8)) :
     (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * tail.length) := by
   induction tail with
-  | nil =>
-    simp [BitVec.fromLEBytes]
+  | nil => simp [BitVec.fromLEBytes]
   | cons h t ih =>
     simp only [List.length_cons, BitVec.fromLEBytes, BitVec.toNat_or, BitVec.toNat_setWidth,
       BitVec.toNat_shiftLeft, Nat.ofNat_pos, mul_lt_mul_iff_right₀, lt_add_iff_pos_right,
@@ -52,21 +48,21 @@ private lemma hdigits_bv_step (head : BitVec 8) (tail : List (BitVec 8)) :
     = (BitVec.toNat head % 2 ^ (8 * (tail.length + 1))) +
       ((BitVec.fromLEBytes tail).toNat <<< 8 % 2 ^ (8 * (tail.length + 1))) := by
   have hshift : (BitVec.fromLEBytes tail).toNat <<< 8 = 256 * (BitVec.fromLEBytes tail).toNat := by
-    simp[Nat.shiftLeft_eq]
+    simp [Nat.shiftLeft_eq]
     ring_nf
   rw [hshift]
   have hbound :
       BitVec.toNat head + 256 * (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * (tail.length + 1)) := by
     have hh : BitVec.toNat head < 2 ^ 8 := by scalar_tac
     have ht : (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * tail.length) := by
-      simp[fromLEBytes_toNat_lt_two_pow]
+      simp [fromLEBytes_toNat_lt_two_pow]
     grind
-  have hbound : 256 * (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * (tail.length + 1)) := by  grind
-  have hbound1 : BitVec.toNat head  < 2 ^ (8 * (tail.length + 1)) := by  grind
-  have :=Nat.mod_eq_of_lt hbound
-  rw[this]
-  have :=Nat.mod_eq_of_lt hbound1
-  rw[this]
+  have hbound : 256 * (BitVec.fromLEBytes tail).toNat < 2 ^ (8 * (tail.length + 1)) := by grind
+  have hbound1 : BitVec.toNat head < 2 ^ (8 * (tail.length + 1)) := by grind
+  have := Nat.mod_eq_of_lt hbound
+  rw [this]
+  have := Nat.mod_eq_of_lt hbound1
+  rw [this]
 
 private lemma hdigits_aux_ha (head : BitVec 8) (tail : List (BitVec 8)) :
     BitVec.toNat head % 2 ^ (8 * (tail.length + 1)) < 2 ^ 8 :=
@@ -96,12 +92,10 @@ lemma hdigits_aux (l : List Byte) :
       obtain ⟨m, hm⟩ := hdigits_aux_hb_dvd tail
       rw [hm, Nat.add_comm, Nat.two_pow_add_eq_or_of_lt (hdigits_aux_ha head tail), Nat.or_comm]
 
-
 lemma hdigits (x : Std.U128) :
-      Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
-        = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
-    rw[hdigits_aux]
-
+    Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
+      = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
+  rw [hdigits_aux]
 
 namespace curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128
 
@@ -122,7 +116,6 @@ natural language specs:
 • Since x.val < 2^128 < L, the resulting Scalar is automatically canonical
 -/
 
-
 private lemma U128_ofDigits_toLEBytes (x : Std.U128) :
     Nat.ofDigits (2^8)
       ((x.bv.toLEBytes.map (@UScalar.mk UScalarTy.U8)).map (·.val)) = x.val := by
@@ -138,7 +131,7 @@ private lemma U128_ofDigits_toLEBytes (x : Std.U128) :
   have hdigits :
       Nat.ofDigits (2^8) (x.bv.toLEBytes.map (fun b => b.toNat))
         = (BitVec.fromLEBytes x.bv.toLEBytes).toNat := by
-    rw[hdigits]
+    rw [hdigits]
   simp only [Nat.reducePow, Nat.reduceMod, BitVec.fromLEBytes_toLEBytes, BitVec.toNat_cast,
     UScalar.bv_toNat] at hdigits
   rw [hdigits]
@@ -146,9 +139,9 @@ private lemma U128_ofDigits_toLEBytes (x : Std.U128) :
 private lemma U8x32_as_Nat_setSlice_zeroI (bs : List Std.U8) (h_len : bs.length = 16) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
     Nat.ofDigits (2^8) (List.ofFn (fun i : Fin 16 => (bs[i]!).val)) := by
-    unfold U8x32_as_Nat List.setSlice!
-    simp [Finset.sum_range_succ, h_len, Nat.ofDigits]
-    ring_nf
+  unfold U8x32_as_Nat List.setSlice!
+  simp [Finset.sum_range_succ, h_len, Nat.ofDigits]
+  ring_nf
 
 private lemma hmap (bs : List Std.U8) (h_len : bs.length = 16) :
     bs.map (·.val) = List.ofFn (fun i : Fin 16 => (bs[i]!).val) := by
@@ -162,8 +155,8 @@ private lemma hmap (bs : List Std.U8) (h_len : bs.length = 16) :
 private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length = 16) :
     U8x32_as_Nat ⟨(List.replicate 32 (0#u8)).setSlice! 0 bs, by simp⟩ =
     Nat.ofDigits (2^8) (bs.map (·.val)) := by
-    rw[U8x32_as_Nat_setSlice_zeroI _ h_len, hmap]
-    exact h_len
+  rw [U8x32_as_Nat_setSlice_zeroI _ h_len, hmap]
+  exact h_len
 
 /-- **Spec and proof concerning `scalar.Scalar.Insts.CoreConvertFromU128.from`**:
 • The function always succeeds (no panic)
@@ -174,7 +167,7 @@ private lemma U8x32_as_Nat_setSlice_zero (bs : List Std.U8) (h_len : bs.length =
 @[step]
 theorem from_spec (x : Std.U128) :
     «from» x ⦃ (result : Scalar) =>
-    U8x32_as_Nat result.bytes = x.val ⦄ := by
+      U8x32_as_Nat result.bytes = x.val ⦄ := by
   unfold «from» core.array.Array.index_mut core.ops.index.IndexMutSlice Array.from_slice
   simp only [step_simps]
   step with core.num.U128.to_le_bytes.step_spec as ⟨ x_bytes, x_bytes_post ⟩
@@ -182,17 +175,17 @@ theorem from_spec (x : Std.U128) :
   let* ⟨ x1, x1_post ⟩ ← core.slice.index.SliceIndexRangeUsizeSlice.index_mut.step_spec
   let* ⟨ s2, s2_post ⟩ ← Array.to_slice.step_spec
   let* ⟨ s3, s3_post ⟩ ← core.slice.Slice.copy_from_slice.step_spec
-  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice, List.length_map, Nat.reduceMod,
-    BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val, UScalar.ofNatCore_val_eq, List.reduceReplicate,
-    List.slice_zero_j, List.take_succ_cons, List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
+  simp_all only [UScalarTy.U8_numBits_eq, Usize.ofNatCore_val_eq, Array.val_to_slice,
+    List.length_map, Nat.reduceMod, BitVec.toLEBytes_length, Nat.reduceDiv, Array.repeat_val,
+    UScalar.ofNatCore_val_eq, List.reduceReplicate, List.slice_zero_j, List.take_succ_cons,
+    List.take_zero, Slice.length, tsub_zero, List.length_cons, List.length_nil,
     zero_add, Nat.reduceAdd, Slice.setSlice!_val, List.length_setSlice!, ↓reduceDIte]
-  have eq1:=U128_ofDigits_toLEBytes x
-  rw[← x_bytes_post] at eq1
-  have :(x_bytes).length = 16:= by
-    simp
-  have :=U8x32_as_Nat_setSlice_zero x_bytes this
-  rw[eq1] at this
-  rw[← this]
+  have eq1 := U128_ofDigits_toLEBytes x
+  rw [← x_bytes_post] at eq1
+  have : (x_bytes).length = 16 := by simp
+  have := U8x32_as_Nat_setSlice_zero x_bytes this
+  rw [eq1] at this
+  rw [← this]
   unfold List.setSlice!
   simp [U8x32_as_Nat, Finset.sum_range_succ, x_bytes_post]
 

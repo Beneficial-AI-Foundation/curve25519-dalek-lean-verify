@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.ExternallyVerified
-
 /-! # Spec Theorem for `CompressedEdwardsY::decompress`
 
 Specification and proof for `CompressedEdwardsY::decompress`.

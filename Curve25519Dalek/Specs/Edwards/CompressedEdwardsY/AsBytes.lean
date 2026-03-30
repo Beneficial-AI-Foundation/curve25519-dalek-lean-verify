@@ -1,10 +1,9 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Funs
-
 /-! # as_bytes
 
 Specification and proof for `CompressedEdwardsY::as_bytes`.
@@ -28,7 +27,7 @@ namespace curve25519_dalek.edwards.CompressedEdwardsY
 theorem as_bytes_spec
     (self : edwards.CompressedEdwardsY) :
     as_bytes self ⦃ result =>
-    result = self ⦄ := by
+      result = self ⦄ := by
   unfold as_bytes
   simp
 
