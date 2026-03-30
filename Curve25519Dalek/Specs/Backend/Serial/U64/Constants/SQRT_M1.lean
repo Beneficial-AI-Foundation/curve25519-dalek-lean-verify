@@ -1,18 +1,20 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::SQRT_M1`
+/-!
+# Spec theorem for `constants::SQRT_M1`
 
 Specification and proof for the constant `SQRT_M1`.
 
 This constant represents one of the square roots of -1 modulo p.
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants

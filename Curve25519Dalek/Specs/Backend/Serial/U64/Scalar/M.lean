@@ -5,7 +5,8 @@ Authors: Oliver Butterley, Theodore Ehrenborg, Liao Zhang
 -/
 import Curve25519Dalek.Funs
 
-/-! # M
+/-!
+# Spec theorem for `m`
 
 The main statement concerning `m` is `m_spec` (below).
 -/

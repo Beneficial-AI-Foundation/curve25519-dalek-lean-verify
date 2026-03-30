@@ -1,19 +1,21 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::MINUS_ONE`
+/-!
+# Spec theorem for `constants::MINUS_ONE`
 
 Specification and proof for the constant `MINUS_ONE`.
 
 This constant represents −1 modulo p as a field element in the 51-bit limb
 representation (five u64 limbs).
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants

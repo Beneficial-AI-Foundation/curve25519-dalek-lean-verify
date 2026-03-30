@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -8,14 +8,16 @@ import Curve25519Dalek.Math.Basic
 
 set_option exponentiation.threshold 260
 
-/-! # Spec Theorem for `constants::R`
+/-!
+# Spec theorem for `constants::R`
 
 Specification and proof for the constant `R`.
 
 This constant represents R mod L, where R = 2^260 is the Montgomery constant
 and L is the group order. It is used in Montgomery form conversions.
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants

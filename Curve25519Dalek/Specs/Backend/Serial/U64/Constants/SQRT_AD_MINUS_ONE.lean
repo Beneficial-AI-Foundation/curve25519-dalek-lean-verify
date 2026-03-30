@@ -1,19 +1,21 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::SQRT_AD_MINUS_ONE`
+/-!
+# Spec theorem for `constants::SQRT_AD_MINUS_ONE`
 
 Specification and proof for the constant `SQRT_AD_MINUS_ONE`.
 
 This constant represents sqrt(a*d - 1) where a and d are the twisted Edwards
 curve parameters in the defining equation ax^2 + y^2 = 1 + dx^2y^2, with a = -1 (mod p).
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
@@ -21,7 +23,8 @@ namespace curve25519_dalek.backend.serial.u64.constants
 /-
 natural language description:
 
-    • constants.SQRT_AD_MINUS_ONE is a constant representing one of the square roots of (a*d - 1) (mod p)
+    • constants.SQRT_AD_MINUS_ONE is a constant representing one of the square roots of
+      (a*d - 1) (mod p)
       where a and d are the parameters in the defining curve equation ax^2 + y^2 = 1 + dx^2y^2
       (for Curve25519 we have a = -1).
     • The field element constants.SQRT_AD_MINUS_ONE is represented as five u64 limbs (51-bit limbs)

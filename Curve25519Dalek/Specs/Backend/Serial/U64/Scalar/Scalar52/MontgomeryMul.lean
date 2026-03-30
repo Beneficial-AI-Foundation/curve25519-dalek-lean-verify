@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
@@ -8,14 +8,14 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 
-/-! # Spec Theorem for `Scalar52::montgomery_mul`
+/-!
+# Spec theorem for `Scalar52::montgomery_mul`
 
 Specification and proof for `Scalar52::montgomery_mul`.
 
 This function performs Montgomery multiplication.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result

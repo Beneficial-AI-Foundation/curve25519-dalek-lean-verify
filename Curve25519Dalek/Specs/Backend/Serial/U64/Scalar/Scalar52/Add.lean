@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang, Oliver Butterley
 -/
@@ -11,14 +11,14 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Mathlib.Data.Nat.ModEq
 
-
-/-! # Spec Theorem for `Scalar52::add`
+/-!
+# Spec theorem for `Scalar52::add`
 
 Specification and proof for `Scalar52::add`.
 
 This function adds two elements.
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 set_option exponentiation.threshold 280

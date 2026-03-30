@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Jinxing Lim
 -/
@@ -9,12 +9,12 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-/-! # Spec Theorem for `Scalar52::mul`
+/-!
+# Spec theorem for `Scalar52::mul`
 
 This function performs regular scalar multiplication (not Montgomery multiplication).
 
-Source: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
@@ -59,7 +59,8 @@ theorem mul_spec (a b : Scalar52)
   progress*
   · unfold constants.RR; decide
   · refine ⟨?_, by grind⟩
-    have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
+    have h_res_R_ab_RR :
+        Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
       rw [a2_post1] at result_post1
       rw [Nat.ModEq]
       exact result_post1
@@ -71,7 +72,8 @@ theorem mul_spec (a b : Scalar52)
       have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
         exact Nat.ModEq.mul_right R ab_post1
       exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
-    have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
+    have h_res_R_a_b_R :
+        Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R [MOD L] := by
       rw [a1_post1] at h_res_R_a1_R
       exact h_res_R_a1_R
     grind [cancelR]

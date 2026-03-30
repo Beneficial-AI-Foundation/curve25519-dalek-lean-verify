@@ -9,10 +9,10 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
-
 set_option exponentiation.threshold 416
 
-/-! # MulInternal
+/-!
+# Spec theorem for `mul_internal`
 
 The main statement concerning `mul_internal` is `mul_internal_spec` (below).
 -/

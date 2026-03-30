@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
@@ -13,19 +13,18 @@ import Mathlib.Algebra.Polynomial.Eval.Coeff
 import Mathlib.Algebra.Polynomial.Eval.Defs
 import Mathlib.Algebra.Polynomial.Eval.Degree
 
-/-! # Spec Theorem for `Scalar52::montgomery_square`
+/-!
+# Spec theorem for `Scalar52::montgomery_square`
 
 Specification and proof for `Scalar52::montgomery_square`.
 
 This function performs Montgomery squaring.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
-
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
-
 
 /-
 natural language description:

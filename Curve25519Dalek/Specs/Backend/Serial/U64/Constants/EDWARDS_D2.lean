@@ -1,18 +1,20 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::EDWARDS_D2`
+/-!
+# Spec theorem for `constants::EDWARDS_D2`
 
 Specification and proof for the constant `EDWARDS_D2`.
 
 This constant represents 2*d (mod p) whereby d is the twisted Edwards curve parameter.
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants

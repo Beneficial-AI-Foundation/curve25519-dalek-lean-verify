@@ -1,19 +1,20 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-
-/-! # Spec Theorem for `constants::L`
+/-!
+# Spec theorem for `constants::L`
 
 Specification and proof for the constant `L`.
 
 This constant represents the group order L of Curve25519.
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants
@@ -44,8 +45,6 @@ lemma L_limbs_spec (i : Usize) (h : i.val < 5) :
   rcases h_idx : i.val with _ | _ | _ | _ | _ | n <;> try decide
   rw [h_idx] at h
   contradiction
-
-
 
 
 end curve25519_dalek.backend.serial.u64.constants

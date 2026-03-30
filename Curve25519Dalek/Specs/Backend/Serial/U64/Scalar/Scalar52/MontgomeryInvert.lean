@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -11,17 +11,18 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
 
 import Mathlib.Data.Int.ModEq
 
-/-! # Spec Theorem for `Scalar52::montgomery_invert`
+/-!
+# Spec theorem for `Scalar52::montgomery_invert`
 
 Specification and proof for `Scalar52::montgomery_invert`.
 
 This function computes the multiplicative inverse using Montgomery form.
 
-**Source**: curve25519-dalek/src/scalar.rs
-
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
+open curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
 
 namespace curve25519_dalek.scalar.Scalar52
@@ -184,7 +185,8 @@ theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
   have step_y    := by apply run_mul RZ  uZ h_RZ hRZ_ne_zero _1111 u y 15 1 step_1111 step_u y_post1
   -- SPECIAL HANDLING FOR y1
   generalize h_huge : 85070591730234615865843651857942052864 = N_huge
-  have y1_post_safe : Scalar52_as_Nat y1 * R ^ N_huge % L = Scalar52_as_Nat y ^ N_huge * Scalar52_as_Nat _101 % L := by
+  have y1_post_safe : Scalar52_as_Nat y1 * R ^ N_huge % L =
+      Scalar52_as_Nat y ^ N_huge * Scalar52_as_Nat _101 % L := by
     rw [← h_huge]
     exact y1_post1
   have step_y1  := by

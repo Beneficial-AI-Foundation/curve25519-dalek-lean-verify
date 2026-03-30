@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,13 +7,14 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
 
-/-! # Spec Theorem for `Scalar52::from_bytes`
+/-!
+# Spec theorem for `Scalar52::from_bytes`
 
 Specification and proof for `Scalar52::from_bytes`.
 
 This function constructs an unpacked scalar from a byte array.
 
-**Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 
 ## TODO
 - Complete proof

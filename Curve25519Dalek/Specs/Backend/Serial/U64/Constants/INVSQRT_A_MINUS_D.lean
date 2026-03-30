@@ -1,19 +1,21 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # Spec Theorem for `constants::INVSQRT_A_MINUS_D`
+/-!
+# Spec theorem for `constants::INVSQRT_A_MINUS_D`
 
 Specification and proof for the constant `INVSQRT_A_MINUS_D`.
 
 This constant represents 1/sqrt(a-d) where a and d are the twisted Edwards curve parameters
 in the defining equation ax^2 + y^2 = 1 + dx^2y^2.
 
-Source: curve25519-dalek/src/backend/serial/u64/constants.rs -/
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
