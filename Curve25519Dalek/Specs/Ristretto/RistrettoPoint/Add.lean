@@ -47,8 +47,6 @@ theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid) (h_
       result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
   step*
-  · exact h_self_valid.1
-  · exact h_other_valid.1
   · constructor
     · constructor
       · exact ep_post1
