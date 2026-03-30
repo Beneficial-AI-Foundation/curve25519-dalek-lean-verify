@@ -4184,7 +4184,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "spec_docstring":
-   "/-- Alternative loop spec with `words_as_Nat` postcondition. The completed loop packs all\n32 bytes into 4 words such that `words_as_Nat words = U8x32_as_Nat bytes`.\nDerived from `from_bytes_loop_helper` + `words_eq_bytes`. -/",
+   "/-- Loop spec with `words_as_Nat` postcondition (used by\n`from_bytes_spec`). Derived from `from_bytes_loop_helper`\n+ `words_eq_bytes`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",

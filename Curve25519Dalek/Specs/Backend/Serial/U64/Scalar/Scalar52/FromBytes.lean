@@ -19,11 +19,17 @@ This function constructs an unpacked scalar from a byte array by:
 
 ## Proof structure
 
-1. `from_bytes_loop_helper`: Per-word loop invariant (each word = 8 little-endian bytes).
-2. `from_bytes_loop_spec` (`@[step]`): Wraps the helper to give `words_as_Nat = U8x32_as_Nat`.
-3. `bit_slicing_of_words`: Pure math — 5 limbs extracted via shift/OR/mask from 4 U64 words
-   reconstruct the same value. Uses `or_mul_pow_two_eq_add` and `bit_slicing_identity`.
-4. `from_bytes_spec` (`@[step]`): Combines loop spec + bit-slicing to prove the full spec.
+1. `from_bytes_loop_helper` / `from_bytes_loop_spec` (`@[step]`):
+   Loop packs 32 bytes into 4 U64 words; postcondition:
+   `words_as_Nat words = U8x32_as_Nat bytes`.
+2. `bit_slicing_of_words`: Pure math — 5 limbs extracted via
+   shift/OR/mask from 4 words reconstruct the same value.
+3. `slice_state4` / `slice_state4_value`: Bridge predicate
+   relating the 5-limb array to `words_as_Nat`.
+4. `from_bytes_spec` (`@[step]`): Unfolds `index_mut` wrappers
+   via `simp` to avoid CPU explosion from function-typed
+   callbacks, then steps through arithmetic and closes via
+   `slice_state4_value`.
 -/
 
 set_option linter.style.whitespace false
@@ -83,21 +89,6 @@ theorem from_bytes_loop_helper (bytes : Array U8 32#usize)
       grind only [= List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
 
 
-/-! ## Step lemma for the Scalar52 index_mut trait wrapper
-
-The extracted `from_bytes` uses `Insts.CoreOpsIndexIndexMutUsizeU64.index_mut` (a thin wrapper
-around `Array.index_mut_usize`) to write each limb. Without a `@[step]` lemma, `step*` cannot
-see through the wrapper. Unfolding it creates ~30 nested let-bindings that cause kernel timeout.
-This step lemma lets `step*` process each index_mut call individually. -/
-
-@[step]
-theorem Scalar52_index_mut_step (self : Scalar52) (i : Usize) (hi : i.val < self.length) :
-    Insts.CoreOpsIndexIndexMutUsizeU64.index_mut self i ⦃ x wb =>
-      wb = Aeneas.Std.Array.set self i ∧ x = self.val[i.val]! ⦄ := by
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  let* ⟨ val, back, h1, h2 ⟩ ← Array.index_mut_usize_spec
-  exact ⟨h1, h2⟩
-
 /-! ## Part 2: Helper lemma for bit-slicing -/
 
 /-- Pure math: 5 limbs obtained by bit-slicing 4 U64 words reconstruct the original value.
@@ -131,9 +122,9 @@ theorem words_eq_bytes (b : Array U8 32#usize) (words : Array U64 4#usize)
   simp only [word_of_bytes, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
   ring
 
-/-- Alternative loop spec with `words_as_Nat` postcondition. The completed loop packs all
-32 bytes into 4 words such that `words_as_Nat words = U8x32_as_Nat bytes`.
-Derived from `from_bytes_loop_helper` + `words_eq_bytes`. -/
+/-- Loop spec with `words_as_Nat` postcondition (used by
+`from_bytes_spec`). Derived from `from_bytes_loop_helper`
++ `words_eq_bytes`. -/
 @[step]
 theorem from_bytes_loop_spec (bytes : Array U8 32#usize)
     (words : Array U64 4#usize) (i : Usize) (hi : i.val ≤ 4)
@@ -187,362 +178,40 @@ theorem bit_slicing_of_words (w0 w1 w2 w3 : U64) :
     show w3.val / 2 ^ 16 % 2 ^ 48 = w3.val / 2 ^ 16 from by omega]
   exact bit_slicing_identity w0.val w1.val w2.val w3.val
 
-/-- The first 52-bit limb extracted from the packed 4-word representation. -/
+/-- The first 52-bit limb. -/
 abbrev limb0_nat (words1 : Array U64 4#usize) : Nat :=
   words1[0]!.val % 2 ^ 52
 
-/-- State after storing only limb 0 into `ZERO`. -/
-def slice_state0 (words1 : Array U64 4#usize) (s : Scalar52) : Prop :=
-  s[0]!.val = limb0_nat words1 ∧
-  s[1]!.val = 0 ∧
-  s[2]!.val = 0 ∧
-  s[3]!.val = 0 ∧
-  s[4]!.val = 0
-
-/-- The first store in the bit-slicing phase: write limb 0 into slot 0 of `ZERO`. -/
-private theorem slice0_step (words1 : Array U64 4#usize) (mask : U64)
-    (hmask : mask.val = 2 ^ 52 - 1) :
-    (do
-      let i2 ← Array.index_usize words1 0#usize
-      let (_, index_mut_back) ← Insts.CoreOpsIndexIndexMutUsizeU64.index_mut ZERO 0#usize
-      let i3 ← lift (i2 &&& mask)
-      ok (index_mut_back i3)) ⦃ s =>
-      slice_state0 words1 s ∧
-      ∀ i < 5, s[i]!.val < 2 ^ 52 ⦄ := by
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  step as ⟨ i2, i2_post ⟩
-  step as ⟨ _, index_mut_back, hset0, _ ⟩
-  step as ⟨ i3, i3_post1, i3_post2 ⟩
-  have hi3_mod : i3.val = i2.val % 2 ^ 52 := by
-    simp only [i3_post1, UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
-  have hi3_bound : i3.val < 2 ^ 52 := by
-    rw [hi3_mod]
-    exact Nat.mod_lt _ (by omega)
-  rw [hset0]
-  refine ⟨?_, ?_⟩
-  · unfold slice_state0 limb0_nat
-    repeat' constructor
-    · rw [Array.set_of_eq ZERO i3 0 (by simp [ZERO])]
-      simpa [i2_post, Array.getElem!_Nat_eq] using hi3_mod
-    · rw [Array.set_of_ne_getElem! ZERO i3 1 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-      simp [ZERO]
-    · rw [Array.set_of_ne_getElem! ZERO i3 2 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-      simp [ZERO]
-    · rw [Array.set_of_ne_getElem! ZERO i3 3 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-      simp [ZERO]
-    · rw [Array.set_of_ne_getElem! ZERO i3 4 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-      simp [ZERO]
-  · intro idx hidx
-    interval_cases idx
-    · simpa [Array.set_of_eq ZERO i3 0 (by simp [ZERO])] using hi3_bound
-    · simpa [Array.set_of_ne_getElem! ZERO i3 1 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-        using (show ZERO[1]!.val < 2 ^ 52 by simp [ZERO])
-    · simpa [Array.set_of_ne_getElem! ZERO i3 2 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-        using (show ZERO[2]!.val < 2 ^ 52 by simp [ZERO])
-    · simpa [Array.set_of_ne_getElem! ZERO i3 3 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-        using (show ZERO[3]!.val < 2 ^ 52 by simp [ZERO])
-    · simpa [Array.set_of_ne_getElem! ZERO i3 4 0 (by simp [ZERO]) (by simp [ZERO]) (by decide)]
-        using (show ZERO[4]!.val < 2 ^ 52 by simp [ZERO])
-
-/-- The second 52-bit limb extracted from the packed 4-word representation. -/
+/-- The second 52-bit limb. -/
 abbrev limb1_nat (words1 : Array U64 4#usize) : Nat :=
-  ((words1[0]!.val / 2 ^ 52) ||| ((words1[1]!.val * 2 ^ 12) % U64.size)) % 2 ^ 52
+  ((words1[0]!.val / 2 ^ 52)
+    ||| ((words1[1]!.val * 2 ^ 12) % U64.size)) % 2 ^ 52
 
-/-- State after storing limbs 0 and 1. -/
-def slice_state1 (words1 : Array U64 4#usize) (s : Scalar52) : Prop :=
-  s[0]!.val = limb0_nat words1 ∧
-  s[1]!.val = limb1_nat words1 ∧
-  s[2]!.val = 0 ∧
-  s[3]!.val = 0 ∧
-  s[4]!.val = 0
-
-/-- The second store in the bit-slicing phase: write limb 1 into slot 1. -/
-private theorem slice1_step (words1 : Array U64 4#usize) (s0 : Scalar52) (mask : U64)
-    (hs0 : slice_state0 words1 s0) (hmask : mask.val = 2 ^ 52 - 1) :
-    (do
-      let w0 ← Array.index_usize words1 0#usize
-      let hi ← w0 >>> 52#i32
-      let w1 ← Array.index_usize words1 1#usize
-      let lo ← w1 <<< 12#i32
-      let comb ← lift (hi ||| lo)
-      let (_, back1) ← Insts.CoreOpsIndexIndexMutUsizeU64.index_mut s0 1#usize
-      let l1 ← lift (comb &&& mask)
-      ok (back1 l1)) ⦃ s =>
-      slice_state1 words1 s ∧
-      ∀ i < 5, s[i]!.val < 2 ^ 52 ⦄ := by
-  obtain ⟨hs0_0, hs0_1, hs0_2, hs0_3, hs0_4⟩ := hs0
-  step as ⟨ w0, w0_post ⟩
-  step as ⟨ hi, hi_post1, hi_post2 ⟩
-  step as ⟨ w1, w1_post ⟩
-  step as ⟨ lo, lo_post1, lo_post2 ⟩
-  step as ⟨ comb, comb_post1, comb_post2 ⟩
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  step as ⟨ _, back1, hset1, _ ⟩
-  step as ⟨ l1, l1_post1, l1_post2 ⟩
-  have hs0_bound0 : s0[0]!.val < 2 ^ 52 := by
-    rw [hs0_0, limb0_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hl1_mod :
-      l1.val = ((w0.val / 2 ^ 52) ||| ((w1.val * 2 ^ 12) % U64.size)) % 2 ^ 52 := by
-    simp only [l1_post1, comb_post1, hi_post1, lo_post1, UScalar.val_and, UScalar.val_or, hmask,
-      land_pow_two_sub_one_eq_mod, Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq]
-  have hl1_bound : l1.val < 2 ^ 52 := by
-    rw [hl1_mod]
-    exact Nat.mod_lt _ (by omega)
-  have hs0_bound2 : s0[2]!.val < 2 ^ 52 := by
-    rw [hs0_2]
-    norm_num
-  have hs0_bound3 : s0[3]!.val < 2 ^ 52 := by
-    rw [hs0_3]
-    norm_num
-  have hs0_bound4 : s0[4]!.val < 2 ^ 52 := by
-    rw [hs0_4]
-    norm_num
-  rw [hset1]
-  refine ⟨?_, ?_⟩
-  · unfold slice_state1 limb0_nat limb1_nat
-    repeat' constructor
-    · rw [Array.set_of_ne_getElem! s0 l1 0 1 (by simp) (by simp) (by decide)]
-      exact hs0_0
-    · rw [Array.set_of_eq s0 l1 1 (by simp)]
-      simpa [w0_post, w1_post] using hl1_mod
-    · rw [Array.set_of_ne_getElem! s0 l1 2 1 (by simp) (by simp) (by decide)]
-      exact hs0_2
-    · rw [Array.set_of_ne_getElem! s0 l1 3 1 (by simp) (by simp) (by decide)]
-      exact hs0_3
-    · rw [Array.set_of_ne_getElem! s0 l1 4 1 (by simp) (by simp) (by decide)]
-      exact hs0_4
-  · intro idx hidx
-    interval_cases idx
-    · simpa [Array.set_of_ne_getElem! s0 l1 0 1 (by simp) (by simp) (by decide)] using hs0_bound0
-    · simpa [Array.set_of_eq s0 l1 1 (by simp)] using hl1_bound
-    · simpa [Array.set_of_ne_getElem! s0 l1 2 1 (by simp) (by simp) (by decide)] using hs0_bound2
-    · simpa [Array.set_of_ne_getElem! s0 l1 3 1 (by simp) (by simp) (by decide)] using hs0_bound3
-    · simpa [Array.set_of_ne_getElem! s0 l1 4 1 (by simp) (by simp) (by decide)] using hs0_bound4
-
-/-- The third 52-bit limb extracted from the packed 4-word representation. -/
+/-- The third 52-bit limb. -/
 abbrev limb2_nat (words1 : Array U64 4#usize) : Nat :=
-  ((words1[1]!.val / 2 ^ 40) ||| ((words1[2]!.val * 2 ^ 24) % U64.size)) % 2 ^ 52
+  ((words1[1]!.val / 2 ^ 40)
+    ||| ((words1[2]!.val * 2 ^ 24) % U64.size)) % 2 ^ 52
 
-/-- State after storing limbs 0, 1, and 2. -/
-def slice_state2 (words1 : Array U64 4#usize) (s : Scalar52) : Prop :=
-  s[0]!.val = limb0_nat words1 ∧
-  s[1]!.val = limb1_nat words1 ∧
-  s[2]!.val = limb2_nat words1 ∧
-  s[3]!.val = 0 ∧
-  s[4]!.val = 0
-
-/-- The third store in the bit-slicing phase: write limb 2 into slot 2. -/
-private theorem slice2_step (words1 : Array U64 4#usize) (s1 : Scalar52) (mask : U64)
-    (hs1 : slice_state1 words1 s1) (hmask : mask.val = 2 ^ 52 - 1) :
-    (do
-      let w1 ← Array.index_usize words1 1#usize
-      let hi ← w1 >>> 40#i32
-      let w2 ← Array.index_usize words1 2#usize
-      let lo ← w2 <<< 24#i32
-      let comb ← lift (hi ||| lo)
-      let (_, back2) ← Insts.CoreOpsIndexIndexMutUsizeU64.index_mut s1 2#usize
-      let l2 ← lift (comb &&& mask)
-      ok (back2 l2)) ⦃ s =>
-      slice_state2 words1 s ∧
-      ∀ i < 5, s[i]!.val < 2 ^ 52 ⦄ := by
-  obtain ⟨hs1_0, hs1_1, hs1_2, hs1_3, hs1_4⟩ := hs1
-  step as ⟨ w1, w1_post ⟩
-  step as ⟨ hi, hi_post1, hi_post2 ⟩
-  step as ⟨ w2, w2_post ⟩
-  step as ⟨ lo, lo_post1, lo_post2 ⟩
-  step as ⟨ comb, comb_post1, comb_post2 ⟩
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  step as ⟨ _, back2, hset2, _ ⟩
-  step as ⟨ l2, l2_post1, l2_post2 ⟩
-  have hs1_bound0 : s1[0]!.val < 2 ^ 52 := by
-    rw [hs1_0, limb0_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs1_bound1 : s1[1]!.val < 2 ^ 52 := by
-    rw [hs1_1, limb1_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hl2_mod :
-      l2.val = ((w1.val / 2 ^ 40) ||| ((w2.val * 2 ^ 24) % U64.size)) % 2 ^ 52 := by
-    simp only [l2_post1, comb_post1, hi_post1, lo_post1, UScalar.val_and, UScalar.val_or, hmask,
-      land_pow_two_sub_one_eq_mod, Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq]
-  have hl2_bound : l2.val < 2 ^ 52 := by
-    rw [hl2_mod]
-    exact Nat.mod_lt _ (by omega)
-  have hs1_bound3 : s1[3]!.val < 2 ^ 52 := by
-    rw [hs1_3]
-    norm_num
-  have hs1_bound4 : s1[4]!.val < 2 ^ 52 := by
-    rw [hs1_4]
-    norm_num
-  rw [hset2]
-  refine ⟨?_, ?_⟩
-  · unfold slice_state2 limb0_nat limb1_nat limb2_nat
-    repeat' constructor
-    · rw [Array.set_of_ne_getElem! s1 l2 0 2 (by simp) (by simp) (by decide)]
-      exact hs1_0
-    · rw [Array.set_of_ne_getElem! s1 l2 1 2 (by simp) (by simp) (by decide)]
-      exact hs1_1
-    · rw [Array.set_of_eq s1 l2 2 (by simp)]
-      simpa [w1_post, w2_post] using hl2_mod
-    · rw [Array.set_of_ne_getElem! s1 l2 3 2 (by simp) (by simp) (by decide)]
-      exact hs1_3
-    · rw [Array.set_of_ne_getElem! s1 l2 4 2 (by simp) (by simp) (by decide)]
-      exact hs1_4
-  · intro idx hidx
-    interval_cases idx
-    · simpa [Array.set_of_ne_getElem! s1 l2 0 2 (by simp) (by simp) (by decide)] using hs1_bound0
-    · simpa [Array.set_of_ne_getElem! s1 l2 1 2 (by simp) (by simp) (by decide)] using hs1_bound1
-    · simpa [Array.set_of_eq s1 l2 2 (by simp)] using hl2_bound
-    · simpa [Array.set_of_ne_getElem! s1 l2 3 2 (by simp) (by simp) (by decide)] using hs1_bound3
-    · simpa [Array.set_of_ne_getElem! s1 l2 4 2 (by simp) (by simp) (by decide)] using hs1_bound4
-
-/-- The fourth 52-bit limb extracted from the packed 4-word representation. -/
+/-- The fourth 52-bit limb. -/
 abbrev limb3_nat (words1 : Array U64 4#usize) : Nat :=
-  ((words1[2]!.val / 2 ^ 28) ||| ((words1[3]!.val * 2 ^ 36) % U64.size)) % 2 ^ 52
+  ((words1[2]!.val / 2 ^ 28)
+    ||| ((words1[3]!.val * 2 ^ 36) % U64.size)) % 2 ^ 52
 
-/-- State after storing limbs 0, 1, 2, and 3. -/
-def slice_state3 (words1 : Array U64 4#usize) (s : Scalar52) : Prop :=
-  s[0]!.val = limb0_nat words1 ∧
-  s[1]!.val = limb1_nat words1 ∧
-  s[2]!.val = limb2_nat words1 ∧
-  s[3]!.val = limb3_nat words1 ∧
-  s[4]!.val = 0
-
-/-- The fourth store in the bit-slicing phase: write limb 3 into slot 3. -/
-private theorem slice3_step (words1 : Array U64 4#usize) (s2 : Scalar52) (mask : U64)
-    (hs2 : slice_state2 words1 s2) (hmask : mask.val = 2 ^ 52 - 1) :
-    (do
-      let w2 ← Array.index_usize words1 2#usize
-      let hi ← w2 >>> 28#i32
-      let w3 ← Array.index_usize words1 3#usize
-      let lo ← w3 <<< 36#i32
-      let comb ← lift (hi ||| lo)
-      let (_, back3) ← Insts.CoreOpsIndexIndexMutUsizeU64.index_mut s2 3#usize
-      let l3 ← lift (comb &&& mask)
-      ok (back3 l3)) ⦃ s =>
-      slice_state3 words1 s ∧
-      ∀ i < 5, s[i]!.val < 2 ^ 52 ⦄ := by
-  obtain ⟨hs2_0, hs2_1, hs2_2, hs2_3, hs2_4⟩ := hs2
-  step as ⟨ w2, w2_post ⟩
-  step as ⟨ hi, hi_post1, hi_post2 ⟩
-  step as ⟨ w3, w3_post ⟩
-  step as ⟨ lo, lo_post1, lo_post2 ⟩
-  step as ⟨ comb, comb_post1, comb_post2 ⟩
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  step as ⟨ _, back3, hset3, _ ⟩
-  step as ⟨ l3, l3_post1, l3_post2 ⟩
-  have hs2_bound0 : s2[0]!.val < 2 ^ 52 := by
-    rw [hs2_0, limb0_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs2_bound1 : s2[1]!.val < 2 ^ 52 := by
-    rw [hs2_1, limb1_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs2_bound2 : s2[2]!.val < 2 ^ 52 := by
-    rw [hs2_2, limb2_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hl3_mod :
-      l3.val = ((w2.val / 2 ^ 28) ||| ((w3.val * 2 ^ 36) % U64.size)) % 2 ^ 52 := by
-    simp only [l3_post1, comb_post1, hi_post1, lo_post1, UScalar.val_and, UScalar.val_or, hmask,
-      land_pow_two_sub_one_eq_mod, Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq]
-  have hl3_bound : l3.val < 2 ^ 52 := by
-    rw [hl3_mod]
-    exact Nat.mod_lt _ (by omega)
-  have hs2_bound4 : s2[4]!.val < 2 ^ 52 := by
-    rw [hs2_4]
-    norm_num
-  rw [hset3]
-  refine ⟨?_, ?_⟩
-  · unfold slice_state3 limb0_nat limb1_nat limb2_nat limb3_nat
-    repeat' constructor
-    · rw [Array.set_of_ne_getElem! s2 l3 0 3 (by simp) (by simp) (by decide)]
-      exact hs2_0
-    · rw [Array.set_of_ne_getElem! s2 l3 1 3 (by simp) (by simp) (by decide)]
-      exact hs2_1
-    · rw [Array.set_of_ne_getElem! s2 l3 2 3 (by simp) (by simp) (by decide)]
-      exact hs2_2
-    · rw [Array.set_of_eq s2 l3 3 (by simp)]
-      simpa [w2_post, w3_post] using hl3_mod
-    · rw [Array.set_of_ne_getElem! s2 l3 4 3 (by simp) (by simp) (by decide)]
-      exact hs2_4
-  · intro idx hidx
-    interval_cases idx
-    · simpa [Array.set_of_ne_getElem! s2 l3 0 3 (by simp) (by simp) (by decide)] using hs2_bound0
-    · simpa [Array.set_of_ne_getElem! s2 l3 1 3 (by simp) (by simp) (by decide)] using hs2_bound1
-    · simpa [Array.set_of_ne_getElem! s2 l3 2 3 (by simp) (by simp) (by decide)] using hs2_bound2
-    · simpa [Array.set_of_eq s2 l3 3 (by simp)] using hl3_bound
-    · simpa [Array.set_of_ne_getElem! s2 l3 4 3 (by simp) (by simp) (by decide)] using hs2_bound4
-
-/-- The fifth limb extracted from the packed 4-word representation. -/
+/-- The fifth limb (48-bit, top of the scalar). -/
 abbrev limb4_nat (words1 : Array U64 4#usize) : Nat :=
   (words1[3]!.val / 2 ^ 16) % 2 ^ 48
 
-/-- State after storing all 5 limbs. -/
-def slice_state4 (words1 : Array U64 4#usize) (s : Scalar52) : Prop :=
+/-- All 5 limbs correctly placed in the output array. -/
+def slice_state4 (words1 : Array U64 4#usize)
+    (s : Scalar52) : Prop :=
   s[0]!.val = limb0_nat words1 ∧
   s[1]!.val = limb1_nat words1 ∧
   s[2]!.val = limb2_nat words1 ∧
   s[3]!.val = limb3_nat words1 ∧
   s[4]!.val = limb4_nat words1
 
-/-- The fifth store in the bit-slicing phase: write limb 4 into slot 4. -/
-private theorem slice4_step (words1 : Array U64 4#usize) (s3 : Scalar52) (top_mask : U64)
-    (hs3 : slice_state3 words1 s3) (htop : top_mask.val = 2 ^ 48 - 1) :
-    (do
-      let w3 ← Array.index_usize words1 3#usize
-      let hi ← w3 >>> 16#i32
-      let (_, back4) ← Insts.CoreOpsIndexIndexMutUsizeU64.index_mut s3 4#usize
-      let l4 ← lift (hi &&& top_mask)
-      ok (back4 l4)) ⦃ s =>
-      slice_state4 words1 s ∧
-      ∀ i < 5, s[i]!.val < 2 ^ 52 ⦄ := by
-  obtain ⟨hs3_0, hs3_1, hs3_2, hs3_3, hs3_4⟩ := hs3
-  step as ⟨ w3, w3_post ⟩
-  step as ⟨ hi, hi_post1, hi_post2 ⟩
-  unfold Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  step as ⟨ _, back4, hset4, _ ⟩
-  step as ⟨ l4, l4_post1, l4_post2 ⟩
-  have hs3_bound0 : s3[0]!.val < 2 ^ 52 := by
-    rw [hs3_0, limb0_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs3_bound1 : s3[1]!.val < 2 ^ 52 := by
-    rw [hs3_1, limb1_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs3_bound2 : s3[2]!.val < 2 ^ 52 := by
-    rw [hs3_2, limb2_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hs3_bound3 : s3[3]!.val < 2 ^ 52 := by
-    rw [hs3_3, limb3_nat]
-    exact Nat.mod_lt _ (by omega)
-  have hl4_mod : l4.val = (w3.val / 2 ^ 16) % 2 ^ 48 := by
-    simp only [l4_post1, hi_post1, UScalar.val_and, htop, land_pow_two_sub_one_eq_mod,
-      Nat.shiftRight_eq_div_pow]
-  have hl4_bound : l4.val < 2 ^ 52 := by
-    rw [hl4_mod]
-    have h48 : (w3.val / 2 ^ 16) % 2 ^ 48 < 2 ^ 48 := Nat.mod_lt _ (by omega)
-    omega
-  rw [hset4]
-  refine ⟨?_, ?_⟩
-  · unfold slice_state4 limb0_nat limb1_nat limb2_nat limb3_nat limb4_nat
-    repeat' constructor
-    · rw [Array.set_of_ne_getElem! s3 l4 0 4 (by simp) (by simp) (by decide)]
-      exact hs3_0
-    · rw [Array.set_of_ne_getElem! s3 l4 1 4 (by simp) (by simp) (by decide)]
-      exact hs3_1
-    · rw [Array.set_of_ne_getElem! s3 l4 2 4 (by simp) (by simp) (by decide)]
-      exact hs3_2
-    · rw [Array.set_of_ne_getElem! s3 l4 3 4 (by simp) (by simp) (by decide)]
-      exact hs3_3
-    · rw [Array.set_of_eq s3 l4 4 (by simp)]
-      simpa [w3_post, Array.getElem!_Nat_eq] using hl4_mod
-  · intro idx hidx
-    interval_cases idx
-    · simpa [Array.set_of_ne_getElem! s3 l4 0 4 (by simp) (by simp) (by decide)] using hs3_bound0
-    · simpa [Array.set_of_ne_getElem! s3 l4 1 4 (by simp) (by simp) (by decide)] using hs3_bound1
-    · simpa [Array.set_of_ne_getElem! s3 l4 2 4 (by simp) (by simp) (by decide)] using hs3_bound2
-    · simpa [Array.set_of_ne_getElem! s3 l4 3 4 (by simp) (by simp) (by decide)] using hs3_bound3
-    · simpa [Array.set_of_eq s3 l4 4 (by simp)] using hl4_bound
-
-/-- A scalar satisfying `slice_state4` has the same value as the packed 4-word input. -/
+/-- A scalar satisfying `slice_state4` has the same value
+as the packed 4-word input. -/
 private theorem slice_state4_value (words1 : Array U64 4#usize) (s : Scalar52)
     (hs : slice_state4 words1 s) :
     Scalar52_as_Nat s = words_as_Nat words1 := by
