@@ -39,6 +39,9 @@ theorem from_bytes_wide_spec (b : Array U8 64#usize) :
         Scalar52_as_Nat u = U8x64_as_Nat b % L ∧
         Scalar52_as_Nat u < L ∧
         ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
+  unfold from_bytes_wide
+  simp only [step_simps]
+  
   sorry
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
