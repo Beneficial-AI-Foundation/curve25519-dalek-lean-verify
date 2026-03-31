@@ -34,7 +34,6 @@ interface ProgressDataPoint {
   verified: number
   externally_verified: number
   specified: number
-  draft_spec: number
   extracted: number
   ai_proveable: number
 }
@@ -96,10 +95,6 @@ const chartData = computed(() => {
     x: dp.timestamp * 1000,
     y: dp.specified + (dp.externally_verified ?? 0) + dp.verified
   }))
-  const draft_spec = props.dataPoints.map(dp => ({
-    x: dp.timestamp * 1000,
-    y: dp.draft_spec + dp.specified + (dp.externally_verified ?? 0) + dp.verified
-  }))
   const total = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.total }))
   const extracted = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.extracted }))
   const ai_proveable = props.dataPoints.map(dp => ({ x: dp.timestamp * 1000, y: dp.ai_proveable }))
@@ -137,17 +132,6 @@ const chartData = computed(() => {
       borderWidth: 0,
       pointRadius: 0,
       order: 3
-    },
-    {
-      label: 'Draft',
-      data: draft_spec,
-      borderColor: '#cbd5e1',
-      backgroundColor: 'rgba(203, 213, 225, 0.5)',
-      fill: true,
-      stepped: 'after' as const,
-      borderWidth: 0,
-      pointRadius: 0,
-      order: 4
     },
     {
       label: 'Not started',
@@ -227,7 +211,7 @@ const chartOptions: ChartOptions<'line'> = {
         usePointStyle: true,
         padding: 15,
         filter: function(item, chart) {
-          return item.text === 'Verified' || item.text === 'Ext. verified' || item.text === 'Spec only' || item.text === 'Draft' || item.text === 'Active Functions'
+          return item.text === 'Verified' || item.text === 'Ext. verified' || item.text === 'Spec only' || item.text === 'Not started'
         }
       }
     },
@@ -244,12 +228,9 @@ const chartOptions: ChartOptions<'line'> = {
           } else if (label === 'Spec only' && context.dataIndex !== undefined) {
             const specified = props.dataPoints[context.dataIndex].specified
             return `${label}: ${specified}`
-          } else if (label === 'Draft' && context.dataIndex !== undefined) {
-            const draft_spec = props.dataPoints[context.dataIndex].draft_spec
-            return `${label}: ${draft_spec}`
           } else if (label === 'Not started' && context.dataIndex !== undefined) {
             const dp = props.dataPoints[context.dataIndex]
-            const notStarted = dp.total - dp.verified - (dp.externally_verified ?? 0) - dp.specified - dp.draft_spec
+            const notStarted = dp.total - dp.verified - (dp.externally_verified ?? 0) - dp.specified
             return `${label}: ${notStarted}`
           }
 

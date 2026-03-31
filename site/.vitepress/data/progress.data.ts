@@ -8,7 +8,6 @@ export interface ProgressDataPoint {
   verified: number
   externally_verified: number
   specified: number
-  draft_spec: number
   extracted: number
   ai_proveable: number
 }
@@ -58,7 +57,6 @@ export default {
           verified: entry.verified,
           externally_verified: entry.externally_verified,
           specified: entry.specified,
-          draft_spec: 0,
           extracted: entry.extracted,
           ai_proveable: 0,
         })

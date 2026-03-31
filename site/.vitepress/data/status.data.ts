@@ -30,7 +30,6 @@ export interface StatusData {
   stats: {
     total: number
     extracted: number
-    draft_spec: number
     specified: number
     verified: number
     externally_verified: number
@@ -75,7 +74,6 @@ export default {
     const stats = {
       total: visible.length,
       extracted: visible.length,
-      draft_spec: 0,
       specified: visible.filter(fn => fn.specified && !fn.verified && !fn.externally_verified).length,
       verified: visible.filter(fn => fn.verified && !fn.externally_verified).length,
       externally_verified: visible.filter(fn => fn.externally_verified).length,
