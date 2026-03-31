@@ -1178,16 +1178,7 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
     : {P : Point Ed25519 // IsEven P} :=
   ⟨{ x := elligator_ristretto_flavor_x r0
      y := elligator_ristretto_flavor_y r0
-     on_curve := by
-
-      unfold elligator_ristretto_flavor_x
-      unfold elligator_ristretto_flavor_y
-      unfold elligator_D
-      unfold elligator_Nt
-      unfold elligator_D
-
-
-      sorry },
+     on_curve := by sorry },
     by
     unfold IsEven
     unfold elligator_ristretto_flavor_y
