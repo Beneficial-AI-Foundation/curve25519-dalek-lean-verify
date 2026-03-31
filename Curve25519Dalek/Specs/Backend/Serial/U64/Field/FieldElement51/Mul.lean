@@ -181,6 +181,12 @@ def mul_product_stage (self _rhs : Array U64 5#usize) :
   let i48 ← i46 + i47
   let i49 ← mul.m i4 i3
   let c4 ← i48 + i49
+  let i50 ← 1#u64 <<< 54#i32
+  massert (i4 < i50); massert (i5 < i50)
+  massert (i16 < i50); massert (i < i50)
+  massert (i13 < i50); massert (i1 < i50)
+  massert (i10 < i50); massert (i2 < i50)
+  massert (i7 < i50); massert (i3 < i50)
   ok (c0, c1, c2, c3, c4)
 
 /-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`. Includes creation of
@@ -275,6 +281,12 @@ theorem fold_mul_product_stage {α : Type} (self _rhs : Array U64 5#usize)
         let i45 ← mul.m i13 i1; let i46 ← i44 + i45
         let i47 ← mul.m i16 i2; let i48 ← i46 + i47
         let i49 ← mul.m i4 i3; let c4 ← i48 + i49
+        let i50 ← 1#u64 <<< 54#i32
+        massert (i4 < i50); massert (i5 < i50)
+        massert (i16 < i50); massert (i < i50)
+        massert (i13 < i50); massert (i1 < i50)
+        massert (i10 < i50); massert (i2 < i50)
+        massert (i7 < i50); massert (i3 < i50)
         f c0 c1 c2 c3 c4) =
     (do let r ← mul_product_stage self _rhs; f r.1 r.2.1 r.2.2.1 r.2.2.2.1 r.2.2.2.2) := by
   simp only [mul_product_stage, bind_assoc_eq, bind_tc_ok]
@@ -469,7 +481,7 @@ private lemma carry_chain_eq (c0 c1 c2 c3 c4 a0 a1 a2 a3 a4 carry c1' c2' c3' c4
 /-! ## Helper Specs -/
 
 set_option maxHeartbeats 8000000 in
--- Required for step* through 25 monadic multiplication operations
+-- Required for step*
 @[step]
 theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, self[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
@@ -561,6 +573,8 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
   let* ⟨ i48, i48_post ⟩ ← U128.add_spec
   let* ⟨ i49, i49_post ⟩ ← m_spec
   let* ⟨ c4, c4_post ⟩ ← U128.add_spec
+  -- debug_assert! checks: 1 <<< 54 then 10 masserts
+  step*
   subst_vars
   have hc0 : c0.val = self[0]!.val * _rhs[0]!.val + self[4]!.val * (_rhs[1]!.val * 19) +
       self[3]!.val * (_rhs[2]!.val * 19) + self[2]!.val * (_rhs[3]!.val * 19) +
@@ -616,8 +630,7 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
     (_hc3 : c3.val < 2 ^ 115) (_hc4 : c4.val < 2 ^ 115)
     (hc1_tight : c1.val < 59 * 2 ^ 108) (hc2_tight : c2.val < 41 * 2 ^ 108)
     (hc3_tight : c3.val < 23 * 2 ^ 108) (hc4_tight : c4.val < 5 * 2 ^ 108) :
-    mul_carry_prop_stage c0 c1 c2 c3 c4
-    ⦃ ((a', carry, _mask) : Array U64 5#usize × U64 × U64) =>
+    mul_carry_prop_stage c0 c1 c2 c3 c4 ⦃ ((a', carry, _mask) : Array U64 5#usize × U64 × U64) =>
       let c1' := c1.val + c0.val / 2 ^ 51
       let c2' := c2.val + c1' / 2 ^ 51
       let c3' := c3.val + c2' / 2 ^ 51
@@ -628,9 +641,7 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
       a'[3]!.val = c3' % 2 ^ 51 ∧
       a'[4]!.val = c4' % 2 ^ 51 ∧
       carry.val = c4' / 2 ^ 51 ∧
-      _mask.val = 2 ^ 51 - 1 ∧
-      carry.val < 6 * 2 ^ 57 ∧
-      (∀ i < 5, a'[i]!.val < 2 ^ 51) ⦄ := by
+      _mask.val = 2 ^ 51 - 1 ∧ carry.val < 6 * 2 ^ 57 ∧ (∀ i < 5, a'[i]!.val < 2 ^ 51) ⦄ := by
   unfold mul_carry_prop_stage
   simp only [step_simps]
   let* ⟨ i50, i50_post1, i50_post2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -774,8 +785,7 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
     simp [*]; omega
   have h_i78 : i78.val = (a'[0]!.val + 19 * carry.val) / 2 ^ 51 := by
     simp only [i78_post1, Nat.shiftRight_eq_div_pow, h_i77]
-  have h_i79 : i79.val = a'[1]!.val := by
-    simp [*]
+  have h_i79 : i79.val = a'[1]!.val := by simp [*]
   let* ⟨ i80, i80_post ⟩ ← U64.add_spec
   let* ⟨ out7, out7_post ⟩ ← Array.update_spec
   let* ⟨ i81, i81_post ⟩ ← Array.index_usize_spec
@@ -817,21 +827,42 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
     · rw [ha8_4]; exact Nat.lt_of_lt_of_le (ha' 4 (by simp)) (by omega)
   exact ⟨ha8_0, ha8_1, ha8_2, ha8_3, ha8_4, ha8_lt⟩
 
-/-! ## Main Proof -/
-
 set_option maxHeartbeats 14000000 in
--- Required for step* through fold-decomposed mul body
+-- Required for step*
 @[step]
-theorem mul_spec (lhs rhs : Array U64 5#usize)
-    (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
-    mul lhs rhs ⦃ r =>
+theorem mul_spec (lhs rhs : Array U64 5#usize) (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54)
+    (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
+    mul lhs rhs ⦃ (r : FieldElement51) =>
       Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
       (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
-  simp only [fold_mul_product_stage, fold_mul_carry_prop_stage, fold_mul_final_reduce_stage]
+  -- Fold all three stages
+  simp_rw [fold_mul_product_stage, fold_mul_carry_prop_stage, fold_mul_final_reduce_stage]
   step as ⟨ prod, prod_post ⟩
   step as ⟨ cp, cp_post ⟩
   step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
+  -- Product identity mod p
+  have a_mul : (prod.1.val + 2 ^ 51 * prod.2.1.val + 2 ^ 102 * prod.2.2.1.val +
+      2 ^ 153 * prod.2.2.2.1.val + 2 ^ 204 * prod.2.2.2.2.val) ≡
+      (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] := by
+    have := decompose lhs[0]!.val lhs[1]!.val lhs[2]!.val
+      lhs[3]!.val lhs[4]!.val rhs[0]!.val rhs[1]!.val
+      rhs[2]!.val rhs[3]!.val rhs[4]!.val
+    have := prod_post.1; have := prod_post.2.1
+    have := prod_post.2.2.1; have := prod_post.2.2.2.1
+    have := prod_post.2.2.2.2.1
+    simp_all only [Nat.ModEq, Field51_as_Nat,
+      Finset.sum_range_succ, Finset.range_one,
+      Finset.sum_singleton, mul_zero, pow_zero, one_mul]
+  -- Carry chain conservation
+  set v0 := prod.1.val; set v1 := prod.2.1.val
+  set v2 := prod.2.2.1.val; set v3 := prod.2.2.2.1.val
+  set v4 := prod.2.2.2.2.val
+  have h_chain := carry_chain_eq v0 v1 v2 v3 v4 _ _ _ _ _ _
+    (v1 + v0 / 2 ^ 51) (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51)
+    (v3 + (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
+    (v4 + (v3 + (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
+    rfl rfl rfl rfl rfl rfl rfl rfl rfl rfl
   -- Extract carry prop postconditions
   have ha'_0 := cp_post.1
   have ha'_1 := cp_post.2.1
@@ -839,47 +870,21 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
   have ha'_3 := cp_post.2.2.2.1
   have ha'_4 := cp_post.2.2.2.2.1
   have hcarry_val := cp_post.2.2.2.2.2.1
-  -- Product identity mod p
-  have a_mul : (prod.1.val + 2^51 * prod.2.1.val + 2^102 * prod.2.2.1.val +
-      2^153 * prod.2.2.2.1.val + 2^204 * prod.2.2.2.2.val)
-      ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] := by
-    have := decompose lhs[0]!.val lhs[1]!.val lhs[2]!.val lhs[3]!.val lhs[4]!.val
-      rhs[0]!.val rhs[1]!.val rhs[2]!.val rhs[3]!.val rhs[4]!.val
-    have := prod_post.1; have := prod_post.2.1; have := prod_post.2.2.1
-    have := prod_post.2.2.2.1; have := prod_post.2.2.2.2.1
-    simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
-      Finset.sum_singleton, mul_zero, pow_zero, one_mul]
-  -- Carry chain conservation
-  set v0 := prod.1.val; set v1 := prod.2.1.val
-  set v2 := prod.2.2.1.val; set v3 := prod.2.2.2.1.val
-  set v4 := prod.2.2.2.2.val
-  have h_chain := carry_chain_eq v0 v1 v2 v3 v4
-      _ _ _ _ _ _
-      (v1 + v0 / 2 ^ 51)
-      (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51)
-      (v3 + (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
-      (v4 + (v3 + (v2 + (v1 + v0 / 2 ^ 51)
-        / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
-      rfl rfl rfl rfl rfl rfl rfl rfl rfl rfl
   -- Field51_as_Nat of the reduced result
-  have hf_r : Field51_as_Nat red =
-      (cp.1[0]!.val + 19 * cp.2.1.val) + 2^51 * cp.1[1]!.val + 2^102 * cp.1[2]!.val +
-      2^153 * cp.1[3]!.val + 2^204 * cp.1[4]!.val := by
+  have hf_r : Field51_as_Nat red = (cp.1[0]!.val + 19 * cp.2.1.val) + 2 ^ 51 * cp.1[1]!.val +
+      2 ^ 102 * cp.1[2]!.val + 2 ^ 153 * cp.1[3]!.val + 2 ^ 204 * cp.1[4]!.val := by
     unfold Field51_as_Nat
     simp only [Finset.sum_range_succ, Finset.sum_range_zero]
     rw [red_post1, red_post2, red_post3, red_post4, red_post5]
-    have := Nat.mod_add_div (cp.1[0]!.val + 19 * cp.2.1.val) (2 ^ 51)
+    have := Nat.mod_add_div
+      (cp.1[0]!.val + 19 * cp.2.1.val) (2 ^ 51)
     omega
-  -- h_key: Field51_as_Nat red + carry * p = c0 + 2^51*c1 + ...
   have h_key : Field51_as_Nat red + cp.2.1.val * p =
-      prod.1.val + 2^51 * prod.2.1.val + 2^102 * prod.2.2.1.val +
-      2^153 * prod.2.2.2.1.val + 2^204 * prod.2.2.2.2.val := by
+      v0 + 2 ^ 51 * v1 + 2 ^ 102 * v2 + 2 ^ 153 * v3 + 2 ^ 204 * v4 := by
     rw [hf_r, h_chain]
     simp only [ha'_0, ha'_1, ha'_2, ha'_3, ha'_4, hcarry_val]
     unfold p; omega
-  have hmul : Field51_as_Nat red ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] :=
-    (modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_mul
-  exact ⟨hmul, red_post6⟩
+  exact ⟨(modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_mul, red_post6⟩
 
 end CoreOpsArithMulSharedAFieldElement51FieldElement51
 end curve25519_dalek.Shared0FieldElement51.Insts
