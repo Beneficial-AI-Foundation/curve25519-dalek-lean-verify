@@ -30,7 +30,7 @@ canonical `Scalar52` reduced modulo L.
 4. `from_bytes_wide_spec` (`@[step]`): Combines all pieces.
 -/
 
-set_option linter.style.whitespace false
+set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -512,12 +512,44 @@ theorem from_bytes_wide_spec
   -- Final postcondition
   refine ⟨?_, u_post2, u_post3⟩
   -- Need: Scalar52_as_Nat u = U8x64_as_Nat b % L
-  -- Chain: u ≡ hi5 + lo5 [MOD L]  (u_post1)
-  --   lo5 ≡ lo [MOD L]            (from lo5_post1 + R_spec)
-  --   hi5 ≡ hi * R [MOD L]        (from hi5_post1 + RR_spec)
-  --   hi*R + lo = N                (bit-slicing identity)
-  --   N = U8x64_as_Nat b          (words1_post)
-  sorry
+  -- Abbreviations for the lo/hi Scalar52 arrays
+  set lo := (((((Std.Array.set ZERO 0#usize i2).set 1#usize i7).set 2#usize i12).set
+    3#usize i17).set 4#usize i22) with lo_def
+  set hi := (((((Std.Array.set ZERO 0#usize i24).set 1#usize i29).set 2#usize i34).set
+    3#usize i39).set 4#usize i41) with hi_def
+  -- Bit-slicing identity: lo + hi * R = words_wide = U8x64_as_Nat b
+  have hslice : Scalar52_as_Nat lo + Scalar52_as_Nat hi * R = U8x64_as_Nat b := by
+    sorry
+  -- R coprime with L (L is prime, R = 2^260)
+  have hcoprime : L.gcd R = 1 :=
+    Nat.Coprime.pow_right 260 (by decide : Nat.Coprime L 2)
+  -- Constants as congruences
+  have hR : Scalar52_as_Nat constants.R ≡ R [MOD L] := by
+    rw [Nat.ModEq]; exact constants.R_spec
+  have hRR : Scalar52_as_Nat constants.RR ≡ R ^ 2 [MOD L] := by
+    rw [Nat.ModEq]; exact constants.RR_spec
+  -- Cancel R from lo5_post1: lo ≡ lo5 [MOD L]
+  have hloR : Scalar52_as_Nat lo * R ≡ Scalar52_as_Nat lo5 * R [MOD L] :=
+    (Nat.ModEq.mul_left _ hR).symm.trans lo5_post1
+  have hlo : Scalar52_as_Nat lo ≡ Scalar52_as_Nat lo5 [MOD L] :=
+    Nat.ModEq.cancel_right_of_coprime hcoprime hloR
+  -- Cancel R from hi5_post1: hi * R ≡ hi5 [MOD L]
+  have hhiR2 : Scalar52_as_Nat hi * R ^ 2 ≡ Scalar52_as_Nat hi5 * R [MOD L] :=
+    (Nat.ModEq.mul_left _ hRR).symm.trans hi5_post1
+  have hhiR : Scalar52_as_Nat hi * R ≡ Scalar52_as_Nat hi5 [MOD L] :=
+    Nat.ModEq.cancel_right_of_coprime hcoprime
+      (show (Scalar52_as_Nat hi * R) * R ≡ Scalar52_as_Nat hi5 * R [MOD L] by
+        rwa [show Scalar52_as_Nat hi * R * R = Scalar52_as_Nat hi * R ^ 2 from by ring])
+  -- Chain: u ≡ hi5 + lo5 ≡ hi * R + lo ≡ lo + hi * R [MOD L]
+  have hu_congr : Scalar52_as_Nat u ≡ U8x64_as_Nat b [MOD L] :=
+    calc Scalar52_as_Nat u
+        ≡ Scalar52_as_Nat hi5 + Scalar52_as_Nat lo5 [MOD L] := u_post1
+      _ ≡ Scalar52_as_Nat hi * R + Scalar52_as_Nat lo [MOD L] :=
+          Nat.ModEq.add hhiR.symm hlo.symm
+      _ = Scalar52_as_Nat lo + Scalar52_as_Nat hi * R := by omega
+      _ = U8x64_as_Nat b := hslice
+  -- u < L + congruence → exact mod
+  rwa [Nat.ModEq, Nat.mod_eq_of_lt u_post2] at hu_congr
 
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
