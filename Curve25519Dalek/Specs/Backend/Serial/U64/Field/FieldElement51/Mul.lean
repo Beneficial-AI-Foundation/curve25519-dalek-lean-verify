@@ -446,6 +446,9 @@ private lemma mul_c4_lt_tight (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ)
   have : a0 * b4 < 2 ^ 108 := by nlinarith
   omega
 
+private lemma lt_of_eq_mod (a b : ℕ) (h : a = b % 2 ^ 51) : a < 2 ^ 51 :=
+  h ▸ Nat.mod_lt _ (by positivity)
+
 /-- Generic carry chain bound. -/
 private lemma carry_chain_lt_pow2_115 (formula carry : ℕ) (K : ℕ)
     (hf : formula < K * 2 ^ 108) (hc : carry < 2 ^ 64) (hK : K ≤ 127) :
@@ -627,7 +630,8 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
       a'[4]!.val = c4' % 2 ^ 51 ∧
       carry.val = c4' / 2 ^ 51 ∧
       _mask.val = 2 ^ 51 - 1 ∧
-      carry.val < 6 * 2 ^ 57 ⦄ := by
+      carry.val < 6 * 2 ^ 57 ∧
+      (∀ i < 5, a'[i]!.val < 2 ^ 51) ⦄ := by
   unfold mul_carry_prop_stage
   simp only [step_simps]
   let* ⟨ i50, i50_post1, i50_post2 ⟩ ← U128.ShiftRight_IScalar_spec
@@ -728,19 +732,20 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
   have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
     simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-  exact ⟨ha5_0,
-    by rw [ha5_1, hc11_eq],
-    by rw [ha5_2, hc21_eq, hc11_eq],
-    by rw [ha5_3, hc31_eq, hc21_eq, hc11_eq],
-    by rw [ha5_4, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
-    by rw [hcarry_val, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
-    by simp [*],
-    by rw [hcarry_val]
-       have hc41_tight : c41.val < 6 * 2 ^ 108 := by
-         rw [hc41_eq]; omega
-       have : (6 : ℕ) * 2 ^ 108 / 2 ^ 51 = 6 * 2 ^ 57 := by decide
-       calc c41.val / 2 ^ 51 ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
-         _ < 6 * 2 ^ 57 := by decide⟩
+  refine ⟨ha5_0, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [ha5_1, hc11_eq]
+  · rw [ha5_2, hc21_eq, hc11_eq]
+  · rw [ha5_3, hc31_eq, hc21_eq, hc11_eq]
+  · rw [ha5_4, hc41_eq, hc31_eq, hc21_eq, hc11_eq]
+  · rw [hcarry_val, hc41_eq, hc31_eq, hc21_eq, hc11_eq]
+  · simp [*]
+  · rw [hcarry_val]
+    have hc41_tight : c41.val < 6 * 2 ^ 108 := by
+      rw [hc41_eq]; omega
+    calc c41.val / 2 ^ 51
+        ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
+      _ < 6 * 2 ^ 57 := by decide
+  · intro i hi; interval_cases i <;> exact lt_of_eq_mod _ _ ‹_›
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through final reduction operations
@@ -828,8 +833,6 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
   step as ⟨ prod, prod_post ⟩
   step as ⟨ cp, cp_post ⟩
   step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
-  · intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
-    interval_cases i <;> simp only [*] <;> exact Nat.mod_lt _ (by positivity)
   -- Extract carry prop postconditions
   have ha'_0 := cp_post.1
   have ha'_1 := cp_post.2.1
