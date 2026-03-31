@@ -423,16 +423,25 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   intro result2 ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩
   -- ROW 3 setup
   let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi13 : (↑i13 : Nat) < 2 ^ 127 := by
+    rw [show (↑i13 : Nat) = i13.val from rfl, show i13.val = (↑a)[3]!.val from by
+      simp [i13_post]]; exact h_bounds 3 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i14 i14_post
   let* ⟨ i15, i15_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi15 : (↑i15 : Nat) < 2 ^ 104 := by rw [i15_post]; nlinarith [h_n1_bound, hi8]
+  have hi14 : (↑i14 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i14_post]; linarith [h_carry2_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i16 i16_post
   let* ⟨ i17, i17_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi17 : (↑i17 : Nat) < 2 ^ 104 := by rw [i17_post]; nlinarith [h_n2_bound, hi3]
+  have hi16 : (↑i16 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 := by rw [i16_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i18 i18_post
   -- ROW 3: part1
-  apply spec_bind; · exact part1_spec i18 (by sorry)
+  have hi18 : (↑i18 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i18_post]; omega
+  apply spec_bind; · exact part1_spec i18 (by rw [hmax]; omega)
   intro result3 ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩
   -- ROW 4 setup
   let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
