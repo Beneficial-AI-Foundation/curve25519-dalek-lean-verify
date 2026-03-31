@@ -83,14 +83,6 @@ jobs:
             functions.json
           retention-days: 30
 
-      - name: Cache probe outputs for non-Lean triggers
-        uses: actions/cache/save@v4
-        with:
-          path: |
-            functions.json
-            atoms.json
-          key: probe-outputs-${{ github.sha }}
-
       - name: Verify build success
         run: |
           echo "✓ Build successful!"

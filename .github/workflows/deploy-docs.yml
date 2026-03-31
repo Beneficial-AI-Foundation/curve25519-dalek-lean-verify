@@ -81,21 +81,28 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
         continue-on-error: true
 
-      - name: Get functions.json from cache
-        id: cache
+      - name: Get functions.json from latest lean.yml artifact
+        id: latest-artifact
         if: github.event_name != 'workflow_run' || steps.artifact.outcome != 'success'
-        uses: actions/cache/restore@v4
-        with:
-          path: |
-            functions.json
-            atoms.json
-          key: probe-outputs-never-match
-          restore-keys: probe-outputs-
+        run: |
+          RUN_ID=$(gh run list --workflow lean.yml --branch "${{ github.ref_name }}" \
+            --status success --limit 1 --json databaseId -q '.[0].databaseId' 2>/dev/null || true)
+          if [ -n "$RUN_ID" ]; then
+            gh run download "$RUN_ID" --name probe-artifacts && \
+              echo "Downloaded probe-artifacts from lean.yml run $RUN_ID" && \
+              echo "outcome=success" >> "$GITHUB_OUTPUT" || \
+              echo "outcome=failure" >> "$GITHUB_OUTPUT"
+          else
+            echo "No successful lean.yml run found on ${{ github.ref_name }}"
+            echo "outcome=failure" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
 
       - name: Fetch functions.json from deployed site
         if: >-
           (github.event_name != 'workflow_run' || steps.artifact.outcome != 'success') &&
-          steps.cache.outputs.cache-matched-key == ''
+          steps.latest-artifact.outputs.outcome != 'success'
         run: |
           curl -sSfL \
             https://beneficial-ai-foundation.github.io/curve25519-dalek-lean-verify/outputs/functions.json \
