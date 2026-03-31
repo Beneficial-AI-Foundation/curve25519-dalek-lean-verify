@@ -181,10 +181,6 @@ theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔ a % p = 1 := by
     decide
   rw [this]
 
-/-- Rewrite `a^n * a` into the more convenient successor exponent form. -/
-theorem pow_add_one (a n : ℕ) : a ^ n * a = a ^ (n + 1) := by
-  ring
-
 /-- Squaring preserves equality modulo `p` after moving one term across zero. -/
 theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
     (h : a + b ≡ 0 [MOD p]) :
