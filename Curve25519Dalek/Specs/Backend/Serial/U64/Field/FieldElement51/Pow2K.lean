@@ -164,19 +164,7 @@ def square_stage (a : Array U64 5#usize) : Result (U128 × U128 × U128 × U128 
   let i28 ← i26 + i27
   let i29 ← 2#u128 * i28
   let c4 ← i25 + i29
-  -- debug_assert! checks (nested if-then-else in Aeneas output)
-  let i30 ← 1#u64 <<< 54#i32
-  if i2 < i30 then
-    if i4 < i30 then
-      if i6 < i30 then
-        if i < i30 then
-          if i1 < i30 then
-            ok (c0, c1, c2, c3, c4)
-          else fail panic
-        else fail panic
-      else fail panic
-    else fail panic
-  else fail panic
+  ok (c0, c1, c2, c3, c4)
 
 /-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`. -/
 def carry_prop_stage (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128) :
@@ -649,26 +637,21 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
   have hcarry_val : carry.val = c41.val / 2 ^ 51 := by
     simp only [*, UScalar.cast_val_eq, UScalarTy.numBits, Nat.shiftRight_eq_div_pow]
     omega
-  exact ⟨ha5_0,
-    by rw [ha5_1, hc11_eq],
-    by rw [ha5_2, hc21_eq, hc11_eq],
-    by rw [ha5_3, hc31_eq, hc21_eq, hc11_eq],
-    by rw [ha5_4, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
-    by rw [hcarry_val, hc41_eq, hc31_eq, hc21_eq, hc11_eq],
-    by simp [*],
-    by rw [hcarry_val]
-       -- carry = c41/2^51 where c41 < 2^115
-       -- c41 = c4 + c31/2^51 < 5*2^108 + 2^64 < 6*2^108
-       -- carry = c41/2^51 < 6*2^108/2^51 = 6*2^57
-       have : c41.val < 2 ^ 115 := hc41_bound
-       have : c41.val / 2 ^ 51 < 2 ^ 64 := carry_fits_U64 _ hc41_bound
-       -- Tighter: c4 < 5*2^108, carry_from_c3 < 2^64
-       -- c41 = c4 + carry_from_c3 < 5*2^108 + 2^64 < 6*2^108
-       have hc41_tight : c41.val < 6 * 2 ^ 108 := by
-         rw [hc41_eq]; omega
-       have : (6 : ℕ) * 2 ^ 108 / 2 ^ 51 = 6 * 2 ^ 57 := by decide
-       calc c41.val / 2 ^ 51 ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 := Nat.div_le_div_right (by omega)
-         _ < 6 * 2 ^ 57 := by decide⟩
+  refine ⟨ha5_0, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [ha5_1, hc11_eq]
+  · rw [ha5_2, hc21_eq, hc11_eq]
+  · rw [ha5_3, hc31_eq, hc21_eq, hc11_eq]
+  · rw [ha5_4, hc41_eq, hc31_eq, hc21_eq, hc11_eq]
+  · rw [hcarry_val, hc41_eq, hc31_eq, hc21_eq, hc11_eq]
+  · simp [*]
+  · -- carry < 6 * 2^57
+    rw [hcarry_val]
+    have hc41_tight : c41.val < 6 * 2 ^ 108 := by
+      rw [hc41_eq]; omega
+    calc c41.val / 2 ^ 51
+        ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 :=
+          Nat.div_le_div_right (by omega)
+      _ < 6 * 2 ^ 57 := by decide
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic operations

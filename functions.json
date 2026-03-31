@@ -3578,7 +3578,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L462-L559",
+   "lines": "L462-L564",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
    "is_relevant": true,
@@ -3597,7 +3597,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK",
-   "lines": "L514-L514",
+   "lines": "L519-L519",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK",
    "is_relevant": true,
@@ -3635,7 +3635,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L474-L556",
+   "lines": "L474-L561",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop",
    "is_relevant": true,
@@ -3700,7 +3700,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
-   "lines": "L562-L564",
+   "lines": "L567-L569",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
    "is_relevant": true,
@@ -3722,7 +3722,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L567-L576",
+   "lines": "L572-L581",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
    "is_relevant": true,
@@ -3745,7 +3745,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L570-L573",
+   "lines": "L575-L578",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop",
    "is_relevant": true,
