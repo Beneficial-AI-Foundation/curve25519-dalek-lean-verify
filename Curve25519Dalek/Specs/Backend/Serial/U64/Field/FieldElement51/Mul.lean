@@ -829,11 +829,14 @@ theorem mul_final_reduce_stage_spec (a' : Array U64 5#usize) (carry i54 : U64)
 
 set_option maxHeartbeats 14000000 in
 -- Required for step*
+/-- Spec theorem for `FieldElement51::mul`.
+
+Field multiplication is correct mod p and produces reduced limbs. -/
 @[step]
-theorem mul_spec (lhs rhs : Array U64 5#usize) (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54)
-    (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
-    mul lhs rhs ⦃ (r : FieldElement51) =>
-      Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
+theorem mul_spec (self _rhs : Array U64 5#usize) (hself : ∀ i < 5, self[i]!.val < 2 ^ 54)
+    (hrhs : ∀ i < 5, _rhs[i]!.val < 2 ^ 54) :
+    mul self _rhs ⦃ (r : FieldElement51) =>
+      Field51_as_Nat r ≡ (Field51_as_Nat self) * (Field51_as_Nat _rhs) [MOD p] ∧
       (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
   -- Fold all three stages
@@ -844,10 +847,10 @@ theorem mul_spec (lhs rhs : Array U64 5#usize) (hlhs : ∀ i < 5, lhs[i]!.val < 
   -- Product identity mod p
   have a_mul : (prod.1.val + 2 ^ 51 * prod.2.1.val + 2 ^ 102 * prod.2.2.1.val +
       2 ^ 153 * prod.2.2.2.1.val + 2 ^ 204 * prod.2.2.2.2.val) ≡
-      (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] := by
-    have := decompose lhs[0]!.val lhs[1]!.val lhs[2]!.val
-      lhs[3]!.val lhs[4]!.val rhs[0]!.val rhs[1]!.val
-      rhs[2]!.val rhs[3]!.val rhs[4]!.val
+      (Field51_as_Nat self) * (Field51_as_Nat _rhs) [MOD p] := by
+    have := decompose self[0]!.val self[1]!.val self[2]!.val
+      self[3]!.val self[4]!.val _rhs[0]!.val _rhs[1]!.val
+      _rhs[2]!.val _rhs[3]!.val _rhs[4]!.val
     have := prod_post.1; have := prod_post.2.1
     have := prod_post.2.2.1; have := prod_post.2.2.2.1
     have := prod_post.2.2.2.2.1
