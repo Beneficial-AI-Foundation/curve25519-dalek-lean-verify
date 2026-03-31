@@ -565,12 +565,12 @@ private theorem check_eq_v_of_sqrt_ratio_data
   rw [mul_pow] at eq2
   have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post1
   have eq_v3 := Nat.ModEq.trans v3_post1 this
-  rw [pow_add_one] at eq_v3
+  rw [← pow_succ] at eq_v3
   have := Nat.ModEq.pow 2 eq_v3
   rw [← pow_mul] at this
   have := Nat.ModEq.trans fe1_post1 this
   have := Nat.ModEq.mul_right (Field51_as_Nat v) this
-  rw [pow_add_one] at this
+  rw [← pow_succ] at this
   have := Nat.ModEq.trans v7_post1 this
   have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
   rw [← pow_mul] at this
@@ -646,12 +646,12 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     rw [mul_pow] at eq2
     have := fe_post1.mul_right (Field51_as_Nat v)
     have eq_v3 := v3_post1.trans this
-    rw [pow_add_one] at eq_v3
+    rw [← pow_succ] at eq_v3
     have := eq_v3.pow 2
     rw [← pow_mul] at this
     have := fe1_post1.trans this
     have := this.mul_right (Field51_as_Nat v)
-    rw [pow_add_one] at this
+    rw [← pow_succ] at this
     have := v7_post1.trans this
     have := this.pow ((2 ^ 252 - 3) * 2)
     rw [← pow_mul] at this
@@ -676,7 +676,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
       simp
       ring
     rw [this]
-    rw [← pow_add, ← pow_mul, ← pow_add, pow_add_one,
+    rw [← pow_add, ← pow_mul, ← pow_add, ← pow_succ,
       (by
         simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub] :
           (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1 =
@@ -1170,7 +1170,7 @@ private theorem solve_second_choice_false_choice3_false
     have fermat :=
       ((Nat.ModEq.pow_card_sub_one_eq_one prime_25519
         h_coprime_v).pow 2).mul_right (Field51_as_Nat v)
-    simp only [← pow_mul, pow_add_one, one_pow, one_mul] at fermat
+    simp only [← pow_mul, ← pow_succ, one_pow, one_mul] at fermat
     have fermat :=
       (fermat.mul_left
         (xx ^ ((p - 1) / 2) * xx ^ 2)).symm.trans xx_check
