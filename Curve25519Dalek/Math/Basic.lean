@@ -9,7 +9,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert.PrimeList
-import ToMathlib.IsSquareMul
+import Mathlib.FieldTheory.Finite.Basic
 
 /-! # Common Definitions
 
@@ -251,6 +251,23 @@ lemma ringChar_ne_two : ringChar (ZMod p) ≠ 2 := by
   norm_num [p]
 
 lemma ne_zero_of_not_isSquare {a : ZMod p} (h : ¬ IsSquare a) : a ≠ 0 := by by_contra; simp_all
+
+/-- In a finite field of odd characteristic, the product of two non-squares is a square.
+TODO: this should probably be replaced by an argument using the quadratic character from
+`Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic`. -/
+theorem FiniteField.isSquare_mul_of_not_isSquare {F : Type*} [Field F] [Finite F]
+    (hchar : ringChar F ≠ 2) {a b : F} (ha : ¬ IsSquare a) (hb : ¬ IsSquare b) :
+    IsSquare (a * b) := by
+  have := Fintype.ofFinite F
+  have ha0 : a ≠ 0 := by intro h; exact ha (h ▸ IsSquare.zero)
+  have hb0 : b ≠ 0 := by intro h; exact hb (h ▸ IsSquare.zero)
+  have half_pow_neg {z : F} (hz : z ≠ 0) (hns : ¬ IsSquare z) :
+      z ^ (Fintype.card F / 2) = -1 :=
+    (FiniteField.pow_dichotomy hchar hz).resolve_left
+      (fun h1 => hns ((FiniteField.isSquare_iff hchar hz).mpr h1))
+  rw [FiniteField.isSquare_iff hchar (mul_ne_zero ha0 hb0),
+      mul_pow, half_pow_neg ha0 ha, half_pow_neg hb0 hb]
+  norm_num
 
 private lemma sqrt_m1_sq_nat :
     19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
