@@ -49,14 +49,14 @@ natural language specs:
     • If bytes.length = 32: the result is Ok(cey) where cey.val = bytes.val
     • If bytes.length ≠ 32: the result is Err(())
 -/
-@[progress]
+@[step]
 theorem from_slice_spec
     (bytes : Slice U8) :
     from_slice bytes ⦃ (result : core.result.Result CompressedEdwardsY core.array.TryFromSliceError) =>
       (bytes.length = 32 → ∃ cey : CompressedEdwardsY, result = .Ok cey ∧ cey.val = bytes.val) ∧
       (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
   unfold from_slice
-  progress
+  step
   · exact List.mapM_clone_eq (fun _ _ => by rfl)
   · cases r
     · simp only [core.result.Result.map]

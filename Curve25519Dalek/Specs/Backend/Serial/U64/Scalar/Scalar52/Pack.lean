@@ -34,14 +34,14 @@ natural language specs:
 /-- **Spec theorem for `scalar.Scalar52.pack`**:
 - Both the unpacked r and the packed s represent the same natural number modulo L
 - The packed scalar is in canonical form (less than L) -/
-@[progress]
+@[step]
 theorem pack_spec (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L) :
     pack self ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ Scalar52_as_Nat self [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold pack
-  progress*
+  step*
   exact ⟨by simp only [*, Nat.ModEq], by assumption⟩
 
 end curve25519_dalek.scalar.Scalar52

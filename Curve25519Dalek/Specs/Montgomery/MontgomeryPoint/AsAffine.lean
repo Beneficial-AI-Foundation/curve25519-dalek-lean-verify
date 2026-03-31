@@ -78,7 +78,7 @@ lemma zmod_div_eq_mul_of_mod_inv (U W x_inv : Nat) (hW_ne : W % p ≠ 0) (h_inv 
 - Returns bytesToField(result) = U/W (mod p) where p = 2^255 - 19
 - Does not verify curve validity (pure encoding of field element U/W)
 -/
-@[progress]
+@[step]
 theorem as_affine_spec (self : montgomery.ProjectivePoint)
     (hU : self.U.IsValid)
     (hW : self.W.IsValid)
@@ -87,7 +87,7 @@ theorem as_affine_spec (self : montgomery.ProjectivePoint)
       (U8x32_as_Field res = self.U.toField / self.W.toField) ∧
       (U8x32_as_Nat res < 2 ^ 255) ⦄ := by
   unfold as_affine at *
-  progress*
+  step*
   · constructor
     · rename_i fe_inv h_mul_U_Winv
       have h_W_nat_nonzero : Field51_as_Nat self.W % p ≠ 0 := Field51_modP_ne_zero_of_toField_ne_zero self.W h_valid

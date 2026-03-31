@@ -35,12 +35,12 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.ZERO`**:
 - The constant is equal to 0
 -/
-@[progress]
+@[step]
 theorem ZERO_spec : ZERO ⦃ (result : FieldElement51) =>
     Field51_as_Nat result = 0 ∧
     (∀ i< 5, (result[i]!.val) < 2^51 )⦄ := by
   unfold ZERO
-  progress*
+  step*
   simp only [*]
   decide
 

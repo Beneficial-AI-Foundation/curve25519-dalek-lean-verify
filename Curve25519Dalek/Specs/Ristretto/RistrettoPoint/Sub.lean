@@ -40,7 +40,7 @@ natural language specs:
 • The result is a valid Ristretto point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
-@[progress]
+@[step]
 theorem sub_spec
     (self other : RistrettoPoint)
     (h_self_valid : self.IsValid)
@@ -49,7 +49,7 @@ theorem sub_spec
       result.IsValid ∧
       result.toPoint = self.toPoint - other.toPoint ⦄ := by
   unfold sub edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub
-  progress
+  step
   · exact h_self_valid.1
   · exact h_other_valid.1
   · have h_toPoint : RistrettoPoint.toPoint ep = self.toPoint - other.toPoint := by

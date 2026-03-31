@@ -74,7 +74,7 @@ Namely:
 4. Granular Flag Meanings
 5. The bridge that proves "Passing the Rust checks" iff "decompress_step1 Succeeding"
 -/
-@[progress]
+@[step]
 theorem step_1_spec (c : CompressedRistretto) :
     step_1 c ⦃ (s_encoding_is_canonical, s_is_negative, s) =>
       (∀ i < 5, s[i]!.val < 2^51) ∧
@@ -86,18 +86,18 @@ theorem step_1_spec (c : CompressedRistretto) :
         (s_encoding_is_canonical.val = 1#u8 ∧ s_is_negative.val = 0#u8)) ⦄ := by
   unfold step_1
   -- Step through the do-block bindings
-  progress as ⟨a, ha⟩               -- as_bytes: ha : a = c
+  step as ⟨a, ha⟩               -- as_bytes: ha : a = c
   simp only [← ha]
-  progress as ⟨s, hs, h_tight⟩ -- from_bytes: hs : congruence, h_tight : < 2^51, hsv : s.IsValid
-  progress as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
+  step as ⟨s, hs, h_tight⟩ -- from_bytes: hs : congruence, h_tight : < 2^51, hsv : s.IsValid
+  step as ⟨s_bytes, hbc1, hbc2⟩ -- to_bytes: hbc1 : ... ≡ ... [MOD p], hbc2 : ... < p
   -- Simplify the SliceIndexRangeFullSliceSlice index chain (identity on slices)
   simp only [core.array.Array.index, core.ops.index.IndexSlice,
     core.slice.index.Slice.index,
     core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index]
   -- Step through remaining do-block bindings
-  progress as ⟨s2, hs2⟩             -- ↑(Array.to_slice c): s2 = c.to_slice
-  progress as ⟨ct_flag, hct⟩        -- ct_eq: ct_flag = Choice.one ↔ s_bytes.to_slice = s2
-  progress as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
+  step as ⟨s2, hs2⟩             -- ↑(Array.to_slice c): s2 = c.to_slice
+  step as ⟨ct_flag, hct⟩        -- ct_eq: ct_flag = Choice.one ↔ s_bytes.to_slice = s2
+  step as ⟨neg_flag, hneg⟩      -- is_negative: neg_flag.val = 1#u8 ↔ ...
   -- Prove conjunction
   have p_lt_pow255 : p < 2 ^ 255 := Nat.sub_lt (by positivity) (by norm_num)
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩

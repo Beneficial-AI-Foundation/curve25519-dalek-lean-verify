@@ -28,7 +28,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOps
 /-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
 - Does not overflow if limb sums don't exceed `U64.max`. -/
-@[progress]
+@[step]
 theorem add_assign_loop_spec (self _rhs : Array U64 5#usize) (i : Usize) (hi : i.val ≤ 5)
     (hab : ∀ j < 5, i.val ≤ j → self[j]!.val + _rhs[j]!.val ≤ U64.max) :
     add_assign_loop self _rhs i ⦃ (result : FieldElement51) =>

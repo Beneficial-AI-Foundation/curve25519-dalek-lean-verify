@@ -45,18 +45,18 @@ natural language specs:
 - Input bounds: x, y are valid U64 values
 - Output bounds: result < 2^128
 -/
-@[progress]
+@[step]
 theorem m_spec (x y : U64) :
     mul.m x y ⦃ r =>
     r.val = x.val * y.val ⦄ := by
   unfold mul.m
-  progress*
+  step*
 
-@[progress]
+@[step]
 theorem LOW_51_BIT_MASK_spec :
     mul.LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
   unfold mul.LOW_51_BIT_MASK
-  progress*
+  step*
 
 lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
   (a0 +
@@ -132,7 +132,7 @@ lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
 
 -- TODO: once we have understand how to do the multiplication used in pow2k, this is the same issue
 set_option maxHeartbeats 10000000000 in
--- progress heavy
+-- step heavy
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.Mul.mul`**:
 - No panic (always returns successfully)
 - The result, when converted to a natural number, is congruent to the product of the inputs modulo p
@@ -140,14 +140,14 @@ set_option maxHeartbeats 10000000000 in
 - Output bounds: each limb < 2^52
 EXTERNALY_VERIFIED
 -/
-@[progress, externally_verified]
+@[step, externally_verified]
 theorem mul_spec (lhs rhs : Array U64 5#usize)
     (hlhs : ∀ i < 5, lhs[i]!.val < 2 ^ 54) (hrhs : ∀ i < 5, rhs[i]!.val < 2 ^ 54) :
     mul lhs rhs ⦃ r =>
       Field51_as_Nat r ≡ (Field51_as_Nat lhs) * (Field51_as_Nat rhs) [MOD p] ∧
       (∀ i < 5, r[i]!.val < 2 ^ 52) ⦄ := by
   unfold mul
-  progress*
+  step*
   · sorry
   · sorry
   · sorry

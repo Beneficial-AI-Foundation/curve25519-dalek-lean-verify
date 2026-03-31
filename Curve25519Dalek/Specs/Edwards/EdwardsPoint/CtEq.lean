@@ -48,7 +48,7 @@ Natural language specs:
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
 - When both points are valid, this is equivalent to toPoint equality
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   -- Bounds are needed for the internal field multiplications
   (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)
@@ -63,13 +63,13 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
     (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧
   (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by
   unfold ct_eq
-  progress as ⟨h1, h2⟩
-  progress as ⟨h3, h4⟩
-  progress as ⟨h5, h6⟩
-  progress as ⟨h7, h8⟩
-  progress as ⟨h9, h10⟩
-  progress as ⟨h11, h12⟩
-  progress as ⟨h13, h14⟩
+  step as ⟨h1, h2⟩
+  step as ⟨h3, h4⟩
+  step as ⟨h5, h6⟩
+  step as ⟨h7, h8⟩
+  step as ⟨h9, h10⟩
+  step as ⟨h11, h12⟩
+  step as ⟨h13, h14⟩
   simp only [h14, h6, h12]
   have to_bytes_iff_mod (x y : backend.serial.u64.field.FieldElement51) :
       x.to_bytes = y.to_bytes ↔ Field51_as_Nat x % p = Field51_as_Nat y % p := by

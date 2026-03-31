@@ -42,7 +42,7 @@ Formal specification:
 - Returns the input unchanged (result = self)
 - Preserves the field element representation
 -/
-@[progress]
+@[step]
 theorem as_bytes_spec (mp : montgomery.MontgomeryPoint) :
     montgomery.MontgomeryPoint.as_bytes mp ⦃ (result : montgomery.MontgomeryPoint) =>
       result = mp ⦄ := by

@@ -34,7 +34,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
 - Consequently, when `choice = Choice.one`, the whole result equals `other`;
   when `choice = Choice.zero`, the result equals `self`.
 -/
-@[progress]
+@[step]
 theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
     conditional_assign self other choice ⦃ (res : FieldElement51) =>
@@ -43,11 +43,11 @@ theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElem
   unfold U64.Insts.SubtleConditionallySelectable.conditional_assign
   by_cases hc : choice.val = 1#u8
   · simp only [hc, reduceIte]
-    progress*
+    step*
     intro i _
     interval_cases i <;> simp [*]
   · simp only [hc, reduceIte]
-    progress*
+    step*
     simp [*]
 
 end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable

@@ -33,7 +33,7 @@ namespace curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallyS
 This implements constant-time conditional selection for Montgomery curve points
 in projective coordinates (U:W).
 -/
-@[progress]
+@[step]
 theorem conditional_select_spec
     (a b : montgomery.ProjectivePoint)
     (choice : subtle.Choice) :
@@ -41,6 +41,6 @@ theorem conditional_select_spec
       (∀ i < 5, res.U[i]! = (if choice.val = 1#u8 then b.U[i]! else a.U[i]!)) ∧
       (∀ i < 5, res.W[i]! = (if choice.val = 1#u8 then b.W[i]! else a.W[i]!)) ⦄ := by
   unfold conditional_select
-  progress*
+  step*
 
 end curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable

@@ -58,7 +58,7 @@ natural language specs:
 - Delegates to `Scalar * EdwardsPoint` multiplication with the clamped scalar
 - The returned EdwardsPoint matches the scalar multiplication result
 -/
-@[progress]
+@[step]
 theorem mul_clamped_spec (self : EdwardsPoint) (bytes : Array U8 32#usize)
     (h_self_valid : self.IsValid) :
     mul_clamped self bytes ⦃ (result : EdwardsPoint) =>
@@ -69,6 +69,6 @@ theorem mul_clamped_spec (self : EdwardsPoint) (bytes : Array U8 32#usize)
       2 ^ 254 ≤ U8x32_as_Nat clamped_scalar ∧
       result.toPoint = (((U8x32_as_Nat clamped_scalar)) • self.toPoint)) ⦄ := by
     unfold mul_clamped
-    progress*
+    step*
 
 end curve25519_dalek.edwards.EdwardsPoint

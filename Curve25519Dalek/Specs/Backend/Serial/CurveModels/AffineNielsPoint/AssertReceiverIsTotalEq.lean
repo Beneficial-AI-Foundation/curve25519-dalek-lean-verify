@@ -37,7 +37,7 @@ natural language specs:
 - The result is `()`
 - This is the `Eq`-trait totality assertion for `AffineNielsPoint`
 -/
-@[progress]
+@[step]
 theorem assert_receiver_is_total_eq_spec
     (self : backend.serial.curve_models.AffineNielsPoint) :
     assert_receiver_is_total_eq self ⦃ result => result = () ⦄ := by

@@ -31,7 +31,7 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleC
 - Consequently, when `choice = Choice.one`, the whole result equals `b`;
   when `choice = Choice.zero`, the result equals `a`.
 -/
-@[progress]
+@[step]
 theorem conditional_select_spec
     (a b : backend.serial.u64.field.FieldElement51)
     (choice : subtle.Choice) :
@@ -42,13 +42,13 @@ theorem conditional_select_spec
   unfold U64.Insts.SubtleConditionallySelectable.conditional_select
   by_cases h: choice.val = 1#u8
   · simp only [h, ite_true, bind_tc_ok]
-    progress*
+    step*
     intro i hi
     subst_vars
     simp only [Array.getElem!_Nat_eq, Array.make, List.getElem!_eq_getElem?_getD]
     rcases i with _ | _ | _ | _ | _ | n <;> simp_all; omega
   · simp only [h, ite_false, bind_tc_ok]
-    progress*
+    step*
     intro i hi
     subst_vars
     simp only [Array.getElem!_Nat_eq, Array.make, List.getElem!_eq_getElem?_getD]

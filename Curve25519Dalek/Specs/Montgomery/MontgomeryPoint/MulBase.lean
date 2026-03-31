@@ -52,19 +52,20 @@ natural language specs:
 - Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`
 - The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result
 -/
-@[externally_verified, progress]
+@[externally_verified, step]
 theorem mul_base_spec (scalar : scalar.Scalar) :
-    mul_base scalar ⦃ (result : montgomery.MontgomeryPoint) =>
-      Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄ := by
-  unfold mul_base
-  progress with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
-  progress with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
-  · exact ep_valid.Y_bounds
-  · exact ep_valid.Z_bounds
-  · simp_all only
-    have := res_hom 1
-    simp only [one_smul] at this
-    rw[← this]
-    apply Montgomery.comm_mul_fromEdwards
+    mul_base scalar ⦃ result =>
+    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
+     := by
+    unfold mul_base
+    step with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
+    step with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
+    · exact ep_valid.Y_bounds
+    · exact ep_valid.Z_bounds
+    · simp_all only
+      have := res_hom 1
+      simp only [one_smul] at this
+      rw[← this]
+      apply Montgomery.comm_mul_fromEdwards
 
 end curve25519_dalek.montgomery.MontgomeryPoint

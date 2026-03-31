@@ -60,7 +60,7 @@ where p = 2^255 - 19
   - C ≡ T * 2 * d (mod p)
 where p = 2^255 - 19
 -/
-@[externally_verified, progress]
+@[externally_verified, step]
 theorem as_projective_niels_spec (e : EdwardsPoint)
     (he : e.IsValid) :
     as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>
@@ -84,7 +84,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
       e.toPoint = pn.toPoint
        ⦄ := by
   unfold as_projective_niels
-  progress*
+  step*
   · exact he.Y_bounds
   · have:= he.X_bounds
     exact this

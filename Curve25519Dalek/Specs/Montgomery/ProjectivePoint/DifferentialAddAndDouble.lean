@@ -124,7 +124,7 @@ The Montgomery ladder invariant maintains that the difference Q-P is known.
 
 set_option maxHeartbeats 10000000 in
 -- heavy simp
-@[progress]
+@[step]
 theorem differential_add_and_double_spec
     (P Q : montgomery.ProjectivePoint)
     (affine_PmQ : backend.serial.u64.field.FieldElement51)
@@ -147,9 +147,8 @@ theorem differential_add_and_double_spec
          Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) )
       ⦄ := by
   unfold differential_add_and_double
-  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a,
-    hpmq_lt, hnon_pmq, heq_pmq⟩ := h_ladder_state
-  progress*
+  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a, hpmq_lt, hnon_pmq, heq_pmq⟩:=  h_ladder_state
+  step*
   · exact hP_valid.U_bounds
   · exact hP_valid.W_bounds
   · have := hQ_valid.U_bounds

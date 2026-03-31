@@ -48,14 +48,14 @@ natural language specs:
 - No panic (returns successfully for non-zero input)
 - The result satisfies the multiplicative inverse property:
   Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/
-@[progress]
+@[step]
 theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)
     (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :
     invert self ⦃ (result : Scalar52) =>
       (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result < L ⦄ := by
   unfold invert
-  progress*
+  step*
   · by_contra _
     have : Scalar52_as_Nat self % L = 0 % L := by
       apply Nat.ModEq.cancel_right_of_coprime (c := R % L) (by rfl)

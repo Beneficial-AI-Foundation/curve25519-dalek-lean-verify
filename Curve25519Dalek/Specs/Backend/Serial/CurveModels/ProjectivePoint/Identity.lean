@@ -39,13 +39,13 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     spec identity (fun (q : ProjectivePoint) =>
       Field51_as_Nat q.X = 0 ∧
       Field51_as_Nat q.Y = 1 ∧
       Field51_as_Nat q.Z = 1) := by
   unfold identity
-  progress*
+  step*
 
 end curve25519_dalek.IdentityCurveModelsProjectivePoint

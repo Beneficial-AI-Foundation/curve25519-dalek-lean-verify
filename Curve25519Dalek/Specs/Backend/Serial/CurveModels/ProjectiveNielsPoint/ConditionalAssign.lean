@@ -72,7 +72,7 @@ theorem conditional_assign_spec
     (∀ i < 5, result.T2d[i]!.val =
       if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) ⦄ := by
   unfold conditional_assign
-  progress*
+  step*
   grind
 
 end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable

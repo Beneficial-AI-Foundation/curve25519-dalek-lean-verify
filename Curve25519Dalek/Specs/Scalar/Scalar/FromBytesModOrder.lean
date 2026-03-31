@@ -36,12 +36,12 @@ natural language specs:
 - No panic (always returns successfully)
 - The result scalar s, when converted to nat, equals the input bytes converted to nat modulo L
 - The result scalar s is less than L (the group order) -/
-@[progress]
+@[step]
 theorem from_bytes_mod_order_spec (b : Array U8 32#usize) :
     from_bytes_mod_order b ⦃ s =>
     U8x32_as_Nat s.bytes ≡ U8x32_as_Nat b [MOD L] ∧ U8x32_as_Nat s.bytes < L ⦄ := by
   unfold from_bytes_mod_order scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index
-  progress*
+  step*
   have := high_bit_zero_of_lt_L s.bytes
   simp [*] at *
   grind

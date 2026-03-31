@@ -36,7 +36,7 @@ natural language specs:
 - The value of constants.EDWARDS_D2 when converted to a natural number equals
   the canonical (reduced) representation of 2*d (mod p) in [0, p-1].
 -/
-@[progress]
+@[step]
 theorem EDWARDS_D2_spec :
     EDWARDS_D2 ⦃ (result : field.FieldElement51) =>
       Field51_as_Nat result = (2 * d) % p ∧

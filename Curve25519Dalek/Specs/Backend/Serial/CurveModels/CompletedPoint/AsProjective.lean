@@ -43,7 +43,7 @@ natural language specs:
 /-- **Auxiliary spec for `as_projective`** proving arithmetic correctness.
 Input bounds: all coordinates < 2^54.
 Output: arithmetic relations modulo p. -/
-@[progress]
+@[step]
 theorem as_projective_spec_aux (q : CompletedPoint)
     (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)
     (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
@@ -65,7 +65,7 @@ theorem as_projective_spec_aux (q : CompletedPoint)
       (∀ i < 5, proj.Y[i]!.val < 2 ^ 52) ∧
       (∀ i < 5, proj.Z[i]!.val < 2 ^ 52) ⦄ := by
   unfold as_projective
-  progress*
+  step*
   rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq]
   simp_all
 

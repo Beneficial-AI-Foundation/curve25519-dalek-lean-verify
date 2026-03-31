@@ -29,7 +29,7 @@ set_option maxHeartbeats 400000 in -- heavy simp
 /-- **Spec for `backend.serial.u64.scalar.Scalar52.mul_internal`**:
 - The result represents the product of the two input field elements
 - Requires that each input limb is at most 62 bits to prevent overflow -/
-@[progress]
+@[step]
 theorem mul_internal_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :
     mul_internal a b ⦃ (result : Array U128 9#usize) =>
@@ -37,7 +37,7 @@ theorem mul_internal_spec (a b : Array U64 5#usize)
       (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
   unfold mul_internal
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
-  progress*
+  step*
   constructor
   · simp only [Scalar52_wide_as_Nat, Array.getElem!_Nat_eq, Array.set_val_eq, Array.repeat_val,
     UScalar.ofNatCore_val_eq, List.reduceReplicate, List.set_cons_zero, List.set_cons_succ,

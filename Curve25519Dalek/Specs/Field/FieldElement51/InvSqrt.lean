@@ -66,7 +66,7 @@ Natural language specs:
   2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)
   3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)
 -/
-@[progress]
+@[step]
 theorem invsqrt_spec
     (v : backend.serial.u64.field.FieldElement51)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
@@ -90,7 +90,7 @@ theorem invsqrt_spec
     backend.serial.u64.field.FieldElement51.ONE
     backend.serial.u64.field.FieldElement51.from_limbs
   simp only [bind_tc_ok]
-  progress as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
+  step as ⟨c, h_bounds, h_nonneg, h_case1, h_case2, h_case3, h_case4⟩
   · intro i _; interval_cases i; all_goals decide
   -- Rewrite Field51_as_Nat of literal ONE to 1 in all case hypotheses
   have h_one : Field51_as_Nat

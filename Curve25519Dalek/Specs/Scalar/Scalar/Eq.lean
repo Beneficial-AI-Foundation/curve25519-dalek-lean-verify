@@ -38,12 +38,12 @@ natural language specs:
 • The function always succeeds (no panic)
 • The result is `true` if and only if the two scalars have the same byte representation
 -/
-@[progress]
+@[step]
 theorem eq_spec (self other : scalar.Scalar) :
     eq self other ⦃ result =>
     result = true ↔ self.bytes = other.bytes ⦄ := by
   unfold eq
-  progress*
+  step*
   unfold Bool.Insts.CoreConvertFromChoice.from
   simp only [spec, theta, wp_return]
   have key : decide (c.val = 1#u8) = true ↔ c = Choice.one := by

@@ -64,7 +64,7 @@ set_option exponentiation.threshold 100000
 - If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)
 - If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)
 -/
-@[progress]
+@[step]
 theorem invert_spec (r : backend.serial.u64.field.FieldElement51)
     (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :
     invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>
@@ -75,9 +75,9 @@ theorem invert_spec (r : backend.serial.u64.field.FieldElement51)
       (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by
   unfold invert
   -- invert = pow22501 → pow2k(t19, 5) → mul(t20, t3)
-  progress with pow22501_spec as ⟨ t19, ht19_mod, ht3_mod, ht19b, ht3b ⟩
-  progress with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
-  progress with mul_spec as ⟨ res, hres, hresb ⟩
+  step with pow22501_spec as ⟨ t19, ht19_mod, ht3_mod, ht19b, ht3b ⟩
+  step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
+  step with mul_spec as ⟨ res, hres, hresb ⟩
   -- Chain: t20 ≡ r^((2^250-1)*32), res ≡ r^((2^250-1)*32 + 11) = r^(p-2)
   -- The exponent (2^250-1)*2^5 + 11 = 2^255-21 = p-2 is verified by kernel reduction.
   have hpow : Field51_as_Nat res ≡ Field51_as_Nat r ^ (p - 2) [MOD p] :=

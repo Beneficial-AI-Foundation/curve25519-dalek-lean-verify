@@ -39,13 +39,13 @@ natural language specs:
 - No panic (always returns successfully)
 - The result is Choice.one iff the two CompressedRistretto values are equal
 -/
-@[progress]
+@[step]
 theorem ct_eq_spec
     (self other : CompressedRistretto) :
     ct_eq self other ⦃ (result : subtle.Choice) =>
       result = Choice.one ↔ self = other ⦄ := by
   unfold ct_eq
-  progress*
+  step*
   simp_all only [Array.to_slice, Slice.eq_iff]
   exact Subtype.val_injective.eq_iff
 

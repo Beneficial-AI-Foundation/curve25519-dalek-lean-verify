@@ -40,15 +40,15 @@ natural language specs:
 - Returns `true` if and only if the point has small order (is in the torsion subgroup E[8])
 - This is determined by checking if multiplying by the cofactor yields the identity element
 -/
-@[progress]
+@[step]
 theorem is_small_order_spec (self : EdwardsPoint) (hself : self.IsValid) :
     is_small_order self ⦃ result =>
     (result ↔ h • self.toPoint = 0) ⦄ := by
   unfold is_small_order curve25519_dalek.traits.IsIdentity.Blanket.is_identity
-  progress with mul_by_cofactor_spec as ⟨ep, hep_valid, hep_point⟩
-  progress with Insts.Curve25519_dalekTraitsIdentity.identity_spec as
+  step with mul_by_cofactor_spec as ⟨ep, hep_valid, hep_point⟩
+  step with Insts.Curve25519_dalekTraitsIdentity.identity_spec as
     ⟨t, ht_X, ht_Y, ht_Z, ht_T, ht_valid⟩
-  progress with Insts.SubtleConstantTimeEq.ct_eq_spec as ⟨c, hc1, hc2⟩
+  step with Insts.SubtleConstantTimeEq.ct_eq_spec as ⟨c, hc1, hc2⟩
   -- Grind bridges the Array/List coercion gap (ep.X[i]! vs (↑ep.X)[i]!) and < → ≤.
   -- Grind-free alternative per goal:
   --   intro i hi; have := hep_valid.X_bounds i hi

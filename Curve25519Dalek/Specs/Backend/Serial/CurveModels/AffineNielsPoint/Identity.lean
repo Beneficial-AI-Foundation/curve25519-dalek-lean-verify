@@ -46,13 +46,13 @@ natural language specs:
 - The resulting AffineNielsPoint is the identity element with coordinates
   (y_plus_x=1, y_minus_x=1, xy2d=0)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (q : AffineNielsPoint) =>
       Field51_as_Nat q.y_plus_x = 1 ∧
       Field51_as_Nat q.y_minus_x = 1 ∧
       Field51_as_Nat q.xy2d = 0 ⦄ := by
   unfold identity
-  progress*
+  step*
 
 end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity

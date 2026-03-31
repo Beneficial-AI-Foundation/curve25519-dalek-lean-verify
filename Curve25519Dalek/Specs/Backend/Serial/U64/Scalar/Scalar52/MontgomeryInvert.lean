@@ -131,21 +131,21 @@ natural language specs:
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
-set_option maxHeartbeats 400000 in -- heavy progress and simp
+set_option maxHeartbeats 400000 in -- heavy step and simp
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
 - Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 - No panic (always returns successfully for non-zero inputs)
 - The result u' satisfies the property that Montgomery multiplication of u and u'
   yields R mod L (the Montgomery representation of 1)
 -/
-@[progress]
+@[step]
 theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)
     (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :
     montgomery_invert u ⦃ u' =>
     (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧
     (∀ i < 5, u'[i]!.val < 2 ^ 62) ⦄ := by
   unfold montgomery_invert
-  progress*
+  step*
   unfold pow2 at *
   simp only [*] at *
   simp only [Nat.reduceAdd, Nat.reducePow] at *

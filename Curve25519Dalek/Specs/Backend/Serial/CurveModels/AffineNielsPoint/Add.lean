@@ -56,7 +56,7 @@ natural language specs:
   - T' ≡ ( 2·Z − T·N.xy2d ) (mod p)
 -/
 
-@[progress]
+@[step]
 theorem add_spec
     (self : edwards.EdwardsPoint)
     (other : backend.serial.curve_models.AffineNielsPoint)
@@ -84,7 +84,7 @@ theorem add_spec
       Z' % p = ((2 * Z) + (T * XY2D)) % p ∧
       (T' + (T * XY2D)) % p = (2 * Z) % p ⦄ := by
   unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←

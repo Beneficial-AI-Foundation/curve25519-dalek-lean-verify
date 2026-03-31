@@ -50,7 +50,7 @@ private lemma decompress_step1_val_eq (c : CompressedRistretto)
 - If the input is valid, then the output is a valid Ristretto point that reflects the
   output of the pure mathematical decompression function
 -/
-@[progress]
+@[step]
 theorem decompress_spec (comp : CompressedRistretto) :
     decompress comp ⦃ result =>
     (¬comp.IsValid → result = none) ∧
@@ -60,7 +60,7 @@ theorem decompress_spec (comp : CompressedRistretto) :
         RistrettoPoint.IsValid rist ∧
         decompress_pure comp = some rist.toPoint) ⦄ := by
   unfold decompress
-  progress as ⟨step1, h1⟩
+  step as ⟨step1, h1⟩
   obtain ⟨h_tight, h_valid, h_field, h_enc, h_neg_iff, h_bridge⟩ := h1
   -- Convert WP goal to existential form so bind_ok can fire
   rw [spec_equiv_exists]

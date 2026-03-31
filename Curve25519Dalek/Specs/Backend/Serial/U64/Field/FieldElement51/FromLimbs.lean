@@ -41,7 +41,7 @@ Natural language specs:
 - The result is identical to the input limbs array
 - The natural number representation of the result equals that of the input
 -/
-@[progress]
+@[step]
 theorem from_limbs_spec (a : Array U64 5#usize) :
     from_limbs a ⦃ r =>
     r = a ∧ Field51_as_Nat r = Field51_as_Nat a ⦄ := by

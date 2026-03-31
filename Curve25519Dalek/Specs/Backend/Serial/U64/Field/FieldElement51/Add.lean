@@ -29,13 +29,13 @@ namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFie
 - Input bounds: both inputs have limbs < 2^53
 - Output bounds: output has limbs < 2^54
 - Simply wraps add_assign -/
-@[progress]
+@[step]
 theorem add_spec (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 53) :
     add a b ⦃ result =>
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) ⦄ := by
   unfold add
-  progress*
+  step*
 
 end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51

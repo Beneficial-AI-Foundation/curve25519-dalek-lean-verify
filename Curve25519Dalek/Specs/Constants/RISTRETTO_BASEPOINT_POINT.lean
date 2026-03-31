@@ -54,14 +54,14 @@ natural language specs:
       basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
       is equivalent to saying that the difference between both points is not in E[4])
 -/
-@[progress]
+@[step]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
     RISTRETTO_BASEPOINT_POINT ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧ _root_.L • result.toPoint = 0 ∧
       result.toPoint ≠ 0 ∧ 4 • result.toPoint ≠ 0 ∧
       result.toPoint = _root_.Edwards.basepoint ⦄ := by
     unfold RISTRETTO_BASEPOINT_POINT RistrettoPoint.IsValid RistrettoPoint.toPoint
-    progress*
+    step*
     refine ⟨by grind, ?_, by grind, by grind, by grind, by grind⟩
     · use 34737626771194858627071295502606372355980995399692169211837275202373938891970
       grind

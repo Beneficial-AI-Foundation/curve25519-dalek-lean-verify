@@ -40,7 +40,7 @@ def SQRT_M1_raw : backend.serial.u64.field.FieldElement51 :=
 - Field51_as_Nat(constants.SQRT_M1) ≡ sqrt(-1) (mod p), which is equivalent to
   Field51_as_Nat(constants.SQRT_M1)^2 ≡ p - 1 (mod p).
 -/
-@[progress]
+@[step]
 theorem SQRT_M1_spec :
     SQRT_M1 ⦃ result =>
     result = SQRT_M1_raw ∧

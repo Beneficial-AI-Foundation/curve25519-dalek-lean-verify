@@ -303,7 +303,7 @@ theorem add_spec_aux_54_52_53_52
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
   unfold add
-  simp only [progress_simps]
+  simp only [step_simps]
   let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
   let* ⟨ Y_minus_X, Y_minus_X_post1, Y_minus_X_post2 ⟩ ←
@@ -732,7 +732,7 @@ The theorem states that adding a valid EdwardsPoint with a valid ProjectiveNiels
 3. The output represents the sum of the input points
 The mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.
 -/
-@[progress]
+@[step]
 theorem add_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :

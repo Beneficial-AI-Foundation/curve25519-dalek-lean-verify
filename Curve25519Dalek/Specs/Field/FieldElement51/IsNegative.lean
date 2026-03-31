@@ -54,14 +54,14 @@ theorem first_bit (bytes : Aeneas.Std.Array U8 32#usize) :
     Nat.cast_add, Nat.cast_mul]
   scalar_tac
 
-@[progress]
+@[step]
 theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     is_negative r ⦃ c =>
       (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by
   unfold is_negative
-  progress as ⟨bytes, h_mod, h_lt⟩
-  progress as ⟨b0⟩
-  progress as ⟨i1, h_i1⟩
+  step as ⟨bytes, h_mod, h_lt⟩
+  step as ⟨b0⟩
+  step as ⟨i1, h_i1⟩
   unfold subtle.Choice.Insts.CoreConvertFromU8.from
   simp_all only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
     UScalar.val_and, Nat.and_one_is_mod, UScalarTy.U8_numBits_eq, Bvify.U8.UScalar_bv, U8.ofNat_bv]
@@ -74,7 +74,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     interval_cases i1.val
     all_goals simp
   rcases h01 with zero | one
-  · progress*
+  · step*
     simp_all only [UScalar.ofNatCore_val_eq, ReduceNat.reduceNatEq, U8.ofNat_bv,
       UScalarTy.U8_numBits_eq, Nat.ofNat_pos, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
       one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq,
@@ -84,7 +84,7 @@ theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :
     have := Nat.mod_eq_of_lt h_lt
     simp only [this, first_bit]
     exact h_i1
-  · progress*
+  · step*
     simp_all only [UScalar.ofNatCore_val_eq, ReduceNat.reduceNatEq, U8.ofNat_bv,
       UScalarTy.U8_numBits_eq, Nat.one_lt_ofNat, Nat.not_eq, ne_eq, one_ne_zero, not_false_eq_true,
       zero_ne_one, not_lt_zero, zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq,

@@ -37,7 +37,7 @@ natural language specs:
 - Field51_as_Nat(constants.INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p), which is equivalent
   to Field51_as_Nat(constants.INVSQRT_A_MINUS_D) ≡ 1/sqrt(a-d) (mod p).
 -/
-@[progress]
+@[step]
 theorem INVSQRT_A_MINUS_D_spec :
     INVSQRT_A_MINUS_D ⦃ result =>
       (Field51_as_Nat result)^2 * (a - d) % p = 1 ∧

@@ -103,9 +103,9 @@ open Aeneas Aeneas.Std Aeneas.Std.WP Result
 `Choice.one`/`Choice.zero`.
 TODO: make this change throughout the code or revert this. -/
 
-attribute [-progress] U64.Insts.SubtleConditionallySelectable.conditional_select_spec
+attribute [-step] U64.Insts.SubtleConditionallySelectable.conditional_select_spec
 /-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
-@[progress]
+@[step]
 theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec' (a b : U64) (choice : subtle.Choice) :
     U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ (res : U64) =>
       (choice = Choice.one → res = b) ∧
@@ -120,7 +120,7 @@ end curve25519_dalek
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-@[progress]
+@[step]
 theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice)
     (carry : U64) (mask : U64) (i : Usize) (hself : ∀ j < 5, self[j]!.val < 2 ^ 52)
     (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5) (hcarry : carry.val < 2 ^ 53) :
@@ -139,31 +139,31 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
     have hi' : i.val < 5 := by agrind
     have hself_i : self[i.val]!.val < 2 ^ 52 := hself i.val hi'
     have hL_i : constants.L[i.val]!.val < 2 ^ 52 := constants.L_limbs_spec i hi'
-    progress as ⟨i1, hi1⟩  -- L[i]
-    progress as ⟨addend, haddend_one, haddend_zero⟩  -- conditional_select
+    step as ⟨i1, hi1⟩  -- L[i]
+    step as ⟨addend, haddend_one, haddend_zero⟩  -- conditional_select
     have hi1_eq : i1.val = constants.L[i.val]!.val := by simp [hi1]
     have haddend_bound : addend.val < 2 ^ 52 := by
       cases Choice.eq_zero_or_one condition with
       | inl h => have := haddend_zero h; subst this; decide
       | inr h => have := haddend_one h; subst this; omega
-    progress as ⟨i2, hi2⟩  -- carry >>> 52
+    step as ⟨i2, hi2⟩  -- carry >>> 52
     have hi2_bound : i2.val < 2 := by simp [hi2, Nat.shiftRight_eq_div_pow]; omega
-    progress as ⟨i3, hi3⟩  -- self[i]
+    step as ⟨i3, hi3⟩  -- self[i]
     have hi3_eq : i3.val = self[i.val]!.val := by simp [hi3]
     have hi3_bound : i3.val < 2 ^ 52 := by rw [hi3_eq]; exact hself_i
     have hi2i3_ok : i2.val + i3.val < 2 ^ 64 := by omega
-    progress as ⟨i4, hi4⟩  -- i2 + i3
+    step as ⟨i4, hi4⟩  -- i2 + i3
     have hi4_bound : i4.val < 2 ^ 52 + 2 := by simp [hi4]; omega
     have hi4addend_ok : i4.val + addend.val < 2 ^ 64 := by omega
-    progress as ⟨carry1, hcarry1⟩  -- i4 + addend
+    step as ⟨carry1, hcarry1⟩  -- i4 + addend
     have hcarry1_bound : carry1.val < 2 ^ 53 := by simp [hcarry1]; omega
-    progress as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
-    progress as ⟨i5, hi5⟩  -- carry1 &&& mask
+    step as ⟨_, index_mut_back, h_imb, _⟩  -- index_mut
+    step as ⟨i5, hi5⟩  -- carry1 &&& mask
     have hi5_mod : i5.val = carry1.val % 2 ^ 52 := by
       simp [hi5, UScalar.val_and, hmask]
     have hi5_bound : i5.val < 2 ^ 52 := by rw [hi5_mod]; exact Nat.mod_lt _ (by omega)
     have hi_plus1_ok : i.val + 1 < 2 ^ 64 := by omega
-    progress as ⟨i6, hi6⟩  -- i + 1
+    step as ⟨i6, hi6⟩  -- i + 1
     have hi6_bound : i6.val ≤ 5 := by simp [hi6]; omega
     have hself1_limbs : ∀ j < 5, (Aeneas.Std.Array.set self i i5)[j]!.val < 2 ^ 52 := by
       intro j hj
@@ -180,7 +180,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
           Nat.and_two_pow_sub_one_eq_mod, Order.add_one_le_iff, UScalar.ofNat_self_val,
           Array.set_val_eq, List.length_set, gt_iff_lt]; agrind
     rw [← h_imb] at hself1_limbs
-    progress as ⟨res, hres_limbs, hres_inv⟩
+    step as ⟨res, hres_limbs, hres_inv⟩
     refine ⟨hres_limbs, ?_⟩
     rw [h_imb] at hres_inv
     simp only [hi6] at hres_inv
@@ -237,7 +237,7 @@ theorem conditional_add_l_loop_spec (self : Scalar52) (condition : subtle.Choice
       omega
   case isFalse hge =>
     have : i.val = 5 := by agrind
-    progress*
+    step*
     refine ⟨by assumption, ?_⟩
     have : ∑ j ∈ Finset.Ico 0 5, 2 ^ (52 * j) * constants.L[j]!.val =
         Scalar52_as_Nat constants.L := by simp [Scalar52_as_Nat]
@@ -253,7 +253,7 @@ decreasing_by agrind
 - When condition is 1: result + 2^260 = input + L, with result < L and limbs < 2^52
 - When condition is 0: result unchanged with limbs < 2^52
 -/
-@[progress]
+@[step]
 theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
     (hself : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (hself' : condition = Choice.one → 2 ^ 260 ≤ Scalar52_as_Nat self + L)
@@ -265,7 +265,7 @@ theorem conditional_add_l_spec (self : Scalar52) (condition : subtle.Choice)
       (condition = Choice.one → Scalar52_as_Nat result.2 + 2 ^ 260 = Scalar52_as_Nat self + L) ∧
       (condition = Choice.zero → Scalar52_as_Nat result.2 = Scalar52_as_Nat self) ⦄ := by
   unfold conditional_add_l
-  progress*
+  step*
   rw [constants.L_spec] at *
   refine ⟨by assumption, ?_, ?_, ?_⟩
   · -- result < L

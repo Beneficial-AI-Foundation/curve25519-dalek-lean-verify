@@ -65,21 +65,21 @@ natural language specs:
 • The result satisfies:
   `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`
 • The result is canonical: `U8x32_as_Nat result.bytes < L` -/
-@[progress]
+@[step]
 theorem mul_assign_spec (self _rhs : Scalar) :
     mul_assign self _rhs ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul_assign
   unfold scalar.Scalar.unpack
-  progress as ⟨s, hs_nat, hs_bounds⟩
-  progress as ⟨s1, hs1_nat, hs1_bounds⟩
+  step as ⟨s, hs_nat, hs_bounds⟩
+  step as ⟨s1, hs1_nat, hs1_bounds⟩
   have hs_62  : ∀ i < 5, s[i]!.val  < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
   have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
     fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  progress as ⟨s2, hs2_cong, hs2_lt⟩
-  progress as ⟨hpack, hpack_cong, hpack_lt⟩
+  step as ⟨s2, hs2_cong, hs2_lt⟩
+  step as ⟨hpack, hpack_cong, hpack_lt⟩
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
              U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
     rw [hs_nat, hs1_nat]
@@ -110,12 +110,12 @@ natural language specs:
 
 /-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:
 • Same spec as the core `mul_assign`. -/
-@[progress]
+@[step]
 theorem mul_assign_spec (self rhs : Scalar) :
     mul_assign self rhs ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
   unfold mul_assign
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar

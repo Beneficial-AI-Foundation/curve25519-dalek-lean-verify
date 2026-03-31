@@ -37,7 +37,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A`**:
 - The value of constants.MONTGOMERY_A when converted to a natural number equals 486662
 -/
-@[progress]
+@[step]
 theorem MONTGOMERY_A_spec :
     MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ∧
     (∀ i < 5, (result[i]!).val < 2 ^51)⦄ := by

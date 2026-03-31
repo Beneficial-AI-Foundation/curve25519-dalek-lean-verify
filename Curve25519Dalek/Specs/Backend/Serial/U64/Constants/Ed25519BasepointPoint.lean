@@ -45,7 +45,7 @@ natural language specs:
       it fulfills the curve equation)
     • ED25519_BASEPOINT_POINT is of prime order L
 -/
-@[progress]
+@[step]
 theorem ED25519_BASEPOINT_POINT_spec :
     ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>
       result.IsValid ∧
@@ -56,7 +56,7 @@ theorem ED25519_BASEPOINT_POINT_spec :
         34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ∧
       result.toPoint = _root_.Edwards.basepoint ⦄ := by
   unfold ED25519_BASEPOINT_POINT
-  progress*
+  step*
   set ep := ({ X := fe, Y := fe1, Z := fe2, T := fe3 } : edwards.EdwardsPoint)
   have h_valid : ep.IsValid := by simp only [ep, *]; decide
   have h_bp : ep.toPoint = _root_.Edwards.basepoint := by simp only [ep, *]; decide

@@ -38,12 +38,12 @@ natural language specs:
 - Packing the result back yields the original scalar: pack(u) = s
 - Both the packed s and the unpacked u represent the same natural number
 -/
-@[progress]
+@[step]
 theorem unpack_spec (self : Scalar) :
     unpack self ⦃ (u : Scalar52) =>
       Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧
       ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by
   unfold unpack
-  progress*
+  step*
 
 end curve25519_dalek.scalar.Scalar

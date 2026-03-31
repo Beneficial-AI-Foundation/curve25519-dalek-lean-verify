@@ -35,7 +35,7 @@ natural language specs:
 /-- **Spec and proof concerning `backend.serial.u64.constants.EDWARDS_D`**:
 - The value of constants.EDWARDS_D when converted to a natural number equals d
 -/
-@[progress]
+@[step]
 theorem EDWARDS_D_spec :
     EDWARDS_D ⦃ result =>
     Field51_as_Nat result = d ∧

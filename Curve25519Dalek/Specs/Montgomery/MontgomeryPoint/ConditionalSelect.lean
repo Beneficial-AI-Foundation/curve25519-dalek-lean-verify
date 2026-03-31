@@ -30,7 +30,7 @@ namespace curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallyS
 This implements constant-time conditional selection for Montgomery curve points,
 where the points are represented as 32-byte arrays containing the u-coordinate.
 -/
-@[progress]
+@[step]
 theorem conditional_select_spec
     (a b : montgomery.MontgomeryPoint)
     (choice : subtle.Choice) :
@@ -38,7 +38,7 @@ theorem conditional_select_spec
       ∀ i < 32,
         res[i]! = (if choice.val = 1#u8 then b[i]! else a[i]!) ⦄ := by
   unfold conditional_select
-  progress*
+  step*
   by_cases h : choice.val = 1#u8 <;> simp_all
 
 end curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable

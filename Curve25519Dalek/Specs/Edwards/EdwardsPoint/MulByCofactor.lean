@@ -35,7 +35,7 @@ natural language specs:
 - No panic (always returns successfully)
 - Returns an EdwardsPoint that represents 8e = (2 ^ 3) * e
 -/
-@[progress]
+@[step]
 theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :
     mul_by_cofactor self ⦃ result =>
     result.IsValid ∧

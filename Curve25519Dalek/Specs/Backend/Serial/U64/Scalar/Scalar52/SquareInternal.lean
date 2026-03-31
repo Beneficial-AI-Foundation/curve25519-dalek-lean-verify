@@ -57,13 +57,13 @@ in `curve25519-dalek/src/backend/serial/u64/scalar.rs`.
 - The result represents the square of the input field element
 - Requires each limb to be less than 62 bits to prevent overflow
 (The optimal bound on the limbs is 2^64 / √5  ≈ 2^62.839) -/
-@[progress]
+@[step]
 theorem square_internal_spec (a : Array U64 5#usize) (ha : ∀ i, i < 5 → (a[i]!).val < 2 ^ 62) :
     square_internal a ⦃ result =>
     Scalar52_wide_as_Nat result = Scalar52_as_Nat a * Scalar52_as_Nat a ∧
     (∀ i < 9, result[i]!.val < 2 ^ 127) ⦄ := by
   unfold square_internal backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
-  progress*
+  step*
   · -- Main Proof
     unfold Array.make at *
     simp only [Scalar52_wide_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,

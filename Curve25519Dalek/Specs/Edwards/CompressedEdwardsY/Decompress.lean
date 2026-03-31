@@ -62,7 +62,7 @@ Natural language specs (ported from Verus):
   - Z.toField = 1
   - X sign matches bit 255 of the input (when y² ≠ 1)
 -/
-@[progress, externally_verified] -- proven in Verus
+@[step, externally_verified] -- proven in Verus
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
     edwards.CompressedEdwardsY.decompress cey ⦃ result =>
       let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)

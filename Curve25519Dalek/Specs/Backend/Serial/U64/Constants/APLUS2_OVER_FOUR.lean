@@ -43,13 +43,13 @@ natural language specs:
 - All limbs of APLUS2_OVER_FOUR are bounded by 2^54, which is used in the Montgomery
 differential addition formula (`Montgomery.ProjectivePoint.DifferentialAddAndDouble`).
 -/
-@[progress]
+@[step]
 theorem APLUS2_OVER_FOUR_spec :
   APLUS2_OVER_FOUR ⦃ result =>
     Field51_as_Nat result = 121666 ∧
     ∀ i < 5, result[i]!.val < 2 ^ 54 ⦄ := by
   unfold APLUS2_OVER_FOUR
-  progress*
+  step*
   constructor
   · simp only [*]; decide
   · simp only [*]; intro i hi; interval_cases i <;> decide

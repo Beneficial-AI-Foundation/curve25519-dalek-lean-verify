@@ -201,13 +201,13 @@ set_option maxHeartbeats 800000 in
 • The output is a valid CompressedRistretto 32-byte representation
 • The output accurately reflects the output of the pure mathematical compression function
 -/
-@[progress]
+@[step]
 theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     compress self ⦃ (result : CompressedRistretto) =>
       result.IsValid ∧
       math.compress_pure self.toPoint = U8x32_as_Nat result ⦄ := by
   unfold compress
-  progress*
+  step*
   all_goals try (intro i hi; first
       | exact h.1.Z_bounds i hi
       | exact h.1.Y_bounds i hi

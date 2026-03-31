@@ -45,12 +45,12 @@ natural language specs:
 - No panic (always returns successfully)
 - The resulting ProjectivePoint is the identity element with coordinates (U=1, W=0)
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     identity ⦃ (q : montgomery.ProjectivePoint) =>
       Field51_as_Nat q.U = 1 ∧
       Field51_as_Nat q.W = 0 ⦄ := by
   unfold identity
-  progress*
+  step*
 
 end curve25519_dalek.IdentityMontgomeryProjectivePoint

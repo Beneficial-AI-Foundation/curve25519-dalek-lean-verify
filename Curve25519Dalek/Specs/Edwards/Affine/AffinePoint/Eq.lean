@@ -50,12 +50,12 @@ natural language specs:
 • The function always succeeds (no panic) for valid inputs
 • The result is `true` if and only if the two points represent the same point on the curve
 -/
-@[progress]
+@[step]
 theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     eq self other ⦃ result =>
     result = true ↔ self.toPoint = other.toPoint ⦄ := by
   unfold eq
-  progress*
+  step*
   · unfold Bool.Insts.CoreConvertFromChoice.from
     simp only [spec_ok, decide_eq_true_eq]
     have : c = Choice.one ↔ c.val = 1#u8 := by

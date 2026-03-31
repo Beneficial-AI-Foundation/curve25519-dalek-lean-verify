@@ -33,7 +33,7 @@ natural language specs:
     • The operation never panics (always returns successfully)
     • as_bytes(cr) = cr, i.e., the function is the identity operation
 -/
-@[progress]
+@[step]
 theorem as_bytes_spec (cr : CompressedRistretto) :
     as_bytes cr ⦃ b =>
     b = cr ⦄ := by

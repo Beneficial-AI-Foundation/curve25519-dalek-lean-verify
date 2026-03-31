@@ -45,7 +45,7 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
-@[progress, externally_verified]
+@[step, externally_verified]
 -- proven in Verus
 theorem sub_spec
     (self other : edwards.EdwardsPoint)
@@ -55,6 +55,6 @@ theorem sub_spec
       result.IsValid ∧
       result.toPoint = self.toPoint - other.toPoint ⦄ := by
   unfold sub
-  progress*
+  step*
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint

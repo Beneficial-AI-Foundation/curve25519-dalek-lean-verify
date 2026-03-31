@@ -48,7 +48,7 @@ theorem add_spec (self other : RistrettoPoint)
       result.IsValid ∧
       result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
-  progress*
+  step*
   · exact h_self_valid.1
   · exact h_other_valid.1
   · constructor

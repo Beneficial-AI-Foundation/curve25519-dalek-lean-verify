@@ -35,7 +35,7 @@ natural language specs:
 - The resulting MontgomeryPoint is 32 zero bytes
 - Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0
 -/
-@[progress]
+@[step]
 theorem identity_spec :
     spec identity (fun q =>
     (∀ i : Fin 32, q[i]! = 0#u8) ∧

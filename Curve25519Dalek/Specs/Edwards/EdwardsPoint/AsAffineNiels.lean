@@ -156,7 +156,7 @@ Output bounds (from field element arithmetic):
 - y_minus_x: all limbs < 2^52
 - xy2d: all limbs < 2^52
 -/
-@[progress]
+@[step]
 theorem as_affine_niels_spec
   (self : EdwardsPoint)
   (hself : self.IsValid) :
@@ -180,7 +180,7 @@ theorem as_affine_niels_spec
   have h_Z_nonzero : Field51_as_Nat self.Z % p ≠ 0 :=
     field51_modP_ne_zero_of_toField_ne_zero self.Z hself.Z_ne_zero
   unfold as_affine_niels
-  progress*
+  step*
   · have h_recip_Z : Field51_as_Nat recip * Field51_as_Nat self.Z ≡ 1 [MOD p] := by
       rw [Nat.ModEq, Nat.mul_mod, show (1 : ℕ) % p = 1 from by decide]
       exact recip_post1 h_Z_nonzero

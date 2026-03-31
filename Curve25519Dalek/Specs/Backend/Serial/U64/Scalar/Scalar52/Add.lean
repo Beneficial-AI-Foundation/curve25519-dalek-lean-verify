@@ -46,7 +46,7 @@ set_option maxHeartbeats 300000 in -- heavy simp_all
 - Result limbs are bounded by 2^52
 - Parts of sum before index i are preserved
 - The result satisfies the modular arithmetic property -/
-@[progress]
+@[step]
 theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
     (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)
@@ -64,7 +64,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
   unfold add_loop
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index
   unfold backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut
-  progress*
+  step*
   · have := ha i (by agrind)
     have := hb i (by agrind)
     scalar_tac
@@ -154,7 +154,7 @@ theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)
 - Requires the input values to be bounded by  2 ^ 259
 - The result represents the sum of the two input scalars modulo L
 -/
-@[progress]
+@[step]
 theorem add_spec (a b : Scalar52)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52)
     (ha' : Scalar52_as_Nat a < L) (hb' : Scalar52_as_Nat b ≤ L) :
@@ -162,7 +162,7 @@ theorem add_spec (a b : Scalar52)
       Scalar52_as_Nat v ≡ Scalar52_as_Nat a + Scalar52_as_Nat b [MOD L] ∧
       Scalar52_as_Nat v < L ∧ ∀ i < 5, v[i]!.val < 2 ^ 52 ⦄ := by
   unfold add
-  progress*
+  step*
   · have : L < 2 ^ 259 := by unfold L; agrind
     agrind
   · have : L < 2 ^ 259 := by unfold L; agrind
