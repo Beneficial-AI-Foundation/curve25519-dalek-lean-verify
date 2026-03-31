@@ -60,93 +60,9 @@ private theorem set_getElem!_ne {n : Usize} (a : Std.Array U64 n)
       getElem!_pos _ _ (by simp only [List.Vector.length_val]; omega)]
   exact List.getElem_set_ne hne.symm (by simp [List.length_set, List.Vector.length_val]; omega)
 
-/-! ## Part 1a: One-iteration byte-packing helper -/
+/-! ## Part 1: Loop spec — byte packing (64 bytes → 8 words) -/
 
-set_option maxHeartbeats 400000 in -- heavy simps
-/-- One iteration of the inner loop packs 8 bytes into a U64 word.
-After 8 read-shift-OR-update steps all writing to the same index `i`,
-the final value at that index equals `word_of_bytes_64 bytes i`. -/
-private theorem pack_word_eq_word_of_bytes_64
-    (bytes : Array U8 64#usize)
-    (words : Array U64 8#usize) (i : Usize)
-    (hlt : i.val < 8)
-    (hzero : words[i.val]!.val = 0)
-    -- byte 0
-    (i1 : Usize) (i1_post : i1.val = i.val * 8)
-    (i2 : U8) (i2_post : i2 = (↑bytes)[i1.val]!)
-    (i3 : U64) (i3_post : i3 = UScalar.cast .U64 i2)
-    (i4 : U64) (i4_post1 : i4.val = i3.val <<< 0 % U64.size)
-    (i5 : U64) (i5_post : i5 = (↑words)[i.val]!)
-    (i6 : U64) (i6_post1 : i6.val = (i5 ||| i4).val)
-    -- byte 1
-    (i9 : U64) (i9_post : i9 = UScalar.cast .U64 (↑bytes)[i1.val + 1]!)
-    (i10 : U64) (i10_post1 : i10.val = i9.val <<< 8 % U64.size)
-    (i11 : U64) (i11_post : i11 = (↑(words.set i i6))[i.val]!)
-    (i12 : U64) (i12_post1 : i12.val = (i11 ||| i10).val)
-    -- byte 2
-    (i15 : U64) (i15_post : i15 = UScalar.cast .U64 (↑bytes)[i1.val + 2]!)
-    (i17 : U64) (i17_post1 : i17.val = i15.val <<< 16 % U64.size)
-    (i18 : U64) (i18_post : i18 = (↑((words.set i i6).set i i12))[i.val]!)
-    (i19 : U64) (i19_post1 : i19.val = (i18 ||| i17).val)
-    -- byte 3
-    (i22 : U64) (i22_post : i22 = UScalar.cast .U64 (↑bytes)[i1.val + 3]!)
-    (i24 : U64) (i24_post1 : i24.val = i22.val <<< 24 % U64.size)
-    (i25 : U64) (i25_post : i25 = (↑(((words.set i i6).set i i12).set i i19))[i.val]!)
-    (i26 : U64) (i26_post1 : i26.val = (i25 ||| i24).val)
-    -- byte 4
-    (i29 : U64) (i29_post : i29 = UScalar.cast .U64 (↑bytes)[i1.val + 4]!)
-    (i31 : U64) (i31_post1 : i31.val = i29.val <<< 32 % U64.size)
-    (i32 : U64) (i32_post : i32 = (↑((((words.set i i6).set i i12).set i i19).set i i26))[i.val]!)
-    (i33 : U64) (i33_post1 : i33.val = (i32 ||| i31).val)
-    -- byte 5
-    (i36 : U64) (i36_post : i36 = UScalar.cast .U64 (↑bytes)[i1.val + 5]!)
-    (i38 : U64) (i38_post1 : i38.val = i36.val <<< 40 % U64.size)
-    (i39 : U64) (i39_post : i39 = (↑(((((words.set i i6).set i i12).set i i19).set i i26).set i i33))[i.val]!)
-    (i40 : U64) (i40_post1 : i40.val = (i39 ||| i38).val)
-    -- byte 6
-    (i43 : U64) (i43_post : i43 = UScalar.cast .U64 (↑bytes)[i1.val + 6]!)
-    (i45 : U64) (i45_post1 : i45.val = i43.val <<< 48 % U64.size)
-    (i46 : U64) (i46_post : i46 = (↑((((((words.set i i6).set i i12).set i i19).set i i26).set i i33).set i i40))[i.val]!)
-    (i47 : U64) (i47_post1 : i47.val = (i46 ||| i45).val)
-    -- byte 7
-    (i50 : U64) (i50_post : i50 = UScalar.cast .U64 (↑bytes)[i1.val + 7]!)
-    (i52 : U64) (i52_post1 : i52.val = i50.val <<< 56 % U64.size)
-    (i53 : U64) (i53_post : i53 = (↑(((((((words.set i i6).set i i12).set i i19).set i i26).set i i33).set i i40).set i i47))[i.val]!)
-    (i54 : U64) (i54_post1 : i54.val = (i53 ||| i52).val) :
-    i54.val = word_of_bytes_64 bytes i.val := by
-  -- Phase 1: collapse read-modify-write lookups via set_getElem!_self
-  have h53 : i53 = i47 := by rw [i53_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h46 : i46 = i40 := by rw [i46_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h39 : i39 = i33 := by rw [i39_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h32 : i32 = i26 := by rw [i32_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h25 : i25 = i19 := by rw [i25_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h18 : i18 = i12 := by rw [i18_post]; exact set_getElem!_self _ _ _ (by agrind)
-  have h11 : i11 = i6  := by rw [i11_post]; exact set_getElem!_self _ _ _ (by agrind)
-  -- Phase 2: expand OR chain to Nat arithmetic
-  simp (discharger := omega) only [h53, h46, h39, h32, h25, h18, h11,
-    i54_post1, i47_post1, i40_post1, i33_post1, i26_post1, i19_post1, i12_post1,
-    i6_post1, UScalar.val_or, UScalar.cast_val_eq, i3_post, i9_post, i15_post,
-    i22_post, i29_post, i36_post, i43_post, i50_post,
-    i4_post1, i10_post1, i17_post1, i24_post1, i31_post1, i38_post1, i45_post1,
-    i52_post1, u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64,
-    i2_post, i1_post, i5_post]
-  -- Eliminate initial zero: words[i] = 0, so 0 ||| x = x
-  rw [show (↑(↑words : List.Vector U64 8)[i.val]! : Nat) = 0 from by
-    rw [Array.getElem!_Nat_eq]; agrind]
-  simp only [Array.getElem!_Nat_eq, pow_zero, mul_one, Nat.zero_or]
-  -- Phase 3: OR to sum, expand word_of_bytes_64, close with ring
-  rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-    (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
-    (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
-    (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
-    (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
-  simp only [word_of_bytes_64, Finset.sum_range_succ, Finset.range_zero,
-    Finset.sum_empty, zero_add, Array.getElem!_Nat_eq]
-  ring_nf
-
-/-! ## Part 1b: Loop spec — byte packing (64 bytes → 8 words) -/
-
-set_option maxHeartbeats 1000000 in -- heavy steps
+set_option maxHeartbeats 800000 in -- heavy steps
 /-- **Loop spec**: Each iteration packs 8 bytes into one
 U64 word. After the loop, `words[j] = word_of_bytes_64 bytes j`
 for all `j < 8`. -/
