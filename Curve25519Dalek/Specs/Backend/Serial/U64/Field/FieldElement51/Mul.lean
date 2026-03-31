@@ -1,17 +1,13 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander, Hoang Le Truong
+Authors: Markus Dablander, Hoang Le Truong, Oliver Butterley
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
-import Curve25519Dalek.Tactics
-import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `FieldElement51::mul`
-
-Specification and proof for `FieldElement51::mul`.
 
 This function computes the product of two field elements.
 
@@ -19,7 +15,8 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 ## Proof strategy: Fold theorem decomposition
 
-The function body is decomposed into 3 helper functions, each with a fold theorem and `@[step]` spec.
+The function body is decomposed into 3 helper functions,
+each with a fold theorem and `@[step]` spec.
 
 ### Stage 1 — Product computation (`mul_product_stage`)
 ### Stage 2 — Carry propagation (`mul_carry_prop_stage`)
@@ -30,16 +27,16 @@ set_option linter.hashCommand false
 #setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
-open _root_.curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
-  (mul)
-open _root_.curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
-  (mul.m mul.LOW_51_BIT_MASK)
+open curve25519_dalek.backend.serial.u64.field
+open MulShared0FieldElement51SharedAFieldElement51FieldElement51 (mul.m mul.LOW_51_BIT_MASK)
+
+namespace curve25519_dalek.Shared0FieldElement51.Insts
+namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
 
 @[step]
 theorem m_spec (x y : U64) :
-    mul.m x y ⦃ r =>
-    r.val = x.val * y.val ⦄ := by
+    mul.m x y ⦃ (r : U128) =>
+      r.val = x.val * y.val ⦄ := by
   unfold mul.m
   step*
 
@@ -91,7 +88,7 @@ lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
   2^ (255) * ( (a4 * b1 + a3 * b2 + a2 * b3 + a1 * b4) +
   2 ^ 51 * (a4 *  b2 + a3 * b3 + a2 * b4)  +
   2^ (2 * 51) * ( a4 * b3 + a3 * b4) +
-  2^ (3 * 51) * (a4 * b4)) := by grind
+  2^ (3 * 51) * (a4 * b4)) := by ring
   rw[this]
   have key  : (2:ℕ)^255 ≡ 19 [MOD p] := by
           unfold p
@@ -118,7 +115,7 @@ lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
           2 ^ 51 * (a1 * b0 + a0 * b1 + a4 * (b2 * 19) + a3 * (b3 * 19) + a2 * (b4 * 19)) +
         2 ^ (2 * 51) * (a2 * b0 + a1 * b1 + a0 * b2 + a4 * (b3 * 19) + a3 * (b4 * 19)) +
       2 ^ (3 * 51) * (a3 * b0 + a2 * b1 + a1 * b2 + a0 * b3 + a4 * (b4 * 19)) +
-    2 ^ (4 * 51) * (a4 * b0 + a3 * b1 + a2 * b2 + a1 * b3 + a0 * b4) := by grind
+    2 ^ (4 * 51) * (a4 * b0 + a3 * b1 + a2 * b2 + a1 * b3 + a0 * b4) := by ring
   rw[this]
 
 /-! ## Helper Functions -/
@@ -578,16 +575,37 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
   have hc4 : c4.val = self[4]!.val * _rhs[0]!.val + self[3]!.val * _rhs[1]!.val +
       self[2]!.val * _rhs[2]!.val + self[1]!.val * _rhs[3]!.val +
       self[0]!.val * _rhs[4]!.val := by simp [*]
-  exact ⟨hc0, hc1, hc2, hc3, hc4,
-    by rw [hc0]; exact mul_c0_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc1]; exact mul_c1_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc2]; exact mul_c2_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc3]; exact mul_c3_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc4]; exact mul_c4_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc1]; exact mul_c1_lt_tight _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc2]; exact mul_c2_lt_tight _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc3]; exact mul_c3_lt_tight _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp)),
-    by rw [hc4]; exact mul_c4_lt_tight _ _ _ _ _ _ _ _ _ _ (hlhs 0 (by simp)) (hlhs 1 (by simp)) (hlhs 2 (by simp)) (hlhs 3 (by simp)) (hlhs 4 (by simp)) (hrhs 0 (by simp)) (hrhs 1 (by simp)) (hrhs 2 (by simp)) (hrhs 3 (by simp)) (hrhs 4 (by simp))⟩
+  have hl0 := hlhs 0 (by simp)
+  have hl1 := hlhs 1 (by simp)
+  have hl2 := hlhs 2 (by simp)
+  have hl3 := hlhs 3 (by simp)
+  have hl4 := hlhs 4 (by simp)
+  have hr0 := hrhs 0 (by simp)
+  have hr1 := hrhs 1 (by simp)
+  have hr2 := hrhs 2 (by simp)
+  have hr3 := hrhs 3 (by simp)
+  have hr4 := hrhs 4 (by simp)
+  refine ⟨hc0, hc1, hc2, hc3, hc4, ?_, ?_, ?_, ?_, ?_,
+    ?_, ?_, ?_, ?_⟩
+  all_goals first
+    | (rw [hc0]; exact mul_c0_lt_pow2_115 _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc1]; exact mul_c1_lt_pow2_115 _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc2]; exact mul_c2_lt_pow2_115 _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc3]; exact mul_c3_lt_pow2_115 _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc4]; exact mul_c4_lt_pow2_115 _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc1]; exact mul_c1_lt_tight _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc2]; exact mul_c2_lt_tight _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc3]; exact mul_c3_lt_tight _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+    | (rw [hc4]; exact mul_c4_lt_tight _ _ _ _ _
+        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic carry propagation operations
@@ -597,13 +615,18 @@ theorem mul_carry_prop_stage_spec (c0 c1 c2 c3 c4 : U128)
     (_hc3 : c3.val < 2 ^ 115) (_hc4 : c4.val < 2 ^ 115)
     (hc1_tight : c1.val < 59 * 2 ^ 108) (hc2_tight : c2.val < 41 * 2 ^ 108)
     (hc3_tight : c3.val < 23 * 2 ^ 108) (hc4_tight : c4.val < 5 * 2 ^ 108) :
-    mul_carry_prop_stage c0 c1 c2 c3 c4 ⦃ ((a', carry, _mask) : Array U64 5#usize × U64 × U64) =>
+    mul_carry_prop_stage c0 c1 c2 c3 c4
+    ⦃ ((a', carry, _mask) : Array U64 5#usize × U64 × U64) =>
+      let c1' := c1.val + c0.val / 2 ^ 51
+      let c2' := c2.val + c1' / 2 ^ 51
+      let c3' := c3.val + c2' / 2 ^ 51
+      let c4' := c4.val + c3' / 2 ^ 51
       a'[0]!.val = c0.val % 2 ^ 51 ∧
-      a'[1]!.val = (c1.val + c0.val / 2 ^ 51) % 2 ^ 51 ∧
-      a'[2]!.val = (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
-      a'[3]!.val = (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
-      a'[4]!.val = (c4.val + (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51 ∧
-      carry.val = (c4.val + (c3.val + (c2.val + (c1.val + c0.val / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51 ∧
+      a'[1]!.val = c1' % 2 ^ 51 ∧
+      a'[2]!.val = c2' % 2 ^ 51 ∧
+      a'[3]!.val = c3' % 2 ^ 51 ∧
+      a'[4]!.val = c4' % 2 ^ 51 ∧
+      carry.val = c4' / 2 ^ 51 ∧
       _mask.val = 2 ^ 51 - 1 ∧
       carry.val < 6 * 2 ^ 57 ⦄ := by
   unfold mul_carry_prop_stage
@@ -826,12 +849,16 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     simp_all only [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, Finset.range_one,
       Finset.sum_singleton, mul_zero, pow_zero, one_mul]
   -- Carry chain conservation
-  have h_chain := carry_chain_eq prod.1.val prod.2.1.val prod.2.2.1.val prod.2.2.2.1.val prod.2.2.2.2.val
+  set v0 := prod.1.val; set v1 := prod.2.1.val
+  set v2 := prod.2.2.1.val; set v3 := prod.2.2.2.1.val
+  set v4 := prod.2.2.2.2.val
+  have h_chain := carry_chain_eq v0 v1 v2 v3 v4
       _ _ _ _ _ _
-      (prod.2.1.val + prod.1.val / 2^51)
-      (prod.2.2.1.val + (prod.2.1.val + prod.1.val / 2^51) / 2^51)
-      (prod.2.2.2.1.val + (prod.2.2.1.val + (prod.2.1.val + prod.1.val / 2^51) / 2^51) / 2^51)
-      (prod.2.2.2.2.val + (prod.2.2.2.1.val + (prod.2.2.1.val + (prod.2.1.val + prod.1.val / 2^51) / 2^51) / 2^51) / 2^51)
+      (v1 + v0 / 2 ^ 51)
+      (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51)
+      (v3 + (v2 + (v1 + v0 / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
+      (v4 + (v3 + (v2 + (v1 + v0 / 2 ^ 51)
+        / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
       rfl rfl rfl rfl rfl rfl rfl rfl rfl rfl
   -- Field51_as_Nat of the reduced result
   have hf_r : Field51_as_Nat red =
@@ -853,4 +880,5 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     (modeq_of_add_mul_eq _ _ cp.2.1.val p h_key).trans a_mul
   exact ⟨hmul, red_post6⟩
 
-end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
+end CoreOpsArithMulSharedAFieldElement51FieldElement51
+end curve25519_dalek.Shared0FieldElement51.Insts

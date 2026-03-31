@@ -9,7 +9,6 @@ autoImplicit = false
 relaxedAutoImplicit = false
 weak.linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
-weak.linter.style.longLine = false
 maxRecDepth = 10000
 
 [[require]]
