@@ -220,6 +220,32 @@ def words_wide_as_Nat
   ∑ j ∈ Finset.range 8,
     words[j]!.val * 2 ^ (64 * j)
 
+/-- One block of 8 bytes shifted by `2^(64*j)` equals 8 flat byte terms. -/
+private theorem word_of_bytes_64_shifted
+    (b : Array U8 64#usize) (j : Nat) :
+    word_of_bytes_64 b j * 2 ^ (64 * j)
+      = ∑ k ∈ Finset.range 8, 2 ^ (8 * (8 * j + k)) * b[8 * j + k]!.val := by
+  simp only [word_of_bytes_64, Finset.sum_mul]
+  apply Finset.sum_congr rfl
+  intro k _
+  rw [show 8 * (8 * j + k) = 8 * k + 64 * j from by ring, Nat.pow_add]
+  ring
+
+/-- Prefix regrouping: `t` blocks of 8 bytes = `8*t` flat bytes. -/
+private theorem words_wide_prefix_eq
+    (b : Array U8 64#usize) :
+    ∀ t, t ≤ 8 →
+      (∑ j ∈ Finset.range t, word_of_bytes_64 b j * 2 ^ (64 * j))
+        = ∑ i ∈ Finset.range (8 * t), 2 ^ (8 * i) * b[i]!.val := by
+  intro t ht
+  induction t with
+  | zero => simp
+  | succ n ih =>
+    rw [Finset.sum_range_succ, ih (by omega),
+        show 8 * (n + 1) = 8 * n + 8 from by ring, Finset.sum_range_add]
+    congr 1
+    exact word_of_bytes_64_shifted b n
+
 /-- Bridge: `words_wide_as_Nat = U8x64_as_Nat`. -/
 theorem words_wide_eq_bytes
     (b : Array U8 64#usize)
@@ -227,14 +253,13 @@ theorem words_wide_eq_bytes
     (h : ∀ j, j < 8 →
       words[j]!.val = word_of_bytes_64 b j) :
     words_wide_as_Nat words = U8x64_as_Nat b := by
-  simp only [words_wide_as_Nat, U8x64_as_Nat, Finset.sum_range_succ, Finset.range_zero,
-    Finset.sum_empty, zero_add]
-  rw [h 0 (by omega), h 1 (by omega), h 2 (by omega), h 3 (by omega),
-      h 4 (by omega), h 5 (by omega), h 6 (by omega), h 7 (by omega)]
-  simp only [word_of_bytes_64, Finset.sum_range_succ, Finset.range_zero,
-    Finset.sum_empty, zero_add]
-
-  sorry
+  simp only [words_wide_as_Nat, U8x64_as_Nat]
+  calc ∑ j ∈ Finset.range 8, words[j]!.val * 2 ^ (64 * j)
+      = ∑ j ∈ Finset.range 8, word_of_bytes_64 b j * 2 ^ (64 * j) := by
+          apply Finset.sum_congr rfl; intro j hj
+          rw [h j (Finset.mem_range.mp hj)]
+    _ = ∑ i ∈ Finset.range 64, 2 ^ (8 * i) * b[i]!.val :=
+          words_wide_prefix_eq b 8 le_rfl
 
 /-- Loop spec with `words_wide_as_Nat` postcondition. -/
 @[step]
