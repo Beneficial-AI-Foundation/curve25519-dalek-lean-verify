@@ -320,9 +320,9 @@ private lemma field51_sq_modeq
     -- The original array
     {a : Array U64 5#usize}
     -- Algebraic identity
-    (a_pow_two : c0 + 2^51 * c1 + 2^102 * c2 + 2^153 * c3 + 2^204 * c4
-        ≡ (Field51_as_Nat a)^2 [MOD p]) :
-    Field51_as_Nat a'' ≡ (Field51_as_Nat a)^2 [MOD p] := by
+    (a_pow_two : c0 + 2 ^ 51 * c1 + 2 ^ 102 * c2 + 2 ^ 153 * c3 + 2 ^ 204 * c4
+        ≡ (Field51_as_Nat a) ^ 2 [MOD p]) :
+    Field51_as_Nat a'' ≡ (Field51_as_Nat a) ^ 2 [MOD p] := by
   have hf_a'' : Field51_as_Nat a'' =
       (a'[0]!.val + 19 * carry.val) + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val +
       2^153 * a'[3]!.val + 2^204 * a'[4]!.val := by
