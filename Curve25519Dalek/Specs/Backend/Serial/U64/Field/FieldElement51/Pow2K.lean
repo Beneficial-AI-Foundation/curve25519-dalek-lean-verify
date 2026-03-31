@@ -7,8 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-set_option linter.style.longLine true
-
 /-! # Specification for `FieldElement51::pow2k`.
 
 This function computes the 2^k-th power of a field element.
@@ -287,6 +285,10 @@ theorem fold_final_reduce_stage {α : Type} (a5 : Array U64 5#usize) (carry i34 
 /-! ## Bounds Lemmas -/
 
 /-- c0 < 77 * 2^108 < 2^115 -/
+private lemma lt_of_eq_mod (a b : ℕ) (h : a = b % 2 ^ 51) :
+    a < 2 ^ 51 :=
+  h ▸ Nat.mod_lt _ (by positivity)
+
 private lemma c0_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
     (h0 : a0 < 2 ^ 54) (h1 : a1 < 2 ^ 54) (h2 : a2 < 2 ^ 54) (h3 : a3 < 2 ^ 54) (h4 : a4 < 2 ^ 54) :
     a0 * a0 + 2 * (a1 * (19 * a4) + a2 * (19 * a3)) < 2 ^ 115 := by
@@ -646,8 +648,7 @@ theorem carry_prop_stage_spec (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128)
   · simp [*]
   · -- carry < 6 * 2^57
     rw [hcarry_val]
-    have hc41_tight : c41.val < 6 * 2 ^ 108 := by
-      rw [hc41_eq]; omega
+    have hc41_tight : c41.val < 6 * 2 ^ 108 := by rw [hc41_eq]; omega
     calc c41.val / 2 ^ 51
         ≤ (6 * 2 ^ 108 - 1) / 2 ^ 51 :=
           Nat.div_le_div_right (by omega)
@@ -747,7 +748,7 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     step as ⟨ cp, cp_post ⟩
     step as ⟨ red, red_post1, red_post2, red_post3, red_post4, red_post5, red_post6 ⟩
     · intro i hi; obtain ⟨h0, h1, h2, h3, h4, _⟩ := cp_post
-      interval_cases i <;> simp only [*] <;> exact Nat.mod_lt _ (by positivity)
+      interval_cases i <;> exact lt_of_eq_mod _ _ ‹_›
     step as ⟨ k1, k1_post1, k1_post2 ⟩
     step with pow2k_loop_spec as ⟨ result, result_post1, result_post2 ⟩
     -- Extract carry prop postconditions
@@ -820,11 +821,13 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
   termination_by k.val
   decreasing_by agrind
 
+/-- **Spec theorem for FieldElement51.pow2k**
+Given `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/
 @[step]
 theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)
     (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :
     pow2k self k ⦃ (result : FieldElement51) =>
-      Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧
+      Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k.val) [MOD p] ∧
       (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow2k
   step*

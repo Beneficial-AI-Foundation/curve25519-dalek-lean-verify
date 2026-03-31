@@ -3571,10 +3571,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)\n    (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    pow2k self k ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)\n    (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    pow2k self k ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k.val) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for FieldElement51.pow2k**\nGiven `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
