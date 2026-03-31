@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Oliver Butterley, Markus Dablander
 -/
@@ -51,10 +51,26 @@ lemma decompress_helper {F : Type*} [Field F] (a d s I u1 u2 v : F)
   dsimp only [x, y]; simp only [pow_two]; ring_nf
   rw [show I^4 = (I^2)^2 by ring, show I^6 = (I^2)^3 by ring, h_inv]
   have h_denom_nz : (v * u2^2) ≠ 0 := right_ne_zero_of_mul_eq_one hI
-  field_simp [h_denom_nz]; rw [div_eq_iff h_denom_nz]
-  simp only [add_mul, one_mul, div_mul_cancel₀ _ h_denom_nz]
-  rw [hv, hu1, hu2, ha];
-  try ring
+  apply mul_left_cancel₀ (pow_ne_zero 3 h_denom_nz)
+  simp only [mul_add, mul_one, inv_pow]
+  have h1 : (v * u2 ^ 2) ^ 3 * (v * u2 ^ 2)⁻¹ = (v * u2 ^ 2) ^ 2 := by
+    rw [show (v * u2 ^ 2) ^ 3 = (v * u2 ^ 2) ^ 2 * (v * u2 ^ 2) from by ring,
+      mul_assoc, mul_inv_cancel₀ h_denom_nz, mul_one]
+  have h2 : (v * u2 ^ 2) ^ 3 * ((v * u2 ^ 2) ^ 2)⁻¹ = v * u2 ^ 2 := by
+    rw [show (v * u2 ^ 2) ^ 3 = v * u2 ^ 2 * (v * u2 ^ 2) ^ 2 from by ring,
+      mul_assoc, mul_inv_cancel₀ (pow_ne_zero 2 h_denom_nz), mul_one]
+  have h3 : (v * u2 ^ 2) ^ 3 * ((v * u2 ^ 2) ^ 3)⁻¹ = 1 :=
+    mul_inv_cancel₀ (pow_ne_zero 3 h_denom_nz)
+  rw [show (v * u2 ^ 2) ^ 3 * (a * s ^ 2 * (v * u2 ^ 2)⁻¹ * u2 ^ 2 * 4) =
+        a * s ^ 2 * u2 ^ 2 * 4 * ((v * u2 ^ 2) ^ 3 * (v * u2 ^ 2)⁻¹) from by ring,
+      show (v * u2 ^ 2) ^ 3 * (((v * u2 ^ 2) ^ 2)⁻¹ * u2 ^ 2 * u1 ^ 2 * v ^ 2) =
+        u2 ^ 2 * u1 ^ 2 * v ^ 2 * ((v * u2 ^ 2) ^ 3 * ((v * u2 ^ 2) ^ 2)⁻¹) from by ring,
+      show (v * u2 ^ 2) ^ 3 * (s ^ 2 * ((v * u2 ^ 2) ^ 3)⁻¹ * u2 ^ 4 * u1 ^ 2 * v ^ 2 * d * 4) =
+        s ^ 2 * u2 ^ 4 * u1 ^ 2 * v ^ 2 * d * 4 *
+          ((v * u2 ^ 2) ^ 3 * ((v * u2 ^ 2) ^ 3)⁻¹) from by ring,
+      h1, h2, h3, mul_one]
+  rw [hv, hu1, hu2, ha]
+  ring
 
 /-! ### Compress Step Functions
 
@@ -154,9 +170,11 @@ lemma iad_sq : (invsqrt_a_minus_d : ZMod p) ^ 2 * (a_val - (↑d : ZMod p)) = 1 
   unfold invsqrt_a_minus_d a_val d
   have h := iad_sq_nat
   unfold p at h
-  have : (((54469307008909316920995813868745141605393597292927456921205312896311721017578 : ℕ) ^ 2 *
+  have : (((54469307008909316920995813868745141605393597292927456921205312896311721017578
+          : ℕ) ^ 2 *
     (57896044618658097711785492504343953926634992332820282019728792003956564819948 -
-     37095705934669439343138083508754565189542113879843219016388785533085940283555) : ℤ) : ZMod p) = 1 := by
+     37095705934669439343138083508754565189542113879843219016388785533085940283555) :
+      ℤ) : ZMod p) = 1 := by
     rw [← ZMod.intCast_mod _ p]
     decide
   push_cast at this; exact this
@@ -178,8 +196,7 @@ lemma compress_den_inv_cancel (P : Point Ed25519)
     have h_yf_sq : compress_y_final P ^ 2 = -(P.x ^ 2) := by
       unfold compress_y_final
       rw [h_yprime]
-      split_ifs <;> (try rw [neg_sq]) <;>
-        rw [show (P.x * sqrt_m1) ^ 2 = P.x ^ 2 * sqrt_m1 ^ 2 from by ring, sqrt_m1_sq] <;> ring
+      split_ifs <;> simp only [neg_sq, mul_pow, sqrt_m1_sq] <;> ring
     have h_factor : compress_u1 P * (1 + P.x ^ 2) =
         compress_u2 P ^ 2 * (a_val - (↑d : ZMod p)) := by
       unfold compress_u1 compress_u2 a_val
@@ -295,7 +312,8 @@ A point $P(x,y)$ on the Edwards curve is "even" if it lies in the image of the d
 
 **KEY Theorem: Characterization of Even Points On Montgomery via Quadratic Residues**
 
-Let $K$ be a field of char $\ne 2$ where $A^2-4$ is not a square (e.g., $K=\mathbb{F}_p$ for Curve25519).
+Let $K$ be a field of char $\ne 2$ where $A^2-4$ is not a square
+(e.g., $K=\mathbb{F}_p$ for Curve25519).
 Let $E$ be the Montgomery curve $y^2 = x^3 + Ax^2 + x$.
 Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
 
@@ -360,7 +378,8 @@ Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
 
     1.  **Setup:**
       Assume $x(P) = u \in K$ is a square (allowing $u=0$).
-      Pick some $Q \in E(\bar K)$ with $2Q = P$ (exists because $[2]$ is surjective on the algebraic closure).
+      Pick some $Q \in E(\bar K)$ with $2Q = P$
+      (exists because $[2]$ is surjective on the algebraic closure).
       Let $x = x(Q)$ and define $\alpha := r(Q) = y/x \in \bar K$.
       By Lemma 3, we have the equation:
       $$ (\star) \quad u = x(P) = \frac{(x - 1/x)^2}{4\alpha^2} $$
@@ -381,9 +400,11 @@ Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
       $$ (\ddagger) \quad \sigma(\alpha) = \pm \alpha $$
       In particular, $\sigma(\alpha^2) = (\pm \alpha)^2 = \alpha^2$, so $\alpha^2 \in K$.
 
-      Also by Lemma 1, if $\sigma Q = Q+T$ then $x \mapsto 1/x$, hence $(x - 1/x) \mapsto -(x - 1/x)$.
+      Also by Lemma 1, if $\sigma Q = Q+T$ then $x \mapsto 1/x$,
+      hence $(x - 1/x) \mapsto -(x - 1/x)$.
       Therefore $(x - 1/x)^2 \in K$ as well.
-      (Note: The right-hand side of $(\star)$ is a quotient of two elements of $K$, consistent with $u \in K$).
+      (Note: The right-hand side of $(\star)$ is a quotient of two elements of $K$,
+      consistent with $u \in K$).
 
     4.  **Deduction of Rationality:**
       Rearranging $(\star)$:
@@ -395,8 +416,10 @@ Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
       Thus $\alpha = \pm \beta$, which implies $\alpha \in K$.
 
     5.  **Conclusion:**
-      Return to $(\ddagger)$: since $\alpha \in K$, we have $\sigma(\alpha) = \alpha$ for all $\sigma$.
-      Therefore the "$-\alpha$" case cannot happen (unless $\alpha=0$, which implies $y=0 \implies P=O$, a trivial case).
+      Return to $(\ddagger)$: since $\alpha \in K$, we have
+      $\sigma(\alpha) = \alpha$ for all $\sigma$.
+      Therefore the "$-\alpha$" case cannot happen
+      (unless $\alpha=0$, which implies $y=0 \implies P=O$, a trivial case).
 
       So necessarily $\sigma Q = Q$ for all $\sigma$, which means $Q \in E(K)$.
       Thus $P = 2Q$ with $Q \in E(K)$, so $P \in 2E(K)$.
@@ -404,7 +427,8 @@ Then $P \in 2E(K) \iff x(P) \in (K^\times)^2 \cup \{0\}$.
 
 **Application to Ed25519:**
 The map $u = (1+y)/(1-y)$ sends Ed25519 to Montgomery.
-$u = \frac{(1+y)^2}{1-y^2}$. Since $(1+y)^2$ is always square, $u \in (K^\times)^2 \iff 1-y^2 \in (K^\times)^2$.
+$u = \frac{(1+y)^2}{1-y^2}$. Since $(1+y)^2$ is always square,
+$u \in (K^\times)^2 \iff 1-y^2 \in (K^\times)^2$.
 
 Note: In the implementation below, we use `EdwardsPoint.toPoint` which computes `Y/Z`.
 For the raw `EdwardsPoint` fields, the check is `IsSquare(Z^2 - Y^2)`.
@@ -423,7 +447,8 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
   intro ⟨Q, hP⟩
   rw [hP]
   unfold IsEven
-  have h_double_y : (Q + Q).y = (Q.y * Q.y - Ed25519.a * Q.x * Q.x) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) :=
+  have h_double_y : (Q + Q).y =
+      (Q.y * Q.y - Ed25519.a * Q.x * Q.x) / (1 - Ed25519.d * Q.x * Q.x * Q.y * Q.y) :=
     add_y Q Q
   have ha : Ed25519.a = -1 := rfl
   rw [ha] at h_double_y
@@ -511,10 +536,8 @@ theorem IsEven_iff_in_doubling_image_left (P : Point Ed25519) :
       · exact h_one_add_d_sq
   obtain ⟨c, hc⟩ := h_num_sq
   use c / (1 - lam)
-  field_simp [h_denom_ne, pow_ne_zero 2 h_denom_ne]
-  convert hc using 1
-  · ring
-  · exact pow_two c
+  rw [div_mul_div_comm, ← sq (1 - lam), div_left_inj' (pow_ne_zero 2 h_denom_ne)]
+  exact hc
 
 /-- A point is even if and only if it lies in the image of the doubling map. -/
 theorem IsEven_iff_in_doubling_image (P : Point Ed25519) :
@@ -546,12 +569,12 @@ theorem EdwardsPoint_IsSquare_iff_IsEven (e : EdwardsPoint) (h : e.IsValid) :
   constructor
   · intro ⟨w, hw⟩
     use w / e.Z.toField
-    field_simp [hz2] at hw ⊢
-    convert hw using 1
+    rw [div_mul_div_comm, ← sq e.Z.toField, div_left_inj' hz2]
+    exact hw
   · intro ⟨w, hw⟩
     use w * e.Z.toField
-    field_simp [hz2] at hw ⊢
-    convert hw using 1
+    rw [div_eq_iff hz2] at hw
+    linear_combination hw
 
 /-- Validity for RistrettoPoint is delegated to EdwardsPoint. -/
 def RistrettoPoint.IsValid (r : RistrettoPoint) : Prop :=
@@ -579,8 +602,8 @@ Indeed:
   - x := abs(2 * s * Dx) = abs(\frac{2s}{√ v}) = frac{1}{√ad-1} · \frac{2s}{t}
   - y := u1 * Dy = \frac{1+as²}{1-as²}
 Equation (⋆) is obtained from the Jacobi quadric `J`: t² = e * s⁴ + 2 * A * s² + 1
-where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂` (where `a₂ = -1` and `d₂ = d`
-for Ed25519). The relation to `J` parameters is:
+where `e = a₁²` and `A = a₁ - 2d₁`. Ristretto uses parameters `a₂, d₂`
+(where `a₂ = -1` and `d₂ = d` for Ed25519). The relation to `J` parameters is:
   - `a₁ = -a₂`
   - `d₁ = (a₂ * d₂) / (a₂ - d₂)`
 Notice that `t²` is proportional to the discriminant `v = (a₂*d₂ - 1) * t²`.
@@ -642,9 +665,11 @@ noncomputable def decompress_step2 (s : ZMod p) : Option (Point Ed25519) :=
               have h_curve_raw : a_val * x_raw^2 + y^2 = 1 + d * x_raw^2 * y^2 := by
                 dsimp only [y, Dy, Dx, x_raw]
                 apply decompress_helper a_val d s I u1 u2 v
-                <;> try rw [a_val];
-                <;> try rfl
-                exact h_I_sq_mul
+                · simp only [a_val]
+                · rfl
+                · rfl
+                · rfl
+                · exact h_I_sq_mul
               have h_x_sq : x^2 = x_raw^2 := by
                 dsimp only [x]
                 exact abs_edwards_sq (2 * s * Dx)
@@ -788,9 +813,10 @@ lemma decompress_step2_2 (s : ZMod p) (pt : Point Ed25519) (I : ZMod p)
   split_ifs with h_cond
   · -- none branch: contradiction (validation should pass)
     -- h_cond uses full expansion but h_ws/h_neg_match/h_y_ne_match use W (set abbrev);
-    simp_all only [ne_eq, mul_eq_zero, false_or, not_or, OfNat.ofNat_ne_zero, not_false_eq_true, pow_eq_zero_iff,
-      or_self, mul_eq_mul_left_iff, mul_eq_mul_right_iff, or_false, beq_eq_false_iff_ne, Bool.not_true, Bool.or_self,
-      Bool.false_or, beq_iff_eq, W]
+    simp_all only [ne_eq, mul_eq_zero, false_or, not_or, OfNat.ofNat_ne_zero,
+      not_false_eq_true, pow_eq_zero_iff, or_self, mul_eq_mul_left_iff,
+      mul_eq_mul_right_iff, or_false, beq_eq_false_iff_ne, Bool.not_true,
+      Bool.or_self, Bool.false_or, beq_iff_eq, W]
   · -- some branch: show point equality
     congr 1; ext
     · exact h_x_match
@@ -873,7 +899,8 @@ lemma decompress_step2_compress_s (P : Point Ed25519) (heven : IsEven P) :
     have h_mobius : compress_s P ^ 2 * (1 + compress_y_final P) = 1 - compress_y_final P := by
       rw [h_sigma_sq]
       have : compress_den_inv P ^ 2 * (1 - compress_y_final P) ^ 2 * (1 + compress_y_final P) =
-          compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2) * (1 - compress_y_final P) := by ring
+          compress_den_inv P ^ 2 * (1 - compress_y_final P ^ 2) *
+            (1 - compress_y_final P) := by ring
       rw [this, h_den_cancel]; ring
     -- === Use h_mobius + h_den_cancel to show decompress_step2 succeeds ===
     set σ := compress_s P
@@ -1151,7 +1178,16 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
     : {P : Point Ed25519 // IsEven P} :=
   ⟨{ x := elligator_ristretto_flavor_x r0
      y := elligator_ristretto_flavor_y r0
-     on_curve := by sorry },
+     on_curve := by
+
+      unfold elligator_ristretto_flavor_x
+      unfold elligator_ristretto_flavor_y
+      unfold elligator_D
+      unfold elligator_Nt
+      unfold elligator_D
+
+
+      sorry },
     by
     unfold IsEven
     unfold elligator_ristretto_flavor_y
@@ -1160,8 +1196,17 @@ noncomputable def elligator_ristretto_flavor_pure (r0 : ZMod p)
         rw [hdenom]; exact div_zero _
       rw [hzero]
       exact ⟨1, by ring⟩
-    · exact ⟨2 * elligator_s r0 / (1 + elligator_s r0 ^ 2),
-        by field_simp [hdenom]; ring⟩⟩
+    · have hd2 : (1 + elligator_s r0 ^ 2) ^ 2 ≠ 0 := pow_ne_zero 2 hdenom
+      have hs : 1 - (1 - elligator_s r0 ^ 2) ^ 2 / (1 + elligator_s r0 ^ 2) ^ 2 =
+          ((1 + elligator_s r0 ^ 2) ^ 2 - (1 - elligator_s r0 ^ 2) ^ 2) /
+          (1 + elligator_s r0 ^ 2) ^ 2 := by
+        rw [eq_div_iff hd2, sub_mul, one_mul, div_mul_cancel₀ _ hd2]
+      exact ⟨2 * elligator_s r0 / (1 + elligator_s r0 ^ 2), by
+        change 1 - ((1 - elligator_s r0 ^ 2) / (1 + elligator_s r0 ^ 2)) ^ 2 =
+            2 * elligator_s r0 / (1 + elligator_s r0 ^ 2) *
+              (2 * elligator_s r0 / (1 + elligator_s r0 ^ 2))
+        rw [div_mul_div_comm, ← sq (1 + elligator_s r0 ^ 2), div_pow, hs, div_left_inj' hd2]
+        ring⟩⟩
 
 /-- Projection: x-coordinate of the pure spec equals the step function. -/
 @[simp]
@@ -1191,12 +1236,14 @@ open curve25519_dalek.math
 **Canonical Ristretto Representation**
 A Point P is the canonical representative of its Ristretto coset if
 decompress ∘ compress = Id on the point.
-The predicate 'IsCanonicalRistrettoRep' characterizes exactly the set of points fixed by the Ristretto
-compression-decompression cycle, i.e. `IsCanonicalRistrettoRep P ↔ decompress (compress P) = P`.
+The predicate 'IsCanonicalRistrettoRep' characterizes exactly the set of points
+fixed by the Ristretto compression-decompression cycle,
+i.e. `IsCanonicalRistrettoRep P ↔ decompress (compress P) = P`.
 
 **Proof Sketch:**
 
-1. **Necessity (Image of Decompression):** (Resources: (RFC 9496 §4.3.1 or https://ristretto.group/ §5.2)
+1. **Necessity (Image of Decompression):**
+   (Resources: RFC 9496 §4.3.1 or https://ristretto.group/ §5.2)
    For any valid encoding `s`, the `decompress` function constructs a point `P`
    enforcing these specific invariants:
    - `x`: computed as `abs(2s * Dx)`, forcing `is_negative x = false`.
@@ -1215,8 +1262,10 @@ compression-decompression cycle, i.e. `IsCanonicalRistrettoRep P ↔ decompress 
 
 **Geometric Interpretation:**
 This predicate defines a section (fundamental domain) of the quotient bundle `E → E/E[8]`:
-- `is_negative (x * y) = false`: Selects the unique coset representative modulo `E[4]` (fixes Torque).
-- `is_negative x = false`: Selects the unique representative modulo the remaining involution (fixes Sign).
+- `is_negative (x * y) = false`: Selects the unique coset representative
+  modulo `E[4]` (fixes Torque).
+- `is_negative x = false`: Selects the unique representative modulo the
+  remaining involution (fixes Sign).
 - `y ≠ 0`: Excludes singular points where the map is undefined.
 -/
 def IsCanonicalRistrettoRep (P : Point Ed25519) : Prop :=
