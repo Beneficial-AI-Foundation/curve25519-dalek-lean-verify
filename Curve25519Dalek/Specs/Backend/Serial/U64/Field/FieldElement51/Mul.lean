@@ -184,8 +184,8 @@ def mul_product_stage (self _rhs : Array U64 5#usize) :
   let c4 ← i48 + i49
   ok (c0, c1, c2, c3, c4)
 
-/-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`.
-    Includes creation of the fresh `out` array. -/
+/-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`. Includes creation of
+the fresh `out` array. -/
 def mul_carry_prop_stage (c0 c1 c2 c3 c4 : U128) :
     Result (Array U64 5#usize × U64 × U64) := do
   let out := Array.repeat 5#usize 0#u64
@@ -323,8 +323,8 @@ theorem fold_mul_final_reduce_stage {α : Type} (out5 : Array U64 5#usize) (carr
 
 /-! ## Bounds Lemmas -/
 
-/-- c0 = a0*b0 + a4*(19*b1) + a3*(19*b2) + a2*(19*b3) + a1*(19*b4)
-    Coefficient sum: 1 + 4*19 = 77; c0 < 77 * 2^108 < 2^115 -/
+/-- c0 = a0*b0 + a4*(19*b1) + a3*(19*b2) + a2*(19*b3) + a1*(19*b4).
+Coefficient sum: 1 + 4*19 = 77; c0 < 77 * 2^108 < 2^115 -/
 private lemma mul_c0_lt_pow2_115 (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ)
     (ha0 : a0 < 2 ^ 54) (ha1 : a1 < 2 ^ 54) (ha2 : a2 < 2 ^ 54) (ha3 : a3 < 2 ^ 54)
     (ha4 : a4 < 2 ^ 54) (hb0 : b0 < 2 ^ 54) (hb1 : b1 < 2 ^ 54) (hb2 : b2 < 2 ^ 54)
@@ -446,7 +446,7 @@ private lemma mul_c4_lt_tight (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ)
   have : a0 * b4 < 2 ^ 108 := by nlinarith
   omega
 
-/-- Generic carry chain bound (reused from Pow2K_V3). -/
+/-- Generic carry chain bound. -/
 private lemma carry_chain_lt_pow2_115 (formula carry : ℕ) (K : ℕ)
     (hf : formula < K * 2 ^ 108) (hc : carry < 2 ^ 64) (hK : K ≤ 127) :
     formula + carry < 2 ^ 115 := by
@@ -585,27 +585,26 @@ theorem mul_product_stage_spec (self _rhs : Array U64 5#usize)
   have hr2 := hrhs 2 (by simp)
   have hr3 := hrhs 3 (by simp)
   have hr4 := hrhs 4 (by simp)
-  refine ⟨hc0, hc1, hc2, hc3, hc4, ?_, ?_, ?_, ?_, ?_,
-    ?_, ?_, ?_, ?_⟩
-  all_goals first
-    | (rw [hc0]; exact mul_c0_lt_pow2_115 _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc1]; exact mul_c1_lt_pow2_115 _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc2]; exact mul_c2_lt_pow2_115 _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc3]; exact mul_c3_lt_pow2_115 _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc4]; exact mul_c4_lt_pow2_115 _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc1]; exact mul_c1_lt_tight _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc2]; exact mul_c2_lt_tight _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc3]; exact mul_c3_lt_tight _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
-    | (rw [hc4]; exact mul_c4_lt_tight _ _ _ _ _
-        _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4)
+  -- Bounds < 2^115 and tight bounds for carry chain
+  refine ⟨hc0, hc1, hc2, hc3, hc4, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · rw [hc0]
+    exact mul_c0_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc1]
+    exact mul_c1_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc2]
+    exact mul_c2_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc3]
+    exact mul_c3_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc4]
+    exact mul_c4_lt_pow2_115 _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc1]
+    exact mul_c1_lt_tight _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc2]
+    exact mul_c2_lt_tight _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc3]
+    exact mul_c3_lt_tight _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
+  · rw [hc4]
+    exact mul_c4_lt_tight _ _ _ _ _ _ _ _ _ _ hl0 hl1 hl2 hl3 hl4 hr0 hr1 hr2 hr3 hr4
 
 set_option maxHeartbeats 8000000 in
 -- Required for step* through ~30 monadic carry propagation operations
