@@ -19,6 +19,11 @@ on:
 env:
   LEAN_ABORT_ON_PANIC: 1
 
+permissions:
+  contents: read
+  actions: read
+  pull-requests: write
+
 jobs:
   build:
     name: Build Lean Project
@@ -88,3 +93,43 @@ jobs:
           echo "✓ Build successful!"
           echo "  atoms.json: $(wc -c < atoms.json) bytes"
           echo "  functions.json: $(wc -c < functions.json) bytes"
+
+      - name: Download baseline functions.json
+        id: baseline
+        if: github.event_name == 'pull_request'
+        run: |
+          BASE_REF="${{ github.event.pull_request.base.ref }}"
+          RUN_ID=$(gh run list --workflow lean.yml --branch "$BASE_REF" \
+            --status success --limit 1 --json databaseId -q '.[0].databaseId' 2>/dev/null || true)
+          if [ -n "$RUN_ID" ]; then
+            gh run download "$RUN_ID" --name probe-artifacts --dir /tmp/baseline && \
+              echo "found=true" >> "$GITHUB_OUTPUT" && \
+              echo "Downloaded baseline from $BASE_REF (run $RUN_ID)" || \
+              echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "No successful lean.yml run found on $BASE_REF"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Post PR status diff comment
+        if: github.event_name == 'pull_request'
+        run: |
+          if [ "${{ steps.baseline.outputs.found }}" = "true" ]; then
+            python3 scripts/diff_functions.py \
+              --old /tmp/baseline/functions.json \
+              --new functions.json > /tmp/diff.md
+          else
+            cat > /tmp/diff.md <<'FALLBACK'
+          ## Verification Status Diff
+
+          No baseline available for comparison (first run on base branch).
+          FALLBACK
+          fi
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body-file /tmp/diff.md --edit-last 2>/dev/null || \
+          gh pr comment "${{ github.event.pull_request.number }}" \
+            --body-file /tmp/diff.md
+        env:
+          GH_TOKEN: ${{ github.token }}

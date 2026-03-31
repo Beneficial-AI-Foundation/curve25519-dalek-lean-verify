@@ -9,6 +9,7 @@ interface FunctionRecord {
   spec_file: string | null
   is_hidden: boolean
   is_extraction_artifact: boolean
+  is_ignored: boolean
   specified: boolean
   verified: boolean
   externally_verified: boolean
@@ -33,6 +34,7 @@ export interface StatusData {
     specified: number
     verified: number
     externally_verified: number
+    ignored: number
     ai_proveable: number
   }
 }
@@ -77,6 +79,7 @@ export default {
       specified: visible.filter(fn => fn.specified && !fn.verified && !fn.externally_verified).length,
       verified: visible.filter(fn => fn.verified && !fn.externally_verified).length,
       externally_verified: visible.filter(fn => fn.externally_verified).length,
+      ignored: visible.filter(fn => fn.is_ignored && !fn.specified && !fn.verified && !fn.externally_verified).length,
       ai_proveable: 0
     }
 
