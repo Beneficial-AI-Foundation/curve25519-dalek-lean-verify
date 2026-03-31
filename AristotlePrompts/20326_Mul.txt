@@ -1,7 +1,0 @@
-Close the five sorries in the declaration mul_spec in the file Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Mul.lean
-
-Stylistic prompt:
-* Add some documentation for each of them
-* Focus on solving the maximum number rather than a very hard one; if some of those becomes too hard, give up and try the next one;
-* Keep lines < 100 characters, but don't cut before 80 characters
-* Try to avoid aesop

@@ -64,8 +64,10 @@ private lemma fe_eq_of_limbs
     simp [a.property, b.property])
   intro n hn _
   have hn5 : n < 5 := by
-    simp [a.property] at hn; exact hn
-  have := h n hn5; simp [*] at this
+    simp only [a.property, UScalar.ofNatCore_val_eq] at hn
+    exact hn
+  have := h n hn5
+  simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, hn5] at this
   exact this
 
 private lemma toField_neg
@@ -144,14 +146,19 @@ theorem step_2_spec
       simp; omega
   rcases hi1_01 with h0 | h1
   · ---- i1 = 0 → sign_bit = false ----
-    simp [h0]; step*
+    simp only [h0, ↓reduceDIte, bind_tc_ok, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+      Nat.reducePow, Nat.add_one_sub_one]
+    step*
     have hsb : sign_bit = false := by
       rw [h_byter, Nat.testBit,
         Nat.shiftRight_eq_div_pow, ← h_i1_eq]
       simp [h0]
     have hXeq : X1 = X := fe_eq_of_limbs
       (fun j hj => by
-        have := X1_post j hj; simp at this
+        have := X1_post j hj
+        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.not_eq,
+          UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one,
+          not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte] at this
         exact this)
     subst hXeq
     simp only [hsb, show (false = true) = False
@@ -174,7 +181,8 @@ theorem step_2_spec
       simp [h1]
     have hXeq : X1 = x_neg := fe_eq_of_limbs
       (fun j hj => by
-        have := X1_post j hj; simp at this
+        have := X1_post j hj
+        simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, ↓reduceIte] at this
         exact this)
     subst hXeq
     simp only [hsb, ite_true]
