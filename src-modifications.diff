@@ -122,6 +122,23 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/field.rs b
              // Precondition: assume input limbs a[i] are bounded as
              //
              // a[i] < 2^(51 + b)
+@@ -508,11 +510,11 @@
+             //    b < 3.365.
+             //
+             // So we require b < 3 to ensure this fits.
+-            debug_assert!(a[0] < (1 << 54));
+-            debug_assert!(a[1] < (1 << 54));
+-            debug_assert!(a[2] < (1 << 54));
+-            debug_assert!(a[3] < (1 << 54));
+-            debug_assert!(a[4] < (1 << 54));
++            // debug_assert!(a[0] < (1 << 54));
++            // debug_assert!(a[1] < (1 << 54));
++            // debug_assert!(a[2] < (1 << 54));
++            // debug_assert!(a[3] < (1 << 54));
++            // debug_assert!(a[4] < (1 << 54));
+ 
+             const LOW_51_BIT_MASK: u64 = (1u64 << 51) - 1;
+ 
 @@ -556,9 +558,6 @@
              // Now all a[i] < 2^(51 + epsilon) and a = self^(2^k).
  

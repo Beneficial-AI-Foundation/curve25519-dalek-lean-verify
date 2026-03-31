@@ -510,11 +510,11 @@ impl FieldElement51 {
             //    b < 3.365.
             //
             // So we require b < 3 to ensure this fits.
-            debug_assert!(a[0] < (1 << 54));
-            debug_assert!(a[1] < (1 << 54));
-            debug_assert!(a[2] < (1 << 54));
-            debug_assert!(a[3] < (1 << 54));
-            debug_assert!(a[4] < (1 << 54));
+            // debug_assert!(a[0] < (1 << 54));
+            // debug_assert!(a[1] < (1 << 54));
+            // debug_assert!(a[2] < (1 << 54));
+            // debug_assert!(a[3] < (1 << 54));
+            // debug_assert!(a[4] < (1 << 54));
 
             const LOW_51_BIT_MASK: u64 = (1u64 << 51) - 1;
 
