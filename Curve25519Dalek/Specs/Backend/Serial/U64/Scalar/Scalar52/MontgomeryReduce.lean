@@ -301,7 +301,29 @@ private lemma base_digit_bound {B d0 d1 d2 d3 d4 : ℤ}
       (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) := by nlinarith
   linarith [show (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) = B ^ 5 - 1 from by ring]
 
-set_option maxHeartbeats 1600000 in -- Lean 4.28 needs more
+/-- Non-trivial shared constants for montgomery_reduce.
+Proved separately to avoid adding kernel depth to the main proof. -/
+private theorem mont_reduce_consts :
+    (constants.L[0]!).val < 2 ^ 52 ∧
+    (constants.L[1]!).val < 2 ^ 52 ∧
+    (constants.L[2]!).val < 2 ^ 52 ∧
+    (constants.L[4]!).val = 2 ^ 44 ∧
+    U128.max = 2 ^ 128 - 1 ∧
+    (2 ^ 52 - 1) * (constants.L[0]!).val < 2 ^ 104 := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · simpa using constants.L_limbs_spec 0#usize (by decide)
+  · simpa using constants.L_limbs_spec 1#usize (by decide)
+  · simpa using constants.L_limbs_spec 2#usize (by decide)
+  · unfold constants.L; decide
+  · scalar_tac
+  · calc (2 ^ 52 - 1) * (constants.L[0]!).val
+        < (2 ^ 52 - 1) * 2 ^ 52 := by
+          apply Nat.mul_lt_mul_of_pos_left
+          · simpa using constants.L_limbs_spec 0#usize (by decide)
+          · positivity
+      _ < 2 ^ 104 := by omega
+
+set_option maxHeartbeats 1600000 in -- New Aeneas version needs more
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -332,12 +354,15 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ result0, h_result0 ⟩ ← part1_spec
   obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
+  -- Shared bound library (proved once, reused by all rows)
+  -- Import shared constants (proved in separate lemma to avoid kernel depth)
+  obtain ⟨h_L0, h_L1, h_L2, h_L4_eq, hmax, h_mask_L0⟩ := mont_reduce_consts
+  -- ROW 1 setup: ALL U128.add_spec use spec_bind to avoid deep recursion
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i2, i2_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i2 i2_post
   let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
   let* ⟨ i4, i4_post ⟩ ← m_spec
-  -- Use spec_bind for U128.add_spec / part1_spec to avoid deep kernel
-  -- recursion in Lean 4.28. Cheap steps (index, m_spec) use let* as usual.
   -- ROW 1: i5 = i2 + i4, then part1(i5)
   apply spec_bind; · exact U128.add_spec (by sorry)
   intro i5 i5_post
@@ -503,7 +528,13 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     rw [show L = Scalar52_as_Nat constants.L from constants.L_spec.symm]
     unfold Scalar52_as_Nat
     simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
-      Array.getElem!_Nat_eq]; agrind
+      Array.getElem!_Nat_eq]
+    simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, getElem!_pos] at h_L3_zero
+    simp only [mul_comm, zero_mul, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.ofNat_pos, getElem!_pos, one_mul, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+      h_L3_zero, add_zero, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_pow, Nat.cast_ofNat]
+    rfl
   let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
   have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
       ↑p2_0.2.val + ↑p2_1.2.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val * (2 ^ 52) ^ 2 +
@@ -556,7 +587,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
           ↑(Scalar52_wide_as_Nat a) + C * ↑L from by linarith [h_core]]
         exact Int.add_mul_emod_self_right _ _ _
 
-  -- OLD PROOF
+  -- OLD PROOF (Aeneas rev: `1180be60c7a0e642cb442bfe90fe5cd8c1bb853f`)
   -- simp only [step_simps]
   -- -- ROW 0: part1(a[0])
   -- let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
