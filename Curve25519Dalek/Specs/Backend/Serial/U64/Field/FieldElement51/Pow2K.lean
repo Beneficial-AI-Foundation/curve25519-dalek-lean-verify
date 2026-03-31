@@ -164,7 +164,19 @@ def square_stage (a : Array U64 5#usize) : Result (U128 × U128 × U128 × U128 
   let i28 ← i26 + i27
   let i29 ← 2#u128 * i28
   let c4 ← i25 + i29
-  ok (c0, c1, c2, c3, c4)
+  -- debug_assert! checks (nested if-then-else in Aeneas output)
+  let i30 ← 1#u64 <<< 54#i32
+  if i2 < i30 then
+    if i4 < i30 then
+      if i6 < i30 then
+        if i < i30 then
+          if i1 < i30 then
+            ok (c0, c1, c2, c3, c4)
+          else fail panic
+        else fail panic
+      else fail panic
+    else fail panic
+  else fail panic
 
 /-- Stage 2: Propagate carries through c0–c4. Returns `(array, carry, mask)`. -/
 def carry_prop_stage (a : Array U64 5#usize) (c0 c1 c2 c3 c4 : U128) :
