@@ -279,13 +279,117 @@ theorem from_bytes_wide_loop_spec
   intro words' hpost
   exact words_wide_eq_bytes bytes words' hpost
 
-/-! ## Part 2: Bit-slicing identity (8 words → lo + hi) -/
+/-! ## Part 2: Bit-slicing identity (8 words → lo + hi)
 
--- TODO: Define 10 limb abbreviations and prove the
--- splitting identity:
---   Scalar52_as_Nat lo + Scalar52_as_Nat hi * 2^260
---     = words_wide_as_Nat words
--- This generalizes bit_slicing_of_words from FromBytes.lean.
+Generalizes `bit_slicing_of_words` from FromBytes.lean.
+Split into lo (5 limbs from words 0-4) and hi (5 limbs from words 4-7).
+
+Proof technique: convert OR→add via `or_mul_pow_two_eq_add`,
+simplify shift-left mods and outer mods via `omega`,
+then close each half with `Nat.div_add_mod` + `omega`. -/
+
+/-- Pure identity: 5 lo-limbs from words 0–4 reconstruct the low 260 bits. -/
+private theorem bit_slicing_wide_lo_identity (w0 w1 w2 w3 w4 : Nat) :
+    w0 % 2 ^ 52
+    + (w0 / 2 ^ 52 + w1 % 2 ^ 40 * 2 ^ 12) * 2 ^ 52
+    + (w1 / 2 ^ 40 + w2 % 2 ^ 28 * 2 ^ 24) * 2 ^ 104
+    + (w2 / 2 ^ 28 + w3 % 2 ^ 16 * 2 ^ 36) * 2 ^ 156
+    + (w3 / 2 ^ 16 + w4 % 2 ^ 4 * 2 ^ 48) * 2 ^ 208
+    = w0 + w1 * 2 ^ 64 + w2 * 2 ^ 128 + w3 * 2 ^ 192
+      + w4 % 2 ^ 4 * 2 ^ 256 := by
+  have := Nat.div_add_mod w0 (2 ^ 52)
+  have := Nat.div_add_mod w1 (2 ^ 40)
+  have := Nat.div_add_mod w2 (2 ^ 28)
+  have := Nat.div_add_mod w3 (2 ^ 16)
+  omega
+
+/-- Pure identity: 5 hi-limbs from words 4–7 reconstruct the high part. -/
+private theorem bit_slicing_wide_hi_identity (w4 w5 w6 w7 : Nat) :
+    (w4 / 2 ^ 4) % 2 ^ 52
+    + (w4 / 2 ^ 56 + w5 % 2 ^ 44 * 2 ^ 8) * 2 ^ 52
+    + (w5 / 2 ^ 44 + w6 % 2 ^ 32 * 2 ^ 20) * 2 ^ 104
+    + (w6 / 2 ^ 32 + w7 % 2 ^ 20 * 2 ^ 32) * 2 ^ 156
+    + w7 / 2 ^ 20 * 2 ^ 208
+    = w4 / 2 ^ 4 + w5 * 2 ^ 60 + w6 * 2 ^ 124
+      + w7 * 2 ^ 188 := by
+  have h_dd : (w4 / 2 ^ 4) / 2 ^ 52 = w4 / 2 ^ 56 := by
+    rw [Nat.div_div_eq_div_mul]; norm_num
+  have h4 := Nat.div_add_mod (w4 / 2 ^ 4) (2 ^ 52)
+  rw [h_dd] at h4
+  have := Nat.div_add_mod w5 (2 ^ 44)
+  have := Nat.div_add_mod w6 (2 ^ 32)
+  have := Nat.div_add_mod w7 (2 ^ 20)
+  omega
+
+/-- The 10 limbs extracted via shift/OR/mask from 8 U64 words reconstruct
+the same value: `lo + hi * 2^260 = words_wide`. -/
+theorem bit_slicing_wide (w0 w1 w2 w3 w4 w5 w6 w7 : U64) :
+    -- Lo limbs (5)
+    let lo0 := w0.val % 2 ^ 52
+    let lo1 := ((w0.val / 2 ^ 52) ||| ((w1.val * 2 ^ 12) % U64.size)) % 2 ^ 52
+    let lo2 := ((w1.val / 2 ^ 40) ||| ((w2.val * 2 ^ 24) % U64.size)) % 2 ^ 52
+    let lo3 := ((w2.val / 2 ^ 28) ||| ((w3.val * 2 ^ 36) % U64.size)) % 2 ^ 52
+    let lo4 := ((w3.val / 2 ^ 16) ||| ((w4.val * 2 ^ 48) % U64.size)) % 2 ^ 52
+    -- Hi limbs (5)
+    let hi0 := (w4.val / 2 ^ 4) % 2 ^ 52
+    let hi1 := ((w4.val / 2 ^ 56) ||| ((w5.val * 2 ^ 8) % U64.size)) % 2 ^ 52
+    let hi2 := ((w5.val / 2 ^ 44) ||| ((w6.val * 2 ^ 20) % U64.size)) % 2 ^ 52
+    let hi3 := ((w6.val / 2 ^ 32) ||| ((w7.val * 2 ^ 32) % U64.size)) % 2 ^ 52
+    let hi4 := w7.val / 2 ^ 20
+    -- Identity
+    (lo0 + lo1 * 2 ^ 52 + lo2 * 2 ^ 104 + lo3 * 2 ^ 156 + lo4 * 2 ^ 208)
+    + (hi0 + hi1 * 2 ^ 52 + hi2 * 2 ^ 104 + hi3 * 2 ^ 156
+       + hi4 * 2 ^ 208) * 2 ^ 260
+    = w0.val + w1.val * 2 ^ 64 + w2.val * 2 ^ 128 + w3.val * 2 ^ 192
+      + w4.val * 2 ^ 256 + w5.val * 2 ^ 320 + w6.val * 2 ^ 384
+      + w7.val * 2 ^ 448 := by
+  -- Get concrete bounds
+  have hU : U64.size = 2 ^ 64 := by scalar_tac
+  have hw0 : w0.val < 2 ^ 64 := hU ▸ w0.hmax
+  have hw1 : w1.val < 2 ^ 64 := hU ▸ w1.hmax
+  have hw2 : w2.val < 2 ^ 64 := hU ▸ w2.hmax
+  have hw3 : w3.val < 2 ^ 64 := hU ▸ w3.hmax
+  have hw4 : w4.val < 2 ^ 64 := hU ▸ w4.hmax
+  have hw5 : w5.val < 2 ^ 64 := hU ▸ w5.hmax
+  have hw6 : w6.val < 2 ^ 64 := hU ▸ w6.hmax
+  have hw7 : w7.val < 2 ^ 64 := hU ▸ w7.hmax
+  -- Simplify shift-left mods: w * 2^k % 2^64 → (w % 2^m) * 2^k
+  simp only [hU,
+    show w1.val * 2 ^ 12 % 2 ^ 64 = (w1.val % 2 ^ 52) * 2 ^ 12 from by omega,
+    show w2.val * 2 ^ 24 % 2 ^ 64 = (w2.val % 2 ^ 40) * 2 ^ 24 from by omega,
+    show w3.val * 2 ^ 36 % 2 ^ 64 = (w3.val % 2 ^ 28) * 2 ^ 36 from by omega,
+    show w4.val * 2 ^ 48 % 2 ^ 64 = (w4.val % 2 ^ 16) * 2 ^ 48 from by omega,
+    show w5.val * 2 ^ 8 % 2 ^ 64 = (w5.val % 2 ^ 56) * 2 ^ 8 from by omega,
+    show w6.val * 2 ^ 20 % 2 ^ 64 = (w6.val % 2 ^ 44) * 2 ^ 20 from by omega,
+    show w7.val * 2 ^ 32 % 2 ^ 64 = (w7.val % 2 ^ 32) * 2 ^ 32 from by omega]
+  -- Convert OR to add (non-overlapping bit ranges)
+  rw [or_mul_pow_two_eq_add _ _ 12 (by omega),
+      or_mul_pow_two_eq_add _ _ 24 (by omega),
+      or_mul_pow_two_eq_add _ _ 36 (by omega),
+      or_mul_pow_two_eq_add _ _ 48 (by omega),
+      or_mul_pow_two_eq_add _ _ 8 (by omega),
+      or_mul_pow_two_eq_add _ _ 20 (by omega),
+      or_mul_pow_two_eq_add _ _ 32 (by omega)]
+  -- Simplify outer mods (sums fit in 52 bits)
+  rw [show (w0.val / 2 ^ 52 + (w1.val % 2 ^ 52) * 2 ^ 12) % 2 ^ 52 =
+        w0.val / 2 ^ 52 + (w1.val % 2 ^ 40) * 2 ^ 12 from by omega,
+      show (w1.val / 2 ^ 40 + (w2.val % 2 ^ 40) * 2 ^ 24) % 2 ^ 52 =
+        w1.val / 2 ^ 40 + (w2.val % 2 ^ 28) * 2 ^ 24 from by omega,
+      show (w2.val / 2 ^ 28 + (w3.val % 2 ^ 28) * 2 ^ 36) % 2 ^ 52 =
+        w2.val / 2 ^ 28 + (w3.val % 2 ^ 16) * 2 ^ 36 from by omega,
+      show (w3.val / 2 ^ 16 + (w4.val % 2 ^ 16) * 2 ^ 48) % 2 ^ 52 =
+        w3.val / 2 ^ 16 + (w4.val % 2 ^ 4) * 2 ^ 48 from by omega,
+      show (w4.val / 2 ^ 56 + (w5.val % 2 ^ 56) * 2 ^ 8) % 2 ^ 52 =
+        w4.val / 2 ^ 56 + (w5.val % 2 ^ 44) * 2 ^ 8 from by omega,
+      show (w5.val / 2 ^ 44 + (w6.val % 2 ^ 44) * 2 ^ 20) % 2 ^ 52 =
+        w5.val / 2 ^ 44 + (w6.val % 2 ^ 32) * 2 ^ 20 from by omega,
+      show (w6.val / 2 ^ 32 + (w7.val % 2 ^ 32) * 2 ^ 32) % 2 ^ 52 =
+        w6.val / 2 ^ 32 + (w7.val % 2 ^ 20) * 2 ^ 32 from by omega]
+  -- Apply pure identities and combine
+  rw [bit_slicing_wide_lo_identity w0.val w1.val w2.val w3.val w4.val,
+      bit_slicing_wide_hi_identity w4.val w5.val w6.val w7.val]
+  have := Nat.div_add_mod w4.val (2 ^ 4)
+  omega
 
 /-! ## Part 3: Main spec -/
 
