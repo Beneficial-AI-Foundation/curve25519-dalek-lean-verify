@@ -5968,13 +5968,13 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.to_affine",
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :\n    double e ⦃ result =>\n    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",
+   "/-- **Spec and proof concerning\n`edwards.EdwardsPoint.double`**:\n- Returns the doubled point 2P (= P + P in elliptic\n  curve addition) where P is the input EdwardsPoint -/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
@@ -5985,7 +5985,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
