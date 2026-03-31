@@ -252,9 +252,9 @@ lemma ringChar_ne_two : ringChar (ZMod p) ≠ 2 := by
 
 lemma ne_zero_of_not_isSquare {a : ZMod p} (h : ¬ IsSquare a) : a ≠ 0 := by by_contra; simp_all
 
-/-- In a finite field of odd characteristic, the product of two non-squares is a square.
-TODO: this should probably be replaced by an argument using the quadratic character from
-`Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic`. -/
+-- TODO: this should probably be replaced by an argument using the quadratic character from
+-- `Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic`.
+/-- In a finite field of odd characteristic, the product of two non-squares is a square. -/
 theorem FiniteField.isSquare_mul_of_not_isSquare {F : Type*} [Field F] [Finite F]
     (hchar : ringChar F ≠ 2) {a b : F} (ha : ¬ IsSquare a) (hb : ¬ IsSquare b) :
     IsSquare (a * b) := by
@@ -539,16 +539,16 @@ private theorem inv_sqrt_spec_abstract {F : Type*} [Field F] (f : F → F × Boo
 
 /-- If `inv_sqrt_checked arg = (I, true)` and `arg ≠ 0`, then `I` is an inverse square root:
 `I ^ 2 * arg = 1`. -/
-theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked arg = (I, true))
+theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked arg = (I, true))
     (hne : arg ≠ 0) : I ^ 2 * arg = 1 := by
   rw [inv_sqrt_checked_unfold arg hne] at h
   exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h hne
 
 /-- Variant of `inv_sqrt_checked_spec` with `was_square` as a separate hypothesis. -/
-theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} {was_square : Bool}
+theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool}
     (h : inv_sqrt_checked arg = (I, was_square)) (hws : was_square = true) (hne : arg ≠ 0) :
     I ^ 2 * arg = 1 := by
-  subst hws; exact inv_sqrt_checked_spec arg h hne
+  subst hws; exact inv_sqrt_checked_spec' arg h hne
 
 /-- `inv_sqrt_checked 0 = (0, false)`. -/
 lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
@@ -565,7 +565,7 @@ theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (hne : u ≠ 0) :
   have h_ws : (inv_sqrt_checked u).2 = true := by
     rw [inv_sqrt_checked_snd u hne]
     exact (sqrt_checked_iff_isSquare u Prod.mk.eta.symm).mpr h
-  exact inv_sqrt_checked_spec u (Prod.ext rfl h_ws) hne
+  exact inv_sqrt_checked_spec' u (Prod.ext rfl h_ws) hne
 
 
 end curve25519_dalek.math
