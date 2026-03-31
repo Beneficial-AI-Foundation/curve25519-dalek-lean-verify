@@ -359,7 +359,11 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   obtain ⟨h_L0, h_L1, h_L2, h_L4_eq, hmax, h_mask_L0⟩ := mont_reduce_consts
   -- ROW 1 setup: ALL U128.add_spec use spec_bind to avoid deep recursion
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  apply spec_bind; · exact U128.add_spec (by
+    have : (↑i1 : Nat) < 2 ^ 127 := by
+      rw [show (↑i1 : Nat) = i1.val from rfl, show i1.val = (↑a)[1]!.val from by
+        simp [i1_post]]; exact h_bounds 1 (by omega)
+    rw [hmax]; omega)
   intro i2 i2_post
   let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
   let* ⟨ i4, i4_post ⟩ ← m_spec
