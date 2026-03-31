@@ -301,6 +301,11 @@ private lemma base_digit_bound {B d0 d1 d2 d3 d4 : ℤ}
       (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) := by nlinarith
   linarith [show (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) = B ^ 5 - 1 from by ring]
 
+/-- Product of two values below 2^52 is below 2^104. -/
+private theorem mul_lt_pow104 {a b : Nat} (ha : a < 2 ^ 52) (hb : b < 2 ^ 52) :
+    a * b < 2 ^ 104 := by
+  agrind
+
 /-- Non-trivial shared constants for montgomery_reduce.
 Proved separately to avoid adding kernel depth to the main proof. -/
 private theorem mont_reduce_consts :
@@ -474,51 +479,84 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     rw [i27_post]; omega
   apply spec_bind; · exact part1_spec i27 (by rw [hmax]; omega)
   intro result4 ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩
-  -- ROW 5 setup
+  -- ROW 5 setup (carry4 < 2^77, products < 2^96 or 2^104)
   let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi28 : (↑i28 : Nat) < 2 ^ 127 := by
+    rw [show (↑i28 : Nat) = i28.val from rfl, show i28.val = (↑a)[5]!.val from by
+      simp [i28_post]]; exact h_bounds 5 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i29 i29_post
   let* ⟨ i30, i30_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi30 : (↑i30 : Nat) < 2 ^ 96 := by
+    rw [i30_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n1_bound (by positivity)
+  have hi29 : (↑i29 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i29_post]; linarith [h_carry4_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i31 i31_post
   let* ⟨ i32, i32_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi32 : (↑i32 : Nat) < 2 ^ 104 := by
+    rw [i32_post]; exact mul_lt_pow104 h_n3_bound hi8
+  have hi31 : (↑i31 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 := by rw [i31_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i33 i33_post
   let* ⟨ i34, i34_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi34 : (↑i34 : Nat) < 2 ^ 104 := by
+    rw [i34_post]; exact mul_lt_pow104 h_n4_bound hi3
+  have hi33 : (↑i33 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 := by rw [i33_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i35 i35_post
   -- ROW 5: part2 → r0
   apply spec_bind; · exact part2_spec i35
   intro p2_0 ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩
-  -- ROW 6 setup
+  -- ROW 6 setup (part2 carry < 2^76)
   let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi36 : (↑i36 : Nat) < 2 ^ 127 := by
+    rw [show (↑i36 : Nat) = i36.val from rfl, show i36.val = (↑a)[6]!.val from by
+      simp [i36_post]]; exact h_bounds 6 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i37 i37_post
   let* ⟨ i38, i38_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi38 : (↑i38 : Nat) < 2 ^ 96 := by
+    rw [i38_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n2_bound (by positivity)
+  have hi37 : (↑i37 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i37_post]; linarith [h_n5_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i39 i39_post
   let* ⟨ i40, i40_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi40 : (↑i40 : Nat) < 2 ^ 104 := by
+    rw [i40_post]; exact mul_lt_pow104 h_n4_bound hi8
+  have hi39 : (↑i39 : Nat) < 2 ^ 76 + 2 ^ 127 + 2 ^ 96 := by rw [i39_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i41 i41_post
   -- ROW 6: part2 → r1
   apply spec_bind; · exact part2_spec i41
   intro p2_1 ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩
   -- ROW 7 setup
   let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi42 : (↑i42 : Nat) < 2 ^ 127 := by
+    rw [show (↑i42 : Nat) = i42.val from rfl, show i42.val = (↑a)[7]!.val from by
+      simp [i42_post]]; exact h_bounds 7 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i43 i43_post
   let* ⟨ i44, i44_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi44 : (↑i44 : Nat) < 2 ^ 96 := by
+    rw [i44_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n3_bound (by positivity)
+  have hi43 : (↑i43 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i43_post]; linarith [h_n6_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i45 i45_post
   -- ROW 7: part2 → r2
   apply spec_bind; · exact part2_spec i45
   intro p2_2 ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩
   -- ROW 8 setup
   let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi46 : (↑i46 : Nat) < 2 ^ 127 := by
+    rw [show (↑i46 : Nat) = i46.val from rfl, show i46.val = (↑a)[8]!.val from by
+      simp [i46_post]]; exact h_bounds 8 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i47 i47_post
   let* ⟨ i48, i48_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi48 : (↑i48 : Nat) < 2 ^ 96 := by
+    rw [i48_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
+  have hi47 : (↑i47 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i47_post]; linarith [h_n7_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i49 i49_post
   -- ROW 8: part2 → r3, r4_u128
   apply spec_bind; · exact part2_spec i49
