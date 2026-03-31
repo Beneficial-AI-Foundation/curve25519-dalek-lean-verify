@@ -390,17 +390,36 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   intro result1 ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩
   -- ROW 2 setup
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  apply spec_bind; · exact U128.add_spec (by
+    have : (↑i6 : Nat) < 2 ^ 127 := by
+      rw [show (↑i6 : Nat) = i6.val from rfl, show i6.val = (↑a)[2]!.val from by
+        simp [i6_post]]; exact h_bounds 2 (by omega)
+    rw [hmax]; omega)
   intro i7 i7_post
   let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
   let* ⟨ i9, i9_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi8 : (↑i8 : Nat) < 2 ^ 52 := by
+    rw [show (↑i8 : Nat) = i8.val from rfl, show i8.val = (↑constants.L)[2]!.val from by
+      simp [i8_post]]; exact h_L2
+  have hi9 : (↑i9 : Nat) < 2 ^ 104 := by rw [i9_post]; nlinarith [h_n0_bound, hi8]
+  have hi6 : (↑i6 : Nat) < 2 ^ 127 := by
+    rw [show (↑i6 : Nat) = i6.val from rfl, show i6.val = (↑a)[2]!.val from by
+      simp [i6_post]]; exact h_bounds 2 (by omega)
+  have hi7 : (↑i7 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i7_post]; linarith [h_carry1_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i10 i10_post
   let* ⟨ i11, i11_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi3 : (↑i3 : Nat) < 2 ^ 52 := by
+    rw [show (↑i3 : Nat) = i3.val from rfl, show i3.val = (↑constants.L)[1]!.val from by
+      simp [i3_post]]; exact h_L1
+  have hi11 : (↑i11 : Nat) < 2 ^ 104 := by rw [i11_post]; nlinarith [h_n1_bound, hi3]
+  have hi10 : (↑i10 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 := by rw [i10_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i12 i12_post
   -- ROW 2: part1
-  apply spec_bind; · exact part1_spec i12 (by sorry)
+  have hi12 : (↑i12 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i12_post]; omega
+  apply spec_bind; · exact part1_spec i12 (by rw [hmax]; omega)
   intro result2 ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩
   -- ROW 3 setup
   let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
