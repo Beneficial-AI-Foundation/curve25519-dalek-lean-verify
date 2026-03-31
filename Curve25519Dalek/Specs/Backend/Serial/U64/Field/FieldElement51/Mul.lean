@@ -15,12 +15,11 @@ Source: curve25519-dalek/src/backend/serial/u64/field.rs
 
 ## Proof strategy: Fold theorem decomposition
 
-The function body is decomposed into 3 helper functions,
-each with a fold theorem and `@[step]` spec.
+The function is decomposed into 3 helper functions, each with a fold theorem and `@[step]` spec.
 
-### Stage 1 — Product computation (`mul_product_stage`)
-### Stage 2 — Carry propagation (`mul_carry_prop_stage`)
-### Stage 3 — Final reduction (`mul_final_reduce_stage`)
+- Stage 1 — Product computation (`mul_product_stage`)
+- Stage 2 — Carry propagation (`mul_carry_prop_stage`)
+- Stage 3 — Final reduction (`mul_final_reduce_stage`)
 -/
 
 set_option linter.hashCommand false
