@@ -146,7 +146,7 @@ private theorem pack_word_eq_word_of_bytes_64
 
 /-! ## Part 1b: Loop spec — byte packing (64 bytes → 8 words) -/
 
-set_option maxHeartbeats 800000 in -- heavy steps
+set_option maxHeartbeats 1000000 in -- heavy steps
 /-- **Loop spec**: Each iteration packs 8 bytes into one
 U64 word. After the loop, `words[j] = word_of_bytes_64 bytes j`
 for all `j < 8`. -/
@@ -155,7 +155,9 @@ theorem from_bytes_wide_loop_helper
     (words : Array U64 8#usize) (i : Usize)
     (hi : i.val ≤ 8)
     (h_prev : ∀ j, j < i.val →
-      words[j]!.val = word_of_bytes_64 bytes j) :
+      words[j]!.val = word_of_bytes_64 bytes j)
+    (h_zero : ∀ j, i.val ≤ j → j < 8 →
+      words[j]!.val = 0) :
     from_bytes_wide_loop bytes words i ⦃ words' =>
       ∀ j, j < 8 →
         words'[j]!.val = word_of_bytes_64 bytes j ⦄ := by
@@ -233,45 +235,68 @@ theorem from_bytes_wide_loop_helper
     let* ⟨ a, a_post ⟩ ← Array.update_spec
     let* ⟨ i55, i55_post ⟩ ← Usize.add_spec
     let* ⟨ words', words'_post1, words'_post2, words'_post3 ⟩ ← ih
-    subst a_post
-    intro j hj
-    by_cases heq : j = i.val
-    · -- j = i: show the accumulated OR equals word_of_bytes_64
-      subst heq
-      -- Resolve outermost set → i54, then resolve all intermediate
-      -- read-modify-write lookups: (a.set i v)[↑i]! = v
-      simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
-      rw [getElem!_pos _ _ (by simp [List.length_set, List.Vector.length_val]; agrind),
-          List.getElem_set_self (by simp [List.length_set, List.Vector.length_val]; agrind)]
-      -- Collapse intermediate lookups: convert (↑(a.set i v))[↑i]! back
-      -- to Std.Array level and apply set_getElem!_self
-      -- simp? [i53_post, i46_post, i39_post, i32_post, i25_post, i18_post, i11_post,
-      --   words7_post, words6_post, words5_post, words4_post, words3_post, words2_post,
-      --   words1_post, ← Array.getElem!_Nat_eq, set_getElem!_self (hj := by omega)]
-      -- OR chain is now direct; expand and convert to sum
-      simp (discharger := omega) only [*, UScalar.val_or, UScalar.cast_val_eq,
-        u8_val_mod_u64_numBits, Nat.shiftLeft_eq, u8_mul_pow_mod_u64]
-      -- rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
-      --   (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
-      --   (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
-      --   (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
-      --   (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
-      simp only [word_of_bytes_64, Finset.sum_range_succ, Finset.range_zero,
-        Finset.sum_empty, zero_add, Array.getElem!_Nat_eq];
-      simp only [Array.set_val_eq, List.set_set, Int.reduceMul,
-        Int.reduceToNat, add_zero, mul_zero, pow_zero, mul_one, Nat.reduceMul]
-
-      sorry
-    · -- j ≠ i: all 8 sets at index i, words[j] unchanged
-      simp only [words7_post, words6_post, words5_post, words4_post, words3_post, words2_post,
-        words1_post, Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set]
-      have h_ji : j < i.val := by omega
-      -- _ : [> let words7.set i i54 ← words7.update i i54 <]
-      -- j : ℕ
-      -- hj : j < ↑i55
-      -- heq : ¬j = ↑i
-      grind only [usr ScalarTac.IScalar.bounds, = List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
-
+    · subst a_post
+      intro j hj
+      by_cases heq : j = i.val
+      · -- j = i: pack 8 bytes into word
+        subst heq
+        -- Phase 1: collapse read-modify-write lookups
+        have h53 : i53 = i47 := by rw [i53_post, words7_post]; agrind
+        have h46 : i46 = i40 := by rw [i46_post, words6_post]; agrind
+        have h39 : i39 = i33 := by rw [i39_post, words5_post]; agrind
+        have h32 : i32 = i26 := by rw [i32_post, words4_post]; agrind
+        have h25 : i25 = i19 := by rw [i25_post, words3_post]; agrind
+        have h18 : i18 = i12 := by rw [i18_post, words2_post]; agrind
+        have h11 : i11 = i6  := by rw [i11_post, words1_post]; agrind
+        -- Resolve outermost set
+        simp only [Array.getElem!_Nat_eq, Array.set_val_eq]
+        rw [getElem!_pos _ _ (by simp only [List.length_set, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; omega),
+            List.getElem_set_self (by simp only [List.length_set, List.Vector.length_val,
+              UScalar.ofNatCore_val_eq]; omega)]
+        -- Phase 2: expand OR chain
+        simp (discharger := omega) only [h53, h46, h39, h32, h25, h18, h11,
+          i54_post1, i47_post1, i40_post1, i33_post1, i26_post1, i19_post1,
+          i12_post1, i6_post1, UScalar.val_or, UScalar.cast_val_eq,
+          i3_post, i9_post, i15_post, i22_post, i29_post, i36_post, i43_post,
+          i50_post, i4_post1, i10_post1, i17_post1, i24_post1, i31_post1,
+          i38_post1, i45_post1, i52_post1, u8_val_mod_u64_numBits,
+          Nat.shiftLeft_eq, u8_mul_pow_mod_u64, i2_post, i1_post, i5_post]
+        -- Expand remaining bytes and shift amounts
+        simp only [pow_zero, mul_one, i8_post, i7_post,
+          i14_post, i13_post, i16_post, Int.reduceMul, Int.reduceToNat, i21_post,
+          i20_post, i23_post, i28_post, i27_post, i30_post, i35_post, i34_post, i37_post, i42_post,
+          i41_post, i44_post, i49_post, i48_post, i51_post]
+        -- Eliminate initial zero: words[i] = 0 (from loop invariant)
+        have hzero : (↑(↑words : List.Vector U64 8)[i.val]! : Nat) = 0 := by
+          rw [Array.getElem!_Nat_eq]; agrind
+        rw [← Array.getElem!_Nat_eq]
+        rw [hzero]; simp only [Nat.zero_or]
+        -- OR to sum, close with ring
+        simp only [i1_post]
+        rw [or_bytes_eq_sum _ _ _ _ _ _ _ _
+          (bytes.val[i.val * 8]!).hmax (bytes.val[i.val * 8 + 1]!).hmax
+          (bytes.val[i.val * 8 + 2]!).hmax (bytes.val[i.val * 8 + 3]!).hmax
+          (bytes.val[i.val * 8 + 4]!).hmax (bytes.val[i.val * 8 + 5]!).hmax
+          (bytes.val[i.val * 8 + 6]!).hmax (bytes.val[i.val * 8 + 7]!).hmax]
+        simp only [word_of_bytes_64, Finset.sum_range_succ, Finset.range_zero,
+          Finset.sum_empty, zero_add, Array.getElem!_Nat_eq]; ring_nf
+      · -- j ≠ i: all 8 sets at index i, words[j] unchanged
+        simp only [words7_post, words6_post, words5_post, words4_post,
+          words3_post, words2_post, words1_post,
+          Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set]
+        have h_ji : j < i.val := by omega
+        grind only [usr ScalarTac.IScalar.bounds,
+          = List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
+    · -- h_zero for next iteration: a[j] = 0 for j ≥ i+1
+      subst a_post; intro j hge hlt
+      have hne : j ≠ i.val := by omega
+      simp only [words7_post, words6_post, words5_post, words4_post,
+        words3_post, words2_post, words1_post,
+        Array.getElem!_Nat_eq, Array.set_val_eq, List.set_set]
+      grind only [usr ScalarTac.IScalar.bounds,
+        = List.getElem!_set_ne, =_ Array.getElem!_Nat_eq]
+    · exact words'_post1 words'_post2 words'_post3
 
 /-- Interpret 8 LE U64 words as a natural number. -/
 def words_wide_as_Nat
@@ -302,12 +327,14 @@ theorem from_bytes_wide_loop_spec
     (words : Array U64 8#usize)
     (i : Usize) (hi : i.val ≤ 8)
     (h_prev : ∀ j, j < i.val →
-      words[j]!.val = word_of_bytes_64 bytes j) :
+      words[j]!.val = word_of_bytes_64 bytes j)
+    (h_zero : ∀ j, i.val ≤ j → j < 8 →
+      words[j]!.val = 0) :
     from_bytes_wide_loop bytes words i ⦃ words' =>
       words_wide_as_Nat words' =
         U8x64_as_Nat bytes ⦄ := by
   apply spec_mono
-    (from_bytes_wide_loop_helper bytes words i hi h_prev)
+    (from_bytes_wide_loop_helper bytes words i hi h_prev h_zero)
   intro words' hpost
   exact words_wide_eq_bytes bytes words' hpost
 
@@ -336,6 +363,10 @@ theorem from_bytes_wide_spec
   unfold from_bytes_wide
   -- Step through loop + mask computation
   let* ⟨ words1, words1_post ⟩ ← from_bytes_wide_loop_spec
+  · intro j h hj;
+    simp only [Array.getElem!_Nat_eq, Array.repeat_val, UScalar.ofNatCore_val_eq,
+      List.reduceReplicate]
+    agrind
   let* ⟨ i, i_post1, i_post2 ⟩ ← U64.ShiftLeft_IScalar_spec
   let* ⟨ mask, mask_post1, mask_post2 ⟩ ← U64.sub_spec
   -- Eliminate index_mut wrappers (10 calls for lo + hi)
