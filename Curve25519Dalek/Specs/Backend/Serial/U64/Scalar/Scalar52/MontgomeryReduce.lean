@@ -323,7 +323,7 @@ private theorem mont_reduce_consts :
           · positivity
       _ < 2 ^ 104 := by omega
 
-set_option maxHeartbeats 1600000 in -- New Aeneas version needs more
+set_option maxHeartbeats 2600000 in -- New Aeneas version needs more
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -445,20 +445,34 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   intro result3 ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩
   -- ROW 4 setup
   let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi19 : (↑i19 : Nat) < 2 ^ 127 := by
+    rw [show (↑i19 : Nat) = i19.val from rfl, show i19.val = (↑a)[4]!.val from by
+      simp [i19_post]]; exact h_bounds 4 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i20 i20_post
   let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
   let* ⟨ i22, i22_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi21 : (↑i21 : Nat) = 2 ^ 44 := by
+    rw [show (↑i21 : Nat) = i21.val from rfl, show i21.val = (↑constants.L)[4]!.val from by
+      simp [i21_post]]; exact h_L4_eq
+  have hi22 : (↑i22 : Nat) < 2 ^ 96 := by rw [i22_post, hi21]; nlinarith [h_n0_bound]
+  have hi20 : (↑i20 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i20_post]; linarith [h_carry3_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i23 i23_post
   let* ⟨ i24, i24_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi24 : (i24 : Nat) < 2 ^ 104 := by rw [i24_post]; agrind
+  have hi23 : (↑i23 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 := by rw [i23_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i25 i25_post
   let* ⟨ i26, i26_post ⟩ ← m_spec
-  apply spec_bind; · exact U128.add_spec (by sorry)
+  have hi26 : (↑i26 : Nat) < 2 ^ 104 := by rw [i26_post]; agrind
+  have hi25 : (↑i25 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 := by rw [i25_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
   intro i27 i27_post
   -- ROW 4: part1
-  apply spec_bind; · exact part1_spec i27 (by sorry)
+  have hi27 : (↑i27 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i27_post]; omega
+  apply spec_bind; · exact part1_spec i27 (by rw [hmax]; omega)
   intro result4 ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩
   -- ROW 5 setup
   let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
