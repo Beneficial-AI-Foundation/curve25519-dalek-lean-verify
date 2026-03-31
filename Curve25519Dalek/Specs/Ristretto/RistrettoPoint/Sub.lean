@@ -51,8 +51,6 @@ theorem sub_spec
       result.toPoint = self.toPoint - other.toPoint ⦄ := by
   unfold sub edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub
   step
-  · exact h_self_valid.1
-  · exact h_other_valid.1
   · have h_toPoint : RistrettoPoint.toPoint ep = self.toPoint - other.toPoint := by
       unfold RistrettoPoint.toPoint; exact ep_post2
     have h_even : ∀ r : RistrettoPoint, r.IsValid → IsEven r.toPoint := fun r hr => by

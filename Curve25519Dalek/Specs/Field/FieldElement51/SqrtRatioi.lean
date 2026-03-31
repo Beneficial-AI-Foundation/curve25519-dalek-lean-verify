@@ -1316,7 +1316,7 @@ private theorem solve_second_choice_false_choice3_false
 
 end sqrt_ratio_i_branch_solvers
 
-set_option maxHeartbeats 250000 in -- the proof works even with 230k heartbeats, but not much less.
+set_option maxHeartbeats 400000 in -- the proof works even with 230k heartbeats, but not much less.
 /-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
 i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
 

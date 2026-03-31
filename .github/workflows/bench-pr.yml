@@ -48,7 +48,7 @@ jobs:
       - name: Checkout PR head
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.pr.outputs.ref }}
+          ref: ${{ steps.pr.outputs.sha }}
 
       - name: Install elan
         run: |
@@ -80,16 +80,27 @@ jobs:
           REPO_NAME=$(gh repo view --json nameWithOwner -q .nameWithOwner)
           HEAD_SHA=${{ steps.pr.outputs.sha }}
           BASE_SHA=${{ steps.pr.outputs.base_sha }}
-          REPORT_URL="${{ secrets.BENCH_API_ENDPOINT }}/${REPO_NAME}/${HEAD_SHA}/report/pr?base=${BASE_SHA}"
+          ENDPOINT="${{ secrets.BENCH_API_ENDPOINT }}"
+          REPORT_URL="${ENDPOINT}/${REPO_NAME}/${HEAD_SHA}/report/pr?base=${BASE_SHA}"
 
-          RESPONSE=$(curl -s --show-error -w "\nHTTP_STATUS:%{http_code}" "$REPORT_URL")
+          RESPONSE=$(curl -s --max-time 300 --show-error -w "\nHTTP_STATUS:%{http_code}" "$REPORT_URL")
           HTTP_STATUS=$(echo "$RESPONSE" | tail -1 | sed 's/HTTP_STATUS://')
           BODY=$(echo "$RESPONSE" | sed '$d')
 
           if [[ "$HTTP_STATUS" -ne 200 ]]; then
-            echo "Server returned HTTP $HTTP_STATUS"
-            echo "$BODY"
-            exit 1
+            echo "::warning::Report with base SHA ${BASE_SHA} failed (HTTP ${HTTP_STATUS}), retrying with default branch tip"
+            DEFAULT_SHA=$(git rev-parse origin/$(gh repo view --json defaultBranchRef -q .defaultBranchRef.name))
+            REPORT_URL="${ENDPOINT}/${REPO_NAME}/${HEAD_SHA}/report/pr?base=${DEFAULT_SHA}"
+
+            RESPONSE=$(curl -s --max-time 300 --show-error -w "\nHTTP_STATUS:%{http_code}" "$REPORT_URL")
+            HTTP_STATUS=$(echo "$RESPONSE" | tail -1 | sed 's/HTTP_STATUS://')
+            BODY=$(echo "$RESPONSE" | sed '$d')
+
+            if [[ "$HTTP_STATUS" -ne 200 ]]; then
+              echo "Server returned HTTP $HTTP_STATUS"
+              echo "$BODY"
+              exit 1
+            fi
           fi
 
           COMMENT=$(echo "$BODY" | jq -r .markdown)
