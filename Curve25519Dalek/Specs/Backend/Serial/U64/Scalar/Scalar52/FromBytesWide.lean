@@ -1,7 +1,7 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
@@ -519,7 +519,38 @@ theorem from_bytes_wide_spec
     3#usize i39).set 4#usize i41) with hi_def
   -- Bit-slicing identity: lo + hi * R = words_wide = U8x64_as_Nat b
   have hslice : Scalar52_as_Nat lo + Scalar52_as_Nat hi * R = U8x64_as_Nat b := by
-    sorry
+    rw [← words1_post, lo_def, hi_def]
+    -- Unfold Scalar52_as_Nat and words_wide_as_Nat to explicit sums
+    unfold Scalar52_as_Nat words_wide_as_Nat
+    simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+    -- Simplify array set-chain lookups and rewrite all intermediate
+    -- values to word-level expressions via postconditions
+    simp only [
+      ↓Array.getElem!_Nat_set_eq, ↓Array.getElem!_Nat_set_ne,
+      ne_eq, Nat.reduceEqDiff, not_false_eq_true, OfNat.ofNat_ne_zero,
+      one_ne_zero, Nat.succ_ne_self, Array.length, List.Vector.length_val,
+      Nat.ofNat_pos, and_self, Nat.reduceLT, Nat.lt_add_one,
+      UScalar.ofNatCore_val_eq,
+      i2_post1, i7_post1, i12_post1, i17_post1, i22_post1,
+      i24_post1, i29_post1, i34_post1, i39_post1,
+      i6_post1, i11_post1, i16_post1, i21_post1,
+      i28_post1, i33_post1, i38_post1,
+      i3_post1, i8_post1, i13_post1, i18_post1, i23_post1,
+      i25_post1, i30_post1, i35_post1,
+      i5_post1, i10_post1, i15_post1, i20_post1,
+      i27_post1, i32_post1, i37_post1,
+      i41_post1,
+      UScalar.val_and, UScalar.val_or, hmask, land_pow_two_sub_one_eq_mod,
+      Nat.shiftRight_eq_div_pow, Nat.shiftLeft_eq,
+      i1_post, i4_post, i9_post, i14_post, i19_post,
+      i26_post, i31_post, i36_post,
+      ← Array.getElem!_Nat_eq]
+    -- Reduce constant exponents and unfold R
+    simp only [Nat.reduceMul, pow_zero, one_mul, show R = 2 ^ 260 from rfl]
+    -- bit_slicing_wide + omega handles the mul_comm mismatch
+    have := bit_slicing_wide words1[0]! words1[1]! words1[2]! words1[3]!
+      words1[4]! words1[5]! words1[6]! words1[7]!
+    omega
   -- R coprime with L (L is prime, R = 2^260)
   have hcoprime : L.gcd R = 1 :=
     Nat.Coprime.pow_right 260 (by decide : Nat.Coprime L 2)

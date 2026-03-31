@@ -4198,14 +4198,14 @@
    "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ (u : Scalar52) =>\n        Scalar52_as_Nat u = U8x64_as_Nat b % L ∧\n        Scalar52_as_Nat u < L ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "theorem from_bytes_wide_spec\n    (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ (u : Scalar52) =>\n      Scalar52_as_Nat u = U8x64_as_Nat b % L ∧\n      Scalar52_as_Nat u < L ∧\n      ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.from_bytes_wide`**:\n- The result represents the input byte array reduced modulo L (canonical form) -/",
+   "/-- **Spec for `Scalar52::from_bytes_wide`**:\n- No panic\n- Result = input mod L (canonical form)\n- All limbs < 2^52 -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4217,7 +4217,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
@@ -4226,11 +4226,13 @@
     "curve25519_dalek.backend.serial.u64.constants.R",
     "curve25519_dalek.backend.serial.u64.constants.RR",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
+   "spec_docstring":
+   "/-- Loop spec with `words_wide_as_Nat` postcondition. -/\n@[step]\ntheorem from_bytes_wide_loop_spec\n    (bytes : Array U8 64#usize)\n    (words : Array U64 8#usize)\n    (i : Usize) (hi : i.val ≤ 8)\n    (h_prev : ∀ j, j < i.val →\n      words[j]!.val = word_of_bytes_64 bytes j)\n    (h_zero : ∀ j, i.val ≤ j → j < 8 →\n      words[j]!.val = 0) :\n    from_bytes_wide_loop bytes words i ⦃ words' =>\n      words_wide_as_Nat words' =\n        U8x64_as_Nat bytes ⦄ := by\n  apply spec_mono\n    (from_bytes_wide_loop_helper bytes words i hi h_prev h_zero)\n  intro words' hpost\n  exact words_wide_eq_bytes bytes words' hpost",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4241,7 +4243,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
