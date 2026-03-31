@@ -182,6 +182,8 @@ def fill_missing_from_git(
         if stats is None:
             continue
         entry = {"commit": c["hash"], "date": c["date"], **stats}
+        if not _has_verification_data(entry):
+            continue
         history.append(entry)
         added += 1
     if added:
