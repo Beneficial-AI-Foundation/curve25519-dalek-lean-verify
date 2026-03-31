@@ -523,6 +523,8 @@ private lemma elligator_nqr_twist
   * The computation maintains constant-time guarantees: all branches are resolved
     via conditional-select and conditional-assign operations
 -/
+set_option maxHeartbeats 220000 in
+-- haeby simp
 
 @[step]
 theorem elligator_encode_spec
@@ -575,6 +577,7 @@ theorem elligator_encode_spec
       · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
         grind
       · simp only [h, ↓reduceIte, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, gt_iff_lt]
+        clear *- A_bound
         grind
     step as ⟨ u_neg, hu_neg, hu_neg_b⟩
     step as ⟨ p1, hp1⟩
@@ -632,6 +635,7 @@ theorem elligator_encode_spec
       have :Field51_as_Nat Atemp=  Field51_as_Nat zero:=by
         simp only [Field51_as_Nat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Finset.sum_range_succ,
           Finset.range_one, Finset.sum_singleton, mul_zero, pow_zero, one_mul, mul_one, Nat.reducePow, Nat.reduceMul]
+        clear *- hAtemp
         simp_all
       rw[zero_eq] at this
       simp only [this, add_zero] at ha
