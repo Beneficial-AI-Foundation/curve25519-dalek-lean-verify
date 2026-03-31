@@ -32,16 +32,11 @@ attribute [local irreducible] p in
 `edwards.EdwardsPoint.double`**:
 - Returns the doubled point 2P (= P + P in elliptic
   curve addition) where P is the input EdwardsPoint -/
-@[externally_verified, step] -- proven in Verus
+@[step]
 theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
     double e ⦃ result =>
     result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by
-    -- Unfold the double function:
-  -- double e = do
-  --   let pp ← as_projective e
-  --   let cp ← ProjectivePoint.double pp
-  --   as_extended cp
-  unfold edwards.EdwardsPoint.double
+  unfold double
   -- Step 1: as_projective (preserves X, Y, Z)
   apply WP.spec_bind
     (edwards.EdwardsPoint.as_projective_spec e)
