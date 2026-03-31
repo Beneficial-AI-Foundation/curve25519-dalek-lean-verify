@@ -18,40 +18,23 @@ Specification and proof for `EdwardsPoint::double`.
 This function doubles an Edwards point (adds it to itself) using elliptic curve point addition.
 
 **Source**: curve25519-dalek/src/edwards.rs
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open Edwards
-
-set_option linter.hashCommand false in
-#setup_aeneas_simps
-
-section curve25519_dalek.edwards.EdwardsPoint
-namespace curve25519_dalek
-
-open backend.serial.u64.field
-open backend.serial.u64.field.FieldElement51
-open backend.serial.curve_models
-open backend.serial.curve_models.ProjectivePoint
+namespace curve25519_dalek.edwards.EdwardsPoint
+/-new-/
+open Edwards backend.serial.curve_models backend.serial.curve_models.ProjectivePoint
 
 -- The `linear_combination` steps require extra heartbeats
 -- for the algebraic verification of the curve equation.
-set_option linter.style.setOption false in
-set_option maxHeartbeats 800000 in
--- `linear_combination` for the curve equation needs
--- extra heartbeats for algebraic verification
 attribute [local irreducible] p in
 /-- **Spec and proof concerning
 `edwards.EdwardsPoint.double`**:
-- No panic (always returns successfully)
 - Returns the doubled point 2P (= P + P in elliptic
   curve addition) where P is the input EdwardsPoint -/
 @[externally_verified, step] -- proven in Verus
-theorem double_spec (e : edwards.EdwardsPoint) (he_valid : e.IsValid) :
-    edwards.EdwardsPoint.double e ⦃ result =>
+theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
+    double e ⦃ result =>
     result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by
     -- Unfold the double function:
   -- double e = do
@@ -266,5 +249,3 @@ theorem double_spec (e : edwards.EdwardsPoint) (he_valid : e.IsValid) :
               (e.toPoint).y) := by
             rw [h_ex, h_ey]
             simp only [Ed25519]; ring
-
-end curve25519_dalek.edwards.EdwardsPoint.curve25519_dalek
