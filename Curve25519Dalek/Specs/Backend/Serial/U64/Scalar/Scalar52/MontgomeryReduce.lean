@@ -301,7 +301,7 @@ private lemma base_digit_bound {B d0 d1 d2 d3 d4 : ℤ}
       (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) := by nlinarith
   linarith [show (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) = B ^ 5 - 1 from by ring]
 
-set_option maxHeartbeats 800000 in -- Progress will timout otherwise
+set_option maxHeartbeats 1600000 in -- Lean 4.28 needs more
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
@@ -329,84 +329,114 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   unfold montgomery_reduce
   unfold Insts.CoreOpsIndexIndexUsizeU64.index
   simp only [step_simps]
-  -- ROW 0: part1(a[0])
   let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
   let* ⟨ result0, h_result0 ⟩ ← part1_spec
   obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
-  -- ROW 1: part1(carry0 + a[1] + n0*L[1])
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ i2, i2_post ⟩ ← U128.add_spec
   let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
   let* ⟨ i4, i4_post ⟩ ← m_spec
-  let* ⟨ i5, i5_post ⟩ ← U128.add_spec
-  -- ROW 1: part1
-  let* ⟨ result1, h_result1 ⟩ ← part1_spec
-  obtain ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩ := h_result1
+  -- Use spec_bind for U128.add_spec / part1_spec to avoid deep kernel
+  -- recursion in Lean 4.28. Cheap steps (index, m_spec) use let* as usual.
+  -- ROW 1: i5 = i2 + i4, then part1(i5)
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i5 i5_post
+  apply spec_bind; · exact part1_spec i5 (by sorry)
+  intro result1 ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩
+  -- ROW 2 setup
   let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i7, i7_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i7 i7_post
   let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
   let* ⟨ i9, i9_post ⟩ ← m_spec
-  let* ⟨ i10, i10_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i10 i10_post
   let* ⟨ i11, i11_post ⟩ ← m_spec
-  let* ⟨ i12, i12_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i12 i12_post
   -- ROW 2: part1
-  let* ⟨ result2, h_result2 ⟩ ← part1_spec
-  obtain ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩ := h_result2
+  apply spec_bind; · exact part1_spec i12 (by sorry)
+  intro result2 ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩
+  -- ROW 3 setup
   let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i14, i14_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i14 i14_post
   let* ⟨ i15, i15_post ⟩ ← m_spec
-  let* ⟨ i16, i16_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i16 i16_post
   let* ⟨ i17, i17_post ⟩ ← m_spec
-  let* ⟨ i18, i18_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i18 i18_post
   -- ROW 3: part1
-  let* ⟨ result3, h_result3 ⟩ ← part1_spec
-  obtain ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩ := h_result3
+  apply spec_bind; · exact part1_spec i18 (by sorry)
+  intro result3 ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩
+  -- ROW 4 setup
   let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i20, i20_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i20 i20_post
   let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
   let* ⟨ i22, i22_post ⟩ ← m_spec
-  let* ⟨ i23, i23_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i23 i23_post
   let* ⟨ i24, i24_post ⟩ ← m_spec
-  let* ⟨ i25, i25_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i25 i25_post
   let* ⟨ i26, i26_post ⟩ ← m_spec
-  let* ⟨ i27, i27_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i27 i27_post
   -- ROW 4: part1
-  let* ⟨ result4, h_result4 ⟩ ← part1_spec
-  obtain ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩ := h_result4
+  apply spec_bind; · exact part1_spec i27 (by sorry)
+  intro result4 ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩
+  -- ROW 5 setup
   let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i29, i29_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i29 i29_post
   let* ⟨ i30, i30_post ⟩ ← m_spec
-  let* ⟨ i31, i31_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i31 i31_post
   let* ⟨ i32, i32_post ⟩ ← m_spec
-  let* ⟨ i33, i33_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i33 i33_post
   let* ⟨ i34, i34_post ⟩ ← m_spec
-  let* ⟨ i35, i35_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i35 i35_post
   -- ROW 5: part2 → r0
-  let* ⟨ p2_0, h_p2_0 ⟩ ← part2_spec
-  obtain ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩ := h_p2_0
+  apply spec_bind; · exact part2_spec i35
+  intro p2_0 ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩
+  -- ROW 6 setup
   let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i37, i37_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i37 i37_post
   let* ⟨ i38, i38_post ⟩ ← m_spec
-  let* ⟨ i39, i39_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i39 i39_post
   let* ⟨ i40, i40_post ⟩ ← m_spec
-  let* ⟨ i41, i41_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i41 i41_post
   -- ROW 6: part2 → r1
-  let* ⟨ p2_1, h_p2_1 ⟩ ← part2_spec
-  obtain ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩ := h_p2_1
+  apply spec_bind; · exact part2_spec i41
+  intro p2_1 ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩
+  -- ROW 7 setup
   let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i43, i43_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i43 i43_post
   let* ⟨ i44, i44_post ⟩ ← m_spec
-  let* ⟨ i45, i45_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i45 i45_post
   -- ROW 7: part2 → r2
-  let* ⟨ p2_2, h_p2_2 ⟩ ← part2_spec
-  obtain ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩ := h_p2_2
+  apply spec_bind; · exact part2_spec i45
+  intro p2_2 ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩
+  -- ROW 8 setup
   let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
-  let* ⟨ i47, i47_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i47 i47_post
   let* ⟨ i48, i48_post ⟩ ← m_spec
-  let* ⟨ i49, i49_post ⟩ ← U128.add_spec
+  apply spec_bind; · exact U128.add_spec (by sorry)
+  intro i49 i49_post
   -- ROW 8: part2 → r3, r4_u128
-  let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
-  obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
+  apply spec_bind; · exact part2_spec i49
+  intro p2_3 ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩
+  -- Cast r4_u128 → r4 (U64)
   let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
   -- Derive tight r4 bound from h_canonical
   have h_L4 : i21.val = 2 ^ 44 := by
@@ -430,21 +460,17 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       rw [r4_post]; simp only [U128_cast_U64_val]; exact Nat.mod_le _ _
     linarith
   -- ===== MAIN EQUATION: T + C * L = inter * R (Montgomery identity) =====
-  -- r4 cast equality (r4_u128 < 2^47 < 2^64 so cast is identity)
   have h_r4_eq : r4.val = p2_3.1.val := by
     rw [r4_post]; simp only [U128_cast_U64_val]
     exact Nat.mod_eq_of_lt (lt_trans h_r4u128_tight (by norm_num))
-  -- Lift part1/part2 value equations to ℤ for mont_step / ediv+emod
   zify at h_n0_val h_carry0_val h_n1_val h_carry1_val h_n2_val h_carry2_val
          h_n3_val h_carry3_val h_n4_val h_carry4_val
          h_r0_val h_n5_val h_r1_val h_n6_val h_r2_val h_n7_val h_r3_val h_r4u128_val
-  -- Part1 carry equations (rows 0–4): input_sum + n_k * L[0] = c_k * 2^52
   have eq0 := mont_step _ _ _ h_n0_val h_carry0_val
   have eq1 := mont_step _ _ _ h_n1_val h_carry1_val
   have eq2 := mont_step _ _ _ h_n2_val h_carry2_val
   have eq3 := mont_step _ _ _ h_n3_val h_carry3_val
   have eq4 := mont_step _ _ _ h_n4_val h_carry4_val
-  -- Part2 split equations (rows 5–8): input_sum = carry * 2^52 + limb
   have eq5 : (↑i35.val : ℤ) = ↑p2_0.1.val * (2 ^ 52 : ℤ) + ↑p2_0.2.val := by
     rw [h_n5_val, h_r0_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
   have eq6 : (↑i41.val : ℤ) = ↑p2_1.1.val * (2 ^ 52 : ℤ) + ↑p2_1.2.val := by
@@ -453,10 +479,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     rw [h_n7_val, h_r2_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
   have eq8 : (↑i49.val : ℤ) = ↑p2_3.1.val * (2 ^ 52 : ℤ) + ↑p2_3.2.val := by
     rw [h_r4u128_val, h_r3_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
-  -- Replace p2_3.1 (u128 carry) with r4 (u64 cast) in eq8
   rw [show (↑p2_3.1.val : ℤ) = ↑r4.val from by exact_mod_cast h_r4_eq.symm] at eq8
-  -- Substitute all intermediate computation values into the 9 equations
-  -- After this, equations use only: a[k]!.val, result_k.{1,2}.val, p2_k.{1,2}.val, r4.val, L[k]!.val
   simp only [i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post, i7_post, i8_post,
     i9_post, i10_post, i11_post, i12_post, i13_post, i14_post, i15_post, i16_post,
     i17_post, i18_post, i19_post, i20_post, i21_post, i22_post, i23_post, i24_post,
@@ -465,7 +488,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post,
     ← Array.getElem!_Nat_eq
   ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
-  -- Expand Scalar52 definitions to match montgomery_core_eq conclusion
   have h_wide : (↑(Scalar52_wide_as_Nat a) : ℤ) =
       ↑a[0]!.val + ↑a[1]!.val * (2 ^ 52 : ℤ) + ↑a[2]!.val * (2 ^ 52) ^ 2 +
       ↑a[3]!.val * (2 ^ 52) ^ 3 + ↑a[4]!.val * (2 ^ 52) ^ 4 +
@@ -482,7 +504,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     unfold Scalar52_as_Nat
     simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
       Array.getElem!_Nat_eq]; agrind
-  -- Name the intermediate result array for readability
   let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
   have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
       ↑p2_0.2.val + ↑p2_1.2.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val * (2 ^ 52) ^ 2 +
@@ -495,7 +516,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     simp only [← pow_mul]; agrind
   have h_R : (↑R : ℤ) = ((2 : ℤ) ^ 52) ^ 5 := by
     simp only [R, Nat.cast_pow, Nat.cast_ofNat, ← pow_mul]
-  -- Montgomery factor C and the core identity
   let C : ℤ := ↑result0.2.val + ↑result1.2.val * (2 ^ 52 : ℤ) +
     ↑result2.2.val * (2 ^ 52) ^ 2 + ↑result3.2.val * (2 ^ 52) ^ 3 +
     ↑result4.2.val * (2 ^ 52) ^ 4
@@ -503,7 +523,6 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       ↑(Scalar52_as_Nat inter_arr) * ↑R := by
     rw [h_wide, h_L_expand, h_inter, h_R]
     exact montgomery_core_eq eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
-  -- C bounds for redc_bound (uses base_digit_bound helper)
   have h_C_nn : (0 : ℤ) ≤ C := by
     unfold C; grind => lia
   have h_C_lt : C < ↑R := by
@@ -514,29 +533,20 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       (Int.natCast_nonneg _) (Int.natCast_nonneg _) (Int.natCast_nonneg _)
       (Int.natCast_nonneg _) (Int.natCast_nonneg _)
   let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
-  · -- case ha: input limbs < 2^52
-    intro j hj
+  · intro j hj
     interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
       List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
       getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
       Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
     <;> try assumption
-  · -- case hb: L limbs < 2^52
-    intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+  · intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
       UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
-  · -- case ha': intermediate < 2*L
-    rw [constants.L_spec, ← Nat.two_mul]
+  · rw [constants.L_spec, ← Nat.two_mul]
     exact redc_bound h_core h_canonical h_C_nn h_C_lt
-  · -- case hb': Scalar52_as_Nat constants.L ≤ L
-    rw [constants.L_spec]
-  -- Final postcondition: m*R % L = T % L ∧ limbs < 2^52 ∧ m < L
+  · rw [constants.L_spec]
   refine ⟨?_, m_post3, m_post2⟩
-  -- Step 1: m ≡ inter [MOD L] (from sub_spec: m + L ≡ inter)
   have h_m_inter : Scalar52_as_Nat m ≡ Scalar52_as_Nat inter_arr [MOD L] := by
     have h := m_post1; rw [constants.L_spec] at h; rwa [Nat.ModEq, Nat.add_mod_right] at h
-  -- Step 2: m * R ≡ inter*R [MOD L]
-  -- Step 3: inter * R ≡ T [MOD L] (from h_core: T + C * L = inter * R)
-  -- Step 4: transitivity gives m * R % L = T % L
   suffices h_int : (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L by
     exact_mod_cast h_int
   calc (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L
@@ -545,5 +555,224 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
         conv_lhs => rw [show ↑(Scalar52_as_Nat inter_arr) * ↑R =
           ↑(Scalar52_wide_as_Nat a) + C * ↑L from by linarith [h_core]]
         exact Int.add_mul_emod_self_right _ _ _
+
+  -- OLD PROOF
+  -- simp only [step_simps]
+  -- -- ROW 0: part1(a[0])
+  -- let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ result0, h_result0 ⟩ ← part1_spec
+  -- obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
+  -- -- ROW 1: part1(carry0 + a[1] + n0*L[1])
+  -- let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i2, i2_post ⟩ ← U128.add_spec
+  -- let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i4, i4_post ⟩ ← m_spec
+  -- let* ⟨ i5, i5_post ⟩ ← U128.add_spec
+  -- -- ROW 1: part1
+  -- let* ⟨ result1, h_result1 ⟩ ← part1_spec
+  -- obtain ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩ := h_result1
+  -- let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i7, i7_post ⟩ ← U128.add_spec
+  -- let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i9, i9_post ⟩ ← m_spec
+  -- let* ⟨ i10, i10_post ⟩ ← U128.add_spec
+  -- let* ⟨ i11, i11_post ⟩ ← m_spec
+  -- let* ⟨ i12, i12_post ⟩ ← U128.add_spec
+  -- -- ROW 2: part1
+  -- let* ⟨ result2, h_result2 ⟩ ← part1_spec
+  -- obtain ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩ := h_result2
+  -- let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i14, i14_post ⟩ ← U128.add_spec
+  -- let* ⟨ i15, i15_post ⟩ ← m_spec
+  -- let* ⟨ i16, i16_post ⟩ ← U128.add_spec
+  -- let* ⟨ i17, i17_post ⟩ ← m_spec
+  -- let* ⟨ i18, i18_post ⟩ ← U128.add_spec
+  -- -- ROW 3: part1
+  -- let* ⟨ result3, h_result3 ⟩ ← part1_spec
+  -- obtain ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩ := h_result3
+  -- let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i20, i20_post ⟩ ← U128.add_spec
+  -- let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i22, i22_post ⟩ ← m_spec
+  -- let* ⟨ i23, i23_post ⟩ ← U128.add_spec
+  -- let* ⟨ i24, i24_post ⟩ ← m_spec
+  -- let* ⟨ i25, i25_post ⟩ ← U128.add_spec
+  -- let* ⟨ i26, i26_post ⟩ ← m_spec
+  -- let* ⟨ i27, i27_post ⟩ ← U128.add_spec
+  -- -- ROW 4: part1
+  -- let* ⟨ result4, h_result4 ⟩ ← part1_spec
+  -- obtain ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩ := h_result4
+  -- let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i29, i29_post ⟩ ← U128.add_spec
+  -- let* ⟨ i30, i30_post ⟩ ← m_spec
+  -- let* ⟨ i31, i31_post ⟩ ← U128.add_spec
+  -- let* ⟨ i32, i32_post ⟩ ← m_spec
+  -- let* ⟨ i33, i33_post ⟩ ← U128.add_spec
+  -- let* ⟨ i34, i34_post ⟩ ← m_spec
+  -- let* ⟨ i35, i35_post ⟩ ← U128.add_spec
+  -- -- ROW 5: part2 → r0
+  -- let* ⟨ p2_0, h_p2_0 ⟩ ← part2_spec
+  -- obtain ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩ := h_p2_0
+  -- let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i37, i37_post ⟩ ← U128.add_spec
+  -- let* ⟨ i38, i38_post ⟩ ← m_spec
+  -- let* ⟨ i39, i39_post ⟩ ← U128.add_spec
+  -- let* ⟨ i40, i40_post ⟩ ← m_spec
+  -- let* ⟨ i41, i41_post ⟩ ← U128.add_spec
+  -- -- ROW 6: part2 → r1
+  -- let* ⟨ p2_1, h_p2_1 ⟩ ← part2_spec
+  -- obtain ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩ := h_p2_1
+  -- let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i43, i43_post ⟩ ← U128.add_spec
+  -- let* ⟨ i44, i44_post ⟩ ← m_spec
+  -- let* ⟨ i45, i45_post ⟩ ← U128.add_spec
+  -- -- ROW 7: part2 → r2
+  -- let* ⟨ p2_2, h_p2_2 ⟩ ← part2_spec
+  -- obtain ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩ := h_p2_2
+  -- let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i47, i47_post ⟩ ← U128.add_spec
+  -- let* ⟨ i48, i48_post ⟩ ← m_spec
+  -- let* ⟨ i49, i49_post ⟩ ← U128.add_spec
+  -- -- ROW 8: part2 → r3, r4_u128
+  -- let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
+  -- obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
+  -- let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
+  -- -- Derive tight r4 bound from h_canonical
+  -- have h_L4 : i21.val = 2 ^ 44 := by
+  --   have := i21_post; rw [this]; unfold constants.L; decide
+  -- have h_a8 : i46.val < 2 ^ 97 := by
+  --   have h1 := a8_bound_of_canonical a h_canonical
+  --   have h2 : i46.val = a[8]!.val := by simp only [i46_post, List.Vector.length_val,
+  --     UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Array.getElem!_Nat_eq]
+  --   agrind
+  -- have h_i48 : i48.val < 2 ^ 96 := by
+  --   rw [i48_post, h_L4]
+  --   exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
+  -- have h_i49_bound : i49.val < 2 ^ 99 := by
+  --   rw [i49_post, i47_post]; linarith [h_n7_bound, h_a8, h_i48]
+  -- have h_r4u128_tight : p2_3.1.val < 2 ^ 47 := by
+  --   rw [h_r4u128_val, Nat.div_lt_iff_lt_mul (by positivity : 0 < 2 ^ 52)]
+  --   calc i49.val < 2 ^ 99 := h_i49_bound
+  --     _ = 2 ^ 47 * 2 ^ 52 := by rw [← pow_add]
+  -- have h_r4_tight : r4.val < 2 ^ 52 := by
+  --   have : r4.val ≤ p2_3.1.val := by
+  --     rw [r4_post]; simp only [U128_cast_U64_val]; exact Nat.mod_le _ _
+  --   linarith
+  -- -- ===== MAIN EQUATION: T + C * L = inter * R (Montgomery identity) =====
+  -- -- r4 cast equality (r4_u128 < 2^47 < 2^64 so cast is identity)
+  -- have h_r4_eq : r4.val = p2_3.1.val := by
+  --   rw [r4_post]; simp only [U128_cast_U64_val]
+  --   exact Nat.mod_eq_of_lt (lt_trans h_r4u128_tight (by norm_num))
+  -- -- Lift part1/part2 value equations to ℤ for mont_step / ediv+emod
+  -- zify at h_n0_val h_carry0_val h_n1_val h_carry1_val h_n2_val h_carry2_val
+  --        h_n3_val h_carry3_val h_n4_val h_carry4_val
+  --        h_r0_val h_n5_val h_r1_val h_n6_val h_r2_val h_n7_val h_r3_val h_r4u128_val
+  -- -- Part1 carry equations (rows 0–4): input_sum + n_k * L[0] = c_k * 2^52
+  -- have eq0 := mont_step _ _ _ h_n0_val h_carry0_val
+  -- have eq1 := mont_step _ _ _ h_n1_val h_carry1_val
+  -- have eq2 := mont_step _ _ _ h_n2_val h_carry2_val
+  -- have eq3 := mont_step _ _ _ h_n3_val h_carry3_val
+  -- have eq4 := mont_step _ _ _ h_n4_val h_carry4_val
+  -- -- Part2 split equations (rows 5–8): input_sum = carry * 2^52 + limb
+  -- have eq5 : (↑i35.val : ℤ) = ↑p2_0.1.val * (2 ^ 52 : ℤ) + ↑p2_0.2.val := by
+  --   rw [h_n5_val, h_r0_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq6 : (↑i41.val : ℤ) = ↑p2_1.1.val * (2 ^ 52 : ℤ) + ↑p2_1.2.val := by
+  --   rw [h_n6_val, h_r1_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq7 : (↑i45.val : ℤ) = ↑p2_2.1.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val := by
+  --   rw [h_n7_val, h_r2_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq8 : (↑i49.val : ℤ) = ↑p2_3.1.val * (2 ^ 52 : ℤ) + ↑p2_3.2.val := by
+  --   rw [h_r4u128_val, h_r3_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- -- Replace p2_3.1 (u128 carry) with r4 (u64 cast) in eq8
+  -- rw [show (↑p2_3.1.val : ℤ) = ↑r4.val from by exact_mod_cast h_r4_eq.symm] at eq8
+  -- -- Substitute all intermediate computation values into the 9 equations
+  -- -- After this, equations use only: a[k]!.val, result_k.{1,2}.val, p2_k.{1,2}.val, r4.val, L[k]!.val
+  -- simp only [i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post, i7_post, i8_post,
+  --   i9_post, i10_post, i11_post, i12_post, i13_post, i14_post, i15_post, i16_post,
+  --   i17_post, i18_post, i19_post, i20_post, i21_post, i22_post, i23_post, i24_post,
+  --   i25_post, i26_post, i27_post, i28_post, i29_post, i30_post, i31_post, i32_post,
+  --   i33_post, i34_post, i35_post, i36_post, i37_post, i38_post, i39_post, i40_post,
+  --   i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post,
+  --   ← Array.getElem!_Nat_eq
+  -- ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  -- -- Expand Scalar52 definitions to match montgomery_core_eq conclusion
+  -- have h_wide : (↑(Scalar52_wide_as_Nat a) : ℤ) =
+  --     ↑a[0]!.val + ↑a[1]!.val * (2 ^ 52 : ℤ) + ↑a[2]!.val * (2 ^ 52) ^ 2 +
+  --     ↑a[3]!.val * (2 ^ 52) ^ 3 + ↑a[4]!.val * (2 ^ 52) ^ 4 +
+  --     ↑a[5]!.val * (2 ^ 52) ^ 5 + ↑a[6]!.val * (2 ^ 52) ^ 6 +
+  --     ↑a[7]!.val * (2 ^ 52) ^ 7 + ↑a[8]!.val * (2 ^ 52) ^ 8 := by
+  --   unfold Scalar52_wide_as_Nat
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.getElem!_Nat_eq]
+  --   simp only [← pow_mul]; agrind
+  -- have h_L3_zero : (constants.L[3]!).val = 0 := by unfold constants.L; decide
+  -- have h_L_expand : (↑L : ℤ) =
+  --     ↑(constants.L[0]!).val + ↑(constants.L[1]!).val * (2 ^ 52 : ℤ) +
+  --     ↑(constants.L[2]!).val * (2 ^ 52) ^ 2 + ↑(constants.L[4]!).val * (2 ^ 52) ^ 4 := by
+  --   rw [show L = Scalar52_as_Nat constants.L from constants.L_spec.symm]
+  --   unfold Scalar52_as_Nat
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
+  --     Array.getElem!_Nat_eq]; agrind
+  -- -- Name the intermediate result array for readability
+  -- let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
+  -- have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
+  --     ↑p2_0.2.val + ↑p2_1.2.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val * (2 ^ 52) ^ 2 +
+  --     ↑p2_3.2.val * (2 ^ 52) ^ 3 + ↑r4.val * (2 ^ 52) ^ 4 := by
+  --   unfold Scalar52_as_Nat inter_arr
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.make,
+  --     Array.getElem!_Nat_eq, List.length_cons, List.length_nil, Nat.reduceAdd, Nat.ofNat_pos,
+  --     getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+  --     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  --   simp only [← pow_mul]; agrind
+  -- have h_R : (↑R : ℤ) = ((2 : ℤ) ^ 52) ^ 5 := by
+  --   simp only [R, Nat.cast_pow, Nat.cast_ofNat, ← pow_mul]
+  -- -- Montgomery factor C and the core identity
+  -- let C : ℤ := ↑result0.2.val + ↑result1.2.val * (2 ^ 52 : ℤ) +
+  --   ↑result2.2.val * (2 ^ 52) ^ 2 + ↑result3.2.val * (2 ^ 52) ^ 3 +
+  --   ↑result4.2.val * (2 ^ 52) ^ 4
+  -- have h_core : (↑(Scalar52_wide_as_Nat a) : ℤ) + C * ↑L =
+  --     ↑(Scalar52_as_Nat inter_arr) * ↑R := by
+  --   rw [h_wide, h_L_expand, h_inter, h_R]
+  --   exact montgomery_core_eq eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  -- -- C bounds for redc_bound (uses base_digit_bound helper)
+  -- have h_C_nn : (0 : ℤ) ≤ C := by
+  --   unfold C; grind => lia
+  -- have h_C_lt : C < ↑R := by
+  --   rw [h_R]; exact base_digit_bound (by positivity)
+  --     (Nat.cast_lt.mpr h_n0_bound) (Nat.cast_lt.mpr h_n1_bound)
+  --     (Nat.cast_lt.mpr h_n2_bound) (Nat.cast_lt.mpr h_n3_bound)
+  --     (Nat.cast_lt.mpr h_n4_bound)
+  --     (Int.natCast_nonneg _) (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+  --     (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+  -- let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
+  -- · -- case ha: input limbs < 2^52
+  --   intro j hj
+  --   interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
+  --     List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+  --     getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+  --     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  --   <;> try assumption
+  -- · -- case hb: L limbs < 2^52
+  --   intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+  --     UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
+  -- · -- case ha': intermediate < 2*L
+  --   rw [constants.L_spec, ← Nat.two_mul]
+  --   exact redc_bound h_core h_canonical h_C_nn h_C_lt
+  -- · -- case hb': Scalar52_as_Nat constants.L ≤ L
+  --   rw [constants.L_spec]
+  -- -- Final postcondition: m*R % L = T % L ∧ limbs < 2^52 ∧ m < L
+  -- refine ⟨?_, m_post3, m_post2⟩
+  -- -- Step 1: m ≡ inter [MOD L] (from sub_spec: m + L ≡ inter)
+  -- have h_m_inter : Scalar52_as_Nat m ≡ Scalar52_as_Nat inter_arr [MOD L] := by
+  --   have h := m_post1; rw [constants.L_spec] at h; rwa [Nat.ModEq, Nat.add_mod_right] at h
+  -- -- Step 2: m * R ≡ inter*R [MOD L]
+  -- -- Step 3: inter * R ≡ T [MOD L] (from h_core: T + C * L = inter * R)
+  -- -- Step 4: transitivity gives m * R % L = T % L
+  -- suffices h_int : (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L by
+  --   exact_mod_cast h_int
+  -- calc (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L
+  --     = (↑(Scalar52_as_Nat inter_arr) * ↑R) % ↑L := by exact_mod_cast h_m_inter.mul_right R
+  --   _ = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L := by
+  --       conv_lhs => rw [show ↑(Scalar52_as_Nat inter_arr) * ↑R =
+  --         ↑(Scalar52_wide_as_Nat a) + C * ↑L from by linarith [h_core]]
+  --       exact Int.add_mul_emod_self_right _ _ _
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

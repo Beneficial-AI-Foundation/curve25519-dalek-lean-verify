@@ -130,7 +130,7 @@ natural language specs:
       - This is equivalent to: montgomery_mul(u, u') = R mod L
 -/
 
-set_option maxHeartbeats 400000 in -- heavy step and simp
+set_option maxHeartbeats 600000 in -- heavy step and simp
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_invert`**:
 - Precondition: u must be non-zero modulo L (i.e., represent a non-zero value in Montgomery form)
 - No panic (always returns successfully for non-zero inputs)

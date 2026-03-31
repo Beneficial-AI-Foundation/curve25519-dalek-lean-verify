@@ -62,7 +62,7 @@ private theorem set_getElem!_ne {n : Usize} (a : Std.Array U64 n)
 
 /-! ## Part 1: Loop spec — byte packing (64 bytes → 8 words) -/
 
-set_option maxHeartbeats 800000 in -- heavy steps
+set_option maxHeartbeats 1200000 in -- heavy steps
 /-- **Loop spec**: Each iteration packs 8 bytes into one
 U64 word. After the loop, `words[j] = word_of_bytes_64 bytes j`
 for all `j < 8`. -/
