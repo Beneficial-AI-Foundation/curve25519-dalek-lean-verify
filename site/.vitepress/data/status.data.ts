@@ -76,8 +76,8 @@ export default {
       total: visible.length,
       extracted: visible.length,
       draft_spec: 0,
-      specified: visible.filter(fn => fn.specified).length,
-      verified: visible.filter(fn => fn.verified).length,
+      specified: visible.filter(fn => fn.specified && !fn.verified && !fn.externally_verified).length,
+      verified: visible.filter(fn => fn.verified && !fn.externally_verified).length,
       externally_verified: visible.filter(fn => fn.externally_verified).length,
       ai_proveable: 0
     }

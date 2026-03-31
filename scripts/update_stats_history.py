@@ -36,11 +36,19 @@ def _stats_from_data(data: dict) -> dict[str, int] | None:
     ]
     if not fns:
         return None
+    ext_verified = sum(1 for f in fns if f.get("externally_verified"))
+    verified_excl = sum(
+        1 for f in fns if f.get("verified") and not f.get("externally_verified")
+    )
+    specified_excl = sum(
+        1 for f in fns
+        if f.get("specified") and not f.get("verified") and not f.get("externally_verified")
+    )
     return {
         "total": len(fns),
-        "verified": sum(1 for f in fns if f.get("verified")),
-        "externally_verified": sum(1 for f in fns if f.get("externally_verified")),
-        "specified": sum(1 for f in fns if f.get("specified")),
+        "verified": verified_excl,
+        "externally_verified": ext_verified,
+        "specified": specified_excl,
         "extracted": len(fns),
         "fully_verified": sum(1 for f in fns if f.get("fully_verified")),
     }
