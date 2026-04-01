@@ -21,18 +21,6 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq
 
-/-
-natural language description:
-
-• Takes an AffineNielsPoint and returns unit. This is the `Eq`-trait totality
-  assertion and has no computational effect.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• The output is Unit (no additional constraints)
--/
-
 /-- **Spec and proof concerning `AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq`**:
 - No panic (always returns successfully)
 - The result is `()`

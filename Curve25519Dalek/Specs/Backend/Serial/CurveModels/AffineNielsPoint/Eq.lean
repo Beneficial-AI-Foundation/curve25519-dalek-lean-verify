@@ -21,20 +21,6 @@ This function compares two AffineNielsPoint values component-wise using
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-/-
-natural language description:
-
-• Compares two AffineNielsPoint values by checking equality of
-  y_plus_x, y_minus_x, and xy2d in that order.
-
-• Uses FieldElement51 equality and returns false as soon as any comparison fails.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• The result is true iff all three coordinate comparisons return true
--/
-
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 namespace CoreCmpPartialEqFieldElement51
 

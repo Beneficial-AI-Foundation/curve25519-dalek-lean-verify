@@ -38,26 +38,15 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithSubSharedAAffineNielsPointCompletedPoint
 
-/-
-natural language description:
-
-• Takes an EdwardsPoint (X, Y, Z, T) in extended coordinates and an AffineNielsPoint
-(Y+X, Y−X, 2dXY) and returns a CompletedPoint (X', Y', Z', T') in completed coordinates
-(ℙ¹ × ℙ¹), representing the group subtraction P − N. Arithmetic is performed in the
-field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
+/-- **Spec and proof concerning `CompletedPoint::sub`**:
+- No panic (always returns successfully)
+- Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:
   - X' ≡ ( (Y+X)·N.y_minus_x − (Y−X)·N.y_plus_x ) (mod p)
   - Y' ≡ ( (Y+X)·N.y_minus_x + (Y−X)·N.y_plus_x ) (mod p)
   - Z' ≡ ( 2·Z − T·N.xy2d ) (mod p)
   - T' ≡ ( 2·Z + T·N.xy2d ) (mod p)
 -/
-
-
 @[step]
 theorem sub_spec
     (self : edwards.EdwardsPoint)

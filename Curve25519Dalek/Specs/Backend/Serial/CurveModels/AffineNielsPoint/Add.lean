@@ -38,16 +38,8 @@ open curve25519_dalek.backend.serial.curve_models
 namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
-/-
-natural language description:
 
-• Takes an EdwardsPoint (X, Y, Z, T) in extended coordinates and an AffineNielsPoint
-(Y+X, Y−X, 2dXY) and returns a CompletedPoint (X', Y', Z', T') in completed coordinates
-(ℙ¹ × ℙ¹), representing the group addition P + N. Arithmetic is performed in the
-field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
+/-- **Spec and proof concerning `CompletedPoint::add`**:
 • The function always succeeds (no panic)
 • Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:

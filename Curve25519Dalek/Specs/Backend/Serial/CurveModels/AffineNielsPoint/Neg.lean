@@ -29,24 +29,7 @@ open curve25519_dalek.backend.serial.curve_models
 
 namespace curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint
 
-/-
-natural language description:
-
-• Takes an AffineNielsPoint (y+x, y−x, 2dxy) in affine Niels coordinates
-and returns its negation -N = (y−x, y+x, −2dxy). Arithmetic is performed in
-the field 𝔽_p where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given input N = (y+x, y−x, 2dxy), the output -N = (y_plus_x', y_minus_x', xy2d')
-  satisfies modulo p:
-  - y_plus_x' = y_minus_x (coordinates are swapped)
-  - y_minus_x' = y_plus_x (coordinates are swapped)
-  - xy2d' ≡ -xy2d (mod p) (xy2d coordinate is negated)
--/
-
-/- **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.neg`**:
+/-- **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.neg`**:
 - No panic (always returns successfully)
 - Given input:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),

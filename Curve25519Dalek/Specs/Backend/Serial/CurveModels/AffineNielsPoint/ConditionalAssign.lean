@@ -31,25 +31,6 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
 namespace SubtleConditionallySelectable
 
-/-
-natural language description:
-
-• Takes an AffineNielsPoint self = (y_plus_x, y_minus_x, xy2d) and another
-  AffineNielsPoint other = (y_plus_x', y_minus_x', xy2d'), along with a
-  Choice value, and conditionally assigns other to self in constant time.
-
-natural language specs:
-
-• The function always succeeds (no panic)
-• Given inputs self = (y_plus_x, y_minus_x, xy2d), other = (y_plus_x', y_minus_x', xy2d'),
-  and choice, the output self' = (y_plus_x'', y_minus_x'', xy2d'') satisfies:
-  - If choice represents 1 (true):
-    y_plus_x'' = y_plus_x', y_minus_x'' = y_minus_x', xy2d'' = xy2d'
-  - If choice represents 0 (false):
-    y_plus_x'' = y_plus_x, y_minus_x'' = y_minus_x, xy2d'' = xy2d
-  - The operation is constant-time (execution time does not depend on choice value)
--/
-
 /-- **Spec and proof concerning
 `backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:
 - No panic (always returns successfully)
