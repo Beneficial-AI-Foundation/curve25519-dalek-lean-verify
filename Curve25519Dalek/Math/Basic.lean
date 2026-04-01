@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Oliver Butterley
 -/
@@ -9,6 +9,7 @@ import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
 import PrimeCert.PrimeList
+import Mathlib.FieldTheory.Finite.Basic
 
 /-! # Common Definitions
 
@@ -17,7 +18,6 @@ field element bridge (FieldElement51), and field utility functions (sqrt, is_neg
 -/
 
 open Aeneas.Std Result
-
 
 /-! ## Constants -/
 
@@ -33,10 +33,12 @@ def R : Nat := 2^260
 /-- The cofactor of Curve25519 -/
 def h : Nat := 8
 
-/-- The constant d in the defining equation for the twisted Edwards curve: ax^2 + y^2 = 1 + dx^2y^2 -/
+/-- The constant d in the defining equation for the twisted Edwards curve:
+    ax^2 + y^2 = 1 + dx^2y^2 -/
 def d : Nat := 37095705934669439343138083508754565189542113879843219016388785533085940283555
 
-/-- The constant a in the defining equation for the twisted Edwards curve: ax^2 + y^2 = 1 + dx^2y^2 -/
+/-- The constant a in the defining equation for the twisted Edwards curve:
+    ax^2 + y^2 = 1 + dx^2y^2 -/
 def a : Int := -1
 
 /-! ## Scalar Montgomery arithmetic helpers -/
@@ -83,14 +85,16 @@ def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
 /-! ## Basic properties of the defined quantities -/
 
 theorem L_lt : L < 2 ^ 260 := by
-  unfold L; grind
+  unfold L
+  omega
 
 /-! ### Scalar52_as_Nat lemmas -/
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
-theorem Scalar52_as_Nat_bounded (s : Aeneas.Std.Array U64 5#usize) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
+theorem Scalar52_as_Nat_bounded (s : Aeneas.Std.Array U64 5#usize)
+    (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     Scalar52_as_Nat s < 2 ^ 260 := by
   simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
   have h0 := hs 0 (by omega); have h1 := hs 1 (by omega); have h2 := hs 2 (by omega)
@@ -178,10 +182,6 @@ theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔ a % p = 1 := by
     decide
   rw [this]
 
-/-- Rewrite `a^n * a` into the more convenient successor exponent form. -/
-theorem pow_add_one (a n : ℕ) : a ^ n * a = a ^ (n + 1) := by
-  grind
-
 /-- Squaring preserves equality modulo `p` after moving one term across zero. -/
 theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
     (h : a + b ≡ 0 [MOD p]) :
@@ -245,14 +245,39 @@ def sqrt_m1 : ZMod p :=
 lemma p_sub_one_cast : (↑(p - 1) : ZMod p) = -1 := by
   rw [Nat.cast_sub (by decide : 1 ≤ p), ZMod.natCast_self, zero_sub, Nat.cast_one]
 
+lemma ringChar_ne_two : ringChar (ZMod p) ≠ 2 := by
+  suffices p ≠ 2 by simpa [ZMod.ringChar_zmod_n p]
+  norm_num [p]
+
+lemma ne_zero_of_not_isSquare {a : ZMod p} (h : ¬ IsSquare a) : a ≠ 0 := by by_contra; simp_all
+
+-- TODO: this should probably be replaced by an argument using the quadratic character from
+-- `Mathlib.NumberTheory.LegendreSymbol.QuadraticChar.Basic`.
+/-- In a finite field of odd characteristic, the product of two non-squares is a square. -/
+theorem FiniteField.isSquare_mul_of_not_isSquare {F : Type*} [Field F] [Finite F]
+    (hchar : ringChar F ≠ 2) {a b : F} (ha : ¬ IsSquare a) (hb : ¬ IsSquare b) :
+    IsSquare (a * b) := by
+  have := Fintype.ofFinite F
+  have ha0 : a ≠ 0 := by intro h; exact ha (h ▸ IsSquare.zero)
+  have hb0 : b ≠ 0 := by intro h; exact hb (h ▸ IsSquare.zero)
+  have half_pow_neg {z : F} (hz : z ≠ 0) (hns : ¬ IsSquare z) :
+      z ^ (Fintype.card F / 2) = -1 :=
+    (FiniteField.pow_dichotomy hchar hz).resolve_left
+      (fun h1 => hns ((FiniteField.isSquare_iff hchar hz).mpr h1))
+  rw [FiniteField.isSquare_iff hchar (mul_ne_zero ha0 hb0),
+      mul_pow, half_pow_neg ha0 ha, half_pow_neg hb0 hb]
+  norm_num
+
 private lemma sqrt_m1_sq_nat :
-    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
+    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p =
+    p - 1 := by
   decide
 
 /-- `sqrt_m1` really is a square root of `-1` in `ZMod p`. -/
 lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
   unfold sqrt_m1
-  have h : (((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℕ)) : ZMod p) =
+  have h : (((19681161376707505956807079304988542015446066515923890162744021073123829784752
+        ^ 2 : ℕ)) : ZMod p) =
       ((p - 1 : ℕ) : ZMod p) := by
     exact (ZMod.natCast_eq_natCast_iff _ _ _).2 (by simpa [Nat.ModEq] using sqrt_m1_sq_nat)
   push_cast at h
@@ -298,16 +323,13 @@ lemma sqrt_m1_not_square : ¬ IsSquare sqrt_m1 := by
     these massive literals, which crashes the server.
 -/
 
-/--
-Raw value for sqrt(ad - 1). Kept private so it's not accidentally used.
--/
+/-- Raw value for sqrt(ad - 1). Kept private so it's not accidentally used. -/
 private def sqrt_ad_minus_one_val : Nat :=
   25063068953384623474111414158702152701244531502492656460079210482610430750235
 
-/--
-Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).
-Since a = -1, this is sqrt(-d - 1).
--/
+/-- Square root of (a * d - 1). Used in the Ristretto isogeny map
+(Step 7 of elligator_ristretto_flavor).
+Since a = -1, this is sqrt(-d - 1). -/
 def sqrt_ad_minus_one : ZMod p := sqrt_ad_minus_one_val
 
 /-- Unfold `sqrt_ad_minus_one` to the raw Nat cast. Proved before `@[irreducible]` takes effect. -/
@@ -318,30 +340,24 @@ lemma sqrt_ad_minus_one_sq : sqrt_ad_minus_one^2 = -d - 1 := by decide
 
 attribute [irreducible] sqrt_ad_minus_one
 
-/--
-Helper: The constant is non-zero.
--/
+/-- Helper: The constant is non-zero. -/
 lemma sqrt_ad_minus_one_ne_zero : sqrt_ad_minus_one ≠ 0 := by
   intro h
   have h_sq : sqrt_ad_minus_one^2 = 0 := by rw [h]; ring
   rw [sqrt_ad_minus_one_sq] at h_sq
-  dsimp [d] at h_sq
+  dsimp only [d] at h_sq
   norm_num at h_sq
   contradiction
 
-/--
-Mathematical square root for ZMod p.
-Returns a root if one exists, otherwise 0.
--/
+/-- Mathematical square root for ZMod p.
+Returns a root if one exists, otherwise 0. -/
 noncomputable def sqrt (x : ZMod p) : ZMod p :=
   if h : IsSquare x then Classical.choose h else 0
 
-/--
-Correctness Lemma:
-If x is a square, then (math_sqrt x)^2 = x.
--/
+/-- Correctness Lemma:
+If x is a square, then (math_sqrt x)^2 = x. -/
 lemma sqrt_sq {x : ZMod p} (h : IsSquare x) : (sqrt x)^2 = x := by
-  dsimp [sqrt]
+  dsimp only [sqrt]
   rw [dif_pos h]
   rw [pow_two]
   symm
@@ -356,10 +372,8 @@ def is_negative (x : ZMod p) : Bool :=
 def abs_edwards (x : ZMod p) : ZMod p :=
   if is_negative x then -x else x
 
-/--
-Square property of the absolute value function.
-Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
--/
+/-- Square property of the absolute value function.
+Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`. -/
 lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
@@ -452,42 +466,11 @@ lemma abs_edwards_eq_of_sq_eq {x y : ZMod p} (h : x ^ 2 = y ^ 2) :
     Note: sqrt_checked 0 = (0, true) since 0 is a square (0² = 0). -/
 noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
   if h : IsSquare x then
-    -- Case 1: x is a square. Pick the root 'y' such that y^2 = x.
     let y := Classical.choose h
     (abs_edwards y, true)
   else
-    -- Case 2: x is not a square. Then i * x must be a square in this field.
-    -- We pick 'y' such that y^2 = i * x.
-    have h_ix : IsSquare (x * sqrt_m1) := by
-      have h_char_ne_2 : ringChar (ZMod p) ≠ 2 := by
-        intro h_char; rw [ZMod.ringChar_zmod_n] at h_char;
-        norm_num [p] at h_char
-      have h_pow_card : Fintype.card (ZMod p) / 2 = p / 2 := by rw [ZMod.card]
-      have hx_ne0 : x ≠ 0 := by intro c; rw [c] at h; simp at h
-      have h_i_ne0 : sqrt_m1 ≠ 0 := by
-        unfold sqrt_m1;
-        try decide
-      have euler {z : ZMod p} (hz : z ≠ 0) : IsSquare z ↔ z ^ (Fintype.card (ZMod p) / 2) = 1 :=
-        FiniteField.isSquare_iff h_char_ne_2 hz
-      simp only [h_pow_card] at euler
-      have h_x_pow : x ^ (p / 2) = -1 := by
-        have dic := FiniteField.pow_dichotomy h_char_ne_2 hx_ne0
-        rw [h_pow_card] at dic
-        cases dic with
-        | inl h1 => rw [← euler hx_ne0] at h1; contradiction
-        | inr h_neg => exact h_neg
-      have not_sq_i : ¬ IsSquare sqrt_m1 := sqrt_m1_not_square
-      have h_i_pow : sqrt_m1 ^ (p / 2) = -1 := by
-        have dic := FiniteField.pow_dichotomy h_char_ne_2 h_i_ne0
-        rw [h_pow_card] at dic
-        cases dic with
-        | inl h1 =>
-          rw [← euler h_i_ne0] at h1
-          grind
-        | inr h_neg => exact h_neg
-      rw [euler (mul_ne_zero hx_ne0 h_i_ne0)]
-      rw [mul_pow, h_x_pow, h_i_pow]
-      norm_num
+    have h_ix : IsSquare (x * sqrt_m1) :=
+      FiniteField.isSquare_mul_of_not_isSquare ringChar_ne_two h sqrt_m1_not_square
     let y := Classical.choose h_ix
     (abs_edwards y, false)
 
@@ -495,54 +478,84 @@ noncomputable def sqrt_checked (x : ZMod p) : (ZMod p × Bool) :=
 theorem sqrt_checked_spec (u : ZMod p) {r : ZMod p} {b : Bool} :
   sqrt_checked u = (r, b) → b = true → r^2 = u := by
   intro h_call h_true
-  sorry -- Proof deferred
+  unfold sqrt_checked at h_call
+  split_ifs at h_call with h_sq
+  · -- IsSquare branch: returned (abs_edwards y, true)
+    obtain ⟨rfl, -⟩ := Prod.mk.inj h_call
+    rw [abs_edwards_sq, pow_two]
+    exact (Classical.choose_spec h_sq).symm
+  · -- Not IsSquare branch: returned (_, false), contradicts b = true
+    obtain ⟨-, hb⟩ := Prod.mk.inj h_call
+    exact absurd h_true (by rw [← hb]; decide)
 
 /-- Spec: `sqrt_checked` returns true iff the input is a square. -/
 theorem sqrt_checked_iff_isSquare (u : ZMod p) {r : ZMod p} {b : Bool} :
   sqrt_checked u = (r, b) → (b = true ↔ IsSquare u) := by
   intro h_call
-  sorry -- Proof deferred
+  unfold sqrt_checked at h_call
+  split_ifs at h_call with h_sq
+  · obtain ⟨-, rfl⟩ := Prod.mk.inj h_call
+    exact ⟨fun _ => h_sq, fun _ => rfl⟩
+  · obtain ⟨-, rfl⟩ := Prod.mk.inj h_call
+    exact ⟨fun h => absurd h (by decide), fun h => absurd h h_sq⟩
 
-/--
-Inverse Square Root, matching Rust's sqrt_ratio_i(1, u).
-Computes 1/sqrt(u) or 1/sqrt(i*u) depending on whether u is a square.
-Guard: inv_sqrt_checked 0 = (0, false) since 1/sqrt(0) is undefined.
-This matches Rust's sqrt_ratio_i(1, 0) returning (Choice(0), 0).
--/
+/-- Inverse Square Root, matching Rust's sqrt_ratio_i(1, u). Computes 1/sqrt(u) or 1/sqrt(i*u)
+depending on whether u is a square. Guard: inv_sqrt_checked 0 = (0, false) since 1/sqrt(0) is
+undefined. This matches Rust's sqrt_ratio_i(1, 0) returning (Choice(0), 0). -/
 noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   if u = 0 then (0, false)
-  else
-    let (root, was_square) := sqrt_checked u
-    (root⁻¹, was_square)
+  else (sqrt_checked u).map (·⁻¹) id -- return `sqrt_checked u` but invert the first component.
+  -- The alternative using `let` here causes a nightmare later when working with the definition.
 
-/--
-Mathematical specification for `inv_sqrt_checked`.
--/
-theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool} :
-  inv_sqrt_checked arg = (I, was_square) →
-  was_square = true →
-  arg ≠ 0 →
-  I^2 * arg = 1 := by
-  -- We treat this as an axiom/specification for now to avoid
-  -- analyzing the massive bit-level recursion of the implementation.
-  sorry
+/-- For `u ≠ 0`, `inv_sqrt_checked u` equals `(sqrt_checked u)` with the first component inverted. -/
+private lemma inv_sqrt_checked_unfold (u : ZMod p) (hu : u ≠ 0) :
+    inv_sqrt_checked u = (sqrt_checked u).map (·⁻¹) id := by
+  delta inv_sqrt_checked; rw [if_neg hu]
 
-/--
-When `u` is a square, `(inv_sqrt_checked u).1` is its inverse square root.
-Combined lemma avoids maxRecDepth from pair-destructuring `inv_sqrt_checked`.
--/
-theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (h_ne : u ≠ 0) :
-    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
-  sorry
+/-- Mapping a function over the first component of a pair preserves the second component. -/
+private theorem inv_snd_abstract {α β γ : Type*} {f : α → γ} {p : α × β} {q : γ × β}
+    (h : q = p.map f id) : q.2 = p.2 := by
+  rw [h, Prod.map_snd, id]
 
-/-- Reduction: inv_sqrt_checked 0 = (0, false) via the zero guard. -/
+/-- If `f` returns a square root when the boolean is `true`, then mapping `(·⁻¹)` over the first
+component yields an inverse square root. Proved abstractly to avoid kernel reduction of `ZMod p`. -/
+private theorem inv_sqrt_spec_abstract {F : Type*} [Field F] (f : F → F × Bool)
+    (f_spec : ∀ {r : F} {b : Bool} (x : F), f x = (r, b) → b = true → r ^ 2 = x)
+    {arg I : F} (h : (f arg).map (·⁻¹) id = (I, true)) (hne : arg ≠ 0) : I ^ 2 * arg = 1 := by
+  have hI : (f arg).1⁻¹ = I := by simpa only [Prod.map_fst] using congr_arg Prod.fst h
+  have hws : (f arg).2 = true := by simpa only [Prod.map_snd, id] using congr_arg Prod.snd h
+  have h_sq : (f arg).1 ^ 2 = arg := f_spec arg Prod.mk.eta.symm hws
+  rw [← hI, inv_pow, h_sq, inv_mul_cancel₀ hne]
+
+/-- If `inv_sqrt_checked arg = (I, true)` and `arg ≠ 0`, then `I` is an inverse square root:
+`I ^ 2 * arg = 1`. -/
+theorem inv_sqrt_checked_spec' (arg : ZMod p) {I : ZMod p} (h : inv_sqrt_checked arg = (I, true))
+    (hne : arg ≠ 0) : I ^ 2 * arg = 1 := by
+  rw [inv_sqrt_checked_unfold arg hne] at h
+  exact inv_sqrt_spec_abstract sqrt_checked (fun x h hb => sqrt_checked_spec x h hb) h hne
+
+/-- Variant of `inv_sqrt_checked_spec` with `was_square` as a separate hypothesis. -/
+theorem inv_sqrt_checked_spec (arg : ZMod p) {I : ZMod p} {was_square : Bool}
+    (h : inv_sqrt_checked arg = (I, was_square)) (hws : was_square = true) (hne : arg ≠ 0) :
+    I ^ 2 * arg = 1 := by
+  subst hws; exact inv_sqrt_checked_spec' arg h hne
+
+/-- `inv_sqrt_checked 0 = (0, false)`. -/
 lemma inv_sqrt_checked_zero : inv_sqrt_checked (0 : ZMod p) = ((0 : ZMod p), false) := by
   delta inv_sqrt_checked; rw [if_pos rfl]
 
-/-- Reduction: the boolean component of inv_sqrt_checked matches sqrt_checked when u ≠ 0. -/
+/-- For `u ≠ 0`, the boolean component of `inv_sqrt_checked u` equals that of `sqrt_checked u`. -/
 lemma inv_sqrt_checked_snd (u : ZMod p) (hu : u ≠ 0) :
-    (inv_sqrt_checked u).2 = (sqrt_checked u).2 := by
-  sorry
+    (inv_sqrt_checked u).2 = (sqrt_checked u).2 :=
+  inv_snd_abstract (inv_sqrt_checked_unfold u hu)
+
+/-- If `u` is a nonzero square, `(inv_sqrt_checked u).1` is an inverse square root of `u`. -/
+theorem inv_sqrt_checked_sq_mul (u : ZMod p) (h : IsSquare u) (hne : u ≠ 0) :
+    (inv_sqrt_checked u).1 ^ 2 * u = 1 := by
+  have h_ws : (inv_sqrt_checked u).2 = true := by
+    rw [inv_sqrt_checked_snd u hne]
+    exact (sqrt_checked_iff_isSquare u Prod.mk.eta.symm).mpr h
+  exact inv_sqrt_checked_spec' u (Prod.ext rfl h_ws) hne
 
 
 end curve25519_dalek.math
