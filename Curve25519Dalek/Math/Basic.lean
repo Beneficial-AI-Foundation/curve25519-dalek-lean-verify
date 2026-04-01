@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Oliver Butterley
 -/
@@ -19,7 +19,6 @@ field element bridge (FieldElement51), and field utility functions (sqrt, is_neg
 
 open Aeneas.Std Result
 
-
 /-! ## Constants -/
 
 /-- Curve25519 is the elliptic curve over the prime field with order p -/
@@ -34,10 +33,12 @@ def R : Nat := 2^260
 /-- The cofactor of Curve25519 -/
 def h : Nat := 8
 
-/-- The constant d in the defining equation for the twisted Edwards curve: ax^2 + y^2 = 1 + dx^2y^2 -/
+/-- The constant d in the defining equation for the twisted Edwards curve:
+    ax^2 + y^2 = 1 + dx^2y^2 -/
 def d : Nat := 37095705934669439343138083508754565189542113879843219016388785533085940283555
 
-/-- The constant a in the defining equation for the twisted Edwards curve: ax^2 + y^2 = 1 + dx^2y^2 -/
+/-- The constant a in the defining equation for the twisted Edwards curve:
+    ax^2 + y^2 = 1 + dx^2y^2 -/
 def a : Int := -1
 
 /-! ## Scalar Montgomery arithmetic helpers -/
@@ -84,14 +85,16 @@ def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
 /-! ## Basic properties of the defined quantities -/
 
 theorem L_lt : L < 2 ^ 260 := by
-  unfold L; grind
+  unfold L
+  omega
 
 /-! ### Scalar52_as_Nat lemmas -/
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
 /-- If all limbs are < 2^52, then Scalar52_as_Nat < 2^260 -/
-theorem Scalar52_as_Nat_bounded (s : Aeneas.Std.Array U64 5#usize) (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
+theorem Scalar52_as_Nat_bounded (s : Aeneas.Std.Array U64 5#usize)
+    (hs : ∀ i < 5, s[i]!.val < 2 ^ 52) :
     Scalar52_as_Nat s < 2 ^ 260 := by
   simp only [Scalar52_as_Nat, Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
   have h0 := hs 0 (by omega); have h1 := hs 1 (by omega); have h2 := hs 2 (by omega)
@@ -178,10 +181,6 @@ theorem modEq_one_iff (a : ℕ) : a ≡ 1 [MOD p] ↔ a % p = 1 := by
     unfold p
     decide
   rw [this]
-
-/-- Rewrite `a^n * a` into the more convenient successor exponent form. -/
-theorem pow_add_one (a n : ℕ) : a ^ n * a = a ^ (n + 1) := by
-  grind
 
 /-- Squaring preserves equality modulo `p` after moving one term across zero. -/
 theorem nat_sq_of_add_modeq_zero {a b p : ℕ}
@@ -270,13 +269,15 @@ theorem FiniteField.isSquare_mul_of_not_isSquare {F : Type*} [Field F] [Finite F
   norm_num
 
 private lemma sqrt_m1_sq_nat :
-    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p = p - 1 := by
+    19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 % p =
+    p - 1 := by
   decide
 
 /-- `sqrt_m1` really is a square root of `-1` in `ZMod p`. -/
 lemma sqrt_m1_sq : (sqrt_m1 : ZMod p) ^ 2 = -1 := by
   unfold sqrt_m1
-  have h : (((19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℕ)) : ZMod p) =
+  have h : (((19681161376707505956807079304988542015446066515923890162744021073123829784752
+        ^ 2 : ℕ)) : ZMod p) =
       ((p - 1 : ℕ) : ZMod p) := by
     exact (ZMod.natCast_eq_natCast_iff _ _ _).2 (by simpa [Nat.ModEq] using sqrt_m1_sq_nat)
   push_cast at h
@@ -322,16 +323,13 @@ lemma sqrt_m1_not_square : ¬ IsSquare sqrt_m1 := by
     these massive literals, which crashes the server.
 -/
 
-/--
-Raw value for sqrt(ad - 1). Kept private so it's not accidentally used.
--/
+/-- Raw value for sqrt(ad - 1). Kept private so it's not accidentally used. -/
 private def sqrt_ad_minus_one_val : Nat :=
   25063068953384623474111414158702152701244531502492656460079210482610430750235
 
-/--
-Square root of (a * d - 1). Used in the Ristretto isogeny map (Step 7 of elligator_ristretto_flavor).
-Since a = -1, this is sqrt(-d - 1).
--/
+/-- Square root of (a * d - 1). Used in the Ristretto isogeny map
+(Step 7 of elligator_ristretto_flavor).
+Since a = -1, this is sqrt(-d - 1). -/
 def sqrt_ad_minus_one : ZMod p := sqrt_ad_minus_one_val
 
 /-- Unfold `sqrt_ad_minus_one` to the raw Nat cast. Proved before `@[irreducible]` takes effect. -/
@@ -342,30 +340,24 @@ lemma sqrt_ad_minus_one_sq : sqrt_ad_minus_one^2 = -d - 1 := by decide
 
 attribute [irreducible] sqrt_ad_minus_one
 
-/--
-Helper: The constant is non-zero.
--/
+/-- Helper: The constant is non-zero. -/
 lemma sqrt_ad_minus_one_ne_zero : sqrt_ad_minus_one ≠ 0 := by
   intro h
   have h_sq : sqrt_ad_minus_one^2 = 0 := by rw [h]; ring
   rw [sqrt_ad_minus_one_sq] at h_sq
-  dsimp [d] at h_sq
+  dsimp only [d] at h_sq
   norm_num at h_sq
   contradiction
 
-/--
-Mathematical square root for ZMod p.
-Returns a root if one exists, otherwise 0.
--/
+/-- Mathematical square root for ZMod p.
+Returns a root if one exists, otherwise 0. -/
 noncomputable def sqrt (x : ZMod p) : ZMod p :=
   if h : IsSquare x then Classical.choose h else 0
 
-/--
-Correctness Lemma:
-If x is a square, then (math_sqrt x)^2 = x.
--/
+/-- Correctness Lemma:
+If x is a square, then (math_sqrt x)^2 = x. -/
 lemma sqrt_sq {x : ZMod p} (h : IsSquare x) : (sqrt x)^2 = x := by
-  dsimp [sqrt]
+  dsimp only [sqrt]
   rw [dif_pos h]
   rw [pow_two]
   symm
@@ -380,10 +372,8 @@ def is_negative (x : ZMod p) : Bool :=
 def abs_edwards (x : ZMod p) : ZMod p :=
   if is_negative x then -x else x
 
-/--
-Square property of the absolute value function.
-Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`.
--/
+/-- Square property of the absolute value function.
+Since `abs_edwards x` is either `x` or `-x`, its square is always `x^2`. -/
 lemma abs_edwards_sq (x : ZMod p) : (abs_edwards x)^2 = x^2 := by
   unfold abs_edwards
   split_ifs <;> ring
