@@ -18,11 +18,13 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
 
-namespace curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+namespace curve25519_dalek.Shared0FieldElement51.Insts
+namespace CoreOpsArithAddSharedAFieldElement51FieldElement51
 
 /-! ## Spec for `add` -/
 
-/-- **Spec for `Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add`**:
+/-- **Spec for
+`Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add`**:
 - Does not overflow when limb sums don't exceed U64.max
 - Returns a field element where each limb is the sum of corresponding input limbs
 - This is element-wise addition, not modular field addition (use reduce for that)
@@ -38,4 +40,5 @@ theorem add_spec (a b : Array U64 5#usize)
   unfold add
   step*
 
-end curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+end CoreOpsArithAddSharedAFieldElement51FieldElement51
+end curve25519_dalek.Shared0FieldElement51.Insts

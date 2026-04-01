@@ -22,7 +22,8 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace SubtleConditionallySelectable
 
 /-! ## Spec for `conditional_assign` -/
 
@@ -50,4 +51,5 @@ theorem conditional_assign_spec (self other : backend.serial.u64.field.FieldElem
     step*
     simp [*]
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

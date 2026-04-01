@@ -12,7 +12,8 @@ import Curve25519Dalek.Math.Basic
 Specification and proof for `FieldElement51::MINUS_ONE`.
 
 This constant represents the field element -1, i.e., the additive inverse of the
-multiplicative identity element in the field. This is congruent to p-1 (mod p) with p = 2^255 - 19.
+multiplicative identity element in the field. This is congruent to p-1 (mod p) with
+p = 2^255 - 19.
 
 Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
@@ -23,7 +24,8 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 /-
 natural language description:
 
-    • Represents the additive inverse of the multiplicative identity element in the field 𝔽_p where p = 2^255 - 19
+    • Represents the additive inverse of the multiplicative identity element in the field
+      𝔽_p where p = 2^255 - 19
     • The field element is represented as five u64 limbs:
 
         [2251799813685228, 2251799813685247, 2251799813685247, 2251799813685247, 2251799813685247]

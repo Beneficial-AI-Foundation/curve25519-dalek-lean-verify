@@ -23,9 +23,11 @@ set_option linter.hashCommand false
 
 /-! ## Spec for `add_assign_loop` -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace CoreOpsArithAddAssignSharedAFieldElement51
 
-/-- **Spec for `backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
+/-- **Spec for
+`backend.serial.u64.field.AddAssignFieldElement51SharedAFieldElement51.add_assign_loop`**:
 - Iterates through limbs adding `b[i]` to `a[i]`
 - Does not overflow if limb sums don't exceed `U64.max`. -/
 @[step]
@@ -69,4 +71,5 @@ theorem add_assign_spec (self _rhs : Array U64 5#usize)
   unfold add_assign
   step*
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+end CoreOpsArithAddAssignSharedAFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

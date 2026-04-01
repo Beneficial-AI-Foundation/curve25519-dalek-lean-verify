@@ -13,7 +13,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
-import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
+import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MinusOne
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
 

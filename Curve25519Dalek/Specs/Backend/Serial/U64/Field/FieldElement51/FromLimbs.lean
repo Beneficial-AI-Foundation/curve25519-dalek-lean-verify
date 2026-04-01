@@ -24,7 +24,8 @@ namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 /-
 Natural language description:
 
-    • Constructs a field element from five u64 limbs representing a field element in 𝔽_p where p = 2^255 - 19
+    • Constructs a field element from five u64 limbs representing a field element in 𝔽_p
+      where p = 2^255 - 19
     • The assumed representation for a field element is in radix 2^51 form
     • Since FieldElement51 is a just type alias for `Array U64 5#usize` in Lean, this is
       merely the identity function wrapped in `Result`

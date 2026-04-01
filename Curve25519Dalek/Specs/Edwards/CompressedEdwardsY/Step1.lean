@@ -13,7 +13,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 /-! # Spec Theorem for `CompressedEdwardsY::decompress::step_1`
 

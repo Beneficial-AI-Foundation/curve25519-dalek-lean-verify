@@ -6,8 +6,6 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-set_option exponentiation.threshold 260
-
 /-!
 # Spec theorem for `constants::R`
 
@@ -18,6 +16,8 @@ and L is the group order. It is used in Montgomery form conversions.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
+
+set_option exponentiation.threshold 260
 
 open Aeneas.Std Result
 namespace curve25519_dalek.backend.serial.u64.constants

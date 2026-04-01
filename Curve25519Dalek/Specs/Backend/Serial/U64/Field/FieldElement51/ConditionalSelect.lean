@@ -19,12 +19,14 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace SubtleConditionallySelectable
 
 /-! ## Spec for `conditional_select` -/
 
 /--
-**Spec for `backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`**:
+**Spec for
+`backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select`**:
 - No panic (always returns successfully)
 - For each limb i, the result limb equals `b[i]` when `choice = 1`,
   and equals `a[i]` when `choice = 0` (constant-time conditional select)
@@ -54,4 +56,5 @@ theorem conditional_select_spec
     simp only [Array.getElem!_Nat_eq, Array.make, List.getElem!_eq_getElem?_getD]
     rcases i with _ | _ | _ | _ | _ | n <;> simp_all; omega
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

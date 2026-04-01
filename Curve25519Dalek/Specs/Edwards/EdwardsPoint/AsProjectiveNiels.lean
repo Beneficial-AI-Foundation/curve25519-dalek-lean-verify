@@ -11,7 +11,7 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D2
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD2
 import Curve25519Dalek.Aux
 /-!
 # Spec theorem for `EdwardsPoint::as_projective_niels`

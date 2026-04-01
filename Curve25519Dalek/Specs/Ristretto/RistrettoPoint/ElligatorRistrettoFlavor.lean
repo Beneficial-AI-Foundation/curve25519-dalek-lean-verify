@@ -17,11 +17,11 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.ONE_MINUS_EDWARDS_D_SQUARED
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MINUS_ONE
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_AD_MINUS_ONE
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D_MINUS_ONE_SQUARED
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.OneMinusEdwardsDSquared
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MinusOne
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtAdMinusOne
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsDMinusOneSquared
 /-! # Spec Theorem for `RistrettoPoint::elligator_ristretto_flavor`
 
 Specification and proof for `RistrettoPoint::elligator_ristretto_flavor`.

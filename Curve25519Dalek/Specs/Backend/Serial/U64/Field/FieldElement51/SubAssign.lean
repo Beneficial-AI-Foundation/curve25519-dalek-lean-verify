@@ -22,7 +22,8 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace CoreOpsArithSubAssignSharedAFieldElement51
 
 /-
 natural language description:
@@ -50,4 +51,5 @@ theorem sub_assign_spec (self _rhs : backend.serial.u64.field.FieldElement51)
   unfold sub_assign
   step*
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51
+end CoreOpsArithSubAssignSharedAFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts

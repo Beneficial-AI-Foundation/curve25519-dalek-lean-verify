@@ -9,8 +9,6 @@ import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.FromLimbs
 
-set_option linter.style.nativeDecide false
-
 /-!
 # Spec theorem for `constants::ED25519_BASEPOINT_POINT`
 
@@ -21,6 +19,8 @@ point for the prime order subgroup of the Ed25519 elliptic curve group.
 
 Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
 -/
+
+set_option linter.style.nativeDecide false
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.backend.serial.u64.constants
