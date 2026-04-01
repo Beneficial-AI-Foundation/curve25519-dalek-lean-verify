@@ -7,9 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
-
 /-!
 # Spec theorem for `FieldElement51::pow2k`
 
@@ -132,6 +129,9 @@ precise intermediate results.
 
 -/
 
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k
@@ -206,7 +206,8 @@ lemma c4_lt_pow2_115 (a0 a1 a2 a3 a4 : ℕ)
   have : (5 : ℕ) * 2 ^ 108 < 2 ^ 115 := by decide
   omega
 
-/-- Generic carry chain bound: if formula < K * 2^108 and carry < 2^64 and K ≤ 127, then sum < 2^115 -/
+/-- Generic carry chain bound: if formula < K * 2^108 and carry < 2^64
+and K ≤ 127, then sum < 2^115 -/
 private lemma carry_chain_lt_pow2_115 (formula carry : ℕ) (K : ℕ)
     (hf : formula < K * 2 ^ 108) (hc : carry < 2 ^ 64) (hK : K ≤ 127) :
     formula + carry < 2 ^ 115 := by
@@ -341,11 +342,16 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
         (a[0]!.val * a[3]!.val + a[1]!.val * a[2]!.val) := by simp [*]
     have hc4 : c4.val = a[2]!.val * a[2]!.val + 2 *
         (a[0]!.val * a[4]!.val + a[1]!.val * a[3]!.val) := by simp [*]
-    have hc0' : c0.val < 2 ^ 115 := by simp only [hc0]; apply c0_lt_pow2_115 <;> exact ha _ (by simp)
-    have hc1' : c1.val < 2 ^ 115 := by simp only [hc1]; apply c1_lt_pow2_115 <;> exact ha _ (by simp)
-    have hc2' : c2.val < 2 ^ 115 := by simp only [hc2]; apply c2_lt_pow2_115 <;> exact ha _ (by simp)
-    have hc3' : c3.val < 2 ^ 115 := by simp only [hc3]; apply c3_lt_pow2_115 <;> exact ha _ (by simp)
-    have hc4' : c4.val < 2 ^ 115 := by simp only [hc4]; apply c4_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc0' : c0.val < 2 ^ 115 := by
+      simp only [hc0]; apply c0_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc1' : c1.val < 2 ^ 115 := by
+      simp only [hc1]; apply c1_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc2' : c2.val < 2 ^ 115 := by
+      simp only [hc2]; apply c2_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc3' : c3.val < 2 ^ 115 := by
+      simp only [hc3]; apply c3_lt_pow2_115 <;> exact ha _ (by simp)
+    have hc4' : c4.val < 2 ^ 115 := by
+      simp only [hc4]; apply c4_lt_pow2_115 <;> exact ha _ (by simp)
     have a_pow_two : (c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val)
         ≡ (Field51_as_Nat a)^2 [MOD p] := by
       have := decompose a[0]!.val a[1]!.val a[2]!.val a[3]!.val a[4]!.val
@@ -556,7 +562,9 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
     -- Limb bounds for a'': all < 2^52
     have ha''_lt : ∀ i < 5, a''[i]!.val < 2 ^ 52 := by
       intro i hi; interval_cases i
-      · rw [ha''_0]; have := Nat.mod_lt (a'[0]!.val + 19 * carry.val) (show 0 < 2 ^ 51 by positivity); omega
+      · rw [ha''_0]
+        have := Nat.mod_lt (a'[0]!.val + 19 * carry.val) (show 0 < 2 ^ 51 by positivity)
+        omega
       · rw [ha''_1, ha'_1]
         have hmod : c1'.val % 2 ^ 51 < 2 ^ 51 := Nat.mod_lt _ (by positivity)
         have hdiv : (a'[0]!.val + 19 * carry.val) / 2 ^ 51 ≤ 2 ^ 13 - 1 := by
@@ -582,7 +590,8 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
       have hsq : Field51_as_Nat a'' ≡ (Field51_as_Nat a)^2 [MOD p] := by
         -- Strategy: show Field51_as_Nat a'' + carry.val * p = c0 + 2^51*c1 + ... + 2^204*c4
         -- Then conclude ModEq, and chain with a_pow_two.
-        -- Step A: Field51_as_Nat a'' = (a'[0]+19*carry) + 2^51*a'[1]+2^102*a'[2]+2^153*a'[3]+2^204*a'[4]
+        -- Step A: Field51_as_Nat a'' =
+        --   (a'[0]+19*carry) + 2^51*a'[1]+2^102*a'[2]+2^153*a'[3]+2^204*a'[4]
         have hf_a'' : Field51_as_Nat a'' =
             (a'[0]!.val + 19 * carry.val) + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val +
             2^153 * a'[3]!.val + 2^204 * a'[4]!.val := by
@@ -593,10 +602,12 @@ theorem pow2k_loop_spec (k : U32) (a : Array U64 5#usize)
           omega
         -- Step B: Carry chain conservation
         have h_chain : c0.val + 2^51 * c1.val + 2^102 * c2.val + 2^153 * c3.val + 2^204 * c4.val =
-            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val + 2^153 * a'[3]!.val + 2^204 * a'[4]!.val +
+            a'[0]!.val + 2^51 * a'[1]!.val + 2^102 * a'[2]!.val +
+            2^153 * a'[3]!.val + 2^204 * a'[4]!.val +
             2^255 * carry.val :=
           carry_chain_eq c0.val c1.val c2.val c3.val c4.val
-            a'[0]!.val a'[1]!.val a'[2]!.val a'[3]!.val a'[4]!.val carry.val c1'.val c2'.val c3'.val c4'.val
+            a'[0]!.val a'[1]!.val a'[2]!.val a'[3]!.val a'[4]!.val
+            carry.val c1'.val c2'.val c3'.val c4'.val
             ha'_0 ha'_1 ha'_2 ha'_3 ha'_4 hc1'_eq hc2'_eq hc3'_eq hc4'_eq hcarry_val
         -- Step C: Field51_as_Nat a'' + carry * p = c0 + ... + 2^204*c4
         have h_key : Field51_as_Nat a'' + carry.val * p =

@@ -7,7 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
-
 import Mathlib.Algebra.Polynomial.Eval.Algebra
 import Mathlib.Algebra.Polynomial.Eval.Coeff
 import Mathlib.Algebra.Polynomial.Eval.Defs

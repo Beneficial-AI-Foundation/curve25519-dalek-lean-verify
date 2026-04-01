@@ -80,7 +80,8 @@ natural language specs:
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
 
-/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul`**:
+/-- **Spec and proof concerning
+`Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul`**:
 • The function always succeeds (no panic) for canonical input Scalars s
   and valid input EdwardsPoints e
 • The result is a valid EdwardsPoint

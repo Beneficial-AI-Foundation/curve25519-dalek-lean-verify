@@ -8,7 +8,11 @@ import Curve25519Dalek.Funs
 import Mathlib.Tactic.IntervalCases
 
 /-!
-# Reduce
+# Spec theorem for `FieldElement51::reduce`
+
+Specification and proof for `FieldElement51::reduce`.
+
+Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

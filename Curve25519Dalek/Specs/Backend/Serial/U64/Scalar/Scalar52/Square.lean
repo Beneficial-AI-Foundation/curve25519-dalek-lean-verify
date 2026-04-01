@@ -81,7 +81,8 @@ theorem square_spec (self : Scalar52)
   · unfold constants.RR; decide
   step as ⟨result, result_post1, result_post2, result_post3⟩
   refine ⟨?_, result_post2⟩
-  have h_result_R_aa_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat aa * Scalar52_as_Nat constants.RR [MOD L] := by
+  have h_result_R_aa_RR :
+      Scalar52_as_Nat result * R ≡ Scalar52_as_Nat aa * Scalar52_as_Nat constants.RR [MOD L] := by
     rw [a1_post1] at result_post1
     rw [Nat.ModEq]
     exact result_post1
@@ -91,7 +92,8 @@ theorem square_spec (self : Scalar52)
   have h_result_R_a_R : Scalar52_as_Nat result * R ≡ Scalar52_wide_as_Nat a * R [MOD L] := by
     rw [← Nat.ModEq] at aa_post1
     exact Nat.ModEq.trans h_result_R_aa_R_R (Nat.ModEq.mul_right R aa_post1)
-  have h_result_R_self_sq_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat self * Scalar52_as_Nat self * R [MOD L] := by
+  have h_result_R_self_sq_R :
+      Scalar52_as_Nat result * R ≡ Scalar52_as_Nat self * Scalar52_as_Nat self * R [MOD L] := by
     rw [a_post1] at h_result_R_a_R
     exact h_result_R_a_R
   grind only [cancelR]

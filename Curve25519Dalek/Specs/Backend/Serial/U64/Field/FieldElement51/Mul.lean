@@ -588,9 +588,11 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
     land_pow_two_sub_one_eq_mod,
     UScalar.cast_val_eq, UScalarTy.numBits,
     Nat.shiftRight_eq_div_pow]
-    suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2^ 64 - 1 by --2 ^ 51 * (2^ 64 - 1 - 2^ 51)
+    -- 2 ^ 51 * (2^ 64 - 1 - 2^ 51)
+    suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2^ 64 - 1 by
       · -- BEGIN TASK
-        suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 64 - 1 - 2^ 51) by
+        suffices h:
+            c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 64 - 1 - 2^ 51) by
           · -- BEGIN TASK
             have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
             have := Nat.div_lt_of_lt_mul h
@@ -652,7 +654,8 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
       UScalar.cast_val_eq, UScalarTy.numBits,
       UScalar.cast_val_eq, UScalarTy.numBits]
       have :  (c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19) % 2 ^ 51 +
-          2 ^ 51 * (c11.val % 2 ^ 64 % 2 ^ 51 + (c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19) >>> 51) +
+          2 ^ 51 * (c11.val % 2 ^ 64 % 2 ^ 51 +
+            (c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19) >>> 51) +
           2 ^ (2 * 51 ) * (c21.val % 2 ^ 64 % 2 ^ 51) +
           2 ^ (3 * 51 )  * (c31.val % 2 ^ 64 % 2 ^ 51) +
           2 ^ (4 * 51 )  * (c41.val % 2 ^ 64 % 2 ^ 51) =
@@ -722,10 +725,12 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         rw[← this]
         apply Nat.ModEq.trans eq1
         have : i71.val * 2 ^ 255 +
-          (c0.val % 2 ^ 51 + 2 ^ 51 * (↑c11 % 2 ^ 64 % 2 ^ 51) + 2 ^ (2 * 51) * (↑c21 % 2 ^ 64 % 2 ^ 51) +
+          (c0.val % 2 ^ 51 + 2 ^ 51 * (↑c11 % 2 ^ 64 % 2 ^ 51) +
+            2 ^ (2 * 51) * (↑c21 % 2 ^ 64 % 2 ^ 51) +
           2 ^ (3 * 51) * (↑c31 % 2 ^ 64 % 2 ^ 51) +
           2 ^ (4 * 51) * (↑c41 % 2 ^ 64 % 2 ^ 51)) =
-          ↑c0 % 2 ^ 51 + 2 ^ 51 * (↑c11 % 2 ^ 64 % 2 ^ 51) + 2 ^ (2 * 51) * (↑c21 % 2 ^ 64 % 2 ^ 51) +
+          ↑c0 % 2 ^ 51 + 2 ^ 51 * (↑c11 % 2 ^ 64 % 2 ^ 51) +
+            2 ^ (2 * 51) * (↑c21 % 2 ^ 64 % 2 ^ 51) +
           2 ^ (3 * 51) * (↑c31 % 2 ^ 64 % 2 ^ 51) +
           2 ^ (4 * 51) * (↑c41 % 2 ^ 64 % 2 ^ 51 + 2 ^ 51 * ↑i71)  := by grind
         rw[this]
@@ -917,7 +922,8 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
       simp at this
       rw[this]
       simp_all
-      have := decompose (lhs[0]!).val (lhs[1]!).val (lhs[2]!).val (lhs[3]!).val (lhs[4]!).val (rhs[0]!).val (rhs[1]!).val (rhs[2]!).val (rhs[3]!).val (rhs[4]!).val
+      have := decompose (lhs[0]!).val (lhs[1]!).val (lhs[2]!).val (lhs[3]!).val (lhs[4]!).val
+        (rhs[0]!).val (rhs[1]!).val (rhs[2]!).val (rhs[3]!).val (rhs[4]!).val
       simp at this
       apply Nat.ModEq.symm
       apply Nat.ModEq.trans this
@@ -943,7 +949,8 @@ theorem mul_spec (lhs rhs : Array U64 5#usize)
         Nat.shiftRight_eq_div_pow]
         suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 64 -1 by
           ·  -- BEGIN TASK
-             suffices h: c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 52 - 1 - 2^ 51) by
+             suffices h:
+                 c0.val % 2 ^ 64 % 2 ^ 51 + i71.val % 2 ^ 64 * 19 < 2 ^ 51 * (2^ 52 - 1 - 2^ 51) by
                · -- BEGIN TASK
                  have eq1:= Nat.mod_lt (c11.val % 2 ^ 64) (by simp : 0 < 2 ^ 51)
                  have := Nat.div_lt_of_lt_mul h

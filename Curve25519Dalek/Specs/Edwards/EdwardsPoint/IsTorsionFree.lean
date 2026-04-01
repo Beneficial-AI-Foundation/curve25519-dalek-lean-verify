@@ -9,7 +9,7 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.CtEq
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.Identity
-import Curve25519Dalek.Specs.Constants.BASEPOINT_ORDER_PRIVATE
+import Curve25519Dalek.Specs.Constants.BasepointOrderPrivate
 /-!
 # Spec theorem for `EdwardsPoint::is_torsion_free`
 

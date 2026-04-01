@@ -16,11 +16,12 @@ Specification and proof for `CompressedRistretto::decompress`.
 
 This function implements the Ristretto decompression (DECODE) function, which attempts to
 decode a (valid) 32-byte representation back to a RistrettoPoint. The function is defined in the
+Ristretto specification:
+https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1
 
-- [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.1).
-
-It takes a CompressedRistretto (a 32-byte array) and attempts to produce the associated RistrettoPoint,
-returning None if the input byte array is not a valid canonical encoding.
+It takes a CompressedRistretto (a 32-byte array) and attempts to produce
+the associated RistrettoPoint, returning None if the input byte array is
+not a valid canonical encoding.
 
 Source: "curve25519-dalek/src/ristretto.rs"
 -/
@@ -125,8 +126,10 @@ theorem decompress_spec (comp : CompressedRistretto) :
         · -- t_is_negative: return none
           simp only [h_t_neg]
           exact ⟨none, rfl, fun _ => rfl, fun ⟨_, h⟩ => by
-            simp only [decompress_pure, h_ds1, Option.bind_some, h_step2_none (by simp only [h_t_neg,
-              Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero, not_false_eq_true, zero_ne_one,
+            simp only [decompress_pure, h_ds1, Option.bind_some,
+              h_step2_none (by simp only [h_t_neg,
+              Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, one_ne_zero,
+              not_false_eq_true, zero_ne_one,
               not_lt_zero, zero_lt_one, or_true, or_self, UScalar.val_not_eq_imp_not_eq, false_and,
               and_false]),
               reduceCtorEq] at h⟩

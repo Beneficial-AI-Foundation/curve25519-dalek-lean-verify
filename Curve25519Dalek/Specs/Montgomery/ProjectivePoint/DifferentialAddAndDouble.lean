@@ -147,7 +147,8 @@ theorem differential_add_and_double_spec
          Montgomery.get_u (P_affine - Q_affine) = Field51_as_Nat affine_PmQ) )
       ⦄ := by
   unfold differential_add_and_double
-  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a, hpmq_lt, hnon_pmq, heq_pmq⟩:=  h_ladder_state
+  obtain ⟨ P_affine, Q_affine, hnon_p, hnon_q, hp_neq_q, hp_a, hq_a,
+    hpmq_lt, hnon_pmq, heq_pmq⟩ := h_ladder_state
   step*
   · exact hP_valid.U_bounds
   · exact hP_valid.W_bounds

@@ -19,7 +19,9 @@ It performs repeated Montgomery squaring followed by a Montgomery multiplication
 Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open curve25519_dalek.backend.serial.u64.scalar
+open curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
 namespace curve25519_dalek.scalar.Scalar52
 
@@ -94,7 +96,8 @@ theorem square_multiply_loop_spec (y : Scalar52) (squarings i : Usize) (hi : i.v
           omega
         rw [h_pow_split, Nat.pow_add]
         unfold pow2 at *; try ring_nf at ⊢ h_math_ih
-        rw [Nat.mul_mod, h_math_ih, ← Nat.mul_mod, ← Nat.mul_pow, Nat.pow_mod, ← hy1_eq, ← Nat.pow_mod]
+        rw [Nat.mul_mod, h_math_ih, ← Nat.mul_mod, ← Nat.mul_pow,
+          Nat.pow_mod, ← hy1_eq, ← Nat.pow_mod]
         ring_nf
     · have : squarings.val - i.val = n + 1 := by assumption
       agrind

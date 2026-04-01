@@ -8,15 +8,13 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 
-
-set_option exponentiation.threshold 416
-
-
 /-!
 # SquareInternal
 
 The main statement concerning `square_internal` is `square_internal_spec` (below).
 -/
+
+set_option exponentiation.threshold 416
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 

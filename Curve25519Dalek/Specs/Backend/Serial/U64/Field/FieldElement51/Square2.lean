@@ -64,7 +64,8 @@ theorem square2_loop_spec (square : Array U64 5#usize) (i : Usize) (hi : i.val â
 
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.square2`**:
 - No panic (always returns successfully)
-- The result, when converted to a natural number, is congruent to twice the square of the input modulo p
+- The result, when converted to a natural number, is congruent to twice
+  the square of the input modulo p
 - Input bounds: each limb < 2^54
 - Output bounds: each limb < 2^53
 -/
