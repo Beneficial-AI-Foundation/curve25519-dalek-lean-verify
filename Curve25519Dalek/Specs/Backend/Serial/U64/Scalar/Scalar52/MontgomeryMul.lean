@@ -48,15 +48,15 @@ natural language specs:
 -/
 @[step]
 theorem montgomery_mul_spec (m m' : Scalar52)
-    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :
+    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62)
+    (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m' < R * L) :
     montgomery_mul m m' ⦃ w =>
     (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧
-    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by
+    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧
+    Scalar52_as_Nat w < L ⦄ := by
   unfold montgomery_mul
   step*
-  constructor
-  · simpa [a1_post1, eq_comm] using w_post1
-  · intro i hi
-    exact lt_trans (w_post2 i hi) (by norm_num)
+  refine ⟨?_, w_post2, w_post3⟩
+  simpa [a1_post1, eq_comm] using w_post1
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

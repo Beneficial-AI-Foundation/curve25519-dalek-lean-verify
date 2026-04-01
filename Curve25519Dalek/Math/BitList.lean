@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -76,33 +76,39 @@ theorem Equiv.trans (h₁ : bs₁ ≈ₗ bs₂) (h₂ : bs₂ ≈ₗ bs₃) : bs
 @[grind =]
 theorem Equiv.append_false (bs : List Bool) (n : Nat) :
     bs ++ replicate n false ≈ₗ bs := by
+  -- grind needed: case analysis on getD for append + replicate interplay
   intro i; by_cases i < bs.length <;> grind
 
-/-- Equiv implies the same numeric value. -/
 private theorem getD_drop_one (bs : List Bool) (i : Nat) :
     (bs.drop 1).getD i false = bs.getD (i + 1) false := by
   cases bs with
-  | nil => simp
-  | cons _ _ => simp
+  | nil => simp only [drop_nil, getD_nil]
+  | cons _ _ => simp only [drop_succ_cons, drop_zero, getD_cons_succ]
 
 private theorem toNat_eq_toNat_of_equiv_aux (n : Nat) :
     ∀ (bs₁ bs₂ : List Bool), bs₁.length ≤ n → bs₂.length ≤ n →
     (bs₁ ≈ₗ bs₂) → toNat bs₁ = toNat bs₂ := by
   induction n with
-  | zero => grind
+  | zero =>
+    intro bs₁ bs₂ h1 h2 _
+    have h1' : bs₁ = [] := List.eq_nil_of_length_eq_zero (by omega)
+    have h2' : bs₂ = [] := List.eq_nil_of_length_eq_zero (by omega)
+    subst h1'; subst h2'; rfl
   | succ n ih =>
     intro bs₁ bs₂ h1 h2 heq
     have step : ∀ bs : List Bool,
         toNat bs = (bs.getD 0 false).toNat + 2 * toNat (bs.drop 1) := by
+      -- simp unfolds toNat and getD; simp only lemma list would be impractically long
       intro bs; cases bs <;> simp [toNat, getD]
     rw [step bs₁, step bs₂, heq 0]
     have : toNat (bs₁.drop 1) = toNat (bs₂.drop 1) := by
       apply ih
-      · grind [length_drop]
-      · grind [length_drop]
+      · simp only [length_drop]; omega
+      · simp only [length_drop]; omega
       · intro i; simp only [getD_drop_one]; exact heq (i + 1)
     omega
 
+/-- Equiv implies the same numeric value. -/
 @[grind →]
 theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
   toNat_eq_toNat_of_equiv_aux (bs₁.length + bs₂.length) bs₁ bs₂ (by omega) (by omega) h
@@ -110,6 +116,7 @@ theorem Equiv.toNat_eq (h : bs₁ ≈ₗ bs₂) : toNat bs₁ = toNat bs₂ :=
 /-- Equiv is preserved by `List.take` on both sides. -/
 private theorem getD_take (bs : List Bool) (n i : Nat) :
     (bs.take n).getD i false = if i < n then bs.getD i false else false := by
+  -- simp uses if_pos/if_neg with getD lemmas; simp only lemma list would be impractically long
   by_cases hi : i < n <;> simp [hi]
 
 theorem Equiv.take (h : bs₁ ≈ₗ bs₂) (n : Nat) :
@@ -143,7 +150,7 @@ attribute [grind =] List.drop_take List.drop_drop List.take_take
 theorem Equiv.trans_take {m n : Nat}
     (h1 : bs₁ ≈ₗ bs₂.take m) (h2 : bs₂ ≈ₗ bs₃.take n) :
     bs₁ ≈ₗ bs₃.take (min m n) :=
-  h1.trans ((h2.take m).trans (by simp [List.take_take]))
+  h1.trans ((h2.take m).trans (by simp only [take_take, Equiv.refl]))
 
 @[grind →]
 theorem Equiv.trans_drop {m : Nat}
@@ -162,8 +169,8 @@ theorem Equiv.trans_take_drop {m n : Nat}
 /-- `ofNat w n` always produces exactly `w` bits. -/
 theorem ofNat_length (w n : Nat) : (ofNat w n).length = w := by
   induction w generalizing n with
-  | zero => simp [ofNat]
-  | succ w ih => simp [ofNat, ih]
+  | zero => simp only [ofNat, length_nil]
+  | succ w ih => simp only [ofNat, length_cons, ih]
 
 theorem ofU8_length (x : U8) : (ofU8 x).length = 8 :=
   ofNat_length 8 x.val
@@ -174,7 +181,7 @@ theorem ofU64_length (x : U64) : (ofU64 x).length = 64 :=
 theorem ofByteList_length (bytes : List U8) :
     (ofByteList bytes).length = 8 * bytes.length := by
   induction bytes with
-  | nil => simp [ofByteList]
+  | nil => simp only [ofByteList, map_nil, flatten_nil, length_nil, Nat.mul_zero]
   | cons x xs ih =>
     unfold ofByteList
     simp only [map_cons, flatten_cons, length_append, ofU8_length]
@@ -183,7 +190,7 @@ theorem ofByteList_length (bytes : List U8) :
 
 theorem ofByteArray_length (arr : Array U8 32#usize) :
     (ofByteArray arr).length = 256 := by
-  simp [ofByteArray, ofByteList_length, arr.property]
+  simp only [ofByteArray, ofByteList_length, arr.property]; norm_num
 
 /-! ## Pure List Bool lemmas: `ofNat` interacts with list operations
 
@@ -193,7 +200,7 @@ These are the primary lemmas, stated as equalities between `List Bool` values. -
 theorem ofNat_take (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     (ofNat w n).take k = ofNat k n := by
   induction k generalizing w n with
-  | zero => simp [ofNat]
+  | zero => simp only [take_zero, ofNat]
   | succ k ih =>
     match w, hkw with
     | w + 1, hkw => grind [ofNat]
@@ -202,7 +209,7 @@ theorem ofNat_take (k w : Nat) (n : Nat) (hkw : k ≤ w) :
 theorem ofNat_drop (k w : Nat) (n : Nat) (hkw : k ≤ w) :
     (ofNat w n).drop k = ofNat (w - k) (n / 2 ^ k) := by
   induction k generalizing w n with
-  | zero => simp
+  | zero => simp only [drop_zero, Nat.sub_zero, Nat.pow_zero, Nat.div_one]
   | succ k ih =>
     match w, hkw with
     | w + 1, hkw =>
@@ -222,7 +229,7 @@ theorem ofNat_extract (w start len : Nat) (n : Nat) (h : start + len ≤ w) :
 theorem ofNat_split (w₁ w₂ : Nat) (n : Nat) :
     ofNat (w₁ + w₂) n = ofNat w₁ n ++ ofNat w₂ (n / 2 ^ w₁) := by
   induction w₁ generalizing n with
-  | zero => simp [ofNat]
+  | zero => simp only [ofNat, Nat.zero_add, Nat.pow_zero, Nat.div_one, nil_append]
   | succ w₁ ih =>
     have : w₁ + 1 + w₂ = (w₁ + w₂) + 1 := by omega
     grind [ofNat, Nat.pow_succ', Nat.div_div_eq_div_mul]
@@ -231,7 +238,7 @@ theorem ofNat_split (w₁ w₂ : Nat) (n : Nat) :
 theorem ofNat_mod (w n : Nat) :
     ofNat w (n % 2 ^ w) = ofNat w n := by
   induction w generalizing n with
-  | zero => simp [ofNat]
+  | zero => simp only [ofNat]
   | succ w ih =>
     have : n % 2 ^ (w + 1) % 2 = n % 2 :=
       Nat.mod_mod_of_dvd n (by rw [Nat.pow_succ']; exact dvd_mul_right 2 (2 ^ w))
@@ -242,8 +249,9 @@ theorem ofNat_mod (w n : Nat) :
 /-- A wider representation is Equiv to a narrower one when the value fits. -/
 private theorem ofNat_zero (w : Nat) : ofNat w 0 = replicate w false := by
   induction w with
-  | zero => simp [ofNat]
-  | succ w ih => simp [ofNat, ih, replicate_succ]
+  | zero => simp only [ofNat, replicate]
+  | succ w ih =>
+    simp only [ofNat, ih, replicate_succ, show (0 % 2 == 1) = false from rfl, Nat.zero_div]
 
 theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k) :
     ofNat w n ≈ₗ ofNat k n := by
@@ -257,45 +265,48 @@ theorem ofNat_equiv_of_lt (k w : Nat) (n : Nat) (hkw : k ≤ w) (hn : n < 2 ^ k)
 theorem extract_extract {α : Type} (l : List α) (a b c d : Nat) (hcd : c + d ≤ b - a) :
     (l.extract a b).extract c (c + d) = l.extract (a + c) (a + c + d) := by
   simp only [extract_eq_drop_take, drop_take, drop_drop]
-  grind
+  have hdc : c + d - c = d := by omega
+  have hacd : a + c + d - (a + c) = d := by omega
+  have hle : d ≤ b - a - c := by omega
+  rw [hdc, hacd, List.take_take, Nat.min_eq_left hle]
 
 /-! ## Byte list decomposition into bits -/
 
 /-- The bits of a cons byte list are the head byte's bits followed by the tail's. -/
 theorem ofByteList_cons (x : U8) (xs : List U8) :
     ofByteList (x :: xs) = ofU8 x ++ ofByteList xs := by
-  simp [ofByteList]
+  simp only [ofByteList, map_cons, flatten_cons]
 
 /-- Extracting 8-aligned bits from a byte list equal to extracting the corresponding bytes. -/
 private theorem flatten_drop_uniform {α : Type} (xss : List (List α)) (k i : Nat)
     (hunif : ∀ xs ∈ xss, xs.length = k) :
     (xss.flatten).drop (k * i) = (xss.drop i).flatten := by
   induction i generalizing xss with
-  | zero => simp
+  | zero => simp only [Nat.mul_zero, drop_zero]
   | succ i ih =>
     cases xss with
-    | nil => simp
+    | nil => simp only [flatten_nil, drop_nil]
     | cons xs xss =>
       simp only [flatten_cons, drop_succ_cons]
-      have : xs.length = k := hunif xs (by simp)
+      have : xs.length = k := hunif xs (List.mem_cons.mpr (Or.inl rfl))
       have : k * (i + 1) = xs.length + k * i := by rw [this]; ring
       rw [this, drop_append, drop_eq_nil_of_le (by omega)]
-      simpa [add_tsub_cancel_left, nil_append] using
-        ih xss (fun ys hy => hunif ys (by simp [hy]))
+      simpa only [add_tsub_cancel_left, nil_append] using
+        ih xss (fun ys hy => hunif ys (List.mem_cons.mpr (Or.inr hy)))
 
 private theorem flatten_take_uniform {α : Type} (xss : List (List α)) (k n : Nat)
     (hunif : ∀ xs ∈ xss, xs.length = k) :
     (xss.flatten).take (k * n) = (xss.take n).flatten := by
   induction n generalizing xss with
-  | zero => simp
+  | zero => simp only [Nat.mul_zero, take_zero, flatten_nil]
   | succ n ih =>
     cases xss with
-    | nil => simp
+    | nil => simp only [flatten_nil, take_nil]
     | cons xs xss =>
-      have : xs.length = k := hunif xs (by simp)
+      have : xs.length = k := hunif xs (List.mem_cons.mpr (Or.inl rfl))
       have : k * (n + 1) = xs.length + k * n := by rw [this]; ring
       simpa [this, take_append, take_of_length_le] using
-        ih xss (fun ys hy => hunif ys (by simp [hy]))
+        ih xss (fun ys hy => hunif ys (List.mem_cons.mpr (Or.inr hy)))
 
 theorem ofByteList_extract (bytes : List U8) (i j : Nat) (_ : j ≤ bytes.length) :
     (ofByteList bytes).extract (8 * i) (8 * j) = ofByteList (bytes.extract i j) := by
@@ -308,20 +319,22 @@ theorem ofByteList_extract (bytes : List U8) (i j : Nat) (_ : j ≤ bytes.length
   rw [show 8 * j - 8 * i = 8 * (j - i) from by omega]
   rw [flatten_drop_uniform _ 8 i hunif]
   rw [flatten_take_uniform _ 8 (j - i) (by intro xs hxs; exact hunif xs (mem_of_mem_drop hxs))]
-  grind [map_drop, map_take]
+  simp only [map_drop, map_take]
 
 /-! ## Round-trip and bridge lemmas (connecting to Nat) -/
 
 /-- Converting to bits and back recovers the original value. -/
 private theorem beq_one_toNat (n : Nat) : (n % 2 == 1).toNat + 2 * (n / 2) = n := by
   have h1 : n % 2 = 0 ∨ n % 2 = 1 := Nat.mod_two_eq_zero_or_one n
-  rcases h1 with h | h <;> simp [h, Bool.toNat] <;> omega
+  rcases h1 with h | h
+  · simp only [h, show ((0 : Nat) == 1) = false from rfl, Bool.toNat_false]; omega
+  · simp only [h, show ((1 : Nat) == 1) = true from rfl, Bool.toNat_true]; omega
 
 theorem toNat_ofNat (w n : Nat) (h : n < 2 ^ w) : toNat (ofNat w n) = n := by
   induction w generalizing n with
-  | zero => simp [ofNat, toNat]; omega
+  | zero => simp only [ofNat, toNat]; omega
   | succ w ih =>
-    have hd : n / 2 < 2 ^ w := by grind
+    have hd : n / 2 < 2 ^ w := by rw [pow_succ] at h; omega
     simp only [ofNat, toNat, ih _ hd]
     exact beq_one_toNat n
 
@@ -335,19 +348,20 @@ theorem toNat_ofU64 (x : U64) : toNat (ofU64 x) = x.val :=
 theorem ofNat_toNat (bs : List Bool) :
     ofNat bs.length (toNat bs) = bs := by
   induction bs with
-  | nil => simp [ofNat, toNat]
+  | nil => simp only [length_nil, toNat, ofNat]
   | cons b bs ih =>
     simp only [length_cons, toNat, ofNat]
     congr 1
-    · cases b <;> simp [Bool.toNat]
+    · -- simp unfolds Bool.toNat arithmetic; simp only lemma list would be impractically long
+      cases b <;> simp [Bool.toNat]
     · have : (b.toNat + 2 * toNat bs) / 2 = toNat bs := by
-        cases b <;> simp [Bool.toNat]; omega
+        cases b <;> simp only [Bool.toNat_true, Bool.toNat_false] <;> omega
       rw [this, ih]
 
 /-- A bit list's value is bounded by `2^length`. -/
 theorem toNat_lt_pow (bs : List Bool) : toNat bs < 2 ^ bs.length := by
   induction bs with
-  | nil => simp [toNat]
+  | nil => simp only [toNat, length_nil, Nat.pow_zero]; norm_num
   | cons b bs ih =>
     have : b.toNat ≤ 1 := Bool.toNat_le b
     grind [toNat, Nat.pow_succ']
@@ -356,17 +370,17 @@ theorem toNat_lt_pow (bs : List Bool) : toNat bs < 2 ^ bs.length := by
 theorem toNat_append (bs₁ bs₂ : List Bool) :
     toNat (bs₁ ++ bs₂) = toNat bs₁ + toNat bs₂ * 2 ^ bs₁.length := by
   induction bs₁ with
-  | nil => simp [toNat]
+  | nil => simp only [nil_append, toNat, length_nil, Nat.pow_zero, Nat.mul_one, Nat.zero_add]
   | cons _ _ _ => grind [toNat, Nat.pow_succ']
 
 /-- Taking k bits gives the value mod 2^k. -/
 theorem toNat_take (k : Nat) (bs : List Bool) :
     toNat (bs.take k) = toNat bs % 2 ^ k := by
   induction k generalizing bs with
-  | zero => simp [toNat, Nat.mod_one]
+  | zero => simp only [take_zero, toNat, Nat.pow_zero, Nat.mod_one]
   | succ k ih =>
     cases bs with
-    | nil => simp [toNat]
+    | nil => simp only [take_nil, toNat, Nat.zero_mod]
     | cons b bs =>
       have := Bool.toNat_le b
       grind [toNat, = Nat.add_mod, = Nat.mul_mod_mul_left, = Nat.mod_eq_of_lt]
@@ -378,10 +392,10 @@ private theorem add_mul_two_div (a m : Nat) (ha : a < 2) :
 theorem toNat_drop (k : Nat) (bs : List Bool) :
     toNat (bs.drop k) = toNat bs / 2 ^ k := by
   induction k generalizing bs with
-  | zero => simp
+  | zero => simp only [drop_zero, Nat.pow_zero, Nat.div_one]
   | succ k ih =>
     cases bs with
-    | nil => simp [toNat]
+    | nil => simp only [drop_nil, toNat, Nat.zero_div]
     | cons b bs =>
       simp only [drop_succ_cons, toNat, Nat.pow_succ']
       rw [ih bs]
@@ -393,7 +407,7 @@ theorem toNat_drop (k : Nat) (bs : List Bool) :
 theorem toNat_ofByteList (bytes : List U8) :
     toNat (ofByteList bytes) = Nat.ofDigits 256 (bytes.map (·.val)) := by
   induction bytes with
-  | nil => simp [ofByteList, toNat]
+  | nil => simp only [ofByteList, map_nil, flatten_nil, toNat, Nat.ofDigits]
   | cons x xs ih =>
     simp only [ofByteList_cons, toNat_append, toNat_ofU8, ofU8_length,
       map_cons, Nat.ofDigits, ih]
@@ -404,7 +418,7 @@ lemma ofDigits_map_val_eq_sum (bytes : List U8) :
     Nat.ofDigits 256 (bytes.map (·.val)) =
       ∑ j ∈ Finset.range bytes.length, bytes[j]!.val * 256 ^ j := by
   induction bytes with
-  | nil => simp
+  | nil => simp only [map_nil, Nat.ofDigits, length_nil, Finset.range_zero, Finset.sum_empty]
   | cons x xs ih =>
     simp only [map_cons, length_cons]
     rw [Finset.sum_range_succ']
@@ -441,7 +455,7 @@ theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length
       ∑ i ∈ Finset.range n,
         toNat (bs.extract (k * i) (k * i + k)) * 2 ^ (k * i) := by
   induction n with
-  | zero => simp [toNat]
+  | zero => simp only [Nat.mul_zero, take_zero, toNat, Finset.range_zero, Finset.sum_empty]
   | succ n ih =>
     rw [Finset.sum_range_succ]
     have hkn : k * n ≤ bs.length := by nlinarith
@@ -452,7 +466,7 @@ theorem toNat_split_chunks (bs : List Bool) (k n : Nat) (h : k * n ≤ bs.length
       rw [extract_eq_drop_take]
       conv_lhs => rw [← take_append_drop (k * n) (bs.take (k * n + k))]
       rw [take_take, drop_take]
-      simp
+      simp only [Nat.min_eq_left (Nat.le_add_right _ _)]
     rw [hsplit, toNat_append]
     have hlen : (bs.take (k * n)).length = k * n := by
       rw [length_take]; omega
@@ -471,7 +485,7 @@ def ofScalar52 (arr : Array U64 5#usize) : List Bool :=
 theorem ofLimbList_length (w : Nat) (limbs : List U64) :
     (ofLimbList w limbs).length = w * limbs.length := by
   induction limbs with
-  | nil => simp [ofLimbList]
+  | nil => simp only [ofLimbList, map_nil, flatten_nil, length_nil, Nat.mul_zero]
   | cons x xs ih =>
     unfold ofLimbList
     simp only [map_cons, flatten_cons, length_append, ofNat_length]
@@ -480,7 +494,7 @@ theorem ofLimbList_length (w : Nat) (limbs : List U64) :
 
 theorem ofScalar52_length (arr : Array U64 5#usize) :
     (ofScalar52 arr).length = 260 := by
-  simp [ofScalar52, ofLimbList_length, arr.property]
+  simp only [ofScalar52, ofLimbList_length, arr.property]; norm_num
 
 /-- The value of a Scalar52's bits equals `Scalar52_as_Nat`. -/
 theorem toNat_ofScalar52 (arr : Array U64 5#usize)
@@ -496,11 +510,16 @@ theorem toNat_ofScalar52 (arr : Array U64 5#usize)
   simp only [Array.getElem!_Nat_eq, List.getElem!_cons_zero, List.getElem!_cons_succ]
   rw [toNat_append, toNat_append, toNat_append, toNat_append]
   simp only [ofNat_length]
-  have h0 : a0.val < 2 ^ 52 := by have := h ⟨0, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
-  have h1 : a1.val < 2 ^ 52 := by have := h ⟨1, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
-  have h2 : a2.val < 2 ^ 52 := by have := h ⟨2, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
-  have h3 : a3.val < 2 ^ 52 := by have := h ⟨3, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
-  have h4 : a4.val < 2 ^ 52 := by have := h ⟨4, by omega⟩; simpa [Array.getElem!_Nat_eq] using this
+  have h0 : a0.val < 2 ^ 52 := by
+    have := h ⟨0, by omega⟩; simpa only [Array.getElem!_Nat_eq] using this
+  have h1 : a1.val < 2 ^ 52 := by
+    have := h ⟨1, by omega⟩; simpa only [Array.getElem!_Nat_eq] using this
+  have h2 : a2.val < 2 ^ 52 := by
+    have := h ⟨2, by omega⟩; simpa only [Array.getElem!_Nat_eq] using this
+  have h3 : a3.val < 2 ^ 52 := by
+    have := h ⟨3, by omega⟩; simpa only [Array.getElem!_Nat_eq] using this
+  have h4 : a4.val < 2 ^ 52 := by
+    have := h ⟨4, by omega⟩; simpa only [Array.getElem!_Nat_eq] using this
   rw [toNat_ofNat 52 a0.val h0, toNat_ofNat 52 a1.val h1,
     toNat_ofNat 52 a2.val h2, toNat_ofNat 52 a3.val h3,
     toNat_ofNat 52 a4.val h4]

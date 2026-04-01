@@ -21,8 +21,9 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 /-
 natural language description:
 
-    • Takes an input unpacked scalar m in Montgomery form and returns an unpacked scalar u representing
-      the value (m * R⁻¹) mod L, where R = 2^260 is the Montgomery constant and L is the group order.
+    • Takes an input unpacked scalar m in Montgomery form and returns an unpacked scalar u
+      representing the value (m * R⁻¹) mod L, where R = 2^260 is the Montgomery constant and L is
+      the group order.
     • This is the inverse operation of as_montgomery.
 
 natural language specs:
@@ -31,7 +32,7 @@ natural language specs:
     • scalar_to_nat(u) * R = scalar_to_nat(m) mod L
 -/
 
-/-- Strange that this result is required, how can the argument be made smoother where this is used?. -/
+/-- TODO: can the argument be made smoother where this is used and remove this? -/
 theorem set_getElem!_eq (l : List U128) (a : U128) (i : ℕ) (h : i < l.length) :
     (l.set i (a))[i]! = a := by
   simp_all only [List.getElem!_set]
@@ -90,15 +91,31 @@ theorem from_montgomery_spec (self : Scalar52) (h_bounds : ∀ i < 5, self[i]!.v
       UScalarTy.U64_numBits_eq, UScalarTy.U128_numBits_eq, Nat.reduceLeDiff,
       UScalar.cast_val_mod_pow_greater_numBits_eq, Nat.reducePow];
       agrind
-    · have h_ge : 5 ≤ i := by agrind
-      rw [limbs1_post2 i hi h_ge]
-      simp only [Array.repeat] at ⊢
-      simp only [getElem!, List.getElem?_replicate]
-      simp_all only [Array.getElem!_Nat_eq, Nat.reducePow, zero_le, forall_const, not_lt_zero',
-        IsEmpty.forall_iff, not_lt, UScalar.ofNatCore_val_eq, reduceIte, Nat.ofNat_pos]
-  · refine ⟨?_, by assumption, by assumption⟩
-    rw [result_post1]
-    simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]
-    simp [-Nat.reducePow, *]
+    · rw [limbs1_post2 i hi (by omega)]
+      simp only [Array.repeat, getElem!, List.getElem?_replicate, *,
+        UScalar.ofNatCore_val_eq, reduceIte]; positivity
+  · -- h_canonical: [self[0]..self[4], 0,0,0,0] has value = Scalar52_as_Nat self << R*L
+    have h_cast : ∀ j < 5, (limbs1[j]!).val = (self[j]!).val := fun j hj => by
+      simp [limbs1_post1 j hj (Nat.zero_le j)]
+    have h_zero : ∀ j, 5 ≤ j → j < 9 → (limbs1[j]!).val = 0 := fun j hge hlt => by
+      simp only [limbs1_post2 j hlt hge, Array.getElem!_Nat_eq, zero_array j hlt]
+    have h_eq : Scalar52_wide_as_Nat limbs1 = Scalar52_as_Nat self := by
+      simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, Finset.sum_range_succ,
+                 Finset.range_zero, Finset.sum_empty, zero_add,
+                 h_cast 0 (by omega), h_cast 1 (by omega), h_cast 2 (by omega),
+                 h_cast 3 (by omega), h_cast 4 (by omega),
+                 h_zero 5 (by omega) (by omega), h_zero 6 (by omega) (by omega),
+                 h_zero 7 (by omega) (by omega), h_zero 8 (by omega) (by omega),
+                 mul_zero, add_zero]
+    rw [h_eq]; unfold Scalar52_as_Nat
+    simp only [Finset.sum_range_succ, Finset.range_zero, Finset.sum_empty, zero_add]
+    have h0 := h_bounds 0 (by omega); have h1 := h_bounds 1 (by omega)
+    have h2 := h_bounds 2 (by omega); have h3 := h_bounds 3 (by omega)
+    have h4 := h_bounds 4 (by omega)
+    unfold R L; omega
+  refine ⟨?_, by assumption, by assumption⟩
+  rw [result_post1]
+  simp only [Scalar52_as_Nat, Scalar52_wide_as_Nat, Finset.sum_range_succ]
+  simp [-Nat.reducePow, *]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

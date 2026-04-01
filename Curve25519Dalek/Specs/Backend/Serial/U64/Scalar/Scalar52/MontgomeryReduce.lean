@@ -1,9 +1,8 @@
 /-
 Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Markus Dablander
+Authors: Markus Dablander, Alessandro D'Angelo
 -/
--- import Curve25519Dalek.Aux
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
@@ -11,11 +10,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
-
-import Mathlib.Algebra.Polynomial.Eval.Algebra
-import Mathlib.Algebra.Polynomial.Eval.Coeff
-import Mathlib.Algebra.Polynomial.Eval.Defs
-import Mathlib.Algebra.Polynomial.Eval.Degree
 
 import Mathlib.Data.Nat.ModEq
 import Mathlib.Data.Int.ModEq
@@ -29,15 +23,12 @@ This function performs Montgomery reduction.
 
 **Source**: curve25519-dalek/src/backend/serial/u64/scalar.rs
 
-## TODO
-- Complete proof
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64
-open Polynomial
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-set_option exponentiation.threshold 262
+set_option exponentiation.threshold 416
 
 /-
 natural language description:
@@ -229,436 +220,690 @@ private theorem part2_spec (sum : U128) :
          _ = 2^76 * 2^52 := by norm_num
   exact ⟨h_w_val, h_carry_val, h_carry_bound, h_w_bound⟩
 
-set_option maxHeartbeats 200000 in -- Progress will timout otherwise
+/-- From `Scalar52_wide_as_Nat a < R * L`, derive `a[8]!.val < 2^97`.
+    Keeps all exponents ≤ 416 (within threshold) by rewriting `2^260 * 2^253 = 2^416 * 2^97`. -/
+private lemma a8_bound_of_canonical (a : Aeneas.Std.Array U128 9#usize)
+    (h_canonical : Scalar52_wide_as_Nat a < R * L) : a[8]!.val < 2 ^ 97 := by
+  have h_limb := Scalar52_wide_limb_le_nat a 8 (by omega)
+  simp only [show 52 * 8 = 416 from rfl] at h_limb
+  have hL : L < 2 ^ 253 := by unfold L; omega
+  -- 2^260 * 2^253 = 2^416 * 2^97 (both = 2^513, but keep symbolic)
+  have key : (2 : Nat) ^ 260 * 2 ^ 253 = 2 ^ 416 * 2 ^ 97 := by
+    rw [← pow_add, ← pow_add]
+  -- Chain: 2^416 * a[8]! ≤ S52waN a < R * L = 2^260 * L < 2^260 * 2^253 = 2^416 * 2^97
+  have : 2 ^ 416 * a[8]!.val < 2 ^ 416 * 2 ^ 97 := by
+    calc 2 ^ 416 * a[8]!.val
+        ≤ Scalar52_wide_as_Nat a := h_limb
+      _ < R * L := h_canonical
+      _ = 2 ^ 260 * L := by dsimp [R]
+      _ < 2 ^ 260 * 2 ^ 253 := by apply Nat.mul_lt_mul_of_pos_left hL; positivity
+      _ = 2 ^ 416 * 2 ^ 97 := key
+  exact (Nat.mul_lt_mul_left (show 0 < 2 ^ 416 from by positivity)).mp this
+
+/-- REDC bound: from the main equation `T + N*L = inter*R` and canonical bound `T < R*L`,
+    with `0 ≤ N < R`, the intermediate satisfies `inter < 2*L`. -/
+private lemma redc_bound {inter T : Nat} {C : Int}
+    (h_eq : (T : Int) + C * ↑L = ↑inter * ↑R)
+    (h_T : T < R * L) (h_C_nn : 0 ≤ C) (h_C_lt : C < ↑R) :
+    inter < 2 * L := by
+  have hR_pos : 0 < R := by decide
+  have hL_pos : 0 < L := by decide
+  have h_cn := Int.toNat_of_nonneg h_C_nn
+  have h_c_lt : C.toNat < R := by
+    have := h_C_lt; rw [← h_cn] at this; exact_mod_cast this
+  have h_eq_nat : inter * R = T + C.toNat * L := by
+    have : (↑(inter * R) : Int) = ↑(T + C.toNat * L) := by
+      push_cast; rw [h_cn]; linarith [h_eq]
+    exact_mod_cast this
+  have h_bound : inter * R < 2 * L * R := by
+    rw [h_eq_nat]; have := (Nat.mul_lt_mul_right hL_pos).mpr h_c_lt; grind => lia
+  exact (Nat.mul_lt_mul_right hR_pos).mp h_bound
+
+/-- Core Montgomery identity: from the 9 carry/split equations, derive
+    `a + C*L = inter * R` where B = 2^52, R = B^5.
+    Proved by telescoping linear combination; lives outside main proof for context hygiene. -/
+private lemma montgomery_core_eq
+    {B a0 a1 a2 a3 a4 a5 a6 a7 a8 : ℤ}
+    {n0 n1 n2 n3 n4 : ℤ}
+    {c0 c1 c2 c3 c4 : ℤ}
+    {r0 r1 r2 r3 r4 : ℤ}
+    {n5 n6 n7 : ℤ}
+    {L0 L1 L2 L4 : ℤ}
+    (eq0 : a0 + n0 * L0 = c0 * B)
+    (eq1 : c0 + a1 + n0 * L1 + n1 * L0 = c1 * B)
+    (eq2 : c1 + a2 + n0 * L2 + n1 * L1 + n2 * L0 = c2 * B)
+    (eq3 : c2 + a3 + n1 * L2 + n2 * L1 + n3 * L0 = c3 * B)
+    (eq4 : c3 + a4 + n0 * L4 + n2 * L2 + n3 * L1 + n4 * L0 = c4 * B)
+    (eq5 : c4 + a5 + n1 * L4 + n3 * L2 + n4 * L1 = n5 * B + r0)
+    (eq6 : n5 + a6 + n2 * L4 + n4 * L2 = n6 * B + r1)
+    (eq7 : n6 + a7 + n3 * L4 = n7 * B + r2)
+    (eq8 : n7 + a8 + n4 * L4 = r4 * B + r3) :
+    (a0 + a1 * B + a2 * B ^ 2 + a3 * B ^ 3 + a4 * B ^ 4 +
+     a5 * B ^ 5 + a6 * B ^ 6 + a7 * B ^ 7 + a8 * B ^ 8) +
+    (n0 + n1 * B + n2 * B ^ 2 + n3 * B ^ 3 + n4 * B ^ 4) *
+    (L0 + L1 * B + L2 * B ^ 2 + L4 * B ^ 4) =
+    (r0 + r1 * B + r2 * B ^ 2 + r3 * B ^ 3 + r4 * B ^ 4) * B ^ 5 := by
+  linear_combination eq0 + eq1 * B + eq2 * B ^ 2 + eq3 * B ^ 3 + eq4 * B ^ 4 +
+    eq5 * B ^ 5 + eq6 * B ^ 6 + eq7 * B ^ 7 + eq8 * B ^ 8
+
+/-- A base-B number with 5 digits each < B is < B^5. Used for the Montgomery factor bound. -/
+private lemma base_digit_bound {B d0 d1 d2 d3 d4 : ℤ}
+    (hB : 0 < B)
+    (h0 : d0 < B) (h1 : d1 < B) (h2 : d2 < B) (h3 : d3 < B) (h4 : d4 < B)
+    (_hnn0 : 0 ≤ d0) (_hnn1 : 0 ≤ d1) (_hnn2 : 0 ≤ d2) (_hnn3 : 0 ≤ d3) (_hnn4 : 0 ≤ d4) :
+    d0 + d1 * B + d2 * B ^ 2 + d3 * B ^ 3 + d4 * B ^ 4 < B ^ 5 := by
+  -- Each d_k ≤ B-1, so sum ≤ (B-1)(1+B+B²+B³+B⁴) = B⁵-1
+  have hBnn : (0 : ℤ) ≤ B := le_of_lt hB
+  have hB2 : (0 : ℤ) ≤ B ^ 2 := sq_nonneg _
+  have hB3 : (0 : ℤ) ≤ B ^ 3 := by positivity
+  have hB4 : (0 : ℤ) ≤ B ^ 4 := by positivity
+  have hle : d0 + d1 * B + d2 * B ^ 2 + d3 * B ^ 3 + d4 * B ^ 4 ≤
+      (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) := by nlinarith
+  linarith [show (B - 1) * (1 + B + B ^ 2 + B ^ 3 + B ^ 4) = B ^ 5 - 1 from by ring]
+
+/-- Product of two values below 2^52 is below 2^104. -/
+private theorem mul_lt_pow104 {a b : Nat} (ha : a < 2 ^ 52) (hb : b < 2 ^ 52) :
+    a * b < 2 ^ 104 := by
+  agrind
+
+/-- Non-trivial shared constants for montgomery_reduce.
+Proved separately to avoid adding kernel depth to the main proof. -/
+private theorem mont_reduce_consts :
+    (constants.L[0]!).val < 2 ^ 52 ∧
+    (constants.L[1]!).val < 2 ^ 52 ∧
+    (constants.L[2]!).val < 2 ^ 52 ∧
+    (constants.L[4]!).val = 2 ^ 44 ∧
+    U128.max = 2 ^ 128 - 1 ∧
+    (2 ^ 52 - 1) * (constants.L[0]!).val < 2 ^ 104 := by
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
+  · simpa using constants.L_limbs_spec 0#usize (by decide)
+  · simpa using constants.L_limbs_spec 1#usize (by decide)
+  · simpa using constants.L_limbs_spec 2#usize (by decide)
+  · unfold constants.L; decide
+  · scalar_tac
+  · calc (2 ^ 52 - 1) * (constants.L[0]!).val
+        < (2 ^ 52 - 1) * 2 ^ 52 := by
+          apply Nat.mul_lt_mul_of_pos_left
+          · simpa using constants.L_limbs_spec 0#usize (by decide)
+          · positivity
+      _ < 2 ^ 104 := by omega
+
+set_option maxHeartbeats 2600000 in -- New Aeneas version needs more
 /-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:
 - No panic (always returns successfully)
 - The result m satisfies the Montgomery reduction property:
   m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant
--/
-@[externally_verified, step] -- working proof commented out because of slow build
+
+**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:
+The Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single
+conditional subtraction. This is only correct when the intermediate result `inter < 2*L`:
+- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get
+  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.
+- A single subtraction of L then guarantees `result < L`.
+- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,
+  and the single subtraction would not produce a canonical result.
+All callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,
+`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/
+@[step]
 theorem montgomery_reduce_spec (a : Array U128 9#usize)
-    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :
+    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127)
+    (h_canonical : Scalar52_wide_as_Nat a < R * L) :
     montgomery_reduce a ⦃ m =>
     (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧
     (∀ i < 5, m[i]!.val < 2 ^ 52) ∧
     (Scalar52_as_Nat m < L) ⦄
     := by
-  sorry
-  -- -- ============================================================================================
-  -- -- INFO 1: The proof below is commented out to speed up build. You need to increase Heartbeats to
-  -- --     8000000 if you the proof is not commented, otherwise you'll get a deterministic timeout.
-  -- -- ============================================================================================
+  unfold montgomery_reduce
+  unfold Insts.CoreOpsIndexIndexUsizeU64.index
+  simp only [step_simps]
+  let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  let* ⟨ result0, h_result0 ⟩ ← part1_spec
+  obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
+  -- Shared bound library (proved once, reused by all rows)
+  -- Import shared constants (proved in separate lemma to avoid kernel depth)
+  obtain ⟨h_L0, h_L1, h_L2, h_L4_eq, hmax, h_mask_L0⟩ := mont_reduce_consts
+  -- ROW 1 setup: ALL U128.add_spec use spec_bind to avoid deep recursion
+  let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  apply spec_bind; · exact U128.add_spec (by
+    have : (↑i1 : Nat) < 2 ^ 127 := by
+      rw [show (↑i1 : Nat) = i1.val from rfl, show i1.val = (↑a)[1]!.val from by
+        simp [i1_post]]; exact h_bounds 1 (by omega)
+    rw [hmax]; omega)
+  intro i2 i2_post
+  let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i4, i4_post ⟩ ← m_spec
+  -- ROW 1: i5 = i2 + i4, then part1(i5)
+  apply spec_bind; · exact U128.add_spec (by
+    have hi1 : (↑i1 : Nat) < 2 ^ 127 := by
+      rw [show (↑i1 : Nat) = i1.val from rfl, show i1.val = (↑a)[1]!.val from by
+        simp [i1_post]]; exact h_bounds 1 (by omega)
+    have hi3 : (↑i3 : Nat) < 2 ^ 52 := by
+      rw [show (↑i3 : Nat) = i3.val from rfl, show i3.val = (↑constants.L)[1]!.val from by
+        simp [i3_post]]; exact h_L1
+    have hi4 : (↑i4 : Nat) < 2 ^ 104 := by rw [i4_post]; nlinarith [h_n0_bound, hi3]
+    rw [i2_post, hmax]; omega)
+  intro i5 i5_post
+  apply spec_bind; · exact part1_spec i5 (by
+    have hi1 : (↑i1 : Nat) < 2 ^ 127 := by
+      rw [show (↑i1 : Nat) = i1.val from rfl, show i1.val = (↑a)[1]!.val from by
+        simp [i1_post]]; exact h_bounds 1 (by omega)
+    have hi3 : (↑i3 : Nat) < 2 ^ 52 := by
+      rw [show (↑i3 : Nat) = i3.val from rfl, show i3.val = (↑constants.L)[1]!.val from by
+        simp [i3_post]]; exact h_L1
+    have hi4 : (↑i4 : Nat) < 2 ^ 104 := by rw [i4_post]; nlinarith [h_n0_bound, hi3]
+    rw [i5_post, i2_post, hmax]; omega)
+  intro result1 ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩
+  -- ROW 2 setup
+  let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
+  apply spec_bind; · exact U128.add_spec (by
+    have : (↑i6 : Nat) < 2 ^ 127 := by
+      rw [show (↑i6 : Nat) = i6.val from rfl, show i6.val = (↑a)[2]!.val from by
+        simp [i6_post]]; exact h_bounds 2 (by omega)
+    rw [hmax]; omega)
+  intro i7 i7_post
+  let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i9, i9_post ⟩ ← m_spec
+  have hi8 : (↑i8 : Nat) < 2 ^ 52 := by
+    rw [show (↑i8 : Nat) = i8.val from rfl, show i8.val = (↑constants.L)[2]!.val from by
+      simp [i8_post]]; exact h_L2
+  have hi9 : (↑i9 : Nat) < 2 ^ 104 := by rw [i9_post]; nlinarith [h_n0_bound, hi8]
+  have hi6 : (↑i6 : Nat) < 2 ^ 127 := by
+    rw [show (↑i6 : Nat) = i6.val from rfl, show i6.val = (↑a)[2]!.val from by
+      simp [i6_post]]; exact h_bounds 2 (by omega)
+  have hi7 : (↑i7 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i7_post]; linarith [h_carry1_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i10 i10_post
+  let* ⟨ i11, i11_post ⟩ ← m_spec
+  have hi3 : (↑i3 : Nat) < 2 ^ 52 := by
+    rw [show (↑i3 : Nat) = i3.val from rfl, show i3.val = (↑constants.L)[1]!.val from by
+      simp [i3_post]]; exact h_L1
+  have hi11 : (↑i11 : Nat) < 2 ^ 104 := by rw [i11_post]; nlinarith [h_n1_bound, hi3]
+  have hi10 : (↑i10 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 := by rw [i10_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i12 i12_post
+  -- ROW 2: part1
+  have hi12 : (↑i12 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i12_post]; omega
+  apply spec_bind; · exact part1_spec i12 (by rw [hmax]; omega)
+  intro result2 ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩
+  -- ROW 3 setup
+  let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
+  have hi13 : (↑i13 : Nat) < 2 ^ 127 := by
+    rw [show (↑i13 : Nat) = i13.val from rfl, show i13.val = (↑a)[3]!.val from by
+      simp [i13_post]]; exact h_bounds 3 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i14 i14_post
+  let* ⟨ i15, i15_post ⟩ ← m_spec
+  have hi15 : (↑i15 : Nat) < 2 ^ 104 := by rw [i15_post]; nlinarith [h_n1_bound, hi8]
+  have hi14 : (↑i14 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i14_post]; linarith [h_carry2_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i16 i16_post
+  let* ⟨ i17, i17_post ⟩ ← m_spec
+  have hi17 : (↑i17 : Nat) < 2 ^ 104 := by rw [i17_post]; nlinarith [h_n2_bound, hi3]
+  have hi16 : (↑i16 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 := by rw [i16_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i18 i18_post
+  -- ROW 3: part1
+  have hi18 : (↑i18 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i18_post]; omega
+  apply spec_bind; · exact part1_spec i18 (by rw [hmax]; omega)
+  intro result3 ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩
+  -- ROW 4 setup
+  let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
+  have hi19 : (↑i19 : Nat) < 2 ^ 127 := by
+    rw [show (↑i19 : Nat) = i19.val from rfl, show i19.val = (↑a)[4]!.val from by
+      simp [i19_post]]; exact h_bounds 4 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i20 i20_post
+  let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
+  let* ⟨ i22, i22_post ⟩ ← m_spec
+  have hi21 : (↑i21 : Nat) = 2 ^ 44 := by
+    rw [show (↑i21 : Nat) = i21.val from rfl, show i21.val = (↑constants.L)[4]!.val from by
+      simp [i21_post]]; exact h_L4_eq
+  have hi22 : (↑i22 : Nat) < 2 ^ 96 := by rw [i22_post, hi21]; nlinarith [h_n0_bound]
+  have hi20 : (↑i20 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i20_post]; linarith [h_carry3_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i23 i23_post
+  let* ⟨ i24, i24_post ⟩ ← m_spec
+  have hi24 : (i24 : Nat) < 2 ^ 104 := by rw [i24_post]; agrind
+  have hi23 : (↑i23 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 := by rw [i23_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i25 i25_post
+  let* ⟨ i26, i26_post ⟩ ← m_spec
+  have hi26 : (↑i26 : Nat) < 2 ^ 104 := by rw [i26_post]; agrind
+  have hi25 : (↑i25 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 := by rw [i25_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i27 i27_post
+  -- ROW 4: part1
+  have hi27 : (↑i27 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 + 2 ^ 104 := by
+    rw [i27_post]; omega
+  apply spec_bind; · exact part1_spec i27 (by rw [hmax]; omega)
+  intro result4 ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩
+  -- ROW 5 setup (carry4 < 2^77, products < 2^96 or 2^104)
+  let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
+  have hi28 : (↑i28 : Nat) < 2 ^ 127 := by
+    rw [show (↑i28 : Nat) = i28.val from rfl, show i28.val = (↑a)[5]!.val from by
+      simp [i28_post]]; exact h_bounds 5 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i29 i29_post
+  let* ⟨ i30, i30_post ⟩ ← m_spec
+  have hi30 : (↑i30 : Nat) < 2 ^ 96 := by
+    rw [i30_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n1_bound (by positivity)
+  have hi29 : (↑i29 : Nat) < 2 ^ 77 + 2 ^ 127 := by rw [i29_post]; linarith [h_carry4_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i31 i31_post
+  let* ⟨ i32, i32_post ⟩ ← m_spec
+  have hi32 : (↑i32 : Nat) < 2 ^ 104 := by
+    rw [i32_post]; exact mul_lt_pow104 h_n3_bound hi8
+  have hi31 : (↑i31 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 := by rw [i31_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i33 i33_post
+  let* ⟨ i34, i34_post ⟩ ← m_spec
+  have hi34 : (↑i34 : Nat) < 2 ^ 104 := by
+    rw [i34_post]; exact mul_lt_pow104 h_n4_bound hi3
+  have hi33 : (↑i33 : Nat) < 2 ^ 77 + 2 ^ 127 + 2 ^ 96 + 2 ^ 104 := by rw [i33_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i35 i35_post
+  -- ROW 5: part2 → r0
+  apply spec_bind; · exact part2_spec i35
+  intro p2_0 ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩
+  -- ROW 6 setup (part2 carry < 2^76)
+  let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
+  have hi36 : (↑i36 : Nat) < 2 ^ 127 := by
+    rw [show (↑i36 : Nat) = i36.val from rfl, show i36.val = (↑a)[6]!.val from by
+      simp [i36_post]]; exact h_bounds 6 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i37 i37_post
+  let* ⟨ i38, i38_post ⟩ ← m_spec
+  have hi38 : (↑i38 : Nat) < 2 ^ 96 := by
+    rw [i38_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n2_bound (by positivity)
+  have hi37 : (↑i37 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i37_post]; linarith [h_n5_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i39 i39_post
+  let* ⟨ i40, i40_post ⟩ ← m_spec
+  have hi40 : (↑i40 : Nat) < 2 ^ 104 := by
+    rw [i40_post]; exact mul_lt_pow104 h_n4_bound hi8
+  have hi39 : (↑i39 : Nat) < 2 ^ 76 + 2 ^ 127 + 2 ^ 96 := by rw [i39_post]; omega
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i41 i41_post
+  -- ROW 6: part2 → r1
+  apply spec_bind; · exact part2_spec i41
+  intro p2_1 ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩
+  -- ROW 7 setup
+  let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
+  have hi42 : (↑i42 : Nat) < 2 ^ 127 := by
+    rw [show (↑i42 : Nat) = i42.val from rfl, show i42.val = (↑a)[7]!.val from by
+      simp [i42_post]]; exact h_bounds 7 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i43 i43_post
+  let* ⟨ i44, i44_post ⟩ ← m_spec
+  have hi44 : (↑i44 : Nat) < 2 ^ 96 := by
+    rw [i44_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n3_bound (by positivity)
+  have hi43 : (↑i43 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i43_post]; linarith [h_n6_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i45 i45_post
+  -- ROW 7: part2 → r2
+  apply spec_bind; · exact part2_spec i45
+  intro p2_2 ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩
+  -- ROW 8 setup
+  let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
+  have hi46 : (↑i46 : Nat) < 2 ^ 127 := by
+    rw [show (↑i46 : Nat) = i46.val from rfl, show i46.val = (↑a)[8]!.val from by
+      simp [i46_post]]; exact h_bounds 8 (by omega)
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i47 i47_post
+  let* ⟨ i48, i48_post ⟩ ← m_spec
+  have hi48 : (↑i48 : Nat) < 2 ^ 96 := by
+    rw [i48_post, hi21]; exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
+  have hi47 : (↑i47 : Nat) < 2 ^ 76 + 2 ^ 127 := by rw [i47_post]; linarith [h_n7_bound]
+  apply spec_bind; · exact U128.add_spec (by rw [hmax]; omega)
+  intro i49 i49_post
+  -- ROW 8: part2 → r3, r4_u128
+  apply spec_bind; · exact part2_spec i49
+  intro p2_3 ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩
+  -- Cast r4_u128 → r4 (U64)
+  let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
+  -- Derive tight r4 bound from h_canonical
+  have h_L4 : i21.val = 2 ^ 44 := by
+    have := i21_post; rw [this]; unfold constants.L; decide
+  have h_a8 : i46.val < 2 ^ 97 := by
+    have h1 := a8_bound_of_canonical a h_canonical
+    have h2 : i46.val = a[8]!.val := by simp only [i46_post, List.Vector.length_val,
+      UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Array.getElem!_Nat_eq]
+    agrind
+  have h_i48 : i48.val < 2 ^ 96 := by
+    rw [i48_post, h_L4]
+    exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
+  have h_i49_bound : i49.val < 2 ^ 99 := by
+    rw [i49_post, i47_post]; linarith [h_n7_bound, h_a8, h_i48]
+  have h_r4u128_tight : p2_3.1.val < 2 ^ 47 := by
+    rw [h_r4u128_val, Nat.div_lt_iff_lt_mul (by positivity : 0 < 2 ^ 52)]
+    calc i49.val < 2 ^ 99 := h_i49_bound
+      _ = 2 ^ 47 * 2 ^ 52 := by rw [← pow_add]
+  have h_r4_tight : r4.val < 2 ^ 52 := by
+    have : r4.val ≤ p2_3.1.val := by
+      rw [r4_post]; simp only [U128_cast_U64_val]; exact Nat.mod_le _ _
+    linarith
+  -- ===== MAIN EQUATION: T + C * L = inter * R (Montgomery identity) =====
+  have h_r4_eq : r4.val = p2_3.1.val := by
+    rw [r4_post]; simp only [U128_cast_U64_val]
+    exact Nat.mod_eq_of_lt (lt_trans h_r4u128_tight (by norm_num))
+  zify at h_n0_val h_carry0_val h_n1_val h_carry1_val h_n2_val h_carry2_val
+         h_n3_val h_carry3_val h_n4_val h_carry4_val
+         h_r0_val h_n5_val h_r1_val h_n6_val h_r2_val h_n7_val h_r3_val h_r4u128_val
+  have eq0 := mont_step _ _ _ h_n0_val h_carry0_val
+  have eq1 := mont_step _ _ _ h_n1_val h_carry1_val
+  have eq2 := mont_step _ _ _ h_n2_val h_carry2_val
+  have eq3 := mont_step _ _ _ h_n3_val h_carry3_val
+  have eq4 := mont_step _ _ _ h_n4_val h_carry4_val
+  have eq5 : (↑i35.val : ℤ) = ↑p2_0.1.val * (2 ^ 52 : ℤ) + ↑p2_0.2.val := by
+    rw [h_n5_val, h_r0_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  have eq6 : (↑i41.val : ℤ) = ↑p2_1.1.val * (2 ^ 52 : ℤ) + ↑p2_1.2.val := by
+    rw [h_n6_val, h_r1_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  have eq7 : (↑i45.val : ℤ) = ↑p2_2.1.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val := by
+    rw [h_n7_val, h_r2_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  have eq8 : (↑i49.val : ℤ) = ↑p2_3.1.val * (2 ^ 52 : ℤ) + ↑p2_3.2.val := by
+    rw [h_r4u128_val, h_r3_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  rw [show (↑p2_3.1.val : ℤ) = ↑r4.val from by exact_mod_cast h_r4_eq.symm] at eq8
+  simp only [i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post, i7_post, i8_post,
+    i9_post, i10_post, i11_post, i12_post, i13_post, i14_post, i15_post, i16_post,
+    i17_post, i18_post, i19_post, i20_post, i21_post, i22_post, i23_post, i24_post,
+    i25_post, i26_post, i27_post, i28_post, i29_post, i30_post, i31_post, i32_post,
+    i33_post, i34_post, i35_post, i36_post, i37_post, i38_post, i39_post, i40_post,
+    i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post,
+    ← Array.getElem!_Nat_eq
+  ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  have h_wide : (↑(Scalar52_wide_as_Nat a) : ℤ) =
+      ↑a[0]!.val + ↑a[1]!.val * (2 ^ 52 : ℤ) + ↑a[2]!.val * (2 ^ 52) ^ 2 +
+      ↑a[3]!.val * (2 ^ 52) ^ 3 + ↑a[4]!.val * (2 ^ 52) ^ 4 +
+      ↑a[5]!.val * (2 ^ 52) ^ 5 + ↑a[6]!.val * (2 ^ 52) ^ 6 +
+      ↑a[7]!.val * (2 ^ 52) ^ 7 + ↑a[8]!.val * (2 ^ 52) ^ 8 := by
+    unfold Scalar52_wide_as_Nat
+    simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.getElem!_Nat_eq]
+    simp only [← pow_mul]; agrind
+  have h_L3_zero : (constants.L[3]!).val = 0 := by unfold constants.L; decide
+  have h_L_expand : (↑L : ℤ) =
+      ↑(constants.L[0]!).val + ↑(constants.L[1]!).val * (2 ^ 52 : ℤ) +
+      ↑(constants.L[2]!).val * (2 ^ 52) ^ 2 + ↑(constants.L[4]!).val * (2 ^ 52) ^ 4 := by
+    rw [show L = Scalar52_as_Nat constants.L from constants.L_spec.symm]
+    unfold Scalar52_as_Nat
+    simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
+      Array.getElem!_Nat_eq]
+    simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.reduceLT, getElem!_pos] at h_L3_zero
+    simp only [mul_comm, zero_mul, pow_zero, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+      Nat.ofNat_pos, getElem!_pos, one_mul, Nat.one_lt_ofNat, Nat.reduceMul, Nat.reduceLT,
+      h_L3_zero, add_zero, Nat.lt_add_one, Nat.cast_add, Nat.cast_mul, Nat.cast_pow, Nat.cast_ofNat]
+    rfl
+  let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
+  have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
+      ↑p2_0.2.val + ↑p2_1.2.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val * (2 ^ 52) ^ 2 +
+      ↑p2_3.2.val * (2 ^ 52) ^ 3 + ↑r4.val * (2 ^ 52) ^ 4 := by
+    unfold Scalar52_as_Nat inter_arr
+    simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.make,
+      Array.getElem!_Nat_eq, List.length_cons, List.length_nil, Nat.reduceAdd, Nat.ofNat_pos,
+      getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+      Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+    simp only [← pow_mul]; agrind
+  have h_R : (↑R : ℤ) = ((2 : ℤ) ^ 52) ^ 5 := by
+    simp only [R, Nat.cast_pow, Nat.cast_ofNat, ← pow_mul]
+  let C : ℤ := ↑result0.2.val + ↑result1.2.val * (2 ^ 52 : ℤ) +
+    ↑result2.2.val * (2 ^ 52) ^ 2 + ↑result3.2.val * (2 ^ 52) ^ 3 +
+    ↑result4.2.val * (2 ^ 52) ^ 4
+  have h_core : (↑(Scalar52_wide_as_Nat a) : ℤ) + C * ↑L =
+      ↑(Scalar52_as_Nat inter_arr) * ↑R := by
+    rw [h_wide, h_L_expand, h_inter, h_R]
+    exact montgomery_core_eq eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  have h_C_nn : (0 : ℤ) ≤ C := by
+    unfold C; grind => lia
+  have h_C_lt : C < ↑R := by
+    rw [h_R]; exact base_digit_bound (by positivity)
+      (Nat.cast_lt.mpr h_n0_bound) (Nat.cast_lt.mpr h_n1_bound)
+      (Nat.cast_lt.mpr h_n2_bound) (Nat.cast_lt.mpr h_n3_bound)
+      (Nat.cast_lt.mpr h_n4_bound)
+      (Int.natCast_nonneg _) (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+      (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+  let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
+  · intro j hj
+    interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
+      List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+      getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+      Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+    <;> try assumption
+  · intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+      UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos]; unfold constants.L; decide)
+  · rw [constants.L_spec, ← Nat.two_mul]
+    exact redc_bound h_core h_canonical h_C_nn h_C_lt
+  · rw [constants.L_spec]
+  refine ⟨?_, m_post3, m_post2⟩
+  have h_m_inter : Scalar52_as_Nat m ≡ Scalar52_as_Nat inter_arr [MOD L] := by
+    have h := m_post1; rw [constants.L_spec] at h; rwa [Nat.ModEq, Nat.add_mod_right] at h
+  suffices h_int : (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L by
+    exact_mod_cast h_int
+  calc (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L
+      = (↑(Scalar52_as_Nat inter_arr) * ↑R) % ↑L := by exact_mod_cast h_m_inter.mul_right R
+    _ = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L := by
+        conv_lhs => rw [show ↑(Scalar52_as_Nat inter_arr) * ↑R =
+          ↑(Scalar52_wide_as_Nat a) + C * ↑L from by linarith [h_core]]
+        exact Int.add_mul_emod_self_right _ _ _
 
-  -- -- ============================================================================================
-  -- -- INFO 2: The hypothesis h_a8_bound should be added to the signature, but since there are
-  -- --         downstream dependencies that need to be changed, as a temporary fix we'll use this
-  -- --         hypothesis as an axiom/have block. Files affected:
-  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
-  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
-  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
-  -- --         - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
-  -- --  (MontSquare =>) - Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
-  -- -- ============================================================================================
-
-  -- -- 0. See INFO 2
-  -- have h_a8_bound : a[8]!.val < 2 ^ 95 := by sorry
-
-  -- -- 1. Instantiate ALL array bounds explicitly.
-  -- have ha0 : a[0]!.val < 2^127 := h_bounds 0 (by decide)
-  -- have ha1 : a[1]!.val < 2^127 := h_bounds 1 (by decide)
-  -- have ha2 : a[2]!.val < 2^127 := h_bounds 2 (by decide)
-  -- have ha3 : a[3]!.val < 2^127 := h_bounds 3 (by decide)
-  -- have ha4 : a[4]!.val < 2^127 := h_bounds 4 (by decide)
-  -- have ha5 : a[5]!.val < 2^127 := h_bounds 5 (by decide)
-  -- have ha6 : a[6]!.val < 2^127 := h_bounds 6 (by decide)
-  -- have ha7 : a[7]!.val < 2^127 := h_bounds 7 (by decide)
-  -- have ha8 : a[8]!.val < 2^127 := h_bounds 8 (by decide)
-
-  -- -- 2. Instantiate L bounds
-  -- have hL0 : (constants.L[0]!).val < 2 ^ 52 := constants.L_limbs_spec 0#usize (by decide)
-  -- have hL1 : (constants.L[1]!).val < 2 ^ 52 := constants.L_limbs_spec 1#usize (by decide)
-  -- have hL2 : (constants.L[2]!).val < 2 ^ 52 := constants.L_limbs_spec 2#usize (by decide)
-  -- have hL3 : (constants.L[3]!).val < 2 ^ 52 := constants.L_limbs_spec 3#usize (by decide)
-  -- have hL4 : (constants.L[4]!).val < 2 ^ 52 := constants.L_limbs_spec 4#usize (by decide)
-
-  -- unfold montgomery_reduce
-  -- unfold backend.serial.u64.scalar.IndexScalar52UsizeU64.index
-
-  -- -- === ROW 0: Compute n0 ===
-  -- step as ⟨limbs0, h_limbs0⟩         -- Read a[0]
-  -- step as ⟨carry0, n0, h_carry0, h_n0, h_n0_bound, h_carry0_bound⟩
-
-  -- -- === ROW 1: Compute n1 ===
-  -- step as ⟨limbs1, h_limbs1⟩         -- 1. Read a[1]
-  -- step as ⟨n1_partial, h_n1_partial⟩ -- 2. Compute partial sum: n0 + limbs1
-  -- step as ⟨L1, h_L1⟩                 -- 3. Read Constant: L[1]
-  -- step as ⟨product1, h_product1⟩     -- 4. Compute Product: carry0 * L[1]
-  -- step as ⟨sum1, h_sum1⟩             -- 5. Total Sum: sum1 = n1_partial + product1
-  -- -- Reduction Step: Compute new reduction factor (carry1) and next row carry (n1)
-  -- step as ⟨carry1, n1, h_carry1, h_n1, h_n1_bound, h_carry1_bound⟩
-
-  -- -- === ROW 2: Compute n2 ===
-  -- step as ⟨limbs2, h_limbs2⟩         -- 1. Read a[2]
-  -- step as ⟨n2_partial, h_n2_partial⟩ -- 2. n1 + limbs2
-  -- step as ⟨L2, h_L2⟩                 -- 3. Read L[2]
-  -- step as ⟨prod2_0, h_prod2_0⟩       -- 4. carry0 * L[2]
-  -- step as ⟨n2_accum, h_n2_accum⟩     -- 5. Add carry0 term: n2_partial + prod2_0
-  -- step as ⟨prod2_1, h_prod2_1⟩       -- 6. carry1 * L[1] (Uses L1 from Row 1)
-  -- step as ⟨sum2, h_sum2⟩             -- 7. Final Sum: n2_accum + prod2_1
-  -- step as ⟨carry2, n2, h_carry2, h_n2, h_n2_bound, h_carry2_bound⟩
-
-  -- -- === ROW 3: Compute n3 ===
-  -- step as ⟨limbs3, h_limbs3⟩         -- 1. Read a[3]
-  -- step as ⟨n3_partial, h_n3_partial⟩ -- 2. n2 + limbs3
-  -- step as ⟨prod3_1, h_prod3_1⟩       -- 3. carry1 * L[2] (Reuses L2 from Row 2)
-  -- step as ⟨n3_accum, h_n3_accum⟩     -- 4. n3_partial + prod3_1
-  -- step as ⟨prod3_2, h_prod3_2⟩       -- 5. carry2 * L[1] (Reuses L1 from Row 1)
-  -- step as ⟨sum3, h_sum3⟩             -- 6. Final Sum: n3_accum + prod3_2
-  -- step as ⟨carry3, n3, h_carry3, h_n3, h_n3_bound, h_carry3_bound⟩
-
-  -- -- === ROW 4: Compute n4 ===
-  -- step as ⟨limbs4, h_limbs4⟩         -- 1. Read a[4]
-  -- step as ⟨n4_partial, h_n4_partial⟩ -- 2. n3 + limbs4
-  -- step as ⟨L4, h_L4⟩                 -- 3. Read L[4]
-  -- step as ⟨prod4_0, h_prod4_0⟩       -- 4. carry0 * L[4]
-  -- step as ⟨n4_accum1, h_n4_accum1⟩   -- 5. Add: n4_partial + prod4_0
-  -- step as ⟨prod4_2, h_prod4_2⟩       -- 6. carry2 * L[2] (Reuses L2)
-  -- step as ⟨n4_accum2, h_n4_accum2⟩   -- 7. Add: n4_accum1 + prod4_2
-  -- step as ⟨prod4_3, h_prod4_3⟩       -- 8. carry3 * L[1] (Reuses L1)
-  -- step as ⟨sum4, h_sum4⟩             -- 9. Total: n4_accum2 + prod4_3
-  -- step as ⟨carry4, n4, h_carry4, h_n4, h_n4_bound, h_carry4_bound⟩
-
-  -- -- === ROW 5: Compute Result Limb 0 (r0) ===
-  -- -- Formula: S5 = n4 + a[5] + carry1 * L4 + carry3 * L2 + carry4 * L1
-  -- step as ⟨limbs5, h_limbs5⟩         -- 1. Read a[5]
-  -- step as ⟨n5_partial, h_n5_partial⟩ -- 2. n4 + limbs5
-  -- step as ⟨prod5_1, h_prod5_1⟩       -- 3. carry1 * L4
-  -- step as ⟨n5_accum1, h_n5_accum1⟩   -- 4. Accumulate
-  -- step as ⟨prod5_2, h_prod5_2⟩       -- 5. carry3 * L2
-  -- step as ⟨n5_accum2, h_n5_accum2⟩   -- 6. Accumulate
-  -- step as ⟨prod5_3, h_prod5_3⟩       -- 7. carry4 * L1
-  -- step as ⟨sum5, h_sum5⟩             -- 8. Final Sum S5
-  -- step as ⟨n5, r0, h_r0, h_n5, h_n5_bounds, h_r0_bound⟩
-
-  -- -- === ROW 6: Compute Result Limb 1 (r1) ===
-  -- -- Formula: S6 = n5 + a[6] + carry2 * L4 + carry4 * L2
-  -- step as ⟨limbs6, h_limbs6⟩         -- 1. Read a[6]
-  -- step as ⟨n6_partial, h_n6_partial⟩ -- 2. n5 + limbs6
-  -- step as ⟨prod6_1, h_prod6_1⟩       -- 3. carry2 * L4
-  -- step as ⟨n6_accum1, h_n6_accum1⟩   -- 4. Accumulate
-  -- step as ⟨prod6_2, h_prod6_2⟩       -- 5. carry4 * L2
-  -- step as ⟨sum6, h_sum6⟩             -- 6. Final Sum S6
-  -- step as ⟨n6, r1, h_r1, h_n6, h_n6_bound, h_r1_bound⟩
-
-  -- -- === ROW 7: Compute Result Limb 2 (r2) ===
-  -- -- Formula: S7 = n6 + a[7] + carry3 * L4
-  -- step as ⟨limbs7, h_limbs7⟩         -- 1. Read a[7]
-  -- step as ⟨n7_partial, h_n7_partial⟩ -- 2. n6 + limbs7
-  -- step as ⟨prod7_1, h_prod7_1⟩       -- 3. carry3 * L4 (Reuse L4)
-  -- step as ⟨sum7, h_sum7⟩             -- 4. Final Sum S7
-  -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
-  -- -- The carry is 'n7' and the result 'r2'.
-  -- step as ⟨n7, r2, h_r2, h_n7, h_n7_bound, h_r2_bound⟩
-
-  -- -- === ROW 8: Compute Result Limb 3 (r3) and Final Carry (r4) ===
-  -- -- Formula: S8 = n7 + a[8] + carry4 * L4
-  -- step as ⟨limbs8, h_limbs8⟩         -- 1. Read a[8]
-  -- step as ⟨n8_partial, h_n8_partial⟩ -- 2. n7 + limbs8
-  -- step as ⟨prod8_1, h_prod8_1⟩       -- 3. carry4 * L4
-  -- step as ⟨sum8, h_sum8⟩             -- 4. Final Sum S8
-  -- -- Reduction Part 2 -> Returns (carry_out, result_limb)
-  -- -- The "carry out" here is the 5th limb, r4 (as a u128 first). The "result limb" is r3.
-  -- step as ⟨r4_u128, r3, h_r3, h_r4_u128, h_r4_u128_bound, h_r3_bound⟩
-
-  -- -- =========================================================
-  -- -- FINAL STEPS: Cast and Conditional Subtraction
-  -- -- =========================================================
-
-  -- -- Cast the final limb (r4_u128) to U64
-  -- step as ⟨r4, h_r4⟩
-
-  -- have h_L4_exact : constants.L[4]!.val = 2^44 := by
-  --     unfold constants.L
-  --     decide
-
-  -- have h_r4_val_bound : r4_u128.val < 2 ^ 45 := by
-  --   rw [h_r4_u128] -- r4_u128 = sum8 / 2^52
-  --   rw [h_sum8, h_n8_partial, h_prod8_1] -- sum8 = n7 + a[8] + carry4 * L4
-  --   have h_prod8_bound : (carry4.val * constants.L[4]!.val) < 2^96 := by
-  --     rw [h_L4_exact]
-  --     calc
-  --       carry4.val * 2^44 < 2^52 * 2^44 := Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
-  --       _ = 2^96                        := by norm_num
-
-  --   -- Bound sum8: n7 (2^76) + a[8] (2^95) + prod8 (2^96) < 2^97
-  --   have h_sum8_bound : n7.val + limbs8.val + carry4.val * constants.L[4]!.val < 2^97 := by
-  --     rw [h_L4_exact]
-  --     calc
-  --       n7.val + limbs8.val + carry4.val * 2^44
-  --         < 2^76 + limbs8.val + carry4.val * 2^44 := by
-  --           apply Nat.add_lt_add_right
-  --           apply Nat.add_lt_add_right
-  --           exact h_n7_bound
-
-  --       _ < 2^76 + 2^95 + carry4.val * 2^44 := by
-  --           apply Nat.add_lt_add_right
-  --           apply Nat.add_lt_add_left
-  --           rw [h_limbs8]
-  --           rw [← Array.getElem!_Nat_eq]
-  --           exact h_a8_bound
-
-  --       _ < 2^76 + 2^95 + 2^52 * 2^44 := by
-  --           apply Nat.add_lt_add_left
-  --           apply Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
-
-  --       _ < 2^97 := by norm_num
-
-  --   apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]; apply lt_of_lt_of_le h_sum8_bound
-  --   norm_num
-
-
-  -- have h_cast_r4 : (r4 : Int) = (r4_u128 : Int) := by
-  --   rw [h_r4]
-  --   simp only [Nat.cast_inj, UScalar.cast, UScalar.val, UScalarTy.U64_numBits_eq]
-  --   rw [BitVec.toNat_setWidth, Nat.mod_eq_of_lt]
-  --   apply lt_trans h_r4_val_bound
-  --   norm_num
-
-  -- have h_r4_tight : ↑r4 < (2 : Nat) ^ 45 := by
-  --   simp only [Nat.cast_inj] at h_cast_r4; rw [h_cast_r4]; exact h_r4_val_bound
-
-  -- have h_red_bound : Scalar52_as_Nat
-  --     (Array.make 5#usize [r0, r1, r2, r3, r4]
-  --     field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
+  -- OLD PROOF (Aeneas rev: `1180be60c7a0e642cb442bfe90fe5cd8c1bb853f`)
+  -- simp only [step_simps]
+  -- -- ROW 0: part1(a[0])
+  -- let* ⟨ i, i_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ result0, h_result0 ⟩ ← part1_spec
+  -- obtain ⟨h_n0_val, h_carry0_val, h_carry0_bound, h_n0_bound⟩ := h_result0
+  -- -- ROW 1: part1(carry0 + a[1] + n0*L[1])
+  -- let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i2, i2_post ⟩ ← U128.add_spec
+  -- let* ⟨ i3, i3_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i4, i4_post ⟩ ← m_spec
+  -- let* ⟨ i5, i5_post ⟩ ← U128.add_spec
+  -- -- ROW 1: part1
+  -- let* ⟨ result1, h_result1 ⟩ ← part1_spec
+  -- obtain ⟨h_n1_val, h_carry1_val, h_carry1_bound, h_n1_bound⟩ := h_result1
+  -- let* ⟨ i6, i6_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i7, i7_post ⟩ ← U128.add_spec
+  -- let* ⟨ i8, i8_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i9, i9_post ⟩ ← m_spec
+  -- let* ⟨ i10, i10_post ⟩ ← U128.add_spec
+  -- let* ⟨ i11, i11_post ⟩ ← m_spec
+  -- let* ⟨ i12, i12_post ⟩ ← U128.add_spec
+  -- -- ROW 2: part1
+  -- let* ⟨ result2, h_result2 ⟩ ← part1_spec
+  -- obtain ⟨h_n2_val, h_carry2_val, h_carry2_bound, h_n2_bound⟩ := h_result2
+  -- let* ⟨ i13, i13_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i14, i14_post ⟩ ← U128.add_spec
+  -- let* ⟨ i15, i15_post ⟩ ← m_spec
+  -- let* ⟨ i16, i16_post ⟩ ← U128.add_spec
+  -- let* ⟨ i17, i17_post ⟩ ← m_spec
+  -- let* ⟨ i18, i18_post ⟩ ← U128.add_spec
+  -- -- ROW 3: part1
+  -- let* ⟨ result3, h_result3 ⟩ ← part1_spec
+  -- obtain ⟨h_n3_val, h_carry3_val, h_carry3_bound, h_n3_bound⟩ := h_result3
+  -- let* ⟨ i19, i19_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i20, i20_post ⟩ ← U128.add_spec
+  -- let* ⟨ i21, i21_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i22, i22_post ⟩ ← m_spec
+  -- let* ⟨ i23, i23_post ⟩ ← U128.add_spec
+  -- let* ⟨ i24, i24_post ⟩ ← m_spec
+  -- let* ⟨ i25, i25_post ⟩ ← U128.add_spec
+  -- let* ⟨ i26, i26_post ⟩ ← m_spec
+  -- let* ⟨ i27, i27_post ⟩ ← U128.add_spec
+  -- -- ROW 4: part1
+  -- let* ⟨ result4, h_result4 ⟩ ← part1_spec
+  -- obtain ⟨h_n4_val, h_carry4_val, h_carry4_bound, h_n4_bound⟩ := h_result4
+  -- let* ⟨ i28, i28_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i29, i29_post ⟩ ← U128.add_spec
+  -- let* ⟨ i30, i30_post ⟩ ← m_spec
+  -- let* ⟨ i31, i31_post ⟩ ← U128.add_spec
+  -- let* ⟨ i32, i32_post ⟩ ← m_spec
+  -- let* ⟨ i33, i33_post ⟩ ← U128.add_spec
+  -- let* ⟨ i34, i34_post ⟩ ← m_spec
+  -- let* ⟨ i35, i35_post ⟩ ← U128.add_spec
+  -- -- ROW 5: part2 → r0
+  -- let* ⟨ p2_0, h_p2_0 ⟩ ← part2_spec
+  -- obtain ⟨h_r0_val, h_n5_val, h_n5_bound, h_r0_bound⟩ := h_p2_0
+  -- let* ⟨ i36, i36_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i37, i37_post ⟩ ← U128.add_spec
+  -- let* ⟨ i38, i38_post ⟩ ← m_spec
+  -- let* ⟨ i39, i39_post ⟩ ← U128.add_spec
+  -- let* ⟨ i40, i40_post ⟩ ← m_spec
+  -- let* ⟨ i41, i41_post ⟩ ← U128.add_spec
+  -- -- ROW 6: part2 → r1
+  -- let* ⟨ p2_1, h_p2_1 ⟩ ← part2_spec
+  -- obtain ⟨h_r1_val, h_n6_val, h_n6_bound, h_r1_bound⟩ := h_p2_1
+  -- let* ⟨ i42, i42_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i43, i43_post ⟩ ← U128.add_spec
+  -- let* ⟨ i44, i44_post ⟩ ← m_spec
+  -- let* ⟨ i45, i45_post ⟩ ← U128.add_spec
+  -- -- ROW 7: part2 → r2
+  -- let* ⟨ p2_2, h_p2_2 ⟩ ← part2_spec
+  -- obtain ⟨h_r2_val, h_n7_val, h_n7_bound, h_r2_bound⟩ := h_p2_2
+  -- let* ⟨ i46, i46_post ⟩ ← Array.index_usize_spec
+  -- let* ⟨ i47, i47_post ⟩ ← U128.add_spec
+  -- let* ⟨ i48, i48_post ⟩ ← m_spec
+  -- let* ⟨ i49, i49_post ⟩ ← U128.add_spec
+  -- -- ROW 8: part2 → r3, r4_u128
+  -- let* ⟨ p2_3, h_p2_3 ⟩ ← part2_spec
+  -- obtain ⟨h_r3_val, h_r4u128_val, h_r4u128_bound, h_r3_bound⟩ := h_p2_3
+  -- let* ⟨ r4, r4_post ⟩ ← UScalar.cast.step_spec
+  -- -- Derive tight r4 bound from h_canonical
+  -- have h_L4 : i21.val = 2 ^ 44 := by
+  --   have := i21_post; rw [this]; unfold constants.L; decide
+  -- have h_a8 : i46.val < 2 ^ 97 := by
+  --   have h1 := a8_bound_of_canonical a h_canonical
+  --   have h2 : i46.val = a[8]!.val := by simp only [i46_post, List.Vector.length_val,
+  --     UScalar.ofNatCore_val_eq, Nat.lt_add_one, getElem!_pos, Array.getElem!_Nat_eq]
+  --   agrind
+  -- have h_i48 : i48.val < 2 ^ 96 := by
+  --   rw [i48_post, h_L4]
+  --   exact Nat.mul_lt_mul_of_pos_right h_n4_bound (by positivity)
+  -- have h_i49_bound : i49.val < 2 ^ 99 := by
+  --   rw [i49_post, i47_post]; linarith [h_n7_bound, h_a8, h_i48]
+  -- have h_r4u128_tight : p2_3.1.val < 2 ^ 47 := by
+  --   rw [h_r4u128_val, Nat.div_lt_iff_lt_mul (by positivity : 0 < 2 ^ 52)]
+  --   calc i49.val < 2 ^ 99 := h_i49_bound
+  --     _ = 2 ^ 47 * 2 ^ 52 := by rw [← pow_add]
+  -- have h_r4_tight : r4.val < 2 ^ 52 := by
+  --   have : r4.val ≤ p2_3.1.val := by
+  --     rw [r4_post]; simp only [U128_cast_U64_val]; exact Nat.mod_le _ _
+  --   linarith
+  -- -- ===== MAIN EQUATION: T + C * L = inter * R (Montgomery identity) =====
+  -- -- r4 cast equality (r4_u128 < 2^47 < 2^64 so cast is identity)
+  -- have h_r4_eq : r4.val = p2_3.1.val := by
+  --   rw [r4_post]; simp only [U128_cast_U64_val]
+  --   exact Nat.mod_eq_of_lt (lt_trans h_r4u128_tight (by norm_num))
+  -- -- Lift part1/part2 value equations to ℤ for mont_step / ediv+emod
+  -- zify at h_n0_val h_carry0_val h_n1_val h_carry1_val h_n2_val h_carry2_val
+  --        h_n3_val h_carry3_val h_n4_val h_carry4_val
+  --        h_r0_val h_n5_val h_r1_val h_n6_val h_r2_val h_n7_val h_r3_val h_r4u128_val
+  -- -- Part1 carry equations (rows 0–4): input_sum + n_k * L[0] = c_k * 2^52
+  -- have eq0 := mont_step _ _ _ h_n0_val h_carry0_val
+  -- have eq1 := mont_step _ _ _ h_n1_val h_carry1_val
+  -- have eq2 := mont_step _ _ _ h_n2_val h_carry2_val
+  -- have eq3 := mont_step _ _ _ h_n3_val h_carry3_val
+  -- have eq4 := mont_step _ _ _ h_n4_val h_carry4_val
+  -- -- Part2 split equations (rows 5–8): input_sum = carry * 2^52 + limb
+  -- have eq5 : (↑i35.val : ℤ) = ↑p2_0.1.val * (2 ^ 52 : ℤ) + ↑p2_0.2.val := by
+  --   rw [h_n5_val, h_r0_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq6 : (↑i41.val : ℤ) = ↑p2_1.1.val * (2 ^ 52 : ℤ) + ↑p2_1.2.val := by
+  --   rw [h_n6_val, h_r1_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq7 : (↑i45.val : ℤ) = ↑p2_2.1.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val := by
+  --   rw [h_n7_val, h_r2_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- have eq8 : (↑i49.val : ℤ) = ↑p2_3.1.val * (2 ^ 52 : ℤ) + ↑p2_3.2.val := by
+  --   rw [h_r4u128_val, h_r3_val, mul_comm]; exact (Int.mul_ediv_add_emod _ _).symm
+  -- -- Replace p2_3.1 (u128 carry) with r4 (u64 cast) in eq8
+  -- rw [show (↑p2_3.1.val : ℤ) = ↑r4.val from by exact_mod_cast h_r4_eq.symm] at eq8
+  -- -- Substitute all intermediate computation values into the 9 equations
+  -- -- After this, equations use only: a[k]!.val, result_k.{1,2}.val, p2_k.{1,2}.val, r4.val, L[k]!.val
+  -- simp only [i_post, i1_post, i2_post, i3_post, i4_post, i5_post, i6_post, i7_post, i8_post,
+  --   i9_post, i10_post, i11_post, i12_post, i13_post, i14_post, i15_post, i16_post,
+  --   i17_post, i18_post, i19_post, i20_post, i21_post, i22_post, i23_post, i24_post,
+  --   i25_post, i26_post, i27_post, i28_post, i29_post, i30_post, i31_post, i32_post,
+  --   i33_post, i34_post, i35_post, i36_post, i37_post, i38_post, i39_post, i40_post,
+  --   i41_post, i42_post, i43_post, i44_post, i45_post, i46_post, i47_post, i48_post, i49_post,
+  --   ← Array.getElem!_Nat_eq
+  -- ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  -- -- Expand Scalar52 definitions to match montgomery_core_eq conclusion
+  -- have h_wide : (↑(Scalar52_wide_as_Nat a) : ℤ) =
+  --     ↑a[0]!.val + ↑a[1]!.val * (2 ^ 52 : ℤ) + ↑a[2]!.val * (2 ^ 52) ^ 2 +
+  --     ↑a[3]!.val * (2 ^ 52) ^ 3 + ↑a[4]!.val * (2 ^ 52) ^ 4 +
+  --     ↑a[5]!.val * (2 ^ 52) ^ 5 + ↑a[6]!.val * (2 ^ 52) ^ 6 +
+  --     ↑a[7]!.val * (2 ^ 52) ^ 7 + ↑a[8]!.val * (2 ^ 52) ^ 8 := by
+  --   unfold Scalar52_wide_as_Nat
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.getElem!_Nat_eq]
+  --   simp only [← pow_mul]; agrind
+  -- have h_L3_zero : (constants.L[3]!).val = 0 := by unfold constants.L; decide
+  -- have h_L_expand : (↑L : ℤ) =
+  --     ↑(constants.L[0]!).val + ↑(constants.L[1]!).val * (2 ^ 52 : ℤ) +
+  --     ↑(constants.L[2]!).val * (2 ^ 52) ^ 2 + ↑(constants.L[4]!).val * (2 ^ 52) ^ 4 := by
+  --   rw [show L = Scalar52_as_Nat constants.L from constants.L_spec.symm]
   --   unfold Scalar52_as_Nat
-
-  --   simp only [Array.make, Array.getElem!_Nat_eq]
-
-  --   repeat rw [Finset.sum_range_succ]
-  --   rw [Finset.sum_range_zero, zero_add]
-  --   simp only [pow_zero, mul_one, pow_mul]
-  --   simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
-  --     getElem!_pos, List.getElem_cons_zero, one_mul, Nat.one_lt_ofNat,
-  --     List.getElem_cons_succ, Nat.reduceLT, Nat.lt_add_one]
-  --   have h_sum_bound : r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
-  --     have h0 : r0.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r0_bound
-  --     have h1 : r1.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r1_bound
-  --     have h2 : r2.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r2_bound
-  --     have h3 : r3.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r3_bound
-  --     have h4 : r4.val ≤ 2^45 - 1 := Nat.le_pred_of_lt h_r4_tight
-
-  --     calc
-  --       r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
-  --       ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
-  --         refine Nat.add_le_add (Nat.add_le_add (Nat.add_le_add (Nat.add_le_add ?_ ?_) ?_) ?_) ?_
-  --         · exact h0
-  --         · apply Nat.mul_le_mul_right _ h1
-  --         · apply Nat.mul_le_mul_right _ h2
-  --         · apply Nat.mul_le_mul_right _ h3
-  --         · apply Nat.mul_le_mul_right _ h4
-  --       _ < 2^253 := by norm_num
-
-  --   simp only [← pow_mul, Nat.reduceMul]
-  --   rw [mul_comm (2 ^ 52) _, mul_comm (2 ^ 104) _, mul_comm (2 ^ 156) _, mul_comm (2 ^ 208) _]
-  --   apply lt_of_lt_of_le h_sum_bound
-
-  --   rw [← constants.L_spec]; unfold Scalar52_as_Nat
-  --   trans 2 * (constants.L.val[4]! * 2^208)
-  --   · rw [← Array.getElem!_Nat_eq, h_L4_exact]
-  --     norm_num
-  --   · rw [← Array.getElem!_Nat_eq]; repeat rw [Finset.sum_range_succ];
-  --     rw [Finset.sum_range_zero, zero_add]
-  --     simp only [pow_zero, mul_one, Nat.mul_add, Nat.reduceMul]
-  --     rw [mul_comm _ (2 ^ 208)]
-  --     try linarith
-
-  -- -- Call the 'sub' function
-  -- step as ⟨m, h_sub, h_bound, h_mod⟩
-  -- · -- Case ha: Prove input limbs are < 2^52
-  --   intro i hi
-  --   interval_cases i
-  --   <;> simp only [
-  --     Array.make, Array.getElem!_Nat_eq,
-  --     List.length_cons, List.length_nil,
-  --     List.getElem_cons_zero, List.getElem_cons_succ, getElem!_pos,
-  --     zero_add, Nat.reduceAdd, Nat.reducePow, Nat.reduceLT,
-  --     Nat.ofNat_pos, Nat.lt_add_one, Nat.one_lt_ofNat
-  --   ]
-  --   <;> try scalar_tac
-  -- · -- Case hb: constants.L are valid
-  --   intro i hi
-  --   interval_cases i <;> assumption
-  -- · -- Case ha': Input < 2 * L
-  --   apply lt_of_lt_of_le h_red_bound
-  --   rw [constants.L_spec, Nat.two_mul]
-  -- · -- Case hb': L ≤ L
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
+  --     Array.getElem!_Nat_eq]; agrind
+  -- -- Name the intermediate result array for readability
+  -- let inter_arr := Array.make 5#usize [p2_0.2, p2_1.2, p2_2.2, p2_3.2, r4] (by simp)
+  -- have h_inter : (↑(Scalar52_as_Nat inter_arr) : ℤ) =
+  --     ↑p2_0.2.val + ↑p2_1.2.val * (2 ^ 52 : ℤ) + ↑p2_2.2.val * (2 ^ 52) ^ 2 +
+  --     ↑p2_3.2.val * (2 ^ 52) ^ 3 + ↑r4.val * (2 ^ 52) ^ 4 := by
+  --   unfold Scalar52_as_Nat inter_arr
+  --   simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, Array.make,
+  --     Array.getElem!_Nat_eq, List.length_cons, List.length_nil, Nat.reduceAdd, Nat.ofNat_pos,
+  --     getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+  --     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  --   simp only [← pow_mul]; agrind
+  -- have h_R : (↑R : ℤ) = ((2 : ℤ) ^ 52) ^ 5 := by
+  --   simp only [R, Nat.cast_pow, Nat.cast_ofNat, ← pow_mul]
+  -- -- Montgomery factor C and the core identity
+  -- let C : ℤ := ↑result0.2.val + ↑result1.2.val * (2 ^ 52 : ℤ) +
+  --   ↑result2.2.val * (2 ^ 52) ^ 2 + ↑result3.2.val * (2 ^ 52) ^ 3 +
+  --   ↑result4.2.val * (2 ^ 52) ^ 4
+  -- have h_core : (↑(Scalar52_wide_as_Nat a) : ℤ) + C * ↑L =
+  --     ↑(Scalar52_as_Nat inter_arr) * ↑R := by
+  --   rw [h_wide, h_L_expand, h_inter, h_R]
+  --   exact montgomery_core_eq eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
+  -- -- C bounds for redc_bound (uses base_digit_bound helper)
+  -- have h_C_nn : (0 : ℤ) ≤ C := by
+  --   unfold C; grind => lia
+  -- have h_C_lt : C < ↑R := by
+  --   rw [h_R]; exact base_digit_bound (by positivity)
+  --     (Nat.cast_lt.mpr h_n0_bound) (Nat.cast_lt.mpr h_n1_bound)
+  --     (Nat.cast_lt.mpr h_n2_bound) (Nat.cast_lt.mpr h_n3_bound)
+  --     (Nat.cast_lt.mpr h_n4_bound)
+  --     (Int.natCast_nonneg _) (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+  --     (Int.natCast_nonneg _) (Int.natCast_nonneg _)
+  -- let* ⟨ m, m_post1, m_post2, m_post3 ⟩ ← sub_spec
+  -- · -- case ha: input limbs < 2^52
+  --   intro j hj
+  --   interval_cases j <;> simp only [Array.make, Array.getElem!_Nat_eq,
+  --     List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
+  --     getElem!_pos, List.getElem_cons_zero, List.getElem_cons_succ,
+  --     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
+  --   <;> try assumption
+  -- · -- case hb: L limbs < 2^52
+  --   intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
+  --     UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
+  -- · -- case ha': intermediate < 2*L
+  --   rw [constants.L_spec, ← Nat.two_mul]
+  --   exact redc_bound h_core h_canonical h_C_nn h_C_lt
+  -- · -- case hb': Scalar52_as_Nat constants.L ≤ L
   --   rw [constants.L_spec]
-  -- · -- Post-conditions
-  --   refine ⟨?_,h_mod,h_bound⟩
-  --   · -- Main Equation: Scalar52_as_Nat m * R % L = Scalar52_wide_as_Nat a % L
-  --     zify
-  --     -- Total Montgomery factor C
-  --     let C : Int := (carry0.val : Int) +
-  --                    (carry1.val : Int) * (2^52 : Int) +
-  --                    (carry2.val : Int) * (2^104 : Int) +
-  --                    (carry3.val : Int) * (2^156 : Int) +
-  --                    (carry4.val : Int) * (2^208 : Int)
-
-  --     let res := Array.make 5#usize [r0, r1, r2, r3, r4]
-  --       field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4
-  --     have h_core : ↑(Scalar52_wide_as_Nat a) + C * L =
-  --                   ↑(Scalar52_as_Nat res) * R := by
-  --       simp only [Scalar52_wide_as_Nat, Scalar52_as_Nat, R]
-  --       repeat rw [Finset.sum_range_succ]
-  --       simp only [Finset.sum_range_zero, zero_add, mul_zero, pow_zero, mul_one]
-  --       simp only [res, Array.make, Array.getElem!_Nat_eq]
-
-  --       zify at h_carry0 h_n0 h_carry1 h_n1 h_carry2 h_n2 h_carry3 h_n3 h_carry4 h_n4
-  --       zify at h_n5 h_r0 h_n6 h_r1 h_n7 h_r2 h_r4_u128 h_r3
-
-  --       have eq0 := mont_step ↑limbs0 ↑carry0 ↑n0 h_carry0 h_n0
-  --       have eq1 := mont_step ↑sum1 ↑carry1 ↑n1 h_carry1 h_n1
-  --       have eq2 := mont_step ↑sum2 ↑carry2 ↑n2 h_carry2 h_n2
-  --       have eq3 := mont_step ↑sum3 ↑carry3 ↑n3 h_carry3 h_n3
-  --       have eq4 := mont_step ↑sum4 ↑carry4 ↑n4 h_carry4 h_n4
-
-  --       have eq5 : ↑sum5 = ↑n5 * (2^52 : Int) + ↑r0 := by
-  --         rw [h_n5, h_r0, mul_comm, Int.mul_ediv_add_emod]
-  --       have eq6 : ↑sum6 = ↑n6 * (2^52 : Int) + ↑r1 := by
-  --         rw [h_n6, h_r1, mul_comm, Int.mul_ediv_add_emod]
-  --       have eq7 : ↑sum7 = ↑n7 * (2^52 : Int) + ↑r2 := by
-  --         rw [h_n7, h_r2, mul_comm, Int.mul_ediv_add_emod]
-  --       have eq8 : ↑sum8 = ↑r4_u128 * (2^52 : Int) + ↑r3 := by
-  --         rw [h_r4_u128, h_r3, mul_comm, Int.mul_ediv_add_emod]
-
-  --       simp only [pow_mul]
-  --       generalize hB : (2 ^ 52) = B
-  --       have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
-  --         simp only [C]
-  --         rw [←hB]
-  --         have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
-  --         have h3 : (2:Int)^156 = (2^52)^3 := by rw [←pow_mul];
-  --         have h4 : (2:Int)^208 = (2^52)^4 := by rw [←pow_mul];
-  --         rw [h2, h3, h4]; simp only [Nat.cast_pow]; rfl
-
-  --       have hR_B : ↑(2 ^ 260) = B^5 := by rw [←hB, ←pow_mul]
-
-  --       have h_L_expand : ↑(Scalar52_as_Nat constants.L) =
-  --         1 * (constants.L[0]!) +
-  --         B * (constants.L[1]!)+
-  --         B^2 * (constants.L[2]!) +
-  --         B^3 * (constants.L[3]!) +
-  --         B^4 * (constants.L[4]!) := by
-  --         unfold Scalar52_as_Nat
-  --         rw [←hB]
-  --         repeat rw [Finset.sum_range_succ]
-  --         rw [Finset.sum_range_zero, zero_add]
-  --         simp only [mul_zero, pow_zero, mul_one, pow_mul]
-
-  --       rw [hC_B, hR_B, ← constants.L_spec, h_L_expand]
-  --       simp only [
-  --         h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
-  --         h_L1, h_L2, h_L4,
-  --         h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
-  --         h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
-  --         h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
-  --         h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
-  --         h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2, h_n5_accum1, h_n5_accum2, h_n6_accum1,
-  --         h_r4
-  --       ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-
-  --       clear h_bounds ha0 ha1 ha2 ha3 ha4 ha5 ha6 ha7 ha8
-  --       clear hL0 hL1 hL2 hL3 hL4
-  --       clear h_n0_bound h_carry0_bound h_n1_bound h_carry1_bound h_n2_bound h_carry2_bound
-  --       clear h_n3_bound h_carry3_bound h_n4_bound h_carry4_bound
-  --       clear h_n5_bounds h_r0_bound h_n6_bound h_r1_bound h_n7_bound h_r2_bound
-  --       clear h_r3_bound
-
-  --       simp only [one_mul]
-
-  --       norm_cast at *
-  --       rw [hB] at *
-
-  --       rw [← h_r4]
-  --       simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
-  --         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
-  --         List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
-
-  --       rw [← h_cast_r4] at eq8
-  --       simp only [← getElem!_pos]
-
-  --       generalize hBz : (B : ℤ) = Bz
-  --       rw [hBz] at *
-  --       clear hB
-
-  --       let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
-  --                                 ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
-  --       let poly_a : Polynomial ℕ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
-
-  --       let C_coeffs : List ℕ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
-  --       let poly_C : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (C_coeffs.getD i 0)
-
-  --       let L_coeffs : List ℕ := [↑(constants.L.val[0]!), ↑(constants.L.val[1]!),
-  --                                 ↑(constants.L.val[2]!), ↑(constants.L.val[3]!),
-  --                                 ↑(constants.L.val[4]!)]
-  --       let poly_L : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (L_coeffs.getD i 0)
-
-  --       let poly_lhs := poly_a + poly_C * poly_L
-  --       let res_coeffs : List ℕ := [↑r0, ↑r1, ↑r2, ↑r3, ↑r4]
-  --       let poly_res : Polynomial ℕ := ∑ i ∈ Finset.range 5, monomial i (res_coeffs.getD i 0)
-  --       let poly_rhs := poly_res * monomial 5 1
-
-  --       suffices h_clean : poly_lhs.eval B = poly_rhs.eval B by
-  --         convert h_clean using 1
-  --         · -- LHS
-  --           simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
-  --             Polynomial.eval_finset_sum, Polynomial.eval_monomial]
-  --           simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one]
-  --           simp [a_coeffs, C_coeffs, L_coeffs]
-  --           ring_nf
-  --         · -- RHS
-  --           simp only [poly_rhs, poly_res, Polynomial.eval_mul, Polynomial.eval_monomial,
-  --             Polynomial.eval_finset_sum]
-  --           repeat rw [Finset.sum_range_succ]
-  --           simp only [Finset.sum_range_zero, zero_add, pow_zero, pow_one]
-  --           simp only [res_coeffs, List.getD_cons_zero, List.getD_cons_succ]
-  --           ring_nf
-
-  --       zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-  --       simp only [poly_lhs, poly_rhs, poly_a, poly_C, poly_L, poly_res, Polynomial.eval_add,
-  --                 Polynomial.eval_mul, Polynomial.eval_monomial,
-  --                 Finset.sum_range_succ, Finset.sum_range_zero, zero_add,
-  --                 pow_zero, pow_one]
-  --       simp only [a_coeffs, C_coeffs, L_coeffs, res_coeffs]
-  --       simp only [List.getD_cons_zero, List.getD_cons_succ]
-
-  --       zify at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
-
-  --       have h_align0 : (↑(constants.L[0]!) : ℤ) = ↑(constants.L.val[0]!) := by
-  --         simp only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
-  --           Nat.ofNat_pos, getElem!_pos]
-
-  --       simp only [h_align0] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8
-
-  --       have h_L3_zero : ↑(constants.L.val[3]!) = (0 : ℤ) := by
-  --         unfold constants.L
-  --         decide
-
-  --       simp only [h_L3_zero, zero_mul, add_zero]
-
-  --       linear_combination eq0 + eq1 * B + eq2 * B^2 + eq3 * B^3 + eq4 * B^4 + eq5 * B^5
-  --                          + eq6 * B^6 + eq7 * B^7 + eq8 * B^8
-
-  --     have h_equiv_int : (Scalar52_as_Nat m : Int) ≡ (Scalar52_as_Nat res : Int) [ZMOD L] := by
-  --       rw [constants.L_spec] at h_sub; change _ ≡ Scalar52_as_Nat res [MOD L] at h_sub
-  --       rw [← Int.natCast_modEq_iff] at h_sub; push_cast at h_sub
-  --       simp only [Int.add_modulus_modEq_iff] at h_sub; exact h_sub
-
-  --     rw [Int.ModEq.mul_right R h_equiv_int]
-  --     rw [← h_core]
-  --     rw [Int.add_mul_emod_self_right]
-
-
-
+  -- -- Final postcondition: m*R % L = T % L ∧ limbs < 2^52 ∧ m < L
+  -- refine ⟨?_, m_post3, m_post2⟩
+  -- -- Step 1: m ≡ inter [MOD L] (from sub_spec: m + L ≡ inter)
+  -- have h_m_inter : Scalar52_as_Nat m ≡ Scalar52_as_Nat inter_arr [MOD L] := by
+  --   have h := m_post1; rw [constants.L_spec] at h; rwa [Nat.ModEq, Nat.add_mod_right] at h
+  -- -- Step 2: m * R ≡ inter*R [MOD L]
+  -- -- Step 3: inter * R ≡ T [MOD L] (from h_core: T + C * L = inter * R)
+  -- -- Step 4: transitivity gives m * R % L = T % L
+  -- suffices h_int : (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L by
+  --   exact_mod_cast h_int
+  -- calc (↑(Scalar52_as_Nat m * R) : ℤ) % ↑L
+  --     = (↑(Scalar52_as_Nat inter_arr) * ↑R) % ↑L := by exact_mod_cast h_m_inter.mul_right R
+  --   _ = (↑(Scalar52_wide_as_Nat a) : ℤ) % ↑L := by
+  --       conv_lhs => rw [show ↑(Scalar52_as_Nat inter_arr) * ↑R =
+  --         ↑(Scalar52_wide_as_Nat a) + C * ↑L from by linarith [h_core]]
+  --       exact Int.add_mul_emod_self_right _ _ _
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

@@ -841,7 +841,7 @@ def
 }
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK]
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 514:12-514:58 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 519:12-519:58 -/
 @[global_simps, irreducible]
 def backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK
   : Result Std.U64 := do
@@ -857,7 +857,7 @@ def backend.serial.u64.field.FieldElement51.pow2k.m
   i * i1
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]: loop 0:
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 474:8-556:9
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 474:8-561:9
     Visibility: public -/
 @[rust_loop]
 def backend.serial.u64.field.FieldElement51.pow2k_loop
@@ -955,7 +955,7 @@ def backend.serial.u64.field.FieldElement51.pow2k_loop
 partial_fixpoint
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 462:4-559:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 462:4-564:5
     Visibility: public -/
 def backend.serial.u64.field.FieldElement51.pow2k
   (self : backend.serial.u64.field.FieldElement51) (k : Std.U32) :
@@ -966,7 +966,7 @@ def backend.serial.u64.field.FieldElement51.pow2k
   ok a
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]: loop 0:
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 570:8-573:9
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 575:8-578:9
     Visibility: public -/
 @[rust_loop]
 def backend.serial.u64.field.FieldElement51.square2_loop
@@ -984,7 +984,7 @@ def backend.serial.u64.field.FieldElement51.square2_loop
 partial_fixpoint
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 567:4-576:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 572:4-581:5
     Visibility: public -/
 def backend.serial.u64.field.FieldElement51.square2
   (self : backend.serial.u64.field.FieldElement51) :
@@ -994,7 +994,7 @@ def backend.serial.u64.field.FieldElement51.square2
   backend.serial.u64.field.FieldElement51.square2_loop square 0#usize
 
 /-- [curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 562:4-564:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/field.rs', lines 567:4-569:5
     Visibility: public -/
 def backend.serial.u64.field.FieldElement51.square
   (self : backend.serial.u64.field.FieldElement51) :

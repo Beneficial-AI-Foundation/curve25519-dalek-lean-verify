@@ -39,4 +39,9 @@ theorem R_spec : Scalar52_as_Nat R % _root_.L = _root_.R % _root_.L := by
   unfold R
   decide
 
+theorem R_limbs_lt : ∀ j < 5, constants.R[j]!.val < 2 ^ 52 := by unfold R; decide
+
+theorem R_value_lt_L : Scalar52_as_Nat R < _root_.L := by
+  unfold R Scalar52_as_Nat _root_.L; decide
+
 end curve25519_dalek.backend.serial.u64.constants
