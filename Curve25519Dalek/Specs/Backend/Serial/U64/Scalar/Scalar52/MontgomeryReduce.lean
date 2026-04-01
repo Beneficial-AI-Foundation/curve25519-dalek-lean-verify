@@ -671,7 +671,7 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
       Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
     <;> try assumption
   · intro j hj; interval_cases j <;> (simp only [Array.getElem!_Nat_eq, List.Vector.length_val,
-      UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos, Nat.reducePow]; unfold constants.L; decide)
+      UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos]; unfold constants.L; decide)
   · rw [constants.L_spec, ← Nat.two_mul]
     exact redc_bound h_core h_canonical h_C_nn h_C_lt
   · rw [constants.L_spec]

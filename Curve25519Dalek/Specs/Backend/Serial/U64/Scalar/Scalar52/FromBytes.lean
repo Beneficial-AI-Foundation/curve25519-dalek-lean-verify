@@ -299,7 +299,8 @@ theorem from_bytes_spec (b : Array U8 32#usize) :
   have hmask : mask.val = 2 ^ 52 - 1 := by scalar_tac
   have htop : top_mask.val = 2 ^ 48 - 1 := by scalar_tac
   -- Convert AND → mod for limb postconditions
-  simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod] at i3_post1 i8_post1 i13_post1 i18_post1
+  simp only [UScalar.val_and, hmask, land_pow_two_sub_one_eq_mod]
+    at i3_post1 i8_post1 i13_post1 i18_post1
   simp only [UScalar.val_and, htop, land_pow_two_sub_one_eq_mod] at i20_post1
   refine ⟨?_, ?_⟩
   · -- Value: Scalar52_as_Nat = U8x32_as_Nat b

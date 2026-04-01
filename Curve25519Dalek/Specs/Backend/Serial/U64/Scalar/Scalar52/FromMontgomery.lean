@@ -21,8 +21,9 @@ namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 /-
 natural language description:
 
-    • Takes an input unpacked scalar m in Montgomery form and returns an unpacked scalar u representing
-      the value (m * R⁻¹) mod L, where R = 2^260 is the Montgomery constant and L is the group order.
+    • Takes an input unpacked scalar m in Montgomery form and returns an unpacked scalar u
+      representing the value (m * R⁻¹) mod L, where R = 2^260 is the Montgomery constant and L is
+      the group order.
     • This is the inverse operation of as_montgomery.
 
 natural language specs:
@@ -31,7 +32,7 @@ natural language specs:
     • scalar_to_nat(u) * R = scalar_to_nat(m) mod L
 -/
 
-/-- Strange that this result is required, how can the argument be made smoother where this is used?. -/
+/-- TODO: can the argument be made smoother where this is used and remove this? -/
 theorem set_getElem!_eq (l : List U128) (a : U128) (i : ℕ) (h : i < l.length) :
     (l.set i (a))[i]! = a := by
   simp_all only [List.getElem!_set]

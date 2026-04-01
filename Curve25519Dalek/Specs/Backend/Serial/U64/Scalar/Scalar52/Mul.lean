@@ -68,15 +68,17 @@ theorem mul_spec (a b : Scalar52)
   · -- Scalar52_wide_as_Nat a2 < R * L
     -- ab < L (from montgomery_reduce), RR < L (concrete constant), so ab * RR < L * L < R * L
     rw [a2_post1]
-    have h_RR_lt : Scalar52_as_Nat constants.RR < L := by unfold constants.RR Scalar52_as_Nat L; decide
+    have h_RR_lt : Scalar52_as_Nat constants.RR < L := by
+      unfold constants.RR Scalar52_as_Nat L; decide
     calc Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR
         < L * L := by exact Nat.mul_lt_mul_of_lt_of_lt ab_post3 h_RR_lt
       _ < R * L := by exact Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega)
   refine ⟨?_, by assumption, by grind⟩
-  have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
-    rw [a2_post1] at result_post1
-    rw [Nat.ModEq]
-    exact result_post1
+  have h_res_R_ab_RR : Scalar52_as_Nat result * R ≡
+    Scalar52_as_Nat ab * Scalar52_as_Nat constants.RR [MOD L] := by
+      rw [a2_post1] at result_post1
+      rw [Nat.ModEq]
+      exact result_post1
   have h_res_R_ab_R_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat ab * R * R [MOD L] := by
     have := curve25519_dalek.backend.serial.u64.constants.RR_spec
     grind [Nat.ModEq, Nat.mul_mod, Nat.pow_two, Nat.mul_assoc]
@@ -85,9 +87,10 @@ theorem mul_spec (a b : Scalar52)
     have h_temp : Scalar52_as_Nat ab * R * R ≡ Scalar52_wide_as_Nat a1 * R [MOD L] := by
       exact Nat.ModEq.mul_right R ab_post1
     exact Nat.ModEq.trans h_res_R_ab_R_R h_temp
-  have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡ Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
-    rw [a1_post1] at h_res_R_a1_R
-    exact h_res_R_a1_R
+  have h_res_R_a_b_R : Scalar52_as_Nat result * R ≡
+    Scalar52_as_Nat a * Scalar52_as_Nat b * R  [MOD L] := by
+      rw [a1_post1] at h_res_R_a1_R
+      exact h_res_R_a1_R
   grind [cancelR]
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52

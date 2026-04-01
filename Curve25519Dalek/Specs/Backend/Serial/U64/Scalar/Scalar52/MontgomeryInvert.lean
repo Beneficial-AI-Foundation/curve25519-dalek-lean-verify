@@ -21,7 +21,8 @@ This function computes the multiplicative inverse using Montgomery form.
 
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar curve25519_dalek.backend.serial.u64.scalar.Scalar52
+open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek.backend.serial.u64.scalar
+open curve25519_dalek.backend.serial.u64.scalar.Scalar52
 open ZMod
 
 set_option exponentiation.threshold 1024

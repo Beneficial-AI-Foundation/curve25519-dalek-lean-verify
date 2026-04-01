@@ -132,7 +132,8 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
         have hdiff_j := hdiff j hj'
         simp only [Array.getElem!_Nat_eq] at hdiff_j
         simp_all
-    have hdiff1_rest : ∀ j, i6.val ≤ j → j < 5 → (Aeneas.Std.Array.set difference i i5)[j]!.val = 0 := by
+    have hdiff1_rest : ∀ j, i6.val ≤ j → j < 5 → (Aeneas.Std.Array.set difference i i5)[j]!.val = 0
+      := by
       intro j hji hj5
       simp only [hi6] at hji
       have hne : j ≠ i.val := by omega
@@ -143,7 +144,8 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       simp_all
     -- Main proof: the loop invariant is preserved
     have hinv1 : Scalar52_partial_as_Nat a i6.val + borrow1.val / 2 ^ 63 * 2 ^ (52 * i6.val) =
-                 Scalar52_partial_as_Nat b i6.val + Scalar52_partial_as_Nat (Aeneas.Std.Array.set difference i i5) i6.val := by
+                 Scalar52_partial_as_Nat b i6.val +
+                 Scalar52_partial_as_Nat (Aeneas.Std.Array.set difference i i5) i6.val := by
       have hws : borrow1.val = (i1.val + (2^64 - i4.val)) % 2^64 := by
         simp only [hborrow1]
         have := U64.wrapping_sub_val_eq i1 i4
@@ -168,7 +170,8 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
       have hdiff'_eq : (Aeneas.Std.Array.set difference i i5)[i.val]!.val = i5.val := by
         have h := Array.set_of_eq difference i5 i (by agrind)
         grind [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.val]
-      have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) * (Aeneas.Std.Array.set difference i i5)[j]!.val
+      have hdiff'_partial : ∑ j ∈ Finset.range i.val, 2^(52*j) *
+                          (Aeneas.Std.Array.set difference i i5)[j]!.val
                           = ∑ j ∈ Finset.range i.val, 2^(52*j) * difference[j]!.val := by
         apply Finset.sum_congr rfl
         intro j hj
@@ -214,9 +217,10 @@ theorem sub_loop_spec (a b difference : Scalar52) (mask borrow : U64) (i : Usize
           have hdpos : 0 < i4.val - i1.val := by omega
           have heq1 : 2^64 + i1.val - i4.val = 2^64 - (i4.val - i1.val) := by omega
           rw [heq1]
-          have heq2 : 2^64 - (i4.val - i1.val) = (2^12 - 1) * 2^52 + (2^52 - (i4.val - i1.val)) := by
-            have h : (2:ℕ)^64 = (2:ℕ)^12 * (2:ℕ)^52 := by decide
-            omega
+          have heq2 : 2^64 - (i4.val - i1.val) = (2^12 - 1) * 2^52 +
+            (2^52 - (i4.val - i1.val)) := by
+              have h : (2:ℕ)^64 = (2:ℕ)^12 * (2:ℕ)^52 := by decide
+              omega
           rw [heq2]
           have heq3 : (2^12 - 1) * 2^52 + (2^52 - (i4.val - i1.val)) =
                       (2^52 - (i4.val - i1.val)) + (2^12 - 1) * 2^52 := by ring

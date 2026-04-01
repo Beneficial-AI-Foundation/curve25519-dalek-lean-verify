@@ -43,7 +43,8 @@ natural language specs:
 
 
 /-- **Spec and proof concerning `scalar.Scalar52.invert`**:
-- Precondition: The unpacked input scalar self must be non-zero modulo L (inverting zero has undefined behavior)
+- Precondition: The unpacked input scalar self must be non-zero modulo L
+  (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
 - The result satisfies the multiplicative inverse property:
   Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/
