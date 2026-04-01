@@ -52,7 +52,8 @@ natural language specs:
 @[step]
 theorem from_slice_spec
     (bytes : Slice U8) :
-    from_slice bytes ⦃ (result : core.result.Result CompressedEdwardsY core.array.TryFromSliceError) =>
+    from_slice bytes ⦃ (result : core.result.Result CompressedEdwardsY
+        core.array.TryFromSliceError) =>
       (bytes.length = 32 → ∃ cey : CompressedEdwardsY, result = .Ok cey ∧ cey.val = bytes.val) ∧
       (bytes.length ≠ 32 → result = .Err ()) ⦄ := by
   unfold from_slice

@@ -35,7 +35,8 @@ namespace curve25519_dalek.edwards.CompressedEdwardsY
 /-
 Natural language description:
 
-    - Decompresses a CompressedEdwardsY (U8x32 byte array) to an EdwardsPoint in extended coordinates
+    - Decompresses a CompressedEdwardsY (U8x32 byte array) to an EdwardsPoint in
+      extended coordinates
     - Extracts the y-coordinate from bytes 0-30 and the low 7 bits of byte 31 (little-endian)
     - Extracts the sign bit from the high bit of byte 31
     - Computes x from y using the curve equation: given y, solve for x² in -x² + y² = 1 + dx²y²

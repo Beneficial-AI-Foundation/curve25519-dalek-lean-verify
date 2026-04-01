@@ -14,11 +14,13 @@ Specifications and proofs for scalar multiplication of Edwards points.
 
 Three trait implementations are covered here:
 
-- `Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul` — the core implementation:
-  `&EdwardsPoint * &Scalar → EdwardsPoint`, delegating to `backend::variable_base_mul`.
+- `Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul` — the core
+  implementation: `&EdwardsPoint * &Scalar → EdwardsPoint`, delegating to
+  `backend::variable_base_mul`.
 
-- `Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul` — the commutative variant:
-  `&Scalar * &EdwardsPoint → EdwardsPoint`, delegating to the above with swapped arguments.
+- `Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul` — the
+  commutative variant: `&Scalar * &EdwardsPoint → EdwardsPoint`, delegating to the above
+  with swapped arguments.
 
 Source: "curve25519-dalek/src/edwards.rs"
 -/
@@ -29,7 +31,8 @@ namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScala
 /-
 natural language description:
 
-• Takes a valid Edwards point (self : edwards.EdwardsPoint) and a canonical scalar (scalar : scalar.Scalar)
+• Takes a valid Edwards point (self : edwards.EdwardsPoint) and a canonical scalar
+  (scalar : scalar.Scalar)
 • Returns the scalar multiple [scalar]self, i.e., the point added to itself scalar times
 • Delegates to backend.variable_base_mul
 
@@ -40,7 +43,8 @@ natural language specs:
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
 
-/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul`**:
+/-- **Spec and proof concerning
+`Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul`**:
 • The function always succeeds (no panic) for valid input EdwardsPoints e and canonical Scalars s
 • The result is a valid EdwardsPoint
 • The result is mathematically correct, i.e., result.toPoint = e.toPoint + .. + e.toPoint (s-times)
@@ -61,7 +65,8 @@ namespace curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPoin
 /-
 natural language description:
 
-• Takes a canonical scalar (self : scalar.Scalar) and a valid Edwards point (point : edwards.EdwardsPoint)
+• Takes a canonical scalar (self : scalar.Scalar) and a valid Edwards point
+  (point : edwards.EdwardsPoint)
 • Returns the scalar multiple [self]point, i.e., the point added to itself self times
 • This is the commutative variant (Scalar * Point rather than Point * Scalar);
   it simply delegates to Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul

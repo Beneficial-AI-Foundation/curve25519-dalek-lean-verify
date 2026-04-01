@@ -9,7 +9,7 @@ import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Math.Edwards.Basepoint
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
-import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
+import Curve25519Dalek.Specs.Constants.RistrettoBasepointPoint
 /-! # Spec Theorem for `RistrettoPoint::mul_base`
 
 Specification and proof for `RistrettoPoint::mul_base`.

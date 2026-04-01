@@ -38,9 +38,10 @@ natural language specs:
     • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which implies that
       it fulfills the curve equation)
     • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
-    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the
-      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
-      is equivalent to saying that the difference between both points is not in E[4])
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint
+      representing the basepoint is not in the same Ristretto equivalence class as the
+      EdwardsPoint identity point, which is equivalent to saying that the difference between
+      both points is not in E[4])
 
   Note: As a consequence of Lagrange's theorem, every non-identity point in a
   prime order group generates the entire group.
@@ -50,9 +51,10 @@ natural language specs:
     • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things
       implies that it fulfills the curve equation)
     • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
-    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the
-      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which
-      is equivalent to saying that the difference between both points is not in E[4])
+    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint
+      representing the basepoint is not in the same Ristretto equivalence class as the
+      EdwardsPoint identity point, which is equivalent to saying that the difference between
+      both points is not in E[4])
 -/
 @[step]
 theorem RISTRETTO_BASEPOINT_POINT_spec :

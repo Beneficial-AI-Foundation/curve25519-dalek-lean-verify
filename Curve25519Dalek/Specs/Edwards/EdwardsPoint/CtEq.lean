@@ -39,13 +39,15 @@ Natural language description:
 
 Natural language specs:
 
-    • Requires: Z coordinates must be non-zero mod p (maintained as invariant for valid EdwardsPoints)
+    • Requires: Z coordinates must be non-zero mod p (maintained as invariant for valid
+      EdwardsPoints)
     • (e1.X · e2.Z, e1.Y · e2.Z) = (e2.X · e1.Z, e2.Y · e1.Z) ⟺ Choice = True
 -/
 
 /-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:
 - No panic (always returns successfully)
-- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates
+- The result is Choice.one (true) if and only if the two points are equal (mod p) in
+  affine coordinates
 - When both points are valid, this is equivalent to toPoint equality
 -/
 @[step]
@@ -59,8 +61,10 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :
   ct_eq e1 e2 ⦃ c =>
   (c = Choice.one ↔
-    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
-    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧
+    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡
+        (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
+    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡
+        (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧
   (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by
   unfold ct_eq
   step as ⟨h1, h2⟩
@@ -103,8 +107,10 @@ theorem ct_eq_spec (e1 e2 : EdwardsPoint)
   · -- toPoint equivalence (given hv1 : e1.IsValid, hv2 : e2.IsValid)
     -- Bridge: modular cross-multiplication equalities ↔ toPoint equality
     have mod_iff_toPoint :
-        ((Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
-         (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ↔
+        ((Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡
+            (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧
+         (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡
+            (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ↔
         e1.toPoint = e2.toPoint := by
       simp only [Montgomery.lift_mod_eq_iff, Nat.cast_mul]
       unfold EdwardsPoint.toPoint

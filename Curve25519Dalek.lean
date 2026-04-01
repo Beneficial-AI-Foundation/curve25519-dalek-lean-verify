@@ -93,7 +93,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.StrausMultiscalarMul
 import Curve25519Dalek.Specs.Backend.VartimeDoubleBaseMul
 import Curve25519Dalek.Specs.Constants.BASEPOINT_ORDER_PRIVATE
-import Curve25519Dalek.Specs.Constants.RISTRETTO_BASEPOINT_POINT
+import Curve25519Dalek.Specs.Constants.RistrettoBasepointPoint
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.ConditionalSelect
 import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.CtEq

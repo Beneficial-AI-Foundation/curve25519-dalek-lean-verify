@@ -51,7 +51,8 @@ natural language specs:
 • The result is `true` if and only if the two points represent the same point on the curve
 -/
 @[step]
-theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
+theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid)
+    (h_other_valid : other.IsValid) :
     eq self other ⦃ result =>
     result = true ↔ self.toPoint = other.toPoint ⦄ := by
   unfold eq

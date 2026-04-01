@@ -99,9 +99,11 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
         simp_all
       · have := pointwise_add_Field51_as_Nat e.Y e.X fe fe_post1
         rw[← Nat.ModEq,Montgomery.lift_mod_eq_iff] at fe1_post2
-        have : (Field51_as_Nat fe1)= (Field51_as_Nat e.Y) -((Field51_as_Nat e.X):Edwards.CurveField) := by grind
+        have : (Field51_as_Nat fe1)=
+            (Field51_as_Nat e.Y) -((Field51_as_Nat e.X):Edwards.CurveField) := by grind
         rw[Montgomery.lift_mod_eq_iff] at fe3_post1
-        have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 }:backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
+        have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 } :
+            backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
           constructor
           · simp_all
           · simp_all
@@ -127,9 +129,11 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
         simp only [this, true_and]
         unfold toPoint curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint
         simp only [he, ↓reduceDIte, this]
-        unfold toPoint' curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint' toField
-        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
-          Nat.cast_add, sub_add_cancel, Nat.cast_mul, ZMod.natCast_mod, Nat.cast_ofNat, add_sub_sub_cancel,
+        unfold toPoint'
+          curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint' toField
+        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq,
+          getElem!_pos, Nat.reducePow, Nat.cast_add, sub_add_cancel, Nat.cast_mul,
+          ZMod.natCast_mod, Nat.cast_ofNat, add_sub_sub_cancel,
           add_add_sub_cancel, Edwards.Point.mk.injEq]
         have := he.Z_ne_zero
         unfold toField at this

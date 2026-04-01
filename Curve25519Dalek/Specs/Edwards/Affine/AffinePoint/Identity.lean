@@ -32,7 +32,8 @@ natural language specs:
 • The resulting AffinePoint is the identity element with coordinates (x=0, y=1)
 -/
 
-/-- **Spec and proof concerning `edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof concerning
+`edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
 - No panic (always returns successfully)
 - The resulting AffinePoint is the identity element with coordinates (x=0, y=1)
 -/
