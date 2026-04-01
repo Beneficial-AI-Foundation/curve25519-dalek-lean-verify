@@ -101,10 +101,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : AffineNielsPoint) =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
+   "\ntheorem neg_spec\n    (self : backend.serial.curve_models.AffineNielsPoint)\n    (self_bound : ∀ i < 5, self.xy2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : AffineNielsPoint) =>\n    result.y_plus_x = self.y_minus_x ∧\n    result.y_minus_x = self.y_plus_x ∧\n    (Field51_as_Nat self.xy2d + Field51_as_Nat result.xy2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Neg.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.neg`**:\n- No panic (always returns successfully)\n- Given input:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\nthe output AffineNielsPoint computed by `neg self` has coordinates\n(y_plus_x', y_minus_x', xy2d') where:\n- y_plus_x' = y_minus_x (the coordinates are swapped)\n- y_minus_x' = y_plus_x (the coordinates are swapped)\n- xy2d' ≡ -xy2d (mod p) (the xy2d coordinate is negated modulo p)\n\nwhere p = 2^255 - 19.\n\nThis implements the negation of a point in affine Niels coordinates.\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg",
@@ -141,10 +142,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nShared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other ⦃ c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧\n(Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧\nZ' % p = ((2 * Z) + (T * XY2D)) % p ∧\n(T' + (T * XY2D)) % p = (2 * Z) % p ⦄\n := by ...",
+   "\ntheorem add_spec\n    (self : edwards.EdwardsPoint)\n    (other : backend.serial.curve_models.AffineNielsPoint)\n    (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n    (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n    (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n    (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n    (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n    (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n    (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\n    Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other\n      ⦃ c =>\n      let X := Field51_as_Nat self.X\n      let Y := Field51_as_Nat self.Y\n      let Z := Field51_as_Nat self.Z\n      let T := Field51_as_Nat self.T\n      let YpX := Field51_as_Nat other.y_plus_x\n      let YmX := Field51_as_Nat other.y_minus_x\n      let XY2D := Field51_as_Nat other.xy2d\n      let X' := Field51_as_Nat c.X\n      let Y' := Field51_as_Nat c.Y\n      let Z' := Field51_as_Nat c.Z\n      let T' := Field51_as_Nat c.T\n      (X' + Y * YmX) % p = (((Y + X) * YpX) + X * YmX) % p ∧\n      (Y' + X * YmX) % p = (((Y + X) * YpX) + Y  * YmX) % p ∧\n      Z' % p = ((2 * Z) + (T * XY2D)) % p ∧\n      (T' + (T * XY2D)) % p = (2 * Z) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Add.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `CompletedPoint::add`**:\n• The function always succeeds (no panic)\n• Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_plus_x − (Y−X)·N.y_minus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_plus_x + (Y−X)·N.y_minus_x ) (mod p)\n  - Z' ≡ ( 2·Z + T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z − T·N.xy2d ) (mod p)\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -346,10 +348,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n  (self : edwards.EdwardsPoint)\n  (other : backend.serial.curve_models.AffineNielsPoint)\n  (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n  (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n  (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n  (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n  (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n  (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n  (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\nShared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub self other ⦃ c =>\nlet X := Field51_as_Nat self.X\nlet Y := Field51_as_Nat self.Y\nlet Z := Field51_as_Nat self.Z\nlet T := Field51_as_Nat self.T\nlet YpX := Field51_as_Nat other.y_plus_x\nlet YmX := Field51_as_Nat other.y_minus_x\nlet XY2D := Field51_as_Nat other.xy2d\nlet X' := Field51_as_Nat c.X\nlet Y' := Field51_as_Nat c.Y\nlet Z' := Field51_as_Nat c.Z\nlet T' := Field51_as_Nat c.T\n(X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n(Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n(Z' + (T * XY2D)) % p = (2 * Z) % p ∧\nT' % p = ((2 * Z) + (T * XY2D)) % p ⦄\n := by ...",
+   "theorem sub_spec\n    (self : edwards.EdwardsPoint)\n    (other : backend.serial.curve_models.AffineNielsPoint)\n    (h_selfX_bounds : ∀ i, i < 5 → (self.X[i]!).val < 2 ^ 53)\n    (h_selfY_bounds : ∀ i, i < 5 → (self.Y[i]!).val < 2 ^ 53)\n    (h_selfZ_bounds : ∀ i, i < 5 → (self.Z[i]!).val < 2 ^ 53)\n    (h_selfT_bounds : ∀ i, i < 5 → (self.T[i]!).val < 2 ^ 53)\n    (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)\n    (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)\n    (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub self other\n      ⦃ c =>\n      let X := Field51_as_Nat self.X\n      let Y := Field51_as_Nat self.Y\n      let Z := Field51_as_Nat self.Z\n      let T := Field51_as_Nat self.T\n      let YpX := Field51_as_Nat other.y_plus_x\n      let YmX := Field51_as_Nat other.y_minus_x\n      let XY2D := Field51_as_Nat other.xy2d\n      let X' := Field51_as_Nat c.X\n      let Y' := Field51_as_Nat c.Y\n      let Z' := Field51_as_Nat c.Z\n      let T' := Field51_as_Nat c.T\n      (X' + Y * YpX) % p = (((Y + X) * YmX) + X * YpX) % p ∧\n      (Y' + X * YpX) % p = (((Y + X) * YmX) + Y  * YpX) % p ∧\n      (Z' + (T * XY2D)) % p = (2 * Z) % p ∧\n      T' % p = ((2 * Z) + (T * XY2D)) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Sub.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `CompletedPoint::sub`**:\n- No panic (always returns successfully)\n- Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')\n  satisfies modulo p:\n  - X' ≡ ( (Y+X)·N.y_minus_x − (Y−X)·N.y_plus_x ) (mod p)\n  - Y' ≡ ( (Y+X)·N.y_minus_x + (Y−X)·N.y_plus_x ) (mod p)\n  - Z' ≡ ( 2·Z − T·N.xy2d ) (mod p)\n  - T' ≡ ( 2·Z + T·N.xy2d ) (mod p)\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -1959,7 +1962,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.IdentityAffineNielsPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting AffineNielsPoint is the identity element with coordinates\n  (y_plus_x=1, y_minus_x=1, xy2d=0)\n-/",
+   "/-- **Spec and proof concerning `backend.serial.curve_models.IdentityAffineNielsPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting AffineNielsPoint is the identity element with coordinates:\n  y_plus_x = 1, y_minus_x = 1, xy2d = 0\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity",
@@ -2003,7 +2006,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/AffineNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\nthe output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements\n-/",
+   "/-- **Spec and proof concerning\n`backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),\n  • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),\n  • a Choice `choice`,\nthe output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other;\n  if choice is 0, output = self\n- The operation is performed in constant time for all field elements\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
