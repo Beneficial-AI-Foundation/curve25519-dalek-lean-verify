@@ -958,10 +958,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self _rhs : scalar.Scalar) :\n    mul self _rhs ⦃ (result : scalar.Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self _rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat _rhs.bytes < L) :\n    mul self _rhs ⦃ (result : scalar.Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L`\n-/",
+   "/-- **Spec and proof concerning `Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2 (scalar.rs:221: \"for all public non-legacy uses,\n  invariant #2 always holds\").\n  Mathematically only one `< L` is needed (the other is `< R` from limb bounds),\n  but both are required to reflect the Rust type invariant.\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L`\n-/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -1629,7 +1629,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -4069,7 +4069,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    as_montgomery u ⦃ m =>\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem as_montgomery_spec (u : Scalar52) (h : ∀ i < 5, u[i]!.val < 2 ^ 52) :\n    as_montgomery u ⦃ m =>\n    Scalar52_as_Nat m ≡ (Scalar52_as_Nat u * R) [MOD L] ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat m < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/AsMontgomery.lean",
    "spec_docstring":
@@ -4153,14 +4153,14 @@
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
     "curve25519_dalek.backend.serial.u64.constants.L",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_bytes_spec (b : Array U8 32#usize) :\n    from_bytes b ⦃ u =>\n    Scalar52_as_Nat u = U8x32_as_Nat b ∧\n    ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:\n- No panic (always returns successfully)\n- The result represents the same number as the input byte array\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.from_bytes`**:\n- No panic (always returns successfully)\n- The result represents the same number as the input byte array\n- All limbs are < 2^52 (from masking with `(1 << 52) - 1` and `(1 << 48) - 1`)\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
@@ -4172,16 +4172,19 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO"]},
-  {"verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+  {"verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem from_bytes_loop_spec (bytes : Array U8 32#usize)\n    (words : Array U64 4#usize) (i : Usize) (hi : i.val ≤ 4)\n    (h_prev : ∀ j, j < i.val → words[j]!.val = word_of_bytes bytes j) :\n    from_bytes_loop bytes words i ⦃ words' =>\n      words_as_Nat words' = U8x32_as_Nat bytes ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytes.lean",
+   "spec_docstring":
+   "/-- Loop spec with `words_as_Nat` postcondition (used by\n`from_bytes_spec`). Derived from `from_bytes_loop_helper`\n+ `words_eq_bytes`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
@@ -4192,17 +4195,17 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_bytes_wide_spec (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ (u : Scalar52) =>\n        Scalar52_as_Nat u = U8x64_as_Nat b % L ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "theorem from_bytes_wide_spec\n    (b : Array U8 64#usize) :\n    from_bytes_wide b ⦃ (u : Scalar52) =>\n      Scalar52_as_Nat u = U8x64_as_Nat b % L ∧\n      Scalar52_as_Nat u < L ∧\n      ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.from_bytes_wide`**:\n- The result represents the input byte array reduced modulo L (canonical form) -/",
+   "/-- **Spec for `Scalar52::from_bytes_wide`**:\n- No panic\n- Result = input mod L (canonical form)\n- All limbs < 2^52 -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4214,7 +4217,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
@@ -4223,11 +4226,13 @@
     "curve25519_dalek.backend.serial.u64.constants.R",
     "curve25519_dalek.backend.serial.u64.constants.RR",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add"]},
-  {"verified": false,
-   "specified": false,
+  {"verified": true,
+   "specified": true,
    "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/FromBytesWide.lean",
+   "spec_docstring":
+   "/-- Loop spec with `words_wide_as_Nat` postcondition. -/\n@[step]\ntheorem from_bytes_wide_loop_spec\n    (bytes : Array U8 64#usize)\n    (words : Array U64 8#usize)\n    (i : Usize) (hi : i.val ≤ 8)\n    (h_prev : ∀ j, j < i.val →\n      words[j]!.val = word_of_bytes_64 bytes j)\n    (h_zero : ∀ j, i.val ≤ j → j < 8 →\n      words[j]!.val = 0) :\n    from_bytes_wide_loop bytes words i ⦃ words' =>\n      words_wide_as_Nat words' =\n        U8x64_as_Nat bytes ⦄ := by\n  apply spec_mono\n    (from_bytes_wide_loop_helper bytes words i hi h_prev h_zero)\n  intro words' hpost\n  exact words_wide_eq_bytes bytes words' hpost",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
@@ -4238,7 +4243,7 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
@@ -4289,7 +4294,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62) :\n    montgomery_mul m m' ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem montgomery_mul_spec (m m' : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) (hm' : ∀ i < 5, m'[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m' < R * L) :\n    montgomery_mul m m' ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m') ≡ (Scalar52_as_Nat w * R) [MOD L] ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat w < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryMul.lean",
    "spec_docstring":
@@ -4309,14 +4314,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_reduce_spec (a : Array U128 9#usize)\n    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127) :\n    montgomery_reduce a ⦃ m =>\n    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat m < L) ⦄\n := by ...",
+   "theorem montgomery_reduce_spec (a : Array U128 9#usize)\n    (h_bounds : ∀ i < 9, a[i]!.val < 2 ^ 127)\n    (h_canonical : Scalar52_wide_as_Nat a < R * L) :\n    montgomery_reduce a ⦃ m =>\n    (Scalar52_as_Nat m * R) % L = Scalar52_wide_as_Nat a % L ∧\n    (∀ i < 5, m[i]!.val < 2 ^ 52) ∧\n    (Scalar52_as_Nat m < L) ⦄\n := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryReduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.montgomery_reduce`**:\n- No panic (always returns successfully)\n- The result m satisfies the Montgomery reduction property:\n  m * R ≡ a (mod L), where R = 2^260 is the Montgomery constant\n\n**Why `h_canonical` (`Scalar52_wide_as_Nat a < R * L`)**:\nThe Rust code (scalar.rs:303-306) truncates `carry` from u128 to u64 and performs a single\nconditional subtraction. This is only correct when the intermediate result `inter < 2*L`:\n- From the REDC identity `inter * R = T + N * L` with `T < R*L` and `N < R`, we get\n  `inter * R < R*L + R*L = 2*R*L`, hence `inter < 2*L`.\n- A single subtraction of L then guarantees `result < L`.\n- Without `T < R*L`, `inter` could be much larger, the u128→u64 truncation would lose bits,\n  and the single subtraction would not produce a canonical result.\nAll callers satisfy this: `mul_internal` produces `m*m' < R*L` when inputs are bounded,\n`square_internal` likewise, and `from_montgomery` embeds values trivially smaller than `R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
@@ -4328,7 +4333,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -4379,7 +4384,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_square_spec (m : Scalar52) (hm : ∀ i < 5, m[i]!.val < 2 ^ 62) :\n    montgomery_square m ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem montgomery_square_spec (m : Scalar52)\n    (hm : ∀ i < 5, m[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat m * Scalar52_as_Nat m < R * L) :\n    montgomery_square m ⦃ w =>\n    (Scalar52_as_Nat m * Scalar52_as_Nat m) % L = (Scalar52_as_Nat w * R) % L ∧\n    (∀ i < 5, w[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat w < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomerySquare.lean",
    "spec_docstring":
@@ -4402,11 +4407,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n      Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "theorem mul_spec (a b : Scalar52)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 62) (hb : ∀ i < 5, b[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat a * Scalar52_as_Nat b < R * L) :\n    mul a b ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat a * Scalar52_as_Nat b [MOD L] ∧\n      Scalar52_as_Nat result < L ∧ ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Mul.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `scalar.Scalar52.mul`**:\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52 -/",
+   "/-- **Spec theorem for `scalar.Scalar52.mul`**:\n- The result represents the product of the two input scalars modulo L\n- Input scalars should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: The first `montgomery_reduce` needs `a*b < R*L` to guarantee the intermediate\n  result is < 2*L (see `MontgomeryReduce.lean` docstring). The second reduce is auto-satisfied\n  since its input is `ab * RR` where `ab < L` and `RR < L`, so `ab*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
@@ -4448,11 +4453,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem square_spec (self : Scalar52)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    square self ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
+   "theorem square_spec (self : Scalar52)\n    (hself : ∀ i < 5, self[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat self * Scalar52_as_Nat self < R * L) :\n    square self ⦃ ( result : Scalar52 ) =>\n      Scalar52_as_Nat result ≡ Scalar52_as_Nat self * Scalar52_as_Nat self [MOD L] ∧\n      Scalar52_as_Nat result < L ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Square.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n-/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.square`**:\n- No panic (always returns successfully)\n- The result represents the square of the input scalar modulo L\n- Input scalar should have limbs bounded by 2^62 (standard Scalar52 representation)\n- Output limbs are bounded by 2^52\n- `h_value`: Required by `montgomery_reduce` (see `MontgomeryReduce.lean`). The second\n  reduce is auto-satisfied since `aa < L` and `RR < L` give `aa*RR < L² < R*L`. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
@@ -9471,7 +9476,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self rhs : Scalar) :\n    mul_assign self rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_assign_spec (self rhs : Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul_assign self rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/MulAssign.lean",
    "spec_docstring":
    "/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:\n• Same spec as the core `mul_assign`. -/",
@@ -9511,7 +9516,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_assign_spec (self _rhs : Scalar) :\n    mul_assign self _rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_assign_spec (self _rhs : Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat _rhs.bytes < L) :\n    mul_assign self _rhs ⦃ (result : Scalar) =>\n      U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/MulAssign.lean",
    "spec_docstring":
    "/-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`**:\n• Precondition: both `self` and `_rhs` are canonical scalars (their byte values are < ℓ),\n  consistent with Scalar invariant #2\n• The function always succeeds (no panic)\n• The result satisfies:\n  `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`\n• The result is canonical: `U8x32_as_Nat result.bytes < L` -/",
@@ -9671,7 +9676,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -9864,7 +9869,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_spec (self rhs : scalar.Scalar) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
+   "theorem mul_spec (self rhs : scalar.Scalar)\n    (h_self : U8x32_as_Nat self.bytes < L)\n    (h_rhs : U8x32_as_Nat rhs.bytes < L) :\n    mul self rhs ⦃ result =>\n      U8x32_as_Nat result.bytes ≡\n        U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧\n      U8x32_as_Nat result.bytes < L ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Mul.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul`**:\n• Same spec as the core `mul`; proof delegates via `step*`\n-/",
@@ -10801,7 +10806,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem unpack_spec (self : Scalar) :\n    unpack self ⦃ (u : Scalar52 ) =>\n        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by ...",
+   "theorem unpack_spec (self : Scalar) :\n    unpack self ⦃ (u : Scalar52 ) =>\n        Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧\n        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/Unpack.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `scalar.Scalar.unpack`**:\n- No panic (always returns successfully)\n- Packing the result back yields the original scalar: pack(u) = s\n- Both the packed s and the unpacked u represent the same natural number\n-/",
@@ -10821,11 +10826,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)\n    (hu : ∀ i < 5, self[i]!.val < 2 ^ 62) :\n    invert self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result < L ⦄ := by ...",
+   "theorem invert_spec (self : Scalar52) (h : Scalar52_as_Nat self % L ≠ 0)\n    (hu : ∀ i < 5, self[i]!.val < 2 ^ 52) :\n    invert self ⦃ (result : Scalar52) =>\n      (Scalar52_as_Nat self * Scalar52_as_Nat result) ≡ 1 [MOD L] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Invert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar self must be non-zero modulo L (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/",
+   "/-- **Spec and proof concerning `scalar.Scalar52.invert`**:\n- Precondition: The unpacked input scalar self must be non-zero modulo L\n  (inverting zero has undefined behavior)\n- No panic (returns successfully for non-zero input)\n- The result satisfies the multiplicative inverse property:\n  Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
@@ -10844,7 +10849,7 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62) :\n    montgomery_invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 62) ⦄ := by ...",
+   "theorem montgomery_invert_spec (u : Scalar52) (h : Scalar52_as_Nat u % L ≠ 0)\n    (h_bounds : ∀ i < 5, u[i]!.val < 2 ^ 62)\n    (h_value : Scalar52_as_Nat u * Scalar52_as_Nat u < R * L) :\n    montgomery_invert u ⦃ u' =>\n    (Scalar52_as_Nat u * Scalar52_as_Nat u') % L = (R * R) % L ∧\n    (∀ i < 5, u'[i]!.val < 2 ^ 52) ∧\n    Scalar52_as_Nat u' < L ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/MontgomeryInvert.lean",
    "spec_docstring":

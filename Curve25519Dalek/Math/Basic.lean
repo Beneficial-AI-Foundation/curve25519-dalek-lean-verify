@@ -107,6 +107,14 @@ theorem Scalar52_limb_le_nat (s : Aeneas.Std.Array U64 5#usize) (i : Nat) (hi : 
   simp only [Scalar52_as_Nat, Finset.sum_range_succ]
   interval_cases i <;> omega
 
+/-! ### Scalar52_wide_as_Nat lemmas -/
+
+/-- A single limb's weighted contribution is at most Scalar52_wide_as_Nat -/
+theorem Scalar52_wide_limb_le_nat (a : Aeneas.Std.Array U128 9#usize) (i : Nat) (hi : i < 9) :
+    2 ^ (52 * i) * a[i]!.val ≤ Scalar52_wide_as_Nat a := by
+  simp only [Scalar52_wide_as_Nat, Finset.sum_range_succ]
+  interval_cases i <;> omega
+
 /-! ## Primality and CurveField -/
 
 instance : Fact (Nat.Prime p) := ⟨PrimeCert.prime_25519''⟩

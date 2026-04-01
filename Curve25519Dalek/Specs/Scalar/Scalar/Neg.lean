@@ -103,6 +103,13 @@ theorem neg_spec (self : scalar.Scalar)
   step as ⟨self_R, hself_R_nat, hself_R_bounds⟩
   · exact R_limb_bounds
   step as ⟨self_mod_l, h_mont_eq, h_mod_bounds, h_mod_lt⟩
+  · -- h_canonical: Scalar52_wide_as_Nat self_R < R * L
+    rw [hself_R_nat]
+    have h_s_lt_L : Scalar52_as_Nat s < L := hs_nat ▸ h_self
+    have h_R_lt_R : Scalar52_as_Nat backend.serial.u64.constants.R < R :=
+      Scalar52_as_Nat_bounded _ (by unfold backend.serial.u64.constants.R; decide)
+    have h_L_pos : 0 < L := by unfold L; omega
+    nlinarith [Nat.mul_comm L R]
   have hmod_le_L : Scalar52_as_Nat self_mod_l ≤ L := Nat.le_of_lt h_mod_lt
   have hZERO_lt : Scalar52_as_Nat backend.serial.u64.scalar.Scalar52.ZERO <
       Scalar52_as_Nat self_mod_l + L := by

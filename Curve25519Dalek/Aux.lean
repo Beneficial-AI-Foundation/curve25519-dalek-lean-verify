@@ -340,6 +340,36 @@ lemma or_mul_pow_two_eq_add (a b k : Nat) (ha : a < 2 ^ k) :
       simp only [h, decide_true, cond_true]
       omega
 
+/-! ## Byte-packing helpers for load8 / from_bytes
+
+These lemmas handle the pattern of ORing 8 shifted bytes into a U64 word.
+Used by both `FieldElement51::from_bytes` and `Scalar52::from_bytes`. -/
+
+lemma u8_mul_pow_lt_u64_size (x : U8) (k : Nat) (hk : k ≤ 56) :
+    x.val * 2 ^ k < U64.size := calc
+  _ ≤ 255 * 2 ^ 56 := Nat.mul_le_mul (Nat.lt_succ_iff.mp x.hmax)
+        (Nat.pow_le_pow_right (by omega) hk)
+  _ < U64.size := by scalar_tac
+
+lemma u8_val_mod_u64_numBits (x : U8) :
+    x.val % 2 ^ UScalarTy.U64.numBits = x.val :=
+  Nat.mod_eq_of_lt (Nat.lt_of_lt_of_le x.hmax (by norm_num))
+
+lemma u8_mul_pow_mod_u64 (x : U8) (k : Nat) (hk : k ≤ 56) :
+    x.val * 2 ^ k % U64.size = x.val * 2 ^ k :=
+  Nat.mod_eq_of_lt (u8_mul_pow_lt_u64_size x k hk)
+
+/-- Left-associated OR of 8 byte values shifted by multiples of 8 equals their sum. -/
+lemma or_bytes_eq_sum (b0 b1 b2 b3 b4 b5 b6 b7 : Nat) (_ : b0 < 256) (_ : b1 < 256)
+    (_ : b2 < 256) (_ : b3 < 256) (_ : b4 < 256) (_ : b5 < 256) (_ : b6 < 256) (_ : b7 < 256) :
+    ((((((b0 ||| b1 * 2^8) ||| b2 * 2^16) ||| b3 * 2^24) |||
+      b4 * 2^32) ||| b5 * 2^40) ||| b6 * 2^48) ||| b7 * 2^56 =
+      b0 + b1 * 2^8 + b2 * 2^16 + b3 * 2^24 + b4 * 2^32 + b5 * 2^40 + b6 * 2^48 + b7 * 2^56 := by
+  rw [or_mul_pow_two_eq_add _ _ 8 (by omega), or_mul_pow_two_eq_add _ _ 16 (by grind),
+    or_mul_pow_two_eq_add _ _ 24 (by grind), or_mul_pow_two_eq_add _ _ 32 (by grind),
+    or_mul_pow_two_eq_add _ _ 40 (by grind), or_mul_pow_two_eq_add _ _ 48 (by grind),
+    or_mul_pow_two_eq_add _ _ 56 (by grind)]
+
 /-- If `x + n * m = y` then `x ≡ y [MOD m]`. -/
 lemma modeq_of_add_mul_eq (x y n m : ℕ) (h : x + n * m = y) :
     Nat.ModEq m x y := by

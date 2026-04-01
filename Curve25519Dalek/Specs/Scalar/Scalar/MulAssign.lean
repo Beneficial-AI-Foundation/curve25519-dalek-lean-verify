@@ -66,24 +66,26 @@ natural language specs:
   `U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L]`
 • The result is canonical: `U8x32_as_Nat result.bytes < L` -/
 @[step]
-theorem mul_assign_spec (self _rhs : Scalar) :
+theorem mul_assign_spec (self _rhs : Scalar)
+    (h_self : U8x32_as_Nat self.bytes < L)
+    (h_rhs : U8x32_as_Nat _rhs.bytes < L) :
     mul_assign self _rhs ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by
-  unfold mul_assign
-  unfold scalar.Scalar.unpack
-  step as ⟨s, hs_nat, hs_bounds⟩
-  step as ⟨s1, hs1_nat, hs1_bounds⟩
-  have hs_62  : ∀ i < 5, s[i]!.val  < 2 ^ 62 :=
-    fun i hi => Nat.lt_trans (hs_bounds  i hi) (by norm_num)
-  have hs1_62 : ∀ i < 5, s1[i]!.val < 2 ^ 62 :=
-    fun i hi => Nat.lt_trans (hs1_bounds i hi) (by norm_num)
-  step as ⟨s2, hs2_cong, hs2_lt⟩
-  step as ⟨hpack, hpack_cong, hpack_lt⟩
+  unfold mul_assign scalar.Scalar.unpack
+  let* ⟨ s, s_post1, s_post2 ⟩ ← backend.serial.u64.scalar.Scalar52.from_bytes_spec
+  let* ⟨ s1, s1_post1, s1_post2 ⟩ ← backend.serial.u64.scalar.Scalar52.from_bytes_spec
+  let* ⟨ s2, s2_post1, s2_post2, s2_post3 ⟩ ← backend.serial.u64.scalar.Scalar52.mul_spec
+  · -- s < L (from h_self), s1 < L (from h_rhs), so s * s1 < L * L < R * L
+    have h_s_lt : Scalar52_as_Nat s < L := s_post1 ▸ h_self
+    have h_s1_lt : Scalar52_as_Nat s1 < L := s1_post1 ▸ h_rhs
+    exact Nat.lt_trans (Nat.mul_lt_mul_of_lt_of_lt h_s_lt h_s1_lt)
+      (Nat.mul_lt_mul_of_pos_right (by unfold R L; omega) (by unfold L; omega))
+  let* ⟨ result, result_post1, result_post2 ⟩ ← scalar.Scalar52.pack_spec
   have heq : Scalar52_as_Nat s * Scalar52_as_Nat s1 =
              U8x32_as_Nat self.bytes * U8x32_as_Nat _rhs.bytes := by
-    rw [hs_nat, hs1_nat]
-  exact ⟨Nat.ModEq.trans hpack_cong (heq ▸ hs2_cong), hpack_lt⟩
+    rw [s_post1, s1_post1]
+  exact ⟨Nat.ModEq.trans result_post1 (heq ▸ s2_post1), result_post2⟩
 
 end curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar
 
@@ -111,7 +113,9 @@ natural language specs:
 /-- **Spec theorem for `scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign`**:
 • Same spec as the core `mul_assign`. -/
 @[step]
-theorem mul_assign_spec (self rhs : Scalar) :
+theorem mul_assign_spec (self rhs : Scalar)
+    (h_self : U8x32_as_Nat self.bytes < L)
+    (h_rhs : U8x32_as_Nat rhs.bytes < L) :
     mul_assign self rhs ⦃ (result : Scalar) =>
       U8x32_as_Nat result.bytes ≡ U8x32_as_Nat self.bytes * U8x32_as_Nat rhs.bytes [MOD L] ∧
       U8x32_as_Nat result.bytes < L ⦄ := by

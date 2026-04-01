@@ -42,7 +42,7 @@ natural language specs:
 theorem unpack_spec (self : Scalar) :
     unpack self ⦃ (u : Scalar52 ) =>
         Scalar52_as_Nat u = U8x32_as_Nat self.bytes ∧
-        ∀ i < 5, u[i]!.val < 2 ^ 62 ⦄ := by
+        ∀ i < 5, u[i]!.val < 2 ^ 52 ⦄ := by
   unfold unpack
   step*
 

@@ -94,7 +94,7 @@ After all 5 limbs, the full sum telescopes to:
 -/
 
 namespace curve25519_dalek
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Aeneas.Std.WP Result 
 
 /- Replace the spec currently in FunsExternal.lean with an alternative phrased in terms of
 `Choice.one`/`Choice.zero`.
@@ -103,7 +103,8 @@ TODO: make this change throughout the code or revert this. -/
 attribute [-step] U64.Insts.SubtleConditionallySelectable.conditional_select_spec
 /-- Progress spec for U64.Insts.SubtleConditionallySelectable.conditional_select -/
 @[step]
-theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec' (a b : U64) (choice : subtle.Choice) :
+theorem U64.Insts.SubtleConditionallySelectable.conditional_select_spec'
+    (a b : U64) (choice : subtle.Choice) :
     U64.Insts.SubtleConditionallySelectable.conditional_select a b choice ⦃ (res : U64) =>
       (choice = Choice.one → res = b) ∧
       (choice = Choice.zero → res = a) ⦄ := by
