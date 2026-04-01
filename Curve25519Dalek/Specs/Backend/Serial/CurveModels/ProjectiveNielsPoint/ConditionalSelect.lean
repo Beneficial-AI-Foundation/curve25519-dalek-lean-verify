@@ -21,7 +21,8 @@ choice = 0, in constant time.
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /--
 **Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**:
@@ -51,4 +52,5 @@ theorem conditional_select_spec
   step*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

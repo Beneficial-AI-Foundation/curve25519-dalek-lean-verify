@@ -28,7 +28,8 @@ it updates `self` such that:
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-
 natural language description:
@@ -49,14 +50,16 @@ natural language specs:
   - The operation is constant-time (execution time does not depend on choice value)
 -/
 
-/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**:
+/-- **Spec and proof concerning
+`backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**:
 - No panic (always returns successfully)
 - Given inputs:
   • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),
   • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),
   • a Choice `choice`,
 the output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:
-- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self
+- Each coordinate is conditionally selected: if choice is 1, output = other;
+  if choice is 0, output = self
 - The operation is performed in constant time for all field elements
 -/
 theorem conditional_assign_spec
@@ -75,4 +78,5 @@ theorem conditional_assign_spec
   step*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

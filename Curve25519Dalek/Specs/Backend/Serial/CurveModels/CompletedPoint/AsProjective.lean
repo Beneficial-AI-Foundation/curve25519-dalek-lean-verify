@@ -85,7 +85,8 @@ open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 These lemmas factor out the key proof steps used in the main theorem:
 1. `as_projective_lift_to_field_eqs`: Lift modular arithmetic to field equalities
-2. `as_projective_on_curve`: Prove the projective on-curve equation from the completed on-curve equation
+2. `as_projective_on_curve`: Prove the projective on-curve equation from the
+   completed on-curve equation
 3. `as_projective_isValid_and_toPoint`: Combined validity and point equality proof
 -/
 

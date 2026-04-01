@@ -18,7 +18,8 @@ This function returns the identity element of the Edwards curve in ProjectiveNie
 
 open Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace Curve25519_dalekTraitsIdentity
 
 /-
 natural language description:
@@ -40,7 +41,8 @@ natural language specs:
   which is the identity element (0, 1) on the Edwards curve
 -/
 
-/-- **Spec and proof concerning `backend.serial.curve_models.IdentityProjectiveNielsPoint.identity`**:
+/-- **Spec and proof concerning
+`backend.serial.curve_models.IdentityProjectiveNielsPoint.identity`**:
 - No panic (always returns successfully)
 - The resulting ProjectiveNielsPoint is the identity element with coordinates
   (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)
@@ -55,4 +57,5 @@ theorem identity_spec :
   unfold identity
   step*
 
-end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+end Curve25519_dalekTraitsIdentity
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts

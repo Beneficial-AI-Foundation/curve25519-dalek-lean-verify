@@ -14,7 +14,8 @@ Specification and proof for `CompletedPoint::as_extended`.
 
 This function implements point conversion from completed coordinates (ℙ¹ × ℙ¹) to extended
 twisted Edwards coordinates (ℙ³) on the Curve25519 elliptic curve. Given a point
-P = (X:Y:Z:T) in completed coordinates (i.e., with affine coordinates given via X/Z = x and Y/T = y),
+P = (X:Y:Z:T) in completed coordinates (i.e., with affine coordinates
+given via X/Z = x and Y/T = y),
 it computes an equivalent representation (X':Y':Z':T') in extended coordinates
 (i.e., with X'/Z' = x, Y'/Z' = y and T' = X'Y'/Z')
 

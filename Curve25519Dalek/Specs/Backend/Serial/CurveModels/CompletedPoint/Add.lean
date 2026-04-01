@@ -74,13 +74,17 @@ where p = 2^255 - 19
 These are the standard mixed-addition formulas via projective Niels coordinates,
 returning the result in completed coordinates.
 -/
+section AddSpecsHelper
+open backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
+open Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
+
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 55) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi hi0
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
@@ -88,8 +92,7 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
     apply le_trans (le_of_lt this)
     grind only [= U64.max_eq]
   obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := spec_imp_exists
-    (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec
-      a b 0#usize (by simp) add_lt)
+    (add_assign_loop_spec a b 0#usize (by simp) add_lt)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
     exists_eq_left']
   constructor
@@ -101,10 +104,10 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^55) := by
-  unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
+  unfold add
   obtain ⟨w, hw_ok, hw, hw0 ⟩:= add_assign_spec' a b ha hb
   simp_all
 
@@ -112,17 +115,18 @@ theorem add_spec' {a b : Array U64 5#usize}
 theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 53) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 52 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
     apply le_trans (le_of_lt this); grind only [= U64.max_eq]
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
-  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (add_assign_loop_spec a b 0#usize (by simp) add_lt)
+  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
   · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
@@ -134,17 +138,18 @@ theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
 theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 54) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 53 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
     apply le_trans (le_of_lt this); grind only [= U64.max_eq]
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
-  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (add_assign_loop_spec a b 0#usize (by simp) add_lt)
+  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq,
+    List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
   · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
@@ -155,22 +160,24 @@ theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
 /-- Tighter add spec using Add.add: (< 2^52) + (< 2^52) → < 2^53 -/
 theorem add_spec_52_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^53) := by
-  unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
+  unfold add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_52_52 a b ha hb
   simp_all
 
 /-- Tighter add spec using Add.add: (< 2^53) + (< 2^52) → < 2^54 -/
 theorem add_spec_53_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) := by
-  unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
+  unfold add
   obtain ⟨w, hw_ok, hw_eq, hw_bounds⟩ := add_assign_spec_53_52 a b ha hb
   simp_all
+
+end AddSpecsHelper
 
 -- ========================================================================
 -- Helper lemmas for add_spec_aux_54_52_53_52 (and add_spec_aux)
@@ -349,7 +356,8 @@ This section provides a cleaner interface using IsValid predicates for inputs.
 The output CompletedPoint satisfies CompletedPoint.IsValid (all coordinates < 2^54).
 -/
 
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+namespace curve25519_dalek.Shared0EdwardsPoint.Insts
+namespace CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
 
 open Edwards
 open curve25519_dalek.backend.serial.curve_models
@@ -738,7 +746,8 @@ theorem add_spec
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
     add self other ⦃ c =>
     c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by
-  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
+  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith,
+      hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     add_spec_bounds self hself other hother
   simp only [spec]
   apply exists_imp_spec
@@ -776,4 +785,5 @@ theorem add_spec
     c hX_F hY_F hZ_F hT_F hcX_bounds hcY_bounds hcZ_bounds hcT_bounds
     other.toPoint h_otherx h_othery
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end curve25519_dalek.Shared0EdwardsPoint.Insts

@@ -26,7 +26,8 @@ namespace curve25519_dalek.backend.serial.curve_models.ProjectivePoint
 natural language description:
 
 • Takes a ProjectivePoint with coordinates (X, Y, Z) in projective ℙ² representation and
-returns an EdwardsPoint (X', Y', Z', T') in extended ℙ³ representation. Arithmetics are performed in the
+returns an EdwardsPoint (X', Y', Z', T') in extended ℙ³ representation.
+Arithmetics are performed in the
 field 𝔽_p where p = 2^255 - 19.
 
 natural language specs:

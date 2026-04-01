@@ -220,7 +220,8 @@ theorem double_spec
   use c
   constructor
   · exact h_run
-  obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ := double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
+  obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ :=
+    double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
   -- Setup curve identity from input validity
   have h_q_curve := hq_valid.on_curve
   have h_qZ_ne : q.Z.toField ≠ 0 := hq_valid.Z_ne_zero
@@ -277,10 +278,14 @@ theorem double_spec
     rw [h_YX_factor, h_yx_sq]
     ring
   -- Convert specific bounds to IsValid (< 2^54)
-  have hcX_valid : c.X.IsValid := fun i hi => Nat.lt_trans (hcX_bounds i hi) (by norm_num : 2^52 < 2^54)
-  have hcY_valid : c.Y.IsValid := fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
-  have hcZ_valid : c.Z.IsValid := fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
-  have hcT_valid : c.T.IsValid := fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcX_valid : c.X.IsValid :=
+    fun i hi => Nat.lt_trans (hcX_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcY_valid : c.Y.IsValid :=
+    fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
+  have hcZ_valid : c.Z.IsValid :=
+    fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcT_valid : c.T.IsValid :=
+    fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
   have h_c_valid : c.IsValid := {
     X_valid := hcX_valid
     Y_valid := hcY_valid
@@ -308,7 +313,8 @@ theorem double_spec
       have hcZ_ne : Y^2 - X^2 ≠ 0 := by
         rw [h_YX_factor, h_yx_sq]
         apply mul_ne_zero hz2 h_denom_plus
-      have h_add_denom_ne : 1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y ≠ 0 := by
+      have h_add_denom_ne :
+          1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y ≠ 0 := by
         rw [h_qx, h_qy]
         convert h_denom_plus using 2
         simp only [hx_def, hy_def]; ring

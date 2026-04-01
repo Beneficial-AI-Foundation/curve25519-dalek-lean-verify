@@ -36,15 +36,18 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+namespace curve25519_dalek.Shared0EdwardsPoint.Insts
+namespace CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.edwards
 
 /-! ## Independent sub-lemmas for `sub_spec_aux_54_52_53_52`
 
 These lemmas factor out the key proof steps used in the main theorem:
-1. `pointwise_add_Field51_as_Nat` (from Aux.lean): converts limb-wise addition to `Field51_as_Nat` sum
-2. `sub_X_modular_relation` / `sub_Y_modular_relation` / `sub_Z_modular_relation` / `sub_T_modular_relation`:
+1. `pointwise_add_Field51_as_Nat` (from Aux.lean): converts limb-wise addition to
+   `Field51_as_Nat` sum
+2. `sub_X_modular_relation` / `sub_Y_modular_relation` / `sub_Z_modular_relation` /
+   `sub_T_modular_relation`:
    pure modular arithmetic lemmas for each coordinate relation
 3. `double_limb_tight_bounds`: derives tight bounds for doubled limb values
 -/
@@ -202,8 +205,10 @@ theorem sub_spec_aux_54_52_53_52
   have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 ZZ2_post1
   have h_fe3_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe3 fe3_post1
   exact ⟨
-    by rw [← Nat.ModEq]; exact sub_X_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 fe_post2,
-    by rw [← Nat.ModEq]; exact sub_Y_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 h_fe1_nat,
+    by rw [← Nat.ModEq];
+       exact sub_X_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 fe_post2,
+    by rw [← Nat.ModEq];
+       exact sub_Y_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 h_fe1_nat,
     by rw [← Nat.ModEq]; exact sub_Z_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat fe2_post2,
     by rw [← Nat.ModEq]; exact sub_T_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat h_fe3_nat,
     fun i hi => lt_trans (fe_post1 i hi) (by norm_num),
@@ -639,9 +644,11 @@ private lemma sub_isValid_and_toPoint
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
-    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>
+    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub
+        self other ⦃ c =>
     c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by
-  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
+  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith,
+      hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     sub_spec_bounds' self hself other hother
   simp only [spec]
   apply exists_imp_spec
@@ -651,4 +658,5 @@ theorem sub_spec
   exact sub_isValid_and_toPoint c self hself other hother
     hX_F' hY_F' hZ_F' hT_F hcX_bounds hcY_bounds hcZ_bounds hcT_bounds
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+end CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+end curve25519_dalek.Shared0EdwardsPoint.Insts
