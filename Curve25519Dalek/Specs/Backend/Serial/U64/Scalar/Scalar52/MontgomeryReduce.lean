@@ -52,12 +52,14 @@ natural language description:
       bitwise shifts.
 
     • **Mechanism**: The algorithm avoids division by adding multiples of `L` to the input `x`
-      until the result is exactly divisible by `R = 2^{260}` (i.e., the lower 260 bits are all zero).
+      until the result is exactly divisible by `R = 2^{260}`
+      (i.e., the lower 260 bits are all zero).
       Since `R = 2^{260}` and limbs are 52 bits, we perform 5 "zeroing" steps (`part1`)
       followed by 4 "result assembly" steps (`part2`).
 
     • **Part 1: The Zeroing Strategy**
-      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen multiple of `L`.
+      We iteratively ensure the lowest remaining limb is 0 by adding a carefully chosen
+      multiple of `L`.
       The helper `part1` calculates a "zeroing factor" `p` using the precomputed `LFACTOR`
       (where `LFACTOR * L ≡ -1 (mod 2⁵²)`).
 
@@ -65,7 +67,8 @@ natural language description:
         * **Problem**: `limbs[0]` is non-zero. We cannot shift yet.
         * **Action**: Calculate `p` such that `limbs[0] + p * L ≡ 0 (mod 2⁵²)`.
         * **Result**: The sum's lowest 52 bits become 0.
-        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²). The carry flows to the next limb.
+        * **Shift**: We discard these zero bits (effectively dividing by 2⁵²).
+          The carry flows to the next limb.
 
       *This repeats 5 times (using updated carries) until the entire lower 260 bits are zero.*
 
@@ -109,7 +112,8 @@ private lemma mont_step (x : Int) (p : Int) (carry_out : Int)
     (hp : p = (x * ↑constants.LFACTOR.val) % (2 ^ 52))
     (hcarry : carry_out = (x + p * ↑constants.L[0]!.val) / (2 ^ 52)) :
     x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) := by
-  have h_div : x + p * ↑constants.L[0]!.val = carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
+  have h_div : x + p * ↑constants.L[0]!.val =
+      carry_out * (2 ^ 52) + (x + p * ↑constants.L[0]!.val) % (2 ^ 52) := by
     rw [hcarry]
     rw [mul_comm ((x + p * ↑constants.L[0]!.val) / 2 ^ 52)]
     rw [Int.mul_ediv_add_emod]
@@ -246,8 +250,9 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
     := by
   sorry
   -- -- ============================================================================================
-  -- -- INFO 1: The proof below is commented out to speed up build. You need to increase Heartbeats to
-  -- --     8000000 if you the proof is not commented, otherwise you'll get a deterministic timeout.
+  -- -- INFO 1: The proof below is commented out to speed up build. You need to increase
+  -- --     Heartbeats to 8000000 if the proof is not commented, otherwise you'll get a
+  -- --     deterministic timeout.
   -- -- ============================================================================================
 
   -- -- ============================================================================================
@@ -388,7 +393,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   --   have h_prod8_bound : (carry4.val * constants.L[4]!.val) < 2^96 := by
   --     rw [h_L4_exact]
   --     calc
-  --       carry4.val * 2^44 < 2^52 * 2^44 := Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
+  --       carry4.val * 2^44 < 2^52 * 2^44 :=
+  --         Nat.mul_lt_mul_of_pos_right h_carry4_bound (by norm_num)
   --       _ = 2^96                        := by norm_num
 
   --   -- Bound sum8: n7 (2^76) + a[8] (2^95) + prod8 (2^96) < 2^97
@@ -414,7 +420,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   --       _ < 2^97 := by norm_num
 
-  --   apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]; apply lt_of_lt_of_le h_sum8_bound
+  --   apply Nat.div_lt_of_lt_mul; rw [h_L4, ← Array.getElem!_Nat_eq]
+  --   apply lt_of_lt_of_le h_sum8_bound
   --   norm_num
 
 
@@ -430,7 +437,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   -- have h_red_bound : Scalar52_as_Nat
   --     (Array.make 5#usize [r0, r1, r2, r3, r4]
-  --     field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4) < 2 * L := by
+  --     field.SubShared0FieldElement51SharedAFieldElement51FieldElement51.sub._proof_4)
+  --     < 2 * L := by
   --   unfold Scalar52_as_Nat
 
   --   simp only [Array.make, Array.getElem!_Nat_eq]
@@ -441,7 +449,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   --   simp only [List.length_cons, List.length_nil, zero_add, Nat.reduceAdd, Nat.ofNat_pos,
   --     getElem!_pos, List.getElem_cons_zero, one_mul, Nat.one_lt_ofNat,
   --     List.getElem_cons_succ, Nat.reduceLT, Nat.lt_add_one]
-  --   have h_sum_bound : r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
+  --   have h_sum_bound :
+  --       r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208 < 2^253 := by
   --     have h0 : r0.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r0_bound
   --     have h1 : r1.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r1_bound
   --     have h2 : r2.val ≤ 2^52 - 1 := Nat.le_pred_of_lt h_r2_bound
@@ -450,7 +459,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   --     calc
   --       r0.val + r1.val * 2^52 + r2.val * 2^104 + r3.val * 2^156 + r4.val * 2^208
-  --       ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 + (2^45 - 1) * 2^208 := by
+  --       ≤ (2^52 - 1) + (2^52 - 1) * 2^52 + (2^52 - 1) * 2^104 + (2^52 - 1) * 2^156 +
+  --         (2^45 - 1) * 2^208 := by
   --         refine Nat.add_le_add (Nat.add_le_add (Nat.add_le_add (Nat.add_le_add ?_ ?_) ?_) ?_) ?_
   --         · exact h0
   --         · apply Nat.mul_le_mul_right _ h1
@@ -534,7 +544,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   --       simp only [pow_mul]
   --       generalize hB : (2 ^ 52) = B
-  --       have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 + ↑carry3 * B^3 + ↑carry4 * B^4 := by
+  --       have hC_B : C = ↑carry0 + ↑carry1 * B + ↑carry2 * B^2 +
+  --           ↑carry3 * B^3 + ↑carry4 * B^4 := by
   --         simp only [C]
   --         rw [←hB]
   --         have h2 : (2:Int)^104 = (2^52)^2 := by rw [←pow_mul];
@@ -558,13 +569,17 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   --       rw [hC_B, hR_B, ← constants.L_spec, h_L_expand]
   --       simp only [
-  --         h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4, h_limbs5, h_limbs6, h_limbs7, h_limbs8,
+  --         h_limbs0, h_limbs1, h_limbs2, h_limbs3, h_limbs4,
+  --         h_limbs5, h_limbs6, h_limbs7, h_limbs8,
   --         h_L1, h_L2, h_L4,
   --         h_sum1, h_sum2, h_sum3, h_sum4, h_sum5, h_sum6, h_sum7, h_sum8,
-  --         h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial, h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
-  --         h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2, h_prod4_0, h_prod4_2, h_prod4_3,
+  --         h_n1_partial, h_n2_partial, h_n3_partial, h_n4_partial,
+  --         h_n5_partial, h_n6_partial, h_n7_partial, h_n8_partial,
+  --         h_product1, h_prod2_0, h_prod2_1, h_prod3_1, h_prod3_2,
+  --         h_prod4_0, h_prod4_2, h_prod4_3,
   --         h_prod5_1, h_prod5_2, h_prod5_3, h_prod6_1, h_prod6_2, h_prod7_1, h_prod8_1,
-  --         h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2, h_n5_accum1, h_n5_accum2, h_n6_accum1,
+  --         h_n2_accum, h_n3_accum, h_n4_accum1, h_n4_accum2,
+  --         h_n5_accum1, h_n5_accum2, h_n6_accum1,
   --         h_r4
   --       ] at eq0 eq1 eq2 eq3 eq4 eq5 eq6 eq7 eq8 ⊢
 
@@ -582,8 +597,10 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
 
   --       rw [← h_r4]
   --       simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, Nat.ofNat_pos, getElem!_pos,
-  --         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one, Array.getElem!_Nat_eq, List.length_cons,
-  --         List.length_nil, zero_add, Nat.reduceAdd, List.getElem_cons_zero, List.getElem_cons_succ]
+  --         Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one,
+  --         Array.getElem!_Nat_eq, List.length_cons,
+  --         List.length_nil, zero_add, Nat.reduceAdd,
+  --         List.getElem_cons_zero, List.getElem_cons_succ]
 
   --       rw [← h_cast_r4] at eq8
   --       simp only [← getElem!_pos]
@@ -592,8 +609,9 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   --       rw [hBz] at *
   --       clear hB
 
-  --       let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!), ↑(a.val[3]!),
-  --                                 ↑(a.val[4]!), ↑(a.val[5]!), ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
+  --       let a_coeffs : List ℕ := [↑(a.val[0]!), ↑(a.val[1]!), ↑(a.val[2]!),
+  --                                 ↑(a.val[3]!), ↑(a.val[4]!), ↑(a.val[5]!),
+  --                                 ↑(a.val[6]!), ↑(a.val[7]!), ↑(a.val[8]!)]
   --       let poly_a : Polynomial ℕ := ∑ i ∈ Finset.range 9, monomial i (a_coeffs.getD i 0)
 
   --       let C_coeffs : List ℕ := [↑carry0, ↑carry1, ↑carry2, ↑carry3, ↑carry4]
@@ -612,7 +630,8 @@ theorem montgomery_reduce_spec (a : Array U128 9#usize)
   --       suffices h_clean : poly_lhs.eval B = poly_rhs.eval B by
   --         convert h_clean using 1
   --         · -- LHS
-  --           simp only [poly_lhs, poly_a, poly_C, poly_L, Polynomial.eval_add, Polynomial.eval_mul,
+  --           simp only [poly_lhs, poly_a, poly_C, poly_L,
+  --             Polynomial.eval_add, Polynomial.eval_mul,
   --             Polynomial.eval_finset_sum, Polynomial.eval_monomial]
   --           simp only [Finset.sum_range_succ, Finset.sum_range_zero, zero_add, pow_zero, pow_one]
   --           simp [a_coeffs, C_coeffs, L_coeffs]

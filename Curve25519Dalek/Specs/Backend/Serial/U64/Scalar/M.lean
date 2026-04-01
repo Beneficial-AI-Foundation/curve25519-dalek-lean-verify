@@ -9,6 +9,8 @@ import Curve25519Dalek.Funs
 # Spec theorem for `m`
 
 The main statement concerning `m` is `m_spec` (below).
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

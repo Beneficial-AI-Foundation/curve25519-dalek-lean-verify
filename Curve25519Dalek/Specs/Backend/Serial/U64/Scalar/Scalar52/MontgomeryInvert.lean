@@ -8,7 +8,6 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomerySquare
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareMultiply
-
 import Mathlib.Data.Int.ModEq
 
 /-!

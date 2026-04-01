@@ -12,8 +12,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
 
-set_option exponentiation.threshold 260
-
 /-!
 # Spec Theorem for `Scalar52::invert`
 
@@ -21,6 +19,8 @@ This function computes the multiplicative inverse.
 
 Source: "curve25519-dalek/src/scalar.rs"
 -/
+
+set_option exponentiation.threshold 260
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result curve25519_dalek.backend.serial.u64.scalar
   curve25519_dalek.backend.serial.u64.scalar.Scalar52
@@ -44,7 +44,8 @@ natural language specs:
 
 
 /-- **Spec and proof concerning `scalar.Scalar52.invert`**:
-- Precondition: The unpacked input scalar self must be non-zero modulo L (inverting zero has undefined behavior)
+- Precondition: The unpacked input scalar self must be non-zero modulo L
+  (inverting zero has undefined behavior)
 - No panic (returns successfully for non-zero input)
 - The result satisfies the multiplicative inverse property:
   Scalar52_as_Nat(self) * Scalar52_as_Nat(result) ≡ 1 (mod L) -/

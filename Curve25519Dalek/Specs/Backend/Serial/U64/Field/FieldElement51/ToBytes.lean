@@ -262,7 +262,8 @@ private lemma canonical_reduction_mod_p
     (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
     (hl2 : l2 = (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
     (hl3 : l3 = (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
-    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
+    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) /
+        2 ^ 51) % 2 ^ 51) :
     (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
       (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
     l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
@@ -313,7 +314,8 @@ private lemma canonical_reduction_mod_p
     rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
   -- Main telescoping: L + c4 * 2^255 = F + 19*q
   have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
-      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+      c4 * 2 ^ 255 = F + 19 * q := by
+    linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
   -- L < 2^255 (each limb < 2^51 from masking)
   have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
   have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
@@ -349,7 +351,8 @@ The algorithm:
 
 Specification:
 - The function succeeds (no panic)
-- The natural number interpretation of the byte array is congruent to the field element value modulo p
+- The natural number interpretation of the byte array is congruent to the field element
+  value modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
 @[step]

@@ -35,7 +35,8 @@ natural language description:
 natural language specs:
 
     • For appropriately bounded FieldElement51s a and b:
-      Field51_as_Nat(sub_assign(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p), or equivalently
+      Field51_as_Nat(sub_assign(a, b)) ≡ Field51_as_Nat(a) - Field51_as_Nat(b) (mod p),
+      or equivalently
       Field51_as_Nat(sub_assign(a, b)) + Field51_as_Nat(b) ≡ Field51_as_Nat(a) (mod p)
 -/
 
