@@ -3571,50 +3571,47 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)\n    (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    pow2k self k ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat self)^(2^k.val) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow2k_spec (self : Array U64 5#usize) (k : U32) (_ : 0 < k.val)\n    (_ : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    pow2k self k ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result ≡ (Field51_as_Nat self) ^ (2 ^ k.val) [MOD p] ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for FieldElement51.pow2k**\nGiven `k > 0`, `pow2k` computes `self^(2^k)` mod p with reduced limbs. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L462-L559",
+   "lines": "L462-L564",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop"]},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem LOW_51_BIT_MASK_spec :\n    LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k::LOW_51_BIT_MASK",
-   "lines": "L514-L514",
+   "lines": "L519-L519",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
-  {"verified": true,
-   "specified": true,
-   "spec_statement":
-   "theorem m_spec (x y : U64) :\n    m x y ⦃ (result : U128) => result.val = x.val * y.val ⦄ := by ...",
-   "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Pow2K.lean",
+  {"verified": false,
+   "specified": false,
+   "spec_statement": null,
+   "spec_file": null,
    "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
@@ -3626,7 +3623,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
   {"verified": true,
@@ -3639,14 +3636,14 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
-   "lines": "L474-L556",
+   "lines": "L474-L561",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": true,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m",
@@ -3704,14 +3701,14 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
-   "lines": "L562-L564",
+   "lines": "L567-L569",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k"]},
@@ -3726,14 +3723,14 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L567-L576",
+   "lines": "L572-L581",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": true,
+   "fully_verified": false,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -3749,7 +3746,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
-   "lines": "L570-L573",
+   "lines": "L575-L578",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop",
    "is_relevant": true,
@@ -5968,13 +5965,13 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.to_affine",
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},
-  {"verified": false,
+  {"verified": true,
    "specified": true,
    "spec_statement":
    "theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :\n    double e ⦃ result =>\n    result.IsValid ∧ result.toPoint = e.toPoint + e.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Double.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.double`**:\n- No panic (always returns successfully)\n- Returns the doubled point 2P (= P + P in elliptic curve addition) where P is the input EdwardsPoint\n-/",
+   "/-- **Spec and proof concerning\n`edwards.EdwardsPoint.double`**:\n- Returns the doubled point 2P (= P + P in elliptic\n  curve addition) where P is the input EdwardsPoint -/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
@@ -5985,7 +5982,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
