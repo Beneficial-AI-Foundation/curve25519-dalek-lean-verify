@@ -19,7 +19,8 @@ This function returns the identity element of the Edwards curve in AffineNiels c
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP curve25519_dalek
 open backend.serial.u64.field.FieldElement51
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
+namespace Curve25519_dalekTraitsIdentity
 
 /-
 natural language description:
@@ -55,4 +56,5 @@ theorem identity_spec :
   unfold identity
   step*
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity
+end Curve25519_dalekTraitsIdentity
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
