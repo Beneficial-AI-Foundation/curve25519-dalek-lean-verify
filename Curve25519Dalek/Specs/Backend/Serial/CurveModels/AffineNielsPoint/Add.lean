@@ -35,7 +35,8 @@ The concrete formulas are:
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
 
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
+namespace curve25519_dalek.Shared0EdwardsPoint.Insts
+namespace CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
 /-
 natural language description:
@@ -67,7 +68,8 @@ theorem add_spec
     (h_otherYpX_bounds : ∀ i, i < 5 → (other.y_plus_x[i]!).val < 2 ^ 53)
     (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)
     (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :
-    Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other ⦃ c =>
+    Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other
+      ⦃ c =>
       let X := Field51_as_Nat self.X
       let Y := Field51_as_Nat self.Y
       let Z := Field51_as_Nat self.Z
@@ -145,4 +147,5 @@ theorem add_spec
     rw [pointwise_add_Field51_as_Nat self.Z self.Z Z2 Z2_post1,
        (by omega : ∀ a, a + a = 2 * a)]
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
+end CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
+end curve25519_dalek.Shared0EdwardsPoint.Insts
