@@ -6,6 +6,7 @@
   dependencies, and verification status.
 -/
 import Lean
+import Mathlib.Tactic
 import Lean.Data.Json
 
 open Lean
