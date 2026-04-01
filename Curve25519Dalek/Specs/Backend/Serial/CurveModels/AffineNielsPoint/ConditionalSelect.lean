@@ -1,15 +1,11 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalSelect
-
-
-
-
 /-! # Spec Theorem for `AffineNielsPoint::conditional_select`
 
 Specification and proof for `AffineNielsPoint::conditional_select`.
@@ -25,7 +21,8 @@ choice = 0, in constant time.
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /--
 **Spec and proof concerning `backend.serial.curve_models.AffineNielsPoint.conditional_select`**:
@@ -53,4 +50,5 @@ theorem conditional_select_spec
   step*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts

@@ -1,16 +1,17 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
-
 /-! # Spec Theorem for `AffineNielsPoint::eq`
 
 Specification and proof for
-`curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq`.
+`curve25519_dalek::backend::serial::curve_models::{core::cmp::PartialEq<
+curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for
+curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::eq`.
 
 This function compares two AffineNielsPoint values component-wise using
 `FieldElement51` equality, short-circuiting on the first mismatch.
@@ -19,7 +20,6 @@ This function compares two AffineNielsPoint values component-wise using
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 
 /-
 natural language description:
@@ -35,7 +35,8 @@ natural language specs:
 • The result is true iff all three coordinate comparisons return true
 -/
 
-namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51
+namespace curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+namespace CoreCmpPartialEqFieldElement51
 
 /-- Helper: the Bool `eq` returns true iff the canonical byte encodings are equal. -/
 @[step]
@@ -51,9 +52,11 @@ theorem eq_spec_aux (a b : backend.serial.u64.field.FieldElement51) :
   rw [key]
   exact c_post
 
-end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51
+end CoreCmpPartialEqFieldElement51
+end curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
 
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
+namespace CoreCmpPartialEqAffineNielsPoint
 
 /-- **Spec and proof concerning `AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq`**:
 - No panic (always returns successfully)
@@ -80,4 +83,5 @@ theorem eq_spec
   · simp only [step_simps]
     agrind
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint
+end CoreCmpPartialEqAffineNielsPoint
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts

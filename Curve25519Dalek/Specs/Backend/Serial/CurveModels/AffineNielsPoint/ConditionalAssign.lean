@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -28,7 +28,8 @@ it updates `self` such that:
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
-namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+namespace curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
+namespace SubtleConditionallySelectable
 
 /-
 natural language description:
@@ -49,14 +50,16 @@ natural language specs:
   - The operation is constant-time (execution time does not depend on choice value)
 -/
 
-/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:
+/-- **Spec and proof concerning
+`backend.serial.curve_models.ConditionallySelectableAffineNielsPoint.conditional_assign`**:
 - No panic (always returns successfully)
 - Given inputs:
   • an AffineNielsPoint `self` with coordinates (y_plus_x, y_minus_x, xy2d),
   • an AffineNielsPoint `other` with coordinates (y_plus_x', y_minus_x', xy2d'),
   • a Choice `choice`,
 the output AffineNielsPoint computed by `conditional_assign self other choice` satisfies:
-- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self
+- Each coordinate is conditionally selected: if choice is 1, output = other;
+  if choice is 0, output = self
 - The operation is performed in constant time for all field elements
 -/
 theorem conditional_assign_spec
@@ -73,4 +76,5 @@ theorem conditional_assign_spec
   step*
   grind
 
-end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable
+end SubtleConditionallySelectable
+end curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts
