@@ -10,7 +10,9 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
 /-! # Spec Theorem for `MontgomeryPoint::mul_assign`
 
 Specification and proof for
-`curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign`.
+`curve25519_dalek::montgomery::{core::ops::arith::MulAssign<
+&0 (curve25519_dalek::scalar::Scalar)>
+for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign`.
 
 This function implements in-place scalar multiplication of a MontgomeryPoint by
 delegating to the MontgomeryPoint * Scalar implementation (the Montgomery ladder

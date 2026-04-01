@@ -53,7 +53,8 @@ natural language specs:
 -/
 
 @[step]
-private lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
+private lemma ONE_bounds_spec :
+    ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   decide
@@ -80,7 +81,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   simp only [step_simps]
   let* ⟨ x, x_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   unfold Bool.Insts.CoreConvertFromChoice.from
-  simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod, Nat.mod_mul_mod, dvd_refl,
+  simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod,
+    Nat.mod_mul_mod, dvd_refl,
     Nat.mod_mod_of_dvd]
   split
   · simp only [spec_ok, reduceCtorEq, IsEmpty.forall_iff, implies_true]
@@ -97,14 +99,16 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ i2, i2_post1, i2_post2 ⟩ ← UScalar.xor_spec
   let* ⟨ y_bytes1, y_bytes1_post ⟩ ← Array.update_spec
-  let* ⟨ result, result_post1, result_post2, ep, result_post3 ⟩ ← edwards.CompressedEdwardsY.decompress_spec
+  let* ⟨ result, result_post1, result_post2, ep, result_post3 ⟩ ←
+    edwards.CompressedEdwardsY.decompress_spec
   -- Extract decompress postconditions (now includes Nat-level Y and Z facts)
   have h_decomp := result_post2 ep result_post3
   obtain ⟨h_valid, _, h_Y_nat, _, h_Z_nat, _, _⟩ := h_decomp
   -- Construct Z_inv via invert_spec (ep.Z is valid from IsValid)
   have h_Z_54 : ∀ i, i < 5 → ep.Z[i]!.val < 2 ^ 54 :=
     fun i hi => by have := h_valid.Z_bounds i hi; omega
-  obtain ⟨Z_inv, h_Zinv, h_inv_ne, _, _⟩ := spec_imp_exists (field.FieldElement51.invert_spec ep.Z h_Z_54)
+  obtain ⟨Z_inv, h_Zinv, h_inv_ne, _, _⟩ :=
+    spec_imp_exists (field.FieldElement51.invert_spec ep.Z h_Z_54)
   use Z_inv
   refine ⟨h_Zinv, ?_, h_valid⟩
   -- Define y_val and derive h_y_val from Nat-level postconditions (no ZMod conversion)

@@ -30,7 +30,8 @@ natural language specs:
 • Interpreted as a natural number, the result equals 0
 -/
 
-/-- **Spec and proof concerning `montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof concerning
+    `montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
 - No panic (always returns successfully)
 - The resulting MontgomeryPoint is 32 zero bytes
 - Interpreted as a natural number via `U8x32_as_Nat`, the result equals 0

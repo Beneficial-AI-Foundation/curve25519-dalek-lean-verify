@@ -83,7 +83,8 @@ theorem to_affine_spec (e : EdwardsPoint)
         · rw [hx_mod, Nat.mul_mod, h_val, mul_zero, Nat.zero_mod]
         · rw [hy_mod, Nat.mul_mod, h_val, mul_zero, Nat.zero_mod]
       · -- Z ≢ 0 case
-        have h_val : (Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p)) % p = 1 := h_inv_nonzero h_Z
+        have h_val : (Field51_as_Nat Z_inv % p * (Field51_as_Nat e.Z % p)) % p = 1 :=
+          h_inv_nonzero h_Z
         rw [Nat.mul_mod] at h_val
         rw [Nat.ModEq] at hx_mod hy_mod
         constructor

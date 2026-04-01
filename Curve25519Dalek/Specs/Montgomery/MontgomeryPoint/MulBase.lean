@@ -55,7 +55,8 @@ natural language specs:
 @[externally_verified, step]
 theorem mul_base_spec (scalar : scalar.Scalar) :
     mul_base scalar ⦃ result =>
-    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
+    Montgomery.MontgomeryPoint.mkPoint result =
+      (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
      := by
     unfold mul_base
     step with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩

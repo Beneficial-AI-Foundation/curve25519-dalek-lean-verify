@@ -12,8 +12,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Mathlib.Data.Nat.ModEq
 /-! # Spec Theorem for `MontgomeryPoint::ct_eq`
 
-Specification and proof for
-`curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq`.
+Specification and proof for `curve25519_dalek::montgomery::{subtle::ConstantTimeEq for
+curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq`.
 
 This function compares two MontgomeryPoint values in constant time by
 interpreting their 32-byte encodings as FieldElement51 values and then

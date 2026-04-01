@@ -326,9 +326,11 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       UScalar.val_not_eq_imp_not_eq, ↓reduceDIte]
     have :  y = 0#u8 := by scalar_tac
     simp only [this, ↓reduceDIte, bind_tc_ok]
-    unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap  zeroize.Zeroize.Blanket.zeroize
-    simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true, one_ne_zero, zero_lt_one,
-    not_lt_zero, or_false, or_self, UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
+    unfold montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap
+      zeroize.Zeroize.Blanket.zeroize
+    simp only [Nat.not_eq, UScalar.ofNatCore_val_eq, ne_eq, zero_ne_one, not_false_eq_true,
+      one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self,
+      UScalar.val_not_eq_imp_not_eq, ↓reduceIte, core.default.DefaultBool.default,
       bind_tc_ok]
     step*
       -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
@@ -348,7 +350,10 @@ end curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMo
 
 namespace curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint
 
-/- [curve25519_dalek::montgomery::{core::ops::arith::Mul<&0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul]:
+/- [curve25519_dalek::montgomery::{core::ops::arith::Mul<
+   &0 (curve25519_dalek::montgomery::MontgomeryPoint),
+   curve25519_dalek::montgomery::MontgomeryPoint>
+   for &1 (curve25519_dalek::scalar::Scalar)}::mul]:
    Source: 'curve25519-dalek/src/montgomery.rs', lines 462:4-464:5
 -/
 
@@ -365,7 +370,8 @@ Natural language specs:
     - Returns the same result as the reverse multiplication (point * scalar)
     - Inherits all mathematical properties from MontgomeryPoint::mul
 -/
-/-- **Spec and proof concerning `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:
+/-- **Spec and proof concerning
+    `montgomery.MulShared1ScalarShared0MontgomeryPointMontgomeryPoint.mul`**:
 - No panic (always returns successfully given valid inputs)
 - Implements scalar multiplication via delegation to the reverse operation
 - The result is mathematically equivalent to [scalar]point

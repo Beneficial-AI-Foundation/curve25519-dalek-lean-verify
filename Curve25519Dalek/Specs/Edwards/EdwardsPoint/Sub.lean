@@ -40,7 +40,8 @@ natural language specs:
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
 
-/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:
+/-- **Spec and proof concerning
+    `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:
 • The function always succeeds (no panic) for valid inputs
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
