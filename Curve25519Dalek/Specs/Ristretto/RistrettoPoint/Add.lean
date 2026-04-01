@@ -10,7 +10,8 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Add
 
 Specification and proof for the `add` trait implementation for Ristretto points.
 
-This function adds two Ristretto points via elliptic curve addition by delegating to the underlying Edwards point addition.
+This function adds two Ristretto points via elliptic curve addition by delegating to the
+underlying Edwards point addition.
 
 **Source**: curve25519-dalek/src/ristretto.rs
 -/

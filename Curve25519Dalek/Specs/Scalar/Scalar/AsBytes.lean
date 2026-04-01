@@ -25,7 +25,8 @@ natural language description:
 natural language specs:
 
     • Scalar{ bytes : s.as_bytes() } = s, whereby Scalar{} denotes the constructor
-      for the Scalar type, i.e., if I convert to bytes and then back to Scalar type I get the identity
+      for the Scalar type, i.e., if I convert to bytes and then back to Scalar type I get
+      the identity
 -/
 
 /-- **Spec and proof concerning `scalar.Scalar.as_bytes`**:

@@ -9,10 +9,15 @@ import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.GCongr
 import Mathlib.Algebra.BigOperators.Ring.Finset
 
+/-! # Spec theorem for `clamp_integer`
+
+Specification and proof for `scalar.clamp_integer`.
+
+Source: "curve25519-dalek/src/scalar.rs"
+-/
+
 set_option linter.style.setOption false
 set_option grind.warning false
-
-/-! # clamp_integer -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek

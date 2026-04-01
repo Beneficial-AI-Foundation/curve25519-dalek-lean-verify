@@ -18,7 +18,8 @@ to the underlying Edwards point subtraction.
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.ristretto
-namespace curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+namespace curve25519_dalek.Shared0RistrettoPoint.Insts
+namespace CoreOpsArithSubSharedARistrettoPointRistrettoPoint
 
 /-
 natural language description:
@@ -32,10 +33,12 @@ natural language specs:
 
 • The function always succeeds (no panic) for valid input Ristretto points
 • The result is a valid Ristretto point
-• The result represents the difference of the inputs (in the mathematical context of elliptic curve subtraction)
+• The result represents the difference of the inputs (in the mathematical context of elliptic
+  curve subtraction)
 -/
 
-/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:
+/-- **Spec and proof concerning
+`Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:
 • The function always succeeds (no panic) for valid inputs
 • The result is a valid Ristretto point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
@@ -66,4 +69,5 @@ theorem sub_spec
       exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by
         unfold RistrettoPoint.toPoint at hQ; rw [hQ]; abel⟩
 
-end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+end CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+end curve25519_dalek.Shared0RistrettoPoint.Insts

@@ -20,25 +20,9 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.Shared0FieldElement51.Insts
-namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
-open _root_.curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
-  (mul)
-open _root_.curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51
-  (mul.m mul.LOW_51_BIT_MASK)
 
-/-
-natural language description:
-
-    • Computes the product of two field elements a and b in the field 𝔽_p where p = 2^255 - 19
-    • The field elements are represented as five u64 limbs each
-
-natural language specs:
-
-    • The function always succeeds (no panic)
-    • Field51_as_Nat(result) ≡ Field51_as_Nat(lhs) * Field51_as_Nat(rhs) (mod p)
--/
-
+namespace curve25519_dalek.backend.serial.u64.field
+namespace MulShared0FieldElement51SharedAFieldElement51FieldElement51
 
 /- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.Mul.mul.m`**:
 - No panic (always returns successfully)
@@ -58,6 +42,24 @@ theorem LOW_51_BIT_MASK_spec :
     mul.LOW_51_BIT_MASK ⦃ (result : U64) => result.val = 2^51 - 1 ⦄ := by
   unfold mul.LOW_51_BIT_MASK
   step*
+
+end MulShared0FieldElement51SharedAFieldElement51FieldElement51
+end curve25519_dalek.backend.serial.u64.field
+
+namespace curve25519_dalek.Shared0FieldElement51.Insts
+namespace CoreOpsArithMulSharedAFieldElement51FieldElement51
+
+/-
+natural language description:
+
+    • Computes the product of two field elements a and b in the field 𝔽_p where p = 2^255 - 19
+    • The field elements are represented as five u64 limbs each
+
+natural language specs:
+
+    • The function always succeeds (no panic)
+    • Field51_as_Nat(result) ≡ Field51_as_Nat(lhs) * Field51_as_Nat(rhs) (mod p)
+-/
 
 lemma decompose (a0 a1 a2 a3 a4 b0 b1 b2 b3 b4 : ℕ) :
   (a0 +

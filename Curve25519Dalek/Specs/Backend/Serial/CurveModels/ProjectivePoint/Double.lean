@@ -14,9 +14,6 @@ import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.Math.Edwards.Representation
 import Mathlib.Data.ZMod.Basic
 
-set_option linter.hashCommand false
-#setup_aeneas_simps
-
 /-! # Spec Theorem for `ProjectivePoint::double`
 
 Specification and proof for `ProjectivePoint::double`.
@@ -27,6 +24,9 @@ elliptic curve addition).
 
 **Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
 -/
+
+set_option linter.hashCommand false
+#setup_aeneas_simps
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 

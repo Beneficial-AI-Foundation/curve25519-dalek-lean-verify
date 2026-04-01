@@ -7,8 +7,6 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 /-! # Spec theorem for `Scalar::from` (From<u8>)
 
 Specification and proof for the `From<u8>` trait implementation for Scalar.
@@ -20,6 +18,8 @@ Because every `u8` value is less than 2^8, and 2^8 < L (the group order,
 
 Source: "curve25519-dalek/src/scalar.rs"
 -/
+
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8
 
 /-

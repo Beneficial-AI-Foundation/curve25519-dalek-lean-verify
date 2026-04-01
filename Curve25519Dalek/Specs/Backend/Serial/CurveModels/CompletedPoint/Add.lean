@@ -40,7 +40,7 @@ The concrete formulas are:
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.curve_models
-open curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+open curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -287,7 +287,7 @@ theorem add_spec_aux_54_52_53_52
     (h_otherYmX_bounds : ∀ i, i < 5 → (other.Y_minus_X[i]!).val < 2 ^ 52)
     (h_otherZ_bounds : ∀ i, i < 5 → (other.Z[i]!).val < 2 ^ 53)
     (h_otherT2d_bounds : ∀ i, i < 5 → (other.T2d[i]!).val < 2 ^ 52) :
-    add self other ⦃ c =>
+    CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add self other ⦃ c =>
     let X := Field51_as_Nat self.X
     let Y := Field51_as_Nat self.Y
     let Z := Field51_as_Nat self.Z
@@ -309,7 +309,7 @@ theorem add_spec_aux_54_52_53_52
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
-  unfold add
+  unfold CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add
   simp only [step_simps]
   let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec

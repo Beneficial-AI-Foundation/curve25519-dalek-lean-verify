@@ -21,7 +21,8 @@ natural language description:
 
     • Compares two scalar types s and s' to determine whether they are equal or not.
 
-    • Crucially does so in constant time irrespective of the inputs as to avoid security liabilities.
+    • Crucially does so in constant time irrespective of the inputs as to avoid security
+      liabilities.
 
 natural language specs:
 
@@ -31,7 +32,8 @@ natural language specs:
 /-- **Spec and proof concerning `scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq`**:
 - No panic (always returns successfully)
 - Returns `Choice` representing equality in constant time
-- The result is Choice.one (true) if and only if the two scalars are equal (same byte representation)
+- The result is Choice.one (true) if and only if the two scalars are equal
+  (same byte representation)
 -/
 @[step]
 theorem ct_eq_spec (self other : scalar.Scalar) :

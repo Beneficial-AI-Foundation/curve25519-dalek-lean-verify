@@ -34,7 +34,8 @@ natural language specs:
 
 /-- **Spec and proof concerning `scalar.Scalar.is_canonical`**:
 - No panic (always returns successfully)
-- Returns Choice.one if and only if the scalar's bytes represent a value less than L (the group order)
+- Returns Choice.one if and only if the scalar's bytes represent a value less than L
+  (the group order)
 -/
 @[step]
 theorem is_canonical_spec (s : Scalar) :

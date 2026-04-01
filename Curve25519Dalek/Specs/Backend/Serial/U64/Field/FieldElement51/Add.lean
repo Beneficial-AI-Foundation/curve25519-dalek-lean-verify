@@ -16,7 +16,6 @@ Source: "curve25519-dalek/src/backend/serial/u64/field.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51
 
 namespace curve25519_dalek.Shared0FieldElement51.Insts
 namespace CoreOpsArithAddSharedAFieldElement51FieldElement51

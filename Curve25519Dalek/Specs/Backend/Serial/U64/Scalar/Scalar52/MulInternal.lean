@@ -13,6 +13,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 # Spec theorem for `mul_internal`
 
 The main statement concerning `mul_internal` is `mul_internal_spec` (below).
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 set_option exponentiation.threshold 416

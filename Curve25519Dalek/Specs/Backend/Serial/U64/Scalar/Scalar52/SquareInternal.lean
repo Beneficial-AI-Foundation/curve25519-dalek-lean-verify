@@ -12,6 +12,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 # SquareInternal
 
 The main statement concerning `square_internal` is `square_internal_spec` (below).
+
+Source: "curve25519-dalek/src/backend/serial/u64/scalar.rs"
 -/
 
 set_option exponentiation.threshold 416
