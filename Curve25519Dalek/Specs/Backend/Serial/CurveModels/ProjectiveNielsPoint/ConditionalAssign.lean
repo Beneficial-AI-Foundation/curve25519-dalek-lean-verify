@@ -21,6 +21,7 @@ Given:
 it updates `self` such that:
 - if choice == 1: self = other (all coordinates are replaced)
 - if choice == 0: self remains unchanged
+
 Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs, lines 305:4-310:5"
 -/
 
