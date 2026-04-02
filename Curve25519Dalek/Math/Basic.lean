@@ -515,7 +515,7 @@ noncomputable def inv_sqrt_checked (u : ZMod p) : (ZMod p × Bool) :=
   else (sqrt_checked u).map (·⁻¹) id -- return `sqrt_checked u` but invert the first component.
   -- The alternative using `let` here causes a nightmare later when working with the definition.
 
-/-- For `u ≠ 0`, `inv_sqrt_checked u` equals `(sqrt_checked u)` with the first component inverted. -/
+/-- For `u ≠ 0`, `inv_sqrt_checked u` equals `(sqrt_checked u)` with first component inverted. -/
 private lemma inv_sqrt_checked_unfold (u : ZMod p) (hu : u ≠ 0) :
     inv_sqrt_checked u = (sqrt_checked u).map (·⁻¹) id := by
   delta inv_sqrt_checked; rw [if_neg hu]
