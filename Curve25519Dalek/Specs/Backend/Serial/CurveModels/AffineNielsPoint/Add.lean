@@ -6,7 +6,9 @@ Authors: Hoang Le Truong
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
-/-! # Spec Theorem for `CompletedPoint::add`
+
+/-!
+# Spec theorem for `CompletedPoint::add`
 
 Specification and proof for `CompletedPoint::add`.
 
@@ -29,7 +31,7 @@ The concrete formulas are:
 - Z'        = Z2 + Txy2d
 - T'        = Z2 − Txy2d
 
-**Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
+Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -39,16 +41,14 @@ namespace curve25519_dalek.Shared0EdwardsPoint.Insts
 namespace CoreOpsArithAddSharedAAffineNielsPointCompletedPoint
 
 
-/-- **Spec and proof concerning `CompletedPoint::add`**:
+/-- **Spec theorem for `CompletedPoint::add`**:
 • The function always succeeds (no panic)
 • Given inputs P = (X, Y, Z, T) and N = (Y+X, Y−X, 2dXY), the output C = (X', Y', Z', T')
   satisfies modulo p:
   - X' ≡ ( (Y+X)·N.y_plus_x − (Y−X)·N.y_minus_x ) (mod p)
   - Y' ≡ ( (Y+X)·N.y_plus_x + (Y−X)·N.y_minus_x ) (mod p)
   - Z' ≡ ( 2·Z + T·N.xy2d ) (mod p)
-  - T' ≡ ( 2·Z − T·N.xy2d ) (mod p)
--/
-
+  - T' ≡ ( 2·Z − T·N.xy2d ) (mod p) -/
 @[step]
 theorem add_spec
     (self : edwards.EdwardsPoint)
@@ -61,7 +61,7 @@ theorem add_spec
     (h_otherYmX_bounds : ∀ i, i < 5 → (other.y_minus_x[i]!).val < 2 ^ 53)
     (h_otherXY2d_bounds : ∀ i, i < 5 → (other.xy2d[i]!).val < 2 ^ 53) :
     Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add self other
-      ⦃ c =>
+      ⦃ (c : CompletedPoint) =>
       let X := Field51_as_Nat self.X
       let Y := Field51_as_Nat self.Y
       let Z := Field51_as_Nat self.Z
