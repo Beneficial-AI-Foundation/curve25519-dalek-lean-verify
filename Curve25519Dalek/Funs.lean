@@ -2886,7 +2886,7 @@ def backend.serial.u64.scalar.Scalar52.from_bytes
   ok (index_mut_back4 i20)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 282:8-285:9 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 281:8-284:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   (sum : Std.U128) : Result (Std.U128 × Std.U64) := do
   let i ← lift (UScalar.cast .U64 sum)
@@ -2897,7 +2897,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2
   ok (i3, w)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 276:8-279:9 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 275:8-278:9 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
   (sum : Std.U128) : Result (Std.U128 × Std.U64) := do
   let i ← lift (UScalar.cast .U64 sum)
@@ -2915,7 +2915,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1
   ok (i7, p)
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]: loop 0:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 217:14-217:19 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 216:14-216:19 -/
 @[rust_loop]
 def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice)
@@ -2948,7 +2948,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l_loop
 partial_fixpoint
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 212:4-225:5 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 211:4-224:5 -/
 def backend.serial.u64.scalar.Scalar52.conditional_add_l
   (self : backend.serial.u64.scalar.Scalar52) (condition : subtle.Choice) :
   Result (Std.U64 × backend.serial.u64.scalar.Scalar52)
@@ -2959,7 +2959,7 @@ def backend.serial.u64.scalar.Scalar52.conditional_add_l
     0#u64 mask 0#usize
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]: loop 0:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 201:8-205:9
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 200:8-204:9
     Visibility: public -/
 @[rust_loop]
 def backend.serial.u64.scalar.Scalar52.sub_loop
@@ -2991,7 +2991,7 @@ def backend.serial.u64.scalar.Scalar52.sub_loop
 partial_fixpoint
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 194:4-210:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 193:4-209:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.sub
   (a : backend.serial.u64.scalar.Scalar52)
@@ -3011,7 +3011,7 @@ def backend.serial.u64.scalar.Scalar52.sub
   ok difference1
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 273:4-306:5 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 272:4-305:5 -/
 def backend.serial.u64.scalar.Scalar52.montgomery_reduce
   (limbs : Array Std.U128 9#usize) :
   Result backend.serial.u64.scalar.Scalar52
@@ -3095,7 +3095,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_reduce
     (Array.make 5#usize [ r0, r1, r2, r3, r4 ]) backend.serial.u64.constants.L
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 230:4-244:5 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 229:4-243:5 -/
 def backend.serial.u64.scalar.Scalar52.mul_internal
   (a : backend.serial.u64.scalar.Scalar52)
   (b : backend.serial.u64.scalar.Scalar52) :
@@ -3184,7 +3184,7 @@ def backend.serial.u64.scalar.Scalar52.mul_internal
   Array.update z8 8#usize i50
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 325:4-327:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 324:4-326:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.montgomery_mul
   (a : backend.serial.u64.scalar.Scalar52)
@@ -3536,7 +3536,7 @@ def backend.serial.u64.scalar.Scalar52.to_bytes
   Array.update s31 31#usize i72
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 249:4-268:5 -/
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 248:4-267:5 -/
 def backend.serial.u64.scalar.Scalar52.square_internal
   (a : backend.serial.u64.scalar.Scalar52) :
   Result (Array Std.U128 9#usize)
@@ -3588,7 +3588,7 @@ def backend.serial.u64.scalar.Scalar52.square_internal
   ok (Array.make 9#usize [ i8, i10, i13, i17, i23, i27, i30, i32, i33 ])
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 310:4-313:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 309:4-312:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.mul
   (a : backend.serial.u64.scalar.Scalar52)
@@ -3603,7 +3603,7 @@ def backend.serial.u64.scalar.Scalar52.mul
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a2
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 318:4-321:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 317:4-320:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.square
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -3617,7 +3617,7 @@ def backend.serial.u64.scalar.Scalar52.square
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a1
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 331:4-333:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 330:4-332:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.montgomery_square
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -3627,7 +3627,7 @@ def backend.serial.u64.scalar.Scalar52.montgomery_square
   backend.serial.u64.scalar.Scalar52.montgomery_reduce a
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 337:4-339:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 336:4-338:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.as_montgomery
   (self : backend.serial.u64.scalar.Scalar52) :
@@ -3637,7 +3637,7 @@ def backend.serial.u64.scalar.Scalar52.as_montgomery
     backend.serial.u64.constants.RR
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]: loop 0:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 347:8-350:9
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 346:8-349:9
     Visibility: public -/
 @[rust_loop]
 def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
@@ -3658,7 +3658,7 @@ def backend.serial.u64.scalar.Scalar52.from_montgomery_loop
 partial_fixpoint
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery]:
-    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 344:4-352:5
+    Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 343:4-351:5
     Visibility: public -/
 def backend.serial.u64.scalar.Scalar52.from_montgomery
   (self : backend.serial.u64.scalar.Scalar52) :
