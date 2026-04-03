@@ -4012,7 +4012,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L177-L192",
+   "lines": "L177-L190",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add",
    "is_relevant": true,
    "is_ignored": false,
@@ -4028,15 +4028,14 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop a b sum mask carry i ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
+   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop { start := i, «end» := 5#usize } a b sum mask carry ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
-   "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:\n- Starting from index `i` with accumulator `sum` and carry `carry`\n- Computes limb-wise addition with carry propagation\n- Result limbs are bounded by 2^52\n- Parts of sum before index i are preserved\n- The result satisfies the modular arithmetic property -/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L184-L188",
+   "lines": "L183-L186",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop",
    "is_relevant": true,
    "is_ignored": false,
@@ -4054,7 +4053,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L184-L188",
+   "lines": "L183-L186",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop.mutual",
    "is_relevant": true,
@@ -4077,7 +4076,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
-   "lines": "L338-L340",
+   "lines": "L336-L338",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
    "is_relevant": true,
@@ -4100,7 +4099,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L213-L226",
+   "lines": "L211-L224",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l",
    "is_relevant": true,
@@ -4121,7 +4120,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L218-L218",
+   "lines": "L216-L216",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop",
    "is_relevant": true,
@@ -4140,7 +4139,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L218-L218",
+   "lines": "L216-L216",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop.mutual",
    "is_relevant": true,
@@ -4257,7 +4256,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
-   "lines": "L345-L353",
+   "lines": "L343-L351",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery",
    "is_relevant": true,
@@ -4280,7 +4279,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
-   "lines": "L348-L351",
+   "lines": "L346-L349",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop",
    "is_relevant": true,
@@ -4302,7 +4301,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
-   "lines": "L326-L328",
+   "lines": "L324-L326",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
    "is_relevant": true,
@@ -4325,7 +4324,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
-   "lines": "L274-L307",
+   "lines": "L272-L305",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
    "is_relevant": true,
@@ -4349,7 +4348,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1",
-   "lines": "L277-L280",
+   "lines": "L275-L278",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
    "is_relevant": true,
@@ -4371,7 +4370,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2",
-   "lines": "L283-L286",
+   "lines": "L281-L284",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2",
    "is_relevant": true,
@@ -4392,7 +4391,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
-   "lines": "L332-L334",
+   "lines": "L330-L332",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square",
    "is_relevant": true,
@@ -4415,7 +4414,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
-   "lines": "L311-L314",
+   "lines": "L309-L312",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
    "is_relevant": true,
    "is_ignored": false,
@@ -4438,7 +4437,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
-   "lines": "L231-L245",
+   "lines": "L229-L243",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
    "is_relevant": true,
@@ -4461,7 +4460,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
-   "lines": "L319-L322",
+   "lines": "L317-L320",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
    "is_relevant": true,
    "is_ignored": true,
@@ -4485,7 +4484,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
-   "lines": "L250-L269",
+   "lines": "L248-L267",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
    "is_relevant": true,
@@ -4508,7 +4507,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L195-L211",
+   "lines": "L193-L209",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub",
    "is_relevant": true,
    "is_ignored": false,
@@ -4531,7 +4530,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L202-L206",
+   "lines": "L200-L204",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop",
    "is_relevant": true,
    "is_ignored": false,
@@ -4549,7 +4548,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L202-L206",
+   "lines": "L200-L204",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop.mutual",
    "is_relevant": true,
