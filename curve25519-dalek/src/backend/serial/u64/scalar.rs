@@ -189,7 +189,6 @@ impl Scalar52 {
         Scalar52::sub(&sum, &constants::L)
     }
 
-
     /// Compute `a - b` (mod l)
     pub fn sub(a: &Scalar52, b: &Scalar52) -> Scalar52 {
         let mut difference = Scalar52::ZERO;
