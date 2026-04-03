@@ -180,16 +180,15 @@ impl Scalar52 {
 
         // a + b
         let mut carry: u64 = 0;
-        let mut i = 0;
-        while i < 5 {
+        for i in 0..5 {
             carry = a[i] + b[i] + (carry >> 52);
             sum[i] = carry & mask;
-            i += 1;
         }
 
         // subtract l if the sum is >= l
         Scalar52::sub(&sum, &constants::L)
     }
+
 
     /// Compute `a - b` (mod l)
     pub fn sub(a: &Scalar52, b: &Scalar52) -> Scalar52 {
