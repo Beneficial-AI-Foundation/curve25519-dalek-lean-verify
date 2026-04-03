@@ -5,6 +5,7 @@
   for a different Aeneas-generated project, modify the values here.
 -/
 import Lean
+import Mathlib.Tactic
 
 open Lean
 
