@@ -46,21 +46,21 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/curve_models/m
  impl Neg for &AffineNielsPoint {
      type Output = AffineNielsPoint;
  
-@@ -519,6 +528,14 @@
-             y_minus_x: self.y_plus_x,
-             xy2d: -(&self.xy2d),
-         }
-+    }
-+}
-+
+@@ -522,6 +531,14 @@
+     }
+ }
+ 
 +impl Neg for AffineNielsPoint {
 +    type Output = AffineNielsPoint;
 +
 +    fn neg(self) -> AffineNielsPoint {
 +        -&self
-     }
- }
- 
++    }
++}
++
+ // ------------------------------------------------------------------------
+ // Debug traits
+ // ------------------------------------------------------------------------
 diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs b/curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs
 --- a/curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs
 +++ b/curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs
@@ -635,16 +635,17 @@ diff -Naur --no-dereference a/curve25519-dalek/src/ristretto.rs b/curve25519-dal
          let mut s_prime = &s * r_0;
          let s_prime_is_pos = !s_prime.is_negative();
 -        s_prime.conditional_negate(s_prime_is_pos);
+-
+-        s.conditional_assign(&s_prime, !Ns_D_is_sq);
+-        c.conditional_assign(&r, !Ns_D_is_sq);
 +        let s_prime_neg = -&s_prime;
 +        s_prime.conditional_assign(&s_prime_neg, s_prime_is_pos);
  
--        s.conditional_assign(&s_prime, !Ns_D_is_sq);
--        c.conditional_assign(&r, !Ns_D_is_sq);
+-        let N_t = &(&(&c * &(&r - &one)) * d_minus_one_sq) - &D;
 +        let not_sq = !Ns_D_is_sq;
 +        s.conditional_assign(&s_prime, not_sq);
 +        c.conditional_assign(&r, not_sq);
- 
--        let N_t = &(&(&c * &(&r - &one)) * d_minus_one_sq) - &D;
++
 +        let r_minus_one = &r - &one;
 +        let c_r_minus_one = &c * &r_minus_one;
 +        let c_r_minus_one_d = &c_r_minus_one * d_minus_one_sq;
