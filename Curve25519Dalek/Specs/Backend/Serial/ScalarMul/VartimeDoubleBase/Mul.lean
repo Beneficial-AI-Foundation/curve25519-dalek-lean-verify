@@ -11,7 +11,7 @@ import Curve25519Dalek.Math.Basic
 
 This function performs variable-time double-base multiplication.
 
-Source: "curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs"
+Source: "curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs:L1-L15"
 
 ## TODO
 - Write draft specification

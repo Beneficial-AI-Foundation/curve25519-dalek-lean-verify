@@ -17,7 +17,7 @@ For Curve25519, A = 486662, so APLUS2_OVER_FOUR = 121666.
 
 This constant is used in the Montgomery ladder differential addition formula.
 
-Source: "curve25519-dalek/src/backend/serial/u64/constants.rs"
+Source: "curve25519-dalek/src/backend/serial/u64/constants.rs:108-109"
 -/
 
 open Aeneas Aeneas.Std Result
