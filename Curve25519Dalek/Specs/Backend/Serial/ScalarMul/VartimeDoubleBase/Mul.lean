@@ -6,13 +6,12 @@ Authors: Oliver Butterley, Alessandro D'Angelo, Liao Zhang
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # mul
-
-Specification and proof for `mul`.
+/-!
+# Spec theorem for `vartime_double_base::mul`
 
 This function performs variable-time double-base multiplication.
 
-**Source**: curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs:L1-L15
+Source: "curve25519-dalek/src/backend/serial/scalar_mul/vartime_double_base.rs"
 
 ## TODO
 - Write draft specification

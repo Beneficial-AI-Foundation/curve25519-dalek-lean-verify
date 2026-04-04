@@ -10,7 +10,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Zero
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Rr
 
 set_option exponentiation.threshold 260
 
