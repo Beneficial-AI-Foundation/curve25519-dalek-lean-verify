@@ -2,7 +2,7 @@
 # Used by aeneas-cli to run charon and aeneas for Lean code generation
 
 aeneas:
-  commit: "1180be60"
+  commit: "28ad838c"
   repo: "https://github.com/AeneasVerif/aeneas.git"
 
 crate:
@@ -99,6 +99,7 @@ tweaks:
         set_option linter.unusedVariables false
         set_option linter.style.whitespace false
         set_option linter.style.setOption false
+        set_option linter.style.longLine false
 
     # --- Fix shift syntax error ---
 

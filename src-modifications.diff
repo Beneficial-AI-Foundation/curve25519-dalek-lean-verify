@@ -210,20 +210,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs 
          }
  
          let mask = (1u64 << 52) - 1;
-@@ -164,9 +180,11 @@
- 
-         // a + b
-         let mut carry: u64 = 0;
--        for i in 0..5 {
-+        let mut i = 0;
-+        while i < 5 {
-             carry = a[i] + b[i] + (carry >> 52);
-             sum[i] = carry & mask;
-+            i += 1;
-         }
- 
-         // subtract l if the sum is >= l
-@@ -180,21 +198,31 @@
+@@ -180,21 +196,31 @@
  
          // a - b
          let mut borrow: u64 = 0;
@@ -262,7 +249,7 @@ diff -Naur --no-dereference a/curve25519-dalek/src/backend/serial/u64/scalar.rs 
      }
  
      /// Compute `a * b`
-@@ -316,8 +344,10 @@
+@@ -316,8 +342,10 @@
      #[inline(never)]
      pub fn from_montgomery(&self) -> Scalar52 {
          let mut limbs = [0u128; 9];

@@ -20,11 +20,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun (q : ProjectivePoint) =>\n      Field51_as_Nat q.X = 0 ∧\n      Field51_as_Nat q.Y = 1 ∧\n      Field51_as_Nat q.Z = 1) := by ...",
+   "theorem identity_spec :\n    identity ⦃ (result : backend.serial.curve_models.ProjectivePoint) =>\n      Field51_as_Nat result.X = 0 ∧\n      Field51_as_Nat result.Y = 1 ∧\n      Field51_as_Nat result.Z = 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.IdentityProjectivePoint.identity`**:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1)\n-/",
+   "/-- **Spec theorem for\n`curve25519_dalek.IdentityCurveModelsProjectivePoint.identity`**\n\nReturns the identity element of the Edwards curve in projective coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectivePoint is the identity element with coordinates (X=0, Y=1, Z=1) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity",
@@ -227,10 +227,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    add self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
+   "theorem add_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    add self other ⦃ (c : CompletedPoint) =>\n      c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/Add.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek.backend.serial.curve_models.CompletedPoint.add`**\nThe theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:\n1. Always succeeds\n2. The output CompletedPoint is valid (bounds and algebraic properties)\n3. The output represents the sum of the input points\nThe mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -433,10 +434,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>\n    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "theorem sub_spec\n    (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)\n    (other : ProjectiveNielsPoint) (hother : other.IsValid) :\n    sub self other ⦃ (c : CompletedPoint) =>\n      c.IsValid ∧\n      c.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for\n`curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub`**\n\nComputes `self - other` as a CompletedPoint: the result is valid and represents\nthe difference of the two input points. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -640,11 +642,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec (self : ProjectiveNielsPoint) (self_bound : ∀ i < 5, self.T2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.Y_plus_X = self.Y_minus_X ∧\n      result.Y_minus_X = self.Y_plus_X ∧\n      result.Z = self.Z ∧\n      (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
+   "theorem neg_spec\n    (self : ProjectiveNielsPoint) (self_bound : ∀ i < 5, self.T2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.Y_plus_X = self.Y_minus_X ∧\n      result.Y_minus_X = self.Y_plus_X ∧\n      result.Z = self.Z ∧\n      (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.neg`**:\n- No panic (always returns successfully)\n- Given input:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\nthe output ProjectiveNielsPoint computed by `neg self` has coordinates\n(Y_plus_X', Y_minus_X', Z', T2d') where:\n- Y_plus_X' = Y_minus_X (the coordinates are swapped)\n- Y_minus_X' = Y_plus_X (the coordinates are swapped)\n- Z' = Z (the Z coordinate is unchanged)\n- T2d' ≡ -T2d (mod p) (the T2d coordinate is negated modulo p)\n\nwhere p = 2^255 - 19.\n\nThis implements the negation of a point in projective Niels coordinates.\n-/",
+   "/-- **Spec theorem for\n`Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**\n\nReturns the negation of a ProjectiveNielsPoint:\n- No panic (always returns successfully)\n- Given input `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d), the output\nProjectiveNielsPoint has coordinates (Y_plus_X', Y_minus_X', Z', T2d') where::\n  - Y_plus_X' = Y_minus_X (coordinates are swapped)\n  - Y_minus_X' = Y_plus_X (coordinates are swapped)\n  - Z' = Z (Z coordinate is unchanged)\n  - T2d' ≡ -T2d (mod p) (T2d is negated modulo p = 2^255 - 19) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
@@ -1146,7 +1148,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.montgomery.differential_add_and_double"]},
@@ -2140,11 +2142,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : CompletedPoint)\n  (h_q_Valid : q.IsValid) :\n  as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n    let X := Field51_as_Nat q.X\n    let Y := Field51_as_Nat q.Y\n    let Z := Field51_as_Nat q.Z\n    let T := Field51_as_Nat q.T\n    let X' := Field51_as_Nat e.X\n    let Y' := Field51_as_Nat e.Y\n    let Z' := Field51_as_Nat e.Z\n    let T' := Field51_as_Nat e.T\n    X' % p = (X * T) % p ∧\n    Y' % p = (Y * Z) % p ∧\n    Z' % p = (Z * T) % p ∧\n    T' % p = (X * Y) % p ∧\n    (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n    (∀ i < 5, e.T[i]!.val < 2 ^ 52) ∧\n    e.IsValid ∧\n    e.toPoint = q.toPoint ⦄ := by ...",
+   "theorem as_extended_spec (q : CompletedPoint)\n    (h_q_Valid : q.IsValid) :\n    as_extended q ⦃ (e : edwards.EdwardsPoint) =>\n      let X := Field51_as_Nat q.X\n      let Y := Field51_as_Nat q.Y\n      let Z := Field51_as_Nat q.Z\n      let T := Field51_as_Nat q.T\n      let X' := Field51_as_Nat e.X\n      let Y' := Field51_as_Nat e.Y\n      let Z' := Field51_as_Nat e.Z\n      let T' := Field51_as_Nat e.T\n      X' % p = (X * T) % p ∧\n      Y' % p = (Y * Z) % p ∧\n      Z' % p = (Z * T) % p ∧\n      T' % p = (X * Y) % p ∧\n      (∀ i < 5, e.X[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, e.Y[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, e.Z[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, e.T[i]!.val < 2 ^ 52) ∧\n      e.IsValid ∧\n      e.toPoint = q.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.CompletedPoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
+   "/-- **Spec theorem for `backend.serial.curve_models.CompletedPoint.as_extended`**\n- No panic (always returns successfully)\n- Given input CompletedPoint with coordinates (X, Y, Z, T), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·T (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z·T (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\n- Output limb bounds: all coordinates have limbs < 2^52 (from mul_spec)\nThese formulas implement the conversion from completed ℙ¹ × ℙ¹ coordinates to extended\ntwisted Edwards ℙ³ coordinates. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
@@ -2335,11 +2337,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    spec identity (fun (q : ProjectiveNielsPoint) =>\n      Field51_as_Nat q.Y_plus_X = 1 ∧\n      Field51_as_Nat q.Y_minus_X = 1 ∧\n      Field51_as_Nat q.Z = 1 ∧\n      Field51_as_Nat q.T2d = 0) := by ...",
+   "theorem identity_spec :\n    identity ⦃ (result : ProjectiveNielsPoint) =>\n      Field51_as_Nat result.Y_plus_X = 1 ∧\n      Field51_as_Nat result.Y_minus_X = 1 ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T2d = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.IdentityProjectiveNielsPoint.identity`**:\n- No panic (always returns successfully)\n- The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)\n-/",
+   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**\n\nReturns the identity element of the Edwards curve in ProjectiveNiels coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
@@ -2379,11 +2381,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_assign_spec\n    (self other : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then other.Y_minus_X[i]!.val else self.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) ⦄ := by ...",
+   "theorem conditional_assign_spec\n    (self other : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_assign self other choice ⦃ (result : ProjectiveNielsPoint) =>\n      (∀ i < 5, result.Y_plus_X[i]!.val =\n        if choice.val = 1#u8 then other.Y_plus_X[i]!.val else self.Y_plus_X[i]!.val) ∧\n      (∀ i < 5, result.Y_minus_X[i]!.val =\n        if choice.val = 1#u8 then other.Y_minus_X[i]!.val else self.Y_minus_X[i]!.val) ∧\n      (∀ i < 5, result.Z[i]!.val =\n        if choice.val = 1#u8 then other.Z[i]!.val else self.Z[i]!.val) ∧\n      (∀ i < 5, result.T2d[i]!.val =\n        if choice.val = 1#u8 then other.T2d[i]!.val else self.T2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalAssign.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\nthe output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected: if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements\n-/",
+   "/-- **Spec theorem for\n`backend.serial.curve_models.ConditionallySelectableProjectiveNielsPoint.conditional_assign`**\n- No panic (always returns successfully)\n- Given inputs:\n  • a ProjectiveNielsPoint `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • a ProjectiveNielsPoint `other` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\nthe output ProjectiveNielsPoint computed by `conditional_assign self other choice` satisfies:\n- Each coordinate is conditionally selected:\n  if choice is 1, output = other; if choice is 0, output = self\n- The operation is performed in constant time for all field elements -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
@@ -2401,11 +2403,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ result =>\n    (∀ i < 5, result.Y_plus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧\n    (∀ i < 5, result.Y_minus_X[i]!.val =\n      if choice.val = 1#u8 then b.Y_minus_X[i]!.val else a.Y_minus_X[i]!.val) ∧\n    (∀ i < 5, result.Z[i]!.val =\n      if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧\n    (∀ i < 5, result.T2d[i]!.val =\n      if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) ⦄ := by ...",
+   "theorem conditional_select_spec\n    (a b : backend.serial.curve_models.ProjectiveNielsPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : ProjectiveNielsPoint) =>\n      (∀ i < 5, result.Y_plus_X[i]!.val =\n        if choice.val = 1#u8 then b.Y_plus_X[i]!.val else a.Y_plus_X[i]!.val) ∧\n      (∀ i < 5, result.Y_minus_X[i]!.val =\n        if choice.val = 1#u8 then b.Y_minus_X[i]!.val else a.Y_minus_X[i]!.val) ∧\n      (∀ i < 5, result.Z[i]!.val =\n        if choice.val = 1#u8 then b.Z[i]!.val else a.Z[i]!.val) ∧\n      (∀ i < 5, result.T2d[i]!.val =\n        if choice.val = 1#u8 then b.T2d[i]!.val else a.T2d[i]!.val) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/ConditionalSelect.lean",
    "spec_docstring":
-   "/--\n**Spec and proof concerning `backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**:\n- No panic (always returns successfully)\n- Given inputs:\n  • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\n  the output ProjectiveNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice)\n-/",
+   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.conditional_select`**\n- No panic (always returns successfully)\n- Given inputs:\n  • ProjectiveNielsPoint `a` with coordinates (Y_plus_X, Y_minus_X, Z, T2d),\n  • ProjectiveNielsPoint `b` with coordinates (Y_plus_X', Y_minus_X', Z', T2d'),\n  • a Choice `choice`,\n  the output ProjectiveNielsPoint has coordinates selected component-wise:\n  - If choice = 1, each coordinate equals the corresponding one of `b`\n  - If choice = 0, each coordinate equals the corresponding one of `a`\n  - The operation is constant-time (does not branch on choice) -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
@@ -2504,11 +2506,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_extended_spec (q : ProjectivePoint)\n  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :\nas_extended q ⦃ e =>\nlet X := Field51_as_Nat q.X\nlet Y := Field51_as_Nat q.Y\nlet Z := Field51_as_Nat q.Z\nlet X' := Field51_as_Nat e.X\nlet Y' := Field51_as_Nat e.Y\nlet Z' := Field51_as_Nat e.Z\nlet T' := Field51_as_Nat e.T\nX' % p = (X * Z) % p ∧\nY' % p = (Y * Z) % p ∧\nZ' % p = (Z^2) % p ∧\nT' % p = (X * Y) % p ⦄\n := by ...",
+   "theorem as_extended_spec\n    (q : ProjectivePoint)\n    (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)\n    (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)\n    (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54) :\n    as_extended q ⦃ (e : curve25519_dalek.edwards.EdwardsPoint) =>\n      let X := Field51_as_Nat q.X\n      let Y := Field51_as_Nat q.Y\n      let Z := Field51_as_Nat q.Z\n      let X' := Field51_as_Nat e.X\n      let Y' := Field51_as_Nat e.Y\n      let Z' := Field51_as_Nat e.Z\n      let T' := Field51_as_Nat e.T\n      X' % p = (X * Z) % p ∧\n      Y' % p = (Y * Z) % p ∧\n      Z' % p = (Z^2) % p ∧\n      T' % p = (X * Y) % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/AsExtended.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.as_extended`**:\n- No panic (always returns successfully)\n- Given input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·Z (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z² (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19\nThese formulas implement the (division-free) conversion from projective ℙ² coordinates to extended\ntwisted Edwards ℙ³ coordinates.\n-/",
+   "/-- **Spec theorem for\n`curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended`**\n\nGiven input ProjectivePoint with coordinates (X, Y, Z), the output EdwardsPoint (X', Y', Z', T')\nsatisfies the conversion formulas modulo p:\n- X' ≡ X·Z (mod p)\n- Y' ≡ Y·Z (mod p)\n- Z' ≡ Z² (mod p)\n- T' ≡ X·Y (mod p)\nwhere p = 2^255 - 19 -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended",
@@ -3161,7 +3163,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -4015,7 +4017,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L177-L192",
+   "lines": "L177-L190",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add",
    "is_relevant": true,
    "is_ignored": false,
@@ -4031,15 +4033,14 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop a b sum mask carry i ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
+   "theorem add_loop_spec (a b sum : Scalar52) (mask carry : U64) (i : Usize)\n    (ha : ∀ j < 5, a[j]!.val < 2 ^ 52) (hb : ∀ j < 5, b[j]!.val < 2 ^ 52)\n    (ha' : Scalar52_as_Nat a < 2 ^ 259) (hb' : Scalar52_as_Nat b < 2 ^ 259)\n    (hmask : mask.val = 2 ^ 52 - 1) (hi : i.val ≤ 5)\n    (hcarry : i.val = 5 → carry.val < 2 ^ 52)\n    (hcarry' : ∀ i < 5, carry.val < 2 ^ 53)\n    (hsum : ∀ j < 5, sum[j]!.val < 2 ^ 52)\n    (hsum' : ∀ j < 5, i.val ≤ j → sum[j]!.val = 0) :\n    add_loop { start := i, «end» := 5#usize } a b sum mask carry ⦃ (sum' : Scalar52) =>\n      (∀ j < 5, sum'[j]!.val < 2 ^ 52) ∧\n      (∀ j < i.val, sum'[j]!.val = sum[j]!.val) ∧\n      ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * sum'[j]!.val =\n        ∑ j ∈ Finset.Ico i.val 5, 2 ^ (52 * j) * (a[j]!.val + b[j]!.val) +\n        2 ^ (52 * i.val) * (carry.val / 2 ^ 52) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Scalar/Scalar52/Add.lean",
-   "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.scalar.Scalar52.add_loop`**:\n- Starting from index `i` with accumulator `sum` and carry `carry`\n- Computes limb-wise addition with carry propagation\n- Result limbs are bounded by 2^52\n- Parts of sum before index i are preserved\n- The result satisfies the modular arithmetic property -/",
+   "spec_docstring": null,
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L184-L188",
+   "lines": "L183-L186",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop",
    "is_relevant": true,
    "is_ignored": false,
@@ -4057,13 +4058,13 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
-   "lines": "L184-L188",
+   "lines": "L183-L186",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop.mutual",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
@@ -4080,7 +4081,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
-   "lines": "L338-L340",
+   "lines": "L336-L338",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
    "is_relevant": true,
@@ -4103,7 +4104,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L213-L226",
+   "lines": "L211-L224",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l",
    "is_relevant": true,
@@ -4124,7 +4125,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L218-L218",
+   "lines": "L216-L216",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop",
    "is_relevant": true,
@@ -4143,13 +4144,13 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
-   "lines": "L218-L218",
+   "lines": "L216-L216",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop.mutual",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
@@ -4260,7 +4261,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
-   "lines": "L345-L353",
+   "lines": "L343-L351",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery",
    "is_relevant": true,
@@ -4283,7 +4284,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
-   "lines": "L348-L351",
+   "lines": "L346-L349",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop",
    "is_relevant": true,
@@ -4305,7 +4306,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
-   "lines": "L326-L328",
+   "lines": "L324-L326",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
    "is_relevant": true,
@@ -4328,7 +4329,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
-   "lines": "L274-L307",
+   "lines": "L272-L305",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
    "is_relevant": true,
@@ -4352,7 +4353,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part1",
-   "lines": "L277-L280",
+   "lines": "L275-L278",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1",
    "is_relevant": true,
@@ -4374,7 +4375,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce::part2",
-   "lines": "L283-L286",
+   "lines": "L281-L284",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2",
    "is_relevant": true,
@@ -4395,7 +4396,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
-   "lines": "L332-L334",
+   "lines": "L330-L332",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square",
    "is_relevant": true,
@@ -4418,7 +4419,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
-   "lines": "L311-L314",
+   "lines": "L309-L312",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
    "is_relevant": true,
    "is_ignored": false,
@@ -4441,7 +4442,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
-   "lines": "L231-L245",
+   "lines": "L229-L243",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
    "is_relevant": true,
@@ -4464,7 +4465,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
-   "lines": "L319-L322",
+   "lines": "L317-L320",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
    "is_relevant": true,
    "is_ignored": true,
@@ -4488,7 +4489,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
-   "lines": "L250-L269",
+   "lines": "L248-L267",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
    "is_relevant": true,
@@ -4511,7 +4512,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L195-L211",
+   "lines": "L193-L209",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub",
    "is_relevant": true,
    "is_ignored": false,
@@ -4534,7 +4535,7 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L202-L206",
+   "lines": "L200-L204",
    "lean_name": "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop",
    "is_relevant": true,
    "is_ignored": false,
@@ -4552,13 +4553,13 @@
    "source": "curve25519-dalek/src/backend/serial/u64/scalar.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
-   "lines": "L202-L206",
+   "lines": "L200-L204",
    "lean_name":
    "curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop.mutual",
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
@@ -10194,7 +10195,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -10476,7 +10477,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -10740,7 +10741,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -10925,7 +10926,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": true,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":
@@ -11067,7 +11068,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies": []},
@@ -11124,7 +11125,7 @@
    "is_relevant": true,
    "is_ignored": false,
    "is_hidden": false,
-   "is_extraction_artifact": false,
+   "is_extraction_artifact": true,
    "fully_verified": false,
    "externally_verified": false,
    "dependencies":

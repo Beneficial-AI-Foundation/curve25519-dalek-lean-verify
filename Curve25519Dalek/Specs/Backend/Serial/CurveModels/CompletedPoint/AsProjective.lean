@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong
 -/
@@ -7,8 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Math.Edwards.Representation
-
-/-! # Spec Theorem for `CompletedPoint::as_projective`
+/-!
+# Spec theorem for `CompletedPoint::as_projective`
 
 Specification and proof for `CompletedPoint::as_projective`.
 
@@ -18,7 +18,7 @@ completed coordinates (i.e., with affine coordinates given via X/Z = x and Y/T =
 it computes an equivalent representation (X':Y':Z') in projective
 coordinates (i.e., with X'/Z' = x and Y'/Z' = y).
 
-**Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
+Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -46,29 +46,28 @@ Input bounds: all coordinates < 2^54.
 Output: arithmetic relations modulo p. -/
 @[step]
 theorem as_projective_spec_aux (q : CompletedPoint)
-  (h_qX_bounds : ∀ i, i < 5 → (q.X[i]!).val < 2 ^ 54)
-  (h_qY_bounds : ∀ i, i < 5 → (q.Y[i]!).val < 2 ^ 54)
-  (h_qZ_bounds : ∀ i, i < 5 → (q.Z[i]!).val < 2 ^ 54)
-  (h_qT_bounds : ∀ i, i < 5 → (q.T[i]!).val < 2 ^ 54) :
-as_projective q ⦃ proj =>
-let X := Field51_as_Nat q.X
-let Y := Field51_as_Nat q.Y
-let Z := Field51_as_Nat q.Z
-let T := Field51_as_Nat q.T
-let X' := Field51_as_Nat proj.X
-let Y' := Field51_as_Nat proj.Y
-let Z' := Field51_as_Nat proj.Z
-X' % p = (X * T) % p ∧
-Y' % p = (Y * Z) % p ∧
-Z' % p = (Z * T) % p ∧
--- Output bounds: mul produces < 2^52
-(∀ i < 5, proj.X[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, proj.Y[i]!.val < 2 ^ 52) ∧
-(∀ i < 5, proj.Z[i]!.val < 2 ^ 52) ⦄
-:= by
+    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 54)
+    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54)
+    (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54)
+    (h_qT_bounds : ∀ i < 5, (q.T[i]!).val < 2 ^ 54) :
+    as_projective q ⦃ (proj : ProjectivePoint) =>
+      let X := Field51_as_Nat q.X
+      let Y := Field51_as_Nat q.Y
+      let Z := Field51_as_Nat q.Z
+      let T := Field51_as_Nat q.T
+      let X' := Field51_as_Nat proj.X
+      let Y' := Field51_as_Nat proj.Y
+      let Z' := Field51_as_Nat proj.Z
+      X' % p = (X * T) % p ∧
+      Y' % p = (Y * Z) % p ∧
+      Z' % p = (Z * T) % p ∧
+      -- Output bounds: mul produces < 2^52
+      (∀ i < 5, proj.X[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, proj.Y[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, proj.Z[i]!.val < 2 ^ 52) ⦄ := by
   unfold as_projective
   step*
-  rw[← Nat.ModEq,← Nat.ModEq,← Nat.ModEq]
+  rw [← Nat.ModEq, ← Nat.ModEq, ← Nat.ModEq]
   simp_all
 
 end curve25519_dalek.backend.serial.curve_models.CompletedPoint
@@ -87,7 +86,8 @@ open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
 These lemmas factor out the key proof steps used in the main theorem:
 1. `as_projective_lift_to_field_eqs`: Lift modular arithmetic to field equalities
-2. `as_projective_on_curve`: Prove the projective on-curve equation from the completed on-curve equation
+2. `as_projective_on_curve`: Prove the projective on-curve equation from the
+   completed on-curve equation
 3. `as_projective_isValid_and_toPoint`: Combined validity and point equality proof
 -/
 
