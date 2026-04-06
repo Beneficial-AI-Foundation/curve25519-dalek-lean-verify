@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -14,10 +14,12 @@ import Curve25519Dalek.Math.Edwards.Curve
 import Curve25519Dalek.Math.Edwards.Representation
 import Mathlib.Data.ZMod.Basic
 
+-- Required for the #setup_aeneas_simps macro below
 set_option linter.hashCommand false
 #setup_aeneas_simps
 
-/-! # Spec Theorem for `ProjectivePoint::double`
+/-!
+# Spec theorem for `ProjectivePoint::double`
 
 Specification and proof for `ProjectivePoint::double`.
 
@@ -25,7 +27,7 @@ This function implements point doubling on the Curve25519 elliptic curve using p
 coordinates. Given a point P = (X:Y:Z), it computes 2P (the point added to itself via
 elliptic curve addition).
 
-**Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
+Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -53,45 +55,44 @@ natural language specs:
 - T' ≡ 2Z² - Y² + X² (mod p)
 -/
 
-/-- **Spec and proof concerning `backend.serial.curve_models.ProjectivePoint.double`**:
-- No panic (always returns successfully)
-- Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
+/-- **Spec theorem for
+`curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double`**
+
+Given input ProjectivePoint with coordinates (X, Y, Z), the output CompletedPoint (X', Y', Z', T')
 satisfies the point doubling formulas modulo p:
 - X' ≡ 2XY (mod p)
 - Y' ≡ Y² + X² (mod p)
 - Z' ≡ Y² - X² (mod p)
 - T' ≡ 2Z² - Y² + X² (mod p)
 where p = 2^255 - 19
-These formulas implement Edwards curve point doubling, computing P + P
-(elliptic curve point addition) where P = (X:Y:Z).
 
 Input bounds: X, Y limbs < 2^53 (for X + Y < 2^54), Z limbs < 2^54.
 Output bounds: X', Z', T' limbs < 2^52, Y' limbs < 2^53.
 
 TODO: Investigate if c.Y can achieve the tighter < 2^52 bound. Currently c.Y = YY + XX
-where YY, XX < 2^52, giving Y < 2^53.
--/
+where YY, XX < 2^52, giving Y < 2^53. -/
 @[step]
-theorem double_spec_aux (q : ProjectivePoint)
+theorem double_spec_aux
+    (q : ProjectivePoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
     (h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54) :
-    double q ⦃ c =>
-    let X := Field51_as_Nat q.X
-    let Y := Field51_as_Nat q.Y
-    let Z := Field51_as_Nat q.Z
-    let X' := Field51_as_Nat c.X
-    let Y' := Field51_as_Nat c.Y
-    let Z' := Field51_as_Nat c.Z
-    let T' := Field51_as_Nat c.T
-    X' % p = (2 * X * Y) % p ∧
-    Y' % p = (Y^2 + X^2) % p ∧
-    (Z' + X^2) % p = Y^2 % p ∧
-    (T' + Z') % p = (2 * Z^2) % p ∧
-    (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
-    (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
-    (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
+    double q ⦃ (c : CompletedPoint) =>
+      let X := Field51_as_Nat q.X
+      let Y := Field51_as_Nat q.Y
+      let Z := Field51_as_Nat q.Z
+      let X' := Field51_as_Nat c.X
+      let Y' := Field51_as_Nat c.Y
+      let Z' := Field51_as_Nat c.Z
+      let T' := Field51_as_Nat c.T
+      X' % p = (2 * X * Y) % p ∧
+      Y' % p = (Y^2 + X^2) % p ∧
+      (Z' + X^2) % p = Y^2 % p ∧
+      (T' + Z') % p = (2 * Z^2) % p ∧
+      (∀ i < 5, c.X[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, c.Y[i]!.val < 2 ^ 53) ∧
+      (∀ i < 5, c.Z[i]!.val < 2 ^ 52) ∧
+      (∀ i < 5, c.T[i]!.val < 2 ^ 52) ⦄ := by
   unfold double
   simp only [step_simps]
   let* ⟨ XX, XX_post1, XX_post2 ⟩ ← square_spec
@@ -125,8 +126,8 @@ theorem double_spec_aux (q : ProjectivePoint)
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.Y[i]!.val) ^ 2 +
         (∑ i ∈ Finset.range 5, 2^(51 * i) * q.X[i]!.val) ^ 2 [MOD p] := by
       apply Nat.ModEq.add
-      · grind
-      · grind
+      · grind only
+      · grind only
     apply Nat.ModEq.add_left_cancel hB_equiv; rw [add_comm]
     ring_nf at *
     rw [← Nat.ModEq] at fe_post2
@@ -142,8 +143,8 @@ theorem double_spec_aux (q : ProjectivePoint)
       simp_all [Finset.mem_range, Nat.mul_add]
     rw [h_YY_plus_XX]
     apply Nat.ModEq.add
-    · grind
-    · grind
+    · grind only
+    · grind only
   · -- (Z' + X^2) % p = Y^2 % p
     rw [← Nat.ModEq] at *; ring_nf at *;
     apply Nat.ModEq.trans (Nat.ModEq.add_left _ XX_post1.symm)
@@ -220,7 +221,8 @@ theorem double_spec
   use c
   constructor
   · exact h_run
-  obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ := double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
+  obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ :=
+    double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
   -- Setup curve identity from input validity
   have h_q_curve := hq_valid.on_curve
   have h_qZ_ne : q.Z.toField ≠ 0 := hq_valid.Z_ne_zero
@@ -277,10 +279,14 @@ theorem double_spec
     rw [h_YX_factor, h_yx_sq]
     ring
   -- Convert specific bounds to IsValid (< 2^54)
-  have hcX_valid : c.X.IsValid := fun i hi => Nat.lt_trans (hcX_bounds i hi) (by norm_num : 2^52 < 2^54)
-  have hcY_valid : c.Y.IsValid := fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
-  have hcZ_valid : c.Z.IsValid := fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
-  have hcT_valid : c.T.IsValid := fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcX_valid :
+    c.X.IsValid := fun i hi => Nat.lt_trans (hcX_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcY_valid :
+    c.Y.IsValid := fun i hi => Nat.lt_trans (hcY_bounds i hi) (by norm_num : 2^53 < 2^54)
+  have hcZ_valid :
+    c.Z.IsValid := fun i hi => Nat.lt_trans (hcZ_bounds i hi) (by norm_num : 2^52 < 2^54)
+  have hcT_valid :
+    c.T.IsValid := fun i hi => Nat.lt_trans (hcT_bounds i hi) (by norm_num : 2^52 < 2^54)
   have h_c_valid : c.IsValid := {
     X_valid := hcX_valid
     Y_valid := hcY_valid
@@ -308,7 +314,8 @@ theorem double_spec
       have hcZ_ne : Y^2 - X^2 ≠ 0 := by
         rw [h_YX_factor, h_yx_sq]
         apply mul_ne_zero hz2 h_denom_plus
-      have h_add_denom_ne : 1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y ≠ 0 := by
+      have h_add_denom_ne :
+          1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y ≠ 0 := by
         rw [h_qx, h_qy]
         convert h_denom_plus using 2
         simp only [hx_def, hy_def]; ring
