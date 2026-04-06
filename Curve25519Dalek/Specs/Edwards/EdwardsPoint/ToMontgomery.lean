@@ -364,14 +364,14 @@ theorem to_montgomery_spec (e : EdwardsPoint)
     (hvalid : e.IsValid)
     (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
     to_montgomery e ⦃ mp =>
-    (let Y := Field51_as_Nat e.Y
-    let Z := Field51_as_Nat e.Z
-    let u := U8x32_as_Nat mp
-    if Z % p = Y % p then
-      u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • e.toPoint) = 0)
-    else
+      let Y := Field51_as_Nat e.Y
+      let Z := Field51_as_Nat e.Z
+      let u := U8x32_as_Nat mp
+      if Z % p = Y % p then
+        u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • e.toPoint) = 0)
+      else
       ((u * Z) % p = (u * Y + (Z + Y)) % p) ∧
-    ( abs_montgomery (fromEdwards (e.toPoint)) = (MontgomeryPoint.mkPoint mp))) ⦄ := by
+      ( abs_montgomery (fromEdwards (e.toPoint)) = (MontgomeryPoint.mkPoint mp)) ⦄ := by
   unfold to_montgomery
   (step*; try grind)
   · -- First prove the arithmetic conjunct as a standalone hypothesis
