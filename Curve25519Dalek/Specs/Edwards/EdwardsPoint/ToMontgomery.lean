@@ -18,7 +18,8 @@ import Curve25519Dalek.Math.Montgomery.Representation
 Specification and proof for `EdwardsPoint::to_montgomery`.
 
 This function converts an EdwardsPoint from the twisted Edwards curve to the
-corresponding MontgomeryPoint (only the u-coordinate) on the Montgomery curve, using the birational map
+corresponding MontgomeryPoint (only the u-coordinate) on the Montgomery curve,
+using the birational map
 u = (1+y)/(1-y) = (Z+Y)/(Z-Y).
 
 **Source**: curve25519-dalek/src/edwards.rs
@@ -89,18 +90,6 @@ The full proof requires several supporting lemmas about `sqrt_checked`, `abs_edw
 `roots_B`, and the interaction of `% 2^255` with the field embedding.
 -/
 
-/-!
-## Supporting private lemmas
-
-These lemmas encapsulate the hard mathematical steps needed in the proof.
-The `sorry`s here represent gaps that are either:
-- Verified externally via Verus (identity/invalid cases)
-- Requiring deep parity infrastructure not yet formalized (v-coordinate matching)
-structured without direct use of sorry.
--/
-
-/-- When `u_0 = 0` in CurveField, `mkPoint a = T_point`.
-    Follows directly from the definition of `u_affine_toPoint`. -/
 lemma mkPoint_u_zero (a : montgomery.MontgomeryPoint)
     (h : (U8x32_as_Field a) = 0) :
     MontgomeryPoint.mkPoint a = T_point := by
@@ -108,18 +97,6 @@ lemma mkPoint_u_zero (a : montgomery.MontgomeryPoint)
   simp only [h, beq_self_eq_true]
   simp
 
-
-
-
-
-
-/-- The v-coordinate of `fromEdwards` equals the canonical v-coordinate of `mkPoint`.
-    Proof sketch:
-    1. `on_MontgomeryCurves`: v_E² = v_squared u (from the nonsingular certificate).
-    2. `sqrt_checked_spec`: r² = v_squared u where r = (sqrt_checked (v_squared u)).1.
-    3. `abs_edwards_eq_of_sq_eq`: v_E² = r² implies abs_edwards(v_E) = abs_edwards(r) = r.
-    4. Parity: roots_B is chosen with even parity so abs_edwards(v_E) = v_E.
-    Step 4 is verified externally (parity of roots_B). -/
 private lemma v_coord_birational_match
     (e : Edwards.Point Edwards.Ed25519)
     (hy_ne_1 : e.y ≠ 1) (hx_ne_0 : e.x ≠ 0)
@@ -129,27 +106,20 @@ private lemma v_coord_birational_match
     (curve25519_dalek.math.sqrt_checked
       (v_squared ((1 + e.y) / (1 - e.y)))).1 =
     math.abs_edwards (Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x)) := by
-  -- Abbreviate the birational coordinates
   set u := (1 + e.y) / (1 - e.y) with hu_def
   set v_E := Curve25519.roots_B * (1 + e.y) / ((1 - e.y) * e.x) with hv_E_def
-  -- Step 1: v_E² = v_squared u  (Montgomery curve equation via birational map)
   have h_v_sq : v_E ^ 2 = v_squared u := by
     have h := on_MontgomeryCurves e hy_ne_1 hx_ne_0
     simp only at h
     simp only [v_squared]
     exact h
-  -- Step 2: (sqrt_checked (v_squared u)).1² = v_squared u
   have h_r_sq : (curve25519_dalek.math.sqrt_checked (v_squared u)).1 ^ 2 = v_squared u :=
     curve25519_dalek.math.sqrt_checked_spec (v_squared u)
       (Prod.mk.eta (p := curve25519_dalek.math.sqrt_checked (v_squared u))).symm h_sqrt_true
-  -- Step 3: abs_edwards of both square roots coincide
   have h_abs_eq : curve25519_dalek.math.abs_edwards
         (curve25519_dalek.math.sqrt_checked (v_squared u)).1 =
       curve25519_dalek.math.abs_edwards v_E :=
     curve25519_dalek.math.abs_edwards_eq_of_sq_eq (by rw [h_r_sq, h_v_sq])
-  -- Step 4: sqrt_checked always returns the canonical (even-parity) root
-  -- Since v_squared u is a square (h_sqrt_true), sqrt_checked returns abs_edwards of some y',
-  -- so abs_edwards of that result equals itself (abs_edwards is idempotent on canonical values)
   have h_is_sq : IsSquare (v_squared u) :=
     (curve25519_dalek.math.sqrt_checked_iff_isSquare (v_squared u)
       (Prod.mk.eta (p := curve25519_dalek.math.sqrt_checked (v_squared u))).symm).mp h_sqrt_true
@@ -157,32 +127,18 @@ private lemma v_coord_birational_match
       curve25519_dalek.math.abs_edwards (Classical.choose h_is_sq) := by
     unfold curve25519_dalek.math.sqrt_checked
     rw [dif_pos h_is_sq]
-  -- The returned root has even parity (is_negative = false)
   have h_r_not_neg : curve25519_dalek.math.is_negative
       (curve25519_dalek.math.sqrt_checked (v_squared u)).1 = false := by
     rw [h_r_unfold]
     exact curve25519_dalek.math.is_negative_abs_edwards _
-  -- Therefore abs_edwards is the identity on the returned root
   have h_r_canon : curve25519_dalek.math.abs_edwards
         (curve25519_dalek.math.sqrt_checked (v_squared u)).1 =
       (curve25519_dalek.math.sqrt_checked (v_squared u)).1 := by
     unfold curve25519_dalek.math.abs_edwards
     rw [h_r_not_neg]
     simp
-  -- Step 5: v_E is already in canonical form (parity of roots_B — verified externally)
-  -- roots_B = Classical.choose B_d_relation is chosen with even parity
   simp_all
 
-/-!
-## Key sub-lemmas extracted from the main proof body
-
-These lemmas capture the non-trivial mathematical steps that appear inline in
-`to_montgomery_birational_eq`, making the main proof cleaner and more readable.
--/
-
-/-- On Ed25519, if `e.x = 0` and `e.y ≠ 1`, then `e.y = -1`.
-    Proof: the curve equation `a*x² + y² = 1 + d*x²*y²` with `x = 0` gives `y² = 1`,
-    so `y = 1` or `y = -1`; the `y ≠ 1` hypothesis forces `y = -1`. -/
 private lemma y_eq_neg_one_of_x_eq_zero
     (e : Edwards.Point Edwards.Ed25519)
     (hx : e.x = 0) (hy_ne_1 : e.y ≠ 1) :
@@ -192,9 +148,6 @@ private lemma y_eq_neg_one_of_x_eq_zero
   simp [hx, mul_zero, zero_mul, zero_add] at hcurve
   grind
 
-/-- On Ed25519, if `e.y = -1`, then `e.x = 0`.
-    Proof: the curve equation with `y = -1` and `a = -1` gives
-    `-x² + 1 = 1 + d*x²`, so `x²*(-1 - d) = 0`; since `-1 - d ≠ 0` we get `x = 0`. -/
 private lemma x_eq_zero_of_y_eq_neg_one
     (e : Edwards.Point Edwards.Ed25519)
     (hy : e.y = -1) :
@@ -210,9 +163,6 @@ private lemma x_eq_zero_of_y_eq_neg_one
     have : (-1 : CurveField) - Edwards.Ed25519.d ≠ 0 := by decide
     exact this h
 
-/-- The birational u-coordinate is nonzero when `e.x ≠ 0` and `e.y ≠ 1`.
-    Proof: if `(1 + e.y) / (1 - e.y) = 0` then `1 + e.y = 0` (since `1 - e.y ≠ 0`),
-    giving `e.y = -1`, which by `x_eq_zero_of_y_eq_neg_one` implies `e.x = 0`, contradiction. -/
 private lemma birational_u_ne_zero_of_x_ne_zero
     (e : Edwards.Point Edwards.Ed25519)
     (hy_ne_1 : e.y ≠ 1) (hx : e.x ≠ 0) :
@@ -224,9 +174,6 @@ private lemma birational_u_ne_zero_of_x_ne_zero
   have hy_m1 : e.y = -1 := by grind
   exact hx (x_eq_zero_of_y_eq_neg_one e hy_m1)
 
-/-- `v_squared u` is a perfect square, witnessed by the Edwards-to-Montgomery v-coordinate.
-    When `(u, v_E)` is the image of a nonsingular Edwards point under the birational map,
-    the Montgomery curve equation gives `v_E² = v_squared u`. -/
 private lemma v_squared_isSquare_of_nonsingular
     (e : Edwards.Point Edwards.Ed25519)
     (a : montgomery.MontgomeryPoint)
@@ -249,8 +196,6 @@ theorem modEq_zero_iff (a n : ℕ) : a ≡ 0 [MOD n] ↔  a % n = 0 := by simp [
 lemma abs_T_point : abs_montgomery T_point = T_point:= by
   unfold T_point abs_montgomery
   simp
-
-
 
 theorem to_montgomery_birational_zero
     (e : EdwardsPoint)
@@ -284,16 +229,13 @@ theorem to_montgomery_birational_eq
         u % p = 0
       else
         (u * Z) % p = (u * Y + (Z + Y)) % p)
-    (hzy : Field51_as_Nat e.Z % p ≠ Field51_as_Nat e.Y % p) :
-   abs_montgomery (fromEdwards e.toPoint) = MontgomeryPoint.mkPoint a := by
+      (hzy : Field51_as_Nat e.Z % p ≠ Field51_as_Nat e.Y % p) :
+    abs_montgomery (fromEdwards e.toPoint) = MontgomeryPoint.mkPoint a := by
   simp only at h_arith
   simp only [hzy, ↓reduceIte] at h_arith
-    -- Z_f ≠ Y_f in CurveField
   have hne : (Field51_as_Nat e.Z : CurveField) ≠ Field51_as_Nat e.Y := by
     intro h
     exact hzy ((Montgomery.lift_mod_eq_iff _ _).mpr h)
-    -- **Step 1**: Lift h_arith from ℕ to CurveField:
-    -- From (u*Z) % p = (u*Y + Z + Y) % p, get u_field * Z_f = u_field * Y_f + Z_f + Y_f
   have h_field : (U8x32_as_Nat a : CurveField) * Field51_as_Nat e.Z =
         (U8x32_as_Nat a : CurveField) * Field51_as_Nat e.Y +
         ((Field51_as_Nat e.Z : CurveField) + Field51_as_Nat e.Y) := by
@@ -359,7 +301,7 @@ theorem to_montgomery_birational_eq
       rw[hu_bira]  at this
       rw[this]
 
-@[step] -- proven in Verus
+@[step]
 theorem to_montgomery_spec (e : EdwardsPoint)
     (hvalid : e.IsValid)
     (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :
@@ -374,8 +316,7 @@ theorem to_montgomery_spec (e : EdwardsPoint)
       ( abs_montgomery (fromEdwards (e.toPoint)) = (MontgomeryPoint.mkPoint mp)) ⦄ := by
   unfold to_montgomery
   (step*; try grind)
-  · -- First prove the arithmetic conjunct as a standalone hypothesis
-    have h_arith : (let Y := Field51_as_Nat e.Y; let Z := Field51_as_Nat e.Z;
+  · have h_arith : (let Y := Field51_as_Nat e.Y; let Z := Field51_as_Nat e.Z;
         let u := U8x32_as_Nat a;
         if Z % p = Y % p then u % p = 0
         else  (u * Z) % p = (u * Y + (Z + Y)) % p) := by
@@ -386,7 +327,6 @@ theorem to_montgomery_spec (e : EdwardsPoint)
           rw [h_zy, ← Nat.ModEq] at W_post2
           conv_rhs at W_post2 => rw [← Nat.zero_add (Field51_as_Nat e.Y)]
           exact Nat.ModEq.add_right_cancel' (Field51_as_Nat e.Y) W_post2
-        -- fe is the invert result — in WP mode, fe_post2 is the zero case
         rw [a_post1, u_post1, Nat.mul_mod, fe_post2 h_W_zero, mul_zero, Nat.zero_mod]
       · rename_i h_zy
         have h_W_neq_zero : Field51_as_Nat W % p ≠ 0 := by
@@ -396,7 +336,6 @@ theorem to_montgomery_spec (e : EdwardsPoint)
         have h_W_inv := fe_post1 h_W_neq_zero
         simp at h_W_inv
         ring_nf at h_W_inv
-        -- Derive the U = Y + Z equation
         have h_U_eq : Field51_as_Nat U = Field51_as_Nat e.Y + Field51_as_Nat e.Z := by
           unfold Field51_as_Nat
           rw [← Finset.sum_add_distrib]
@@ -404,8 +343,8 @@ theorem to_montgomery_spec (e : EdwardsPoint)
           intro i hi
           rw [U_post1 i (Finset.mem_range.mp hi)]
           ring
-        -- Derive the key congruence: a * W ≡ Y + Z [MOD p]
-        have h_elim : U8x32_as_Nat a * Field51_as_Nat W ≡ Field51_as_Nat e.Y + Field51_as_Nat e.Z [MOD p] := by
+        have h_elim : U8x32_as_Nat a * Field51_as_Nat W ≡
+          Field51_as_Nat e.Y + Field51_as_Nat e.Z [MOD p] := by
           calc
             U8x32_as_Nat a * Field51_as_Nat W ≡
                 Field51_as_Nat u * Field51_as_Nat W [MOD p] := by
@@ -413,13 +352,15 @@ theorem to_montgomery_spec (e : EdwardsPoint)
             _ ≡ (Field51_as_Nat U * Field51_as_Nat fe) * Field51_as_Nat W [MOD p] := by
                   simpa using u_post1.mul_right (Field51_as_Nat W)
             _ ≡ Field51_as_Nat U [MOD p] := by
-                  rw [Nat.mul_assoc]
-                  simpa using @Nat.ModEq.mul_left p (Field51_as_Nat fe * Field51_as_Nat W) 1 (Field51_as_Nat U) h_W_inv
+              rw [Nat.mul_assoc]
+              simpa using @Nat.ModEq.mul_left p (Field51_as_Nat fe *
+              Field51_as_Nat W) 1 (Field51_as_Nat U) h_W_inv
             _ ≡ Field51_as_Nat e.Y + Field51_as_Nat e.Z [MOD p] := by
                   unfold Nat.ModEq; simp only [h_U_eq]
         rw [Nat.mul_mod, ← W_post2, Nat.add_mod, ← Nat.mul_mod, Nat.mul_add, ← Nat.ModEq]
         ring_nf
-        have h_sum : U8x32_as_Nat a * (Field51_as_Nat W % p) + U8x32_as_Nat a * (Field51_as_Nat e.Y % p)
+        have h_sum : U8x32_as_Nat a * (Field51_as_Nat W % p) +
+            U8x32_as_Nat a * (Field51_as_Nat e.Y % p)
             ≡ U8x32_as_Nat a * Field51_as_Nat W + U8x32_as_Nat a * Field51_as_Nat e.Y [MOD p] :=
             (Nat.ModEq.mul_left (U8x32_as_Nat a) (Nat.mod_modEq (Field51_as_Nat W) p)).add
             (Nat.ModEq.mul_left (U8x32_as_Nat a) (Nat.mod_modEq (Field51_as_Nat e.Y) p))
