@@ -44,7 +44,8 @@ natural language specs:
 - The returned MontgomeryPoint matches the clamped scalar multiplication result
 -/
 @[step]
-theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
+theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul_clamped P bytes ⦃ res =>
       (∃ clamped_scalar,
       h ∣ U8x32_as_Nat clamped_scalar ∧
@@ -54,9 +55,11 @@ theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize) :
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
   unfold mul_clamped
   step*
+  have :=scalar.U8x32_as_Nat_eq_foldr' a
+  rw [this] at res_post
   have := Nat.mod_eq_of_lt  a_post2
-  rw[this] at res_post
+  rw [this] at res_post
+  simp only [scalar.U8x32_as_Nat_eq_foldr', Nat.reducePow]
   exact ⟨a, a_post1, a_post2, a_post3, res_post⟩
-
 
 end curve25519_dalek.montgomery.MontgomeryPoint

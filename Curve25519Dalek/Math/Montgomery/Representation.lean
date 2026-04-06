@@ -147,14 +147,14 @@ section MontgomeryPoint
 def v_squared (u : CurveField) : CurveField := u ^ 3 + Curve25519.A * u ^ 2 + u
 
 noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
-    if h_invalid : !(curve25519_dalek.math.sqrt_checked (v_squared u)).2 || (u == 0) then
+    if  h_y_eq_false:u == 0 then
+      T_point
+    else
+    if h_sq_not : !(curve25519_dalek.math.sqrt_checked (v_squared u)).2  then
       T_point
     else
       .some (x := u) (y := (curve25519_dalek.math.sqrt_checked (v_squared u)).1) (h := by
-        replace h_invalid := Bool.eq_false_iff.mpr h_invalid
-        rw [Bool.or_eq_false_iff] at h_invalid
-        obtain ⟨h_sq_not, h_y_eq_false⟩ := h_invalid
-        simp only [Bool.not_eq_eq_eq_not, Bool.not_false] at h_sq_not
+        simp only [Bool.not_eq_eq_eq_not] at h_sq_not
         have h_call : curve25519_dalek.math.sqrt_checked (v_squared u) =
           ((curve25519_dalek.math.sqrt_checked (v_squared u)).1,
            (curve25519_dalek.math.sqrt_checked (v_squared u)).2) :=
@@ -163,7 +163,10 @@ noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
             u ^ 3 + Curve25519.A * u ^ 2 + u := by
           apply sqrt_checked_spec (v_squared u)
           · exact h_call
-          · exact h_sq_not
+          · simp only [Bool.not_true] at h_sq_not
+            cases h : (curve25519_dalek.math.sqrt_checked (v_squared u)).2
+            · exact absurd h h_sq_not
+            · rfl
         apply (nonsingular_iff u _).mpr
         rw [WeierstrassCurve.Affine.equation_iff]
         simp only [MontgomeryCurveCurve25519]
@@ -191,8 +194,56 @@ theorem non_u_affine_toPoint_spec {u v : CurveField}
   simp only [equation]
   ring
 
+
+
 noncomputable def MontgomeryPoint.mkPoint (m : MontgomeryPoint) : Point:=
-    MontgomeryPoint.u_affine_toPoint  (((U8x32_as_Nat m) % 2 ^255):ℕ )
+    MontgomeryPoint.u_affine_toPoint (U8x32_as_Field m)
+
+noncomputable def abs_montgomery1 : Point → Point
+  | .zero => 0
+  | e@(.some (x := _) (y := v) (h := _)) =>
+    if is_negative v then -e else e
+
+
+noncomputable def abs_montgomery : Point → Point
+  | .zero => 0
+  | e@(.some (x := u) (y := v) (h := h)) =>
+      .some (x := u) (y := abs_edwards v) (h := by
+      apply (nonsingular_iff u _).mpr
+      rw [WeierstrassCurve.Affine.equation_iff]
+      simp only [abs_edwards_sq, MontgomeryCurveCurve25519, zero_mul, add_zero, one_mul]
+      rw[nonsingular_iff u _] at h
+      rw [WeierstrassCurve.Affine.equation_iff] at h
+      simp only [MontgomeryCurveCurve25519, zero_mul, add_zero, one_mul] at h
+      exact h)
+
+
+lemma abs_eq_some (u v u₁ v₁ : CurveField)
+  (h : MontgomeryCurveCurve25519.Nonsingular u v)
+  (h₁ : MontgomeryCurveCurve25519.Nonsingular u₁ v₁)
+  (hx : u = u₁)
+  (hy : abs_edwards v = v₁) :
+  abs_montgomery (WeierstrassCurve.Affine.Point.some h)
+  = (WeierstrassCurve.Affine.Point.some h₁) := by
+  unfold abs_montgomery
+  simp_all
+
+
+lemma is_negative_eq (u v : CurveField)
+  (h : MontgomeryCurveCurve25519.Nonsingular u v)
+  (hv : is_negative v) :
+  abs_montgomery (WeierstrassCurve.Affine.Point.some h)
+  = -(WeierstrassCurve.Affine.Point.some h) := by
+  unfold abs_montgomery
+  simp[MontgomeryCurveCurve25519, abs_edwards, hv]
+
+lemma cast_zero (res : MontgomeryPoint)
+  (hmod : U8x32_as_Nat res % p = 0) :
+    U8x32_as_Field res = 0 := by
+    have := Edwards.lift_mod_eq (U8x32_as_Nat res) 0 (by
+    simpa [Nat.zero_mod] using hmod)
+    rw [U8x32_as_Field_eq_cast, this]
+    simp only [Nat.reducePow, Nat.reduceSub, Nat.cast_zero]
 
 end MontgomeryPoint
 

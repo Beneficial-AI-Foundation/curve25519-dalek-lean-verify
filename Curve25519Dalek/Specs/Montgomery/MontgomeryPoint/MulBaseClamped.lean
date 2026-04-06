@@ -38,13 +38,14 @@ natural language specs:
 • The result is the Montgomery basepoint multiplication of the clamped scalar
 -/
 
-/--
+/-
 **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
 - No panic (always returns successfully)
 - Clamps input bytes with `scalar.clamp_integer`
 - Delegates to `montgomery.MontgomeryPoint.mul_base` with the clamped scalar
 - The returned MontgomeryPoint matches the basepoint multiplication result
 -/
+
 @[step]
 theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     mul_base_clamped bytes ⦃ result =>
@@ -52,9 +53,14 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
     h ∣ clamped_scalar_nat ∧
     clamped_scalar_nat < 2 ^ 255 ∧
     2 ^ 254 ≤ clamped_scalar_nat ∧
-     MontgomeryPoint.mkPoint result = clamped_scalar_nat • (fromEdwards _root_.Edwards.basepoint)) ⦄    := by
+    (if (clamped_scalar_nat • Edwards.basepoint).y = 1 then
+        MontgomeryPoint.mkPoint result = T_point
+      else MontgomeryPoint.mkPoint result =
+        abs_montgomery (clamped_scalar_nat • fromEdwards _root_.Edwards.basepoint))) ⦄ := by
    unfold mul_base_clamped
-   step*
-   exact ⟨U8x32_as_Nat a, a_post1, a_post2, a_post3, result_post⟩
+   step with scalar.clamp_integer_spec
+   step with mul_base_spec
+   use scalar.U8x32_as_Nat_foldr a
+   simp_all[scalar.U8x32_as_Nat_eq_foldr']
 
 end curve25519_dalek.montgomery.MontgomeryPoint
