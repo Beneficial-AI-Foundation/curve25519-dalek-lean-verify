@@ -1,16 +1,13 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
-
-
-/-! # Spec Theorem for `CompletedPoint::sub`
-
-Specification and proof for `CompletedPoint::sub`.
+/-!
+# Spec theorem for `ProjectiveNielsPoint::sub`
 
 This function implements the mixed subtraction of a ProjectiveNielsPoint from an
 Edwards point in extended coordinates, returning the result in completed
@@ -32,7 +29,7 @@ The concrete formulas are:
 - Z'        = ZZ2 − TT2d
 - T'        = ZZ2 + TT2d
 
-**Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
+Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
@@ -642,12 +639,18 @@ private lemma sub_isValid_and_toPoint
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
       hX_factored hY_factored hZ_factored hT_factored
 
+/-- **Spec theorem for
+`curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub`**
+
+Computes `self - other` as a CompletedPoint: the result is valid and represents
+the difference of the two input points. -/
 @[step]
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
-    Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub self other ⦃ c =>
-    c.IsValid ∧ c.toPoint = self.toPoint - other.toPoint ⦄ := by
+    sub self other ⦃ (c : CompletedPoint) =>
+      c.IsValid ∧
+      c.toPoint = self.toPoint - other.toPoint ⦄ := by
   obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     sub_spec_bounds' self hself other hother
   simp only [spec]

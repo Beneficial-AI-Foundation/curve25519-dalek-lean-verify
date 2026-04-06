@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong, Oliver Butterley
 -/
@@ -11,7 +11,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Sub
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.AddAssign
 
-/-! # Spec Theorem for `CompletedPoint::add`
+/-!
+# Spec theorem for `CompletedPoint::add`
 
 Specification and proof for `CompletedPoint::add`.
 
@@ -35,13 +36,17 @@ The concrete formulas are:
 - Z'        = ZZ2 + TT2d
 - T'        = ZZ2 − TT2d
 
-**Source**: curve25519-dalek/src/backend/serial/curve_models/mod.rs
+Source: "curve25519-dalek/src/backend/serial/curve_models/mod.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.curve_models
-open curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+open curve25519_dalek.Shared0EdwardsPoint.Insts
+open CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+open curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts
+open CoreOpsArithAddAssignSharedAFieldElement51
+open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51
 namespace curve25519_dalek.backend.serial.curve_models.CompletedPoint
 
 /-
@@ -78,10 +83,10 @@ returning the result in completed coordinates.
 theorem add_assign_spec' (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 55) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi hi0
     have :(a[i]!).val + (b[i]!).val < 2 ^ 54 + 2 ^ 52:= by
@@ -89,7 +94,7 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
     apply le_trans (le_of_lt this)
     grind only [= U64.max_eq]
   obtain ⟨w, hw_ok, hw_eq, hw_lt⟩  := spec_imp_exists
-    (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec
+    (add_assign_loop_spec
       a b 0#usize (by simp) add_lt)
   simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow,
     exists_eq_left']
@@ -102,7 +107,7 @@ theorem add_assign_spec' (a b : Array U64 5#usize)
 
 theorem add_spec' {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 54) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^55) := by
   unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
@@ -113,17 +118,18 @@ theorem add_spec' {a b : Array U64 5#usize}
 theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 53) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 52 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
     apply le_trans (le_of_lt this); grind only [= U64.max_eq]
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
-  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (add_assign_loop_spec a b 0#usize (by simp) add_lt)
+  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
+  Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
   · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
@@ -135,17 +141,18 @@ theorem add_assign_spec_52_52 (a b : Array U64 5#usize)
 theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53)
     (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign a b = ok result ∧
+    ∃ result, add_assign a b = ok result ∧
     (∀ i < 5, (result[i]!).val = (a[i]!).val + (b[i]!).val) ∧
     (∀ i < 5, result[i]!.val < 2 ^ 54) := by
-  unfold backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign
+  unfold add_assign
   have add_lt: ∀ j < 5, (0#usize).val ≤ j → (a[j]!).val + (b[j]!).val ≤ U64.max := by
     intro i hi _
     have : (a[i]!).val + (b[i]!).val < 2 ^ 53 + 2 ^ 52 := by
       have := ha i hi; have := hb i hi; omega
     apply le_trans (le_of_lt this); grind only [= U64.max_eq]
-  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec a b 0#usize (by simp) add_lt)
-  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
+  obtain ⟨w, hw_ok, hw_eq, _⟩ := spec_imp_exists (add_assign_loop_spec a b 0#usize (by simp) add_lt)
+  simp only [hw_ok, ok.injEq, Array.getElem!_Nat_eq,
+             List.getElem!_eq_getElem?_getD, Nat.reducePow, exists_eq_left']
   refine ⟨fun i hi ↦ ?_, fun i hi ↦ ?_⟩
   · simpa using hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
   · have h := hw_eq i hi (by exact Nat.le_of_ble_eq_true rfl)
@@ -156,7 +163,7 @@ theorem add_assign_spec_53_52 (a b : Array U64 5#usize)
 /-- Tighter add spec using Add.add: (< 2^52) + (< 2^52) → < 2^53 -/
 theorem add_spec_52_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 52) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^53) := by
   unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
@@ -166,7 +173,7 @@ theorem add_spec_52_52 {a b : Array U64 5#usize}
 /-- Tighter add spec using Add.add: (< 2^53) + (< 2^52) → < 2^54 -/
 theorem add_spec_53_52 {a b : Array U64 5#usize}
     (ha : ∀ i < 5, a[i]!.val < 2 ^ 53) (hb : ∀ i < 5, b[i]!.val < 2 ^ 52) :
-    ∃ result, Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add a b = ok result ∧
+    ∃ result, add a b = ok result ∧
     (∀ i < 5, result[i]!.val = a[i]!.val + b[i]!.val) ∧
     (∀ i < 5, result[i]!.val < 2^54) := by
   unfold Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add
@@ -304,7 +311,7 @@ theorem add_spec_aux_54_52_53_52
     (∀ i < 5, c.Y[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.Z[i]!.val < 2 ^ 54) ∧
     (∀ i < 5, c.T[i]!.val < 2 ^ 54) ⦄ := by
-  unfold add
+  unfold Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add
   simp only [step_simps]
   let* ⟨ Y_plus_X, Y_plus_X_post1, Y_plus_X_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec
@@ -727,20 +734,20 @@ private lemma add_spec_algebraic
     hX_factored hY_factored hZ_factored hT_factored h_denom_plus h_denom_minus
 
 
-/- Spec for `add`.
+/-- **Spec theorem for `curve25519_dalek.backend.serial.curve_models.CompletedPoint.add`**
 The theorem states that adding a valid EdwardsPoint with a valid ProjectiveNielsPoint:
 1. Always succeeds
 2. The output CompletedPoint is valid (bounds and algebraic properties)
 3. The output represents the sum of the input points
-The mixed addition formulas implement elliptic curve point addition on twisted Edwards curves.
--/
+The mixed addition formulas implement elliptic curve point addition on twisted Edwards curves. -/
 @[step]
 theorem add_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
     (other : ProjectiveNielsPoint) (hother : other.IsValid) :
-    add self other ⦃ c =>
-    c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by
-  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
+    add self other ⦃ (c : CompletedPoint) =>
+      c.IsValid ∧ c.toPoint = self.toPoint + other.toPoint ⦄ := by
+  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds,
+   hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     add_spec_bounds self hself other hother
   simp only [spec]
   apply exists_imp_spec
