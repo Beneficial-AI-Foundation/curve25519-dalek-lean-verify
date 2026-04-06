@@ -45,7 +45,7 @@ natural language specs:
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
-@[step, externally_verified]
+@[step]
 -- proven in Verus
 theorem sub_spec
     (self other : edwards.EdwardsPoint)

@@ -6191,7 +6191,8 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"verified": true,
    "specified": true,
-   "spec_statement": null,
+   "spec_statement":
+   "theorem to_montgomery_spec (e : EdwardsPoint)\n    (hvalid : e.IsValid)\n    (h_Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53) (h_Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53) :\n    to_montgomery e ⦃ mp =>\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let u := U8x32_as_Nat mp\n      if Z % p = Y % p then\n        u % p = 0 ∧ (∀ n : ℕ, fromEdwards (n • e.toPoint) = 0)\n      else\n      ((u * Z) % p = (u * Y + (Z + Y)) % p) ∧\n      ( abs_montgomery (fromEdwards (e.toPoint)) = (MontgomeryPoint.mkPoint mp)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToMontgomery.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/edwards.rs",
