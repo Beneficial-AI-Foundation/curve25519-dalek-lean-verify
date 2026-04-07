@@ -212,7 +212,8 @@ private lemma inv_step
   push_cast [Finset.sum_range_succ]
   have h_nibble := nibble_identity (self.bytes[i]!).val i
   simp only [Array.getElem!_Nat_eq, add_zero, add_assoc, add_right_inj]
-  simp only [Array.getElem!_Nat_eq, Int.natCast_emod, Nat.cast_ofNat, mul_comm, Int.natCast_ediv] at h_nibble
+  simp only [Array.getElem!_Nat_eq, Int.natCast_emod, Nat.cast_ofNat, mul_comm, Int.natCast_ediv]
+    at h_nibble
   simp only [mul_comm]
   rw[h_nibble]
   simp only [mul_eq_mul_right_iff, Int.natCast_eq_zero]
@@ -313,7 +314,8 @@ private theorem as_radix_16_loop0_spec_strong
       have : ¬j = 2 * ↑i +1 := by grind
       simp only [this, not_false_eq_true, forall_const] at eq1
       simp only [Array.getElem!_Nat_eq, eq1, eq]
-    have ha_later : ∀ j, 2 * (i.val + 1) ≤ j → j < 64 → (a[j]! : Std.I8).val = (output[j]!).val := by
+    have ha_later : ∀ j, 2 * (i.val + 1) ≤ j → j < 64 →
+      (a[j]! : Std.I8).val = (output[j]!).val := by
       intro j hj1 hj2
       have eq := h_upd1 j
       simp only [hi3, ne_eq, Array.getElem!_Nat_eq] at eq
@@ -479,7 +481,8 @@ private theorem isize_shiftLeft_4_spec (i : I8)
   simp only [HShiftLeft.hShiftLeft, IScalar.shiftLeft_IScalar, IScalar.shiftLeft,
              IScalar.toNat, IScalar.val]
   norm_num
-  simp only [IScalarTy.I32_numBits_eq, BitVec.reduceToInt, Nat.ofNat_nonneg, ↓reduceIte, Int.reduceLT,
+  simp only [IScalarTy.I32_numBits_eq, BitVec.reduceToInt,
+    Nat.ofNat_nonneg, ↓reduceIte, Int.reduceLT,
     IScalarTy.I8_numBits_eq, Int.reduceToNat, spec_ok]
   simp only [HShiftLeft.hShiftLeft]
   have hbv : (i.bv.shiftLeft 4 : BitVec 8) = i.bv * (16 : BitVec 8) := by
