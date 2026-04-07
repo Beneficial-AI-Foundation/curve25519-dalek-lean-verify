@@ -175,9 +175,9 @@ noncomputable def MontgomeryPoint.u_affine_toPoint (u : CurveField) : Point:=
      )
 
 theorem Aux_u_affine_toPoint_spec {u v : CurveField}
-  (non : u ≠ 0)
-  (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
-   ((sqrt_checked (u ^ 3 + Curve25519.A * u ^ 2 + u)).2 = false ∨ u = 0) = False:= by
+    (non : u ≠ 0)
+    (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
+    ((sqrt_checked (u ^ 3 + Curve25519.A * u ^ 2 + u)).2 = false ∨ u = 0) = False := by
   have is_sq : IsSquare (u ^ 3 + Curve25519.A * u ^ 2 + u) := by
     use v
     rw [sq] at equation
@@ -186,10 +186,10 @@ theorem Aux_u_affine_toPoint_spec {u v : CurveField}
   simp only [is_sq, ↓reduceDIte, Bool.true_eq_false, non, or_self]
 
 theorem non_u_affine_toPoint_spec {u v : CurveField}
-  (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
-  MontgomeryCurveCurve25519.Nonsingular u v := by
-  apply  (nonsingular_iff u v).mpr
-  rw[WeierstrassCurve.Affine.equation_iff]
+    (equation : v ^ 2 = u ^ 3 + Curve25519.A * u ^ 2 + u) :
+    MontgomeryCurveCurve25519.Nonsingular u v := by
+  apply (nonsingular_iff u v).mpr
+  rw [WeierstrassCurve.Affine.equation_iff]
   simp only [MontgomeryCurveCurve25519]
   simp only [equation]
   ring
