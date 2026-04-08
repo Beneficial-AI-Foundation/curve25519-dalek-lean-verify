@@ -19,6 +19,7 @@ and trait instance structures.
 -- The whitespace linter flags the space in `@[rust_fun "..."]` attribute syntax as
 -- extraneous; this is a false positive since the space is standard Lean style.
 set_option linter.style.whitespace false
+set_option linter.style.longLine false
 
 open Aeneas Aeneas.Std Aeneas.Std.WP Result
 
@@ -1794,5 +1795,58 @@ theorem ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional
   unfold ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign
   obtain ⟨res, h_eq⟩ := h
   simp [h_eq, spec_ok]
+
+
+
+/-- [core::iter::adapters::rev::{core::iter::traits::iterator::Iterator<Clause0_Clause0_Item> for core::iter::adapters::rev::Rev<I>}::next]:
+    Source: '/rustc/library/core/src/iter/adapters/rev.rs', lines 52:4-52:55
+    Name pattern: [core::iter::adapters::rev::{core::iter::traits::iterator::Iterator<core::iter::adapters::rev::Rev<@I>, @Clause0_Clause0_Item>}::next]
+    Visibility: public -/
+@[rust_fun
+  "core::iter::adapters::rev::{core::iter::traits::iterator::Iterator<core::iter::adapters::rev::Rev<@I>, @Clause0_Clause0_Item>}::next"]
+axiom core.iter.adapters.rev.Rev.Insts.CoreIterTraitsIteratorIterator.next
+  {I : Type} {Clause0_Clause0_Item : Type}
+  (traitsdouble_endedDoubleEndedIteratorInst :
+  core.iter.traits.double_ended.DoubleEndedIterator I Clause0_Clause0_Item) :
+  core.iter.adapters.rev.Rev I → Result ((Option Clause0_Clause0_Item) ×
+    (core.iter.adapters.rev.Rev I))
+
+/-- [core::iter::range::{core::iter::traits::iterator::Iterator<A> for core::ops::range::Range<A>}::rev]:
+    Source: '/rustc/library/core/src/iter/range.rs', lines 852:0-852:40
+    Name pattern: [core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::rev]
+    Visibility: public -/
+@[rust_fun
+  "core::iter::range::{core::iter::traits::iterator::Iterator<core::ops::range::Range<@A>, @A>}::rev"]
+axiom core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.rev
+  {A : Type} {Clause1_Clause0_Item : Type} (StepInst : core.iter.range.Step A)
+  (traitsdouble_endedDoubleEndedIteratorRangeClause1_Clause0_ItemInst :
+  core.iter.traits.double_ended.DoubleEndedIterator (core.ops.range.Range A)
+  Clause1_Clause0_Item) :
+  core.ops.range.Range A → Result (core.iter.adapters.rev.Rev
+    (core.ops.range.Range A))
+
+/-- [core::iter::range::{core::iter::traits::double_ended::DoubleEndedIterator<A> for core::ops::range::Range<A>}::next_back]:
+    Source: '/rustc/library/core/src/iter/range.rs', lines 978:4-978:40
+    Name pattern: [core::iter::range::{core::iter::traits::double_ended::DoubleEndedIterator<core::ops::range::Range<@A>, @A>}::next_back]
+    Visibility: public -/
+@[rust_fun
+  "core::iter::range::{core::iter::traits::double_ended::DoubleEndedIterator<core::ops::range::Range<@A>, @A>}::next_back"]
+axiom
+  core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back
+  {A : Type} (StepInst : core.iter.range.Step A) :
+  core.ops.range.Range A → Result ((Option A) × (core.ops.range.Range A))
+
+/-- [core::iter::traits::iterator::Iterator::rev]:
+    Source: '/rustc/library/core/src/iter/traits/iterator.rs', lines 3422:4-3424:42
+    Name pattern: [core::iter::traits::iterator::Iterator::rev]
+    Visibility: public -/
+@[rust_fun "core::iter::traits::iterator::Iterator::rev"]
+axiom core.iter.traits.iterator.Iterator.rev.default
+  {Self : Type} {Clause0_Item : Type} {Clause1_Clause0_Item : Type}
+  (IteratorInst : core.iter.traits.iterator.Iterator Self Clause0_Item)
+  (double_endedDoubleEndedIteratorInst :
+  core.iter.traits.double_ended.DoubleEndedIterator Self Clause1_Clause0_Item)
+  :
+  Self → Result (core.iter.adapters.rev.Rev Self)
 
 end curve25519_dalek

@@ -5,6 +5,7 @@
   for a different Aeneas-generated project, modify the values here.
 -/
 import Lean
+import Mathlib.Tactic
 
 open Lean
 
@@ -32,7 +33,8 @@ main function (e.g., `foo_body`'s docstring is used for `foo`).
 def extractionArtifactSuffixes : List String := [
   "_body",             -- Global/constant body definitions
   "_loop",             -- Loop helper functions
-  "_loop0", "_loop1", "_loop2", "_loop3"  -- Numbered loop variants
+  "_loop0", "_loop1", "_loop2", "_loop3",  -- Numbered loop variants
+  "_loop.mutual"       -- Loop variant
 ]
 
 /-!
