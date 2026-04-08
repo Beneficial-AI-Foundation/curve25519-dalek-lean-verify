@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.MulBase
@@ -57,10 +58,11 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
         MontgomeryPoint.mkPoint result = T_point
       else MontgomeryPoint.mkPoint result =
         abs_montgomery (clamped_scalar_nat • fromEdwards _root_.Edwards.basepoint))) ⦄ := by
-   unfold mul_base_clamped
-   step with scalar.clamp_integer_spec
-   step with mul_base_spec
-   use scalar.U8x32_as_Nat_foldr a
-   simp_all[scalar.U8x32_as_Nat_eq_foldr']
+  unfold mul_base_clamped
+  step with scalar.clamp_integer_spec
+  step with mul_base_spec
+  have :=U8x32_as_Nat_eq_foldr' a
+  rw [this] at result_post a_post1 a_post2 a_post3
+  use U8x32_as_Nat_foldr a
 
 end curve25519_dalek.montgomery.MontgomeryPoint

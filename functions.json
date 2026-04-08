@@ -10952,9 +10952,10 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>\n      h ∣ U8x32_as_Nat_foldr result ∧\n      U8x32_as_Nat_foldr result < 2^255 ∧\n      2^254 ≤ U8x32_as_Nat_foldr result ⦄ := by ...",
+   "theorem clamp_integer_spec (bytes : Array U8 32#usize) :\n    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>\n      h ∣ U8x32_as_Nat result ∧\n      U8x32_as_Nat result < 2^255 ∧\n      2^254 ≤ U8x32_as_Nat result ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Scalar/ClampInteger.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `scalar.clamp_integer`**:\n- No panic\n- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)\n- as_nat_32_u8 result < 2^255\n- 2^254 ≤ as_nat_32_u8 result -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name": "curve25519_dalek::scalar::clamp_integer",
    "lines": "L1415-L1420",

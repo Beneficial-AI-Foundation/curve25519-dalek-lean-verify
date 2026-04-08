@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Montgomery.Representation
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.Mul
@@ -55,11 +56,11 @@ theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
   unfold mul_clamped
   step*
-  have :=scalar.U8x32_as_Nat_eq_foldr' a
-  rw [this] at res_post
+  have :=U8x32_as_Nat_eq_foldr' a
+  rw [this] at res_post a_post1 a_post2 a_post3
   have := Nat.mod_eq_of_lt  a_post2
   rw [this] at res_post
-  simp only [scalar.U8x32_as_Nat_eq_foldr', Nat.reducePow]
+  simp only [U8x32_as_Nat_eq_foldr', Nat.reducePow]
   exact ⟨a, a_post1, a_post2, a_post3, res_post⟩
 
 end curve25519_dalek.montgomery.MontgomeryPoint

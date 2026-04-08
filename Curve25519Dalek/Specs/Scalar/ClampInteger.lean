@@ -30,8 +30,8 @@ namespace curve25519_dalek.scalar
 - (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)
 - as_nat_32_u8 result < 2^255
 - 2^254 ≤ as_nat_32_u8 result -/
-
-theorem clamp_integer_spec' (bytes : Array U8 32#usize) :
+@[step]
+theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
       h ∣ U8x32_as_Nat result ∧
       U8x32_as_Nat result < 2^255 ∧
@@ -67,22 +67,5 @@ theorem clamp_integer_spec' (bytes : Array U8 32#usize) :
   · have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
     simp [Finset.sum_range_succ]
     grind
-
-def U8x32_as_Nat_foldr (bytes : Array U8 32#usize) :=
-  bytes.val.foldr (fun b (acc : ℕ) => b.val + 256 * acc) 0
-
-lemma U8x32_as_Nat_eq_foldr' (a : Aeneas.Std.Array U8 32#usize) :
-  U8x32_as_Nat a = U8x32_as_Nat_foldr a := by
-  unfold U8x32_as_Nat_foldr
-  apply U8x32_as_Nat_eq_foldr
-
-@[step]
-theorem clamp_integer_spec (bytes : Array U8 32#usize) :
-    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
-      h ∣ U8x32_as_Nat_foldr result ∧
-      U8x32_as_Nat_foldr result < 2^255 ∧
-      2^254 ≤ U8x32_as_Nat_foldr result ⦄ := by
-      simp only [← U8x32_as_Nat_eq_foldr']
-      apply clamp_integer_spec'
 
 end curve25519_dalek.scalar

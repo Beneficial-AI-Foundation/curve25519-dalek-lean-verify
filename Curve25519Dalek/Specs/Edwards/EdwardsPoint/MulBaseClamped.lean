@@ -61,8 +61,5 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
       result.toPoint = ((U8x32_as_Nat clamped_scalar) • _root_.Edwards.basepoint)) ⦄ := by
     unfold mul_base_clamped
     step*
-    simp only [result_post1, Nat.reducePow, true_and]
-    simp_all only [Nat.reducePow, scalar.U8x32_as_Nat_eq_foldr']
-    use a
 
 end curve25519_dalek.edwards.EdwardsPoint
