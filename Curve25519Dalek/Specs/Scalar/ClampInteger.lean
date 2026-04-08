@@ -5,7 +5,6 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
-import Curve25519Dalek.Aux
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.GCongr
 import Mathlib.Algebra.BigOperators.Ring.Finset
