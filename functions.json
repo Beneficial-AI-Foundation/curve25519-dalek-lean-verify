@@ -2609,11 +2609,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem APLUS2_OVER_FOUR_spec :\n  APLUS2_OVER_FOUR ⦃ result =>\n    Field51_as_Nat result = 121666 ∧\n    ∀ i < 5, result[i]!.val < 2 ^ 54 ⦄ := by ...",
+   "theorem APLUS2_OVER_FOUR_spec :\n    APLUS2_OVER_FOUR ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result = 121666 ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 54 ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/APLUS2_OVER_FOUR.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Aplus2OverFour.lean",
    "spec_docstring":
-   "/-- **Spec for `backend.serial.u64.constants.APLUS2_OVER_FOUR`**:\n- The value of constants.APLUS2_OVER_FOUR when converted to a natural number equals 121666\n- All limbs of APLUS2_OVER_FOUR are bounded by 2^54, which is used in the Montgomery\ndifferential addition formula (`Montgomery.ProjectivePoint.DifferentialAddAndDouble`).\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR`**\n\nThe value of `APLUS2_OVER_FOUR` when converted to a natural number equals 121666, and all limbs\nare bounded by 2^54, which is used in the Montgomery differential addition formula. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::APLUS2_OVER_FOUR",
@@ -2633,9 +2633,9 @@
    "spec_statement":
    "theorem ED25519_BASEPOINT_POINT_spec :\n    ED25519_BASEPOINT_POINT ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      _root_.L • result.toPoint = 0 ∧\n      result.toPoint ≠ 0 ∧\n      4 • result.toPoint ≠ 0 ∧\n      result.Z.toField ^ 2 - result.Y.toField ^ 2 =\n        34737626771194858627071295502606372355980995399692169211837275202373938891970 ^ 2 ∧\n      result.toPoint = _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ED25519_BASEPOINT_POINT.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Ed25519BasepointPoint.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.ED25519_BASEPOINT_POINT`**:\n    • ED25519_BASEPOINT_POINT is a valid Edwards point (which amongst other things implies that it fulfills the curve equation)\n    • ED25519_BASEPOINT_POINT is of prime order L\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT`**\n\n`ED25519_BASEPOINT_POINT` is a valid Edwards point (fulfilling the curve equation) of prime order L. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ED25519_BASEPOINT_POINT",
@@ -2653,11 +2653,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_spec :\n    EDWARDS_D ⦃ result =>\n    Field51_as_Nat result = d ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
+   "theorem EDWARDS_D_spec :\n    EDWARDS_D ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = d ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.EDWARDS_D`**:\n- The value of constants.EDWARDS_D when converted to a natural number equals d\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D`**\n\nField51_as_Nat(constants.EDWARDS_D) = d where d is the mathematical representation of the Edwards\ncurve parameter as a natural number. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D",
    "lines": "L45-L51",
@@ -2675,9 +2675,9 @@
    "spec_statement":
    "theorem EDWARDS_D2_spec :\n    EDWARDS_D2 ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = (2 * d) % p ∧\n      ∀ i < 5, result[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D2.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsD2.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.EDWARDS_D2`**:\n- The value of constants.EDWARDS_D2 when converted to a natural number equals\n  the canonical (reduced) representation of 2*d (mod p) in [0, p-1].\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2`**\n\nThe value of `EDWARDS_D2` when converted to a natural number equals\nthe canonical (reduced) representation of 2*d (mod p) in [0, p-1]. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D2",
    "lines": "L54-L60",
@@ -2693,11 +2693,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :\n    EDWARDS_D_MINUS_ONE_SQUARED ⦃ result =>\n    Field51_as_Nat result = (d - 1) ^ 2 % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
+   "theorem EDWARDS_D_MINUS_ONE_SQUARED_spec :\n    EDWARDS_D_MINUS_ONE_SQUARED ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = (d - 1) ^ 2 % p ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EDWARDS_D_MINUS_ONE_SQUARED.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EdwardsDMinusOneSquared.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED`**:\n- The value of constants.EDWARDS_D_MINUS_ONE_SQUARED when converted to a natural number equals\n  the canonical (reduced) representation of (d - 1)² (mod p) in [0, p-1].\n-/",
+   "/-- Spec theorem for `backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED`\n\nThe value of `EDWARDS_D_MINUS_ONE_SQUARED` when converted to a natural number equals\nthe canonical (reduced) representation of (d - 1)² (mod p) in [0, p-1]. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EDWARDS_D_MINUS_ONE_SQUARED",
@@ -2715,11 +2715,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem EIGHT_TORSION_spec :\n    EIGHT_TORSION ⦃ result =>\n      let P := result.val[1]\n      P.IsValid ∧ 4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0 ∧\n      (∀ (i : Fin 8), result.val[i].IsValid) ∧\n      (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by ...",
+   "theorem EIGHT_TORSION_spec :\n    EIGHT_TORSION ⦃ (result : Array edwards.EdwardsPoint 8#usize) =>\n      let P := result.val[1]\n      P.IsValid ∧ 4 • P.toPoint ≠ 0 ∧ 8 • P.toPoint = 0 ∧\n      (∀ (i : Fin 8), result.val[i].IsValid) ∧\n      (∀ (i : Fin 8), result.val[i].toPoint = (i : ℕ) • P.toPoint) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EIGHT_TORSION.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/EightTorsion.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.EIGHT_TORSION`**:\n• P := EIGHT_TORSION[1] is a valid EdwardsPoint\n• P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that the order of P divides 8)\n• For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P\n-/",
+   "/-- Spec theorem for `curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION`\n\n• P := EIGHT_TORSION[1] is a valid EdwardsPoint\n• P has order eight (this is equivalent to [4]P ≠ 0 and [8]P = 0, because [8]P = 0 implies that\nthe order of P divides 8)\n• For all i ∈ {0,...,7}: EIGHT_TORSION[i] is a valid EdwardsPoint and EIGHT_TORSION[i] = [i]P -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::EIGHT_TORSION",
@@ -2755,11 +2755,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem INVSQRT_A_MINUS_D_spec :\n    INVSQRT_A_MINUS_D ⦃ result =>\n      (Field51_as_Nat result)^2 * (a - d) % p = 1 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
+   "theorem INVSQRT_A_MINUS_D_spec :\n    INVSQRT_A_MINUS_D ⦃ (result : field.FieldElement51) =>\n      (Field51_as_Nat result)^2 * (a - d) % p = 1 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/INVSQRT_A_MINUS_D.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/InvsqrtAMinusD.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.INVSQRT_A_MINUS_D`**:\n- Field51_as_Nat(constants.INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p), which is equivalent\n  to Field51_as_Nat(constants.INVSQRT_A_MINUS_D) ≡ 1/sqrt(a-d) (mod p).\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D`**\n\nField51_as_Nat(constants.INVSQRT_A_MINUS_D)^2 * (a - d) ≡ 1 (mod p), which is equivalent\nto Field51_as_Nat(constants.INVSQRT_A_MINUS_D) ≡ 1/sqrt(a-d) (mod p). Here, a and d are the\nmathematical representations of the Edwards curve parameters as integers. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::INVSQRT_A_MINUS_D",
@@ -2779,7 +2779,7 @@
    "spec_statement": "theorem L_spec : Scalar52_as_Nat L = _root_.L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/L.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.L`**:\n- The value of constants.L when converted to a natural number equals L\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::L`**\n\nScalar52_as_Nat(constants.L) = L where L is the group order. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::L",
    "lines": "L127-L133",
@@ -2796,9 +2796,9 @@
    "spec_statement":
    "theorem LFACTOR_spec :\n    (_root_.L * LFACTOR + 1) % (2^52) = 0 ∧\n    0 ≤ LFACTOR.val ∧\n    LFACTOR.val < 2^52 := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/LFACTOR.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Lfactor.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.LFACTOR`**:\n- The value of LFACTOR satisfies: L * LFACTOR ≡ -1 (mod 2^52)\n- LFACTOR is in the range [0, 2^52 - 1]\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::LFACTOR`**\n\n(L * LFACTOR + 1) % 2^52 = 0 and LFACTOR is in the range [0, 2^52 - 1]. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::LFACTOR",
    "lines": "L136-L136",
@@ -2815,9 +2815,9 @@
    "spec_statement":
    "theorem MINUS_ONE_spec :\n    MINUS_ONE ⦃ result =>\n    Field51_as_Nat result = p - 1 ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MINUS_ONE.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MinusOne.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.MINUS_ONE`**:\n- The value of constants.MINUS_ONE, when converted to a natural number, equals p − 1\n  (the canonical representative of −1 modulo p in [0, p-1]).\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MINUS_ONE`**\n- The value of constants.MINUS_ONE, when converted to a natural number, equals p − 1\n(the canonical representative of −1 modulo p in [0, p-1]). -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::MINUS_ONE",
    "lines": "L26-L32",
@@ -2833,11 +2833,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MONTGOMERY_A_spec :\n    MONTGOMERY_A ⦃ result => Field51_as_Nat result = 486662 ∧\n    (∀ i < 5, (result[i]!).val < 2 ^51)⦄ := by ...",
+   "theorem MONTGOMERY_A_spec :\n    MONTGOMERY_A ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = 486662 ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryA.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A`**:\n- The value of constants.MONTGOMERY_A when converted to a natural number equals 486662\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A`**\nThe value of constants.MONTGOMERY_A when converted to a natural number equals 486662. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A",
@@ -2854,11 +2854,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem MONTGOMERY_A_NEG_spec :\n    MONTGOMERY_A_NEG ⦃ result => Field51_as_Nat result + 486662 = p ∧\n    (∀ i< 5, (result[i]!).val < 2^ 51) ⦄ := by ...",
+   "theorem MONTGOMERY_A_NEG_spec :\n    MONTGOMERY_A_NEG ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result + 486662 = p ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MONTGOMERY_A_NEG.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/MontgomeryANeg.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.MONTGOMERY_A_NEG`**:\n- The value of constants.MONTGOMERY_A_NEG when converted to a natural number equals\n  p - 486662 = 57896044618658097711785492504343953926634992332820282019728792003956564333287\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG`**\n\nField51_as_Nat(constants.MONTGOMERY_A_NEG) + 486662 = p, i.e. MONTGOMERY_A_NEG represents\n−486662 modulo p, the negation of the Montgomery curve parameter A. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::MONTGOMERY_A_NEG",
@@ -2876,11 +2876,11 @@
   {"verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :\n    ONE_MINUS_EDWARDS_D_SQUARED ⦃ result =>\n    Field51_as_Nat result = (1 + p - (d^2 % p)) % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
+   "theorem ONE_MINUS_EDWARDS_D_SQUARED_spec :\n    ONE_MINUS_EDWARDS_D_SQUARED ⦃ (result : field.FieldElement51) =>\n      Field51_as_Nat result = (1 + p - (d^2 % p)) % p ∧\n      (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/ONE_MINUS_EDWARDS_D_SQUARED.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/OneMinusEdwardsDSquared.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED`**:\n- The value of constants.ONE_MINUS_EDWARDS_D_SQUARED when converted to a natural number equals\n  the canonical (reduced) representation of (1 - d²) (mod p) in [0, p-1].\n  Note: the extra \" + p\" in the spec theorem is to avoided hitting 0 in the truncated subtraction\n  implemented by Lean.\n-/",
+   "/-- **Spec theorem for\n`curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED`**\n- The value of constants.ONE_MINUS_EDWARDS_D_SQUARED when converted to a natural number equals\n  the canonical (reduced) representation of (1 - d²) (mod p) in [0, p-1].\n  Note: the extra \" + p\" in the spec theorem is to avoided hitting 0 in the truncated subtraction\n  implemented by Lean. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::constants::ONE_MINUS_EDWARDS_D_SQUARED",
@@ -2901,7 +2901,7 @@
    "theorem R_spec : Scalar52_as_Nat R % _root_.L = _root_.R % _root_.L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/R.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.R`**:\n- The value of constants.R when converted to a natural number is congruent to R modulo L\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::R`**\n- The value of constants.R when converted to a natural number is congruent to R modulo L -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::R",
    "lines": "L139-L145",
@@ -2917,9 +2917,9 @@
    "specified": true,
    "spec_statement":
    "theorem RR_spec : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
+   "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Rr.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.constants.RR`**:\n- The value of constants.RR when converted to a natural number is congruent to R² modulo L\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::RR`**\nScalar52_as_Nat(constants.RR) ≡ R² (mod L) where R = 2^260. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
    "rust_name": "curve25519_dalek::backend::serial::u64::constants::RR",
    "lines": "L148-L154",
@@ -2936,7 +2936,7 @@
    "spec_statement":
    "theorem SQRT_AD_MINUS_ONE_spec :\n    SQRT_AD_MINUS_ONE ⦃ result =>\n    (Field51_as_Nat result)^2 % p = (a * d - 1) % p ∧\n    (∀ i < 5, result[i]!.val < 2^51) ∧\n    result = SQRT_AD_MINUS_ONE_raw ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_AD_MINUS_ONE.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtAdMinusOne.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `backend.serial.u64.constants.SQRT_AD_MINUS_ONE`**:\n- Field51_as_Nat(constants.SQRT_AD_MINUS_ONE) is a square root of (a*d - 1) modulo p, i.e.\n  `(Field51_as_Nat constants.SQRT_AD_MINUS_ONE)^2 ≡ (a*d - 1) (mod p)`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
@@ -2958,7 +2958,7 @@
    "spec_statement":
    "theorem SQRT_M1_spec :\n    SQRT_M1 ⦃ result =>\n    result = SQRT_M1_raw ∧\n    (Field51_as_Nat result)^2 % p = p - 1 ∧\n    (∀ i < 5, result[i]!.val < 2^51) ⦄ := by ...",
    "spec_file":
-   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SQRT_M1.lean",
+   "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/SqrtM1.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `backend.serial.u64.constants.SQRT_M1`**:\n- Field51_as_Nat(constants.SQRT_M1) ≡ sqrt(-1) (mod p), which is equivalent to\n  Field51_as_Nat(constants.SQRT_M1)^2 ≡ p - 1 (mod p).\n-/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
