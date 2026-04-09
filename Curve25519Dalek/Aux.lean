@@ -391,3 +391,11 @@ lemma pointwise_add_Field51_as_Nat (a b c : Array U64 5#usize)
     UScalar.ofNatCore_val_eq, getElem!_pos, Nat.ofNat_pos,
     Nat.one_lt_ofNat, Nat.reduceLT, Nat.lt_add_one]
   scalar_tac
+
+def U8x32_as_Nat_foldr (bytes : Array U8 32#usize) :=
+  bytes.val.foldr (fun b (acc : ℕ) => b.val + 256 * acc) 0
+
+lemma U8x32_as_Nat_eq_foldr' (a : Aeneas.Std.Array U8 32#usize) :
+  U8x32_as_Nat a = U8x32_as_Nat_foldr a := by
+  unfold U8x32_as_Nat_foldr
+  apply U8x32_as_Nat_eq_foldr

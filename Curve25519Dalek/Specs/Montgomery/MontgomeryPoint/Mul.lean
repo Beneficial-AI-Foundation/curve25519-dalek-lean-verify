@@ -64,7 +64,7 @@ Natural language specs:
 -/
 
 
-@[step]
+@[step, externally_verified]
 theorem mul_loop_spec
     (affine_u : backend.serial.u64.field.FieldElement51)
     (x0 x1 : montgomery.ProjectivePoint)
@@ -197,21 +197,6 @@ The following lemmas factor out the common proof patterns shared between the two
 main branches (bit = true / bit = false) of the Montgomery ladder's final step.
 -/
 
-/-- **Field lifting**: When `from_bytes` produces a field element `x` satisfying
-    `Field51_as_Nat x ≡ (U8x32_as_Nat P) % 2^255 [MOD p]`, we can lift this to the
-    equality `x.toField = ((U8x32_as_Nat P % 2^255) : CurveField)` in `ZMod p`.
-
-    This lemma encapsulates the common pattern of unfolding `FieldElement51.toField`
-    and applying `Edwards.lift_mod_eq` with the modular congruence from `from_bytes`. -/
-lemma mul_spec_toField_eq
-    (x : backend.serial.u64.field.FieldElement51)
-    (P : montgomery.MontgomeryPoint)
-    (hmod_x : Field51_as_Nat x ≡ (U8x32_as_Nat P) % 2 ^ 255 [MOD p]) :
-    x.toField = ((U8x32_as_Nat P % 2 ^ 255 : ℕ) : CurveField) := by
-  unfold curve25519_dalek.backend.serial.u64.field.FieldElement51.toField
-  have := Edwards.lift_mod_eq (Field51_as_Nat x) ((U8x32_as_Nat P) % 2 ^ 255)
-  rw [← Nat.ModEq] at this
-  exact this hmod_x
 
 /-- **MontgomeryPoint result assembly**: Given:
     - The `from_bytes` modular congruence (`hmod_x`)
@@ -232,15 +217,31 @@ lemma mul_spec_mkPoint_from_affine
     (hmod_x : Field51_as_Nat x ≡ (U8x32_as_Nat P) % 2 ^ 255 [MOD p])
     (res_bound : U8x32_as_Nat res < 2 ^ 255)
     (res_field : U8x32_as_Field res = u_div_w)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255)
     (loop_inv : MontgomeryPoint.u_affine_toPoint u_div_w =
         ((U8x32_as_Nat scalar.bytes) % 2 ^ 255) • MontgomeryPoint.u_affine_toPoint x.toField) :
     MontgomeryPoint.mkPoint res =
         ((U8x32_as_Nat scalar.bytes) % 2 ^ 255) • MontgomeryPoint.mkPoint P := by
   have eq1 := Nat.mod_eq_of_lt res_bound
   have := U8x32_as_Field_eq_cast res
-  rw [this, ← eq1] at res_field
+  have eqP:= U8x32_as_Field_eq_cast P
+  rw [this, ← eq1, ] at res_field
+  have eq2 := U8x32_as_Field_eq_cast P
   unfold MontgomeryPoint.mkPoint
-  rw [res_field, loop_inv, mul_spec_toField_eq x P hmod_x]
+  have hxP : x.toField = U8x32_as_Field P := by
+    rw [eq2]
+    refine Edwards.lift_mod_eq _ _ ?_
+    have hmodeq := hmod_x
+    rw [Nat.mod_eq_of_lt hP_bound] at hmodeq
+    exact hmodeq
+  rw [this, ← eq1, res_field, loop_inv, hxP]
+
+
+
+
+
+
+
 
 
 /- **Spec and proof concerning `montgomery.MulShared1MontgomeryPointShared0ScalarMontgomeryPoint.mul`**:
@@ -262,8 +263,13 @@ lemma mul_spec_mkPoint_from_affine
     unconditional arithmetic operations are performed)
 -/
 
+
+
+
+
 @[step, externally_verified]
-theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
+theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul P scalar ⦃ res =>
       let m:= (U8x32_as_Nat scalar.bytes) % 2^255
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄ := by
@@ -286,7 +292,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
       step*
         -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
         -- We first construct the loop invariant with the simplified scalar.
-      refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 ?_
+      refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 hP_bound ?_
       rw [ct.right.right.right.right.right]
       have := aux_eq_mod_mul scalar
       rw [← this]
@@ -311,7 +317,7 @@ theorem mul_spec (P : montgomery.MontgomeryPoint) (scalar : scalar.Scalar) :
     step*
       -- Use `mul_spec_mkPoint_from_affine` to assemble the final result.
       -- We first construct the loop invariant with the simplified scalar.
-    refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 ?_
+    refine mul_spec_mkPoint_from_affine res P scalar x _ hmod_x res_post2 res_post1 hP_bound ?_
     rw [cf.right.right.right.right.right]
     have := aux_eq_mod_mul scalar
     simp only [Nat.reducePow, Int.reduceDiv, Int.reduceToNat, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
@@ -356,7 +362,8 @@ Natural language specs:
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
 @[step]
-theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint) :
+theorem mul_spec (scalar : scalar.Scalar) (P : montgomery.MontgomeryPoint)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul scalar P ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
@@ -401,7 +408,8 @@ Natural language specs:
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
 @[step]
-theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar) :
+theorem mul_spec (P : MontgomeryPoint) (rhs : scalar.Scalar)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul P rhs ⦃ res =>
     let m:= (U8x32_as_Nat rhs.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
@@ -443,7 +451,8 @@ Natural language specs:
   * The returned MontgomeryPoint is a valid 32-byte encoding with value reduced modulo 2^255
 -/
 @[step]
-theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint) :
+theorem mul_spec (scalar : Scalar) (P : montgomery.MontgomeryPoint)
+    (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul scalar P ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄

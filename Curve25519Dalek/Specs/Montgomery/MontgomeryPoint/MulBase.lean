@@ -46,25 +46,59 @@ natural language specs:
   basepoint multiplication result
 -/
 
-/-- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:
+/- **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base`**:
 - No panic (always returns successfully)
 - Delegates to `edwards.EdwardsPoint.mul_base` and `edwards.EdwardsPoint.to_montgomery`
 - The returned MontgomeryPoint is the Montgomery conversion of the Edwards basepoint result
 -/
-@[externally_verified, step]
+
+@[step]
 theorem mul_base_spec (scalar : scalar.Scalar) :
     mul_base scalar ⦃ result =>
-    Montgomery.MontgomeryPoint.mkPoint result = (U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint) ⦄
+    let ep := (U8x32_as_Nat scalar.bytes) •  _root_.Edwards.basepoint
+    if  ep.y=1 then
+      Montgomery.MontgomeryPoint.mkPoint result = T_point
+      else
+      Montgomery.MontgomeryPoint.mkPoint result =
+      abs_montgomery ((U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint)) ⦄
      := by
     unfold mul_base
     step with edwards.EdwardsPoint.mul_base_spec as ⟨ ep, ep_valid, ep_toPoint ⟩
-    step with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond, res_hom ⟩
+    step with edwards.EdwardsPoint.to_montgomery_spec as ⟨ res, res_cond⟩
     · exact ep_valid.Y_bounds
     · exact ep_valid.Z_bounds
-    · simp_all only
-      have := res_hom 1
-      simp only [one_smul] at this
-      rw[← this]
-      apply Montgomery.comm_mul_fromEdwards
+    · rw[← ep_toPoint]
+      by_cases h : ep.toPoint.y = 1
+      · simp only [h, ↓reduceIte]
+        by_cases ht : Field51_as_Nat ep.Z % p = Field51_as_Nat ep.Y % p
+        · simp only [ht, ↓reduceIte] at res_cond
+          have := cast_zero res res_cond.left
+          apply curve25519_dalek.edwards.EdwardsPoint.mkPoint_u_zero
+          exact this
+        · have := curve25519_dalek.edwards.EdwardsPoint.toPoint_of_isValid ep_valid
+          have hZY_eq := (Montgomery.lift_mod_eq_iff (Field51_as_Nat ep.Z) (Field51_as_Nat ep.Y))
+          rw [← curve25519_dalek.backend.serial.u64.field.FieldElement51.toField] at hZY_eq
+          rw [← curve25519_dalek.backend.serial.u64.field.FieldElement51.toField] at hZY_eq
+          rw [Nat.ModEq] at hZY_eq
+          simp only [hZY_eq] at ht
+          rw [h] at this
+          field_simp [ep_valid.Z_ne_zero] at this
+          simp only [this.right, not_true_eq_false] at ht
+      · simp only [h, ↓reduceIte]
+        have := curve25519_dalek.edwards.EdwardsPoint.toPoint_of_isValid ep_valid
+        have hZY_eq := (Montgomery.lift_mod_eq_iff (Field51_as_Nat ep.Z) (Field51_as_Nat ep.Y))
+        rw[← curve25519_dalek.backend.serial.u64.field.FieldElement51.toField] at hZY_eq
+        rw[← curve25519_dalek.backend.serial.u64.field.FieldElement51.toField] at hZY_eq
+        rw[Nat.ModEq] at hZY_eq
+        by_cases ht : Field51_as_Nat ep.Z % p = Field51_as_Nat ep.Y % p
+        · simp only [ht, ↓reduceIte] at res_cond
+          simp only [hZY_eq] at ht
+          rw [← ht] at this
+          field_simp [ep_valid.Z_ne_zero] at this
+          simp only [this.right, not_true_eq_false] at h
+        · simp_all only [false_iff, ↓reduceIte]
+          have := res_cond.right
+          rw[← this]
+          rw[Montgomery.comm_mul_fromEdwards]
 
 end curve25519_dalek.montgomery.MontgomeryPoint

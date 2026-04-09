@@ -49,7 +49,8 @@ natural language specs:
 - The returned MontgomeryPoint equals the Montgomery ladder result for the given scalar and point
 -/
 @[step]
-theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar) :
+theorem mul_assign_spec (P : MontgomeryPoint) (scalar : scalar.Scalar)
+  (hP_bound : U8x32_as_Nat P < 2 ^ 255) :
     mul_assign P scalar ⦃ res =>
     let m:= (U8x32_as_Nat scalar.bytes) % 2^255
     MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P) ⦄
