@@ -15,7 +15,7 @@ maxRecDepth = 10000
 name = "aeneas"
 git = "https://github.com/AeneasVerif/aeneas.git"
 subDir = "backends/lean"
-rev = "28ad838c"
+rev = "42c0e90d"
 
 [[require]]
 name = "PrimeCert"
