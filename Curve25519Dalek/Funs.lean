@@ -7337,9 +7337,8 @@ def scalar.Scalar.from_bytes_mod_order
   let s ← scalar.Scalar.reduce { bytes }
   let i ← scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index s 31#usize
   let right_val ← i >>> 7#i32
-  if 0#u8 = right_val
-  then ok s
-  else fail panic
+  massert (0#u8 = right_val)
+  ok s
 
 /-- [curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide]:
     Source: 'curve25519-dalek/src/scalar.rs', lines 250:4-252:5
@@ -7990,9 +7989,11 @@ def scalar.Scalar.non_adjacent_form_loop
     let i ← 64#usize - w
     let bit_buf ←
       if bit_idx < i
-      then let i1 ← Array.index_usize x_u64 u64_idx
+      then do
+           let i1 ← Array.index_usize x_u64 u64_idx
            i1 >>> bit_idx
       else
+        do
         let i1 ← Array.index_usize x_u64 u64_idx
         let i2 ← i1 >>> bit_idx
         let i3 ← 1#usize + u64_idx
@@ -8013,10 +8014,12 @@ def scalar.Scalar.non_adjacent_form_loop
       let (naf1, carry1) ←
         if window < i3
         then
+          do
           let i4 ← lift (UScalar.hcast .I8 window)
           let a ← Array.update naf pos i4
           ok (a, 0#u64)
         else
+          do
           let i4 ← lift (UScalar.hcast .I8 window)
           let i5 ← lift (UScalar.hcast .I8 width)
           let i6 ← lift (core.num.I8.wrapping_sub i4 i5)
@@ -8057,12 +8060,13 @@ def scalar.Scalar.to_radix_2w_size_hint
   massert (w >= 4#usize)
   massert (w <= 8#usize)
   let digits_count ←
+    do
+    massert ((w <= 7#usize) || (w = 8#usize))
     if w <= 7#usize
     then let i ← 256#usize + w
          let i1 ← i - 1#usize
          i1 / w
     else
-      massert (w = 8#usize)
       let i ← 256#usize + w
       let i1 ← i - 1#usize
       let i2 ← i1 / w
@@ -8091,15 +8095,20 @@ def scalar.Scalar.as_radix_2w_loop
     let (iter2, bit_buf) ←
       if bit_idx < i1
       then
+        do
         let i2 ← Array.index_usize scalar64x4 u64_idx
         let bit_buf1 ← i2 >>> bit_idx
         ok (iter1, bit_buf1)
       else
+        do
         let i2 ←
           if u64_idx = 3#usize
-          then let i3 ← Array.index_usize scalar64x4 u64_idx
-               i3 >>> bit_idx
+          then
+            do
+            let i3 ← Array.index_usize scalar64x4 u64_idx
+            i3 >>> bit_idx
           else
+            do
             let i3 ← Array.index_usize scalar64x4 u64_idx
             let i4 ← i3 >>> bit_idx
             let i5 ← 1#usize + u64_idx
