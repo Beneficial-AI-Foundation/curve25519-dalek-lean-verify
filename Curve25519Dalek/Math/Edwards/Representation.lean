@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Oliver Butterley
 -/
@@ -35,12 +35,11 @@ open Aeneas.Std Result
 
 section EdwardsDecompression
 
-/--
-**Pure Edwards Decompression**
+/-- **Pure Edwards Decompression**
 Recovers (x, y) from a 32-byte representation `s` according to RFC 8032 (Ed25519).
 Morally: we store the point (x,y) as just the coordinate y and the sign bit, i.e. using 32-bits,
-leveraging the EdCurve equation: -x² + y² = 1 + dx²y². Indeed, we can recover x just knowing y and
-the sign to take on the square root to obtain x.
+leveraging the EdCurve equation: -x² + y² = 1 + dx²y². Indeed, we can recover x just knowing y
+and the sign to take on the square root to obtain x.
 1. Treat the 32 bytes as a little-endian integer `s`.
 2. y is the lower 255 bits (s % 2^255).
 3. The sign of x is the 256th bit (s / 2^255).
@@ -73,7 +72,7 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                 suffices x_root ^ 2 = x2 by split_ifs <;> simpa
                 have spec := Classical.choose_spec h
                 rw [spec]
-                dsimp [x_root]
+                dsimp only [x_root]
                 rw [abs_edwards_sq (Classical.choose h), pow_two]
               have hv_ne0 : v ≠ 0 := by
                 intro hv
@@ -86,7 +85,9 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                   -- kernel struggles with 78-digit number literals. Need to
                   -- precompute these as top-level lemmas to avoid crashing the elaborator.
 
-                  -- change ((-1-19681161376707505956807079304988542015446066515923890162744021073123829784752 ^ 2 : ℤ) : ZMod p) = 0
+                  -- change ((-1 -
+                  --   19681161376707505956807079304988542015446066515923890162744021073123829784752
+                  --   ^ 2 : ℤ) : ZMod p) = 0
                   -- rw [intCast_zmod_eq_zero_iff_dvd]
                   -- try decide
                   sorry
@@ -100,15 +101,15 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                   apply h_d_not_sq
                   by_cases hy : y = 0
                   · simp only [hy, pow_two, mul_zero] at h_neg;
-                    try grind
+                    grind
                   · rcases h_is_sq with ⟨k, hk⟩
                     use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
 
                 rw [h_neg] at lhs_not_sq
-                try grind
+                exact absurd rhs_sq lhs_not_sq
 
               simp only [hx_sq]
-              dsimp [Ed25519, x2, u, v]
+              dsimp only [Ed25519, x2, u, v]
               simp only [neg_mul, one_mul]
               simp only [v] at hv_ne0
               rw [mul_comm] at hv_ne0
@@ -122,19 +123,15 @@ end EdwardsDecompression
 
 end curve25519_dalek.math
 
-/-!
-## AffinePoint Validity
--/
+/-! ## AffinePoint Validity -/
 
 namespace curve25519_dalek.edwards.affine
 
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
 
-/--
-Validity predicate for AffinePoint.
-An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation.
--/
+/-- Validity predicate for AffinePoint.
+An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation. -/
 @[mk_iff]
 structure AffinePoint.IsValid (a : AffinePoint) : Prop where
   /-- Coordinates must be valid field elements (limbs < 2^54). -/
@@ -165,8 +162,8 @@ namespace curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64.field Edwards
 
 /-- Validity predicate for EdwardsPoint.
-    An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
-    Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
+An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
+Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
 @[mk_iff]
 structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^53. -/
@@ -187,7 +184,7 @@ instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsVa
   decidable_of_iff _ (isValid_iff e).symm
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
-    Requires a proof that the point is valid. -/
+Requires a proof that the point is valid. -/
 def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
   let X := e.X.toField
   let Y := e.Y.toField
@@ -205,7 +202,7 @@ def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
       linear_combination hcurve }
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
-    Returns 0 if the point is not valid. -/
+Returns 0 if the point is not valid. -/
 def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
   if h : e.IsValid then e.toPoint' h else 0
 
@@ -220,24 +217,18 @@ theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
 
 end curve25519_dalek.edwards
 
-/-!
-## CompressedEdwardsY Validity
--/
+/-! ## CompressedEdwardsY Validity -/
 
 namespace curve25519_dalek.edwards
 open curve25519_dalek.math Edwards
 
-/--
-A CompressedEdwardsY is valid if it represents a valid point on the curve.
-This means the bytes must decompress successfully using the standard Ed25519 rules.
--/
+/-- A CompressedEdwardsY is valid if it represents a valid point on the curve.
+This means the bytes must decompress successfully using the standard Ed25519 rules. -/
 def CompressedEdwardsY.IsValid (c : CompressedEdwardsY) : Prop :=
   (decompress_edwards_pure c).isSome
 
-/--
-Convert a CompressedEdwardsY to the mathematical Point.
-Returns the neutral element if invalid.
--/
+/-- Convert a CompressedEdwardsY to the mathematical Point.
+Returns the neutral element if invalid. -/
 noncomputable def CompressedEdwardsY.toPoint (c : CompressedEdwardsY) : Point Ed25519 :=
   match decompress_edwards_pure c with
   | some P => P
@@ -252,13 +243,13 @@ open Edwards
 
 open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for ProjectivePoint.
-    A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
-    For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
-    Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
+A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
+For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
+Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
 
-    Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
-    because operations like `double` compute X + Y, which must be < 2^54 for subsequent
-    squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
+Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
+because operations like `double` compute X + Y, which must be < 2^54 for subsequent
+squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
 @[mk_iff]
 structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
   /-- All coordinate limbs are bounded by 2^52. -/
@@ -276,7 +267,7 @@ instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable
   decidable_of_iff _ (isValid_iff pp).symm
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
-    Returns 0 if the point is not valid. -/
+Returns 0 if the point is not valid. -/
 noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
   if h : pp.IsValid then
     let X := pp.X.toField
@@ -305,11 +296,11 @@ theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsVali
 
 open curve25519_dalek.backend.serial.u64.field in
 /-- Validity predicate for CompletedPoint.
-    A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
-    For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
-    Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
+A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
+For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
+Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
 
-    All coordinates use the universal bound < 2^54. -/
+All coordinates use the universal bound < 2^54. -/
 @[mk_iff]
 structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
   /-- All coordinate limbs are bounded by 2^54. -/
@@ -332,7 +323,7 @@ instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable c
   decidable_of_iff _ (isValid_iff cp).symm
 
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
-    Returns 0 if the point is not valid. -/
+Returns 0 if the point is not valid. -/
 noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :=
   if h : cp.IsValid then
     let X := cp.X.toField
@@ -346,7 +337,8 @@ noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :
         have ht : T ≠ 0 := h.T_ne_zero
         have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
         have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
-        have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 := h.on_curve
+        have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 :=
+            h.on_curve
         simp only [Ed25519] at hcurve ⊢
         simp only [div_pow]
         field_simp [hz2, ht2]
@@ -362,17 +354,17 @@ theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid)
 /-! ## ProjectiveNielsPoint Validity and Casting -/
 
 /-- Validity predicate for ProjectiveNielsPoint.
-    A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
-    - X = (Y_plus_X - Y_minus_X) / 2
-    - Y = (Y_plus_X + Y_minus_X) / 2
-    - The affine point (X/Z, Y/Z) is on Ed25519
-    - T2d = 2*d*x*y*Z where x, y are the affine coordinates
+A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
+- X = (Y_plus_X - Y_minus_X) / 2
+- Y = (Y_plus_X + Y_minus_X) / 2
+- The affine point (X/Z, Y/Z) is on Ed25519
+- T2d = 2*d*x*y*Z where x, y are the affine coordinates
 
-    The curve equation in these coordinates (multiplied by 4 to avoid divisions):
-    4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
-      16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
+The curve equation in these coordinates (multiplied by 4 to avoid divisions):
+4*a*(Y_plus_X - Y_minus_X)²*Z² + 4*(Y_plus_X + Y_minus_X)²*Z² =
+  16*Z⁴ + d*(Y_plus_X - Y_minus_X)²*(Y_plus_X + Y_minus_X)²
 
-    Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
+Bounds: all coordinates < 2^53 (needed for mixed addition operations). -/
 /-
 @[mk_iff]
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
@@ -415,16 +407,16 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     let Z := pn.Z.toField; let T2d := pn.T2d.toField
     2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
-
-instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) : Decidable pn.IsValid :=
+instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) :
+    Decidable pn.IsValid :=
   decidable_of_iff _ (isValid_iff pn).symm
 
---instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) : Decidable pn.IsValid' :=
+--instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) :
+--    Decidable pn.IsValid' :=
 --  decidable_of_iff _ (isValid'_iff pn).symm
 
-
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
-    The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
+The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
 noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsValid) :
     Point Ed25519 :=
   let YpX := pn.Y_plus_X.toField
@@ -445,8 +437,6 @@ noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h :
       ring_nf
       ring_nf at hcurve
       linear_combination hcurve }
-
-
 
 /- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
@@ -475,7 +465,7 @@ noncomputable def ProjectiveNielsPoint.toPointI' (pn : ProjectiveNielsPoint) (h 
 -/
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
-    Returns 0 if the point is not valid. -/
+Returns 0 if the point is not valid. -/
 noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
   if h : pn.IsValid then pn.toPoint' h else 0
 
@@ -514,10 +504,10 @@ noncomputable instance : Coe CompletedPoint (Point Ed25519) where
 
 @[simp]
 theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
-  p.toPoint = ↑p := rfl
+    p.toPoint = ↑p := rfl
 
 @[simp]
 theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
-  p.toPoint = ↑p := rfl
+    p.toPoint = ↑p := rfl
 
 end curve25519_dalek.backend.serial.curve_models
