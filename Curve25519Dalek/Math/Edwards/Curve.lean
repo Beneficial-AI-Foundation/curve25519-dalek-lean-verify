@@ -1,10 +1,9 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2025 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Alessandro D'Angelo, Markus Dablander
 -/
 import Curve25519Dalek.Math.Basic
-
 import Mathlib.Algebra.Field.ZMod
 import Mathlib.NumberTheory.LegendreSymbol.Basic
 import Mathlib.Tactic.NormNum.LegendreSymbol
@@ -42,7 +41,6 @@ open ZMod
 /-! ## Mathematical Foundations: Twisted Edwards Curves -/
 
 instance : NeZero (2 : CurveField) := ⟨by decide⟩
-
 
 /-- A Twisted Edwards curve structure defined by parameters a and d. -/
 structure EdwardsCurve (F : Type) where
@@ -138,7 +136,8 @@ theorem add_closure (C : EdwardsCurve F) (p1 p2 : Point C)
     have : 1 + x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 := by grind
     have : 1 - x₁ * y₂ * y₁ * x₂ * C.d ≠ 0 := by grind
     unfold add_coords
-    field_simp; assumption
+    field_simp
+    assumption
   rw [← sub_eq_zero]
   /- We define polynomials A, B, P, Q such that the LHS of the goal can be written as a linear
   combination of the form P*A + Q*B. A and B are chosen such that p1 and p2 lying on the curve
@@ -309,8 +308,8 @@ instance : AddCommGroup (Point Ed25519) where
 
 /-- Helper lemma to expose the addition formula without unfolding the whole structure. -/
 theorem add_def (p1 p2 : Point Ed25519) :
-  (p1 + p2).x = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).1 ∧
-  (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
+    (p1 + p2).x = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).1 ∧
+    (p1 + p2).y = (add_coords Ed25519 (p1.x, p1.y) (p2.x, p2.y)).2 := by
   exact Prod.mk_inj.mp rfl
 
 /-- Binary scalar multiplication equals the standard linear scalar multiplication. -/
