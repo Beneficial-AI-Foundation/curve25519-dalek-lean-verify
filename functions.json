@@ -2917,7 +2917,7 @@
    "specified": true,
    "spec_statement":
    "theorem RR_spec : Scalar52_as_Nat RR % _root_.L = _root_.R ^ 2 % _root_.L := by ...",
-   "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/Rr.lean",
+   "spec_file": "Curve25519Dalek/Specs/Backend/Serial/U64/Constants/RR.lean",
    "spec_docstring":
    "/-- **Spec theorem for `curve25519_dalek::backend::serial::u64::constants::RR`**\nScalar52_as_Nat(constants.RR) ≡ R² (mod L) where R = 2^260. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/constants.rs",
