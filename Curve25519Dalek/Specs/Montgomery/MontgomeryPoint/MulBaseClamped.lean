@@ -59,10 +59,10 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
       else MontgomeryPoint.mkPoint result =
         abs_montgomery (clamped_scalar_nat • fromEdwards _root_.Edwards.basepoint))) ⦄ := by
   unfold mul_base_clamped
-  step with scalar.clamp_integer_spec
+  step with scalar.clamp_integer_spec'
   step with mul_base_spec
   have :=U8x32_as_Nat_eq_foldr' a
-  rw [this] at result_post a_post1 a_post2 a_post3
   use U8x32_as_Nat_foldr a
+  simp_all
 
 end curve25519_dalek.montgomery.MontgomeryPoint
