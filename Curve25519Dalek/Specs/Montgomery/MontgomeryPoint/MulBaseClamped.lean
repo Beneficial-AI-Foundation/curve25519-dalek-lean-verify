@@ -25,7 +25,7 @@ open curve25519_dalek.backend.serial.u64
 open Montgomery
 namespace curve25519_dalek.montgomery.MontgomeryPoint
 
-/-
+/--
 natural language description:
 
 • Clamps the 32-byte input to a valid scalar using `scalar.clamp_integer`.
@@ -37,9 +37,7 @@ natural language specs:
 
 • The function always succeeds (no panic)
 • The result is the Montgomery basepoint multiplication of the clamped scalar
--/
 
-/-
 **Spec and proof concerning `montgomery.MontgomeryPoint.mul_base_clamped`**:
 - No panic (always returns successfully)
 - Clamps input bytes with `scalar.clamp_integer`
