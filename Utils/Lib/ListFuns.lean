@@ -153,6 +153,7 @@ def buildFunctionRecord
     lineRange := lineRange
     dependencies := filteredDeps
     isRelevant := isRelevant
+    visibility := docInfo.visibility
     isExtractionArtifact := rawData.isExtractionArtifact
     isHidden := rawData.isHidden
     isIgnored := isIgnoredFunction rawData.name
