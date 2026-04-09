@@ -20,6 +20,7 @@ structure DocstringInfo where
   source : Option String := none
   lineStart : Option Nat := none
   lineEnd : Option Nat := none
+  visibility : Option String := none
   deriving Repr, Inhabited
 
 /-- A complete record of a function and its analysis results. -/
@@ -38,6 +39,8 @@ structure FunctionRecord where
   isRelevant : Bool := false
   /-- True if this is an Aeneas extraction artifact (_body, _loop, etc.) -/
   isExtractionArtifact : Bool := false
+  /-- Rust visibility from docstring (e.g. "public") -/
+  visibility : Option String := none
   /-- True if this function is explicitly hidden via Config.hiddenFunctions -/
   isHidden : Bool := false
   /-- True if this function is marked as ignored via Config.ignoredFunctions -/
@@ -75,6 +78,7 @@ structure FunctionOutput where
   is_extraction_artifact : Bool := false
   is_hidden : Bool := false
   is_ignored : Bool := false
+  visibility : Option String := none
   specified : Bool := false
   verified : Bool := false
   fully_verified : Bool := false
@@ -98,6 +102,7 @@ def FunctionRecord.toOutput (rec : FunctionRecord) : FunctionOutput :=
     is_extraction_artifact := rec.isExtractionArtifact
     is_hidden := rec.isHidden
     is_ignored := rec.isIgnored
+    visibility := rec.visibility
     specified := rec.isSpecified
     verified := rec.isVerified
     fully_verified := rec.isFullyVerified
