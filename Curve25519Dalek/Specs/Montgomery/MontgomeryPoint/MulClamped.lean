@@ -55,13 +55,9 @@ theorem mul_clamped_spec (P : MontgomeryPoint) (bytes : Array U8 32#usize)
       let m:= (U8x32_as_Nat clamped_scalar)
       MontgomeryPoint.mkPoint res = m • (MontgomeryPoint.mkPoint P)) ⦄ := by
   unfold mul_clamped
-  step with scalar.clamp_integer_spec'
-  step
-  have :=U8x32_as_Nat_eq_foldr' a
+  step*
+  have := Nat.mod_eq_of_lt a_post2
   rw [this] at res_post
-  have := Nat.mod_eq_of_lt  a_post2
-  rw [this] at res_post
-  simp only [U8x32_as_Nat_eq_foldr', Nat.reducePow]
   exact ⟨a, a_post1, a_post2, a_post3, res_post⟩
 
 end curve25519_dalek.montgomery.MontgomeryPoint
