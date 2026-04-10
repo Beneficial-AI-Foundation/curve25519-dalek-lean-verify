@@ -57,6 +57,13 @@ def runSyncStatus (p : Parsed) : IO UInt32 := do
   -- Step 4: Read current status.csv
   IO.eprintln s!"Reading {csvPath}..."
   let statusFile ← readStatusFile csvPath
+  -- Ensure header includes the visibility column
+  let expectedHeader := "function,lean_name,source,lines,spec_theorem,\
+    extracted,verified,notes,ignored,ai-proveable,visibility"
+  let hasVisibility := (statusFile.header.splitOn "visibility").length > 1
+  let statusFile := if !hasVisibility then
+    { statusFile with header := expectedHeader }
+  else statusFile
   IO.eprintln s!"Found {statusFile.rows.size} existing entries in status.csv"
 
   -- Step 5: Sync filtered functions (update existing, add new)

@@ -33,6 +33,7 @@ structure StatusRow where
   notes : String
   ignored : String
   ai_proveable : String
+  visibility : String
   deriving Repr, Inhabited
 
 /-- The full status.csv file -/
@@ -103,7 +104,7 @@ def joinCsvLine (fields : Array String) : String :=
 /-- Parse a CSV line into a StatusRow -/
 def parseRow (line : String) : Option StatusRow :=
   let fields := splitCsvLine line
-  if fields.size >= 10 then
+  if fields.size >= 11 then
     some {
       function := fields[0]!
       lean_name := fields[1]!
@@ -115,9 +116,25 @@ def parseRow (line : String) : Option StatusRow :=
       notes := fields[7]!
       ignored := fields[8]!
       ai_proveable := fields[9]!
+      visibility := fields[10]!
+    }
+  else if fields.size >= 10 then
+    -- Old format without visibility column
+    some {
+      function := fields[0]!
+      lean_name := fields[1]!
+      source := fields[2]!
+      lines := fields[3]!
+      spec_theorem := fields[4]!
+      extracted := fields[5]!
+      verified := fields[6]!
+      notes := fields[7]!
+      ignored := fields[8]!
+      ai_proveable := fields[9]!
+      visibility := ""
     }
   else if fields.size >= 2 then
-    -- Minimal row or old format without ignored column
+    -- Minimal row or old format
     some {
       function := fields[0]!
       lean_name := fields[1]!
@@ -129,6 +146,7 @@ def parseRow (line : String) : Option StatusRow :=
       notes := fields.getD 7 ""
       ignored := ""
       ai_proveable := fields.getD 8 ""
+      visibility := ""
     }
   else
     none
@@ -136,7 +154,8 @@ def parseRow (line : String) : Option StatusRow :=
 /-- Convert a StatusRow to a CSV line -/
 def StatusRow.toCsvLine (row : StatusRow) : String :=
   joinCsvLine #[row.function, row.lean_name, row.source, row.lines,
-                row.spec_theorem, row.extracted, row.verified, row.notes, row.ignored, row.ai_proveable]
+                row.spec_theorem, row.extracted, row.verified, row.notes, row.ignored, row.ai_proveable,
+                row.visibility]
 
 /-- Read and parse status.csv -/
 def readStatusFile (path : System.FilePath := defaultPath) : IO StatusFile := do
@@ -178,7 +197,8 @@ def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
     verified := verifiedStr
     notes := ""
     ignored := ignoredStr
-    ai_proveable := "" }
+    ai_proveable := ""
+    visibility := fn.visibility.getD "" }
 
 /-- Check if two StatusRows have the same updatable fields -/
 def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
@@ -188,7 +208,8 @@ def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
   a.spec_theorem == b.spec_theorem &&
   a.extracted == b.extracted &&
   a.verified == b.verified &&
-  a.ignored == b.ignored
+  a.ignored == b.ignored &&
+  a.visibility == b.visibility
 
 /-- Update an existing StatusRow with data from FunctionOutput.
     Preserves: notes, ai_proveable -/
@@ -206,7 +227,8 @@ def StatusRow.updateFrom (row : StatusRow) (fn : FunctionOutput) : StatusRow :=
     spec_theorem := fn.spec_file.getD row.spec_theorem
     extracted := extractedStr
     verified := verifiedStr
-    ignored := ignoredStr }
+    ignored := ignoredStr
+    visibility := fn.visibility.getD row.visibility }
 
 /-- Add a new row to the StatusFile -/
 def StatusFile.addRow (file : StatusFile) (row : StatusRow) : StatusFile :=

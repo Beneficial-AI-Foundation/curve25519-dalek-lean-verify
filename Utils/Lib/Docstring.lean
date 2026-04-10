@@ -58,12 +58,27 @@ def extractLineRange (doc : String) : Option (Nat × Nat) :=
     | _ => none
   else none
 
+/-- Extract visibility from `Visibility: <value>` pattern. -/
+def extractVisibility (doc : String) : Option String :=
+  let pattern := "Visibility: "
+  let parts := doc.splitOn pattern
+  if h : parts.length >= 2 then
+    -- Take everything after the pattern up to end of line
+    let afterPattern := parts[1]
+    let lineParts := afterPattern.splitOn "\n"
+    if h2 : lineParts.length >= 1 then
+      let value := lineParts[0].trimAscii.toString
+      if value.isEmpty then none else some value
+    else none
+  else none
+
 /-- Parse a complete docstring into structured info -/
 def parseDocstring (doc : String) : DocstringInfo :=
   { rustName := extractRustName doc
     source := extractSourceFile doc
     lineStart := (extractLineRange doc).map Prod.fst
-    lineEnd := (extractLineRange doc).map Prod.snd }
+    lineEnd := (extractLineRange doc).map Prod.snd
+    visibility := extractVisibility doc }
 
 /-- Get docstring for a constant from the environment -/
 def getDocstring (env : Environment) (name : Name) : IO (Option String) :=

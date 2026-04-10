@@ -74,26 +74,13 @@ theorem to_radix_2w_size_hint_spec (w : Std.Usize)
   step (config := { maxSteps := 1 })
   split_ifs with hw
   · step*
-    · simp_all
-      have hw_pos : 0 < w.val := by omega
-      have h65 : (255 + w.val) / ↑w < 65 := by
-        rw [Nat.div_lt_iff_lt_mul hw_pos]
-        linarith
+    simp_all
+    have hw_pos : 0 < w.val := by omega
+    have h65 : (255 + w.val) / ↑w < 65 := by
+      rw [Nat.div_lt_iff_lt_mul hw_pos]
       linarith
-    · constructor
-      · simp_all
-      · constructor
-        · simp_all
-          grind
-        · simp_all
-          have hw_pos : 0 < w.val := by omega
-          have h65 : (255 + w.val) / ↑w < 65 := by
-            rw [Nat.div_lt_iff_lt_mul hw_pos]
-            linarith
-          linarith
+    linarith
   · step (config := { maxSteps := 1 })
     step*
-    have : w.val = 8:= by scalar_tac
-    simp_all
 
 end curve25519_dalek.scalar.Scalar

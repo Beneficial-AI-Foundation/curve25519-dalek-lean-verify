@@ -5,6 +5,7 @@ Authors: Oliver Butterley
 -/
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Funs
+import Curve25519Dalek.Aux
 import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.GCongr
 import Mathlib.Algebra.BigOperators.Ring.Finset
@@ -66,5 +67,14 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
   · have : 64 ≤ ((bytes : List U8)[31] &&& 127 ||| 64) := Nat.right_le_or
     simp [Finset.sum_range_succ]
     grind
+
+
+theorem clamp_integer_spec' (bytes : Array U8 32#usize) :
+    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
+      h ∣ U8x32_as_Nat_foldr result ∧
+      U8x32_as_Nat_foldr result < 2^255 ∧
+      2^254 ≤ U8x32_as_Nat_foldr result ⦄ := by
+      simp only [← U8x32_as_Nat_eq_foldr']
+      apply clamp_integer_spec
 
 end curve25519_dalek.scalar
