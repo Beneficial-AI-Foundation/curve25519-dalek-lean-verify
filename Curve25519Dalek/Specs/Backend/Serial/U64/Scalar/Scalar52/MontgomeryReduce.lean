@@ -8,7 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.M
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.L
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.LFACTOR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Lfactor
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Sub
 
 import Mathlib.Data.Nat.ModEq
