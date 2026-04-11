@@ -8,14 +8,14 @@ import Aeneas
 /-! # `expand_array` tactic
 
 Given an array `result` built through a chain of `.set` operations,
-`expand_array result` introduces hypotheses `h_result_0 : result[0]! = v0`,
-`h_result_1 : result[1]! = v1`, etc. for every index of the array.
+`expand_array result` introduces hypotheses `hresult0 : result[0]! = v0`,
+`hresult1 : result[1]! = v1`, etc. for every index of the array.
 
 ## Requirements
 - `result` must be a local variable of type `Aeneas.Std.Array α n`
   with a literal size (the size is extracted automatically)
 - The `.set` chain must be visible (call `subst_vars` first if needed)
-- Produces one hypothesis per index, named `h_<varname>_<index>`
+- Produces one hypothesis per index, named `h<varname><index>`
 - Intermediate array variables are consumed by `subst_vars`
 -/
 
@@ -56,13 +56,14 @@ elab "expand_array " x:ident : tactic => do
     let (hEqFVar, goal4) ← goal3.intro `h_expand_eq_
     replaceMainGoal [goal4]
     -- Now context has: result, h_expand_eq_ : result = <.set chain>
-    -- For each index, introduce h_<name>_k with chain on the RHS
+    -- For each index, introduce h<name>k with chain on the RHS
     let eqIdent := mkIdent `h_expand_eq_
+    let hIdents : Array (TSyntax `ident) :=
+      (Array.range n).map fun k => mkIdent (Name.mkSimple s!"h{xName}{k}")
     for k in [:n] do
       withMainContext do
         let kLit := Syntax.mkNumLit (toString k)
-        let hName := Name.mkSimple s!"h_{xName}_{k}"
-        let hIdent := mkIdent hName
+        let hIdent := hIdents[k]!
         -- Introduce trivial equality, then rewrite RHS to the .set chain
         evalTactic (←
           `(tactic| have $hIdent : ($x)[$kLit]! = ($x)[$kLit]! := rfl))
@@ -72,7 +73,7 @@ elab "expand_array " x:ident : tactic => do
     let goal5 ← getMainGoal
     let goal6 ← goal5.clear hEqFVar
     replaceMainGoal [goal6]
-    -- Simplify all .set chains in one pass
+    -- Simplify all .set chains, targeting only the generated hypotheses
     evalTactic (←
       `(tactic|
         simp (discharger := agrind) only [
@@ -81,7 +82,7 @@ elab "expand_array " x:ident : tactic => do
           Array.getElem!_Nat_set_eq,
           Array.getElem!_Nat_set_ne,
           Array.set_length,
-          Array.length_eq] at *))
+          Array.length_eq] at $hIdents:ident*))
 
 /-! ## Tests -/
 
@@ -105,8 +106,8 @@ example
     (hgoal : v0.val + v1.val = 42) :
     result[0]!.val + result[1]!.val = 42 := by
   expand_array result
-  -- Now h_result_0 : result[0]! = v0
-  --     h_result_1 : result[1]! = v1, etc.
+  -- Now hresult0 : result[0]! = v0
+  --     hresult1 : result[1]! = v1, etc.
   simp only [*]
 
 -- Test 2: 3-element U8 array
@@ -122,7 +123,7 @@ example
     result[0]!.val + result[1]!.val + result[2]!.val =
     a.val + b.val + c.val := by
   expand_array result
-  rw [h_result_0, h_result_1, h_result_2]
+  rw [hresult0, hresult1, hresult2]
 
 -- Test 3: partial updates (index 1 not set)
 example
@@ -136,6 +137,23 @@ example
     result[1]! = out[1]! ∧
     result[2]! = v2 := by
   expand_array result
-  exact ⟨h_result_0, h_result_1, h_result_2⟩
+  exact ⟨hresult0, hresult1, hresult2⟩
+
+-- Test 4: other hypotheses in context are not modified
+example
+    (out : Array U64 3#usize)
+    (v0 v1 v2 : U64)
+    (out1 : Array U64 3#usize)
+    (out2 : Array U64 3#usize)
+    (result : Array U64 3#usize)
+    (other : Array U64 3#usize)
+    (h1 : out1 = out.set 0#usize v0)
+    (h2 : out2 = out1.set 1#usize v1)
+    (h3 : result = out2.set 2#usize v2)
+    (hother : other[0]!.val + other[1]!.val = 100) :
+    result[0]! = v0 ∧ other[0]!.val + other[1]!.val = 100 := by
+  expand_array result
+  -- hother should still be in context unchanged
+  exact ⟨hresult0, hother⟩
 
 end Test
