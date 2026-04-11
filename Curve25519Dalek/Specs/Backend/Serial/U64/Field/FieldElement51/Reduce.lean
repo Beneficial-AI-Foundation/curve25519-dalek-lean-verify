@@ -54,20 +54,23 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
     scalar_tac
   · simp_lists [*, UScalar.val_and, Nat.and_two_pow_sub_one_eq_mod]
     scalar_tac
-  · -- A ∧ B: limb bounds ∧ ModEq
-    rw [UScalar.val_and] at *
+  · rw [UScalar.val_and] at *
     expand_array limbs10
     simp_lists at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
     simp only [*] at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
     simp_lists at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
-    constructor
-    · intro i _
-      interval_cases i
-      simp [*]
 
+    -- prove the bounds: (∀ i < 5, result[i]!.val < 2 ^ 52)
 
+    -- prove: Field51_as_Nat limbs = Field51_as_Nat limbs10 + c4 * p
+    -- where c4 = limbs[4].val >>> 51 = limbs[4].val / 2^51
 
+    -- then uses these two facts to quickly derive the conclusion
+    refine ⟨?_, ?_, ?_⟩
+    · -- from above
       sorry
+    · simp [Nat.ModEq, Field51_as_Nat, Finset.sum_range_succ, p, *]
+      scalar_tac
     · sorry
 
 
