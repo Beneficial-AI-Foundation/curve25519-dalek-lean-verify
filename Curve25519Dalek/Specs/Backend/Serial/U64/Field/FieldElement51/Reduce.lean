@@ -54,7 +54,6 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
   · expand_array limbs10 using [UScalar.val_and]
-    -- Now array written as 5 clear equalities
     have hbounds : ∀ j < 5, limbs10[j]!.val < 2 ^ 52 := by
       intro j _; interval_cases j <;>
         simp only [hlimbs100, hlimbs101, hlimbs102, hlimbs103, hlimbs104,
