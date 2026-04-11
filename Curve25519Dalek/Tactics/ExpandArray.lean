@@ -22,8 +22,8 @@ Given an array `result` built through a chain of `.set` operations,
 
 open Lean Elab Tactic Meta Aeneas.Std
 
-/-- Extract the array size `n` from the type `Aeneas.Std.Array α n` of a variable.
-    The Usize literal is reduced to a Nat via `whnf`. -/
+/-- Extract the array size `n` from the type `Aeneas.Std.Array α n` of a variable. The Usize
+literal is reduced to a Nat via `whnf`. -/
 private def getArraySize (fvarId : FVarId) : MetaM Nat := do
   let ty ← Meta.inferType (mkFVar fvarId)
   let fn := ty.getAppFn
@@ -60,9 +60,9 @@ private def extractSetBase (e : Expr) : Option FVarId :=
     else none
   else none
 
-/-- Walk the `.set` chain from `resultFVar`'s defining equality, collecting
-    the equality hypothesis fvarIds for each intermediate array variable.
-    Returns them in bottom-up order (ready for `substCore`). -/
+/-- Walk the `.set` chain from `resultFVar`'s defining equality, collecting the equality hypothesis
+fvarIds for each intermediate array variable. Returns them in bottom-up order (ready for
+`substCore`). -/
 private partial def collectChainAux (lctx : LocalContext) (rhs : Expr)
     (acc : Array FVarId) : Array FVarId :=
   match extractSetBase rhs with
@@ -78,12 +78,73 @@ private def collectChainEqs (lctx : LocalContext) (resultFVar : FVarId) :
   | none => #[]
   | some (_, rhs) => (collectChainAux lctx rhs #[]).reverse
 
-/-- `expand_array result` introduces hypotheses `hresult0 : result[0]! = v0`,
-    `hresult1 : result[1]! = v1`, etc. for an array built through `.set` chains.
+/-- Inline the `.set` chain for `resultFVar` by reverting it, substituting only the intermediate
+array variables via `substCore`, then re-introducing `result` together with a defining equality
+`result = <full chain>`. Returns `(resultFVar, hEqFVar)` in the new goal. -/
+private def inlineSetChain (xName : Name) (resultFVar : FVarId)
+    (chainEqs : Array FVarId) : TacticM (FVarId × FVarId) := do
+  -- Revert result to protect it from substitution
+  let goal ← getMainGoal
+  let (_, goal) ← goal.revert #[resultFVar]
+  replaceMainGoal [goal]
+  -- Targeted substitution: only the intermediates in the .set chain
+  let mut fvarSubst : FVarSubst := {}
+  for hFVar in chainEqs do
+    let goal ← getMainGoal
+    let mapped := fvarSubst.get hFVar
+    if mapped.isFVar then
+      let (newSubst, newGoal) ← substCore goal mapped.fvarId!
+      fvarSubst := fvarSubst.append newSubst
+      replaceMainGoal [newGoal]
+  -- Re-introduce result and its defining equality
+  let goal ← getMainGoal
+  let (resultFVar, goal) ← goal.intro xName
+  let (hEqFVar, goal) ← goal.intro `h_expand_eq_
+  replaceMainGoal [goal]
+  return (resultFVar, hEqFVar)
 
-    The array size is inferred from the type. Only intermediate array variables
-    in the `.set` chain for `result` are substituted; other hypotheses in the
-    context are left untouched. -/
+/-- For each index `k < n`, assert `h<xName><k> : result[k]! = chain[k]!` by building
+`congrArg (fun arr => arr[k]!) hExpandEq` at the meta level. Returns the ident syntax array for
+the generated hypothesis names. -/
+private def assertIndexHyps (x : TSyntax `ident) (xName : Name) (n : Nat)
+    (resultFVar hEqFVar : FVarId) : TacticM (Array (TSyntax `ident)) := do
+  let hIdents : Array (TSyntax `ident) :=
+    (Array.range n).map fun k => mkIdent (Name.mkSimple s!"h{xName}{k}")
+  for k in [:n] do
+    withMainContext do
+      let kLit := Syntax.mkNumLit (toString k)
+      let resultK ← Lean.Elab.Term.elabTerm (← `(($x)[$kLit]!)) none
+      let f ← mkLambdaFVars #[mkFVar resultFVar] resultK
+      let proof ← mkCongrArg f (mkFVar hEqFVar)
+      let proofType ← inferType proof
+      let hName := Name.mkSimple s!"h{xName}{k}"
+      let goal ← getMainGoal
+      let goal ← goal.assert hName proofType proof
+      let (_, goal) ← goal.intro1P
+      replaceMainGoal [goal]
+  -- Clean up internal equality
+  let goal ← getMainGoal
+  let goal ← goal.clear hEqFVar
+  replaceMainGoal [goal]
+  return hIdents
+
+/-- Simplify the `.set` chains in the generated hypotheses, resolving each `chain[k]!` to its
+final value (e.g. `v0`, `v1`, ...). -/
+private def simpSetChains (hIdents : Array (TSyntax `ident)) : TacticM Unit := do
+  evalTactic (←
+    `(tactic|
+      simp (discharger := agrind) only [
+        Array.getElem!_Usize_set_eq,
+        Array.getElem!_Usize_set_ne,
+        Array.getElem!_Nat_set_eq,
+        Array.getElem!_Nat_set_ne,
+        Array.set_length,
+        Array.length_eq] at $hIdents:ident*))
+
+/-- `expand_array result` introduces hypotheses `hresult0 : result[0]! = v0`,
+`hresult1 : result[1]! = v1`, etc. for an array built through `.set` chains. The array size is
+inferred from the type. Only intermediate array variables in the `.set` chain for `result` are
+substituted; other hypotheses in the context are left untouched. -/
 elab "expand_array " x:ident : tactic => do
   withMainContext do
     let xName := x.getId
@@ -91,55 +152,10 @@ elab "expand_array " x:ident : tactic => do
     let some decl := lctx.findFromUserName? xName
       | throwError "expand_array: variable '{xName}' not found"
     let n ← getArraySize decl.fvarId
-    -- Collect intermediate chain equalities before any context modification
     let chainEqs := collectChainEqs lctx decl.fvarId
-    -- Revert result to protect it from substitution
-    let goal ← getMainGoal
-    let (_, goal) ← goal.revert #[decl.fvarId]
-    replaceMainGoal [goal]
-    -- Targeted substitution: only the intermediates in the .set chain
-    let mut fvarSubst : FVarSubst := {}
-    for hFVar in chainEqs do
-      let goal ← getMainGoal
-      let mapped := fvarSubst.get hFVar
-      if mapped.isFVar then
-        let (newSubst, newGoal) ← substCore goal mapped.fvarId!
-        fvarSubst := fvarSubst.append newSubst
-        replaceMainGoal [newGoal]
-    -- Re-introduce result and its defining equality
-    let goal ← getMainGoal
-    let (resultFVar, goal) ← goal.intro xName
-    let (hEqFVar, goal) ← goal.intro `h_expand_eq_
-    replaceMainGoal [goal]
-    -- Build hypotheses via congrArg at the meta level (no evalTactic per index)
-    let hIdents : Array (TSyntax `ident) :=
-      (Array.range n).map fun k => mkIdent (Name.mkSimple s!"h{xName}{k}")
-    for k in [:n] do
-      withMainContext do
-        let kLit := Syntax.mkNumLit (toString k)
-        let resultK ← Lean.Elab.Term.elabTerm (← `(($x)[$kLit]!)) none
-        let f ← mkLambdaFVars #[mkFVar resultFVar] resultK
-        let proof ← mkCongrArg f (mkFVar hEqFVar)
-        let proofType ← inferType proof
-        let hName := Name.mkSimple s!"h{xName}{k}"
-        let goal ← getMainGoal
-        let goal ← goal.assert hName proofType proof
-        let (_, goal) ← goal.intro1P
-        replaceMainGoal [goal]
-    -- Clean up internal equality
-    let goal ← getMainGoal
-    let goal ← goal.clear hEqFVar
-    replaceMainGoal [goal]
-    -- Single simp call to resolve .set chains, targeting only generated hypotheses
-    evalTactic (←
-      `(tactic|
-        simp (discharger := agrind) only [
-          Array.getElem!_Usize_set_eq,
-          Array.getElem!_Usize_set_ne,
-          Array.getElem!_Nat_set_eq,
-          Array.getElem!_Nat_set_ne,
-          Array.set_length,
-          Array.length_eq] at $hIdents:ident*))
+    let (resultFVar, hEqFVar) ← inlineSetChain xName decl.fvarId chainEqs
+    let hIdents ← assertIndexHyps x xName n resultFVar hEqFVar
+    simpSetChains hIdents
 
 /-! ## Tests -/
 
