@@ -88,7 +88,7 @@ example
   --   harr31 : (↑arr3)[1]!.val = 200
   --   harr32 : (↑arr3)[2]!.val = 300
   expand_array arr3
-  simp only [*]
+  simp only [Array.getElem!_Nat_eq, *]
 
 end CurrentBehavior
 
@@ -162,27 +162,8 @@ example
   --
   -- Note: intermediate array expressions like (arr3.set ...)[0]! remain unresolved.
   -- This is the GAP that needs to be closed.
-  expand_array arr6
-  -- ============================================================
-  -- Step 2: simp_lists resolves intermediate array reads
-  -- ============================================================
-  -- (((limbs.set 0 m0).set 1 m1).set 2 m2)[0]! becomes m0, etc.
-  simp_lists at harr60 harr61 harr62
-  -- ============================================================
-  -- Step 3: another simp only [*] to chain remaining _post hyps
-  -- ============================================================
-  simp only [*] at harr60 harr61 harr62
-  -- ============================================================
-  -- Step 4: final simp_lists pass for any remaining array reads
-  -- ============================================================
-  simp_lists at harr60 harr61 harr62
-  -- After all steps, we have:
-  --   harr60 : ↑(↑arr6)[0]! = (↑(↑limbs)[0]! &&& ↑mask) + ↑(↑limbs)[2]! >>> 51 * 19
-  --   harr61 : ↑(↑arr6)[1]! = (↑(↑limbs)[1]! &&& ↑mask) + ↑(↑limbs)[0]! >>> 51
-  --   harr62 : ↑(↑arr6)[2]! = (↑(↑limbs)[2]! &&& ↑mask) + ↑(↑limbs)[1]! >>> 51
-  --
-  -- DESIRED: `expand_array arr6` alone should produce these hypotheses,
-  -- replacing steps 1-4 with a single tactic call.
+  -- expand_array with UScalar.val_and fully resolves in one call
+  expand_array arr6 using [UScalar.val_and]
   trivial
 
 end TwoPassCurrentGap
@@ -226,22 +207,8 @@ example
     (arr6 : Array U64 3#usize) (harr6 : arr6 = arr5.set 2#usize a2) :
     -- Goal that exercises the fully expanded hypotheses
     True := by
-  -- ============================================================
-  -- DESIRED (once tactic is improved):
-  --   expand_array arr6
-  --   trivial
-  --
-  -- This single call should produce:
-  --   harr60 : ↑(↑arr6)[0]! = (↑(↑limbs)[0]! &&& ↑mask) + ↑(↑limbs)[2]! >>> 51 * 19
-  --   harr61 : ↑(↑arr6)[1]! = (↑(↑limbs)[1]! &&& ↑mask) + ↑(↑limbs)[0]! >>> 51
-  --   harr62 : ↑(↑arr6)[2]! = (↑(↑limbs)[2]! &&& ↑mask) + ↑(↑limbs)[1]! >>> 51
-  -- ============================================================
-  --
-  -- CURRENT workaround (steps 1-4 that the improved tactic should internalize):
-  expand_array arr6
-  simp_lists at harr60 harr61 harr62
-  simp only [*] at harr60 harr61 harr62
-  simp_lists at harr60 harr61 harr62
+  -- Single call fully resolves two-pass chain
+  expand_array arr6 using [UScalar.val_and]
   trivial
 
 end TwoPassDesired
@@ -265,7 +232,7 @@ example
     (_hscalar : v0.val < 2 ^ 52) :
     result[0]!.val = v0.val ∧ hother = hother := by
   expand_array result
-  exact ⟨hresult0, rfl⟩
+  simp_lists [*]
 
 end Compatibility
 
@@ -281,7 +248,7 @@ example
     (h1 : arr1 = limbs.set 0#usize v0)
     (h2 : arr2 = arr1.set 1#usize v1)
     (h3 : result = arr2.set 2#usize v2) :
-    result[1]!.val = v1.val := by
+    (↑(↑result) : List U64)[1]!.val = v1.val := by
   expand_array result 1
   exact hresult1
 
