@@ -42,7 +42,8 @@
       "Bash(git log:*)",
       "Bash(xargs strings:*)",
       "Bash(lake build:*)",
-      "Bash(lake env lean:*)"
+      "Bash(lake env lean:*)",
+      "mcp__lean-lsp-mcp__lean_run_code"
     ],
     "additionalDirectories": [
       "/tmp",
