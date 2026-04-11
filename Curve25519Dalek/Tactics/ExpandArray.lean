@@ -8,8 +8,8 @@ import Aeneas
 /-! # `expand_array` tactic
 
 Given an array `result` built through a chain of `.set` operations,
-`expand_array result` introduces hypotheses `hresult0 : result[0]! = v0`,
-`hresult1 : result[1]! = v1`, etc. for every index of the array.
+`expand_array result` introduces hypotheses `hresult0 : result[0]!.val = <expanded>`, etc.
+for every index of the array.
 
 ## Requirements
 - `result` must be a local variable of type `Aeneas.Std.Array α n`
@@ -71,73 +71,97 @@ private partial def collectChainAux (lctx : LocalContext) (rhs : Expr)
     | none => acc
     | some (hFVar, nextRhs) => collectChainAux lctx nextRhs (acc.push hFVar)
 
-/-- Collect ALL chain equality hypothesis fvarIds starting from the target's defining equality,
-in top-down order (defining eq first, then intermediates). Suitable for `rw [h5, h4, h3, h2, h1]`
-to inline the full chain. -/
+/-- Collect ALL chain equality hypothesis idents starting from the target's defining equality,
+in top-down order. Returns `(allChainForRw, intermediatesForSimp)` where `allChainForRw` includes
+the target's defining eq (needed for `rw`) and `intermediatesForSimp` excludes it (safe for
+`simp_lists` without collapsing the LHS). -/
 private def collectAllChainEqs (lctx : LocalContext) (resultFVar : FVarId) :
-    Array (TSyntax `ident) :=
+    Array (TSyntax `ident) × Array (TSyntax `ident) :=
   match findDefEq lctx resultFVar with
-  | none => #[]
+  | none => (#[], #[])
   | some (hFVar, rhs) =>
-    let allFVars := #[hFVar] ++ collectChainAux lctx rhs #[]
-    allFVars.map fun fvar => mkIdent (lctx.get! fvar).userName
+    let intermediates := collectChainAux lctx rhs #[]
+    let allFVars := #[hFVar] ++ intermediates
+    let toIdent := fun fvar => mkIdent (lctx.get! fvar).userName
+    (allFVars.map toIdent, intermediates.map toIdent)
 
-/-- Core implementation for expanding a single array index. Produces
-`h<name><k> : x[k]!.val = ...` by inlining the `.set` chain via `rw`, resolving index
-comparisons via `simp (discharger := norm_num)`, then chaining through `_post` hypotheses. -/
-private def expandSingleIndex (x : TSyntax `ident) (xName : Name) (k : Nat)
-    (chainIdents : Array (TSyntax `ident)) : TacticM (TSyntax `ident) := do
-  let kLit := Syntax.mkNumLit (toString k)
-  let hIdent := mkIdent (Name.mkSimple s!"h{xName}{k}")
-  -- Introduce .val rfl hypothesis, then rw chain on RHS
-  evalTactic (←
-    `(tactic| have $hIdent : ($x)[$kLit]!.val = ($x)[$kLit]!.val := rfl))
-  evalTactic (←
-    `(tactic| conv at $hIdent => rhs; rw [$[$chainIdents:ident],*]))
-  -- Resolve .set chain with norm_num discharger (fast)
-  let hArr := #[hIdent]
-  evalTactic (←
-    `(tactic|
-      simp (discharger := norm_num) only [
-        Array.getElem!_Nat_set_eq, Array.getElem!_Nat_set_ne,
-        Array.set_length, Array.length_eq] at $hArr:ident*))
-  return hIdent
+/-- Collect all hypotheses whose name contains `_post` or matches equality patterns useful for
+expansion. These are the `_post` hypotheses from `step*` that describe scalar operations. Returns
+ident syntax for use in `simp_lists [...]`. -/
+private def collectPostHyps (lctx : LocalContext) (exclude : FVarId) :
+    Array (TSyntax `ident) :=
+  lctx.foldl (init := #[]) fun acc d =>
+    if d.fvarId != exclude && (d.userName.toString.splitOn "_post").length > 1 then
+      acc.push (mkIdent d.userName)
+    else
+      acc
 
-/-- `expand_array x` or `expand_array x k` introduces `.val`-level hypotheses for an array built
-through `.set` chains. With an index argument, only that index is expanded. The array size is
-inferred from the type. Uses `norm_num` for fast index comparison. After `.set` resolution, chains
-through `_post` hypotheses via `simp only [*]`. Aeneas step markers and unrelated hypotheses are
-left untouched. -/
-elab "expand_array " x:ident idx:(num)? : tactic => do
+/-- `expand_array x [extra1, extra2]` or `expand_array x k [extra1]` introduces `.val`-level
+hypotheses for an array built through `.set` chains. Optional extra lemmas are passed to the
+`simp only [*, extras]` phase for domain-specific rewriting (e.g. `UScalar.val_and`).
+With an index argument, only that index is expanded. The array size is inferred from the type.
+Phases: (1) rfl + rw chain, (2) simp_lists, (3) simp only [*, extras], (4) simp_lists. -/
+private def expandArrayCore (x : TSyntax `ident) (idx : Option (TSyntax `num))
+    (extraTerms : Array (TSyntax `term)) : TacticM Unit := do
   withMainContext do
     let xName := x.getId
     let lctx ← getLCtx
     let some decl := lctx.findFromUserName? xName
       | throwError "expand_array: variable '{xName}' not found"
     let n ← getArraySize decl.fvarId
-    let chainIdents := collectAllChainEqs lctx decl.fvarId
+    let (rwChain, _) := collectAllChainEqs lctx decl.fvarId
     -- Determine which indices to expand
     let indices := match idx with
       | some idxSyn => #[idxSyn.getNat]
-      | none => (Array.range n)
-    -- Expand each index
+      | none => Array.range n
+    -- Phase 1: introduce rfl + rw chain for each index
     let mut hIdents : Array (TSyntax `ident) := #[]
     for k in indices do
-      let hIdent ← expandSingleIndex x xName k chainIdents
+      let kLit := Syntax.mkNumLit (toString k)
+      let hIdent := mkIdent (Name.mkSimple s!"h{xName}{k}")
       hIdents := hIdents.push hIdent
-    if idx.isNone then
-      -- All-indices: clear defining eq, then chain through _post hypotheses
-      withMainContext do
-        if let some (hFVar, _) := findDefEq (← getLCtx) decl.fvarId then
-          try let goal ← getMainGoal; replaceMainGoal [← goal.clear hFVar] catch _ => pure ()
-      try evalTactic (← `(tactic| simp only [*] at $hIdents:ident*)) catch _ => pure ()
+      evalTactic (←
+        `(tactic| have $hIdent : ($x)[$kLit]!.val = ($x)[$kLit]!.val := rfl))
+      evalTactic (←
+        `(tactic| conv at $hIdent => rhs; rw [$[$rwChain:ident],*]))
+    -- Clear defining eq FIRST (prevents LHS collapse via simp [*])
+    withMainContext do
+      if let some (hFVar, _) := findDefEq (← getLCtx) decl.fvarId then
+        try let goal ← getMainGoal; replaceMainGoal [← goal.clear hFVar] catch _ => pure ()
+    -- Phase 2: resolve .set chains via simp_lists
+    evalTactic (←
+      `(tactic| simp_lists at $hIdents:ident*))
+    -- Phases 3-4: iterate simp only [*, extras] + simp_lists to resolve multi-pass chains
+    for _ in [:2] do
+      try evalTactic (←
+        `(tactic| simp only [*, $[$extraTerms:term],*] at $hIdents:ident*))
+      catch _ => pure ()
+      try evalTactic (←
+        `(tactic| simp_lists at $hIdents:ident*))
+      catch _ => pure ()
+
+/-- `expand_array x`, `expand_array x k`, or `expand_array x using [extra1, extra2]`. -/
+syntax "expand_array " ident : tactic
+syntax "expand_array " ident num : tactic
+syntax "expand_array " ident "using" "[" term,* "]" : tactic
+syntax "expand_array " ident num "using" "[" term,* "]" : tactic
+
+elab_rules : tactic
+  | `(tactic| expand_array $x:ident) =>
+    expandArrayCore x none #[]
+  | `(tactic| expand_array $x:ident $idx:num) =>
+    expandArrayCore x (some idx) #[]
+  | `(tactic| expand_array $x:ident using [$[$extras:term],*]) =>
+    expandArrayCore x none extras
+  | `(tactic| expand_array $x:ident $idx:num using [$[$extras:term],*]) =>
+    expandArrayCore x (some idx) extras
 
 /-! ## Tests -/
 
 section Test
 open Aeneas.Std
 
--- Test 1: basic 5-element array
+-- Test 1: basic 5-element array (hypotheses use ↑(↑arr)[k]! form from simp_lists)
 example
     (out : Array U64 5#usize)
     (v0 v1 v2 v3 v4 : U64)
@@ -154,7 +178,7 @@ example
     (hgoal : v0.val + v1.val = 42) :
     result[0]!.val + result[1]!.val = 42 := by
   expand_array result
-  simp only [*]
+  simp only [Array.getElem!_Nat_eq, *]
 
 -- Test 2: 3-element U8 array
 example
@@ -169,9 +193,9 @@ example
     result[0]!.val + result[1]!.val + result[2]!.val =
     a.val + b.val + c.val := by
   expand_array result
-  rw [hresult0, hresult1, hresult2]
+  simp only [Array.getElem!_Nat_eq, *]
 
--- Test 3: partial updates (index 1 not set), .val level
+-- Test 3: partial updates (index 1 not set) — hypotheses use list-coerced form
 example
     (out : Array U64 3#usize)
     (v0 v2 : U64)
@@ -179,9 +203,9 @@ example
     (result : Array U64 3#usize)
     (h1 : out1 = out.set 0#usize v0)
     (h2 : result = out1.set 2#usize v2) :
-    result[0]!.val = v0.val ∧
-    result[1]!.val = out[1]!.val ∧
-    result[2]!.val = v2.val := by
+    (↑(↑result) : List U64)[0]!.val = v0.val ∧
+    (↑(↑result) : List U64)[1]!.val = (↑(↑out) : List U64)[1]!.val ∧
+    (↑(↑result) : List U64)[2]!.val = v2.val := by
   expand_array result
   exact ⟨hresult0, hresult1, hresult2⟩
 
@@ -199,6 +223,6 @@ example
     (hother : other[0]!.val + other[1]!.val = 100) :
     result[0]!.val = v0.val ∧ other[0]!.val + other[1]!.val = 100 := by
   expand_array result
-  exact ⟨hresult0, hother⟩
+  simp_lists [*]
 
 end Test

@@ -53,11 +53,7 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
-  · -- Expand array to get per-limb formulas in terms of original limbs.
-    expand_array limbs10
-    simp_lists at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
-    simp only [*, UScalar.val_and] at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
-    simp_lists at hlimbs100 hlimbs101 hlimbs102 hlimbs103 hlimbs104
+  · expand_array limbs10 using [UScalar.val_and]
     -- Now array written as 5 clear equalities
     have hbounds : ∀ j < 5, limbs10[j]!.val < 2 ^ 52 := by
       intro j _; interval_cases j <;>
