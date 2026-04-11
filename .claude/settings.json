@@ -1,0 +1,52 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const fs = require\\(''fs''\\); const d = JSON.parse\\(fs.readFileSync\\(''functions.json'',''utf8''\\)\\); console.log\\(''has is_ignored:'', ''is_ignored'' in d.functions[0]\\); console.log\\(''sample keys:'', Object.keys\\(d.functions[0]\\).join\\('', ''\\)\\)\")",
+      "Read(//home/oliver/Projects/Verify/curve25519-dalek-lean-verify/**)",
+      "Bash(/tmp/test_square2.lean:*)",
+      "Bash(/tmp/test_progress3.lean:*)",
+      "Bash(/tmp/test_progress4.lean:*)",
+      "Bash(/tmp/test_list.lean:*)",
+      "Bash(/tmp/test_extract.lean:*)",
+      "Bash(/tmp/test_ns.lean:*)",
+      "Bash(/tmp/test_bv.lean:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh search:*)",
+      "Bash(/tmp/test_or.lean:*)",
+      "Bash(/tmp/test_simp.lean:*)",
+      "Bash(/tmp/test_extract_append.lean:*)",
+      "Bash(/tmp/test_hb6.lean:*)",
+      "Bash(/tmp/test_eq.lean:*)",
+      "Bash(/tmp/test_extract_rw.lean:*)",
+      "Bash(/tmp/test_wilson.lean:*)",
+      "Bash(do echo:*)",
+      "Bash(python3 -c \":*)",
+      "Bash(pip show:*)",
+      "Bash(uvx --help)",
+      "Read(//home/oliver/.claude/**)",
+      "Read(//home/oliver/.local/lean-lsp-mcp-venv/bin/**)",
+      "Bash(/home/oliver/.local/lean-lsp-mcp-venv/bin/lean-lsp-mcp --help)",
+      "Bash(/home/oliver/.local/lean-lsp-mcp-venv/bin/pip show:*)",
+      "Bash(/home/oliver/.local/lean-lsp-mcp-venv/bin/pip index:*)",
+      "mcp__lean-lsp-mcp__lean_goal",
+      "mcp__lean-lsp-mcp__lean_loogle",
+      "mcp__lean-lsp-mcp__lean_leansearch",
+      "mcp__lean-lsp-mcp__lean_diagnostic_messages",
+      "mcp__lean-lsp-mcp__lean_local_search",
+      "mcp__lean-lsp-mcp__lean_leanfinder",
+      "mcp__lean-lsp-mcp__lean_build",
+      "mcp__lean-lsp-mcp__lean_multi_attempt",
+      "mcp__lean-lsp-mcp__lean_profile_proof",
+      "Bash(ps aux:*)",
+      "mcp__lean-lsp-mcp__lean_hover_info",
+      "Bash(git log:*)",
+      "Bash(xargs strings:*)",
+      "Bash(lake build:*)",
+      "Bash(lake env lean:*)"
+    ],
+    "additionalDirectories": [
+      "/tmp",
+      "/home/oliver/Projects/Verify/curve25519-dalek-lean-verify/.git/info"
+    ]
+  }
+}

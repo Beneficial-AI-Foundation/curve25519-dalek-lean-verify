@@ -61,8 +61,8 @@ set_option maxRecDepth 4096 in
   a[i] < 2^63  and b[i] < 2^54
 -/
 @[step]
-theorem sub_spec (a b : Array U64 5#usize)
-    (ha : ∀ i < 5, a[i]!.val < 2 ^ 63) (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :
+theorem sub_spec (a b : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 63)
+    (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :
     sub a b ⦃ (d : FieldElement51) =>
       (∀ i < 5, d[i]!.val < 2 ^ 52) ∧
       (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by
