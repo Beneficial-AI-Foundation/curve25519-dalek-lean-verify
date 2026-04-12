@@ -46,26 +46,21 @@ and the sign to take on the square root to obtain x.
 -/
 noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (Point Ed25519) :=
   let s := U8x32_as_Nat bytes
-
   -- Mathematical splitting of the 256-bit integer
   let y_int := s % (2^255)
   let sign_bit := s / (2^255) -- This is 0 or 1 because s < 2^256
-
   if y_int >= p then
     none
   else
     let y : ZMod p := y_int
-
     -- Solve for x²: x² = (y² - 1) / (dy² + 1)
     let u := y^2 - 1
     let v := d * y^2 + 1
     let x2 := u * v⁻¹
-
     if h : IsSquare x2 then
       let x_root := abs_edwards (Classical.choose h)
       -- Apply sign bit: if sign_bit is 1, we want the negative (odd) root
       let x := if (is_negative x_root) != (sign_bit == 1) then -x_root else x_root
-
       some { x := x, y := y, on_curve := by
               have hx_sq : x^2 = x2 := by
                 simp only [x]
@@ -78,36 +73,21 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
                 intro hv
                 dsimp only [v] at hv
                 have h_neg : (d : ZMod p) * y^2 = -1 := eq_neg_of_add_eq_zero_left hv
-
-                have rhs_sq : IsSquare (-1 : ZMod p) := by
-                  use sqrt_m1; rw [←pow_two, sqrt_m1]; rw [← sub_eq_zero]
-                  -- TODO: The tactics below cause excessive memory usage (20+ GB) because Lean's
-                  -- kernel struggles with 78-digit number literals. Need to
-                  -- precompute these as top-level lemmas to avoid crashing the elaborator.
-
-                  -- change ((-1 -
-                  --   19681161376707505956807079304988542015446066515923890162744021073123829784752
-                  --   ^ 2 : ℤ) : ZMod p) = 0
-                  -- rw [intCast_zmod_eq_zero_iff_dvd]
-                  -- try decide
-                  sorry
-
+                have rhs_sq : IsSquare (-1 : ZMod p) :=
+                  ⟨sqrt_m1, by rw [← sq]; exact sqrt_m1_sq.symm⟩
                 have lhs_not_sq : ¬ IsSquare ((d : ZMod p) * y^2) := by
                   intro h_is_sq
                   have h_d_not_sq : ¬ IsSquare (d : ZMod p) := by
                     apply (legendreSym.eq_neg_one_iff' p).mp
                     norm_num [d, p]
-
                   apply h_d_not_sq
                   by_cases hy : y = 0
                   · simp only [hy, pow_two, mul_zero] at h_neg;
                     grind
                   · rcases h_is_sq with ⟨k, hk⟩
                     use k * y⁻¹; ring_nf; field_simp [hy]; rw [← pow_two] at hk; exact hk
-
                 rw [h_neg] at lhs_not_sq
                 exact absurd rhs_sq lhs_not_sq
-
               simp only [hx_sq]
               dsimp only [Ed25519, x2, u, v]
               simp only [neg_mul, one_mul]
@@ -120,6 +100,17 @@ noncomputable def decompress_edwards_pure (bytes : Array U8 32#usize) : Option (
       none
 
 end EdwardsDecompression
+
+section EdwardsCompression
+
+/-- **Pure Edwards Compression**
+Encodes a curve point as a 256-bit integer: the canonical y-coordinate
+in the lower 255 bits, with the sign (parity) of x in bit 255.
+This is the inverse of `decompress_edwards_pure`. -/
+noncomputable def compress_edwards_pure (P : Point Ed25519) : Nat :=
+  P.y.val + (if is_negative P.x then 1 else 0) * 2 ^ 255
+
+end EdwardsCompression
 
 end curve25519_dalek.math
 
