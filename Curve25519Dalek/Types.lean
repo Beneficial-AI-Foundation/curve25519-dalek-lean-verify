@@ -184,6 +184,11 @@ structure backend.serial.curve_models.ProjectivePoint where
   Y : backend.serial.u64.field.FieldElement51
   Z : backend.serial.u64.field.FieldElement51
 
+/-- [curve25519_dalek::window::NafLookupTable5]
+    Source: 'curve25519-dalek/src/window.rs', lines 185:0-185:56 -/
+@[reducible]
+def window.NafLookupTable5 (T : Type) := Array T 8#usize
+
 /-- [curve25519_dalek::backend::serial::curve_models::AffineNielsPoint]
     Source: 'curve25519-dalek/src/backend/serial/curve_models/mod.rs', lines 184:0-188:1
     Visibility: public -/

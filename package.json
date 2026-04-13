@@ -4,18 +4,28 @@
   "description": "A project to formally verify curve25519-dalek",
   "type": "module",
   "scripts": {
+    "aeneas-extract": "tsx scripts/aeneas-extract.ts",
     "docs:dev": "vitepress dev site",
     "docs:build": "vitepress build site",
     "docs:preview": "vitepress preview site",
     "docs:rust": "bash scripts/build-rust-docs.sh",
-    "src-diff": "node scripts/src-diff.js"
+    "src-diff": "node scripts/src-diff.js",
+    "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
     "@types/cytoscape-dagre": "^2.3.4",
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
     "mermaid": "^11.12.1",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0",
     "vitepress": "^2.0.0-alpha.12"
   },
   "dependencies": {
+    "chalk": "^5.4.0",
+    "execa": "^9.5.0",
+    "js-yaml": "^4.1.0",
+    "ora": "^8.2.0",
     "@vueuse/core": "^14.1.0",
     "chart.js": "^4.4.1",
     "chartjs-adapter-date-fns": "^3.0.0",

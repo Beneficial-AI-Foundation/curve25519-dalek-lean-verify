@@ -151,7 +151,13 @@
       "Bash(git merge:*)",
       "Bash(make:*)",
       "Bash(git config:*)",
-      "Bash(lean --version)"
+      "Bash(lean --version)",
+      "Bash(aeneas-cli --help)",
+      "Bash(aeneas-cli extract:*)",
+      "Bash(node -e ':*)",
+      "Bash(node -e \"const yaml = require\\('js-yaml'\\); console.log\\('node yaml ok'\\)\")",
+      "Bash(node -e \"const yaml = require\\('/home/oliver/.nvm/versions/node/v22.20.0/lib/node_modules/aeneas-cli/node_modules/js-yaml/dist/js-yaml.mjs'\\); console.log\\('ok'\\)\")",
+      "Bash(yq --version)"
     ],
     "deny": [],
     "ask": []

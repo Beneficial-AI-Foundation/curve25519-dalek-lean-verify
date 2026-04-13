@@ -631,7 +631,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sub_spec (a b : Array U64 5#usize)\n    (ha : ∀ i < 5, a[i]!.val < 2 ^ 63) (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    sub a b ⦃ (d : FieldElement51) =>\n      (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by ...",
+   "theorem sub_spec (a b : Array U64 5#usize) (ha : ∀ i < 5, a[i]!.val < 2 ^ 63)\n    (hb : ∀ i < 5, b[i]!.val < 2 ^ 54) :\n    sub a b ⦃ (d : FieldElement51) =>\n      (∀ i < 5, d[i]!.val < 2 ^ 52) ∧\n      (Field51_as_Nat d + Field51_as_Nat b) % p = Field51_as_Nat a % p ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Sub.lean",
    "spec_docstring":
@@ -3842,7 +3842,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Reduce.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, ≤ 2^(51 + ε)\n- The result is equal to the input mod p.\n- The result value is < 2p. -/",
+   "/-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:\n- All the limbs of the result are small, < 2^52\n- The result is equal to the input mod p.\n- The result value is < 2p. -/",
    "source": "curve25519-dalek/src/backend/serial/u64/field.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
