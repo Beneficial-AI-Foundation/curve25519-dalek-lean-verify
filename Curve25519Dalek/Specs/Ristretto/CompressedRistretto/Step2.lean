@@ -15,7 +15,7 @@ import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
 /-! # Spec Theorem for `ristretto.decompress.step_2`

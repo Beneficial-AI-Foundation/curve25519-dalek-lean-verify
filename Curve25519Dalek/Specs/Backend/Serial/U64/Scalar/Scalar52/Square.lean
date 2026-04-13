@@ -8,7 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.SquareInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MulInternal
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Rr
 
 /-! # Spec Theorem for `Scalar52::square`
 

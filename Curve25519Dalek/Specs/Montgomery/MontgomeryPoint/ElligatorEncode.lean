@@ -20,8 +20,8 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Conditional
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ZERO
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MONTGOMERY_A_NEG
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MontgomeryA
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MontgomeryANeg
 
 /-! # Spec Theorem for `elligator_encode`
 

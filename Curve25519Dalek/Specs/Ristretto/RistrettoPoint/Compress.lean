@@ -15,8 +15,8 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.InvsqrtAMinusD
 
 /-! # Spec Theorem for `RistrettoPoint::compress`
 
