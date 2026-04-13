@@ -5230,11 +5230,11 @@
    "verified": false,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n      let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)\n      let x_sign_bit := cey[31]!.val.testBit 7\n      -- Decompression succeeds iff y is a valid Edwards y-coordinate\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      -- When successful:\n      (∀ ep, result = some ep →\n        -- is_well_formed_edwards_point\n        ep.IsValid ∧\n        -- Y matches the encoded y-coordinate (ZMod and Nat levels)\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧\n        -- Z = 1 (ZMod and Nat levels)\n        ep.Z.toField = 1 ∧\n        Field51_as_Nat ep.Z % p = 1 ∧\n        ep.T.toField = ep.X.toField * ep.Y.toField ∧\n        -- X sign matches bit 255\n        -- (when y² ≠ 1, i.e. the non-degenerate case where x ≠ 0)\n        (y ^ 2 ≠ 1 →\n          (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by ...",
+   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n      let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)\n      let x_sign_bit := cey[31]!.val.testBit 7\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      (∀ ep, result = some ep →\n        ep.IsValid ∧\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧\n        ep.Z.toField = 1 ∧\n        Field51_as_Nat ep.Z % p = 1 ∧\n        (y ^ 2 ≠ 1 →\n          (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean",
    "spec_docstring":
-   "/-- **Spec for `edwards.CompressedEdwardsY.decompress`**:\n- No panic (always returns successfully)\n- Returns `none` iff the y-coordinate does not admit a curve point\n- When returning `some ep`:\n  - ep.IsValid (curve equation, T = XY/Z, bounds, Z ≠ 0)\n  - Y.toField matches the encoded y-coordinate\n  - Z.toField = 1\n  - X sign matches bit 255 of the input (when y² ≠ 1)\n-/",
+   "/-- **Spec for `edwards.CompressedEdwardsY.decompress`**. No panic (always returns successfully).\n\nLet `y : CurveField` be the y-coordinate encoded in the low 255 bits of `cey`, and let\n`x_sign_bit` be bit 7 of byte 31 (the encoded sign of x).\n\n**Success condition.** Decompression returns `some` iff `y` is a valid Edwards\ny-coordinate, i.e. some curve point has that y value.\n\n**On success** (`result = some ep`):\n- `ep.IsValid` — full validity invariant (curve equation, `T = XY/Z`, bounds, `Z ≠ 0`)\n- `ep.Y.toField = y` and `Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]` —\n  `Y` matches the encoded y-coordinate at both the `ZMod` and `Nat` levels\n- `ep.Z.toField = 1` and `Field51_as_Nat ep.Z % p = 1` — `Z` is the field element 1\n- When `y^2 ≠ 1` (the non-degenerate case where `x ≠ 0`):\n  `x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1` — sign of `X` matches bit 255 of the input.\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress",
@@ -6860,11 +6860,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)\n  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)\n  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :\n    to_edwards self ⦃ result =>\n      result.X = self.x ∧ result.Y = self.y ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T % p = (Field51_as_Nat self.x * Field51_as_Nat self.y) % p ∧\n      (∀ i < 5, result.T[i]!.val < 2 ^ 52) ∧\n      (∀ i < 5, result.Z[i]!.val < 2 ^ 53) ∧\n      result.IsValid ⦄ := by ...",
+   "theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)\n  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)\n  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :\n    to_edwards self ⦃ result =>\n      result.X = self.x ∧\n      result.Y = self.y ∧\n      result.IsValid ∧\n      result.toPoint = self.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/ToEdwards.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:\n- No panic when the input AffinePoint is valid (coordinate limbs < 2^54)\n- The resulting EdwardsPoint has X = self.x, Y = self.y\n- Z has field value 1, T ≡ x · y (mod p)\n- T limbs < 2^52, Z limbs < 2^53\n- If coordinate limbs are < 2^53, the resulting EdwardsPoint is valid (IsValid)\n-/",
+   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:\n- No panic when `self` is a valid AffinePoint and its limbs are < 2^53\n- Structural: `result.X = self.x` and `result.Y = self.y` (direct Rust copies)\n- The resulting EdwardsPoint is valid: `result.IsValid`\n- Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::to_edwards",

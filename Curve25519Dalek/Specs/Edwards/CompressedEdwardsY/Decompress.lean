@@ -36,7 +36,8 @@ namespace curve25519_dalek.edwards.CompressedEdwardsY
 /-
 Natural language description:
 
-    - Decompresses a CompressedEdwardsY (U8x32 byte array) to an EdwardsPoint in extended coordinates
+    - Decompresses a CompressedEdwardsY (U8x32 byte array) to an EdwardsPoint in
+      extended coordinates
     - Extracts the y-coordinate from bytes 0-30 and the low 7 bits of byte 31 (little-endian)
     - Extracts the sign bit from the high bit of byte 31
     - Computes x from y using the curve equation: given y, solve for x² in -x² + y² = 1 + dx²y²
@@ -54,35 +55,34 @@ Natural language specs (ported from Verus):
       - The sign of X matches the sign bit (when y² ≠ 1 in the field)
 -/
 
-/-- **Spec for `edwards.CompressedEdwardsY.decompress`**:
-- No panic (always returns successfully)
-- Returns `none` iff the y-coordinate does not admit a curve point
-- When returning `some ep`:
-  - ep.IsValid (curve equation, T = XY/Z, bounds, Z ≠ 0)
-  - Y.toField matches the encoded y-coordinate
-  - Z.toField = 1
-  - X sign matches bit 255 of the input (when y² ≠ 1)
+/-- **Spec for `edwards.CompressedEdwardsY.decompress`**. No panic (always returns successfully).
+
+Let `y : CurveField` be the y-coordinate encoded in the low 255 bits of `cey`, and let
+`x_sign_bit` be bit 7 of byte 31 (the encoded sign of x).
+
+**Success condition.** Decompression returns `some` iff `y` is a valid Edwards
+y-coordinate, i.e. some curve point has that y value.
+
+**On success** (`result = some ep`):
+- `ep.IsValid` — full validity invariant (curve equation, `T = XY/Z`, bounds, `Z ≠ 0`)
+- `ep.Y.toField = y` and `Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]` —
+  `Y` matches the encoded y-coordinate at both the `ZMod` and `Nat` levels
+- `ep.Z.toField = 1` and `Field51_as_Nat ep.Z % p = 1` — `Z` is the field element 1
+- When `y^2 ≠ 1` (the non-degenerate case where `x ≠ 0`):
+  `x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1` — sign of `X` matches bit 255 of the input.
 -/
 @[step, externally_verified] -- proven in Verus
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
     edwards.CompressedEdwardsY.decompress cey ⦃ result =>
       let y : CurveField := (U8x32_as_Nat cey % 2 ^ 255 : CurveField)
       let x_sign_bit := cey[31]!.val.testBit 7
-      -- Decompression succeeds iff y is a valid Edwards y-coordinate
       (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧
-      -- When successful:
       (∀ ep, result = some ep →
-        -- is_well_formed_edwards_point
         ep.IsValid ∧
-        -- Y matches the encoded y-coordinate (ZMod and Nat levels)
         ep.Y.toField = y ∧
         Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧
-        -- Z = 1 (ZMod and Nat levels)
         ep.Z.toField = 1 ∧
         Field51_as_Nat ep.Z % p = 1 ∧
-        ep.T.toField = ep.X.toField * ep.Y.toField ∧
-        -- X sign matches bit 255
-        -- (when y² ≠ 1, i.e. the non-degenerate case where x ≠ 0)
         (y ^ 2 ≠ 1 →
           (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by
   sorry

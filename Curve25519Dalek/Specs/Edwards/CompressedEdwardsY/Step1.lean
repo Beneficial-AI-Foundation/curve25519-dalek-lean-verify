@@ -73,37 +73,35 @@ Natural language specs (ported from Verus):
     - Output bounds: Y limbs < 2^51, Z limbs < 2^51, X limbs ≤ 2^53-1
 -/
 
-/-- **Spec for `edwards.decompress.step_1`** (ported from Verus):
-- No panic (always returns successfully)
-- Returns a tuple (is_valid_y_coord, X, Y, Z) where:
-  - Y is the field element decoded from the compressed representation
-  - Z is the multiplicative identity (Z.toField = 1)
-  - is_valid_y_coord = 1 ↔ y is a valid Edwards y-coordinate (a curve point exists)
-  - If valid: (X.toField, Y.toField) satisfies the curve equation -x² + y² = 1 + dx²y²
-  - X has even parity and limbs ≤ 2^53 - 1
+/-- **Spec for `edwards.decompress.step_1`**. No panic.
+
+Returns a tuple `(is_valid_y_coord, X, Y, Z)` — let `x := X.toField`, `y := Y.toField`.
+
+- `Y` is the field element decoded from the low 255 bits of `cey`:
+  `Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]`, with `Y` limbs `< 2^51`.
+- `Z` is the multiplicative identity: `Field51_as_Nat Z = 1`, with `Z` limbs `< 2^51`.
+- `X` is the non-negative square root produced by `sqrt_ratio_i`:
+  limbs `≤ 2^53 - 1` (inherited from `sqrt_ratio_i_spec'` — see
+  `Ed_audit_ref/README.md` DEFER-1), parity `(Field51_as_Nat X % p) % 2 = 0`.
+- `is_valid_y_coord.val = 1` iff `y` is a valid Edwards y-coordinate, i.e. there
+  exists some `x'` satisfying the twisted Edwards curve equation
+  `a·x'^2 + y^2 = 1 + d·x'^2·y^2`.
+- When valid, the pair `(x, y)` satisfies that same equation.
 -/
 @[step]
-theorem step_1_spec (cey : edwards.CompressedEdwardsY)
-    (bytes : Aeneas.Std.Array U8 32#usize)
-    (h_byter : cey.as_bytes = ok bytes) :
+theorem step_1_spec (cey : edwards.CompressedEdwardsY) :
     edwards.decompress.step_1 cey ⦃ result =>
       let (is_valid_y_coord, X, Y, Z) := result
       let x := X.toField
       let y := Y.toField
-      -- Y is the field element decoded from the input bytes
-      Field51_as_Nat Y ≡ (U8x32_as_Nat bytes % 2 ^ 255) [MOD p] ∧
+      Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧
       (∀ i < 5, Y[i]!.val < 2 ^ 51) ∧
-      -- Z is the multiplicative identity
       Field51_as_Nat Z = 1 ∧
       (∀ i < 5, Z[i]!.val < 2 ^ 51) ∧
-      -- X bounds and non-negativity
       (∀ i < 5, X[i]!.val ≤ 2 ^ 53 - 1) ∧
       (Field51_as_Nat X % p) % 2 = 0 ∧
-      -- is_valid ↔ valid Edwards y-coordinate
-      -- (there exists an x such that the curve equation holds)
       (is_valid_y_coord.val = 1#u8 ↔
         ∃ x' : CurveField, Ed25519.a * x' ^ 2 + y ^ 2 = 1 + Ed25519.d * x' ^ 2 * y ^ 2) ∧
-      -- if valid, (X, Y) is on the curve
       (is_valid_y_coord.val = 1#u8 →
         Ed25519.a * x ^ 2 + y ^ 2 = 1 + Ed25519.d * x ^ 2 * y ^ 2) ⦄ := by
   sorry

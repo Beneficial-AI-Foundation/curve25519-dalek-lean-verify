@@ -35,14 +35,11 @@ natural language description:
 
 natural language specs:
 
-    When the function succeeds (no panic when input limbs < 2^54):
-      - The X and Y coordinates are exactly the input x and y
-      - The Z coordinate is the field element 1 (Field51_as_Nat Z = 1)
-      - The T coordinate satisfies T ≡ x · y (mod p)
-      - T limbs are bounded by 2^52, Z limbs by 2^53
-      - If the input AffinePoint is valid and its coordinate limbs are < 2^53,
-        the resulting EdwardsPoint is valid (IsValid) and represents the same
-        mathematical curve point: result.toPoint = self.toPoint
+    When the input is a valid AffinePoint with limbs satisfying the tighter < 2^53 bound:
+      - Structurally, X = self.x and Y = self.y (direct Rust copies)
+      - The resulting EdwardsPoint is valid (IsValid)
+      - The conversion preserves the represented mathematical point:
+        result.toPoint = self.toPoint in `Point Ed25519`
 -/
 
 @[step]
@@ -53,23 +50,20 @@ private lemma ONE_bounds_spec :
   decide
 
 /-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:
-- No panic when the input AffinePoint is valid (coordinate limbs < 2^54)
-- The resulting EdwardsPoint has X = self.x, Y = self.y
-- Z has field value 1, T ≡ x · y (mod p)
-- T limbs < 2^52, Z limbs < 2^53
-- If coordinate limbs are < 2^53, the resulting EdwardsPoint is valid (IsValid)
+- No panic when `self` is a valid AffinePoint and its limbs are < 2^53
+- Structural: `result.X = self.x` and `result.Y = self.y` (direct Rust copies)
+- The resulting EdwardsPoint is valid: `result.IsValid`
+- Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)
 -/
 @[step]
 theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
   (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
   (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
     to_edwards self ⦃ result =>
-      result.X = self.x ∧ result.Y = self.y ∧
-      Field51_as_Nat result.Z = 1 ∧
-      Field51_as_Nat result.T % p = (Field51_as_Nat self.x * Field51_as_Nat self.y) % p ∧
-      (∀ i < 5, result.T[i]!.val < 2 ^ 52) ∧
-      (∀ i < 5, result.Z[i]!.val < 2 ^ 53) ∧
-      result.IsValid ⦄ := by
+      result.X = self.x ∧
+      result.Y = self.y ∧
+      result.IsValid ∧
+      result.toPoint = self.toPoint ⦄ := by
   unfold to_edwards
   have hx : ∀ i < 5, self.x[i]!.val < 2 ^ 54 := hself.x_valid
   have hy : ∀ i < 5, self.y[i]!.val < 2 ^ 54 := hself.y_valid
@@ -81,8 +75,7 @@ theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
     unfold FieldElement51.toField
     have h := Edwards.lift_mod_eq _ _ hT_mod
     push_cast at h; exact h
-  refine ⟨hZ_val, hT_mod, hT_bounds, hZ_bounds, ?_⟩
-  exact {
+  have hres_valid : ({ X := self.x, Y := self.y, Z := Z, T := T } : EdwardsPoint).IsValid := {
     X_bounds := hx53
     Y_bounds := hy53
     Z_bounds := hZ_bounds
@@ -91,5 +84,12 @@ theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
     T_relation := by rw [hT_F, hZ_F, mul_one]
     on_curve := by dsimp only; rw [hZ_F]; simp only [one_pow, mul_one]; exact hself.on_curve
   }
+  refine ⟨hres_valid, ?_⟩
+  have ⟨hpx, hpy⟩ := EdwardsPoint.toPoint_of_isValid hres_valid
+  unfold AffinePoint.toPoint
+  rw [dif_pos hself]
+  ext
+  · simp [hpx, hZ_F]
+  · simp [hpy, hZ_F]
 
 end curve25519_dalek.edwards.affine.AffinePoint
