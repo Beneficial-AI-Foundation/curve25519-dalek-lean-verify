@@ -412,10 +412,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "-- proven in Verus\ntheorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "theorem sub_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Sub.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
+   "/-- **Spec and proof concerning\n`Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs (in the context of elliptic curve subtraction)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Sub<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
@@ -5949,11 +5949,13 @@
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem sub_spec (self other : EdwardsPoint)\n    (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    sub self other ⦃ result =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Sub.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning\n`edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the difference of the inputs\n-/",
    "source": "curve25519-dalek/src/macros.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Sub<curve25519_dalek::edwards::EdwardsPoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::sub",
@@ -6480,10 +6482,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_affine_spec (e : EdwardsPoint)\n    (hX : ∀ i < 5, e.X[i]!.val < 2 ^ 54)\n    (hY : ∀ i < 5, e.Y[i]!.val < 2 ^ 54)\n    (hZ : ∀ i < 5, e.Z[i]!.val < 2 ^ 54) :\n    to_affine e ⦃ ap =>\n      let X := Field51_as_Nat e.X\n      let Y := Field51_as_Nat e.Y\n      let Z := Field51_as_Nat e.Z\n      let x := Field51_as_Nat ap.x\n      let y := Field51_as_Nat ap.y\n      (if Z % p = 0 then\n        x % p = 0 ∧ y % p = 0\n      else\n        (x * Z) % p = X % p ∧\n        (y * Z) % p = Y % p) ∧\n        (∀ i < 5, ap.x[i]!.val < 2 ^ 52) ∧\n        (∀ i < 5, ap.y[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem to_affine_spec (e : EdwardsPoint) (hself : e.IsValid) :\n    to_affine e ⦃ ap =>\n      ap.IsValid ∧\n      ap.toPoint = e.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/ToAffine.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_affine`**:\n- No panic (always returns successfully)\n- For the input Edwards point (X, Y, Z, T), the resulting AffinePoint has coordinates:\n  - If Z ≢ 0 (mod p): x * Z ≡ X (mod p) and y * Z ≡ Y (mod p)\n  - If Z ≡ 0 (mod p): x ≡ 0 (mod p) and y ≡ 0 (mod p)\nwhere p = 2^255 - 19\n-/",
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.to_affine`** (math-bridged):\n- Requires `self.IsValid` (limbs `< 2^53`, `Z ≠ 0`, extended relation, curve equation).\n- Ensures `result.IsValid` (the affine point satisfies the curve equation).\n- Math bridge: `result.toPoint = self.toPoint` in `Point Ed25519`.\n\nWraps the operational `to_affine_spec'` and lifts its Nat-modular postconditions to\nthe abstract `Point Ed25519` group.\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine",
