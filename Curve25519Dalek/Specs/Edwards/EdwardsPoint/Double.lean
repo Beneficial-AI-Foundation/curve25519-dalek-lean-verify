@@ -24,6 +24,7 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.edwards.EdwardsPoint
 /-new-/
 open Edwards backend.serial.curve_models backend.serial.curve_models.ProjectivePoint
+  backend.serial.u64.field
 
 -- The `linear_combination` steps require extra heartbeats
 -- for the algebraic verification of the curve equation.
@@ -50,11 +51,9 @@ theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
       ∀ i < 5, pp.Y[i]!.val < 2 ^ 53 := by
     intro i hi; rw [hpp_Y]
     exact he_valid.Y_bounds i hi
-  have hZ_bounds :
-      ∀ i < 5, pp.Z[i]!.val < 2 ^ 54 := by
-    intro i hi; rw [hpp_Z]
-    exact Nat.lt_trans (he_valid.Z_bounds i hi)
-      (by norm_num : 2 ^ 53 < 2 ^ 54)
+  have hZ_bounds : pp.Z.IsValid := by
+    rw [hpp_Z]
+    exact FieldElement51.IsValid_of_lt_pow he_valid.Z_bounds (by decide)
   -- Step 2: ProjectivePoint.double
   apply WP.spec_bind
     (double_spec_aux pp
@@ -131,18 +130,10 @@ theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
           (1 - Ed25519.d * x ^ 2 * y ^ 2) := by
     rw [h_YX_factor, h_yx_sq]; ring
   -- Prove CompletedPoint validity
-  have hcX_valid : cp.X.IsValid :=
-    fun i hi => Nat.lt_trans (hcX_bounds i hi)
-      (by norm_num : 2 ^ 52 < 2 ^ 54)
-  have hcY_valid : cp.Y.IsValid :=
-    fun i hi => Nat.lt_trans (hcY_bounds i hi)
-      (by norm_num : 2 ^ 53 < 2 ^ 54)
-  have hcZ_valid : cp.Z.IsValid :=
-    fun i hi => Nat.lt_trans (hcZ_bounds i hi)
-      (by norm_num : 2 ^ 52 < 2 ^ 54)
-  have hcT_valid : cp.T.IsValid :=
-    fun i hi => Nat.lt_trans (hcT_bounds i hi)
-      (by norm_num : 2 ^ 52 < 2 ^ 54)
+  have hcX_valid : cp.X.IsValid := FieldElement51.IsValid_of_lt_pow hcX_bounds (by decide)
+  have hcY_valid : cp.Y.IsValid := FieldElement51.IsValid_of_lt_pow hcY_bounds (by decide)
+  have hcZ_valid : cp.Z.IsValid := FieldElement51.IsValid_of_lt_pow hcZ_bounds (by decide)
+  have hcT_valid : cp.T.IsValid := FieldElement51.IsValid_of_lt_pow hcT_bounds (by decide)
   have h_cp_Z_ne : cp.Z.toField ≠ 0 := by
     rw [hZ_F, h_YX_factor, h_yx_sq]
     apply mul_ne_zero hz2 h_denom_plus

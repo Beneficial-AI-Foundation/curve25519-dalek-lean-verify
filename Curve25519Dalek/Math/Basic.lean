@@ -179,6 +179,14 @@ def FieldElement51.IsValid (fe : FieldElement51) : Prop := ∀ i < 5, fe[i]!.val
 instance FieldElement51.instDecidableIsValid (fe : FieldElement51) : Decidable fe.IsValid :=
   show Decidable (∀ i < 5, fe[i]!.val < 2^54) from inferInstance
 
+/-- Lift a tighter limb bound (`< 2^k` for any `k ≤ 54`) to `FieldElement51.IsValid`.
+Eliminates the repeated `Nat.lt_trans (h i hi) (by norm_num : 2^k < 2^54)` boilerplate
+that appears across the Double / Add / Sub specs. -/
+lemma FieldElement51.IsValid_of_lt_pow
+    {fe : FieldElement51} {k : ℕ}
+    (h : ∀ i < 5, fe[i]!.val < 2 ^ k) (hk : k ≤ 54) : fe.IsValid :=
+  fun i hi => Nat.lt_of_lt_of_le (h i hi) (Nat.pow_le_pow_right (by decide) hk)
+
 end curve25519_dalek.backend.serial.u64.field
 
 /-! ## Field Utility Functions -/

@@ -402,7 +402,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
         have hJ_I : compress_invsqrt P ^ 2 = I ^ 2 * Z ^ 6 := by
           have hI_u := h_I_sq_mul hd
           have hJ_u : compress_invsqrt P ^ 2 * u1_u2_sq.toField = Z ^ 6 := by
-            rwa [h_aff, ← mul_div_assoc, div_eq_iff (pow_ne_zero 6 hZ_ne), one_mul] at hJ_sq
+            rw [h_aff, ← mul_div_assoc, div_eq_iff (pow_ne_zero 6 hZ_ne), one_mul] at hJ_sq
+            exact hJ_sq
           have : u1_u2_sq.toField * (compress_invsqrt P ^ 2 - I ^ 2 * Z ^ 6) = 0 := by
             linear_combination hJ_u - hI_u * Z ^ 6
           exact sub_eq_zero.mp ((mul_eq_zero.mp this).resolve_left hd)

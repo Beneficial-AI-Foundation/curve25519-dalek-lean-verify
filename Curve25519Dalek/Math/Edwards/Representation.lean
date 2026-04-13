@@ -152,16 +152,14 @@ end curve25519_dalek.edwards.affine
 namespace curve25519_dalek.edwards
 open curve25519_dalek.backend.serial.u64.field Edwards
 
-/-- Validity predicate for EdwardsPoint.
-An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
-Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54). -/
+/-- Semantic curve-point invariant for the extended-coordinate representation.
+
+Captures exactly what is needed to interpret `(X, Y, Z, T)` as a well-defined
+mathematical point on Ed25519: `Z ≠ 0`, the extended coordinate relation
+`T = XY/Z`, and the projective curve equation. Limb bounds live separately
+in `EdwardsPoint.IsValid`. -/
 @[mk_iff]
-structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
-  /-- All coordinate limbs are bounded by 2^53. -/
-  X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
-  Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53
-  Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53
-  T_bounds : ∀ i < 5, e.T[i]!.val < 2 ^ 53
+structure EdwardsPoint.OnCurve (e : EdwardsPoint) : Prop where
   /-- The Z coordinate is non-zero in the field. -/
   Z_ne_zero : e.Z.toField ≠ 0
   /-- Extended coordinate relation: T = XY/Z, i.e., XY = TZ. -/
@@ -171,12 +169,31 @@ structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop where
     let X := e.X.toField; let Y := e.Y.toField; let Z := e.Z.toField
     Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
+instance EdwardsPoint.instDecidableOnCurve (e : EdwardsPoint) : Decidable e.OnCurve :=
+  decidable_of_iff _ (onCurve_iff e).symm
+
+/-- Validity predicate for EdwardsPoint.
+An EdwardsPoint (X, Y, Z, T) represents the affine point (X/Z, Y/Z) with T = XY/Z.
+Bounds: all coordinates < 2^53 (needed for add operations where Y+X < 2^54).
+
+Layered over `EdwardsPoint.OnCurve`: `IsValid` adds the per-limb bounds needed for
+the underlying Rust arithmetic, while `OnCurve` carries the pure mathematical
+content used by `toPoint'`. -/
+@[mk_iff]
+structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop extends EdwardsPoint.OnCurve e where
+  /-- All coordinate limbs are bounded by 2^53. -/
+  X_bounds : ∀ i < 5, e.X[i]!.val < 2 ^ 53
+  Y_bounds : ∀ i < 5, e.Y[i]!.val < 2 ^ 53
+  Z_bounds : ∀ i < 5, e.Z[i]!.val < 2 ^ 53
+  T_bounds : ∀ i < 5, e.T[i]!.val < 2 ^ 53
+
 instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsValid :=
   decidable_of_iff _ (isValid_iff e).symm
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
-Requires a proof that the point is valid. -/
-def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
+Requires a proof that the point semantically represents a curve point
+(`OnCurve`); limb bounds are not needed. -/
+def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.OnCurve) : Point Ed25519 :=
   let X := e.X.toField
   let Y := e.Y.toField
   let Z := e.Z.toField
@@ -195,7 +212,7 @@ def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.IsValid) : Point Ed25519 :=
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
 Returns 0 if the point is not valid. -/
 def EdwardsPoint.toPoint (e : EdwardsPoint) : Point Ed25519 :=
-  if h : e.IsValid then e.toPoint' h else 0
+  if h : e.IsValid then e.toPoint' h.toOnCurve else 0
 
 /-- Unfolding lemma: when an EdwardsPoint is valid, toPoint computes (X/Z, Y/Z). -/
 theorem EdwardsPoint.toPoint_of_isValid {e : EdwardsPoint} (h : e.IsValid) :
