@@ -10947,10 +10947,11 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)\n    (h_lo : 4 ≤ w.val) (h_hi : w.val ≤ 8)\n    (h_top : (self.bytes[31]!).val ≤ 127) :\n    as_radix_2w self w ⦃ result =>\n      I8x64_as_Radix2w w.val result = ↑(U8x32_as_Nat self.bytes) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/AsRadix2w.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
@@ -10968,10 +10969,11 @@
     "curve25519_dalek.scalar.read_le_u64_into",
     "curve25519_dalek.scalar.Scalar.as_radix_2w_loop"]},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem as_radix_2w_loop_spec\n    (iter : core.ops.range.Range Std.Usize)\n    (w : Std.Usize)\n    (scalar64x4 : Array Std.U64 4#usize)\n    (radix window_mask : Std.U64)\n    (carry : Std.U64)\n    (digits : Array Std.I8 64#usize)\n    (K : ℕ) (N : ℕ)\n    (hw_lo : 5 ≤ w.val) (hw_hi : w.val ≤ 8)\n    (h_radix : radix.val = 2 ^ w.val)\n    (h_mask : window_mask.val = 2 ^ w.val - 1)\n    (h_N : N = X64_as_Nat scalar64x4)\n    (h_N_lt : N < 2 ^ (w.val * K))\n    (hK_le64 : K ≤ 64)\n    (hK_le_digits : K * w.val ≤ 255 + w.val)\n    (h_end : iter.end.val = K)\n    (h_start : iter.start.val ≤ K)\n    (h_inv : ∑ j ∈ Finset.range iter.start.val, (2 ^ w.val : ℤ) ^ j * (digits[j]!).val\n                + (carry.val : ℤ) * (2 ^ w.val) ^ iter.start.val\n                = ↑(N % 2 ^ (w.val * iter.start.val)))\n    (h_carry : carry.val ≤ 1)\n    (h_bounds : ∀ j < iter.start.val,\n        -(2 ^ (w.val - 1) : ℤ) ≤ (digits[j]!).val ∧ (digits[j]!).val < 2 ^ (w.val - 1))\n    (h_tail : ∀ j, iter.start.val ≤ j → j < 64 → (digits[j]! : Std.I8).val = 0) :\n    as_radix_2w_loop iter w scalar64x4 radix window_mask carry digits ⦃ result =>\n      ∑ j ∈ Finset.range K, (2 ^ w.val : ℤ) ^ j * (result.2[j]!).val\n      + (result.1.val : ℤ) * (2 ^ w.val) ^ K = ↑N ∧\n      result.1.val ≤ 1 ∧\n      (∀ j < K,\n        -(2 ^ (w.val - 1) : ℤ) ≤ (result.2[j]!).val ∧\n        (result.2[j]!).val < 2 ^ (w.val - 1)) ∧\n      (∀ j, K ≤ j → j < 64 → (result.2[j]! : Std.I8).val = 0) ⦄ := ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/AsRadix2w.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
