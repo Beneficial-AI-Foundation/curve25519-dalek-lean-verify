@@ -6,7 +6,7 @@ Authors: Markus Dablander, Oliver Butterley, Theo Ehrenborg
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Rr
 
 set_option exponentiation.threshold 260
 
