@@ -5,6 +5,7 @@ Authors: Oliver Butterley, Zhang-Liao, Alessandro D'Angelo,
   Hoang Le Truong, Markus Ferdinand Dablander
 -/
 import Aeneas
+import Curve25519Dalek.Lint.Basic
 import Curve25519Dalek.Types
 
 /-!
