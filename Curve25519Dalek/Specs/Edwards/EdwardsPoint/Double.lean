@@ -244,3 +244,5 @@ theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
               (e.toPoint).y) := by
             rw [h_ex, h_ey]
             simp only [Ed25519]; ring
+
+end curve25519_dalek.edwards.EdwardsPoint

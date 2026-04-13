@@ -5409,7 +5409,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    eq self other ⦃ result =>\n    result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
+   "theorem eq_spec (self other : EdwardsPoint)\n    (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    eq self other ⦃ result =>\n      result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Eq.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.PartialEqEdwardsPoint.eq`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is `true` if and only if the two points represent the same point on the curve\n-/",
