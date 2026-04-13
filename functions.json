@@ -198,7 +198,7 @@
    "theorem add_spec\n    (self other : edwards.EdwardsPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    add self other ⦃ (result : edwards.EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
+   "/-- **Spec and proof** concerning:\n`Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add`:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{core::ops::arith::Add<&'a (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
@@ -5590,7 +5590,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n    result.IsValid ∧\n    result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
+   "theorem add_spec (self other : EdwardsPoint)\n    (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :\n    add self other ⦃ result =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Add.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.AddEdwardsPointEdwardsPointEdwardsPoint.add`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Edwards point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
@@ -6162,10 +6162,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z) ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
+   "theorem ct_eq_spec (e1 e2 : EdwardsPoint)\n  -- Bounds are needed for the internal field multiplications\n  (h_e1_X : ∀ i, i < 5 → e1.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Y : ∀ i, i < 5 → e1.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e1_Z : ∀ i, i < 5 → e1.Z.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_X : ∀ i, i < 5 → e2.X.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Y : ∀ i, i < 5 → e2.Y.val[i]!.val ≤ 2 ^ 53)\n  (h_e2_Z : ∀ i, i < 5 → e2.Z.val[i]!.val ≤ 2 ^ 53) :\n  ct_eq e1 e2 ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat e1.X * Field51_as_Nat e2.Z)\n      ≡ (Field51_as_Nat e2.X * Field51_as_Nat e1.Z) [MOD p] ∧\n    (Field51_as_Nat e1.Y * Field51_as_Nat e2.Z)\n      ≡ (Field51_as_Nat e2.Y * Field51_as_Nat e1.Z) [MOD p]) ∧\n  (e1.IsValid → e2.IsValid → (c = Choice.one ↔ e1.toPoint = e2.toPoint)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/CtEq.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in affine coordinates\n- When both points are valid, this is equivalent to toPoint equality\n-/",
+   "/-- **Spec and proof concerning `edwards.ConstantTimeEqEdwardsPoint.ct_eq`**:\n- No panic (always returns successfully)\n- The result is `Choice.one` (true) iff the two points are equal (mod p) in\n  affine coordinates\n- When both points are valid, this is equivalent to `toPoint` equality\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq",
@@ -6255,10 +6255,10 @@
    "verified": false,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (self : EdwardsPoint) (hX : ∀ i < 5, self.X[i]!.val < 2 ^ 54)\n      (hY : ∀ i < 5, self.Y[i]!.val < 2 ^ 54) (hZ : ∀ i < 5, self.Z[i]!.val < 2 ^ 54)\n      -- (hself : self.IsValid)\n      :\n    compress self ⦃ result => True ⦄ := by ...",
+   "theorem compress_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    compress self ⦃ result =>\n      U8x32_as_Nat result = compress_edwards_pure self.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/Compress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.EdwardsPoint.compress`**:\n- No panic when Z is invertible / not zero (always returns successfully)\n- On success, returns a CompressedEdwardsY (U8x32 byte array) where:\n  - Bytes 0-30 and the low 7 bits of byte 31 encode the affine y-coordinate in little-endian\n  - The high bit of byte 31 encodes the sign (parity) of the affine x-coordinate\n-/",
+   "/-- **Spec and proof concerning `edwards.EdwardsPoint.compress`**:\n- Requires `self.IsValid` (limbs < 2^53, Z ≠ 0, extended relation, curve equation).\n- Ensures the compressed bytes equal the pure mathematical compression of the\n  corresponding abstract point:\n  `U8x32_as_Nat result = compress_edwards_pure self.toPoint`.\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress",
