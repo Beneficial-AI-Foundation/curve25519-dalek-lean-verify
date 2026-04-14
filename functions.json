@@ -2662,7 +2662,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean",
    "spec_docstring":
-   "/--\nVerification of the `double` function.\nThe theorem states that the Rust implementation of point doubling corresponds\nexactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.\n-/",
+   "/-- Verification of the `double` function for `ProjectivePoint`.\nThin wrapper over `double_spec_core`: widens bounds from `< 2^52`\nto `< 2^53` and bridges `toPoint' → toPoint`. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
