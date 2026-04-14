@@ -18,3 +18,16 @@ A verso powered page which shows the signature of each spec theorem together wit
 - Lean project contains the spec theorems
 
 - Proof status is obtained from the Lean (i.e., print_axioms).  
+
+
+
+## Lean for curve-dalek
+
+- Produce a repo which mirrors the latest version of curve-dalek together with spec theorems and proofs in Lean
+- Demonstrate the details to Michael
+- For a period of time, keep this repo side-by-side mirroring the main repo to test and demostrate the workflow of updating proofs
+
+
+Comments: 
+- just 1/3 of the crates at the moment
+- just 64 bit serial backed.
