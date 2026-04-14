@@ -440,6 +440,7 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.edwards.decompress.step_2",
   -- Scalar
   "curve25519_dalek.scalar.Scalar.non_adjacent_form",
+   "curve25519_dalek.scalar.Scalar.batch_invert",
    -- Variable-base scalar multiplication
   "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
   "curve25519_dalek.backend.variable_base_mul"
