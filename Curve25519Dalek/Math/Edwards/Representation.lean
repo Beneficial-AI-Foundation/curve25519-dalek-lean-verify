@@ -121,23 +121,39 @@ namespace curve25519_dalek.edwards.affine
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
 
-/-- Validity predicate for AffinePoint.
-An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation. -/
+/-- Semantic curve-point invariant for the affine representation.
+
+Captures exactly what is needed to interpret `(x, y)` as a well-defined
+mathematical point on Ed25519: the twisted Edwards curve equation.
+Limb bounds live separately in `AffinePoint.IsValid`. -/
 @[mk_iff]
-structure AffinePoint.IsValid (a : AffinePoint) : Prop where
-  /-- Coordinates must be valid field elements (limbs < 2^54). -/
-  x_valid : a.x.IsValid
-  y_valid : a.y.IsValid
+structure AffinePoint.OnCurve (a : AffinePoint) : Prop where
   /-- The point must satisfy the twisted Edwards equation: -x² + y² = 1 + dx²y² -/
   on_curve :
     let x := a.x.toField
     let y := a.y.toField
     Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2
 
+instance AffinePoint.instDecidableOnCurve (a : AffinePoint) : Decidable a.OnCurve :=
+  decidable_of_iff _ (onCurve_iff a).symm
+
+/-- Validity predicate for AffinePoint.
+An AffinePoint contains raw field elements (x, y) which must satisfy the curve equation.
+
+Layered over `AffinePoint.OnCurve`: `IsValid` adds the per-limb bounds needed for
+the underlying Rust arithmetic, while `OnCurve` carries the pure mathematical
+content used by `toPoint`. -/
+@[mk_iff]
+structure AffinePoint.IsValid (a : AffinePoint) : Prop extends AffinePoint.OnCurve a where
+  /-- Coordinates must be valid field elements (limbs < 2^54). -/
+  x_valid : a.x.IsValid
+  y_valid : a.y.IsValid
+
 instance AffinePoint.instDecidableIsValid (a : AffinePoint) : Decidable a.IsValid :=
   decidable_of_iff _ (isValid_iff a).symm
 
-/-- Convert an AffinePoint to the mathematical Point. -/
+/-- Convert an AffinePoint to the mathematical Point.
+Requires only `OnCurve`; limb bounds are not needed. -/
 def AffinePoint.toPoint (a : AffinePoint) : Point Ed25519 :=
   if h : a.IsValid then
     { x := a.x.toField
@@ -250,72 +266,86 @@ namespace curve25519_dalek.backend.serial.curve_models
 open Edwards
 
 open curve25519_dalek.backend.serial.u64.field in
-/-- Validity predicate for ProjectivePoint.
-A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
-For this to be on Ed25519, we need: a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)²
-Clearing denominators: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
+/-- Semantic curve-point invariant for the projective representation.
 
-Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
-because operations like `double` compute X + Y, which must be < 2^54 for subsequent
-squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54. -/
+Captures exactly what is needed to interpret `(X, Y, Z)` as a well-defined
+mathematical point on Ed25519: `Z ≠ 0` and the projective curve equation.
+Limb bounds live separately in `ProjectivePoint.IsValid`. -/
 @[mk_iff]
-structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop where
-  /-- All coordinate limbs are bounded by 2^52. -/
-  X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
-  Y_bounds : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52
-  Z_bounds : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52
-  /-- The Z coordinate is non-zero. -/
+structure ProjectivePoint.OnCurve (pp : ProjectivePoint) : Prop where
+  /-- The Z coordinate is non-zero in the field. -/
   Z_ne_zero : pp.Z.toField ≠ 0
   /-- The curve equation (cleared denominators). -/
   on_curve :
     let X := pp.X.toField; let Y := pp.Y.toField; let Z := pp.Z.toField
     Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2
 
+instance ProjectivePoint.instDecidableOnCurve (pp : ProjectivePoint) : Decidable pp.OnCurve :=
+  decidable_of_iff _ (onCurve_iff pp).symm
+
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for ProjectivePoint.
+A ProjectivePoint (X, Y, Z) represents the affine point (X/Z, Y/Z).
+
+Note: ProjectivePoint coordinates must have the tighter bound < 2^52 (not just < 2^54)
+because operations like `double` compute X + Y, which must be < 2^54 for subsequent
+squaring. With coords < 2^52, we get X + Y < 2^53 < 2^54.
+
+Layered over `ProjectivePoint.OnCurve`: `IsValid` adds the per-limb bounds needed for
+the underlying Rust arithmetic, while `OnCurve` carries the pure mathematical
+content used by `toPoint'`. -/
+@[mk_iff]
+structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop
+    extends ProjectivePoint.OnCurve pp where
+  /-- All coordinate limbs are bounded by 2^52. -/
+  X_bounds : ∀ i < 5, pp.X[i]!.val < 2 ^ 52
+  Y_bounds : ∀ i < 5, pp.Y[i]!.val < 2 ^ 52
+  Z_bounds : ∀ i < 5, pp.Z[i]!.val < 2 ^ 52
+
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
   decidable_of_iff _ (isValid_iff pp).symm
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
+Requires only `OnCurve`; limb bounds are not needed. -/
+noncomputable def ProjectivePoint.toPoint' (pp : ProjectivePoint) (h : pp.OnCurve) :
+    Point Ed25519 :=
+  let X := pp.X.toField
+  let Y := pp.Y.toField
+  let Z := pp.Z.toField
+  { x := X / Z
+    y := Y / Z
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
+      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, hz4]
+      linear_combination hcurve }
+
+/-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
 Returns 0 if the point is not valid. -/
 noncomputable def ProjectivePoint.toPoint (pp : ProjectivePoint) : Point Ed25519 :=
-  if h : pp.IsValid then
-    let X := pp.X.toField
-    let Y := pp.Y.toField
-    let Z := pp.Z.toField
-    { x := X / Z
-      y := Y / Z
-      on_curve := by
-        have hz : Z ≠ 0 := h.Z_ne_zero
-        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-        have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
-        have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
-        simp only [Ed25519] at hcurve ⊢
-        simp only [div_pow]
-        field_simp [hz2, hz4]
-        linear_combination hcurve }
-  else 0
+  if h : pp.IsValid then pp.toPoint' h.toOnCurve else 0
 
 /-- Unfolding lemma: when a ProjectivePoint is valid, toPoint computes (X/Z, Y/Z). -/
 theorem ProjectivePoint.toPoint_of_isValid {pp : ProjectivePoint} (h : pp.IsValid) :
     (pp.toPoint).x = pp.X.toField / pp.Z.toField ∧
     (pp.toPoint).y = pp.Y.toField / pp.Z.toField := by
-  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
+  unfold toPoint; rw [dif_pos h]; simp only [toPoint']; trivial
 
 /-! ## CompletedPoint Validity and Casting -/
 
 open curve25519_dalek.backend.serial.u64.field in
-/-- Validity predicate for CompletedPoint.
-A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
-For this to be on Ed25519, we need: a*(X/Z)² + (Y/T)² = 1 + d*(X/Z)²*(Y/T)²
-Clearing denominators: a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²
+/-- Semantic curve-point invariant for the completed-coordinate representation.
 
-All coordinates use the universal bound < 2^54. -/
+Captures exactly what is needed to interpret `(X, Y, Z, T)` as a well-defined
+mathematical point on Ed25519 (with affine coordinates X/Z, Y/T): both `Z ≠ 0`
+and `T ≠ 0`, plus the projective curve equation.
+Limb bounds live separately in `CompletedPoint.IsValid`. -/
 @[mk_iff]
-structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
-  /-- All coordinate limbs are bounded by 2^54. -/
-  X_valid : cp.X.IsValid
-  Y_valid : cp.Y.IsValid
-  Z_valid : cp.Z.IsValid
-  T_valid : cp.T.IsValid
+structure CompletedPoint.OnCurve (cp : CompletedPoint) : Prop where
   /-- The Z coordinate is non-zero. -/
   Z_ne_zero : cp.Z.toField ≠ 0
   /-- The T coordinate is non-zero. -/
@@ -327,41 +357,66 @@ structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop where
     Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2
 
 open curve25519_dalek.backend.serial.u64.field in
+instance CompletedPoint.instDecidableOnCurve (cp : CompletedPoint) : Decidable cp.OnCurve :=
+  decidable_of_iff _ (onCurve_iff cp).symm
+
+open curve25519_dalek.backend.serial.u64.field in
+/-- Validity predicate for CompletedPoint.
+A CompletedPoint (X, Y, Z, T) represents the affine point (X/Z, Y/T).
+All coordinates use the universal bound < 2^54.
+
+Layered over `CompletedPoint.OnCurve`: `IsValid` adds the per-limb bounds needed for
+the underlying Rust arithmetic, while `OnCurve` carries the pure mathematical
+content used by `toPoint'`. -/
+@[mk_iff]
+structure CompletedPoint.IsValid (cp : CompletedPoint) : Prop
+    extends CompletedPoint.OnCurve cp where
+  /-- All coordinate limbs are bounded by 2^54. -/
+  X_valid : cp.X.IsValid
+  Y_valid : cp.Y.IsValid
+  Z_valid : cp.Z.IsValid
+  T_valid : cp.T.IsValid
+
+open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
   decidable_of_iff _ (isValid_iff cp).symm
 
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
+Requires only `OnCurve`; limb bounds are not needed. -/
+noncomputable def CompletedPoint.toPoint' (cp : CompletedPoint) (h : cp.OnCurve) :
+    Point Ed25519 :=
+  let X := cp.X.toField
+  let Y := cp.Y.toField
+  let Z := cp.Z.toField
+  let T := cp.T.toField
+  { x := X / Z
+    y := Y / T
+    on_curve := by
+      have hz : Z ≠ 0 := h.Z_ne_zero
+      have ht : T ≠ 0 := h.T_ne_zero
+      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
+      have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
+      have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 :=
+          h.on_curve
+      simp only [Ed25519] at hcurve ⊢
+      simp only [div_pow]
+      field_simp [hz2, ht2]
+      linear_combination hcurve }
+
+/-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
 Returns 0 if the point is not valid. -/
 noncomputable def CompletedPoint.toPoint (cp : CompletedPoint) : Point Ed25519 :=
-  if h : cp.IsValid then
-    let X := cp.X.toField
-    let Y := cp.Y.toField
-    let Z := cp.Z.toField
-    let T := cp.T.toField
-    { x := X / Z
-      y := Y / T
-      on_curve := by
-        have hz : Z ≠ 0 := h.Z_ne_zero
-        have ht : T ≠ 0 := h.T_ne_zero
-        have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-        have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
-        have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 :=
-            h.on_curve
-        simp only [Ed25519] at hcurve ⊢
-        simp only [div_pow]
-        field_simp [hz2, ht2]
-        linear_combination hcurve }
-  else 0
+  if h : cp.IsValid then cp.toPoint' h.toOnCurve else 0
 
 /-- Unfolding lemma: when a CompletedPoint is valid, toPoint computes (X/Z, Y/T). -/
 theorem CompletedPoint.toPoint_of_isValid {cp : CompletedPoint} (h : cp.IsValid) :
     (cp.toPoint).x = cp.X.toField / cp.Z.toField ∧
     (cp.toPoint).y = cp.Y.toField / cp.T.toField := by
-  unfold toPoint; rw [dif_pos h]; constructor <;> rfl
+  unfold toPoint; rw [dif_pos h]; simp only [toPoint']; trivial
 
 /-! ## ProjectiveNielsPoint Validity and Casting -/
 
-/-- Validity predicate for ProjectiveNielsPoint.
+/- Old uniform-bounds version of ProjectiveNielsPoint.IsValid (commented out below).
 A ProjectiveNielsPoint (Y_plus_X, Y_minus_X, Z, T2d) represents a point where:
 - X = (Y_plus_X - Y_minus_X) / 2
 - Y = (Y_plus_X + Y_minus_X) / 2
@@ -395,25 +450,45 @@ structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
     2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
 
 -/
+/-- Semantic curve-point invariant for the projective-Niels representation.
+
+Captures exactly what is needed to interpret `(Y_plus_X, Y_minus_X, Z, T2d)` as
+a well-defined mathematical point on Ed25519: `Z ≠ 0`, the T2d relation, and
+the projective curve equation (scaled by 4 to avoid division by 2).
+Limb bounds live separately in `ProjectiveNielsPoint.IsValid`. -/
 @[mk_iff]
-structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop where
-  /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 52 2 ^ 53 2 ^ 52. -/
-  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 54
-  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 52
-  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
-  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 52
-  /-- The Z coordinate is non-zero. -/
+structure ProjectiveNielsPoint.OnCurve (pn : ProjectiveNielsPoint) : Prop where
+  /-- The Z coordinate is non-zero in the field. -/
   Z_ne_zero : pn.Z.toField ≠ 0
+  /-- T2d relation: 2*Z*T2d = d*(YpX² - YmX²). -/
+  T2d_relation :
+    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
+    let Z := pn.Z.toField; let T2d := pn.T2d.toField
+    2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
   /-- The curve equation (scaled by 4 to avoid 1/2). -/
   on_curve :
     let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField; let Z := pn.Z.toField
     4 * Ed25519.a * (YpX - YmX)^2 * Z^2 + 4 * (YpX + YmX)^2 * Z^2 =
       16 * Z^4 + Ed25519.d * (YpX - YmX)^2 * (YpX + YmX)^2
-  /-- T2d relation: T2d = 2*d*x*y*Z = d*(YpX² - YmX²)/(2*Z) i.e., 2*Z*T2d = d*(YpX² - YmX²). -/
-  T2d_relation :
-    let YpX := pn.Y_plus_X.toField; let YmX := pn.Y_minus_X.toField
-    let Z := pn.Z.toField; let T2d := pn.T2d.toField
-    2 * Z * T2d = Ed25519.d * (YpX^2 - YmX^2)
+
+instance ProjectiveNielsPoint.instDecidableOnCurve (pn : ProjectiveNielsPoint) :
+    Decidable pn.OnCurve :=
+  decidable_of_iff _ (onCurve_iff pn).symm
+
+/-- Validity predicate for ProjectiveNielsPoint.
+Mixed bounds: Y_plus_X < 2^54, Y_minus_X < 2^52, Z < 2^53, T2d < 2^52.
+
+Layered over `ProjectiveNielsPoint.OnCurve`: `IsValid` adds the per-limb bounds
+needed for the underlying Rust arithmetic, while `OnCurve` carries the pure
+mathematical content used by `toPoint'`. -/
+@[mk_iff]
+structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop
+    extends ProjectiveNielsPoint.OnCurve pn where
+  /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 52 2 ^ 53 2 ^ 52. -/
+  Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 54
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 52
+  Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
+  T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 52
 
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) :
     Decidable pn.IsValid :=
@@ -424,8 +499,9 @@ instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) :
 --  decidable_of_iff _ (isValid'_iff pn).symm
 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
-The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/
-noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.IsValid) :
+The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)).
+Requires only `OnCurve`; limb bounds are not needed. -/
+noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.OnCurve) :
     Point Ed25519 :=
   let YpX := pn.Y_plus_X.toField
   let YmX := pn.Y_minus_X.toField
@@ -475,7 +551,7 @@ noncomputable def ProjectiveNielsPoint.toPointI' (pn : ProjectiveNielsPoint) (h 
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
 Returns 0 if the point is not valid. -/
 noncomputable def ProjectiveNielsPoint.toPoint (pn : ProjectiveNielsPoint) : Point Ed25519 :=
-  if h : pn.IsValid then pn.toPoint' h else 0
+  if h : pn.IsValid then pn.toPoint' h.toOnCurve else 0
 
 --noncomputable def ProjectiveNielsPoint.toPointI (pn : ProjectiveNielsPoint) : Point Ed25519 :=
 --  if h : pn.IsValid' then pn.toPointI' h else 0

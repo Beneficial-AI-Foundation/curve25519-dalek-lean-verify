@@ -135,7 +135,7 @@ theorem as_extended_spec (q : CompletedPoint)
   simp only [this, true_and]
   unfold toPoint   edwards.EdwardsPoint.toPoint
   simp only [this, ↓reduceDIte, h_q_Valid]
-  unfold edwards.EdwardsPoint.toPoint'
+  unfold toPoint' edwards.EdwardsPoint.toPoint'
   simp only [Edwards.Point.mk.injEq]
   unfold FieldElement51.toField
   have := h_q_Valid.T_ne_zero

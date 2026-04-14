@@ -104,20 +104,12 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
         rw[Montgomery.lift_mod_eq_iff] at fe3_post1
         have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 } :
             backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
-          constructor
-          · simp_all
-          · simp_all
-          · have := he.Z_bounds
-            simp_all
-          · simp_all
+          refine
+            { Z_ne_zero := ?_, T2d_relation := ?_, on_curve := ?_,
+              Y_plus_X_bounds := ?_, Y_minus_X_bounds := ?_,
+              Z_bounds := ?_, T2d_bounds := ?_ }
           · have := he.Z_ne_zero
             simp_all
-          · unfold toField
-            simp_all
-            have := he.on_curve
-            simp only at this
-            unfold toField at this
-            grind
           · unfold toField
             simp_all
             have := he.T_relation
@@ -126,6 +118,17 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
             ring_nf
             have:Edwards.Ed25519.d=d:=rfl
             grind
+          · unfold toField
+            simp_all
+            have := he.on_curve
+            simp only at this
+            unfold toField at this
+            grind
+          · simp_all
+          · simp_all
+          · have := he.Z_bounds
+            simp_all
+          · simp_all
         simp only [this, true_and]
         unfold toPoint curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint
         simp only [he, ↓reduceDIte, this]
