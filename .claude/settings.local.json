@@ -157,7 +157,10 @@
       "Bash(node -e ':*)",
       "Bash(node -e \"const yaml = require\\('js-yaml'\\); console.log\\('node yaml ok'\\)\")",
       "Bash(node -e \"const yaml = require\\('/home/oliver/.nvm/versions/node/v22.20.0/lib/node_modules/aeneas-cli/node_modules/js-yaml/dist/js-yaml.mjs'\\); console.log\\('ok'\\)\")",
-      "Bash(yq --version)"
+      "Bash(yq --version)",
+      "Bash(sed -n '796,812p' /home/oliver/Projects/Verification/curve25519-dalek-lean-verify/curve25519-dalek/src/edwards.rs)",
+      "Bash(sed -n '460,490p' /home/oliver/Projects/Verification/curve25519-dalek-lean-verify/curve25519-dalek/src/scalar.rs)",
+      "Bash(sed -n '931,945p' /home/oliver/Projects/Verification/curve25519-dalek-lean-verify/curve25519-dalek/src/ristretto.rs)"
     ],
     "deny": [],
     "ask": []

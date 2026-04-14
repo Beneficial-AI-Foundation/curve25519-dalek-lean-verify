@@ -10,10 +10,19 @@ set_option linter.style.whitespace false
 set_option linter.style.setOption false
 set_option linter.style.longLine false
 
+
 /- You can set the `maxHeartbeats` value with the `-max-heartbeats` CLI option -/
 set_option maxHeartbeats 1000000
 
 namespace curve25519_dalek
+
+/-- Trait declaration: [core::borrow::Borrow]
+    Source: '/rustc/library/core/src/borrow.rs', lines 158:0-158:40
+    Name pattern: [core::borrow::Borrow]
+    Visibility: public -/
+@[rust_trait "core::borrow::Borrow"]
+structure core.borrow.Borrow (Self : Type) (Borrowed : Type) where
+  borrow : Self → Result Borrowed
 
 /-- Trait declaration: [core::ops::arith::Add]
     Source: '/rustc/library/core/src/ops/arith.rs', lines 77:0-77:31
@@ -73,6 +82,23 @@ structure core.ops.arith.SubAssign (Self : Type) (Rhs : Type) where
 @[rust_trait "core::ops::arith::MulAssign"]
 structure core.ops.arith.MulAssign (Self : Type) (Rhs : Type) where
   mul_assign : Self → Rhs → Result Self
+
+/-- Trait declaration: [core::ops::bit::Not]
+    Source: '/rustc/library/core/src/ops/bit.rs', lines 35:0-35:19
+    Name pattern: [core::ops::bit::Not]
+    Visibility: public -/
+@[rust_trait "core::ops::bit::Not"]
+structure core.ops.bit.Not (Self : Type) (Self_Output : Type) where
+  not : Self → Result Self_Output
+
+/-- Trait declaration: [core::ops::bit::BitOr]
+    Source: '/rustc/library/core/src/ops/bit.rs', lines 254:0-254:33
+    Name pattern: [core::ops::bit::BitOr]
+    Visibility: public -/
+@[rust_trait "core::ops::bit::BitOr"]
+structure core.ops.bit.BitOr (Self : Type) (Rhs : Type) (Self_Output : Type)
+  where
+  bitor : Self → Rhs → Result Self_Output
 
 /-- [core::ops::range::RangeFull]
     Source: '/rustc/library/core/src/ops/range.rs', lines 44:0-44:20
@@ -197,16 +223,54 @@ structure backend.serial.curve_models.AffineNielsPoint where
   y_minus_x : backend.serial.u64.field.FieldElement51
   xy2d : backend.serial.u64.field.FieldElement51
 
-/-- Trait declaration: [curve25519_dalek::traits::ValidityCheck]
-    Source: 'curve25519-dalek/src/traits.rs', lines 426:0-429:1 -/
-structure traits.ValidityCheck (Self : Type) where
-  is_valid : Self → Result Bool
+/-- [curve25519_dalek::backend::serial::scalar_mul::pippenger::Pippenger]
+    Source: 'curve25519-dalek/src/backend/serial/scalar_mul/pippenger.rs', lines 62:0-62:21
+    Visibility: public -/
+@[reducible]
+def backend.serial.scalar_mul.pippenger.Pippenger := Unit
+
+/-- [curve25519_dalek::window::NafLookupTable8]
+    Source: 'curve25519-dalek/src/window.rs', lines 231:0-231:57 -/
+@[reducible]
+def window.NafLookupTable8 (T : Type) := Array T 64#usize
+
+/-- [curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus]
+    Source: 'curve25519-dalek/src/backend/serial/scalar_mul/precomputed_straus.rs', lines 29:0-31:1
+    Visibility: public -/
+structure backend.serial.scalar_mul.precomputed_straus.VartimePrecomputedStraus
+  where
+  static_lookup_tables : alloc.vec.Vec (window.NafLookupTable8
+    backend.serial.curve_models.AffineNielsPoint)
+
+/-- [curve25519_dalek::backend::serial::scalar_mul::straus::Straus]
+    Source: 'curve25519-dalek/src/backend/serial/scalar_mul/straus.rs', lines 47:0-47:20
+    Visibility: public -/
+@[reducible]
+def backend.serial.scalar_mul.straus.Straus := Unit
 
 /-- [curve25519_dalek::backend::serial::u64::scalar::Scalar52]
     Source: 'curve25519-dalek/src/backend/serial/u64/scalar.rs', lines 26:0-26:34
     Visibility: public -/
 @[reducible]
 def backend.serial.u64.scalar.Scalar52 := Array Std.U64 5#usize
+
+/-- [curve25519_dalek::edwards::CompressedEdwardsY]
+    Source: 'curve25519-dalek/src/edwards.rs', lines 172:0-172:44
+    Visibility: public -/
+@[reducible]
+def edwards.CompressedEdwardsY := Array Std.U8 32#usize
+
+/-- [curve25519_dalek::montgomery::MontgomeryPoint]
+    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41
+    Visibility: public -/
+@[reducible]
+def montgomery.MontgomeryPoint := Array Std.U8 32#usize
+
+/-- [curve25519_dalek::ristretto::CompressedRistretto]
+    Source: 'curve25519-dalek/src/ristretto.rs', lines 220:0-220:45
+    Visibility: public -/
+@[reducible]
+def ristretto.CompressedRistretto := Array Std.U8 32#usize
 
 /-- [curve25519_dalek::ristretto::RistrettoPoint]
     Source: 'curve25519-dalek/src/ristretto.rs', lines 494:0-494:51
@@ -221,22 +285,16 @@ structure edwards.affine.AffinePoint where
   x : backend.serial.u64.field.FieldElement51
   y : backend.serial.u64.field.FieldElement51
 
-/-- [curve25519_dalek::edwards::CompressedEdwardsY]
-    Source: 'curve25519-dalek/src/edwards.rs', lines 172:0-172:44
-    Visibility: public -/
-@[reducible]
-def edwards.CompressedEdwardsY := Array Std.U8 32#usize
-
 /-- [curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::from_slice::closure]
     Source: 'curve25519-dalek/src/edwards.rs', lines 416:29-416:54 -/
 @[reducible]
 def edwards.CompressedEdwardsY.from_slice.closure := Unit
 
-/-- [curve25519_dalek::montgomery::MontgomeryPoint]
-    Source: 'curve25519-dalek/src/montgomery.rs', lines 75:0-75:41
+/-- [curve25519_dalek::edwards::VartimeEdwardsPrecomputation]
+    Source: 'curve25519-dalek/src/edwards.rs', lines 997:0-997:82
     Visibility: public -/
 @[reducible]
-def montgomery.MontgomeryPoint := Array Std.U8 32#usize
+def edwards.VartimeEdwardsPrecomputation := backend.VartimePrecomputedStraus
 
 /-- [curve25519_dalek::montgomery::ProjectivePoint]
     Source: 'curve25519-dalek/src/montgomery.rs', lines 290:0-293:1 -/
@@ -244,15 +302,148 @@ structure montgomery.ProjectivePoint where
   U : backend.serial.u64.field.FieldElement51
   W : backend.serial.u64.field.FieldElement51
 
-/-- [curve25519_dalek::ristretto::CompressedRistretto]
-    Source: 'curve25519-dalek/src/ristretto.rs', lines 220:0-220:45
-    Visibility: public -/
-@[reducible]
-def ristretto.CompressedRistretto := Array Std.U8 32#usize
-
 /-- [curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::from_slice::closure]
     Source: 'curve25519-dalek/src/ristretto.rs', lines 247:29-247:55 -/
 @[reducible]
 def ristretto.CompressedRistretto.from_slice.closure := Unit
+
+/-- [curve25519_dalek::ristretto::VartimeRistrettoPrecomputation]
+    Source: 'curve25519-dalek/src/ristretto.rs', lines 1053:0-1053:84
+    Visibility: public -/
+@[reducible]
+def ristretto.VartimeRistrettoPrecomputation :=
+  backend.VartimePrecomputedStraus
+
+/-- Trait declaration: [curve25519_dalek::traits::IsIdentity]
+    Source: 'curve25519-dalek/src/traits.rs', lines 33:0-36:1
+    Visibility: public -/
+structure traits.IsIdentity (Self : Type) where
+  is_identity : Self → Result Bool
+
+/-- Trait declaration: [curve25519_dalek::traits::BasepointTable]
+    Source: 'curve25519-dalek/src/traits.rs', lines 51:0-75:1
+    Visibility: public -/
+structure traits.BasepointTable (Self : Type) (Self_Point : Type) where
+  create : Self_Point → Result Self
+  basepoint : Self → Result Self_Point
+  mul_base : Self → scalar.Scalar → Result Self_Point
+  mul_base_clamped : Self → Array Std.U8 32#usize → Result Self_Point
+
+/-- Trait declaration: [curve25519_dalek::traits::MultiscalarMul]
+    Source: 'curve25519-dalek/src/traits.rs', lines 78:0-134:1
+    Visibility: public -/
+structure traits.MultiscalarMul (Self : Type) (Self_Point : Type) where
+  multiscalar_mul : forall {I : Type} {J : Type} {Clause0_Item : Type}
+    {Clause0_IntoIter : Type} {Clause2_Item : Type} {Clause2_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+    core.iter.traits.collect.IntoIterator J Clause2_Item Clause2_IntoIter)
+    (coreborrowBorrowInst : core.borrow.Borrow Clause2_Item Self_Point), I →
+    J → Result Self_Point
+
+/-- Trait declaration: [curve25519_dalek::traits::VartimeMultiscalarMul]
+    Source: 'curve25519-dalek/src/traits.rs', lines 137:0-263:1
+    Visibility: public -/
+structure traits.VartimeMultiscalarMul (Self : Type) (Self_Point : Type) where
+  optional_multiscalar_mul : forall {I : Type} {J : Type} {Clause0_Item : Type}
+    {Clause0_IntoIter : Type} {Clause2_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorPOptionPInst :
+    core.iter.traits.collect.IntoIterator J (Option Self_Point)
+    Clause2_IntoIter), I → J → Result (Option Self_Point)
+  vartime_multiscalar_mul : forall {I : Type} {J : Type} {Clause0_Item : Type}
+    {Clause0_IntoIter : Type} {Clause2_Item : Type} {Clause2_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+    core.iter.traits.collect.IntoIterator J Clause2_Item Clause2_IntoIter)
+    (coreborrowBorrowInst : core.borrow.Borrow Clause2_Item Self_Point)
+    (corecloneCloneInst : core.clone.Clone Self_Point), I → J → Result
+    Self_Point
+
+/-- [curve25519_dalek::traits::VartimeMultiscalarMul::vartime_multiscalar_mul::closure]
+    Source: 'curve25519-dalek/src/traits.rs', lines 259:35-259:63 -/
+@[reducible]
+def traits.VartimeMultiscalarMul.vartime_multiscalar_mul.closure {Self : Type}
+  {I : Type} {J : Type} {Clause0_Point : Type} {Clause1_Item : Type}
+  {Clause1_IntoIter : Type} {Clause3_Item : Type} {Clause3_IntoIter : Type}
+  (VartimeMultiscalarMulInst : traits.VartimeMultiscalarMul Self Clause0_Point)
+  (coreitertraitscollectIntoIteratorInst :
+  core.iter.traits.collect.IntoIterator I Clause1_Item Clause1_IntoIter)
+  (coreborrowBorrowClause1_ItemScalarInst : core.borrow.Borrow Clause1_Item
+  scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+  core.iter.traits.collect.IntoIterator J Clause3_Item Clause3_IntoIter)
+  (coreborrowBorrowInst : core.borrow.Borrow Clause3_Item Clause0_Point)
+  (corecloneCloneInst : core.clone.Clone Clause0_Point) :=
+Unit
+
+/-- Trait declaration: [curve25519_dalek::traits::VartimePrecomputedMultiscalarMul]
+    Source: 'curve25519-dalek/src/traits.rs', lines 291:0-414:1
+    Visibility: public -/
+structure traits.VartimePrecomputedMultiscalarMul (Self : Type) (Self_Point :
+  Type) where
+  corecloneCloneInst : core.clone.Clone Self_Point
+  new : forall {I : Type} {Clause0_Item : Type} {Clause0_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowInst : core.borrow.Borrow Clause0_Item Self_Point), I →
+    Result Self
+  len : Self → Result Std.Usize
+  is_empty : Self → Result Bool
+  vartime_multiscalar_mul : forall {I : Type} {Clause0_Item : Type}
+    {Clause0_IntoIter : Type} (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar), Self → I → Result Self_Point
+  vartime_mixed_multiscalar_mul : forall {I : Type} {J : Type} {K : Type}
+    {Clause0_Item : Type} {Clause0_IntoIter : Type} {Clause2_Item : Type}
+    {Clause2_IntoIter : Type} {Clause4_Item : Type} {Clause4_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+    core.iter.traits.collect.IntoIterator J Clause2_Item Clause2_IntoIter)
+    (coreborrowBorrowPScalarInst1 : core.borrow.Borrow Clause2_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorInst2 :
+    core.iter.traits.collect.IntoIterator K Clause4_Item Clause4_IntoIter)
+    (coreborrowBorrowInst : core.borrow.Borrow Clause4_Item Self_Point), Self
+    → I → J → K → Result Self_Point
+  optional_mixed_multiscalar_mul : forall {I : Type} {J : Type} {K : Type}
+    {Clause0_Item : Type} {Clause0_IntoIter : Type} {Clause2_Item : Type}
+    {Clause2_IntoIter : Type} {Clause4_IntoIter : Type}
+    (coreitertraitscollectIntoIteratorInst :
+    core.iter.traits.collect.IntoIterator I Clause0_Item Clause0_IntoIter)
+    (coreborrowBorrowPScalarInst : core.borrow.Borrow Clause0_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+    core.iter.traits.collect.IntoIterator J Clause2_Item Clause2_IntoIter)
+    (coreborrowBorrowPScalarInst1 : core.borrow.Borrow Clause2_Item
+    scalar.Scalar) (coreitertraitscollectIntoIteratorPOptionPInst :
+    core.iter.traits.collect.IntoIterator K (Option Self_Point)
+    Clause4_IntoIter), Self → I → J → K → Result (Option Self_Point)
+
+/-- [curve25519_dalek::traits::VartimePrecomputedMultiscalarMul::vartime_mixed_multiscalar_mul::closure]
+    Source: 'curve25519-dalek/src/traits.rs', lines 376:43-376:71 -/
+@[reducible]
+def traits.VartimePrecomputedMultiscalarMul.vartime_mixed_multiscalar_mul.closure
+  {Self : Type} {I : Type} {J : Type} {K : Type} {Clause0_Point : Type}
+  {Clause1_Item : Type} {Clause1_IntoIter : Type} {Clause3_Item : Type}
+  {Clause3_IntoIter : Type} {Clause5_Item : Type} {Clause5_IntoIter : Type}
+  (VartimePrecomputedMultiscalarMulInst :
+  traits.VartimePrecomputedMultiscalarMul Self Clause0_Point)
+  (coreitertraitscollectIntoIteratorInst :
+  core.iter.traits.collect.IntoIterator I Clause1_Item Clause1_IntoIter)
+  (coreborrowBorrowClause1_ItemScalarInst : core.borrow.Borrow Clause1_Item
+  scalar.Scalar) (coreitertraitscollectIntoIteratorInst1 :
+  core.iter.traits.collect.IntoIterator J Clause3_Item Clause3_IntoIter)
+  (coreborrowBorrowClause3_ItemScalarInst : core.borrow.Borrow Clause3_Item
+  scalar.Scalar) (coreitertraitscollectIntoIteratorInst2 :
+  core.iter.traits.collect.IntoIterator K Clause5_Item Clause5_IntoIter)
+  (coreborrowBorrowInst : core.borrow.Borrow Clause5_Item Clause0_Point) :=
+Unit
 
 end curve25519_dalek
