@@ -39,6 +39,7 @@ namespace curve25519_dalek
 namespace Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.edwards
+open curve25519_dalek.backend.serial.curve_models
 
 /-! ## Independent sub-lemmas for `sub_spec_aux_54_52_53_52`
 
@@ -263,65 +264,9 @@ used in the main theorem `sub_spec'`:
 5. `sub_isValid_and_toPoint`: Main geometric validity and point equality proof
 -/
 
-/-- General lemma: if a completed point `(cX : cY : cZ : cT)` satisfies
-    `cX / cZ = Q.x` and `cY / cT = Q.y` for some point `Q` on Ed25519,
-    with `cZ ≠ 0` and `cT ≠ 0`, then the projective curve equation holds:
-    `a * cX² * cT² + cY² * cZ² = cZ² * cT² + d * cX² * cY²`.
-
-    This is used to prove the on-curve property for both addition and subtraction
-    of completed points. -/
-private lemma completed_on_curve_of_affine_div
-    (cX cY cZ cT : Edwards.CurveField)
-    (hcZ_ne : cZ ≠ 0) (hcT_ne : cT ≠ 0)
-    (Q : Point Ed25519)
-    (hx_eq : cX / cZ = Q.x) (hy_eq : cY / cT = Q.y) :
-    Ed25519.a * cX^2 * cT^2 + cY^2 * cZ^2 =
-    cZ^2 * cT^2 + Ed25519.d * cX^2 * cY^2 := by
-  have hcZ2 : cZ^2 ≠ 0 := pow_ne_zero 2 hcZ_ne
-  have hcT2 : cT^2 ≠ 0 := pow_ne_zero 2 hcT_ne
-  have h_on : Ed25519.a * Q.x^2 + Q.y^2 = 1 + Ed25519.d * Q.x^2 * Q.y^2 := Q.on_curve
-  calc Ed25519.a * cX^2 * cT^2 + cY^2 * cZ^2
-      = (Ed25519.a * (cX / cZ)^2 + (cY / cT)^2) *
-          cZ^2 * cT^2 := by field_simp [hcZ2, hcT2]
-    _ = (Ed25519.a * Q.x^2 + Q.y^2) * cZ^2 * cT^2 := by rw [hx_eq, hy_eq]
-    _ = (1 + Ed25519.d * Q.x^2 * Q.y^2) * cZ^2 * cT^2 := by rw [h_on]
-    _ = cZ^2 * cT^2 + Ed25519.d * cX^2 * cY^2 := by
-          rw [← hx_eq, ← hy_eq]; simp only [div_pow]; field_simp [hcZ2, hcT2]
-
-/-- From a projective niels point's T2d relation `2 * Z * T2d = d * (YpX² - YmX²)`,
-    derive the affine expression `T2d = 2 * d * Z * x * y`
-    where `x = (YpX - YmX) / (2 * Z)` and `y = (YpX + YmX) / (2 * Z)`. -/
-private lemma niels_T2d_affine_expr
-    (YpX YmX Z T2d x y : Edwards.CurveField)
-    (hZ_ne : Z ≠ 0)
-    (h_T2d_rel : 2 * Z * T2d = Ed25519.d * (YpX ^ 2 - YmX ^ 2))
-    (hx : x = (YpX - YmX) / (2 * Z))
-    (hy : y = (YpX + YmX) / (2 * Z)) :
-    T2d = 2 * Ed25519.d * Z * x * y := by
-  have h2 : (2 : Edwards.CurveField) ≠ 0 := by decide
-  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
-  have h_sq_diff : YpX^2 - YmX^2 = (YpX - YmX) * (YpX + YmX) := by ring
-  have h_factor : (YpX - YmX) * (YpX + YmX) = 4 * Z^2 * x * y := by
-    simp only [hx, hy]; field_simp [h2Z_ne]; ring
-  rw [h_sq_diff, h_factor] at h_T2d_rel
-  have h_simpl : T2d * (2 * Z) = 2 * Ed25519.d * Z * x * y * (2 * Z) := by
-    linear_combination h_T2d_rel
-  field_simp [hZ_ne, h2] at h_simpl
-  calc T2d = 2 * Z * Ed25519.d * x * y := h_simpl
-    _ = 2 * Ed25519.d * Z * x * y := by ring
-
-/-- From an Edwards point's T relation `X * Y = T * Z` with `Z ≠ 0`,
-    derive the affine expression `T = x * y * Z`
-    where `x = X / Z` and `y = Y / Z`. -/
-private lemma edwards_T_affine_expr
-    (X Y Z T x y : Edwards.CurveField)
-    (hZ_ne : Z ≠ 0)
-    (h_T_rel : X * Y = T * Z)
-    (hx : x = X / Z) (hy : y = Y / Z) :
-    T = x * y * Z := by
-  simp only [hx, hy]
-  field_simp [hZ_ne]
-  linear_combination -h_T_rel
+-- `completed_on_curve_of_affine_div`, `niels_T2d_affine_expr`,
+-- `edwards_T_affine_expr` are now shared from
+-- `Math/Edwards/Representation.lean`
 
 /-- Lift the four modular arithmetic results from `sub_spec_bounds'` to simplified
     field equalities in `CurveField`. Each modular relation `(a + b) % p = c % p`

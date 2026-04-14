@@ -358,7 +358,8 @@ This section provides a cleaner interface using IsValid predicates for inputs.
 The output CompletedPoint satisfies CompletedPoint.IsValid (all coordinates < 2^54).
 -/
 
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+namespace curve25519_dalek
+namespace Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
 
 open Edwards
 open curve25519_dalek.backend.serial.curve_models
@@ -407,35 +408,8 @@ These lemmas extract independent proof steps from the main `add_spec` theorem,
 making the algebraic reasoning modular and reusable across both `add_spec` and `add_spec'`.
 -/
 
-/-- Express T2d in terms of affine coordinates from the ProjectiveNiels T2d relation.
-    From `2 * Z * T2d = d * (YpX² - YmX²)` and the definitions of x, y as
-    `(YpX - YmX)/(2Z)` and `(YpX + YmX)/(2Z)`, derives `T2d = 2 * d * Z * x * y`. -/
-private lemma niels_T2d_affine_expr (YpX YmX Z T2d x y : CurveField)
-    (hZ_ne : Z ≠ 0)
-    (hx : x = (YpX - YmX) / (2 * Z))
-    (hy : y = (YpX + YmX) / (2 * Z))
-    (h_rel : 2 * Z * T2d = Ed25519.d * (YpX ^ 2 - YmX ^ 2)) :
-    T2d = 2 * Ed25519.d * Z * x * y := by
-  have h2 : (2 : CurveField) ≠ 0 := by decide
-  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
-  rw [show YpX ^ 2 - YmX ^ 2 = (YpX - YmX) * (YpX + YmX) from by ring] at h_rel
-  have h_factor : (YpX - YmX) * (YpX + YmX) = 4 * Z ^ 2 * x * y := by
-    simp only [hx, hy]; field_simp [h2Z_ne]; ring
-  rw [h_factor] at h_rel
-  have h_cancel : T2d * (2 * Z) = 2 * Ed25519.d * Z * x * y * (2 * Z) := by
-    linear_combination h_rel
-  field_simp [hZ_ne, h2] at h_cancel
-  calc T2d = 2 * Z * Ed25519.d * x * y := h_cancel
-    _ = 2 * Ed25519.d * Z * x * y := by ring
-
-/-- Express T in terms of affine coordinates from the Edwards extended coordinate relation.
-    From `X * Y = T * Z` and `x = X/Z`, `y = Y/Z`, derives `T = x * y * Z`. -/
-private lemma edwards_T_affine_expr (X Y Z T x y : CurveField)
-    (hZ_ne : Z ≠ 0)
-    (hx : x = X / Z) (hy : y = Y / Z)
-    (h_T : X * Y = T * Z) :
-    T = x * y * Z := by
-  simp only [hx, hy]; field_simp [hZ_ne]; linear_combination -h_T
+-- `niels_T2d_affine_expr` and `edwards_T_affine_expr` are now shared
+-- from `Math/Edwards/Representation.lean`
 
 /-- The completed point satisfies the twisted Edwards curve equation when its coordinates
     are the factored forms arising from Edwards point addition. -/
@@ -672,10 +646,10 @@ private lemma add_spec_algebraic
   have h_denom_minus : 1 - Ed25519.d * x1 * x2 * y1 * y2 ≠ 0 := by
     have h := h_denoms.2; simp only [P1, P2] at h; convert h using 1
   -- T expressions using helper lemmas
-  have h_T2d_expr := niels_T2d_affine_expr YpX YmX Z2 T2d x2 y2 hZ2_ne hx2_def hy2_def
-    hother_T2d_relation
-  have h_T1_expr := edwards_T_affine_expr X1 Y1 Z1 T1 x1 y1 hZ1_ne hx1_def hy1_def
-    hself.T_relation
+  have h_T2d_expr := niels_T2d_affine_expr YpX YmX Z2 T2d x2 y2 hZ2_ne
+    hother_T2d_relation hx2_def hy2_def
+  have h_T1_expr := edwards_T_affine_expr X1 Y1 Z1 T1 x1 y1 hZ1_ne
+    hself.T_relation hx1_def hy1_def
   -- Key T1*T2d product (using extracted sub-lemma)
   have h_T1_T2d := add_T1_T2d_product T1 T2d x1 y1 x2 y2 Z1 Z2 h_T1_expr h_T2d_expr
   -- Factored coordinate forms (using extracted sub-lemmas)
@@ -776,4 +750,5 @@ theorem add_spec
     c hX_F hY_F hZ_F hT_F hcX_bounds hcY_bounds hcZ_bounds hcT_bounds
     other.toPoint h_otherx h_othery
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint
+end curve25519_dalek

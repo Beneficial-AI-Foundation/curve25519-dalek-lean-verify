@@ -601,4 +601,74 @@ theorem ProjectivePoint.toPoint_eq_coe (p : ProjectivePoint) :
 theorem CompletedPoint.toPoint_eq_coe (p : CompletedPoint) :
     p.toPoint = ↑p := rfl
 
+/-! ### Shared helpers for Edwards binary operations (add / sub)
+
+These lemmas are shared by `CompletedPoint/Add.lean` and
+`ProjectiveNielsPoint/Sub.lean`. -/
+
+/-- General on-curve lemma for completed points from affine ratios.
+If `cX / cZ = Q.x` and `cY / cT = Q.y` for a curve point `Q`,
+with `cZ ≠ 0` and `cT ≠ 0`, then the completed-coordinate curve
+equation holds. -/
+theorem completed_on_curve_of_affine_div
+    (cX cY cZ cT : CurveField)
+    (hcZ_ne : cZ ≠ 0) (hcT_ne : cT ≠ 0)
+    (Q : Point Ed25519)
+    (hx_eq : cX / cZ = Q.x) (hy_eq : cY / cT = Q.y) :
+    Ed25519.a * cX ^ 2 * cT ^ 2 + cY ^ 2 * cZ ^ 2 =
+    cZ ^ 2 * cT ^ 2 + Ed25519.d * cX ^ 2 * cY ^ 2 := by
+  have hcZ2 : cZ ^ 2 ≠ 0 := pow_ne_zero 2 hcZ_ne
+  have hcT2 : cT ^ 2 ≠ 0 := pow_ne_zero 2 hcT_ne
+  have h_on := Q.on_curve
+  calc Ed25519.a * cX ^ 2 * cT ^ 2 + cY ^ 2 * cZ ^ 2
+      = (Ed25519.a * (cX / cZ) ^ 2 + (cY / cT) ^ 2) *
+          cZ ^ 2 * cT ^ 2 := by field_simp [hcZ2, hcT2]
+    _ = (Ed25519.a * Q.x ^ 2 + Q.y ^ 2) *
+          cZ ^ 2 * cT ^ 2 := by rw [hx_eq, hy_eq]
+    _ = (1 + Ed25519.d * Q.x ^ 2 * Q.y ^ 2) *
+          cZ ^ 2 * cT ^ 2 := by rw [h_on]
+    _ = cZ ^ 2 * cT ^ 2 +
+          Ed25519.d * cX ^ 2 * cY ^ 2 := by
+          rw [← hx_eq, ← hy_eq]; simp only [div_pow]
+          field_simp [hcZ2, hcT2]
+
+/-- From a Niels point's T2d relation and affine coordinate
+definitions, derive `T2d = 2 * d * Z * x * y`. -/
+theorem niels_T2d_affine_expr
+    (YpX YmX Z T2d x y : CurveField)
+    (hZ_ne : Z ≠ 0)
+    (h_T2d_rel : 2 * Z * T2d =
+      Ed25519.d * (YpX ^ 2 - YmX ^ 2))
+    (hx : x = (YpX - YmX) / (2 * Z))
+    (hy : y = (YpX + YmX) / (2 * Z)) :
+    T2d = 2 * Ed25519.d * Z * x * y := by
+  have h2 : (2 : CurveField) ≠ 0 := by decide
+  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
+  have h_sq_diff : YpX ^ 2 - YmX ^ 2 =
+      (YpX - YmX) * (YpX + YmX) := by ring
+  have h_factor :
+      (YpX - YmX) * (YpX + YmX) =
+        4 * Z ^ 2 * x * y := by
+    simp only [hx, hy]; field_simp [h2Z_ne]; ring
+  rw [h_sq_diff, h_factor] at h_T2d_rel
+  have h_simpl :
+      T2d * (2 * Z) =
+        2 * Ed25519.d * Z * x * y * (2 * Z) := by
+    linear_combination h_T2d_rel
+  field_simp [hZ_ne, h2] at h_simpl
+  calc T2d = 2 * Z * Ed25519.d * x * y := h_simpl
+    _ = 2 * Ed25519.d * Z * x * y := by ring
+
+/-- From an Edwards point's T relation `X * Y = T * Z` and affine
+coordinate definitions, derive `T = x * y * Z`. -/
+theorem edwards_T_affine_expr
+    (X Y Z T x y : CurveField)
+    (hZ_ne : Z ≠ 0)
+    (h_T_rel : X * Y = T * Z)
+    (hx : x = X / Z) (hy : y = Y / Z) :
+    T = x * y * Z := by
+  simp only [hx, hy]
+  field_simp [hZ_ne]
+  linear_combination -h_T_rel
+
 end curve25519_dalek.backend.serial.curve_models
