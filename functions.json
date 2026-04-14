@@ -460,7 +460,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Sub.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub`**\n\nComputes `self - other` as a CompletedPoint: the result is valid and represents\nthe difference of the two input points. -/",
+   "/-- **Spec theorem for `sub`**\n(`CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint`)\n\nComputes `self - other` as a CompletedPoint: the result is valid\nand represents the difference of the two input points. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'a (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",

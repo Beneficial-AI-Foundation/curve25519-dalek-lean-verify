@@ -482,37 +482,28 @@ private lemma completed_on_curve_of_factored_add
           field_simp [hcZ2, hcT2]
 
 /-- From projective Edwards curve equation to affine curve equation.
-    Given a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y² with Z ≠ 0,
-    derives a*(X/Z)² + (Y/Z)² = 1 + d*(X/Z)²*(Y/Z)². -/
+    Delegates to `curve25519_dalek.edwards.affine_on_curve_of_projective`. -/
 private lemma edwards_affine_on_curve_of_projective
     (X Y Z : CurveField) (hZ_ne : Z ≠ 0)
-    (h_curve : Ed25519.a * X ^ 2 * Z ^ 2 + Y ^ 2 * Z ^ 2 = Z ^ 4 + Ed25519.d * X ^ 2 * Y ^ 2) :
-    Ed25519.a * (X / Z)^2 + (Y / Z)^2 = 1 + Ed25519.d * (X / Z) ^ 2 * (Y / Z) ^ 2 := by
-  have hZ2 : Z^2 ≠ 0 := pow_ne_zero 2 hZ_ne
-  have hZ4 : Z^4 ≠ 0 := pow_ne_zero 4 hZ_ne
-  simp only [Ed25519] at h_curve ⊢
-  simp only [div_pow]
-  field_simp [hZ2, hZ4]
-  linear_combination h_curve
+    (h_curve : Ed25519.a * X ^ 2 * Z ^ 2 + Y ^ 2 * Z ^ 2 =
+      Z ^ 4 + Ed25519.d * X ^ 2 * Y ^ 2) :
+    Ed25519.a * (X / Z) ^ 2 + (Y / Z) ^ 2 =
+      1 + Ed25519.d * (X / Z) ^ 2 * (Y / Z) ^ 2 :=
+  curve25519_dalek.edwards.affine_on_curve_of_projective X Y Z hZ_ne h_curve
 
 /-- From Niels projective curve equation to affine curve equation.
-    Given the scaled curve equation in (YpX, YmX, Z) coordinates with Z ≠ 0,
-    derives the affine curve equation for ((YpX-YmX)/(2Z), (YpX+YmX)/(2Z)). -/
+    Delegates to `curve25519_dalek.edwards.affine_on_curve_of_niels`. -/
 private lemma niels_affine_on_curve_of_projective
     (YpX YmX Z : CurveField) (hZ_ne : Z ≠ 0)
-    (h_curve : 4 * Ed25519.a * (YpX - YmX) ^ 2 * Z ^ 2 + 4 * (YpX + YmX) ^ 2 * Z ^ 2 =
-      16 * Z ^ 4 + Ed25519.d * (YpX - YmX) ^ 2 * (YpX + YmX) ^ 2) :
-    Ed25519.a * ((YpX - YmX) / (2 * Z))^2 + ((YpX + YmX) / (2 * Z))^2 =
-      1 + Ed25519.d * ((YpX - YmX) / (2 * Z))^2 * ((YpX + YmX) / (2 * Z))^2 := by
-  have h2 : (2 : CurveField) ≠ 0 := by decide
-  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero h2 hZ_ne
-  have h2Z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2Z_ne
-  have h2Z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2Z_ne
-  simp only [Ed25519] at h_curve ⊢
-  simp only [div_pow]
-  field_simp [h2Z2, h2Z4]
-  ring_nf; ring_nf at h_curve
-  linear_combination h_curve
+    (h_curve : 4 * Ed25519.a * (YpX - YmX) ^ 2 * Z ^ 2 +
+      4 * (YpX + YmX) ^ 2 * Z ^ 2 =
+      16 * Z ^ 4 +
+      Ed25519.d * (YpX - YmX) ^ 2 * (YpX + YmX) ^ 2) :
+    Ed25519.a * ((YpX - YmX) / (2 * Z)) ^ 2 +
+      ((YpX + YmX) / (2 * Z)) ^ 2 =
+      1 + Ed25519.d * ((YpX - YmX) / (2 * Z)) ^ 2 *
+        ((YpX + YmX) / (2 * Z)) ^ 2 :=
+  curve25519_dalek.edwards.affine_on_curve_of_niels YpX YmX Z hZ_ne h_curve
 
 /-- T1 * T2d product identity: from T1 = x1*y1*Z1 and T2d = 2*d*Z2*x2*y2,
     derives T1 * T2d = 2*d*x1*x2*y1*y2*Z1*Z2. -/

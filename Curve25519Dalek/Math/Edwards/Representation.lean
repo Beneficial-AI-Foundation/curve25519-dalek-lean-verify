@@ -206,24 +206,64 @@ structure EdwardsPoint.IsValid (e : EdwardsPoint) : Prop extends EdwardsPoint.On
 instance EdwardsPoint.instDecidableIsValid (e : EdwardsPoint) : Decidable e.IsValid :=
   decidable_of_iff _ (isValid_iff e).symm
 
+/-! ### Projective-to-affine bridge lemmas
+
+These lemmas convert projective curve equations to the affine form
+`Ed25519.a * x² + y² = 1 + Ed25519.d * x² * y²`, which is what `Point Ed25519`
+requires for its `on_curve` field. Each representation has a different projective
+shape; these lemmas clear the denominators. -/
+
+/-- From the standard projective curve equation `a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²`
+with `Z ≠ 0`, derive the affine curve equation for `(X/Z, Y/Z)`. -/
+theorem affine_on_curve_of_projective
+    (X Y Z : CurveField) (hZ_ne : Z ≠ 0)
+    (h_curve : Ed25519.a * X ^ 2 * Z ^ 2 + Y ^ 2 * Z ^ 2 =
+      Z ^ 4 + Ed25519.d * X ^ 2 * Y ^ 2) :
+    Ed25519.a * (X / Z) ^ 2 + (Y / Z) ^ 2 =
+      1 + Ed25519.d * (X / Z) ^ 2 * (Y / Z) ^ 2 := by
+  simp only [Ed25519] at h_curve ⊢; simp only [div_pow]
+  field_simp [pow_ne_zero 2 hZ_ne, pow_ne_zero 4 hZ_ne]
+  linear_combination h_curve
+
+/-- From the Niels-coordinate curve equation (scaled by 4 to avoid division by 2)
+with `Z ≠ 0`, derive the affine curve equation for
+`((YpX - YmX)/(2Z), (YpX + YmX)/(2Z))`. -/
+theorem affine_on_curve_of_niels
+    (YpX YmX Z : CurveField) (hZ_ne : Z ≠ 0)
+    (h_curve : 4 * Ed25519.a * (YpX - YmX) ^ 2 * Z ^ 2 +
+      4 * (YpX + YmX) ^ 2 * Z ^ 2 =
+      16 * Z ^ 4 +
+      Ed25519.d * (YpX - YmX) ^ 2 * (YpX + YmX) ^ 2) :
+    Ed25519.a * ((YpX - YmX) / (2 * Z)) ^ 2 +
+      ((YpX + YmX) / (2 * Z)) ^ 2 =
+      1 + Ed25519.d * ((YpX - YmX) / (2 * Z)) ^ 2 *
+        ((YpX + YmX) / (2 * Z)) ^ 2 := by
+  have h2Z_ne : 2 * Z ≠ 0 := mul_ne_zero (by decide) hZ_ne
+  simp only [Ed25519] at h_curve ⊢; simp only [div_pow]
+  field_simp [pow_ne_zero 2 h2Z_ne, pow_ne_zero 4 h2Z_ne]
+  ring_nf; ring_nf at h_curve; linear_combination h_curve
+
+/-- From the completed-coordinate curve equation
+`a*X²*T² + Y²*Z² = Z²*T² + d*X²*Y²` with `Z ≠ 0` and `T ≠ 0`,
+derive the affine curve equation for `(X/Z, Y/T)`. -/
+theorem affine_on_curve_of_completed
+    (X Y Z T : CurveField) (hZ_ne : Z ≠ 0) (hT_ne : T ≠ 0)
+    (h_curve : Ed25519.a * X ^ 2 * T ^ 2 + Y ^ 2 * Z ^ 2 =
+      Z ^ 2 * T ^ 2 + Ed25519.d * X ^ 2 * Y ^ 2) :
+    Ed25519.a * (X / Z) ^ 2 + (Y / T) ^ 2 =
+      1 + Ed25519.d * (X / Z) ^ 2 * (Y / T) ^ 2 := by
+  simp only [Ed25519] at h_curve ⊢; simp only [div_pow]
+  field_simp [pow_ne_zero 2 hZ_ne, pow_ne_zero 2 hT_ne]
+  linear_combination h_curve
+
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
 Requires a proof that the point semantically represents a curve point
 (`OnCurve`); limb bounds are not needed. -/
 def EdwardsPoint.toPoint' (e : EdwardsPoint) (h : e.OnCurve) : Point Ed25519 :=
-  let X := e.X.toField
-  let Y := e.Y.toField
-  let Z := e.Z.toField
-  { x := X / Z
-    y := Y / Z
-    on_curve := by
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
-      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [hz2, hz4]
-      linear_combination hcurve }
+  { x := e.X.toField / e.Z.toField
+    y := e.Y.toField / e.Z.toField
+    on_curve := affine_on_curve_of_projective
+      e.X.toField e.Y.toField e.Z.toField h.Z_ne_zero h.on_curve }
 
 /-- Convert an EdwardsPoint to the affine point (X/Z, Y/Z).
 Returns 0 if the point is not valid. -/
@@ -305,24 +345,15 @@ structure ProjectivePoint.IsValid (pp : ProjectivePoint) : Prop
 instance ProjectivePoint.instDecidableIsValid (pp : ProjectivePoint) : Decidable pp.IsValid :=
   decidable_of_iff _ (isValid_iff pp).symm
 
+open curve25519_dalek.edwards in
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
 Requires only `OnCurve`; limb bounds are not needed. -/
 noncomputable def ProjectivePoint.toPoint' (pp : ProjectivePoint) (h : pp.OnCurve) :
     Point Ed25519 :=
-  let X := pp.X.toField
-  let Y := pp.Y.toField
-  let Z := pp.Z.toField
-  { x := X / Z
-    y := Y / Z
-    on_curve := by
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-      have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 hz
-      have hcurve : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [hz2, hz4]
-      linear_combination hcurve }
+  { x := pp.X.toField / pp.Z.toField
+    y := pp.Y.toField / pp.Z.toField
+    on_curve := affine_on_curve_of_projective
+      pp.X.toField pp.Y.toField pp.Z.toField h.Z_ne_zero h.on_curve }
 
 /-- Convert a ProjectivePoint to the affine point (X/Z, Y/Z).
 Returns 0 if the point is not valid. -/
@@ -381,27 +412,16 @@ open curve25519_dalek.backend.serial.u64.field in
 instance CompletedPoint.instDecidableIsValid (cp : CompletedPoint) : Decidable cp.IsValid :=
   decidable_of_iff _ (isValid_iff cp).symm
 
+open curve25519_dalek.edwards in
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
 Requires only `OnCurve`; limb bounds are not needed. -/
 noncomputable def CompletedPoint.toPoint' (cp : CompletedPoint) (h : cp.OnCurve) :
     Point Ed25519 :=
-  let X := cp.X.toField
-  let Y := cp.Y.toField
-  let Z := cp.Z.toField
-  let T := cp.T.toField
-  { x := X / Z
-    y := Y / T
-    on_curve := by
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have ht : T ≠ 0 := h.T_ne_zero
-      have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 hz
-      have ht2 : T^2 ≠ 0 := pow_ne_zero 2 ht
-      have hcurve : Ed25519.a * X^2 * T^2 + Y^2 * Z^2 = Z^2 * T^2 + Ed25519.d * X^2 * Y^2 :=
-          h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [hz2, ht2]
-      linear_combination hcurve }
+  { x := cp.X.toField / cp.Z.toField
+    y := cp.Y.toField / cp.T.toField
+    on_curve := affine_on_curve_of_completed
+      cp.X.toField cp.Y.toField cp.Z.toField cp.T.toField
+      h.Z_ne_zero h.T_ne_zero h.on_curve }
 
 /-- Convert a CompletedPoint to the affine point (X/Z, Y/T).
 Returns 0 if the point is not valid. -/
@@ -498,29 +518,16 @@ instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) :
 --    Decidable pn.IsValid' :=
 --  decidable_of_iff _ (isValid'_iff pn).symm
 
+open curve25519_dalek.edwards in
 /-- Convert a ProjectiveNielsPoint to the affine point it represents.
 The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)).
 Requires only `OnCurve`; limb bounds are not needed. -/
 noncomputable def ProjectiveNielsPoint.toPoint' (pn : ProjectiveNielsPoint) (h : pn.OnCurve) :
     Point Ed25519 :=
-  let YpX := pn.Y_plus_X.toField
-  let YmX := pn.Y_minus_X.toField
-  let Z := pn.Z.toField
-  { x := (YpX - YmX) / (2 * Z)
-    y := (YpX + YmX) / (2 * Z)
-    on_curve := by
-      have hz : Z ≠ 0 := h.Z_ne_zero
-      have h2 : (2 : CurveField) ≠ 0 := by decide
-      have h2z : 2 * Z ≠ 0 := mul_ne_zero h2 hz
-      have h2z2 : (2 * Z)^2 ≠ 0 := pow_ne_zero 2 h2z
-      have h2z4 : (2 * Z)^4 ≠ 0 := pow_ne_zero 4 h2z
-      have hcurve := h.on_curve
-      simp only [Ed25519] at hcurve ⊢
-      simp only [div_pow]
-      field_simp [h2z2, h2z4]
-      ring_nf
-      ring_nf at hcurve
-      linear_combination hcurve }
+  { x := (pn.Y_plus_X.toField - pn.Y_minus_X.toField) / (2 * pn.Z.toField)
+    y := (pn.Y_plus_X.toField + pn.Y_minus_X.toField) / (2 * pn.Z.toField)
+    on_curve := affine_on_curve_of_niels
+      pn.Y_plus_X.toField pn.Y_minus_X.toField pn.Z.toField h.Z_ne_zero h.on_curve }
 
 /- Convert a ProjectiveNielsPoint to the affine point it represents.
     The affine coordinates are ((Y_plus_X - Y_minus_X)/(2Z), (Y_plus_X + Y_minus_X)/(2Z)). -/

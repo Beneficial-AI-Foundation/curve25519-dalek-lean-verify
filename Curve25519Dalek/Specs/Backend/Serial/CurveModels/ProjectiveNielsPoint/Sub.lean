@@ -35,17 +35,20 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.curve_models
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
-namespace curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+namespace curve25519_dalek
+namespace Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.edwards
 
 /-! ## Independent sub-lemmas for `sub_spec_aux_54_52_53_52`
 
 These lemmas factor out the key proof steps used in the main theorem:
-1. `pointwise_add_Field51_as_Nat` (from Aux.lean): converts limb-wise addition to `Field51_as_Nat` sum
-2. `sub_X_modular_relation` / `sub_Y_modular_relation` / `sub_Z_modular_relation` / `sub_T_modular_relation`:
+1. `pointwise_add_Field51_as_Nat` (from Aux.lean):
+   converts limb-wise addition to `Field51_as_Nat` sum
+2. `sub_X/Y/Z/T_modular_relation`:
    pure modular arithmetic lemmas for each coordinate relation
-3. `double_limb_tight_bounds`: derives tight bounds for doubled limb values
+3. `double_limb_tight_bounds`:
+   derives tight bounds for doubled limb values
 -/
 
 
@@ -205,8 +208,12 @@ theorem sub_spec_aux_54_52_53_52
   have h_ZZ2_nat := pointwise_add_Field51_as_Nat ZZ ZZ ZZ2 ZZ2_post1
   have h_fe3_nat := pointwise_add_Field51_as_Nat ZZ2 TT2d fe3 fe3_post1
   exact ⟨
-    by rw [← Nat.ModEq]; exact sub_X_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 fe_post2,
-    by rw [← Nat.ModEq]; exact sub_Y_modular_relation h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 h_fe1_nat,
+    by rw [← Nat.ModEq]
+       exact sub_X_modular_relation
+         h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 fe_post2,
+    by rw [← Nat.ModEq]
+       exact sub_Y_modular_relation
+         h_sum_YX Y_minus_X_post2 PM_post1 MP_post1 h_fe1_nat,
     by rw [← Nat.ModEq]; exact sub_Z_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat fe2_post2,
     by rw [← Nat.ModEq]; exact sub_T_modular_relation TT2d_post1 ZZ_post1 h_ZZ2_nat h_fe3_nat,
     fun i hi => lt_trans (fe_post1 i hi) (by norm_num),
@@ -556,14 +563,10 @@ private lemma sub_isValid_and_toPoint
   have hZ1_ne : Z1 ≠ 0 := hself.Z_ne_zero
   set x1 := X1 / Z1 with hx1_def
   set y1 := Y1 / Z1 with hy1_def
-  have h_P1_on_curve : Ed25519.a * x1 ^ 2 + y1 ^ 2 = 1 + Ed25519.d * x1 ^ 2 * y1 ^ 2 := by
-    have hZ1_2 : Z1 ^ 2 ≠ 0 := pow_ne_zero 2 hZ1_ne
-    have hZ1_4 : Z1 ^ 4 ≠ 0 := pow_ne_zero 4 hZ1_ne
-    have h_self_curve := hself.on_curve
-    simp only [Ed25519] at h_self_curve ⊢
-    simp only [hx1_def, hy1_def, div_pow]
-    field_simp [hZ1_2, hZ1_4]
-    linear_combination h_self_curve
+  have h_P1_on_curve : Ed25519.a * x1 ^ 2 + y1 ^ 2 =
+      1 + Ed25519.d * x1 ^ 2 * y1 ^ 2 :=
+    curve25519_dalek.edwards.affine_on_curve_of_projective
+      X1 Y1 Z1 hZ1_ne hself.on_curve
   let P1 : Point Ed25519 := ⟨x1, y1, h_P1_on_curve⟩
   -- Setup other's affine coordinates from ProjectiveNielsPoint
   set YpX := other.Y_plus_X.toField with hYpX_def
@@ -571,18 +574,14 @@ private lemma sub_isValid_and_toPoint
   set Z2 := other.Z.toField with hZ2_def
   set T2d := other.T2d.toField with hT2d_def
   have hZ2_ne : Z2 ≠ 0 := hother.Z_ne_zero
-  have h2Z2_ne : 2 * Z2 ≠ 0 := mul_ne_zero (by decide : (2 : Edwards.CurveField) ≠ 0) hZ2_ne
+  have h2Z2_ne : 2 * Z2 ≠ 0 :=
+    mul_ne_zero (by decide : (2 : Edwards.CurveField) ≠ 0) hZ2_ne
   set x2 := (YpX - YmX) / (2 * Z2) with hx2_def
   set y2 := (YpX + YmX) / (2 * Z2) with hy2_def
-  have h_P2_on_curve : Ed25519.a * x2 ^ 2 + y2 ^ 2 = 1 + Ed25519.d * x2 ^ 2 * y2 ^ 2 := by
-    have h2Z2_2 : (2 * Z2) ^ 2 ≠ 0 := pow_ne_zero 2 h2Z2_ne
-    have h2Z2_4 : (2 * Z2) ^ 4 ≠ 0 := pow_ne_zero 4 h2Z2_ne
-    have h_other_curve := hother.on_curve
-    simp only [Ed25519] at h_other_curve ⊢
-    simp only [hx2_def, hy2_def, div_pow]
-    field_simp [h2Z2_2, h2Z2_4]
-    ring_nf; ring_nf at h_other_curve
-    linear_combination h_other_curve
+  have h_P2_on_curve : Ed25519.a * x2 ^ 2 + y2 ^ 2 =
+      1 + Ed25519.d * x2 ^ 2 * y2 ^ 2 :=
+    curve25519_dalek.edwards.affine_on_curve_of_niels
+      YpX YmX Z2 hZ2_ne hother.on_curve
   let P2 : Point Ed25519 := ⟨x2, y2, h_P2_on_curve⟩
   -- Completeness theorem for denominators
   have h_denoms := Ed25519.denomsNeZero P1 P2
@@ -639,11 +638,11 @@ private lemma sub_isValid_and_toPoint
       hZ1_ne hZ2_ne h_self_x h_self_y h_other_x h_other_y
       hX_factored hY_factored hZ_factored hT_factored
 
-/-- **Spec theorem for
-`curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub`**
+/-- **Spec theorem for `sub`**
+(`CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint`)
 
-Computes `self - other` as a CompletedPoint: the result is valid and represents
-the difference of the two input points. -/
+Computes `self - other` as a CompletedPoint: the result is valid
+and represents the difference of the two input points. -/
 @[step]
 theorem sub_spec
     (self : curve25519_dalek.edwards.EdwardsPoint) (hself : self.IsValid)
@@ -651,7 +650,8 @@ theorem sub_spec
     sub self other ⦃ (c : CompletedPoint) =>
       c.IsValid ∧
       c.toPoint = self.toPoint - other.toPoint ⦄ := by
-  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith, hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
+  obtain ⟨c, hc_run, hX_arith, hY_arith, hZ_arith,
+    hT_arith, hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
     sub_spec_bounds' self hself other hother
   simp only [spec]
   apply exists_imp_spec
@@ -661,4 +661,5 @@ theorem sub_spec
   exact sub_isValid_and_toPoint c self hself other hother
     hX_F' hY_F' hZ_F' hT_F hcX_bounds hcY_bounds hcZ_bounds hcT_bounds
 
-end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+end Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint
+end curve25519_dalek

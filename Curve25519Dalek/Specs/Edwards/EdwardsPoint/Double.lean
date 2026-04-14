@@ -85,15 +85,11 @@ theorem double_spec (e : EdwardsPoint) (he_valid : e.IsValid) :
   set x := X / Z with hx_def
   set y := Y / Z with hy_def
   have hz2 : Z ^ 2 ≠ 0 := pow_ne_zero 2 hZ_ne
-  have hz4 : Z ^ 4 ≠ 0 := pow_ne_zero 4 hZ_ne
-  -- Affine curve equation
+  -- Affine curve equation (via bridge lemma)
   have h_P_on_curve :
       Ed25519.a * x ^ 2 + y ^ 2 =
-        1 + Ed25519.d * x ^ 2 * y ^ 2 := by
-    simp only [Ed25519] at h_curve ⊢
-    simp only [hx_def, hy_def, div_pow]
-    field_simp [hz2, hz4]
-    linear_combination h_curve
+        1 + Ed25519.d * x ^ 2 * y ^ 2 :=
+    affine_on_curve_of_projective X Y Z hZ_ne h_curve
   -- Completeness: denominators are non-zero
   let P : Point Ed25519 := ⟨x, y, h_P_on_curve⟩
   have h_denoms := Ed25519.denomsNeZero P P

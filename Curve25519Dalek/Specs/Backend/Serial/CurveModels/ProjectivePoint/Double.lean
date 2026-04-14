@@ -237,13 +237,8 @@ theorem double_spec
   set y := Y / Z with hy_def
   -- Prove denominators are non-zero using completeness theorem
   -- First construct the affine point P on Ed25519
-  have h_P_on_curve : Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := by
-    have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 h_qZ_ne
-    have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 h_qZ_ne
-    simp only [Ed25519] at h_curve_field ⊢
-    simp only [hx_def, hy_def, div_pow]
-    field_simp [hz2, hz4]
-    linear_combination h_curve_field
+  have h_P_on_curve : Ed25519.a * x ^ 2 + y ^ 2 = 1 + Ed25519.d * x ^ 2 * y ^ 2 :=
+    curve25519_dalek.edwards.affine_on_curve_of_projective X Y Z h_qZ_ne h_curve_field
   let P : Point Ed25519 := ⟨x, y, h_P_on_curve⟩
   have h_denoms := Ed25519.denomsNeZero P P
   -- denomsNeZero gives: 1 + d * P.x * P.x * P.y * P.y ≠ 0, i.e., 1 + d * x * x * y * y ≠ 0
