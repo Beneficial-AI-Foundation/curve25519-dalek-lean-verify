@@ -720,7 +720,7 @@
    "theorem add_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    add self other ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint + other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Add.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `ristretto.AddShared0RistrettoPointSharedARistrettoPointRistrettoPoint.add`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::add`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the sum of the inputs (in the context of elliptic curve addition)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Add<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
@@ -762,7 +762,7 @@
    "theorem mul_spec (self : RistrettoPoint) (scalar : scalar.Scalar)\n    (hscalar : U8x32_as_Nat scalar.bytes < 2 ^ 255) (hself : self.IsValid) :\n    mul self scalar ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (U8x32_as_Nat scalar.bytes) • self.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul`**\n• The function always succeeds (no panic) for valid input RistrettoPoints r and canonical Scalars s\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::mul`**\n• The function always succeeds (no panic) for valid input RistrettoPoints r and canonical Scalars s\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::scalar::Scalar), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::mul",
@@ -844,7 +844,7 @@
    "theorem sub_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    sub self other ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = self.toPoint - other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Sub.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `ristretto.SubShared0RistrettoPointSharedARistrettoPointRistrettoPoint.sub`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the difference of the inputs (via elliptic curve group subtraction)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::sub`**\n• The function always succeeds (no panic) for valid inputs\n• The result is a valid Ristretto point\n• The result represents the difference of the inputs (via elliptic curve group subtraction)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Sub<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::ristretto::RistrettoPoint)}::sub",
@@ -972,7 +972,7 @@
    "theorem mul_spec (self : scalar.Scalar) (point : RistrettoPoint)\n    (hself : U8x32_as_Nat self.bytes < 2 ^ 255) (hpoint : point.IsValid) :\n    mul self point ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧ result.toPoint = (U8x32_as_Nat self.bytes) • point.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Mul.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul`**\n• The function always succeeds (no panic) for canonical Scalars s and valid RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::mul`**\n• The function always succeeds (no panic) for canonical Scalars s and valid RistrettoPoints r\n• The result is a valid RistrettoPoint\n• The result = r + ... + r represents the input RistrettoPoint r added to itself s-times\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'a (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &1 (curve25519_dalek::scalar::Scalar)}::mul",
@@ -8300,7 +8300,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes\n    ⦃ (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
+   "theorem from_slice_spec (bytes : Slice U8) :\n    from_slice bytes ⦃\n      (result : core.result.Result CompressedRistretto core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cr : CompressedRistretto, result = .Ok cr ∧ cr.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/CompressedRistretto/FromSlice.lean",
    "spec_docstring":
@@ -8460,10 +8460,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec\n    (self other : RistrettoPoint)\n    (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    eq self other ⦃ (result : Bool) =>\n      (result = true ↔\n        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡\n            (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨\n        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡\n            (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by ...",
+   "theorem eq_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    eq self other ⦃ (result : Bool) =>\n      (result = true ↔\n        (Field51_as_Nat self.X * Field51_as_Nat other.Y) ≡\n          (Field51_as_Nat self.Y * Field51_as_Nat other.X) [MOD p] ∨\n        (Field51_as_Nat self.X * Field51_as_Nat other.X) ≡\n          (Field51_as_Nat self.Y * Field51_as_Nat other.Y) [MOD p]) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/Eq.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `ristretto::RistrettoPoint::Insts::CoreCmpPartialEqRistrettoPoint::eq`**\n• No panic (always returns successfully given valid inputs)\n• Returns true iff the two points satisfy the multiplicative Ristretto equivalence condition:\n  X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::eq`**\n• No panic (always returns successfully given valid inputs)\n• Returns true iff the two points satisfy the multiplicative Ristretto equivalence condition:\n  X1·Y2 ≡ Y1·X2 (mod p) or X1·X2 ≡ Y1·Y2 (mod p)\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::eq",
@@ -9125,7 +9125,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : RistrettoPoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : RistrettoPoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
+   "theorem conditional_select_spec (a b : RistrettoPoint) (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : RistrettoPoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ConditionalSelect.lean",
    "spec_docstring":
@@ -9242,7 +9242,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem elligator_ristretto_flavor_spec\n    (r_0 : FieldElement51)\n    (h_r_0_valid : r_0.IsValid) :\n    elligator_ristretto_flavor r_0 ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (elligator_ristretto_flavor_pure r_0.toField).val ⦄ := by ...",
+   "theorem elligator_ristretto_flavor_spec (r_0 : FieldElement51) (h_r_0_valid : r_0.IsValid) :\n    elligator_ristretto_flavor r_0 ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint = (elligator_ristretto_flavor_pure r_0.toField).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/ElligatorRistrettoFlavor.lean",
    "spec_docstring":
@@ -9280,11 +9280,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint =\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_lower bytes))).val +\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_upper bytes))).val\n      ⦄ := by ...",
+   "theorem from_uniform_bytes_spec (bytes : Array U8 64#usize) :\n    from_uniform_bytes bytes ⦃ (result : RistrettoPoint) =>\n      result.IsValid ∧\n      result.toPoint =\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_lower bytes))).val +\n        (elligator_ristretto_flavor_pure (field_from_bytes (bytes_upper bytes))).val ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Ristretto/RistrettoPoint/FromUniformBytes.lean",
    "spec_docstring":
-   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes`**\n• The function always succeeds (no panic) for arbitrary 64-byte inputs.\n• The result is a mathematically valid Ristretto point (i.e., an even Edwards point on the curve).\n• The result equals `elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))` in\n  the Ed25519 group, where `from_bytes` maps 32 bytes to a field element (low 255 bits mod p) and\n  `elligator` is the Ristretto-flavored Elligator map. -/",
+   "/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::from_uniform_bytes`**\n• The function always succeeds (no panic) for arbitrary 64-byte inputs.\n• The result is a mathematically valid Ristretto point (i.e., an even Edwards point on the curve).\n• The result equals `elligator(from_bytes(bytes[0..32])) + elligator(from_bytes(bytes[32..64]))` in\n  the Ed25519 group, where `from_bytes` maps 32 bytes to a field element (low 255 bits mod p) and\n  `elligator` is the Ristretto-flavored Elligator map.\n-/",
    "source": "curve25519-dalek/src/ristretto.rs",
    "rust_name":
    "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
