@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
@@ -7,44 +7,28 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Sub
 
-/-! # Spec Theorem for `RistrettoPoint::sub`
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::sub`
 
-Specification and proof for the `Sub` trait implementation for Ristretto points.
+Subtracts two Ristretto points via elliptic curve group subtraction. The implementation unwraps
+both points to their underlying `EdwardsPoint` representations, performs Edwards subtraction,
+and wraps the result back as a `RistrettoPoint`.
 
-This function subtracts two Ristretto points via elliptic curve subtraction by delegating
-to the underlying Edwards point subtraction.
-
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.ristretto
-namespace curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+namespace curve25519_dalek.Shared0RistrettoPoint.Insts
+namespace CoreOpsArithSubSharedARistrettoPointRistrettoPoint
 
-/-
-natural language description:
-
-• Takes two RistrettoPoints `self` and `other`
-• Returns their difference as a RistrettoPoint via elliptic curve group subtraction
-• Implementation: unwraps both points to their underlying EdwardsPoint representations,
-  performs Edwards subtraction, and wraps the result back as a RistrettoPoint
-
-natural language specs:
-
-• The function always succeeds (no panic) for valid input Ristretto points
-• The result is a valid Ristretto point
-• The result represents the difference of the inputs (in the mathematical context of elliptic curve subtraction)
--/
-
-/-- **Spec and proof concerning `Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub`**:
+/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::sub`**
 • The function always succeeds (no panic) for valid inputs
 • The result is a valid Ristretto point
-• The result represents the difference of the inputs (in the context of elliptic curve subtraction)
+• The result represents the difference of the inputs (via elliptic curve group subtraction)
 -/
 @[step]
-theorem sub_spec
-    (self other : RistrettoPoint)
-    (h_self_valid : self.IsValid)
+theorem sub_spec (self other : RistrettoPoint) (h_self_valid : self.IsValid)
     (h_other_valid : other.IsValid) :
     sub self other ⦃ (result : RistrettoPoint) =>
       result.IsValid ∧
@@ -62,6 +46,8 @@ theorem sub_spec
     apply even_add_closure_Ed25519
     · exact h_even self h_self_valid
     · obtain ⟨Q, hQ⟩ := (IsEven_iff_in_doubling_image _).mp (h_even other h_other_valid)
-      exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by unfold RistrettoPoint.toPoint at hQ; rw [hQ]; abel⟩
+      exact (IsEven_iff_in_doubling_image _).mpr ⟨-Q, by
+        unfold RistrettoPoint.toPoint at hQ; rw [hQ]; abel⟩
 
-end curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+end CoreOpsArithSubSharedARistrettoPointRistrettoPoint
+end curve25519_dalek.Shared0RistrettoPoint.Insts
