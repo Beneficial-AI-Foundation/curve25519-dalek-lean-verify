@@ -26,6 +26,10 @@ rev = "3bc7e58f74bbb15a9d4259c0accd7decc31bcdec"
 name = "Curve25519Dalek"
 
 [[lean_lib]]
+name = "LinterTest"
+roots = ["Curve25519Dalek.Lint.Test"]
+
+[[lean_lib]]
 name = "Utils"
 
 [[lean_exe]]

@@ -110,7 +110,12 @@ def specStyleLinter : Linter where run stx := do
   if getLinterValue linter.curve25519.specSourceDoc (← getLinterOptions) then
     if hasStep then
       let docs := Lean.getMainModuleDoc (← getEnv)
-      unless docs.any (fun d => d.doc.contains "Source:") do
+      -- Check for a line that actually starts with "Source: " (space after colon).
+      -- Plain `contains "Source:"` would falsely match imported module docs that
+      -- mention the string inside prose or table cells (e.g. "`Source:`").
+      unless docs.any (fun d =>
+          d.doc.splitOn "\n" |>.any (fun line =>
+            (line.dropWhile Char.isWhitespace).startsWith "Source:")) do
         logLint linter.curve25519.specSourceDoc stx
           m!"This file contains an `@[step]` theorem but the module docstring \
             does not include a `Source:` line. Add e.g.:\n\
