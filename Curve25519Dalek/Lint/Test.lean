@@ -7,6 +7,7 @@ Authors: Zhang-Liao
 import Curve25519Dalek.Lint.Test.MaxHeartbeats
 import Curve25519Dalek.Lint.Test.SpecSourceDoc
 import Curve25519Dalek.Lint.Test.SpecStyle
+import Curve25519Dalek.Lint.Test.SpecIndent
 
 /-!
 # Linter test suite root

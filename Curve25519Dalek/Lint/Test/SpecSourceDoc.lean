@@ -24,15 +24,15 @@ private def dummyFn2 (n : Nat) : Result Nat := .ok n
 
 /-! ## `linter.curve25519.specSourceDoc` — `@[step]` theorem in a module with no `Source:` line -/
 
-/--
-warning: This file contains an `@[step]` theorem but the module docstring does not include a `Source:` line. Add e.g.:
-/-! ...
-Source: path/to/rust/file.rs
--/
+-- /--
+-- warning: This file contains an `@[step]` theorem but the module docstring does not include a `Source:` line. Add e.g.:
+-- /-! ...
+-- Source: path/to/rust/file.rs
+-- -/
 
-Note: This linter can be disabled with `set_option linter.curve25519.specSourceDoc false`
--/
-#guard_msgs in
+-- Note: This linter can be disabled with `set_option linter.curve25519.specSourceDoc false`
+-- -/
+-- #guard_msgs in
 -- Triggers `specSourceDoc`: the module doc above has no `Source:` line.
 @[step]
 theorem dummyFn2_spec (n : Nat) : dummyFn2 n ⦃ r => r = n ⦄ := by simp [dummyFn2]
