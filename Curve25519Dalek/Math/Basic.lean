@@ -140,25 +140,12 @@ theorem lift_mod_eq (a b : ℕ) (h : a % p = b % p) : (a : CurveField) = (b : Cu
 
 end Edwards
 
-/-! ## Field Element Conversions -/
-
-namespace Edwards
-
-open curve25519_dalek.backend.serial.u64.field ZMod
-
-/-- Convert the 5-limb array to a field element in ZMod p. -/
-def field_from_limbs (fe : FieldElement51) : CurveField :=
-  (Field51_as_Nat fe : CurveField)
-
-end Edwards
-
 /-! ## FieldElement51 Validity and Casting -/
 
 namespace curve25519_dalek.backend.serial.u64.field
 open Edwards
 
-/-- Convert a FieldElement51 to the mathematical field element in ZMod p.
-    This is the same as `field_from_limbs` but with dot notation support. -/
+/-- Convert a FieldElement51 to the mathematical field element in ZMod p. -/
 def FieldElement51.toField (fe : FieldElement51) : CurveField :=
   (Field51_as_Nat fe : CurveField)
 
