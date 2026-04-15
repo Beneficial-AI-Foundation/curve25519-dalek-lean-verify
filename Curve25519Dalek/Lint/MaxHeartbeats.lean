@@ -40,6 +40,12 @@ private partial def collectBadHeartbeats : Syntax → Array (Syntax × Nat)
       if val != 0 && val % 200000 != 0 then inner.push (stx, val) else inner
     else
       inner
+  | stx@`(command| set_option $opt $_ in $_) =>
+    -- Stop recursing when entering a scope that suppresses this linter.
+    -- The inner command runs with the linter disabled; reporting from the outer
+    -- scope would bypass the user's explicit suppression.
+    if opt.getId.toString == "linter.curve25519.maxHeartbeatsMultiple" then #[]
+    else stx.getArgs.flatMap collectBadHeartbeats
   | stx => stx.getArgs.flatMap collectBadHeartbeats
 
 /-- The `linter.curve25519.maxHeartbeatsMultiple` linter. -/
