@@ -104,6 +104,35 @@ theorem step_1_spec (cey : edwards.CompressedEdwardsY) :
         ∃ x' : CurveField, Ed25519.a * x' ^ 2 + y ^ 2 = 1 + Ed25519.d * x' ^ 2 * y ^ 2) ∧
       (is_valid_y_coord.val = 1#u8 →
         Ed25519.a * x ^ 2 + y ^ 2 = 1 + Ed25519.d * x ^ 2 * y ^ 2) ⦄ := by
-  sorry
+  unfold edwards.decompress.step_1
+  let* ⟨ a, a_post ⟩ ← edwards.CompressedEdwardsY.as_bytes_spec
+  let* ⟨ Y, Y_mod, Y_bounds ⟩ ← from_bytes_spec
+  let* ⟨ Z, Z_val, Z_bounds ⟩ ← ONE_spec
+  let* ⟨ YY, YY_mod, YY_bounds ⟩ ← square_spec
+  let* ⟨ u, u_post1, u_post2 ⟩ ← sub_spec
+  let* ⟨ fe, fe_post1, fe_post2 ⟩ ← EDWARDS_D_spec
+  let* ⟨ fe1, fe1_post1, fe1_post2 ⟩ ← mul_spec
+  let* ⟨ v, v_post1, v_post2 ⟩ ← add_spec
+  let* ⟨ sqrt_res, X_lbounds, X_parity, sq_case1, sq_case2, sq_case3, sq_case4 ⟩ ←
+    sqrt_ratio_i_spec
+  -- Discharge the 8 postconditions one by one
+  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
+  · -- 1. Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]
+    rw [a_post] at Y_mod
+    exact Y_mod
+  · -- 2. ∀ i < 5, Y[i]!.val < 2^51
+    exact Y_bounds
+  · -- 3. Field51_as_Nat Z = 1
+    exact Z_val
+  · -- 4. ∀ i < 5, Z[i]!.val < 2^51
+    exact Z_bounds
+  · -- 5. ∀ i < 5, X[i]!.val ≤ 2^53 - 1
+    exact X_lbounds
+  · -- 6. (Field51_as_Nat X % p) % 2 = 0
+    exact X_parity
+  · -- 7. is_valid_y_coord.val = 1 ↔ ∃ x' : CurveField, curve_eq(x', y)
+    sorry
+  · -- 8. is_valid_y_coord.val = 1 → curve_eq(x, y)
+    sorry
 
 end curve25519_dalek.edwards.CompressedEdwardsY
