@@ -29,7 +29,6 @@ handling zero inputs specially.
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
@@ -58,14 +57,14 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   have h_sqrt_eq : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 :=
     SQRT_M1_val_spec
   have h_sqrt_mod : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡ p - 1 [MOD p] := by
-    simp [Nat.ModEq, h_sqrt_eq]
+    exact sqrt_m1_sq_modEq
   have h1 : (Field51_as_Nat SQRT_M1_val) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
     exact h_sqrt_mod.mul_right b
   have hp_pos : 1 ≤ p := by unfold p; simp
   have h2 : (p - 1) * b = p * b - b := by
       rw [Nat.sub_mul _ _ _, Nat.one_mul]
   have h3 : 0 ≡ p * b  [MOD p] := by
-      simp [Nat.ModEq]
+    simp only [Nat.ModEq, Nat.zero_mod, Nat.mul_mod_right]
   have : p *b =  b + (p-1) *b  := by unfold p; omega
   rw[this] at h3
   have h4:=h3.add_left a
@@ -592,7 +591,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
             Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)))) =
       Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
         Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) := by
-    simp only [Nat.reduceAdd, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
+    simp only [Nat.reduceAdd, Nat.reduceMul]
     ring
   rw [this]
 
@@ -680,7 +679,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     rw [this]
     rw [← pow_add, ← pow_mul, ← pow_add, ← pow_succ,
       (by
-        simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub] :
+        omega :
           (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1 =
             7 * 2 ^ 253 - 35)]
   have check_eq_v :=
@@ -1115,14 +1114,27 @@ private theorem solve_second_choice_false_choice3_false
   refine ⟨?_, ?_, ?_, ?_, ?_⟩
   · intro hu; exfalso
     rw [← modEq_zero_iff] at hu
-    have := check_eq_v.trans
-      ((hu.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
-       (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)))
-    simp only [Nat.reducePow, Nat.reduceSub, Nat.reduceMul, Nat.reduceAdd, ne_eq,
-      OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
-    rw [modEq_zero_iff] at hu this
+    let E := 2 + (2 ^ 252 - 3) * 2
+    have huPow : Field51_as_Nat u ^ E ≡ 0 [MOD p] := by
+      calc
+        Field51_as_Nat u ^ E ≡ (0 : Nat) ^ E [MOD p] := hu.pow E
+        _ = 0 := by
+          have hEpos : 0 < E := by
+            dsimp only [E]
+            positivity
+          exact zero_pow (Nat.ne_of_gt hEpos)
+    have this : Field51_as_Nat check ≡ 0 [MOD p] := by
+      calc
+        Field51_as_Nat check ≡
+            Field51_as_Nat u ^ E * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] :=
+          check_eq_v
+        _ ≡ 0 * Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] :=
+          huPow.mul_right _
+        _ ≡ 0 [MOD p] := by
+          rw [zero_mul]
+    have hcheck0 : Field51_as_Nat check % p = 0 := (modEq_zero_iff _ _).1 this
     exact h_check_ne_u
-      ((to_bytes_zero_of_Field51_as_Nat_zero this).trans
+      ((to_bytes_zero_of_Field51_as_Nat_zero hcheck0).trans
        (to_bytes_zero_of_Field51_as_Nat_zero hu).symm)
   · intro ⟨hu, hv⟩
     rw [← modEq_zero_iff] at hv
@@ -1156,7 +1168,7 @@ private theorem solve_second_choice_false_choice3_false
     simp only [Nat.mul_mod_mod] at hxx
     rw [← Nat.ModEq] at hxx
     have p_eq : 2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) =
-        (p - 1) * 2 + 1 := by unfold p; simp
+        (p - 1) * 2 + 1 := by unfold p; omega
     have p_eq1 : 2 * (2 + (2 ^ 252 - 3) * 2) =
         (p - 1) / 2 + 2 := by unfold p; omega
     have xx_check :=
@@ -1263,7 +1275,7 @@ private theorem solve_second_choice_false_choice3_false
           have := eq_check.trans this
           simp only at this
           have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
-            (by simpa [r1_eq_r] using r_neg_post1) r2_post
+            (by simpa only [r1_eq_r] using r_neg_post1) r2_post
           rw [r1_eq_r] at r2_eq_sq
           exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
         · rcases h with h | h
