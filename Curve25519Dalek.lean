@@ -172,7 +172,7 @@ import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Eq
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.FromUniformBytes
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Identity
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul
-import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Mul_Base
+import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.MulBase
 import Curve25519Dalek.Specs.Ristretto.RistrettoPoint.Sub
 import Curve25519Dalek.Specs.Scalar.ClampInteger
 import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
