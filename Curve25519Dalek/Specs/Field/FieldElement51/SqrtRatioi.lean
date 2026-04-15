@@ -22,12 +22,12 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 
 Specification and proof for `FieldElement51::sqrt_ratio_i`.
 
-This function computes a nonnegative square root of u/v or i*u/v (where i = sqrt(-1) = SQRT_M1 constant),
-returning a flag indicating which case occurred and handling zero inputs specially.
+This function computes a nonnegative square root of u/v or i*u/v,
+(where i = sqrt(-1) = SQRT_M1 constant), returning a flag indicating which case occurred and
+handling zero inputs specially.
 
 **Source**: curve25519-dalek/src/field.rs
 -/
-
 
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -125,8 +125,8 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
     intro i hi _
     have hi_val := h_bytes_zero i hi
     interval_cases i
-    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate, List.getElem_cons_succ,
-      List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
+    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate,
+      List.getElem_cons_succ, List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
   rw [← hru_eq]
   exact hu
 
@@ -266,10 +266,12 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
             (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
             a ^ ((p -1)/2 ) + 1
             [MOD p] := by
-            have :(p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡ 1 [MOD p]:= by
+            have :(p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val)
+              ≡ 1 [MOD p]:= by
               unfold SQRT_M1_val
               decide
-            have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
+            have :=this.add_left (a ^ ((p - 1) / 2) + p *
+              (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
             apply Nat.ModEq.trans this
             simp[Nat.modEq_iff_dvd]
           apply (eq1.mul this).trans
@@ -1333,8 +1335,8 @@ Postconditions (4 mutually exclusive cases + non-negativity):
 theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
     ∃ c, sqrt_ratio_i u v = ok c ∧
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
@@ -1380,7 +1382,8 @@ theorem sqrt_ratio_i_spec'
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← constants.SQRT_M1_spec
   let* ⟨ correct_sign_sqrt, correct_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
-  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
   let* ⟨ flipped_sign_sqrt, flipped_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ fe7, fe7_post1, fe7_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
@@ -1407,7 +1410,8 @@ theorem sqrt_ratio_i_spec'
         Or.inr first_choice, if_true, bind_tc_ok]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+      Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
     · intro i hi
       simp only [Choice.one, ↓reduceIte] at r1_post
       rw [r1_post i hi]
@@ -1432,7 +1436,8 @@ theorem sqrt_ratio_i_spec'
       simp only [first_choice, false_or, or_false, if_pos second_choice, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         simp only [Choice.one, ↓reduceIte] at r1_post
         rw [r1_post i hi]
@@ -1494,7 +1499,8 @@ theorem sqrt_ratio_i_spec'
       simp only [if_neg second_choice, first_choice, false_or, or_false, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         have h01 : ¬(0#u8 = 1#u8) := by decide
         simp only [Choice.zero, h01, ite_false] at r1_post
@@ -1537,8 +1543,8 @@ theorem sqrt_ratio_i_spec'
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
     sqrt_ratio_i u v ⦃ c =>
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
