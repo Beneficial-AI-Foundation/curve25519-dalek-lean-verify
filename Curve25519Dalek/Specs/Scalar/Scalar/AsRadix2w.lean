@@ -882,7 +882,8 @@ private theorem as_radix_2w_loop_spec_strong
                 rw [← pow_add]
                 grind
               rw [← this]
-              simp
+              simp only [Array.getElem!_Nat_eq, Nat.ofNat_pos, pow_pos,
+              mul_lt_mul_iff_left₀, gt_iff_lt]
               apply Nat.mod_lt
               grind
           rw [h_hi_eq, or_mul_pow_two_eq_add _ _ (64-bit_idx.val) hlo_lt]
@@ -961,7 +962,7 @@ private theorem as_radix_2w_loop_spec_strong
         step as ⟨i6, hi6⟩
         have hi6_val : i6.val = carry1.val * 2 ^ w.val := by
           have hbound : carry1.val * 2 ^ w.val < U64.size := by
-            simp only [U64.size]; norm_num; scalar_tac
+            simp only [U64.size]; scalar_tac
           have heq : carry1.val <<< w.val % U64.size = carry1.val * 2 ^ w.val := by
             rw [Nat.shiftLeft_eq]; apply Nat.mod_eq_of_lt hbound
           linarith [show i6.val = carry1.val <<< w.val % U64.size from by scalar_tac, heq]
@@ -1445,7 +1446,14 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     have hw8 : w.val = 8 := by grind
     have hK_lt : digits_count.val < 64 := by
       have hi1 : i1.val = 255 + w.val := by scalar_tac
-      simp_all
+      simp_all only [UScalar.ofNatCore_val_eq, Nat.reduceLeDiff, le_refl, Array.getElem!_Nat_eq,
+      ge_iff_le, UScalar.le_equiv, Nat.not_eq, ne_eq, Nat.reduceEqDiff, not_false_eq_true,
+      Nat.reduceLT, or_true, or_self, UScalar.val_not_eq_imp_not_eq, Array.repeat_val,
+      List.slice_zero_j, List.take_replicate, min_self, Slice.length,
+      tsub_zero, Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, BitVec.reduceHShiftLeft,
+      Nat.reduceShiftLeft, Nat.reduceAdd, Nat.add_one_sub_one, Nat.one_le_ofNat,
+      Nat.reduceDiv, zero_add]
     have h_nat_eq : X64_as_Nat (res1.2 s2) = U8x32_as_Nat self.bytes := by
       apply X64_as_Nat_eq_U8x32_as_Nat
       all_goals simp_all
@@ -1473,7 +1481,12 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     step
     step
     · simp only [UScalar.ofNatCore_val_eq, radix_post1, Nat.shiftLeft_eq, one_mul]
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
+      Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne,
+      or_self, UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val,
+      List.slice_zero_j, List.take_replicate, min_self, Slice.length, tsub_zero,
+      Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv]
       have : 2 ^ w.val % U64.size = 2 ^ w.val  := by
         apply Nat.mod_eq_of_lt
         simp[U64.size]
@@ -1494,7 +1507,7 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       scalar_tac
     · simp_all [Nat.shiftLeft_eq]
       have h2w_lt : 2 ^ w.val < U64.size := by
-        simp [U64.size]
+        simp only [U64.size]
         exact Nat.pow_lt_pow_right (by norm_num) (by scalar_tac)
       have : 2 ^ w.val % U64.size = 2 ^ w.val  := by
         apply Nat.mod_eq_of_lt
@@ -1506,10 +1519,20 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
       rw [hi1]
       exact X64_as_Nat_lt_pow_w_digits_count _ w.val hw_ge5 h_hi
     · have hi1 : i1.val = 255 + w.val := by scalar_tac
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
+      Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
+      UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
+      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
+      Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one]
       exact digits_count_le_64 w.val hw_ge5 h_hi
     · have hi1 : i1.val = 255 + w.val := by scalar_tac
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
+      Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
+      UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
+      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
+      Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one]
       exact digits_count_mul_le w.val
     · simp only [UScalar.ofNatCore_val_eq, Finset.range_zero, Array.getElem!_Nat_eq,
       Array.repeat_val, Finset.sum_empty, CharP.cast_eq_zero, pow_zero, mul_one, add_zero,
@@ -1532,13 +1555,27 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
     · -- 1 ≤ digits_count (needed for i4 = digits_count - 1)
       have hi1 : i1.val = 255 + w.val := by scalar_tac
       have hpos := digits_count_pos w.val hw_ge5 (by grind)
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
+      Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne, or_self,
+      UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val, List.slice_zero_j,
+      List.take_replicate, min_self, Slice.length, tsub_zero, Usize.ofNatCore_val_eq,
+      List.length_replicate, Nat.reduceMul, Array.val_to_slice, UScalarTy.U64_numBits_eq,
+      Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one, Nat.add_left_cancel_iff,
+      CharP.cast_eq_zero, zero_mul, add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod]
     step
     · -- i4 < result.2.length (needed to index into result.2)
       have hi1 : i1.val = 255 + w.val := by scalar_tac
       have h64 := digits_count_le_64 w.val hw_ge5 (by grind)
       have hlen : result.2.length = 64 := by simp
-      simp_all
+      simp_all only [Array.getElem!_Nat_eq, ge_iff_le, UScalar.le_equiv, UScalar.ofNatCore_val_eq,
+      Nat.not_eq, ne_eq, not_false_eq_true, ReduceNat.reduceNatEq, lt_or_lt_iff_ne,
+      or_self, UScalar.val_not_eq_imp_not_eq, UScalar.neq_to_neq_val, Array.repeat_val,
+      List.slice_zero_j, List.take_replicate, min_self, Slice.length, tsub_zero,
+      Usize.ofNatCore_val_eq, List.length_replicate, Nat.reduceMul, Array.val_to_slice,
+      UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, U64.ofNat_bv, Nat.succ_add_sub_one,
+      Nat.add_left_cancel_iff, CharP.cast_eq_zero, zero_mul,
+      add_zero, zero_le, Nat.zero_shiftLeft, Nat.zero_mod, Array.length,
+      List.Vector.length_val, gt_iff_lt]
       omega
     step
     · have hi3_zero : i3.val = 0 := by
@@ -1621,6 +1658,6 @@ theorem as_radix_2w_spec (self : Scalar) (w : Std.Usize)
           OfNat.ofNat_ne_zero, ne_eq, false_and, or_false]
           have := hres j hjne
           simp only [Array.getElem!_Nat_eq] at this
-          simp [this]
+          simp only [this]
 
 end curve25519_dalek.scalar.Scalar
