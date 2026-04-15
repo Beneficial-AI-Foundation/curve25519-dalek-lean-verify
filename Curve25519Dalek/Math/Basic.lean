@@ -82,6 +82,15 @@ def U8x32_as_Field (bytes : Array U8 32#usize) : ZMod (2^255 - 19) :=
 def U8x64_as_Nat (bytes : Array U8 64#usize) : Nat :=
   ∑ i ∈ Finset.range 64, 2^(8 * i) * (bytes[i]!).val
 
+/-- Interpret a 4-element `u64` array as a 256-bit natural number in
+    little-endian limb order. -/
+def X64_as_Nat (limbs : Array U64 4#usize) : ℕ :=
+  ∑ i ∈ Finset.range 4, 2 ^ (64 * i) * (limbs[i]!).val
+
+/-- Interpret a 64-element `i8` array as a signed integer in base `2^w`. -/
+def I8x64_as_Radix2w (w : ℕ) (digits : Array I8 64#usize) : ℤ :=
+  ∑ i ∈ Finset.range 64, (2 ^ w : ℤ) ^ i * (digits[i]!).val
+
 /-! ## Basic properties of the defined quantities -/
 
 theorem L_lt : L < 2 ^ 260 := by

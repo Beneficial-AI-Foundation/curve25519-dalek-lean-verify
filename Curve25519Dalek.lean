@@ -46,7 +46,6 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.MontgomeryANeg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.OneMinusEdwardsDSquared
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.RR
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Rr
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtAdMinusOne
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
@@ -179,6 +178,7 @@ import Curve25519Dalek.Specs.Scalar.ReadLeU64Into
 import Curve25519Dalek.Specs.Scalar.Scalar.Add
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix16
+import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix2w
 import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 import Curve25519Dalek.Specs.Scalar.Scalar.Eq

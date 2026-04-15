@@ -38,7 +38,7 @@ natural language specs:
 • Returns `a` when `choice = Choice.zero` (choice.val = 0)
 -/
 
-private theorem next_spec (range : core.ops.range.Range Usize) :
+theorem next_spec (range : core.ops.range.Range Usize) :
     ∃ opt range',
       core.iter.range.IteratorRange.next core.iter.range.StepUsize range = ok (opt, range') ∧
       (¬ range.start.val < range.end.val → opt = none ∧ range' = range) ∧
