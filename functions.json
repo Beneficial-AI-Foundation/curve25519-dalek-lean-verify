@@ -11006,10 +11006,11 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem batch_invert_spec\n    (inputs : Slice scalar.Scalar)\n    (vals : ℕ → ℕ)\n    (h_vals_lt : ∀ j < inputs.val.length, vals j < L)\n    (h_vals_nz : ∀ j < inputs.val.length, vals j % L ≠ 0)\n    (h_vals_def : ∀ j < inputs.val.length,\n        SliceScalarAt inputs j (fun b => U8x32_as_Nat b = vals j)) :\n    batch_invert inputs ⦃ result =>\n      U8x32_as_Nat result.1.bytes * PrefixProd vals inputs.val.length ≡ 1 [MOD L] ∧\n      ∀ j < inputs.val.length,\n          SliceScalarAt result.2 j\n            (fun b => U8x32_as_Nat b * vals j ≡ 1 [MOD L]) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/BatchInvert.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
@@ -11035,11 +11036,13 @@
     "curve25519_dalek.scalar.Scalar.batch_invert_loop1",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem batch_invert_loop0_spec\n    (inputs : Slice scalar.Scalar) (n : Std.Usize)\n    (scratch : alloc.vec.Vec backend.serial.u64.scalar.Scalar52)\n    (acc : backend.serial.u64.scalar.Scalar52) (i : Std.Usize)\n    (hi : i.val ≤ n.val)\n    (h_inputs_len : inputs.val.length = n.val)\n    (h_scratch_len : scratch.val.length = n.val)\n    (h_acc_limbs : ∀ j < 5, acc[j]!.val < 2 ^ 52)\n    (h_acc_lt : Scalar52_as_Nat acc < L)\n    (A : ℕ)\n    (vals : ℕ → ℕ)\n    (h_vals_lt : ∀ j < n.val, vals j < L)\n    (h_acc_inv : Scalar52_as_Nat acc ≡ A * PrefixProd vals i.val [MOD L])\n    (h_scratch_inv : ∀ j < i.val,\n        Vec52At scratch j\n          (fun x => Scalar52_as_Nat x ≡ A * PrefixProd vals j [MOD L]))\n    (h_inp_mont : ∀ j < i.val,\n        SliceScalarAt inputs j\n          (fun b => U8x32_as_Nat b ≡ vals j * R [MOD L]))\n    (h_inp_orig : ∀ j, i.val ≤ j → j < n.val →\n        SliceScalarAt inputs j\n          (fun b => U8x32_as_Nat b = vals j)) :\n    batch_invert_loop0 inputs n scratch acc i ⦃ result =>\n      Scalar52_as_Nat result.2.2 ≡ A * PrefixProd vals n.val [MOD L] ∧\n      (∀ j < n.val,\n          Vec52At result.2.1 j\n            (fun x => Scalar52_as_Nat x ≡ A * PrefixProd vals j [MOD L])) ∧\n      (∀ j < n.val,\n          SliceScalarAt result.1 j\n            (fun b => U8x32_as_Nat b ≡ vals j * R [MOD L])) ∧\n            (∀ i < 5, result.2.2[i]!.val < 2 ^ 52) ∧\n            (Scalar52_as_Nat result.2.2 < L) ∧\n            result.1.val.length = n.val ∧\n            result.2.1.val.length = n.val ⦄ := ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/BatchInvert.lean",
+   "spec_docstring":
+   "/--\nnatural language description:\n\n• Takes a mutable slice `inputs` of `n` scalars, a pre-allocated `scratch` vector\n  of `n` `Scalar52` elements (each initially holding the Montgomery form of 1,\n  i.e. `ONE.unpack().as_montgomery()`), an accumulator `acc` (initially the same),\n  and the loop counter `i` starting at 0.\n\n• For each index `i < n`:\n    1. `scratch[i] ← acc`                          (record running prefix product)\n    2. `tmp ← inputs[i].unpack().as_montgomery()`  (convert i-th scalar to Montgomery form)\n    3. `inputs[i] ← tmp.pack()`                    (overwrite with Montgomery-form scalar)\n    4. `acc ← montgomery_mul(acc, tmp)`             (extend the prefix product)\n    5. `i ← i + 1`\n\n• On exit, returns `(inputs', scratch', acc')`.\n\nnatural language specs:\n\n• The function always terminates and succeeds for any valid `inputs`, `scratch`,\n  `acc`, and `i ≤ n`.\n• **Accumulator**: `Scalar52_as_Nat acc' ≡ A · ∏_{j < n} vals(j)  [MOD L]`\n  where `A = Scalar52_as_Nat acc_init` and `vals(j) = U8x32_as_Nat inputs_orig[j].bytes`.\n• **Scratch**: for all `j < n` and any `x = scratch'[j]`,\n  `Scalar52_as_Nat x ≡ A · ∏_{m < j} vals(m)  [MOD L]`.\n• **Inputs**: for all `j < n` and any `inp = inputs'[j]`,\n  `U8x32_as_Nat inp.bytes ≡ vals(j) · R  [MOD L]`\n  (every original input has been replaced by its Montgomery form).\n\n **Spec and proof concerning `scalar.Scalar.batch_invert_loop0`**:\n[curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]: loop 0.\nSource: 'curve25519-dalek/src/scalar.rs', lines 808:8-818:9.\n\n* **Precondition**: `i.val ≤ n.val` — loop counter does not exceed `n`.\n* **Size**: `inputs.val.length = n.val` and `scratch.val.length = n.val`.\n* **Limb validity**: `acc` has limbs `< 2^52` and `Scalar52_as_Nat acc < L`.\n* **Loop invariant on entry** (parameterised by `A : ℕ` and `vals : ℕ → ℕ`):\n  - `Scalar52_as_Nat acc ≡ A · PrefixProd vals i  [MOD L]`\n  - For `j < i`: `Vec52At scratch j (fun x => Scalar52_as_Nat x ≡ A · PrefixProd vals j)`\n  - For `j < i`: `SliceScalarAt inputs j (fun b => U8x32_as_Nat b ≡ vals j · R)`\n  - For `i ≤ j < n`: `SliceScalarAt inputs j (fun b => U8x32_as_Nat b = vals j)`\n* **Postcondition** — `result = (inputs', scratch', acc')` satisfies:\n  - `Scalar52_as_Nat acc'     ≡ A · PrefixProd vals n  [MOD L]`\n  - `∀ j < n, Vec52At scratch' j (fun x => Scalar52_as_Nat x ≡ A · PrefixProd vals j)`\n  - `∀ j < n, SliceScalarAt inputs' j (fun b => U8x32_as_Nat b ≡ vals j · R)`\n\n**Proof strategy**: derived from `batch_invert_loop0_spec_strong`, the stronger\ninductive theorem that explicitly tracks all four invariant components.  At the\ninitial call (`i = 0`) from `batch_invert`, the hypotheses are:\n- `h_acc_inv`: `Scalar52_as_Nat (ONE.unpack().as_montgomery()) ≡ R [MOD L]`\n  (initial acc is the Montgomery representation of 1, so `A = R`).\n- `h_scratch_inv`: vacuously true (empty range `j < 0`).\n- `h_inp_mont`: vacuously true.\n- `h_inp_orig`: every `inputs[j].bytes` equals the original scalar bytes. -/",
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":
    "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert",
@@ -11076,10 +11079,11 @@
     "curve25519_dalek.scalar.Scalar52.pack",
     "curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem batch_invert_loop1_spec\n    (inputs : Slice scalar.Scalar)\n    (scratch : alloc.vec.Vec backend.serial.u64.scalar.Scalar52)\n    (acc : backend.serial.u64.scalar.Scalar52) (i n : Std.Usize)\n    (hi : i.val ≤ n.val)\n    (h_inputs_len : inputs.val.length = n.val)\n    (h_scratch_len : scratch.val.length = n.val)\n    (h_acc_limbs : ∀ j < 5, acc[j]!.val < 2 ^ 52)\n    (h_acc_lt : Scalar52_as_Nat acc < L)\n    (h_scratch_limbs : ∀ j < n.val,\n        Vec52At scratch j\n          (fun x => (∀ k < 5, x[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat x < L))\n    (vals : ℕ → ℕ)\n    (h_vals_lt : ∀ j < n.val, vals j < L)\n    (P : ℕ)\n    (h_acc_inv : Scalar52_as_Nat acc * PrefixProd vals i.val ≡ P [MOD L])\n    (h_inp_inv : ∀ j, i.val ≤ j → j < n.val →\n        SliceScalarAt inputs j (fun b => U8x32_as_Nat b * vals j ≡ P [MOD L]))\n    (h_inp_mont : ∀ j < i.val,\n        SliceScalarAt inputs j (fun b => U8x32_as_Nat b ≡ vals j * R [MOD L]))\n    (h_inp_mont_lt : ∀ j < i.val,\n        SliceScalarAt inputs j (fun b => U8x32_as_Nat b < L))\n    (h_scratch_inv : ∀ j < n.val,\n        Vec52At scratch j\n          (fun x => Scalar52_as_Nat x ≡ R * PrefixProd vals j [MOD L])) :\n    batch_invert_loop1 inputs scratch acc i ⦃ result =>\n      ∀ j < n.val,\n          SliceScalarAt result j (fun b => U8x32_as_Nat b * vals j ≡ P [MOD L]) ⦄ := ...",
+   "spec_file": "Curve25519Dalek/Specs/Scalar/Scalar/BatchInvert.lean",
    "spec_docstring": null,
    "source": "curve25519-dalek/src/scalar.rs",
    "rust_name":

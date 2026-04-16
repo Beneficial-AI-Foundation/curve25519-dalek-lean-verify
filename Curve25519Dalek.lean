@@ -179,6 +179,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.Add
 import Curve25519Dalek.Specs.Scalar.Scalar.AsBytes
 import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix16
 import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix2w
+import Curve25519Dalek.Specs.Scalar.Scalar.BatchInvert
 import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
 import Curve25519Dalek.Specs.Scalar.Scalar.Eq
