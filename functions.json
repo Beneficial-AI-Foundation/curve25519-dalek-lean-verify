@@ -6437,11 +6437,13 @@
     "curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_by_pow_2_loop_spec\n    (k : U32) (s : ProjectivePoint) (i : U32)\n    (hk : k.val > 0) (hi : i.val ≤ k.val - 1)\n    (hs_on : s.OnCurve)\n    (hs_X : ∀ j < 5, s.X[j]!.val < 2 ^ 53)\n    (hs_Y : ∀ j < 5, s.Y[j]!.val < 2 ^ 53)\n    (hs_Z : s.Z.IsValid)\n    (P₀ : Point Ed25519)\n    (hs_point : s.toPoint' hs_on = 2 ^ i.val • P₀) :\n    mul_by_pow_2_loop k s i ⦃ (result : ProjectivePoint) =>\n      ∃ h_on : result.OnCurve,\n        (∀ j < 5, result.X[j]!.val < 2 ^ 53) ∧\n        (∀ j < 5, result.Y[j]!.val < 2 ^ 53) ∧\n        result.Z.IsValid ∧\n        result.toPoint' h_on = 2 ^ (k.val - 1) • P₀ ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulByPow2.lean",
+   "spec_docstring":
+   "/-- Loop spec for `mul_by_pow_2_loop`: repeatedly doubles `s` via\n`ProjectivePoint.double` + `CompletedPoint.as_projective` from counter `i` up to `k - 1`.\n\nLoop invariant at entry: `s.toPoint' hs_on = 2^i • P₀` for a reference point `P₀`.\nAt exit (counter `k - 1`), `result.toPoint' h_on = 2^(k-1) • P₀`.\n\nUses the weaker bounds `X, Y < 2^53` + `Z.IsValid` rather than `IsValid`'s `< 2^52`:\nthe initial `s` (from `EdwardsPoint.as_projective`) has only `< 2^53`, but each loop\niteration's `CompletedPoint.as_projective` produces `ProjectivePoint.IsValid` whose\n`< 2^52` bounds imply the weaker ones. So the invariant is self-sustaining. -/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2",
