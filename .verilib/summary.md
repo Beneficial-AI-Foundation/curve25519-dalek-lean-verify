@@ -1,0 +1,1783 @@
+# Verification report: unknown unknown
+
+## 1. Verified public API functions (72)
+
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&EdwardsPoint#impl<&AffineNielsPoint>#[`&EdwardsPoint`][`Add<&'a/AffineNielsPoint>`]add()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add_spec`)
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&EdwardsPoint#impl<&AffineNielsPoint>#[`&EdwardsPoint`][`Sub<&'a/AffineNielsPoint>`]sub()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub_spec`)
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&EdwardsPoint#impl<&ProjectiveNielsPoint>#[`&EdwardsPoint`][`Add<&'a/ProjectiveNielsPoint>`]add()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add_spec`)
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&EdwardsPoint#impl<&ProjectiveNielsPoint>#[`&EdwardsPoint`][`Sub<&'a/ProjectiveNielsPoint>`]sub()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<&CompressedEdwardsY>#[CompressedEdwardsY][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<[u8;/{const}]>#[CompressedEdwardsY]as_bytes()` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.as_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`PartialEq<Self>`]eq()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[`&EdwardsPoint`][`Add<&'a/EdwardsPoint>`]add()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[`&EdwardsPoint`][`Sub<&'a/EdwardsPoint>`]sub()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<EdwardsPoint>#[EdwardsPoint]mul_by_cofactor()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<EdwardsPoint>#[`&EdwardsPoint`][Neg]neg()` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<MontgomeryPoint>#[EdwardsPoint]to_montgomery()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<bool>#[EdwardsPoint]is_small_order()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.is_small_order_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<bool>#[EdwardsPoint]is_torsion_free()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/&Scalar#impl<&EdwardsPoint>#[`&Scalar`][`Mul<&'a/EdwardsPoint>`]mul()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/EdwardsPoint#impl<[u8;/{const}]>#[EdwardsPoint]mul_clamped()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_clamped_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<&EdwardsPoint>#[EdwardsPoint][ConditionallySelectable]conditional_select()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<&[u8]>#[CompressedEdwardsY]from_slice()` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<CompressedEdwardsY>#[CompressedEdwardsY][Identity]identity()` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<EdwardsPoint>#[EdwardsPoint][Identity]identity()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<[u8;/{const}]>#[EdwardsPoint]mul_base_clamped()` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&MontgomeryPoint>#[MontgomeryPoint][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&MontgomeryPoint>#[MontgomeryPoint][`PartialEq<Self>`]eq()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&Scalar>#[`&MontgomeryPoint`][`Mul<&Scalar>`]mul()` (spec: `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<[u8;/{const}]>#[MontgomeryPoint]as_bytes()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.as_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<[u8;/{const}]>#[MontgomeryPoint]to_bytes()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<u8>#[MontgomeryPoint]to_edwards()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_edwards_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/&Scalar#impl<&MontgomeryPoint>#[`&Scalar`][`Mul<&MontgomeryPoint>`]mul()` (spec: `probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/MontgomeryPoint#impl<[u8;/{const}]>#[MontgomeryPoint]mul_clamped()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/impl<&Scalar>#[MontgomeryPoint]mul_base()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/impl<&Self>#[MontgomeryPoint][ConditionallySelectable]conditional_select()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/impl<MontgomeryPoint>#[MontgomeryPoint][Identity]identity()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519-dalek/4.2.0/montgomery/impl<[u8;/{const}]>#[MontgomeryPoint]mul_base_clamped()` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl<&CompressedRistretto>#[CompressedRistretto][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl<Option<RistrettoPoint>>#[CompressedRistretto]decompress()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.decompress_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl<[u8;/{const}]>#[CompressedRistretto]as_bytes()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.as_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl<[u8;/{const}]>#[CompressedRistretto]to_bytes()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.to_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[RistrettoPoint][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[RistrettoPoint][`PartialEq<Self>`]eq()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[`&RistrettoPoint`][`Add<&'a/RistrettoPoint>`]add()` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[`&RistrettoPoint`][`Sub<&'a/RistrettoPoint>`]sub()` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&Scalar>#[`&RistrettoPoint`][`Mul<&'a/Scalar>`]mul()` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<CompressedRistretto>#[RistrettoPoint]compress()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/&Scalar#impl<&RistrettoPoint>#[`&Scalar`][`Mul<&'a/RistrettoPoint>`]mul()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&RistrettoPoint>#[RistrettoPoint][ConditionallySelectable]conditional_select()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&Scalar>#[RistrettoPoint]mul_base()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&[u8;/{const}]>#[RistrettoPoint]from_uniform_bytes()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&[u8]>#[CompressedRistretto]from_slice()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<CompressedRistretto>#[CompressedRistretto][Identity]identity()` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<RistrettoPoint>#[RistrettoPoint][Identity]identity()` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`MulAssign<&'a/Scalar>`]mul_assign()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[`&Scalar`][`Add<&'a/Scalar>`]add()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[`&Scalar`][`Mul<&'a/Scalar>`]mul()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[`&Scalar`][`Sub<&'a/Scalar>`]sub()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Self>#[Scalar][ConstantTimeEq]ct_eq()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Self>#[Scalar][`PartialEq<Self>`]eq()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<Scalar>#[Scalar]invert()` (spec: `probe:curve25519_dalek.scalar.Scalar.invert_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<Scalar>#[`&Scalar`][Neg]neg()` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<[u8;/{const}]>#[Scalar]as_bytes()` (spec: `probe:curve25519_dalek.scalar.Scalar.as_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<[u8;/{const}]>#[Scalar]to_bytes()` (spec: `probe:curve25519_dalek.scalar.Scalar.to_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/Scalar#impl<Scalar>#[Scalar][Neg]neg()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/clamp_integer()` (spec: `probe:curve25519_dalek.scalar.clamp_integer_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<&Self>#[Scalar][ConditionallySelectable]conditional_select()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<&[u8;/{const}]>#[Scalar]from_bytes_mod_order_wide()` (spec: `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<[u8;/{const}]>#[Scalar]from_bytes_mod_order()` (spec: `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<[u8;/{const}]>#[Scalar]from_canonical_bytes()` (spec: `probe:curve25519_dalek.scalar.Scalar.from_canonical_bytes_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<u128>#[Scalar][`From<u128>`]from()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<u16>#[Scalar][`From<u16>`]from()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<u32>#[Scalar][`From<u32>`]from()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<u64>#[Scalar][`From<u64>`]from()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from_spec`)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<u8>#[Scalar][`From<u8>`]from()` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from_spec`)
+
+## 2. Trusted public API functions (0)
+
+None
+
+## 3. Trust base
+
+### 3a. Properties assumed to hold (25 axioms)
+
+Axioms — propositions assumed without proof.
+
+- `probe:curve25519_dalek.Array.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.Slice.Insts.SubtleConstantTimeEq.ct_eq`
+- `probe:curve25519_dalek.Slice.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.alloc.vec.Vec.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.ne`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.ne`
+- `probe:curve25519_dalek.core.fmt.Arguments`
+- `probe:curve25519_dalek.core.iter.adapters.rev.Rev.Insts.CoreIterTraitsIteratorIterator.next`
+- `probe:curve25519_dalek.core.iter.traits.iterator.Iterator.rev.default`
+- `probe:curve25519_dalek.core.ops.range.Range.Insts.CoreIterTraitsDouble_endedDoubleEndedIterator.next_back`
+- `probe:curve25519_dalek.core.ops.range.Range.Insts.CoreIterTraitsIteratorIterator.rev`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_unchecked_mut`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.ne`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.ne`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.ne`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.ne`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.ne`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.ne`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.ne`
+
+### 3b. External functions assumed correct w.r.t. their specs (53)
+
+- `probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_select` (external)
+- `probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.Bool.Insts.CoreConvertFromChoice.from` (external)
+- `probe:curve25519_dalek.Choice.one` (external)
+- `probe:curve25519_dalek.Choice.zero` (external)
+- `probe:curve25519_dalek.U16.Insts.SubtleConstantTimeEq.ct_eq` (external)
+- `probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select` (external)
+- `probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_select` (external)
+- `probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.U8.Insts.SubtleConstantTimeEq.ct_eq` (external)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'` (external)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get` (external)
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut` (external)
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index` (external)
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut` (external)
+- `probe:curve25519_dalek.core.result.Result.map` (external)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'` (external)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'` (external)
+- `probe:curve25519_dalek.instDecidableEqChoice` (external)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq` (external)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign` (external)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap` (external)
+- `probe:curve25519_dalek.subtle.Choice` (external)
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreConvertFromU8.from` (external)
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand` (external)
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitBitOrChoiceChoice.bitor` (external)
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitNotChoice.not` (external)
+- `probe:curve25519_dalek.subtle.Choice.unwrap_u8` (external)
+- `probe:curve25519_dalek.subtle.Choice.val` (external)
+- `probe:curve25519_dalek.subtle.ConditionallyNegatable.Blanket.conditional_negate` (external)
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_assign.default` (external)
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_swap.default` (external)
+- `probe:curve25519_dalek.subtle.CtOption` (external)
+- `probe:curve25519_dalek.subtle.CtOption.is_some` (external)
+- `probe:curve25519_dalek.subtle.CtOption.new` (external)
+- `probe:curve25519_dalek.subtle.CtOption.value` (external)
+- `probe:curve25519_dalek.zeroize.Zeroize.Blanket.zeroize` (external)
+
+## 4. Unverified and failed functions (65)
+
+- `probe:Edwards.add_assoc_Ed25519`
+- `probe:Edwards.complete_addition_denominators_ne_zero`
+- `probe:curve25519-dalek/4.2.0/backend/get_selected_backend()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&AffineNielsPoint#impl#[AffineNielsPoint][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&ProjectiveNielsPoint#impl#[ProjectiveNielsPoint][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&ProjectivePoint#impl<bool>#[ProjectivePoint][ValidityCheck]is_valid()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/AffineNielsPoint#impl<AffineNielsPoint>#[AffineNielsPoint][Neg]neg()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/ProjectiveNielsPoint#impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Neg]neg()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<AffineNielsPoint>#[AffineNielsPoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/scalar_mul/variable_base/mul()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl#[FieldElement51][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl<&FieldElement51>#[FieldElement51][`MulAssign<&'a/FieldElement51>`]mul_assign()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/field/impl<&FieldElement51>#[FieldElement51][ConditionallySelectable]conditional_swap()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl#[Scalar52][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<usize>#[Scalar52][`Index<usize>`]index()`
+- `probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<usize>#[Scalar52][`IndexMut<usize>`]index_mut()`
+- `probe:curve25519-dalek/4.2.0/backend/variable_base_mul()`
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<Option<EdwardsPoint>>#[CompressedEdwardsY]decompress()`
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<[u8;/{const}]>#[CompressedEdwardsY]to_bytes()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`AddAssign<&'a/EdwardsPoint>`]add_assign()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`SubAssign<&'a/EdwardsPoint>`]sub_assign()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&Scalar>#[EdwardsPoint][`MulAssign<&'a/Scalar>`]mul_assign()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&Scalar>#[`&EdwardsPoint`][`Mul<&'a/Scalar>`]mul()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<CompressedEdwardsY>#[EdwardsPoint]compress()`
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<bool>#[EdwardsPoint][ValidityCheck]is_valid()`
+- `probe:curve25519-dalek/4.2.0/edwards/EdwardsPoint#impl<EdwardsPoint>#[EdwardsPoint][Neg]neg()`
+- `probe:curve25519-dalek/4.2.0/edwards/affine/AffinePoint#impl<CompressedEdwardsY>#[AffinePoint]compress()`
+- `probe:curve25519-dalek/4.2.0/edwards/affine/Scalar#impl<&AffinePoint>#[Scalar][`Mul<&AffinePoint>`]mul()`
+- `probe:curve25519-dalek/4.2.0/edwards/affine/Scalar#impl<AffinePoint>#[Scalar][`Mul<AffinePoint>`]mul()`
+- `probe:curve25519-dalek/4.2.0/edwards/affine/impl<AffinePoint>#[AffinePoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/edwards/decompress/step_1()`
+- `probe:curve25519-dalek/4.2.0/edwards/impl<&Scalar>#[EdwardsPoint]mul_base()`
+- `probe:curve25519-dalek/4.2.0/edwards/impl<CompressedEdwardsY>#[CompressedEdwardsY][Default]default()`
+- `probe:curve25519-dalek/4.2.0/edwards/impl<EdwardsPoint>#[EdwardsPoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/field/&FieldElement51#impl<&FieldElement>#[`backend::serial::u64::field::FieldElement51`][`PartialEq<Self>`]eq()`
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl#[MontgomeryPoint][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&Scalar>#[MontgomeryPoint][`MulAssign<&Scalar>`]mul_assign()`
+- `probe:curve25519-dalek/4.2.0/montgomery/impl<ProjectivePoint>#[ProjectivePoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[RistrettoPoint][`AddAssign<&RistrettoPoint>`]add_assign()`
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[RistrettoPoint][`SubAssign<&RistrettoPoint>`]sub_assign()`
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&Scalar>#[RistrettoPoint][`MulAssign<&'a/Scalar>`]mul_assign()`
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<RistrettoPoint>#[`&RistrettoPoint`][Neg]neg()`
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<[EdwardsPoint;/{const}]>#[RistrettoPoint]coset4()`
+- `probe:curve25519-dalek/4.2.0/ristretto/RistrettoPoint#impl<RistrettoPoint>#[RistrettoPoint][Neg]neg()`
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<CompressedRistretto>#[CompressedRistretto][Default]default()`
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<RistrettoPoint>#[RistrettoPoint][Default]default()`
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl#[Scalar][Zeroize]zeroize()`
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`AddAssign<&'a/Scalar>`]add_assign()`
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`SubAssign<&'a/Scalar>`]sub_assign()`
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<[i8;/{const}]>#[Scalar]non_adjacent_form()`
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<usize>#[Scalar][`Index<usize>`]index()`
+- `probe:curve25519-dalek/4.2.0/scalar/impl<&[Scalar]>#[Scalar]batch_invert()`
+- `probe:curve25519-dalek/4.2.0/scalar/impl<Scalar>#[Scalar][Default]default()`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul_spec`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.decompress_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.step_1_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.compress_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.compress_spec`
+- `probe:curve25519_dalek.math.decompress_edwards_pure`
+- `probe:curve25519_dalek.math.elligator_ristretto_flavor_pure`
+- `probe:curve25519_dalek.ristretto.IsEven_iff_in_doubling_image_right`
+
+## 5. Verified remaining Lean functions (770)
+
+- `probe:BitList.Equiv`
+- `probe:BitList.ofByteArray`
+- `probe:BitList.ofByteList`
+- `probe:BitList.ofLimbList`
+- `probe:BitList.ofNat`
+- `probe:BitList.ofScalar52`
+- `probe:BitList.ofU64`
+- `probe:BitList.ofU8` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes_spec`)
+- `probe:BitList.toNat` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.load8_at_bitList_spec`)
+- `probe:BitList.«term_≈ₗ_»`
+- `probe:Edwards.CurveField`
+- `probe:Edwards.Ed25519`
+- `probe:Edwards.EdwardsCurve.a`
+- `probe:Edwards.EdwardsCurve.d`
+- `probe:Edwards.IsCanonicalRistrettoRep`
+- `probe:Edwards.Point.x`
+- `probe:Edwards.Point.y`
+- `probe:Edwards.add_coords`
+- `probe:Edwards.basepoint`
+- `probe:Edwards.binary_nsmul_Ed25519`
+- `probe:Edwards.eightTorsionGen` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_spec`)
+- `probe:Edwards.eightTorsionPoints` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_spec`)
+- `probe:Edwards.field_from_limbs`
+- `probe:Edwards.instAddCommGroupPointCurveFieldEd25519` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub_spec`)
+- `probe:Edwards.instAddPointCurveFieldEd25519`
+- `probe:Edwards.instDecidableEqPointCurveFieldEd25519` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec`)
+- `probe:Edwards.instInhabitedPointCurveFieldEd25519`
+- `probe:Edwards.instNegPointCurveFieldEd25519`
+- `probe:Edwards.instReprPoint`
+- `probe:Edwards.instReprPoint.repr`
+- `probe:Edwards.instSMulIntPointCurveFieldEd25519`
+- `probe:Edwards.instSMulNatPointCurveFieldEd25519`
+- `probe:Edwards.instSubPointCurveFieldEd25519`
+- `probe:Edwards.instZeroPointCurveFieldEd25519`
+- `probe:Edwards.nsmul_Ed25519`
+- `probe:Edwards.zsmul_Ed25519` (spec: `probe:Edwards.zsmul_succ_Ed25519`)
+- `probe:Field51_as_Nat`
+- `probe:I8x64_as_Radix2w` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_spec`)
+- `probe:L`
+- `probe:Montgomery.Curve25519.A`
+- `probe:Montgomery.Curve25519.roots_B`
+- `probe:Montgomery.CurveField`
+- `probe:Montgomery.MontgomeryCurveCurve25519`
+- `probe:Montgomery.MontgomeryPoint.mkPoint`
+- `probe:Montgomery.MontgomeryPoint.u_affine_toPoint`
+- `probe:Montgomery.Point`
+- `probe:Montgomery.T_point`
+- `probe:Montgomery.abs_montgomery`
+- `probe:Montgomery.abs_montgomery1`
+- `probe:Montgomery.fromEdwards`
+- `probe:Montgomery.get_u` (spec: `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`)
+- `probe:Montgomery.get_v` (spec: `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`)
+- `probe:Montgomery.instDecidableEqCurveField`
+- `probe:Montgomery.mk_point` (spec: `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`)
+- `probe:Montgomery.toEdwards`
+- `probe:Montgomery.toEdwards.fromMontgomeryPoint`
+- `probe:Montgomery.v_squared`
+- `probe:R`
+- `probe:Scalar52_as_Nat`
+- `probe:Scalar52_wide_as_Nat`
+- `probe:U8x32_as_Field`
+- `probe:U8x32_as_Nat`
+- `probe:U8x32_as_Nat_foldr` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped_spec`)
+- `probe:U8x64_as_Nat`
+- `probe:X64_as_Nat`
+- `probe:a`
+- `probe:curve25519_dalek.Bool.Insts.CoreConvertFromChoice`
+- `probe:curve25519_dalek.Bool.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.Bool.Insts.ZeroizeDefaultIsZeroes` (spec: `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.IdentityCurveModelsProjectivePoint`
+- `probe:curve25519_dalek.IdentityCurveModelsProjectivePoint.identity` (spec: `probe:curve25519_dalek.IdentityCurveModelsProjectivePoint.identity_spec`)
+- `probe:curve25519_dalek.IdentityMontgomeryProjectivePoint`
+- `probe:curve25519_dalek.IdentityMontgomeryProjectivePoint.identity` (spec: `probe:curve25519_dalek.IdentityMontgomeryProjectivePoint.identity_spec`)
+- `probe:curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint`
+- `probe:curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg` (spec: `probe:curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub_spec`)
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub` (spec: `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_carry_prop_stage` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_carry_prop_stage_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_final_reduce_stage` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_final_reduce_stage_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_product_stage` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_product_stage_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec`)
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub` (spec: `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec`)
+- `probe:curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint`
+- `probe:curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg` (spec: `probe:curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg_spec`)
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add_spec`)
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec`)
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg_spec`)
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub` (spec: `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub_spec`)
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul` (spec: `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop` (spec: `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_loop_spec`)
+- `probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint`
+- `probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul` (spec: `probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add`
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint`
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul` (spec: `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul_spec`)
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub`
+- `probe:curve25519_dalek.SharedAMontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint`
+- `probe:curve25519_dalek.SharedAMontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.SharedARistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithAddScalarScalar.add`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base_spec`)
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul` (spec: `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul_spec`)
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithSubScalarScalar`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithSubScalarScalar.sub`
+- `probe:curve25519_dalek.U64.Insts.ZeroizeDefaultIsZeroes`
+- `probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.U8.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.U8.Insts.ZeroizeDefaultIsZeroes`
+- `probe:curve25519_dalek.backend.BackendKind.read_discriminant`
+- `probe:curve25519_dalek.backend.get_selected_backend`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq` (spec: `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq` (spec: `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreMarkerStructuralPartialEq`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign` (spec: `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.xy2d`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_minus_x`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.y_plus_x`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.T`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.X`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Y`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.Z`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended` (spec: `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective` (spec: `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective_spec_aux`)
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.instDecidableIsValid` (spec: `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.toPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.MontgomeryPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.T2d`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_minus_X`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Y_plus_X`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Z`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.instDecidableIsValid` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint'` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.X`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Y`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Z`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double_spec`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.instDecidableIsValid` (spec: `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.toPoint_of_isValid`)
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.toPoint`
+- `probe:curve25519_dalek.backend.serial.curve_models.instCoeCompletedPointPointCurveFieldEd25519`
+- `probe:curve25519_dalek.backend.serial.curve_models.instCoeProjectivePointPointCurveFieldEd25519`
+- `probe:curve25519_dalek.backend.serial.scalar_mul.variable_base.mul`
+- `probe:curve25519_dalek.backend.serial.scalar_mul.variable_base.mul_loop`
+- `probe:curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_INNER_DOC_HIDDEN` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.L` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.L_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.LFACTOR` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.MINUS_ONE` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.R` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.R_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.RR` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.RR_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_raw`
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_M1` (spec: `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_M1_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_M1_raw`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51.mul_assign`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_swap`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.IsValid`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.carry_prop_stage` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.carry_prop_stage_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.final_reduce_stage` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.final_reduce_stage_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes.load8_at`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.instDecidableIsValid`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.negate` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.negate_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.LOW_51_BIT_MASK`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k.m`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_stage` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_stage_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.toField`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes` (spec: `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.LOW_51_BIT_MASK`
+- `probe:curve25519_dalek.backend.serial.u64.field.MulShared0FieldElement51SharedAFieldElement51FieldElement51.mul.m`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Scalar52_partial_as_Nat`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.limb0_nat` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.limb1_nat` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.limb2_nat` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.limb3_nat` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.limb4_nat` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part1` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce.part2` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.slice_state4` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes_spec`)
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.word_of_bytes`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.word_of_bytes_64`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_as_Nat`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_wide_as_Nat`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.m` (spec: `probe:curve25519_dalek.backend.serial.u64.scalar.m_spec`)
+- `probe:curve25519_dalek.backend.variable_base_mul`
+- `probe:curve25519_dalek.constants.BASEPOINT_ORDER_PRIVATE` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free_spec`)
+- `probe:curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT` (spec: `probe:curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT_spec`)
+- `probe:curve25519_dalek.core.ops.arith.Add.add`
+- `probe:curve25519_dalek.core.ops.arith.AddAssign.add_assign`
+- `probe:curve25519_dalek.core.ops.arith.Mul.mul`
+- `probe:curve25519_dalek.core.ops.arith.MulAssign.mul_assign`
+- `probe:curve25519_dalek.core.ops.arith.Neg.neg`
+- `probe:curve25519_dalek.core.ops.arith.Sub.sub`
+- `probe:curve25519_dalek.core.ops.arith.SubAssign.sub_assign`
+- `probe:curve25519_dalek.core.ops.range.RangeFull` (spec: `probe:curve25519_dalek.ristretto.decompress.step_1_spec`)
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexPrivate_slice_indexSealed`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice` (spec: `probe:curve25519_dalek.ristretto.decompress.step_1_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreCmpPartialEqCompressedEdwardsY.eq`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreMarkerStructuralPartialEq`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.IsValid`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.as_bytes` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.as_bytes_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.decompress` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.decompress_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice_spec`)
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedEdwardsY.call_once`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.toPoint`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.to_bytes`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint.add_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignSharedAEdwardsPoint.add_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddSharedBEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddSharedBEdwardsPointEdwardsPoint.add`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulSharedBScalarEdwardsPoint.mul` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint.sub_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignSharedAEdwardsPoint.sub_assign`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub` (spec: `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubSharedBEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubSharedBEdwardsPointEdwardsPoint.sub`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.T`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.X`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Y`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Z`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_affine_niels` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.as_affine_niels_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.compress` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.compress_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.double` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.double_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.instDecidableIsValid`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.is_small_order` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.is_small_order_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_loop`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_clamped` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.mul_clamped_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.toPoint`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.toPoint'`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_affine` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.to_affine_spec`)
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery` (spec: `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.ZeroizeDefaultIsZeroes`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.compress` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.compress_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.instDecidableIsValid`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.toPoint`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.to_edwards` (spec: `probe:curve25519_dalek.edwards.affine.AffinePoint.to_edwards_spec`)
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.x`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.y`
+- `probe:curve25519_dalek.edwards.decompress.step_1` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.step_1_spec`)
+- `probe:curve25519_dalek.edwards.decompress.step_2` (spec: `probe:curve25519_dalek.edwards.CompressedEdwardsY.step_2_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.SQRT_M1_val` (spec: `probe:curve25519_dalek.field.FieldElement51.SQRT_M1_val_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.invert` (spec: `probe:curve25519_dalek.field.FieldElement51.invert_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.invsqrt` (spec: `probe:curve25519_dalek.field.FieldElement51.invsqrt_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.is_negative` (spec: `probe:curve25519_dalek.field.FieldElement51.is_negative_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.is_zero` (spec: `probe:curve25519_dalek.field.FieldElement51.is_zero_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.pow22501` (spec: `probe:curve25519_dalek.field.FieldElement51.pow22501_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.pow_p58` (spec: `probe:curve25519_dalek.field.FieldElement51.pow_p58_spec`)
+- `probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i` (spec: `probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i_spec`)
+- `probe:curve25519_dalek.math.a_val` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.abs_edwards`
+- `probe:curve25519_dalek.math.compress_den1` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_den2` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_den_inv` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_invsqrt` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_pure` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_rotate` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_s` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_u1` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_u2` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_x_prime` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_y_final` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_y_prime` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.compress_z_inv` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.elligator_D` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_Ns` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_Nt` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_c` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_is_square` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_r` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_ratio` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_ristretto_flavor_x` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_ristretto_flavor_y` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.elligator_s` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.instDecidableElligatorIsSquare` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.inv_sqrt_checked` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.invsqrt_a_minus_d` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.math.is_negative`
+- `probe:curve25519_dalek.math.sqrt` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.sqrt_ad_minus_one` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.math.sqrt_checked` (spec: `probe:curve25519_dalek.math.sqrt_checked_spec`)
+- `probe:curve25519_dalek.math.sqrt_m1`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulScalarMontgomeryPoint.mul`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.IsValid`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.as_bytes` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.as_bytes_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.toPoint`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_bytes` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_bytes_spec`)
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_edwards` (spec: `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_edwards_spec`)
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.U`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.W`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.as_affine` (spec: `probe:curve25519_dalek.montgomery.ProjectivePoint.as_affine_spec`)
+- `probe:curve25519_dalek.montgomery.differential_add_and_double` (spec: `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`)
+- `probe:curve25519_dalek.montgomery.elligator_encode` (spec: `probe:curve25519_dalek.montgomery.elligator_encode_spec`)
+- `probe:curve25519_dalek.montgomery.instDecidableIsValid`
+- `probe:curve25519_dalek.montgomery.valid_ladder_state` (spec: `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpEq.assert_receiver_is_total_eq`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreCmpPartialEqCompressedRistretto.eq`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreConvertTryFromShared0SliceU8TryFromSliceError.try_from`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreMarkerStructuralPartialEq`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.IsValid`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.as_bytes` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.as_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.decompress` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.decompress_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice_spec`)
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice.closure.Insts.CoreOpsFunctionFnOnceTupleArrayU832CompressedRistretto.call_once`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.toPoint`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.to_bytes` (spec: `probe:curve25519_dalek.ristretto.CompressedRistretto.to_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.IsEven`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint.add_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignShared0RistrettoPoint.add_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddRistrettoPointRistrettoPoint.add` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddSharedBRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddSharedBRistrettoPointRistrettoPoint.add`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulScalarRistrettoPoint.mul`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulSharedBScalarRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulSharedBScalarRistrettoPoint.mul`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint.sub_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignShared0RistrettoPoint.sub_assign`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubRistrettoPointRistrettoPoint.sub`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubSharedBRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubSharedBRistrettoPointRistrettoPoint.sub`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.IsValid`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.bytes_lower` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.bytes_upper` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.compress` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.coset4`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.field_from_bytes` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base` (spec: `probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base_spec`)
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.toPoint`
+- `probe:curve25519_dalek.ristretto.decompress.step_1` (spec: `probe:curve25519_dalek.ristretto.decompress.step_1_spec`)
+- `probe:curve25519_dalek.ristretto.decompress.step_2` (spec: `probe:curve25519_dalek.ristretto.decompress.step_2_spec`)
+- `probe:curve25519_dalek.ristretto.decompress_pure`
+- `probe:curve25519_dalek.ristretto.decompress_step1`
+- `probe:curve25519_dalek.ristretto.decompress_step2`
+- `probe:curve25519_dalek.scalar.Scalar.I8x64_as_Radix16`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCloneClone.clone`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpEq`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault.default`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreMarkerCopy`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar.add_assign`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignSharedAScalar.add_assign`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddScalarScalar.add`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulRistrettoPointRistrettoPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBEdwardsPointEdwardsPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBEdwardsPointEdwardsPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBMontgomeryPointMontgomeryPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBMontgomeryPointMontgomeryPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBRistrettoPointRistrettoPoint`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBRistrettoPointRistrettoPoint.mul`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar.sub_assign`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignSharedAScalar.sub_assign`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubScalarScalar.sub`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq` (spec: `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize.zeroize`
+- `probe:curve25519_dalek.scalar.Scalar.ONE` (spec: `probe:curve25519_dalek.scalar.Scalar.ONE_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.ZERO` (spec: `probe:curve25519_dalek.scalar.Scalar.ZERO_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_bytes` (spec: `probe:curve25519_dalek.scalar.Scalar.as_bytes_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_16_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16.bot_half` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_16.bot_half_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16.top_half` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_16.top_half_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop0` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop0_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop1` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop1_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_2w` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_loop` (spec: `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_loop_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.batch_invert`
+- `probe:curve25519_dalek.scalar.Scalar.batch_invert_loop0`
+- `probe:curve25519_dalek.scalar.Scalar.batch_invert_loop1`
+- `probe:curve25519_dalek.scalar.Scalar.bytes`
+- `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order` (spec: `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide` (spec: `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.from_canonical_bytes` (spec: `probe:curve25519_dalek.scalar.Scalar.from_canonical_bytes_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.invert` (spec: `probe:curve25519_dalek.scalar.Scalar.invert_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.is_canonical` (spec: `probe:curve25519_dalek.scalar.Scalar.is_canonical_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.non_adjacent_form`
+- `probe:curve25519_dalek.scalar.Scalar.non_adjacent_form_loop`
+- `probe:curve25519_dalek.scalar.Scalar.reduce` (spec: `probe:curve25519_dalek.scalar.Scalar.reduce_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.to_bytes` (spec: `probe:curve25519_dalek.scalar.Scalar.to_bytes_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint` (spec: `probe:curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint_spec`)
+- `probe:curve25519_dalek.scalar.Scalar.unpack` (spec: `probe:curve25519_dalek.scalar.Scalar.unpack_spec`)
+- `probe:curve25519_dalek.scalar.Scalar52.IsMont` (spec: `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert_spec`)
+- `probe:curve25519_dalek.scalar.Scalar52.invert` (spec: `probe:curve25519_dalek.scalar.Scalar52.invert_spec`)
+- `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert` (spec: `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert_spec`)
+- `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply`
+- `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert.square_multiply_loop` (spec: `probe:curve25519_dalek.scalar.Scalar52.square_multiply_spec`)
+- `probe:curve25519_dalek.scalar.Scalar52.pack` (spec: `probe:curve25519_dalek.scalar.Scalar52.pack_spec`)
+- `probe:curve25519_dalek.scalar.U64Slice_as_Nat`
+- `probe:curve25519_dalek.scalar.U8Slice_chunk_as_U64`
+- `probe:curve25519_dalek.scalar.clamp_integer` (spec: `probe:curve25519_dalek.scalar.clamp_integer_spec`)
+- `probe:curve25519_dalek.scalar.read_le_u64_into` (spec: `probe:curve25519_dalek.scalar.read_le_u64_into_spec`)
+- `probe:curve25519_dalek.scalar.read_le_u64_into_loop` (spec: `probe:curve25519_dalek.scalar.read_le_u64_into_loop_spec`)
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreConvertFromU8` (spec: `probe:curve25519_dalek.field.FieldElement51.is_negative_spec`)
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_assign`
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_select`
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_swap`
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.coremarkerCopyInst`
+- `probe:curve25519_dalek.subtle.ConstantTimeEq.ct_eq`
+- `probe:curve25519_dalek.traits.Identity.identity`
+- `probe:curve25519_dalek.traits.IsIdentity.Blanket.is_identity`
+- `probe:curve25519_dalek.traits.ValidityCheck.is_valid`
+- `probe:curve25519_dalek.window.LookupTable`
+- `probe:curve25519_dalek.window.LookupTable.select`
+- `probe:curve25519_dalek.window.LookupTable.select_loop`
+- `probe:curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from`
+- `probe:curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop`
+- `probe:curve25519_dalek.zeroize.DefaultIsZeroes.coredefaultDefaultInst` (spec: `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec`)
+- `probe:curve25519_dalek.zeroize.DefaultIsZeroes.coremarkerCopyInst`
+- `probe:curve25519_dalek.zeroize.Zeroize.Blanket`
+- `probe:curve25519_dalek.zeroize.Zeroize.zeroize`
+- `probe:d`
+- `probe:externallyVerifiedAttr`
+- `probe:h`
+- `probe:instDiscriminantBackendKindIsize`
+- `probe:p`
+- `probe:tacticExpand_With_`
+
+## 6. Verified lemmas (709)
+
+- `probe:Aeneas.Std.U64.shiftRight_51`
+- `probe:Array.getElem_eq_getElem!`
+- `probe:Array.getElem_usize_eq_getElem!`
+- `probe:Array.set_of_eq`
+- `probe:Array.set_of_ne`
+- `probe:Array.set_of_ne'`
+- `probe:Array.set_of_ne_getElem!`
+- `probe:Array.val_getElem!_eq'`
+- `probe:BitList.Equiv.append_false`
+- `probe:BitList.Equiv.drop`
+- `probe:BitList.Equiv.extract`
+- `probe:BitList.Equiv.refl`
+- `probe:BitList.Equiv.symm`
+- `probe:BitList.Equiv.take`
+- `probe:BitList.Equiv.toNat_eq`
+- `probe:BitList.Equiv.trans`
+- `probe:BitList.Equiv.trans_drop`
+- `probe:BitList.Equiv.trans_take`
+- `probe:BitList.Equiv.trans_take_drop`
+- `probe:BitList.extract_extract`
+- `probe:BitList.ofByteArray_length`
+- `probe:BitList.ofByteList_cons`
+- `probe:BitList.ofByteList_extract`
+- `probe:BitList.ofByteList_length`
+- `probe:BitList.ofDigits_map_val_eq_sum`
+- `probe:BitList.ofLimbList_length`
+- `probe:BitList.ofNat_drop`
+- `probe:BitList.ofNat_equiv_of_lt`
+- `probe:BitList.ofNat_extract`
+- `probe:BitList.ofNat_length`
+- `probe:BitList.ofNat_mod`
+- `probe:BitList.ofNat_split`
+- `probe:BitList.ofNat_take`
+- `probe:BitList.ofNat_toNat`
+- `probe:BitList.ofScalar52_length`
+- `probe:BitList.ofU64_length`
+- `probe:BitList.ofU8_length`
+- `probe:BitList.toNat_append`
+- `probe:BitList.toNat_drop`
+- `probe:BitList.toNat_lt_pow`
+- `probe:BitList.toNat_ofByteArray`
+- `probe:BitList.toNat_ofByteArray'`
+- `probe:BitList.toNat_ofByteList`
+- `probe:BitList.toNat_ofNat`
+- `probe:BitList.toNat_ofScalar52`
+- `probe:BitList.toNat_ofU64`
+- `probe:BitList.toNat_ofU8`
+- `probe:BitList.toNat_split_chunks`
+- `probe:BitList.toNat_take`
+- `probe:Edwards.Ed25519.denomsNeZero`
+- `probe:Edwards.Point.ext`
+- `probe:Edwards.Point.ext_iff`
+- `probe:Edwards.Point.on_curve`
+- `probe:Edwards.add_closure`
+- `probe:Edwards.add_closure_Ed25519`
+- `probe:Edwards.add_comm_Ed25519`
+- `probe:Edwards.add_coords_mk`
+- `probe:Edwards.add_def`
+- `probe:Edwards.add_x`
+- `probe:Edwards.add_y`
+- `probe:Edwards.add_zero_Ed25519`
+- `probe:Edwards.basepoint_ne_zero`
+- `probe:Edwards.basepoint_order_L`
+- `probe:Edwards.binary_nsmul_Ed25519_eq`
+- `probe:Edwards.d_not_square`
+- `probe:Edwards.eightTorsion_eq_nsmul`
+- `probe:Edwards.eight_nsmul_gen_eq_zero`
+- `probe:Edwards.four_nsmul_basepoint_ne_zero`
+- `probe:Edwards.four_nsmul_gen_ne_zero`
+- `probe:Edwards.instNeZeroCurveFieldOfNat`
+- `probe:Edwards.lift_mod_eq`
+- `probe:Edwards.neg_add_cancel_Ed25519`
+- `probe:Edwards.neg_one_is_square`
+- `probe:Edwards.neg_x`
+- `probe:Edwards.neg_y`
+- `probe:Edwards.nsmul_eightTorsionGen_eq`
+- `probe:Edwards.nsmul_succ_Ed25519`
+- `probe:Edwards.zero_add_Ed25519`
+- `probe:Edwards.zero_x`
+- `probe:Edwards.zero_y`
+- `probe:Edwards.zsmul_succ_Ed25519`
+- `probe:L_lt`
+- `probe:Montgomery.A_add_2`
+- `probe:Montgomery.A_minus_two_non_square`
+- `probe:Montgomery.A_plus_two_square`
+- `probe:Montgomery.Aux_u_affine_toPoint_spec`
+- `probe:Montgomery.B_d_relation`
+- `probe:Montgomery.DBL_neq_zero`
+- `probe:Montgomery.T_point_order_two`
+- `probe:Montgomery.T_point_x`
+- `probe:Montgomery.a_plus_d`
+- `probe:Montgomery.a_sub_d`
+- `probe:Montgomery.abs_eq_some`
+- `probe:Montgomery.adA`
+- `probe:Montgomery.adB`
+- `probe:Montgomery.addX_eq_addX_negY_sub`
+- `probe:Montgomery.addX_spec`
+- `probe:Montgomery.add_assoc'`
+- `probe:Montgomery.add_comm`
+- `probe:Montgomery.add_fromEdwards`
+- `probe:Montgomery.add_mk_point`
+- `probe:Montgomery.birational_map_symm`
+- `probe:Montgomery.cast_zero`
+- `probe:Montgomery.comm_mul_fromEdwards`
+- `probe:Montgomery.condition_Neg`
+- `probe:Montgomery.d_eq`
+- `probe:Montgomery.d_plus_one_square`
+- `probe:Montgomery.edwards_neg_iff_montgomery_neg`
+- `probe:Montgomery.edwards_one_sub_y_sq_mul_x_sq_eq`
+- `probe:Montgomery.exceptEdwardsPoint`
+- `probe:Montgomery.ext`
+- `probe:Montgomery.fromEdwards_add_of_snd_x_eq_zero`
+- `probe:Montgomery.fromEdwards_add_of_snd_x_eq_zero_of_fst_y_eq_neg_one`
+- `probe:Montgomery.fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one`
+- `probe:Montgomery.fromEdwards_add_of_sum_x_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y`
+- `probe:Montgomery.fromEdwards_add_of_sum_x_eq_zero_of_y_ne_one_of_y_ne_neg_one`
+- `probe:Montgomery.fromEdwards_add_of_sum_y_eq_one`
+- `probe:Montgomery.fromEdwards_add_of_x_eq_of_y_eq_neg`
+- `probe:Montgomery.fromEdwards_add_of_x_eq_zero`
+- `probe:Montgomery.fromEdwards_add_of_x_ne_zero`
+- `probe:Montgomery.fromEdwards_u_add_of_eq`
+- `probe:Montgomery.fromEdwards_u_add_of_eq_y`
+- `probe:Montgomery.fromEdwards_u_add_of_y_ne`
+- `probe:Montgomery.fromEdwards_v_add_of_eq`
+- `probe:Montgomery.fromEdwards_v_add_of_eq_y`
+- `probe:Montgomery.fromEdwards_v_add_of_y_ne`
+- `probe:Montgomery.get_u_T`
+- `probe:Montgomery.get_u_mk_point`
+- `probe:Montgomery.get_u_v_inj`
+- `probe:Montgomery.get_u_v_inj_neg`
+- `probe:Montgomery.get_u_zero`
+- `probe:Montgomery.get_v_T`
+- `probe:Montgomery.get_v_mk_point`
+- `probe:Montgomery.get_v_zero`
+- `probe:Montgomery.id_1`
+- `probe:Montgomery.id_2`
+- `probe:Montgomery.id_3`
+- `probe:Montgomery.id_4`
+- `probe:Montgomery.id_5`
+- `probe:Montgomery.id_6`
+- `probe:Montgomery.injective_fromEdwards`
+- `probe:Montgomery.instFactPrimeP`
+- `probe:Montgomery.instNeZeroCurveFieldOfNat`
+- `probe:Montgomery.inver_Ad`
+- `probe:Montgomery.inver_Ad_eq`
+- `probe:Montgomery.is_negative_eq`
+- `probe:Montgomery.lift_mod_add`
+- `probe:Montgomery.lift_mod_eq_iff`
+- `probe:Montgomery.lift_mod_mul`
+- `probe:Montgomery.map_zero`
+- `probe:Montgomery.mk_point_T`
+- `probe:Montgomery.mk_point_def`
+- `probe:Montgomery.mk_point_neq`
+- `probe:Montgomery.mk_point_neq_T_of_u`
+- `probe:Montgomery.mk_point_neq_neg`
+- `probe:Montgomery.mk_point_neq_zero`
+- `probe:Montgomery.mod_nat_mul_mod`
+- `probe:Montgomery.montgomery_addX_eq_zero_of_sum_y_eq_neg_one_of_y_ne_neg_y`
+- `probe:Montgomery.montgomery_edwards_inverse`
+- `probe:Montgomery.montgomery_inv_u_eq`
+- `probe:Montgomery.montgomery_v_add_eq_zero_of_sum_y_eq_neg_one_of_y_ne`
+- `probe:Montgomery.neg_fromEdwards`
+- `probe:Montgomery.neg_u_coord`
+- `probe:Montgomery.neg_v_coord`
+- `probe:Montgomery.non_IsQuase`
+- `probe:Montgomery.non_singular`
+- `probe:Montgomery.non_u_affine_toPoint_spec`
+- `probe:Montgomery.nonsingular_iff`
+- `probe:Montgomery.nonsingular_on_curves_M`
+- `probe:Montgomery.on_MontgomeryCurves`
+- `probe:Montgomery.on_curves_M`
+- `probe:Montgomery.point_on_curve`
+- `probe:Montgomery.pow2_roots_B`
+- `probe:Montgomery.quadratic_ne_zero`
+- `probe:Montgomery.roots_B_d`
+- `probe:Montgomery.roots_B_non_zero`
+- `probe:Montgomery.slope_of_X_ne`
+- `probe:Montgomery.slope_of_Y_eq`
+- `probe:Montgomery.slope_of_Y_ne`
+- `probe:Montgomery.slope_of_Y_ne'`
+- `probe:Montgomery.uADD`
+- `probe:Montgomery.uDBL`
+- `probe:Montgomery.x_eq_or_eq_neg_of_y_eq`
+- `probe:Montgomery.x_sq_mul_linear_factor_eq`
+- `probe:Montgomery.zeroY`
+- `probe:Montgomery.zero_def`
+- `probe:Montgomery.zero_iff`
+- `probe:Scalar52_as_Nat_bounded`
+- `probe:Scalar52_limb_le_nat`
+- `probe:Scalar52_top_limb_lt_of_as_Nat_lt`
+- `probe:Scalar52_wide_limb_le_nat`
+- `probe:U128_cast_U64_cast_U128_val`
+- `probe:U128_cast_U64_val`
+- `probe:U64_cast_U128_val`
+- `probe:U64_shiftRight_le`
+- `probe:U8x32_as_Field_eq_cast`
+- `probe:U8x32_as_Nat_eq_foldr`
+- `probe:U8x32_as_Nat_eq_foldr'`
+- `probe:U8x32_as_Nat_injective`
+- `probe:U8x32_as_Nat_is_NatofDigits`
+- `probe:cancelR`
+- `probe:carry_fits_U64`
+- `probe:carry_mod_eq`
+- `probe:core.array.TryFromArrayCopySlice.try_from_spec`
+- `probe:curve25519_dalek.Array.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.Choice.eq_one_of_val`
+- `probe:curve25519_dalek.Choice.eq_zero_of_val`
+- `probe:curve25519_dalek.Choice.eq_zero_or_one`
+- `probe:curve25519_dalek.Choice.ne_one_iff`
+- `probe:curve25519_dalek.Choice.ne_zero_iff`
+- `probe:curve25519_dalek.Choice.one_ne_zero`
+- `probe:curve25519_dalek.Choice.val_eq_one_iff`
+- `probe:curve25519_dalek.Choice.val_eq_zero_or_one`
+- `probe:curve25519_dalek.Choice.zero_ne_one`
+- `probe:curve25519_dalek.IdentityCurveModelsProjectivePoint.identity_spec`
+- `probe:curve25519_dalek.IdentityMontgomeryProjectivePoint.identity_spec`
+- `probe:curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add_spec_bounds`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub_spec`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub_spec_aux_54_52_53_52`
+- `probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub_spec_bounds'`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.LOW_51_BIT_MASK_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.decompose`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.fold_mul_carry_prop_stage`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.fold_mul_final_reduce_stage`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.fold_mul_product_stage`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.m_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_carry_prop_stage_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_final_reduce_stage_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_product_stage_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec`
+- `probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub_spec`
+- `probe:curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg_spec`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add_spec`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul_spec`
+- `probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg_spec`
+- `probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub_spec`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.aux_eq_mod_mul`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.aux_eq_mul`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.aux_lt254_mul`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.aux_lt_mul`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec`
+- `probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul_spec_mkPoint_from_affine`
+- `probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul_spec`
+- `probe:curve25519_dalek.SharedAEdwardsPoint.Insts.CoreOpsArithMulScalarEdwardsPoint.mul_spec`
+- `probe:curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulScalarScalar.mul_spec`
+- `probe:curve25519_dalek.U16.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.U64.Insts.SubtleConditionallySelectable.conditional_select_spec'`
+- `probe:curve25519_dalek.U8.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.U8.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreCmpPartialEqAffineNielsPoint.eq_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.T_ne_zero`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.T_valid`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.X_valid`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.Y_valid`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.Z_ne_zero`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.Z_valid`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.IsValid.on_curve`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_assign_spec'`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_assign_spec_52_52`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_assign_spec_53_52`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_spec'`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_spec_52_52`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_spec_53_52`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.add_spec_aux_54_52_53_52`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective_spec_aux`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.isValid_iff`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.toPoint_eq_coe`
+- `probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.toPoint_of_isValid`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.T2d_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.T2d_relation`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.Y_minus_X_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.Y_plus_X_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.Z_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.Z_ne_zero`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.IsValid.on_curve`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.isValid_iff`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint_of_isValid`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.IsValid.X_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.IsValid.Y_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.IsValid.Z_bounds`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.IsValid.Z_ne_zero`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.IsValid.on_curve`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double_lift_to_field_eqs`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double_spec`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double_spec_aux`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.isValid_iff`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.toPoint_eq_coe`
+- `probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.toPoint_of_isValid`
+- `probe:curve25519_dalek.backend.serial.u64.constants.APLUS2_OVER_FOUR_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_MINUS_ONE_SQUARED_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.EDWARDS_D_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.EIGHT_TORSION_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.INVSQRT_A_MINUS_D_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.LFACTOR_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.L_limbs_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.L_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.MINUS_ONE_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_NEG_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.MONTGOMERY_A_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.ONE_MINUS_EDWARDS_D_SQUARED_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.RR_limbs_lt`
+- `probe:curve25519_dalek.backend.serial.u64.constants.RR_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.RR_value_lt_L`
+- `probe:curve25519_dalek.backend.serial.u64.constants.R_limbs_lt`
+- `probe:curve25519_dalek.backend.serial.u64.constants.R_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.R_value_lt_L`
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_AD_MINUS_ONE_spec`
+- `probe:curve25519_dalek.backend.serial.u64.constants.SQRT_M1_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq_spec_aux`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.LOW_51_BIT_MASK_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.MINUS_ONE_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ONE_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.U64_cast_U8`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.ZERO_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.byte_packing_eq`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.carry_prop_stage_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.decompose_or_limbs_shift1`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.decompose_or_limbs_shift3`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.decompose_or_limbs_shift4`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.decompose_or_limbs_shift6`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.field51_eq_of_bitList`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.final_reduce_stage_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.fold_carry_prop_stage`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.fold_final_reduce_stage`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.fold_square_stage`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.limb_bound_of_equiv`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.load8_at_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.load8_at_bitList_step_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.load8_at_val_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.m_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.negate_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.recompose_decomposed_limb`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.recompose_decomposed_limb_shift1`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.recompose_decomposed_limb_shift3`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.recompose_decomposed_limb_shift4`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.recompose_decomposed_limb_shift6`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce.LOW_51_BIT_MASK_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square_stage_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.u64_and_mask51_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.u64_and_mask_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.u64_shr_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.List.extract_append_extract`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.RR_lt`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Scalar52_top_limb_lt_of_canonical`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.U64.ShiftLeft_IScalar_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.U64.ShiftRight_IScalar_bitList_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ZERO_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.bit_slicing_of_words`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.bit_slicing_wide`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop_helper`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop_helper`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ofU64_or_non_overlapping`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.ofU8_cast_eq_ofU64_take`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.scalar52_eq_of_bitList_bytes`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.set_getElem!_eq`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_loop_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes_spec`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_eq_bytes`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.words_wide_eq_bytes`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.zero_array`
+- `probe:curve25519_dalek.backend.serial.u64.scalar.m_spec`
+- `probe:curve25519_dalek.constants.BASEPOINT_ORDER_PRIVATE_spec`
+- `probe:curve25519_dalek.constants.RISTRETTO_BASEPOINT_POINT_spec`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_mut_spec`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.get_spec`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_mut_spec`
+- `probe:curve25519_dalek.core.ops.range.RangeFull.Insts.CoreSliceIndexSliceIndexSliceSlice.index_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.as_bytes_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice_spec`
+- `probe:curve25519_dalek.edwards.CompressedEdwardsY.step_2_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.Choice.eq_one`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.Choice.eq_zero`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddEdwardsPointEdwardsPoint.add_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.T_bounds`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.T_relation`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.X_bounds`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.Y_bounds`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.Z_bounds`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.Z_ne_zero`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.IsValid.on_curve`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.abs_T_point`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_affine_niels_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.double_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.isValid_iff`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.is_small_order_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mkPoint_u_zero`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.modEq_zero_iff`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.mul_clamped_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.toPoint_of_isValid`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_affine_spec`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery_birational_eq`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery_birational_zero`
+- `probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.Choice.eq_one`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.Choice.eq_zero`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign'_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap'_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.IsValid.on_curve`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.IsValid.x_valid`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.IsValid.y_valid`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.isValid_iff`
+- `probe:curve25519_dalek.edwards.affine.AffinePoint.to_edwards_spec`
+- `probe:curve25519_dalek.field.FieldElement51.SQRT_M1_not_square`
+- `probe:curve25519_dalek.field.FieldElement51.SQRT_M1_val_spec`
+- `probe:curve25519_dalek.field.FieldElement51.array_eq_of_to_slice_eq`
+- `probe:curve25519_dalek.field.FieldElement51.chain_mul`
+- `probe:curve25519_dalek.field.FieldElement51.chain_pow2k`
+- `probe:curve25519_dalek.field.FieldElement51.chain_sq`
+- `probe:curve25519_dalek.field.FieldElement51.coprime_of_prime_not_dvd`
+- `probe:curve25519_dalek.field.FieldElement51.eq_to_bytes_eq_Field51_as_Nat`
+- `probe:curve25519_dalek.field.FieldElement51.first_bit`
+- `probe:curve25519_dalek.field.FieldElement51.invert_spec`
+- `probe:curve25519_dalek.field.FieldElement51.invsqrt_spec`
+- `probe:curve25519_dalek.field.FieldElement51.is_negative_spec`
+- `probe:curve25519_dalek.field.FieldElement51.is_zero_spec`
+- `probe:curve25519_dalek.field.FieldElement51.nat_sqrt_m1_sq_of_add_modeq_zero`
+- `probe:curve25519_dalek.field.FieldElement51.pow22501_spec`
+- `probe:curve25519_dalek.field.FieldElement51.pow_div_four_eq_four_cases`
+- `probe:curve25519_dalek.field.FieldElement51.pow_div_two_eq_neg_one_or_one`
+- `probe:curve25519_dalek.field.FieldElement51.pow_p58_spec`
+- `probe:curve25519_dalek.field.FieldElement51.prime_25519`
+- `probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i_spec`
+- `probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i_spec'`
+- `probe:curve25519_dalek.field.FieldElement51.to_bytes_zero_of_Field51_as_Nat_zero`
+- `probe:curve25519_dalek.field.FieldElement51.zero_mod_lt_zero`
+- `probe:curve25519_dalek.field.FieldElement51.zero_of_mul_SQRT_M1_zero`
+- `probe:curve25519_dalek.math.FiniteField.isSquare_mul_of_not_isSquare`
+- `probe:curve25519_dalek.math.abs_edwards_eq_of_sq_eq`
+- `probe:curve25519_dalek.math.abs_edwards_eq_of_sq_eq_sq`
+- `probe:curve25519_dalek.math.abs_edwards_neg`
+- `probe:curve25519_dalek.math.abs_edwards_sq`
+- `probe:curve25519_dalek.math.abs_edwards_val_even`
+- `probe:curve25519_dalek.math.abs_edwards_val_even'`
+- `probe:curve25519_dalek.math.compress_canonical_eq`
+- `probe:curve25519_dalek.math.compress_canonical_on_curve`
+- `probe:curve25519_dalek.math.compress_den_inv_cancel`
+- `probe:curve25519_dalek.math.compress_s_sq`
+- `probe:curve25519_dalek.math.compress_x_prime_sq`
+- `probe:curve25519_dalek.math.compress_y_final_sq`
+- `probe:curve25519_dalek.math.compress_z_inv_eq_one`
+- `probe:curve25519_dalek.math.decompress_helper`
+- `probe:curve25519_dalek.math.elligator_pure_val_x`
+- `probe:curve25519_dalek.math.elligator_pure_val_y`
+- `probe:curve25519_dalek.math.eq_abs_edwards_of_sq_eq`
+- `probe:curve25519_dalek.math.iad_sq`
+- `probe:curve25519_dalek.math.inv_sqrt_checked_snd`
+- `probe:curve25519_dalek.math.inv_sqrt_checked_spec`
+- `probe:curve25519_dalek.math.inv_sqrt_checked_spec'`
+- `probe:curve25519_dalek.math.inv_sqrt_checked_sq_mul`
+- `probe:curve25519_dalek.math.inv_sqrt_checked_zero`
+- `probe:curve25519_dalek.math.is_negative_abs_edwards`
+- `probe:curve25519_dalek.math.modEq_one_iff`
+- `probe:curve25519_dalek.math.modEq_zero_iff`
+- `probe:curve25519_dalek.math.mod_mul_mod`
+- `probe:curve25519_dalek.math.mod_sq_mod`
+- `probe:curve25519_dalek.math.mod_sq_mod_eq`
+- `probe:curve25519_dalek.math.mod_sq_mod_mul`
+- `probe:curve25519_dalek.math.mod_sq_mod_mul_eq`
+- `probe:curve25519_dalek.math.mul_zero_eq_or`
+- `probe:curve25519_dalek.math.nat_sq_of_add_modeq_zero`
+- `probe:curve25519_dalek.math.ne_zero_of_not_isSquare`
+- `probe:curve25519_dalek.math.p_sub_one_cast`
+- `probe:curve25519_dalek.math.ringChar_ne_two`
+- `probe:curve25519_dalek.math.sq_mod_eq_mod_sq`
+- `probe:curve25519_dalek.math.sqrt_ad_minus_one_eq_val`
+- `probe:curve25519_dalek.math.sqrt_ad_minus_one_ne_zero`
+- `probe:curve25519_dalek.math.sqrt_ad_minus_one_sq`
+- `probe:curve25519_dalek.math.sqrt_checked_iff_isSquare`
+- `probe:curve25519_dalek.math.sqrt_checked_spec`
+- `probe:curve25519_dalek.math.sqrt_m1_not_square`
+- `probe:curve25519_dalek.math.sqrt_m1_sq`
+- `probe:curve25519_dalek.math.sqrt_sq`
+- `probe:curve25519_dalek.montgomery.A_ne_zero`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpEq.assert_receiver_is_total_eq_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignShared0Scalar.mul_assign_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulSharedBScalarMontgomeryPoint.mul_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.as_bytes_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_bytes_spec`
+- `probe:curve25519_dalek.montgomery.MontgomeryPoint.to_edwards_spec`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Field51_modP_ne_zero_of_toField_ne_zero`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.IsValid.U_bounds`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.IsValid.W_bounds`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.IsValid.W_ne_zero`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.IsValid.on_curve`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.as_affine_spec`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.isValid_iff`
+- `probe:curve25519_dalek.montgomery.ProjectivePoint.zmod_div_eq_mul_of_mod_inv`
+- `probe:curve25519_dalek.montgomery.SQRT_M1_val_ne_zero`
+- `probe:curve25519_dalek.montgomery.curveField_486662_eq_A`
+- `probe:curve25519_dalek.montgomery.d0_eq_d_of_inv`
+- `probe:curve25519_dalek.montgomery.differential_add_and_double_spec`
+- `probe:curve25519_dalek.montgomery.edwards_denom_nonzero`
+- `probe:curve25519_dalek.montgomery.elligator_encode_spec`
+- `probe:curve25519_dalek.montgomery.eps_zero_of_d1_zero`
+- `probe:curve25519_dalek.montgomery.fe1_inv_of_mod_mul`
+- `probe:curve25519_dalek.montgomery.fe1_inv_of_mod_mul'`
+- `probe:curve25519_dalek.montgomery.montgomery_helper`
+- `probe:curve25519_dalek.montgomery.nat_486662_eq_A`
+- `probe:curve25519_dalek.montgomery.ne_zero_if_eq_one`
+- `probe:curve25519_dalek.montgomery.not_eq_T_point`
+- `probe:curve25519_dalek.montgomery.nqr_condition_of_nonzero`
+- `probe:curve25519_dalek.montgomery.qr_condition_of_square`
+- `probe:curve25519_dalek.montgomery.two_did_is_square`
+- `probe:curve25519_dalek.montgomery.two_mul_is_square`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.as_bytes_spec`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.decompress_spec`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice_spec`
+- `probe:curve25519_dalek.ristretto.CompressedRistretto.to_bytes_spec`
+- `probe:curve25519_dalek.ristretto.EdwardsPoint_IsSquare_iff_IsEven`
+- `probe:curve25519_dalek.ristretto.IsEven_iff_in_doubling_image`
+- `probe:curve25519_dalek.ristretto.IsEven_iff_in_doubling_image_left`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.compress_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes_spec`
+- `probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base_spec`
+- `probe:curve25519_dalek.ristretto.decompress.step_1_spec`
+- `probe:curve25519_dalek.ristretto.decompress.step_2_spec`
+- `probe:curve25519_dalek.ristretto.decompress_step2_1`
+- `probe:curve25519_dalek.ristretto.decompress_step2_2`
+- `probe:curve25519_dalek.ristretto.decompress_step2_compress_s`
+- `probe:curve25519_dalek.ristretto.decompress_step2_zero`
+- `probe:curve25519_dalek.ristretto.even_add_closure_Ed25519`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddSharedBScalarScalar.add_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulMontgomeryPointMontgomeryPoint.mul_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulScalarScalar.mul_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulSharedBScalarScalar.mul_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubSharedBScalarScalar.sub_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_assign_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_loop_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_swap_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.next_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq_spec`
+- `probe:curve25519_dalek.scalar.Scalar.ONE_spec`
+- `probe:curve25519_dalek.scalar.Scalar.Scalar_ext`
+- `probe:curve25519_dalek.scalar.Scalar.U8x32_as_Nat_eq_zero_iff_ZERO`
+- `probe:curve25519_dalek.scalar.Scalar.X64_as_Nat_lt_pow256`
+- `probe:curve25519_dalek.scalar.Scalar.X64_window_single_limb`
+- `probe:curve25519_dalek.scalar.Scalar.ZERO_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_bytes_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16.bot_half_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16.top_half_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop0_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16_loop1_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_16_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_loop_spec`
+- `probe:curve25519_dalek.scalar.Scalar.as_radix_2w_spec`
+- `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_spec`
+- `probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide_spec`
+- `probe:curve25519_dalek.scalar.Scalar.from_canonical_bytes_spec`
+- `probe:curve25519_dalek.scalar.Scalar.invert_spec`
+- `probe:curve25519_dalek.scalar.Scalar.is_canonical_spec`
+- `probe:curve25519_dalek.scalar.Scalar.reduce_spec`
+- `probe:curve25519_dalek.scalar.Scalar.to_bytes_spec`
+- `probe:curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint_spec`
+- `probe:curve25519_dalek.scalar.Scalar.unpack_spec`
+- `probe:curve25519_dalek.scalar.Scalar52.invert_spec`
+- `probe:curve25519_dalek.scalar.Scalar52.isMont_loop`
+- `probe:curve25519_dalek.scalar.Scalar52.isMont_mul`
+- `probe:curve25519_dalek.scalar.Scalar52.isMont_sq`
+- `probe:curve25519_dalek.scalar.Scalar52.montgomery_invert_spec`
+- `probe:curve25519_dalek.scalar.Scalar52.pack_spec`
+- `probe:curve25519_dalek.scalar.Scalar52.run_loop_nat`
+- `probe:curve25519_dalek.scalar.Scalar52.run_mul`
+- `probe:curve25519_dalek.scalar.Scalar52.run_sq`
+- `probe:curve25519_dalek.scalar.Scalar52.square_multiply_loop_spec`
+- `probe:curve25519_dalek.scalar.Scalar52.square_multiply_spec`
+- `probe:curve25519_dalek.scalar.clamp_integer_spec`
+- `probe:curve25519_dalek.scalar.clamp_integer_spec'`
+- `probe:curve25519_dalek.scalar.read_le_u64_into_combined_value`
+- `probe:curve25519_dalek.scalar.read_le_u64_into_loop_spec`
+- `probe:curve25519_dalek.scalar.read_le_u64_into_spec`
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitBitAndChoiceChoice.bitand_spec`
+- `probe:curve25519_dalek.subtle.Choice.Insts.CoreOpsBitNotChoice.not_spec`
+- `probe:curve25519_dalek.subtle.Choice.ne_zero_iff_eq_one`
+- `probe:curve25519_dalek.subtle.Choice.valid`
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_assign.default_spec`
+- `probe:curve25519_dalek.subtle.ConditionallySelectable.conditional_swap.default_spec`
+- `probe:curve25519_dalek.subtle.CtOption.new_spec`
+- `probe:double_cast_of_lt`
+- `probe:hdigits`
+- `probe:hdigits_aux`
+- `probe:high_bit_zero_of_lt_255`
+- `probe:high_bit_zero_of_lt_L`
+- `probe:horner_natCast`
+- `probe:instFactPrimeL`
+- `probe:instFactPrimeP`
+- `probe:land_pow_two_sub_one_eq_mod`
+- `probe:modeq_of_add_mul_eq`
+- `probe:or_bytes_eq_sum`
+- `probe:or_mul_pow_two_eq_add`
+- `probe:pointwise_add_Field51_as_Nat`
+- `probe:u8_mul_pow_lt_u64_size`
+- `probe:u8_mul_pow_mod_u64`
+- `probe:u8_val_mod_u64_numBits`
+
+## 7. Out-of-scope public API functions (46)
+
+Public API functions that Lean (via Aeneas) did not process.
+
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl#[CompressedEdwardsY][Zeroize]zeroize()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<&core::fmt::Formatter<'_>>#[CompressedEdwardsY][Debug]fmt()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl#[EdwardsPoint][Zeroize]zeroize()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&core::fmt::Formatter<'_>>#[EdwardsPoint][Debug]fmt()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&VartimeEdwardsPrecomputation#impl<I>#[VartimeEdwardsPrecomputation][VartimePrecomputedMultiscalarMul]optional_mixed_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&VartimeEdwardsPrecomputation#impl<bool>#[VartimeEdwardsPrecomputation][VartimePrecomputedMultiscalarMul]is_empty()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/&VartimeEdwardsPrecomputation#impl<usize>#[VartimeEdwardsPrecomputation][VartimePrecomputedMultiscalarMul]len()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<&[u8]>#[CompressedEdwardsY][`TryFrom<&[u8]>`]try_from()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<I>#[EdwardsPoint][`Sum<T>`]sum()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<I>#[VartimeEdwardsPrecomputation][VartimePrecomputedMultiscalarMul]new()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<J>#[EdwardsPoint][MultiscalarMul]multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/impl<J>#[EdwardsPoint][VartimeMultiscalarMul]optional_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/test/is_small_order()` (other)
+- `probe:curve25519-dalek/4.2.0/edwards/test/mul_base_clamped()` (other)
+- `probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&H>#[MontgomeryPoint][Hash]hash()` (other)
+- `probe:curve25519-dalek/4.2.0/montgomery/test/mul_base_clamped()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl#[CompressedRistretto][Zeroize]zeroize()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&CompressedRistretto#impl<&core::fmt::Formatter<'_>>#[CompressedRistretto][Debug]fmt()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoBasepointTable#impl<&Scalar>#[`&RistrettoBasepointTable`][`Mul<&'b/Scalar>`]mul()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoBasepointTable#impl<RistrettoPoint>#[RistrettoBasepointTable]basepoint()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl#[RistrettoPoint][Zeroize]zeroize()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&core::fmt::Formatter<'_>>#[RistrettoPoint][Debug]fmt()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&Scalar#impl<&RistrettoBasepointTable>#[`&Scalar`][`Mul<&'a/RistrettoBasepointTable>`]mul()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&VartimeRistrettoPrecomputation#impl<I>#[VartimeRistrettoPrecomputation][VartimePrecomputedMultiscalarMul]optional_mixed_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&VartimeRistrettoPrecomputation#impl<bool>#[VartimeRistrettoPrecomputation][VartimePrecomputedMultiscalarMul]is_empty()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/&VartimeRistrettoPrecomputation#impl<usize>#[VartimeRistrettoPrecomputation][VartimePrecomputedMultiscalarMul]len()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&RistrettoPoint>#[RistrettoBasepointTable]create()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<&[u8]>#[CompressedRistretto][`TryFrom<&[u8]>`]try_from()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<I>#[RistrettoPoint][`Sum<T>`]sum()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<I>#[VartimeRistrettoPrecomputation][VartimePrecomputedMultiscalarMul]new()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<J>#[RistrettoPoint][MultiscalarMul]multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/ristretto/impl<J>#[RistrettoPoint][VartimeMultiscalarMul]optional_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&core::fmt::Formatter<'_>>#[Scalar][Debug]fmt()` (other)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<I>#[Scalar][`Product<T>`]product()` (other)
+- `probe:curve25519-dalek/4.2.0/scalar/impl<I>#[Scalar][`Sum<T>`]sum()` (other)
+- `probe:curve25519-dalek/4.2.0/scalar/test/from_bytes_mod_order_wide()` (other)
+- `probe:curve25519-dalek/4.2.0/scalar/test/invert()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/&Self#BasepointTable<[u8;/{const}]>#mul_base_clamped()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/&Self#VartimePrecomputedMultiscalarMul<I>#vartime_mixed_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/&Self#VartimePrecomputedMultiscalarMul<I>#vartime_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/BasepointTable<&Self::Point>#create()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/Identity#identity()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/MultiscalarMul<J>#multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/VartimeMultiscalarMul<J>#optional_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/VartimeMultiscalarMul<J>#vartime_multiscalar_mul()` (other)
+- `probe:curve25519-dalek/4.2.0/traits/VartimePrecomputedMultiscalarMul<I>#new()` (other)
+
+---
+
+## Public API accounting
+
+| Category | Count |
+|----------|------:|
+| Verified public API | 72 |
+| Trusted public API | 0 |
+| Out-of-scope public API | 46 |
+| **Total public API** | **118** |

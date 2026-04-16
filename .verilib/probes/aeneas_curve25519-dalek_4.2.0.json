@@ -3,7 +3,7 @@
   "schema-version": "2.0",
   "tool": {
     "name": "probe-aeneas",
-    "version": "0.9.0",
+    "version": "0.9.1",
     "command": "extract"
   },
   "inputs": [
@@ -11,7 +11,7 @@
       "schema": "probe-rust/extract",
       "source": {
         "repo": "https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
-        "commit": "a567a6b4c0b060fa475d992b904889e0c92dcf8b",
+        "commit": "8aad9ca5d55adcc730529567b552417c08b24ccf",
         "language": "rust",
         "package": "curve25519-dalek",
         "package-version": "4.2.0"
@@ -21,14 +21,14 @@
       "schema": "probe-lean/extract",
       "source": {
         "repo": "https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
-        "commit": "a567a6b4c0b060fa475d992b904889e0c92dcf8b",
+        "commit": "8aad9ca5d55adcc730529567b552417c08b24ccf",
         "language": "lean",
         "package": "Curve25519Dalek",
         "package-version": "0.1.0"
       }
     }
   ],
-  "timestamp": "2026-04-15T18:30:45Z",
+  "timestamp": "2026-04-16T19:29:55Z",
   "data": {
     "probe:Aeneas.Std.U64.shiftRight_51": {
       "display-name": "shiftRight_51",
@@ -15382,6 +15382,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::{curve25519_dalek::backend::VartimePrecomputedStraus}::optional_mixed_multiscalar_mul"
     },
@@ -15400,6 +15401,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::{curve25519_dalek::backend::VartimePrecomputedStraus}::is_empty"
     },
@@ -15418,6 +15420,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::{curve25519_dalek::backend::VartimePrecomputedStraus}::len"
     },
@@ -15434,6 +15437,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::get_selected_backend",
       "translation-name": "probe:curve25519_dalek.backend.get_selected_backend",
@@ -15442,7 +15446,7 @@
         "lines-end": 141,
         "lines-start": 138
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/impl<I>#[VartimePrecomputedStraus]new()": {
       "display-name": "VartimePrecomputedStraus::new",
@@ -15461,6 +15465,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::{curve25519_dalek::backend::VartimePrecomputedStraus}::new"
     },
@@ -15481,6 +15486,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::pippenger_optional_multiscalar_mul"
     },
@@ -15500,6 +15506,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::zeroize",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.ZeroizeZeroize.zeroize",
@@ -15508,7 +15515,7 @@
         "lines-end": 1661,
         "lines-start": 1645
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&AffineNielsPoint#impl<&Self>#[AffineNielsPoint][ConditionallySelectable]conditional_assign()": {
       "display-name": "AffineNielsPoint::conditional_assign",
@@ -15526,6 +15533,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign",
@@ -15549,6 +15557,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::fmt::Debug for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::fmt"
     },
@@ -15568,6 +15577,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for &'0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg",
@@ -15591,6 +15601,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::fmt::Debug for curve25519_dalek::backend::serial::curve_models::CompletedPoint}::fmt"
     },
@@ -15610,6 +15621,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_extended",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended",
@@ -15636,6 +15648,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_projective",
@@ -15666,6 +15679,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAAffineNielsPointCompletedPoint.add",
@@ -15696,6 +15710,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'0 (curve25519_dalek::backend::serial::curve_models::AffineNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAAffineNielsPointCompletedPoint.sub",
@@ -15726,6 +15741,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Add<&'0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAProjectiveNielsPointCompletedPoint.add",
@@ -15756,6 +15772,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Sub<&'0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint), curve25519_dalek::backend::serial::curve_models::CompletedPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAProjectiveNielsPointCompletedPoint.sub",
@@ -15782,6 +15799,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{zeroize::Zeroize for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::zeroize",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.ZeroizeZeroize.zeroize",
@@ -15790,7 +15808,7 @@
         "lines-end": 1691,
         "lines-start": 1672
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/&ProjectiveNielsPoint#impl<&Self>#[ProjectiveNielsPoint][ConditionallySelectable]conditional_assign()": {
       "display-name": "ProjectiveNielsPoint::conditional_assign",
@@ -15808,6 +15826,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign",
@@ -15831,6 +15850,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::fmt::Debug for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::fmt"
     },
@@ -15850,6 +15870,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &'0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg",
@@ -15873,6 +15894,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::fmt::Debug for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::fmt"
     },
@@ -15898,6 +15920,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.double",
@@ -15926,6 +15949,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::as_extended",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.as_extended",
@@ -15960,6 +15984,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::is_valid",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectivePoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
@@ -15968,7 +15993,7 @@
         "lines-end": 1810,
         "lines-start": 1784
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/AffineNielsPoint#impl<AffineNielsPoint>#[AffineNielsPoint][Neg]neg()": {
       "display-name": "AffineNielsPoint::neg",
@@ -15986,6 +16011,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::AffineNielsPoint> for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::neg",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreOpsArithNegAffineNielsPoint.neg",
@@ -15994,7 +16020,7 @@
         "lines-end": 2111,
         "lines-start": 2103
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/ProjectiveNielsPoint#impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Neg]neg()": {
       "display-name": "ProjectiveNielsPoint::neg",
@@ -16012,6 +16038,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::neg",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg",
@@ -16020,7 +16047,7 @@
         "lines-end": 831,
         "lines-start": 822
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<&Self>#[AffineNielsPoint][ConditionallySelectable]conditional_select()": {
       "display-name": "AffineNielsPoint::conditional_select",
@@ -16038,6 +16065,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -16064,6 +16092,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -16090,6 +16119,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::default",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.CoreDefaultDefault.default",
@@ -16098,7 +16128,7 @@
         "lines-end": 1762,
         "lines-start": 1756
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<AffineNielsPoint>#[AffineNielsPoint][Identity]identity()": {
       "display-name": "AffineNielsPoint::identity",
@@ -16113,6 +16143,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::AffineNielsPoint}::identity",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.AffineNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -16139,6 +16170,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{core::default::Default for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::default",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreDefaultDefault.default",
@@ -16147,7 +16179,7 @@
         "lines-end": 1725,
         "lines-start": 1719
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/curve_models/impl<ProjectiveNielsPoint>#[ProjectiveNielsPoint][Identity]identity()": {
       "display-name": "ProjectiveNielsPoint::identity",
@@ -16162,6 +16194,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
       "translation-name": "probe:curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -16185,6 +16218,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::identity",
       "translation-name": "probe:curve25519_dalek.IdentityCurveModelsProjectivePoint.identity",
@@ -16252,6 +16286,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::pippenger::{curve25519_dalek::traits::VartimeMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::pippenger::Pippenger}::optional_multiscalar_mul"
     },
@@ -16292,6 +16327,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::pippenger::test_vartime_pippenger"
     },
@@ -16344,6 +16380,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus}::optional_mixed_multiscalar_mul"
     },
@@ -16362,6 +16399,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus}::is_empty"
     },
@@ -16380,6 +16418,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus}::len"
     },
@@ -16402,6 +16441,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::precomputed_straus::VartimePrecomputedStraus}::new"
     },
@@ -16440,6 +16480,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::straus::{curve25519_dalek::traits::MultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::straus::Straus}::multiscalar_mul"
     },
@@ -16487,6 +16528,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::straus::{curve25519_dalek::traits::VartimeMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::backend::serial::scalar_mul::straus::Straus}::optional_multiscalar_mul"
     },
@@ -16521,6 +16563,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
       "translation-name": "probe:curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
@@ -16529,7 +16572,7 @@
         "lines-end": 1298,
         "lines-start": 1272
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/scalar_mul/vartime_double_base/mul()": {
       "display-name": "mul",
@@ -16575,6 +16618,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::scalar_mul::vartime_double_base::mul"
     },
@@ -16593,6 +16637,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::field::FieldElement51}::zeroize",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.ZeroizeZeroize.zeroize",
@@ -16601,7 +16646,7 @@
         "lines-end": 1643,
         "lines-start": 1633
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl#[FieldElement51]negate()": {
       "display-name": "FieldElement51::negate",
@@ -16621,6 +16666,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::negate",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.negate",
@@ -16648,6 +16694,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_assign",
@@ -16677,6 +16724,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::AddAssign<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::add_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithAddAssignSharedAFieldElement51.add_assign",
@@ -16703,6 +16751,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::MulAssign<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::mul_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithMulAssignSharedAFieldElement51.mul_assign",
@@ -16711,7 +16760,7 @@
         "lines-end": 2484,
         "lines-start": 2472
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/field/&FieldElement51#impl<&FieldElement51>#[FieldElement51][`SubAssign<&'a/FieldElement51>`]sub_assign()": {
       "display-name": "FieldElement51::sub_assign",
@@ -16729,6 +16778,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::SubAssign<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::sub_assign",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreOpsArithSubAssignSharedAFieldElement51.sub_assign",
@@ -16756,6 +16806,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Add<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &'1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
@@ -16779,6 +16830,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Mul<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &'1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul",
@@ -16808,6 +16860,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Sub<&'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51), curve25519_dalek::backend::serial::u64::field::FieldElement51> for &'1 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub",
@@ -16833,6 +16886,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::fmt::Debug for curve25519_dalek::backend::serial::u64::field::FieldElement51}::fmt"
     },
@@ -16852,6 +16906,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square",
@@ -16882,6 +16937,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::square2",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.square2",
@@ -16909,6 +16965,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{core::ops::arith::Neg<curve25519_dalek::backend::serial::u64::field::FieldElement51> for &'0 (curve25519_dalek::backend::serial::u64::field::FieldElement51)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg",
@@ -16935,6 +16992,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::as_bytes",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.as_bytes",
@@ -16960,6 +17018,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow2k",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.pow2k",
@@ -16997,6 +17056,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::to_bytes",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
@@ -17023,6 +17083,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_select",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_select",
@@ -17049,6 +17110,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{subtle::ConditionallySelectable for curve25519_dalek::backend::serial::u64::field::FieldElement51}::conditional_swap",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConditionallySelectable.conditional_swap",
@@ -17057,7 +17119,7 @@
         "lines-end": 2558,
         "lines-start": 2518
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/field/impl<&[u8;/{const}]>#[FieldElement51]from_bytes()": {
       "display-name": "FieldElement51::from_bytes",
@@ -17072,6 +17134,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_bytes",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_bytes",
@@ -17095,6 +17158,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::from_limbs",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.from_limbs",
@@ -17127,6 +17191,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::reduce",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce",
@@ -17158,6 +17223,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::load8_at"
     },
@@ -17190,6 +17256,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::m"
     },
@@ -17222,6 +17289,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::field::m"
     },
@@ -17240,6 +17308,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{zeroize::Zeroize for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::zeroize",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.ZeroizeZeroize.zeroize",
@@ -17248,7 +17317,7 @@
         "lines-end": 2708,
         "lines-start": 2698
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<&core::fmt::Formatter<'_>>#[Scalar52][Debug]fmt()": {
       "display-name": "Scalar52::fmt",
@@ -17265,6 +17334,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{core::fmt::Debug for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::fmt"
     },
@@ -17284,6 +17354,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::as_montgomery",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.as_montgomery",
@@ -17314,6 +17385,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_montgomery",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_montgomery",
@@ -17342,6 +17414,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_square",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_square",
@@ -17372,6 +17445,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
@@ -17408,6 +17482,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::conditional_add_l",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.conditional_add_l",
@@ -17433,6 +17508,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::Index for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexUsizeU64.index",
@@ -17441,7 +17517,7 @@
         "lines-end": 2725,
         "lines-start": 2718
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/&Scalar52#impl<usize>#[Scalar52][`IndexMut<usize>`]index_mut()": {
       "display-name": "Scalar52::index_mut",
@@ -17458,6 +17534,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{core::ops::index::IndexMut for curve25519_dalek::backend::serial::u64::scalar::Scalar52}::index_mut",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.Insts.CoreOpsIndexIndexMutUsizeU64.index_mut",
@@ -17466,7 +17543,7 @@
         "lines-end": 2748,
         "lines-start": 2737
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/serial/u64/scalar/Scalar52#impl<[u8;/{const}]>#[Scalar52]to_bytes()": {
       "display-name": "Scalar52::to_bytes",
@@ -17487,6 +17564,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::to_bytes",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.to_bytes",
@@ -17523,6 +17601,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.add",
@@ -17551,6 +17630,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_mul",
@@ -17579,6 +17659,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul",
@@ -17609,6 +17690,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::square_internal",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.square_internal",
@@ -17647,6 +17729,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.sub",
@@ -17685,6 +17768,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes",
@@ -17729,6 +17813,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.from_bytes_wide",
@@ -17752,6 +17837,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_reduce",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.montgomery_reduce",
@@ -17781,6 +17867,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul_internal",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.Scalar52.mul_internal",
@@ -17806,6 +17893,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::m",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.scalar.m",
@@ -17840,6 +17928,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::part1"
     },
@@ -17868,6 +17957,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::part2"
     },
@@ -17889,6 +17979,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::add"
     },
@@ -17910,6 +18001,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::from_bytes_wide"
     },
@@ -17931,6 +18023,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_mul"
     },
@@ -17952,6 +18045,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::montgomery_mul_max"
     },
@@ -17973,6 +18067,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::montgomery_square_max"
     },
@@ -17994,6 +18089,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::mul"
     },
@@ -18015,6 +18111,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::mul_max"
     },
@@ -18036,6 +18133,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::square_max"
     },
@@ -18057,6 +18155,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::serial::u64::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::sub"
     },
@@ -18077,6 +18176,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::straus_multiscalar_mul"
     },
@@ -18097,6 +18197,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::straus_optional_multiscalar_mul"
     },
@@ -18118,6 +18219,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::backend::variable_base_mul",
       "translation-name": "probe:curve25519_dalek.backend.variable_base_mul",
@@ -18126,7 +18228,7 @@
         "lines-end": 1308,
         "lines-start": 1300
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/backend/vartime_double_base_mul()": {
       "display-name": "vartime_double_base_mul",
@@ -18145,6 +18247,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::backend::vartime_double_base_mul"
     },
@@ -18170,6 +18273,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_d_vs_ratio"
     },
@@ -18193,6 +18297,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_eight_torsion"
     },
@@ -18219,6 +18324,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_four_torsion"
     },
@@ -18242,6 +18348,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_sqrt_ad_minus_one"
     },
@@ -18264,6 +18371,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_sqrt_constants_sign"
     },
@@ -18287,6 +18395,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_sqrt_minus_one"
     },
@@ -18313,6 +18422,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::constants::test_two_torsion"
     },
@@ -18366,6 +18476,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{zeroize::Zeroize for curve25519_dalek::edwards::CompressedEdwardsY}::zeroize"
     },
@@ -18386,6 +18497,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::CompressedEdwardsY}::ct_eq",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq",
@@ -18412,6 +18524,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::fmt::Debug for curve25519_dalek::edwards::CompressedEdwardsY}::fmt"
     },
@@ -18434,6 +18547,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.decompress",
@@ -18442,7 +18556,7 @@
         "lines-end": 4220,
         "lines-start": 4206
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&CompressedEdwardsY#impl<[u8;/{const}]>#[CompressedEdwardsY]as_bytes()": {
       "display-name": "CompressedEdwardsY::as_bytes",
@@ -18457,6 +18571,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.as_bytes",
@@ -18480,6 +18595,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::to_bytes",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.to_bytes",
@@ -18488,7 +18604,7 @@
         "lines-end": 4033,
         "lines-start": 4028
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl#[EdwardsPoint][Zeroize]zeroize()": {
       "display-name": "EdwardsPoint::zeroize",
@@ -18506,6 +18622,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{zeroize::Zeroize for curve25519_dalek::edwards::EdwardsPoint}::zeroize"
     },
@@ -18528,6 +18645,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::EdwardsPoint}::ct_eq",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq.ct_eq",
@@ -18555,6 +18673,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::AddAssign<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::edwards::EdwardsPoint}::add_assign",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithAddAssignEdwardsPoint.add_assign",
@@ -18563,7 +18682,7 @@
         "lines-end": 5161,
         "lines-start": 5153
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[EdwardsPoint][`PartialEq<Self>`]eq()": {
       "display-name": "EdwardsPoint::eq",
@@ -18582,6 +18701,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::cmp::PartialEq<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::eq",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq",
@@ -18609,6 +18729,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::SubAssign<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::edwards::EdwardsPoint}::sub_assign",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubAssignEdwardsPoint.sub_assign",
@@ -18617,7 +18738,7 @@
         "lines-end": 5424,
         "lines-start": 5416
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&EdwardsPoint>#[`&EdwardsPoint`][`Add<&'a/EdwardsPoint>`]add()": {
       "display-name": "EdwardsPoint::add",
@@ -18639,6 +18760,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Add<&'0 (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add",
@@ -18669,6 +18791,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Sub<&'0 (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub",
@@ -18696,6 +18819,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::MulAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::edwards::EdwardsPoint}::mul_assign",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
@@ -18704,7 +18828,7 @@
         "lines-end": 6042,
         "lines-start": 6034
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&Scalar>#[`&EdwardsPoint`][`Mul<&'a/Scalar>`]mul()": {
       "display-name": "EdwardsPoint::mul",
@@ -18722,6 +18846,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Mul<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::edwards::EdwardsPoint> for &'1 (curve25519_dalek::edwards::EdwardsPoint)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint.mul",
@@ -18730,7 +18855,7 @@
         "lines-end": 3884,
         "lines-start": 3877
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<&core::fmt::Formatter<'_>>#[EdwardsPoint][Debug]fmt()": {
       "display-name": "EdwardsPoint::fmt",
@@ -18750,6 +18875,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::fmt::Debug for curve25519_dalek::edwards::EdwardsPoint}::fmt"
     },
@@ -18775,6 +18901,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_affine_niels",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.as_affine_niels",
@@ -18805,6 +18932,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::compress",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.compress",
@@ -18813,7 +18941,7 @@
         "lines-end": 4576,
         "lines-start": 4570
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<EdwardsPoint>#[EdwardsPoint]double()": {
       "display-name": "EdwardsPoint::double",
@@ -18835,6 +18963,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::double",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.double",
@@ -18861,6 +18990,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_cofactor",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_cofactor",
@@ -18897,6 +19027,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_by_pow_2",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2",
@@ -18923,6 +19054,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Neg<curve25519_dalek::edwards::EdwardsPoint> for &'0 (curve25519_dalek::edwards::EdwardsPoint)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
@@ -18957,6 +19089,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_montgomery",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.to_montgomery",
@@ -18987,6 +19120,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective_niels",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
@@ -19010,6 +19144,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::as_projective",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.as_projective",
@@ -19042,6 +19177,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::ValidityCheck for curve25519_dalek::edwards::EdwardsPoint}::is_valid",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsValidityCheck.is_valid",
@@ -19050,7 +19186,7 @@
         "lines-end": 4389,
         "lines-start": 4370
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/&EdwardsPoint#impl<bool>#[EdwardsPoint]is_small_order()": {
       "display-name": "EdwardsPoint::is_small_order",
@@ -19069,6 +19205,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.is_small_order",
@@ -19095,6 +19232,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_torsion_free",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.is_torsion_free",
@@ -19121,6 +19259,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Mul<&'0 (curve25519_dalek::edwards::EdwardsPoint), curve25519_dalek::edwards::EdwardsPoint> for &'1 (curve25519_dalek::scalar::Scalar)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul",
@@ -19147,6 +19286,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::VartimeEdwardsPrecomputation}::optional_mixed_multiscalar_mul"
     },
@@ -19165,6 +19305,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::VartimeEdwardsPrecomputation}::is_empty"
     },
@@ -19183,6 +19324,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::VartimeEdwardsPrecomputation}::len"
     },
@@ -19204,6 +19346,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::to_affine",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.to_affine",
@@ -19230,6 +19373,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::ops::arith::Neg<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::neg",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
@@ -19238,7 +19382,7 @@
         "lines-end": 4698,
         "lines-start": 4693
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/EdwardsPoint#impl<[u8;/{const}]>#[EdwardsPoint]mul_clamped()": {
       "display-name": "EdwardsPoint::mul_clamped",
@@ -19257,6 +19401,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_clamped",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.mul_clamped",
@@ -19284,6 +19429,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{subtle::ConstantTimeEq for curve25519_dalek::edwards::affine::AffinePoint}::ct_eq",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq",
@@ -19311,6 +19457,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::eq",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq",
@@ -19343,6 +19490,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.compress",
@@ -19351,7 +19499,7 @@
         "lines-end": 3875,
         "lines-start": 3863
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/affine/AffinePoint#impl<EdwardsPoint>#[AffinePoint]to_edwards()": {
       "display-name": "AffinePoint::to_edwards",
@@ -19369,6 +19517,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::to_edwards",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
@@ -19396,6 +19545,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{core::ops::arith::Mul<&'0 (curve25519_dalek::edwards::affine::AffinePoint), curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulShared0AffinePointEdwardsPoint.mul",
@@ -19404,7 +19554,7 @@
         "lines-end": 3904,
         "lines-start": 3896
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/affine/Scalar#impl<AffinePoint>#[Scalar][`Mul<AffinePoint>`]mul()": {
       "display-name": "Scalar::mul",
@@ -19422,6 +19572,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{core::ops::arith::Mul<curve25519_dalek::edwards::affine::AffinePoint, curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::scalar::Scalar}::mul",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAffinePointEdwardsPoint.mul",
@@ -19430,7 +19581,7 @@
         "lines-end": 3914,
         "lines-start": 3906
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/affine/impl<&Self>#[AffinePoint][ConditionallySelectable]conditional_select()": {
       "display-name": "AffinePoint::conditional_select",
@@ -19448,6 +19599,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -19474,6 +19626,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{core::default::Default for curve25519_dalek::edwards::affine::AffinePoint}::default",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault.default",
@@ -19482,7 +19635,7 @@
         "lines-end": 3785,
         "lines-start": 3780
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/affine/impl<AffinePoint>#[AffinePoint][Identity]identity()": {
       "display-name": "AffinePoint::identity",
@@ -19497,6 +19650,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::affine::AffinePoint}::identity",
       "translation-name": "probe:curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -19525,6 +19679,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::generator_round_trip"
     },
@@ -19548,6 +19703,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::affine::identity_conversion"
     },
@@ -19579,6 +19735,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::decompress::step_1",
       "translation-name": "probe:curve25519_dalek.edwards.decompress.step_1",
@@ -19587,7 +19744,7 @@
         "lines-end": 4204,
         "lines-start": 4181
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/decompress/step_2()": {
       "display-name": "step_2",
@@ -19614,6 +19771,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::decompress::step_2",
       "translation-name": "probe:curve25519_dalek.edwards.decompress.step_2",
@@ -19970,6 +20128,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{subtle::ConditionallySelectable for curve25519_dalek::edwards::EdwardsPoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -19995,6 +20154,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.mul_base",
@@ -20003,7 +20163,7 @@
         "lines-end": 4771,
         "lines-start": 4765
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/impl<&[u8]>#[CompressedEdwardsY][`TryFrom<&[u8]>`]try_from()": {
       "display-name": "CompressedEdwardsY::try_from",
@@ -20021,6 +20181,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::convert::TryFrom<core::array::TryFromSliceError> for curve25519_dalek::edwards::CompressedEdwardsY}::try_from"
     },
@@ -20040,6 +20201,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::from_slice",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.from_slice",
@@ -20066,6 +20228,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::default::Default for curve25519_dalek::edwards::CompressedEdwardsY}::default",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.CoreDefaultDefault.default",
@@ -20074,7 +20237,7 @@
         "lines-end": 4328,
         "lines-start": 4323
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/impl<CompressedEdwardsY>#[CompressedEdwardsY][Identity]identity()": {
       "display-name": "CompressedEdwardsY::identity",
@@ -20089,6 +20252,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::CompressedEdwardsY}::identity",
       "translation-name": "probe:curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -20115,6 +20279,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::default::Default for curve25519_dalek::edwards::EdwardsPoint}::default",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.CoreDefaultDefault.default",
@@ -20123,7 +20288,7 @@
         "lines-end": 4352,
         "lines-start": 4347
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/edwards/impl<EdwardsPoint>#[EdwardsPoint][Identity]identity()": {
       "display-name": "EdwardsPoint::identity",
@@ -20138,6 +20303,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::EdwardsPoint}::identity",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -20167,6 +20333,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{core::iter::traits::accum::Sum<T0> for curve25519_dalek::edwards::EdwardsPoint}::sum"
     },
@@ -20185,6 +20352,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::VartimeEdwardsPrecomputation}::new"
     },
@@ -20206,6 +20374,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::MultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::multiscalar_mul"
     },
@@ -20229,6 +20398,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::traits::VartimeMultiscalarMul<curve25519_dalek::edwards::EdwardsPoint> for curve25519_dalek::edwards::EdwardsPoint}::optional_multiscalar_mul"
     },
@@ -20250,6 +20420,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped",
       "translation-name": "probe:curve25519_dalek.edwards.EdwardsPoint.mul_base_clamped",
@@ -20279,6 +20450,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::EdwardsPoint::random"
     },
@@ -20300,6 +20472,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint16_vs_mul_by_pow_2_4"
     },
@@ -20326,6 +20499,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_decompression_compression"
     },
@@ -20347,6 +20521,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_double_vs_basepoint2"
     },
@@ -20367,6 +20542,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_mult_by_basepoint_order"
     },
@@ -20387,6 +20563,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_mult_one_vs_basepoint"
     },
@@ -20410,6 +20587,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_mult_two_vs_basepoint2"
     },
@@ -20431,6 +20609,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_mult_vs_ed25519py"
     },
@@ -20456,6 +20635,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_plus_basepoint_affine_niels_vs_basepoint2"
     },
@@ -20481,6 +20661,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_plus_basepoint_projective_niels_vs_basepoint2"
     },
@@ -20501,6 +20682,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_plus_basepoint_vs_basepoint2"
     },
@@ -20524,6 +20706,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_projective_extended_round_trip"
     },
@@ -20544,6 +20727,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_table_basepoint_function_correct"
     },
@@ -20573,6 +20757,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_tables"
     },
@@ -20602,6 +20787,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::basepoint_tables_unreduced_scalar"
     },
@@ -20629,6 +20815,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::batch_to_montgomery"
     },
@@ -20660,6 +20847,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::compress_batch"
     },
@@ -20683,6 +20871,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::compressed_identity"
     },
@@ -20707,6 +20896,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::conditional_assign_for_affine_niels_point"
     },
@@ -20735,6 +20925,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::decompression_sign_handling"
     },
@@ -20760,6 +20951,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::extended_point_equality_handles_scaling"
     },
@@ -20787,6 +20979,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::impl_sum"
     },
@@ -20808,6 +21001,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::is_identity"
     },
@@ -20828,6 +21022,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::is_small_order"
     },
@@ -20847,6 +21042,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::monte_carlo_overflow_underflow_debug_assert_test"
     },
@@ -20873,6 +21069,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::edwards::{curve25519_dalek::edwards::EdwardsPoint}::mul_base_clamped"
     },
@@ -20902,6 +21099,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_consistency_iter"
     },
@@ -20920,6 +21118,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_consistency_n_100"
     },
@@ -20938,6 +21137,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_consistency_n_1000"
     },
@@ -20956,6 +21156,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_consistency_n_250"
     },
@@ -20974,6 +21175,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_consistency_n_500"
     },
@@ -20994,6 +21196,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::scalar_mul_vs_ed25519py"
     },
@@ -21017,6 +21220,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::scalarmult_extended_point_works_both_ways"
     },
@@ -21038,6 +21242,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::test_precomputed_basepoint_mult"
     },
@@ -21066,6 +21271,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::to_affine_niels_clears_denominators"
     },
@@ -21086,6 +21292,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::double_scalar_mul_basepoint_vs_ed25519py"
     },
@@ -21113,6 +21320,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_mul_vartime_vs_consttime"
     },
@@ -21136,6 +21344,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::multiscalar_mul_vs_ed25519py"
     },
@@ -21172,6 +21381,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::edwards::vartime_precomputed_vs_nonprecomputed_multiscalar"
     },
@@ -21348,6 +21558,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{subtle::ConstantTimeEq for curve25519_dalek::backend::serial::u64::field::FieldElement51}::ct_eq",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.SubtleConstantTimeEq.ct_eq",
@@ -21375,6 +21586,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{core::cmp::PartialEq<curve25519_dalek::backend::serial::u64::field::FieldElement51> for curve25519_dalek::backend::serial::u64::field::FieldElement51}::eq",
       "translation-name": "probe:curve25519_dalek.backend.serial.u64.field.FieldElement51.Insts.CoreCmpPartialEqFieldElement51.eq",
@@ -21383,7 +21595,7 @@
         "lines-end": 1566,
         "lines-start": 1554
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/field/&FieldElement51#impl<(Choice,/FieldElement)>#[`backend::serial::u64::field::FieldElement51`]invsqrt()": {
       "display-name": "backend::serial::u64::field::FieldElement51::invsqrt",
@@ -21401,6 +21613,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.invsqrt",
@@ -21431,6 +21644,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.pow22501",
@@ -21460,6 +21674,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.is_negative",
@@ -21487,6 +21702,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.is_zero",
@@ -21517,6 +21733,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.invert",
@@ -21547,6 +21764,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.pow_p58",
@@ -21586,6 +21804,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i",
       "translation-name": "probe:curve25519_dalek.field.FieldElement51.sqrt_ratio_i",
@@ -21616,6 +21835,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::a_invert_vs_inverse_of_a_constant"
     },
@@ -21637,6 +21857,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::a_mul_a_vs_a_squared_constant"
     },
@@ -21658,6 +21879,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::a_p58_vs_ap58_constant"
     },
@@ -21681,6 +21903,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::a_square2_vs_a_squared_constant"
     },
@@ -21702,6 +21925,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::a_square_vs_a_squared_constant"
     },
@@ -21730,6 +21954,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::batch_invert_a_matches_nonbatched"
     },
@@ -21748,6 +21973,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::batch_invert_empty"
     },
@@ -21767,6 +21993,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::conditional_negate"
     },
@@ -21790,6 +22017,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::encoding_is_canonical"
     },
@@ -21809,6 +22037,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::equality"
     },
@@ -21830,6 +22059,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::from_bytes_highbit_is_ignored"
     },
@@ -21859,6 +22089,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::field::sqrt_ratio_behavior"
     },
@@ -21953,6 +22184,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{zeroize::Zeroize for curve25519_dalek::montgomery::MontgomeryPoint}::zeroize",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.ZeroizeZeroize.zeroize",
@@ -21961,7 +22193,7 @@
         "lines-end": 6281,
         "lines-start": 6273
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&H>#[MontgomeryPoint][Hash]hash()": {
       "display-name": "MontgomeryPoint::hash",
@@ -21982,6 +22214,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::hash::Hash for curve25519_dalek::montgomery::MontgomeryPoint}::hash"
     },
@@ -22003,6 +22236,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{subtle::ConstantTimeEq for curve25519_dalek::montgomery::MontgomeryPoint}::ct_eq",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConstantTimeEq.ct_eq",
@@ -22030,6 +22264,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::cmp::PartialEq<curve25519_dalek::montgomery::MontgomeryPoint> for curve25519_dalek::montgomery::MontgomeryPoint}::eq",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreCmpPartialEqMontgomeryPoint.eq",
@@ -22057,6 +22292,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::ops::arith::MulAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::montgomery::MontgomeryPoint}::mul_assign",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
@@ -22065,7 +22301,7 @@
         "lines-end": 6072,
         "lines-start": 6064
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/montgomery/&MontgomeryPoint#impl<&Scalar>#[`&MontgomeryPoint`][`Mul<&Scalar>`]mul()": {
       "display-name": "MontgomeryPoint::mul",
@@ -22104,6 +22340,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::ops::arith::Mul<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::montgomery::MontgomeryPoint> for &'1 (curve25519_dalek::montgomery::MontgomeryPoint)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared1MontgomeryPoint.Insts.CoreOpsArithMulShared0ScalarMontgomeryPoint.mul",
@@ -22127,6 +22364,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::as_bytes",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.as_bytes",
@@ -22150,6 +22388,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_bytes",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.to_bytes",
@@ -22193,6 +22432,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::to_edwards",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.to_edwards",
@@ -22223,6 +22463,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::ProjectivePoint}::as_affine",
       "translation-name": "probe:curve25519_dalek.montgomery.ProjectivePoint.as_affine",
@@ -22249,6 +22490,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::ops::arith::Mul<&'0 (curve25519_dalek::montgomery::MontgomeryPoint), curve25519_dalek::montgomery::MontgomeryPoint> for &'1 (curve25519_dalek::scalar::Scalar)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared1Scalar.Insts.CoreOpsArithMulShared0MontgomeryPointMontgomeryPoint.mul",
@@ -22276,6 +22518,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_clamped",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_clamped",
@@ -22308,6 +22551,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::differential_add_and_double",
       "translation-name": "probe:curve25519_dalek.montgomery.differential_add_and_double",
@@ -22353,6 +22597,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::elligator_encode",
       "translation-name": "probe:curve25519_dalek.montgomery.elligator_encode",
@@ -22409,6 +22654,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::ProjectivePoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -22437,6 +22683,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base",
@@ -22462,6 +22709,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{subtle::ConditionallySelectable for curve25519_dalek::montgomery::MontgomeryPoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -22485,6 +22733,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::MontgomeryPoint}::identity",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -22511,6 +22760,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{core::default::Default for curve25519_dalek::montgomery::ProjectivePoint}::default",
       "translation-name": "probe:curve25519_dalek.montgomery.ProjectivePoint.Insts.CoreDefaultDefault.default",
@@ -22519,7 +22769,7 @@
         "lines-end": 6448,
         "lines-start": 6443
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/montgomery/impl<ProjectivePoint>#[ProjectivePoint][Identity]identity()": {
       "display-name": "ProjectivePoint::identity",
@@ -22534,6 +22784,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::traits::Identity for curve25519_dalek::montgomery::ProjectivePoint}::identity",
       "translation-name": "probe:curve25519_dalek.IdentityMontgomeryProjectivePoint.identity",
@@ -22564,6 +22815,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped",
       "translation-name": "probe:curve25519_dalek.montgomery.MontgomeryPoint.mul_base_clamped",
@@ -22590,6 +22842,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::basepoint_edwards_to_montgomery"
     },
@@ -22612,6 +22865,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::basepoint_montgomery_to_edwards"
     },
@@ -22638,6 +22892,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::bytestring_bits_le"
     },
@@ -22656,6 +22911,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::eq_defined_mod_p"
     },
@@ -22679,6 +22935,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::identity_in_different_coordinates"
     },
@@ -22704,6 +22961,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::identity_in_different_models"
     },
@@ -22731,6 +22989,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_elligator_correct"
     },
@@ -22754,6 +23013,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_elligator_zero_zero"
     },
@@ -22777,6 +23037,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_ladder_matches_edwards_scalarmult"
     },
@@ -22804,6 +23065,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_mul_bits_be"
     },
@@ -22826,6 +23088,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_mul_bits_be_twist"
     },
@@ -22852,6 +23115,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::montgomery_to_edwards_rejects_twist"
     },
@@ -22874,6 +23138,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::montgomery::{curve25519_dalek::montgomery::MontgomeryPoint}::mul_base_clamped"
     },
@@ -22894,6 +23159,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::montgomery::rand_prime_order_point"
     },
@@ -23139,6 +23405,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{zeroize::Zeroize for curve25519_dalek::ristretto::CompressedRistretto}::zeroize"
     },
@@ -23159,6 +23426,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::CompressedRistretto}::ct_eq",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.SubtleConstantTimeEq.ct_eq",
@@ -23185,6 +23453,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::fmt::Debug for curve25519_dalek::ristretto::CompressedRistretto}::fmt"
     },
@@ -23209,6 +23478,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::decompress",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.decompress",
@@ -23232,6 +23502,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::as_bytes",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.as_bytes",
@@ -23255,6 +23526,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::to_bytes",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.to_bytes",
@@ -23280,6 +23552,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::ristretto::RistrettoBasepointTable)}::mul"
     },
@@ -23298,6 +23571,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoBasepointTable}::basepoint"
     },
@@ -23318,6 +23592,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{zeroize::Zeroize for curve25519_dalek::ristretto::RistrettoPoint}::zeroize"
     },
@@ -23340,6 +23615,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{subtle::ConstantTimeEq for curve25519_dalek::ristretto::RistrettoPoint}::ct_eq",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConstantTimeEq.ct_eq",
@@ -23367,6 +23643,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::AddAssign<&'0 (curve25519_dalek::ristretto::RistrettoPoint)> for curve25519_dalek::ristretto::RistrettoPoint}::add_assign",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithAddAssignRistrettoPoint.add_assign",
@@ -23375,7 +23652,7 @@
         "lines-end": 5192,
         "lines-start": 5183
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[RistrettoPoint][`PartialEq<Self>`]eq()": {
       "display-name": "RistrettoPoint::eq",
@@ -23394,6 +23671,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::cmp::PartialEq<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::eq",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreCmpPartialEqRistrettoPoint.eq",
@@ -23421,6 +23699,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::SubAssign<&'0 (curve25519_dalek::ristretto::RistrettoPoint)> for curve25519_dalek::ristretto::RistrettoPoint}::sub_assign",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithSubAssignRistrettoPoint.sub_assign",
@@ -23429,7 +23708,7 @@
         "lines-end": 5455,
         "lines-start": 5446
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&RistrettoPoint>#[`&RistrettoPoint`][`Add<&'a/RistrettoPoint>`]add()": {
       "display-name": "RistrettoPoint::add",
@@ -23446,6 +23725,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Add<&'0 (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::ristretto::RistrettoPoint)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithAddSharedARistrettoPointRistrettoPoint.add",
@@ -23471,6 +23751,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Sub<&'0 (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::ristretto::RistrettoPoint)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithSubSharedARistrettoPointRistrettoPoint.sub",
@@ -23498,6 +23779,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::MulAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::ristretto::RistrettoPoint}::mul_assign",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithMulAssignScalar.mul_assign",
@@ -23506,7 +23788,7 @@
         "lines-end": 6102,
         "lines-start": 6094
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<&Scalar>#[`&RistrettoPoint`][`Mul<&'a/Scalar>`]mul()": {
       "display-name": "RistrettoPoint::mul",
@@ -23523,6 +23805,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::ristretto::RistrettoPoint)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithMulSharedAScalarRistrettoPoint.mul",
@@ -23554,6 +23837,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::fmt::Debug for curve25519_dalek::ristretto::RistrettoPoint}::fmt"
     },
@@ -23589,6 +23873,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::compress",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.compress",
@@ -23615,6 +23900,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Neg<curve25519_dalek::ristretto::RistrettoPoint> for &'0 (curve25519_dalek::ristretto::RistrettoPoint)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg",
@@ -23623,7 +23909,7 @@
         "lines-end": 7211,
         "lines-start": 7205
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/&RistrettoPoint#impl<[EdwardsPoint;/{const}]>#[RistrettoPoint]coset4()": {
       "display-name": "RistrettoPoint::coset4",
@@ -23641,6 +23927,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::coset4",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.coset4",
@@ -23649,7 +23936,7 @@
         "lines-end": 6947,
         "lines-start": 6928
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/&Scalar#impl<&RistrettoBasepointTable>#[`&Scalar`][`Mul<&'a/RistrettoBasepointTable>`]mul()": {
       "display-name": "Scalar::mul",
@@ -23666,6 +23953,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'0 (curve25519_dalek::ristretto::RistrettoBasepointTable), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::scalar::Scalar)}::mul"
     },
@@ -23684,6 +23972,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Mul<&'0 (curve25519_dalek::ristretto::RistrettoPoint), curve25519_dalek::ristretto::RistrettoPoint> for &'1 (curve25519_dalek::scalar::Scalar)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedARistrettoPointRistrettoPoint.mul",
@@ -23712,6 +24001,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::VartimeRistrettoPrecomputation}::optional_mixed_multiscalar_mul"
     },
@@ -23730,6 +24020,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::VartimeRistrettoPrecomputation}::is_empty"
     },
@@ -23748,6 +24039,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::VartimeRistrettoPrecomputation}::len"
     },
@@ -23767,6 +24059,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::ops::arith::Neg<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::neg",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreOpsArithNegRistrettoPoint.neg",
@@ -23775,7 +24068,7 @@
         "lines-end": 7226,
         "lines-start": 7221
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/decompress/step_1()": {
       "display-name": "step_1",
@@ -23801,6 +24094,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::decompress::step_1",
       "translation-name": "probe:curve25519_dalek.ristretto.decompress.step_1",
@@ -23843,6 +24137,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::decompress::step_2",
       "translation-name": "probe:curve25519_dalek.ristretto.decompress.step_2",
@@ -23960,6 +24255,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::RistrettoPoint::random"
     },
@@ -23978,6 +24274,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoBasepointTable}::create"
     },
@@ -23997,6 +24294,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{subtle::ConditionallySelectable for curve25519_dalek::ristretto::RistrettoPoint}::conditional_select",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.SubtleConditionallySelectable.conditional_select",
@@ -24022,6 +24320,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::mul_base",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.mul_base",
@@ -24053,6 +24352,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::from_uniform_bytes",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.from_uniform_bytes",
@@ -24079,6 +24379,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::convert::TryFrom<core::array::TryFromSliceError> for curve25519_dalek::ristretto::CompressedRistretto}::try_from"
     },
@@ -24098,6 +24399,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::CompressedRistretto}::from_slice",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.from_slice",
@@ -24124,6 +24426,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::default::Default for curve25519_dalek::ristretto::CompressedRistretto}::default",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.CoreDefaultDefault.default",
@@ -24132,7 +24435,7 @@
         "lines-end": 6791,
         "lines-start": 6786
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/impl<CompressedRistretto>#[CompressedRistretto][Identity]identity()": {
       "display-name": "CompressedRistretto::identity",
@@ -24147,6 +24450,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::CompressedRistretto}::identity",
       "translation-name": "probe:curve25519_dalek.ristretto.CompressedRistretto.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -24176,6 +24480,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::iter::traits::accum::Sum<T0> for curve25519_dalek::ristretto::RistrettoPoint}::sum"
     },
@@ -24197,6 +24502,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::VartimePrecomputedMultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::VartimeRistrettoPrecomputation}::new"
     },
@@ -24218,6 +24524,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::MultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::multiscalar_mul"
     },
@@ -24239,6 +24546,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::VartimeMultiscalarMul<curve25519_dalek::ristretto::RistrettoPoint> for curve25519_dalek::ristretto::RistrettoPoint}::optional_multiscalar_mul"
     },
@@ -24258,6 +24566,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{core::default::Default for curve25519_dalek::ristretto::RistrettoPoint}::default",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.CoreDefaultDefault.default",
@@ -24266,7 +24575,7 @@
         "lines-end": 7087,
         "lines-start": 7082
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/ristretto/impl<RistrettoPoint>#[RistrettoPoint][Identity]identity()": {
       "display-name": "RistrettoPoint::identity",
@@ -24284,6 +24593,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::traits::Identity for curve25519_dalek::ristretto::RistrettoPoint}::identity",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity",
@@ -24327,6 +24637,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::ristretto::{curve25519_dalek::ristretto::RistrettoPoint}::elligator_ristretto_flavor",
       "translation-name": "probe:curve25519_dalek.ristretto.RistrettoPoint.elligator_ristretto_flavor",
@@ -24363,6 +24674,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::basepoint_roundtrip"
     },
@@ -24386,6 +24698,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::compress_id"
     },
@@ -24415,6 +24728,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::decompress_id"
     },
@@ -24437,6 +24751,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::decompress_negative_s_fails"
     },
@@ -24461,6 +24776,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::elligator_vs_ristretto_sage"
     },
@@ -24483,6 +24799,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::encodings_of_small_multiples_of_basepoint"
     },
@@ -24502,6 +24819,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::four_torsion_basepoint"
     },
@@ -24524,6 +24842,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::four_torsion_random"
     },
@@ -24551,6 +24870,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::impl_sum"
     },
@@ -24572,6 +24892,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::one_way_map"
     },
@@ -24602,6 +24923,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::partial_precomputed_mixed_multiscalar"
     },
@@ -24631,6 +24953,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::partial_precomputed_mixed_multiscalar_empty"
     },
@@ -24661,6 +24984,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::partial_precomputed_multiscalar"
     },
@@ -24689,6 +25013,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::partial_precomputed_multiscalar_empty"
     },
@@ -24714,6 +25039,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::random_roundtrip"
     },
@@ -24739,6 +25065,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::scalarmult_ristrettopoint_works_both_ways"
     },
@@ -24771,6 +25098,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::ristretto::vartime_precomputed_vs_nonprecomputed_multiscalar"
     },
@@ -24874,6 +25202,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{zeroize::Zeroize for curve25519_dalek::scalar::Scalar}::zeroize",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.ZeroizeZeroize.zeroize",
@@ -24882,7 +25211,7 @@
         "lines-end": 7716,
         "lines-start": 7708
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`AddAssign<&'a/Scalar>`]add_assign()": {
       "display-name": "Scalar::add_assign",
@@ -24900,6 +25229,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::AddAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::add_assign",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithAddAssignScalar.add_assign",
@@ -24908,7 +25238,7 @@
         "lines-end": 5216,
         "lines-start": 5211
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[Scalar][`MulAssign<&'a/Scalar>`]mul_assign()": {
       "display-name": "Scalar::mul_assign",
@@ -24931,6 +25261,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::MulAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::mul_assign",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignScalar.mul_assign",
@@ -24957,6 +25288,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::SubAssign<&'0 (curve25519_dalek::scalar::Scalar)> for curve25519_dalek::scalar::Scalar}::sub_assign",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithSubAssignScalar.sub_assign",
@@ -24965,7 +25297,7 @@
         "lines-end": 5479,
         "lines-start": 5474
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<&Scalar>#[`&Scalar`][`Add<&'a/Scalar>`]add()": {
       "display-name": "Scalar::add",
@@ -24987,6 +25319,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::Add<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &'1 (curve25519_dalek::scalar::Scalar)}::add",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add",
@@ -25017,6 +25350,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::Mul<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &'1 (curve25519_dalek::scalar::Scalar)}::mul",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul",
@@ -25047,6 +25381,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::Sub<&'0 (curve25519_dalek::scalar::Scalar), curve25519_dalek::scalar::Scalar> for &'1 (curve25519_dalek::scalar::Scalar)}::sub",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub",
@@ -25072,6 +25407,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{subtle::ConstantTimeEq for curve25519_dalek::scalar::Scalar}::ct_eq",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConstantTimeEq.ct_eq",
@@ -25099,6 +25435,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::cmp::PartialEq<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::eq",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq",
@@ -25122,6 +25459,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::fmt::Debug for curve25519_dalek::scalar::Scalar}::fmt"
     },
@@ -25143,6 +25481,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::is_canonical",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.is_canonical",
@@ -25173,6 +25512,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.invert",
@@ -25205,6 +25545,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.reduce",
@@ -25239,6 +25580,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::Neg<curve25519_dalek::scalar::Scalar> for &'0 (curve25519_dalek::scalar::Scalar)}::neg",
       "translation-name": "probe:curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
@@ -25265,6 +25607,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::unpack",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.unpack",
@@ -25290,6 +25633,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_16",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.as_radix_16",
@@ -25336,6 +25680,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_radix_2w",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.as_radix_2w",
@@ -25380,6 +25725,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::non_adjacent_form",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.non_adjacent_form",
@@ -25388,7 +25734,7 @@
         "lines-end": 8054,
         "lines-start": 8034
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/&Scalar#impl<[u8;/{const}]>#[Scalar]as_bytes()": {
       "display-name": "Scalar::as_bytes",
@@ -25403,6 +25749,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::as_bytes",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.as_bytes",
@@ -25426,6 +25773,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_bytes",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.to_bytes",
@@ -25451,6 +25799,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::index::Index for curve25519_dalek::scalar::Scalar}::index",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsIndexIndexUsizeU8.index",
@@ -25459,7 +25808,7 @@
         "lines-end": 690,
         "lines-start": 685
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/&Scalar52#impl<Scalar>#[`backend::serial::u64::scalar::Scalar52`]pack()": {
       "display-name": "backend::serial::u64::scalar::Scalar52::pack",
@@ -25477,6 +25826,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::pack",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar52.pack",
@@ -25507,6 +25857,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::invert",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar52.invert",
@@ -25536,6 +25887,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::backend::serial::u64::scalar::Scalar52}::montgomery_invert",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar52.montgomery_invert",
@@ -25562,6 +25914,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::ops::arith::Neg<curve25519_dalek::scalar::Scalar> for curve25519_dalek::scalar::Scalar}::neg",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithNegScalar.neg",
@@ -25588,6 +25941,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::bot_half"
     },
@@ -25609,6 +25963,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::clamp_integer",
       "translation-name": "probe:curve25519_dalek.scalar.clamp_integer",
@@ -25756,6 +26111,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::Scalar::random"
     },
@@ -25776,6 +26132,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{subtle::ConditionallySelectable for curve25519_dalek::scalar::Scalar}::conditional_select",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select",
@@ -25822,6 +26179,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.batch_invert",
@@ -25830,7 +26188,7 @@
         "lines-end": 7929,
         "lines-start": 7903
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/impl<&[u8;/{const}]>#[Scalar]from_bytes_mod_order_wide()": {
       "display-name": "Scalar::from_bytes_mod_order_wide",
@@ -25850,6 +26208,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order_wide",
@@ -25877,6 +26236,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::iter::traits::accum::Product<T0> for curve25519_dalek::scalar::Scalar}::product"
     },
@@ -25897,6 +26257,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::iter::traits::accum::Sum<T0> for curve25519_dalek::scalar::Scalar}::sum"
     },
@@ -25913,6 +26274,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::default::Default for curve25519_dalek::scalar::Scalar}::default",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreDefaultDefault.default",
@@ -25921,7 +26283,7 @@
         "lines-end": 7577,
         "lines-start": 7573
       },
-      "verification-status": "verified"
+      "verification-status": "unverified"
     },
     "probe:curve25519-dalek/4.2.0/scalar/impl<[u8;/{const}]>#[Scalar]from_bytes_mod_order()": {
       "display-name": "Scalar::from_bytes_mod_order",
@@ -25941,6 +26303,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.from_bytes_mod_order",
@@ -25972,6 +26335,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_canonical_bytes",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.from_canonical_bytes",
@@ -26000,6 +26364,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::convert::From for curve25519_dalek::scalar::Scalar}::from",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from",
@@ -26028,6 +26393,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::convert::From for curve25519_dalek::scalar::Scalar}::from",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from",
@@ -26056,6 +26422,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::convert::From for curve25519_dalek::scalar::Scalar}::from",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from",
@@ -26084,6 +26451,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::convert::From for curve25519_dalek::scalar::Scalar}::from",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from",
@@ -26109,6 +26477,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{core::convert::From for curve25519_dalek::scalar::Scalar}::from",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from",
@@ -26138,6 +26507,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::to_radix_2w_size_hint",
       "translation-name": "probe:curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint",
@@ -26170,6 +26540,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::read_le_u64_into",
       "translation-name": "probe:curve25519_dalek.scalar.read_le_u64_into",
@@ -26202,6 +26573,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::square_multiply"
     },
@@ -26220,6 +26592,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::add_reduces"
     },
@@ -26252,6 +26625,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::batch_invert_consistency"
     },
@@ -26271,6 +26645,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::batch_invert_empty"
     },
@@ -26291,6 +26666,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::batch_invert_with_a_zero_input_panics"
     },
@@ -26315,6 +26691,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::canonical_decoding"
     },
@@ -26338,6 +26715,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::from_bytes_mod_order_wide"
     },
@@ -26359,6 +26737,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::from_u64"
     },
@@ -26384,6 +26763,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::fuzzer_testcase_reduction"
     },
@@ -26404,6 +26784,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::impl_add"
     },
@@ -26422,6 +26803,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::impl_mul"
     },
@@ -26448,6 +26830,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::impl_product"
     },
@@ -26474,6 +26857,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::impl_sum"
     },
@@ -26494,6 +26878,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::invert"
     },
@@ -26525,6 +26910,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::montgomery_reduce_matches_from_bytes_mod_order_wide"
     },
@@ -26544,6 +26930,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::neg_twice_is_identity"
     },
@@ -26573,6 +26960,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::non_adjacent_form_iter"
     },
@@ -26594,6 +26982,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::non_adjacent_form_random"
     },
@@ -26614,6 +27003,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::non_adjacent_form_test_vector"
     },
@@ -26633,6 +27023,7 @@
       "language": "rust",
       "is-disabled": false,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": true,
       "rust-qualified-name": "curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::reduce"
     },
@@ -26653,6 +27044,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::scalar_mul_by_one"
     },
@@ -26679,6 +27071,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::square"
     },
@@ -26697,6 +27090,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::sub_reduces"
     },
@@ -26721,6 +27115,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_mul_reduction_invariance"
     },
@@ -26746,6 +27141,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_pippenger_radix"
     },
@@ -26782,6 +27178,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_pippenger_radix_iter"
     },
@@ -26802,6 +27199,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_read_le_u64_into"
     },
@@ -26821,6 +27219,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_read_le_u64_into_should_panic_on_bad_input"
     },
@@ -26840,6 +27239,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_scalar_clamp"
     },
@@ -26873,6 +27273,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::test_scalar_from_int"
     },
@@ -26896,6 +27297,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::to_bytes_from_bytes_roundtrips"
     },
@@ -26928,6 +27330,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": false,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::scalar::top_half"
     },
@@ -27026,6 +27429,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::BasepointTable::mul_base_clamped"
     },
@@ -27049,6 +27453,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::VartimePrecomputedMultiscalarMul::vartime_mixed_multiscalar_mul"
     },
@@ -27068,6 +27473,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::VartimePrecomputedMultiscalarMul::vartime_multiscalar_mul"
     },
@@ -27088,6 +27494,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::{curve25519_dalek::traits::IsIdentity for T0}::is_identity"
     },
@@ -27119,6 +27526,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::BasepointTable::create"
     },
@@ -27135,6 +27543,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::Identity::identity"
     },
@@ -27151,6 +27560,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::MultiscalarMul::multiscalar_mul"
     },
@@ -27167,6 +27577,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::VartimeMultiscalarMul::optional_multiscalar_mul"
     },
@@ -27190,6 +27601,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::VartimeMultiscalarMul::vartime_multiscalar_mul"
     },
@@ -27221,6 +27633,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": true,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::traits::VartimePrecomputedMultiscalarMul::new"
     },
@@ -27237,6 +27650,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::fmt::Debug for curve25519_dalek::window::NafLookupTable5}::fmt"
     },
@@ -27258,6 +27672,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{curve25519_dalek::window::NafLookupTable5}::select"
     },
@@ -27277,6 +27692,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::fmt::Debug for curve25519_dalek::window::NafLookupTable8}::fmt"
     },
@@ -27298,6 +27714,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{curve25519_dalek::window::NafLookupTable8}::select"
     },
@@ -27356,6 +27773,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::convert::From<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::NafLookupTable5}::from"
     },
@@ -27384,6 +27802,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::convert::From<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::NafLookupTable5}::from"
     },
@@ -27412,6 +27831,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::convert::From<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::NafLookupTable8}::from"
     },
@@ -27440,6 +27860,7 @@
       "language": "rust",
       "is-disabled": true,
       "is-public": true,
+      "is-public-api": false,
       "is-relevant": false,
       "rust-qualified-name": "curve25519_dalek::window::{core::convert::From<&'0 (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::NafLookupTable8}::from"
     },
