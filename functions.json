@@ -6254,7 +6254,7 @@
     "curve25519_dalek.backend.serial.u64.constants.EDWARDS_D2",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul"]},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem compress_spec (self : EdwardsPoint) (hself : self.IsValid) :\n    compress self ⦃ result =>\n      U8x32_as_Nat result = compress_edwards_pure self.toPoint ⦄ := by ...",
@@ -6271,7 +6271,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.to_affine",
     "curve25519_dalek.edwards.affine.AffinePoint.compress"]},

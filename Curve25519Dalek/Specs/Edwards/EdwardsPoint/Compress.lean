@@ -7,6 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.ExternallyVerified
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.ToAffine
+import Curve25519Dalek.Specs.Edwards.Affine.AffinePoint.Compress
 
 /-! # Spec Theorem for `EdwardsPoint::compress`
 
@@ -50,10 +52,13 @@ Natural language specs:
   corresponding abstract point:
   `U8x32_as_Nat result = compress_edwards_pure self.toPoint`.
 -/
-@[externally_verified, step] -- proven in Verus
+@[step]
 theorem compress_spec (self : EdwardsPoint) (hself : self.IsValid) :
     compress self ⦃ result =>
       U8x32_as_Nat result = compress_edwards_pure self.toPoint ⦄ := by
-  sorry
+  unfold compress
+  let* ⟨ap, h_valid, h_point⟩ ← to_affine_spec _ hself
+  let* ⟨res, h_res⟩ ← affine.AffinePoint.compress_spec _ h_valid
+  rw [h_res, h_point]
 
 end curve25519_dalek.edwards.EdwardsPoint
