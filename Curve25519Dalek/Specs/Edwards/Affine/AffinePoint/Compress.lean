@@ -47,7 +47,7 @@ Natural language specs:
       in bit 255
 -/
 
-set_option maxHeartbeats 600000 in -- heavy step
+
 /-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:
 - Requires: the AffinePoint is valid (limbs < 2^54, on curve)
 - Ensures: the compressed bytes equal the pure mathematical compression of the point

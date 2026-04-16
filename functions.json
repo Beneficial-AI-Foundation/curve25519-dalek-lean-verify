@@ -6413,7 +6413,7 @@
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2"]},
   {"visibility": null,
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32)\n    (hself : self.IsValid) (hk : k.val > 0) :\n    mul_by_pow_2 self k ⦃ result =>\n      result.IsValid ∧\n      result.toPoint = (2 ^ k.val) • self.toPoint ⦄ := by ...",
@@ -6430,7 +6430,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective",
     "curve25519_dalek.edwards.EdwardsPoint.mul_by_pow_2_loop",
