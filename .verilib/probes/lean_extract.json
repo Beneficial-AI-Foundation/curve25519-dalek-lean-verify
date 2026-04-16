@@ -1,12 +1,12 @@
 {"tool": {"version": "0.6.1", "name": "probe-lean", "command": "extract"},
- "timestamp": "2026-04-15T18:30:44Z",
+ "timestamp": "2026-04-16T19:29:54Z",
  "source":
  {"repo":
   "https://github.com/Beneficial-AI-Foundation/curve25519-dalek-lean-verify.git",
   "package-version": "0.1.0",
   "package": "Curve25519Dalek",
   "language": "lean",
-  "commit": "a567a6b4c0b060fa475d992b904889e0c92dcf8b"},
+  "commit": "8aad9ca5d55adcc730529567b552417c08b24ccf"},
  "schema-version": "2.0",
  "schema": "probe-lean/extract",
  "data":
