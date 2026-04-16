@@ -167,7 +167,7 @@ Axioms — propositions assumed without proof.
 - `probe:curve25519_dalek.subtle.CtOption.value` (external)
 - `probe:curve25519_dalek.zeroize.Zeroize.Blanket.zeroize` (external)
 
-## 4. Unverified and failed functions (65)
+## 4. Unverified rust functions (65)
 
 - `probe:Edwards.add_assoc_Ed25519`
 - `probe:Edwards.complete_addition_denominators_ne_zero`
