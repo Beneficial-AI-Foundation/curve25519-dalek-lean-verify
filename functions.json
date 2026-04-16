@@ -11018,7 +11018,7 @@
    "lines": "L788-L845",
    "lean_name": "curve25519_dalek.scalar.Scalar.batch_invert",
    "is_relevant": true,
-   "is_ignored": true,
+   "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
