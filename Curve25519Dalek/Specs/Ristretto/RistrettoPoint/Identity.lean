@@ -1,40 +1,29 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 
-/-! # Spec Theorem for `RistrettoPoint::identity`
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::identity`
 
-Specification and proof for the `Identity` trait implementation for `RistrettoPoint`.
+Returns the identity element of the Ristretto group by delegating to
+`EdwardsPoint::identity`, which produces the point with coordinates
+(X=0, Y=1, Z=1, T=0).
 
-This function returns the identity element of the Ristretto group by delegating to the
-underlying Edwards point identity.
-
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 namespace curve25519_dalek.ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity
 
-/-
-natural language description:
-
-- Returns the identity element of the Ristretto group
-- Delegates to `EdwardsPoint::identity` which returns (X=0, Y=1, Z=1, T=0)
-
-natural language specs:
-
-- The function always succeeds (no panic)
-- The resulting RistrettoPoint has coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
--/
-
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
-- No panic (always returns successfully)
-- The resulting RistrettoPoint is the identity element with coordinates (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
+/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::identity`**
+• No panic (always returns successfully)
+• The resulting RistrettoPoint is the identity element with coordinates
+  (X=ZERO, Y=ONE, Z=ONE, T=ZERO)
 -/
 @[step]
 theorem identity_spec :
