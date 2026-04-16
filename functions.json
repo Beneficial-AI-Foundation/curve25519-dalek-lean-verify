@@ -6836,7 +6836,7 @@
    ["curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreMarkerCopy",
     "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreDefaultDefault"]},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :\n    compress self ⦃ result =>\n    U8x32_as_Nat result = compress_edwards_pure (self.toPoint) ⦄ := by ...",
@@ -6853,8 +6853,8 @@
    "is_ignored": false,
    "is_hidden": false,
    "is_extraction_artifact": false,
-   "fully_verified": false,
-   "externally_verified": true,
+   "fully_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.field.FieldElement51.to_bytes",
     "curve25519_dalek.field.FieldElement51.is_negative"]},

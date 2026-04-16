@@ -52,7 +52,7 @@ set_option maxHeartbeats 600000 in -- heavy step
 - Requires: the AffinePoint is valid (limbs < 2^54, on curve)
 - Ensures: the compressed bytes equal the pure mathematical compression of the point
 -/
-@[externally_verified, step] -- proven in Verus
+@[step]
 theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
     compress self ⦃ result =>
     U8x32_as_Nat result = compress_edwards_pure (self.toPoint) ⦄ := by
@@ -128,7 +128,22 @@ theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :
       have h_i1_eq : i1 = 128#u8 := UScalar.eq_of_val_eq h_i1_val
       rw [i3_post1, h_i1_eq]
       simp only [UScalar.val_xor, UScalar.ofNatCore_val_eq]
-      sorry
+      -- Goal: ↑i2 ^^^ 128 = ↑i2 + 128 (Nat XOR, n < 128 = 2^7)
+      rw [show (128 : ℕ) = 2 ^ 7 from by norm_num]
+      apply Nat.eq_of_testBit_eq; intro k
+      simp only [Nat.testBit_xor, Nat.testBit_two_pow]
+      by_cases hk : k < 7
+      · simp only [ReduceNat.reduceNatEq, Nat.ne_of_lt hk, decide_false, Bool.bne_false]
+        exact (Aeneas.SimpScalar.Nat.testBit_add_two_pow_gt hk _).symm
+      · by_cases hk7 : k = 7
+        · subst hk7
+          rw [Aeneas.SimpScalar.Nat.testBit_add_two_pow_eq' _ 7 7 rfl,
+              Nat.testBit_eq_false_of_lt h_lt']; simp
+        · have hk8 : k ≥ 8 := by omega
+          have hpow : 2 ^ 8 ≤ 2 ^ k := Nat.pow_le_pow_right (by norm_num) hk8
+          rw [Nat.testBit_eq_false_of_lt (by omega),
+              Nat.testBit_eq_false_of_lt (by omega)]
+          simp [Nat.ne_of_gt (by omega : k > 7)]
     -- Sum decomposition of U8x32_as_Nat s (split off byte 31)
     have h_orig : U8x32_as_Nat s =
         (∑ j ∈ Finset.range 31, 2^(8*j) * (s.val[j]!).val) + 2^248 * (↑s)[31]!.val := by
