@@ -11664,7 +11664,7 @@
    ["curve25519_dalek.edwards.EdwardsPoint.as_projective_niels",
     "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop"]},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_loop_spec\n    (P : EdwardsPoint) (hP : P.IsValid)\n    (iter : core.ops.range.Range Std.Usize)\n    (points : Array ProjectiveNielsPoint 8#usize)\n    (h_start : iter.start.val ≤ 7) (h_end : iter.«end».val = 7)\n    (h_prefix_valid : ∀ (k : Fin 8), k.val < iter.start.val + 1 → points.val[k].IsValid)\n    (h_prefix_point : ∀ (k : Fin 8), k.val < iter.start.val + 1 →\n        points.val[k].toPoint = (k.val + 1) • P.toPoint) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop\n        iter P points ⦃ (result : Array ProjectiveNielsPoint 8#usize) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
