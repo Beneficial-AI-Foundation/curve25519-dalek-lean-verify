@@ -161,8 +161,7 @@ theorem from_loop_spec
     -- Step 3: CompletedPoint.as_extended — ep (extended form of cp)
     step as ⟨ep, hep1, hep2, hep3, hep4, hep5, hep6, hep7, hep_valid, hep_eq, hep_cp⟩
     -- Step 4: EdwardsPoint.as_projective_niels — pnp1 (niels form of ep)
-    step as ⟨pnp, hpnp1, hpnp2, hpnp3, hpnp4, hpnp1_valid, hpnp1_eq⟩
-    -- rename_i pnp1
+    step as ⟨pnp1, _, _, _, _, _, hpnp1_valid, hpnp1_eq⟩
     -- Step 5: i_next = j + 1
     step as ⟨i_next, hi_next_val⟩
     -- Step 6: Array.update — a = points.set i_next pnp1
@@ -170,88 +169,54 @@ theorem from_loop_spec
       have : i_next.val = j.val + 1 := by scalar_tac
       omega
     let* ⟨ a, a_post1, a_post2 ⟩ ← Array_PNP_8_update_spec
-    let* ⟨ result, result_post1, result_post2 ⟩ ← from_loop_spec
-    · sorry
-    · sorry
+    -- Normalize Aeneas Array `[·]!` to List `[·]!` so the invariant's Fin access bridges cleanly.
+    simp only [Array.getElem!_Nat_eq] at a_post1 a_post2
+    -- General bridge: Fin-index on a PNP array of length 8 equals List getElem!.
+    have ha_bridge : ∀ (arr : Array ProjectiveNielsPoint 8#usize) (k : Fin 8),
+        (↑arr : List ProjectiveNielsPoint)[k] = (↑arr : List ProjectiveNielsPoint)[k.val]! := by
+      intro arr k
+      have hkl : k.val < (↑arr : List ProjectiveNielsPoint).length := by
+        have := arr.2; simp_all
+      rw [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem hkl, Option.getD_some]
+      agrind only [= Fin.getElem_fin]
+    have hiter1_start_val : iter1.start.val = j.val + 1 := by rw [hiter1_start, hj_val]
+    have hi_next_val_eq : i_next.val = j.val + 1 := hi_next_val
+    -- Preconditions for the recursive call.
+    have h_start' : iter1.start.val ≤ 7 := by rw [hiter1_start_val]; omega
+    have h_end' : iter1.«end».val = 7 := by rw [hiter1_end]; exact h_end
+    have h_prefix_valid' : ∀ (k : Fin 8), k.val < iter1.start.val + 1 →
+        (↑a : List ProjectiveNielsPoint)[k].IsValid := by
+      intro k hk
+      rw [hiter1_start_val] at hk
+      rw [ha_bridge a k]
+      by_cases hkeq : k.val = i_next.val
+      · rw [hkeq, a_post2]
+        exact hpnp1_valid
+      · rw [a_post1 k.val hkeq, ← ha_bridge points k]
+        apply h_prefix_valid k
+        omega
+    have h_prefix_point' : ∀ (k : Fin 8), k.val < iter1.start.val + 1 →
+        (↑a : List ProjectiveNielsPoint)[k].toPoint = (k.val + 1) • P.toPoint := by
+      intro k hk
+      rw [hiter1_start_val] at hk
+      rw [ha_bridge a k]
+      by_cases hkeq : k.val = i_next.val
+      · -- k = i_next = j+1: pnp1.toPoint = ep.toPoint = cp.toPoint
+        --                  = P.toPoint + pnp.toPoint = P.toPoint + (j+1)•P = (j+2)•P = (k+1)•P
+        rw [hkeq, a_post2, ← hpnp1_eq, hep_cp, hcp_eq, hpnp_point, hi_next_val]
+        rw [show (↑j + 1 + 1 : ℕ) • P.toPoint = (↑j + 1) • P.toPoint + P.toPoint
+            from succ_nsmul _ _]
+        rw [add_comm]
+      · rw [a_post1 k.val hkeq, ← ha_bridge points k]
+        apply h_prefix_point k
+        omega
+    apply spec_mono (from_loop_spec P hP iter1 a h_start' h_end' h_prefix_valid' h_prefix_point')
+    intro result hresult
+    exact hresult
+  termination_by iter.«end».val - iter.start.val
+  decreasing_by
+    rw [hiter1_start, hiter1_end]
     agrind
-
-    -- step with Array_PNP_8_update_spec points i_next hpnp1 hi_next_lt8
-    --   as ⟨a, ha_other, ha_curr⟩
-    -- Establish new invariants for iter1
-    -- have hiter1_start_val : iter1.start.val = j.val + 1 := by
-    --   rw [hiter1_start, hj_val]
-    -- have hi_next_val_eq : i_next.val = j.val + 1 := by scalar_tac
-    -- -- Prefix IsValid for iter1
-    -- have h_prefix_valid' : ∀ (k : Fin 8), k.val < iter1.start.val + 1 →
-    --     a.val[k].IsValid := by
-    --   intro k hk
-    --   rw [hiter1_start_val] at hk
-    --   by_cases hkeq : k.val = i_next.val
-    --   · -- k = i_next = j + 1: a[k] = pnp1
-    --     have h1 : a.val[k] = pnp1 := by
-    --       have := ha_curr
-    --       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, getElem?_pos,
-    --         Option.getD_some] at this
-    --       rw [hkeq] at *
-    --       have hkFin : k.val = i_next.val := hkeq
-    --       -- a.val[k] = a.val[i_next.val] = pnp1
-    --       rw [show k.val = i_next.val from hkeq] at *
-    --       exact this
-    --     rw [h1]; exact hpnp1_valid
-    --   · -- k ≠ i_next: a[k] = points[k], use h_prefix_valid
-    --     have h1 : a.val[k] = points.val[k] := by
-    --       have := ha_other k.val hkeq
-    --       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, getElem?_pos,
-    --         Option.getD_some] at this
-    --       exact this
-    --     rw [h1]
-    --     apply h_prefix_valid k
-    --     omega
-    -- -- Prefix toPoint for iter1
-    -- have h_prefix_point' : ∀ (k : Fin 8), k.val < iter1.start.val + 1 →
-    --     a.val[k].toPoint = (k.val + 1) • P.toPoint := by
-    --   intro k hk
-    --   rw [hiter1_start_val] at hk
-    --   by_cases hkeq : k.val = i_next.val
-    --   · -- k = j + 1: a[k] = pnp1, derive pnp1.toPoint = (j+2) • P
-    --     have h1 : a.val[k] = pnp1 := by
-    --       have := ha_curr
-    --       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, getElem?_pos,
-    --         Option.getD_some] at this
-    --       rw [show k.val = i_next.val from hkeq] at *
-    --       exact this
-    --     rw [h1]
-    --  -- Build the chain: pnp1.toPoint = ep.toPoint = cp.toPoint = P + pnp = P + (j+1)•P = (j+2)•P
-    --     rw [← hpnp1_eq, hep_eq, hcp_eq, hpnp_point]
-    --     -- (j.val + 1) • P.toPoint + P.toPoint = (j.val + 2) • P.toPoint
-    --     have hkval : k.val = j.val + 1 := by rw [hkeq]; exact hi_next_val_eq
-    --     rw [hkval]
-    --     rw [show j.val + 1 + 1 = j.val + 2 from rfl]
-    --     rw [add_comm P.toPoint]
-    --     rw [show (j.val + 2 : ℕ) • P.toPoint = (j.val + 1) • P.toPoint + P.toPoint by
-    --       rw [show j.val + 2 = (j.val + 1) + 1 from rfl, succ_nsmul]]
-    --   · -- k ≠ j + 1: a[k] = points[k], use h_prefix_point
-    --     have h1 : a.val[k] = points.val[k] := by
-    --       have := ha_other k.val hkeq
-    --       simp only [Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD, getElem?_pos,
-    --         Option.getD_some] at this
-    --       exact this
-    --     rw [h1]
-    --     apply h_prefix_point k
-    --     omega
-    -- -- Preconditions for the IH
-    -- have h_start' : iter1.start.val ≤ 7 := by
-    --   rw [hiter1_start_val]; omega
-    -- have h_end' : iter1.«end».val = 7 := by
-    --   rw [hiter1_end]; exact h_end
-    -- -- Apply the IH
-    -- apply spec_mono
-    --   (from_loop_spec P hP iter1 a h_start' h_end' h_prefix_valid' h_prefix_point')
-    -- intro result hresult
-    -- exact hresult
-    -- simp_wf
-    -- rw [hiter1_start, hiter1_end]
-    -- omega
 
 /-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::from`**:
 - No panic (always returns successfully).
