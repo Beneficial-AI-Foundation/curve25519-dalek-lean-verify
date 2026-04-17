@@ -7036,10 +7036,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n      (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 self ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result % p = (Field51_as_Nat self ^ pow_p58_exp) % p ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
+   "/-- **Spec theroem for `field.FieldElement51.pow_p58`**:\n- Field51_as_Nat(result) ≡ Field51_as_Nat(self)^(2^252-3) (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
