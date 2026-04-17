@@ -205,6 +205,7 @@ import Curve25519Dalek.Specs.Scalar.Scalar.ToRadix2wSizeHint
 import Curve25519Dalek.Specs.Scalar.Scalar.Unpack
 import Curve25519Dalek.Specs.Scalar.Scalar.Zero
 import Curve25519Dalek.Specs.Window.LookupTable.From
+import Curve25519Dalek.Specs.Window.LookupTable.Select
 import Curve25519Dalek.Tactics
 import Curve25519Dalek.Types
 import Curve25519Dalek.TypesAux

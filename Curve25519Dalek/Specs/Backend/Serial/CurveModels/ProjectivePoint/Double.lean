@@ -348,13 +348,14 @@ theorem double_spec_core
             (q.toPoint' hq_on).y) := by
             rw [h_qx, h_qy]; simp only [Ed25519]; ring
 
-/-- Verification of the `double` function for `ProjectivePoint`.
+/-- Verification of the `double` function for `ProjectivePoint` in WP form.
 Thin wrapper over `double_spec_core`: widens bounds from `< 2^52`
 to `< 2^53` and bridges `toPoint' → toPoint`. -/
+@[step]
 theorem double_spec
     (q : ProjectivePoint) (hq_valid : q.IsValid) :
-    ∃ c, ProjectivePoint.double q = ok c ∧
-    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
+    ProjectivePoint.double q ⦃ (c : CompletedPoint) =>
+      c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint ⦄ := by
   obtain ⟨c, h_run, h_c_valid, h_eq⟩ := double_spec_core q
     hq_valid.toOnCurve
     (fun i hi => Nat.lt_trans (hq_valid.X_bounds i hi)
@@ -363,8 +364,9 @@ theorem double_spec
       (by norm_num : 2 ^ 52 < 2 ^ 53))
     (FieldElement51.IsValid_of_lt_pow hq_valid.Z_bounds
       (by decide))
-  exact ⟨c, h_run, h_c_valid, by
+  have h_eq' : c.toPoint = q.toPoint + q.toPoint := by
     simp only [toPoint, dif_pos hq_valid, toPoint'] at h_eq ⊢
-    exact h_eq⟩
+    exact h_eq
+  simp only [h_run, spec_ok, h_c_valid, h_eq', and_self]
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint
