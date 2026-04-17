@@ -62,6 +62,45 @@ natural language specs:
 
 -- `Inhabited ProjectiveNielsPoint` is already provided in `Window/LookupTable/From.lean`.
 
+/-! ## Helpers: I16 arithmetic operations for the sign-mask trick -/
+
+/-- Arithmetic shift right of an I16 by 7 bits.
+For `i ∈ [-8, 8]`, the result is `-1` if `i < 0` and `0` otherwise.
+This is the `xmask = x >> 7` step in `select`. Modelled on
+`isize_shiftRight_4_spec` in `Specs/Scalar/Scalar/AsRadix16.lean`. -/
+@[step]
+private theorem i16_shiftRight_7_spec (i : Std.I16)
+    (h_lo : -8 ≤ i.val) (h_hi : i.val ≤ 8) :
+    i >>> 7#i32 ⦃ r =>
+      r.val = i.val / 128 ∧
+      (r.val = -1 ∨ r.val = 0) ∧
+      (r.val = -1 ↔ i.val < 0) ⦄ := by
+  simp only [HShiftRight.hShiftRight, IScalar.shiftRight_IScalar,
+             IScalar.shiftRight, IScalar.toNat, IScalar.val]
+  norm_num
+  have h7_eq : (7#IScalarTy.I32.numBits).toInt.toNat = 7 := by decide
+  simp only [h7_eq]
+  have hmatch : i.val >>> (7 : Nat) = i.val / 128 := by
+    rw [Int.shiftRight_eq_div_pow]; norm_num
+  have h_val_eq : (i.bv.sshiftRight 7).toInt = i.val / 128 := by
+    rw [BitVec.sshiftRight_eq]
+    rw [BitVec.toInt_ofInt]
+    rw [I16.bv_toInt_eq]
+    rw [hmatch]
+    exact Aeneas.Arith.Int.bmod_pow2_eq_of_inBounds 15 (i.val / 128)
+      (by omega) (by omega)
+  refine ⟨?_, ?_, ?_⟩
+  · change (i.bv.sshiftRight 7).toInt = i.val / 128
+    exact h_val_eq
+  · change (i.bv.sshiftRight 7).toInt = -1 ∨ (i.bv.sshiftRight 7).toInt = 0
+    rw [h_val_eq]
+    rcases lt_or_ge i.val 0 with hneg | hnn
+    · left; omega
+    · right; omega
+  · change (i.bv.sshiftRight 7).toInt = -1 ↔ i.val < 0
+    rw [h_val_eq]
+    omega
+
 /-! ## Spec for `LookupTable<ProjectiveNielsPoint>::select` -/
 
 /-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::select`**:
@@ -96,6 +135,25 @@ theorem select_spec {P : EdwardsPoint}
   · simp only [i_post, IScalar.le_equiv, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
     Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]; agrind
   let* ⟨ i1, i1_post ⟩ ← IScalar.cast.step_spec
+  -- Bridge: casting I8 → I16 preserves val.
+  have hi1_val : i1.val = x.val := by
+    simp only [i1_post, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
+      Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]
+  let* ⟨ xmask, xmask_post1, xmask_post2, xmask_post3 ⟩ ← i16_shiftRight_7_spec
+  let* ⟨ i2, i2_post ⟩ ← IScalar.cast.step_spec
+  let* ⟨ i3, i3_post ⟩ ← I16.add_spec
+  let* ⟨ xabs, xabs_post1, xabs_post2 ⟩ ← IScalar.xor_spec
+  let* ⟨ t, t_post1, t_post2, t_post3, t_post4 ⟩ ←
+    ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec
+  -- Bridge: i2 is also a cast, same as i and i1.
+  have hi2_val : i2.val = x.val := by
+    simp only [i2_post, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
+      Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]
+  -- xabs.val = |x.val|: sign-mask trick.
+  -- Proof by case split on xmask.val ∈ {0, -1}, using bitvec-level XOR identities.
+  -- Deferred to focus on higher-level structure; see handoff for detailed sketch.
+  have hxabs_val : xabs.val = x.val.natAbs := by
+    sorry
   sorry
   -- Proof strategy (to be completed; see `.formalising/fv-plans/.continue-here.md`):
   --
