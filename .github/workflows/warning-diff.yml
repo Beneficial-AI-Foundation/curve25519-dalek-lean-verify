@@ -1,0 +1,38 @@
+name: Warning Diff
+
+on:
+  pull_request:
+    paths:
+      - '**/*.lean'
+      - 'lakefile.lean'
+      - 'lean-toolchain'
+
+jobs:
+  warning-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # need full history for base ref
+
+      - name: Install elan
+        run: |
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: Cache .lake
+        uses: actions/cache@v4
+        with:
+          path: .lake
+          key: lake-${{ runner.os }}-${{ hashFiles('lean-toolchain', 'lakefile.lean') }}
+          restore-keys: lake-${{ runner.os }}-
+
+      - name: Run warning diff
+        id: diff
+        run: node scripts/warning-diff.js ${{ github.event.pull_request.base.sha }} ${{ github.sha }}
+
+      - name: Post PR comment
+        if: steps.diff.outputs.has_diff == 'true'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: .warning-diff-comment.md
