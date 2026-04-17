@@ -11642,10 +11642,12 @@
    "dependencies": []},
   {"visibility": "public",
    "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem from_spec (P : EdwardsPoint) (hP : P.IsValid) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from\n        P ⦃ (result : window.LookupTable ProjectiveNielsPoint) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/From.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::from`**:\n- No panic (always returns successfully).\n- Every entry of the resulting 8-element lookup table is a valid `ProjectiveNielsPoint`.\n- For each k ∈ {0, 1, ..., 7}, the k-th entry represents `(k+1) • P` on the Ed25519 curve. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from",
@@ -11663,10 +11665,12 @@
     "curve25519_dalek.window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop"]},
   {"visibility": "public",
    "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem from_loop_spec\n    (P : EdwardsPoint) (hP : P.IsValid)\n    (iter : core.ops.range.Range Std.Usize)\n    (points : Array ProjectiveNielsPoint 8#usize)\n    (h_start : iter.start.val ≤ 7) (h_end : iter.«end».val = 7)\n    (h_prefix_valid : ∀ (k : Fin 8), k.val < iter.start.val + 1 → points.val[k].IsValid)\n    (h_prefix_point : ∀ (k : Fin 8), k.val < iter.start.val + 1 →\n        points.val[k].toPoint = (k.val + 1) • P.toPoint) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop\n        iter P points ⦃ (result : Array ProjectiveNielsPoint 8#usize) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/From.lean",
+   "spec_docstring":
+   "/-- Loop spec for `from_loop`: given a `points` array whose prefix `[0, iter.start.val]`\n(i.e. `iter.start.val + 1` entries) already holds `[P, 2P, ..., (iter.start.val + 1)P]` as\nvalid `ProjectiveNielsPoint`s, the loop extends the prefix to cover all 8 indices.\n\nLoop invariant at entry: for every `k ≤ iter.start.val`, `points[k].IsValid` and\n`points[k].toPoint = (k + 1) • P.toPoint`. At exit, the invariant holds up to index 7.\n\nThe loop body computes\n`points[j+1] = (P + points[j]).as_extended().as_projective_niels()`\nwhich turns `(j+1)·P` at index `j` into `(j+2)·P` at index `j+1`. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from",
