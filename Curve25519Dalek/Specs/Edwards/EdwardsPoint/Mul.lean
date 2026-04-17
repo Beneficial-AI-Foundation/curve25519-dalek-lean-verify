@@ -62,6 +62,9 @@ theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
     mul e s ⦃ result =>
     result.IsValid ∧
     result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint ⦄ := by
+  unfold mul backend.variable_base_mul
+  simp only [step_simps]
+
   sorry
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint

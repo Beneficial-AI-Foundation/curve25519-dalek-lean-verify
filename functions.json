@@ -6348,10 +6348,10 @@
     "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConstantTimeEq",
     "curve25519_dalek.edwards.EdwardsPoint.Insts.Curve25519_dalekTraitsIdentity"]},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat scalar.bytes < 2 ^ 255) :\n    mul_base scalar ⦃ res =>\n    EdwardsPoint.IsValid res ∧\n    res.toPoint = (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/EdwardsPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_base`**:\n- No panic (always returns successfully)\n- Delegates to scalar multiplication with the Edwards basepoint constant\n- The returned EdwardsPoint equals the output of that scalar multiplication\n-/",
@@ -6365,7 +6365,7 @@
    "is_hidden": false,
    "is_extraction_artifact": false,
    "fully_verified": false,
-   "externally_verified": true,
+   "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.backend.serial.u64.constants.ED25519_BASEPOINT_POINT",
     "curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul"]},

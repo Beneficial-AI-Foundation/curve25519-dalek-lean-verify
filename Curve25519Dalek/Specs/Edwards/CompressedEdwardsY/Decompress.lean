@@ -74,7 +74,7 @@ y-coordinate, i.e. some curve point has that y value.
 - When `y^2 ≠ 1` (the non-degenerate case where `x ≠ 0`):
   `x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1` — sign of `X` matches bit 255 of the input.
 -/
-@[step, externally_verified] -- proven in Verus
+@[step]
 theorem decompress_spec (cey : edwards.CompressedEdwardsY) :
     edwards.CompressedEdwardsY.decompress cey ⦃ result =>
       let y : CurveField := ((U8x32_as_Nat cey % 2 ^ 255 : Nat) : CurveField)

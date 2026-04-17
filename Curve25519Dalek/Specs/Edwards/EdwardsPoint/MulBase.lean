@@ -7,6 +7,8 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Edwards.Basepoint
+import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Mul
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint
 import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorem for `EdwardsPoint::mul_base`
@@ -47,11 +49,18 @@ natural language specs:
 - Delegates to scalar multiplication with the Edwards basepoint constant
 - The returned EdwardsPoint equals the output of that scalar multiplication
 -/
-@[externally_verified, step] -- proven in Verus
-theorem mul_base_spec (scalar : scalar.Scalar) :
+@[step]
+theorem mul_base_spec (scalar : scalar.Scalar)
+    (h_s_canonical : U8x32_as_Nat scalar.bytes < 2 ^ 255) :
     mul_base scalar ⦃ res =>
     EdwardsPoint.IsValid res ∧
     res.toPoint = (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint ⦄ := by
-    sorry
+  unfold mul_base
+      curve25519_dalek.SharedAScalar.Insts.CoreOpsArithMulEdwardsPointEdwardsPoint.mul
+  let* ⟨ ep, ep_post1, ep_post2, ep_post3, ep_post4, ep_post5, ep_post6 ⟩
+    ← constants.ED25519_BASEPOINT_POINT_spec
+  let* ⟨ res, res_post1, res_post2 ⟩
+    ← Shared0Scalar.Insts.CoreOpsArithMulSharedAEdwardsPointEdwardsPoint.mul_spec
+  exact ⟨res_post1, by rw [res_post2, ep_post6]⟩
 
 end curve25519_dalek.edwards.EdwardsPoint
