@@ -22,19 +22,33 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
 
 Specification and proof for `FieldElement51::sqrt_ratio_i`.
 
-This function computes a nonnegative square root of u/v or i*u/v (where i = sqrt(-1) = SQRT_M1 constant),
+This function computes a nonnegative square root of u/v or i*u/v
+(where i = sqrt(-1) = SQRT_M1 constant),
 returning a flag indicating which case occurred and handling zero inputs specially.
 
 **Source**: curve25519-dalek/src/field.rs
 -/
 
-
+attribute [-simp] Int.reducePow Nat.reducePow
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 open curve25519_dalek.math
 namespace curve25519_dalek.field.FieldElement51
+
+/-- Algebraic identity used in sqrt_ratio_i: collecting powers of u and v. -/
+private theorem sqrt_ratio_collect (u v e : Nat) :
+    v * (u ^ 2 * (v ^ (2 + 1)) ^ 2 *
+      (u ^ (e * 2) * v ^ (((2 + 1) * 2 + 1) * (e * 2)))) =
+    u ^ (2 + e * 2) * v ^ (14 * e + 7) := by ring
+
+/-- Algebraic identity used in sqrt_ratio_i: rearranging factors. -/
+private theorem sqrt_ratio_rearrange (u v e : Nat) :
+    u ^ 2 * (v ^ (2 + 1)) ^ 2 *
+      (u ^ (e * 2) * v ^ (((2 + 1) * 2 + 1) * (e * 2))) * v =
+    (u ^ 2 * u ^ (e * 2)) *
+      ((v ^ (2 + 1)) ^ 2 * v ^ (((2 + 1) * 2 + 1) * (e * 2)) * v) := by ring
 
 /-- The SQRT_M1 constant as a plain FieldElement51 (alias for `constants.SQRT_M1_raw`). -/
 def SQRT_M1_val := backend.serial.u64.constants.SQRT_M1_raw
@@ -61,7 +75,7 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
     simp [Nat.ModEq, h_sqrt_eq]
   have h1 : (Field51_as_Nat SQRT_M1_val) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
     exact h_sqrt_mod.mul_right b
-  have hp_pos : 1 ≤ p := by unfold p; simp
+  have hp_pos : 1 ≤ p := by unfold p; simp [Nat.reducePow]
   have h2 : (p - 1) * b = p * b - b := by
       rw [Nat.sub_mul _ _ _, Nat.one_mul]
   have h3 : 0 ≡ p * b  [MOD p] := by
@@ -125,8 +139,8 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
     intro i hi _
     have hi_val := h_bytes_zero i hi
     interval_cases i
-    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate, List.getElem_cons_succ,
-      List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
+    all_goals simp only [Array.repeat, UScalar.ofNatCore_val_eq, List.replicate,
+      List.getElem_cons_succ, List.getElem_cons_zero]; grind only [= UScalar.ofNatCore_val_eq]
   rw [← hru_eq]
   exact hu
 
@@ -266,10 +280,12 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
             (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
             a ^ ((p -1)/2 ) + 1
             [MOD p] := by
-            have :(p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡ 1 [MOD p]:= by
+            have : (p - 1) * (Field51_as_Nat SQRT_M1_val * Field51_as_Nat SQRT_M1_val) ≡
+                1 [MOD p]:= by
               unfold SQRT_M1_val
               decide
-            have :=this.add_left (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
+            have := this.add_left
+              (a ^ ((p - 1) / 2) + p * (a ^ ((p - 1) / 4) * Field51_as_Nat SQRT_M1_val))
             apply Nat.ModEq.trans this
             simp[Nat.modEq_iff_dvd]
           apply (eq1.mul this).trans
@@ -534,7 +550,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
     (r_post1 :
       Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
     (fe4_post1 :
-      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ pow_p58_exp % p)
     (fe3_post1 :
       Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
     (fe2_post1 :
@@ -548,8 +564,8 @@ private theorem check_eq_v_of_sqrt_ratio_data
     (fe_post1 :
       Field51_as_Nat fe ≡ Field51_as_Nat v ^ 2 [MOD p]) :
     Field51_as_Nat check ≡
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p] := by
+      Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+        Field51_as_Nat v ^ (14 * pow_p58_exp + 7) [MOD p] := by
   apply check_post1.trans
   have := fe5_post1.mul_left (Field51_as_Nat v)
   apply this.trans
@@ -560,7 +576,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
   rw [← Nat.ModEq] at fe4_post1
   have eq1 := Nat.ModEq.pow 2 fe4_post1
   rw [← pow_mul] at eq1
-  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) fe3_post1
+  have := Nat.ModEq.pow (pow_p58_exp * 2) fe3_post1
   have eq2 := Nat.ModEq.trans eq1 this
   rw [mul_pow] at eq2
   have := Nat.ModEq.mul_right (Field51_as_Nat v) fe_post1
@@ -572,9 +588,9 @@ private theorem check_eq_v_of_sqrt_ratio_data
   have := Nat.ModEq.mul_right (Field51_as_Nat v) this
   rw [← pow_succ] at this
   have := Nat.ModEq.trans v7_post1 this
-  have := Nat.ModEq.pow ((2 ^ 252 - 3) * 2) this
+  have := Nat.ModEq.pow (pow_p58_exp * 2) this
   rw [← pow_mul] at this
-  have := Nat.ModEq.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) this
+  have := Nat.ModEq.mul_left (Field51_as_Nat u ^ (pow_p58_exp * 2)) this
   have eq3 := Nat.ModEq.trans eq2 this
   have := Nat.ModEq.mul_left (Field51_as_Nat u) eq_v3
   have := Nat.ModEq.trans fe2_post1 this
@@ -583,16 +599,7 @@ private theorem check_eq_v_of_sqrt_ratio_data
   have := Nat.ModEq.mul eq4 eq3
   have := Nat.ModEq.mul_left (Field51_as_Nat v) this
   apply Nat.ModEq.trans this
-  have :
-      Field51_as_Nat v *
-        (Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)))) =
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) := by
-    simp only [Nat.reduceAdd, Nat.reducePow, Nat.reduceSub, Nat.reduceMul]
-    ring
-  rw [this]
+  rw [sqrt_ratio_collect]
 
 /-- Main algebraic bridge before the branch split in `sqrt_ratio_i`. -/
 private theorem check_eq_mod_of_sqrt_ratio_data
@@ -608,7 +615,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     (r_post1 :
       Field51_as_Nat r ≡ Field51_as_Nat fe2 * Field51_as_Nat fe4 [MOD p])
     (fe4_post1 :
-      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ (2 ^ 252 - 3) % p)
+      Field51_as_Nat fe4 % p = Field51_as_Nat fe3 ^ pow_p58_exp % p)
     (fe3_post1 :
       Field51_as_Nat fe3 ≡ Field51_as_Nat u * Field51_as_Nat v7 [MOD p])
     (fe2_post1 :
@@ -626,8 +633,8 @@ private theorem check_eq_mod_of_sqrt_ratio_data
   have eq1_mod :
       Field51_as_Nat r_prime ^ 2 * Field51_as_Nat v ≡
         Field51_as_Nat SQRT_M1_val ^ 2 *
-          (Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)) [MOD p] := by
+          (Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+            Field51_as_Nat v ^ (14 * pow_p58_exp + 7)) [MOD p] := by
     have := r_prime_post1.pow 2
     rw [mul_pow] at this
     have := this.mul_right (Field51_as_Nat v)
@@ -641,7 +648,7 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     rw [← Nat.ModEq] at fe4_post1
     have eq1 := fe4_post1.pow 2
     rw [← pow_mul] at eq1
-    have := fe3_post1.pow ((2 ^ 252 - 3) * 2)
+    have := fe3_post1.pow (pow_p58_exp * 2)
     have eq2 := eq1.trans this
     rw [mul_pow] at eq2
     have := fe_post1.mul_right (Field51_as_Nat v)
@@ -653,9 +660,9 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     have := this.mul_right (Field51_as_Nat v)
     rw [← pow_succ] at this
     have := v7_post1.trans this
-    have := this.pow ((2 ^ 252 - 3) * 2)
+    have := this.pow (pow_p58_exp * 2)
     rw [← pow_mul] at this
-    have := this.mul_left (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2))
+    have := this.mul_left (Field51_as_Nat u ^ (pow_p58_exp * 2))
     have eq3 := eq2.trans this
     have := eq_v3.mul_left (Field51_as_Nat u)
     have := fe2_post1.trans this
@@ -664,23 +671,9 @@ private theorem check_eq_mod_of_sqrt_ratio_data
     have := eq4.mul eq3
     have := this.mul_right (Field51_as_Nat v)
     apply this.trans
-    have :
-        Field51_as_Nat u ^ 2 * (Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-          (Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2) *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2))) *
-          Field51_as_Nat v =
-        (Field51_as_Nat u ^ 2 * Field51_as_Nat u ^ ((2 ^ 252 - 3) * 2)) *
-          ((Field51_as_Nat v ^ (2 + 1)) ^ 2 *
-            Field51_as_Nat v ^ (((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2)) *
-            Field51_as_Nat v) := by
-      simp
-      ring
-    rw [this]
-    rw [← pow_add, ← pow_mul, ← pow_add, ← pow_succ,
-      (by
-        simp only [Nat.reduceAdd, Nat.reduceMul, Nat.reducePow, Nat.reduceSub] :
-          (2 + 1) * 2 + ((2 + 1) * 2 + 1) * ((2 ^ 252 - 3) * 2) + 1 =
-            7 * 2 ^ 253 - 35)]
+    rw [sqrt_ratio_rearrange, ← pow_add, ← pow_mul, ← pow_add, ← pow_succ]
+    rw [show (2 + 1) * 2 + ((2 + 1) * 2 + 1) * (pow_p58_exp * 2) + 1 =
+            (14 * pow_p58_exp + 7) from by omega]
   have check_eq_v :=
     check_eq_v_of_sqrt_ratio_data u v fe v3 fe1 v7 fe2 fe3 fe4 r fe5 check
       check_post1 fe5_post1 r_post1 fe4_post1 fe3_post1 fe2_post1
@@ -1086,8 +1079,8 @@ private theorem solve_second_choice_false_choice3_true
 /-- Solves the nonsquare `r` branch where no matching signature is found for check. -/
 private theorem solve_second_choice_false_choice3_false
     (check_eq_v : Field51_as_Nat check ≡
-      Field51_as_Nat u ^ (2 + (2 ^ 252 - 3) * 2) *
-        Field51_as_Nat v ^ (7 * 2 ^ 253 - 35) [MOD p])
+      Field51_as_Nat u ^ (2 + pow_p58_exp * 2) *
+        Field51_as_Nat v ^ (14 * pow_p58_exp + 7) [MOD p])
     (check_eq_r_v : Field51_as_Nat check ≡
       Field51_as_Nat r ^ 2 * Field51_as_Nat v [MOD p])
     (u_m : Field51_as_Nat u ≡
@@ -1114,8 +1107,9 @@ private theorem solve_second_choice_false_choice3_false
   · intro hu; exfalso
     rw [← modEq_zero_iff] at hu
     have := check_eq_v.trans
-      ((hu.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
-       (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35)))
+      ((hu.pow (2 + pow_p58_exp * 2)).mul_right
+       (Field51_as_Nat v ^ (14 * pow_p58_exp + 7)))
+    rw [pow_p58_exp_def] at this
     simp only [Nat.reducePow, Nat.reduceSub, Nat.reduceMul, Nat.reduceAdd, ne_eq,
       OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
     rw [modEq_zero_iff] at hu this
@@ -1153,13 +1147,16 @@ private theorem solve_second_choice_false_choice3_false
   · intro ⟨hu, hv, xx, hxx⟩; exfalso
     simp only [Nat.mul_mod_mod] at hxx
     rw [← Nat.ModEq] at hxx
-    have p_eq : 2 + (2 ^ 252 - 3) * 2 + (7 * 2 ^ 253 - 35) =
-        (p - 1) * 2 + 1 := by unfold p; simp
-    have p_eq1 : 2 * (2 + (2 ^ 252 - 3) * 2) =
-        (p - 1) / 2 + 2 := by unfold p; omega
+    have p_eq : (2 + pow_p58_exp * 2) + (14 * pow_p58_exp + 7) =
+        (p - 1) * 2 + 1 := by
+      rw [pow_p58_exp_def]
+      unfold p; simp [Nat.reducePow]
+    have p_eq1 : 2 * (2 + pow_p58_exp * 2) =
+        (p - 1) / 2 + 2 := by
+      rw [pow_p58_exp_def]; unfold p; omega
     have xx_check :=
-      ((hxx.pow (2 + (2 ^ 252 - 3) * 2)).mul_right
-        (Field51_as_Nat v ^ (7 * 2 ^ 253 - 35))).trans
+      ((hxx.pow (2 + pow_p58_exp * 2)).mul_right
+        (Field51_as_Nat v ^ (14 * pow_p58_exp + 7))).trans
       check_eq_v.symm
     rw [mul_pow, mul_assoc, ← pow_add, p_eq,
       ← pow_mul, p_eq1, pow_add] at xx_check
@@ -1232,11 +1229,11 @@ private theorem solve_second_choice_false_choice3_false
       rw [← Nat.ModEq]
       have eq_check :=
         (check_eq_v.symm.trans check_eq_r_v).symm
-      have : 2 + (2 ^ 252 - 3) * 2 = (p - 1) / 4 + 1 := by
-        unfold p; omega
+      have : (2 + pow_p58_exp * 2) = (p - 1) / 4 + 1 := by
+        rw [pow_p58_exp_def]; unfold p; omega
       rw [this, pow_add] at eq_check
-      have : 7 * 2 ^ 253 - 35 = 7 * ((p - 1) / 4) := by
-        unfold p; omega
+      have : (14 * pow_p58_exp + 7) = 7 * ((p - 1) / 4) := by
+        rw [pow_p58_exp_def]; unfold p; omega
       rw [this] at eq_check
       simp only [pow_mul, mul_assoc, pow_one] at eq_check
       rw [mul_comm (Field51_as_Nat u) ((Field51_as_Nat v ^ 7) ^ ((p - 1) / 4))] at eq_check
@@ -1316,6 +1313,9 @@ private theorem solve_second_choice_false_choice3_false
 
 end sqrt_ratio_i_branch_solvers
 
+attribute [local irreducible] p
+
+
 set_option maxHeartbeats 400000 in -- the proof works even with 230k heartbeats, but not much less.
 /-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
 i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
@@ -1380,7 +1380,8 @@ theorem sqrt_ratio_i_spec'
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   let* ⟨ i, i_post1, i_post2, i_post3 ⟩ ← constants.SQRT_M1_spec
   let* ⟨ correct_sign_sqrt, correct_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
-  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+  let* ⟨ fe6, fe6_post1, fe6_post2 ⟩ ←
+    Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
   let* ⟨ flipped_sign_sqrt, flipped_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ fe7, fe7_post1, fe7_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
@@ -1407,7 +1408,8 @@ theorem sqrt_ratio_i_spec'
         Or.inr first_choice, if_true, bind_tc_ok]
     let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
     let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+    let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+      Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
     · intro i hi
       simp only [Choice.one, ↓reduceIte] at r1_post
       rw [r1_post i hi]
@@ -1432,7 +1434,8 @@ theorem sqrt_ratio_i_spec'
       simp only [first_choice, false_or, or_false, if_pos second_choice, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         simp only [Choice.one, ↓reduceIte] at r1_post
         rw [r1_post i hi]
@@ -1494,7 +1497,8 @@ theorem sqrt_ratio_i_spec'
       simp only [if_neg second_choice, first_choice, false_or, or_false, bind_tc_ok]
       let* ⟨ r1, r1_post ⟩ ← Insts.SubtleConditionallySelectable.conditional_assign_spec
       let* ⟨ r_is_negative, r_is_negative_post ⟩ ← is_negative_spec
-      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ← Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
+      let* ⟨ r_neg, r_neg_post1, r_neg_post2 ⟩ ←
+        Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51.neg_spec
       · intro i hi
         have h01 : ¬(0#u8 = 1#u8) := by decide
         simp only [Choice.zero, h01, ite_false] at r1_post
