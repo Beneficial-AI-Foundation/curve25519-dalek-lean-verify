@@ -11641,7 +11641,7 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem from_spec (P : EdwardsPoint) (hP : P.IsValid) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from\n        P ⦃ (result : window.LookupTable ProjectiveNielsPoint) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
