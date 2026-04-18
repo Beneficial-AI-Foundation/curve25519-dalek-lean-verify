@@ -70,7 +70,7 @@ For `i ∈ [-8, 8]`, the result is `-1` if `i < 0` and `0` otherwise.
 This is the `xmask = x >> 7` step in `select`. Modelled on
 `isize_shiftRight_4_spec` in `Specs/Scalar/Scalar/AsRadix16.lean`. -/
 @[step]
-private theorem i16_shiftRight_7_spec (i : Std.I16)
+private theorem i16_shiftRight_7 (i : Std.I16)
     (h_lo : -8 ≤ i.val) (h_hi : i.val ≤ 8) :
     i >>> 7#i32 ⦃ r =>
       r.val = i.val / 128 ∧
@@ -101,60 +101,6 @@ private theorem i16_shiftRight_7_spec (i : Std.I16)
   · change (i.bv.sshiftRight 7).toInt = -1 ↔ i.val < 0
     rw [h_val_eq]
     omega
-
-/-! ## Point-level wrapper for `ProjectiveNielsPoint::conditional_assign` -/
-
-/-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
-Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
-whose `toPoint` equals `other.toPoint` if `choice.val = 1#u8`, otherwise `self.toPoint`.
-
-Derived from the Field51-level `conditional_assign_spec` by lifting per-limb val equality
-to term equality via `UScalar.eq_of_val_eq` + `fe_eq_of_limbs`, then case-splitting on
-the `Choice`'s `valid` field. -/
-@[step]
-private theorem conditional_assign_point_spec
-    (self other : ProjectiveNielsPoint)
-    (h_self : self.IsValid) (h_other : other.IsValid)
-    (choice : subtle.Choice) :
-    ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign
-      self other choice ⦃ (result : ProjectiveNielsPoint) =>
-      result.IsValid ∧
-      result.toPoint = (if choice.val = 1#u8 then other.toPoint else self.toPoint) ⦄ := by
-  let* ⟨ r, r_post1, r_post2, r_post3, r_post4 ⟩ ←
-    ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
-  -- Case-split on the Choice's `valid` field: choice.val ∈ {0#u8, 1#u8}.
-  rcases choice.valid with hc0 | hc1
-  · -- choice.val = 0#u8 → result = self.
-    have hne : ¬ (choice.val = 1#u8) := by rw [hc0]; decide
-    simp only [hne, if_false] at r_post1 r_post2 r_post3 r_post4 ⊢
-    -- Lift per-limb val equality to FE equality.
-    have h_ypx : r.Y_plus_X = self.Y_plus_X := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
-    have h_ymx : r.Y_minus_X = self.Y_minus_X := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
-    have h_z : r.Z = self.Z := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
-    have h_t2d : r.T2d = self.T2d := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
-    -- Therefore r = self as PNP structs.
-    have hr_eq : r = self := by
-      cases r; cases self; simp_all
-    rw [hr_eq]
-    exact ⟨h_self, rfl⟩
-  · -- choice.val = 1#u8 → result = other.
-    simp only [hc1, if_true] at r_post1 r_post2 r_post3 r_post4 ⊢
-    have h_ypx : r.Y_plus_X = other.Y_plus_X := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
-    have h_ymx : r.Y_minus_X = other.Y_minus_X := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
-    have h_z : r.Z = other.Z := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
-    have h_t2d : r.T2d = other.T2d := fe_eq_of_limbs
-      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
-    have hr_eq : r = other := by
-      cases r; cases other; simp_all
-    rw [hr_eq]
-    exact ⟨h_other, rfl⟩
 
 /-! ## Loop spec for `LookupTable<ProjectiveNielsPoint>::select_loop` -/
 
@@ -258,7 +204,8 @@ theorem select_loop_spec {P : EdwardsPoint}
     have ht1_point : t1.toPoint = ((i2.val + 1 : ℕ) : ℤ) • P.toPoint := by
       rw [t1_post, ht1_bridge]; exact h_table_point ⟨i2.val, hi2_lt8⟩
     -- Step 6: t2 ← conditional_assign t t1 c (our point-level wrapper)
-    let* ⟨ t2, t2_valid, t2_point ⟩ ← conditional_assign_point_spec
+    let* ⟨ t2, t2_valid, t2_point ⟩ ←
+      ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_point
     -- Setup iter1 preconditions for recursive call.
     have hiter1_start_val : iter1.start.val = j.val + 1 := by rw [hiter1_start, hj_val]
     have h_start_lo' : 1 ≤ iter1.start.val := by rw [hiter1_start_val]; omega
@@ -354,7 +301,7 @@ theorem select_spec {P : EdwardsPoint}
   have hi1_val : i1.val = x.val := by
     simp only [i1_post, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
       Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]
-  let* ⟨ xmask, xmask_post1, xmask_post2, xmask_post3 ⟩ ← i16_shiftRight_7_spec
+  let* ⟨ xmask, xmask_post1, xmask_post2, xmask_post3 ⟩ ← i16_shiftRight_7
   let* ⟨ i2, i2_post ⟩ ← IScalar.cast.step_spec
   let* ⟨ i3, i3_post ⟩ ← I16.add_spec
   let* ⟨ xabs, xabs_post1, xabs_post2 ⟩ ← IScalar.xor_spec
