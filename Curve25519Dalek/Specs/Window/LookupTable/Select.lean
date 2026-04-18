@@ -149,11 +149,52 @@ theorem select_spec {P : EdwardsPoint}
   have hi2_val : i2.val = x.val := by
     simp only [i2_post, IScalarTy.I8_numBits_eq, IScalarTy.I16_numBits_eq,
       Nat.reduceLeDiff, IScalar.val_mod_pow_greater_numBits]
-  -- xabs.val = |x.val|: sign-mask trick.
-  -- Proof by case split on xmask.val ∈ {0, -1}, using bitvec-level XOR identities.
-  -- Deferred to focus on higher-level structure; see handoff for detailed sketch.
+  -- xabs.val = |x.val|: sign-mask trick `(x + xmask) XOR xmask = |x|`.
+  -- Proof by case split on xmask.val ∈ {0, -1}. BitVec-level XOR identities
+  -- are reduced via `BitVec.eq_of_toInt_eq` (no bv_decide needed).
+  have hi3_val : i3.val = x.val + xmask.val := by rw [i3_post, hi2_val]
   have hxabs_val : xabs.val = x.val.natAbs := by
-    sorry
+    have hxabs_bv_toInt : xabs.val = (i3.bv ^^^ xmask.bv).toInt := by
+      change xabs.bv.toInt = _; fcongr 1
+    rw [hxabs_bv_toInt]
+    rcases xmask_post2 with hm | hm
+    · -- xmask.val = -1, so x.val < 0, and xmask.bv = allOnes 16.
+      have hx_neg : x.val < 0 := by rw [← hi1_val]; exact xmask_post3.mp hm
+      have hxm_bv : xmask.bv = BitVec.allOnes 16 := by
+        apply BitVec.eq_of_toInt_eq
+        rw [BitVec.toInt_allOnes]
+        change xmask.val = _
+        rw [hm]; decide
+      rw [hxm_bv, BitVec.xor_allOnes, BitVec.toInt_not]
+      -- Goal: (↑(2^16 - 1 - i3.bv.toNat) : ℤ).bmod (2^16) = ↑x.val.natAbs.
+      -- Bounds: i3.val = x.val - 1 ∈ [-9, -2].
+      have hi3_toInt : i3.bv.toInt = x.val - 1 := by
+        change i3.val = _; rw [hi3_val, hm]; ring
+      have hi3_neg : i3.bv.toInt < 0 := by rw [hi3_toInt]; omega
+      have hcond := BitVec.toInt_eq_toNat_cond i3.bv
+      rw [hi3_toInt] at hcond
+      split_ifs at hcond with hlt
+      · exfalso; omega
+      -- hcond : x.val - 1 = ↑i3.bv.toNat - 2^16
+      have hi3_toNat : (i3.bv.toNat : ℤ) = x.val + (2^16 - 1) := by push_cast at hcond ⊢; omega
+      have hbm_arg : (2^16 - 1 - (i3.bv.toNat : ℤ) : ℤ) = -x.val := by
+        push_cast; omega
+      rw [hbm_arg, Int.ofNat_natAbs_of_nonpos (le_of_lt hx_neg)]
+      exact Aeneas.Arith.Int.bmod_pow2_eq_of_inBounds 15 (-x.val)
+        (by omega) (by omega)
+    · -- xmask.val = 0, so x.val ≥ 0, and xmask.bv = 0#16.
+      have hx_nn : 0 ≤ x.val := by
+        rw [← hi1_val]
+        by_contra hneg
+        push_neg at hneg
+        have := xmask_post3.mpr hneg; omega
+      have hxm_bv : xmask.bv = 0#16 := by
+        apply BitVec.eq_of_toInt_eq
+        change xmask.val = _
+        rw [hm]; decide
+      rw [hxm_bv, BitVec.xor_zero]
+      change i3.val = _
+      rw [hi3_val, hm, Int.natAbs_of_nonneg hx_nn]; ring
   sorry
   -- Proof strategy (to be completed; see `.formalising/fv-plans/.continue-here.md`):
   --
