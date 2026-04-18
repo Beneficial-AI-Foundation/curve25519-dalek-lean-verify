@@ -7,6 +7,7 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Math.Edwards.Curve
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Window.LookupTable.From
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Identity
@@ -100,6 +101,220 @@ private theorem i16_shiftRight_7_spec (i : Std.I16)
   · change (i.bv.sshiftRight 7).toInt = -1 ↔ i.val < 0
     rw [h_val_eq]
     omega
+
+/-! ## Point-level wrapper for `ProjectiveNielsPoint::conditional_assign` -/
+
+/-- **Point-level wrapper for `ProjectiveNielsPoint::conditional_assign`**:
+Given valid `self` and `other` and a `Choice`, the output is a valid `ProjectiveNielsPoint`
+whose `toPoint` equals `other.toPoint` if `choice.val = 1#u8`, otherwise `self.toPoint`.
+
+Derived from the Field51-level `conditional_assign_spec` by lifting per-limb val equality
+to term equality via `UScalar.eq_of_val_eq` + `fe_eq_of_limbs`, then case-splitting on
+the `Choice`'s `valid` field. -/
+@[step]
+private theorem conditional_assign_point_spec
+    (self other : ProjectiveNielsPoint)
+    (h_self : self.IsValid) (h_other : other.IsValid)
+    (choice : subtle.Choice) :
+    ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign
+      self other choice ⦃ (result : ProjectiveNielsPoint) =>
+      result.IsValid ∧
+      result.toPoint = (if choice.val = 1#u8 then other.toPoint else self.toPoint) ⦄ := by
+  let* ⟨ r, r_post1, r_post2, r_post3, r_post4 ⟩ ←
+    ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_spec
+  -- Case-split on the Choice's `valid` field: choice.val ∈ {0#u8, 1#u8}.
+  rcases choice.valid with hc0 | hc1
+  · -- choice.val = 0#u8 → result = self.
+    have hne : ¬ (choice.val = 1#u8) := by rw [hc0]; decide
+    simp only [hne, if_false] at r_post1 r_post2 r_post3 r_post4 ⊢
+    -- Lift per-limb val equality to FE equality.
+    have h_ypx : r.Y_plus_X = self.Y_plus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
+    have h_ymx : r.Y_minus_X = self.Y_minus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
+    have h_z : r.Z = self.Z := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
+    have h_t2d : r.T2d = self.T2d := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
+    -- Therefore r = self as PNP structs.
+    have hr_eq : r = self := by
+      cases r; cases self; simp_all
+    rw [hr_eq]
+    exact ⟨h_self, rfl⟩
+  · -- choice.val = 1#u8 → result = other.
+    simp only [hc1, if_true] at r_post1 r_post2 r_post3 r_post4 ⊢
+    have h_ypx : r.Y_plus_X = other.Y_plus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post1 i hi))
+    have h_ymx : r.Y_minus_X = other.Y_minus_X := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post2 i hi))
+    have h_z : r.Z = other.Z := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post3 i hi))
+    have h_t2d : r.T2d = other.T2d := fe_eq_of_limbs
+      (fun i hi => UScalar.eq_of_val_eq (r_post4 i hi))
+    have hr_eq : r = other := by
+      cases r; cases other; simp_all
+    rw [hr_eq]
+    exact ⟨h_other, rfl⟩
+
+/-! ## Loop spec for `LookupTable<ProjectiveNielsPoint>::select_loop` -/
+
+/-- **Spec for `window.LookupTable<ProjectiveNielsPoint>::select_loop`**:
+
+Given a valid table `[P, 2P, ..., 8P]` (in `ProjectiveNielsPoint` form) and an
+iterator `iter` with `iter.start.val = s ∈ [1, 9]`, `iter.«end».val = 9`:
+
+- At entry, if the loop has already examined `j ∈ [1, s)` and found a match
+  (i.e., `xabs.val ∈ [1, s)`), then `t.toPoint = xabs.val • P.toPoint`; otherwise
+  `t.toPoint = 0`. (At `s = 1` this is just `t.toPoint = 0`.)
+
+- At exit (`s = 9`), since `xabs.val ∈ [0, 8]`:
+  - if `xabs.val ∈ [1, 8]`: the loop matched, `t.toPoint = xabs.val • P.toPoint`;
+  - if `xabs.val = 0`: no match, `t.toPoint = 0 = 0 • P.toPoint`.
+  Both cases collapse to `result.toPoint = xabs.val • P.toPoint`.
+
+Body of one iteration with `j = iter.start.val`:
+1. `ct_eq xabs j` returns `Choice.one` iff `xabs.val = j.val`;
+2. `table[j - 1]` gives `j • P` (valid);
+3. `conditional_assign t table[j-1] c`: picks `table[j-1]` iff match, else keeps `t`;
+4. recurse with iterator advanced (`iter1.start = s + 1`). -/
+@[step]
+theorem select_loop_spec {P : EdwardsPoint}
+    (table : window.LookupTable ProjectiveNielsPoint)
+    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)
+    (h_table_point : ∀ (k : Fin 8),
+        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)
+    (iter : core.ops.range.Range Std.Usize)
+    (h_start_lo : 1 ≤ iter.start.val) (h_start_hi : iter.start.val ≤ 9)
+    (h_end : iter.«end».val = 9)
+    (xabs : Std.I16) (h_xabs_lo : 0 ≤ xabs.val) (h_xabs_hi : xabs.val ≤ 8)
+    (t : ProjectiveNielsPoint) (h_t_valid : t.IsValid)
+    (h_t_point : t.toPoint =
+        (if 1 ≤ xabs.val ∧ xabs.val < (iter.start.val : ℤ)
+          then (xabs.val : ℤ) • P.toPoint else 0)) :
+    window.LookupTable.select_loop
+        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable
+        iter table xabs t ⦃ (result : ProjectiveNielsPoint) =>
+      result.IsValid ∧ result.toPoint = (xabs.val : ℤ) • P.toPoint ⦄ := by
+  unfold window.LookupTable.select_loop
+  obtain ⟨o, iter1, h_next, h_none_branch, h_some_branch⟩ :=
+    curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.next_spec iter
+  rw [h_next, bind_tc_ok]
+  match o with
+  | none =>
+    -- Base case: iter.start.val ≥ iter.end.val = 9, with h_start_hi ≤ 9 forces = 9.
+    have hge : ¬ iter.start.val < iter.«end».val := by
+      intro hlt
+      exact absurd (h_some_branch hlt).1 (by simp)
+    have hstart9 : iter.start.val = 9 := by omega
+    simp only [spec_ok]
+    refine ⟨h_t_valid, ?_⟩
+    rw [h_t_point, hstart9]
+    push_cast
+    -- Collapse invariant: xabs.val ∈ [0, 8], so either xabs.val = 0 (0•P = 0) or xabs.val ∈ [1, 8].
+    by_cases hx : xabs.val = 0
+    · simp [hx]
+    · have hxge1 : (1 : ℤ) ≤ xabs.val := by omega
+      have hxlt9 : xabs.val < (9 : ℤ) := by omega
+      simp [hxge1, hxlt9]
+  | some j =>
+    have hlt : iter.start.val < iter.«end».val := by
+      by_contra hge
+      exact absurd (h_none_branch hge).1 (by simp)
+    obtain ⟨hj_eq_some, hiter1_start, hiter1_end⟩ := h_some_branch hlt
+    have hj_val : j.val = iter.start.val := by
+      have h : some j = some iter.start := hj_eq_some
+      exact congrArg UScalar.val (Option.some.inj h)
+    have hj_lo : 1 ≤ j.val := by omega
+    have hj_hi : j.val ≤ 8 := by omega
+    have hj_lt9 : j.val < 9 := by omega
+    simp only [step_simps]
+    -- Step 1: i ← hcast .U16 xabs
+    have hxabs_U16 : (0 : ℤ) ≤ xabs.val ∧ xabs.val ≤ UScalar.max .U16 := by
+      refine ⟨h_xabs_lo, ?_⟩
+      simp only [UScalar.max]; agrind
+    let* ⟨ i, i_post ⟩ ← IScalar.hcast_inBounds_spec
+    -- Step 2: i1 ← cast .U16 j
+    have hj_U16 : j.val ≤ UScalar.max .U16 := by
+      simp only [UScalar.max]; agrind
+    let* ⟨ i1, i1_post ⟩ ← UScalar.cast_inBounds_spec
+    -- Step 3: c ← ct_eq i i1
+    let* ⟨ c, c_post ⟩ ← U16.Insts.SubtleConstantTimeEq.ct_eq_spec
+    -- Step 4: i2 ← j - 1
+    let* ⟨ i2, i2_post ⟩ ← Usize.sub_spec
+    -- Bridge: i2.val = j.val - 1 ∈ [0, 7].
+    have hi2_val : i2.val = j.val - 1 := by omega
+    have hi2_lt8 : i2.val < 8 := by omega
+    -- Step 5: t1 ← Array.index_usize table i2
+    let* ⟨ t1, t1_post ⟩ ← Array.index_usize_spec
+    -- Bridge: t1 = table[i2.val]! = table.val[⟨i2.val, _⟩].
+    have hlen : i2.val < (↑table : List ProjectiveNielsPoint).length := by
+      have := table.2; simp_all
+    have ht1_bridge : (↑table : List ProjectiveNielsPoint)[i2.val]! =
+        (↑table : List ProjectiveNielsPoint)[(⟨i2.val, hi2_lt8⟩ : Fin 8)] := by
+      rw [List.getElem!_eq_getElem?_getD, List.getElem?_eq_getElem hlen, Option.getD_some]
+      agrind only [= Fin.getElem_fin]
+    have ht1_valid : t1.IsValid := by
+      rw [t1_post, ht1_bridge]; exact h_table_valid ⟨i2.val, hi2_lt8⟩
+    have ht1_point : t1.toPoint = ((i2.val + 1 : ℕ) : ℤ) • P.toPoint := by
+      rw [t1_post, ht1_bridge]; exact h_table_point ⟨i2.val, hi2_lt8⟩
+    -- Step 6: t2 ← conditional_assign t t1 c (our point-level wrapper)
+    let* ⟨ t2, t2_valid, t2_point ⟩ ← conditional_assign_point_spec
+    -- Setup iter1 preconditions for recursive call.
+    have hiter1_start_val : iter1.start.val = j.val + 1 := by rw [hiter1_start, hj_val]
+    have h_start_lo' : 1 ≤ iter1.start.val := by rw [hiter1_start_val]; omega
+    have h_start_hi' : iter1.start.val ≤ 9 := by rw [hiter1_start_val]; omega
+    have h_end' : iter1.«end».val = 9 := by rw [hiter1_end]; exact h_end
+    -- Bridge: c.val = 1#u8 ↔ xabs.val = j.val (as ℤ).
+    have hi1_int : (i1.val : ℤ) = (j.val : ℤ) := by exact_mod_cast i1_post
+    have hi_eq_i1_iff : i = i1 ↔ xabs.val = (j.val : ℤ) := by
+      constructor
+      · intro heq
+        have : (i.val : ℤ) = (i1.val : ℤ) := by rw [heq]
+        rw [i_post, hi1_int] at this; exact this
+      · intro heq
+        apply UScalar.eq_of_val_eq
+        have : (i.val : ℤ) = (i1.val : ℤ) := by rw [i_post, hi1_int, heq]
+        exact_mod_cast this
+    have hc_val_xabs_iff : c.val = 1#u8 ↔ xabs.val = (j.val : ℤ) := by
+      rw [Choice.val_eq_one_iff, c_post, hi_eq_i1_iff]
+    -- Establish t2's toPoint invariant for the recursive call.
+    have h_t2_point_inv : t2.toPoint =
+        (if 1 ≤ xabs.val ∧ xabs.val < (iter1.start.val : ℤ)
+          then (xabs.val : ℤ) • P.toPoint else 0) := by
+      rw [t2_point, hiter1_start_val]
+      push_cast
+      by_cases hmatch : xabs.val = (j.val : ℤ)
+      · -- Match: c.val = 1, t2 = t1, condition holds.
+        have hcv : c.val = 1#u8 := hc_val_xabs_iff.mpr hmatch
+        have hxge1 : (1 : ℤ) ≤ xabs.val := by rw [hmatch]; exact_mod_cast hj_lo
+        have hxlt_jp1 : xabs.val < ((j.val : ℤ) + 1) := by rw [hmatch]; omega
+        simp only [hcv, if_true, hxge1, hxlt_jp1, and_self]
+        rw [ht1_point, hi2_val]
+        have : ((j.val - 1 + 1 : ℕ) : ℤ) = xabs.val := by
+          rw [Nat.sub_add_cancel hj_lo]; exact hmatch.symm
+        rw [this]
+      · -- No match: c.val = 0, t2 = t, new invariant from old.
+        have hcv : c.val ≠ 1#u8 := fun h => hmatch (hc_val_xabs_iff.mp h)
+        simp only [hcv, if_false]
+        rw [h_t_point, hj_val]
+        have hxabs_ne : xabs.val ≠ (iter.start.val : ℤ) := by rw [← hj_val]; exact hmatch
+        by_cases hxge : 1 ≤ xabs.val
+        · by_cases hxlt : xabs.val < ((iter.start.val : ℤ))
+          · have hxlt' : xabs.val < ((iter.start.val : ℤ) + 1) := by omega
+            simp only [hxge, hxlt, hxlt', and_self, if_true]
+          · push_neg at hxlt
+            have hxnlt' : ¬ (xabs.val < ((iter.start.val : ℤ) + 1)) := by omega
+            have hxnlt : ¬ (xabs.val < (iter.start.val : ℤ)) := not_lt.mpr hxlt
+            simp only [hxge, hxnlt, hxnlt', and_false, if_false]
+        · simp only [hxge, false_and, if_false]
+    apply spec_mono (select_loop_spec table h_table_valid h_table_point iter1
+      h_start_lo' h_start_hi' h_end' xabs h_xabs_lo h_xabs_hi t2 t2_valid h_t2_point_inv)
+    intro result hresult
+    exact hresult
+  termination_by iter.«end».val - iter.start.val
+  decreasing_by
+    rw [hiter1_start, hiter1_end]
+    grind
 
 /-! ## Spec for `LookupTable<ProjectiveNielsPoint>::select` -/
 
