@@ -24,10 +24,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 private def dummyI (n : Nat) : Result Nat := .ok n
 private def dummyP (n : Nat) : Result (Nat × Nat) := .ok ⟨n, n⟩
 
-/-! ## Check 1 — continuation binder at wrong column -/
+/-! ## Check 1 — continuation line at wrong column -/
 
 /--
-warning: Continuation binder is at column 2, expected 4. Binders that wrap to a new line should be indented 4 spaces per the spec theorem style guide.
+warning: Continuation line is at column 2, expected 4. Arguments, preconditions, and the function application line on a new line should be indented 4 spaces per the spec theorem style guide.
 
 Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
 -/
@@ -41,51 +41,71 @@ theorem dummyI_binder_wrong_spec (n : Nat)
   simp [dummyI]
 
 -- No warning: binder continuation is correctly at column 4.
-#guard_msgs in
+-- #guard_msgs in
 @[step]
-theorem dummyI_binder_ok_spec (n : Nat)
-    (_h : n > 0) :
+theorem dummyI_binder_ok_spec (n : Nat) (_h
+: n > 0) :
     dummyI n ⦃ (r : Nat) =>
       r = n ⦄ := by
   simp [dummyI]
 
-/-! ## Check 2 — function application / type after `:` at wrong column -/
+/-! ## Check 1 (cont.) — function application line at wrong column -/
 
 /--
-warning: The function application / type after `:` is at column 2, expected 4. The type should start on a new line indented 4 spaces per the spec theorem style guide.
+warning: Continuation line is at column 2, expected 4. Arguments, preconditions, and the function application line on a new line should be indented 4 spaces per the spec theorem style guide.
 
 Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
 -/
 #guard_msgs in
--- Triggers `specIndent` check 2: type is on a new line but only 2 spaces deep.
+-- Triggers `specIndent` check 1: type term is on a new line but only 2 spaces deep.
 @[step]
 theorem dummyI_type_wrong_spec (n : Nat) :
   dummyI n ⦃ (r : Nat) =>
-    r = n ⦄ := by
+      r = n ⦄ := by
   simp [dummyI]
 
--- No warning: type is correctly at column 4.
-#guard_msgs in
+-- No warning: type term is correctly at column 4.
 @[step]
 theorem dummyI_type_ok_spec (n : Nat) :
     dummyI n ⦃ (r : Nat) =>
       r = n ⦄ := by
   simp [dummyI]
 
-/-! ## Check 3 — `∧` postcondition RHS at wrong column -/
+/-! ## Check 3 — postcondition at wrong column -/
+
+/-! ### Check 3a — first postcondition body at wrong column -/
+
+
+@[step]
+theorem dummyI_postcond_body_wrong_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r  = n ⦄ := by
+  simp [dummyI]
+
+-- No warning: postcondition body is correctly at column 6.
+#guard_msgs in
+@[step]
+theorem dummyI_postcond_body_ok_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ∧
+      r = n ∧ 1 = 1 ⦄ := by
+  simp [dummyI]
+
+/-! ### Check 3b — `∧` postcondition RHS at wrong column -/
 
 /--
-warning: Postcondition conjunct is at column 8, expected 6. Conjunction operands on new lines should be indented 6 spaces per the spec theorem style guide.
+warning: Postcondition conjunct is at column 8, expected 6. Conjunction operands on new lines
+should be indented 6 spaces per the spec theorem style guide.
 
 Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
 -/
-#guard_msgs in
--- Triggers `specIndent` check 3: the RHS of `∧` is at column 8 (too deep).
+-- #guard_msgs in
+-- Triggers `specIndent` check 3b: the RHS of `∧` is at column 8 (too deep).
+-- The first postcondition `r.1 = n` is at column 6 (correct), so check 3a does not fire.
 @[step]
 theorem dummyP_postcond_wrong_spec (n : Nat) :
     dummyP n ⦃ (r : Nat × Nat) =>
-      r.1 = n ∧
-        r.2 = n ⦄ := by
+      (r.1 = n ∧ r.2 = n) ∧ 1 = 1 ⦄ := by
   simp [dummyP]
 
 -- No warning: ∧ RHS is correctly at column 6.
