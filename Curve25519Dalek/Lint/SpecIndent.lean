@@ -12,8 +12,8 @@ Enforces the four indentation rules for `@[step]` spec theorems defined in `doc/
 
 | Location | Expected column (0-indexed) |
 |---|---|
-| Continuation binder on a new line after the `theorem` line | 4 |
-| Function application / type after `:` (when on a new line) | 4 |
+| Continuation line on a new line after the `theorem` line (arguments, preconditions, function application) | 4 |
+| Postcondition body on a new line after `=>` in the WP binder | 6 |
 | `∧` RHS postcondition on a new line inside the WP binder | 6 |
 | Proof body after `by` (when on a new line) | 2 |
 
@@ -88,25 +88,76 @@ independent of namespace resolution details. -/
 private def isAndNode (stx : Syntax) : Bool :=
   stx.getArgs.size == 3 &&
   match stx.getArgs[1]? with
-  | some (Syntax.atom _ v) => v == "∧"
+  | some (Syntax.atom _ v) => v.trimAscii == "∧"
   | _                      => false
+
+/-- Recursively collect every WP-binder body — the term immediately after `=>` in
+`⦃ binder => body ⦄` — that starts on a new line after `=>` and is NOT at `expected` column. -/
+private partial def collectMisindentedWpBodies
+    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
+  let childResults := stx.getArgs.flatMap (collectMisindentedWpBodies · fm expected)
+  let args := stx.getArgs
+  -- Only match nodes that have ` ⦃ ` as a direct atom child (WP binder notation).
+  let hasLLBracket := args.any fun c =>
+    match c with | Syntax.atom _ v => v.trimAscii == "⦃" | _ => false
+  if !hasLLBracket then childResults
+  else
+    match args.findIdx? (fun c => match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
+    | none => childResults
+    | some arrowIdx =>
+      match args[arrowIdx]?, args[arrowIdx + 1]? with
+      | some arrowAtom, some body =>
+        match lineOf arrowAtom fm, lineOf body fm, colOf body fm with
+        | some arrowLine, some bodyLine, some bodyCol =>
+          if bodyLine > arrowLine && bodyCol ≠ expected then childResults.push body
+          else childResults
+        | _, _, _ => childResults
+      | _, _ => childResults
 
 /-- Recursively collect every `∧`-RHS node that (a) starts on a line strictly after the
 corresponding `∧` node's start line and (b) is NOT at `expected` column.
 Returns the offending RHS nodes for diagnostic reporting. -/
+-- private partial def collectMisindentedAndRhs
+--     (stx : Syntax) (fm : FileMap) (expected : Nat) : List Syntax :=
+--   -- let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
+--   if isAndNode stx then
+--     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
+--     | some lhs, some andNode, some rhs =>
+--         match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, lineOf rhs fm with
+--         | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
+--           if lhsLine < andLine then
+--             if andCol != expected then
+--               andNode :: collectMisindentedAndRhs rhs fm expected
+--             else
+--               collectMisindentedAndRhs rhs fm expected
+--           else
+--             if rhsLine > andLine && rhsCol ≠ expected then rhs :: collectMisindentedAndRhs rhs fm expected
+--             else collectMisindentedAndRhs rhs fm expected
+--         | _, _, _, _, _, _ => collectMisindentedAndRhs rhs fm expected
+--     | _, _, _ => []
+--   else []
+
+
 private partial def collectMisindentedAndRhs
     (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
   let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
   if isAndNode stx then
-    match stx.getArgs[2]?, lineOf stx fm with
-    | some rhs, some andLine =>
-      match lineOf rhs fm, colOf rhs fm with
-      | some rhsLine, some rhsCol =>
-        if rhsLine > andLine && rhsCol ≠ expected then childResults.push rhs
-        else childResults
-      | _, _ => childResults
-    | _, _ => childResults
+    match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
+    | some lhs, some andNode, some rhs =>
+        match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, lineOf rhs fm with
+        | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
+          if lhsLine < andLine then
+            if andCol != expected then
+              childResults.push rhs
+            else
+              childResults
+          else
+            if rhsLine > andLine && rhsCol ≠ expected then childResults.push rhs
+            else childResults
+        | _, _, _, _, _, _ => childResults
+    | _, _, _ => childResults
   else childResults
+
 
 /-! ## Linter -/
 
@@ -131,33 +182,35 @@ def specIndentLinter : Linter where run stx := do
   let some bindersNode := sig.getArgs[0]? | return
   let some typeSpec    := sig.getArgs[1]? | return
   -- typeSpec[0] = ":" atom,  typeSpec[1] = type term
-  let some colonNode := typeSpec.getArgs[0]? | return
   let some typeTerm  := typeSpec.getArgs[1]? | return
 
-  -- ── Check 1: Continuation binders at column 4 ────────────────────────────
-  for binder in bindersNode.getArgs do
-    if let some bLine := lineOf binder fm then
-      if bLine > kwLine then
-        if let some bCol := colOf binder fm then
-          unless bCol == 4 do
-            logLint linter.curve25519.specIndent binder
-              m!"Continuation binder is at column {bCol}, expected 4. \
-                Binders that wrap to a new line should be indented 4 spaces \
+  -- ── Check 1: Continuation lines at column 4 ─────────────────────────────
+  -- Arguments, preconditions, and the function application line all share the
+  -- same 4-space rule; iterate over binders and typeTerm together.
+  for node in bindersNode.getArgs ++ #[typeTerm] do
+    if let some nodeLine := lineOf node fm then
+      if nodeLine > kwLine then
+        if let some nodeCol := colOf node fm then
+          unless nodeCol == 4 do
+            logLint linter.curve25519.specIndent node
+              m!"Continuation line is at column {nodeCol}, expected 4. \
+                Arguments, preconditions, and the function application line \
+                on a new line should be indented 4 spaces \
                 per the spec theorem style guide."
 
-  -- ── Check 2: Type / function application at column 4 ─────────────────────
-  if let some colonLine := lineOf colonNode fm then
-    if let some typeLine := lineOf typeTerm fm then
-      if typeLine > colonLine then
-        if let some typeCol := colOf typeTerm fm then
-          unless typeCol == 4 do
-            logLint linter.curve25519.specIndent typeTerm
-              m!"The function application / type after `:` is at column {typeCol}, expected 4. \
-                The type should start on a new line indented 4 spaces \
-                per the spec theorem style guide."
+  -- ── Check 3a: First postcondition body at column 6 ──────────────────────
+  for node in collectMisindentedWpBodies typeTerm fm 6 do
+    let col := (colOf node fm).getD 0
+    logLint linter.curve25519.specIndent node
+      m!"Postcondition body is at column {col}, expected 6. \
+        The postcondition body after `=>` should be indented 6 spaces \
+        per the spec theorem style guide."
 
-  -- ── Check 3: ∧ postcondition RHS at column 6 ─────────────────────────────
+  -- -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
+
+  -- logLint linter.curve25519.specIndent typeTerm m!"xx{typeTerm}"
   for node in collectMisindentedAndRhs typeTerm fm 6 do
+    -- dbg_trace "typeTerm: {repr typeTerm}"
     let col := (colOf node fm).getD 0
     logLint linter.curve25519.specIndent node
       m!"Postcondition conjunct is at column {col}, expected 6. \
