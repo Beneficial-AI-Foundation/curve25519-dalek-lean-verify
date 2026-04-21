@@ -197,9 +197,13 @@ def specIndentLinter : Linter where run stx := do
   -- ── Check 1: Continuation lines at column 4 ─────────────────────────────
   -- Arguments, preconditions, and the function application line all share the
   -- same 4-space rule; iterate over binders and typeTerm together.
+  -- Only the first node on each continuation line is checked; multiple binders
+  -- on the same line (e.g. `(n : Nat) (_h : n > 0)`) are a single logical line.
+  let mut seenLines : List Nat := []
   for node in bindersNode.getArgs ++ #[typeTerm] do
     if let some nodeLine := lineOf node fm then
-      if nodeLine > kwLine then
+      if nodeLine > kwLine && !seenLines.contains nodeLine then
+        seenLines := seenLines ++ [nodeLine]
         if let some nodeCol := colOf node fm then
           unless nodeCol == 4 do
             logLint linter.curve25519.specIndent node

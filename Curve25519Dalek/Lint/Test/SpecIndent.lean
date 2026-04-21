@@ -161,3 +161,14 @@ theorem dummyP_canonical_spec (n : Nat)
       (r.2 = n ∧ 1 = 1) ∧
       2 = 2 ⦄ := by
   simp [dummyP]
+
+#guard_msgs in
+@[step]
+theorem dummyP_canonical2_spec
+    (n : Nat)
+    (_h : n > 0) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n ∧
+      (r.2 = n ∧ 1 = 1) ∧
+      2 = 2 ⦄ := by
+  simp [dummyP]
