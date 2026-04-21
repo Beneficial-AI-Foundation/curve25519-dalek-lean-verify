@@ -124,11 +124,13 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
             simp only at this
             unfold toField at this
             grind
-          · simp_all
-          · simp_all
+          · simp_all  -- Y_plus_X_bounds: < 2^54 
+          · -- Y_minus_X_bounds: goal < 2^54, fact fe1_post1 : < 2^52
+            intro i hi; have := fe1_post1 i hi; agrind
           · have := he.Z_bounds
             simp_all
-          · simp_all
+          · -- T2d_bounds: < 2^52
+            intro i hi; have := fe3_post2 i hi; agrind
         simp only [this, true_and]
         unfold toPoint curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint
         simp only [he, ↓reduceDIte, this]

@@ -357,6 +357,11 @@ theorem select_spec {P : EdwardsPoint}
       rw [hxm_bv, BitVec.xor_zero]
       change i3.val = _
       rw [hi3_val, hm, Int.natAbs_of_nonneg hx_nn]; ring
+  let* ⟨ t1, t1_post1, t1_post2 ⟩ ← select_loop_spec
+  · sorry
+  · sorry
+  let* ⟨ i4, i4_post1, i4_post2 ⟩ ← IScalar.and_spec
+  let* ⟨ i5, i5_post ⟩ ← IScalar.hcast.step_spec
   sorry
   -- Proof strategy (to be completed; see `.formalising/fv-plans/.continue-here.md`):
   --

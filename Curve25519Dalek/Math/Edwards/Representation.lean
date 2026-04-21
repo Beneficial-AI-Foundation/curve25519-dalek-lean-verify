@@ -496,7 +496,22 @@ instance ProjectiveNielsPoint.instDecidableOnCurve (pn : ProjectiveNielsPoint) :
   decidable_of_iff _ (onCurve_iff pn).symm
 
 /-- Validity predicate for ProjectiveNielsPoint.
-Mixed bounds: Y_plus_X < 2^54, Y_minus_X < 2^52, Z < 2^53, T2d < 2^52.
+
+**Bounds matching Rust source profiles**: Y_plus_X < 2^54, Y_minus_X < 2^54,
+Z < 2^53, T2d < 2^52.
+
+These bounds are chosen so that `IsValid` is closed under `neg` and
+`conditional_assign` while remaining as tight as Rust actually provides:
+- `as_projective_niels` output: (54, 52, 53, 52) — fits within IsValid
+  since 52 < 54.
+- `neg` output: swaps Y_plus_X/Y_minus_X, so (52, 54, 53, 52) — fits since
+  52 < 54 and T2d via `FieldElement51.negate` is < 2^52 strictly.
+- `conditional_assign` output: fieldwise branchwise reuse of the same profile
+  in both branches.
+
+Producer-side sharper bounds are captured separately in
+`AsProjectiveNielsProfile` (`Y_minus_X < 2^52` extra) and
+`NegProfile` (`Y_plus_X < 2^52` extra) — see below.
 
 Layered over `ProjectiveNielsPoint.OnCurve`: `IsValid` adds the per-limb bounds
 needed for the underlying Rust arithmetic, while `OnCurve` carries the pure
@@ -504,15 +519,44 @@ mathematical content used by `toPoint'`. -/
 @[mk_iff]
 structure ProjectiveNielsPoint.IsValid (pn : ProjectiveNielsPoint) : Prop
     extends ProjectiveNielsPoint.OnCurve pn where
-  /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 52 2 ^ 53 2 ^ 52. -/
+  /-- coordinate limbs are bounded by 2 ^ 54 2 ^ 54 2 ^ 53 2 ^ 52. -/
   Y_plus_X_bounds : ∀ i < 5, pn.Y_plus_X[i]!.val < 2 ^ 54
-  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 52
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < 2 ^ 54
   Z_bounds : ∀ i < 5, pn.Z[i]!.val < 2 ^ 53
   T2d_bounds : ∀ i < 5, pn.T2d[i]!.val < 2 ^ 52
 
 instance ProjectiveNielsPoint.instDecidableIsValid (pn : ProjectiveNielsPoint) :
     Decidable pn.IsValid :=
   decidable_of_iff _ (isValid_iff pn).symm
+
+/-- Parametric limb-bounds predicate for `ProjectiveNielsPoint`.
+
+This is an *auxiliary* predicate for expressing exact producer/consumer
+numeric profiles (e.g., the sharper bounds of `as_projective_niels`'s output)
+without polluting the main `IsValid` predicate.
+
+Use `IsValid` as the public representation invariant; use `InBounds` only
+where exact limb bounds matter.
+
+See also: `AsProjectiveNielsProfile`, `NegProfile`. -/
+structure ProjectiveNielsPoint.InBounds
+    (pn : ProjectiveNielsPoint) (ypxMax ymxMax zMax t2dMax : ℕ) : Prop where
+  Y_plus_X_bounds  : ∀ i < 5, pn.Y_plus_X[i]!.val  < ypxMax
+  Y_minus_X_bounds : ∀ i < 5, pn.Y_minus_X[i]!.val < ymxMax
+  Z_bounds         : ∀ i < 5, pn.Z[i]!.val         < zMax
+  T2d_bounds       : ∀ i < 5, pn.T2d[i]!.val       < t2dMax
+
+/-- The exact bound profile produced by `EdwardsPoint.as_projective_niels`:
+`Y_plus_X < 2^54`, `Y_minus_X < 2^52`, `Z < 2^53`, `T2d < 2^52`. Sharper than
+`IsValid` on `Y_minus_X` and `T2d`. -/
+def ProjectiveNielsPoint.AsProjectiveNielsProfile (pn : ProjectiveNielsPoint) : Prop :=
+  pn.InBounds (2 ^ 54) (2 ^ 52) (2 ^ 53) (2 ^ 52)
+
+/-- The mirror of `AsProjectiveNielsProfile` produced by `neg`:
+`Y_plus_X < 2^52`, `Y_minus_X < 2^54`, `Z < 2^53`, `T2d < 2^52`.
+Derived from the Rust `FieldElement51::negate` output bound `< 2^52`. -/
+def ProjectiveNielsPoint.NegProfile (pn : ProjectiveNielsPoint) : Prop :=
+  pn.InBounds (2 ^ 52) (2 ^ 54) (2 ^ 53) (2 ^ 52)
 
 --instance ProjectiveNielsPoint.instDecidableIsValid' (pn : ProjectiveNielsPoint) :
 --    Decidable pn.IsValid' :=
