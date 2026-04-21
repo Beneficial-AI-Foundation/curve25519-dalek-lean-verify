@@ -1,0 +1,12 @@
+{
+	"servers": {
+		"lean-lsp": {
+			"command": "uvx",
+			"args": [
+				"lean-lsp-mcp"
+			],
+			"type": "stdio"
+		}
+	},
+	"inputs": []
+}

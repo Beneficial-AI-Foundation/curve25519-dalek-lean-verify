@@ -55,8 +55,7 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   · expand_array limbs10 using [UScalar.val_and]
     have hbounds : ∀ j < 5, limbs10[j]!.val < 2 ^ 52 := by
       intro j _; interval_cases j <;>
-        simp only [hlimbs100, hlimbs101, hlimbs102, hlimbs103, hlimbs104,
-          Nat.shiftRight_eq_div_pow, Array.getElem!_Nat_eq] at * <;> scalar_tac
+        simp only [*, Nat.shiftRight_eq_div_pow, Array.getElem!_Nat_eq] at * <;> scalar_tac
     have hexact : Field51_as_Nat limbs = Field51_as_Nat limbs10 + c4.val * p := by
       simp [Field51_as_Nat, Finset.sum_range_succ, p, *, Nat.shiftRight_eq_div_pow]
       omega
