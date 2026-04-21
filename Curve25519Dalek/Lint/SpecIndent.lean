@@ -129,57 +129,40 @@ private partial def collectWpBodies (stx : Syntax) : Array Syntax :=
       | none      => #[]
 
 
-private partial def collectMisindentedAndRhs_aux (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
+private partial def collectMisindentedAndRhs_aux
+    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array (Syntax × String) :=
   if isAndNode stx then
     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
     | some lhs, some andNode, some rhs =>
-        let rhsResults := collectMisindentedAndRhs_aux rhs fm expected
-        match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, colOf rhs fm with
-        | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
-          -- if lhsLine < andLine then
-          --   if andCol != expected then
-          --     rhsResults.push rhs
-          --   else if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
-          --   else rhsResults
-          -- else
-          --   if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
-          --   else rhsResults
-          if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
-          else rhsResults
-        | _, _, _, _, _, _ => rhsResults
+        let acc := collectMisindentedAndRhs_aux rhs fm expected
+        match lineOf lhs fm, lineOf andNode fm, lineOf rhs fm, colOf rhs fm with
+        | some lhsLine, some andLine, some rhsLine, some rhsCol =>
+          let acc :=
+            if andLine > lhsLine then
+              acc.push (andNode,
+                "∧ operator should be appended to the end of the preceding line, \
+                not placed at the start of a new line, \
+                per the spec theorem style guide.")
+            else acc
+          let acc :=
+            if rhsLine > andLine && rhsCol ≠ expected then
+              acc.push (rhs,
+                s!"Postcondition conjunct is at column {rhsCol}, expected {expected}. \
+                Conjunction operands on new lines should be indented {expected} spaces \
+                per the spec theorem style guide.")
+            else acc
+          acc
+        | _, _, _, _ => acc
     | _, _, _ => #[]
   else #[]
 
 
 private partial def collectMisindentedAndRhs
-    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
+    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array (Syntax × String) :=
   if isAndNode stx then
     collectMisindentedAndRhs_aux stx fm expected
   else
-    let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
-    childResults
-
--- private partial def collectMisindentedAndRhs
---     (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
---   if isAndNode stx then
---     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
---     | some lhs, some andNode, some rhs =>
---         let rhsResults := collectMisindentedAndRhs rhs fm expected
---         match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, colOf rhs fm with
---         | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
---           if lhsLine < andLine then
---             if andCol != expected then
---               rhsResults.push rhs
---             else
---               rhsResults
---           else
---             if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
---             else rhsResults
---         | _, _, _, _, _, _ => rhsResults
---     | _, _, _ => #[]
---   else
---     let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
---     childResults
+    stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
 
 
 /-! ## Linter -/
@@ -231,12 +214,8 @@ def specIndentLinter : Linter where run stx := do
 
   -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
   for body in collectWpBodies typeTerm do
-    for node in collectMisindentedAndRhs body fm 6 do
-      let col := (colOf node fm).getD 0
-      logLint linter.curve25519.specIndent node
-        m!"Postcondition conjunct is at column {col}, expected 6. \
-          Conjunction operands on new lines should be indented 6 spaces \
-          per the spec theorem style guide."
+    for (node, msg) in collectMisindentedAndRhs body fm 6 do
+      logLint linter.curve25519.specIndent node m!"{msg}"
 
   -- ── Check 4: Proof body at column 2 ──────────────────────────────────────
   unless declVal.isOfKind ``Lean.Parser.Command.declValSimple do return
