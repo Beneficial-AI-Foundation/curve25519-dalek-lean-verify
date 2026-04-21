@@ -14,6 +14,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek
 
 attribute [-simp] Int.reducePow Nat.reducePow
+set_option linter.hashCommand false
+#setup_aeneas_simps
+
+attribute [local simp_lists_safe] UScalar.val_and Nat.and_two_pow_sub_one_eq_mod
 
 /-! ## Spec for `reduce` -/
 
@@ -29,7 +33,7 @@ end curve25519_dalek.backend.serial.u64.field.FieldElement51.reduce
 
 namespace curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-set_option maxHeartbeats 500000 in -- heavy step, scalar_tac and simp_all's
+set_option maxHeartbeats 1000000 in -- heavy
 /-- **Spec and proof concerning `backend.serial.u64.field.FieldElement51.reduce`**:
 - All the limbs of the result are small, ≤ 2^(51 + ε)
 - The result is equal to the input mod p.
@@ -43,7 +47,7 @@ theorem reduce_spec (limbs : Array U64 5#usize) :
   unfold reduce
   step*
   · scalar_tac
-  · simp_lists [*, UScalar.val_and]; scalar_tac
+  · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
   · simp_lists [*]; scalar_tac
