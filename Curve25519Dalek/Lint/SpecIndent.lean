@@ -81,6 +81,10 @@ private def colOf (stx : Syntax) (fm : FileMap) : Option Nat :=
 private def lineOf (stx : Syntax) (fm : FileMap) : Option Nat :=
   stx.getPos? >>= fun p => some (fm.toPosition p).line
 
+/-- 1-indexed source line of `stx`'s trailing (end) position. -/
+private def tailLineOf (stx : Syntax) (fm : FileMap) : Option Nat :=
+  stx.getTailPos? >>= fun p => some (fm.toPosition p).line
+
 /-- `true` iff `stx` is a `A ∧ B` node (the `«term_∧_»` notation).
 Matches by checking that the node has exactly three children and the middle child is the
 `∧` atom.  We use the atom-value check rather than `stx.getKind == \`«term_∧_»` to stay
@@ -135,10 +139,10 @@ private partial def collectMisindentedAndRhs_aux
     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
     | some lhs, some andNode, some rhs =>
         let acc := collectMisindentedAndRhs_aux rhs fm expected
-        match lineOf lhs fm, lineOf andNode fm, lineOf rhs fm, colOf rhs fm with
-        | some lhsLine, some andLine, some rhsLine, some rhsCol =>
+        match tailLineOf lhs fm, lineOf andNode fm, lineOf rhs fm, colOf rhs fm with
+        | some lhsTailLine, some andLine, some rhsLine, some rhsCol =>
           let acc :=
-            if andLine > lhsLine then
+            if andLine > lhsTailLine then
               acc.push (andNode,
                 "∧ operator should be appended to the end of the preceding line, \
                 not placed at the start of a new line, \
