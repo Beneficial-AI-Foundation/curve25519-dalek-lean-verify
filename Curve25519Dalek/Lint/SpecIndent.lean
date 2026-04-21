@@ -114,29 +114,20 @@ private partial def collectMisindentedWpBodies
         | _, _, _ => childResults
       | _, _ => childResults
 
-/-- Recursively collect every `∧`-RHS node that (a) starts on a line strictly after the
-corresponding `∧` node's start line and (b) is NOT at `expected` column.
-Returns the offending RHS nodes for diagnostic reporting. -/
--- private partial def collectMisindentedAndRhs
---     (stx : Syntax) (fm : FileMap) (expected : Nat) : List Syntax :=
---   -- let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
---   if isAndNode stx then
---     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
---     | some lhs, some andNode, some rhs =>
---         match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, lineOf rhs fm with
---         | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
---           if lhsLine < andLine then
---             if andCol != expected then
---               andNode :: collectMisindentedAndRhs rhs fm expected
---             else
---               collectMisindentedAndRhs rhs fm expected
---           else
---             if rhsLine > andLine && rhsCol ≠ expected then rhs :: collectMisindentedAndRhs rhs fm expected
---             else collectMisindentedAndRhs rhs fm expected
---         | _, _, _, _, _, _ => collectMisindentedAndRhs rhs fm expected
---     | _, _, _ => []
---   else []
-
+/-- Recursively collect every WP-binder body term (the `body` in `⦃ binder => body ⦄`).
+Used to scope `∧`-RHS checks to postconditions only. -/
+private partial def collectWpBodies (stx : Syntax) : Array Syntax :=
+  let childResults := stx.getArgs.flatMap collectWpBodies
+  let args := stx.getArgs
+  let hasLLBracket := args.any fun c =>
+    match c with | Syntax.atom _ v => v.trimAscii == "⦃" | _ => false
+  if !hasLLBracket then childResults
+  else
+    match args.findIdx? (fun c => match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
+    | none     => childResults
+    | some idx => match args[idx + 1]? with
+      | some body => childResults.push body
+      | none      => childResults
 
 private partial def collectMisindentedAndRhs
     (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
@@ -206,16 +197,14 @@ def specIndentLinter : Linter where run stx := do
         The postcondition body after `=>` should be indented 6 spaces \
         per the spec theorem style guide."
 
-  -- -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
-
-  -- logLint linter.curve25519.specIndent typeTerm m!"xx{typeTerm}"
-  for node in collectMisindentedAndRhs typeTerm fm 6 do
-    -- dbg_trace "typeTerm: {repr typeTerm}"
-    let col := (colOf node fm).getD 0
-    logLint linter.curve25519.specIndent node
-      m!"Postcondition conjunct is at column {col}, expected 6. \
-        Conjunction operands on new lines should be indented 6 spaces \
-        per the spec theorem style guide."
+  -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
+  for body in collectWpBodies typeTerm do
+    for node in collectMisindentedAndRhs body fm 6 do
+      let col := (colOf node fm).getD 0
+      logLint linter.curve25519.specIndent node
+        m!"Postcondition conjunct is at column {col}, expected 6. \
+          Conjunction operands on new lines should be indented 6 spaces \
+          per the spec theorem style guide."
 
   -- ── Check 4: Proof body at column 2 ──────────────────────────────────────
   unless declVal.isOfKind ``Lean.Parser.Command.declValSimple do return
