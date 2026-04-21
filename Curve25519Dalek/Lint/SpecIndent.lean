@@ -1,7 +1,7 @@
 /-
 Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: Zhang-Liao
+Authors: Liao Zhang
 -/
 import Lean
 
@@ -117,37 +117,69 @@ private partial def collectMisindentedWpBodies
 /-- Recursively collect every WP-binder body term (the `body` in `⦃ binder => body ⦄`).
 Used to scope `∧`-RHS checks to postconditions only. -/
 private partial def collectWpBodies (stx : Syntax) : Array Syntax :=
-  let childResults := stx.getArgs.flatMap collectWpBodies
   let args := stx.getArgs
   let hasLLBracket := args.any fun c =>
     match c with | Syntax.atom _ v => v.trimAscii == "⦃" | _ => false
-  if !hasLLBracket then childResults
+  if !hasLLBracket then args.flatMap collectWpBodies
   else
     match args.findIdx? (fun c => match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
-    | none     => childResults
+    | none     => #[]
     | some idx => match args[idx + 1]? with
-      | some body => childResults.push body
-      | none      => childResults
+      | some body => #[body]
+      | none      => #[]
 
-private partial def collectMisindentedAndRhs
-    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
-  let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
+
+private partial def collectMisindentedAndRhs_aux (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
   if isAndNode stx then
     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
     | some lhs, some andNode, some rhs =>
-        match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, lineOf rhs fm with
+        let rhsResults := collectMisindentedAndRhs_aux rhs fm expected
+        match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, colOf rhs fm with
         | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
-          if lhsLine < andLine then
-            if andCol != expected then
-              childResults.push rhs
-            else
-              childResults
-          else
-            if rhsLine > andLine && rhsCol ≠ expected then childResults.push rhs
-            else childResults
-        | _, _, _, _, _, _ => childResults
-    | _, _, _ => childResults
-  else childResults
+          -- if lhsLine < andLine then
+          --   if andCol != expected then
+          --     rhsResults.push rhs
+          --   else if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
+          --   else rhsResults
+          -- else
+          --   if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
+          --   else rhsResults
+          if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
+          else rhsResults
+        | _, _, _, _, _, _ => rhsResults
+    | _, _, _ => #[]
+  else #[]
+
+
+private partial def collectMisindentedAndRhs
+    (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
+  if isAndNode stx then
+    collectMisindentedAndRhs_aux stx fm expected
+  else
+    let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
+    childResults
+
+-- private partial def collectMisindentedAndRhs
+--     (stx : Syntax) (fm : FileMap) (expected : Nat) : Array Syntax :=
+--   if isAndNode stx then
+--     match stx.getArgs[0]?, stx.getArgs[1]?, stx.getArgs[2]? with
+--     | some lhs, some andNode, some rhs =>
+--         let rhsResults := collectMisindentedAndRhs rhs fm expected
+--         match lineOf lhs fm, colOf lhs fm, lineOf andNode fm, colOf andNode fm, lineOf rhs fm, colOf rhs fm with
+--         | some lhsLine, some _lhsCol, some andLine, some andCol, some rhsLine, some rhsCol =>
+--           if lhsLine < andLine then
+--             if andCol != expected then
+--               rhsResults.push rhs
+--             else
+--               rhsResults
+--           else
+--             if rhsLine > andLine && rhsCol ≠ expected then rhsResults.push rhs
+--             else rhsResults
+--         | _, _, _, _, _, _ => rhsResults
+--     | _, _, _ => #[]
+--   else
+--     let childResults := stx.getArgs.flatMap (collectMisindentedAndRhs · fm expected)
+--     childResults
 
 
 /-! ## Linter -/

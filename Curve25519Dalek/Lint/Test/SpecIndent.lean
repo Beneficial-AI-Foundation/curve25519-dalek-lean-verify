@@ -113,8 +113,7 @@ theorem dummyP_postcond_wrong_spec (n : Nat) :
 @[step]
 theorem dummyP_postcond_ok_spec (n : Nat) :
     dummyP n ⦃ (r : Nat × Nat) =>
-      r.1 = n ∧
-      r.2 = n ⦄ := by
+      r.1 = n ∧ r.2 = n ⦄ := by
   simp [dummyP]
 
 /-! ## Check 4 — proof body after `by` at wrong column -/
@@ -159,5 +158,6 @@ theorem dummyP_canonical_spec (n : Nat)
     (_h : n > 0) :
     dummyP n ⦃ (r : Nat × Nat) =>
       r.1 = n ∧
-      r.2 = n ⦄ := by
+      (r.2 = n ∧ 1 = 1) ∧
+      2 = 2 ⦄ := by
   simp [dummyP]
