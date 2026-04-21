@@ -196,21 +196,25 @@ def specIndentLinter : Linter where run stx := do
 
   -- ── Check 1: Continuation lines at column 4 ─────────────────────────────
   -- Arguments, preconditions, and the function application line all share the
-  -- same 4-space rule; iterate over binders and typeTerm together.
-  -- Only the first node on each continuation line is checked; multiple binders
-  -- on the same line (e.g. `(n : Nat) (_h : n > 0)`) are a single logical line.
-  let mut seenLines : List Nat := []
-  for node in bindersNode.getArgs ++ #[typeTerm] do
-    if let some nodeLine := lineOf node fm then
-      if nodeLine > kwLine && !seenLines.contains nodeLine then
-        seenLines := seenLines ++ [nodeLine]
-        if let some nodeCol := colOf node fm then
-          unless nodeCol == 4 do
-            logLint linter.curve25519.specIndent node
-              m!"Continuation line is at column {nodeCol}, expected 4. \
-                Arguments, preconditions, and the function application line \
-                on a new line should be indented 4 spaces \
-                per the spec theorem style guide."
+  -- same 4-space rule.  Keep only the first node on each continuation line so
+  -- that multiple binders sharing a line (e.g. `(n : Nat) (_h : n > 0)`) count
+  -- as one logical line.
+  let (firstPerLine, _) := (bindersNode.getArgs ++ #[typeTerm]).foldl
+    (fun acc node =>
+      let (arr, seen) := acc
+      match lineOf node fm with
+      | some l => if l > kwLine && !seen.contains l then (arr.push node, seen.cons l)
+                  else acc
+      | none   => acc)
+    ((#[] : Array Syntax), ([] : List Nat))
+  for node in firstPerLine do
+    if let some nodeCol := colOf node fm then
+      unless nodeCol == 4 do
+        logLint linter.curve25519.specIndent node
+          m!"Continuation line is at column {nodeCol}, expected 4. \
+            Arguments, preconditions, and the function application line \
+            on a new line should be indented 4 spaces \
+            per the spec theorem style guide."
 
   -- ── Check 3a: First postcondition body at column 6 ──────────────────────
   for node in collectMisindentedWpBodies typeTerm fm 6 do
