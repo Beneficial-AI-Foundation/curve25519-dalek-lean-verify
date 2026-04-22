@@ -15,7 +15,7 @@ import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.AsAffine
 import Curve25519Dalek.Specs.Montgomery.ProjectivePoint.DifferentialAddAndDouble
 
 /-!
-# Spec theorems for `curve25519_dalek::montgomery::MontgomeryPoint::mul`
+# Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul`
 
 The core algorithm is the Montgomery ladder (Algorithm 8 from Costello-Smith 2017), which
 performs constant-time scalar multiplication by processing scalar bits from bit 254 down to
