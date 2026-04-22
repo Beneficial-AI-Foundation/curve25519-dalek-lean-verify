@@ -60,7 +60,7 @@ where p = 2^255 - 19
   - C ≡ T * 2 * d (mod p)
 where p = 2^255 - 19
 -/
-@[externally_verified, step]
+@[step]
 theorem as_projective_niels_spec (e : EdwardsPoint)
     (he : e.IsValid) :
     as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>
@@ -124,7 +124,7 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
             simp only at this
             unfold toField at this
             grind
-          · simp_all  -- Y_plus_X_bounds: < 2^54 
+          · simp_all  -- Y_plus_X_bounds: < 2^54
           · -- Y_minus_X_bounds: goal < 2^54, fact fe1_post1 : < 2^52
             intro i hi; have := fe1_post1 i hi; agrind
           · have := he.Z_bounds

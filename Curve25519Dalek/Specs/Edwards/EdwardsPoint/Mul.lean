@@ -6,6 +6,7 @@ Authors: Markus Dablander
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Representation
+import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VariableBase.Mul
 import Curve25519Dalek.ExternallyVerified
 
 /-! # Spec Theorems for `EdwardsPoint::mul`
@@ -55,17 +56,33 @@ natural language specs:
 • The result is mathematically correct, i.e.,
   result.toPoint = e.toPoint + .. + e.toPoint (s-times)
 -/
-@[step, externally_verified] -- proven in Verus
+@[step]
 theorem mul_spec (e : edwards.EdwardsPoint) (s : scalar.Scalar)
     (h_s_canonical : U8x32_as_Nat s.bytes < 2 ^ 255)
     (h_e_valid : e.IsValid) :
     mul e s ⦃ result =>
     result.IsValid ∧
     result.toPoint = (U8x32_as_Nat s.bytes) • e.toPoint ⦄ := by
-  unfold mul backend.variable_base_mul
+  -- `U8x32_as_Nat < 2^255` forces the top byte to have a clear high bit
+  -- (i.e., `s.bytes[31].val ≤ 127`), which is the precondition of
+  -- `variable_base.mul_spec`.
+  have h_top : (s.bytes[31]!).val ≤ 127 := by
+    -- If `bytes[31] ≥ 128` then the top byte alone contributes `≥ 2^248 * 128 = 2^255`,
+    -- contradicting `U8x32_as_Nat < 2^255`.
+    by_contra h_neg
+    push_neg at h_neg
+    unfold U8x32_as_Nat at h_s_canonical
+    rw [Finset.sum_range_succ] at h_s_canonical
+    have h_high_ge : 2 ^ 255 ≤ 2 ^ (8 * 31) * (s.bytes[31]!).val := by
+      calc 2 ^ 255 = 2 ^ (8 * 31) * 128 := by norm_num
+        _ ≤ 2 ^ (8 * 31) * (s.bytes[31]!).val := Nat.mul_le_mul_left _ h_neg
+    omega
+  unfold mul backend.variable_base_mul backend.get_selected_backend
   simp only [step_simps]
-
-  sorry
+  let* ⟨ result, result_valid, result_point ⟩ ←
+    curve25519_dalek.backend.serial.scalar_mul.variable_base.mul_spec e h_e_valid s h_top
+  refine ⟨result_valid, ?_⟩
+  rw [result_point, natCast_zsmul]
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithMulSharedAScalarEdwardsPoint
 

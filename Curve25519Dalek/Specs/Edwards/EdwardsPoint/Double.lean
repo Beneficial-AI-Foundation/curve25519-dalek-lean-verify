@@ -9,7 +9,7 @@ import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
-import Mathlib
+
 
 /-! # Spec Theorem for `EdwardsPoint::double`
 

@@ -13,7 +13,6 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Con
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Identity
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Neg
 import Curve25519Dalek.ExternallyVerified
-import Mathlib
 
 /-! # Spec Theorem for `LookupTable<ProjectiveNielsPoint>::select`
 

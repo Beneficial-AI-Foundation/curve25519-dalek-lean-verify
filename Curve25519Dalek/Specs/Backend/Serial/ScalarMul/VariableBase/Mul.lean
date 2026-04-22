@@ -15,7 +15,6 @@ import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix16
 import Curve25519Dalek.Specs.Scalar.Scalar.AsRadix2w
 import Curve25519Dalek.Specs.Edwards.EdwardsPoint.Identity
 import Curve25519Dalek.ExternallyVerified
-import Mathlib
 
 /-! # Spec Theorem for `variable_base::mul`
 

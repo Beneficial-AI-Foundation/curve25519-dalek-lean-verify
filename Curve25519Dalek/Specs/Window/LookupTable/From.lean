@@ -12,7 +12,6 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.Add
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
 import Curve25519Dalek.Specs.Scalar.Scalar.ConditionalSelect
 import Curve25519Dalek.ExternallyVerified
-import Mathlib
 
 /-! # Spec Theorem for `LookupTable::from`
 
