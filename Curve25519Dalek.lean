@@ -30,6 +30,8 @@ import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectiveNielsPoint.Sub
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.AsExtended
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Identity
+import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VariableBase.Mul
+import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VariableBase.MulLoop
 import Curve25519Dalek.Specs.Backend.Serial.ScalarMul.VartimeDoubleBase.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Aplus2OverFour
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint

@@ -2684,11 +2684,14 @@
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldElement51FieldElement51.add",
     "curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithSubSharedAFieldElement51FieldElement51.sub"]},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_spec (point : EdwardsPoint) (hpoint : point.IsValid)\n    (scalar : Scalar) (h_top : (scalar.bytes[31]!).val ≤ 127) :\n    mul point scalar ⦃ (result : EdwardsPoint) =>\n      result.IsValid ∧\n      result.toPoint = ((U8x32_as_Nat scalar.bytes : ℕ) : ℤ) • point.toPoint ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/Mul.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `variable_base.mul`**:\n- No panic (always returns successfully) given `point.IsValid` and\n  `(scalar.bytes[31]!).val ≤ 127`.\n- The result is a valid `EdwardsPoint`.\n- It represents `(U8x32_as_Nat scalar.bytes) • point.toPoint` on Ed25519.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
@@ -2713,11 +2716,14 @@
     "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul_loop",
     "curve25519_dalek.backend.serial.curve_models.CompletedPoint.as_extended"]},
   {"visibility": null,
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem mul_loop_spec\n    (P : EdwardsPoint) (hP : P.IsValid)\n    (lookup_table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), lookup_table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        lookup_table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (scalar_digits : Array Std.I8 64#usize)\n    (h_digits_bds : ∀ k < 63,\n        -8 ≤ (scalar_digits[k]!).val ∧ (scalar_digits[k]!).val < 8)\n    (h_digit_63 : -8 ≤ (scalar_digits[63]!).val ∧ (scalar_digits[63]!).val ≤ 8)\n    (tmp3 : EdwardsPoint)\n    (tmp1 : CompletedPoint) (h_tmp1_valid : tmp1.IsValid)\n    (i : Usize) (h_i : i.val ≤ 63)\n    (h_inv : tmp1.toPoint =\n        (I8x64_partial_radix16 scalar_digits i.val) • P.toPoint) :\n    mul_loop lookup_table scalar_digits tmp3 tmp1 i ⦃ (result : CompletedPoint) =>\n      result.IsValid ∧\n      result.toPoint = (I8x64_partial_radix16 scalar_digits 0) • P.toPoint ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/ScalarMul/VariableBase/MulLoop.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `variable_base.mul_loop`**:\n- No panic (always returns successfully)\n- Returns a `CompletedPoint` whose Edwards point equals the full radix-16 reconstruction\n  of `scalar_digits`, scaled by `P.toPoint`.\n-/",
    "source": "curve25519-dalek/src/backend/serial/scalar_mul/variable_base.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::scalar_mul::variable_base::mul",
