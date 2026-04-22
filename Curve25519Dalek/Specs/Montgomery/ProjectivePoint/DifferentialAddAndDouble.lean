@@ -13,7 +13,7 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Montgomery.MontgomeryPoint.ElligatorEncode
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.APLUS2_OVER_FOUR
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Aplus2OverFour
 /-! # differential_add_and_double
 
 Specification for `montgomery::differential_add_and_double`.

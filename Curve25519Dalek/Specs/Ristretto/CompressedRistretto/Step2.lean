@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -15,21 +15,32 @@ import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 import Curve25519Dalek.Specs.Field.FieldElement51.InvSqrt
 import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EDWARDS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
-/-! # Spec Theorem for `ristretto.decompress.step_2`
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::decompress::step_2`
 
-Specification and proof for `ristretto.decompress.step_2`.
+Takes a field element `s` as input (from step_1) and performs the second step of Ristretto
+decompression, computing the coordinates of an Edwards curve point via the inverse Ristretto
+encoding map. Concretely:
 
-This function performs the second step of Ristretto decompression, computing
-the affine coordinates (x, y) of a point on the Edwards curve from the field element s, then
-outputs extended Edwards coordinates (x, y, 1, xy)
+- Computes `ss = s^2`, `u1 = 1 - ss`, `u2 = 1 + ss`, `u2_sqr = u2^2`
+- Computes `v = (-EDWARDS_D) * u1^2 - u2^2` and `W = v * u2^2`
+- Computes `(ok1, I) = invsqrt(W)`, where `ok1` indicates whether the inverse square root exists
+- Derives `Dx = I * u2`, `Dy = I * Dx * v`, `x = 2 * s * Dx`; conditionally negates `x` if
+  negative, producing `x1`; then `y = u1 * Dy` and `t = x1 * y`
+- Returns `(ok1, c, c1, pt)` where `c` flags whether `t` is negative, `c1` flags whether
+  `y = 0`, and `pt = { X := x1, Y := y, Z := 1, T := t }` in extended twisted Edwards form
 
-**Source**: curve25519-dalek/src/ristretto.rs
+The three `Choice` flags `(ok1, c, c1)` are consumed by the full `decompress` function to
+validate the decompression result.
+
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
-open Aeneas Aeneas.Std Result Edwards Aeneas.Std.WP
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Edwards
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.math curve25519_dalek.ristretto
 namespace curve25519_dalek.ristretto.decompress
@@ -92,7 +103,6 @@ private lemma Py_ne_zero {y : FieldElement51} {P : Point Ed25519} {c1 : subtle.C
   simp only [FieldElement51.toField, ne_eq, ZMod.natCast_eq_zero_iff, Nat.dvd_iff_mod_eq_zero]
   intro h
   exact absurd (h_post.mpr h) (by rw [h_c1]; decide)
-
 
 /-- Wrapper for `decompress_step2_2` with the algebraic forms used in step_2_spec.
     Extracted to avoid ring normalization timeouts in the large proof context. -/
@@ -182,88 +192,31 @@ private lemma decompress_step2_forward (s : ZMod p) (P : Point Ed25519)
       have h1 : I_math * (I_math * u2) * v = I_math ^ 2 * u2 * v := by ring
       rw [h1, ← hI_sq_eq]
 
-/-
-natural language description:
-
-    • Takes a field element s as input (from step_1)
-    • Computes ss = s²
-    • Computes u1 = 1 - ss
-    • Computes u2 = 1 + ss
-    • Computes u2_sqr = u2²
-    • Computes v = (-EDWARDS_D) · u1² - u2²
-    • Computes I = invsqrt(v · u2²), obtaining (ok1, I) where ok1 indicates if the inverse square root exists
-    • Computes Dx = I · u2
-    • Computes Dy = I · Dx · v
-    • Computes x = 2s · Dx
-    • Conditionally negates x if x is negative, producing x1
-    • Computes y = u1 · Dy
-    • Computes t = x1 · y (the extended coordinate)
-    • Checks if t is negative (stored in c)
-    • Checks if y is zero (stored in c1)
-    • Returns a tuple containing:
-        - ok1: Choice indicating whether the inverse square root computation succeeded
-        - c: Choice indicating whether t is negative
-        - c1: Choice indicating whether y is zero
-        - A RistrettoPoint with coordinates (X=x1, Y=y, Z=1, T=t) in extended twisted Edwards form
-
-    This is the second step in Ristretto decompression. It computes the point coordinates
-    from the field element s, performing the inverse of the Ristretto encoding map.
-    The three Choice values (ok1, c, c1) are used in the full decompress function to validate
-    that the decompression is valid.
-
-natural language specs:
-
-    • The function always succeeds (no panic) for any valid field element s
-    • ok1 is true iff the inverse square root of w := v · u2² exists,
-      where v = (-EDWARDS_D) · u1² - u2², u1 = 1 - s², u2 = 1 + s².
-      The function called in step_2 is `invsqrt(w)`, which computes
-      r = 1/√w. For 1/√w to exist we need w ≠ 0 (so that 1/w is
-      defined) and w to be a quadratic residue (so that √w exists).
-      Equivalently, `invsqrt` tests whether r² · w ≡ 1 (mod p) has a
-      solution. When w = 0, r² · 0 = 0 ≠ 1, so no solution exists and
-      ok1 = 0. Since Mathlib's `IsSquare 0 = True` (0 = 0²), the spec
-      requires the conjunct `w ≠ 0` alongside `IsSquare w`.
-    • c is true if and only if t is negative, where t = x1 · y is the T coordinate of the output point
-    • c1 is true if and only if y = 0
-    • The output point pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0 (all checks pass)
--/
-
-
 set_option maxHeartbeats 400000 in -- increased for step* through many sub-calls
-/-- **Spec for `step_2`**
-Reflects the Rust implementation:
-1.  Performs the algebraic lift (Elligator map) to compute a point `pt`.
-2.  Computes validity flags `ok1` (square exists), `c` (non-negative T), `c1` (non-zero Y).
-
-It proves:
-1.  **Low-Level Correctness**: The flags correspond exactly to their mathematical definitions.
-2.  **High-Level Correctness**: The function returns a result that matches `decompress_step2` **iff** the flags indicate success.
-
-Namely:
-    • The function always succeeds (no panic) for any valid field element `s`
-    • ok1 is true if and only if the inverse square root of v · u2² exists
-    • c is true if and only if t is negative
-    • c1 is true if and only if y is zero
-    • pt is a valid RistrettoPoint when ok1 = 1, c = 0, and c1 = 0
-Moreover if the high-level function returns `some P`, then:
-a) The Rust flags must be set to success (1, 0, 0)
-b) The Rust point `pt` must match the mathematical point `P`
-And conversely.
+/-- **Spec theorem for `curve25519_dalek::ristretto::decompress::step_2`**
+• The function always succeeds (no panic) for any valid field element `s`
+• `ok1.val = 1` iff `v * u2^2 ≠ 0 ∧ IsSquare(v * u2^2)`, where `u1 = 1 - s^2`,
+  `u2 = 1 + s^2`, `v = (-EDWARDS_D) * u1^2 - u2^2`
+• `c.val = 1` iff `pt.T` is negative (i.e. `pt.T.toField` has odd canonical representative)
+• `c1.val = 1` iff `pt.Y.toField = 0`
+• `decompress_step2 s.toField = some P` iff `ok1 = 1 ∧ c = 0 ∧ c1 = 0 ∧ pt.toPoint = P`
+• When `ok1 = 1 ∧ c = 0 ∧ c1 = 0`, `pt` is a valid `RistrettoPoint`
 -/
 @[step]
 theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     (h_s : ∀ i < 5, s[i]!.val < 2 ^ 52) :
-    step_2 s ⦃ (ok1, c, c1, pt) =>
-    (let s_val := s.toField
-     let u1 := 1 - s_val ^ 2
-     let u2 := 1 + s_val ^ 2
-     let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2
-     (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧
-     (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
-     (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧
-    (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
-      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧
-    (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
+    step_2 s ⦃ ((ok1, c, c1, pt) :
+        subtle.Choice × subtle.Choice × subtle.Choice × RistrettoPoint) =>
+      (let s_val := s.toField
+       let u1 := 1 - s_val ^ 2
+       let u2 := 1 + s_val ^ 2
+       let v := (-Ed25519.d) * u1 ^ 2 - u2 ^ 2
+       (ok1.val = 1#u8 ↔ (v * u2 ^ 2 ≠ 0 ∧ IsSquare (v * u2 ^ 2))) ∧
+       (c.val = 1#u8 ↔ math.is_negative pt.T.toField) ∧
+       (c1.val = 1#u8 ↔ pt.Y.toField = 0)) ∧
+      (∀ (P : Point Ed25519), ristretto.decompress_step2 s.toField = some P ↔
+        (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧ pt.toPoint = P)) ∧
+      (ok1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 → RistrettoPoint.IsValid pt) ⦄ := by
   unfold step_2
   step*
   rename_i invsqrt _ invsqrt_bounds invsqrt_nonneg invsqrt_case1 invsqrt_case2 invsqrt_case3
@@ -287,7 +240,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     rw [one_post1]; push_cast
     have hss' := hss; unfold FieldElement51.toField at hss'; rw [hss']
   have hu2_sqr : u2_sqr.toField = u2.toField ^ 2 := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ u2_sqr_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ u2_sqr_post1; push_cast at this; exact this
   have hfe_d : fe.toField = Ed25519.d := by
     unfold FieldElement51.toField; rw [fe_post1]; rfl
   have hfe_neg_add : fe.toField + neg_d.toField = 0 := by
@@ -298,16 +252,19 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
   have hneg_d : neg_d.toField = -Ed25519.d := by
     linear_combination hfe_neg_add - hfe_d
   have hu1_sq : u1_sq.toField = u1.toField ^ 2 := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ u1_sq_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ u1_sq_post1; push_cast at this; exact this
   have hneg_d_u1_sq : neg_d_u1_sq.toField = neg_d.toField * u1_sq.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ neg_d_u1_sq_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ neg_d_u1_sq_post1; push_cast at this; exact this
   have hv_add : v.toField + u2_sqr.toField = neg_d_u1_sq.toField := by
     unfold FieldElement51.toField; have := lift_mod_eq _ _ v_post2; push_cast at this; exact this
   have hv_val : v.toField = (-Ed25519.d) * u1.toField ^ 2 - u2.toField ^ 2 := by
     rw [hneg_d, hu1_sq] at hneg_d_u1_sq; rw [hu2_sqr, hneg_d_u1_sq] at hv_add
     linear_combination hv_add
   have hv_u2_sqr : v_u2_sqr.toField = v.toField * u2_sqr.toField := by
-    unfold FieldElement51.toField; have := lift_mod_eq _ _ v_u2_sqr_post1; push_cast at this; exact this
+    unfold FieldElement51.toField
+    have := lift_mod_eq _ _ v_u2_sqr_post1; push_cast at this; exact this
   -- Set W = the combined expression
   set W := (-Ed25519.d * (1 - s.toField ^ 2) ^ 2 - (1 + s.toField ^ 2) ^ 2) *
            (1 + s.toField ^ 2) ^ 2 with hW_def
@@ -379,13 +336,16 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     have h := lift_mod_eq _ _ (show (Field51_as_Nat x + Field51_as_Nat x_negated) % p = 0 % p by
       rw [Nat.zero_mod]; exact x_negated_post1)
     push_cast at h; grind
-  have hx1_nat : Field51_as_Nat x1 = if x_neg.val = 1#u8 then Field51_as_Nat x_negated else Field51_as_Nat x := by
+  have hx1_nat : Field51_as_Nat x1 =
+      if x_neg.val = 1#u8 then Field51_as_Nat x_negated else Field51_as_Nat x := by
     unfold Field51_as_Nat
     split <;> rename_i h
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-      have := x1_post i hi; rw [if_pos h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+      have := x1_post i hi; rw [if_pos h] at this
+      exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
     · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-      have := x1_post i hi; rw [if_neg h] at this; exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
+      have := x1_post i hi; rw [if_neg h] at this
+      exact congrArg (fun u => 2 ^ (51 * i) * u.val) this
   have hx1_select : x1.toField = if x_neg.val = 1#u8 then x_negated.toField else x.toField := by
     unfold FieldElement51.toField; rw [hx1_nat]; split <;> rfl
   have hx1_abs : x1.toField = math.abs_edwards x.toField := by
@@ -399,7 +359,8 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
     · rw [if_neg hxn]
       have : (x.toField.val % 2 == 1) = false := by
         rw [Bool.eq_false_iff]; intro h; rw [beq_iff_eq] at h
-        exact hxn (x_neg_post.mpr (by unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
+        exact hxn (x_neg_post.mpr (by
+          unfold FieldElement51.toField at h; rwa [ZMod.val_natCast] at h))
       simp only [this, Bool.false_eq_true, ↓reduceIte]
   have hI_sq_W : invsqrt.1.val = 1#u8 → invsqrt.2.toField ^ 2 * W = 1 := by
     intro h_ok1

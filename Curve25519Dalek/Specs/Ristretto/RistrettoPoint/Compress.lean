@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -15,46 +15,29 @@ import Curve25519Dalek.Specs.Field.FieldElement51.IsNegative
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ToBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SQRT_M1
-import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.INVSQRT_A_MINUS_D
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
+import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.InvsqrtAMinusD
 
-/-! # Spec Theorem for `RistrettoPoint::compress`
-
-Specification and proof for `RistrettoPoint::compress`.
+/-!
+# Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::compress`
 
 This function implements the Ristretto compression (ENCODE) function, which maps a
-RistrettoPoint to its canonical 32-byte representation. The function is defined in the
+RistrettoPoint to its canonical 32-byte representation, as specified in
+draft-irtf-cfrg-ristretto255-decaf448-08 (section 4.3.2).
 
-- [Ristretto specification](https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2).
+- The input is a RistrettoPoint (an equivalence class of Edwards points), represented
+  internally as an even EdwardsPoint in extended coordinates (X, Y, Z, T).
+- The output is a unique, canonical 32-byte representation.
+- Arithmetic is performed in the field 𝔽ₚ where p = 2^255 - 19.
 
-It takes a RistrettoPoint (which represents an equivalence class of Edwards points) and produces a unique, canonical byte representation.
->>
-**Source**: curve25519-dalek/src/ristretto.rs
+Source: "curve25519-dalek/src/ristretto.rs"
 -/
 
-open Aeneas Aeneas.Std Result Aeneas.Std.WP Edwards
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+open Edwards
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.math curve25519_dalek.ristretto
 namespace curve25519_dalek.ristretto.RistrettoPoint
-
-/-
-natural language description:
-
-• Takes a RistrettoPoint (represented internally as an even EdwardsPoint in extended coordinates
-  (X, Y, Z, T)) and compresses it to a canonical 32-byte representation according to the
-  Ristretto ENCODE function specified in:
-
-  https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-ristretto255-decaf448-08#section-4.3.2
-
-  Arithmetics are performed in the field 𝔽ₚ where p = 2^255 - 19.
-
-natural language specs:
-
-• The function always succeeds (no panic) for all valid RistrettoPoint inputs
-• The output is a valid CompressedRistretto 32-byte representation
-• The output accurately reflects the output of the pure mathematical compression function
--/
-
 
 -- Bridge helpers: lift Field51_as_Nat postconditions to FieldElement51.toField equalities
 private lemma bridge_mul {a b c : FieldElement51}
@@ -72,14 +55,18 @@ private lemma bridge_sq {a b : FieldElement51}
 private lemma bridge_sub {a b c : FieldElement51}
     (h : (Field51_as_Nat a + Field51_as_Nat c) % p = Field51_as_Nat b % p) :
     a.toField = b.toField - c.toField := by
-  unfold FieldElement51.toField; have := lift_mod_eq _ _ h
-  push_cast at this; linear_combination this
+  unfold FieldElement51.toField
+  have := lift_mod_eq _ _ h
+  push_cast at this
+  linear_combination this
 
 private lemma bridge_neg {a b : FieldElement51}
     (h : Field51_as_Nat a + Field51_as_Nat b ≡ 0 [MOD p]) :
     b.toField = -a.toField := by
-  unfold FieldElement51.toField; have := lift_mod_eq _ _ h
-  push_cast at this; linear_combination this
+  unfold FieldElement51.toField
+  have := lift_mod_eq _ _ h
+  push_cast at this
+  linear_combination this
 
 private lemma bridge_add {a b c : FieldElement51}
     (h : ∀ i < 5, (a[i]!).val = (b[i]!).val + (c[i]!).val) :
@@ -88,34 +75,52 @@ private lemma bridge_add {a b c : FieldElement51}
   have key : ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (a[i]!).val =
     ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (b[i]!).val +
     ∑ i ∈ Finset.range 5, 2 ^ (51 * i) * (c[i]!).val := by
-    rw [← Finset.sum_add_distrib]; apply Finset.sum_congr rfl
-    intro i hi; rw [Finset.mem_range] at hi; rw [h i hi]; ring
+    rw [← Finset.sum_add_distrib]
+    apply Finset.sum_congr rfl
+    intro i hi
+    rw [Finset.mem_range] at hi
+    rw [h i hi]
+    ring
   exact (congrArg Nat.cast key).trans (Nat.cast_add _ _)
 
 private lemma bridge_cond_nat {a b c : FieldElement51} {flag : subtle.Choice}
     (h : ∀ i < 5, a[i]! = if flag.val = 1#u8 then b[i]! else c[i]!) :
     Field51_as_Nat a = if flag.val = 1#u8 then Field51_as_Nat b else Field51_as_Nat c := by
-  unfold Field51_as_Nat; split <;> rename_i hc
-  · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-    have := h i hi; rw [if_pos hc] at this; rw [this]
-  · apply Finset.sum_congr rfl; intro i hi; rw [Finset.mem_range] at hi
-    have := h i hi; rw [if_neg hc] at this; rw [this]
+  unfold Field51_as_Nat
+  split <;> rename_i hc
+  · apply Finset.sum_congr rfl
+    intro i hi
+    rw [Finset.mem_range] at hi
+    have := h i hi
+    rw [if_pos hc] at this
+    rw [this]
+  · apply Finset.sum_congr rfl
+    intro i hi
+    rw [Finset.mem_range] at hi
+    have := h i hi
+    rw [if_neg hc] at this
+    rw [this]
 
 private lemma bridge_cond {a b c : FieldElement51} {flag : subtle.Choice}
     (h : ∀ i < 5, a[i]! = if flag.val = 1#u8 then b[i]! else c[i]!) :
     a.toField = if flag.val = 1#u8 then b.toField else c.toField := by
-  unfold FieldElement51.toField; rw [bridge_cond_nat h]; split <;> rfl
+  unfold FieldElement51.toField
+  rw [bridge_cond_nat h]
+  split <;> rfl
 
 private lemma flag_eq_true_iff_is_negative_of_val {flag : subtle.Choice} {n : Nat} {x : ZMod p}
     (hflag : flag.val = 1#u8 ↔ n % 2 = 1) (hx : n = x.val) :
     flag.val = 1#u8 ↔ is_negative x = true := by
-  refine ⟨?_, ?_ ⟩
+  refine ⟨?_, ?_⟩
   · intro hf
     unfold is_negative
-    rw [beq_iff_eq, ← hx]; exact hflag.mp hf
+    rw [beq_iff_eq, ← hx]
+    exact hflag.mp hf
   · intro hneg
     exact hflag.mpr (by
-      unfold is_negative at hneg; rw [beq_iff_eq] at hneg; rwa [← hx] at hneg)
+      unfold is_negative at hneg
+      rw [beq_iff_eq] at hneg
+      rwa [← hx] at hneg)
 
 private lemma flag_eq_true_iff_is_negative_of_neg_val
     {flag : subtle.Choice} {n : Nat} {x : ZMod p}
@@ -132,7 +137,8 @@ private lemma flag_eq_true_iff_is_negative_of_neg_val
     unfold is_negative
     rw [beq_eq_false_iff_ne]
     have hneg : (-x).val % 2 = 1 := by
-      have : n % 2 = 1 := hflag.mp hf; rwa [hx] at this
+      have : n % 2 = 1 := hflag.mp hf
+      rwa [hx] at this
     rw [hneg_val] at hneg
     exact fun h => by omega
   · intro hneg
@@ -179,8 +185,10 @@ private lemma cond_neg_scale_of_neg_flag_match (Z y x : ZMod p) (flag : subtle.C
 private lemma lift_fe_sq (fe : FieldElement51) (h : Field51_as_Nat fe ^ 2 % p = p - 1) :
     fe.toField ^ 2 = -1 := by
   unfold FieldElement51.toField
-  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1) (by rwa [Nat.mod_eq_of_lt (show p - 1 < p from by decide)])
-  push_cast at h; rwa [p_sub_one_cast] at h
+  have h := lift_mod_eq (Field51_as_Nat fe ^ 2) (p - 1)
+      (by rwa [Nat.mod_eq_of_lt (show p - 1 < p from by decide)])
+  push_cast at h
+  rwa [p_sub_one_cast] at h
 
 private lemma lift_rm_sq (rm : FieldElement51)
     (h : (Field51_as_Nat rm) ^ 2 * (a - d) % p = 1) :
@@ -189,10 +197,12 @@ private lemma lift_rm_sq (rm : FieldElement51)
   rw [show a = (-1 : ℤ) from rfl] at h
   have : (((↑(Field51_as_Nat rm) : ℤ) ^ 2 * (-1 - ↑d) : ℤ) : ZMod p) = 1 := by
     rw [← ZMod.intCast_mod _ p, h, Int.cast_one]
-  push_cast at this; exact this
+  push_cast at this
+  exact this
 
-set_option maxHeartbeats 800000 in -- maxHeartbeats increased: compress has many sub-calls, step* needs more time after Aeneas update
-/-- **Spec and proof concerning `ristretto.RistrettoPoint.compress`**:
+set_option maxHeartbeats 800000 in
+-- maxHeartbeats increased: compress has many sub-calls, step* needs more time after Aeneas update
+/-- **Spec theorem for `curve25519_dalek::ristretto::RistrettoPoint::compress`**
 • The function always succeeds (no panic) for all valid RistrettoPoint inputs
 • The output is a valid CompressedRistretto 32-byte representation
 • The output accurately reflects the output of the pure mathematical compression function
@@ -255,7 +265,8 @@ theorem compress_spec (self : RistrettoPoint) (h : self.IsValid) :
     simpa only [h_a_eq] using h_s1_parity
   -- Build the shared implementation-to-pure bridge once.
   -- Both final goals consume h_key : s1.toField = compress_s self.toPoint.
-  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6 _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+  rename_i _ _ _ _ _ _ x_post1 _ x_post2 x_post3 x_post4 x_post5 x_post6
+    _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
   have hvalid := h.1
   have ⟨hpx, hpy⟩ := edwards.EdwardsPoint.toPoint_of_isValid hvalid
   have hZ_ne := hvalid.Z_ne_zero  -- Z.toField ≠ 0

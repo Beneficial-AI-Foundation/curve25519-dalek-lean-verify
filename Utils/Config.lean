@@ -438,45 +438,9 @@ def ignoredFunctions : List String := [
   -- Edwards
   "curve25519_dalek.edwards.decompress.step_1",
   "curve25519_dalek.edwards.decompress.step_2",
-  "curve25519_dalek.edwards.EdwardsPoint.as_affine_niels",
-  "curve25519_dalek.edwards.EdwardsPoint.is_torsion_free",
-  "curve25519_dalek.edwards.EdwardsPoint.mul_clamped",
-  "curve25519_dalek.edwards.EdwardsPoint.Insts.SubtleConditionallySelectable.conditional_select",
-  "curve25519_dalek.edwards.EdwardsPoint.Insts.CoreCmpPartialEqEdwardsPoint.eq",
-  "curve25519_dalek.edwards.CompressedEdwardsY.from_slice",
-  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity",
-  "curve25519_dalek.edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq",
-  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithNegEdwardsPoint.neg",
-  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub",
-  "curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add",
-  -- AffinePoint
-  "curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity",
-  "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select",
-  "curve25519_dalek.edwards.affine.AffinePoint.to_edwards",
-  "curve25519_dalek.edwards.affine.AffinePoint.Insts.CoreCmpPartialEqAffinePoint.eq",
-  "curve25519_dalek.edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq",
   -- Scalar
-  "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU8.from",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU16.from",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU32.from",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU64.from",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreConvertFromU128.from",
-  "curve25519_dalek.scalar.Scalar.Insts.SubtleConditionallySelectable.conditional_select",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq",
-  "curve25519_dalek.scalar.Scalar.Insts.CoreOpsArithMulAssignSharedAScalar.mul_assign",
-  "curve25519_dalek.scalar.Scalar.to_radix_2w_size_hint",
-  "curve25519_dalek.scalar.Scalar.as_radix_2w",
-  "curve25519_dalek.scalar.Scalar.as_radix_16",
   "curve25519_dalek.scalar.Scalar.non_adjacent_form",
-  "curve25519_dalek.scalar.Scalar.batch_invert",
-  "curve25519_dalek.scalar.read_le_u64_into",
-  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithAddSharedAScalarScalar.add",
-  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithMulSharedAScalarScalar.mul",
-  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithSubSharedAScalarScalar.sub",
-  "curve25519_dalek.Shared0Scalar.Insts.CoreOpsArithNegScalar.neg",
-  -- Scalar52 (thin wrappers, specs live on montgomery_mul/montgomery_square)
-  "curve25519_dalek.backend.serial.u64.scalar.Scalar52.square",
-  -- Variable-base scalar multiplication
+   -- Variable-base scalar multiplication
   "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
   "curve25519_dalek.backend.variable_base_mul"
 ]
