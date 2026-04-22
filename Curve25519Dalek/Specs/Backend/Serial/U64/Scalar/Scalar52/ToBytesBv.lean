@@ -20,18 +20,6 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 
 namespace curve25519_dalek.backend.serial.u64.scalar.Scalar52
 
-/-! ## Part 0: local helpers -/
-
-/-- Casting a U64 to U8 takes the value modulo `2^8`. Mirrors the helper in
-`FieldElement51.to_bytes` but kept local to avoid the import. -/
-@[local simp]
-private theorem U64_cast_U8 (x : U64) : (UScalar.cast UScalarTy.U8 x).val = x.val % 2^8 := by
-  simp only [UScalar.cast, UScalarTy.U64_numBits_eq, UScalarTy.U8_numBits_eq,
-    Aeneas.Bvify.U64.UScalar_bv, BitVec.truncate_eq_setWidth]
-  simp only [UScalar.val]
-  simp only [UScalarTy.U8_numBits_eq, BitVec.toNat_setWidth, UScalar.bv_toNat,
-    UScalarTy.U64_numBits_eq, Aeneas.Bvify.U64.UScalar_bv]
-
 /-! ## Part 1: abstract byte-layout predicate (the "abstract function") -/
 
 /-- Byte-by-byte packing formula for 5 × 52-bit limbs into 32 LE bytes.
@@ -124,7 +112,7 @@ theorem decompose_or_limbs_shift4 (limb0 limb1 : U64) (h : limb0.val < 2 ^ 52) :
   bvify 64 at *
   have : BitVec.ofNat 64 (limb1.val <<< 4 % U64.size) = limb1.bv <<< 4 := by
     apply BitVec.eq_of_toNat_eq
-    simp [BitVec.toNat_shiftLeft, U64.size, U64.numBits, Nat.shiftLeft_eq]
+    grind [BitVec.toNat_shiftLeft, U64.size, U64.numBits]
   rw [this]; bv_decide
 
 /-! ## Part 3: Postcondition of the abstract function
@@ -185,16 +173,8 @@ theorem to_bytes_matches_layout (self : Scalar52) :
   unfold to_bytes
   step*
   unfold bytes_match_limbs_52
-  refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
-          ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
-    (subst_vars
-     simp only [Array.set_val_eq, getElem!_pos, List.length_set, List.Vector.length_val,
-       List.getElem_set_self, ne_eq, not_false_eq_true, List.getElem_set_ne,
-       UScalar.ofNatCore_val_eq,
-       Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos,
-       Nat.reduceEqDiff, Nat.succ_ne_self,
-       one_ne_zero, OfNat.ofNat_ne_one, OfNat.ofNat_ne_zero,
-       U64_cast_U8, UScalar.val_or, Nat.shiftRight_zero, *])
+  subst_vars
+  simp [UScalar.ofNatCore_val_eq, UScalar.cast_val_eq, UScalarTy.U8_numBits_eq, UScalar.val_or, *]
 
 /-! ## Part 6: main theorem — combine conformance + abstract postcondition -/
 
@@ -205,11 +185,11 @@ theorem to_bytes_spec' (self : Scalar52) (h : ∀ i < 5, self[i]!.val < 2 ^ 52)
     (h' : Scalar52_as_Nat self < L) :
     to_bytes self ⦃ (result : Std.Array U8 32#usize) =>
       U8x32_as_Nat result = Scalar52_as_Nat self ∧ U8x32_as_Nat result < L ⦄ := by
-  have hval : ∀ i < 5, self.val[i]!.val < 2 ^ 52 := by
-    intro i hi; have := h i hi; simpa using this
+  have hval : ∀ i < 5, self.val[i]!.val < 2 ^ 52 := by intro i hi; simpa using h i hi
   have htop := top_limb_lt_2_48 self h'
-  exact WP.spec_mono (to_bytes_matches_layout self) fun result hbytes =>
-    have heq := byte_packing_eq_52 self result hval htop hbytes
-    ⟨heq, heq ▸ h'⟩
+  apply WP.spec_mono (to_bytes_matches_layout self)
+  intro bytes hbytes
+  have heq := byte_packing_eq_52 self bytes hval htop hbytes
+  exact ⟨heq, heq ▸ h'⟩
 
 end curve25519_dalek.backend.serial.u64.scalar.Scalar52
