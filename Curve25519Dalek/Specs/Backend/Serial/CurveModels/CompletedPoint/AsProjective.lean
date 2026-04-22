@@ -43,8 +43,10 @@ natural language specs:
 
 /-- **Auxiliary spec for `as_projective`** proving arithmetic correctness.
 Input bounds: all coordinates < 2^54.
-Output: arithmetic relations modulo p. -/
-@[step]
+Output: arithmetic relations modulo p.
+
+The point-level `as_projective_spec` (WP form, takes `IsValid` and
+returns `IsValid ∧ toPoint = toPoint`) is the canonical chain target. -/
 theorem as_projective_spec_aux (q : CompletedPoint)
     (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 54)
     (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54)
@@ -184,31 +186,31 @@ private lemma as_projective_isValid_and_toPoint
       field_simp [hq_valid.Z_ne_zero, hq_valid.T_ne_zero]
 
 /--
-Verification of the `as_projective` function.
+Verification of the `as_projective` function (WP form, canonical chain target).
+
 The theorem states that converting a valid CompletedPoint to ProjectivePoint:
 1. Always succeeds
 2. Produces a valid ProjectivePoint
 3. Preserves the represented affine point
 -/
+@[step]
 theorem as_projective_spec
     (q : CompletedPoint) (hq_valid : q.IsValid) :
-    ∃ proj, as_projective q = ok proj ∧
-    proj.IsValid ∧ proj.toPoint = q.toPoint := by
+    as_projective q ⦃ (proj : ProjectivePoint) =>
+      proj.IsValid ∧ proj.toPoint = q.toPoint ⦄ := by
   -- Extract bounds from validity
   have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 54 := hq_valid.X_valid
   have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 54 := hq_valid.Y_valid
   have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 := hq_valid.Z_valid
   have h_qT_bounds : ∀ i < 5, (q.T[i]!).val < 2 ^ 54 := hq_valid.T_valid
-  -- Use auxiliary spec
-  obtain ⟨proj, h_run, hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩ :=
-    spec_imp_exists (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
-  use proj
-  constructor
-  · exact h_run
-  -- Lift arithmetic to field equalities
+  -- Use auxiliary spec, then strengthen its post to the point-level form.
+  apply WP.spec_mono
+    (as_projective_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds h_qT_bounds)
+  intro proj ⟨hX_arith, hY_arith, hZ_arith, hpX_bounds, hpY_bounds, hpZ_bounds⟩
+  -- Lift arithmetic to field equalities.
   have ⟨hX_F, hY_F, hZ_F⟩ :=
     as_projective_lift_to_field_eqs proj q hX_arith hY_arith hZ_arith
-  -- Prove validity and point equality
+  -- Combine validity and point equality.
   exact as_projective_isValid_and_toPoint proj q hq_valid
     hX_F hY_F hZ_F hpX_bounds hpY_bounds hpZ_bounds
 

@@ -2275,11 +2275,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_projective_spec\n    (q : CompletedPoint) (hq_valid : q.IsValid) :\n    ∃ proj, as_projective q = ok proj ∧\n    proj.IsValid ∧ proj.toPoint = q.toPoint := by ...",
+   "theorem as_projective_spec\n    (q : CompletedPoint) (hq_valid : q.IsValid) :\n    as_projective q ⦃ (proj : ProjectivePoint) =>\n      proj.IsValid ∧ proj.toPoint = q.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/CompletedPoint/AsProjective.lean",
    "spec_docstring":
-   "/--\nVerification of the `as_projective` function.\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
+   "/--\nVerification of the `as_projective` function (WP form, canonical chain target).\n\nThe theorem states that converting a valid CompletedPoint to ProjectivePoint:\n1. Always succeeds\n2. Produces a valid ProjectivePoint\n3. Preserves the represented affine point\n-/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::CompletedPoint}::as_projective",

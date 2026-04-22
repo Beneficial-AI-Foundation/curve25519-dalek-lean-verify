@@ -90,7 +90,7 @@ theorem mul_by_pow_2_loop_spec
     simp only [hr_run]
     -- CompletedPoint.as_projective r → proj with proj.IsValid, proj.toPoint = r.toPoint
     obtain ⟨proj, hproj_run, hproj_valid, hproj_toPoint⟩ :=
-      CompletedPoint.as_projective_spec r hr_valid
+      spec_imp_exists (CompletedPoint.as_projective_spec r hr_valid)
     simp only [bind_tc_ok, hproj_run, Array.getElem!_Nat_eq, List.getElem!_eq_getElem?_getD,
       exists_and_left]
     -- Increment counter
