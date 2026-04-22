@@ -305,7 +305,7 @@ theorem select_spec {P : EdwardsPoint}
   let* ⟨ i2, i2_post ⟩ ← IScalar.cast.step_spec
   let* ⟨ i3, i3_post ⟩ ← I16.add_spec
   let* ⟨ xabs, xabs_post1, xabs_post2 ⟩ ← IScalar.xor_spec
-  let* ⟨ t, t_post1, t_post2, t_post3, t_post4 ⟩ ←
+  let* ⟨ t, t_post1, t_post2, t_post3, t_post4, t_valid, t_zero ⟩ ←
     ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity_spec
   -- Bridge: i2 is also a cast, same as i and i1.
   have hi2_val : i2.val = x.val := by
@@ -358,31 +358,87 @@ theorem select_spec {P : EdwardsPoint}
       change i3.val = _
       rw [hi3_val, hm, Int.natAbs_of_nonneg hx_nn]; ring
   let* ⟨ t1, t1_post1, t1_post2 ⟩ ← select_loop_spec
-  · sorry
-  · sorry
+  · -- `h_t_point`: at loop entry (iter.start.val = 1), the invariant condition
+    rw [t_zero]
+    split_ifs with h
+    · exfalso; obtain ⟨h1, h2⟩ := h; agrind
+    · rfl
   let* ⟨ i4, i4_post1, i4_post2 ⟩ ← IScalar.and_spec
   let* ⟨ i5, i5_post ⟩ ← IScalar.hcast.step_spec
-  sorry
-  -- Proof strategy (to be completed; see `.formalising/fv-plans/.continue-here.md`):
-  --
-  --  1. Unfold `select`. Show the two `massert`s succeed (bounds on x).
-  --  2. Identify `xmask.val = if x.val < 0 then -1 else 0` and `xabs.val = |x.val|`
-  --     via arithmetic on I16. (`>>> 7` on I16 is arithmetic shift.)
-  --  3. Step through `identity`; obtain initial `t` with `t.IsValid ∧ t.toPoint = 0`.
-  --  4. Dispatch a `select_loop_spec` with loop invariant
-  --       `t.IsValid ∧ t.toPoint = if |x|.val ∈ [1..iter.start.val) then
-  --                                  ((|x|.val - 1 : ℕ) + 1 : ℤ) • P.toPoint
-  --                                else 0`
-  --     which, since the iterator runs `start = 1`, `end = 9`, yields after exit
-  --       `t.toPoint = if |x|.val ∈ [1..8] then (|x|.val : ℤ) • P.toPoint else 0`
-  --     i.e. `t.toPoint = (|x.val| : ℤ) • P.toPoint` for all `|x.val| ∈ [0..8]`.
-  --  5. Compute `neg_mask`: it is `Choice.one` iff `x.val < 0`, else `Choice.zero`.
-  --  6. Apply `neg_spec` to get `t_neg.IsValid ∧ t_neg.toPoint = -t.toPoint`.
-  --  7. Apply a point-level `conditional_assign_spec` to combine: result matches
-  --     `t` or `t_neg` depending on `neg_mask`, then push `toPoint` through.
-  --  8. Conclude `selected.toPoint = sign(x) · |x| · P.toPoint = x.val • P.toPoint`
-  --     via `Int.sign_mul_natAbs` / `zsmul` identities.
-
+  -- Establish `i5` is `0#u8` (x.val ≥ 0) or `1#u8` (x.val < 0) via case split
+  -- on `xmask.val ∈ {-1, 0}` + BitVec computations.
+  -- Helpers: compute xmask.bv concretely from xmask.val, then i4.bv, then i5 = UScalar.
+  have aux_xmask_bv_neg1 (h : xmask.val = -1) : xmask.bv = BitVec.allOnes 16 := by
+    apply BitVec.eq_of_toInt_eq
+    rw [BitVec.toInt_allOnes]; change xmask.val = _; rw [h]; decide
+  have aux_xmask_bv_zero (h : xmask.val = 0) : xmask.bv = 0#16 := by
+    apply BitVec.eq_of_toInt_eq; change xmask.val = _; rw [h]; decide
+  have aux_i5_one_of_xmask_neg1 (h : xmask.val = -1) : i5 = 1#u8 := by
+    have hxm_bv := aux_xmask_bv_neg1 h
+    have hi4_bv : i4.bv = 1#16 := by
+      simp only [i4_post2, hxm_bv]; decide
+    apply UScalar.eq_of_val_eq
+    change i5.bv.toNat = (1#u8 : U8).bv.toNat
+    rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
+    rw [hi4_bv]; decide
+  have aux_i5_zero_of_xmask_zero (h : xmask.val = 0) : i5 = 0#u8 := by
+    have hxm_bv := aux_xmask_bv_zero h
+    have hi4_bv : i4.bv = 0#16 := by
+      simp only [i4_post2, hxm_bv]; decide
+    apply UScalar.eq_of_val_eq
+    change i5.bv.toNat = (0#u8 : U8).bv.toNat
+    rw [i5_post]; change (i4.bv.signExtend 8).toNat = _
+    rw [hi4_bv]; decide
+  have hi5_cases : i5 = 0#u8 ∨ i5 = 1#u8 := by
+    rcases xmask_post2 with hxm | hxm
+    · exact Or.inr (aux_i5_one_of_xmask_neg1 hxm)
+    · exact Or.inl (aux_i5_zero_of_xmask_zero hxm)
+  -- Unfold Choice.from and case-split on i5.
+  unfold subtle.Choice.Insts.CoreConvertFromU8.from
+  rcases hi5_cases with hi5_zero | hi5_one
+  · -- Case A: i5 = 0#u8 → neg_mask = Choice.zero (no flip). x.val ≥ 0.
+    have hx_nn : 0 ≤ x.val := by
+      by_contra hneg; push_neg at hneg
+      have hi1_neg : i1.val < 0 := by rw [hi1_val]; exact hneg
+      have hxm_neg : xmask.val = -1 := xmask_post3.mpr hi1_neg
+      have := aux_i5_one_of_xmask_neg1 hxm_neg
+      rw [this] at hi5_zero; exact absurd hi5_zero (by decide)
+    simp only [hi5_zero, ↓reduceDIte, bind_tc_ok]
+    let* ⟨ t_neg, t_neg_valid, t_neg_point ⟩ ←
+      ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg_spec
+    let* ⟨ selected, selected_valid, selected_point ⟩ ←
+      ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_point
+    refine ⟨selected_valid, ?_⟩
+    rw [selected_point]
+    simp only [show ¬((0#u8 : U8) = (1#u8 : U8)) from by decide, if_false]
+    rw [t1_post2, hxabs_val]
+    push_cast
+    congr 1
+    exact_mod_cast Int.natAbs_of_nonneg hx_nn
+  · -- Case B: i5 = 1#u8 → neg_mask = Choice.one (flip). x.val < 0.
+    have hx_neg : x.val < 0 := by
+      by_contra hnn; push_neg at hnn
+      have hi1_nn : 0 ≤ i1.val := by rw [hi1_val]; exact hnn
+      have hxm_zero : xmask.val = 0 := by
+        rcases xmask_post2 with hxm | hxm
+        · exfalso; have := xmask_post3.mp hxm; omega
+        · exact hxm
+      have := aux_i5_zero_of_xmask_zero hxm_zero
+      rw [this] at hi5_one; exact absurd hi5_one (by decide)
+    simp only [hi5_one, show ¬((1#u8 : U8) = (0#u8 : U8)) from by decide,
+               ↓reduceDIte, bind_tc_ok]
+    let* ⟨ t_neg, t_neg_valid, t_neg_point ⟩ ←
+      ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg_spec
+    let* ⟨ selected, selected_valid, selected_point ⟩ ←
+      ProjectiveNielsPoint.Insts.SubtleConditionallySelectable.conditional_assign_point
+    refine ⟨selected_valid, ?_⟩
+    rw [selected_point]
+    simp only [if_true]
+    rw [t_neg_point, t1_post2, hxabs_val, ← neg_zsmul]
+    fcongr 1
+    have h_nat : (x.val.natAbs : ℤ) = -x.val :=
+      Int.ofNat_natAbs_of_nonpos (le_of_lt hx_neg)
+    omega
 
 end window.LookupTable
 end curve25519_dalek

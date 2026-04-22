@@ -2414,11 +2414,14 @@
    "dependencies":
    ["curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem neg_spec (self : ProjectiveNielsPoint) (h_self : self.IsValid) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.IsValid ∧ result.toPoint = -self.toPoint ⦄ := by ...",
+   "spec_file":
+   "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
+   "spec_docstring":
+   "/-- **Spec theorem for the owned-value\n`ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**.\n\nMirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a\none-step delegation to it (Rust source: `-&self`). Needed so that `let*`\nin downstream proofs (e.g., `LookupTable.select_spec`) matches the binding\nthat type-class resolution produces. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::neg",
@@ -2429,7 +2432,7 @@
    "is_ignored": false,
    "is_hidden": true,
    "is_extraction_artifact": false,
-   "fully_verified": false,
+   "fully_verified": true,
    "externally_verified": false,
    "dependencies":
    ["curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg"]},
@@ -2457,11 +2460,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (result : ProjectiveNielsPoint) =>\n      Field51_as_Nat result.Y_plus_X = 1 ∧\n      Field51_as_Nat result.Y_minus_X = 1 ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T2d = 0 ⦄ := by ...",
+   "theorem identity_spec :\n    identity ⦃ (result : ProjectiveNielsPoint) =>\n      Field51_as_Nat result.Y_plus_X = 1 ∧\n      Field51_as_Nat result.Y_minus_X = 1 ∧\n      Field51_as_Nat result.Z = 1 ∧\n      Field51_as_Nat result.T2d = 0 ∧\n      result.IsValid ∧\n      result.toPoint = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**\n\nReturns the identity element of the Edwards curve in ProjectiveNiels coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0) -/",
+   "/-- **Spec theorem for\n`backend.serial.curve_models.ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity.identity`**\n\nReturns the identity element of the Edwards curve in ProjectiveNiels coordinates:\n- No panic (always returns successfully)\n- The resulting ProjectiveNielsPoint is the identity element with coordinates\n  (Y_plus_X=1, Y_minus_X=1, Z=1, T2d=0)\n- The result is a valid `ProjectiveNielsPoint`.\n- It represents the Edwards curve identity `0 = (0, 1)` (the affine neutral element). -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::traits::Identity for curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint}::identity",
@@ -11587,7 +11590,7 @@
    "externally_verified": false,
    "dependencies": []},
   {"visibility": "public",
-   "verified": false,
+   "verified": true,
    "specified": true,
    "spec_statement":
    "theorem select_spec {P : EdwardsPoint}\n    (table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (x : Std.I8)\n    (h_bounds_lo : -8 ≤ x.val) (h_bounds_hi : x.val ≤ 8) :\n    window.LookupTable.select\n        ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity\n        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable\n        ProjectiveNielsPoint.Insts.CoreMarkerCopy\n        ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint\n        table x ⦃ (selected : ProjectiveNielsPoint) =>\n      selected.IsValid ∧\n      selected.toPoint = (x.val : ℤ) • P.toPoint ⦄ := by ...",

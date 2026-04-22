@@ -100,3 +100,24 @@ theorem neg_spec
     ring
 
 end curve25519_dalek.Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint
+
+namespace curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
+namespace CoreOpsArithNegProjectiveNielsPoint
+
+/-- **Spec theorem for the owned-value
+`ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**.
+
+Mirrors the shared-reference `Shared0…neg_spec`; the owned `neg` is just a
+one-step delegation to it (Rust source: `-&self`). Needed so that `let*`
+in downstream proofs (e.g., `LookupTable.select_spec`) matches the binding
+that type-class resolution produces. -/
+@[step]
+theorem neg_spec (self : ProjectiveNielsPoint) (h_self : self.IsValid) :
+    neg self ⦃ (result : ProjectiveNielsPoint) =>
+      result.IsValid ∧ result.toPoint = -self.toPoint ⦄ := by
+  unfold neg
+  exact Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg_spec
+    self h_self
+
+end CoreOpsArithNegProjectiveNielsPoint
+end curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.Insts
