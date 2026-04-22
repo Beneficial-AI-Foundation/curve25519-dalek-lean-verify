@@ -476,7 +476,7 @@ private theorem conditional_negate_bounds_of_eq
     (r_is_negative : subtle.Choice)
     (r1_post : ∀ i < 5, r1[i]! = base[i]!)
     (base_bounds : ∀ i < 5, base[i]!.val < 2 ^ 52)
-    (x_bounds : ∀ i < 5, x[i]!.val ≤ 2 ^ 52)
+    (x_bounds : ∀ i < 5, x[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
     ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 := by
   intro i hi
@@ -754,7 +754,7 @@ private theorem solve_first_choice_true
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -833,7 +833,7 @@ private theorem solve_second_choice_true_choice3_true
       Field51_as_Nat SQRT_M1_val * Field51_as_Nat r [MOD p])
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -906,7 +906,7 @@ private theorem solve_second_choice_true_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.zero := by
@@ -1021,7 +1021,7 @@ private theorem solve_second_choice_false_choice3_true
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -1101,7 +1101,7 @@ private theorem solve_second_choice_false_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1)
     (h_check_ne_u : ¬(check.to_bytes = u.to_bytes))

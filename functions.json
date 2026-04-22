@@ -588,7 +588,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec (self : FieldElement51)\n    (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    neg self ⦃ (neg : FieldElement51) =>\n      Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧\n      ∀ i < 5, neg[i]!.val ≤ 2 ^ 52 ⦄ := by ...",
+   "theorem neg_spec (self : FieldElement51)\n    (h : ∀ i < 5, self[i]!.val < 2 ^ 54) :\n    neg self ⦃ (neg : FieldElement51) =>\n      Field51_as_Nat self + Field51_as_Nat neg ≡ 0 [MOD p] ∧\n      ∀ i < 5, neg[i]!.val < 2 ^ 52 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/U64/Field/FieldElement51/Neg.lean",
    "spec_docstring":
@@ -674,11 +674,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem neg_spec\n    (self : ProjectiveNielsPoint) (self_bound : ∀ i < 5, self.T2d[i]!.val < 2 ^ 54) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.Y_plus_X = self.Y_minus_X ∧\n      result.Y_minus_X = self.Y_plus_X ∧\n      result.Z = self.Z ∧\n      (Field51_as_Nat self.T2d + Field51_as_Nat result.T2d) % p = 0 ⦄ := by ...",
+   "theorem neg_spec\n    (self : ProjectiveNielsPoint) (h_self : self.IsValid) :\n    neg self ⦃ (result : ProjectiveNielsPoint) =>\n      result.IsValid ∧ result.toPoint = -self.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectiveNielsPoint/Neg.lean",
    "spec_docstring":
-   "/-- **Spec theorem for\n`Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**\n\nReturns the negation of a ProjectiveNielsPoint:\n- No panic (always returns successfully)\n- Given input `self` with coordinates (Y_plus_X, Y_minus_X, Z, T2d), the output\nProjectiveNielsPoint has coordinates (Y_plus_X', Y_minus_X', Z', T2d') where::\n  - Y_plus_X' = Y_minus_X (coordinates are swapped)\n  - Y_minus_X' = Y_plus_X (coordinates are swapped)\n  - Z' = Z (Z coordinate is unchanged)\n  - T2d' ≡ -T2d (mod p) (T2d is negated modulo p = 2^255 - 19) -/",
+   "/-- **Spec theorem for\n`Shared0ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint.neg`**:\n\n- No panic (always returns successfully) given `self.IsValid`.\n- The output is a valid `ProjectiveNielsPoint`.\n- It represents `-self.toPoint` on Ed25519.\n\nDerived by lifting the Field51-level `FieldElement51.neg_spec` postconditions\n(`r.Y_plus_X = self.Y_minus_X`, `r.Y_minus_X = self.Y_plus_X`, `r.Z = self.Z`,\n`r.T2d ≡ -self.T2d [mod p]` with `r.T2d[i]!.val < 2^52`) through\n`ProjectiveNielsPoint.toPoint'`. `IsValid` is symmetric in `Y_plus_X`/`Y_minus_X`\nat `< 2^54`, so the swap preserves `IsValid` trivially on those fields;\n`Z` is unchanged; `T2d`'s strict `< 2^52` bound is supplied by the tightened\n`FieldElement51.neg_spec`. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{core::ops::arith::Neg<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint> for &0 (curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint)}::neg",
@@ -2658,11 +2658,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem double_spec\n    (q : ProjectivePoint) (hq_valid : q.IsValid) :\n    ∃ c, ProjectivePoint.double q = ok c ∧\n    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by ...",
+   "theorem double_spec\n    (q : ProjectivePoint) (hq_valid : q.IsValid) :\n    ProjectivePoint.double q ⦃ (c : CompletedPoint) =>\n      c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Backend/Serial/CurveModels/ProjectivePoint/Double.lean",
    "spec_docstring":
-   "/-- Verification of the `double` function for `ProjectivePoint`.\nThin wrapper over `double_spec_core`: widens bounds from `< 2^52`\nto `< 2^53` and bridges `toPoint' → toPoint`. -/",
+   "/-- Verification of the `double` function for `ProjectivePoint` in WP form.\nThin wrapper over `double_spec_core`: widens bounds from `< 2^52`\nto `< 2^53` and bridges `toPoint' → toPoint`. -/",
    "source": "curve25519-dalek/src/backend/serial/curve_models/mod.rs",
    "rust_name":
    "curve25519_dalek::backend::serial::curve_models::{curve25519_dalek::backend::serial::curve_models::ProjectivePoint}::double",
@@ -11588,10 +11588,12 @@
    "dependencies": []},
   {"visibility": "public",
    "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "specified": true,
+   "spec_statement":
+   "theorem select_spec {P : EdwardsPoint}\n    (table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (x : Std.I8)\n    (h_bounds_lo : -8 ≤ x.val) (h_bounds_hi : x.val ≤ 8) :\n    window.LookupTable.select\n        ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity\n        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable\n        ProjectiveNielsPoint.Insts.CoreMarkerCopy\n        ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint\n        table x ⦃ (selected : ProjectiveNielsPoint) =>\n      selected.IsValid ∧\n      selected.toPoint = (x.val : ℤ) • P.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/Select.lean",
+   "spec_docstring":
+   "/-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::select`**:\n- No panic (always returns successfully) on inputs with `-8 ≤ x ≤ 8`.\n- The returned `ProjectiveNielsPoint` is valid.\n- It represents `(x.val : ℤ) • P.toPoint`, where `P` is the EdwardsPoint used to\n  construct the table (so `table[k].toPoint = (k+1) • P.toPoint` for `k ∈ Fin 8`).\n\nThis follows the Rust semantics literally:\n`selected.toPoint = (sign of x) • (|x| • P) = x • P`. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select",
@@ -11605,11 +11607,13 @@
    "externally_verified": false,
    "dependencies": ["curve25519_dalek.window.LookupTable.select_loop"]},
   {"visibility": "public",
-   "verified": false,
-   "specified": false,
-   "spec_statement": null,
-   "spec_file": null,
-   "spec_docstring": null,
+   "verified": true,
+   "specified": true,
+   "spec_statement":
+   "theorem select_loop_spec {P : EdwardsPoint}\n    (table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (iter : core.ops.range.Range Std.Usize)\n    (h_start_lo : 1 ≤ iter.start.val) (h_start_hi : iter.start.val ≤ 9)\n    (h_end : iter.«end».val = 9)\n    (xabs : Std.I16) (h_xabs_lo : 0 ≤ xabs.val) (h_xabs_hi : xabs.val ≤ 8)\n    (t : ProjectiveNielsPoint) (h_t_valid : t.IsValid)\n    (h_t_point : t.toPoint =\n        (if 1 ≤ xabs.val ∧ xabs.val < (iter.start.val : ℤ)\n          then (xabs.val : ℤ) • P.toPoint else 0)) :\n    window.LookupTable.select_loop\n        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable\n        iter table xabs t ⦃ (result : ProjectiveNielsPoint) =>\n      result.IsValid ∧ result.toPoint = (xabs.val : ℤ) • P.toPoint ⦄ := by ...",
+   "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/Select.lean",
+   "spec_docstring":
+   "/-- **Spec for `window.LookupTable<ProjectiveNielsPoint>::select_loop`**:\n\nGiven a valid table `[P, 2P, ..., 8P]` (in `ProjectiveNielsPoint` form) and an\niterator `iter` with `iter.start.val = s ∈ [1, 9]`, `iter.«end».val = 9`:\n\n- At entry, if the loop has already examined `j ∈ [1, s)` and found a match\n  (i.e., `xabs.val ∈ [1, s)`), then `t.toPoint = xabs.val • P.toPoint`; otherwise\n  `t.toPoint = 0`. (At `s = 1` this is just `t.toPoint = 0`.)\n\n- At exit (`s = 9`), since `xabs.val ∈ [0, 8]`:\n  - if `xabs.val ∈ [1, 8]`: the loop matched, `t.toPoint = xabs.val • P.toPoint`;\n  - if `xabs.val = 0`: no match, `t.toPoint = 0 = 0 • P.toPoint`.\n  Both cases collapse to `result.toPoint = xabs.val • P.toPoint`.\n\nBody of one iteration with `j = iter.start.val`:\n1. `ct_eq xabs j` returns `Choice.one` iff `xabs.val = j.val`;\n2. `table[j - 1]` gives `j • P` (valid);\n3. `conditional_assign t table[j-1] c`: picks `table[j-1]` iff match, else keeps `t`;\n4. recurse with iterator advanced (`iter1.start = s + 1`). -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select",
