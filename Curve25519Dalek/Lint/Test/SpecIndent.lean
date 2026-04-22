@@ -171,4 +171,5 @@ theorem dummyP_canonical2_spec
       r.1 = n ∧
       (r.2 = n ∧ 1 = 1) ∧
       2 = 2 ⦄ := by
+  simp
   simp [dummyP]
