@@ -3,7 +3,6 @@ Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhang-Liao
 -/
-import Curve25519Dalek.Lint.MaxHeartbeats
 import Curve25519Dalek.Lint.SpecIndent
 
 /-!
@@ -17,7 +16,6 @@ transitive import graph of spec theorem files.
 
 | Option | What it checks |
 |---|---|
-| `linter.curve25519.maxHeartbeatsMultiple` | `maxHeartbeats N` not a multiple of 200000 |
 | `linter.curve25519.specIndent` | `@[step]` theorem indentation (binders/type/body/proof) |
 
 All linters are enabled by default (`defValue := true`) and can be suppressed locally with a
