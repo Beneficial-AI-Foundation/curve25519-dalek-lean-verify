@@ -7,7 +7,7 @@ defaultTargets = ["Curve25519Dalek"]
 pp.unicode.fun = true # pretty-prints `fun a ↦ b`
 autoImplicit = false
 relaxedAutoImplicit = false
-weak.linter.mathlibStandardSet = true
+linter.mathlibStandardSet = true
 maxSynthPendingDepth = 3
 maxRecDepth = 10000
 

@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Zhang-Liao
 -/
 import Lean
+import Mathlib.Tactic.Linter
 
 /-!
 # Linter: `maxHeartbeats` values must be multiples of 200000
