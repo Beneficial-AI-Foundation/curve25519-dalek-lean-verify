@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Liao Zhang
 -/
@@ -17,59 +17,48 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.MINUS_ONE
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.CtEq
 import Curve25519Dalek.Math.Montgomery.Representation
 
-/-! # Spec Theorem for `MontgomeryPoint::to_edwards`
+/-!
+# Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::to_edwards`
 
-Specification and proof for `MontgomeryPoint::to_edwards`.
+Converts a `MontgomeryPoint` (u-coordinate only) to an `EdwardsPoint` on the twisted Edwards
+curve using the birational map y = (u − 1)/(u + 1) (mod p), where p = 2^255 − 19.
+Special case: when u ≡ −1 (mod p), the point lies on the twist and the function returns
+`None`; otherwise it encodes y with the specified sign bit and decompresses to a full
+`EdwardsPoint`.
 
-This function attempts to convert a MontgomeryPoint (u-coordinate only) to an
-EdwardsPoint on the twisted Edwards curve, using the birational map
-y = (u-1)/(u+1), followed by Edwards decompression with a specified sign bit.
-
-**Source**: curve25519-dalek/src/montgomery.rs:224-253
-
+Source: "curve25519-dalek/src/montgomery.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.montgomery.MontgomeryPoint
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-
-/-
-natural language description:
-
-    Converts a MontgomeryPoint (u-coordinate only) to an EdwardsPoint using the
-    birational map y = (u-1)/(u+1) (mod p), where p = 2^255 - 19.
-    Special case: when u ≡ -1 (mod p), returns None (point is on the twist).
-    Otherwise, computes y, encodes it with the specified sign bit, and decompresses
-    to obtain a full EdwardsPoint.
-
-natural language specs:
-
-    When the function returns Some(ep):
-      - ep.Z is invertible in the field (invert ep.Z = ok Z_inv for some Z_inv)
-      - The affine Edwards y-coordinate y = ep.Y / ep.Z satisfies the birational map:
-          y * (u + 1) ≡ u - 1 (mod p)
-        where u = U8x32_as_Nat mp % 2^255
-
-    where p = 2^255 - 19
--/
+namespace curve25519_dalek.montgomery.MontgomeryPoint
 
 @[step]
-private lemma ONE_bounds_spec : ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
+private lemma ONE_bounds_spec :
+    ONE ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   decide
 
+/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::to_edwards`**
+• The function always terminates without panic.
+• When the result is `Some ep`: `ep.Z` is invertible in the field.
+• When the result is `Some ep`: the affine Edwards y-coordinate y = ep.Y / ep.Z satisfies
+  y · (u + 1) ≡ u − 1 (mod p), where u = U8x32_as_Nat mp % 2^255 and p = 2^255 − 19.
+• When the result is `Some ep`: `ep` is a valid `EdwardsPoint`.
+-/
 @[step]
 theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
-      to_edwards mp sign ⦃ result =>
-        (∀ ep, result = some ep →
-          ∃ Z_inv,
-            field.FieldElement51.invert ep.Z = ok Z_inv ∧
-            let u := U8x32_as_Nat mp % 2^255
-            let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p
-            (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧ ep.IsValid )
-      ⦄ := by
+    to_edwards mp sign ⦃ (result : Option edwards.EdwardsPoint) =>
+      (∀ ep, result = some ep →
+        ∃ Z_inv,
+          field.FieldElement51.invert ep.Z = ok Z_inv ∧
+          let u := U8x32_as_Nat mp % 2^255
+          let y := Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p
+          (y * ((u + 1) % p)) % p = ((u + p - 1) % p) % p ∧
+          ep.IsValid ) ⦄ := by
   unfold to_edwards
   simp only [step_simps]
   let* ⟨ u, u_post1, u_post2 ⟩ ← from_bytes_spec
@@ -78,8 +67,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   simp only [step_simps]
   let* ⟨ x, x_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   unfold Bool.Insts.CoreConvertFromChoice.from
-  simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod, Nat.mod_mul_mod, dvd_refl,
-    Nat.mod_mod_of_dvd]
+  simp only [bind_tc_ok, decide_eq_true_eq, Nat.reducePow, Nat.mul_mod_mod,
+    Nat.mod_mul_mod, dvd_refl, Nat.mod_mod_of_dvd]
   split
   · simp only [spec_ok, reduceCtorEq, IsEmpty.forall_iff, implies_true]
   let* ⟨ one, one_post1, one_post2 ⟩ ← ONE_bounds_spec
@@ -95,31 +84,26 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   let* ⟨ i1, i1_post ⟩ ← Array.index_usize_spec
   let* ⟨ i2, i2_post1, i2_post2 ⟩ ← UScalar.xor_spec
   let* ⟨ y_bytes1, y_bytes1_post ⟩ ← Array.update_spec
-  let* ⟨ result, result_post1, result_post2, ep, result_post3 ⟩ ← edwards.CompressedEdwardsY.decompress_spec
-  -- Extract decompress postconditions (now includes Nat-level Y and Z facts)
+  let* ⟨ result, result_post1, result_post2, ep, result_post3 ⟩ ←
+    edwards.CompressedEdwardsY.decompress_spec
   have h_decomp := result_post2 ep result_post3
   obtain ⟨h_valid, _, h_Y_nat, _, h_Z_nat, _, _⟩ := h_decomp
-  -- Construct Z_inv via invert_spec (ep.Z is valid from IsValid)
   have h_Z_54 : ∀ i, i < 5 → ep.Z[i]!.val < 2 ^ 54 :=
     fun i hi => by have := h_valid.Z_bounds i hi; omega
-  obtain ⟨Z_inv, h_Zinv, h_inv_ne, _, _⟩ := spec_imp_exists (field.FieldElement51.invert_spec ep.Z h_Z_54)
+  obtain ⟨Z_inv, h_Zinv, h_inv_ne, _, _⟩ :=
+    spec_imp_exists (field.FieldElement51.invert_spec ep.Z h_Z_54)
   use Z_inv
   refine ⟨h_Zinv, ?_, h_valid⟩
-  -- Define y_val and derive h_y_val from Nat-level postconditions (no ZMod conversion)
   set y_val := (Field51_as_Nat ep.Y * Field51_as_Nat Z_inv) % p with y_val_def
   have h_affine_y : Field51_as_Nat ep.Y * Field51_as_Nat Z_inv % p = y_val := rfl
-  -- Z_inv % p = 1 (from Z % p = 1 and invert)
   have h_Zinv_mod : Field51_as_Nat Z_inv % p = 1 := by
     have h_ne : Field51_as_Nat ep.Z % p ≠ 0 := by rw [h_Z_nat]; decide
     have h := h_inv_ne h_ne
     rw [h_Z_nat, mul_one, Nat.mod_mod] at h; exact h
-  -- y_val = Y % p (since Z_inv ≡ 1), and Y ≡ encoded y (Nat-level from decompress_spec)
   have h_y_val : y_val % p = U8x32_as_Nat y_bytes1 % 2 ^ 255 % p := by
     rw [y_val_def, Nat.mod_mod, Nat.mul_mod, h_Zinv_mod, mul_one, Nat.mod_mod]
     exact h_Y_nat
-  -- Clear unused hypotheses to reduce context for the calc chain
   clear result_post1 result_post2 result_post3 h_Z_54 h_Z_nat h_Y_nat h_inv_ne
-  -- Restored from old proof: establish field arithmetic facts
   have h_expand : Field51_as_Nat fe2 = Field51_as_Nat u + Field51_as_Nat one := by
     unfold Field51_as_Nat
     rw [← Finset.sum_add_distrib]
@@ -163,7 +147,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
       rw [h_mod_i2, h_xor_lo, h_mod_i1]
     have h_i2_mod : i2.val % 128 = (↑y_bytes)[31]!.val := by rw [h_i2_lo, h_i1_eq]
     have h_orig_eq : U8x32_as_Nat y_bytes =
-        (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) + 2^248 * (↑y_bytes)[31]!.val := by
+        (∑ j ∈ Finset.range 31, 2^(8*j) * (y_bytes.val[j]!).val) +
+        2^248 * (↑y_bytes)[31]!.val := by
       unfold U8x32_as_Nat
       rw [Finset.sum_range_succ, show (8:Nat) * 31 = 248 from by norm_num]
       simp [Array.getElem!_Nat_eq]
@@ -314,7 +299,7 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
     _ = Field51_as_Nat fe1 % p := by
         ring_nf
     _ = (Field51_as_Nat u + p - 1) % p := h_fe1_eq
-    _ = (U8x32_as_Nat mp % 2^ 255 + p - 1) % p := by
+    _ = (U8x32_as_Nat mp % 2^255 + p - 1) % p := by
         have hp1 : 1 ≤ p := by decide
         rw [Nat.add_sub_assoc hp1, Nat.add_sub_assoc hp1]
         rw [Nat.add_mod (Field51_as_Nat u), Nat.add_mod (U8x32_as_Nat mp % 2 ^ 255),
