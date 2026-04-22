@@ -2,6 +2,9 @@ import Curve25519Dalek.Aux
 import Curve25519Dalek.ExternallyVerified
 import Curve25519Dalek.Funs
 import Curve25519Dalek.FunsExternal
+import Curve25519Dalek.Lint.Basic
+import Curve25519Dalek.Lint.SpecIndent
+import Curve25519Dalek.Lint.Test.SpecIndent
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.BitList
 import Curve25519Dalek.Math.Edwards.Basepoint

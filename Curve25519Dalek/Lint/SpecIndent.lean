@@ -13,7 +13,7 @@ Enforces the four indentation rules for `@[step]` spec theorems defined in `doc/
 
 | Location | Expected column (0-indexed) |
 |---|---|
-| Continuation line on a new line after the `theorem` line (arguments, preconditions, function application) | 4 |
+| Continuation line on a new line after the `theorem` line | 4 |
 | Postcondition body on a new line after `=>` in the WP binder | 6 |
 | `∧` RHS postcondition on a new line inside the WP binder | 6 |
 | Proof body after `by` (when on a new line) | 2 |
@@ -107,7 +107,8 @@ private partial def collectMisindentedWpBodies
     match c with | Syntax.atom _ v => v.trimAscii == "⦃" | _ => false
   if !hasLLBracket then childResults
   else
-    match args.findIdx? (fun c => match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
+    match args.findIdx? (fun c =>
+    match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
     | none => childResults
     | some arrowIdx =>
       match args[arrowIdx]?, args[arrowIdx + 1]? with
@@ -127,11 +128,12 @@ private partial def collectWpBodies (stx : Syntax) : Array Syntax :=
     match c with | Syntax.atom _ v => v.trimAscii == "⦃" | _ => false
   if !hasLLBracket then args.flatMap collectWpBodies
   else
-    match args.findIdx? (fun c => match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
-    | none     => #[]
-    | some idx => match args[idx + 1]? with
-      | some body => #[body]
-      | none      => #[]
+    match args.findIdx? (fun c =>
+      match c with | Syntax.atom _ v => v.trimAscii == "=>" | _ => false) with
+      | none     => #[]
+      | some idx => match args[idx + 1]? with
+        | some body => #[body]
+        | none      => #[]
 
 
 private partial def collectMisindentedAndRhs_aux
@@ -179,22 +181,17 @@ def specIndentLinter : Linter where run stx := do
   let some inner := stx.getArgs[1]? | return
   unless inner.isOfKind ``Lean.Parser.Command.theorem do return
   unless hasStepAttr stx do return
-
   let fm ← getFileMap
-
   -- ── Extract key sub-trees ─────────────────────────────────────────────────
   let some kwNode  := inner.getArgs[0]? | return   -- "theorem" keyword
   let some sig     := inner.getArgs[2]? | return   -- declSig
   let some declVal := inner.getArgs[3]? | return   -- declVal
-
   let some kwLine  := lineOf kwNode fm  | return
-
   -- declSig[0] = binder array,  declSig[1] = typeSpec
   let some bindersNode := sig.getArgs[0]? | return
   let some typeSpec    := sig.getArgs[1]? | return
   -- typeSpec[0] = ":" atom,  typeSpec[1] = type term
   let some typeTerm  := typeSpec.getArgs[1]? | return
-
   -- ── Check 1: Continuation lines at column 4 ─────────────────────────────
   -- Arguments, preconditions, and the function application line all share the
   -- same 4-space rule.  Keep only the first node on each continuation line so
@@ -216,7 +213,6 @@ def specIndentLinter : Linter where run stx := do
             Arguments, preconditions, and the function application line \
             on a new line should be indented 4 spaces \
             per the spec theorem style guide."
-
   -- ── Check 3a: First postcondition body at column 6 ──────────────────────
   for node in collectMisindentedWpBodies typeTerm fm 6 do
     let col := (colOf node fm).getD 0
@@ -224,12 +220,10 @@ def specIndentLinter : Linter where run stx := do
       m!"Postcondition body is at column {col}, expected 6. \
         The postcondition body after `=>` should be indented 6 spaces \
         per the spec theorem style guide."
-
   -- ── Check 3b: ∧ postcondition RHS at column 6 ────────────────────────────
   for body in collectWpBodies typeTerm do
     for (node, msg) in collectMisindentedAndRhs body fm 6 do
       logLint linter.curve25519.specIndent node m!"{msg}"
-
   -- ── Check 4: Proof body at column 2 ──────────────────────────────────────
   unless declVal.isOfKind ``Lean.Parser.Command.declValSimple do return
   -- declValSimple[0]=":=", [1]=declBody, [2]=Termination.suffix, [3]=whereDecls

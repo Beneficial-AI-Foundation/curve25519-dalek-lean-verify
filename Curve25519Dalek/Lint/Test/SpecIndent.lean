@@ -40,8 +40,9 @@ theorem dummyI_binder_wrong_spec (n : Nat)
       r = n ⦄ := by
   simp [dummyI]
 
--- No warning: binder continuation is correctly at column 4.
--- #guard_msgs in
+-- No warning: `(_h : n > 0)` starts on the theorem-keyword line, so the linter
+-- does not flag it — only binders whose node begins on a new line are checked.
+#guard_msgs in
 @[step]
 theorem dummyI_binder_ok_spec (n : Nat) (_h
 : n > 0) :
@@ -65,6 +66,7 @@ theorem dummyI_type_wrong_spec (n : Nat) :
   simp [dummyI]
 
 -- No warning: type term is correctly at column 4.
+#guard_msgs in
 @[step]
 theorem dummyI_type_ok_spec (n : Nat) :
     dummyI n ⦃ (r : Nat) =>
@@ -75,11 +77,17 @@ theorem dummyI_type_ok_spec (n : Nat) :
 
 /-! ### Check 3a — first postcondition body at wrong column -/
 
+/--
+warning: Postcondition body is at column 8, expected 6. The postcondition body after `=>` should be indented 6 spaces per the spec theorem style guide.
 
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 3a: WP body `r = n` is on a new line but at column 8, not 6.
 @[step]
 theorem dummyI_postcond_body_wrong_spec (n : Nat) :
     dummyI n ⦃ (r : Nat) =>
-      r  = n ⦄ := by
+        r = n ⦄ := by
   simp [dummyI]
 
 -- No warning: postcondition body is correctly at column 6.
@@ -94,18 +102,18 @@ theorem dummyI_postcond_body_ok_spec (n : Nat) :
 /-! ### Check 3b — `∧` postcondition RHS at wrong column -/
 
 /--
-warning: Postcondition conjunct is at column 8, expected 6. Conjunction operands on new lines
-should be indented 6 spaces per the spec theorem style guide.
+warning: Postcondition conjunct is at column 8, expected 6. Conjunction operands on new lines should be indented 6 spaces per the spec theorem style guide.
 
 Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
 -/
--- #guard_msgs in
--- Triggers `specIndent` check 3b: the RHS of `∧` is at column 8 (too deep).
--- The first postcondition `r.1 = n` is at column 6 (correct), so check 3a does not fire.
+#guard_msgs in
+-- Triggers `specIndent` check 3b: `∧` RHS `r.2 = n` wraps to a new line at column 8.
+-- The WP body `r.1 = n` is at column 6 (correct), so check 3a does not fire.
 @[step]
 theorem dummyP_postcond_wrong_spec (n : Nat) :
     dummyP n ⦃ (r : Nat × Nat) =>
-      (r.1 = n ∧ r.2 = n) ∧ 1 = 1 ⦄ := by
+      r.1 = n ∧
+        r.2 = n ⦄ := by
   simp [dummyP]
 
 -- No warning: ∧ RHS is correctly at column 6.
