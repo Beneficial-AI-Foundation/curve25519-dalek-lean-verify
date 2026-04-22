@@ -7051,10 +7051,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 r ⦃ r' =>\n      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧\n      (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 self ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result % p = (Field51_as_Nat self ^ pow_p58_exp) % p ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:\n- No panic for field element inputs r (always returns r' successfully)\n- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)\n-/",
+   "/-- **Spec theroem for `field.FieldElement51.pow_p58`**:\n- Field51_as_Nat(result) ≡ Field51_as_Nat(self)^(2^252-3) (mod p)\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
@@ -7612,7 +7612,7 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem mul_base_spec (scalar : scalar.Scalar) :\n    mul_base scalar ⦃ (result : MontgomeryPoint) =>\n      let ep := (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint\n      if ep.y = 1 then\n        MontgomeryPoint.mkPoint result = T_point\n      else\n        MontgomeryPoint.mkPoint result = abs_montgomery\n          ((U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint)) ⦄ := by ...",
+   "theorem mul_base_spec (scalar : scalar.Scalar)\n    (h_s_canonical : U8x32_as_Nat scalar.bytes < 2 ^ 255) :\n    mul_base scalar ⦃ (result : MontgomeryPoint) =>\n      let ep := (U8x32_as_Nat scalar.bytes) • _root_.Edwards.basepoint\n      if ep.y = 1 then\n        MontgomeryPoint.mkPoint result = T_point\n      else\n        MontgomeryPoint.mkPoint result = abs_montgomery\n          ((U8x32_as_Nat scalar.bytes) • (fromEdwards _root_.Edwards.basepoint)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Montgomery/MontgomeryPoint/MulBase.lean",
    "spec_docstring":
    "/-- **Spec theorem for `curve25519_dalek::montgomery::MontgomeryPoint::mul_base`**\n• The function always succeeds (no panic)\n• If `ep.y = 1` (where `ep := (U8x32_as_Nat scalar.bytes) • Edwards.basepoint`),\n  then `mkPoint result = T_point`\n• Otherwise, `mkPoint result = abs_montgomery (s • fromEdwards Edwards.basepoint)`\n  where `s = U8x32_as_Nat scalar.bytes`\n-/",
@@ -11601,7 +11601,8 @@
    "spec_statement":
    "theorem select_spec {P : EdwardsPoint}\n    (table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (x : Std.I8)\n    (h_bounds_lo : -8 ≤ x.val) (h_bounds_hi : x.val ≤ 8) :\n    window.LookupTable.select\n        ProjectiveNielsPoint.Insts.Curve25519_dalekTraitsIdentity\n        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable\n        ProjectiveNielsPoint.Insts.CoreMarkerCopy\n        ProjectiveNielsPoint.Insts.CoreOpsArithNegProjectiveNielsPoint\n        table x ⦃ (selected : ProjectiveNielsPoint) =>\n      selected.IsValid ∧\n      selected.toPoint = (x.val : ℤ) • P.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/Select.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::select`**:\n- No panic (always returns successfully) on inputs with `-8 ≤ x ≤ 8`.\n- The returned `ProjectiveNielsPoint` is valid.\n- It represents `(x.val : ℤ) • P.toPoint`, where `P` is the EdwardsPoint used to\n  construct the table (so `table[k].toPoint = (k+1) • P.toPoint` for `k ∈ Fin 8`).\n\nThis follows the Rust semantics literally:\n`selected.toPoint = (sign of x) • (|x| • P) = x • P`. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select",
@@ -11620,7 +11621,8 @@
    "spec_statement":
    "theorem select_loop_spec {P : EdwardsPoint}\n    (table : window.LookupTable ProjectiveNielsPoint)\n    (h_table_valid : ∀ (k : Fin 8), table.val[k].IsValid)\n    (h_table_point : ∀ (k : Fin 8),\n        table.val[k].toPoint = ((k.val + 1 : ℕ) : ℤ) • P.toPoint)\n    (iter : core.ops.range.Range Std.Usize)\n    (h_start_lo : 1 ≤ iter.start.val) (h_start_hi : iter.start.val ≤ 9)\n    (h_end : iter.«end».val = 9)\n    (xabs : Std.I16) (h_xabs_lo : 0 ≤ xabs.val) (h_xabs_hi : xabs.val ≤ 8)\n    (t : ProjectiveNielsPoint) (h_t_valid : t.IsValid)\n    (h_t_point : t.toPoint =\n        (if 1 ≤ xabs.val ∧ xabs.val < (iter.start.val : ℤ)\n          then (xabs.val : ℤ) • P.toPoint else 0)) :\n    window.LookupTable.select_loop\n        ProjectiveNielsPoint.Insts.SubtleConditionallySelectable\n        iter table xabs t ⦃ (result : ProjectiveNielsPoint) =>\n      result.IsValid ∧ result.toPoint = (xabs.val : ℤ) • P.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/Select.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec for `window.LookupTable<ProjectiveNielsPoint>::select_loop`**:\n\nGiven a valid table `[P, 2P, ..., 8P]` (in `ProjectiveNielsPoint` form) and an\niterator `iter` with `iter.start.val = s ∈ [1, 9]`, `iter.«end».val = 9`:\n\n- At entry, if the loop has already examined `j ∈ [1, s)` and found a match\n  (i.e., `xabs.val ∈ [1, s)`), then `t.toPoint = xabs.val • P.toPoint`; otherwise\n  `t.toPoint = 0`. (At `s = 1` this is just `t.toPoint = 0`.)\n\n- At exit (`s = 9`), since `xabs.val ∈ [0, 8]`:\n  - if `xabs.val ∈ [1, 8]`: the loop matched, `t.toPoint = xabs.val • P.toPoint`;\n  - if `xabs.val = 0`: no match, `t.toPoint = 0 = 0 • P.toPoint`.\n  Both cases collapse to `result.toPoint = xabs.val • P.toPoint`.\n\nBody of one iteration with `j = iter.start.val`:\n1. `ct_eq xabs j` returns `Choice.one` iff `xabs.val = j.val`;\n2. `table[j - 1]` gives `j • P` (valid);\n3. `conditional_assign t table[j-1] c`: picks `table[j-1]` iff match, else keeps `t`;\n4. recurse with iterator advanced (`iter1.start = s + 1`). -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{curve25519_dalek::window::LookupTable<T>}::select",
@@ -11657,7 +11659,8 @@
    "spec_statement":
    "theorem from_spec (P : EdwardsPoint) (hP : P.IsValid) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from\n        P ⦃ (result : window.LookupTable ProjectiveNielsPoint) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/From.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec and proof concerning `window.LookupTable<ProjectiveNielsPoint>::from`**:\n- No panic (always returns successfully).\n- Every entry of the resulting 8-element lookup table is a valid `ProjectiveNielsPoint`.\n- For each k ∈ {0, 1, ..., 7}, the k-th entry represents `(k+1) • P` on the Ed25519 curve. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from",
@@ -11679,7 +11682,8 @@
    "spec_statement":
    "theorem from_loop_spec\n    (P : EdwardsPoint) (hP : P.IsValid)\n    (iter : core.ops.range.Range Std.Usize)\n    (points : Array ProjectiveNielsPoint 8#usize)\n    (h_start : iter.start.val ≤ 7) (h_end : iter.«end».val = 7)\n    (h_prefix_valid : ∀ (k : Fin 8), k.val < iter.start.val + 1 → points.val[k].IsValid)\n    (h_prefix_point : ∀ (k : Fin 8), k.val < iter.start.val + 1 →\n        points.val[k].toPoint = (k.val + 1) • P.toPoint) :\n    window.LookupTableProjectiveNielsPoint.Insts.CoreConvertFromSharedAEdwardsPoint.from_loop\n        iter P points ⦃ (result : Array ProjectiveNielsPoint 8#usize) =>\n      (∀ (k : Fin 8), result.val[k].IsValid) ∧\n      (∀ (k : Fin 8), result.val[k].toPoint = (k.val + 1) • P.toPoint) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Window/LookupTable/From.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- Loop spec for `from_loop`: given a `points` array whose prefix `[0, iter.start.val]`\n(i.e. `iter.start.val + 1` entries) already holds `[P, 2P, ..., (iter.start.val + 1)P]` as\nvalid `ProjectiveNielsPoint`s, the loop extends the prefix to cover all 8 indices.\n\nLoop invariant at entry: for every `k ≤ iter.start.val`, `points[k].IsValid` and\n`points[k].toPoint = (k + 1) • P.toPoint`. At exit, the invariant holds up to index 7.\n\nThe loop body computes\n`points[j+1] = (P + points[j]).as_extended().as_projective_niels()`\nwhich turns `(j+1)·P` at index `j` into `(j+2)·P` at index `j+1`. -/",
    "source": "curve25519-dalek/src/window.rs",
    "rust_name":
    "curve25519_dalek::window::{core::convert::From<&'a (curve25519_dalek::edwards::EdwardsPoint)> for curve25519_dalek::window::LookupTable<curve25519_dalek::backend::serial::curve_models::ProjectiveNielsPoint>}::from",
