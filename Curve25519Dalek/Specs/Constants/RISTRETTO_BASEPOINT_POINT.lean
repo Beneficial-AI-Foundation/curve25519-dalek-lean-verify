@@ -8,8 +8,8 @@ import Curve25519Dalek.Math.Ristretto.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.Ed25519BasepointPoint
 
 /-! # Spec theorem for `curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT`
-The standard Ristretto basepoint, serving as the generator point for the Ristretto group.
 
+The standard Ristretto basepoint, serving as the generator point for the Ristretto group.
 • It is defined as `RistrettoPoint(ED25519_BASEPOINT_POINT)`, wrapping the Ed25519 basepoint
   in the Ristretto point type.
 • This constant is used as the base point for scalar multiplication operations in the
@@ -29,13 +29,12 @@ namespace curve25519_dalek.constants
 
 /-- **Spec theorem for `curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT`**
 • The constant is successfully computed (no panic)
-• constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things
-  implies that it fulfills the curve equation)
-• constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint
-• constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint
-  representing the basepoint is not in the same Ristretto equivalence class as the EdwardsPoint
-  identity point, which is equivalent to saying that the difference between
-  both points is not in E[4])
+• The output is a valid RistrettoPoint (which amongst other things implies that it fulfills
+  the curve equation)
+• The output has the same representation as the Edwards basepoint
+• The output is not the identity point (i.e., the EdwardsPoint representing the basepoint is
+  not in the same Ristretto equivalence class as the EdwardsPoint identity point, which is
+  equivalent to saying that the difference between both points is not in E[4])
 -/
 @[step]
 theorem RISTRETTO_BASEPOINT_POINT_spec :
