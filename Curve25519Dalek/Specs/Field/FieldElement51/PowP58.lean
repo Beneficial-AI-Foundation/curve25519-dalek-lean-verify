@@ -8,6 +8,7 @@ import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Specs.Field.FieldElement51.Pow22501
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Pow2K
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
+
 /-! # Spec Theorem for `FieldElement51::pow_p58`
 
 Specification and proof for `FieldElement51::pow_p58`.
@@ -19,40 +20,33 @@ and thus (p-5)/8 = 2^252 -3
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64.field.FieldElement51
+open curve25519_dalek.backend.serial.u64.field FieldElement51
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51
   (mul_spec)
 namespace curve25519_dalek.field.FieldElement51
 
-/-
-Natural language description:
+/-- The exponent `(p-5)/8 = 2^252 - 3`, used in the pow_p58 computation. -/
+def pow_p58_exp : Nat := 2 ^ 252 - 3
 
-    • Computes r^((p-5)/8) = r^(2^252-3) for a field element r in 𝔽_p where p = 2^255 - 19
-    • The field element is represented in radix 2^51 form with five u64 limbs
+theorem pow_p58_exp_def : pow_p58_exp = 2 ^ 252 - 3 := rfl
 
-Natural language specs:
+attribute [irreducible] pow_p58_exp
 
-    • The function succeeds (no panic)
-    • For any field element r, the result r' satisfies:
-      - Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)
--/
-
-/-- **Spec and proof concerning `field.FieldElement51.pow_p58`**:
-- No panic for field element inputs r (always returns r' successfully)
-- Field51_as_Nat(r') ≡ Field51_as_Nat(r)^(2^252-3) (mod p)
+/-- **Spec theroem for `field.FieldElement51.pow_p58`**:
+- Field51_as_Nat(result) ≡ Field51_as_Nat(self)^(2^252-3) (mod p)
 -/
 @[step]
-theorem pow_p58_spec (r : backend.serial.u64.field.FieldElement51)
-    (h_bounds : ∀ i, i < 5 → (r[i]!).val ≤ 2 ^ 52 - 1) :
-    pow_p58 r ⦃ r' =>
-      Field51_as_Nat r' % p = (Field51_as_Nat r ^ (2 ^ 252 - 3)) % p ∧
-      (∀ i < 5, r'[i]!.val < 2 ^ 52) ⦄ := by
+theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[i]!).val ≤ 2 ^ 52 - 1) :
+    pow_p58 self ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result % p = (Field51_as_Nat self ^ pow_p58_exp) % p ∧
+      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by
   unfold pow_p58
   step with pow22501_spec as ⟨ t19, ht19_mod, _, ht19b, _ ⟩
   step with pow2k_spec as ⟨ t20, ht20, ht20b ⟩
   step with mul_spec as ⟨ res, hres, hresb ⟩
-  have exp_r : Field51_as_Nat r ≡ (Field51_as_Nat r) ^ 1 [MOD p] := by rw [pow_one]
+  have exp_r : Field51_as_Nat self ≡ (Field51_as_Nat self) ^ 1 [MOD p] := by rw [pow_one]
   have exp_t20 := chain_pow2k ht19_mod ht20
+  rw [pow_p58_exp_def]
   exact ⟨chain_mul exp_r exp_t20 hres, hresb⟩
 
 end curve25519_dalek.field.FieldElement51
