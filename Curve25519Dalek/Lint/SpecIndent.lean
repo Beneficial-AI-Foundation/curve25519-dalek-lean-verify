@@ -20,36 +20,6 @@ Enforces the four indentation rules for `@[step]` spec theorems defined in `doc/
 
 All checks apply only to `@[step]` theorems.  The linter is controlled by a single option
 `linter.curve25519.specIndent` so that a justified deviation can be suppressed uniformly.
-
-Syntax-tree shapes assumed (Lean 4.26, confirmed from `Lean.Parser.Command`):
-```
-Lean.Parser.Command.declaration
-  [0] declModifiers          ← @[step] lives here
-  [1] Lean.Parser.Command.theorem
-        [0] "theorem" keyword atom
-        [1] Lean.Parser.Command.declId
-        [2] Lean.Parser.Command.declSig
-              [0] null-array of binders  (Term.binderIdent | Term.bracketedBinder)*
-              [1] Lean.Parser.Term.typeSpec
-                    [0] ":" atom
-                    [1] type term
-        [3] Lean.Parser.Command.declValSimple
-              [0] ":=" atom
-              [1] declBody (the proof term)
-              [2] Termination.suffix
-              [3] optional whereDecls
-```
-`byTactic` (kind `Lean.Parser.Term.byTactic`):
-```
-  [0] "by " atom
-  [1] tacticSeq (position = first tactic's first token)
-```
-`«term_∧_»` node (from `infixr:35 " ∧ " => And`):
-```
-  [0] left operand
-  [1] "∧" atom
-  [2] right operand
-```
 -/
 
 namespace Curve25519Dalek.Lint
