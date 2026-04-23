@@ -26,10 +26,10 @@ open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.constants
 
 /-- **Spec theorem for `curve25519_dalek::constants::BASEPOINT_ORDER_PRIVATE`**
-    • The byte representation of BASEPOINT_ORDER_PRIVATE, interpreted as a little-endian
-      natural number via U8x32_as_Nat, equals the group order L.
-    • The byte representation is canonical, i.e., U8x32_as_Nat(bytes) < 2^256
-      (which follows from the previous property since L < 2^256).
+• The byte representation of BASEPOINT_ORDER_PRIVATE, interpreted as a little-endian
+  natural number via U8x32_as_Nat, equals the group order L.
+• The byte representation is canonical, i.e., U8x32_as_Nat(bytes) < 2^256
+  (which follows from the previous property since L < 2^256).
 -/
 @[simp]
 theorem BASEPOINT_ORDER_PRIVATE_spec :
