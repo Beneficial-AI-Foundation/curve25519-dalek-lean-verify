@@ -7,6 +7,11 @@ on:
       - 'lakefile.lean'
       - 'lean-toolchain'
 
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
 jobs:
   warning-diff:
     runs-on: ubuntu-latest
