@@ -81,6 +81,11 @@ instance {T : Type} {n : Usize} [Repr T] :
     Repr (Aeneas.Std.Array T n) where
   reprPrec A prec := reprPrec A.val prec
 
+-- `Array α n = {l : List α // l.length = n.val}` is a non-reducible def, so
+-- Lean's generic subtype instance doesn't fire. Bridge explicitly.
+instance {T : Type} {n : Usize} [DecidableEq T] : DecidableEq (Aeneas.Std.Array T n) :=
+  fun a b => decidable_of_iff (a.val = b.val) Subtype.ext_iff.symm
+
 /-! ## Domain types
 
 `@[reducible]` def aliases (`FieldElement51`, `Scalar52`, `CompressedEdwardsY`,
@@ -201,7 +206,7 @@ instance : Repr backend.serial.curve_models.CompletedPoint where
 `WP.spec x p = theta x p`.  `theta` pattern-matches on `Result`: `ok x` reduces to
 `wp_return x p = p x` (decidable when `p x` is), while `fail` and `div` reduce to `False`. -/
 
-instance {α : Type*} (x : Result α) (p : Post α) [∀ a, Decidable (p a)] :
+instance {α : Type*} {x : Result α} {p : Post α} [∀ a, Decidable (p a)] :
     Decidable (WP.spec x p) := by
   unfold WP.spec theta
   split
