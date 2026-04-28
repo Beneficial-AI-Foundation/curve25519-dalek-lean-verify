@@ -64,9 +64,18 @@ instance {T : Type} {n : Usize} [Arbitrary T] :
     let ⟨elems, h⟩ ← genListN n.val
     return Array.make n elems h
 
-instance {T : Type} {n : Usize} :
+-- Shrink one element at a time; the fixed-length subtype invariant is preserved by List.set.
+private def shrinkListAt {T : Type} [Shrinkable T]
+    (l : List T) : List {l' : List T // l'.length = l.length} :=
+  (List.finRange l.length).flatMap fun ⟨i, hi⟩ =>
+    (Shrinkable.shrink (l.get ⟨i, hi⟩)).map fun x' =>
+      ⟨l.set i x', by simp⟩
+
+instance {T : Type} {n : Usize} [Shrinkable T] :
     Shrinkable (Aeneas.Std.Array T n) where
-  shrink _ := []
+  shrink A :=
+    (shrinkListAt A.val).map fun ⟨l', h'⟩ =>
+      Array.make n l' (h'.trans A.property)
 
 instance {T : Type} {n : Usize} [Repr T] :
     Repr (Aeneas.Std.Array T n) where
@@ -85,7 +94,7 @@ instance : Arbitrary scalar.Scalar where
   arbitrary := do return { bytes := ← arbitrary }
 
 instance : Shrinkable scalar.Scalar where
-  shrink _ := []
+  shrink s := (Shrinkable.shrink s.bytes).map fun b => { bytes := b }
 
 instance : Repr scalar.Scalar where
   reprPrec s prec := reprPrec s.bytes prec
@@ -96,7 +105,11 @@ instance : Arbitrary edwards.EdwardsPoint where
     return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary, T := ← arbitrary }
 
 instance : Shrinkable edwards.EdwardsPoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
+    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
+    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z }) ++
+    (Shrinkable.shrink p.T).map (fun t => { p with T := t })
 
 instance : Repr edwards.EdwardsPoint where
   reprPrec p prec := reprPrec (p.X, p.Y, p.Z, p.T) prec
@@ -106,7 +119,9 @@ instance : Arbitrary edwards.affine.AffinePoint where
   arbitrary := do return { x := ← arbitrary, y := ← arbitrary }
 
 instance : Shrinkable edwards.affine.AffinePoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.x).map (fun x => { p with x := x }) ++
+    (Shrinkable.shrink p.y).map (fun y => { p with y := y })
 
 instance : Repr edwards.affine.AffinePoint where
   reprPrec p prec := reprPrec (p.x, p.y) prec
@@ -116,7 +131,9 @@ instance : Arbitrary montgomery.ProjectivePoint where
   arbitrary := do return { U := ← arbitrary, W := ← arbitrary }
 
 instance : Shrinkable montgomery.ProjectivePoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.U).map (fun u => { p with U := u }) ++
+    (Shrinkable.shrink p.W).map (fun w => { p with W := w })
 
 instance : Repr montgomery.ProjectivePoint where
   reprPrec p prec := reprPrec (p.U, p.W) prec
@@ -126,7 +143,10 @@ instance : Arbitrary backend.serial.curve_models.ProjectivePoint where
   arbitrary := do return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary }
 
 instance : Shrinkable backend.serial.curve_models.ProjectivePoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
+    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
+    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z })
 
 instance : Repr backend.serial.curve_models.ProjectivePoint where
   reprPrec p prec := reprPrec (p.X, p.Y, p.Z) prec
@@ -138,7 +158,11 @@ instance : Arbitrary backend.serial.curve_models.ProjectiveNielsPoint where
              Z        := ← arbitrary, T2d       := ← arbitrary }
 
 instance : Shrinkable backend.serial.curve_models.ProjectiveNielsPoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.Y_plus_X).map  (fun x => { p with Y_plus_X  := x }) ++
+    (Shrinkable.shrink p.Y_minus_X).map (fun x => { p with Y_minus_X := x }) ++
+    (Shrinkable.shrink p.Z).map         (fun z => { p with Z         := z }) ++
+    (Shrinkable.shrink p.T2d).map       (fun t => { p with T2d       := t })
 
 instance : Repr backend.serial.curve_models.ProjectiveNielsPoint where
   reprPrec p prec := reprPrec (p.Y_plus_X, p.Y_minus_X, p.Z, p.T2d) prec
@@ -149,7 +173,10 @@ instance : Arbitrary backend.serial.curve_models.AffineNielsPoint where
     return { y_plus_x := ← arbitrary, y_minus_x := ← arbitrary, xy2d := ← arbitrary }
 
 instance : Shrinkable backend.serial.curve_models.AffineNielsPoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.y_plus_x).map  (fun x => { p with y_plus_x  := x }) ++
+    (Shrinkable.shrink p.y_minus_x).map (fun x => { p with y_minus_x := x }) ++
+    (Shrinkable.shrink p.xy2d).map      (fun d => { p with xy2d      := d })
 
 instance : Repr backend.serial.curve_models.AffineNielsPoint where
   reprPrec p prec := reprPrec (p.y_plus_x, p.y_minus_x, p.xy2d) prec
@@ -160,7 +187,11 @@ instance : Arbitrary backend.serial.curve_models.CompletedPoint where
     return { X := ← arbitrary, Y := ← arbitrary, Z := ← arbitrary, T := ← arbitrary }
 
 instance : Shrinkable backend.serial.curve_models.CompletedPoint where
-  shrink _ := []
+  shrink p :=
+    (Shrinkable.shrink p.X).map (fun x => { p with X := x }) ++
+    (Shrinkable.shrink p.Y).map (fun y => { p with Y := y }) ++
+    (Shrinkable.shrink p.Z).map (fun z => { p with Z := z }) ++
+    (Shrinkable.shrink p.T).map (fun t => { p with T := t })
 
 instance : Repr backend.serial.curve_models.CompletedPoint where
   reprPrec p prec := reprPrec (p.X, p.Y, p.Z, p.T) prec
