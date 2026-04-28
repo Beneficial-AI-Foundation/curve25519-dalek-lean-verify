@@ -24,10 +24,6 @@ clamping guarantees `< 2^255`, which suffices for correctness of variable-base
 scalar multiplication (see the Rust source comment at line 892).
 
 **Source**: curve25519-dalek/src/edwards.rs, lines 891:4-903:5
-
-## TODO
-- Complete proof (the intermediate `mul_spec` currently requires a canonical scalar `< L`,
-  but clamping only guarantees `< 2^255`; a relaxed variable-base mul spec is needed)
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP

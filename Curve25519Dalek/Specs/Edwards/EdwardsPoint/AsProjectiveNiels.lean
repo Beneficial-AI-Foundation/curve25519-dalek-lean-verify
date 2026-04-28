@@ -60,7 +60,7 @@ where p = 2^255 - 19
   - C ≡ T * 2 * d (mod p)
 where p = 2^255 - 19
 -/
-@[externally_verified, step]
+@[step]
 theorem as_projective_niels_spec (e : EdwardsPoint)
     (he : e.IsValid) :
     as_projective_niels e ⦃ (pn : backend.serial.curve_models.ProjectiveNielsPoint) =>
@@ -99,23 +99,17 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
         simp_all
       · have := pointwise_add_Field51_as_Nat e.Y e.X fe fe_post1
         rw[← Nat.ModEq,Montgomery.lift_mod_eq_iff] at fe1_post2
-        have : (Field51_as_Nat fe1)= (Field51_as_Nat e.Y) -((Field51_as_Nat e.X):Edwards.CurveField) := by grind
+        have : (Field51_as_Nat fe1) =
+            (Field51_as_Nat e.Y) - ((Field51_as_Nat e.X) : Edwards.CurveField) := by grind
         rw[Montgomery.lift_mod_eq_iff] at fe3_post1
-        have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 }:backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
-          constructor
-          · simp_all
-          · simp_all
-          · have := he.Z_bounds
-            simp_all
-          · simp_all
+        have : ({ Y_plus_X := fe, Y_minus_X := fe1, Z := e.Z, T2d := fe3 } :
+            backend.serial.curve_models.ProjectiveNielsPoint).IsValid := by
+          refine
+            { Z_ne_zero := ?_, T2d_relation := ?_, on_curve := ?_,
+              Y_plus_X_bounds := ?_, Y_minus_X_bounds := ?_,
+              Z_bounds := ?_, T2d_bounds := ?_ }
           · have := he.Z_ne_zero
             simp_all
-          · unfold toField
-            simp_all
-            have := he.on_curve
-            simp only at this
-            unfold toField at this
-            grind
           · unfold toField
             simp_all
             have := he.T_relation
@@ -124,13 +118,28 @@ theorem as_projective_niels_spec (e : EdwardsPoint)
             ring_nf
             have:Edwards.Ed25519.d=d:=rfl
             grind
+          · unfold toField
+            simp_all
+            have := he.on_curve
+            simp only at this
+            unfold toField at this
+            grind
+          · simp_all  -- Y_plus_X_bounds: < 2^54
+          · -- Y_minus_X_bounds: goal < 2^54, fact fe1_post1 : < 2^52
+            intro i hi; have := fe1_post1 i hi; agrind
+          · have := he.Z_bounds
+            simp_all
+          · -- T2d_bounds: < 2^52
+            intro i hi; have := fe3_post2 i hi; agrind
         simp only [this, true_and]
         unfold toPoint curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint
         simp only [he, ↓reduceDIte, this]
-        unfold toPoint' curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint' toField
-        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow,
-          Nat.cast_add, sub_add_cancel, Nat.cast_mul, ZMod.natCast_mod, Nat.cast_ofNat, add_sub_sub_cancel,
-          add_add_sub_cancel, Edwards.Point.mk.injEq]
+        unfold toPoint'
+          curve25519_dalek.backend.serial.curve_models.ProjectiveNielsPoint.toPoint' toField
+        simp_all only [Array.getElem!_Nat_eq, List.Vector.length_val,
+          UScalar.ofNatCore_val_eq, getElem!_pos, Nat.reducePow, Nat.cast_add,
+          sub_add_cancel, Nat.cast_mul, ZMod.natCast_mod, Nat.cast_ofNat,
+          add_sub_sub_cancel, add_add_sub_cancel, Edwards.Point.mk.injEq]
         have := he.Z_ne_zero
         unfold toField at this
         field_simp

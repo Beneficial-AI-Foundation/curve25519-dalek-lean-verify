@@ -39,7 +39,8 @@ natural language specs:
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
 
-/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add`**:
+/-- **Spec and proof** concerning:
+`Shared0EdwardsPoint.Insts.CoreOpsArithAddSharedAEdwardsPointEdwardsPoint.add`:
 • The function always succeeds (no panic) for valid inputs
 • The result is a valid Edwards point
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
@@ -81,10 +82,11 @@ natural language specs:
 • The result represents the sum of the inputs (in the context of elliptic curve addition)
 -/
 @[step]
-theorem add_spec (self other : EdwardsPoint) (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
+theorem add_spec (self other : EdwardsPoint)
+    (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
     add self other ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = self.toPoint + other.toPoint ⦄ := by
+      result.IsValid ∧
+      result.toPoint = self.toPoint + other.toPoint ⦄ := by
   unfold add
   step*
 

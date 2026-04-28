@@ -87,7 +87,8 @@ theorem to_edwards_spec (mp : MontgomeryPoint) (sign : U8) :
   let* ⟨ result, result_post1, result_post2, ep, result_post3 ⟩ ←
     edwards.CompressedEdwardsY.decompress_spec
   have h_decomp := result_post2 ep result_post3
-  obtain ⟨h_valid, _, h_Y_nat, _, h_Z_nat, _, _⟩ := h_decomp
+  obtain ⟨h_valid, _, h_Y_nat, _, h_Z_nat, _⟩ := h_decomp
+  -- Construct Z_inv via invert_spec (ep.Z is valid from IsValid)
   have h_Z_54 : ∀ i, i < 5 → ep.Z[i]!.val < 2 ^ 54 :=
     fun i hi => by have := h_valid.Z_bounds i hi; omega
   obtain ⟨Z_inv, h_Zinv, h_inv_ne, _, _⟩ :=

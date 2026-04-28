@@ -39,11 +39,11 @@ natural language specs:
 @[step]
 theorem mul_by_cofactor_spec (self : EdwardsPoint) (hself : self.IsValid) :
     mul_by_cofactor self ⦃ result =>
-    result.IsValid ∧
-    result.toPoint = h • self.toPoint ⦄ := by
+      result.IsValid ∧
+      result.toPoint = h • self.toPoint ⦄ := by
   unfold mul_by_cofactor
-  apply Aeneas.Std.WP.exists_imp_spec
-  obtain ⟨result, hresult, hvalid, hpoint⟩ := mul_by_pow_2_spec self 3#u32 hself (by decide)
-  exact ⟨result, hresult, hvalid, by simp_all [h]⟩
+  step as ⟨result, hvalid, hpoint⟩
+  refine ⟨hvalid, ?_⟩
+  simp_all [h]
 
 end curve25519_dalek.edwards.EdwardsPoint
