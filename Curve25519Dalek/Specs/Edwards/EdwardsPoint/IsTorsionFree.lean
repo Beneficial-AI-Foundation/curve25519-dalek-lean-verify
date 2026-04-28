@@ -58,7 +58,7 @@ private lemma field51_limb_le_of_sum_eq_one {f : backend.serial.u64.field.FieldE
 - Returns `true` if and only if the point is torsion-free (is in the prime-order subgroup)
 - This is determined by checking if multiplying by the basepoint order L yields the identity element
 -/
-@[step, externally_verified]
+@[step]
 theorem is_torsion_free_spec (self : EdwardsPoint) (hself : self.IsValid) :
     is_torsion_free self ⦃ result =>
     (result ↔ L • self.toPoint = 0) ⦄ := by

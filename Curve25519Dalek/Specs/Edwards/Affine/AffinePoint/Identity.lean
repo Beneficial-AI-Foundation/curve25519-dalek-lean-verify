@@ -34,18 +34,29 @@ natural language specs:
 • The resulting AffinePoint is the identity element with coordinates (x=0, y=1)
 -/
 
-/-- **Spec and proof concerning `edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof** concerning:
+`edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`
 - No panic (always returns successfully)
-- The resulting AffinePoint is the identity element with coordinates (x=0, y=1)
+- The resulting AffinePoint is the identity element of the Ed25519 group
 -/
 @[step]
 theorem identity_spec :
     identity ⦃ (q : AffinePoint) =>
       Field51_as_Nat q.x = 0 ∧ Field51_as_Nat q.y = 1 ∧
-      q.IsValid ⦄ := by
+      q.IsValid ∧ q.toPoint = 0 ⦄ := by
   unfold identity ZERO ONE
   step*
-  simp only [*]
-  decide
+  have hx : Field51_as_Nat fe = 0 := by rw [fe_post2]; decide
+  have hy : Field51_as_Nat fe1 = 1 := by rw [fe1_post2]; decide
+  have hv : ({ x := fe, y := fe1 } : AffinePoint).IsValid := by
+    rw [fe_post1, fe1_post1]; decide
+  refine ⟨hx, hy, hv, ?_⟩
+  unfold AffinePoint.toPoint
+  rw [dif_pos hv]
+  ext
+  · simp [toField, hx]
+  · simp [toField, hy]
+
+
 
 end curve25519_dalek.edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity

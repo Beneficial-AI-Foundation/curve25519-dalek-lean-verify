@@ -62,11 +62,9 @@ theorem neg_spec
   have fe_neg: fe.toField=-self.X.toField  := by grind
   have fe1_neg: fe1.toField =-self.T.toField := by grind
   have : ({ X := fe, Y := self.Y, Z := self.Z, T := fe1 }:edwards.EdwardsPoint).IsValid := by
-    constructor
-    · grind
-    · grind
-    · grind
-    · grind
+    refine
+      { Z_ne_zero := ?_, T_relation := ?_, on_curve := ?_,
+        X_bounds := ?_, Y_bounds := ?_, Z_bounds := ?_, T_bounds := ?_ }
     · have := h_self_valid.Z_ne_zero
       simp[this]
     · have := h_self_valid.T_relation
@@ -78,6 +76,10 @@ theorem neg_spec
       have := h_self_valid.on_curve
       simp at this
       grind
+    · grind
+    · grind
+    · grind
+    · grind
   unfold toPoint
   simp only [this, ↓reduceDIte, toPoint', h_self_valid, true_and, fe_neg]
   ext

@@ -36,7 +36,8 @@ natural language specs:
 -/
 
 /--
-**Spec and proof concerning `edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select`**:
+**Spec and proof** concerning:
+`edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select`:
 - No panic (always returns successfully)
 - Returns `b` when `choice = 1` and `a` when `choice = 0`
 -/

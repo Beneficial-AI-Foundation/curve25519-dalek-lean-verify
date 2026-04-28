@@ -19,9 +19,6 @@ This function performs scalar multiplication by the Edwards basepoint after
 clamping the input bytes to a valid scalar, delegating to `EdwardsPoint.mul_base`.
 
 **Source**: curve25519-dalek/src/edwards.rs, lines 906:4-914:5
-
-## TODO
-- Complete proof
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
