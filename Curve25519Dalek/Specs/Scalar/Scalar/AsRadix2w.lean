@@ -1267,7 +1267,7 @@ private lemma U8x32_as_Nat_lt_pow256 (self : Scalar) :
       < 2 ^ (8 * 32) := key 32 le_rfl
     _ = 2 ^ 256 := by norm_num
 
-private lemma U8x32_as_Nat_lt_pow255 (self : Scalar)
+lemma U8x32_as_Nat_lt_pow255 (self : Scalar)
     (h_top : (self.bytes[31]!).val ≤ 127) :
     U8x32_as_Nat self.bytes < 2 ^ 255 := by
   simp only [U8x32_as_Nat]

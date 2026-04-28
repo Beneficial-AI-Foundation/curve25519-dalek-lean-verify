@@ -5,6 +5,7 @@ Authors: Filippo A. E. Nuccio
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
+import Curve25519Dalek.Aux
 import Curve25519Dalek.Specs.Edwards.CompressedEdwardsY.AsBytes
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
@@ -53,22 +54,6 @@ Natural language specs (ported from Verus):
     - Y and Z are unchanged
     - Output bounds: result.X limbs ≤ 2^53-1, result.T limbs < 2^52
 -/
-
-private lemma fe_eq_of_limbs
-    {a b : FieldElement51}
-    (h : ∀ i < 5, a[i]! = b[i]!) :
-    a = b := by
-  simp only [Array.getElem!_Nat_eq] at h
-  apply Subtype.ext
-  apply List.ext_getElem (by
-    simp [a.property, b.property])
-  intro n hn _
-  have hn5 : n < 5 := by
-    simp only [a.property, UScalar.ofNatCore_val_eq] at hn
-    exact hn
-  have := h n hn5
-  simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, hn5] at this
-  exact this
 
 private lemma toField_neg
     {X xneg : FieldElement51}

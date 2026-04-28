@@ -383,21 +383,9 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
   have h_valid_point
       (hI : invsqrt.2.toField ^ 2 * (v.toField * u2.toField ^ 2) = 1) :
       edwards.EdwardsPoint.IsValid { X := x1, Y := y, Z := one, T := t } := by
-    refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-    · -- X_bounds
-      change ∀ i < 5, x1[i]!.val < 2 ^ 53
-      intro i hi; rw [x1_post i hi]; split
-      · have := x_negated_post2 i hi; omega
-      · have := x_post2 i hi; omega
-    · -- Y_bounds
-      change ∀ i < 5, y[i]!.val < 2 ^ 53
-      intro i hi; have := y_post2 i hi; omega
-    · -- Z_bounds
-      change ∀ i < 5, one[i]!.val < 2 ^ 53
-      intro i hi; have := one_post2 i hi; omega
-    · -- T_bounds
-      change ∀ i < 5, t[i]!.val < 2 ^ 53
-      intro i hi; have := t_post2 i hi; omega
+    refine
+      { Z_ne_zero := ?_, T_relation := ?_, on_curve := ?_,
+        X_bounds := ?_, Y_bounds := ?_, Z_bounds := ?_, T_bounds := ?_ }
     · -- Z_ne_zero
       change one.toField ≠ 0
       rw [hONE]; exact one_ne_zero
@@ -413,6 +401,20 @@ theorem step_2_spec (s : backend.serial.u64.field.FieldElement51)
       exact on_curve_from_decompression Ed25519.a Ed25519.d s.toField
         invsqrt.2.toField u1.toField u2.toField v.toField
         (by simp only [Ed25519]) hu1_val hu2_val hv_val hI
+    · -- X_bounds
+      change ∀ i < 5, x1[i]!.val < 2 ^ 53
+      intro i hi; rw [x1_post i hi]; split
+      · have := x_negated_post2 i hi; omega
+      · have := x_post2 i hi; omega
+    · -- Y_bounds
+      change ∀ i < 5, y[i]!.val < 2 ^ 53
+      intro i hi; have := y_post2 i hi; omega
+    · -- Z_bounds
+      change ∀ i < 5, one[i]!.val < 2 ^ 53
+      intro i hi; have := one_post2 i hi; omega
+    · -- T_bounds
+      change ∀ i < 5, t[i]!.val < 2 ^ 53
+      intro i hi; have := t_post2 i hi; omega
   have h_step2_success_of_decompress (P : Point Ed25519)
       (h_decomp : ristretto.decompress_step2 s.toField = some P) :
       invsqrt.1.val = 1#u8 ∧ c.val = 0#u8 ∧ c1.val = 0#u8 ∧

@@ -200,50 +200,43 @@ lemma double_lift_to_field_eqs (c : CompletedPoint) (q : ProjectivePoint)
     have h := lift_mod_eq _ _ hT_arith; push_cast at h; exact eq_sub_of_add_eq h
 
 attribute [local irreducible] p in
-/--
-Verification of the `double` function.
-The theorem states that the Rust implementation of point doubling corresponds
-exactly to the mathematical addition of the point to itself (`q + q`) on the Edwards curve.
--/
-theorem double_spec
-    (q : ProjectivePoint) (hq_valid : q.IsValid) :
+/-- Core geometric proof for point doubling. Takes only `OnCurve` and
+the exact bounds needed by `double_spec_aux` (X,Y < 2^53, Z < 2^54).
+Both `ProjectivePoint.double_spec` and `EdwardsPoint.double_spec`
+delegate to this. -/
+theorem double_spec_core
+    (q : ProjectivePoint)
+    (hq_on : q.OnCurve)
+    (h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53)
+    (h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53)
+    (h_qZ_valid : q.Z.IsValid) :
     ∃ c, ProjectivePoint.double q = ok c ∧
-    c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint := by
-  have h_qX_bounds : ∀ i < 5, (q.X[i]!).val < 2 ^ 53 :=
-    fun i hi => Nat.lt_trans (hq_valid.X_bounds i hi) (by norm_num : 2^52 < 2^53)
-  have h_qY_bounds : ∀ i < 5, (q.Y[i]!).val < 2 ^ 53 :=
-    fun i hi => Nat.lt_trans (hq_valid.Y_bounds i hi) (by norm_num : 2^52 < 2^53)
-  have h_qZ_bounds : ∀ i < 5, (q.Z[i]!).val < 2 ^ 54 :=
-    fun i hi => Nat.lt_trans (hq_valid.Z_bounds i hi) (by norm_num : 2^52 < 2^54)
+    c.IsValid ∧ c.toPoint = q.toPoint' hq_on + q.toPoint' hq_on := by
   obtain ⟨c, h_run, hX_arith, hY_arith, hZ_arith, hT_arith,
           hcX_bounds, hcY_bounds, hcZ_bounds, hcT_bounds⟩ :=
-    spec_imp_exists (ProjectivePoint.double_spec_aux q h_qX_bounds h_qY_bounds h_qZ_bounds)
+    spec_imp_exists (ProjectivePoint.double_spec_aux q
+      h_qX_bounds h_qY_bounds h_qZ_valid)
   use c
   constructor
   · exact h_run
   obtain ⟨hX_F, hY_F, hZ_F, hT_F⟩ :=
     double_lift_to_field_eqs c q hX_arith hY_arith hZ_arith hT_arith
-  -- Setup curve identity from input validity
-  have h_q_curve := hq_valid.on_curve
-  have h_qZ_ne : q.Z.toField ≠ 0 := hq_valid.Z_ne_zero
+  -- Setup curve identity from OnCurve
+  have h_q_curve := hq_on.on_curve
+  have h_qZ_ne : q.Z.toField ≠ 0 := hq_on.Z_ne_zero
   -- Let P be the affine point represented by q
   set X := q.X.toField with hX_def
   set Y := q.Y.toField with hY_def
   set Z := q.Z.toField with hZ_def
-  -- The curve equation in field terms: a*X²*Z² + Y²*Z² = Z⁴ + d*X²*Y²
+  -- The curve equation in field terms: a * X² * Z² + Y² * Z² = Z⁴ + d * X² * Y²
   have h_curve_field : Ed25519.a * X^2 * Z^2 + Y^2 * Z^2 = Z^4 + Ed25519.d * X^2 * Y^2 := h_q_curve
   -- Affine coordinates: x = X/Z, y = Y/Z
   set x := X / Z with hx_def
   set y := Y / Z with hy_def
   -- Prove denominators are non-zero using completeness theorem
   -- First construct the affine point P on Ed25519
-  have h_P_on_curve : Ed25519.a * x^2 + y^2 = 1 + Ed25519.d * x^2 * y^2 := by
-    have hz2 : Z^2 ≠ 0 := pow_ne_zero 2 h_qZ_ne
-    have hz4 : Z^4 ≠ 0 := pow_ne_zero 4 h_qZ_ne
-    simp only [Ed25519] at h_curve_field ⊢
-    simp only [hx_def, hy_def, div_pow]
-    field_simp [hz2, hz4]
-    linear_combination h_curve_field
+  have h_P_on_curve : Ed25519.a * x ^ 2 + y ^ 2 = 1 + Ed25519.d * x ^ 2 * y ^ 2 :=
+    curve25519_dalek.edwards.affine_on_curve_of_projective X Y Z h_qZ_ne h_curve_field
   let P : Point Ed25519 := ⟨x, y, h_P_on_curve⟩
   have h_denoms := Ed25519.denomsNeZero P P
   -- denomsNeZero gives: 1 + d * P.x * P.x * P.y * P.y ≠ 0, i.e., 1 + d * x * x * y * y ≠ 0
@@ -301,52 +294,79 @@ theorem double_spec
   }
   constructor
   · exact h_c_valid
-  · -- Prove c.toPoint = q.toPoint + q.toPoint
+  · -- Prove c.toPoint = q.toPoint' hq_on + q.toPoint' hq_on
     have ⟨h_cx, h_cy⟩ := CompletedPoint.toPoint_of_isValid h_c_valid
-    have ⟨h_qx, h_qy⟩ := ProjectivePoint.toPoint_of_isValid hq_valid
+    have h_qx : (q.toPoint' hq_on).x = x := rfl
+    have h_qy : (q.toPoint' hq_on).y = y := rfl
     ext
-    · -- x coordinate: c.toPoint.x = (q.toPoint + q.toPoint).x
-      -- c.toPoint.x = 2XY / (Y² - X²)
-      -- (q + q).x = 2xy / (1 + d*x²y²) where x = X/Z, y = Y/Z
-      rw [h_cx, hX_F, hZ_F]  -- LHS: c.X.toField / c.Z.toField = 2*X*Y / (Y² - X²)
-      rw [add_x]  -- RHS: expand addition formula
-      -- Key facts for denominators
-      have hcZ_ne : Y^2 - X^2 ≠ 0 := by
+    · rw [h_cx, hX_F, hZ_F, add_x]
+      have hcZ_ne : Y ^ 2 - X ^ 2 ≠ 0 := by
         rw [h_YX_factor, h_yx_sq]
         apply mul_ne_zero hz2 h_denom_plus
-      have h_add_denom_ne :
-          1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y ≠ 0 := by
-        rw [h_qx, h_qy]
-        convert h_denom_plus using 2
-        simp only [hx_def, hy_def]; ring
-      -- Calculate: 2XY / (Y² - X²)
-      calc 2 * X * Y / (Y^2 - X^2)
-        _ = 2 * X * Y / (Z^2 * (y^2 - x^2)) := by rw [h_YX_factor]
-        _ = 2 * X * Y / (Z^2 * (1 + Ed25519.d * x^2 * y^2)) := by rw [h_yx_sq]
-        _ = 2 * (Z * x) * (Z * y) / (Z^2 * (1 + Ed25519.d * x^2 * y^2)) := by
+      calc 2 * X * Y / (Y ^ 2 - X ^ 2)
+        _ = 2 * X * Y / (Z ^ 2 * (y ^ 2 - x ^ 2)) := by
+            rw [h_YX_factor]
+        _ = 2 * X * Y / (Z ^ 2 * (1 + Ed25519.d * x ^ 2 * y ^ 2)) := by
+            rw [h_yx_sq]
+        _ = 2 * (Z * x) * (Z * y) /
+            (Z ^ 2 * (1 + Ed25519.d * x ^ 2 * y ^ 2)) := by
             simp only [hx_def, hy_def]; field_simp [h_qZ_ne]
-        _ = Z^2 * (2 * x * y) / (Z^2 * (1 + Ed25519.d * x^2 * y^2)) := by ring
-        _ = (2 * x * y) / (1 + Ed25519.d * x^2 * y^2) := by rw [mul_div_mul_left _ _ hz2]
-        _ = (q.toPoint.x * q.toPoint.y + q.toPoint.y * q.toPoint.x) /
-            (1 + Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y) := by
+        _ = Z ^ 2 * (2 * x * y) /
+            (Z ^ 2 * (1 + Ed25519.d * x ^ 2 * y ^ 2)) := by
+            ring
+        _ = (2 * x * y) /
+            (1 + Ed25519.d * x ^ 2 * y ^ 2) := by
+            rw [mul_div_mul_left _ _ hz2]
+        _ = ((q.toPoint' hq_on).x * (q.toPoint' hq_on).y +
+            (q.toPoint' hq_on).y * (q.toPoint' hq_on).x) /
+            (1 + Ed25519.d * (q.toPoint' hq_on).x *
+            (q.toPoint' hq_on).x * (q.toPoint' hq_on).y *
+            (q.toPoint' hq_on).y) := by
             rw [h_qx, h_qy]; ring
-    · -- y coordinate: c.toPoint.y = (q.toPoint + q.toPoint).y
-      -- c.toPoint.y = (Y² + X²) / (2Z² - (Y² - X²))
-      -- (q + q).y = (y² - a * x²) / (1 - d * x²y²) = (y² + x²) / (1 - d * x²y²) since a = -1
-      rw [h_cy, hY_F, hT_F, hZ_F]  -- LHS: c.Y.toField / c.T.toField
-      rw [add_y]  -- RHS: expand addition formula
-      -- Helper: Y² + X² = Z² * (y² + x²)
-      have h_num_factor : Y^2 + X^2 = Z^2 * (y^2 + x^2) := by
-        have hx : X = Z * x := by simp only [hx_def]; field_simp [h_qZ_ne]
-        have hy : Y = Z * y := by simp only [hy_def]; field_simp [h_qZ_ne]
+    · rw [h_cy, hY_F, hT_F, hZ_F, add_y]
+      have h_num_factor : Y ^ 2 + X ^ 2 = Z ^ 2 * (y ^ 2 + x ^ 2) := by
+        have hx : X = Z * x := by
+          simp only [hx_def]; field_simp [h_qZ_ne]
+        have hy : Y = Z * y := by
+          simp only [hy_def]; field_simp [h_qZ_ne]
         rw [hx, hy]; ring
-      -- Calculate: (Y² + X²) / (2Z² - (Y² - X²))
-      calc (Y^2 + X^2) / (2 * Z^2 - (Y^2 - X^2))
-        _ = (Y^2 + X^2) / (Z^2 * (1 - Ed25519.d * x^2 * y^2)) := by rw [h_denom_factor]
-        _ = Z^2 * (y^2 + x^2) / (Z^2 * (1 - Ed25519.d * x^2 * y^2)) := by rw [h_num_factor]
-        _ = (y^2 + x^2) / (1 - Ed25519.d * x^2 * y^2) := by rw [mul_div_mul_left _ _ hz2]
-        _ = (q.toPoint.y * q.toPoint.y - Ed25519.a * q.toPoint.x * q.toPoint.x) /
-            (1 - Ed25519.d * q.toPoint.x * q.toPoint.x * q.toPoint.y * q.toPoint.y) := by
+      calc (Y ^ 2 + X ^ 2) / (2 * Z ^ 2 - (Y ^ 2 - X ^ 2))
+        _ = (Y ^ 2 + X ^ 2) /
+            (Z ^ 2 * (1 - Ed25519.d * x ^ 2 * y ^ 2)) := by
+            rw [h_denom_factor]
+        _ = Z ^ 2 * (y ^ 2 + x ^ 2) /
+            (Z ^ 2 * (1 - Ed25519.d * x ^ 2 * y ^ 2)) := by
+            rw [h_num_factor]
+        _ = (y ^ 2 + x ^ 2) /
+            (1 - Ed25519.d * x ^ 2 * y ^ 2) := by
+            rw [mul_div_mul_left _ _ hz2]
+        _ = ((q.toPoint' hq_on).y * (q.toPoint' hq_on).y -
+            Ed25519.a * (q.toPoint' hq_on).x *
+            (q.toPoint' hq_on).x) /
+            (1 - Ed25519.d * (q.toPoint' hq_on).x *
+            (q.toPoint' hq_on).x * (q.toPoint' hq_on).y *
+            (q.toPoint' hq_on).y) := by
             rw [h_qx, h_qy]; simp only [Ed25519]; ring
+
+/-- Verification of the `double` function for `ProjectivePoint` in WP form.
+Thin wrapper over `double_spec_core`: widens bounds from `< 2^52`
+to `< 2^53` and bridges `toPoint' → toPoint`. -/
+@[step]
+theorem double_spec
+    (q : ProjectivePoint) (hq_valid : q.IsValid) :
+    ProjectivePoint.double q ⦃ (c : CompletedPoint) =>
+      c.IsValid ∧ c.toPoint = q.toPoint + q.toPoint ⦄ := by
+  obtain ⟨c, h_run, h_c_valid, h_eq⟩ := double_spec_core q
+    hq_valid.toOnCurve
+    (fun i hi => Nat.lt_trans (hq_valid.X_bounds i hi)
+      (by norm_num : 2 ^ 52 < 2 ^ 53))
+    (fun i hi => Nat.lt_trans (hq_valid.Y_bounds i hi)
+      (by norm_num : 2 ^ 52 < 2 ^ 53))
+    (FieldElement51.IsValid_of_lt_pow hq_valid.Z_bounds
+      (by decide))
+  have h_eq' : c.toPoint = q.toPoint + q.toPoint := by
+    simp only [toPoint, dif_pos hq_valid, toPoint'] at h_eq ⊢
+    exact h_eq
+  simp only [h_run, spec_ok, h_c_valid, h_eq', and_self]
 
 end curve25519_dalek.backend.serial.curve_models.ProjectivePoint

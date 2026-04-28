@@ -49,7 +49,8 @@ Natural language specs:
     • When both points are valid, this is equivalent to toPoint equality
 -/
 
-/-- **Spec and proof concerning `edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq`**:
+/-- **Spec and proof** concerning:
+`edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq`:
 - No panic (always returns successfully)
 - The result is Choice.one (true) if and only if the two points are equal (mod p) in coordinates
 - When both points are valid, this is equivalent to toPoint equality

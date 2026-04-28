@@ -40,13 +40,13 @@ natural language specs:
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
 
-/-- **Spec and proof concerning `Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:
+/-- **Spec and proof concerning
+`Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint.sub`**:
 • The function always succeeds (no panic) for valid inputs
 • The result is a valid Edwards point
 • The result represents the difference of the inputs (in the context of elliptic curve subtraction)
 -/
 @[step]
--- proven in Verus
 theorem sub_spec
     (self other : edwards.EdwardsPoint)
     (h_self_valid : self.IsValid)
@@ -58,3 +58,24 @@ theorem sub_spec
   step*
 
 end curve25519_dalek.Shared0EdwardsPoint.Insts.CoreOpsArithSubSharedAEdwardsPointEdwardsPoint
+
+/-! ## Wrapper: `EdwardsPoint - EdwardsPoint` -/
+
+namespace curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint
+
+/-- **Spec and proof concerning
+`edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint.sub`**:
+• The function always succeeds (no panic) for valid inputs
+• The result is a valid Edwards point
+• The result represents the difference of the inputs
+-/
+@[step]
+theorem sub_spec (self other : EdwardsPoint)
+    (h_self_valid : self.IsValid) (h_other_valid : other.IsValid) :
+    sub self other ⦃ result =>
+      result.IsValid ∧
+      result.toPoint = self.toPoint - other.toPoint ⦄ := by
+  unfold sub
+  step*
+
+end curve25519_dalek.edwards.EdwardsPoint.Insts.CoreOpsArithSubEdwardsPointEdwardsPoint
