@@ -109,11 +109,9 @@ theorem as_extended_spec (q : CompletedPoint)
   rw[Montgomery.lift_mod_eq_iff] at fe2_post1
   rw[Montgomery.lift_mod_eq_iff] at fe3_post1
   have :({ X := fe, Y := fe1, Z := fe2, T := fe3 }:edwards.EdwardsPoint).IsValid := by
-    constructor
-    · grind
-    · grind
-    · grind
-    · grind
+    refine
+      { Z_ne_zero := ?_, T_relation := ?_, on_curve := ?_,
+        X_bounds := ?_, Y_bounds := ?_, Z_bounds := ?_, T_bounds := ?_ }
     · have := h_q_Valid.T_ne_zero
       unfold FieldElement51.toField at this
       have := h_q_Valid.Z_ne_zero
@@ -130,10 +128,14 @@ theorem as_extended_spec (q : CompletedPoint)
       simp only at this
       unfold FieldElement51.toField
       grind
+    · grind
+    · grind
+    · grind
+    · grind
   simp only [this, true_and]
   unfold toPoint   edwards.EdwardsPoint.toPoint
   simp only [this, ↓reduceDIte, h_q_Valid]
-  unfold edwards.EdwardsPoint.toPoint'
+  unfold toPoint' edwards.EdwardsPoint.toPoint'
   simp only [Edwards.Point.mk.injEq]
   unfold FieldElement51.toField
   have := h_q_Valid.T_ne_zero

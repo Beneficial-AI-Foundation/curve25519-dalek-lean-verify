@@ -39,7 +39,8 @@ natural language specs:
 • The little-endian encoding of Y = 1 is [1, 0, 0, ..., 0] (32 bytes)
 -/
 
-/-- **Spec and proof concerning `edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity`**:
+/-- **Spec and proof** concerning:
+`edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity`
 - No panic (always returns successfully)
 - The resulting CompressedEdwardsY encodes the value 1 (the Y-coordinate of the identity point)
 -/

@@ -72,14 +72,14 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   have h_sqrt_eq : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 :=
     SQRT_M1_val_spec
   have h_sqrt_mod : (Field51_as_Nat SQRT_M1_val) ^ 2 ≡ p - 1 [MOD p] := by
-    simp [Nat.ModEq, h_sqrt_eq]
+    exact sqrt_m1_sq_modEq
   have h1 : (Field51_as_Nat SQRT_M1_val) ^ 2 * b ≡ (p - 1) * b [MOD p] := by
     exact h_sqrt_mod.mul_right b
   have hp_pos : 1 ≤ p := by unfold p; simp [Nat.reducePow]
   have h2 : (p - 1) * b = p * b - b := by
       rw [Nat.sub_mul _ _ _, Nat.one_mul]
   have h3 : 0 ≡ p * b  [MOD p] := by
-      simp [Nat.ModEq]
+    simp only [Nat.ModEq, Nat.zero_mod, Nat.mul_mod_right]
   have : p *b =  b + (p-1) *b  := by unfold p; omega
   rw[this] at h3
   have h4:=h3.add_left a
@@ -491,7 +491,7 @@ private theorem conditional_negate_bounds_of_eq
     (r_is_negative : subtle.Choice)
     (r1_post : ∀ i < 5, r1[i]! = base[i]!)
     (base_bounds : ∀ i < 5, base[i]!.val < 2 ^ 52)
-    (x_bounds : ∀ i < 5, x[i]!.val ≤ 2 ^ 52)
+    (x_bounds : ∀ i < 5, x[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then x[i]! else r1[i]!) :
     ∀ i < 5, r2[i]!.val ≤ 2 ^ 53 - 1 := by
   intro i hi
@@ -746,7 +746,7 @@ private theorem solve_first_choice_true
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -825,7 +825,7 @@ private theorem solve_second_choice_true_choice3_true
       Field51_as_Nat SQRT_M1_val * Field51_as_Nat r [MOD p])
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -898,7 +898,7 @@ private theorem solve_second_choice_true_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r_prime[i]!)
     (r_prime_post2 : ∀ i < 5, r_prime[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.zero := by
@@ -1013,7 +1013,7 @@ private theorem solve_second_choice_false_choice3_true
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1) :
     sqrt_ratio_i_cases u v r2 Choice.one := by
@@ -1093,7 +1093,7 @@ private theorem solve_second_choice_false_choice3_false
     (r1_post : ∀ i < 5, r1[i]! = r[i]!)
     (r_post2 : ∀ i < 5, r[i]!.val < 2 ^ 52)
     (r_neg_post1 : Field51_as_Nat r1 + Field51_as_Nat r_neg ≡ 0 [MOD p])
-    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val ≤ 2 ^ 52)
+    (r_neg_post2 : ∀ i < 5, r_neg[i]!.val < 2 ^ 52)
     (r2_post : ∀ i < 5, r2[i]! = if r_is_negative.val = 1#u8 then r_neg[i]! else r1[i]!)
     (r_is_negative_post : r_is_negative.val = 1#u8 ↔ Field51_as_Nat r1 % p % 2 = 1)
     (h_check_ne_u : ¬(check.to_bytes = u.to_bytes))
@@ -1113,8 +1113,9 @@ private theorem solve_second_choice_false_choice3_false
     simp only [Nat.reducePow, Nat.reduceSub, Nat.reduceMul, Nat.reduceAdd, ne_eq,
       OfNat.ofNat_ne_zero, not_false_eq_true, zero_pow, zero_mul] at this
     rw [modEq_zero_iff] at hu this
+    have hcheck0 : Field51_as_Nat check % p = 0 := this
     exact h_check_ne_u
-      ((to_bytes_zero_of_Field51_as_Nat_zero this).trans
+      ((to_bytes_zero_of_Field51_as_Nat_zero hcheck0).trans
        (to_bytes_zero_of_Field51_as_Nat_zero hu).symm)
   · intro ⟨hu, hv⟩
     rw [← modEq_zero_iff] at hv
@@ -1258,7 +1259,7 @@ private theorem solve_second_choice_false_choice3_false
           have := eq_check.trans this
           simp only at this
           have r2_eq_sq := conditional_negate_sq r1 r_neg r2 r_is_negative
-            (by simpa [r1_eq_r] using r_neg_post1) r2_post
+            (by simpa only [r1_eq_r] using r_neg_post1) r2_post
           rw [r1_eq_r] at r2_eq_sq
           exact (r2_eq_sq.mul_right (Field51_as_Nat v)).trans this
         · rcases h with h | h
@@ -1333,8 +1334,8 @@ Postconditions (4 mutually exclusive cases + non-negativity):
 theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
     ∃ c, sqrt_ratio_i u v = ok c ∧
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p
@@ -1541,8 +1542,8 @@ theorem sqrt_ratio_i_spec'
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
-    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val ≤ 2 ^ 52 - 1)
-    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :
+    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
+    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
     sqrt_ratio_i u v ⦃ c =>
     let u_nat := Field51_as_Nat u % p
     let v_nat := Field51_as_Nat v % p

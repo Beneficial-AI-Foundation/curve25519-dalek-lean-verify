@@ -817,7 +817,8 @@ private lemma elligator_completed_point_valid
           ring
         rw [step1]
         exact constr_to_squares_r hB
-  exact ⟨fun i hi => by
+  exact ⟨⟨h_cp_Z_ne, h_cp_T_ne, h_cp_curve⟩,
+    fun i hi => by
       dsimp only [Nat.reducePow]
       have := cp_X_post2 i hi
       omega,
@@ -832,8 +833,7 @@ private lemma elligator_completed_point_valid
     fun i hi => by
       dsimp only [Nat.reducePow]
       have := cp_T_post2 i hi
-      omega,
-    h_cp_Z_ne, h_cp_T_ne, h_cp_curve⟩
+      omega⟩
 
 /-- If the extracted `sqrt_ratio_i` flag is square, the pure Elligator squareness predicate
 holds. -/

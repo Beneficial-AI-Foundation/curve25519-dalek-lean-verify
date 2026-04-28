@@ -91,6 +91,23 @@ theorem Array.set_of_eq (bs : Array U64 5#usize) (a : U64) (i : Nat) (hi : i < b
     = Array.set_val_eq, = UScalar.ofNatCore_val_eq,
     = List.getElem_set]
 
+/-- If two `FieldElement51`s agree pointwise at every limb (as `U64`s), they are equal.
+Used to lift per-limb val/term equality back to the `FieldElement51` level. -/
+theorem fe_eq_of_limbs
+    {a b : curve25519_dalek.backend.serial.u64.field.FieldElement51}
+    (h : ∀ i < 5, a[i]! = b[i]!) :
+    a = b := by
+  simp only [Array.getElem!_Nat_eq] at h
+  apply Subtype.ext
+  apply List.ext_getElem (by simp [a.property, b.property])
+  intro n hn _
+  have hn5 : n < 5 := by
+    simp only [a.property, UScalar.ofNatCore_val_eq] at hn
+    exact hn
+  have := h n hn5
+  simp only [List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos, hn5] at this
+  exact this
+
 /-- If a 32-byte array represents a value less than `2 ^ 252`, then the high bit (bit 7) of byte 31
 must be 0. -/
 theorem high_bit_zero_of_lt_255 (bytes : Array U8 32#usize) (h : U8x32_as_Nat bytes < 2 ^ 255) :

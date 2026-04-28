@@ -45,8 +45,8 @@ theorem mul_base_clamped_spec (bytes : Array U8 32#usize) :
         else MontgomeryPoint.mkPoint result =
           abs_montgomery (clamped_scalar_nat • fromEdwards _root_.Edwards.basepoint))) ⦄ := by
   unfold mul_base_clamped
-  step with scalar.clamp_integer_spec'
-  step with mul_base_spec
+  step with scalar.clamp_integer_spec
+  step with mul_base_spec ({ bytes := a } : scalar.Scalar) a_post2
   use U8x32_as_Nat_foldr a
   simp_all [U8x32_as_Nat_eq_foldr' a]
 
