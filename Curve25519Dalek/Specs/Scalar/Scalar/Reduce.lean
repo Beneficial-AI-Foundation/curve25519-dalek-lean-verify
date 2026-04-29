@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley, Markus Dablander, Hoang Le Truong
 -/
@@ -11,40 +11,28 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryReduce
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Pack
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.R
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.Invert
-/-! # Spec Theorem for `Scalar::reduce`
 
-Specification and proof for `Scalar::reduce`.
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::reduce`
 
-This function performs modular reduction.
+Takes an input scalar `s` and outputs a scalar `s'` representing its canonical reduced form:
+`s'` lies in `{0, …, ℓ – 1}` and satisfies `s ≡ s' (mod ℓ)` where `ℓ` is the group order.
 
-**Source**: curve25519-dalek/src/scalar.rs
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
-set_option linter.style.whitespace false
+set_option linter.style.whitespace false -- spaces inside ⟨ ... ⟩ in let* patterns are intentional
 set_option exponentiation.threshold 260
 
-open Aeneas Aeneas.Std Aeneas.Std.WP Result
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open curve25519_dalek.backend.serial.u64
 open curve25519_dalek.scalar.Scalar52
 namespace curve25519_dalek.scalar.Scalar
 
-/-
-natural language description:
-
-    • Takes an input Scalar s and outputs a Scalar s’ that represents
-      the canonical reduced version, i.e.,  s’ \in \{0, …, \ell – 1}
-      and s is congruent to s’ modulo \ell.
-
-natural language specs:
-
-    • scalar_to_nat(s) is congruent to scalar_to_nat(s') modulo \ell
-    • scalar_to_nat(s') \in \{0,…, \ell - 1}
--/
-
-/-- **Spec and proof concerning `scalar.Scalar.reduce`**:
-- No panic (always returns successfully)
-- The result scalar s' is congruent to the input scalar s modulo L (the group order)
-- The result scalar s' is in canonical form (less than L)
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::reduce`**
+• No panic (always returns successfully)
+• The result scalar `s'` is congruent to the input scalar `s` modulo `L` (the group order)
+• The result scalar `s'` is in canonical form (less than `L`)
 -/
 @[step]
 theorem reduce_spec (s : Scalar) :
@@ -55,7 +43,8 @@ theorem reduce_spec (s : Scalar) :
   let* ⟨ x, x_post1, x_post2 ⟩ ← unpack_spec
   let* ⟨ xR, xR_post1, xR_post2 ⟩ ← scalar.Scalar52.mul_internal_spec
   · unfold constants.R; decide
-  let* ⟨ x_mod_l, x_mod_l_post1, x_mod_l_post2, x_mod_l_post3 ⟩ ← scalar.Scalar52.montgomery_reduce_spec
+  let* ⟨ x_mod_l, x_mod_l_post1, x_mod_l_post2, x_mod_l_post3 ⟩ ←
+      scalar.Scalar52.montgomery_reduce_spec
   · -- x < R (from limbs < 2^52), constants.R < L (it's R mod L), so x * R_const < R * L
     rw [xR_post1]
     have h_x_lt : Scalar52_as_Nat x < R := Scalar52_as_Nat_bounded x x_post2

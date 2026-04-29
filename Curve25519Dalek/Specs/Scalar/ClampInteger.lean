@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Oliver Butterley
 -/
@@ -10,29 +10,36 @@ import Mathlib.Tactic.IntervalCases
 import Mathlib.Tactic.GCongr
 import Mathlib.Algebra.BigOperators.Ring.Finset
 
-set_option linter.style.setOption false
-set_option grind.warning false
+/-!
+# Spec theorem for `curve25519_dalek::scalar::clamp_integer`
 
-/-! # clamp_integer -/
+Applies bitwise clamping to a 32-byte little-endian scalar representation:
+• clears the three lowest bits of byte[0] (ensuring divisibility by the cofactor h = 8),
+• clears the highest bit of byte[31] (ensuring the value < 2^255),
+• sets bit 6 of byte[31] (ensuring the value ≥ 2^254).
+
+The result is a properly clamped scalar in the range [2^254, 2^255) divisible by h = 8,
+suitable for use in X25519 scalar multiplication.
+
+Source: "curve25519-dalek/src/scalar.rs"
+-/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek
-open scalar
+open curve25519_dalek scalar
 
 attribute [-simp] Int.reducePow Nat.reducePow
 
-/-! ## Spec for `clamp_integer` -/
-
 namespace curve25519_dalek.scalar
 
-/-- **Spec and proof concerning `scalar.clamp_integer`**:
-- No panic
-- (as_nat_32_u8 result) is divisible by h (cofactor of curve25519)
-- as_nat_32_u8 result < 2^255
-- 2^254 ≤ as_nat_32_u8 result -/
+/-- **Spec theorem for `curve25519_dalek::scalar::clamp_integer`**
+• The function always succeeds (no panic) for any 32-byte input
+• h divides U8x32_as_Nat result (the result is divisible by the cofactor h = 8)
+• U8x32_as_Nat result < 2^255
+• 2^254 ≤ U8x32_as_Nat result
+-/
 @[step]
 theorem clamp_integer_spec (bytes : Array U8 32#usize) :
-    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
+    clamp_integer bytes ⦃ (result : Array U8 32#usize) =>
       h ∣ U8x32_as_Nat result ∧
       U8x32_as_Nat result < 2^255 ∧
       2^254 ≤ U8x32_as_Nat result ⦄ := by
@@ -68,13 +75,18 @@ theorem clamp_integer_spec (bytes : Array U8 32#usize) :
     simp [Finset.sum_range_succ]
     grind
 
-
+/-- **Spec theorem for `curve25519_dalek::scalar::clamp_integer`** (via `U8x32_as_Nat_foldr`)
+• The function always succeeds (no panic) for any 32-byte input
+• h divides U8x32_as_Nat_foldr result
+• U8x32_as_Nat_foldr result < 2^255
+• 2^254 ≤ U8x32_as_Nat_foldr result
+-/
 theorem clamp_integer_spec' (bytes : Array U8 32#usize) :
-    clamp_integer bytes ⦃ (result : Std.Array U8 32#usize) =>
+    clamp_integer bytes ⦃ (result : Array U8 32#usize) =>
       h ∣ U8x32_as_Nat_foldr result ∧
       U8x32_as_Nat_foldr result < 2^255 ∧
       2^254 ≤ U8x32_as_Nat_foldr result ⦄ := by
-      simp only [← U8x32_as_Nat_eq_foldr']
-      apply clamp_integer_spec
+  simp only [← U8x32_as_Nat_eq_foldr']
+  apply clamp_integer_spec
 
 end curve25519_dalek.scalar

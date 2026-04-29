@@ -64,6 +64,11 @@ function hasUncommittedChanges() {
 function collectWarnings() {
   let output
   try {
+    // Download pre-built Mathlib .olean files from Mathlib's cache server.
+    // Without this, lake build compiles Mathlib from source on a fresh runner,
+    // which takes hours. With it, the build takes minutes.
+    execSync('lake exe cache get', { cwd: REPO_ROOT, stdio: 'inherit' })
+
     // Run lake build, stream to console AND capture output
     output = execSync('lake build 2>&1', {
       cwd: REPO_ROOT,
