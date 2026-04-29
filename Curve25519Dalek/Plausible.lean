@@ -86,6 +86,57 @@ instance {T : Type} {n : Usize} [Repr T] :
 instance {T : Type} {n : Usize} [DecidableEq T] : DecidableEq (Aeneas.Std.Array T n) :=
   fun a b => decidable_of_iff (a.val = b.val) Subtype.ext_iff.symm
 
+/-! ## Bounded `Array U64 5` sampling for subtype preconditions
+
+Plausible's `subtypeVarTestable` instance (priority 2000) handles propositions of
+the shape `∀ (a : α), p a → Q a` by sampling `a` from `{ a : α // p a }` directly,
+rather than generating `a` freely and then filtering.  This eliminates the
+vacuous-success problem for hypotheses like `ha : ∀ i < 5, a[i]!.val < 2^53`,
+which are satisfied by only ≈ 1/2^110 of unconstrained arrays.
+
+The required `Repr` and `Shrinkable` pieces come for free:
+• `Repr` — Lean 4's built-in `Repr (Subtype p)` delegates to `Repr (Array U64 5)`.
+• `Shrinkable` — Plausible's `Subtype.shrinkable` shrinks the inner array and
+  filters candidates via the decidable predicate.
+• `SampleableExt` — `SampleableExt.selfContained` assembles the above three.
+
+The only piece we must supply is `Arbitrary`. -/
+
+-- Like `genListN` but driven by an explicit element generator.
+private def genListNWith {T : Type} (g : Gen T) :
+    (n : Nat) → Gen {l : List T // l.length = n}
+  | 0     => pure ⟨[], rfl⟩
+  | n + 1 => do
+    let x      ← g
+    let ⟨xs, h⟩ ← genListNWith g n
+    return ⟨x :: xs, by simp [h]⟩
+
+-- Single U64 limb uniformly sampled from [0, bound − 1]; falls back to 0 for bound = 0.
+private def genBoundedLimb (bound : Nat) : Gen U64 := do
+  let max := if 0 < bound then bound - 1 else 0
+  let rand := do let ⟨v, _⟩ ← Gen.choose Nat 0 max (Nat.zero_le _); pure v
+  let m ← Gen.frequency rand [(90, rand), (5, pure 0), (5, pure max)]
+  return mkUScalar m
+
+-- `Array U64 5` with every limb < bound.
+private def genBoundedFEArr (bound : Nat) : Gen (Array U64 5#usize) := do
+  let ⟨elems, h⟩ ← genListNWith (genBoundedLimb bound) 5
+  return Array.make 5#usize elems h
+
+/-- `Arbitrary` for `{ a : Array U64 5 // ∀ i < 5, a[i]!.val < bound }`.
+
+`genBoundedFEArr` keeps every limb in `[0, bound − 1]`, so the runtime decidability
+check always succeeds for `bound > 0`.  For `bound = 0` the subtype is empty and
+`throw` causes Plausible to report "gave up", which is the correct outcome. -/
+instance (bound : Nat) :
+    Arbitrary { a : Array U64 5#usize // ∀ i < 5, a[i]!.val < bound } where
+  arbitrary := do
+    let arr ← genBoundedFEArr bound
+    if h : ∀ i < 5, arr[i]!.val < bound then
+      pure ⟨arr, h⟩
+    else
+      throw (.genError s!"bounded-limb generator produced a limb ≥ {bound}")
+
 /-! ## Domain types
 
 `@[reducible]` def aliases (`FieldElement51`, `Scalar52`, `CompressedEdwardsY`,
