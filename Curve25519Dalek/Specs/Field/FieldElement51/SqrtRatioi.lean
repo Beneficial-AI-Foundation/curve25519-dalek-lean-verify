@@ -1,12 +1,11 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Hoang Le Truong, Alessandro D'Angelo
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Math.Edwards.Curve
-
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Square
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Field.FieldElement51.PowP58
@@ -18,24 +17,23 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Conditional
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.SqrtM1
 import Curve25519Dalek.Specs.Field.FieldElement51.Invert
 import Curve25519Dalek.Specs.Field.FieldElement51.IsZero
-/-! # Spec Theorem for `FieldElement51::sqrt_ratio_i`
 
-Specification and proof for `FieldElement51::sqrt_ratio_i`.
+/-!
+# Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`
 
 This function computes a nonnegative square root of u/v or i*u/v
 (where i = sqrt(-1) = SQRT_M1 constant),
 returning a flag indicating which case occurred and handling zero inputs specially.
 
-**Source**: curve25519-dalek/src/field.rs
+Source: "curve25519-dalek/src/field.rs"
 -/
 
-attribute [-simp] Int.reducePow Nat.reducePow
-
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-open curve25519_dalek.backend.serial.u64
+open curve25519_dalek.backend.serial.u64 curve25519_dalek.math
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
-open curve25519_dalek.math
 namespace curve25519_dalek.field.FieldElement51
+
+attribute [-simp] Int.reducePow Nat.reducePow
 
 /-- Algebraic identity used in sqrt_ratio_i: collecting powers of u and v. -/
 private theorem sqrt_ratio_collect (u v e : Nat) :
@@ -53,20 +51,25 @@ private theorem sqrt_ratio_rearrange (u v e : Nat) :
 /-- The SQRT_M1 constant as a plain FieldElement51 (alias for `constants.SQRT_M1_raw`). -/
 def SQRT_M1_val := backend.serial.u64.constants.SQRT_M1_raw
 
-theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
+/-- The square of `SQRT_M1_val` reduces to `p - 1` modulo `p`. -/
+private theorem SQRT_M1_val_spec : (Field51_as_Nat SQRT_M1_val)^2 % p = p - 1 := by
   unfold SQRT_M1_val constants.SQRT_M1_raw; decide
 
+/-- If a power is zero modulo the prime `p`, then the base itself is zero modulo `p`. -/
 private theorem modEq_zero_of_pow_modEq_zero {a k : ℕ}
     (h : a ^ k ≡ 0 [MOD p]) :
     a ≡ 0 [MOD p] := by
   rw [Nat.modEq_zero_iff_dvd] at h ⊢
   exact prime_25519.dvd_of_dvd_pow h
 
+/-- `SQRT_M1_val` squared is congruent to `p - 1` modulo `p`. -/
 private theorem sqrt_m1_sq_modEq :
     Field51_as_Nat SQRT_M1_val ^ 2 ≡ p - 1 [MOD p] := by
   simp [Nat.ModEq, SQRT_M1_val_spec]
 
-theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
+/-- If `a + b ≡ 0 [MOD p]`, then `a ≡ (SQRT_M1_val)^2 * b [MOD p]`
+(since `(SQRT_M1_val)^2 ≡ -1`). -/
+private theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   (h : a + b ≡ 0 [MOD p]) :
   a ≡ (Field51_as_Nat SQRT_M1_val) ^ 2 * b [MOD p] := by
   have h_sqrt_eq : (Field51_as_Nat SQRT_M1_val) ^ 2 % p = p - 1 :=
@@ -90,7 +93,8 @@ theorem nat_sqrt_m1_sq_of_add_modeq_zero {a b : ℕ}
   simp only [zero_add] at h6
   exact h6.trans (h1.symm)
 
-theorem eq_to_bytes_eq_Field51_as_Nat
+/-- Equal `to_bytes` outputs imply equal underlying field-element values modulo `p`. -/
+private theorem eq_to_bytes_eq_Field51_as_Nat
     {u v : backend.serial.u64.field.FieldElement51}
     (h : u.to_bytes = v.to_bytes) :
   Field51_as_Nat u % p = Field51_as_Nat v % p := by
@@ -108,7 +112,8 @@ theorem eq_to_bytes_eq_Field51_as_Nat
     exact (Nat.ModEq.symm h1).trans h2
   simpa only [Nat.ModEq] using huv_mod
 
-lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
+/-- A value below `p` that is congruent to `0` modulo `p` must be exactly `0`. -/
+private lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
     u = 0 := by
     rw[Nat.ModEq] at hu_mod
     simp only [Nat.zero_mod] at hu_mod
@@ -117,7 +122,8 @@ lemma zero_mod_lt_zero {u p : ℕ} (hu_lt : u < p) (hu_mod : u ≡ 0 [MOD p]) :
     simp only [ReduceNat.reduceNatEq] at this
     exact this
 
-theorem to_bytes_zero_of_Field51_as_Nat_zero
+/-- A field element representing `0` modulo `p` serializes to the all-zero byte array. -/
+private theorem to_bytes_zero_of_Field51_as_Nat_zero
     {u : backend.serial.u64.field.FieldElement51}
     (h : Field51_as_Nat u % p = 0) :
    u.to_bytes = ok (Array.repeat 32#usize 0#u8)  := by
@@ -144,7 +150,8 @@ theorem to_bytes_zero_of_Field51_as_Nat_zero
   rw [← hru_eq]
   exact hu
 
-theorem SQRT_M1_not_square (x : ℕ) :
+/-- `SQRT_M1` is not a square in `ZMod p`: no natural number `x` satisfies `x^4 ≡ -1 [MOD p]`. -/
+private theorem SQRT_M1_not_square (x : ℕ) :
   ¬ (x ^ 4 ≡ p - 1 [MOD p]) := by
   intro hx
   have hx_z : ((x : ZMod p) ^ 4) = (-1 : ZMod p) := by
@@ -176,7 +183,9 @@ theorem SQRT_M1_not_square (x : ℕ) :
           ring
   exact _root_.curve25519_dalek.math.sqrt_m1_not_square hsquare
 
-lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
+/-- If `a * SQRT_M1_val ≡ 0 [MOD p]`, then `a ≡ 0 [MOD p]` (since `SQRT_M1_val` is a unit). -/
+private lemma zero_of_mul_SQRT_M1_zero {a : ℕ}
+    (ha : a * Field51_as_Nat SQRT_M1_val ≡ 0 [MOD p]) :
   a ≡ 0 [MOD p] := by
   have eq:= ha.mul_right (Field51_as_Nat SQRT_M1_val)
   simp only [mul_assoc, zero_mul] at eq
@@ -193,7 +202,8 @@ lemma zero_of_mul_SQRT_M1_zero {a : ℕ} (ha : a * Field51_as_Nat SQRT_M1_val �
     simp
   apply eq.symm.trans this
 
-theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
+/-- For nonzero `a` mod `p`, `a^((p-1)/2)` is either `1` or `p - 1` modulo `p` (Euler criterion). -/
+private theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     a ^ ((p -1) / 2) ≡ 1 [MOD p]∨ a ^ ((p-1) / 2) ≡ p - 1 [MOD p] := by
     have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1) ≡ 0 [MOD p] := by
       have : (a ^ ((p -1) / 2) + (p -1)) * (a ^ ((p-1) / 2) +1)
@@ -232,7 +242,9 @@ theorem pow_div_two_eq_neg_one_or_one {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
       simp[this] at r
       simp[r]
 
-theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
+/-- For nonzero `a` mod `p`, `a^((p-1)/4)` lies in the four-element group
+generated by `SQRT_M1_val` (i.e. equals `1`, `i`, `-1`, or `-i` modulo `p`). -/
+private theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     a ^ ((p -1) / 4) ≡ 1 [MOD p] ∨
     a ^ ((p-1) / 4) ≡ Field51_as_Nat SQRT_M1_val [MOD p] ∨
     a ^ ((p-1) / 4) ≡ (Field51_as_Nat SQRT_M1_val)^2 [MOD p] ∨
@@ -351,6 +363,7 @@ theorem pow_div_four_eq_four_cases {a : ℕ} (ha : ¬ a ≡ 0 [MOD p]) :
     have r:= r.trans this
     simp [r]
 
+/-- If `a + b ≡ 0 [MOD p]` and `a mod p` is odd, then `b mod p` is even (uses oddness of `p`). -/
 private theorem nonneg_of_neg_mod_p (a b : ℕ)
     (h_sum : (a + b) % p = 0) (h_a_odd : a % p % 2 = 1) :
     b % p % 2 = 0 := by
@@ -1316,22 +1329,19 @@ end sqrt_ratio_i_branch_solvers
 
 attribute [local irreducible] p
 
-
 set_option maxHeartbeats 400000 in -- the proof works even with 230k heartbeats, but not much less.
-/-- Spec for `FieldElement51::sqrt_ratio_i`: computes a nonnegative square root of u/v or
-i*u/v (where i = sqrt(-1) = SQRT_M1), returning a flag indicating which case occurred.
-
-Returns `(Choice(1), +sqrt(u/v))` if u/v is square, `(Choice(1), 0)` if u=0,
-`(Choice(0), 0)` if v=0 and u≠0, `(Choice(0), +sqrt(i*u/v))` if u/v is nonsquare.
-
-Postconditions (4 mutually exclusive cases + non-negativity):
-1. u ≡ 0 → c=1, r≡0
-2. u≢0, v≡0 → c=0, r≡0
-3. u≢0, v≢0, ∃x, x²v≡u → c=1, r²v≡u
-4. u≢0, v≢0, ¬∃x, x²v≡u → c=0, r²v≡SQRT_M1·u
-5. r is non-negative (r % p % 2 = 0)
+/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`**
+(auxiliary existential form, used internally to derive `sqrt_ratio_i_spec`).
+• The function succeeds (no panic) for limb-bounded inputs `u, v` with limbs `< 2^54`
+• If `u ≡ 0 (mod p)`, then `c.1 = 1` and `r ≡ 0 (mod p)`
+• If `u ≢ 0` and `v ≡ 0 (mod p)`, then `c.1 = 0` and `r ≡ 0 (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is a square, then `c.1 = 1` and `r^2 * v ≡ u (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is not a square, then `c.1 = 0` and
+  `r^2 * v ≡ SQRT_M1 * u (mod p)`
+• The output limbs satisfy `c.2[i] ≤ 2^53 - 1`
+• The result `r` is non-negative (`r % p % 2 = 0`)
 -/
-theorem sqrt_ratio_i_spec'
+private theorem sqrt_ratio_i_spec'
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
     (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
@@ -1386,7 +1396,8 @@ theorem sqrt_ratio_i_spec'
   let* ⟨ flipped_sign_sqrt, flipped_sign_sqrt_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ fe7, fe7_post1, fe7_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
-  let* ⟨ flipped_sign_sqrt_i, flipped_sign_sqrt_i_post ⟩ ← Insts.SubtleConstantTimeEq.ct_eq_spec
+  let* ⟨ flipped_sign_sqrt_i, flipped_sign_sqrt_i_post ⟩ ←
+    Insts.SubtleConstantTimeEq.ct_eq_spec
   let* ⟨ r_prime, r_prime_post1, r_prime_post2 ⟩ ←
     Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldElement51FieldElement51.mul_spec
   -- Bridge: i = SQRT_M1_raw, fold back to SQRT_M1_val
@@ -1537,29 +1548,37 @@ theorem sqrt_ratio_i_spec'
               r2_post r_is_negative_post
               h_check_ne_u h_check_ne_fe6 h_check_ne_fe7
 
-
+/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`**
+• The function succeeds (no panic) for limb-bounded inputs `u, v` with limbs `< 2^54`
+• Output limbs are bounded by `2^53 - 1`
+• The result `r` is non-negative (`r_nat % 2 = 0`)
+• If `u ≡ 0 (mod p)`, then `c.1 = 1` and `r ≡ 0 (mod p)`
+• If `u ≢ 0` and `v ≡ 0 (mod p)`, then `c.1 = 0` and `r ≡ 0 (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is a square, then `c.1 = 1` and `r^2 * v ≡ u (mod p)`
+• If `u ≢ 0`, `v ≢ 0`, and `u/v` is not a square, then `c.1 = 0` and
+  `r^2 * v ≡ SQRT_M1 * u (mod p)`
+-/
 @[step]
 theorem sqrt_ratio_i_spec
     (u : backend.serial.u64.field.FieldElement51)
     (v : backend.serial.u64.field.FieldElement51)
     (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)
     (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :
-    sqrt_ratio_i u v ⦃ c =>
-    let u_nat := Field51_as_Nat u % p
-    let v_nat := Field51_as_Nat v % p
-    let r_nat := Field51_as_Nat c.2 % p
-    let i_nat := Field51_as_Nat SQRT_M1_val % p
-    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧
-    (r_nat % 2 = 0) ∧
-    (u_nat = 0 →
-      c.1.val = 1#u8 ∧ r_nat = 0) ∧
-    (u_nat ≠ 0 ∧ v_nat = 0 →
-      c.1.val = 0#u8 ∧ r_nat = 0) ∧
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →
-      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧
-    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
-      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)
-    ⦄ := by
+    sqrt_ratio_i u v ⦃ (c : subtle.Choice × backend.serial.u64.field.FieldElement51) =>
+      let u_nat := Field51_as_Nat u % p
+      let v_nat := Field51_as_Nat v % p
+      let r_nat := Field51_as_Nat c.2 % p
+      let i_nat := Field51_as_Nat SQRT_M1_val % p
+      (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧
+      (r_nat % 2 = 0) ∧
+      (u_nat = 0 →
+        c.1.val = 1#u8 ∧ r_nat = 0) ∧
+      (u_nat ≠ 0 ∧ v_nat = 0 →
+        c.1.val = 0#u8 ∧ r_nat = 0) ∧
+      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →
+        c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧
+      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →
+        c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p) ⦄ := by
   have ⟨c, h_ok, h1, h2, h3, h4, h_nonneg⟩ := sqrt_ratio_i_spec' u v h_u_bounds h_v_bounds
   exact exists_imp_spec ⟨c, h_ok, by
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_⟩
@@ -1580,6 +1599,7 @@ theorem sqrt_ratio_i_spec
     · -- Case 3
       intro ⟨hu, hv, hqr⟩; exact ⟨(h3 ⟨hu, hv, hqr⟩).1, (h3 ⟨hu, hv, hqr⟩).2.1⟩
     · -- Case 4
-      intro ⟨hu, hv, hnqr⟩; exact ⟨(h4 ⟨hu, hv, hnqr⟩).1, (h4 ⟨hu, hv, hnqr⟩).2.1⟩⟩
+      intro ⟨hu, hv, hnqr⟩
+      exact ⟨(h4 ⟨hu, hv, hnqr⟩).1, (h4 ⟨hu, hv, hnqr⟩).2.1⟩⟩
 
 end curve25519_dalek.field.FieldElement51
