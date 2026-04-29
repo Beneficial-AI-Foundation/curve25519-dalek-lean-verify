@@ -201,6 +201,32 @@ instance : Shrinkable backend.serial.curve_models.CompletedPoint where
 instance : Repr backend.serial.curve_models.CompletedPoint where
   reprPrec p prec := reprPrec (p.X, p.Y, p.Z, p.T) prec
 
+/-! ## Decidable bounded universal quantification
+
+Three instances together let Plausible evaluate hypotheses of the form
+`∀ i < 5, a[i]!.val < 2^53` as guards (via `decGuardTestable`) rather than
+treating them as universally-quantified things to sample.
+
+`NamedBinder` is `@[expose]` (not `@[reducible]`), so instance synthesis does
+not see through it automatically — the bridge and body instances are both needed. -/
+
+-- Bridge: strip a NamedBinder wrapper for decidability.
+instance {s : String} {P : Prop} [Decidable P] :
+    Decidable (Plausible.NamedBinder s P) := ‹Decidable P›
+
+-- Body: decide ∀ i : ℕ, NamedBinder s (i < n → Q i), the exact shape Plausible
+-- generates for a bounded-hypothesis binder such as `ha : ∀ i < 5, a[i]!.val < 2^53`.
+instance {n : Nat} {Q : Nat → Prop} [DecidablePred Q] {s : String} :
+    Decidable (∀ i : Nat, Plausible.NamedBinder s (i < n → Q i)) :=
+  decidable_of_iff (∀ j : Fin n, Q j.val)
+    ⟨fun h i hi => h ⟨i, hi⟩, fun h j => h j.val j.isLt⟩
+
+-- Plain form: decide ∀ i < n, P i (used in postconditions, which carry no NamedBinder).
+instance {n : Nat} {P : Nat → Prop} [DecidablePred P] :
+    Decidable (∀ i < n, P i) :=
+  decidable_of_iff (∀ i : Fin n, P i.val)
+    ⟨fun h i hi => h ⟨i, hi⟩, fun h i => h i.val i.isLt⟩
+
 /-! ## `WP.spec` Decidable instance
 
 `WP.spec x p = theta x p`.  `theta` pattern-matches on `Result`: `ok x` reduces to
