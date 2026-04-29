@@ -5,43 +5,29 @@ Authors: Hoang Le Truong
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Specs.Scalar.Scalar.CtEq
-/-! # Spec Theorem for `Scalar::eq`
 
-Specification and proof for the `eq` (PartialEq) trait implementation for Scalar.
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::eq`
 
 This function performs equality comparison for two Scalars by delegating
 to constant-time equality (`ct_eq`) and converting the resulting `Choice` to `Bool`.
 Two Scalars are considered equal when they have the same byte representation,
 i.e., `self.bytes = other.bytes`.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 295:4-297:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 namespace curve25519_dalek.scalar.Scalar.Insts.CoreCmpPartialEqScalar
 
-/-
-natural language description:
-
-• Takes two Scalars `self` and `other`
-• Returns `true` if they have the same byte representation, `false` otherwise
-• Implementation: delegates to `ct_eq` (constant-time equality) which compares
-  the byte arrays of both scalars, then converts the `Choice` to `Bool`
-
-natural language specs:
-
-• The function always succeeds (no panic) for any input Scalars
-• The result is `true` if and only if the two scalars have the same byte representation
--/
-
-/-- **Spec and proof concerning `scalar.Scalar.Insts.CoreCmpPartialEqScalar.eq`**:
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::eq`**
 • The function always succeeds (no panic)
 • The result is `true` if and only if the two scalars have the same byte representation
 -/
 @[step]
-theorem eq_spec (self other : scalar.Scalar) :
-    eq self other ⦃ result =>
-    result = true ↔ self.bytes = other.bytes ⦄ := by
+theorem eq_spec (self other : Scalar) :
+    eq self other ⦃ (result : Bool) =>
+      result = true ↔ self.bytes = other.bytes ⦄ := by
   unfold eq
   step*
   unfold Bool.Insts.CoreConvertFromChoice.from
