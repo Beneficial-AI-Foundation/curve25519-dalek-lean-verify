@@ -7,69 +7,44 @@ import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 import Curve25519Dalek.Aux
 
+/-!
+# Spec theorem for `curve25519_dalek::scalar::read_le_u64_into`
 
-/-! # Spec Theorems for `read_le_u64_into`
-
-Specification and proof for `read_le_u64_into` (lines 1376:0–1393:1) and its
-loop auxiliary `read_le_u64_into_loop` (lines 1379:4–1392:5).
-
+Reads a byte slice `src` of length `8 * n` and interprets it as `n` little-endian `u64`
+values, writing them into a mutable `u64` slice `dst` of length `n`.
 
 In each iteration `i` (from `0` to `dst.len() − 1`) the loop body:
 1. Computes the byte offset `start = 8 * i`.
 2. Reads the 8 consecutive bytes `src[8i], src[8i+1], …, src[8i+7]`.
-3. Assembles them as a **little-endian** `u64`:
-      `dst[i] ← src[8i] + 2^8 · src[8i+1] + … + 2^56 · src[8i+7]`.
+3. Assembles them as a little-endian `u64`:
+   `dst[i] ← src[8i] + 2^8 · src[8i+1] + … + 2^56 · src[8i+7]`.
 
 ## Loop invariant
 
-At loop counter `i` (with `i ≤ dst.len = n`), the slice `dst` satisfies:
-
-  **Element correctness** — for all `k < i`:
-    `dst[k].val = ∑ j ∈ Finset.range 8, src.val[8k+j].val · 2^(8j)`
-               `= U8Slice_chunk_as_U64 src k`.
+At loop counter `i` (with `i ≤ dst.len = n`), the slice `dst` satisfies the
+**element-correctness** invariant — for all `k < i`:
+  `dst[k].val = ∑ j ∈ Finset.range 8, src.val[8k+j].val · 2^(8j) = U8Slice_chunk_as_U64 src k`.
 
 Each iteration extends this invariant from `i` to `i + 1` by:
 - Reading `src.val[8i], …, src.val[8i+7]` via `Slice.index_usize`.
 - Computing their little-endian `u64` value via `core.num.U64.from_le_bytes`.
 - Writing the result to `dst` position `i` via `Slice.update`.
 
-## Postconditions
-
-After `read_le_u64_into src dst` (with `src.len = 8 * n`, `n = dst.len`):
-1. **Element correctness**: `∀ k < n, result[k].val = U8Slice_chunk_as_U64 src k`.
-2. **Combined-value preservation**:
-     `U64Slice_as_Nat result n = ∑ j ∈ Finset.range (8*n), src.val[j].val · 2^(8j)`.
-
-The combined-value property is the key fact consumed by callers.  When
-`n = 4` and `src` comes from a 32-byte `Scalar`, this reads:
+The combined-value property is the key fact consumed by callers. When `n = 4` and `src`
+comes from a 32-byte `Scalar`, this reads:
   `X64_as_Nat (index_mut_back result) = U8x32_as_Nat self.bytes`
 where `X64_as_Nat` is the 4-limb `u64` interpretation from `AsRadix2wLoop.lean`.
 
-**Source**: curve25519-dalek/src/scalar.rs, lines 1376:0-1393:1
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
+-- `#setup_aeneas_simps` triggers the hash-command linter; suppress it for this file.
 set_option linter.hashCommand false
 #setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
 namespace curve25519_dalek.scalar
-
-
-/-
-natural language specs:
-
-• The function always succeeds whenever `src.len = 8 * dst.len`.
-• On return, for every `k < n`:
-    `result[k].val = src.val[8k+0].val · 2^0  +  src.val[8k+1].val · 2^8
-                   + src.val[8k+2].val · 2^16 +  src.val[8k+3].val · 2^24
-                   + src.val[8k+4].val · 2^32 +  src.val[8k+5].val · 2^40
-                   + src.val[8k+6].val · 2^48 +  src.val[8k+7].val · 2^56`
-  which is the little-endian `u64` interpretation of the `k`-th 8-byte chunk.
-• Equivalently, the combined value is preserved:
-    `∑ k < n, result[k].val · 2^(64k) = ∑ j < 8n, src.val[j].val · 2^(8j)`.
--/
 
 /-- Interpret 8 consecutive bytes of slice `src` beginning at byte offset `8 * k`
     as a natural number in **little-endian** byte order:
@@ -77,13 +52,15 @@ natural language specs:
 
     This is the natural-number value that `u64::from_le_bytes` returns for the
     8-byte chunk `[src[8k], src[8k+1], …, src[8k+7]]`. -/
-def U8Slice_chunk_as_U64 (src : Slice Std.U8) (k : ℕ) : ℕ :=
+def U8Slice_chunk_as_U64 (src : Slice U8) (k : ℕ) : ℕ :=
   ∑ j ∈ Finset.range 8, (src.val[8 * k + j]!).val * 2 ^ (8 * j)
 
-def U64Slice_as_Nat (dst : Slice Std.U64) (n : ℕ) : ℕ :=
+/-- The value of the first `n` elements of `dst` as a base-`2^64` natural number:
+    `∑ k ∈ Finset.range n, (dst.val[k]!).val * 2^(64 * k)`. -/
+def U64Slice_as_Nat (dst : Slice U64) (n : ℕ) : ℕ :=
   ∑ k ∈ Finset.range n, (dst.val[k]!).val * 2 ^ (64 * k)
 
-private lemma chunk_step_identity (src : Slice Std.U8) (k : ℕ) :
+private lemma chunk_step_identity (src : Slice U8) (k : ℕ) :
     ∑ j ∈ Finset.range (8 * (k + 1)), (src.val[j]!).val * 2 ^ (8 * j) =
     ∑ j ∈ Finset.range (8 * k), (src.val[j]!).val * 2 ^ (8 * j) +
     U8Slice_chunk_as_U64 src k * 2 ^ (64 * k) := by
@@ -100,7 +77,7 @@ private lemma chunk_step_identity (src : Slice Std.U8) (k : ℕ) :
     ring
   rw [hsub]
 
-private lemma chunk_sum_eq (src : Slice Std.U8) (n : ℕ) :
+private lemma chunk_sum_eq (src : Slice U8) (n : ℕ) :
     ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) =
     ∑ k ∈ Finset.range n, U8Slice_chunk_as_U64 src k * 2 ^ (64 * k) := by
   induction n with
@@ -109,7 +86,7 @@ private lemma chunk_sum_eq (src : Slice Std.U8) (n : ℕ) :
     rw [chunk_step_identity src n, ih, Finset.sum_range_succ]
 
 private lemma U64Slice_as_Nat_eq_chunk_sum
-    (src : Slice Std.U8) (dst : Slice Std.U64) (n : ℕ)
+    (src : Slice U8) (dst : Slice U64) (n : ℕ)
     (h_inv : ∀ k < n, (dst.val[k]!).val = U8Slice_chunk_as_U64 src k) :
     U64Slice_as_Nat dst n =
     ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) := by
@@ -132,8 +109,10 @@ private lemma fromLEBytes_toNat_list (l : List Byte) :
       fun j => List.getElem!_cons_eq_getElem!_sub b l (j + 1) (by omega)
     simp_rw [hcons, show ∀ j, 8 * (j + 1) = 8 * j + 8 from fun j => by ring,
              pow_add]
-    simp only [BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft, Nat.ofNat_pos, mul_lt_mul_iff_right₀,
-    lt_add_iff_pos_right, zero_lt_one, BitVec.toNat_mod_cancel_of_lt, ← mul_assoc, ← Finset.sum_mul, ← ih]
+    simp only [BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft,
+               Nat.ofNat_pos, mul_lt_mul_iff_right₀, lt_add_iff_pos_right,
+               zero_lt_one, BitVec.toNat_mod_cancel_of_lt,
+               ← mul_assoc, ← Finset.sum_mul, ← ih]
     simp only [show 8 * (l.length + 1) = 8 * l.length + 8 from by ring]
     have h_b_lt : b.toNat < 2 ^ 8 := by scalar_tac
     have h_l_lt : (BitVec.fromLEBytes l).toNat < 2 ^ (8 * l.length) :=
@@ -148,7 +127,7 @@ private lemma fromLEBytes_toNat_list (l : List Byte) :
       simp only [BitVec.toNat_shiftLeft, BitVec.toNat_setWidth]
       rw [Nat.mod_eq_of_lt (Nat.lt_of_lt_of_le h_l_lt
             (Nat.pow_le_pow_right (by norm_num) (by omega)))]
-      have:= Nat.mod_eq_of_lt (calc (BitVec.fromLEBytes l).toNat * 2 ^ 8
+      have := Nat.mod_eq_of_lt (calc (BitVec.fromLEBytes l).toNat * 2 ^ 8
           < 2 ^ (8 * l.length) * 2 ^ 8 :=
               Nat.mul_lt_mul_of_pos_right h_l_lt (by positivity)
           _ = 2 ^ n := by rw [← pow_add])
@@ -157,16 +136,23 @@ private lemma fromLEBytes_toNat_list (l : List Byte) :
     have h_or : (BitVec.setWidth n b ||| BitVec.setWidth n (BitVec.fromLEBytes l) <<< 8).toNat =
                 b.toNat ||| (BitVec.fromLEBytes l).toNat * 2 ^ 8 := by
       rw [BitVec.toNat_or, h1, h3]
-    have :(BitVec.fromLEBytes l).toNat % 2 ^ n = (BitVec.fromLEBytes l).toNat := by
+    have : (BitVec.fromLEBytes l).toNat % 2 ^ n = (BitVec.fromLEBytes l).toNat := by
       apply Nat.mod_eq_of_lt
       grind
     simp only [BitVec.toNat_or, BitVec.toNat_setWidth, BitVec.toNat_shiftLeft, this] at h_or   ⊢
-    have :=or_mul_pow_two_eq_add b.toNat (BitVec.fromLEBytes l).toNat 8 h_b_lt
+    have := or_mul_pow_two_eq_add b.toNat (BitVec.fromLEBytes l).toNat 8 h_b_lt
     omega
 
+/-- **Spec theorem for `core::num::U64::from_le_bytes`**
+• Always succeeds.
+• `result.val = ∑ j ∈ Finset.range 8, (bytes[j]!).val * 2^(8j)` (little-endian byte interpretation).
+
+Note: `lift` is needed because `core.num.U64.from_le_bytes` returns a `Result`, not a WP.
+-/
 @[step]
-private theorem from_le_bytes_val_spec (bytes : Array Std.U8 8#usize) :
-    lift (core.num.U64.from_le_bytes bytes) ⦃ result =>
+private theorem from_le_bytes_val_spec
+    (bytes : Array U8 8#usize) :
+    lift (core.num.U64.from_le_bytes bytes) ⦃ (result : U64) =>
       result.val = ∑ j ∈ Finset.range 8, (bytes[j]!).val * 2 ^ (8 * j) ⦄ := by
   apply spec_mono (core.num.U64.from_le_bytes.step_spec bytes)
   intro result hbv
@@ -185,13 +171,20 @@ private theorem from_le_bytes_val_spec (bytes : Array Std.U8 8#usize) :
   simp_lists
   grind
 
+/-- **Spec theorem for `Aeneas.Std.Slice.update`** (auxiliary, for `U64` slices)
+• Always succeeds whenever `j.val < s.len`.
+• `result.val[k]! = s.val[k]!` for all `k ≠ j.val` (other elements unchanged).
+• `result.val[j.val]! = v` (updated element equals `v`).
+• `(Slice.len result).val = (Slice.len s).val` (length preserved).
+-/
 @[step]
-private lemma Slice_U64_update_spec (s : Slice Std.U64) (j : Usize) (v : Std.U64)
+private lemma Slice_U64_update_spec
+    (s : Slice U64) (j : Usize) (v : U64)
     (hj : j.val < (Slice.len s).val) :
-    Slice.update s j v ⦃ s' =>
-      (∀ k, k ≠ j.val → (s'.val[k]!) = (s.val[k]!)) ∧
-      (s'.val[j.val]!) = v ∧
-      (Slice.len s').val = (Slice.len s).val ⦄ := by
+    Slice.update s j v ⦃ (result : Slice U64) =>
+      (∀ k, k ≠ j.val → (result.val[k]!) = (s.val[k]!)) ∧
+      (result.val[j.val]!) = v ∧
+      (Slice.len result).val = (Slice.len s).val ⦄ := by
   apply spec_mono (Slice.update_spec s j v (by scalar_tac))
   intro s' hs'
   subst hs'
@@ -207,8 +200,8 @@ private lemma Slice_U64_update_spec (s : Slice Std.U64) (j : Usize) (v : Std.U64
   · simp only [Slice.len_val, Slice.set_length]
 
 private lemma inv_step
-    (src : Slice Std.U8) (dst s : Slice Std.U64) (i : ℕ)
-    (v : Std.U64) (hv : v.val = U8Slice_chunk_as_U64 src i)
+    (src : Slice U8) (dst s : Slice U64) (i : ℕ)
+    (v : U64) (hv : v.val = U8Slice_chunk_as_U64 src i)
     (h_at_i : (s.val[i]!) = v)
     (h_other : ∀ k, k ≠ i → (s.val[k]!) = (dst.val[k]!))
     (h_inv : ∀ k < i, (dst.val[k]!).val = U8Slice_chunk_as_U64 src k) :
@@ -219,43 +212,29 @@ private lemma inv_step
     exact h_inv k hlt
   · rw [congrArg (·.val) h_at_i, hv]
 
-/-! ## The Main Spec Theorems -/
-
-/- **Strong loop spec for `read_le_u64_into_loop`**:
+/-- Strengthened induction hypothesis for `curve25519_dalek::scalar::read_le_u64_into_loop`.
 
     Starting from loop counter `i` with the element-correctness invariant
-    `∀ k < i.val, dst.val[k].val = U8Slice_chunk_as_U64 src k`, the loop
-    runs to completion and returns `result` satisfying the full invariant
-    for all `k < n` (where `n = (Slice.len dst).val`).
+    `∀ k < i.val, dst.val[k].val = U8Slice_chunk_as_U64 src k`, the loop runs to completion
+    returning `result` satisfying the full invariant for all `k < n`
+    (where `n = (Slice.len dst).val`).
 
-    **Hypotheses**:
-    - `hn` — identifies the loop bound `n` with the dst length.
-    - `h_src_len` — length precondition `src.len = 8 * n`.
-    - `hi` — loop counter in range: `i.val ≤ n`.
-    - `h_inv` — element-correctness invariant for `k < i.val`.
+    Postconditions:
+    • **Element correctness**: `∀ k < n, result.val[k].val = U8Slice_chunk_as_U64 src k`.
+    • **Combined value**: `U64Slice_as_Nat result n = ∑_{j<8n} src.val[j].val · 2^(8j)`.
 
-    **Postconditions**:
-    1. **Element correctness**: `∀ k < n, result.val[k].val = U8Slice_chunk_as_U64 src k`.
-    2. **Combined value**: `U64Slice_as_Nat result n = ∑_{j<8n} src.val[j].val · 2^(8j)`.
-
-    **Proof strategy**: Decreasing induction on `n − i.val`.
-    - **Active branch** (`i < n`): the `step` tactic processes the 8
-      `Slice.index_usize` calls and the `Slice.update` call;
-      `from_le_bytes_val_spec` relates the assembled bytes to the
-      `U8Slice_chunk_as_U64` value; `inv_step` extends the invariant.
-    - **Base case** (`i = n`): the loop exits, the invariant directly gives
-      postcondition 1, and `U64Slice_as_Nat_eq_chunk_sum` + `chunk_sum_eq`
-      establish postcondition 2.
--/
-
-
+    Proof by decreasing induction on `n − i.val`: in the active branch (`i < n`) the `step`
+    tactic handles the 8 `Slice.index_usize` and 1 `Slice.update` calls,
+    `from_le_bytes_val_spec` supplies the chunk value, and `inv_step` extends the invariant;
+    in the base case (`i = n`) the loop exits and `U64Slice_as_Nat_eq_chunk_sum` establishes
+    the combined-value postcondition. -/
 private theorem read_le_u64_into_loop_spec_strong
-    (src : Slice Std.U8) (dst : Slice Std.U64) (i : Std.Usize)
+    (src : Slice U8) (dst : Slice U64) (i : Usize)
     (n : ℕ) (hn : n = (Slice.len dst).val)
     (h_src_len : (Slice.len src).val = 8 * n)
     (hi : i.val ≤ n)
     (h_inv : ∀ k < i.val, (dst.val[k]!).val = U8Slice_chunk_as_U64 src k) :
-    read_le_u64_into_loop src dst i ⦃ result =>
+    read_le_u64_into_loop src dst i ⦃ (result : Slice U64) =>
       (∀ k < n, (result.val[k]!).val = U8Slice_chunk_as_U64 src k) ∧
       U64Slice_as_Nat result n =
         ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) ⦄ := by
@@ -276,7 +255,8 @@ private theorem read_le_u64_into_loop_spec_strong
     step as ⟨off7, hoff7⟩; step as ⟨b7, hb7⟩
     step with from_le_bytes_val_spec (Array.make 8#usize [b0, b1, b2, b3, b4, b5, b6, b7])
       as ⟨v, hv⟩
-    step with Slice_U64_update_spec dst i v (by scalar_tac) as ⟨dst', hdst'_other, hdst'_at, hdst'_len⟩
+    step with Slice_U64_update_spec dst i v (by scalar_tac)
+      as ⟨dst', hdst'_other, hdst'_at, hdst'_len⟩
     step as ⟨i', hi'_step⟩
     have hi'_eq : i'.val = i.val + 1 := by scalar_tac
     have hoff1_val : off1.val = 8 * i.val + 1 := by scalar_tac
@@ -331,33 +311,42 @@ private theorem read_le_u64_into_loop_spec_strong
     have hi_eq : i.val = n := by scalar_tac
     rw [spec_ok]
     refine ⟨fun k hk => h_inv k (by omega), ?_⟩
-    -- Combined value: U64Slice_as_Nat dst n = ∑_{j<8n} src[j] * 2^(8j)
-    rw[hi_eq] at h_inv
+    rw [hi_eq] at h_inv
     exact U64Slice_as_Nat_eq_chunk_sum src dst n h_inv
   termination_by n - i.val
   decreasing_by
     simp only [hi'_eq]
     omega
 
+/-- **Spec theorem for `curve25519_dalek::scalar::read_le_u64_into_loop`**
+• The loop always succeeds whenever `src.len = 8 * n` and `i.val ≤ n`.
+• **Element correctness**: `∀ k < n, result[k].val = U8Slice_chunk_as_U64 src k`.
+• **Combined-value preservation**: `U64Slice_as_Nat result n = ∑ j < 8*n, src.val[j].val · 2^(8j)`.
+-/
 @[step]
 theorem read_le_u64_into_loop_spec
-    (src : Slice Std.U8) (dst : Slice Std.U64) (i : Std.Usize)
+    (src : Slice U8) (dst : Slice U64) (i : Usize)
     (n : ℕ) (hn : n = (Slice.len dst).val)
     (h_src_len : (Slice.len src).val = 8 * n)
     (hi : i.val ≤ n)
     (h_inv : ∀ k < i.val, (dst.val[k]!).val = U8Slice_chunk_as_U64 src k) :
-    read_le_u64_into_loop src dst i ⦃ result =>
+    read_le_u64_into_loop src dst i ⦃ (result : Slice U64) =>
       (∀ k < n, (result.val[k]!).val = U8Slice_chunk_as_U64 src k) ∧
       U64Slice_as_Nat result n =
         ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) ⦄ :=
   read_le_u64_into_loop_spec_strong src dst i n hn h_src_len hi h_inv
 
+/-- **Spec theorem for `curve25519_dalek::scalar::read_le_u64_into`**
+• The function always succeeds whenever `src.len = 8 * n`.
+• **Element correctness**: `∀ k < n, result[k].val = U8Slice_chunk_as_U64 src k`.
+• **Combined-value preservation**: `U64Slice_as_Nat result n = ∑ j < 8*n, src.val[j].val · 2^(8j)`.
+-/
 @[step]
 theorem read_le_u64_into_spec
-    (src : Slice Std.U8) (dst : Slice Std.U64)
+    (src : Slice U8) (dst : Slice U64)
     (n : ℕ) (hn : n = (Slice.len dst).val)
     (h_src_len : (Slice.len src).val = 8 * n) :
-    read_le_u64_into src dst ⦃ result =>
+    read_le_u64_into src dst ⦃ (result : Slice U64) =>
       (∀ k < n, (result.val[k]!).val = U8Slice_chunk_as_U64 src k) ∧
       U64Slice_as_Nat result n =
         ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) ⦄ := by
@@ -367,11 +356,15 @@ theorem read_le_u64_into_spec
   step as ⟨len8, hlen8⟩
   simp_all
 
+/-- **Spec theorem for `curve25519_dalek::scalar::read_le_u64_into`** (combined-value corollary)
+• The function always succeeds whenever `src.len = 8 * n`.
+• **Combined-value preservation**: `U64Slice_as_Nat result n = ∑ j < 8*n, src.val[j].val · 2^(8j)`.
+-/
 theorem read_le_u64_into_combined_value
-    (src : Slice Std.U8) (dst : Slice Std.U64)
+    (src : Slice U8) (dst : Slice U64)
     (n : ℕ) (hn : n = (Slice.len dst).val)
     (h_src_len : (Slice.len src).val = 8 * n) :
-    read_le_u64_into src dst ⦃ result =>
+    read_le_u64_into src dst ⦃ (result : Slice U64) =>
       U64Slice_as_Nat result n =
         ∑ j ∈ Finset.range (8 * n), (src.val[j]!).val * 2 ^ (8 * j) ⦄ := by
   apply spec_mono (read_le_u64_into_spec src dst n hn h_src_len)
