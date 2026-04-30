@@ -14,13 +14,10 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryInvert
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.FromMontgomery
 import Curve25519Dalek.Specs.Backend.Serial.U64.Scalar.Scalar52.MontgomeryMul
 
+/-!
+# Spec theorem for `curve25519_dalek::scalar::Scalar::batch_invert`
 
-
-/-! # Spec Theorem for `Scalar::batch_invert`
-
-Specification and proof for `Scalar::batch_invert`
-(curve25519-dalek/src/scalar.rs, lines 788:4–845:5), which computes
-the multiplicative inverses of a batch of scalars in-place using
+Computes the multiplicative inverses of a batch of scalars in-place using
 Montgomery's batch-inversion trick.
 
 ## Algorithm overview
@@ -76,64 +73,19 @@ On exit: `∀ j < n, U8x32_as_Nat inputs2[j].bytes · vals j ≡ 1  [MOD L]`.
 **Return**: `(ret, inputs2)` where `ret` is the inverse of the full product and
 each `inputs2[j]` is the multiplicative inverse of the original `inputs[j]`.
 
-**Source**: curve25519-dalek/src/scalar.rs (lines 788:4-845:5)
+Source: "curve25519-dalek/src/scalar.rs"
 -/
 
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+namespace curve25519_dalek.scalar.Scalar
+
+-- `#setup_aeneas_simps` uses a `#` command which triggers the hashCommand linter;
+-- suppressed intentionally.
 set_option linter.hashCommand false
+-- R = 2^260 in the Montgomery domain; prevents kernel exponentiation explosion.
 set_option exponentiation.threshold 260
 #setup_aeneas_simps
 attribute [-simp] Int.reducePow Nat.reducePow
-
-open Aeneas Aeneas.Std Result Aeneas.Std.WP
-
-/-! # Spec Theorem for `Scalar::batch_invert`: loop 0
-
-Specification and proof for `batch_invert_loop0` (loop 0 of `Scalar::batch_invert`),
-which implements the **forward pass** of Montgomery's batch-inversion trick.
-
-The loop runs for `i` from a starting index up to `n = inputs.len()`.  In each
-iteration `i`:
-  - `scratch[i] ← acc`                                     (save prefix product)
-  - `tmp        ← inputs[i].unpack().as_montgomery()`      (convert input to Montgomery form)
-  - `inputs[i]  ← tmp.pack()`                              (store Montgomery-form input back)
-  - `acc        ← montgomery_mul(acc, tmp)`                (extend prefix product)
-
-Let `R = 2^260` be the Montgomery constant and `L` the group order.  Writing
-`val(x) = Scalar52_as_Nat x` for the natural-number interpretation of a `Scalar52`,
-the loop maintains the following invariants at counter `i`
-(with `A = val(acc_init)` and `vals j` = original value of `inputs[j]`):
-
-1. **Accumulator invariant**:
-       `val(acc) ≡ A · ∏_{j < i} vals(j)  [MOD L]`
-
-2. **Scratch invariant**: for all `j < i`,
-       `val(scratch[j]) ≡ A · ∏_{m < j} vals(m)  [MOD L]`
-   (scratch[j] holds the prefix product **before** processing input j)
-
-3. **Montgomery-converted prefix**: for all `j < i`,
-       `U8x32_as_Nat inputs[j].bytes ≡ vals(j) · R  [MOD L]`
-   (inputs[0..i−1] have been replaced by their Montgomery forms)
-
-4. **Untouched suffix**: for all `i ≤ j < n`,
-       `U8x32_as_Nat inputs[j].bytes = vals(j)`
-   (inputs[i..n−1] are still the original values)
-
-Note that invariant (2) combined with (1) gives the key relationship used
-in the backward pass (`batch_invert_loop1`):
-   `val(scratch[j]) · val(inputs[j]) · val(acc_final / (A · ∏_{m<n} vals(m)))
-    ≡ 1  [MOD L]`
-from which the individual inverses are reconstructed.
-
-On exit (loop counter reaches `n`):
-- `val(acc)         ≡ A · ∏_{j < n} vals(j)  [MOD L]`
-- `∀ j < n,  val(scratch[j])         ≡ A · ∏_{m < j} vals(m)  [MOD L]`
-- `∀ j < n,  U8x32_as_Nat inputs[j].bytes  ≡ vals(j) · R  [MOD L]`
-
-**Source**: curve25519-dalek/src/scalar.rs (lines 808:8-818:9)
--/
-
-
-namespace curve25519_dalek.scalar.Scalar
 
 /-! ## Auxiliary Element-Access Predicates
 
@@ -256,8 +208,7 @@ private lemma inp_orig_step
 
     On exit (i = n): `result = (inputs', scratch', acc')` satisfies (1)–(3) for `n`.  -/
 
-set_option maxHeartbeats 1000000 in
----
+set_option maxHeartbeats 1000000 in -- large inductive proof over loop requires extra heartbeats.
 private theorem batch_invert_loop0_spec_strong
     (inputs : Slice scalar.Scalar) (n : Std.Usize)
     (scratch : alloc.vec.Vec backend.serial.u64.scalar.Scalar52)
@@ -280,7 +231,9 @@ private theorem batch_invert_loop0_spec_strong
     (h_inp_orig : ∀ j, i.val ≤ j → j < n.val →
         SliceScalarAt inputs j
           (fun b => U8x32_as_Nat b = vals j)) :
-    batch_invert_loop0 inputs n scratch acc i ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc i ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       Scalar52_as_Nat result.2.2 ≡ A * PrefixProd vals n.val [MOD L] ∧
       (∀ j < n.val,
           Vec52At result.2.1 j
@@ -288,10 +241,10 @@ private theorem batch_invert_loop0_spec_strong
       (∀ j < n.val,
           SliceScalarAt result.1 j
             (fun b => U8x32_as_Nat b ≡ vals j * R [MOD L])) ∧
-            (∀ i < 5, result.2.2[i]!.val < 2 ^ 52) ∧
-            (Scalar52_as_Nat result.2.2 < L) ∧
-            result.1.val.length = n.val ∧
-            result.2.1.val.length = n.val ⦄ := by
+      (∀ i < 5, result.2.2[i]!.val < 2 ^ 52) ∧
+      (Scalar52_as_Nat result.2.2 < L) ∧
+      result.1.val.length = n.val ∧
+      result.2.1.val.length = n.val ⦄ := by
   unfold batch_invert_loop0
   split
   case isTrue hlt =>
@@ -304,7 +257,7 @@ private theorem batch_invert_loop0_spec_strong
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
     step with Slice.index_mut_usize_spec as ⟨  input, index_mut_back⟩
-    step with Aeneas.Std.alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
+    step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
@@ -418,27 +371,9 @@ private theorem batch_invert_loop0_spec_strong
   decreasing_by scalar_tac
 
 
-/--
-natural language description:
-
-• Takes a mutable slice `inputs` of `n` scalars, a pre-allocated `scratch` vector
-  of `n` `Scalar52` elements (each initially holding the Montgomery form of 1,
-  i.e. `ONE.unpack().as_montgomery()`), an accumulator `acc` (initially the same),
-  and the loop counter `i` starting at 0.
-
-• For each index `i < n`:
-    1. `scratch[i] ← acc`                          (record running prefix product)
-    2. `tmp ← inputs[i].unpack().as_montgomery()`  (convert i-th scalar to Montgomery form)
-    3. `inputs[i] ← tmp.pack()`                    (overwrite with Montgomery-form scalar)
-    4. `acc ← montgomery_mul(acc, tmp)`             (extend the prefix product)
-    5. `i ← i + 1`
-
-• On exit, returns `(inputs', scratch', acc')`.
-
-natural language specs:
-
-• The function always terminates and succeeds for any valid `inputs`, `scratch`,
-  `acc`, and `i ≤ n`.
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::batch_invert_loop0`**
+• The function always terminates and succeeds for any valid `inputs`, `scratch`, `acc`,
+  and `i ≤ n`.
 • **Accumulator**: `Scalar52_as_Nat acc' ≡ A · ∏_{j < n} vals(j)  [MOD L]`
   where `A = Scalar52_as_Nat acc_init` and `vals(j) = U8x32_as_Nat inputs_orig[j].bytes`.
 • **Scratch**: for all `j < n` and any `x = scratch'[j]`,
@@ -446,32 +381,7 @@ natural language specs:
 • **Inputs**: for all `j < n` and any `inp = inputs'[j]`,
   `U8x32_as_Nat inp.bytes ≡ vals(j) · R  [MOD L]`
   (every original input has been replaced by its Montgomery form).
-
- **Spec and proof concerning `scalar.Scalar.batch_invert_loop0`**:
-[curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]: loop 0.
-Source: 'curve25519-dalek/src/scalar.rs', lines 808:8-818:9.
-
-* **Precondition**: `i.val ≤ n.val` — loop counter does not exceed `n`.
-* **Size**: `inputs.val.length = n.val` and `scratch.val.length = n.val`.
-* **Limb validity**: `acc` has limbs `< 2^52` and `Scalar52_as_Nat acc < L`.
-* **Loop invariant on entry** (parameterised by `A : ℕ` and `vals : ℕ → ℕ`):
-  - `Scalar52_as_Nat acc ≡ A · PrefixProd vals i  [MOD L]`
-  - For `j < i`: `Vec52At scratch j (fun x => Scalar52_as_Nat x ≡ A · PrefixProd vals j)`
-  - For `j < i`: `SliceScalarAt inputs j (fun b => U8x32_as_Nat b ≡ vals j · R)`
-  - For `i ≤ j < n`: `SliceScalarAt inputs j (fun b => U8x32_as_Nat b = vals j)`
-* **Postcondition** — `result = (inputs', scratch', acc')` satisfies:
-  - `Scalar52_as_Nat acc'     ≡ A · PrefixProd vals n  [MOD L]`
-  - `∀ j < n, Vec52At scratch' j (fun x => Scalar52_as_Nat x ≡ A · PrefixProd vals j)`
-  - `∀ j < n, SliceScalarAt inputs' j (fun b => U8x32_as_Nat b ≡ vals j · R)`
-
-**Proof strategy**: derived from `batch_invert_loop0_spec_strong`, the stronger
-inductive theorem that explicitly tracks all four invariant components.  At the
-initial call (`i = 0`) from `batch_invert`, the hypotheses are:
-- `h_acc_inv`: `Scalar52_as_Nat (ONE.unpack().as_montgomery()) ≡ R [MOD L]`
-  (initial acc is the Montgomery representation of 1, so `A = R`).
-- `h_scratch_inv`: vacuously true (empty range `j < 0`).
-- `h_inp_mont`: vacuously true.
-- `h_inp_orig`: every `inputs[j].bytes` equals the original scalar bytes. -/
+-/
 @[step]
 theorem batch_invert_loop0_spec
     (inputs : Slice scalar.Scalar) (n : Std.Usize)
@@ -495,7 +405,9 @@ theorem batch_invert_loop0_spec
     (h_inp_orig : ∀ j, i.val ≤ j → j < n.val →
         SliceScalarAt inputs j
           (fun b => U8x32_as_Nat b = vals j)) :
-    batch_invert_loop0 inputs n scratch acc i ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc i ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       Scalar52_as_Nat result.2.2 ≡ A * PrefixProd vals n.val [MOD L] ∧
       (∀ j < n.val,
           Vec52At result.2.1 j
@@ -503,61 +415,16 @@ theorem batch_invert_loop0_spec
       (∀ j < n.val,
           SliceScalarAt result.1 j
             (fun b => U8x32_as_Nat b ≡ vals j * R [MOD L])) ∧
-            (∀ i < 5, result.2.2[i]!.val < 2 ^ 52) ∧
-            (Scalar52_as_Nat result.2.2 < L) ∧
-            result.1.val.length = n.val ∧
-            result.2.1.val.length = n.val ⦄ :=
+      (∀ i < 5, result.2.2[i]!.val < 2 ^ 52) ∧
+      (Scalar52_as_Nat result.2.2 < L) ∧
+      result.1.val.length = n.val ∧
+      result.2.1.val.length = n.val ⦄ :=
   batch_invert_loop0_spec_strong
     inputs n scratch acc i
     hi h_inputs_len h_scratch_len
     h_acc_limbs h_acc_lt
     A vals h_vals_lt
     h_acc_inv h_scratch_inv h_inp_mont h_inp_orig
-
-end curve25519_dalek.scalar.Scalar
-
-/-! # Spec Theorem for `Scalar::batch_invert`: loop 1
-
-Specification and proof for `batch_invert_loop1` (loop 1 of `Scalar::batch_invert`),
-which implements the **backward pass** of Montgomery's batch-inversion trick.
-
-The loop runs backwards from `i = n` down to `0`. In each iteration (processing index
-`k = i − 1`):
-  - `i1          ← i − 1`                                       (decrement counter)
-  - `input       ← inputs[i1]`                                  (current input in Montgomery form)
-  - `scratch_val ← scratch[i1]`                                 (prefix product saved by loop 0)
-  - `s           ← input.unpack()`                              (`Scalar52_as_Nat s ≡ vals k · R`)
-  - `tmp         ← montgomery_mul(acc, s)`                      (new accumulator)
-  - `s1          ← montgomery_mul(acc, scratch_val)`            (compute individual inverse)
-  - `input1      ← pack(s1)`                                    (pack inverse into Scalar)
-  - `inputs[i1]  ← input1`                                      (store result in-place)
-  - recurse with updated `inputs`, `acc ← tmp`, `i ← i1`
-
-Let `R = 2^260` be the Montgomery constant and `L` the group order.  Writing
-`val(x) = Scalar52_as_Nat x`, the loop maintains the following invariants at counter `i`
-(with abstract parameter `P : ℕ`):
-
-1. **Accumulator invariant**:
-       `val(acc) · PrefixProd vals i ≡ P  [MOD L]`
-
-2. **Processed suffix**: for all `j` with `i ≤ j < n`,
-       `U8x32_as_Nat inputs[j].bytes · vals j ≡ P  [MOD L]`
-   When `P ≡ 1 [MOD L]`, position `j` holds `vals(j)⁻¹ [MOD L]`.
-
-3. **Montgomery prefix**: for all `j < i`,
-       `U8x32_as_Nat inputs[j].bytes ≡ vals j · R  [MOD L]`
-   (positions `0..i−1` still hold the Montgomery-form values from loop 0).
-
-4. **Scratch invariant** (read-only): for all `j < n`,
-       `val(scratch[j]) ≡ R · PrefixProd vals j  [MOD L]`
-
-On exit (i = 0): for all `j < n`,
-   `U8x32_as_Nat inputs[j].bytes · vals j ≡ P  [MOD L]`.
-
-**Source**: curve25519-dalek/src/scalar.rs (lines 832:8-839:9)
--/
-
-namespace curve25519_dalek.scalar.Scalar
 
 private lemma acc_inv_step_loop1
     (acc tmp s : backend.serial.u64.scalar.Scalar52)
@@ -670,7 +537,7 @@ private theorem batch_invert_loop1_spec_strong
     (h_scratch_inv : ∀ j < n.val,
         Vec52At scratch j
           (fun x => Scalar52_as_Nat x ≡ R * PrefixProd vals j [MOD L])) :
-    batch_invert_loop1 inputs scratch acc i ⦃ result =>
+    batch_invert_loop1 inputs scratch acc i ⦃ (result : Slice scalar.Scalar) =>
       ∀ j < n.val,
           SliceScalarAt result j (fun b => U8x32_as_Nat b * vals j ≡ P [MOD L]) ⦄ := by
   unfold batch_invert_loop1
@@ -698,7 +565,8 @@ private theorem batch_invert_loop1_spec_strong
       simp_all
     have h_sv_inv : Scalar52_as_Nat scratch_val ≡ R * PrefixProd vals i1.val [MOD L] :=
       h_scratch_inv i1.val hk_lt scratch_val h_sv_getElem?
-    have h_sv_bounds : (∀ k < 5, scratch_val[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat scratch_val < L :=
+    have h_sv_bounds : (∀ k < 5, scratch_val[k]!.val < 2 ^ 52) ∧
+        Scalar52_as_Nat scratch_val < L :=
       h_scratch_limbs i1.val hk_lt scratch_val h_sv_getElem?
     step with unpack_spec as ⟨s_val, s_nat_eq, s_limbs⟩
     have h_s_mont : Scalar52_as_Nat s_val ≡ vals i1.val * R [MOD L] := by
@@ -794,45 +662,10 @@ private theorem batch_invert_loop1_spec_strong
   termination_by i.val
   decreasing_by scalar_tac
 
-/-! ## The Published Spec Theorem
-
-natural language description:
-
-• Takes a mutable slice `inputs` of scalars (in Montgomery form from loop 0),
-  a scratch vector of `Scalar52` elements holding prefix products from loop 0,
-  an accumulator `acc` (the from-Montgomery inverse of the full product), and
-  the starting loop counter `i` (initially `n`).
-
-• For each index `k = i − 1` (counted down from `i − 1` to `0`):
-    1. `s           ← unpack(inputs[k])`
-    2. `tmp         ← montgomery_mul(acc, s)`
-    3. `s1          ← montgomery_mul(acc, scratch[k])`
-    4. `inputs[k]   ← pack(s1)`
-    5. `acc ← tmp`, `i ← k`
-
-• On exit, returns the updated `inputs`.
-
-natural language specs:
-
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::batch_invert_loop1`**
 • The function always terminates and succeeds when the loop invariants hold.
-• **Postcondition**: `∀ j < n, U8x32_as_Nat inputs'[j].bytes · vals j ≡ P [MOD L]`.
-  When `P ≡ 1 [MOD L]`, this gives `inputs'[j] ≡ vals(j)⁻¹ [MOD L]` for all `j`.
-
- **Spec and proof concerning `scalar.Scalar.batch_invert_loop1`**:
-[curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert]: loop 1.
-Source: 'curve25519-dalek/src/scalar.rs', lines 832:8-839:9.
-
-* `i.val ≤ n.val`, `inputs.val.length = n.val`, `scratch.val.length = n.val`.
-* `acc` has limbs `< 2^52` and `Scalar52_as_Nat acc < L`.
-* For all `j < n`, each scratch entry has limbs `< 2^52` and total value `< L`.
-* **Loop invariant** (parameterised by `vals : ℕ → ℕ` and `P : ℕ`):
-  - `Scalar52_as_Nat acc · PrefixProd vals i ≡ P [MOD L]`
-  - For `i ≤ j < n`: `SliceScalarAt inputs j (fun b => U8x32_as_Nat b · vals j ≡ P)`
-  - For `j < i`:     `SliceScalarAt inputs j (fun b => U8x32_as_Nat b ≡ vals j · R)`
-  - For `j < i`:     `SliceScalarAt inputs j (fun b => U8x32_as_Nat b < L)`
-  - For `j < n`:     `Vec52At scratch j (fun x => Scalar52_as_Nat x ≡ R · PrefixProd vals j)`
-* **Postcondition**:
-  `∀ j < n, SliceScalarAt result j (fun b => U8x32_as_Nat b · vals j ≡ P [MOD L])`. -/
+• For all `j < n`: `U8x32_as_Nat inputs'[j].bytes · vals j ≡ P [MOD L]`.
+-/
 @[step]
 theorem batch_invert_loop1_spec
     (inputs : Slice scalar.Scalar)
@@ -859,7 +692,7 @@ theorem batch_invert_loop1_spec
     (h_scratch_inv : ∀ j < n.val,
         Vec52At scratch j
           (fun x => Scalar52_as_Nat x ≡ R * PrefixProd vals j [MOD L])) :
-    batch_invert_loop1 inputs scratch acc i ⦃ result =>
+    batch_invert_loop1 inputs scratch acc i ⦃ (result : Slice scalar.Scalar) =>
       ∀ j < n.val,
           SliceScalarAt result j (fun b => U8x32_as_Nat b * vals j ≡ P [MOD L]) ⦄ :=
   batch_invert_loop1_spec_strong
@@ -944,7 +777,9 @@ private theorem batch_invert_loop0_bounds_strong
     (h_scratch_bounds : ∀ j < i.val,
         Vec52At scratch j
           (fun x => (∀ k < 5, x[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat x < L)) :
-    batch_invert_loop0 inputs n scratch acc i ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc i ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       ∀ j < n.val,
           Vec52At result.2.1 j
             (fun x => (∀ k < 5, x[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat x < L) ⦄ := by
@@ -960,7 +795,7 @@ private theorem batch_invert_loop0_bounds_strong
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
     step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
-    step with Aeneas.Std.alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
+    step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
@@ -1036,7 +871,9 @@ private lemma loop0_scratch_limbs
     (h_acc_lt : Scalar52_as_Nat acc < L)
     (h_scratch_len : scratch.val.length = n.val)
     (h_inputs_len : inputs.val.length = n.val) :
-    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       ∀ j < n.val,
           Vec52At result.2.1 j
             (fun x => (∀ k < 5, x[k]!.val < 2 ^ 52) ∧ Scalar52_as_Nat x < L) ⦄ :=
@@ -1056,7 +893,9 @@ private theorem batch_invert_loop0_acc_bounds_strong
     (h_scratch_len : scratch.val.length = n.val)
     (h_acc_limbs : ∀ j < 5, acc[j]!.val < 2 ^ 52)
     (h_acc_lt : Scalar52_as_Nat acc < L) :
-    batch_invert_loop0 inputs n scratch acc i ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc i ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       (∀ j < 5, result.2.2[j]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result.2.2 < L ⦄ := by
   unfold batch_invert_loop0
   split
@@ -1070,7 +909,7 @@ private theorem batch_invert_loop0_acc_bounds_strong
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
     step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
-    step with Aeneas.Std.alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
+    step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
@@ -1126,36 +965,15 @@ private lemma loop0_acc_bounds
     (h_acc_lt : Scalar52_as_Nat acc < L)
     (h_scratch_len : scratch.val.length = n.val)
     (h_inputs_len : inputs.val.length = n.val) :
-    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       (∀ j < 5, result.2.2[j]!.val < 2 ^ 52) ∧ Scalar52_as_Nat result.2.2 < L ⦄ :=
   batch_invert_loop0_acc_bounds_strong inputs n scratch acc 0#usize
     (by simp)
     h_inputs_len
     h_scratch_len
     h_acc_limbs h_acc_lt
-
-/-! ## The Main Specification Theorem
-
-natural language description:
-
-• Takes a mutable slice `inputs` of `n` scalars (all assumed non-zero in `ℤ/Lℤ`).
-• Uses Montgomery's batch-inversion trick:
-    1. **Forward pass**: build prefix products, converting inputs to Montgomery form.
-    2. **Inversion**: compute the inverse of the full product via `montgomery_invert`
-       followed by `from_montgomery`.
-    3. **Backward pass**: recover individual inverses from the prefix products.
-• Returns `(ret, inputs2)` where:
-    - `ret = (∏_{j<n} inputs[j])^{-1}  [MOD L]`,
-    - `inputs2[j] = inputs[j]^{-1}  [MOD L]` for each `j < n`.
-• No panic provided all inputs are non-zero modulo `L`.
-
-natural language specs:
-
-• `U8x32_as_Nat ret.bytes · PrefixProd vals n ≡ 1  [MOD L]`
-  (`ret` is the inverse of the product of all original inputs).
-• `∀ j < n, U8x32_as_Nat inputs2[j].bytes · vals j ≡ 1  [MOD L]`
-  (each updated input holds the inverse of the corresponding original).
--/
 
 private theorem batch_invert_loop0_inputs_lt_strong
     (inputs : Slice scalar.Scalar) (n : Std.Usize)
@@ -1167,7 +985,9 @@ private theorem batch_invert_loop0_inputs_lt_strong
     (h_acc_limbs : ∀ j < 5, acc[j]!.val < 2 ^ 52)
     (h_acc_lt : Scalar52_as_Nat acc < L)
     (h_inp_lt : ∀ j < i.val, SliceScalarAt inputs j (fun b => U8x32_as_Nat b < L)) :
-    batch_invert_loop0 inputs n scratch acc i ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc i ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       ∀ j < n.val, SliceScalarAt result.1 j (fun b => U8x32_as_Nat b < L) ⦄ := by
   unfold batch_invert_loop0
   split
@@ -1181,7 +1001,7 @@ private theorem batch_invert_loop0_inputs_lt_strong
     haveI : Inhabited scalar.Scalar := ⟨{ bytes := Array.repeat 32#usize 0#u8 }⟩
     haveI : Inhabited backend.serial.u64.scalar.Scalar52 := ⟨Array.repeat 5#usize 0#u64⟩
     step with Slice.index_mut_usize_spec as ⟨input, index_mut_back⟩
-    step with Aeneas.Std.alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
+    step with alloc.vec.Vec.index_mut_usize_spec scratch i as ⟨_, _, _, h_vec_back⟩
     step
     step
     step
@@ -1254,7 +1074,9 @@ private lemma loop0_inputs_lt
     (h_acc_lt : Scalar52_as_Nat acc < L)
     (h_scratch_len : scratch.val.length = n.val)
     (h_inputs_len : inputs.val.length = n.val) :
-    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ result =>
+    batch_invert_loop0 inputs n scratch acc 0#usize ⦃ (result :
+        Slice scalar.Scalar × alloc.vec.Vec backend.serial.u64.scalar.Scalar52 ×
+        backend.serial.u64.scalar.Scalar52) =>
       ∀ j < n.val, SliceScalarAt result.1 j (fun b => U8x32_as_Nat b < L) ⦄ :=
   batch_invert_loop0_inputs_lt_strong inputs n scratch acc 0#usize
     (by simp)
@@ -1270,33 +1092,13 @@ private theorem spec_and {α} {m : Result α} {P Q : α → Prop}
   | fail e => exact hp
   | div => exact hp
 
-/- **Spec and proof concerning `scalar.Scalar.batch_invert`**:
-[curve25519_dalek::scalar::{curve25519_dalek::scalar::Scalar}::batch_invert].
-Source: 'curve25519-dalek/src/scalar.rs', lines 788:4-845:5.
-
-* **Preconditions** (parameterised by `vals : ℕ → ℕ`, the original input values):
-  - `∀ j < n, vals j < L` — inputs are already reduced modulo `L`.
-  - `∀ j < n, vals j % L ≠ 0` — every input is non-zero modulo `L`.
-  - `∀ j < n, SliceScalarAt inputs j (fun b => U8x32_as_Nat b = vals j)` —
-    `vals` agrees with the actual byte representations.
-* **Postcondition** — `result = (ret, inputs2)` satisfies:
-  - `U8x32_as_Nat ret.bytes · PrefixProd vals n ≡ 1 [MOD L]`
-    (`ret` is the inverse of the full scalar product).
-  - `∀ j < n, SliceScalarAt inputs2 j (fun b => U8x32_as_Nat b · vals j ≡ 1 [MOD L])`
-    (every input has been replaced by its multiplicative inverse).
-
-**Proof strategy**:
-The proof chains:
-1. `unpack_spec` + `as_montgomery_spec` to establish the initial `one ≡ R [MOD L]`
-   and `acc ≡ R [MOD L]`.
-2. `batch_invert_loop0_spec` (forward pass) with `A = R`, giving the full-product
-   accumulator `acc1 ≡ R · PrefixProd vals n [MOD L]`.
-3. `montgomery_invert_spec` + `from_montgomery_spec` to derive the reciprocal
-   of the product, connected to `acc2` via `batch_invert_acc2_inv`.
-4. `pack_spec` for the return value `ret`.
-5. `batch_invert_loop1_spec` (backward pass) with `P = 1`, recovering individual
-   inverses from the scratch prefix products. -/
-
+/-- **Spec theorem for `curve25519_dalek::scalar::Scalar::batch_invert`**
+• The function always succeeds (no panic) provided all inputs are non-zero modulo `L`.
+• `U8x32_as_Nat ret.bytes · PrefixProd vals n ≡ 1  [MOD L]`
+  (`ret` is the multiplicative inverse of the full product of the original inputs).
+• `∀ j < n, U8x32_as_Nat inputs2[j].bytes · vals j ≡ 1  [MOD L]`
+  (each entry of `inputs2` holds the multiplicative inverse of the corresponding original input).
+-/
 @[step]
 theorem batch_invert_spec
     (inputs : Slice scalar.Scalar)
@@ -1305,7 +1107,7 @@ theorem batch_invert_spec
     (h_vals_nz : ∀ j < inputs.val.length, vals j % L ≠ 0)
     (h_vals_def : ∀ j < inputs.val.length,
         SliceScalarAt inputs j (fun b => U8x32_as_Nat b = vals j)) :
-    batch_invert inputs ⦃ result =>
+    batch_invert inputs ⦃ (result : scalar.Scalar × Slice scalar.Scalar) =>
       U8x32_as_Nat result.1.bytes * PrefixProd vals inputs.val.length ≡ 1 [MOD L] ∧
       ∀ j < inputs.val.length,
           SliceScalarAt result.2 j
