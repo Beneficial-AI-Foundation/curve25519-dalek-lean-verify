@@ -5156,11 +5156,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (q : edwards.CompressedEdwardsY) =>\n      U8x32_as_Nat q = 1 ⦄ := by ...",
+   "theorem identity_spec :\n    identity ⦃ (result : CompressedEdwardsY) =>\n      U8x32_as_Nat result = 1 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Identity.lean",
    "spec_docstring":
-   "/-- **Spec and proof** concerning:\n`edwards.CompressedEdwardsY.Insts.Curve25519_dalekTraitsIdentity.identity`\n- No panic (always returns successfully)\n- The resulting CompressedEdwardsY encodes the value 1 (the Y-coordinate of the identity point)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::identity`**\n• No panic (always returns successfully)\n• The resulting `CompressedEdwardsY` encodes the value 1 (the Y-coordinate of the identity point)\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::CompressedEdwardsY}::identity",
@@ -5201,7 +5201,7 @@
    "theorem ct_eq_spec\n    (self other : CompressedEdwardsY) :\n    ct_eq self other ⦃ (result : subtle.Choice) =>\n      result = Choice.one ↔ self = other ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/CtEq.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.Insts.SubtleConstantTimeEq.ct_eq`**:\n- No panic (always returns successfully)\n- The result is Choice.one iff the two CompressedEdwardsY values are equal\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::ct_eq`**\n• The operation never panics (always returns successfully)\n• Returns `Choice.one` iff the two `CompressedEdwardsY` values are equal\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{subtle::ConstantTimeEq for curve25519_dalek::edwards::CompressedEdwardsY}::ct_eq",
@@ -5219,10 +5219,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem as_bytes_spec\n    (self : edwards.CompressedEdwardsY) :\n    as_bytes self ⦃ result =>\n    result = self ⦄ := by ...",
+   "theorem as_bytes_spec (self : CompressedEdwardsY) :\n    as_bytes self ⦃ (result : Array U8 32#usize) =>\n      result = self ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/AsBytes.lean",
    "spec_docstring":
-   "/-- **Spec for `edwards.CompressedEdwardsY.as_bytes`**:\n- The function succeeds (always returns `ok`)\n- The result is exactly the internal byte array representation.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::as_bytes`**\n• The function succeeds (always returns `ok`)\n• The result is exactly the internal byte array representation\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::as_bytes",
@@ -5239,11 +5239,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem decompress_spec (cey : edwards.CompressedEdwardsY) :\n    edwards.CompressedEdwardsY.decompress cey ⦃ result =>\n      let y : CurveField := ((U8x32_as_Nat cey % 2 ^ 255 : Nat) : CurveField)\n      let x_sign_bit := cey[31]!.val.testBit 7\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      (∀ ep, result = some ep →\n        ep.IsValid ∧\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧\n        ep.Z.toField = 1 ∧\n        Field51_as_Nat ep.Z % p = 1 ∧\n        (y ^ 2 ≠ 1 →\n          (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by ...",
+   "theorem decompress_spec (self : CompressedEdwardsY) :\n    decompress self ⦃ (result : Option EdwardsPoint) =>\n      let y : CurveField := ((U8x32_as_Nat self % 2 ^ 255 : Nat) : CurveField)\n      let x_sign_bit := self[31]!.val.testBit 7\n      (result.isSome ↔ ∃ pt : Point Ed25519, pt.y = y) ∧\n      (∀ ep, result = some ep →\n        ep.IsValid ∧\n        ep.Y.toField = y ∧\n        Field51_as_Nat ep.Y ≡ (U8x32_as_Nat self % 2 ^ 255) [MOD p] ∧\n        ep.Z.toField = 1 ∧\n        Field51_as_Nat ep.Z % p = 1 ∧\n        (y ^ 2 ≠ 1 →\n          (x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1))) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/Decompress.lean",
    "spec_docstring":
-   "/-- **Spec for `edwards.CompressedEdwardsY.decompress`**. No panic (always returns successfully).\n\nLet `y : CurveField` be the y-coordinate encoded in the low 255 bits of `cey`, and let\n`x_sign_bit` be bit 7 of byte 31 (the encoded sign of x).\n\n**Success condition.** Decompression returns `some` iff `y` is a valid Edwards\ny-coordinate, i.e. some curve point has that y value.\n\n**On success** (`result = some ep`):\n- `ep.IsValid` — full validity invariant (curve equation, `T = XY/Z`, bounds, `Z ≠ 0`)\n- `ep.Y.toField = y` and `Field51_as_Nat ep.Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]` —\n  `Y` matches the encoded y-coordinate at both the `ZMod` and `Nat` levels\n- `ep.Z.toField = 1` and `Field51_as_Nat ep.Z % p = 1` — `Z` is the field element 1\n- When `y^2 ≠ 1` (the non-degenerate case where `x ≠ 0`):\n  `x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1` — sign of `X` matches bit 255 of the input.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::decompress`**\n• The function always succeeds (no panic)\n• Decompression returns `some` iff the encoded `y` (the low 255 bits of `self`) is a\n  valid Edwards y-coordinate, i.e. some curve point has that y value\n• On success, `ep.IsValid` holds (curve equation, `T = XY/Z`, bounds, `Z ≠ 0`)\n• On success, `ep.Y.toField = y` — `Y` matches the encoded y-coordinate at the\n  `ZMod` level\n• On success, `Field51_as_Nat ep.Y ≡ (U8x32_as_Nat self % 2^255) [MOD p]` — same\n  equality at the `Nat` level\n• On success, `ep.Z.toField = 1` — `Z` is the field element 1\n• On success, `Field51_as_Nat ep.Z % p = 1` — same equality at the `Nat` level\n• On success, when `y² ≠ 1` (the non-degenerate case where `x ≠ 0`), the encoded\n  sign bit (bit 7 of byte 31) matches the parity of `X`:\n  `x_sign_bit ↔ (Field51_as_Nat ep.X % p) % 2 = 1`\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::decompress",
@@ -5262,11 +5262,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes ⦃ (result : core.result.Result CompressedEdwardsY core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cey : CompressedEdwardsY, result = .Ok cey ∧ cey.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
+   "theorem from_slice_spec\n    (bytes : Slice U8) :\n    from_slice bytes ⦃\n      (result : core.result.Result CompressedEdwardsY core.array.TryFromSliceError) =>\n      (bytes.length = 32 → ∃ cey : CompressedEdwardsY, result = .Ok cey ∧ cey.val = bytes.val) ∧\n      (bytes.length ≠ 32 → result = .Err ()) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/CompressedEdwardsY/FromSlice.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.CompressedEdwardsY.from_slice`**:\n    • The operation never panics (always returns `ok` at the Aeneas level)\n    • If bytes.length = 32: the result is Ok(cey) where cey.val = bytes.val\n    • If bytes.length ≠ 32: the result is Err(())\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::CompressedEdwardsY::from_slice`**\n• The operation never panics (always returns `.ok` at the Aeneas level)\n• If `bytes.length = 32`: the `result` is `.Ok cey` where `cey.val = bytes.val`\n• If `bytes.length ≠ 32`: the `result` is `.Err ()`\n-/",
    "source": "curve25519-dalek/src/edwards.rs",
    "rust_name":
    "curve25519_dalek::edwards::{curve25519_dalek::edwards::CompressedEdwardsY}::from_slice",
@@ -6617,10 +6617,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    eq self other ⦃ result =>\n    result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
+   "theorem eq_spec (self other : AffinePoint) (h_self_valid : self.IsValid)\n    (h_other_valid : other.IsValid) :\n    eq self other ⦃ (result : Bool) =>\n      result = true ↔ self.toPoint = other.toPoint ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Eq.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.PartialEqAffinePoint.eq`**:\n• The function always succeeds (no panic) for valid inputs\n• The result is `true` if and only if the two points represent the same point on the curve\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::eq`**\n• The function always succeeds (no panic) for valid input affine Edwards points\n• The result is `true` if and only if the two points represent the same point on the curve\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{core::cmp::PartialEq<curve25519_dalek::edwards::affine::AffinePoint> for curve25519_dalek::edwards::affine::AffinePoint}::eq",
@@ -6719,11 +6719,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem identity_spec :\n    identity ⦃ (q : AffinePoint) =>\n      Field51_as_Nat q.x = 0 ∧ Field51_as_Nat q.y = 1 ∧\n      q.IsValid ∧ q.toPoint = 0 ⦄ := by ...",
+   "theorem identity_spec :\n    identity ⦃ (q : AffinePoint) =>\n      Field51_as_Nat q.x = 0 ∧\n      Field51_as_Nat q.y = 1 ∧\n      q.IsValid ∧\n      q.toPoint = 0 ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Identity.lean",
    "spec_docstring":
-   "/-- **Spec and proof** concerning:\n`edwards.affine.AffinePoint.Insts.Curve25519_dalekTraitsIdentity.identity`\n- No panic (always returns successfully)\n- The resulting AffinePoint is the identity element of the Ed25519 group\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::identity`**\n• The function always succeeds (no panic)\n• The x-coordinate of the result is `0`\n• The y-coordinate of the result is `1`\n• The resulting `AffinePoint` is valid\n• The result represents the identity element of the Ed25519 group\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::traits::Identity for curve25519_dalek::edwards::affine::AffinePoint}::identity",
@@ -6764,11 +6764,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem conditional_select_spec\n    (a b : edwards.affine.AffinePoint)\n    (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : edwards.affine.AffinePoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
+   "theorem conditional_select_spec (a b : AffinePoint) (choice : subtle.Choice) :\n    conditional_select a b choice ⦃ (result : AffinePoint) =>\n      result = if choice.val = 1#u8 then b else a ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/ConditionalSelect.lean",
    "spec_docstring":
-   "/--\n**Spec and proof** concerning:\n`edwards.affine.AffinePoint.Insts.SubtleConditionallySelectable.conditional_select`:\n- No panic (always returns successfully)\n- Returns `b` when `choice = 1` and `a` when `choice = 0`\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::conditional_select`**\n• No panic (always returns successfully)\n• Returns `b` when `choice = 1` and `a` when `choice = 0`\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{subtle::ConditionallySelectable for curve25519_dalek::edwards::affine::AffinePoint}::conditional_select",
@@ -6807,10 +6807,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem ct_eq_spec (self other : AffinePoint) :\n  ct_eq self other ⦃ c =>\n  (c = Choice.one ↔\n    (Field51_as_Nat self.x) ≡ (Field51_as_Nat other.x) [MOD p] ∧\n    (Field51_as_Nat self.y) ≡ (Field51_as_Nat other.y) [MOD p]) ∧\n  (self.IsValid → other.IsValid → (c = Choice.one ↔ self.toPoint = other.toPoint)) ⦄ := by ...",
+   "theorem ct_eq_spec (self other : AffinePoint) :\n    ct_eq self other ⦃ (c : subtle.Choice) =>\n      (c = Choice.one ↔\n        (Field51_as_Nat self.x) ≡ (Field51_as_Nat other.x) [MOD p] ∧\n        (Field51_as_Nat self.y) ≡ (Field51_as_Nat other.y) [MOD p]) ∧\n      (self.IsValid → other.IsValid →\n        (c = Choice.one ↔ self.toPoint = other.toPoint)) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/CtEq.lean",
    "spec_docstring":
-   "/-- **Spec and proof** concerning:\n`edwards.affine.AffinePoint.Insts.SubtleConstantTimeEq.ct_eq`:\n- No panic (always returns successfully)\n- The result is Choice.one (true) if and only if the two points are equal (mod p) in coordinates\n- When both points are valid, this is equivalent to toPoint equality\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::ct_eq`**\n• The operation never panics (always returns successfully)\n• Returns `Choice.one` iff `self.x ≡ other.x (mod p)` and `self.y ≡ other.y (mod p)`\n• When both points are valid, this is equivalent to `toPoint` equality\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{subtle::ConstantTimeEq for curve25519_dalek::edwards::affine::AffinePoint}::ct_eq",
@@ -6850,11 +6850,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :\n    compress self ⦃ result =>\n    U8x32_as_Nat result = compress_edwards_pure (self.toPoint) ⦄ := by ...",
+   "theorem compress_spec (self : AffinePoint) (hself : self.IsValid) :\n    compress self ⦃ (result : edwards.CompressedEdwardsY) =>\n      U8x32_as_Nat result = compress_edwards_pure (self.toPoint) ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/Compress.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.compress`**:\n- Requires: the AffinePoint is valid (limbs < 2^54, on curve)\n- Ensures: the compressed bytes equal the pure mathematical compression of the point\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::compress`**\n• The function always succeeds (no panic) when the `AffinePoint` is valid\n• The encoded byte array represents the canonical y-coordinate of `self` in\n  its lower 255 bits, with the parity (sign) bit of x stored in bit 255\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::compress",
@@ -6873,11 +6873,11 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)\n  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)\n  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :\n    to_edwards self ⦃ result =>\n      result.X = self.x ∧\n      result.Y = self.y ∧\n      result.IsValid ∧\n      result.toPoint = self.toPoint ⦄ := by ...",
+   "theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)\n    (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)\n    (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :\n    to_edwards self ⦃ (result : EdwardsPoint) =>\n      result.X = self.x ∧\n      result.Y = self.y ∧\n      result.IsValid ∧\n      result.toPoint = self.toPoint ⦄ := by ...",
    "spec_file":
    "Curve25519Dalek/Specs/Edwards/Affine/AffinePoint/ToEdwards.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:\n- No panic when `self` is a valid AffinePoint and its limbs are < 2^53\n- Structural: `result.X = self.x` and `result.Y = self.y` (direct Rust copies)\n- The resulting EdwardsPoint is valid: `result.IsValid`\n- Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::to_edwards`**\n• No panic when `self` is a valid AffinePoint and its limbs are < 2^53\n• `result.X = self.x` (direct Rust copy of the affine `x` coordinate)\n• `result.Y = self.y` (direct Rust copy of the affine `y` coordinate)\n• The resulting EdwardsPoint is valid: `result.IsValid`\n• Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)\n-/",
    "source": "curve25519-dalek/src/edwards/affine.rs",
    "rust_name":
    "curve25519_dalek::edwards::affine::{curve25519_dalek::edwards::affine::AffinePoint}::to_edwards",
