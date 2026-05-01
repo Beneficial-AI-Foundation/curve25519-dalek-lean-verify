@@ -6943,10 +6943,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>\n      let r_nat := Field51_as_Nat r % p\n      let r'_nat := Field51_as_Nat r' % p\n      (r_nat ≠ 0 → (r'_nat * r_nat) % p = 1) ∧\n      (r_nat = 0 → r'_nat = 0) ∧\n      (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by ...",
+   "theorem invert_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    invert r ⦃ (r' : backend.serial.u64.field.FieldElement51) =>\n      (Field51_as_Nat r % p ≠ 0 →\n        (Field51_as_Nat r' % p * (Field51_as_Nat r % p)) % p = 1) ∧\n      (Field51_as_Nat r % p = 0 → Field51_as_Nat r' % p = 0) ∧\n      (∀ i, i < 5 → (r'[i]!).val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Invert.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.invert`**:\n- No panic for field element inputs r (always returns r' successfully)\n- If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)\n- If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::invert`**\n• No panic when each input limb of r satisfies `r[i].val < 2 ^ 54`\n  (always returns r' successfully)\n• If r ≢ 0 (mod p), then Field51_as_Nat(r') * Field51_as_Nat(r) ≡ 1 (mod p)\n• If r ≡ 0 (mod p), then Field51_as_Nat(r') ≡ 0 (mod p)\n• The output limbs satisfy `r'[i].val < 2^52` for all `i < 5`\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invert",
@@ -6966,10 +6966,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ res =>\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat res.snd % p\n    let i_nat := Field51_as_Nat SQRT_M1_val % p\n    -- Unconditional bounds\n    (∀ i < 5, res.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n    -- Non-negativity\n    (r_nat % 2 = 0) ∧\n    -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n    (v_nat = 0 → res.fst.val = 0#u8 ∧ r_nat = 0) ∧\n    -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n    (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n    -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n    (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n      res.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
+   "theorem invsqrt_spec\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val ≤ 2 ^ 52 - 1) :\n    invsqrt v ⦃ (result : subtle.Choice × backend.serial.u64.field.FieldElement51) =>\n      let v_nat := Field51_as_Nat v % p\n      let r_nat := Field51_as_Nat result.snd % p\n      let i_nat := Field51_as_Nat SQRT_M1_val % p\n      -- Output limb bounds\n      (∀ i < 5, result.snd[i]!.val ≤ 2 ^ 53 - 1) ∧\n      -- Non-negativity\n      (r_nat % 2 = 0) ∧\n      -- Case 1: If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n      (v_nat = 0 → result.fst.val = 0#u8 ∧ r_nat = 0) ∧\n      -- Case 2: If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n      (v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n        result.fst.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = 1) ∧\n      -- Case 3: If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ i (mod p)\n      (v_nat ≠ 0 ∧ ¬(∃ x : Nat, (x ^ 2 * v_nat) % p = 1) →\n        result.fst.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = i_nat) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/InvSqrt.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.invsqrt`**:\n- No panic for field element inputs v (always returns (c, r) successfully)\n- Output limbs bounded by 2^53 - 1\n- Result r is non-negative (r_nat % 2 = 0)\n- The result satisfies exactly one of three mutually exclusive cases:\n  1. If v ≡ 0 (mod p), then c.val = 0 and r ≡ 0 (mod p)\n  2. If v ≢ 0 and ∃ x, x^2 * v ≡ 1 (mod p), then c.val = 1 and r^2 * v ≡ 1 (mod p)\n  3. If v ≢ 0 and ¬∃ x, x^2 * v ≡ 1 (mod p), then c.val = 0 and r^2 * v ≡ SQRT_M1 (mod p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::invsqrt`**\n• The function succeeds (no panic) for field element inputs `v` with limbs bounded by `2^52 - 1`\n• Output limbs are bounded by `2^53 - 1`\n• The result `r` is non-negative (`r_nat % 2 = 0`)\n• If `v ≡ 0 (mod p)`, then `c.val = 0` and `r ≡ 0 (mod p)`\n• If `v ≢ 0 (mod p)` and `v` is a square, then `c.val = 1` and `r^2 * v ≡ 1 (mod p)`\n• If `v ≢ 0 (mod p)` and `v` is not a square, then `c.val = 0` and `r^2 * v ≡ i (mod p)`\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::invsqrt",
@@ -6988,9 +6988,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_negative_spec (r : backend.serial.u64.field.FieldElement51) :\n    is_negative r ⦃ c =>\n    (c.val = 1#u8 ↔ (Field51_as_Nat r % p) % 2 = 1) ⦄ := by ...",
+   "theorem is_negative_spec (self : backend.serial.u64.field.FieldElement51) :\n    is_negative self ⦃ (c : subtle.Choice) =>\n      (c.val = 1#u8 ↔ (Field51_as_Nat self % p) % 2 = 1) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/IsNegative.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::is_negative`**\n• The function always succeeds (no panic).\n• The result `c` satisfies `c.val = 1` iff the canonical representative of the\n  field element modulo `p = 2^255 - 19` is odd.\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_negative",
@@ -7008,9 +7009,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem is_zero_spec (r : backend.serial.u64.field.FieldElement51) :\n    is_zero r ⦃ c =>\n    (c.val = 1#u8 ↔ Field51_as_Nat r % p = 0) ⦄ := by ...",
+   "theorem is_zero_spec (self : backend.serial.u64.field.FieldElement51) :\n    is_zero self ⦃ (c : subtle.Choice) =>\n      (c.val = 1#u8 ↔ Field51_as_Nat self % p = 0) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/IsZero.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::is_zero`**\n• The function always succeeds (no panic).\n• The result `c` satisfies `c.val = 1#u8` iff the canonical representative of\n  the field element modulo `p = 2^255 - 19` equals zero.\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::is_zero",
@@ -7028,10 +7030,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem pow22501_spec (r : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (r[i]!).val < 2 ^ 54) :\n    pow22501 r ⦃ result =>\n    let r1 := result.1\n    let r2 := result.2\n    Field51_as_Nat r1 % p = (Field51_as_Nat r ^ (2 ^ 250 - 1)) % p ∧\n    Field51_as_Nat r2 % p = (Field51_as_Nat r ^ 11) % p ∧\n    (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n    (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by ...",
+   "theorem pow22501_spec (self : backend.serial.u64.field.FieldElement51)\n    (h_bounds : ∀ i, i < 5 → (self[i]!).val < 2 ^ 54) :\n    pow22501 self ⦃ (result : backend.serial.u64.field.FieldElement51 ×\n        backend.serial.u64.field.FieldElement51) =>\n      let r1 := result.1\n      let r2 := result.2\n      Field51_as_Nat r1 % p = (Field51_as_Nat self ^ (2 ^ 250 - 1)) % p ∧\n      Field51_as_Nat r2 % p = (Field51_as_Nat self ^ 11) % p ∧\n      (∀ i, i < 5 → (r1[i]!).val < 2 ^ 52) ∧\n      (∀ i, i < 5 → (r2[i]!).val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/Pow22501.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `field.FieldElement51.pow22501`**:\n- No panic (always returns (r1, r2) successfully)\n- Field51_as_Nat(r1) ≡ Field51_as_Nat(r)^(2^250-1) (mod p)\n  Field51_as_Nat(r2) ≡ Field51_as_Nat(r)^11 (mod p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::pow22501`**\n• No panic (always returns (r1, r2) successfully)\n• Field51_as_Nat(r1) ≡ Field51_as_Nat(self)^(2^250-1) (mod p)\n• Field51_as_Nat(r2) ≡ Field51_as_Nat(self)^11 (mod p)\n• Each limb of r1 is bounded by 2^52\n• Each limb of r2 is bounded by 2^52\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow22501",
@@ -7054,7 +7056,7 @@
    "theorem pow_p58_spec (self : FieldElement51) (h_bounds : ∀ i, i < 5 → (self[i]!).val ≤ 2 ^ 52 - 1) :\n    pow_p58 self ⦃ (result : FieldElement51) =>\n      Field51_as_Nat result % p = (Field51_as_Nat self ^ pow_p58_exp) % p ∧\n      (∀ i < 5, result[i]!.val < 2 ^ 52) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/PowP58.lean",
    "spec_docstring":
-   "/-- **Spec theroem for `field.FieldElement51.pow_p58`**:\n- Field51_as_Nat(result) ≡ Field51_as_Nat(self)^(2^252-3) (mod p)\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::pow_p58`**\n• The function never panics, given that each limb of `self` is bounded by `2^52 - 1`\n• `Field51_as_Nat(result) ≡ Field51_as_Nat(self) ^ (2^252 - 3) (mod p)`\n• Each limb of the result is bounded by `2^52`\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::pow_p58",
@@ -7074,9 +7076,10 @@
    "verified": true,
    "specified": true,
    "spec_statement":
-   "theorem sqrt_ratio_i_spec\n    (u : backend.serial.u64.field.FieldElement51)\n    (v : backend.serial.u64.field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :\n    sqrt_ratio_i u v ⦃ c =>\n    let u_nat := Field51_as_Nat u % p\n    let v_nat := Field51_as_Nat v % p\n    let r_nat := Field51_as_Nat c.2 % p\n    let i_nat := Field51_as_Nat SQRT_M1_val % p\n    (∀ i < 5,  c.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n    (r_nat % 2 = 0) ∧\n    (u_nat = 0 →\n      c.1.val = 1#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat = 0 →\n      c.1.val = 0#u8 ∧ r_nat = 0) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x^2 * v_nat) % p = u_nat) →\n      c.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n    (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x^2 * v_nat) % p = u_nat)) →\n      c.1.val = 0#u8 ∧ (r_nat ^2 * v_nat) % p = (i_nat * u_nat) % p)\n    ⦄ := by ...",
+   "theorem sqrt_ratio_i_spec\n    (u : field.FieldElement51)\n    (v : field.FieldElement51)\n    (h_u_bounds : ∀ i, i < 5 → (u[i]!).val < 2 ^ 54)\n    (h_v_bounds : ∀ i, i < 5 → (v[i]!).val < 2 ^ 54) :\n    sqrt_ratio_i u v ⦃ (result : subtle.Choice × field.FieldElement51) =>\n      let u_nat := Field51_as_Nat u % p\n      let v_nat := Field51_as_Nat v % p\n      let r_nat := Field51_as_Nat result.2 % p\n      let i_nat := Field51_as_Nat SQRT_M1_val % p\n      (∀ i < 5, result.2[i]!.val ≤ 2 ^ 53 - 1) ∧\n      (r_nat % 2 = 0) ∧\n      (u_nat = 0 →\n        result.1.val = 1#u8 ∧ r_nat = 0) ∧\n      (u_nat ≠ 0 ∧ v_nat = 0 →\n        result.1.val = 0#u8 ∧ r_nat = 0) ∧\n      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat) →\n        result.1.val = 1#u8 ∧ (r_nat ^ 2 * v_nat) % p = u_nat) ∧\n      (u_nat ≠ 0 ∧ v_nat ≠ 0 ∧ (¬(∃ x : Nat, (x ^ 2 * v_nat) % p = u_nat)) →\n        result.1.val = 0#u8 ∧ (r_nat ^ 2 * v_nat) % p = (i_nat * u_nat) % p) ⦄ := by ...",
    "spec_file": "Curve25519Dalek/Specs/Field/FieldElement51/SqrtRatioi.lean",
-   "spec_docstring": null,
+   "spec_docstring":
+   "/-- **Spec theorem for `curve25519_dalek::field::FieldElement51::sqrt_ratio_i`**\n• The function succeeds (no panic) for limb-bounded inputs `u, v` with limbs `< 2^54`\n• Output limbs are bounded by `2^53 - 1`\n• The result `r` is non-negative (`r_nat % 2 = 0`)\n• If `u ≡ 0 (mod p)`, then `c.1 = 1` and `r ≡ 0 (mod p)`\n• If `u ≢ 0` and `v ≡ 0 (mod p)`, then `c.1 = 0` and `r ≡ 0 (mod p)`\n• If `u ≢ 0`, `v ≢ 0`, and `u/v` is a square, then `c.1 = 1` and `r^2 * v ≡ u (mod p)`\n• If `u ≢ 0`, `v ≢ 0`, and `u/v` is not a square, then `c.1 = 0` and\n  `r^2 * v ≡ SQRT_M1 * u (mod p)`\n-/",
    "source": "curve25519-dalek/src/field.rs",
    "rust_name":
    "curve25519_dalek::field::{curve25519_dalek::backend::serial::u64::field::FieldElement51}::sqrt_ratio_i",
