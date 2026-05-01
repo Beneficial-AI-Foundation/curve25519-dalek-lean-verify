@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2026 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Hoang Le Truong
 -/
@@ -9,57 +9,49 @@ import Curve25519Dalek.Math.Edwards.Representation
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ONE
 
-/-! # Spec Theorem for `AffinePoint::to_edwards`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::to_edwards`
 
-Specification and proof for `edwards.affine.AffinePoint.to_edwards`.
+Converts an affine Edwards point with coordinates `(x, y)` to extended twisted Edwards
+coordinates `(X, Y, Z, T)` by setting
 
-This function converts an affine Edwards point (x, y) to extended twisted Edwards
-coordinates (X, Y, Z, T) = (x, y, 1, x·y), lifting from affine to projective representation.
+  `X = x`,  `Y = y`,  `Z = 1`,  `T = x · y (mod p)`,
 
-**Source**: curve25519-dalek/src/edwards/affine.rs, lines 60:4-67:5
+where `p = 2^255 - 19`. This lifts the affine representation of the point to the
+extended projective representation used internally by the Edwards group law.
 
+Source: "curve25519-dalek/src/edwards/affine.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
-namespace curve25519_dalek.edwards.affine.AffinePoint
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.backend.serial.u64.field.FieldElement51
 
-/-
-natural language description:
-
-    Converts an affine Edwards point with coordinates (x, y) to extended twisted
-    Edwards coordinates (X, Y, Z, T) by setting:
-      X = x, Y = y, Z = 1, T = x * y (mod p)
-    where p = 2^255 - 19.
-
-natural language specs:
-
-    When the input is a valid AffinePoint with limbs satisfying the tighter < 2^53 bound:
-      - Structurally, X = self.x and Y = self.y (direct Rust copies)
-      - The resulting EdwardsPoint is valid (IsValid)
-      - The conversion preserves the represented mathematical point:
-        result.toPoint = self.toPoint in `Point Ed25519`
--/
-
+/-- Local helper: weakened spec for `ONE` with `2^53` limb bounds, suitable for
+feeding into the `to_edwards` proof. -/
 @[step]
-private lemma ONE_bounds_spec :
-    ONE ⦃ result => Field51_as_Nat result = 1 ∧ ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
+private theorem ONE_bounds_spec :
+    ONE ⦃ (result : FieldElement51) =>
+      Field51_as_Nat result = 1 ∧
+      ∀ i < 5, result[i]!.val < 2 ^ 53 ⦄ := by
   unfold ONE from_limbs
   simp only [spec_ok]
   decide
 
-/-- **Spec and proof concerning `edwards.affine.AffinePoint.to_edwards`**:
-- No panic when `self` is a valid AffinePoint and its limbs are < 2^53
-- Structural: `result.X = self.x` and `result.Y = self.y` (direct Rust copies)
-- The resulting EdwardsPoint is valid: `result.IsValid`
-- Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)
+namespace curve25519_dalek.edwards.affine.AffinePoint
+
+/-- **Spec theorem for `curve25519_dalek::edwards::affine::AffinePoint::to_edwards`**
+• No panic when `self` is a valid AffinePoint and its limbs are < 2^53
+• `result.X = self.x` (direct Rust copy of the affine `x` coordinate)
+• `result.Y = self.y` (direct Rust copy of the affine `y` coordinate)
+• The resulting EdwardsPoint is valid: `result.IsValid`
+• Math bridge: `result.toPoint = self.toPoint` (same curve point in `Point Ed25519`)
 -/
 @[step]
 theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
-  (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
-  (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
-    to_edwards self ⦃ result =>
+    (hx53 : ∀ i < 5, self.x[i]!.val < 2 ^ 53)
+    (hy53 : ∀ i < 5, self.y[i]!.val < 2 ^ 53) :
+    to_edwards self ⦃ (result : EdwardsPoint) =>
       result.X = self.x ∧
       result.Y = self.y ∧
       result.IsValid ∧
@@ -70,9 +62,9 @@ theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
   step as ⟨T, hT_mod, hT_bounds⟩
   step as ⟨Z, hZ_val, hZ_bounds⟩
   have hZ_F : Z.toField = 1 := by
-    unfold FieldElement51.toField; rw [hZ_val]; exact Nat.cast_one
+    unfold toField; rw [hZ_val]; exact Nat.cast_one
   have hT_F : T.toField = self.x.toField * self.y.toField := by
-    unfold FieldElement51.toField
+    unfold toField
     have h := Edwards.lift_mod_eq _ _ hT_mod
     push_cast at h; exact h
   have hres_valid : ({ X := self.x, Y := self.y, Z := Z, T := T } : EdwardsPoint).IsValid := {
@@ -86,7 +78,7 @@ theorem to_edwards_spec (self : AffinePoint) (hself : self.IsValid)
   }
   refine ⟨hres_valid, ?_⟩
   have ⟨hpx, hpy⟩ := EdwardsPoint.toPoint_of_isValid hres_valid
-  unfold AffinePoint.toPoint
+  unfold toPoint
   rw [dif_pos hself]
   ext
   · simp [hpx, hZ_F]
