@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Filippo A. E. Nuccio
 -/
@@ -11,21 +11,23 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Neg
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Mul
 import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.ConditionalAssign
 
-/-! # Spec Theorem for `CompressedEdwardsY::decompress::step_2`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::decompress::step_2`
 
-Specification and proof for the second step of `CompressedEdwardsY::decompress`.
+The final step of `CompressedEdwardsY::decompress`. Given a `CompressedEdwardsY`
+together with the field elements `X`, `Y`, `Z` produced by `step_1`, this
+function:
 
-This function performs the final decompression step which:
-1. Extracts the sign bit from the compressed representation (byte 31, bit 7)
-2. Conditionally negates the x-coordinate according to the sign bit
-3. Computes T = X * Y
-4. Returns the complete EdwardsPoint in extended coordinates (X, Y, Z, T)
+- Takes a `CompressedEdwardsY` and field elements `X`, `Y`, `Z` from `step_1`
+- Extracts the sign bit from the high bit of byte 31 of the compressed
+  representation
+- Since `sqrt_ratio_i` returns the nonnegative square root, conditionally
+  negates `X` according to the sign bit so that the recovered x-coordinate
+  matches the encoded sign
+- Computes `T = X * Y` (the product of the x and y coordinates)
+- Returns an `EdwardsPoint` in extended coordinates `(X, Y, Z, T)`
 
-Ported from the Verus spec in dalek-lite/curve25519-dalek/src/edwards.rs (lines 507-539),
-which asserts: result.X = if sign then field_neg(X) else X, result.T = field_mul(result.X, Y),
-Y and Z unchanged, limb bounds 52-bit.
-
-**Source**: curve25519-dalek/src/edwards.rs, lines 230-248
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -33,27 +35,7 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithMulSharedAFieldEle
 open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithNegFieldElement51
 open curve25519_dalek.backend.serial.u64.field
 open Edwards
-
 namespace curve25519_dalek.edwards.CompressedEdwardsY
-
-/-
-Natural language description:
-
-    - Takes a CompressedEdwardsY and field elements X, Y, Z from step_1
-    - Extracts the sign bit from the high bit of byte 31 of the compressed representation
-    - Since sqrt_ratio_i returns the nonnegative square root, conditionally negates X
-      according to the sign bit to match the encoded sign
-    - Computes T = X * Y (the product of x and y coordinates)
-    - Returns an EdwardsPoint with coordinates (X, Y, Z, T)
-
-Natural language specs (ported from Verus):
-
-    - The function always succeeds (no panic) given bounded inputs
-    - result.X.toField = if sign_bit then -X.toField else X.toField
-    - result.T.toField = result.X.toField * Y.toField
-    - Y and Z are unchanged
-    - Output bounds: result.X limbs ≤ 2^53-1, result.T limbs < 2^52
--/
 
 private lemma toField_neg
     {X xneg : FieldElement51}
@@ -75,27 +57,28 @@ private lemma toField_mul
   have heq := lift_mod_eq _ _ h
   push_cast at heq; exact heq
 
-/-- **Spec for `edwards.decompress.step_2`** (ported from Verus):
-- Returns an EdwardsPoint with coordinates (X', Y, Z, T) where:
-  - Y and Z are unchanged from the inputs
-  - X'.toField = if sign_bit then -X.toField else X.toField
-  - X' limbs ≤ 2^53 - 1
-  - T.toField = X'.toField * Y.toField
-  - T limbs < 2^52
+/-- **Spec theorem for `curve25519_dalek::edwards::decompress::step_2`**
+• The function always succeeds (no panic) given the bounded inputs `hX` and `hY`
+• `result.Y = Y` is unchanged
+• `result.Z = Z` is unchanged
+• If `sign_bit` is true then `result.X.toField = -X.toField`, else `result.X = X`
+• `result.X` has bounded limbs: `∀ i < 5, result.X[i]!.val ≤ 2^53 - 1`
+• `result.T.toField = result.X.toField * Y.toField`
+• `result.T` has bounded limbs: `∀ i < 5, result.T[i]!.val < 2^52`
 -/
 @[step]
 theorem step_2_spec
-    (repr : edwards.CompressedEdwardsY)
-    (X : backend.serial.u64.field.FieldElement51)
-    (Y : backend.serial.u64.field.FieldElement51)
-    (Z : backend.serial.u64.field.FieldElement51)
-    (bytes : Aeneas.Std.Array U8 32#usize)
+    (repr : CompressedEdwardsY)
+    (X : FieldElement51)
+    (Y : FieldElement51)
+    (Z : FieldElement51)
+    (bytes : Array U8 32#usize)
     (sign_bit : Bool)
     (h_repr : repr.as_bytes = ok bytes)
     (h_byter : sign_bit = (bytes[31]!.val.testBit 7))
     (hX : ∀ i < 5, X[i]!.val ≤ 2 ^ 53 - 1)
     (hY : ∀ i < 5, Y[i]!.val < 2 ^ 51) :
-    edwards.decompress.step_2 repr X Y Z ⦃ result =>
+    edwards.decompress.step_2 repr X Y Z ⦃ (result : EdwardsPoint) =>
       result.Y = Y ∧
       result.Z = Z ∧
       (if sign_bit then

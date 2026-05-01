@@ -1,7 +1,7 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
-Authors: AI Assistant
+Authors: TBA
 -/
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
@@ -16,26 +16,26 @@ import Curve25519Dalek.Specs.Backend.Serial.U64.Field.FieldElement51.Add
 import Curve25519Dalek.Specs.Backend.Serial.U64.Constants.EdwardsD
 import Curve25519Dalek.Specs.Field.FieldElement51.SqrtRatioi
 
-/-! # Spec Theorem for `CompressedEdwardsY::decompress::step_1`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::decompress::step_1`
 
-Specification for the first step of `CompressedEdwardsY::decompress`.
+The first step of `CompressedEdwardsY::decompress`. Given a 32-byte
+`CompressedEdwardsY` input, this function:
 
-This function performs the initial decompression step which:
-1. Extracts the y-coordinate from the compressed representation
-2. Computes u = y² - 1
-3. Computes v = dy² + 1 where d is the Edwards curve constant
-4. Computes the x-coordinate using sqrt_ratio_i(u, v)
-5. Returns a validity flag and the coordinates (X, Y, Z)
+- Extracts the y-coordinate `Y` from the byte array via `from_bytes` (masking
+  the top bit)
+- Sets `Z = 1` (projective coordinate)
+- Computes `YY = Y²`
+- Computes `u = YY - Z = y² - 1`
+- Computes `v = d·YY + Z = d·y² + 1`, where `d` is the Edwards curve constant
+- Computes `(is_valid_y_coord, X) = sqrt_ratio_i(u, v)`
+- Returns `(is_valid_y_coord, X, Y, Z)`
 
-The twisted Edwards curve equation is: -x² + y² = 1 + d·x²·y²
-Rearranging for x²: x² = (y² - 1) / (d·y² + 1)
-So u is the numerator and v the denominator of x².
+The twisted Edwards curve equation `-x² + y² = 1 + d·x²·y²` rearranges to
+`x² = (y² - 1) / (d·y² + 1)`, so `u` is the numerator and `v` the denominator
+of `x²`.
 
-Ported from the Verus spec in dalek-lite/curve25519-dalek/src/edwards.rs (lines 359-392),
-which asserts curve-level properties: `is_on_edwards_curve(X, Y)` and
-`is_valid_edwards_y_coordinate(Y)`.
-
-**Source**: curve25519-dalek/src/edwards.rs, lines 216-227
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
@@ -47,55 +47,31 @@ open curve25519_dalek.Shared0FieldElement51.Insts.CoreOpsArithAddSharedAFieldEle
 open curve25519_dalek.backend.serial.u64.field
 open curve25519_dalek.field.FieldElement51
 open Edwards
-
 namespace curve25519_dalek.edwards.CompressedEdwardsY
 
-/-
-Natural language description:
-
-    - Takes a CompressedEdwardsY (32-byte array) as input
-    - Extracts the y-coordinate from the byte array via from_bytes (masks top bit)
-    - Sets Z = 1 (projective coordinate)
-    - Computes YY = Y²
-    - Computes u = YY - Z = y² - 1
-    - Computes v = d·YY + Z = d·y² + 1, where d is the Edwards curve constant
-    - Computes (is_valid_y_coord, X) = sqrt_ratio_i(u, v)
-    - Returns (is_valid_y_coord, X, Y, Z)
-
-Natural language specs (ported from Verus):
-
-    - The function always succeeds (no panic) for any 32-byte input
-    - Y encodes the y-coordinate from the input bytes (mod p)
-    - Z = 1 (the multiplicative identity)
-    - is_valid_y_coord = 1 iff there exists an x such that (x, y) is on the curve
-    - If is_valid_y_coord = 1, then (X, Y) is on the twisted Edwards curve
-    - X has even parity (non-negative square root)
-    - Output bounds: Y limbs < 2^51, Z limbs < 2^51, X limbs ≤ 2^53-1
--/
-
-/-- **Spec for `edwards.decompress.step_1`**. No panic.
-
-Returns a tuple `(is_valid_y_coord, X, Y, Z)` — let `x := X.toField`, `y := Y.toField`.
-
-- `Y` is the field element decoded from the low 255 bits of `cey`:
-  `Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]`, with `Y` limbs `< 2^51`.
-- `Z` is the multiplicative identity: `Field51_as_Nat Z = 1`, with `Z` limbs `< 2^51`.
-- `X` is the non-negative square root produced by `sqrt_ratio_i`:
-  limbs `≤ 2^53 - 1` (inherited from `sqrt_ratio_i_spec'` — see
-  `Ed_audit_ref/README.md` DEFER-1), parity `(Field51_as_Nat X % p) % 2 = 0`.
-- `is_valid_y_coord.val = 1` iff `y` is a valid Edwards y-coordinate, i.e. there
-  exists some `x'` satisfying the twisted Edwards curve equation
-  `a·x'^2 + y^2 = 1 + d·x'^2·y^2`.
-- When valid, the specific square root returned by `sqrt_ratio_i`, namely `(x, y)`,
-  satisfies that same equation.
+/-- **Spec theorem for `curve25519_dalek::edwards::decompress::step_1`**
+• The function always succeeds (no panic) for any 32-byte input
+• `Y` decodes the low 255 bits of `repr`:
+  `Field51_as_Nat Y ≡ (U8x32_as_Nat repr % 2^255) [MOD p]`
+• `Y` limbs are reduced: `∀ i < 5, Y[i]!.val < 2^51`
+• `Z` is the multiplicative identity: `Field51_as_Nat Z = 1`
+• `Z` limbs are reduced: `∀ i < 5, Z[i]!.val < 2^51`
+• `X` (the non-negative square root produced by `sqrt_ratio_i`) has bounded
+  limbs: `∀ i < 5, X[i]!.val ≤ 2^53 - 1`
+• `X` has even parity: `(Field51_as_Nat X % p) % 2 = 0`
+• `is_valid_y_coord.val = 1` iff the encoded `y` is a valid Edwards
+  y-coordinate, i.e. some `x'` satisfies `a·x'² + y² = 1 + d·x'²·y²`
+• When `is_valid_y_coord.val = 1`, the returned `(x, y)` (with
+  `x := X.toField`, `y := Y.toField`) satisfies `a·x² + y² = 1 + d·x²·y²`
 -/
 @[step]
-theorem step_1_spec (cey : edwards.CompressedEdwardsY) :
-    edwards.decompress.step_1 cey ⦃ result =>
+theorem step_1_spec (repr : CompressedEdwardsY) :
+    decompress.step_1 repr ⦃ (result : subtle.Choice ×
+        FieldElement51 × FieldElement51 × FieldElement51) =>
       let (is_valid_y_coord, X, Y, Z) := result
       let x := X.toField
       let y := Y.toField
-      Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2 ^ 255) [MOD p] ∧
+      Field51_as_Nat Y ≡ (U8x32_as_Nat repr % 2 ^ 255) [MOD p] ∧
       (∀ i < 5, Y[i]!.val < 2 ^ 51) ∧
       Field51_as_Nat Z = 1 ∧
       (∀ i < 5, Z[i]!.val < 2 ^ 51) ∧
@@ -105,8 +81,8 @@ theorem step_1_spec (cey : edwards.CompressedEdwardsY) :
         ∃ x' : CurveField, Ed25519.a * x' ^ 2 + y ^ 2 = 1 + Ed25519.d * x' ^ 2 * y ^ 2) ∧
       (is_valid_y_coord.val = 1#u8 →
         Ed25519.a * x ^ 2 + y ^ 2 = 1 + Ed25519.d * x ^ 2 * y ^ 2) ⦄ := by
-  unfold edwards.decompress.step_1
-  let* ⟨ a, a_post ⟩ ← edwards.CompressedEdwardsY.as_bytes_spec
+  unfold decompress.step_1
+  let* ⟨ a, a_post ⟩ ← as_bytes_spec
   let* ⟨ Y, Y_mod, Y_bounds ⟩ ← from_bytes_spec
   let* ⟨ Z, Z_val, Z_bounds ⟩ ← ONE_spec
   let* ⟨ YY, YY_mod, YY_bounds ⟩ ← square_spec
@@ -191,7 +167,7 @@ theorem step_1_spec (cey : edwards.CompressedEdwardsY) :
           rw [hf0] at h_flag; exact absurd h_flag (by decide)
   -- Discharge the 8 postconditions
   refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩
-  · -- 1. Field51_as_Nat Y ≡ (U8x32_as_Nat cey % 2^255) [MOD p]
+  · -- 1. Field51_as_Nat Y ≡ (U8x32_as_Nat repr % 2^255) [MOD p]
     rw [a_post] at Y_mod
     exact Y_mod
   · -- 2. ∀ i < 5, Y[i]!.val < 2^51
