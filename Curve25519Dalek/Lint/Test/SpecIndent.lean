@@ -1,0 +1,183 @@
+/-
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Zhang-Liao
+-/
+import Aeneas
+import Curve25519Dalek.Lint.Basic
+
+/-!
+# Tests for `linter.curve25519.specIndent`
+
+Tests for the four indentation checks on `@[step]` spec theorems.  Each `#guard_msgs` block
+targets exactly one violation so the expected-output annotation stays minimal.
+
+This module docstring includes a `Source:` line so that `linter.curve25519.specSourceDoc`
+does **not** fire here.
+
+Source: curve25519-dalek/src/backend/serial/u64/field.rs
+-/
+
+open Aeneas Aeneas.Std Result Aeneas.Std.WP
+
+-- Two minimal dummy functions for the test cases below.
+private def dummyI (n : Nat) : Result Nat := .ok n
+private def dummyP (n : Nat) : Result (Nat × Nat) := .ok ⟨n, n⟩
+
+/-! ## Check 1 — continuation line at wrong column -/
+
+/--
+warning: Continuation line is at column 2, expected 4. Arguments, preconditions, and the function application line on a new line should be indented 4 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 1: `(_h : n > 0)` wraps to a new line but uses only 2 spaces.
+@[step]
+theorem dummyI_binder_wrong_spec (n : Nat)
+  (_h : n > 0) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+  simp [dummyI]
+
+-- No warning: `(_h : n > 0)` starts on the theorem-keyword line, so the linter
+-- does not flag it — only binders whose node begins on a new line are checked.
+#guard_msgs in
+@[step]
+theorem dummyI_binder_ok_spec (n : Nat) (_h
+: n > 0) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+  simp [dummyI]
+
+/-! ## Check 1 (cont.) — function application line at wrong column -/
+
+/--
+warning: Continuation line is at column 2, expected 4. Arguments, preconditions, and the function application line on a new line should be indented 4 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 1: type term is on a new line but only 2 spaces deep.
+@[step]
+theorem dummyI_type_wrong_spec (n : Nat) :
+  dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+  simp [dummyI]
+
+-- No warning: type term is correctly at column 4.
+#guard_msgs in
+@[step]
+theorem dummyI_type_ok_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+  simp [dummyI]
+
+/-! ## Check 3 — postcondition at wrong column -/
+
+/-! ### Check 3a — first postcondition body at wrong column -/
+
+/--
+warning: Postcondition body is at column 8, expected 6. The postcondition body after `=>` should be indented 6 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 3a: WP body `r = n` is on a new line but at column 8, not 6.
+@[step]
+theorem dummyI_postcond_body_wrong_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+        r = n ⦄ := by
+  simp [dummyI]
+
+-- No warning: postcondition body is correctly at column 6.
+#guard_msgs in
+@[step]
+theorem dummyI_postcond_body_ok_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ∧
+      r = n ∧ 1 = 1 ⦄ := by
+  simp [dummyI]
+
+/-! ### Check 3b — `∧` postcondition RHS at wrong column -/
+
+/--
+warning: Postcondition conjunct is at column 8, expected 6. Conjunction operands on new lines should be indented 6 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 3b: `∧` RHS `r.2 = n` wraps to a new line at column 8.
+-- The WP body `r.1 = n` is at column 6 (correct), so check 3a does not fire.
+@[step]
+theorem dummyP_postcond_wrong_spec (n : Nat) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n ∧
+        r.2 = n ⦄ := by
+  simp [dummyP]
+
+-- No warning: ∧ RHS is correctly at column 6.
+#guard_msgs in
+@[step]
+theorem dummyP_postcond_ok_spec (n : Nat) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n ∧ r.2 = n ⦄ := by
+  simp [dummyP]
+
+/-! ## Check 4 — proof body after `by` at wrong column -/
+
+/--
+warning: Proof body is at column 4, expected 2. Tactics after `by` should be indented 2 spaces per the spec theorem style guide.
+
+Note: This linter can be disabled with `set_option linter.curve25519.specIndent false`
+-/
+#guard_msgs in
+-- Triggers `specIndent` check 4: first tactic is at column 4 instead of 2.
+@[step]
+theorem dummyI_proof_wrong_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+    simp [dummyI]
+
+-- No warning: proof body is correctly at column 2.
+#guard_msgs in
+@[step]
+theorem dummyI_proof_ok_spec (n : Nat) :
+    dummyI n ⦃ (r : Nat) =>
+      r = n ⦄ := by
+  simp [dummyI]
+
+/-! ## Suppression -/
+
+-- No warning expected: the whole indentation linter is suppressed.
+#guard_msgs in
+set_option linter.curve25519.specIndent false in
+@[step]
+theorem dummyI_suppressed_spec (n : Nat)
+  (_h : n > 0) :
+  dummyI n ⦃ (r : Nat) => r = n ⦄ := by
+    simp [dummyI]
+
+/-! ## Fully-correct canonical layout — no warnings at all -/
+
+#guard_msgs in
+@[step]
+theorem dummyP_canonical_spec (n : Nat)
+    (_h : n > 0) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n ∧
+      (r.2 = n ∧ 1 = 1) ∧
+      2 = 2 ⦄ := by
+  simp [dummyP]
+
+#guard_msgs in
+@[step]
+theorem dummyP_canonical2_spec
+    (n : Nat)
+    (_h : n > 0) :
+    dummyP n ⦃ (r : Nat × Nat) =>
+      r.1 = n ∧
+      (r.2 = n ∧ 1 = 1) ∧
+      2 = 2 ⦄ := by
+  simp
+  simp [dummyP]

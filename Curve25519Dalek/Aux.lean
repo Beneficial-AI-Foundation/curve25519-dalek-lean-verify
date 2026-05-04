@@ -5,6 +5,7 @@ Authors: Oliver Butterley, Zhang-Liao, Markus Ferdinand Dablander, Hoang Le Truo
   Alessandro D'Angelo
 -/
 import Aeneas
+import Curve25519Dalek.Lint.Basic
 import Curve25519Dalek.Math.Basic
 import Mathlib.Data.Nat.Digits.Lemmas
 import Mathlib.Algebra.Order.BigOperators.Group.Finset
