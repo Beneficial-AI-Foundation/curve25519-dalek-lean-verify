@@ -54,6 +54,30 @@ attribute [array_post_nf]
   one_ne_zero zero_ne_one
   not_false_eq_true
 
+/-- Build the simp call from a (possibly empty) array of extra args.
+Used by both forms of `array_post_nf` below.
+
+We concatenate `extras` with the auto-collected equational hypotheses into
+a single array, then splice once with `$args,*`. Splicing two arrays
+separately (`$extras,*, $eqs,*`) would leave a stray comma when one side
+is empty, which is a syntax error in `simp only [...]`. -/
+private def runArrayPostNf
+    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma)) : TacticM Unit :=
+  withMainContext do
+    let lctx ← getLCtx
+    let mut eqLemmas : TSyntaxArray ``Lean.Parser.Tactic.simpLemma := #[]
+    for decl in lctx do
+      if decl.isImplementationDetail then continue
+      let type ← instantiateMVars decl.type
+      if type.isAppOf ``Eq then
+        let lem ← `(Lean.Parser.Tactic.simpLemma|
+                     $(mkIdent decl.userName):term)
+        eqLemmas := eqLemmas.push lem
+    let allArgs : TSyntaxArray ``Lean.Parser.Tactic.simpLemma :=
+      extras ++ eqLemmas
+    evalTactic (← `(tactic|
+      try simp only [array_post_nf, $allArgs,*]))
+
 /--
 `array_post_nf` normalizes Aeneas array read-after-write expressions of the form
 `((arr.set i a).set j b ...)[k]! = e` arising from `progress`/`step*` chains.
@@ -65,9 +89,9 @@ Behavior (stage 1):
    (`_ = _`). This catches `progress`/`step*` post-condition equations
    (currently named `*_post`/`*_post<N>`, but the test is shape-based so
    it survives Aeneas naming changes).
-2. Fire `simp only [array_post_nf, <those hypotheses>]` — the registered
-   simp set (see `Curve25519Dalek/Tactics/Attr.lean`) plus the collected
-   equations.
+2. Fire `simp only [array_post_nf, <extras>, <those hypotheses>]` — the
+   registered simp set (see `Curve25519Dalek/Tactics/Attr.lean`), any
+   user-supplied extras, plus the collected equations.
 
 Closes the goal if normalization makes it `rfl`; otherwise leaves whatever
 residual for `scalar_tac`/`omega`/`grind` to pick up.
@@ -76,20 +100,18 @@ Deliberately does NOT call `subst_vars`, `simp_all`, `*`, or any arithmetic
 tactic — the simp arguments are explicit and bounded.
 
 Usage:
-```lean
+```
 have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
--- or, when a residual remains:
+-- pass extra simp lemmas (byte/bit ops not in the base set):
+have h_l1 : ... := by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow]
+-- when a residual remains:
 · array_post_nf; scalar_tac
 ```
 -/
-elab "array_post_nf" : tactic => do
-  withMainContext do
-    let lctx ← getLCtx
-    let mut eqLemmas : TSyntaxArray ``Parser.Tactic.simpLemma := #[]
-    for decl in lctx do
-      if decl.isImplementationDetail then continue
-      let type ← instantiateMVars decl.type
-      if type.isAppOf ``Eq then
-        let lem ← `(Parser.Tactic.simpLemma| $(mkIdent decl.userName):term)
-        eqLemmas := eqLemmas.push lem
-    evalTactic (← `(tactic| try simp only [array_post_nf, $eqLemmas,*]))
+syntax (name := arrayPostNf) "array_post_nf"
+  (" [" Lean.Parser.Tactic.simpLemma,* "]")? : tactic
+
+elab_rules : tactic
+  | `(tactic| array_post_nf $[[$extras,*]]?) => do
+    let extraArr := extras.map (·.getElems) |>.getD #[]
+    runArrayPostNf extraArr
