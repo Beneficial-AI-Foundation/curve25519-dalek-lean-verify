@@ -336,7 +336,7 @@ private lemma canonical_reduction_mod_p
 
 /-! ## Spec for `to_bytes` -/
 
-set_option maxHeartbeats 1550000 in -- heavy step*
+set_option maxHeartbeats 1600000 in -- heavy step*
 /-- **Spec for `backend.serial.u64.field.FieldElement51.to_bytes`**:
 
 This function converts a field element to its canonical 32-byte little-endian representation.
@@ -615,13 +615,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
     unfold bytes_match_limbs
     refine ⟨?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
             ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_, ?_⟩ <;>
-    simp only [
-      Array.set_val_eq, getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, List.getElem_set_ne, ne_eq, not_false_eq_true,
-      UScalar.ofNatCore_val_eq, U64_cast_U8, UScalar.val_or,
-      Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos,
-      Nat.reduceEqDiff, Nat.succ_ne_self,
-      one_ne_zero, OfNat.ofNat_ne_one, OfNat.ofNat_ne_zero, *]
+    array_post_nf [U64_cast_U8, UScalar.val_or]
   have hpack := byte_packing_eq limbs9 s32 hlimbs hbytes
   rw [hpack]
   -- (B) Canonical reduction in clean context
@@ -661,33 +655,16 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
         Nat.shiftRight_eq_div_pow]; agrind)
     limbs9[0]!.val limbs9[1]!.val limbs9[2]!.val limbs9[3]!.val limbs9[4]!.val
     -- hl0..hl4: each resolves a limb's carry chain (array updates → &&&→% via hmask, >>>→/)
-    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
-    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
-    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, one_ne_zero, OfNat.ofNat_ne_zero,
-    land_pow_two_sub_one_eq_mod, *])
-    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
-    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
-    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, zero_ne_one, OfNat.ofNat_ne_one,
-    land_pow_two_sub_one_eq_mod, *])
-    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
-    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
-    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
-    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
-    land_pow_two_sub_one_eq_mod, *])
-    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
-    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
-    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff,
-    Nat.succ_ne_self, zero_ne_one, OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat,
-    land_pow_two_sub_one_eq_mod, *])
-    (by simp only [Array.getElem!_Nat_eq, Array.set_val_eq, UScalar.ofNatCore_val_eq,
-    List.length_set, List.Vector.length_val, getElem!_pos, ne_eq, not_false_eq_true,
-    List.getElem_set_ne, List.getElem_set_self, UScalar.val_and, Nat.shiftRight_eq_div_pow,
-    Nat.reduceLT, Nat.lt_add_one, Nat.one_lt_ofNat, Nat.ofNat_pos, Nat.reduceEqDiff, zero_ne_one,
-    OfNat.one_ne_ofNat, OfNat.zero_ne_ofNat, land_pow_two_sub_one_eq_mod, *])
+    (by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow,
+        land_pow_two_sub_one_eq_mod])
+    (by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow,
+        land_pow_two_sub_one_eq_mod])
+    (by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow,
+        land_pow_two_sub_one_eq_mod])
+    (by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow,
+        land_pow_two_sub_one_eq_mod])
+    (by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow,
+        land_pow_two_sub_one_eq_mod])
   -- Unfold Field51_as_Nat/p/ModEq everywhere so hcanon (explicit sums) and
   -- fe_post2 (Field51_as_Nat) are in the same form. Then omega chains them.
   obtain ⟨hmod, hlt⟩ := hcanon
