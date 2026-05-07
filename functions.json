@@ -4866,7 +4866,7 @@
    "theorem BASEPOINT_ORDER_PRIVATE_spec :\n    U8x32_as_Nat BASEPOINT_ORDER_PRIVATE.bytes = L := by ...",
    "spec_file": "Curve25519Dalek/Specs/Constants/BASEPOINT_ORDER_PRIVATE.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `constants.BASEPOINT_ORDER_PRIVATE`**:\n    • The byte representation of BASEPOINT_ORDER_PRIVATE, interpreted as a little-endian\n      natural number via U8x32_as_Nat, equals the group order L.\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::constants::BASEPOINT_ORDER_PRIVATE`**\n• The byte representation of BASEPOINT_ORDER_PRIVATE, interpreted as a little-endian\n  natural number via U8x32_as_Nat, equals the group order L.\n• The byte representation is canonical, i.e., U8x32_as_Nat(bytes) < 2^256\n  (which follows from the previous property since L < 2^256).\n-/",
    "source": "curve25519-dalek/src/constants.rs",
    "rust_name": "curve25519_dalek::constants::BASEPOINT_ORDER_PRIVATE",
    "lines": "L75-L81",
@@ -4886,7 +4886,7 @@
    "spec_file":
    "Curve25519Dalek/Specs/Constants/RISTRETTO_BASEPOINT_POINT.lean",
    "spec_docstring":
-   "/-- **Spec and proof concerning `constants.RISTRETTO_BASEPOINT_POINT`**:\n    • constants.RISTRETTO_BASEPOINT_POINT is a valid RistrettoPoint (which amongst other things\n      implies that it fulfills the curve equation)\n    • constants.RISTRETTO_BASEPOINT_POINT has the same representation as the Edwards basepoint\n    • constants.RISTRETTO_BASEPOINT_POINT is not the identity point (i.e., the EdwardsPoint representing the\n      basepoint is not in the same Ristretto equivalence class as the EdwardsPoint identity point, which\n      is equivalent to saying that the difference between both points is not in E[4])\n-/",
+   "/-- **Spec theorem for `curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT`**\n• The constant is successfully computed (no panic)\n• The output is a valid RistrettoPoint (which amongst other things implies that it fulfills\n  the curve equation)\n• The output has the same representation as the Edwards basepoint\n• The output is not the identity point (i.e., the EdwardsPoint representing the basepoint is\n  not in the same Ristretto equivalence class as the EdwardsPoint identity point, which is\n  equivalent to saying that the difference between both points is not in E[4])\n-/",
    "source": "curve25519-dalek/src/constants.rs",
    "rust_name": "curve25519_dalek::constants::RISTRETTO_BASEPOINT_POINT",
    "lines": "L66-L66",
