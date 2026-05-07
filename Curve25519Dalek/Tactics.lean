@@ -5,6 +5,8 @@ Authors: Oliver Butterley
 -/
 import Lean
 import Mathlib.Tactic
+import Aeneas
+import Curve25519Dalek.Tactics.Attr
 
 /-! # Custom Tactics
 
@@ -12,6 +14,7 @@ This file contains custom tactics used throughout the verification project.
 -/
 
 open Lean Elab Tactic Meta
+open Aeneas Aeneas.Std
 
 /--
 Expand a universal quantifier hypothesis `h : ∀ i < n, P i` into individual hypotheses
@@ -33,3 +36,45 @@ elab "expand " h:ident " with " n:num : tactic => do
   for i in [:n] do
     let newName := h.getId.appendAfter s!"_{i}"
     evalTactic (← `(tactic| have $(mkIdent newName) := $h $(quote i) (by omega)))
+
+-- The `array_post_nf` simp attribute is registered in
+-- `Curve25519Dalek/Tactics/Attr.lean` (Lean 4 forbids using a `register_simp_attr`
+-- attribute in the same file it's declared). Tag upstream lemmas
+-- (core / std / Aeneas) here so the simp set is self-contained. Project-local
+-- helpers in `Curve25519Dalek/Aux.lean` are tagged at their definition sites.
+attribute [array_post_nf]
+  Array.getElem!_Nat_eq Array.set_val_eq
+  List.length_set List.Vector.length_val
+  List.getElem_set_self List.getElem_set_ne
+  UScalar.ofNatCore_val_eq getElem!_pos ne_eq
+  Nat.reduceLT Nat.reduceEqDiff Nat.succ_ne_self
+  Nat.lt_add_one Nat.ofNat_pos Nat.one_lt_ofNat
+  OfNat.ofNat_ne_zero OfNat.ofNat_ne_one
+  OfNat.zero_ne_ofNat OfNat.one_ne_ofNat
+  one_ne_zero zero_ne_one
+  not_false_eq_true
+
+/--
+`array_post_nf` normalizes Aeneas array read-after-write expressions of the form
+`((arr.set i a).set j b ...)[k]! = e` arising from `progress`/`step*` chains.
+Encapsulates the recurring `simp only [Array.set_val_eq, List.getElem_set_*, …]`
+boilerplate scattered across `Curve25519Dalek/Specs/`.
+
+Stage 1 only — pure syntactic normalization via lemmas tagged
+`@[array_post_nf]` (see `Curve25519Dalek/Aux.lean` and the registrations above).
+Closes the goal if normalization makes it `rfl`; otherwise leaves whatever
+residual for `scalar_tac`/`omega`/`grind` to pick up.
+
+Deliberately does NOT call `subst_vars`, `simp_all`, `*`, or any arithmetic
+tactic — call sites stay composable and the info view stays readable.
+
+Usage:
+```lean
+have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
+-- or, when a residual remains:
+· array_post_nf; scalar_tac
+```
+-/
+elab "array_post_nf" : tactic => do
+  withMainContext do
+    evalTactic (← `(tactic| try simp only [array_post_nf]))
