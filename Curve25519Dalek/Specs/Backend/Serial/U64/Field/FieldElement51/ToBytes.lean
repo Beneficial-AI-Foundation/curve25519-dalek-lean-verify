@@ -261,7 +261,8 @@ private lemma canonical_reduction_mod_p
     (hl1 : l1 = (f1 + (f0 + 19 * q) / 2 ^ 51) % 2 ^ 51)
     (hl2 : l2 = (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
     (hl3 : l3 = (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51)
-    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) % 2 ^ 51) :
+    (hl4 : l4 = (f4 + (f3 + (f2 + (f1 + (f0 + 19 * q) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51) / 2 ^ 51)
+      % 2 ^ 51) :
     (l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4) % (2 ^ 255 - 19) =
       (f0 + 2 ^ 51 * f1 + 2 ^ 102 * f2 + 2 ^ 153 * f3 + 2 ^ 204 * f4) % (2 ^ 255 - 19) ∧
     l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 < 2 ^ 255 - 19 := by
@@ -312,7 +313,8 @@ private lemma canonical_reduction_mod_p
     rw [hl4, Nat.mul_comm c4]; exact Nat.mod_add_div _ _
   -- Main telescoping: L + c4 * 2^255 = F + 19*q
   have htel : l0 + 2 ^ 51 * l1 + 2 ^ 102 * l2 + 2 ^ 153 * l3 + 2 ^ 204 * l4 +
-      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153 * ht3 + 2^204 * ht4
+      c4 * 2 ^ 255 = F + 19 * q := by linear_combination ht0 + 2^51 * ht1 + 2^102 * ht2 + 2^153
+        * ht3 + 2^204 * ht4
   -- L < 2^255 (each limb < 2^51 from masking)
   have hl0b : l0 < 2 ^ 51 := by rw [hl0]; exact Nat.mod_lt _ (by norm_num)
   have hl1b : l1 < 2 ^ 51 := by rw [hl1]; exact Nat.mod_lt _ (by norm_num)
@@ -348,7 +350,8 @@ The algorithm:
 
 Specification:
 - The function succeeds (no panic)
-- The natural number interpretation of the byte array is congruent to the field element value modulo p
+- The natural number interpretation of the byte array is congruent to the field element value
+  modulo p
 - The byte array represents the unique canonical form (0 ≤ value < p)
 -/
 @[step]
@@ -596,32 +599,11 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
       UScalarTy.U64_numBits_eq]; norm_num; bv_normalize
   -- (A) Byte packing: U8x32_as_Nat s32 = Field51_as_Nat limbs9
   -- Array resolution: limbs9[0]!=i18, [1]!=i24, [2]!=i30, [3]!=i36, [4]!=i38
-  have h_l0 : limbs9.val[0]! = i18 := by
-    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
-      limbs4_post, limbs3_post, limbs2_post, Array.set_val_eq,
-      getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
-      not_false_eq_true, one_ne_zero, OfNat.ofNat_ne_zero, Nat.ofNat_pos]
-  have h_l1 : limbs9.val[1]! = i24 := by
-    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, limbs5_post,
-      limbs4_post, Array.set_val_eq,
-      getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
-      Nat.reduceLT, not_false_eq_true, OfNat.ofNat_ne_one]
-  have h_l2 : limbs9.val[2]! = i30 := by
-    simp only [limbs9_post, limbs8_post, limbs7_post, limbs6_post, Array.set_val_eq,
-      getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
-      Nat.reduceLT, not_false_eq_true, Nat.reduceEqDiff, Nat.succ_ne_self]
-  have h_l3 : limbs9.val[3]! = i36 := by
-    simp only [limbs9_post, limbs8_post, Array.set_val_eq,
-      getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, ne_eq, List.getElem_set_ne, UScalar.ofNatCore_val_eq,
-      Nat.reduceLT, not_false_eq_true, Nat.succ_ne_self]
-  have h_l4 : limbs9.val[4]! = i38 := by
-    simp only [limbs9_post, Array.set_val_eq,
-      getElem!_pos, List.length_set, List.Vector.length_val,
-      List.getElem_set_self, UScalar.ofNatCore_val_eq, Nat.lt_add_one]
+  have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
+  have h_l1 : limbs9.val[1]! = i24 := by array_post_nf
+  have h_l2 : limbs9.val[2]! = i30 := by array_post_nf
+  have h_l3 : limbs9.val[3]! = i36 := by array_post_nf
+  have h_l4 : limbs9.val[4]! = i38 := by array_post_nf
   have hlimbs : ∀ i < 5, (limbs9.val[i]! : U64).val < 2 ^ 51 := by
     intro i hi; interval_cases i
     · rw [h_l0, i18_post1]; exact and_mask_lt_pow i17 low_51_bit_mask hmask
