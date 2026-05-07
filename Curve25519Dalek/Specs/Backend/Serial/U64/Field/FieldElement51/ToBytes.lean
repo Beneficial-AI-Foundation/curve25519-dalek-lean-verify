@@ -395,14 +395,7 @@ theorem to_bytes_spec (self : backend.serial.u64.field.FieldElement51) :
   · have h14 : (i14 : U64).val < (2^13 : ℕ) := by
       have : (i13 : U64).val < (2^64 : ℕ) := by agrind
       rw [i14_post1, Nat.shiftRight_eq_div_pow]; agrind
-    have h15 : (i15 : U64).val < (2^52 : ℕ) := by
-      simp only [i15_post, limbs_post, Array.set_val_eq] at *;
-      simp_all only [Array.getElem!_Nat_eq,
-        List.Vector.length_val, UScalar.ofNatCore_val_eq, getElem!_pos,
-        Nat.ofNat_pos, UScalarTy.U64_numBits_eq, Bvify.U64.UScalar_bv, Nat.one_lt_ofNat,
-        Nat.reduceLT, Nat.lt_add_one, Nat.reduceShiftLeft, U64.ofNat_bv, BitVec.reduceHShiftLeft,
-        List.length_set, List.getElem_set_self, Nat.not_eq, ne_eq, zero_ne_one, not_false_eq_true,
-        one_ne_zero, zero_lt_one, not_lt_zero, or_false, or_self, ↓List.getElem!_set_ne]
+    have h15 : (i15 : U64).val < (2^52 : ℕ) := by array_post_nf_all
     grind only [= U64.max_eq]
   let* ⟨ limbs1, limbs1_post ⟩ ← Array.update_spec
   let* ⟨ i17, i17_post ⟩ ← Array.index_usize_spec

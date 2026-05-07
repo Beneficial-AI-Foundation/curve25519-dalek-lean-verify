@@ -120,3 +120,46 @@ elab_rules : tactic
   | `(tactic| array_post_nf $[[$extras,*]]? $[$loc:location]?) => do
     let extraArr := extras.map (·.getElems) |>.getD #[]
     runArrayPostNf extraArr loc
+
+/-- Helper: build a `simp_all only [...]` call. Iterates the simp set to
+fixpoint across goal and hypotheses. Use only when the dependency between
+hypotheses needs the iterative simplification — costs more HB than
+`array_post_nf` on the goal alone. -/
+private def runArrayPostNfAll
+    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma)) : TacticM Unit :=
+  withMainContext do
+    let lctx ← getLCtx
+    let mut eqLemmas : TSyntaxArray ``Lean.Parser.Tactic.simpLemma := #[]
+    for decl in lctx do
+      if decl.isImplementationDetail then continue
+      let type ← instantiateMVars decl.type
+      if type.isAppOf ``Eq then
+        let lem ← `(Lean.Parser.Tactic.simpLemma|
+                     $(mkIdent decl.userName):term)
+        eqLemmas := eqLemmas.push lem
+    let allArgs : TSyntaxArray ``Lean.Parser.Tactic.simpLemma :=
+      extras ++ eqLemmas
+    evalTactic (← `(tactic|
+      try simp_all only [array_post_nf, $allArgs,*]))
+
+/--
+`array_post_nf_all` is the `simp_all only`-flavored variant of
+`array_post_nf`. Same simp set, same auto-collected equational hypotheses,
+but iterates to fixpoint over the goal AND every hypothesis (per Lean's
+`simp_all` semantics).
+
+Prefer `array_post_nf` when you only need to normalize the goal —
+`simp_all` walks every hypothesis on every iteration, which can blow up
+heartbeats with a large simp set.
+
+Use `array_post_nf_all` when (a) hypotheses need normalization to feed
+later tactics, or (b) the dependency chain requires iterative
+substitution that `simp only ... at *` would miss.
+-/
+syntax (name := arrayPostNfAll) "array_post_nf_all"
+  (" [" Lean.Parser.Tactic.simpLemma,* "]")? : tactic
+
+elab_rules : tactic
+  | `(tactic| array_post_nf_all $[[$extras,*]]?) => do
+    let extraArr := extras.map (·.getElems) |>.getD #[]
+    runArrayPostNfAll extraArr
