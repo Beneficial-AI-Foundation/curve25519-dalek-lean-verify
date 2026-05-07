@@ -57,16 +57,23 @@ attribute [array_post_nf]
 /--
 `array_post_nf` normalizes Aeneas array read-after-write expressions of the form
 `((arr.set i a).set j b ...)[k]! = e` arising from `progress`/`step*` chains.
-Encapsulates the recurring `simp only [Array.set_val_eq, List.getElem_set_*, …]`
-boilerplate scattered across `Curve25519Dalek/Specs/`.
+Encapsulates the recurring `simp only [Array.set_val_eq, List.getElem_set_*, …,
+limbs_N_post, …]` boilerplate scattered across `Curve25519Dalek/Specs/`.
 
-Stage 1 only — pure syntactic normalization via lemmas tagged
-`@[array_post_nf]` (see `Curve25519Dalek/Aux.lean` and the registrations above).
+Behavior (stage 1):
+1. Collect every local hypothesis whose type is a propositional equality
+   (`_ = _`). This catches `progress`/`step*` post-condition equations
+   (currently named `*_post`/`*_post<N>`, but the test is shape-based so
+   it survives Aeneas naming changes).
+2. Fire `simp only [array_post_nf, <those hypotheses>]` — the registered
+   simp set (see `Curve25519Dalek/Tactics/Attr.lean`) plus the collected
+   equations.
+
 Closes the goal if normalization makes it `rfl`; otherwise leaves whatever
 residual for `scalar_tac`/`omega`/`grind` to pick up.
 
 Deliberately does NOT call `subst_vars`, `simp_all`, `*`, or any arithmetic
-tactic — call sites stay composable and the info view stays readable.
+tactic — the simp arguments are explicit and bounded.
 
 Usage:
 ```lean
@@ -77,4 +84,12 @@ have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
 -/
 elab "array_post_nf" : tactic => do
   withMainContext do
-    evalTactic (← `(tactic| try simp only [array_post_nf]))
+    let lctx ← getLCtx
+    let mut eqLemmas : TSyntaxArray ``Parser.Tactic.simpLemma := #[]
+    for decl in lctx do
+      if decl.isImplementationDetail then continue
+      let type ← instantiateMVars decl.type
+      if type.isAppOf ``Eq then
+        let lem ← `(Parser.Tactic.simpLemma| $(mkIdent decl.userName):term)
+        eqLemmas := eqLemmas.push lem
+    evalTactic (← `(tactic| try simp only [array_post_nf, $eqLemmas,*]))
