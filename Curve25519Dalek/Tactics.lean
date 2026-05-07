@@ -62,7 +62,8 @@ a single array, then splice once with `$args,*`. Splicing two arrays
 separately (`$extras,*, $eqs,*`) would leave a stray comma when one side
 is empty, which is a syntax error in `simp only [...]`. -/
 private def runArrayPostNf
-    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma)) : TacticM Unit :=
+    (extras : Array (TSyntax `Lean.Parser.Tactic.simpLemma))
+    (loc : Option (TSyntax `Lean.Parser.Tactic.location)) : TacticM Unit :=
   withMainContext do
     let lctx ← getLCtx
     let mut eqLemmas : TSyntaxArray ``Lean.Parser.Tactic.simpLemma := #[]
@@ -76,7 +77,7 @@ private def runArrayPostNf
     let allArgs : TSyntaxArray ``Lean.Parser.Tactic.simpLemma :=
       extras ++ eqLemmas
     evalTactic (← `(tactic|
-      try simp only [array_post_nf, $allArgs,*]))
+      try simp only [array_post_nf, $allArgs,*] $[$loc:location]?))
 
 /--
 `array_post_nf` normalizes Aeneas array read-after-write expressions of the form
@@ -106,12 +107,16 @@ have h_l0 : limbs9.val[0]! = i18 := by array_post_nf
 have h_l1 : ... := by array_post_nf [UScalar.val_and, Nat.shiftRight_eq_div_pow]
 -- when a residual remains:
 · array_post_nf; scalar_tac
+-- target hypotheses (or all, with `at *`) like `simp only ... at`:
+array_post_nf at h
+array_post_nf [UScalar.val_or] at *
 ```
 -/
 syntax (name := arrayPostNf) "array_post_nf"
-  (" [" Lean.Parser.Tactic.simpLemma,* "]")? : tactic
+  (" [" Lean.Parser.Tactic.simpLemma,* "]")?
+  (Lean.Parser.Tactic.location)? : tactic
 
 elab_rules : tactic
-  | `(tactic| array_post_nf $[[$extras,*]]?) => do
+  | `(tactic| array_post_nf $[[$extras,*]]? $[$loc:location]?) => do
     let extraArr := extras.map (·.getElems) |>.getD #[]
-    runArrayPostNf extraArr
+    runArrayPostNf extraArr loc
