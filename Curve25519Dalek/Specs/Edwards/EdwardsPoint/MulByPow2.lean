@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2025 Beneficial AI Foundation. All rights reserved.
+Copyright 2026 The Beneficial AI Foundation. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Markus Dablander, Alessandro D'Angelo
 -/
@@ -10,36 +10,22 @@ import Curve25519Dalek.Specs.Edwards.EdwardsPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.ProjectivePoint.Double
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsProjective
 import Curve25519Dalek.Specs.Backend.Serial.CurveModels.CompletedPoint.AsExtended
-import Mathlib
 
-/-! # Spec Theorem for `EdwardsPoint::mul_by_pow_2`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2`
 
-Specification and proof for `EdwardsPoint::mul_by_pow_2`.
+Takes an `EdwardsPoint` `self` and a positive integer `k`, and returns the result of doubling
+the point `k` times (i.e., computes `[2^k] self` where `self` is the input point) via successive
+doublings.
 
-This function computes [2^k]e (the Edwards point e doubled k times for some natural k > 0)
-by successive doublings.
-
-**Source**: curve25519-dalek/src/edwards.rs:1328-1340
+Source: "curve25519-dalek/src/edwards.rs"
 -/
 
 open Aeneas Aeneas.Std Result Aeneas.Std.WP
 open Edwards curve25519_dalek.backend.serial.curve_models
-open curve25519_dalek.backend.serial.curve_models.ProjectivePoint
-open curve25519_dalek.backend.serial.u64.field
-
+  curve25519_dalek.backend.serial.curve_models.ProjectivePoint
+  curve25519_dalek.backend.serial.u64.field
 namespace curve25519_dalek.edwards.EdwardsPoint
-
-/-
-natural language description:
-
-• Takes an EdwardsPoint e and a positive integer k, and returns the result of doubling the point
-k times (i.e., computes [2^k]e where e is the input point)
-
-natural language specs:
-
-• For k = 1, returns double(e)
-• For k > 1, satisfies the recursive property: mul_by_pow_2(e, k) = double(mul_by_pow_2(e, k-1))
--/
 
 /-- Loop spec for `mul_by_pow_2_loop`: repeatedly doubles `s` via
 `ProjectivePoint.double` + `CompletedPoint.as_projective` from counter `i` up to `k - 1`.
@@ -119,14 +105,15 @@ theorem mul_by_pow_2_loop_spec
     obtain ⟨h_on, hX, hY, hZ, hpt⟩ := result_post
     exact ⟨hX, hY, hZ, h_on, hpt⟩
 
-/-- **Spec and proof concerning `edwards.EdwardsPoint.mul_by_pow_2`**:
-- For k = 1, returns the doubled point 2e for the input point e
-- For k > 1, returns a point equal to double(mul_by_pow_2(e, k-1))
+/-- **Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::mul_by_pow_2`**
+• Does not panic for a valid input point `self` and `k > 0`
+• The result is a valid `EdwardsPoint`
+• The result equals `2 ^ k` scalar-multiplied with the input point `self`
 -/
 @[step]
 theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32)
     (hself : self.IsValid) (hk : k.val > 0) :
-    mul_by_pow_2 self k ⦃ result =>
+    mul_by_pow_2 self k ⦃ (result : EdwardsPoint) =>
       result.IsValid ∧
       result.toPoint = (2 ^ k.val) • self.toPoint ⦄ := by
   unfold mul_by_pow_2
@@ -167,6 +154,5 @@ theorem mul_by_pow_2_spec (self : EdwardsPoint) (k : U32)
   fcongr 1
   rw [show k.val = (k.val - 1) + 1 from by omega, pow_succ, mul_comm]
   agrind
-
 
 end curve25519_dalek.edwards.EdwardsPoint

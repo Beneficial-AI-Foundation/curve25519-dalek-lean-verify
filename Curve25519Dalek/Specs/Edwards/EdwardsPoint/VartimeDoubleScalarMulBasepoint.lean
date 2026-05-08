@@ -6,13 +6,14 @@ Authors: Oliver Butterley, Alessandro D'Angelo, Liao Zhang
 import Curve25519Dalek.Funs
 import Curve25519Dalek.Math.Basic
 
-/-! # `EdwardsPoint::vartime_double_scalar_mul_basepoint`
+/-!
+# Spec theorem for `curve25519_dalek::edwards::EdwardsPoint::vartime_double_scalar_mul_basepoint`
 
 Computes `[a]A + [b]B` in variable time, where `B` is the Ed25519 basepoint.
 Used by Ed25519 signature verification (the canonical caller is
 `ristretto::RistrettoPoint::vartime_double_scalar_mul_basepoint`, which delegates here).
 
-**Source**: `curve25519-dalek/src/edwards.rs:1037-1047`
+Source: "curve25519-dalek/src/edwards.rs"
 
 ## Status: cannot specify yet — function not extracted
 
@@ -42,25 +43,25 @@ backends (serial / AVX2 / AVX512) via runtime backend selection, which Aeneas ca
 ## Target spec shape (for when extraction is unblocked)
 
 The Verus port at `dalek-lite/curve25519-dalek/src/edwards.rs:2853-2869` specifies:
-- **Pre**: `is_well_formed_edwards_point(*A) ∧ scalar_as_nat(a) < 2^255 ∧ scalar_as_nat(b) < 2^255`
+- **Pre**: `is_well_formed_edwards_point(*A)` ∧
+  `scalar_as_nat(a) < 2^255` ∧ `scalar_as_nat(b) < 2^255`
 - **Post**: `result.IsValid` ∧
   `result.toPoint = (U8x32_as_Nat a.bytes) • A.toPoint`
   ` + (U8x32_as_Nat b.bytes) • Edwards.basepoint`
 
-Concretely, the future Lean theorem will read:
+Concretely, the future Lean theorem will likely read:
 ```
 @[step, externally_verified] -- proven in Verus
-theorem vartime_double_scalar_mul_basepoint_spec (a : scalar.Scalar) (A : edwards.EdwardsPoint)
+theorem vartime_double_scalar_mul_basepoint_spec (a : scalar.Scalar) (A : EdwardsPoint)
     (b : scalar.Scalar) (h_A_valid : A.IsValid)
     (h_a_canonical : U8x32_as_Nat a.bytes < 2 ^ 255)
     (h_b_canonical : U8x32_as_Nat b.bytes < 2 ^ 255) :
-    vartime_double_scalar_mul_basepoint a A b ⦃ result =>
+    vartime_double_scalar_mul_basepoint a A b ⦃ (result : EdwardsPoint) =>
       result.IsValid ∧
       result.toPoint = (U8x32_as_Nat a.bytes) • A.toPoint
                        + (U8x32_as_Nat b.bytes) • _root_.Edwards.basepoint ⦄ := by
   sorry
 ```
-
 -/
 
 -- No Lean specification possible until extraction is unblocked.
