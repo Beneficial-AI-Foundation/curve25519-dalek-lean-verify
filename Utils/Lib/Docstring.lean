@@ -80,7 +80,7 @@ def parseDocstring (doc : String) : DocstringInfo :=
 
 /-- Get docstring for a constant from the environment. -/
 def getDocstring (env : Environment) (name : Name) : IO (Option String) :=
-  findDocString? env name
+  Lean.findDocString? env name
 
 /-- Get parsed docstring info for a constant. -/
 def getDocstringInfo (env : Environment) (name : Name) : IO DocstringInfo := do

@@ -11,7 +11,7 @@
   - verified: Verification status
   - notes: Additional notes
   - ignored: Whether the function is ignored ("ignored" or "")
-  - ai_proveable: AI proveability notes
+  - ai-proveable: AI proveability notes
 -/
 import Lean
 import Utils.Lib.Types
