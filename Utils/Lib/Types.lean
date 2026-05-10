@@ -10,7 +10,6 @@ import Mathlib.Tactic
 import Lean.Data.Json
 
 open Lean
-
 namespace Utils.Lib.Types
 
 /-- Information parsed from a function's Aeneas-generated docstring.

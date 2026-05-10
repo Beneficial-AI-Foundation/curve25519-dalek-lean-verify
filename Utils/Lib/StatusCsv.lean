@@ -11,7 +11,7 @@
   - verified: Verification status
   - notes: Additional notes
   - ignored: Whether the function is ignored ("ignored" or "")
-  - ai-proveable: AI proveability notes
+  - ai_proveable: AI proveability notes
 -/
 import Lean
 import Utils.Lib.Types
@@ -74,7 +74,6 @@ def splitCsvLine (line : String) : Array String := Id.run do
   let mut inQuotes := false
   let mut i := 0
   let chars := line.toList
-
   while i < chars.length do
     let c := chars[i]!
     if c == '"' then
@@ -92,7 +91,6 @@ def splitCsvLine (line : String) : Array String := Id.run do
     else
       current := current.push c
     i := i + 1
-
   -- Don't forget the last field
   fields := fields.push current
   return fields
@@ -154,8 +152,8 @@ def parseRow (line : String) : Option StatusRow :=
 /-- Convert a StatusRow to a CSV line -/
 def StatusRow.toCsvLine (row : StatusRow) : String :=
   joinCsvLine #[row.function, row.lean_name, row.source, row.lines,
-                row.spec_theorem, row.extracted, row.verified, row.notes, row.ignored, row.ai_proveable,
-                row.visibility]
+    row.spec_theorem, row.extracted, row.verified, row.notes,
+    row.ignored, row.ai_proveable, row.visibility]
 
 /-- Read and parse status.csv -/
 def readStatusFile (path : System.FilePath := defaultPath) : IO StatusFile := do
@@ -182,10 +180,11 @@ def StatusFile.getLeanNames (file : StatusFile) : Array String :=
 
 /-- Create a new StatusRow from a FunctionOutput -/
 def StatusRow.fromFunctionOutput (fn : FunctionOutput) : StatusRow :=
-  let verifiedStr := if fn.verified then "verified"
-                     else if fn.externally_verified then "externally verified"
-                     else if fn.specified then "specified"
-                     else ""
+  let verifiedStr :=
+    if fn.verified then "verified"
+    else if fn.externally_verified then "externally verified"
+    else if fn.specified then "specified"
+    else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""
   let ignoredStr := if fn.is_ignored then "ignored" else ""
   { function := fn.rust_name.getD ""
@@ -214,10 +213,11 @@ def StatusRow.sameUpdatableFields (a b : StatusRow) : Bool :=
 /-- Update an existing StatusRow with data from FunctionOutput.
     Preserves: notes, ai_proveable -/
 def StatusRow.updateFrom (row : StatusRow) (fn : FunctionOutput) : StatusRow :=
-  let verifiedStr := if fn.verified then "verified"
-                     else if fn.externally_verified then "externally verified"
-                     else if fn.specified then "specified"
-                     else ""
+  let verifiedStr :=
+    if fn.verified then "verified"
+    else if fn.externally_verified then "externally verified"
+    else if fn.specified then "specified"
+    else ""
   let extractedStr := if fn.is_relevant then "extracted" else ""
   let ignoredStr := if fn.is_ignored then "ignored" else ""
   { row with
@@ -258,7 +258,8 @@ def StatusFile.upsertFromFunction (file : StatusFile) (fn : FunctionOutput) : St
 def StatusFile.removeByLeanNames (file : StatusFile) (names : Std.HashSet String) : StatusFile :=
   { file with rows := file.rows.filter fun row => !names.contains row.lean_name }
 
-/-- Find duplicate lean_names in the StatusFile. Returns array of lean_names that appear more than once. -/
+/-- Find duplicate lean_names in the StatusFile.
+Returns array of lean_names that appear more than once. -/
 def StatusFile.findDuplicateLeanNames (file : StatusFile) : Array String := Id.run do
   let mut seen : Std.HashSet String := {}
   let mut duplicates : Std.HashSet String := {}
