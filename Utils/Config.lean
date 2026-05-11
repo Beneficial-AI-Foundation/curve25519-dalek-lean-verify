@@ -7,8 +7,13 @@
 import Lean
 import Mathlib.Tactic
 
+-- The lists below contain fully-qualified Rust paths used by tooling as data
+-- keys. Their canonical form is the long Rust path, and we want each entry to
+-- remain searchable by a single grep for the full path; splitting them across
+-- lines would defeat that. We therefore disable the long-line linter for this
+-- file only.
+set_option linter.style.longLine false
 open Lean
-
 namespace Utils.Config
 
 /-- The main module to import (contains Funs and Specs) -/
@@ -440,7 +445,7 @@ def ignoredFunctions : List String := [
   "curve25519_dalek.edwards.decompress.step_2",
   -- Scalar
   "curve25519_dalek.scalar.Scalar.non_adjacent_form",
-   -- Variable-base scalar multiplication
+  -- Variable-base scalar multiplication
   "curve25519_dalek.backend.serial.scalar_mul.variable_base.mul",
   "curve25519_dalek.backend.variable_base_mul"
 ]
